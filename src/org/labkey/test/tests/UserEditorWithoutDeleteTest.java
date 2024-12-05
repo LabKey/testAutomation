@@ -1,5 +1,6 @@
 package org.labkey.test.tests;
 
+import com.github.sardine.impl.SardineException;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -7,9 +8,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Daily;
-import org.labkey.test.components.FilesWebPart;
 import org.labkey.test.util.FileBrowserHelper;
-import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.TestUser;
 import org.labkey.test.util.core.webdav.WebDavUploadHelper;
 import org.labkey.test.util.core.webdav.WebDavUrlFactory;
@@ -45,9 +44,6 @@ public class UserEditorWithoutDeleteTest extends BaseWebDriverTest
         EDITOR_WITHOUT_DELETE.create(this)
                 .setInitialPassword()
                 .addPermission("EditorWithoutDelete", getProjectName());
-
-        goToProjectHome();
-        new PortalHelper(this).addWebPart("Files");
     }
 
     /*
@@ -57,19 +53,27 @@ public class UserEditorWithoutDeleteTest extends BaseWebDriverTest
     public void testFileDeleteWithEditorWithoutDeleteUser()
     {
         goToProjectHome();
+        goToModule("FileContent");
         impersonate(EDITOR_WITHOUT_DELETE.getEmail());
-        FilesWebPart filesWebPart = FilesWebPart.getWebPart(getDriver());
-        filesWebPart.fileBrowser().uploadFile(TEST_FILE);
+        _fileBrowserHelper.uploadFile(TEST_FILE);
         Assert.assertFalse("Delete action should not be present for " + EDITOR_WITHOUT_DELETE.getEmail(),
-                filesWebPart.fileBrowser().isActionPresent(FileBrowserHelper.BrowserAction.DELETE));
+                _fileBrowserHelper.isActionPresent(FileBrowserHelper.BrowserAction.DELETE));
 
         WebDavUploadHelper uploadHelper = new WebDavUploadHelper(WebDavUrlFactory.webDavUrlFactory(getProjectName()),
                 WebDavUtils.beginSardine(getCurrentUser()));
         uploadHelper.uploadFile(TEST_FILE);
-        uploadHelper.deleteFile(WebDavUtils.buildBaseWebDavUrl(getProjectName()) + TEST_FILE.getName(), true);
+        SardineException sardineException = uploadHelper.deleteExpectingError(WebDavUtils.buildBaseWebDavUrl(getProjectName()) + TEST_FILE.getName());
+        Assert.assertEquals("Incorrect response for deletion", 404, sardineException.getStatusCode());
         Assert.assertTrue("File should not be deleted by " + EDITOR_WITHOUT_DELETE.getEmail(),
                 uploadHelper.fileExists(WebDavUtils.buildBaseWebDavUrl(getProjectName()) + TEST_FILE.getName()));
+
         stopImpersonating();
+
+        log("Verify delete exists for admin");
+        goToProjectHome();
+        goToModule("FileContent");
+        Assert.assertTrue("Delete action should be present for " + getCurrentUser(),
+                _fileBrowserHelper.isActionPresent(FileBrowserHelper.BrowserAction.DELETE));
     }
 
     @Override
