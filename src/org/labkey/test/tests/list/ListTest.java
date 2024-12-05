@@ -685,7 +685,8 @@ public class ListTest extends BaseWebDriverTest
         assertTextPresent("query not found");
 
         log("Test exporting a nonexistent list returns a 404");
-        String exportUrl = "/" + EscapeUtil.encode(PROJECT_VERIFY) + "/query-exportRowsTsv.view?schemaName=lists&query.queryName=" + EscapeUtil.encode(LIST_NAME_COLORS);
+        String exportUrl = WebTestHelper.buildURL("query", PROJECT_VERIFY, "exportRowsTsv",
+            Map.of("schemaName", "lists", "query.queryName", LIST_NAME_COLORS));
         beginAt(exportUrl);
         assertEquals("Incorrect response code", 404, getResponseCode());
         assertTextPresent("The specified query '%s' does not exist in schema '%s'".formatted(LIST_NAME_COLORS, "lists"));
@@ -1562,7 +1563,8 @@ public class ListTest extends BaseWebDriverTest
             createList("B", Bcolumns, Bdata);
             createList("A", Acolumns, Adata);
 
-            beginAt("/query/" + EscapeUtil.encode(PROJECT_VERIFY) + "/executeQuery.view?schemaName=lists&query.queryName=A");
+            beginAt(WebTestHelper.buildURL("query", PROJECT_VERIFY, "executeQuery",
+                Map.of("schemaName", "lists", "query.queryName", "A")));
 
             pushLocation();
             {

@@ -327,11 +327,11 @@ public class BaseSettingsPage extends LabKeyPage<BaseSettingsPage.ElementCache>
         WebElement defaultDateTimeTimeFormat = Locator.id("timeSelect").findWhenNeeded(this);
 
         WebElement defaultNumberFormat = Locator.inputByNameContaining("defaultNumberFormat").findWhenNeeded(this);
-        // TODO: remove the next three (additionalParsingPattern*) once feature is removed. For now, set them null if not found (deprecated flag is disabled).
-        // They are used only by ParsingPatternForDateTest, but other tests use BaseSettingsPage and need to soldier on if these elements aren't found.
-        WebElement additionalParsingPatternDates = Locator.inputByNameContaining("extraDateParsingPattern").findElementOrNull(this);
-        WebElement additionalParsingPatternTimes = Locator.inputByNameContaining("extraTimeParsingPattern").findElementOrNull(this);
-        WebElement additionalParsingPatternDateAndTime = Locator.inputByNameContaining("extraDateTimeParsingPattern").findElementOrNull(this);
+        // TODO: remove the next three (additionalParsingPattern*) once feature is removed.
+        // They are used only by ParsingPatternForDateTest.
+        WebElement additionalParsingPatternDates = Locator.inputByNameContaining("extraDateParsingPattern").findWhenNeeded(this);
+        WebElement additionalParsingPatternTimes = Locator.inputByNameContaining("extraTimeParsingPattern").findWhenNeeded(this);
+        WebElement additionalParsingPatternDateAndTime = Locator.inputByNameContaining("extraDateTimeParsingPattern").findWhenNeeded(this);
 
         WebElement restrictChartingColsChk = Locator.checkboxByName("restrictedColumnsEnabled").findWhenNeeded(this);
         WebElement altLoginPageTxt = Locator.inputById("customLogin").findWhenNeeded(this);

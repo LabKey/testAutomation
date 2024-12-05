@@ -17,7 +17,7 @@ package org.labkey.test.util.core.webdav;
 
 
 import org.apache.commons.lang3.StringUtils;
-import org.labkey.test.util.EscapeUtil;
+import org.eclipse.jetty.util.URIUtil;
 
 import static org.labkey.test.util.core.webdav.WebDavUtils.buildBaseWebDavUrl;
 import static org.labkey.test.util.core.webdav.WebDavUtils.buildBaseWebfilesUrl;
@@ -33,13 +33,12 @@ public class WebDavUrlFactory
 
     public String getPath(String relativePath)
     {
-        return baseUrl + StringUtils.stripStart(relativePath, "/");
+        return baseUrl + URIUtil.encodePath(StringUtils.strip(relativePath, "/"));
     }
 
     public String getPath(String relativeParent, String fileName)
     {
-        String encodedParent = EscapeUtil.encode(relativeParent).replace("%2F", "/");
-        return getPath(StringUtils.stripEnd(encodedParent, "/") + "/" + EscapeUtil.encode(fileName));
+        return getPath(relativeParent) + "/" + URIUtil.encodePath(fileName);
     }
 
     public static WebDavUrlFactory pipelineUrlFactory(String containerPath)
