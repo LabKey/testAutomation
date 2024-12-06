@@ -78,7 +78,9 @@ public class EscapeUtil
      */
     public static String encode(String s)
     {
-        return s == null ? "" : URLEncoder.encode(s, StandardCharsets.UTF_8);
+        return s == null ? "" : URLEncoder.encode(s, StandardCharsets.UTF_8)
+            // Product often doesn't decode '+' into ' '. "%20" is a more reliable encoding
+            .replace("+", "%20");
     }
 
     /**
