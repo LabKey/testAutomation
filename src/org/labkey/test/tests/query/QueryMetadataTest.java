@@ -7,7 +7,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.domain.DomainFieldRow;
-import org.labkey.test.pages.core.admin.BaseSettingsPage;
+import org.labkey.test.pages.core.admin.BaseSettingsPage.DATE_FORMAT;
 import org.labkey.test.pages.query.QueryMetadataEditorPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
@@ -217,7 +217,7 @@ public class QueryMetadataTest extends BaseWebDriverTest
         var editPage = QueryMetadataEditorPage.beginAt(this, getProjectName(), "lists", TEST_LIST);
         DomainFieldRow fieldRow = editPage.fieldsPanel().getField("Created");
         fieldRow.setDateTimeInherited(false);
-        fieldRow.setDateTimeFormatDate(BaseSettingsPage.DATE_FORMAT.ddMMMyy.toString());
+        fieldRow.setDateTimeFormat(DATE_FORMAT.ddMMMyy);
         editPage.clickSave();
 
         var queryXmlPage = editPage.clickEditSource();
@@ -244,7 +244,7 @@ public class QueryMetadataTest extends BaseWebDriverTest
         var editPage = QueryMetadataEditorPage.beginAt(this, getProjectName(), "assay.General." + TEST_ASSAY, "Data");
         DomainFieldRow fieldRow = editPage.fieldsPanel().getField("Created");
         fieldRow.setDateTimeInherited(false);
-        fieldRow.setDateTimeFormatDate(BaseSettingsPage.DATE_FORMAT.ddMMMyy.toString());
+        fieldRow.setDateTimeFormat(DATE_FORMAT.ddMMMyy);
         editPage.aliasField("Row Id");
         editPage.clickSave();
 
