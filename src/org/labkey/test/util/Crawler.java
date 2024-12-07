@@ -1430,9 +1430,9 @@ public class Crawler
         {
             if (!sb.isEmpty())
                 sb.append('&');
-            sb.append(URLEncoder.encode(e.getKey(), StandardCharsets.UTF_8));
+            sb.append(EscapeUtil.encode(e.getKey()));
             sb.append('=');
-            sb.append(null==e.getValue()?"":URLEncoder.encode(e.getValue(), StandardCharsets.UTF_8));
+            sb.append(EscapeUtil.encode(e.getValue()));
         }
         );
         return sb.toString();

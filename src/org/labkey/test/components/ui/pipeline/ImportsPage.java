@@ -56,7 +56,9 @@ public class ImportsPage extends LabKeyPage<LabKeyPage<?>.ElementCache>
 
     public QueryGrid getImportsGrid()
     {
-        return elementCache().pipelineJobsGrid();
+        QueryGrid grid = elementCache().pipelineJobsGrid();
+        waitFor(grid::isLoaded, "Imports grid did not become active in time.", 2_500);
+        return grid;
     }
 
     @Override

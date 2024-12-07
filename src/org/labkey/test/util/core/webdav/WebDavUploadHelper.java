@@ -16,6 +16,7 @@
 package org.labkey.test.util.core.webdav;
 
 import com.github.sardine.Sardine;
+import com.github.sardine.impl.SardineException;
 import org.jetbrains.annotations.NotNull;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
@@ -65,7 +66,7 @@ public class WebDavUploadHelper
 
     /**
      * Sets a custom file filter for uploading directories. Defaults to accepting all files.
-     *
+     * <p>
      * This only applies to {@link #uploadDirectory(File)} and {@link #uploadDirectoryContents(File)}. Individual file
      * uploads will ignore this filter.
      *
@@ -131,6 +132,47 @@ public class WebDavUploadHelper
     public void uploadFile(@NotNull File file)
     {
         uploadFile(file, "");
+    }
+
+    public void deleteFile(@NotNull String file)
+    {
+        try
+        {
+            _sardine.delete(_urlFactory.getPath(file));
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public SardineException deleteExpectingError(String file)
+    {
+        try
+        {
+            _sardine.delete(_urlFactory.getPath(file));
+            throw new RuntimeException("Expected error did not occur");
+        }
+        catch (SardineException expected)
+        {
+            return expected;
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public boolean fileExists(String file)
+    {
+        try
+        {
+            return _sardine.exists(_urlFactory.getPath(file));
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
     public void uploadFile(@NotNull File file, @NotNull String destPrefix)

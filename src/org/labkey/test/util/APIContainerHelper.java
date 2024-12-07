@@ -31,8 +31,6 @@ import org.labkey.test.WebTestHelper;
 
 import java.io.IOException;
 import java.net.SocketTimeoutException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -197,10 +195,10 @@ public class APIContainerHelper extends AbstractContainerHelper
     @LogMethod
     public void renameFolder(@LoggedParam String containerPath, @LoggedParam String newName, final boolean createAlias)
     {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", URLEncoder.encode(newName, StandardCharsets.UTF_8));
-        params.put("addAlias", String.valueOf(createAlias));
-        params.put("titleSameAsName", String.valueOf(true));
+        Map<String, Object> params = new HashMap<>();
+        params.put("name", newName);
+        params.put("addAlias", createAlias);
+        params.put("titleSameAsName", true);
         SimpleHttpRequest simpleHttpRequest = new SimpleHttpRequest(WebTestHelper.buildURL("admin", containerPath, "renameFolder", params), "POST");
         simpleHttpRequest.copySession(_test.getDriver());
 
