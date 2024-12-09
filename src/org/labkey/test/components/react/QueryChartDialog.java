@@ -474,7 +474,7 @@ public class QueryChartDialog extends ModalDialog
         public WebElement fieldOptionIconByLabel(String label)
         {
             Locator loc = Locator.tag("div").withChild(Locator.tagContainingText("label", label));
-            return Locator.tagWithClass("div", "field-option-icon").descendant("i").findElementOrNull(loc.findElement(this));
+            return Locator.tagWithClass("div", "field-option-icon").descendant("span").findElementOrNull(loc.findElement(this));
         }
         private Locator.XPathLocator previewContainerLoc = Locator.tag("div").withChild(Locator.tagWithText("label", "Preview"));
         public WebElement previewContainer()
