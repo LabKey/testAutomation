@@ -35,6 +35,8 @@ import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.domain.RangeValidatorDialog;
 import org.labkey.test.components.domain.RegexValidatorDialog;
 import org.labkey.test.components.domain.RegexValidatorPanel;
+import org.labkey.test.pages.core.admin.BaseSettingsPage.DATE_FORMAT;
+import org.labkey.test.pages.core.admin.BaseSettingsPage.TIME_FORMAT;
 import org.labkey.test.pages.experiment.CreateSampleTypePage;
 import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.params.FieldDefinition;
@@ -311,7 +313,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         domainFormPanel.addField("addedField")
                 .setType(FieldDefinition.ColumnType.DateAndTime)
                 .expand()
-                .setDateTimeFormat("yyyy-MM-dd HH:mm")
+                .setDateTimeFormat(DATE_FORMAT.yyyy_MM_dd, TIME_FORMAT.HH_mm)
                 .setExcludeFromDateShifting(false)
                 .setDescription("simplest date format of all")
                 .setLabel("DateTime");
