@@ -55,7 +55,7 @@
         // chartConfig is the saved information about the chart (labels, scales, etc.)
         var gch = LABKEY.vis.GenericChartHelper;
         var DEFAULT_WIDTH = 800, DEFAULT_HEIGHT = 600;
-        var chartType = gch.getChartType(chartConfig.renderType, chartConfig.measures.x.normalizedType);
+        var chartType = gch.getChartType(chartConfig);
         var layerConfig = {
             data: responseData.rows,
             geom: gch.generateGeom(chartType, chartConfig.geomOptions)
