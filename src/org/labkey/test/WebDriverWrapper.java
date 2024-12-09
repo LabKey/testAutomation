@@ -1006,6 +1006,9 @@ public abstract class WebDriverWrapper implements WrapsDriver
         try
         {
             getDriver().switchTo().window(windows.get(index));
+            new WebDriverWait(getDriver(), Duration.ofSeconds(WAIT_FOR_PAGE))
+                .withMessage("waiting for document to be ready")
+                .until(wd -> Objects.equals(executeScript("return document.readyState;"), "complete"));
         }
         catch (StackOverflowError soe)
         {
