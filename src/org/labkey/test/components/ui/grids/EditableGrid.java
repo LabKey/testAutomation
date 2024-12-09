@@ -739,7 +739,19 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         // split pasteContent into its parts
         var contentParts = pasteContent.replace("\n", "\t").split("\t");
         // filter out empty and space-only values
-        var filteredParts = Arrays.stream(contentParts).filter(a-> !a.isEmpty() && !a.equals(" ")).collect(Collectors.toList());
+        var filteredParts = Arrays.stream(contentParts)
+                .filter(a-> !a.isEmpty() && !a.equals(" "))
+                .map(str -> {
+                    if (str.startsWith("\"") && str.endsWith("\""))
+                    {
+                        // reverse TsvQuoter.quote
+                        str = str.replaceAll("\"\"", "\"");
+                        str = str.substring(1);
+                        str = str.substring(0, str.length() - 1);
+                    }
+                    return str;
+                })
+                .collect(Collectors.toList());
         await().atMost(Duration.ofSeconds(2))
                 .untilAsserted(()-> Assertions.assertThat(getSelectionCellTexts())
                         .containsAll(filteredParts));

@@ -82,6 +82,7 @@ public class TestDataGenerator
     private final String _containerPath;
     private String _excludedChars;
     private boolean _alphaNumericStr;
+    private final TestDataUtils.TsvQuoter _tsvQuoter = new TestDataUtils.TsvQuoter(',');
 
     /**
      *  use TestDataGenerator to generate data to a specific fieldSet
@@ -384,14 +385,43 @@ public class TestDataGenerator
         return builder;
     }
 
+    public static String getTsvQuotedValue(Object value, TestDataUtils.TsvQuoter tsvQuoter)
+    {
+        String strVal;
+        if (value instanceof String s)
+            strVal = tsvQuoter.quoteValue(s);
+        else
+            strVal = value != null ? String.valueOf(value) : "";
+
+        return strVal;
+    }
+
+    public List<String> getPasteColumnValues(String fieldName)
+    {
+        List<String> values = new ArrayList<>();
+        for (Map<String, Object> row : _rows)
+        {
+            Object value = row.get(fieldName);
+            String strVal = getTsvQuotedValue(value, _tsvQuoter);
+            values.add(strVal);
+        }
+        return values;
+    }
+
     public String rowToString(List<String> fieldNames, Map<String, Object> row)
     {
         StringBuilder builder = new StringBuilder();
         List<String> values = new ArrayList<>();
-        for (String name : fieldNames)
+        String firstField = fieldNames.get(0);
+        for (String fieldName : fieldNames)
         {
-            Object value = row.get(name);
-            values.add(value != null ? String.valueOf(value) : "");
+            Object value = row.get(fieldName);
+            String strVal = getTsvQuotedValue(value, _tsvQuoter);
+
+            if (strVal.startsWith("#") && fieldName.equals(firstField)) // don't generate comment lines
+                strVal = "\"" + strVal + "\"";
+
+            values.add(strVal);
         }
         builder.append(String.join("\t", values));
         builder.append("\n");
