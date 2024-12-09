@@ -22,7 +22,6 @@ import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.hc.client5.http.utils.URIUtils;
 import org.eclipse.jetty.util.URIUtil;
 import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.Contract;
@@ -3923,6 +3922,13 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return paramValue;
     }
 
+    /**
+     * Parses the URL query of the current page
+     * @deprecated Duplicated in {@link WebTestHelper#parseUrlQueryString(String)}. Warning: valueless parameters are
+     * handled differently ({@code null} instead of {@code ""})
+     * @return Map of encoded URL parameters
+     */
+    @Deprecated (since = "25.1")
     public Map<String, String> getUrlParameters()
     {
         Map<String, String> params = new HashMap<>();
