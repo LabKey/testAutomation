@@ -86,7 +86,7 @@ public class ScriptReportPage extends LabKeyPage<ScriptReportPage.ElementCache>
         {
             saveReportWithName(name, isSaveAs);
         }
-        return getUrlParam("reportId");
+        return getUrlParam("reportId", true);
     }
 
     /**
