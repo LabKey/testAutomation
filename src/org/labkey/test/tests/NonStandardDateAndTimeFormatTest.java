@@ -36,8 +36,11 @@ import org.openqa.selenium.WebElement;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
 
 @Category({Daily.class})
 public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
@@ -240,6 +243,12 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
                 timeCol02, "14:42",
                 dateTimeCol01, "May 1, 2005 6:32 pm",
                 dateTimeCol02, "6/1/24 10:00"), false);
+
+        TimeZone tz = TimeZone.getDefault();
+        boolean isDT = tz.inDaylightTime(new Date());
+        log("Is timezone in Daylight Savings Time: " + isDT);
+        String tzD = tz.getDisplayName(isDT, 0, Locale.getDefault());
+        log("TimeZone display name: " + tzD);
 
         Map<String, String> expectedRowValues = Map.of(dateCol01, "April 01, 2021",
                 dateCol02, "2019-52 AD",
@@ -506,6 +515,13 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
         String bulkData = String.format("%s\t%s\t%s\t%s\n", "Name", dateTimeCol, dateCol, timeCol)
                 + "A\t12/23/24 14:45\t12/23/24\t14:45\n";
 
+        TimeZone tz = TimeZone.getDefault();
+        boolean isDT = tz.inDaylightTime(new Date());
+        log("Is timezone in Daylight Savings Time: " + isDT);
+        String tzD = tz.getDisplayName(isDT, 0, Locale.getDefault());
+        log("TimeZone display name: " + tzD);
+        log("Get offset: " + tz.getOffset(new Date().getTime()));
+
         Map<String, String> expectedFormatData = Map.of("Name", "A",
                 dateTimeCol, "December 23, 2024 02:45:00.00 PM",
                 dateCol, "December 23, 2024",
@@ -735,6 +751,12 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
                 true, nsSiteTimeFormat, false,
                 true, String.format("%s %s", nsSiteDateFormat, nsSiteTimeFormat), "",
                 false, false);
+
+        TimeZone tz = TimeZone.getDefault();
+        boolean isDT = tz.inDaylightTime(new Date());
+        log("Is timezone in Daylight Savings Time: " + isDT);
+        String tzD = tz.getDisplayName(isDT, 0, Locale.getDefault());
+        log("TimeZone display name: " + tzD);
 
         log("Sanity check that the DataClass data is formatted in the project and subfolder.");
         Map<String, String> expectedFormatData = Map.of("Name", "P1",
