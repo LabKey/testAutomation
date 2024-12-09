@@ -660,6 +660,21 @@ public class FileBrowserHelper extends WebDriverWrapper
             clickFileBrowserButtonOverflow(action);
     }
 
+    @LogMethod (quiet = true)
+    public boolean isActionPresent(@LoggedParam BrowserAction action)
+    {
+        waitForFileGridReady();
+        try
+        {
+            action.findButton(waitForToolbar());
+        }
+        catch (NoSuchElementException e)
+        {
+            return false;
+        }
+        return true;
+    }
+
     private void clickFileBrowserButtonOverflow(BrowserAction action)
     {
         Locator overflowMenuButton = Locator.css("div.fbrowser > div > a.x4-box-menu-after");
