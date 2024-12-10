@@ -82,8 +82,8 @@ public class FileAttachmentEntry extends WebDriverComponent<FileAttachmentEntry.
     public static class FileAttachmentEntryFinder extends WebDriverComponentFinder<FileAttachmentEntry, FileAttachmentEntryFinder>
     {
         private final Locator.XPathLocator _baseLocator = Locator.XPathLocator.union(
-                Locator.tagWithClass("div", "attached-file--container"),
-                Locator.tagWithClass("div", "attached-file--inline-container"));
+                Locator.tagWithClass("div", "attached-file__container"),
+                Locator.tagWithClass("div", "attached-file__inline-container"));
         private String _title = null;
 
         public FileAttachmentEntryFinder(WebDriver driver)

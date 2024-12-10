@@ -58,9 +58,9 @@ public class SsoLogoInputPanel extends WebDriverComponent<SsoLogoInputPanel.Elem
 
     protected class ElementCache extends WebDriverComponent.ElementCache
     {
-        WebElement logoFileInputContainer = Locator.tagWithClass("div", "file-upload--container")
+        WebElement logoFileInputContainer = Locator.tagWithClass("div", "file-upload__container")
                 .refindWhenNeeded(this).withTimeout(4000);
-        WebElement logoFileInput = Locator.tagWithClass("input", "file-upload--input")
+        WebElement logoFileInput = Locator.tagWithClass("input", "file-upload__input")
                 .refindWhenNeeded(this).withTimeout(4000);
         WebElement logoImageContainer = Locator.byClass("sso-fields__image-holder")
                 .refindWhenNeeded(this).withTimeout(4000);
@@ -69,7 +69,7 @@ public class SsoLogoInputPanel extends WebDriverComponent<SsoLogoInputPanel.Elem
 
         Locator attachedFile(File file)
         {
-            return Locator.tagWithClass("div", "attached-file--container").containing(file.getName());
+            return Locator.tagWithClass("div", "attached-file__container").containing(file.getName());
         }
         Locator fileDropLoc = Locator.tagWithClass("div", "sso-fields__file-attachment");
     }
