@@ -233,7 +233,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
         ProjectSettingsPage projectSettingsPage = goToProjectSettings();
         projectSettingsPage.setDefaultDateTimeDisplayInherited(false);
-        projectSettingsPage.setDefaultDateTimeDisplay(BaseSettingsPage.DATE_FORMAT.yyyy_MM_dd, BaseSettingsPage.TIME_FORMAT.Default);
+        projectSettingsPage.setDefaultDateTimeDisplay(BaseSettingsPage.DATE_FORMAT.MMMM_dd_yyyy, BaseSettingsPage.TIME_FORMAT.Default);
         projectSettingsPage.save();
 
         // images for thumbnails

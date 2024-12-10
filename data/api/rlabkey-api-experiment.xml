@@ -185,6 +185,26 @@
             ]]>
         </response>
     </test>
+    <test name="labkey.saveBatch for assay with field import alias (Issue 51822)" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+                print(labkey.saveBatch(baseUrl=labkey.url.base, folderPath="%projectName%", "Rlabkey GPAT Test", data.frame(guspec=c(4,5))))
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                $batch$runs[[1]]$dataRows[[1]]$SpecimenID
+                [1] "4"
+
+                $batch$runs[[1]]$dataRows[[2]]$SpecimenID
+                [1] "5"
+
+                $batch$runs[[1]]$schemaName
+                [1] "assay.General.Rlabkey GPAT Test"
+            ]]>
+        </response>
+    </test>
     <test name="create sample type and load data" type="post">
         <url>
             <![CDATA[
