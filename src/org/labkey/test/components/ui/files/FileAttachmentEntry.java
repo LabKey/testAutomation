@@ -73,9 +73,9 @@ public class FileAttachmentEntry extends WebDriverComponent<FileAttachmentEntry.
 
     protected class ElementCache extends Component<?>.ElementCache
     {
-        public Locator removeIconLoc = Locator.tagWithClass("span", "file-upload__remove--icon");
+        public Locator removeIconLoc = Locator.byClass("attached-file__remove-icon");
         public WebElement removeIcon = removeIconLoc.findWhenNeeded(this);
-        public WebElement fileIcon = Locator.tagWithClass("span", "attached-file--icon").findWhenNeeded(this);
+        public WebElement fileIcon = Locator.byClass("attached-file__icon").findWhenNeeded(this);
     }
 
 
