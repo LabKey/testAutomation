@@ -1,5 +1,6 @@
 package org.labkey.test.tests;
 
+import org.apache.commons.lang3.SystemUtils;
 import org.jetbrains.annotations.Nullable;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -38,6 +39,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -293,9 +295,19 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
         Calendar calDateTime01 = Calendar.getInstance();
         calDateTime01.set(2005, Calendar.MAY, 1, 18, 32);
 
-        expectedRowValues = Map.of(dateCol01, "01/04/21",
-                timeCol01, String.format("0:32:0 AM %s00", getTimezoneOffset(calTime01.getTime())),
-                dateTimeCol01, String.format("Sunday May 01 121 2005 18:32:0 %s", getTimezoneOffset(calDateTime01.getTime())));
+        if (SystemUtils.IS_OS_WINDOWS)
+        {
+            expectedRowValues = Map.of(dateCol01, "01/04/21",
+                    timeCol01, String.format("0:32:0 AM %s0", getTimezoneOffset(calTime01.getTime())),
+                    dateTimeCol01, "Sunday May 01 121 2005 18:32:0 Z");
+
+        }
+        else
+        {
+            expectedRowValues = Map.of(dateCol01, "01/04/21",
+                    timeCol01, String.format("0:32:0 AM %s00", getTimezoneOffset(calTime01.getTime())),
+                    dateTimeCol01, String.format("Sunday May 01 121 2005 18:32:0 %s", getTimezoneOffset(calDateTime01.getTime())));
+        }
 
         listDefinitionPage =  _listHelper.goToEditDesign(listInherit);
         domainEditor = listDefinitionPage.getFieldsPanel();
@@ -538,10 +550,22 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
         calTime.set(Calendar.HOUR_OF_DAY, 14);
         calTime.set(Calendar.MINUTE, 45);
 
-        Map<String, String> expectedInheritedData = Map.of("Name", "A",
-                dateTimeCol, String.format("Monday December 23 358 2024 14:45:0 %s", getTimezoneOffset(calDateTime.getTime())),
-                dateCol, "23/12/24",
-                timeCol, String.format("2:45:0 PM %s00", getTimezoneOffset(calTime.getTime())), "Flag", "");
+        Map<String, String> expectedInheritedData = new HashMap<>();
+
+        if (SystemUtils.IS_OS_WINDOWS)
+        {
+            expectedInheritedData = Map.of("Name", "A",
+                    dateTimeCol, "Monday December 23 358 2024 14:45:0 Z",
+                    dateCol, "23/12/24",
+                    timeCol, String.format("2:45:0 PM %s0", getTimezoneOffset(calTime.getTime())), "Flag", "");
+        }
+        else
+        {
+            expectedInheritedData = Map.of("Name", "A",
+                    dateTimeCol, String.format("Monday December 23 358 2024 14:45:0 %s", getTimezoneOffset(calDateTime.getTime())),
+                    dateCol, "23/12/24",
+                    timeCol, String.format("2:45:0 PM %s00", getTimezoneOffset(calTime.getTime())), "Flag", "");
+        }
 
         populateDataClass(getProjectName(), dcFormat, bulkData);
         populateDataClass(getProjectName(), dcInherit, bulkData);
@@ -1389,7 +1413,7 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
     // Timezone offset from GMT is dependent on the date
     private String getTimezoneOffset(Date date)
     {
-        return String.format("%03d", TIME_ZONE.getOffset(date.getTime()) / 1000 / 60 / 60);
+        return String.format("%+03d", TIME_ZONE.getOffset(date.getTime()) / 1000 / 60 / 60);
     }
 
 }
