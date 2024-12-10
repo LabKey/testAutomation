@@ -36,6 +36,7 @@ import org.openqa.selenium.WebElement;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -64,6 +65,8 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
     private static final String TT_NS_DATETIME = "Non-standard date-time format.";
 
     private final PortalHelper _portalHelper = new PortalHelper(this);
+
+    private static final TimeZone TIME_ZONE = TimeZone.getDefault();
 
     @Override
     public List<String> getAssociatedModules()
@@ -244,18 +247,19 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
                 dateTimeCol01, "May 1, 2005 6:32 pm",
                 dateTimeCol02, "6/1/24 10:00"), false);
 
-        TimeZone tz = TimeZone.getDefault();
-        boolean isDT = tz.inDaylightTime(new Date());
-        log("Is timezone in Daylight Savings Time: " + isDT);
-        String tzD = tz.getDisplayName(isDT, 0, Locale.getDefault());
-        log("TimeZone display name: " + tzD);
+        Calendar calTime02 = Calendar.getInstance();
+        calTime02.set(Calendar.HOUR_OF_DAY, 14);
+        calTime02.set(Calendar.MINUTE, 42);
+
+        Calendar calDateTime02 = Calendar.getInstance();
+        calDateTime02.set(2024, Calendar.JUNE, 1, 10, 0);
 
         Map<String, String> expectedRowValues = Map.of(dateCol01, "April 01, 2021",
                 dateCol02, "2019-52 AD",
                 timeCol01, "12:32:00.00 AM",
-                timeCol02, "2:42 PM PST",
+                timeCol02, String.format("2:42 PM %s", getTimezoneDesc(calTime02.getTime())),
                 dateTimeCol01, "May 01, 2005 06:32:00.00 PM",
-                dateTimeCol02, "10:00 AM PDT 2024-22 AD");
+                dateTimeCol02, String.format("10:00 AM %s 2024-22 AD", getTimezoneDesc(calDateTime02.getTime())));
 
         EditListDefinitionPage listDefinitionPage = _listHelper.goToEditDesign(listFormat);
         DomainFormPanel domainEditor = listDefinitionPage.getFieldsPanel();
@@ -282,9 +286,16 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
                 timeCol01, "12:32 am",
                 dateTimeCol01, "May 1, 2005 6:32 pm"), false);
 
+        Calendar calTime01 = Calendar.getInstance();
+        calTime01.set(Calendar.HOUR_OF_DAY, 0);
+        calTime01.set(Calendar.MINUTE, 32);
+
+        Calendar calDateTime01 = Calendar.getInstance();
+        calDateTime01.set(2005, Calendar.MAY, 1, 18, 32);
+
         expectedRowValues = Map.of(dateCol01, "01/04/21",
-                timeCol01, "0:32:0 AM -0800",
-                dateTimeCol01, "Sunday May 01 121 2005 18:32:0 -07");
+                timeCol01, String.format("0:32:0 AM %s00", getTimezoneOffset(calTime01.getTime())),
+                dateTimeCol01, String.format("Sunday May 01 121 2005 18:32:0 %s", getTimezoneOffset(calDateTime01.getTime())));
 
         listDefinitionPage =  _listHelper.goToEditDesign(listInherit);
         domainEditor = listDefinitionPage.getFieldsPanel();
@@ -515,22 +526,22 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
         String bulkData = String.format("%s\t%s\t%s\t%s\n", "Name", dateTimeCol, dateCol, timeCol)
                 + "A\t12/23/24 14:45\t12/23/24\t14:45\n";
 
-        TimeZone tz = TimeZone.getDefault();
-        boolean isDT = tz.inDaylightTime(new Date());
-        log("Is timezone in Daylight Savings Time: " + isDT);
-        String tzD = tz.getDisplayName(isDT, 0, Locale.getDefault());
-        log("TimeZone display name: " + tzD);
-        log("Get offset: " + tz.getOffset(new Date().getTime()));
-
         Map<String, String> expectedFormatData = Map.of("Name", "A",
                 dateTimeCol, "December 23, 2024 02:45:00.00 PM",
                 dateCol, "December 23, 2024",
                 timeCol, "02:45:00.00 PM", "Flag", "");
 
+        Calendar calDateTime = Calendar.getInstance();
+        calDateTime.set(2024, Calendar.DECEMBER, 23, 14, 45);
+
+        Calendar calTime = Calendar.getInstance();
+        calTime.set(Calendar.HOUR_OF_DAY, 14);
+        calTime.set(Calendar.MINUTE, 45);
+
         Map<String, String> expectedInheritedData = Map.of("Name", "A",
-                dateTimeCol, "Monday December 23 358 2024 14:45:0 -08",
+                dateTimeCol, String.format("Monday December 23 358 2024 14:45:0 %s", getTimezoneOffset(calDateTime.getTime())),
                 dateCol, "23/12/24",
-                timeCol, "2:45:0 PM -0800", "Flag", "");
+                timeCol, String.format("2:45:0 PM %s00", getTimezoneOffset(calTime.getTime())), "Flag", "");
 
         populateDataClass(getProjectName(), dcFormat, bulkData);
         populateDataClass(getProjectName(), dcInherit, bulkData);
@@ -752,25 +763,31 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
                 true, String.format("%s %s", nsSiteDateFormat, nsSiteTimeFormat), "",
                 false, false);
 
-        TimeZone tz = TimeZone.getDefault();
-        boolean isDT = tz.inDaylightTime(new Date());
-        log("Is timezone in Daylight Savings Time: " + isDT);
-        String tzD = tz.getDisplayName(isDT, 0, Locale.getDefault());
-        log("TimeZone display name: " + tzD);
+        Calendar calDateTime = Calendar.getInstance();
+        calDateTime.set(2024, Calendar.DECEMBER, 23, 14, 25);
+
+        Calendar calTime = Calendar.getInstance();
+        calTime.set(Calendar.HOUR_OF_DAY, 14);
+        calTime.set(Calendar.MINUTE, 45);
 
         log("Sanity check that the DataClass data is formatted in the project and subfolder.");
         Map<String, String> expectedFormatData = Map.of("Name", "P1",
-                dateTimeCol, "December 23, 2024 14:45 PST",
+                dateTimeCol, String.format("December 23, 2024 14:45 %s", getTimezoneDesc(calDateTime.getTime())),
                 dateCol, "December 23, 2024",
-                timeCol, "14:45 PST",
+                timeCol, String.format("14:45 %s", getTimezoneDesc(calTime.getTime())),
                 "Flag", "");
 
         validateDataIsFormatted(folderProject, dcInProj, expectedFormatData);
 
+        calDateTime.set(2024, Calendar.NOVEMBER, 28, 11, 11);
+
+        calTime.set(Calendar.HOUR_OF_DAY, 11);
+        calTime.set(Calendar.MINUTE, 11);
+
         expectedFormatData = Map.of("Name", "C1",
-                dateTimeCol, "November 28, 2024 11:11 PST",
+                dateTimeCol, String.format("November 28, 2024 11:11 %s", getTimezoneDesc(calDateTime.getTime())),
                 dateCol, "November 28, 2024",
-                timeCol, "11:11 PST",
+                timeCol, String.format("11:11 %s", getTimezoneDesc(calTime.getTime())),
                 "Flag", "");
         validateDataIsFormatted(subFolderPath, dcInSub, expectedFormatData);
         validateDataIsFormatted(subFolderPath, dcInProj, expectedFormatData);
@@ -792,9 +809,9 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
 
         log("Check the format in the DataClasses");
         expectedFormatData = Map.of("Name", "C1",
-                dateTimeCol, "Thursday November 28, 2024 11:11 (PST)",
+                dateTimeCol, String.format("Thursday November 28, 2024 11:11 (%s)", getTimezoneDesc(calDateTime.getTime())),
                 dateCol, "Thursday November 28, 2024",
-                timeCol, "11:11 (PST)",
+                timeCol, String.format("11:11 (%s)", getTimezoneDesc(calTime.getTime())),
                 "Flag", "");
         validateDataIsFormatted(subFolderPath, dcInSub, expectedFormatData);
         validateDataIsFormatted(subFolderPath, dcInProj, expectedFormatData);
@@ -1360,6 +1377,19 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
         }
 
         return warnings;
+    }
+
+    // Timezone description (PST vs. PDT) is dependent on the date.
+    private String getTimezoneDesc(Date date)
+    {
+        boolean isDT = TIME_ZONE.inDaylightTime(date);
+        return TIME_ZONE.getDisplayName(isDT, 0, Locale.getDefault());
+    }
+
+    // Timezone offset from GMT is dependent on the date
+    private String getTimezoneOffset(Date date)
+    {
+        return String.format("%03d", TIME_ZONE.getOffset(date.getTime()) / 1000 / 60 / 60);
     }
 
 }
