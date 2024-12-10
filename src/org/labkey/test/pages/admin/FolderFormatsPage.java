@@ -166,6 +166,7 @@ public class FolderFormatsPage extends FolderManagementPage
         setInherited("extraDateParsingPatternInherited", enable);
     }
 
+    // Only available if the "extraDateTimeParsingPatterns" optional/deprecated feature is enabled.
     public String getAdditionalParsingPatternDates()
     {
         return getFormElement(elementCache().additionalParsingPatternDates);
@@ -186,6 +187,7 @@ public class FolderFormatsPage extends FolderManagementPage
         setInherited("extraDateTimeParsingPatternInherited", enable);
     }
 
+    // Only available if the "extraDateTimeParsingPatterns" optional/deprecated feature is enabled.
     public String getAdditionalParsingPatternDateAndTime()
     {
         return getFormElement(elementCache().additionalParsingPatternDateAndTime);
@@ -206,6 +208,7 @@ public class FolderFormatsPage extends FolderManagementPage
         setInherited("extraTimeParsingPatternInherited", enable);
     }
 
+    // Only available if the "extraDateTimeParsingPatterns" optional/deprecated feature is enabled.
     public String getAdditionalParsingPatternTimes()
     {
         return getFormElement(elementCache().additionalParsingPatternTimes);
@@ -286,10 +289,13 @@ public class FolderFormatsPage extends FolderManagementPage
         }
 
         WebElement defaultNumberFormat = Locator.inputByNameContaining("defaultNumberFormat").findWhenNeeded(this);
-        WebElement additionalParsingPatternDates = Locator.inputByNameContaining("extraDateParsingPattern").findElement(this);
-        WebElement additionalParsingPatternTimes = Locator.inputByNameContaining("extraTimeParsingPattern").findElement(this);
-        WebElement additionalParsingPatternDateAndTime = Locator.inputByNameContaining("extraDateTimeParsingPattern").findElement(this);
         WebElement restrictChartingColsChk = Locator.checkboxByName("restrictedColumnsEnabled").findWhenNeeded(this);
+
+        // These next three elements can go away one the feature is completely removed.
+        // Until then these will only appear on the page if the "extraDateTimeParsingPatterns" optional/deprecated feature is enabled.
+        WebElement additionalParsingPatternDates = Locator.inputByNameContaining("extraDateParsingPattern").findWhenNeeded(this);
+        WebElement additionalParsingPatternTimes = Locator.inputByNameContaining("extraTimeParsingPattern").findWhenNeeded(this);
+        WebElement additionalParsingPatternDateAndTime = Locator.inputByNameContaining("extraDateTimeParsingPattern").findWhenNeeded(this);
 
         WebElement saveButton = Locator.lkButton("Save").findWhenNeeded(this);
         WebElement inheritAll = Locator.lkButton("Inherit All").findWhenNeeded(this);
