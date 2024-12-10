@@ -5,6 +5,7 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
+import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.components.ui.grids.QueryGrid;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -90,6 +91,101 @@ public class QueryChartDialog extends ModalDialog
     public List<String> getXAxisSelectionOptions()
     {
         return elementCache().reactSelectByLabel("X Axis").getOptions();
+    }
+
+    public boolean hasAxisFieldOptions(String label)
+    {
+        return elementCache().fieldOptionIconByLabel(label) != null;
+    }
+
+    private QueryChartDialog clickAxisFieldOptions(String label)
+    {
+        elementCache().fieldOptionIconByLabel(label).click();
+        return this;
+    }
+
+    /**
+     * Set the axis scale to 'linear' or 'log' for the given axis
+     * @param label the axis label
+     * @param value the value to set (linear or log)
+     * @return this
+     */
+    public QueryChartDialog setAxisScaleType(String label, String value)
+    {
+        clickAxisFieldOptions(label); // open the popover
+        if ("linear".equalsIgnoreCase(value))
+            elementCache().scaleLinearRadio.check();
+        else if ("log".equalsIgnoreCase(value))
+            elementCache().scaleLogRadio.check();
+        else
+            throw new IllegalArgumentException("Invalid scale value: " + value);
+        clickAxisFieldOptions(label); // close the popover
+        return this;
+    }
+
+    public boolean isAxisScaleTypeSelected(String label, String value)
+    {
+        clickAxisFieldOptions(label); // open the popover
+        boolean selected = "linear".equalsIgnoreCase(value) ? elementCache().scaleLinearRadio.isChecked() :
+                "log".equalsIgnoreCase(value) && elementCache().scaleLogRadio.isChecked();
+        clickAxisFieldOptions(label); // close the popover
+        return selected;
+    }
+
+    /**
+     * Set the axis range to 'automatic' or 'manual' for the given axis
+     * @param label the axis label
+     * @param value the value to set (automatic or manual)
+     * @return this
+     */
+    public QueryChartDialog setAxisRangeType(String label, String value)
+    {
+        clickAxisFieldOptions(label); // open the popover
+        if ("automatic".equalsIgnoreCase(value))
+            elementCache().scaleAutomaticRadio.check();
+        else if ("manual".equalsIgnoreCase(value))
+            elementCache().scaleManualRadio.check();
+        else
+            throw new IllegalArgumentException("Invalid range value: " + value);
+        clickAxisFieldOptions(label); // close the popover
+        return this;
+    }
+
+    public boolean isAxisRangeTypeSelected(String label, String value)
+    {
+        clickAxisFieldOptions(label); // open the popover
+        boolean selected = "automatic".equalsIgnoreCase(value) ? elementCache().scaleAutomaticRadio.isChecked() :
+                "manual".equalsIgnoreCase(value) && elementCache().scaleManualRadio.isChecked();
+        clickAxisFieldOptions(label); // close the popover
+        return selected;
+    }
+
+    public QueryChartDialog setAxisRange(String label, String min, String max)
+    {
+        clickAxisFieldOptions(label); // open the popover
+        if (elementCache().scaleManualRadio.isChecked())
+        {
+            elementCache().scaleRangeMinInput.set(min);
+            elementCache().scaleRangeMaxInput.set(max);
+        }
+        clickAxisFieldOptions(label); // close the popover
+        return this;
+    }
+
+    public String getAxisRangeMin(String label)
+    {
+        clickAxisFieldOptions(label); // open the popover
+        String min = elementCache().scaleRangeMinInput.get();
+        clickAxisFieldOptions(label); // close the popover
+        return min;
+    }
+
+    public String getAxisRangeMax(String label)
+    {
+        clickAxisFieldOptions(label); // open the popover
+        String max = elementCache().scaleRangeMaxInput.get();
+        clickAxisFieldOptions(label); // close the popover
+        return max;
     }
 
     /*
@@ -375,6 +471,11 @@ public class QueryChartDialog extends ModalDialog
                 return ReactSelect.finder(getDriver()).find(loc.waitForElement(this, 1500));
         }
 
+        public WebElement fieldOptionIconByLabel(String label)
+        {
+            Locator loc = Locator.tag("div").withChild(Locator.tagContainingText("label", label));
+            return Locator.tagWithClass("div", "field-option-icon").descendant("span").findElementOrNull(loc.findElement(this));
+        }
         private Locator.XPathLocator previewContainerLoc = Locator.tag("div").withChild(Locator.tagWithText("label", "Preview"));
         public WebElement previewContainer()
         {
@@ -393,6 +494,13 @@ public class QueryChartDialog extends ModalDialog
             return svgLoc.waitForElement(previewContainer(), 1500);
         }
 
+        private final WebElement fieldOptionPopover = Locator.tagWithId("div", "chart-field-option-popover").refindWhenNeeded(getDriver());
+        public RadioButton scaleLinearRadio = RadioButton.RadioButton(Locator.radioButtonByNameAndValue("scaleTrans", "linear")).refindWhenNeeded(fieldOptionPopover);
+        public RadioButton scaleLogRadio = RadioButton.RadioButton(Locator.radioButtonByNameAndValue("scaleTrans", "log")).refindWhenNeeded(fieldOptionPopover);
+        public RadioButton scaleAutomaticRadio = RadioButton.RadioButton(Locator.radioButtonByNameAndValue("scaleType", "automatic")).refindWhenNeeded(fieldOptionPopover);
+        public RadioButton scaleManualRadio = RadioButton.RadioButton(Locator.radioButtonByNameAndValue("scaleType", "manual")).refindWhenNeeded(fieldOptionPopover);
+        public Input scaleRangeMinInput = Input(Locator.input("scaleMin"), getDriver()).refindWhenNeeded(fieldOptionPopover);
+        public Input scaleRangeMaxInput = Input(Locator.input("scaleMax"), getDriver()).refindWhenNeeded(fieldOptionPopover);
     }
 
     public enum CHART_TYPE{
