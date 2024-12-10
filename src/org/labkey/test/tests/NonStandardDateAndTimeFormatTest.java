@@ -295,18 +295,18 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
         Calendar calDateTime01 = Calendar.getInstance();
         calDateTime01.set(2005, Calendar.MAY, 1, 18, 32);
 
+        expectedRowValues = new HashMap<>();
+        expectedRowValues.put(dateCol01, "01/04/21");
+        expectedRowValues.put(timeCol01, String.format("0:32:0 AM %s00", getTimezoneOffset(calTime01.getTime())));
+
         if (SystemUtils.IS_OS_WINDOWS)
         {
-            expectedRowValues = Map.of(dateCol01, "01/04/21",
-                    timeCol01, String.format("0:32:0 AM %s0", getTimezoneOffset(calTime01.getTime())),
-                    dateTimeCol01, "Sunday May 01 121 2005 18:32:0 Z");
-
+            expectedRowValues.put(dateTimeCol01, "Sunday May 01 121 2005 18:32:0 Z");
         }
         else
         {
-            expectedRowValues = Map.of(dateCol01, "01/04/21",
-                    timeCol01, String.format("0:32:0 AM %s00", getTimezoneOffset(calTime01.getTime())),
-                    dateTimeCol01, String.format("Sunday May 01 121 2005 18:32:0 %s", getTimezoneOffset(calDateTime01.getTime())));
+            expectedRowValues.put(dateTimeCol01,
+                    String.format("Sunday May 01 121 2005 18:32:0 %s", getTimezoneOffset(calDateTime01.getTime())));
         }
 
         listDefinitionPage =  _listHelper.goToEditDesign(listInherit);
@@ -551,20 +551,19 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
         calTime.set(Calendar.MINUTE, 45);
 
         Map<String, String> expectedInheritedData = new HashMap<>();
+        expectedInheritedData.put("Name", "A");
+        expectedInheritedData.put(dateCol, "23/12/24");
+        expectedInheritedData.put(timeCol, String.format("2:45:0 PM %s00", getTimezoneOffset(calTime.getTime())));
+        expectedInheritedData.put("Flag", "");
 
         if (SystemUtils.IS_OS_WINDOWS)
         {
-            expectedInheritedData = Map.of("Name", "A",
-                    dateTimeCol, "Monday December 23 358 2024 14:45:0 Z",
-                    dateCol, "23/12/24",
-                    timeCol, String.format("2:45:0 PM %s0", getTimezoneOffset(calTime.getTime())), "Flag", "");
+            expectedInheritedData.put(dateTimeCol, "Monday December 23 358 2024 14:45:0 Z");
         }
         else
         {
-            expectedInheritedData = Map.of("Name", "A",
-                    dateTimeCol, String.format("Monday December 23 358 2024 14:45:0 %s", getTimezoneOffset(calDateTime.getTime())),
-                    dateCol, "23/12/24",
-                    timeCol, String.format("2:45:0 PM %s00", getTimezoneOffset(calTime.getTime())), "Flag", "");
+            expectedInheritedData.put(dateTimeCol,
+                    String.format("Monday December 23 358 2024 14:45:0 %s", getTimezoneOffset(calDateTime.getTime())));
         }
 
         populateDataClass(getProjectName(), dcFormat, bulkData);
