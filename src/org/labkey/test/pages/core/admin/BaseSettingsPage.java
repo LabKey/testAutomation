@@ -376,6 +376,7 @@ public class BaseSettingsPage extends LabKeyPage<BaseSettingsPage.ElementCache>
         WebElement defaultNumberFormat = Locator.inputByNameContaining("defaultNumberFormat").findWhenNeeded(this);
         // TODO: remove the next three (additionalParsingPattern*) once feature is removed.
         // They are used only by ParsingPatternForDateTest.
+        // Until then these will only appear on the page if the "extraDateTimeParsingPatterns" deprecated feature is enabled.
         WebElement additionalParsingPatternDates = Locator.inputByNameContaining("extraDateParsingPattern").findWhenNeeded(this);
         WebElement additionalParsingPatternTimes = Locator.inputByNameContaining("extraTimeParsingPattern").findWhenNeeded(this);
         WebElement additionalParsingPatternDateAndTime = Locator.inputByNameContaining("extraDateTimeParsingPattern").findWhenNeeded(this);
