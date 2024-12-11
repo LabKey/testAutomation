@@ -81,6 +81,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.params.FieldDefinition.ColumnType;
+import static org.labkey.test.params.FieldDefinition.DOMAIN_TRICKY_CHARACTERS;
 import static org.labkey.test.util.DataRegionTable.DataRegion;
 
 @Category({Daily.class, Data.class, Hosting.class})
@@ -89,7 +90,7 @@ public class ListTest extends BaseWebDriverTest
 {
     protected final static String PROJECT_VERIFY = "ListVerifyProject" ;//+ TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
     private final static String PROJECT_OTHER = "OtherListVerifyProject";
-    protected final static String LIST_NAME_COLORS = TRICKY_CHARACTERS_NO_QUOTES + "Colors";
+    protected final static String LIST_NAME_COLORS = DOMAIN_TRICKY_CHARACTERS + "_Colors";
     protected final static ColumnType LIST_KEY_TYPE = ColumnType.String;
     protected final static String LIST_KEY_NAME = "Key";
     protected final static String LIST_KEY_NAME2 = "Color";
@@ -867,7 +868,7 @@ public class ListTest extends BaseWebDriverTest
     @Test
     public void listSelfJoinTest()
     {
-        final String listName = "listSelfJoin" + TRICKY_CHARACTERS;
+        final String listName = "listSelfJoin" + DOMAIN_TRICKY_CHARACTERS;
         final String dummyBase = "dummyCol";
         final String dummyCol = dummyBase + TRICKY_CHARACTERS;
         final String lookupField = "lookupField" + TRICKY_CHARACTERS;

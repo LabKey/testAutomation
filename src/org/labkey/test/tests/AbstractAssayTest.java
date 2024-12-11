@@ -33,6 +33,8 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.labkey.test.params.FieldDefinition.DOMAIN_TRICKY_CHARACTERS;
+
 /**
  * @deprecated TODO: Move shared functionality to a Helper class
  */
@@ -59,7 +61,7 @@ public abstract class AbstractAssayTest extends BaseWebDriverTest
     protected final static String TEST_ASSAY_FLDR_STUDY3 = "Study 3";                 //another sub of Studies
     protected final static String TEST_ASSAY_PERMS_STUDY_READALL = "READ";
 
-    protected static final String TEST_ASSAY = "Test" + TRICKY_CHARACTERS + "Assay1";
+    protected static final String TEST_ASSAY = "Test" + DOMAIN_TRICKY_CHARACTERS + "Assay1";
     protected static final String TEST_ASSAY_DESC = "Description for assay 1";
     protected static final String TEST_ASSAY_SET_PROP_NAME = "testAssaySetProp";
     protected static final int TEST_ASSAY_SET_PREDEFINED_PROP_COUNT = 2;

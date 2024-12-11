@@ -43,13 +43,14 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.labkey.test.params.FieldDefinition.DOMAIN_TRICKY_CHARACTERS;
 
 @Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 8)
 public class CustomizeViewTest extends BaseWebDriverTest
 {
     public static final String PROJECT_NAME = "CustomizeViewTest";
-    public static final String LIST_NAME = "People" + INJECT_CHARS_1;
+    public static final String LIST_NAME = "People" + DOMAIN_TRICKY_CHARACTERS;
     private final static String LIST_KEY_COLUMN = "Key";
     private final static String LAST_NAME_COLUMN = "LastName" + INJECT_CHARS_2;
     private final static String FIRST_NAME_COLUMN = "FirstName";

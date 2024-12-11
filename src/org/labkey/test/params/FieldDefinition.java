@@ -31,6 +31,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.labkey.test.util.TestDataGenerator.DOMAIN_SPECIAL_STRING;
+
 public class FieldDefinition extends PropertyDescriptor
 {
     private static final String SNOWMAN = "\u2603";
@@ -38,6 +40,7 @@ public class FieldDefinition extends PropertyDescriptor
     private static final String A_UMLAUT = "\u00E4";
     // Non-alphanumeric characters supported for field names
     public static final String TRICKY_CHARACTERS = "><&$,/%\\'}{][ \";:" + SNOWMAN + ANGSTROM + A_UMLAUT;
+    public static final String DOMAIN_TRICKY_CHARACTERS = DOMAIN_SPECIAL_STRING + SNOWMAN + ANGSTROM + A_UMLAUT;
 
     // for UI helpers
     private ColumnType _type;

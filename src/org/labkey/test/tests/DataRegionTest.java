@@ -39,12 +39,13 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.labkey.test.params.FieldDefinition.DOMAIN_TRICKY_CHARACTERS;
 
 @Category({Daily.class, Data.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 6)
 public class DataRegionTest extends AbstractQWPTest
 {
-    private static final String LIST_NAME = "WebColors" + INJECT_CHARS_1;
+    private static final String LIST_NAME = "WebColors" + DOMAIN_TRICKY_CHARACTERS;
     private static final FieldDefinition.ColumnType LIST_KEY_TYPE = FieldDefinition.ColumnType.Integer;
     private static final String LIST_KEY_NAME = "Key";
 
