@@ -22,6 +22,7 @@ import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.awaitility.Awaitility;
 import org.eclipse.jetty.util.URIUtil;
 import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.Contract;
@@ -1006,9 +1007,8 @@ public abstract class WebDriverWrapper implements WrapsDriver
         try
         {
             getDriver().switchTo().window(windows.get(index));
-            new WebDriverWait(getDriver(), Duration.ofSeconds(WAIT_FOR_PAGE))
-                .withMessage("waiting for document to be ready")
-                .until(wd -> Objects.equals(executeScript("return document.readyState;"), "complete"));
+            Awaitility.await("waiting for document to be ready").atMost(Duration.ofMillis(WAIT_FOR_PAGE)).untilAsserted(() ->
+                assertEquals("document.readyState", "complete", executeScript("return document.readyState;")));
         }
         catch (StackOverflowError soe)
         {
