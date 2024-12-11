@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -39,6 +40,7 @@ import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
+import org.labkey.test.util.TestDataGenerator;
 import org.labkey.test.util.core.webdav.WebDavUploadHelper;
 import org.openqa.selenium.WebElement;
 
@@ -333,15 +335,20 @@ public class GpatAssayTest extends BaseWebDriverTest
     @Test
     public void testUpdateAssayDesign() throws IOException, CommandException
     {
+        File trialData = TestFileUtils.getSampleData("GPAT/renameAssayTrial.xls");
+
+        String invalidAssayName = TestDataGenerator.randomInvalidDomainName(10);
+        ReactAssayDesignerPage assayDesignerPage = startCreateGpatAssay(trialData, invalidAssayName);
+        List<String> errors = assayDesignerPage.clickSaveExpectingErrors();
+        assayDesignerPage.clickCancel();
+        Assert.assertTrue("Error msg not as expected during assay creation", errors.contains("Invalid Assay Design name. Domain name must start with a letter or a number character."));
 
         BaseSettingsPage.resetSettings(createDefaultConnection(), "/");
         BaseSettingsPage.resetSettings(createDefaultConnection(), getProjectName());
 
-        File trialData = TestFileUtils.getSampleData("GPAT/renameAssayTrial.xls");
-
-        String originalAssayName = "A Assay Name";
+        String originalAssayName = TestDataGenerator.randomDomainName();
         log(String.format("Create an assay named '%s'.", originalAssayName));
-        ReactAssayDesignerPage assayDesignerPage = startCreateGpatAssay(trialData, originalAssayName);
+        assayDesignerPage = startCreateGpatAssay(trialData, originalAssayName);
 
         DomainFormPanel runProperties = assayDesignerPage.goToRunFields();
 
@@ -389,13 +396,17 @@ public class GpatAssayTest extends BaseWebDriverTest
         checker().verifyEquals(String.format("Value in column '%s' is not as expected.", runDateTime02),
                 defaultDateTimeFormat.format(date), rowMap.get(runDateTime02));
 
-        String newAssayName = "Updated Assay Name";
+        String newAssayName = TestDataGenerator.randomDomainName();
         log(String.format("Edit the assay design and rename it to '%s'.", newAssayName));
 
         assayDesignerPage = _assayHelper.clickEditAssayDesign(false);
         checker().fatal()
                 .verifyTrue("The 'Name' field should be enabled and editable. Fatal error.",
                         assayDesignerPage.isNameEnabled());
+
+        assayDesignerPage.setName(invalidAssayName);
+        errors = assayDesignerPage.clickSaveExpectingErrors();
+        Assert.assertTrue("Error msg not as expected during assay update", errors.contains("Invalid Assay Design name. Domain name must start with a letter or a number character."));
 
         assayDesignerPage.setName(newAssayName);
 

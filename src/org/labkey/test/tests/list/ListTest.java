@@ -18,6 +18,7 @@ package org.labkey.test.tests.list;
 
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.MatcherAssert;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -1149,10 +1150,20 @@ public class ListTest extends BaseWebDriverTest
         String listName = "new";
         String origFieldName = "BarBar";
         String newFieldName = "FooFoo";
+        String invalidListName = TestDataGenerator.randomInvalidDomainName(5);
+        EditListDefinitionPage listDefinitionPage = _listHelper.beginCreateList(PROJECT_VERIFY, invalidListName);
+        listDefinitionPage.manuallyDefineFieldsWithAutoIncrementingKey("key");
+        List<String> errors = listDefinitionPage.clickSaveExpectingErrors();
+        Assert.assertTrue("Error msg not as expected during list creation", errors.contains("Invalid IntList name. Domain name must start with a letter or a number character."));
+
         _listHelper.createList(PROJECT_VERIFY, listName, "key",
                 new FieldDefinition(origFieldName, ColumnType.String).setLabel(origFieldName).setDescription("first column"));
 
-        EditListDefinitionPage listDefinitionPage = _listHelper.goToEditDesign(listName);
+        listDefinitionPage = _listHelper.goToEditDesign(listName);
+        listDefinitionPage.setName(invalidListName);
+        errors = listDefinitionPage.clickSaveExpectingErrors();
+        Assert.assertTrue("Error msg not as expected during list renaming", errors.contains("Invalid IntList name. Domain name must start with a letter or a number character."));
+        listDefinitionPage.setName(listName);
         listDefinitionPage.getFieldsPanel()
                 .getField(origFieldName)
                 .setName(newFieldName)
