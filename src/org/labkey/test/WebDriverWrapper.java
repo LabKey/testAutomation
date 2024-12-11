@@ -22,6 +22,7 @@ import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.assertj.core.api.Assertions;
 import org.awaitility.Awaitility;
 import org.eclipse.jetty.util.URIUtil;
 import org.intellij.lang.annotations.Language;
@@ -1008,7 +1009,8 @@ public abstract class WebDriverWrapper implements WrapsDriver
         {
             getDriver().switchTo().window(windows.get(index));
             Awaitility.await("waiting for document to be ready").atMost(Duration.ofMillis(WAIT_FOR_PAGE)).untilAsserted(() ->
-                assertEquals("document.readyState", "complete", executeScript("return document.readyState;")));
+                Assertions.assertThat(executeScript("return document.readyState;"))
+                    .as("document.readyState").isIn("complete", "uninitialized")); // "uninitialized" for blank firefox tab
         }
         catch (StackOverflowError soe)
         {
