@@ -936,6 +936,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
         // check the row level audit details
         popLocation();
+        waitForElement(Locator.linkWithText("vehicle.Models"));
         selectSchema(VEHICLE_SCHEMA);
         selectQuery(VEHICLE_SCHEMA, "Models");
         assertElementPresent(Locator.linkWithText("view data"));
@@ -1214,7 +1215,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
     {
         log("Verify module report \"created\" date");
         click(Locator.tag("span").withClass("fa-list-ul").notHidden());
-        waitForText("2015-08-01");
+        waitForText("August 01 2015");
     }
 
     @LogMethod

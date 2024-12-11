@@ -139,21 +139,28 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
             else if (fieldDefinition.getType().equals(FieldDefinition.ColumnType.DateAndTime))
             {
 
-                // Identify the part of the format that is the date and the part that is the time. Take into account
-                // a data format may include spaces (time does not).
-                String format = fieldDefinition.getFormat().trim();
-                int index = format.lastIndexOf(" ");
+                // Identify the part of the format that is the date and the part that is the time.
+                String formatStr = fieldDefinition.getFormat().trim();
+                int index = formatStr.indexOf(":");
 
-                if (format.substring(index + 1).contains(":"))
+                if (index == -1)
                 {
-                    fieldRow.setDateTimeFormat(
-                            DATE_FORMAT.get(format.substring(0, index)),
-                            TIME_FORMAT.get(format.substring(index + 1)));
+                    // If there is no ':' then it is a date only format.
+                    fieldRow.setDateTimeFormat(DATE_FORMAT.get(formatStr));
                 }
                 else
                 {
-                    fieldRow.setDateTimeFormat(DATE_FORMAT.get(format));
+                    // Split the format into the date part and the time part. Take into account that the date part may
+                    // have several spaces and the time part may have a space if there is an am/pm indicator.
+                    // Find the last index of the ' ' before the ':'.
+                    String tmpStr = formatStr.substring(0, index);
+                    index = tmpStr.lastIndexOf(" ");
+
+                    fieldRow.setDateTimeFormat(
+                            DATE_FORMAT.get(formatStr.substring(0, index)),
+                            TIME_FORMAT.get(formatStr.substring(index + 1)));
                 }
+
             }
             else
             {
