@@ -4,11 +4,10 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.pages.core.admin.BaseSettingsPage;
-import org.labkey.test.pages.core.admin.BaseSettingsPage.DATE_FORMAT;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-public class FolderFormatsPage extends FolderManagementPage
+public class FolderFormatsPage extends BaseSettingsPage
 {
 
     public FolderFormatsPage(WebDriver driver)
@@ -50,42 +49,6 @@ public class FolderFormatsPage extends FolderManagementPage
         setInherited("defaultDateFormatInherited", enable);
     }
 
-    public String getDefaultDateDisplay()
-    {
-        return getSelectedOptionValue(elementCache().defaultDateFormat);
-    }
-
-    public void setDefaultDateDisplay(DATE_FORMAT dateFormat)
-    {
-        selectOptionByValue(elementCache().defaultDateFormat, dateFormat.toString());
-    }
-
-    public boolean defaultDateDisplayWarning()
-    {
-        return elementCache().nonStandardWarning(elementCache().defaultDateFormat).isDisplayed();
-    }
-
-    public void setDefaultDateTimeDisplay(BaseSettingsPage.DATE_FORMAT dateFormat, BaseSettingsPage.TIME_FORMAT timeFormat)
-    {
-        setDefaultDateTimeDateDisplay(dateFormat);
-        setDefaultDateTimeTimeDisplay(timeFormat);
-    }
-
-    public String getDefaultDateTimeDateDisplay()
-    {
-        return getSelectedOptionValue(elementCache().defaultDateTimeDateFormat);
-    }
-
-    public void setDefaultDateTimeDateDisplay(BaseSettingsPage.DATE_FORMAT dateFormat)
-    {
-        selectOptionByValue(elementCache().defaultDateTimeDateFormat, dateFormat.toString());
-    }
-
-    public boolean defaultDateTimeDateDisplayWarning()
-    {
-        return elementCache().nonStandardWarning(elementCache().defaultDateTimeDateFormat).isDisplayed();
-    }
-
     public boolean getDefaultTimeDisplayInherited()
     {
         return getInherited("defaultTimeFormatInherited");
@@ -94,21 +57,6 @@ public class FolderFormatsPage extends FolderManagementPage
     public void setDefaultTimeDisplayInherited(boolean enable)
     {
         setInherited("defaultTimeFormatInherited", enable);
-    }
-
-    public String getDefaultDateTimeTimeDisplay()
-    {
-        return getSelectedOptionValue(elementCache().defaultDateTimeTimeFormat);
-    }
-
-    public void setDefaultDateTimeTimeDisplay(BaseSettingsPage.TIME_FORMAT timeFormat)
-    {
-        selectOptionByValue(elementCache().defaultDateTimeTimeFormat, timeFormat.toString());
-    }
-
-    public boolean defaultDateTimeTimeDisplayWarning()
-    {
-        return elementCache().nonStandardWarning(elementCache().defaultDateTimeTimeFormat).isDisplayed();
     }
 
     public boolean getDefaultDateTimeDisplayInherited()
@@ -121,21 +69,6 @@ public class FolderFormatsPage extends FolderManagementPage
         setInherited("defaultDateTimeFormatInherited", enable);
     }
 
-    public String getDefaultTimeDisplay()
-    {
-        return getSelectedOptionValue(elementCache().defaultTimeFormat);
-    }
-
-    public void setDefaultTimeDisplay(BaseSettingsPage.TIME_FORMAT timeFormat)
-    {
-        selectOptionByValue(elementCache().defaultTimeFormat, timeFormat.toString());
-    }
-
-    public boolean defaultTimeDisplayWarning()
-    {
-        return elementCache().nonStandardWarning(elementCache().defaultTimeFormat).isDisplayed();
-    }
-
     public boolean getDefaultNumberDisplayInherited()
     {
         return getInherited("defaultNumberFormatInherited");
@@ -144,16 +77,6 @@ public class FolderFormatsPage extends FolderManagementPage
     public void setDefaultNumberDisplayInherited(boolean enable)
     {
         setInherited("defaultNumberFormatInherited", enable);
-    }
-
-    public String getDefaultNumberDisplay()
-    {
-        return getFormElement(elementCache().defaultNumberFormat);
-    }
-
-    public void setDefaultNumberDisplay(String numberFormat)
-    {
-        setFormElement(elementCache().defaultNumberFormat, numberFormat);
     }
 
     public boolean getAdditionalParsingPatternDatesInherited()
@@ -166,17 +89,6 @@ public class FolderFormatsPage extends FolderManagementPage
         setInherited("extraDateParsingPatternInherited", enable);
     }
 
-    // Only available if the "extraDateTimeParsingPatterns" optional/deprecated feature is enabled.
-    public String getAdditionalParsingPatternDates()
-    {
-        return getFormElement(elementCache().additionalParsingPatternDates);
-    }
-
-    public void setAdditionalParsingPatternDates(String pattern)
-    {
-        setFormElement(elementCache().additionalParsingPatternDates, pattern);
-    }
-
     public boolean getAdditionalParsingPatternDateAndTimeInherited()
     {
         return getInherited("extraDateTimeParsingPatternInherited");
@@ -185,17 +97,6 @@ public class FolderFormatsPage extends FolderManagementPage
     public void setAdditionalParsingPatternDateAndTimeInherited(boolean enable)
     {
         setInherited("extraDateTimeParsingPatternInherited", enable);
-    }
-
-    // Only available if the "extraDateTimeParsingPatterns" optional/deprecated feature is enabled.
-    public String getAdditionalParsingPatternDateAndTime()
-    {
-        return getFormElement(elementCache().additionalParsingPatternDateAndTime);
-    }
-
-    public void setAdditionalParsingPatternDateAndTime(String pattern)
-    {
-        setFormElement(elementCache().additionalParsingPatternDateAndTime, pattern);
     }
 
     public boolean getAdditionalParsingPatternTimesInherited()
@@ -208,17 +109,6 @@ public class FolderFormatsPage extends FolderManagementPage
         setInherited("extraTimeParsingPatternInherited", enable);
     }
 
-    // Only available if the "extraDateTimeParsingPatterns" optional/deprecated feature is enabled.
-    public String getAdditionalParsingPatternTimes()
-    {
-        return getFormElement(elementCache().additionalParsingPatternTimes);
-    }
-
-    public void setAdditionalParsingPatternTimes(String pattern)
-    {
-        setFormElement(elementCache().additionalParsingPatternTimes, pattern);
-    }
-
     public boolean getRestrictChartingColsInherited()
     {
         return getInherited("restrictedColumnsEnabledInherited");
@@ -229,22 +119,9 @@ public class FolderFormatsPage extends FolderManagementPage
         setInherited("restrictedColumnsEnabledInherited", enable);
     }
 
-    public void setRestrictChartingCols(boolean restrict)
-    {
-        if (restrict)
-            checkCheckbox(elementCache().restrictChartingColsChk);
-        else
-            uncheckCheckbox(elementCache().restrictChartingColsChk);
-    }
-
-    public boolean getRestrictChartingCols()
-    {
-        return elementCache().restrictChartingColsChk.isSelected();
-    }
-
     public FolderFormatsPage clickSave()
     {
-        clickAndWait(elementCache().saveButton);
+        super.save();
         clearCache();
         return this;
     }
@@ -257,47 +134,24 @@ public class FolderFormatsPage extends FolderManagementPage
     }
 
     @Override
-    protected ElementCache newElementCache()
-    {
-        return new ElementCache();
-    }
-
-    @Override
     protected ElementCache elementCache()
     {
         return (ElementCache) super.elementCache();
     }
 
-    protected class ElementCache extends FolderManagementPage.ElementCache
+    @Override
+    protected ElementCache newElementCache()
+    {
+        return new ElementCache();
+    }
+
+    protected class ElementCache extends BaseSettingsPage.ElementCache
     {
         WebElement inheritedChk(String name)
         {
             return Locator.checkboxByName(name).findWhenNeeded(this);
         }
 
-        WebElement defaultDateFormat = Locator.id("defaultDateFormat").findWhenNeeded(this);
-        WebElement defaultTimeFormat = Locator.id("defaultTimeFormat").findWhenNeeded(this);
-        WebElement defaultDateTimeDateFormat = Locator.id("dateSelect").findWhenNeeded(this);
-        WebElement defaultDateTimeTimeFormat = Locator.id("timeSelect").findWhenNeeded(this);
-        WebElement formatWarningBanner = Locator.tagWithId("div", "dateFormatWarning").findWhenNeeded(this);
-
-        WebElement nonStandardWarning(WebElement field)
-        {
-            String id = field.getAttribute("id");
-            String xpath = String.format("//select[@id='%s']/following-sibling::span[@class='has-warning']", id);
-            return Locator.xpath(xpath).findWhenNeeded(this);
-        }
-
-        WebElement defaultNumberFormat = Locator.inputByNameContaining("defaultNumberFormat").findWhenNeeded(this);
-        WebElement restrictChartingColsChk = Locator.checkboxByName("restrictedColumnsEnabled").findWhenNeeded(this);
-
-        // These next three elements can go away one the feature is completely removed.
-        // Until then these will only appear on the page if the "extraDateTimeParsingPatterns" optional/deprecated feature is enabled.
-        WebElement additionalParsingPatternDates = Locator.inputByNameContaining("extraDateParsingPattern").findWhenNeeded(this);
-        WebElement additionalParsingPatternTimes = Locator.inputByNameContaining("extraTimeParsingPattern").findWhenNeeded(this);
-        WebElement additionalParsingPatternDateAndTime = Locator.inputByNameContaining("extraDateTimeParsingPattern").findWhenNeeded(this);
-
-        WebElement saveButton = Locator.lkButton("Save").findWhenNeeded(this);
         WebElement inheritAll = Locator.lkButton("Inherit All").findWhenNeeded(this);
 
     }
