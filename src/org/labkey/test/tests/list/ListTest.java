@@ -1155,7 +1155,7 @@ public class ListTest extends BaseWebDriverTest
         EditListDefinitionPage listDefinitionPage = _listHelper.beginCreateList(PROJECT_VERIFY, invalidListName);
         listDefinitionPage.manuallyDefineFieldsWithAutoIncrementingKey("key");
         List<String> errors = listDefinitionPage.clickSaveExpectingErrors();
-        Assert.assertTrue("Error msg not as expected during list creation", errors.contains("Invalid IntList name. Domain name must start with a letter or a number character."));
+        Assert.assertTrue("Error msg not as expected during list creation", errors.contains("Invalid IntList name \"" + invalidListName + "\". IntList name must start with a letter or a number."));
 
         _listHelper.createList(PROJECT_VERIFY, listName, "key",
                 new FieldDefinition(origFieldName, ColumnType.String).setLabel(origFieldName).setDescription("first column"));
@@ -1163,7 +1163,7 @@ public class ListTest extends BaseWebDriverTest
         listDefinitionPage = _listHelper.goToEditDesign(listName);
         listDefinitionPage.setName(invalidListName);
         errors = listDefinitionPage.clickSaveExpectingErrors();
-        Assert.assertTrue("Error msg not as expected during list renaming", errors.contains("Invalid IntList name. Domain name must start with a letter or a number character."));
+        Assert.assertTrue("Error msg not as expected during list renaming", errors.contains("Invalid IntList name \"" + invalidListName + "\". IntList name must start with a letter or a number."));
         listDefinitionPage.setName(listName);
         listDefinitionPage.getFieldsPanel()
                 .getField(origFieldName)

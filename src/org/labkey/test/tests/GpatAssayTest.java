@@ -55,6 +55,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.labkey.test.params.FieldDefinition.DOMAIN_TRICKY_CHARACTERS;
 
 @Category({Assays.class, BVT.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 7)
@@ -64,7 +65,7 @@ public class GpatAssayTest extends BaseWebDriverTest
     private static final File GPAT_ASSAY_XLSX = TestFileUtils.getSampleData("GPAT/trial01a.xlsx");
     private static final File GPAT_ASSAY_TSV = TestFileUtils.getSampleData("GPAT/trial02.tsv");
     private static final File GPAT_ASSAY_FNA_1 = TestFileUtils.getSampleData("GPAT/trial03.fna");
-    private static final String ASSAY_NAME_XLS = "XLS Assay " + TRICKY_CHARACTERS;
+    private static final String ASSAY_NAME_XLS = "XLS Assay " + DOMAIN_TRICKY_CHARACTERS;
     private static final String ASSAY_NAME_XLSX = "XLSX Assay";
     private static final String ASSAY_NAME_TSV = "TSV Assay";
     private static final String ASSAY_NAME_FNA = "FASTA Assay";
@@ -341,7 +342,7 @@ public class GpatAssayTest extends BaseWebDriverTest
         ReactAssayDesignerPage assayDesignerPage = startCreateGpatAssay(trialData, invalidAssayName);
         List<String> errors = assayDesignerPage.clickSaveExpectingErrors();
         assayDesignerPage.clickCancel();
-        Assert.assertTrue("Error msg not as expected during assay creation", errors.contains("Invalid Assay Design name. Domain name must start with a letter or a number character."));
+        Assert.assertTrue("Error msg not as expected during assay creation", errors.contains("Invalid Assay Design name \"" + invalidAssayName + "\". Assay Design name must start with a letter or a number."));
 
         BaseSettingsPage.resetSettings(createDefaultConnection(), "/");
         BaseSettingsPage.resetSettings(createDefaultConnection(), getProjectName());
@@ -406,7 +407,7 @@ public class GpatAssayTest extends BaseWebDriverTest
 
         assayDesignerPage.setName(invalidAssayName);
         errors = assayDesignerPage.clickSaveExpectingErrors();
-        Assert.assertTrue("Error msg not as expected during assay update", errors.contains("Invalid Assay Design name. Domain name must start with a letter or a number character."));
+        Assert.assertTrue("Error msg not as expected during assay update", errors.contains("Invalid Assay Design name \"" + invalidAssayName + "\". Assay Design name must start with a letter or a number."));
 
         assayDesignerPage.setName(newAssayName);
 
