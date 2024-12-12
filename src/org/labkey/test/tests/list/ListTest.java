@@ -145,7 +145,7 @@ public class ListTest extends BaseWebDriverTest
     private final String TEST_FAIL3 = LIST_KEY_NAME2 + "\t" + FAKE_COL_NAME + "\t" + _listColMonth.getName() + "\n" +
             LIST_ROW1;
     private final static String TEST_VIEW = "list_view";
-    private final static String LIST2_NAME_CARS = TRICKY_CHARACTERS_NO_QUOTES + "Cars";
+    private final static String LIST2_NAME_CARS = "Cars_" + DOMAIN_TRICKY_CHARACTERS;
     protected final static ColumnType LIST2_KEY_TYPE = ColumnType.String;
     protected final static String LIST2_KEY_NAME = "Car";
 

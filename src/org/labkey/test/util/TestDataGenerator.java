@@ -350,7 +350,7 @@ public class TestDataGenerator
             domainName = prefix + randomString(size - 1, null, charset);
             domainName = domainName.trim();
         }
-        while (domainName.length() < size || Pattern.matches("(.*\\s--[^ ].*)|(.*\\s-[^- ].*)", domainName)); // domain name must not contain space followed by dash. (command like)
+        while (domainName.length() < size || Pattern.matches("(.*\\s--[^ ].*)|(.*\\s-[^- ].*)", domainName)); // domain name must not contain space followed by dash. (command like: Issue 49161)
 
         return domainName;
     }
