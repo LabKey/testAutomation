@@ -627,7 +627,7 @@ public class ClientAPITest extends BaseWebDriverTest
                 "});\n";
 
         Map<String, Object> error = (Map<String,Object>)executeAsyncScript(create);
-        assertEquals("Unexpected error message", "Dataset name cannot be empty.", error.get("exception"));
+        assertEquals("Unexpected error message", "StudyDatasetVisit name must not be blank.", error.get("exception"));
     }
 
     @Test

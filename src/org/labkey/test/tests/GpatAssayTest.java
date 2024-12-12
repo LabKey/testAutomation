@@ -38,6 +38,7 @@ import org.labkey.test.pages.assay.AssayBeginPage;
 import org.labkey.test.pages.core.admin.BaseSettingsPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.TestDataGenerator;
@@ -121,7 +122,7 @@ public class GpatAssayTest extends BaseWebDriverTest
         {
             // Issue 36077: SelectRows: SchemaKey decoding of public schema name causes request failure
             Connection cn = createDefaultConnection();
-            SelectRowsCommand selectCmd = new SelectRowsCommand("assay.General." + ASSAY_NAME_XLS, "Runs");
+            SelectRowsCommand selectCmd = new SelectRowsCommand("assay.General." + EscapeUtil.fieldKeyEncodePart(ASSAY_NAME_XLS), "Runs");
             selectCmd.setRequiredVersion(17.1);
             SelectRowsResponse selectResp = selectCmd.execute(cn, getProjectName());
             assertEquals(1, selectResp.getRowCount().intValue());
