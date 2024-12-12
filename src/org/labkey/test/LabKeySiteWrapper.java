@@ -1320,6 +1320,8 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     public void clickProject(String project, boolean assertDestination)
     {
         projectMenu().navigateToProject(project);
+        // After clicking menu item mouse could be left in a position that would be over an element that could have a pop-up.
+        mouseOut();
         if (assertDestination)
         {
             acceptTermsOfUse(null, true);

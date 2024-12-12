@@ -1113,11 +1113,9 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
      * <p>
      *     Test setting the format property on a date-only, time-only and DateTime field.
      * </p>
-     * @throws IOException Can be thrown by helper that checks if the list already exists.
-     * @throws CommandException Can be thrown by helper that checks if the list already exists.
      */
     @Test
-    public void testDateAndTimeFormat() throws IOException, CommandException
+    public void testDateAndTimeFormat()
     {
         DATE_FORMAT dateFormat01 = DATE_FORMAT.Default;
         TIME_FORMAT timeFormat01 = TIME_FORMAT.hh_mm_a;
