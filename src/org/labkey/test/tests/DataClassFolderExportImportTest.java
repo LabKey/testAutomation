@@ -181,7 +181,7 @@ public class DataClassFolderExportImportTest extends BaseWebDriverTest
 
         String subfolder = "missingValueDataClassExportFolder";
         String subfolderPath = getProjectName() + "/" + subfolder;
-        String testDataClass = "missing_Value*Data//Class";     // having the dataClass with non-file-legal chars in it is intentional,
+        String testDataClass = "missing_Value+Data//Class";     // having the dataClass with non-file-legal chars in it is intentional,
                                                                 // the import/export processes will write temp-files with names derived from
                                                                 // the dataClass name.  This ensures that the sanitized name on export can
                                                                 // be successfully matched up with the intended dataClass on import

@@ -2173,12 +2173,14 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             assertTextPresent(searchFor);
         }
     }
-
-    // Helper methods for interacting with the query schema browser
     public void selectSchema(String schemaName)
     {
         String[] schemaParts = schemaName.split("\\.");
-
+        selectSchema(schemaParts);
+    }
+    // Helper methods for interacting with the query schema browser
+    public void selectSchema(String[] schemaParts)
+    {
         StringBuilder schemaWithParents = new StringBuilder();
         String separator = "";
         for (String schemaPart : schemaParts)
@@ -2227,8 +2229,14 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     public void selectQuery(String schemaName, String queryName)
     {
+        selectQuery(schemaName.split("\\."), queryName);
+    }
+
+    public void selectQuery(String[] schemaPart, String queryName)
+    {
+        String schemaName = StringUtils.join(schemaPart, ".");
         log("Selecting query " + schemaName + "." + queryName + " in the schema browser...");
-        selectSchema(schemaName);
+        selectSchema(schemaPart);
         mouseOver(Locator.byClass(".x4-tab-button")); // Move away from schema tree to dismiss tooltip
         waitAndClick(Ext4Helper.Locators.tab(schemaName)); // Click schema tab to make sure query list is visible
         WebElement queryLink = Locator.tagWithClass("table", "lk-qd-coltable").append(Locator.tagWithClass("span", "labkey-link")).withText(queryName).notHidden().waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);

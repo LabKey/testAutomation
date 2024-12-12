@@ -60,7 +60,7 @@ public class FilterTest extends BaseWebDriverTest
     protected final static String R_VIEW = TRICKY_CHARACTERS + "R report";
     protected final static String FACET_TEST_LIST = "FacetList";
 
-    protected final static String LIST_NAME_COLORS = DOMAIN_TRICKY_CHARACTERS + "Colors";
+    protected final static String LIST_NAME_COLORS = "Colors" + DOMAIN_TRICKY_CHARACTERS;
     protected final static String LIST_KEY_NAME2 = "Color";
 
     protected final FieldDefinition _listColKey = new FieldDefinition("Color", ColumnType.String);

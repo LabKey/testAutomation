@@ -90,7 +90,7 @@ public class ListTest extends BaseWebDriverTest
 {
     protected final static String PROJECT_VERIFY = "ListVerifyProject" ;//+ TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
     private final static String PROJECT_OTHER = "OtherListVerifyProject";
-    protected final static String LIST_NAME_COLORS = DOMAIN_TRICKY_CHARACTERS + "_Colors";
+    protected final static String LIST_NAME_COLORS = "Colors_" + DOMAIN_TRICKY_CHARACTERS;
     protected final static ColumnType LIST_KEY_TYPE = ColumnType.String;
     protected final static String LIST_KEY_NAME = "Key";
     protected final static String LIST_KEY_NAME2 = "Color";
