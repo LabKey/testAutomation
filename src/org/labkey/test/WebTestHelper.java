@@ -188,13 +188,12 @@ public class WebTestHelper
         {
             try
             {
-                SelectRowsCommand selectRowsCommand = new SelectRowsCommand("core", "UserApiKeys");
+                SelectRowsCommand selectRowsCommand = new SelectRowsCommand("core", "apiKeys");
                 selectRowsCommand.setFilters(List.of(new Filter("Description", description)));
                 List<Map<String, Object>> rows = selectRowsCommand.execute(connection, null).getRows();
-                rows = rows.stream().filter(row -> row.get("Description").equals(description)).toList(); // API Filter isn't working
                 if (rows.size() == 1)
                 {
-                    DeleteRowsCommand deleteRowsCommand = new DeleteRowsCommand("core", "UserApiKeys");
+                    DeleteRowsCommand deleteRowsCommand = new DeleteRowsCommand("core", "apiKeys");
                     deleteRowsCommand.setRows(rows);
                     deleteRowsCommand.execute(connection, null);
                     savedApiKeys.remove(apiKey);
