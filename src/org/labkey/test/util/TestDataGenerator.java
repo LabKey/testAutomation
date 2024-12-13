@@ -68,7 +68,7 @@ public class TestDataGenerator
     // chose a Character random from this String
     public static final String CHARSET_STRING = "ABCDEFG01234abcdefvxyz~!@#$%^&*()-+=_{}[]|:;\"',.<>";
     public static final String ALPHANUMERIC_STRING = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvxyz";
-    public static final String DOMAIN_SPECIAL_STRING =  " +-_.:&()/";
+    public static final String DOMAIN_SPECIAL_STRING =  "+- _.:&()/";
     public static final String ILLEGAL_DOMAIN_NAME_CHARSET = "<>[]{};,`\"~!@#$%^*=|?\\";
 
     private final Map<String, PropertyDescriptor> _columns = new CaseInsensitiveLinkedHashMap<>();
