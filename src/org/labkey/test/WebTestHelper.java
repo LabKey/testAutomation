@@ -46,6 +46,9 @@ import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.SimplePostCommand;
+import org.labkey.remoteapi.query.DeleteRowsCommand;
+import org.labkey.remoteapi.query.Filter;
+import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.serverapi.reader.Readers;
 import org.labkey.test.util.InstallCert;
 import org.labkey.test.util.LogMethod;
@@ -79,9 +82,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Random;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -107,6 +112,7 @@ public class WebTestHelper
     private static boolean USE_CONTAINER_RELATIVE_URL = true;
     private static final Map<String, Map<String, Cookie>> savedCookies = new HashMap<>();
     private static final Map<String, String> savedSessionKeys = new HashMap<>();
+    private static final Map<String, String> savedApiKeys = new HashMap<>();
 
     static { TestProperties.load(); }
 
@@ -139,31 +145,74 @@ public class WebTestHelper
         }
         String sessionId = sessionCookie.getValue();
 
-        if (!savedSessionKeys.containsKey(sessionId))
-        {
-            Connection connection = getRemoteApiConnection(user, true);
-            SimplePostCommand command = new SimplePostCommand("security", "createApiKey");
-            JSONObject json = new JSONObject();
-            json.put("type", "session");
-            command.setJsonObject(json);
+        return savedSessionKeys.computeIfAbsent(sessionId, k -> createApiKey(getRemoteApiConnection(user, true), "session", null));
+    }
 
+    public static String createApiKey(Connection connection)
+    {
+        String description = UUID.randomUUID().toString(); // Something unique that we can query for deletion
+        String apiKey = createApiKey(connection, API_KEY, description);
+        savedApiKeys.put(apiKey, description);
+        return apiKey;
+    }
+
+    private static String createApiKey(Connection connection, String type, String description)
+    {
+        SimplePostCommand command = new SimplePostCommand("security", "createApiKey");
+        JSONObject json = new JSONObject();
+        json.put("type", type);
+        json.put("description", description);
+        command.setJsonObject(json);
+
+        try
+        {
+            CommandResponse response = command.execute(connection, "/");
+            String apikey = (String) response.getParsedData().get("apikey");
+            if (apikey == null)
+            {
+                TestLogger.error(response.getText());
+                throw new RuntimeException("Failed to generate session key");
+            }
+            return apikey;
+        }
+        catch (CommandException | IOException e)
+        {
+            throw new RuntimeException("Unable to generate session key", e);
+        }
+    }
+
+    public static void deleteApiKey(Connection connection, String apiKey)
+    {
+        String description = savedApiKeys.get(apiKey);
+        if (description != null)
+        {
             try
             {
-                CommandResponse response = command.execute(connection, "/");
-                Object apikey = response.getParsedData().get("apikey");
-                if (apikey == null)
+                SelectRowsCommand selectRowsCommand = new SelectRowsCommand("core", "UserApiKeys");
+                selectRowsCommand.setFilters(List.of(new Filter("Description", description)));
+                List<Map<String, Object>> rows = selectRowsCommand.execute(connection, null).getRows();
+                rows = rows.stream().filter(row -> row.get("Description").equals(description)).toList(); // API Filter isn't working
+                if (rows.size() == 1)
                 {
-                    TestLogger.error(response.getText());
-                    throw new RuntimeException("Failed to generate session key");
+                    DeleteRowsCommand deleteRowsCommand = new DeleteRowsCommand("core", "UserApiKeys");
+                    deleteRowsCommand.setRows(rows);
+                    deleteRowsCommand.execute(connection, null);
+                    savedApiKeys.remove(apiKey);
                 }
-                savedSessionKeys.put(sessionId, (String) apikey);
+                else
+                {
+                    TestLogger.log("Unexpected number of rows found: " + rows.size());
+                }
             }
-            catch (CommandException | IOException e)
+            catch (IOException | CommandException e)
             {
-                throw new RuntimeException("Unable to generate session key", e);
+                throw new RuntimeException(e);
             }
         }
-        return savedSessionKeys.get(sessionId);
+        else
+        {
+            TestLogger.warn("Refusing to delete an API key not created by this test");
+        }
     }
 
     public static boolean isUseContainerRelativeUrl()
