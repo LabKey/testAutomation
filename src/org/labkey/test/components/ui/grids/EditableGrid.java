@@ -129,6 +129,14 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         throw new NotFoundException("Column not found in grid: " + columnHeader + ". Found: " + columnTexts);
     }
 
+    public EditableGrid removeColumn(String columnHeader)
+    {
+        WebElement headerCell = elementCache().getGridCellHeader(columnHeader);
+        Locator.byClass("fa-chevron-circle-down").findElement(headerCell).click();
+        Locator.tagWithText("a", "Remove Column").findElement(headerCell).click();
+        return this;
+    }
+
     private boolean hasSelectColumn()
     {
         return elementCache().selectColumn.isDisplayed();
@@ -1079,6 +1087,11 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         final ExportMenu exportMenu = ExportMenu.finder(getDriver()).findWhenNeeded(topControls);
         final WebElement table = Locator.byClass("table-cellular").findWhenNeeded(this);
         private final WebElement selectColumn = Locator.xpath("//th/input[@type='checkbox']").findWhenNeeded(table);
+
+        public WebElement getGridCellHeader(String label)
+        {
+            return Locator.byClass("grid-header-cell").withDescendant(Locator.tagContainingText("span", label)).findWhenNeeded(table);
+        }
 
         private List<String> columnNames = new ArrayList<>();
 

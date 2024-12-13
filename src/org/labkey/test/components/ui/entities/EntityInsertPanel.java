@@ -6,13 +6,12 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.html.RadioButton;
-import org.labkey.test.components.react.ReactSelect;
+import org.labkey.test.components.react.MultiMenu;
 import org.labkey.test.components.ui.files.FileUploadPanel;
 import org.labkey.test.components.ui.grids.EditableGrid;
 import org.labkey.test.components.ui.grids.ResponsiveGrid;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
@@ -22,7 +21,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
-import static org.labkey.test.WebDriverWrapper.sleep;
 
 /**
  * This class automates the UI component defined in <a href="https://github.com/LabKey/labkey-ui-components/blob/master/packages/components/src/components/entities/EntityInsertPanel.tsx">components/entities/EntityInsertPanel.tsx</a>
@@ -53,113 +51,40 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
         return _driver;
     }
 
-    public boolean hasTargetEntityTypeSelect()
+    public String getTargetEntityType()
     {
-        return Locator.tagWithName("input", "targetEntityType").existsIn(this);
+        return elementCache().targetType.getText();
     }
 
-    public ReactSelect targetEntityTypeSelect()
+    public MultiMenu getAddParentMenu()
     {
-        // Which tabs are available and selected can vary so try finding the visible react select
-        ReactSelect firstTabSelect = ReactSelect.finder(getDriver()).withName("targetEntityType").index(0).waitFor();
-        if (firstTabSelect.getComponentElement().isDisplayed())
-        {
-            return firstTabSelect;
-        }
-        else
-        {
-            return ReactSelect.finder(getDriver()).withName("targetEntityType").index(1).waitFor();
-        }
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().addParent.getComponentElement()));
+        return elementCache().addParent;
     }
 
-    private ReactSelect parentEntityTypeSelect(String label)
+    public EntityInsertPanel addParent(String parentType)
     {
-        return ReactSelect.finder(getDriver()).followingLabelWithSpan(label).findWhenNeeded(getDriver());
-    }
-
-    public EntityInsertPanel addParent(String label, String parentType)
-    {
-        return addParent(label, parentType, true);
-    }
-
-    /*
-        Occasionally the 'add parent' functionality of the EntityInsertPanel will show the parent select
-        briefly after clicking the 'show parent' button, but then it will disappear.  This occasionally causes
-        test failures; until we can address the product-side issue, adding retry to prevent unwanted false-failure
-     */
-    private EntityInsertPanel addParent(String label, String parentType, boolean retry)
-    {
-        try
-        {
-            getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().addParent));
-            elementCache().addParent.click();
-            getWrapper().waitForElement(Locator.tag("label").withChild(Locator.tagWithText("span", label)));
-            parentEntityTypeSelect(label).select(parentType);
-            return this;
-        }
-        catch (WebDriverException ex)
-        {
-            if (retry)
-            {
-                sleep(3_000);    // penalty sleep, make *sure* it's ready to be clicked now
-                return addParent(label, parentType, false); // false here prevents looping
-            }
-            else
-            {
-                throw ex;
-            }
-        }
-    }
-
-    public ReactSelect getParentSelect(String label)
-    {
-        if (ReactSelect.finder(getDriver()).followingLabelWithSpan(label).findOptional(this).isEmpty())
-            elementCache().addParent.click();
-        return parentEntityTypeSelect(label);
-    }
-
-    public EntityInsertPanel addSource(String label, String sourceType)
-    {
-        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().addSource));
-        elementCache().addSource.click();
-        getWrapper().waitForElement(Locator.tag("label").withChild(Locator.tagWithText("span", label)));
-        parentEntityTypeSelect(label).select(sourceType);
+        getAddParentMenu().doMenuAction(parentType);
         return this;
     }
 
-    public ReactSelect getSourceSelect(String label)
+    public MultiMenu getAddSourceMenu()
     {
-        if (ReactSelect.finder(getDriver()).followingLabelWithSpan(label).findOptional(this).isEmpty())
-            elementCache().addSource.click();
-        return parentEntityTypeSelect(label);
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().addSource.getComponentElement()));
+        return elementCache().addSource;
     }
 
-    private EntityInsertPanel clearParents(String typeText)
+    public EntityInsertPanel addSource(String sourceType)
     {
-        Locator loc = Locator.tagWithClass("span", "container--action-button")
-                .withChild(Locator.tagWithClass("i", "container--removal-icon")).withText(typeText);
-
-        getWrapper().waitFor(()-> loc.findElementOrNull(getDriver()) != null, 1500);  // it's okay if it isn't there
-
-        while (loc.findElementOrNull(getDriver()) != null)      // click the top one until they are all gone
-        {
-            WebElement parentBtn = loc.findElement(getDriver());
-            getWrapper().log("removing parent " + parentBtn.getText());
-            parentBtn.click();
-            getWrapper().sleep(500);
-        }
-
+        getAddSourceMenu().doMenuAction(sourceType);
         return this;
     }
 
-    public EntityInsertPanel clearParents()
+    public EntityInsertPanel removeColumn(String columnName)
     {
-        return clearParents("Remove Parent 1");
-    }
-
-    public EntityInsertPanel clearSources()
-    {
-        return clearParents("Remove Source Parent 1");
+        showGrid();
+        elementCache().grid.removeColumn(columnName);
+        return this;
     }
 
     public EntityInsertPanel addRecords(List<Map<String, Object>> records)
@@ -429,8 +354,7 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
             try
             {
                 return  isGridVisible() ||          // when uploading assay data there is no target select
-                        isFileUploadVisible() ||
-                        targetEntityTypeSelect().isInteractive();
+                        isFileUploadVisible();
             }catch (NoSuchElementException nse)
             {
                 return false;
@@ -456,10 +380,12 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
 
     protected class ElementCache extends Component<?>.ElementCache
     {
-        WebElement addParent = Locator.tagWithClass("span", "container--action-button")
-                .containing("Parent").findWhenNeeded(getDriver());
-        WebElement addSource = Locator.tagWithClass("span", "container--action-button")
-                .containing("Source").findWhenNeeded(getDriver());
+        WebElement targetType = Locator.tagWithId("div", "target-entity-type").findWhenNeeded(this);
+
+        MultiMenu addParent = new MultiMenu.MultiMenuFinder(getDriver()).containsText("Add Parent")
+                .timeout(WAIT_FOR_JAVASCRIPT).findWhenNeeded();
+        MultiMenu addSource = new MultiMenu.MultiMenuFinder(getDriver()).containsText("Add Source")
+                .timeout(WAIT_FOR_JAVASCRIPT).findWhenNeeded();
 
         RadioButton allowMergeRadio = RadioButton.RadioButton(Locator.radioButtonByNameAndValue("insertOption", "true")).findWhenNeeded(this);
         RadioButton notAllowMergeRadio = RadioButton.RadioButton(Locator.radioButtonByNameAndValue("insertOption", "false")).findWhenNeeded(this);
