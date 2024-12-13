@@ -7,6 +7,7 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.UpdatingComponent;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.html.Checkbox;
+import org.labkey.test.util.EscapeUtil;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -162,7 +163,9 @@ public class FieldSelectionDialog extends ModalDialog
 
         while(iterator.hasNext())
         {
-            fieldKey.append(iterator.next().replace(" ", ""));
+            String field = iterator.next().trim();
+            String fieldEncoded = field.contains("$D") ? field : EscapeUtil.fieldKeyEncodePart(field);
+            fieldKey.append(fieldEncoded);
 
             // If this isn't the last item in the collection keep expanding and building the expected data-fieldkey value.
             if(iterator.hasNext())
