@@ -171,13 +171,13 @@ public class WebTestHelper
             if (apikey == null)
             {
                 TestLogger.error(response.getText());
-                throw new RuntimeException("Failed to generate session key");
+                throw new RuntimeException("Failed to generate %s key".formatted(type));
             }
             return apikey;
         }
         catch (CommandException | IOException e)
         {
-            throw new RuntimeException("Unable to generate session key", e);
+            throw new RuntimeException("Failed to generate %s key".formatted(type), e);
         }
     }
 
