@@ -90,7 +90,7 @@ public class ListTest extends BaseWebDriverTest
 {
     protected final static String PROJECT_VERIFY = "ListVerifyProject" ;//+ TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
     private final static String PROJECT_OTHER = "OtherListVerifyProject";
-    protected final static String LIST_NAME_COLORS = "Colors_" + DOMAIN_TRICKY_CHARACTERS;
+    protected final static String LIST_NAME_COLORS = "A_Colors_" + DOMAIN_TRICKY_CHARACTERS;
     protected final static ColumnType LIST_KEY_TYPE = ColumnType.String;
     protected final static String LIST_KEY_NAME = "Key";
     protected final static String LIST_KEY_NAME2 = "Color";
@@ -565,7 +565,7 @@ public class ListTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("view history"));
         checker().wrapAssertion(()->assertTextPresent(":History"));
         checker().wrapAssertion(()->assertTextPresent("record was modified", 2));    // An existing list record was modified
-        checker().wrapAssertion(()->assertTextPresent("were modified", 8));          // The column(s) of domain ></% 1äöüColors were modified
+        checker().wrapAssertion(()->assertTextPresent("were modified", 8));          // The column(s) of LIST_NAME_COLORS domain were modified
         checker().wrapAssertion(()->assertTextPresent("Bulk inserted", 2));
         checker().wrapAssertion(()->assertTextPresent("A new list record was inserted", 1));
         checker().wrapAssertion(()->assertTextPresent("was created", 2));                // Once for the list, once for the domain
