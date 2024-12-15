@@ -1452,7 +1452,7 @@ public abstract class Locator extends By
         public XPathLocator withAttributeIgnoreCase(String attrName, String attrVal)
         {
             return this.withPredicate(
-                    String.format("translate(@%s, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')=%s",
+                    String.format("translate(@%s, 'ABCDEFGHIJKLMNOPQRSTUVWXYZÅ', 'abcdefghijklmnopqrstuvwxyzå')=%s",
                             attrName, xq(attrVal.toLowerCase())));
         }
 
