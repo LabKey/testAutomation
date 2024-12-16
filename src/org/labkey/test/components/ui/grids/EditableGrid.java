@@ -92,10 +92,10 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         doAndWaitForUpdate(() -> elementCache().deleteRowsBtn.click());
     }
 
-    public EntityBulkInsertDialog clickBulkInsert()
+    public EntityBulkInsertDialog clickBulkAdd()
     {
-        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().bulkInsertBtn));
-        elementCache().bulkInsertBtn.click();
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().bulkAddBtn));
+        elementCache().bulkAddBtn.click();
 
         return new EntityBulkInsertDialog(getDriver());
     }
@@ -1081,7 +1081,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     protected class ElementCache extends Component<?>.ElementCache
     {
         final WebElement topControls = Locator.byClass("editable-grid-buttons__action-buttons").findWhenNeeded(this);
-        final WebElement bulkInsertBtn = Locator.byClass("bulk-add-button").findWhenNeeded(topControls);
+        final WebElement bulkAddBtn = Locator.byClass("bulk-add-button").findWhenNeeded(topControls);
         final WebElement bulkUpdateBtn = Locator.byClass("bulk-update-button").findWhenNeeded(topControls);
         final WebElement deleteRowsBtn =  Locator.byClass("bulk-remove-button").findWhenNeeded(topControls);
         final ExportMenu exportMenu = ExportMenu.finder(getDriver()).findWhenNeeded(topControls);

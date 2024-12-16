@@ -235,10 +235,10 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
         return this;
     }
 
-    public EntityBulkInsertDialog clickBulkInsert()
+    public EntityBulkInsertDialog clickBulkAdd()
     {
         showGrid();
-        return elementCache().grid.clickBulkInsert();
+        return elementCache().grid.clickBulkAdd();
     }
 
     public EntityBulkUpdateDialog clickBulkUpdate()
