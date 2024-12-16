@@ -36,7 +36,7 @@ import static org.labkey.test.util.TestDataGenerator.DOMAIN_SPECIAL_STRING;
 public class FieldDefinition extends PropertyDescriptor
 {
     private static final String SNOWMAN = "\u2603";
-    private static final String ANGSTROM = "\u00C5";
+    public static final String ANGSTROM = "\u00C5";
     private static final String A_UMLAUT = "\u00E4";
     // Non-alphanumeric characters supported for field names
     public static final String TRICKY_CHARACTERS = "><&$,/%\\'}{][ \";:" + SNOWMAN + ANGSTROM + A_UMLAUT;
