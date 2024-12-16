@@ -48,6 +48,7 @@ import java.util.Map;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.labkey.test.params.FieldDefinition.DOMAIN_TRICKY_CHARACTERS;
 
 @Category({Daily.class, Assays.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 6)
@@ -159,7 +160,7 @@ public class AssayAPITest extends BaseWebDriverTest
     {
         goToProjectHome();
 
-        String assayName = "GPAT-ImportRunApi" + TRICKY_CHARACTERS;
+        String assayName = "GPAT-ImportRunApi" + DOMAIN_TRICKY_CHARACTERS;
         APIAssayHelper assayHelper = new APIAssayHelper(this);
         int assayId = assayHelper.getIdFromAssayName(assayName, getProjectName(), false);
         if (assayId == 0)
@@ -248,7 +249,7 @@ public class AssayAPITest extends BaseWebDriverTest
         goToProjectHome();
 
         log("create GPAT assay");
-        String assayName = "GPAT-ImportRunApi-dataRows" + TRICKY_CHARACTERS;
+        String assayName = "GPAT-ImportRunApi-dataRows" + DOMAIN_TRICKY_CHARACTERS;
         createAssayWithFileFields(assayName);
 
         File fileRoot = TestFileUtils.getDefaultFileRoot(getProjectName());
@@ -297,7 +298,7 @@ public class AssayAPITest extends BaseWebDriverTest
         goToProjectHome();
 
         log("create GPAT assay");
-        String assayName = "GPAT-SaveBatch" + TRICKY_CHARACTERS;
+        String assayName = "GPAT-SaveBatch" + DOMAIN_TRICKY_CHARACTERS;
         createAssayWithFileFields(assayName);
 
         log("create run via saveBatch");

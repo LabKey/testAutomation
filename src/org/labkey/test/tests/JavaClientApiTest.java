@@ -94,7 +94,7 @@ import static org.junit.Assert.fail;
 public class JavaClientApiTest extends BaseWebDriverTest
 {
     public static final String PROJECT_NAME = JavaClientApiTest.class.getSimpleName() + " Project " + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
-    public static final String LIST_NAME = "People" + FieldDefinition.TRICKY_CHARACTERS;
+    public static final String LIST_NAME = "People" + FieldDefinition.DOMAIN_TRICKY_CHARACTERS;
     public static final String LAST_NAME = "LastName" + FieldDefinition.TRICKY_CHARACTERS;
     public static final String USER_NAME = "user1@javaclientapi.test";
     public static final String USER2_NAME = "user2@javaclientapi.test";

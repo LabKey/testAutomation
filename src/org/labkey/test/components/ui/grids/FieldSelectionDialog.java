@@ -7,6 +7,7 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.UpdatingComponent;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.html.Checkbox;
+import org.labkey.test.util.EscapeUtil;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -162,7 +163,9 @@ public class FieldSelectionDialog extends ModalDialog
 
         while(iterator.hasNext())
         {
-            fieldKey.append(iterator.next().replace(" ", ""));
+            String field = iterator.next().trim();
+            String fieldEncoded = field.contains("$D") ? field : EscapeUtil.fieldKeyEncodePart(field);
+            fieldKey.append(fieldEncoded);
 
             // If this isn't the last item in the collection keep expanding and building the expected data-fieldkey value.
             if(iterator.hasNext())
@@ -386,20 +389,25 @@ public class FieldSelectionDialog extends ModalDialog
     public FieldSelectionDialog removeAllSelectedFields()
     {
         List<WebElement> allItems = elementCache().getListItemElements(elementCache().selectedFieldsPanel);
+        boolean removedAll = true;
 
-        for(WebElement listItem : allItems)
+        for (WebElement listItem : allItems)
         {
             WebElement removeIcon = Locator.tagWithClass("span", "view-field__action").findWhenNeeded(listItem);
 
-            // For the tooltip not all fields can be removed.
-            if(removeIcon.isDisplayed())
+            // In some usages there may be fields that are not removable.
+            if (!removeIcon.isDisplayed())
             {
-                removeIcon.click();
+                removedAll = false;
+                continue;
             }
+
+            removeIcon.click();
         }
 
-        WebDriverWrapper.waitFor(()-> getSelectedFields().isEmpty(),
-                "Did not remove all of the selected fields.", 500);
+        // If a non-removable field is encountered, then skip check to see if all fields are removed.
+        if (removedAll)
+            WebDriverWrapper.waitFor(()-> getSelectedFields().isEmpty(), "Did not remove all of the selected fields.", 500);
 
         return this;
     }

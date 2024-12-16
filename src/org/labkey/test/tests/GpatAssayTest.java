@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -37,8 +38,10 @@ import org.labkey.test.pages.assay.AssayBeginPage;
 import org.labkey.test.pages.core.admin.BaseSettingsPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
+import org.labkey.test.util.TestDataGenerator;
 import org.labkey.test.util.core.webdav.WebDavUploadHelper;
 import org.openqa.selenium.WebElement;
 
@@ -53,6 +56,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.labkey.test.params.FieldDefinition.DOMAIN_TRICKY_CHARACTERS;
 
 @Category({Assays.class, BVT.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 7)
@@ -62,7 +66,7 @@ public class GpatAssayTest extends BaseWebDriverTest
     private static final File GPAT_ASSAY_XLSX = TestFileUtils.getSampleData("GPAT/trial01a.xlsx");
     private static final File GPAT_ASSAY_TSV = TestFileUtils.getSampleData("GPAT/trial02.tsv");
     private static final File GPAT_ASSAY_FNA_1 = TestFileUtils.getSampleData("GPAT/trial03.fna");
-    private static final String ASSAY_NAME_XLS = "XLS Assay " + TRICKY_CHARACTERS;
+    private static final String ASSAY_NAME_XLS = "XLS Assay " + DOMAIN_TRICKY_CHARACTERS;
     private static final String ASSAY_NAME_XLSX = "XLSX Assay";
     private static final String ASSAY_NAME_TSV = "TSV Assay";
     private static final String ASSAY_NAME_FNA = "FASTA Assay";
@@ -118,7 +122,7 @@ public class GpatAssayTest extends BaseWebDriverTest
         {
             // Issue 36077: SelectRows: SchemaKey decoding of public schema name causes request failure
             Connection cn = createDefaultConnection();
-            SelectRowsCommand selectCmd = new SelectRowsCommand("assay.General." + ASSAY_NAME_XLS, "Runs");
+            SelectRowsCommand selectCmd = new SelectRowsCommand("assay.General." + EscapeUtil.fieldKeyEncodePart(ASSAY_NAME_XLS), "Runs");
             selectCmd.setRequiredVersion(17.1);
             SelectRowsResponse selectResp = selectCmd.execute(cn, getProjectName());
             assertEquals(1, selectResp.getRowCount().intValue());
@@ -333,15 +337,20 @@ public class GpatAssayTest extends BaseWebDriverTest
     @Test
     public void testUpdateAssayDesign() throws IOException, CommandException
     {
+        File trialData = TestFileUtils.getSampleData("GPAT/renameAssayTrial.xls");
+
+        String invalidAssayName = TestDataGenerator.randomInvalidDomainName(10);
+        ReactAssayDesignerPage assayDesignerPage = startCreateGpatAssay(trialData, invalidAssayName);
+        List<String> errors = assayDesignerPage.clickSaveExpectingErrors();
+        assayDesignerPage.clickCancel();
+        Assert.assertTrue("Error msg not as expected during assay creation", errors.contains("Invalid Assay Design name \"" + invalidAssayName + "\". Assay Design name must start with a letter or a number."));
 
         BaseSettingsPage.resetSettings(createDefaultConnection(), "/");
         BaseSettingsPage.resetSettings(createDefaultConnection(), getProjectName());
 
-        File trialData = TestFileUtils.getSampleData("GPAT/renameAssayTrial.xls");
-
-        String originalAssayName = "A Assay Name";
+        String originalAssayName = TestDataGenerator.randomDomainName();
         log(String.format("Create an assay named '%s'.", originalAssayName));
-        ReactAssayDesignerPage assayDesignerPage = startCreateGpatAssay(trialData, originalAssayName);
+        assayDesignerPage = startCreateGpatAssay(trialData, originalAssayName);
 
         DomainFormPanel runProperties = assayDesignerPage.goToRunFields();
 
@@ -389,13 +398,17 @@ public class GpatAssayTest extends BaseWebDriverTest
         checker().verifyEquals(String.format("Value in column '%s' is not as expected.", runDateTime02),
                 defaultDateTimeFormat.format(date), rowMap.get(runDateTime02));
 
-        String newAssayName = "Updated Assay Name";
+        String newAssayName = TestDataGenerator.randomDomainName();
         log(String.format("Edit the assay design and rename it to '%s'.", newAssayName));
 
         assayDesignerPage = _assayHelper.clickEditAssayDesign(false);
         checker().fatal()
                 .verifyTrue("The 'Name' field should be enabled and editable. Fatal error.",
                         assayDesignerPage.isNameEnabled());
+
+        assayDesignerPage.setName(invalidAssayName);
+        errors = assayDesignerPage.clickSaveExpectingErrors();
+        Assert.assertTrue("Error msg not as expected during assay update", errors.contains("Invalid Assay Design name \"" + invalidAssayName + "\". Assay Design name must start with a letter or a number."));
 
         assayDesignerPage.setName(newAssayName);
 

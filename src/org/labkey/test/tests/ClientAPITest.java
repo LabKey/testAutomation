@@ -82,6 +82,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.WebTestHelper.getHttpResponse;
+import static org.labkey.test.params.FieldDefinition.DOMAIN_TRICKY_CHARACTERS;
 
 @Category({BVT.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 14)
@@ -106,7 +107,7 @@ public class ClientAPITest extends BaseWebDriverTest
     private static final String OTHER_PROJECT_LIST = "otherProjectList"; // for cross-project query test
     // Add tricky characters to assay name to check for regressions
     // Issue 36077: SelectRows: SchemaKey decoding of public schema name causes request failure
-    protected static final String TEST_ASSAY = "TestAssay1" + TRICKY_CHARACTERS;
+    protected static final String TEST_ASSAY = "TestAssay1" + DOMAIN_TRICKY_CHARACTERS;
     protected static final String TEST_ASSAY_DESC = "Description for assay 1";
     private static final List<FieldDefinition> LIST_COLUMNS = List.of(
         new FieldDefinition("FirstName", FieldDefinition.ColumnType.String).setLabel("First Name").setDescription("The first name").setRequired(true),
@@ -626,7 +627,7 @@ public class ClientAPITest extends BaseWebDriverTest
                 "});\n";
 
         Map<String, Object> error = (Map<String,Object>)executeAsyncScript(create);
-        assertEquals("Unexpected error message", "Dataset name cannot be empty.", error.get("exception"));
+        assertEquals("Unexpected error message", "StudyDatasetVisit name must not be blank.", error.get("exception"));
     }
 
     @Test

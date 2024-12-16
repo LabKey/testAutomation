@@ -102,6 +102,7 @@ public class EscapeUtil
         str = StringUtils.replace(str, "}", "$B");
         str = StringUtils.replace(str, "~", "$T");
         str = StringUtils.replace(str, ",", "$C");
+        str = StringUtils.replace(str, ".", "$P");
         return str;
     }
 
@@ -113,6 +114,7 @@ public class EscapeUtil
         str = StringUtils.replace(str, "$A", "&");
         str = StringUtils.replace(str, "$S", "/");
         str = StringUtils.replace(str, "$D", "$");
+        str = StringUtils.replace(str, "$P", ".");
         return str;
     }
 }

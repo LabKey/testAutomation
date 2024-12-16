@@ -26,6 +26,8 @@ import org.labkey.test.params.FieldDefinition;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.labkey.test.params.FieldDefinition.DOMAIN_TRICKY_CHARACTERS;
+
 @Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 4)
 public class SchemaBrowserTest extends BaseWebDriverTest
@@ -34,9 +36,9 @@ public class SchemaBrowserTest extends BaseWebDriverTest
     public static final String TEST_DESC_BOOKS = "This is a test description on books";
     public static final String TEST_DESC_AUTHORS = "This is a test description on authors";
     public static final String TEST_DESC_PUBLISHERS = "This is a test description on publishers";
-    public static final String AUTHORS_LIST = "Authors" + TRICKY_CHARACTERS_NO_QUOTES;
-    public static final String PUBLISHERS_LIST = "Publishers" + TRICKY_CHARACTERS_NO_QUOTES;
-    public static final String BOOKS_LIST = "Books" + TRICKY_CHARACTERS_NO_QUOTES;
+    public static final String AUTHORS_LIST = "Authors" + DOMAIN_TRICKY_CHARACTERS;
+    public static final String PUBLISHERS_LIST = "Publishers" + DOMAIN_TRICKY_CHARACTERS;
+    public static final String BOOKS_LIST = "Books" + DOMAIN_TRICKY_CHARACTERS;
 
     @Override
     public List<String> getAssociatedModules()

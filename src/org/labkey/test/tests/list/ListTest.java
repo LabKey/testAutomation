@@ -18,6 +18,7 @@ package org.labkey.test.tests.list;
 
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.MatcherAssert;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -80,6 +81,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.params.FieldDefinition.ColumnType;
+import static org.labkey.test.params.FieldDefinition.DOMAIN_TRICKY_CHARACTERS;
 import static org.labkey.test.util.DataRegionTable.DataRegion;
 
 @Category({Daily.class, Data.class, Hosting.class})
@@ -88,7 +90,7 @@ public class ListTest extends BaseWebDriverTest
 {
     protected final static String PROJECT_VERIFY = "ListVerifyProject" ;//+ TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
     private final static String PROJECT_OTHER = "OtherListVerifyProject";
-    protected final static String LIST_NAME_COLORS = TRICKY_CHARACTERS_NO_QUOTES + "Colors";
+    protected final static String LIST_NAME_COLORS = "A_Colors_" + DOMAIN_TRICKY_CHARACTERS;
     protected final static ColumnType LIST_KEY_TYPE = ColumnType.String;
     protected final static String LIST_KEY_NAME = "Key";
     protected final static String LIST_KEY_NAME2 = "Color";
@@ -143,7 +145,7 @@ public class ListTest extends BaseWebDriverTest
     private final String TEST_FAIL3 = LIST_KEY_NAME2 + "\t" + FAKE_COL_NAME + "\t" + _listColMonth.getName() + "\n" +
             LIST_ROW1;
     private final static String TEST_VIEW = "list_view";
-    private final static String LIST2_NAME_CARS = TRICKY_CHARACTERS_NO_QUOTES + "Cars";
+    private final static String LIST2_NAME_CARS = "Cars_" + DOMAIN_TRICKY_CHARACTERS;
     protected final static ColumnType LIST2_KEY_TYPE = ColumnType.String;
     protected final static String LIST2_KEY_NAME = "Car";
 
@@ -563,7 +565,7 @@ public class ListTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("view history"));
         checker().wrapAssertion(()->assertTextPresent(":History"));
         checker().wrapAssertion(()->assertTextPresent("record was modified", 2));    // An existing list record was modified
-        checker().wrapAssertion(()->assertTextPresent("were modified", 8));          // The column(s) of domain ></% 1äöüColors were modified
+        checker().wrapAssertion(()->assertTextPresent("were modified", 8));          // The column(s) of LIST_NAME_COLORS domain were modified
         checker().wrapAssertion(()->assertTextPresent("Bulk inserted", 2));
         checker().wrapAssertion(()->assertTextPresent("A new list record was inserted", 1));
         checker().wrapAssertion(()->assertTextPresent("was created", 2));                // Once for the list, once for the domain
@@ -866,7 +868,7 @@ public class ListTest extends BaseWebDriverTest
     @Test
     public void listSelfJoinTest()
     {
-        final String listName = "listSelfJoin" + TRICKY_CHARACTERS;
+        final String listName = "listSelfJoin" + DOMAIN_TRICKY_CHARACTERS;
         final String dummyBase = "dummyCol";
         final String dummyCol = dummyBase + TRICKY_CHARACTERS;
         final String lookupField = "lookupField" + TRICKY_CHARACTERS;
@@ -1149,10 +1151,20 @@ public class ListTest extends BaseWebDriverTest
         String listName = "new";
         String origFieldName = "BarBar";
         String newFieldName = "FooFoo";
+        String invalidListName = TestDataGenerator.randomInvalidDomainName(5);
+        EditListDefinitionPage listDefinitionPage = _listHelper.beginCreateList(PROJECT_VERIFY, invalidListName);
+        listDefinitionPage.manuallyDefineFieldsWithAutoIncrementingKey("key");
+        List<String> errors = listDefinitionPage.clickSaveExpectingErrors();
+        Assert.assertTrue("Error msg not as expected during list creation", errors.contains("Invalid IntList name \"" + invalidListName + "\". IntList name must start with a letter or a number."));
+
         _listHelper.createList(PROJECT_VERIFY, listName, "key",
                 new FieldDefinition(origFieldName, ColumnType.String).setLabel(origFieldName).setDescription("first column"));
 
-        EditListDefinitionPage listDefinitionPage = _listHelper.goToEditDesign(listName);
+        listDefinitionPage = _listHelper.goToEditDesign(listName);
+        listDefinitionPage.setName(invalidListName);
+        errors = listDefinitionPage.clickSaveExpectingErrors();
+        Assert.assertTrue("Error msg not as expected during list renaming", errors.contains("Invalid IntList name \"" + invalidListName + "\". IntList name must start with a letter or a number."));
+        listDefinitionPage.setName(listName);
         listDefinitionPage.getFieldsPanel()
                 .getField(origFieldName)
                 .setName(newFieldName)

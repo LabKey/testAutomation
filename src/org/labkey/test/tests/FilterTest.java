@@ -47,6 +47,7 @@ import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.labkey.test.params.FieldDefinition.ColumnType;
+import static org.labkey.test.params.FieldDefinition.DOMAIN_TRICKY_CHARACTERS;
 import static org.labkey.test.params.FieldDefinition.LookupInfo;
 import static org.labkey.test.util.PermissionsHelper.MemberType;
 
@@ -59,7 +60,7 @@ public class FilterTest extends BaseWebDriverTest
     protected final static String R_VIEW = TRICKY_CHARACTERS + "R report";
     protected final static String FACET_TEST_LIST = "FacetList";
 
-    protected final static String LIST_NAME_COLORS = TRICKY_CHARACTERS_NO_QUOTES + "Colors";
+    protected final static String LIST_NAME_COLORS = "Colors" + DOMAIN_TRICKY_CHARACTERS;
     protected final static String LIST_KEY_NAME2 = "Color";
 
     protected final FieldDefinition _listColKey = new FieldDefinition("Color", ColumnType.String);
