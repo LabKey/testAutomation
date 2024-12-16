@@ -56,26 +56,48 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
         return elementCache().targetType.getText();
     }
 
+    public boolean isAddParentMenuPresent()
+    {
+        return getWrapper().isElementPresent(Locator.buttonContainingText("Add Parent"));
+    }
+
+    public boolean isAddParentMenuEnabled()
+    {
+        return Locator.buttonContainingText("Add Parent").findElement(this).isEnabled();
+    }
+
     public MultiMenu getAddParentMenu()
     {
-        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().addParent.getComponentElement()));
         return elementCache().addParent;
     }
 
     public EntityInsertPanel addParent(String parentType)
     {
+        Assert.assertTrue("Add Parent menu not present", isAddParentMenuPresent());
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().addParent.getComponentElement()));
         getAddParentMenu().doMenuAction(parentType);
         return this;
     }
 
+    public boolean isAddSourceMenuPresent()
+    {
+        return getWrapper().isElementPresent(Locator.buttonContainingText("Add Source"));
+    }
+
+    public boolean isAddSourceMenuEnabled()
+    {
+        return Locator.buttonContainingText("Add Source").findElement(this).isEnabled();
+    }
+
     public MultiMenu getAddSourceMenu()
     {
-        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().addSource.getComponentElement()));
         return elementCache().addSource;
     }
 
     public EntityInsertPanel addSource(String sourceType)
     {
+        Assert.assertTrue("Add Source menu not present", isAddSourceMenuPresent());
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().addSource.getComponentElement()));
         getAddSourceMenu().doMenuAction(sourceType);
         return this;
     }
@@ -383,9 +405,9 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
         WebElement targetType = Locator.tagWithId("div", "target-entity-type").findWhenNeeded(this);
 
         MultiMenu addParent = new MultiMenu.MultiMenuFinder(getDriver()).containsText("Add Parent")
-                .timeout(WAIT_FOR_JAVASCRIPT).findWhenNeeded();
+                .timeout(WAIT_FOR_JAVASCRIPT).refindWhenNeeded();
         MultiMenu addSource = new MultiMenu.MultiMenuFinder(getDriver()).containsText("Add Source")
-                .timeout(WAIT_FOR_JAVASCRIPT).findWhenNeeded();
+                .timeout(WAIT_FOR_JAVASCRIPT).refindWhenNeeded();
 
         RadioButton allowMergeRadio = RadioButton.RadioButton(Locator.radioButtonByNameAndValue("insertOption", "true")).findWhenNeeded(this);
         RadioButton notAllowMergeRadio = RadioButton.RadioButton(Locator.radioButtonByNameAndValue("insertOption", "false")).findWhenNeeded(this);
