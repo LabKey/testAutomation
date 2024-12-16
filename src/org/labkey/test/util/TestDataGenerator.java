@@ -68,6 +68,8 @@ public class TestDataGenerator
     // chose a Character random from this String
     public static final String CHARSET_STRING = "ABCDEFG01234abcdefvxyz~!@#$%^&*()-+=_{}[]|:;\"',.<>";
     public static final String ALPHANUMERIC_STRING = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvxyz";
+    public static final String DOMAIN_SPECIAL_STRING =  "+- _.:&()/";
+    public static final String ILLEGAL_DOMAIN_NAME_CHARSET = "<>[]{};,`\"~!@#$%^*=|?\\";
 
     private final Map<String, PropertyDescriptor> _columns = new CaseInsensitiveLinkedHashMap<>();
     private final Map<String, Supplier<Object>> _dataSuppliers = new CaseInsensitiveHashMap<>();
@@ -326,6 +328,31 @@ public class TestDataGenerator
             val.append(charSetFrom.charAt(randIndex));
         }
         return val.toString();
+    }
+
+    public static String randomDomainName()
+    {
+        return randomDomainName(10);
+    }
+
+    public static String randomInvalidDomainName(int size)
+    {
+        return randomString(size, null, ILLEGAL_DOMAIN_NAME_CHARSET);
+    }
+
+    public static String randomDomainName(int size)
+    {
+        String domainName = "";
+        do
+        {
+            String prefix = randomString(1, null, ALPHANUMERIC_STRING); // domain needs to start with alphanumeric char
+            final String charset = ALPHANUMERIC_STRING + DOMAIN_SPECIAL_STRING;
+            domainName = prefix + randomString(size - 1, null, charset);
+            domainName = domainName.trim();
+        }
+        while (domainName.length() < size || Pattern.matches("(.*\\s--[^ ].*)|(.*\\s-[^- ].*)", domainName)); // domain name must not contain space followed by dash. (command like: Issue 49161)
+
+        return domainName;
     }
 
     public static int randomInt(int min, int max)
