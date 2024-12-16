@@ -200,7 +200,7 @@ public class WebTestHelper
                 }
                 else
                 {
-                    TestLogger.log("Unexpected number of rows found: " + rows.size());
+                    TestLogger.log("Skipping apiKey deletion. Unexpected number of rows found: " + rows.size());
                 }
             }
             catch (IOException | CommandException e)
