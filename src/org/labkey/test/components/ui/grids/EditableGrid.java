@@ -87,7 +87,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         Locators.spinner.waitForElementToDisappear(this, 30000);
     }
 
-    public void clickRemove()
+    public void clickDelete()
     {
         doAndWaitForUpdate(() -> elementCache().deleteRowsBtn.click());
     }

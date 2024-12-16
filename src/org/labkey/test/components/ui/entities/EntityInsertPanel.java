@@ -231,7 +231,7 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
     public EntityInsertPanel clickRemove()
     {
         showGrid();
-        elementCache().grid.clickRemove();
+        elementCache().grid.clickDelete();
         return this;
     }
 

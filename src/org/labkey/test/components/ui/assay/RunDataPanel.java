@@ -206,11 +206,9 @@ public class RunDataPanel extends WebDriverComponent<RunDataPanel.ElementCache>
             waitForLoaded();
         }
 
-        Locator deleteRowsBtnLoc = Locator.XPathLocator.union(
-                Locator.button("Delete rows"),
-                Locator.buttonContainingText("Remove"));
+        Locator deleteRowsBtnLoc = Locator.button("Delete");
         Locator bulkInsertBtnLoc = Locator.button("Bulk Add");
-        Locator bulkUpdateBtnLoc = Locator.button("Bulk Update");
+        Locator bulkUpdateBtnLoc = Locator.button("Edit in Bulk");
         Locator runDataTextArea = Locator.textarea("rundata");
 
         WebElement bulkInsertBtn = bulkInsertBtnLoc.findWhenNeeded(this).withTimeout(2000);
