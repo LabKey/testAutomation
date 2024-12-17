@@ -188,23 +188,23 @@ public class FileAttachmentContainer extends WebDriverComponent<FileAttachmentCo
     protected class ElementCache extends Component<?>.ElementCache
     {
         public Locator dropTargetLoc = Locator.XPathLocator.union(
-                Locator.tagWithClass("div", "file-upload--container"),
-                Locator.tagWithClass("div", "file-upload--container--compact"));
+                Locator.tagWithClass("div", "file-upload__container"),
+                Locator.tagWithClass("div", "file-upload__container--compact"));
         public Locator labelLoc = Locator.XPathLocator.union(
-                Locator.tagWithClass("label", "file-upload--label"),
-                Locator.tagWithClass("label", "file-upload--label--compact"));
-        public FileInput fileInput = Input.FileInput(Locator.tagWithClass("input", "file-upload--input"), getDriver())
+                Locator.tagWithClass("label", "file-upload__label"),
+                Locator.tagWithClass("label", "file-upload__label--compact"));
+        public FileInput fileInput = Input.FileInput(Locator.tagWithClass("input", "file-upload__input"), getDriver())
                 .findWhenNeeded(this);
-        public WebElement fileEntryList = Locator.tagWithClass("div", "file-upload--file-entry-listing")
+        public WebElement fileEntryList = Locator.tagWithClass("div", "file-upload__file-entry-listing")
                 .findWhenNeeded(this);
         public Locator uploadAlertLoc = Locator.tagWithClass("div", "alert");
-        public Locator fileUploadScrollFooterLoc = Locator.tagWithClass("div", "file-upload--scroll-footer");
+        public Locator fileUploadScrollFooterLoc = Locator.tagWithClass("div", "file-upload__scroll-footer");
     }
 
 
     public static class FileAttachmentContainerFinder extends WebDriverComponentFinder<FileAttachmentContainer, FileAttachmentContainerFinder>
     {
-        private final Locator.XPathLocator _baseLocator = Locator.tagWithClass("div", "file-upload--container").parent("div");
+        private final Locator.XPathLocator _baseLocator = Locator.tagWithClass("div", "file-upload__container").parent("div");
         private String _inputName = null;
         private String _label = null;
 
@@ -235,10 +235,10 @@ public class FileAttachmentContainer extends WebDriverComponent<FileAttachmentCo
         protected Locator locator()
         {
             if (_inputName != null)
-                return _baseLocator.withDescendant(Locator.tagWithClass("input", "file-upload--input")
+                return _baseLocator.withDescendant(Locator.tagWithClass("input", "file-upload__input")
                         .withAttribute("name", _inputName));
             else if (_label != null)
-                return Locator.tagWithClass("label", "file-upload--label")
+                return Locator.tagWithClass("label", "file-upload__label")
                         .withAttributeMatchingOtherElementAttribute("name", Locator.tag("label").withText(_label), "for")
                         .parent("*");
             else

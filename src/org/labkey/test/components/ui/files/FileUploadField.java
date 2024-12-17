@@ -78,11 +78,11 @@ public class FileUploadField extends WebDriverComponent<FileUploadField.ElementC
         // Elements when no attachment is set
         WebElement fileInputLabel = Locator.tagWithClass("label", "file-upload--compact-label")
                 .refindWhenNeeded(this);
-        WebElement fileInput = Locator.tagWithClass("input", "file-upload--input")
+        WebElement fileInput = Locator.tagWithClass("input", "file-upload__input")
                 .refindWhenNeeded(this);
 
         // Elements for new attachment
-        WebElement tempFileLoc = Locator.tagWithClass("div", "attached-file--inline-container")
+        WebElement tempFileLoc = Locator.tagWithClass("div", "attached-file__inline-container")
                 .refindWhenNeeded(this);
         WebElement removeBtn = Locator.tagWithClass("span", "file-upload__remove--icon")
                 .refindWhenNeeded(this);

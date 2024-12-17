@@ -242,7 +242,7 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
         String targetPath = transformScript.getAbsolutePath();
         if (usingFileUpload)
         {
-            getWrapper().setFormElement(Locator.tagWithClass("input", "file-upload--input"), transformScript);
+            getWrapper().setFormElement(Locator.tagWithClass("input", "file-upload__input"), transformScript);
             targetPath = "/@scripts/" + transformScript.getName();
         }
         else

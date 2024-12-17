@@ -43,7 +43,7 @@ public class CompactFileUploadField extends WebDriverComponent<CompactFileUpload
 
     public boolean hasAttachedFile()
     {
-        return Locator.tagWithClass("div", "attached-file--container")
+        return Locator.tagWithClass("div", "attached-file__container")
                 .existsIn(this);
     }
 
@@ -51,7 +51,7 @@ public class CompactFileUploadField extends WebDriverComponent<CompactFileUpload
     {
         if (hasAttachedFile())
         {
-            return Locator.tagWithClass("div", "attached-file--container")
+            return Locator.tagWithClass("div", "attached-file__container")
                     .waitForElement(this, 2000).getText();
         }
         else
@@ -98,7 +98,7 @@ public class CompactFileUploadField extends WebDriverComponent<CompactFileUpload
     protected class ElementCache extends Component<?>.ElementCache
     {
 
-        WebElement logoFileInput = Locator.tagWithClass("input", "file-upload--input")
+        WebElement logoFileInput = Locator.tagWithClass("input", "file-upload__input")
                 .refindWhenNeeded(this).withTimeout(4000);
 
         WebElement removeBtn = Locator.tagWithClass("span", "file-upload__remove--icon")
@@ -106,7 +106,7 @@ public class CompactFileUploadField extends WebDriverComponent<CompactFileUpload
 
         Locator attachedFile(File file)
         {
-            return Locator.tagWithClass("div", "attached-file--container").containing(file.getName());
+            return Locator.tagWithClass("div", "attached-file__container").containing(file.getName());
         }
     }
 
