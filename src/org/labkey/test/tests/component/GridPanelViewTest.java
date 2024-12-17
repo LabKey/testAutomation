@@ -968,7 +968,8 @@ public class GridPanelViewTest extends GridPanelBaseTest
             customizeModal.setShowAll(false);
         }
 
-        String materialIDField = "Material Source Id";
+        String materialIDField = "MaterialSourceId";
+        String materialIDFieldName = "Material Source Id";
         log(String.format("Validate that field '%s' is not visible before checking 'Show all'.", materialIDField));
 
         List<String> actualFields = customizeModal.getAvailableFields();
@@ -983,8 +984,8 @@ public class GridPanelViewTest extends GridPanelBaseTest
 
         actualFields = customizeModal.getAvailableFields();
 
-        checker().verifyTrue(String.format("Field '%s' is not present in 'Available Fields' panel, it should be.", materialIDField),
-                actualFields.contains(materialIDField));
+        checker().verifyTrue(String.format("Field '%s' is not present in 'Available Fields' panel, it should be.", materialIDFieldName),
+                actualFields.contains(materialIDFieldName));
 
         String materialNameField = "Name";
         log(String.format("Select the '%s' field under '%s' and add it to the grid.", materialNameField, materialIDField));
