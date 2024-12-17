@@ -101,7 +101,7 @@ public class FileUploadPanel extends WebDriverComponent<FileUploadPanel.ElementC
             return Input.FileInput(Locator.id("fileUpload"), getDriver()).waitFor(this);
         }
 
-        Locator.XPathLocator attachedFileContainer = Locator.tagWithClass("div", "attached-file--container")
+        Locator.XPathLocator attachedFileContainer = Locator.tagWithClass("div", "attached-file__container")
                 .withChild(Locator.tagWithClass("span", "fa-times-circle"));
         WebElement downloadTemplate = Locator.linkWithTitle("Download Template").findWhenNeeded(getDriver());
 
@@ -120,7 +120,7 @@ public class FileUploadPanel extends WebDriverComponent<FileUploadPanel.ElementC
 
     public static class FileUploadPanelFinder extends WebDriverComponentFinder<FileUploadPanel, FileUploadPanelFinder>
     {
-        private final Locator.XPathLocator _baseLocator = Locator.tagWithClass("div", "file-upload--container").parent();
+        private final Locator.XPathLocator _baseLocator = Locator.tagWithClass("div", "file-upload__container").parent();
 
         public FileUploadPanelFinder(WebDriver driver)
         {
