@@ -262,7 +262,7 @@ public class EntityBulkUpdateDialog extends ModalDialog
 
         public FilteringReactSelect getSelect(String fieldKey)
         {
-            return FilteringReactSelect.finder(getDriver()).withNamedInput(fieldKey).findWhenNeeded(this);
+            return FilteringReactSelect.finder(getDriver()).withNamedInput(fieldKey).refindWhenNeeded(this);
         }
 
         public Input textInput(String fieldKey)
