@@ -717,7 +717,7 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
             }
         };
 
-        WebElement fileUploadInput = Locator.tagWithClass("input", "file-upload--input").findWhenNeeded(DomainFormPanel.this).withTimeout(2000);
+        WebElement fileUploadInput = Locator.tagWithClass("input", "file-upload__input").findWhenNeeded(DomainFormPanel.this).withTimeout(2000);
 
         WebElement defaultSystemFieldsContainer = Locator.tagWithClass("div", "domain-system-fields")
                 .findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
