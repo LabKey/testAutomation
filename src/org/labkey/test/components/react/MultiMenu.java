@@ -45,6 +45,13 @@ public class MultiMenu extends BootstrapMenu
         return Locator.tagWithClass("ul", "dropdown-menu").findElement(this);
     }
 
+    public List<WebElement> getMenuItems()
+    {
+        expand();
+        waitForData();
+        return Locators.menuItem().findElements(getMenuList());
+    }
+
     /**
      * finds the first menu item with the specified text.
      * If there are duplicate items in the menu by text and the one you want isn't the first in the menu,
@@ -57,6 +64,11 @@ public class MultiMenu extends BootstrapMenu
         expand();
         waitForData();
         return Locators.menuItem().withText(menuItem).waitForElement(getMenuList(), _menuWaitTimeout);
+    }
+
+    public boolean hasMenuItem(String menuItem)
+    {
+        return !Locators.menuItem().withText(menuItem).findElements(getMenuList()).isEmpty();
     }
 
     /**
@@ -408,6 +420,11 @@ public class MultiMenu extends BootstrapMenu
             return menuContainer().withChild(dropdownToggle().withText(text));
         }
 
+        static public Locator.XPathLocator menuContainerContains(String text)
+        {
+            return menuContainer().withChild(dropdownToggle().containing(text));
+        }
+
         // finds the toggle to expand/collapse the root menu
         public static Locator.XPathLocator dropdownToggle()
         {
@@ -465,6 +482,12 @@ public class MultiMenu extends BootstrapMenu
         public MultiMenuFinder withText(String text)
         {
             _locator = MultiMenu.Locators.menuContainer(text);
+            return this;
+        }
+
+        public MultiMenuFinder containsText(String text)
+        {
+            _locator = MultiMenu.Locators.menuContainerContains(text);
             return this;
         }
 

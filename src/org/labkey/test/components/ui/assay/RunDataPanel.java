@@ -92,7 +92,7 @@ public class RunDataPanel extends WebDriverComponent<RunDataPanel.ElementCache>
         return elementCache().grid;
     }
 
-    public EntityBulkInsertDialog clickBulkInsert()
+    public EntityBulkInsertDialog clickBulkAdd()
     {
         showGrid();
         getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().bulkInsertBtn));
@@ -206,11 +206,9 @@ public class RunDataPanel extends WebDriverComponent<RunDataPanel.ElementCache>
             waitForLoaded();
         }
 
-        Locator deleteRowsBtnLoc = Locator.XPathLocator.union(
-                Locator.button("Delete rows"),
-                Locator.buttonContainingText("Remove"));
-        Locator bulkInsertBtnLoc = Locator.button("Bulk Insert");
-        Locator bulkUpdateBtnLoc = Locator.button("Bulk Update");
+        Locator deleteRowsBtnLoc = Locator.button("Delete");
+        Locator bulkInsertBtnLoc = Locator.button("Bulk Add");
+        Locator bulkUpdateBtnLoc = Locator.button("Edit in Bulk");
         Locator runDataTextArea = Locator.textarea("rundata");
 
         WebElement bulkInsertBtn = bulkInsertBtnLoc.findWhenNeeded(this).withTimeout(2000);

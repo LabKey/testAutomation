@@ -87,15 +87,15 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         Locators.spinner.waitForElementToDisappear(this, 30000);
     }
 
-    public void clickRemove()
+    public void clickDelete()
     {
         doAndWaitForUpdate(() -> elementCache().deleteRowsBtn.click());
     }
 
-    public EntityBulkInsertDialog clickBulkInsert()
+    public EntityBulkInsertDialog clickBulkAdd()
     {
-        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().bulkInsertBtn));
-        elementCache().bulkInsertBtn.click();
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().bulkAddBtn));
+        elementCache().bulkAddBtn.click();
 
         return new EntityBulkInsertDialog(getDriver());
     }
@@ -127,6 +127,14 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
                 return i;
         }
         throw new NotFoundException("Column not found in grid: " + columnHeader + ". Found: " + columnTexts);
+    }
+
+    public EditableGrid removeColumn(String columnHeader)
+    {
+        WebElement headerCell = elementCache().getGridCellHeader(columnHeader);
+        Locator.byClass("fa-chevron-circle-down").findElement(headerCell).click();
+        Locator.tagWithText("a", "Remove Column").findElement(headerCell).click();
+        return this;
     }
 
     private boolean hasSelectColumn()
@@ -1073,12 +1081,17 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     protected class ElementCache extends Component<?>.ElementCache
     {
         final WebElement topControls = Locator.byClass("editable-grid-buttons__action-buttons").findWhenNeeded(this);
-        final WebElement bulkInsertBtn = Locator.byClass("bulk-add-button").findWhenNeeded(topControls);
+        final WebElement bulkAddBtn = Locator.byClass("bulk-add-button").findWhenNeeded(topControls);
         final WebElement bulkUpdateBtn = Locator.byClass("bulk-update-button").findWhenNeeded(topControls);
         final WebElement deleteRowsBtn =  Locator.byClass("bulk-remove-button").findWhenNeeded(topControls);
         final ExportMenu exportMenu = ExportMenu.finder(getDriver()).findWhenNeeded(topControls);
         final WebElement table = Locator.byClass("table-cellular").findWhenNeeded(this);
         private final WebElement selectColumn = Locator.xpath("//th/input[@type='checkbox']").findWhenNeeded(table);
+
+        public WebElement getGridCellHeader(String label)
+        {
+            return Locator.byClass("grid-header-cell").withDescendant(Locator.tagContainingText("span", label)).findWhenNeeded(table);
+        }
 
         private List<String> columnNames = new ArrayList<>();
 

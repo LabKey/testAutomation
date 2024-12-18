@@ -480,7 +480,7 @@ public class EditableGridTest extends BaseWebDriverTest
         new Actions(getDriver())
                 .click(checkBoxes.get(2))
                 .perform();
-        testGrid.clickRemove();
+        testGrid.clickDelete();
         checkBoxes = boxes.findElements(testGrid);
 
         // verify shift-select to another row does not select the range from the now-removed row
@@ -634,7 +634,7 @@ public class EditableGridTest extends BaseWebDriverTest
 
         log("Reset the grid.");
         editableGrid.selectAll(true);
-        editableGrid.clickRemove();
+        editableGrid.clickDelete();
 
         log("Paste in a multi-line string without putting the cell into edit mode.");
         editableGrid.addRows(1);
@@ -763,7 +763,7 @@ public class EditableGridTest extends BaseWebDriverTest
 
         log("Reset the grid.");
         editableGrid.selectAll(true);
-        editableGrid.clickRemove();
+        editableGrid.clickDelete();
 
         log("Enter one long line.");
         editableGrid.addRows(1);
@@ -801,7 +801,7 @@ public class EditableGridTest extends BaseWebDriverTest
 
         log("Reset the grid again.");
         editableGrid.selectAll(true);
-        editableGrid.clickRemove();
+        editableGrid.clickDelete();
 
         log("Enter many short lines.");
         editableGrid.addRows(1);
@@ -849,7 +849,7 @@ public class EditableGridTest extends BaseWebDriverTest
 
         log("Reset the grid for the last time.");
         editableGrid.selectAll(true);
-        editableGrid.clickRemove();
+        editableGrid.clickDelete();
 
         log("Validate <esc> exits edit mode and does not save.");
         editableGrid.addRows(1);
