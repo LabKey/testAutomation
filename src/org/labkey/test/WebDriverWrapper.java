@@ -49,12 +49,12 @@ import org.labkey.test.pages.user.ShowUsersPage;
 import org.labkey.test.selenium.EphemeralWebElement;
 import org.labkey.test.util.CodeMirrorHelper;
 import org.labkey.test.util.Crawler;
-import org.labkey.test.util.OptionalFeatureHelper;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.LabKeyExpectedConditions;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
+import org.labkey.test.util.OptionalFeatureHelper;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.RelativeUrl;
 import org.labkey.test.util.TestLogger;
@@ -2265,21 +2265,12 @@ public abstract class WebDriverWrapper implements WrapsDriver
      * Wait for Supplier to return non-null non-false value
      * @param wait milliseconds
      * @return final result of Supplier.get()
+     * @see Timer#waitFor(Supplier)
      */
     @Contract(pure = true)
     public static <T> T waitFor(Supplier<T> checker, int wait)
     {
-        long startTime = System.currentTimeMillis();
-        T result;
-        do
-        {
-            result = checker.get();
-            if (result != null && !Boolean.FALSE.equals(result))
-                break;
-            sleep(100);
-        } while ((System.currentTimeMillis() - startTime) < wait);
-
-        return result;
+        return new Timer(Duration.ofMillis(wait)).waitFor(checker);
     }
 
     public static void waitForEquals(String message, Supplier<?> expected, Supplier<?> actual, int wait)
@@ -2298,17 +2289,20 @@ public abstract class WebDriverWrapper implements WrapsDriver
         }
     }
 
-    public static void waitFor(Supplier<Boolean> checker, String failMessage, int wait)
+    /**
+     * @see Timer#waitFor(Supplier, String)
+     */
+    public static <T> T waitFor(Supplier<T> checker, String failMessage, int wait)
     {
-        waitFor(checker, () -> failMessage, wait);
+        return new Timer(Duration.ofMillis(wait)).waitFor(checker, failMessage);
     }
 
-    public static void waitFor(Supplier<Boolean> checker, Supplier<String> failMessage, int wait)
+    /**
+     * @see Timer#waitFor(Supplier, Supplier)
+     */
+    public static <T> T waitFor(Supplier<T> checker, Supplier<String> failMessageSupplier, int wait)
     {
-        if (!waitFor(checker, wait))
-        {
-            throw new TimeoutException(failMessage.get() + TestLogger.formatElapsedTime(wait));
-        }
+        return new Timer(Duration.ofMillis(wait)).waitFor(checker, failMessageSupplier);
     }
 
     public File clickAndWaitForDownload(Locator elementToClick)
