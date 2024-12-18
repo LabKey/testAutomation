@@ -9,6 +9,7 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.params.perf.PerfScenario;
 import org.labkey.test.stress.AbstractScenario;
 import org.labkey.test.stress.RequestInfoTsvWriter;
+import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.TestDateUtils;
 import org.labkey.test.util.TestLogger;
 import org.labkey.test.util.Timer;
@@ -56,6 +57,7 @@ public class JsonPerfScenarioHelper
         return this;
     }
 
+    @LogMethod
     public Map<String, Result> runPerfScenarios(List<PerfScenario> scenarios) throws Exception
     {
         final ExecutorService importExecutor = Executors.newFixedThreadPool(importThreads);
@@ -94,7 +96,8 @@ public class JsonPerfScenarioHelper
         }
         ImportDataCommand command = new ImportDataCommand(schemaName, perfScenario.getTypeName());
         command.setFile(perfDataFileSupplier.apply(perfScenario.getFileName()));
-        command.setTimeout(Math.max(connection.getTimeout(), perfScenario.getAverage() * importThreads));
+        command.setTimeout(Math.max(connection.getTimeout(), perfScenario.getAverage() * importThreads) * 2);
+        command.setInsertOption(ImportDataCommand.InsertOption.MERGE);
         Timer timer = new Timer();
         String msgSuffix = "";
         try
