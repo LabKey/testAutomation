@@ -27,11 +27,13 @@ import org.labkey.remoteapi.security.CreateContainerResponse;
 import org.labkey.remoteapi.security.DeleteContainerCommand;
 import org.labkey.remoteapi.security.GetContainersCommand;
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.TestProperties;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 
 import java.io.IOException;
 import java.net.SocketTimeoutException;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -145,6 +147,7 @@ public class APIContainerHelper extends AbstractContainerHelper
     {
         WebTestHelper.logToServer("=Test= Starting container delete: " + path);
 
+        Timer deleteTimer = new Timer(Duration.ofMillis(wait));
         DeleteContainerCommand dcc = new DeleteContainerCommand();
         dcc.setTimeout(wait);
         try
@@ -152,8 +155,6 @@ public class APIContainerHelper extends AbstractContainerHelper
             Connection defaultConnection = _test.createDefaultConnection();
             defaultConnection.setTimeout(wait);
             dcc.execute(defaultConnection, path);
-
-            WebTestHelper.logToServer("=Test= Finished container delete: " + path);
         }
         catch (CommandException e)
         {
@@ -161,6 +162,14 @@ public class APIContainerHelper extends AbstractContainerHelper
             {
                 if (failIfNotFound)
                     fail("Container not found: " + path);
+            }
+            else if (TestProperties.isServerRemote() && e.getStatusCode() == HttpStatus.SC_GATEWAY_TIMEOUT)
+            {
+                TestLogger.log("Waiting for container deletion after Gateway Timeout (504) error");
+                deleteTimer.waitFor(() -> !doesContainerExist(path), () -> {
+                    WebTestHelper.logToServer("=Test= Timed out deleting container: " + path);
+                    return "Timed out deleting container [%s]".formatted(path);
+                });
             }
             else
             {
@@ -176,6 +185,8 @@ public class APIContainerHelper extends AbstractContainerHelper
         {
             throw new RuntimeException("Failed to delete container: " + path, e);
         }
+
+        WebTestHelper.logToServer("=Test= Finished container delete: " + path);
     }
 
     @Override

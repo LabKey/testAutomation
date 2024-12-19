@@ -4,6 +4,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
 import org.labkey.remoteapi.Connection;
+import org.labkey.test.TestProperties;
+import org.labkey.test.teamcity.TeamCityUtils;
 import org.labkey.test.util.TestDateUtils;
 import org.labkey.test.util.TestLogger;
 
@@ -182,6 +184,20 @@ public abstract class AbstractScenario<T>
         {
             shutdownNow();
             throw t;
+        }
+        finally
+        {
+            if (getResultsFile() != null)
+            {
+                if (TestProperties.isTestRunningOnTeamCity())
+                {
+                    TeamCityUtils.publishArtifact(getResultsFile(), null);
+                }
+                else
+                {
+                    TestLogger.log("Perf data available in: " + getResultsFile().getAbsolutePath());
+                }
+            }
         }
     }
 
