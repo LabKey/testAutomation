@@ -49,6 +49,8 @@ public class PipelineAnalysisHelper
 
     private static int expectedJobCount = 1;
 
+    public static final String PROTOCOL_NAME_NEW_PROTOCOL = "<New Protocol>";
+
     public PipelineAnalysisHelper(BaseWebDriverTest test)
     {
         _test = test;
@@ -275,5 +277,10 @@ public class PipelineAnalysisHelper
         {
             throw new RuntimeException("Exception parsing xml string " + xml, e);
         }
+    }
+
+    public void setDescription(String description)
+    {
+        _test.setFormElement(Locator.name("protocolDescription"), description);
     }
 }
