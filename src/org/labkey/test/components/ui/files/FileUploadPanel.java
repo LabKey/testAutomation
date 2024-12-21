@@ -138,7 +138,8 @@ public class FileUploadPanel extends WebDriverComponent<FileUploadPanel.ElementC
         {
             super(driver);
             _backwardsCompat = backwardsCompat;
-            _baseLocator = Locator.tagWithClass("div", "file-upload--container").parent();
+            if (backwardsCompat)
+                _baseLocator = Locator.tagWithClass("div", "file-upload--container").parent();
         }
 
 
