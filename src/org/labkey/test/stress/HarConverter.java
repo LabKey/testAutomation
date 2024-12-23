@@ -35,7 +35,7 @@ public class HarConverter
 
     public static void main(String[] args) throws IOException
     {
-        final String inputParam = "/Users/treychadick/Downloads/dashboard.har";// args.length == 0 ? "-" : args[0];
+        final String inputParam = args.length == 0 ? "-" : args[0];
         final String outputFileName = args.length < 2
             ? (inputParam.length() > 1 ? inputParam.replaceFirst("(.har)?$", ".xml") : "har.xml")
             : args[1];
