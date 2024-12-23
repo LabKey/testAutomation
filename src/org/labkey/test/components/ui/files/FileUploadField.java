@@ -84,7 +84,7 @@ public class FileUploadField extends WebDriverComponent<FileUploadField.ElementC
         // Elements for new attachment
         WebElement tempFileLoc = Locator.tagWithClass("div", "attached-file__inline-container")
                 .refindWhenNeeded(this);
-        WebElement removeBtn = Locator.tagWithClass("span", "file-upload__remove--icon")
+        WebElement removeBtn = Locator.tagWithClass("span", "attached-file__remove-icon")
                 .refindWhenNeeded(this);
 
         // Component for existing attachment
