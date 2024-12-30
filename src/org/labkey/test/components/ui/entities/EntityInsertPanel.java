@@ -53,7 +53,7 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
 
     public String getTargetEntityType()
     {
-        return elementCache().targetType.getText();
+        return elementCache().targetTab.getText();
     }
 
     public boolean isAddParentMenuPresent()
@@ -402,7 +402,9 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
 
     protected class ElementCache extends Component<?>.ElementCache
     {
-        WebElement targetType = Locator.tagWithId("div", "target-entity-type").findWhenNeeded(this);
+        Locator navTab = Locator.tagWithClass("ul", "nav-tabs")
+                .child(Locator.tag("li").withChild(Locator.tag("a")));
+        WebElement targetTab = navTab.findWhenNeeded(this);
 
         MultiMenu addParent = new MultiMenu.MultiMenuFinder(getDriver()).containsText("Add Parent")
                 .timeout(WAIT_FOR_JAVASCRIPT).refindWhenNeeded();
