@@ -1212,6 +1212,25 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         return new ConditionalFormatDialog(this);
     }
 
+    public boolean hasHitSelectionCriteriaBtn()
+    {
+        return elementCache().hitSelectionCriteriaBtnLoc.existsIn(this);
+    }
+
+    public HitSelectionDialog clickHitSelectionCriteriaButton()
+    {
+        expand();
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().hitSelectionCriteriaButton()));
+        elementCache().hitSelectionCriteriaButton().click();
+        return new HitSelectionDialog(getDriver());
+    }
+
+    public List<String> getHitSelectionCriteria()
+    {
+        expand();
+        return elementCache().hitSelectionCriteria();
+    }
+
     @Override
     protected ElementCache newElementCache()
     {
@@ -1766,6 +1785,18 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         {
             return Locator.waitForAnyElement(new FluentWait<SearchContext>(this).withTimeout(Duration.ofMillis(WAIT_FOR_JAVASCRIPT)),
                     Locator.button("Add Format"), Locator.button("Edit Formats"));
+        }
+
+        public Locator hitSelectionCriteriaBtnLoc = Locator.button("Edit Criteria");
+        public WebElement hitSelectionCriteriaButton()
+        {
+            return hitSelectionCriteriaBtnLoc.waitForElement(this, WAIT_FOR_JAVASCRIPT);
+        }
+
+        public List<String> hitSelectionCriteria()
+        {
+            return getWrapper().getTexts(Locator.tagWithClass("li", "hit-criteria-renderer__field-value")
+                    .findElements(this));
         }
 
         public RadioButton aliquotOption(ExpSchema.DerivationDataScopeType option)
