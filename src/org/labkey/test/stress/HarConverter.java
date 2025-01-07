@@ -3,11 +3,13 @@ package org.labkey.test.stress;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.xmlbeans.XmlOptions;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.labkey.query.xml.ApiTestsDocument;
 import org.labkey.query.xml.TestCaseType;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.Crawler.ControllerActionId;
 
 import java.io.File;
@@ -40,27 +42,35 @@ public class HarConverter
             ? (inputParam.length() > 1 ? inputParam.replaceFirst("(.har)?$", ".xml") : "har.xml")
             : args[1];
 
-        ApiTestsDocument.ApiTests apiTests = new HarConverter(inputParam).doConversion();
+        ApiTestsDocument apiTestsDoc = new HarConverter(inputParam).doConversion();
 
         try (OutputStream outputStream = getOutputStream(outputFileName))
         {
-            apiTests.save(outputStream);
+            XmlOptions opts = new XmlOptions();
+            opts.setSaveCDataEntityCountThreshold(0);
+            opts.setSaveCDataLengthThreshold(0);
+            opts.setSavePrettyPrint();
+            opts.setUseDefaultNamespace();
+            opts.setSaveNoXmlDecl();
+            apiTestsDoc.save(outputStream, opts);
         }
     }
 
-    public ApiTestsDocument.ApiTests doConversion() throws IOException
+    public ApiTestsDocument doConversion() throws IOException
     {
         List<HarRequest> requests = readRequestsFromHar();
-        ApiTestsDocument.ApiTests apiTests = ApiTestsDocument.ApiTests.Factory.newInstance();
-        TestCaseType[] testCases = new TestCaseType[requests.size()];
+
+        ApiTestsDocument apiTestsDoc = ApiTestsDocument.Factory.newInstance();
+        ApiTestsDocument.ApiTests apiTests = apiTestsDoc.addNewApiTests();
+
         for (int i = 0; i < requests.size(); i++)
         {
             String name = i + " " + new ControllerActionId(requests.get(i).getUrl());
-            testCases[i] = requests.get(i).toTestCase();
-            testCases[i].setName(name);
+            TestCaseType testCase = apiTests.addNewTest();
+            testCase.setName(name);
+            requests.get(i).populateTestCase(testCase);
         }
-        apiTests.setTestArray(testCases);
-        return apiTests;
+        return apiTestsDoc;
     }
 
     private InputStream getInputStream(String inputParam) throws FileNotFoundException
@@ -115,7 +125,7 @@ public class HarConverter
             try
             {
                 ControllerActionId actionId = new ControllerActionId(url);
-                if (excludedActions.contains(actionId) || StringUtils.isBlank(actionId.getAction()))
+                if (excludedActions.contains(actionId) || StringUtils.isBlank(actionId.getAction()) || "app".equals(actionId.getAction()))
                 {
                     include = false;
                 }
@@ -131,7 +141,7 @@ public class HarConverter
             if (include)
                 LOG.info("Including request to " + url);
             else
-                LOG.info("Skip request to " + url);
+                LOG.info("Skipping request to " + url);
         }
     }
 
@@ -147,7 +157,7 @@ public class HarConverter
         {
             JSONObject request = harEntry.getJSONObject("request");
             method = request.getString("method").toLowerCase();
-            url = request.getString("url");
+            url = request.getString("url").substring(WebTestHelper.getBaseURL().length());
             JSONObject postData = request.optJSONObject("postData", new JSONObject());
             postMime = postData.optString("mimeType");
             postText = postData.optString("text");
@@ -179,9 +189,8 @@ public class HarConverter
             return responseCode;
         }
 
-        public TestCaseType toTestCase()
+        public TestCaseType populateTestCase(TestCaseType testCase)
         {
-            TestCaseType testCase = TestCaseType.Factory.newInstance();
             testCase.setUrl(url);
             if ("get".equals(method))
             {
@@ -189,14 +198,15 @@ public class HarConverter
             }
             else if ("post".equals(method))
             {
-                testCase.setFormData(postText);
                 if (ApiTestCommand.CONTENT_TYPE_JSON.equals(postMime))
                 {
                     testCase.setType("post");
+                    testCase.setFormData(new JSONObject(postText).toString(2));
                 }
                 else
                 {
                     testCase.setType("post_form");
+                    testCase.setFormData(postText);
                 }
             }
             else
