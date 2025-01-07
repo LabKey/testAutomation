@@ -47,6 +47,7 @@ public class HitSelectionDialog extends ModalDialog
             throw new IllegalStateException("Apply button is not enabled.");
         }
         elementCache().submitButton.click();
+        waitForClose();
     }
 
     @Override
