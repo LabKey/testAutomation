@@ -330,7 +330,7 @@ public class ArtifactCollector
     {
         FileFilter directoryOrArtifactFilter = pathname ->
                 pathname.isDirectory()
-                        ? !pathname.isHidden() && !pathname.getName().equals("@labkey_full_text_index")
+                        ? !pathname.getName().equals("@labkey_full_text_index")
                         : pathname.lastModified() > _testStart && filter.accept(pathname);
 
         File[] files = path.listFiles(directoryOrArtifactFilter);
