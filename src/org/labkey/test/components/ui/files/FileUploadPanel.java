@@ -6,6 +6,7 @@ import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.html.FileInput;
 import org.labkey.test.components.html.Input;
+import org.labkey.test.components.react.MultiMenu;
 import org.openqa.selenium.ElementNotInteractableException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -77,7 +78,27 @@ public class FileUploadPanel extends WebDriverComponent<FileUploadPanel.ElementC
 
     public File downloadTemplate()
     {
-        return getWrapper().doAndWaitForDownload(()->elementCache().downloadTemplate.click());
+        if (!isTemplateDownloadDropdown())
+            return getWrapper().doAndWaitForDownload(()->elementCache().downloadTemplate.click());
+
+        return downloadTemplate("Default Template");
+    }
+
+    public File downloadTemplate(String templateName)
+    {
+        return getWrapper().doAndWaitForDownload(()-> {
+            getTemplateDownloadDropdown().doMenuAction(templateName);
+        });
+    }
+
+    public MultiMenu getTemplateDownloadDropdown()
+    {
+        return new MultiMenu.MultiMenuFinder(getDriver()).withText("Template").findOrNull(getDriver());
+    }
+
+    public boolean isTemplateDownloadDropdown()
+    {
+        return getTemplateDownloadDropdown() != null;
     }
 
     /*
@@ -107,7 +128,7 @@ public class FileUploadPanel extends WebDriverComponent<FileUploadPanel.ElementC
                 .withChild(Locator.tagWithClass("span", "fa-times-circle"));
         Locator.XPathLocator attachedFileContainerOld = Locator.tagWithClass("div", "attached-file--container")
                 .withChild(Locator.tagWithClass("span", "fa-times-circle"));
-        WebElement downloadTemplate = Locator.linkWithTitle("Download Template").findWhenNeeded(getDriver());
+        WebElement downloadTemplate = Locator.linkWithTitle("Download Template").findElementOrNull(getDriver());
 
         Locator attachedFileContainer(String fileName)
         {
