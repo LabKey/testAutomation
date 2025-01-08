@@ -45,10 +45,10 @@ public abstract class SampleTypeDesigner<T extends SampleTypeDesigner<T>> extend
     {
         expandPropertiesPanel();
 
-        WebDriverWrapper.waitFor(elementCache().addAliasButton::isDisplayed,
+        WebDriverWrapper.waitFor(elementCache().addParentAliasButton::isDisplayed,
                 "'Add a Parent' button is not visible.", 2_500);
 
-        elementCache().addAliasButton.click();
+        elementCache().addParentAliasButton.click();
         int initialCount = findEmptyAlias();
         if (optionDisplayText == null)
         {
@@ -100,6 +100,8 @@ public abstract class SampleTypeDesigner<T extends SampleTypeDesigner<T>> extend
         protected final WebElement uniqueIdMsgCheckIcon = Locator.tagWithClass("div","uniqueid-msg")
                 .append(Locator.tagWithClassContaining("i", "domain-panel-status-icon-green")).refindWhenNeeded(this);
 
+        public final WebElement addParentAliasButton = Locator.tagWithClassContaining("span", "container--action-button")
+                .withText("Add a Parent").findWhenNeeded(propertiesPanel);
         public final WebElement addAliasButton = Locator.tagWithClass("i","container--addition-icon").findWhenNeeded(this);
     }
 }
