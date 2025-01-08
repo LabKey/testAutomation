@@ -20,8 +20,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 public class HarConverter
 {
@@ -63,12 +66,30 @@ public class HarConverter
         ApiTestsDocument apiTestsDoc = ApiTestsDocument.Factory.newInstance();
         ApiTestsDocument.ApiTests apiTests = apiTestsDoc.addNewApiTests();
 
+        Map<String, String> replacements = new HashMap<>();
+
         for (int i = 0; i < requests.size(); i++)
         {
-            String name = i + " " + new ControllerActionId(requests.get(i).getUrl());
+            ControllerActionId actionId = new ControllerActionId(requests.get(i).getUrl());
             TestCaseType testCase = apiTests.addNewTest();
-            testCase.setName(name);
+            testCase.setName(i + " " + actionId);
             requests.get(i).populateTestCase(testCase);
+            String containerPath = actionId.getContainerPath();
+            if (containerPath != null && !containerPath.isBlank())
+            {
+                containerPath = "/" + containerPath; // Relative URLs will have a leading slash
+                String replacementString = replacements.computeIfAbsent(containerPath, k -> "@@CONTAINER" + (replacements.isEmpty() ? "" : "_" + (replacements.size() + 1)) + "@@");
+                String urlWithReplacementString = testCase.getUrl().replaceFirst("^" + Pattern.quote(containerPath), replacementString);
+                testCase.setUrl(urlWithReplacementString);
+            }
+        }
+        if (!replacements.isEmpty())
+        {
+            LOG.info("Use the following containerPath replacements for these requests:");
+            for (Map.Entry<String, String> entry : replacements.entrySet())
+            {
+                LOG.info("    '" + entry.getValue() + "' => '" + entry.getKey() + "'");
+            }
         }
         return apiTestsDoc;
     }
@@ -107,41 +128,43 @@ public class HarConverter
             for (int i = 0; i < entries.length(); i++)
             {
                 JSONObject entry = entries.getJSONObject(i);
-                if (filterHarEntry(entry))
+                if (shouldIncludeHarEntry(entry))
                 {
                     requests.add(new HarRequest(entry));
                 }
             }
+
+            if (requests.isEmpty())
+            {
+                throw new IllegalArgumentException("No requests included from har file: " + inputParam);
+            }
+
+            LOG.info("Including %d of %d entries from %s".formatted(requests.size(), entries.length(), inputParam));
             return requests;
         }
     }
 
-    private boolean filterHarEntry(JSONObject entry)
+    private boolean shouldIncludeHarEntry(JSONObject entry)
     {
-        boolean include = true;
         String url = entry.getJSONObject("request").getString("url");
         try
         {
-            try
+            ControllerActionId actionId = new ControllerActionId(url);
+            if (excludedActions.contains(actionId) || StringUtils.isBlank(actionId.getAction()) || "app".equals(actionId.getAction()))
             {
-                ControllerActionId actionId = new ControllerActionId(url);
-                if (excludedActions.contains(actionId) || StringUtils.isBlank(actionId.getAction()) || "app".equals(actionId.getAction()))
-                {
-                    include = false;
-                }
+                LOG.info("Skipping request: " + url);
+                return false;
             }
-            catch (IllegalArgumentException ignore)
-            {
-                include = false;
-            }
-            return include;
-        }
-        finally
-        {
-            if (include)
-                LOG.info("Including request to " + url);
             else
-                LOG.info("Skipping request to " + url);
+            {
+                LOG.info("Including request: " + url);
+                return true;
+            }
+        }
+        catch (IllegalArgumentException ignore)
+        {
+            LOG.warn("Request doesn't target expected server (%s): %s".formatted(WebTestHelper.getBaseURL(), url));
+            return false;
         }
     }
 
