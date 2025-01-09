@@ -32,10 +32,10 @@ import static java.io.File.pathSeparator;
 public class PipelineToolsHelper
 {
     private final LabKeySiteWrapper _test;
-    private static Set<String> _originalToolsDirs = null;
-    private static Set<String> _currentToolsDirs = null;
     private static final String _defaultToolsDirectory = new File(TestFileUtils.getModulesDir().getParentFile(), "bin").getAbsoluteFile().toString();
     private static final String _extraPipelineTools = TestProperties.getAdditionalPipelineTools();
+    private static Set<String> _originalToolsDirs = null;
+    private static Set<String> _currentToolsDirs = Set.of(_defaultToolsDirectory); // Presume current tools dir is just the default dir
 
     public PipelineToolsHelper(LabKeySiteWrapper test)
     {
@@ -90,7 +90,7 @@ public class PipelineToolsHelper
         Set<String> directoriesToAppend = new LinkedHashSet<>(Arrays.asList(directories));
         directoriesToAppend.remove("");
         directoriesToAppend.remove(null);
-        if (directoriesToAppend.isEmpty() || _currentToolsDirs != null && _currentToolsDirs.containsAll(directoriesToAppend))
+        if (directoriesToAppend.isEmpty() || _currentToolsDirs.containsAll(directoriesToAppend))
         {
             TestLogger.log("No changes needed");
             return;
