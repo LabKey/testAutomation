@@ -26,6 +26,34 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+/**
+ * This can convert the JSON from a browser network recording (HAR file) into a {@link ApiTestsDocument} that can be
+ * used to simulate UI activities via API.<br>
+ * The relevant portions of the HAR file is the log.entries array:
+ * <pre>
+ * {
+ *   "log" : {
+ *     "entries" : [
+ *         // entries
+ *     ]
+ *   }
+ * }
+ * </pre>
+ *
+ * Each HAR entry contains information about a single request:
+ * <pre>
+ * {
+ *   "request": {
+ *     "method": "",
+ *     "url": "",
+ *     "postData": { // no postData for GET requests
+ *       "mimeType": "",
+ *       "text": ""
+ *     }
+ *   }
+ * }
+ * </pre>
+ */
 public class HarConverter
 {
     private static final Logger LOG = LogManager.getLogger(HarConverter.class);
@@ -38,10 +66,14 @@ public class HarConverter
         this.inputParam = inputParam;
     }
 
+    /**
+     * Run tool through gradle:<br>
+     * {@code ./gradlew :server:testAutomation:convertHarToStressXml -PharInFile=/path/to/some.har [-PharOutFile=/path/to/output.xml]}
+     */
     public static void main(String[] args) throws IOException
     {
-        final String inputParam = args.length == 0 ? "-" : args[0];
-        final String outputFileName = args.length < 2
+        final String inputParam = args.length == 0 ? null : args[0];
+        final String outputFileName = args.length == 1
             ? (inputParam.length() > 1 ? inputParam.replaceFirst("(.har)?$", ".xml") : "har.xml")
             : args[1];
 
@@ -96,23 +128,22 @@ public class HarConverter
 
     private InputStream getInputStream(String inputParam) throws FileNotFoundException
     {
-        if ("-".equals(inputParam))
-        {
-            LOG.info("Reading HAR file from stdin");
-            return System.in;
-        }
-        else
-        {
-            File inputFile = new File(inputParam);
-            LOG.info("Reading HAR file from " + inputFile.getAbsolutePath());
-            return new FileInputStream(inputFile);
-        }
+        File inputFile = new File(inputParam);
+        LOG.info("Reading HAR file from " + inputFile.getAbsolutePath());
+        return new FileInputStream(inputFile);
     }
 
     private static OutputStream getOutputStream(String outputParam) throws FileNotFoundException
     {
         File outputFile = new File(outputParam);
-        LOG.info("Writing converted HAR file to " + outputFile.getAbsolutePath());
+        if (outputFile.exists())
+        {
+            LOG.warn("Specified output file (" + outputFile.getAbsolutePath() + ") already exists. Not writing file.");
+        }
+        else
+        {
+            LOG.info("Writing converted HAR file to " + outputFile.getAbsolutePath());
+        }
         return new FileOutputStream(outputFile);
     }
 

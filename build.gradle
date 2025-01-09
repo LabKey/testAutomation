@@ -163,20 +163,18 @@ project.tasks.register("convertHarToStressXml", JavaExec) {
                 [project.configurations.uiTestRuntimeClasspath, project.tasks.jar]
             }
 
-            String[] args = []
-
             if (project.hasProperty('harInFile')) {
-                args += getProperty('harInFile')
+                String[] args = [getProperty('harInFile')]
+                if (project.hasProperty('harOutFile')) {
+                    args += getProperty('harOutFile')
+                }
+                task.args(args)
             }
-            else {
-                args += "-"
-                standardInput = System.in
+        }
+        task.doFirst {
+            if (!project.hasProperty('harInFile')) {
+                throw new IllegalArgumentException("Specify input file for " + task.name + ". -PharInFile=<file>")
             }
-            if (project.hasProperty('harOutFile')) {
-                args += getProperty('harOutFile')
-            }
-
-            task.args(args)
         }
 }
 
