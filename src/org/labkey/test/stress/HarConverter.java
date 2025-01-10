@@ -30,7 +30,7 @@ import java.util.regex.Pattern;
  * This can convert the JSON from a browser network recording (HAR file) into a {@link ApiTestsDocument} that can be
  * used to simulate UI activities via API.<br>
  * The relevant portions of the HAR file is the log.entries array:
- * <pre>
+ * <pre>{@code
  * {
  *   "log" : {
  *     "entries" : [
@@ -38,21 +38,36 @@ import java.util.regex.Pattern;
  *     ]
  *   }
  * }
- * </pre>
+ * }</pre>
  *
- * Each HAR entry contains information about a single request:
- * <pre>
+ * Each HAR entry contains information about a single request. Each request is converted to a format that is understood
+ * by our API test helpers ({@link org.labkey.test.util.APITestHelper} and {@link ApiTestCommand}).<br>
+ * <br>
+ * This is an example of a conversion.<br>
+ * HAR entry:
+ * <pre>{@code
  * {
  *   "request": {
- *     "method": "",
- *     "url": "",
+ *     "method": "post",
+ *     "url": "http://localhost:8080/SMTestProject/query-getSelected.api",
  *     "postData": { // no postData for GET requests
- *       "mimeType": "",
- *       "text": ""
+ *       "mimeType": "application/json",
+ *       "text": "{\"schemaName\":\"inventory\",\"queryName\":\"LocationCapacityByType\",\"query.selectionKey\":\"freezerListModel\",\"query.containerFilterName\":\"Current\",\"query.param.LocationTypeName\":\"Freezer\"}"
  *     }
  *   }
  * }
- * </pre>
+ * }</pre>
+ * The resulting API test XML:
+ * <pre>{@code
+ * <test name="getSelected 1" type="post">
+ *    <url>
+ *        <![CDATA[@@CONTAINER@@/query-getSelected.api]]>
+ *    </url>
+ *    <formData>
+ *      <![CDATA[{"schemaName":"inventory","queryName":"LocationCapacityByType","query.selectionKey":"freezerListModel","query.containerFilterName":"Current","query.param.LocationTypeName":"Freezer"}]]>
+ *    </formData>
+ * </test>
+ * }</pre>
  */
 public class HarConverter
 {
