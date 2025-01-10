@@ -31,11 +31,11 @@ import static java.io.File.pathSeparator;
 
 public class PipelineToolsHelper
 {
-    private LabKeySiteWrapper _test;
-    private static Set<String> _originalToolsDirs = null;
-    private static Set<String> _currentToolsDirs = null;
+    private final LabKeySiteWrapper _test;
     private static final String _defaultToolsDirectory = new File(TestFileUtils.getModulesDir().getParentFile(), "bin").getAbsoluteFile().toString();
     private static final String _extraPipelineTools = TestProperties.getAdditionalPipelineTools();
+    private static Set<String> _originalToolsDirs = null;
+    private static Set<String> _currentToolsDirs = Set.of(_defaultToolsDirectory); // Presume current tools dir is just the default dir
 
     public PipelineToolsHelper(LabKeySiteWrapper test)
     {
@@ -90,7 +90,7 @@ public class PipelineToolsHelper
         Set<String> directoriesToAppend = new LinkedHashSet<>(Arrays.asList(directories));
         directoriesToAppend.remove("");
         directoriesToAppend.remove(null);
-        if (directoriesToAppend.isEmpty() || _currentToolsDirs != null && _currentToolsDirs.containsAll(directoriesToAppend))
+        if (directoriesToAppend.isEmpty() || _currentToolsDirs.containsAll(directoriesToAppend))
         {
             TestLogger.log("No changes needed");
             return;
@@ -125,14 +125,10 @@ public class PipelineToolsHelper
     @LogMethod
     public void resetPipelineToolsDirectory()
     {
-        if (_originalToolsDirs != null)
-        {
-            if (TestProperties.isTestRunningOnTeamCity())
-                setToolsDirToTestDefault();
-            else
-                setPipelineToolsDirectory(pathFromDirs(_originalToolsDirs));
-            _originalToolsDirs = null;
-        }
+        if (TestProperties.isTestRunningOnTeamCity())
+            setToolsDirToTestDefault();
+        else if (_originalToolsDirs != null)
+            setPipelineToolsDirectory(pathFromDirs(_originalToolsDirs));
     }
 
     /**
@@ -143,7 +139,7 @@ public class PipelineToolsHelper
     {
         setPipelineToolsDirectory(getDefaultToolsPath());
         if (TestProperties.isTestRunningOnTeamCity())
-            _originalToolsDirs = null;
+            _originalToolsDirs = _currentToolsDirs; // Don't remove 'additional.pipeline.tools' between tests
     }
 
     private void goToSiteSettings()
