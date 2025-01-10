@@ -1427,9 +1427,7 @@ public class EditableGridTest extends BaseWebDriverTest
         );
 
         EditableGrid testGrid = goToEditableGrid(ALL_TYPE_SAMPLE_TYPE);
-
-        // Add extra rows, because the invalid value popup on last row can get in the way when updating.
-        testGrid.addRows(6);
+        testGrid.addRows(3);
 
         log("Pasting invalid values");
         testGrid.selectCell(0, STR_FIELD_NAME);
@@ -1485,35 +1483,22 @@ public class EditableGridTest extends BaseWebDriverTest
         checker().screenShotIfNewError("after required value correction error");
 
         log("Correct bad data type values should remove paste data warnings");
-        testGrid.setCellValue(2, STR_FIELD_NAME, "good");
-        testGrid.setCellValue(2, REQ_STR_FIELD_NAME + " *", "good");
-        testGrid.setCellValue(2, INT_FIELD_NAME, "1");
-        testGrid.setCellValue(2, REQ_INT_FIELD_NAME + " *", "134");
-        testGrid.setCellValue(2, BOOL_FIELD_NAME, "on");
-        testGrid.setCellValue(2, FLOAT_FIELD_NAME, "1.23");
-        testGrid.setCellValue(2, TEXTCHOICE_FIELD_NAME, List.of("red"));
-        testGrid.setCellValue(2, REQ_TEXTCHOICE_FIELD_NAME + " *", List.of("red"));
-        testGrid.setCellValue(2, LOOKUP_FIELD_NAME, List.of("kiwi"));
-        testGrid.setCellValue(2, REQ_LOOKUP_FIELD_NAME + " *", List.of("kiwi"));
-        testGrid.setCellValue(2, DATE_FIELD_NAME, LocalDate.of(2024, 7, 7));
-        testGrid.setCellValue(2, TIME_FIELD_NAME, LocalTime.of(2, 30));
-        testGrid.setCellValue(2, REQ_DATETIME_FIELD_NAME + " *", LocalDateTime.of(2024, 7, 7, 10, 30));
-        testGrid.setCellValue(2, REQ_TIME_FIELD_NAME + " *", LocalTime.of(2, 30));
-//        // Use paste. On this row setCellValue can cause the invalid popup to show and prevent interaction with the element.
-//        testGrid.pasteFromCell(2, STR_FIELD_NAME, "good");
-//        testGrid.pasteFromCell(2, REQ_STR_FIELD_NAME + " *", "good");
-//        testGrid.pasteFromCell(2, INT_FIELD_NAME, "1");
-//        testGrid.pasteFromCell(2, REQ_INT_FIELD_NAME + " *", "134");
-//        testGrid.pasteFromCell(2, BOOL_FIELD_NAME, "on");
-//        testGrid.pasteFromCell(2, FLOAT_FIELD_NAME, "1.23");
-//        testGrid.pasteFromCell(2, TEXTCHOICE_FIELD_NAME, "red");
-//        testGrid.pasteFromCell(2, REQ_TEXTCHOICE_FIELD_NAME + " *", "red");
-//        testGrid.pasteFromCell(2, LOOKUP_FIELD_NAME, "kiwi");
-//        testGrid.pasteFromCell(2, REQ_LOOKUP_FIELD_NAME + " *", "kiwi");
-//        testGrid.pasteFromCell(2, DATE_FIELD_NAME, LocalDate.of(2024, 7, 7).toString());
-//        testGrid.pasteFromCell(2, TIME_FIELD_NAME, LocalTime.of(2, 30).toString());
-//        testGrid.pasteFromCell(2, REQ_DATETIME_FIELD_NAME + " *", LocalDateTime.of(2024, 7, 7, 10, 30).toString());
-//        testGrid.pasteFromCell(2, REQ_TIME_FIELD_NAME + " *", LocalTime.of(2, 30).toString());
+        // Use paste. Using setCellValue can cause the invalid data popup to show and prevent interaction with the editable element.
+        // Using paste will still cause the popup, but it uses <ctrlKey>v to paste the text and doesn't require the editable element be clickable.
+        testGrid.pasteFromCell(2, STR_FIELD_NAME, "good");
+        testGrid.pasteFromCell(2, REQ_STR_FIELD_NAME + " *", "good");
+        testGrid.pasteFromCell(2, INT_FIELD_NAME, "1");
+        testGrid.pasteFromCell(2, REQ_INT_FIELD_NAME + " *", "134");
+        testGrid.pasteFromCell(2, BOOL_FIELD_NAME, "on");
+        testGrid.pasteFromCell(2, FLOAT_FIELD_NAME, "1.23");
+        testGrid.pasteFromCell(2, TEXTCHOICE_FIELD_NAME, "red");
+        testGrid.pasteFromCell(2, REQ_TEXTCHOICE_FIELD_NAME + " *", "red");
+        testGrid.pasteFromCell(2, LOOKUP_FIELD_NAME, "kiwi");
+        testGrid.pasteFromCell(2, REQ_LOOKUP_FIELD_NAME + " *", "kiwi");
+        testGrid.pasteFromCell(2, DATE_FIELD_NAME, LocalDate.of(2024, 7, 7).toString());
+        testGrid.pasteFromCell(2, TIME_FIELD_NAME, LocalTime.of(2, 30).toString());
+        testGrid.pasteFromCell(2, REQ_DATETIME_FIELD_NAME + " *", LocalDateTime.of(2024, 7, 7, 10, 30).toString());
+        testGrid.pasteFromCell(2, REQ_TIME_FIELD_NAME + " *", LocalTime.of(2, 30).toString());
 
         for (int col = 0; col < ALL_FIELD_NAMES.size(); col++)
         {
