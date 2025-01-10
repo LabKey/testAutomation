@@ -83,6 +83,7 @@ import org.labkey.test.util.Log4jUtils;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.PermissionsHelper;
+import org.labkey.test.util.PipelineToolsHelper;
 import org.labkey.test.util.ReadOnlyTest;
 import org.labkey.test.util.SecurityHelper;
 import org.labkey.test.util.SimpleHttpResponse;
@@ -691,6 +692,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         }
 
         cleanup(false);
+
+        new PipelineToolsHelper(this).resetPipelineToolsDirectory();
     }
 
     private void enableTroubleshootingStacktraces()
