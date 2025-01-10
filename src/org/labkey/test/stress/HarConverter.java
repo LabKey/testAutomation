@@ -27,7 +27,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
- * This can convert the JSON from a browser network recording (HAR file) into a {@link ApiTestsDocument} that can be
+ * This converts the JSON from a browser network recording (HAR file) into a {@link ApiTestsDocument} that can be
  * used to simulate UI activities via API.<br>
  * The relevant portions of the HAR file is the log.entries array:
  * <pre>{@code
@@ -59,7 +59,7 @@ import java.util.regex.Pattern;
  * }</pre>
  * The resulting API test XML:
  * <pre>{@code
- * <test name="getSelected 1" type="post">
+ * <test name="1 query-getSelected" type="post">
  *    <url>
  *        <![CDATA[@@CONTAINER@@/query-getSelected.api]]>
  *    </url>
@@ -75,6 +75,8 @@ public class HarConverter
     private static final Set<ControllerActionId> excludedActions = Set.of(new ControllerActionId("login", "whoami"));
 
     private final String inputParam;
+
+    private Map<String, String> _containerReplacements = new HashMap<>();
 
     public HarConverter(String inputParam)
     {
@@ -113,8 +115,6 @@ public class HarConverter
         ApiTestsDocument apiTestsDoc = ApiTestsDocument.Factory.newInstance();
         ApiTestsDocument.ApiTests apiTests = apiTestsDoc.addNewApiTests();
 
-        Map<String, String> replacements = new HashMap<>();
-
         for (int i = 0; i < requests.size(); i++)
         {
             ControllerActionId actionId = new ControllerActionId(requests.get(i).getUrl());
@@ -125,20 +125,25 @@ public class HarConverter
             if (containerPath != null && !containerPath.isBlank())
             {
                 containerPath = "/" + containerPath; // Relative URLs will have a leading slash
-                String replacementString = replacements.computeIfAbsent(containerPath, k -> "@@CONTAINER" + (replacements.isEmpty() ? "" : "_" + (replacements.size() + 1)) + "@@");
+                String replacementString = _containerReplacements.computeIfAbsent(containerPath, k -> "@@CONTAINER" + (_containerReplacements.isEmpty() ? "" : "_" + (_containerReplacements.size() + 1)) + "@@");
                 String urlWithReplacementString = testCase.getUrl().replaceFirst("^" + Pattern.quote(containerPath), replacementString);
                 testCase.setUrl(urlWithReplacementString);
             }
         }
-        if (!replacements.isEmpty())
+        if (!_containerReplacements.isEmpty())
         {
             LOG.info("Use the following containerPath replacements for these requests:");
-            for (Map.Entry<String, String> entry : replacements.entrySet())
+            for (Map.Entry<String, String> entry : _containerReplacements.entrySet())
             {
                 LOG.info("    '" + entry.getValue() + "' => '" + entry.getKey() + "'");
             }
         }
         return apiTestsDoc;
+    }
+
+    public Map<String, String> getContainerReplacements()
+    {
+        return _containerReplacements;
     }
 
     private InputStream getInputStream(String inputParam) throws FileNotFoundException
