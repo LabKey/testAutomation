@@ -22,6 +22,7 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.DomainDesignerPage;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.domain.DomainPanel;
+import org.labkey.test.components.domain.HitSelectionDialog;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.OptionSelect;
@@ -33,6 +34,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 
 import java.io.File;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
@@ -205,6 +207,19 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
         return this;
     }
 
+    public HitSelectionDialog clickEditCriteria()
+    {
+        expandPropertiesPanel();
+        elementCache().hitSelectionCriteriaBtn.click();
+        return new HitSelectionDialog(getDriver());
+    }
+
+    public List<String> getHitCriteria()
+    {
+        expandPropertiesPanel();
+        return getWrapper().getTexts(elementCache().hitSelectionCriteriaLoc.findElements(elementCache().propertiesPanel));
+    }
+
     public ReactAssayDesignerPage setStatus(boolean checked)
     {
         expandPropertiesPanel();
@@ -351,5 +366,9 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
         final Checkbox qcEnabledCheckbox = Checkbox(Locator.checkboxById("assay-design-qcEnabled")).findWhenNeeded(propertiesPanel);
         final Checkbox plateTemplateCheckbox = Checkbox(Locator.checkboxById("assay-design-plateMetadata")).findWhenNeeded(propertiesPanel);
         final Checkbox activeStatusCheckBox = Checkbox(Locator.checkboxById("assay-design-status")).findWhenNeeded(propertiesPanel);
+
+        final WebElement hitSelectionCriteriaBtn = Locator.tagWithClass("div", "filter-criteria-input__button")
+                .child(Locator.button("Edit Criteria")).findWhenNeeded(propertiesPanel);
+        final Locator hitSelectionCriteriaLoc = Locator.tagWithClass("li", "hit-criteria-renderer__field-value");
     }
 }
