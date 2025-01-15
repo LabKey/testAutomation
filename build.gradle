@@ -152,6 +152,32 @@ def initPropertiesTask = project.tasks.register("initProperties", Task) {
         })
 }
 
+project.tasks.register("convertHarToStressXml", JavaExec) {
+    JavaExec task ->
+        task.group = GroupNames.TEST
+        task.description = "Convert browser HAR dump to XML for use as a stress test activity"
+        task.setMainClass('org.labkey.test.stress.HarConverter')
+
+        task.configure {
+            classpath {
+                [project.configurations.uiTestRuntimeClasspath, project.tasks.jar]
+            }
+
+            if (project.hasProperty('harInFile')) {
+                String[] args = [getProperty('harInFile')]
+                if (project.hasProperty('harOutFile')) {
+                    args += getProperty('harOutFile')
+                }
+                task.args(args)
+            }
+        }
+        task.doFirst {
+            if (!project.hasProperty('harInFile')) {
+                throw new IllegalArgumentException("Specify input file for " + task.name + ". -PharInFile=<file>")
+            }
+        }
+}
+
 project.tasks.uiTests.dependsOn(initPropertiesTask)
 project.parent.parent.tasks.ijConfigure.dependsOn(initPropertiesTask)
 
