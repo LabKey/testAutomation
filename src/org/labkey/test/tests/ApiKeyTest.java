@@ -72,19 +72,19 @@ public class ApiKeyTest extends BaseWebDriverTest
     private static final String API_USERNAME = "apikey";
     private static final TestUser EDITOR_USER = new TestUser("editor@apikey.test");
 
-    @Override
-    protected void doCleanup(boolean afterTest) throws TestTimeoutException
-    {
-        super.doCleanup(afterTest);
-        _userHelper.deleteUsers(false, EDITOR_USER);
-    }
-
     @BeforeClass
     public static void setupProject()
     {
         ApiKeyTest init = (ApiKeyTest) getCurrentTest();
 
         init.doSetup();
+    }
+
+    @Override
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException
+    {
+        super.doCleanup(afterTest);
+        _userHelper.deleteUsers(false, EDITOR_USER);
     }
 
     private void doSetup()
@@ -118,20 +118,25 @@ public class ApiKeyTest extends BaseWebDriverTest
 
         signOut();
         log("Verify that logging out invalidates session keys");
-        verifyInvalidAPIKey(apiKey);
+        verifyInvalidAPIKey(apiKey, null);
         simpleSignIn();
         log("Verify that session keys remain invalid after logging back in");
-        verifyInvalidAPIKey(apiKey);
+        verifyInvalidAPIKey(apiKey, null);
     }
 
     private void verifyValidAPIKey(String apiKey) throws IOException
     {
-        verifyValidAPIKey(apiKey, false);
+        verifyValidAPIKey(apiKey, false, null);
     }
 
-    private void verifyValidAPIKey(String apiKey, boolean basicAuth) throws IOException
+    private Connection verifyValidAPIKey(String apiKey, boolean basicAuth, @Nullable Connection connection) throws IOException
     {
-        Connection cn = new Connection(WebTestHelper.getBaseURL(), basicAuth ? new BasicAuthCredentialsProvider(API_USERNAME, apiKey) : new ApiKeyCredentialsProvider(apiKey));
+        Connection cn;
+        if (connection == null)
+            cn = new Connection(WebTestHelper.getBaseURL(), basicAuth ? new BasicAuthCredentialsProvider(API_USERNAME, apiKey)
+                    : new ApiKeyCredentialsProvider(apiKey));
+        else
+            cn = connection;
         try
         {
             GetSchemasCommand cmd = new GetSchemasCommand();
@@ -145,12 +150,17 @@ public class ApiKeyTest extends BaseWebDriverTest
         {
             throw new RuntimeException("Response: " + e.getStatusCode(), e);
         }
+        return cn;
     }
 
-    private void verifyInvalidAPIKey(String apiKey) throws IOException
+    private void verifyInvalidAPIKey(String apiKey, @Nullable Connection connection) throws IOException
     {
         boolean isSessionKey = !apiKey.startsWith(API_USERNAME);
-        Connection cn = new Connection(WebTestHelper.getBaseURL(), new ApiKeyCredentialsProvider(apiKey));
+        Connection cn;
+        if (connection == null)
+            cn = new Connection(WebTestHelper.getBaseURL(), new ApiKeyCredentialsProvider(apiKey));
+        else
+            cn = connection;
         try
         {
             GetSchemasCommand cmd = new GetSchemasCommand();
@@ -160,7 +170,7 @@ public class ApiKeyTest extends BaseWebDriverTest
             else
                 fail("API key should no longer be valid");
         }
-        catch(CommandException e)
+        catch (CommandException e)
         {
             assertEquals("Wrong response for invalid " + (isSessionKey ? "session" : "API") + " key", HttpStatus.SC_UNAUTHORIZED, e.getStatusCode());
             log("Success: command failed as expected.");
@@ -188,8 +198,8 @@ public class ApiKeyTest extends BaseWebDriverTest
         int beforeDeleteCount = grid.getRecordCount();
         assertFalse("Row with description not found", grid.getRowMap("Description", keyDescription).isEmpty());
         grid = deleteAPIKeyViaUI();
-        assertEquals("Number of keys after UI deletion not as expected", beforeDeleteCount-1, grid.getRecordCount());
-        verifyInvalidAPIKey(apiKey);
+        assertEquals("Number of keys after UI deletion not as expected", beforeDeleteCount - 1, grid.getRecordCount());
+        verifyInvalidAPIKey(apiKey, null);
     }
 
     @Test
@@ -207,7 +217,7 @@ public class ApiKeyTest extends BaseWebDriverTest
         log("Verify active API key via api authentication");
         verifyValidAPIKey(apiKey);
         log("Verify active API key via basic authentication");
-        verifyValidAPIKey(apiKey, true);
+        verifyValidAPIKey(apiKey, true, null);
 
         log("Generate two other keys for use in testing deletion.");
         generateAPIKey(null);
@@ -215,7 +225,7 @@ public class ApiKeyTest extends BaseWebDriverTest
         QueryGrid grid = new QueryGrid.QueryGridFinder(getDriver()).waitFor();
         int beforeDeleteCount = grid.getRecordCount();
         grid = deleteAPIKeyViaUI();
-        assertEquals("Number of keys after UI deletion not as expected", beforeDeleteCount-1, grid.getRecordCount());
+        assertEquals("Number of keys after UI deletion not as expected", beforeDeleteCount - 1, grid.getRecordCount());
 
         log("Verify existing active API key with disabled api key setting");
         goToAdminConsole()
@@ -226,13 +236,60 @@ public class ApiKeyTest extends BaseWebDriverTest
 
         log("Verify key deletion via UI with disabled api key generation works.");
         grid = deleteAPIKeyViaUI();
-        assertEquals("Number of keys after UI deletion not as expected", beforeDeleteCount-2, grid.getRecordCount());
+        assertEquals("Number of keys after UI deletion not as expected", beforeDeleteCount - 2, grid.getRecordCount());
 
         // skip testing api key expiration since it's already covered in unit test and 10 seconds expiration option is dev mode only
 
         log("Verify revoked/deleted api key");
         deleteAPIKeys(_generatedApiKeys);
-        verifyInvalidAPIKey(apiKey);
+        verifyInvalidAPIKey(apiKey, null);
+    }
+
+    /*
+        Regression coverage for Secure Issue 51637: Invalidate sessions when their API key becomes invalid
+     */
+    @Test
+    public void testSessionInvalidatesAfterAPIKeyChange() throws IOException
+    {
+        List<Map<String, Object>> _generatedApiKeys = new ArrayList<>();
+
+        log("Generating an apikey which expire in one week");
+        goToAdminConsole()
+                .clickSiteSettings()
+                .setAllowApiKeys(true)
+                .setApiKeyExpiration(CustomizeSitePage.KeyExpirationOptions.ONE_WEEK)
+                .save();
+
+        String apiKey1 = generateAPIKeyAndRecord(_generatedApiKeys);
+        Connection cn = verifyValidAPIKey(apiKey1, false, null);
+
+        log("Deleting the apikey");
+        deleteAPIKeys(_generatedApiKeys);
+
+        log("Verifying the session associated with deleted apikey is invalid");
+        verifyInvalidAPIKey(apiKey1, cn);
+
+        log("Verifying that new connection cannot be created after apikey is deleted");
+        verifyInvalidAPIKey(apiKey1, null);
+
+        log("Generating the apikey which expires in ten seconds");
+        goToAdminConsole()
+                .clickSiteSettings()
+                .setAllowApiKeys(true)
+                .setApiKeyExpiration(CustomizeSitePage.KeyExpirationOptions.TEN_SECONDS)
+                .save();
+
+        log("Verify apikey generation fails");
+        goToExternalToolPage();
+        String apikey2 = ApiKeyPanel.panelFinder(getDriver()).find().generateApiKey();
+
+        log("Verify valid apikey cannot be created before expiring");
+        verifyValidAPIKey(apikey2, false, null);
+
+        sleep(10000); // Wait for apikey to expire
+
+        log("Verify apikey cannot be created after the timer is expired");
+        verifyInvalidAPIKey(apikey2, null);
     }
 
     @Test
@@ -413,7 +470,7 @@ public class ApiKeyTest extends BaseWebDriverTest
         String keyField = "RowId";
         Map<String, Object> record = response.getRows().get(0);
         Map<String, Object> newRow = new HashMap<>();
-        Integer rowId = (Integer)((Map<String, Object>)record.get(keyField)).get("value");
+        Integer rowId = (Integer) ((Map<String, Object>) record.get(keyField)).get("value");
         newRow.put(keyField, rowId);
 
         return newRow;
