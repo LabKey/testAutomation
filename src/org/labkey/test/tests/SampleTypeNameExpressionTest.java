@@ -154,7 +154,7 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
     @Test
     public void testSimpleNameExpression()
     {
-        String nameExpression = "${A}-${B}.${genId}.${batchRandomId}.${randomId}";
+        String nameExpression = "${A}-${B}.${genId}.${batchRandomId}.${container}.${randomId}";
         String data = """
                 A\tB\tC
                 a\tb\tc
@@ -183,9 +183,9 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         assertEquals(3, names.size());
 
         String batchRandomId = names.get(0).split("\\.")[2];
-        assertThat(names.get(0), startsWith("a-b.3." + batchRandomId + "."));
-        assertThat(names.get(1), startsWith("a-b.2." + batchRandomId + "."));
-        assertThat(names.get(2), startsWith("a-b.1." + batchRandomId + "."));
+        assertThat(names.get(0), startsWith("a-b.3." + batchRandomId + "." + PROJECT_NAME + "."));
+        assertThat(names.get(1), startsWith("a-b.2." + batchRandomId + "." + PROJECT_NAME +"."));
+        assertThat(names.get(2), startsWith("a-b.1." + batchRandomId + "." + PROJECT_NAME + "."));
     }
 
 
