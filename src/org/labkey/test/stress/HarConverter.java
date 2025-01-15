@@ -40,10 +40,11 @@ import java.util.regex.Pattern;
  * }
  * }</pre>
  *
- * Each HAR entry contains information about a single request. Each request is converted to a format that is understood
- * by our API test helpers ({@link org.labkey.test.util.APITestHelper} and {@link ApiTestCommand}).<br>
+ * Each HAR entry contains information about a single request. This tool will collect 'GET' and 'POST' requests to
+ * LabKey actions (not source downloads). Each request is converted to a format that is understood by our API test
+ * helpers ({@link org.labkey.test.util.APITestHelper} and {@link ApiTestCommand}).<br>
  * <br>
- * This is an example of a conversion.<br>
+ * This is an example of a conversion of a 'POST' request with JSON data.<br>
  * HAR entry:
  * <pre>{@code
  * {
@@ -76,7 +77,7 @@ public class HarConverter
 
     private final String inputParam;
 
-    private Map<String, String> _containerReplacements = new HashMap<>();
+    private final Map<String, String> _containerReplacements = new HashMap<>();
 
     public HarConverter(String inputParam)
     {
@@ -84,8 +85,19 @@ public class HarConverter
     }
 
     /**
-     * Run tool through gradle:<br>
-     * {@code ./gradlew :server:testAutomation:convertHarToStressXml -PharInFile=/path/to/some.har [-PharOutFile=/path/to/output.xml]}
+     * In order to produce replay files for stress testing, you must generate representative HAR files.<br>
+     * <ol>
+     *     <li>Initialize project to match test environment</li>
+     *     <li>Create HAR file:<ol>
+     *         <li>Start recording by opening browser developer tools and/or clearing network log</li>
+     *         <li>Perform action(s) to be replayed during stress simulation</li>
+     *         <li>Export network log to HAR file</li>
+     *         <li>Repeat for other activities</li>
+     *     </ol></li>
+     *     <li>Convert HAR files to ApiTest XML files
+     *         <pre>./gradlew :server:testAutomation:convertHarToStressXml -PharInFile=/path/to/some.har [-PharOutFile=/path/to/output.xml]</pre>
+     *     </li>
+     * </ol>
      */
     public static void main(String[] args) throws IOException
     {
