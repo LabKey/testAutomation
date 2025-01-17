@@ -214,8 +214,11 @@ public class ApiKeyTest extends BaseWebDriverTest
         log("Deleting the apikey");
         deleteAPIKeys(_generatedApiKeys);
 
+        /*
+            Regression coverage for Issue 52004: Session associated with APIKey can used even after APIKey is deleted.
+         */
         log("Verifying the session associated with deleted apikey is invalid");
-//        verifyInvalidAPIKey(cn, false);
+        verifyInvalidAPIKey(cn, false);
 
         log("Verifying that new connection cannot be created after apikey is deleted");
         verifyInvalidAPIKey(createApiKeyConnection(apiKey1, false), false);
