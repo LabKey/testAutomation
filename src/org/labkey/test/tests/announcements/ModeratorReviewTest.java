@@ -35,11 +35,9 @@ import org.labkey.test.util.query.QueryUtils;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-/**
- * User: tgaluhn
- * Date: 4/30/2018
- */
 @Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 5)
 public class ModeratorReviewTest extends BaseWebDriverTest
@@ -163,20 +161,32 @@ public class ModeratorReviewTest extends BaseWebDriverTest
                 .setBody(response)
                 .submit();
 
-        boolean responseAdded = isTextPresent(response);
+        // commonmark-java auto-linking turns all email addresses into mailto: links
+        String formattedResponse = replaceEmailAddressesWithMailToLinks(response);
+        boolean responseAdded = isTextPresent(formattedResponse);
         if (expectAutoApproved && !responseAdded)
         {
-            checker().fatal().error(String.format("Expected response '%s' was not present on the thread page.", response));
+            checker().fatal().error(String.format("Expected response '%s' was not present on the thread page.", formattedResponse));
         }
         else if (!expectAutoApproved && responseAdded)
         {
-            checker().fatal().error(String.format("Response '%s' was present on the thread page. It should not be", response));
+            checker().fatal().error(String.format("Response '%s' was present on the thread page. It should not be", formattedResponse));
         }
         stopImpersonating();
 
         verifyNotification("RE: " + responseTitle, expectAutoApproved);
 
         return expectAutoApproved ? responseTitle : title; // New title if the response was posted successfully
+    }
+
+    private String replaceEmailAddressesWithMailToLinks(String s)
+    {
+        // A very primitive regex, but it's good enough to match our test email addresses
+        Matcher matcher = Pattern.compile("[0-9A-Za-z+_.-]+@[0-9A-Za-z.-]+").matcher(s);
+        return matcher.replaceAll(match -> {
+            String email = match.group();
+            return "<a href=\"mailto:" + email + "\">" + email + "</a>";
+        });
     }
 
     @Test
