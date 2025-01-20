@@ -30,7 +30,6 @@ import org.apache.hc.core5.http.HttpStatus;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.protocol.HttpContext;
 import org.assertj.core.api.Assertions;
-import org.eclipse.jetty.util.URIUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
@@ -607,8 +606,8 @@ public class Crawler
 
             String strippedRelativeURL = stripQueryParams(getRelativeURL());
 
-            // never go to the exactly same URL (minus query params) twice:
-            if (_urlsChecked.contains(URIUtil.decodePath(strippedRelativeURL)))
+            // never go to the exact same URL (minus query params) twice:
+            if (_urlsChecked.contains(EscapeUtil.decodeUriPath(strippedRelativeURL)))
                 return false;
 
             if (getRelativeURL().contains("export=")) //Study report export uses same URL for export. But don't mark visited yet
@@ -969,7 +968,7 @@ public class Crawler
         // Keep track of where crawler has been
         _actionsVisited.add(actionId);
         _urlsChecked.add(stripQueryParams(relativeURL));
-        _urlsChecked.add(URIUtil.decodePath(stripQueryParams(relativeURL)));
+        _urlsChecked.add(EscapeUtil.decodeUriPath(stripQueryParams(relativeURL)));
         URL origin = urlToCheck.getOrigin();
         int depth = urlToCheck.getDepth();
         String originMessage = (origin != null ? "\nOriginating page: " + origin : "") +
