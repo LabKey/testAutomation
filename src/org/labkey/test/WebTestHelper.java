@@ -42,12 +42,14 @@ import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
+import org.junit.Assert;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.remoteapi.query.DeleteRowsCommand;
 import org.labkey.remoteapi.query.Filter;
+import org.labkey.remoteapi.query.SaveRowsResponse;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.serverapi.reader.Readers;
 import org.labkey.test.util.InstallCert;
@@ -82,10 +84,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Random;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -113,6 +117,7 @@ public class WebTestHelper
     private static final Map<String, Map<String, Cookie>> savedCookies = new HashMap<>();
     private static final Map<String, String> savedSessionKeys = new HashMap<>();
     private static final Map<String, String> savedApiKeys = new HashMap<>();
+    private static final Set<String> deletedApiKeys = new HashSet<>();
 
     static { TestProperties.load(); }
 
@@ -195,8 +200,10 @@ public class WebTestHelper
                 {
                     DeleteRowsCommand deleteRowsCommand = new DeleteRowsCommand("core", "apiKeys");
                     deleteRowsCommand.setRows(rows);
-                    deleteRowsCommand.execute(connection, null);
+                    SaveRowsResponse response = deleteRowsCommand.execute(connection, null);
                     savedApiKeys.remove(apiKey);
+                    deletedApiKeys.add(apiKey);
+                    Assert.assertEquals("Wrong number of rows affected by apiKey deletion", 1, response.getRowsAffected());
                 }
                 else
                 {
@@ -210,7 +217,14 @@ public class WebTestHelper
         }
         else
         {
-            TestLogger.warn("Refusing to delete an API key not created by this test");
+            if (deletedApiKeys.contains(apiKey))
+            {
+                TestLogger.warn("API key already deleted");
+            }
+            else
+            {
+                TestLogger.warn("Refusing to delete an API key not created by 'WebTestHelper.createApiKey'");
+            }
         }
     }
 
