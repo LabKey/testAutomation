@@ -74,7 +74,7 @@ public class EscapeUtil
      * Encode a string to be used as a URL query key or value
      * @param s to be encoded
      * @return encoded value or empty string if provided string was `null`
-     * @apiNote Use {@link URIUtil#encodePath(String)} for URL paths
+     * @apiNote Use {@link #encodeUriPath(String)} for URL paths
      */
     public static String encode(String s)
     {
@@ -84,14 +84,36 @@ public class EscapeUtil
     }
 
     /**
+     * Encode a string to be used as a URL path
+     * For now, simply designates to URIUtil. Will replace with an impl that doesn't require Jetty utils.
+     * @param path Path to be encoded
+     * @return encoded value or empty string if provided string was `null`
+     */
+    public static String encodeUriPath(String path)
+    {
+        return URIUtil.encodePath(path);
+    }
+
+    /**
      * Decode a string extracted from a URL query
      * @param s to be decoded
      * @return decoded value or empty string if provided string was `null`
-     * @apiNote Use {@link URIUtil#decodePath(String)} for URL paths
+     * @apiNote Use {@link #decodeUriPath(String)} for URL paths
      */
     public static String decode(String s)
     {
         return null == s ? "" : URLDecoder.decode(s, StandardCharsets.UTF_8);
+    }
+
+    /**
+     * Decode a string representing a URL path
+     * For now, simply designates to URIUtil. Will replace with an impl that doesn't require Jetty utils.
+     * @param path path to be decoded
+     * @return decoded value or empty string if the provided string was `null`
+     */
+    public static String decodeUriPath(String path)
+    {
+        return URIUtil.decodePath(path);
     }
 
     public static String fieldKeyEncodePart(String str)

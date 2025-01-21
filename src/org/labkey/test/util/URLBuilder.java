@@ -1,7 +1,6 @@
 package org.labkey.test.util;
 
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.jetty.util.URIUtil;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.WebTestHelper;
 
@@ -167,7 +166,7 @@ public class URLBuilder
         if (_containerPath != null) // null is root container; nothing to append.
         {
             url.append("/");
-            url.append(URIUtil.encodePath(_containerPath)
+            url.append(EscapeUtil.encodeUriPath(_containerPath)
                     .replace("+", "%2B")
                     .replace("[", "%5B")
                     .replace("]", "%5D"));

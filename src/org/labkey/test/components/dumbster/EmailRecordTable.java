@@ -115,7 +115,13 @@ public class EmailRecordTable extends Table
 
     public EmailMessage getMessage(String subject)
     {
-        return getMessage(actualSubject -> actualSubject.equals(subject));
+        List<EmailMessage> messages = getMessages(subject);
+        return messages.isEmpty() ? null : messages.get(0);
+    }
+
+    public List<EmailMessage> getMessages(String subject)
+    {
+        return getMessages(actualSubject -> actualSubject.equals(subject));
     }
 
     public WebElement getRowEl(EmailMessage message)
@@ -125,11 +131,13 @@ public class EmailRecordTable extends Table
 
     public EmailMessage getMessageRegEx(String regExp)
     {
-        return getMessage(subject -> subject.matches(regExp));
+        List<EmailMessage> messages = getMessages(subject -> subject.matches(regExp));
+        return messages.isEmpty() ? null : messages.get(0);
     }
 
-    private EmailMessage getMessage(Predicate<String> subjectFilter)
+    private List<EmailMessage> getMessages(Predicate<String> subjectFilter)
     {
+        List<EmailMessage> messages = new ArrayList<>();
         int rows = getRowCount() - _footerRows;
 
         if (rows > 0)
@@ -142,12 +150,12 @@ public class EmailRecordTable extends Table
                 String subjectLine = lines.length > 0 ? lines[0] : "";
                 if (subjectFilter.test(subjectLine))
                 {
-                    return getEmailAtTableIndex(i);
+                    messages.add(getEmailAtTableIndex(i));
                 }
             }
         }
 
-        return null;
+        return messages;
     }
 
     public List<EmailMessage> getMessagesByHeaderAndText(String header, String text)

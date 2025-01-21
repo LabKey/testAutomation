@@ -59,10 +59,6 @@ public abstract class AbstractScenario<T>
      */
     public AbstractScenario(@NotNull List<Simulation.Definition> simulationDefinitions, String scenarioName, @Nullable File resultsDir)
     {
-        if (simulationDefinitions.isEmpty())
-        {
-            throw new IllegalArgumentException("Must supply simulation definitions to run scenario");
-        }
         _simulationDefinitions = simulationDefinitions;
         _scenarioName = scenarioName;
         _resultsFile = resultsDir == null ? null : new File(resultsDir, scenarioName + "-" + TestDateUtils.dateTimeFileName() + ".tsv");
