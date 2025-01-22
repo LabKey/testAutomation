@@ -99,8 +99,7 @@ public class UIPermissionsHelper extends PermissionsHelper
     public Integer createPermissionsGroup(String groupName)
     {
         _driver.log("Creating permissions group " + groupName);
-        enterPermissionsUI();
-        _driver._ext4Helper.clickTabContainingText("Project Groups");
+        goToProjectGroups();
         _driver.setFormElement(Locator.xpath("//input[contains(@name, 'projectgroupsname')]"), groupName);
         _driver.clickButton("Create New Group", 0);
         _driver._extHelper.waitForExtDialog(groupName + " Information");
@@ -108,6 +107,13 @@ public class UIPermissionsHelper extends PermissionsHelper
         _driver.click(Ext4Helper.Locators.ext4Button("Done"));
         WebElement addedGroup = _driver.waitForElement(Locator.css(".groupPicker .x4-grid-cell-inner div").withText(groupName), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         return Integer.parseInt(addedGroup.getAttribute("groupId"));
+    }
+
+    private void goToProjectGroups()
+    {
+        enterPermissionsUI();
+        _driver._ext4Helper.clickTabContainingText("Project Groups");
+        _driver.shortWait().until(ExpectedConditions.visibilityOfElementLocated(Locator.tagWithClass("div", "pGroup").withText("Guests")));
     }
 
     @Override
@@ -349,8 +355,7 @@ public class UIPermissionsHelper extends PermissionsHelper
     {
         _driver.ensureAdminMode();
         _driver.clickProject(projectName);
-        enterPermissionsUI();
-        _driver._ext4Helper.clickTabContainingText("Project Groups");
+        goToProjectGroups();
         _driver.waitForText("Member Groups");
         List<Ext4CmpRef> refs = _driver._ext4Helper.componentQuery("grid", Ext4CmpRef.class);
         Ext4CmpRef ref = refs.get(0);
@@ -364,8 +369,7 @@ public class UIPermissionsHelper extends PermissionsHelper
     {
         _driver.ensureAdminMode();
         _driver.clickProject(projectName);
-        enterPermissionsUI();
-        _driver._ext4Helper.clickTabContainingText("Project Groups");
+        goToProjectGroups();
         _driver.waitForElement(Locator.css(".groupPicker"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         _driver.waitAndClick(Locator.xpath("//div[text()='" + groupName + "']"));
         _driver._extHelper.waitForExtDialog(groupName + " Information");
@@ -400,7 +404,7 @@ public class UIPermissionsHelper extends PermissionsHelper
 
     public void openGroupPermissionsDisplay(String groupName)
     {
-        _driver._ext4Helper.clickTabContainingText("Project Groups");
+        goToProjectGroups();
         // warning Administrators can appear multiple times
         List<Ext4CmpRef> refs = _driver._ext4Helper.componentQuery("grid", Ext4CmpRef.class);
         Ext4CmpRef ref = refs.get(0);
