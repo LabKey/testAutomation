@@ -6,13 +6,14 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.categories.Git;
+import org.labkey.test.categories.Disabled;
 import org.openqa.selenium.WebElement;
 
 import java.util.Collections;
 import java.util.List;
 
-@Category({Git.class})
+// Don't run as a git test, explicitly add this test to a suite file.
+@Category({Disabled.class})
 public class ServerUpgradeTest extends BaseWebDriverTest
 {
 
