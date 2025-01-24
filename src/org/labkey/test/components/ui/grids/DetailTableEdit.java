@@ -200,6 +200,7 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
 
         WebElement fieldValueElement = elementCache().fieldValue(fieldCaption);
         Assert.assertTrue(String.format("Field '%s' is not editable and cannot be set.", fieldCaption), isEditableField(fieldValueElement));
+        getWrapper().scrollIntoView(fieldValueElement);
 
         WebElement editableElement = fieldValueElement.findElement(By.xpath("./div/div/input"));
         String elementType = editableElement.getAttribute("type").toLowerCase().trim();
