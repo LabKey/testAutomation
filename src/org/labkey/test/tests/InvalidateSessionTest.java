@@ -131,7 +131,13 @@ public class InvalidateSessionTest extends BaseWebDriverTest
 
     private String getJSessionIdValue(Set<Cookie> cookies)
     {
-        return cookies.stream().toList().get(1).getValue();
+        String jsession = "";
+        for (Cookie c : cookies)
+        {
+            if(c.getName().equals(Connection.JSESSIONID))
+                jsession = c.getValue();
+        }
+        return jsession;
     }
 
     @Override

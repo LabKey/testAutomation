@@ -146,21 +146,13 @@ public class UserPermissionsTest extends BaseWebDriverTest
          */
     }
 
+    /*
+      Validate the permissions by impersonating the user.
+     */
     @Test
-    public void testSteps()
+    public void testUserPermissionRights()
     {
         enableEmailRecorder();
-        userPermissionRightsTest();
-    }
-
-    /**
-     * Create some projects, create some groups, permissions for those groups
-     * Create some users, assign to groups and validate the permissions by
-     * impersonating the user.
-     */
-    @LogMethod
-    private void userPermissionRightsTest()
-    {
 
         //Make sure the Editor can edit
         impersonate(GAMMA_EDITOR_USER);
@@ -280,7 +272,7 @@ public class UserPermissionsTest extends BaseWebDriverTest
         ShowAuditLogPage showAuditLogPage = goToAdminConsole().clickAuditLog();
         showAuditLogPage.selectView("Group and role events");
         DataRegionTable table = showAuditLogPage.getLogTable();
-        Assert.assertEquals("Incorrect audit log record for user getting added to group", expectedComment, table.getDataAsText(0, "Comment"));
+        Assert.assertEquals("Incorrect audit log record for group events", expectedComment, table.getDataAsText(0, "Comment"));
     }
 
     private void clickLinkWithTextNoTarget(String text)
