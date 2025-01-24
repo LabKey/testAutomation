@@ -70,7 +70,7 @@ public class ModeratorReviewTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        ModeratorReviewTest init = (ModeratorReviewTest) getCurrentTest();
+        ModeratorReviewTest init = getCurrentTest();
         init.doSetup();
     }
 
@@ -185,7 +185,7 @@ public class ModeratorReviewTest extends BaseWebDriverTest
         Matcher matcher = Pattern.compile("[0-9A-Za-z+_.-]+@[0-9A-Za-z.-]+").matcher(s);
         return matcher.replaceAll(match -> {
             String email = match.group();
-            return "<a href=\"mailto:" + email + "\">" + email + "</a>";
+            return "<a href=\"mailto:" + email + "\" rel=\"nofollow\">" + email + "</a>";
         });
     }
 
