@@ -83,6 +83,10 @@ public abstract class TestFileUtils
 {
     private static final Logger LOG = LogManager.getLogger(TestFileUtils.class);
 
+    private static final char _chQuote = '"';
+    // here we quote for both tab and comma, even though
+    private static final String _escapedCharsString = "\r\n\\" + _chQuote;
+
     private static File _labkeyRoot = null;
     private static File _buildDir = null;
     private static File _testRoot = null;
@@ -688,5 +692,49 @@ public abstract class TestFileUtils
         }
 
         return excelFile;
+    }
+
+    public static boolean shouldQuote(String value, String delimiter)
+    {
+        String escapeChars = _escapedCharsString + delimiter;
+
+        int len = value.length();
+        if (len == 0)
+            return false;
+        char firstCh = value.charAt(0);
+        char lastCh = value.charAt(len-1);
+        if (Character.isSpaceChar(firstCh) || Character.isSpaceChar(lastCh))
+            return true;
+        return StringUtils.containsAny(value,escapeChars);
+    }
+
+    public static String quoteValue(String value, String delimiter)
+    {
+        if (value == null)
+            return "";
+
+        String escaped = value;
+        if (shouldQuote(value, delimiter))
+        {
+            StringBuilder sb = new StringBuilder(value.length() + 10);
+            sb.append(_chQuote);
+            int i;
+            int lastMatch = 0;
+
+            while (-1 != (i = value.indexOf(_chQuote, lastMatch)))
+            {
+                sb.append(value, lastMatch, i);
+                sb.append(_chQuote).append(_chQuote);
+                lastMatch = i+1;
+            }
+
+            if (lastMatch < value.length())
+                sb.append(value.substring(lastMatch));
+
+            sb.append(_chQuote);
+            escaped = sb.toString();
+        }
+
+        return escaped;
     }
 }
