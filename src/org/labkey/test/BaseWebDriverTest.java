@@ -215,7 +215,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     public static final double DELTA = 10E-10;
 
-    // See QueryKey.ILLEGAL
+    // See QueryKey.ILLEGAL  TODO make that array public so it can be used here
     public static final String[] ILLEGAL_QUERY_KEY_CHARACTERS = {"$", "/", "&", "}", "~", ",", "."};
     // See TSVWriter.shouldQuote. Generally we are not able to use the tab and new line characters when creating field names in the UI, but including here for completeness
     public static final String[] TRICKY_IMPORT_FIELD_CHARACTERS = {"\\", "\"", "\\t", ",", "\\n", "\\r"};
