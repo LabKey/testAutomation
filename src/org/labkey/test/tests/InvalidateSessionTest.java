@@ -20,9 +20,9 @@ import org.openqa.selenium.Cookie;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.Assert.fail;
-import static org.labkey.test.WebTestHelper.getCookies;
 
 @Category({Daily.class})
 public class InvalidateSessionTest extends BaseWebDriverTest
@@ -61,23 +61,16 @@ public class InvalidateSessionTest extends BaseWebDriverTest
         Regression coverage for Secure Issue 51523: Invalidate sessions on password change
      */
     @Test
-    public void testSessionInvalidatesAfterPasswordChange() throws IOException
+    public void testSessionInvalidatesAfterPasswordChange() throws IOException, CommandException
     {
         signOut();
         signIn(USER);
         Connection cn = createDefaultConnection();
         SelectRowsResponse response;
         SelectRowsCommand selectCmd = new SelectRowsCommand("auditLog", "UserAuditEvent");
-        try
-        {
-            response = selectCmd.execute(cn, "Home");
-            Assert.assertEquals("Did not establish the database connection before the password change", 200,
-                    response.getStatusCode());
-        }
-        catch (IOException | CommandException e)
-        {
-            throw new RuntimeException(e);
-        }
+        response = selectCmd.execute(cn, "Home");
+        Assert.assertEquals("Did not establish the database connection before the password change", 200,
+                response.getStatusCode());
 
         log("Changing the user password");
         String newPassword = PasswordUtil.getPassword() + "&*&*";
@@ -104,25 +97,18 @@ public class InvalidateSessionTest extends BaseWebDriverTest
         Regression coverage for Secure Issue 31493: Test for session and cookie persistence through login and logout
      */
     @Test
-    public void testCookieAndSessionFromLogout() throws IOException
+    public void testCookieAndSessionFromLogout() throws IOException, CommandException
     {
         log("Capture the cookie after login");
-        Cookie beforeCookie = getCookies(getCurrentUser()).get(Connection.JSESSIONID);
+        Set<Cookie> beforeCookie = getDriver().manage().getCookies();
 
         log("Establish the connection");
         Connection cn = createDefaultConnection();
         SelectRowsResponse response;
         SelectRowsCommand selectCmd = new SelectRowsCommand("auditLog", "UserAuditEvent");
-        try
-        {
-            response = selectCmd.execute(cn, getProjectName());
-            Assert.assertEquals("Did not establish the database connection before the password change", 200,
-                    response.getStatusCode());
-        }
-        catch (CommandException e)
-        {
-            throw new RuntimeException(e);
-        }
+        response = selectCmd.execute(cn, getProjectName());
+        Assert.assertEquals("Did not establish the database connection before the password change", 200,
+                response.getStatusCode());
 
         log("Sign out");
         signOut();
@@ -139,8 +125,13 @@ public class InvalidateSessionTest extends BaseWebDriverTest
         }
 
         log("Capture the cookie after logout");
-        Cookie afterCookie = getCookies(getCurrentUser()).get(Connection.JSESSIONID);
-        Assert.assertFalse("Before and after log out cookie should be different", beforeCookie.equals(afterCookie));
+        Set<Cookie> afterCookie = getDriver().manage().getCookies();
+        Assert.assertFalse("Before and after log out cookie should be different", getJSessionIdValue(beforeCookie).equals(getJSessionIdValue(afterCookie)));
+    }
+
+    private String getJSessionIdValue(Set<Cookie> cookies)
+    {
+        return cookies.stream().toList().get(1).getValue();
     }
 
     @Override
