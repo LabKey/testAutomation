@@ -113,7 +113,7 @@ public class UIPermissionsHelper extends PermissionsHelper
     {
         enterPermissionsUI();
         _driver._ext4Helper.clickTabContainingText("Project Groups");
-        _driver.shortWait().until(ExpectedConditions.visibilityOfElementLocated(Locator.tagWithClass("div", "pGroup").withText("Guests")));
+        _driver.shortWait().until(ExpectedConditions.visibilityOfElementLocated(Locator.tagWithClass("div", "pGroup").withText("Users")));
     }
 
     @Override
