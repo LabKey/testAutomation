@@ -936,6 +936,8 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         if (!isElementPresent(tag("a").withClass("x4-tab-active").withText("Site Groups")))
             clickAdminMenuItem("Site", "Site Groups");
+        // Wait for groups grid
+        shortWait().until(ExpectedConditions.visibilityOfElementLocated(Locator.tagWithClass("div", "pSite").withText("Guests")));
     }
 
     public void goToSitePermissions()
