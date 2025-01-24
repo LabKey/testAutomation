@@ -201,8 +201,7 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
         WebElement fieldValueElement = elementCache().fieldValue(fieldCaption);
         Assert.assertTrue(String.format("Field '%s' is not editable and cannot be set.", fieldCaption), isEditableField(fieldValueElement));
 
-        // The text used in the field caption and the value of the name attribute in the checkbox don't always have the same case.
-        WebElement editableElement = fieldValueElement.findElement(Locator.tagWithAttributeIgnoreCase("input", "name", fieldCaption));
+        WebElement editableElement = fieldValueElement.findElement(By.xpath("./div/div/input"));
         String elementType = editableElement.getAttribute("type").toLowerCase().trim();
 
         Assert.assertEquals(String.format("Field '%s' is not a checkbox. Cannot be set to true/false.", fieldCaption), "checkbox", elementType);
@@ -357,7 +356,7 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
 
     /**
      * Set a DateTime, Date or Time field.
-     * @param fieldCaption The caption of the field to set.
+     * @param fieldKey The encoded fieldKey of the field to set.
      * @param dateTime Will be used to determine what kind of field is being set and how to set it. If the parameter
      *                 is a LocalDateTime object then it is assumed that field is a DateTime field. If the parameter is
      *                 a LocalDate object then it is assumed to be a date-only field. And I think you can guess what
@@ -365,9 +364,9 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
      *                 is typed into the field (no picker is used).
      * @return A reference to this DetailTableEdit object.
      */
-    public DetailTableEdit setDateTimeField(String fieldCaption, Object dateTime)
+    public DetailTableEdit setDateTimeField(String fieldKey, Object dateTime)
     {
-        ReactDateTimePicker dateTimePicker = getDateTimePicker(fieldCaption);
+        ReactDateTimePicker dateTimePicker = getDateTimePicker(fieldKey);
         if(dateTime instanceof LocalDateTime localDateTime)
         {
             dateTimePicker.select(localDateTime);
