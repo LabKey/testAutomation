@@ -307,7 +307,6 @@ public class GroupTest extends BaseWebDriverTest
     {
         String projectName = getProject2Name();
 
-        ensureAdminMode();
         navBar()
                 .goToCreateProjectPage()
                 .setProjectName(projectName)

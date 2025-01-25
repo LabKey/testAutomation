@@ -494,19 +494,53 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     @Deprecated
     public void ensureAdminMode()
     {
+        boolean didSomething = false;
         if (!onLabKeyPage())
+        {
             goToHome();
+            didSomething = true;
+        }
         if (!isSignedIn())
+        {
             simpleSignIn();
+            didSomething = true;
+        }
         else if (!isUserSystemAdmin() && isImpersonating())
+        {
             stopImpersonating(false);
+            didSomething = true;
+        }
         Locator projectMenu = ProjectMenu.Locators.menuProjectNav;
         if (!isElementPresent(projectMenu))
         {
             goToHome();
             waitForElement(projectMenu, WAIT_FOR_PAGE);
+            didSomething = true;
         }
         assertTrue("Test user '" + getCurrentUser() + "' is not an admin", isUserAdmin());
+
+        StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+        StringBuilder relevantCalls = new StringBuilder();
+        for (int i = 1; i < stackTrace.length; i++)
+        {
+            if (stackTrace[i].getClassName().contains("labkey"))
+            {
+                relevantCalls.append("\n");
+                relevantCalls.append(stackTrace[i].toString());
+            }
+            else
+            {
+                break;
+            }
+        }
+        if (didSomething)
+        {
+            TestLogger.warn("Necessary call to 'ensureAdminMode'. Consider refactoring to make it unnecessary." + relevantCalls);
+        }
+        else
+        {
+            TestLogger.warn("Unnecessary call to 'ensureAdminMode'. Consider removing it." + relevantCalls);
+        }
     }
 
     public ShowAdminPage goToAdminConsole()
