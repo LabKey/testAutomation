@@ -16,12 +16,17 @@
 
 package org.labkey.test.tests;
 
+import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Daily;
+import org.labkey.test.pages.core.admin.ShowAuditLogPage;
+import org.labkey.test.util.ApiPermissionsHelper;
+import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 import org.openqa.selenium.WebElement;
@@ -36,14 +41,13 @@ import static org.junit.Assert.assertNotNull;
 @BaseWebDriverTest.ClassTimeout(minutes = 7)
 public class UserPermissionsTest extends BaseWebDriverTest
 {
-    PortalHelper portalHelper = new PortalHelper(this);
     protected static final String PERM_PROJECT_NAME = "PermissionCheckProject";
     protected static final String DENIED_SUB_FOLDER_NAME = "UnlinkedFolder";
     protected static final String GAMMA_SUB_FOLDER_NAME = "GammaFolder";
     protected static final String GAMMA_EDITOR_GROUP_NAME = "GammaEditor";
     protected static final String GAMMA_AUTHOR_GROUP_NAME = "GammaAuthor";
     protected static final String GAMMA_READER_GROUP_NAME = "GammaReader";
-//    protected static final String GAMMA_RESTRICTED_READER_GROUP_NAME = "GammaRestrictedReader";
+    //    protected static final String GAMMA_RESTRICTED_READER_GROUP_NAME = "GammaRestrictedReader";
     protected static final String GAMMA_SUBMITTER_GROUP_NAME = "GammaSubmitter";
     protected static final String GAMMA_ADMIN_GROUP_NAME = "GammaAdmin";
     //permissions
@@ -54,10 +58,19 @@ public class UserPermissionsTest extends BaseWebDriverTest
     protected static final String GAMMA_AUTHOR_PAGE_TITLE = "This is a Test Message from : " + GAMMA_AUTHOR_USER;
     protected static final String GAMMA_READER_USER = "gammareader@security.test";
     protected static final String GAMMA_PROJECT_ADMIN_USER = "gammaadmin@security.test";
+    protected static final String GAMMA_SUBMITTER_USER = "gammasubmitter@security.test";
+    PortalHelper portalHelper = new PortalHelper(this);
 
     //I can't really find any docs on what this is exactly?
 //    protected static final String GAMMA_RESTRICTED_READER_USER = "gammarestricted@security.test";
 //    protected static final String GAMMA_SUBMITTER_USER = "gammasubmitter@security.test";
+
+    @BeforeClass
+    public static void setupProject()
+    {
+        UserPermissionsTest init = getCurrentTest();
+        init.doSetup();
+    }
 
     @Override
     public List<String> getAssociatedModules()
@@ -83,23 +96,10 @@ public class UserPermissionsTest extends BaseWebDriverTest
         log(this.getClass().getName() + " Cleaning Up");
         _containerHelper.deleteProject(PERM_PROJECT_NAME, afterTest);
 
-        deleteUsersIfPresent(GAMMA_EDITOR_USER, GAMMA_AUTHOR_USER, GAMMA_READER_USER, GAMMA_PROJECT_ADMIN_USER);
+        deleteUsersIfPresent(GAMMA_EDITOR_USER, GAMMA_AUTHOR_USER, GAMMA_READER_USER, GAMMA_PROJECT_ADMIN_USER, GAMMA_SUBMITTER_USER);
     }
 
-    @Test
-    public void testSteps()
-    {
-        enableEmailRecorder();
-        userPermissionRightsTest();
-    }
-
-    /**
-     * Create some projects, create some groups, permissions for those groups
-     * Create some users, assign to groups and validate the permissions by
-     * impersonating the user.
-     */
-    @LogMethod
-    private void userPermissionRightsTest()
+    private void doSetup()
     {
         _containerHelper.createProject(PERM_PROJECT_NAME, null);
         _permissionsHelper.createPermissionsGroup(GAMMA_EDITOR_GROUP_NAME);
@@ -107,8 +107,8 @@ public class UserPermissionsTest extends BaseWebDriverTest
         _permissionsHelper.setPermissions(GAMMA_EDITOR_GROUP_NAME, "Editor");
         createUserInProjectForGroup(GAMMA_EDITOR_USER, PERM_PROJECT_NAME, GAMMA_EDITOR_GROUP_NAME, false);
 
-        _containerHelper.createSubfolder(PERM_PROJECT_NAME, PERM_PROJECT_NAME, DENIED_SUB_FOLDER_NAME, "None", new String[] {"Messages", "Wiki"}, true);
-        _containerHelper.createSubfolder(PERM_PROJECT_NAME, DENIED_SUB_FOLDER_NAME, GAMMA_SUB_FOLDER_NAME, "None", new String[] {"Messages", "Wiki"}, true);
+        _containerHelper.createSubfolder(PERM_PROJECT_NAME, PERM_PROJECT_NAME, DENIED_SUB_FOLDER_NAME, "None", new String[]{"Messages", "Wiki"}, true);
+        _containerHelper.createSubfolder(PERM_PROJECT_NAME, DENIED_SUB_FOLDER_NAME, GAMMA_SUB_FOLDER_NAME, "None", new String[]{"Messages", "Wiki"}, true);
         portalHelper.addWebPart("Messages");
         assertElementPresent(Locator.linkWithText("Messages"));
         portalHelper.addWebPart("Wiki");
@@ -123,6 +123,7 @@ public class UserPermissionsTest extends BaseWebDriverTest
         _permissionsHelper.assertPermissionSetting(GAMMA_READER_GROUP_NAME, "No Permissions");
         _permissionsHelper.setPermissions(GAMMA_READER_GROUP_NAME, "Reader");
         createUserInProjectForGroup(GAMMA_READER_USER, PERM_PROJECT_NAME, GAMMA_READER_GROUP_NAME, false);
+
         //Create Author User
         clickProject(PERM_PROJECT_NAME);
         _permissionsHelper.enterPermissionsUI();
@@ -130,17 +131,28 @@ public class UserPermissionsTest extends BaseWebDriverTest
         _permissionsHelper.assertPermissionSetting(GAMMA_AUTHOR_GROUP_NAME, "No Permissions");
         _permissionsHelper.setPermissions(GAMMA_AUTHOR_GROUP_NAME, "Author");
         createUserInProjectForGroup(GAMMA_AUTHOR_USER, PERM_PROJECT_NAME, GAMMA_AUTHOR_GROUP_NAME, false);
+
         //Create the Submitter User
         clickProject(PERM_PROJECT_NAME);
         _permissionsHelper.enterPermissionsUI();
         _permissionsHelper.createPermissionsGroup(GAMMA_SUBMITTER_GROUP_NAME);
         _permissionsHelper.assertPermissionSetting(GAMMA_SUBMITTER_GROUP_NAME, "No Permissions");
         _permissionsHelper.setPermissions(GAMMA_SUBMITTER_GROUP_NAME, "Submitter");
+
         // TODO: Add submitter to a group
         /*
          * I need a way to test submitter, I can't even view a folder where submitter has permissions when
          * impersonating on my local labkey, so may require special page?
          */
+    }
+
+    /*
+      Validate the permissions by impersonating the user.
+     */
+    @Test
+    public void testUserPermissionRights()
+    {
+        enableEmailRecorder();
 
         //Make sure the Editor can edit
         impersonate(GAMMA_EDITOR_USER);
@@ -234,6 +246,33 @@ public class UserPermissionsTest extends BaseWebDriverTest
         stopImpersonating();
         signOut();
         signIn();
+    }
+
+    /*
+        Regression for Secure Issue 51187: Additional automation testing for group audit logs
+     */
+    @Test
+    public void testAuditLogForGroupUpdates()
+    {
+        ApiPermissionsHelper permissionsHelper = new ApiPermissionsHelper(this);
+
+        log("Add user to the group and verify logs");
+        _userHelper.createUser(GAMMA_SUBMITTER_USER);
+        permissionsHelper.addUserToProjGroup(GAMMA_SUBMITTER_USER, getProjectName(), GAMMA_SUBMITTER_GROUP_NAME);
+        verifyAuditLog("User: " + GAMMA_SUBMITTER_USER + " was added as a member to Group: " + GAMMA_SUBMITTER_GROUP_NAME);
+
+        log("Remove user from group and verify logs");
+        goToProjectHome();
+        permissionsHelper.removeUserFromGroup(GAMMA_SUBMITTER_GROUP_NAME, GAMMA_SUBMITTER_USER);
+        verifyAuditLog("User: " + GAMMA_SUBMITTER_USER + " was deleted from Group: " + GAMMA_SUBMITTER_GROUP_NAME);
+    }
+
+    private void verifyAuditLog(String expectedComment)
+    {
+        ShowAuditLogPage showAuditLogPage = goToAdminConsole().clickAuditLog();
+        showAuditLogPage.selectView("Group and role events");
+        DataRegionTable table = showAuditLogPage.getLogTable();
+        Assert.assertEquals("Incorrect audit log record for group events", expectedComment, table.getDataAsText(0, "Comment"));
     }
 
     private void clickLinkWithTextNoTarget(String text)
