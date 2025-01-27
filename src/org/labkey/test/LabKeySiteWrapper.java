@@ -147,7 +147,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         else
         {
             log("Signing in as " + PasswordUtil.getUsername());
-            assertElementPresent(Locator.tagWithName("form", "login"));
+            waitForElement(Locator.tagWithName("form", "login"), WAIT_FOR_PAGE);
             setFormElement(Locator.name("email"), PasswordUtil.getUsername());
             setFormElement(Locator.name("password"), PasswordUtil.getPassword());
             acceptTermsOfUse(null, false);
