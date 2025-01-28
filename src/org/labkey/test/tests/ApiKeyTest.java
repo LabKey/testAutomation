@@ -72,19 +72,19 @@ public class ApiKeyTest extends BaseWebDriverTest
     private static final String API_USERNAME = "apikey";
     private static final TestUser EDITOR_USER = new TestUser("editor@apikey.test");
 
+    @BeforeClass
+    public static void setupProject()
+    {
+        ApiKeyTest init = getCurrentTest();
+
+        init.doSetup();
+    }
+
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         super.doCleanup(afterTest);
         _userHelper.deleteUsers(false, EDITOR_USER);
-    }
-
-    @BeforeClass
-    public static void setupProject()
-    {
-        ApiKeyTest init = (ApiKeyTest) getCurrentTest();
-
-        init.doSetup();
     }
 
     private void doSetup()
@@ -107,64 +107,21 @@ public class ApiKeyTest extends BaseWebDriverTest
 
         String apiKey = generateSessionKey();
 
-        verifyValidAPIKey(apiKey);
+        verifyValidAPIKey(createApiKeyConnection(apiKey, false));
 
         log("Verify session key remains valid if key generation is turned off");
         goToAdminConsole()
                 .clickSiteSettings()
                 .setAllowSessionKeys(false)
                 .save();
-        verifyValidAPIKey(apiKey);
+        verifyValidAPIKey(createApiKeyConnection(apiKey, false));
 
         signOut();
         log("Verify that logging out invalidates session keys");
-        verifyInvalidAPIKey(apiKey);
+        verifyInvalidAPIKey(createApiKeyConnection(apiKey, false), false);
         simpleSignIn();
         log("Verify that session keys remain invalid after logging back in");
-        verifyInvalidAPIKey(apiKey);
-    }
-
-    private void verifyValidAPIKey(String apiKey) throws IOException
-    {
-        verifyValidAPIKey(apiKey, false);
-    }
-
-    private void verifyValidAPIKey(String apiKey, boolean basicAuth) throws IOException
-    {
-        Connection cn = new Connection(WebTestHelper.getBaseURL(), basicAuth ? new BasicAuthCredentialsProvider(API_USERNAME, apiKey) : new ApiKeyCredentialsProvider(apiKey));
-        try
-        {
-            GetSchemasCommand cmd = new GetSchemasCommand();
-            GetSchemasResponse resp = cmd.execute(cn, getProjectName());
-            List<String> schemaNames = resp.getSchemaNames().stream().map(String::toLowerCase).collect(Collectors.toList());
-            Set<String> missingSchemas = new HashSet<>(Arrays.asList("pipeline", "lists", "core"));
-            missingSchemas.removeAll(schemaNames);
-            assertTrue("Some expected schemas missing. Schemas missing: " + missingSchemas, missingSchemas.isEmpty());
-        }
-        catch (CommandException e)
-        {
-            throw new RuntimeException("Response: " + e.getStatusCode(), e);
-        }
-    }
-
-    private void verifyInvalidAPIKey(String apiKey) throws IOException
-    {
-        boolean isSessionKey = !apiKey.startsWith(API_USERNAME);
-        Connection cn = new Connection(WebTestHelper.getBaseURL(), new ApiKeyCredentialsProvider(apiKey));
-        try
-        {
-            GetSchemasCommand cmd = new GetSchemasCommand();
-            cmd.execute(cn, getProjectName());
-            if (isSessionKey)
-                fail("Session key didn't invalidate after logout");
-            else
-                fail("API key should no longer be valid");
-        }
-        catch(CommandException e)
-        {
-            assertEquals("Wrong response for invalid " + (isSessionKey ? "session" : "API") + " key", HttpStatus.SC_UNAUTHORIZED, e.getStatusCode());
-            log("Success: command failed as expected.");
-        }
+        verifyInvalidAPIKey(createApiKeyConnection(apiKey, false), false);
     }
 
     @Test
@@ -182,14 +139,14 @@ public class ApiKeyTest extends BaseWebDriverTest
         signIn(EDITOR_USER.getEmail(), EDITOR_USER.getPassword());
         String keyDescription = "Key for editing";
         String apiKey = generateAPIKey(keyDescription);
-        verifyValidAPIKey(apiKey);
+        verifyValidAPIKey(createApiKeyConnection(apiKey, false));
 
         QueryGrid grid = new QueryGrid.QueryGridFinder(getDriver()).waitFor();
         int beforeDeleteCount = grid.getRecordCount();
         assertFalse("Row with description not found", grid.getRowMap("Description", keyDescription).isEmpty());
         grid = deleteAPIKeyViaUI();
-        assertEquals("Number of keys after UI deletion not as expected", beforeDeleteCount-1, grid.getRecordCount());
-        verifyInvalidAPIKey(apiKey);
+        assertEquals("Number of keys after UI deletion not as expected", beforeDeleteCount - 1, grid.getRecordCount());
+        verifyInvalidAPIKey(createApiKeyConnection(apiKey, false), false);
     }
 
     @Test
@@ -205,9 +162,9 @@ public class ApiKeyTest extends BaseWebDriverTest
 
         String apiKey = generateAPIKeyAndRecord(_generatedApiKeys);
         log("Verify active API key via api authentication");
-        verifyValidAPIKey(apiKey);
+        verifyValidAPIKey(createApiKeyConnection(apiKey, false));
         log("Verify active API key via basic authentication");
-        verifyValidAPIKey(apiKey, true);
+        verifyValidAPIKey(createApiKeyConnection(apiKey, true));
 
         log("Generate two other keys for use in testing deletion.");
         generateAPIKey(null);
@@ -215,24 +172,75 @@ public class ApiKeyTest extends BaseWebDriverTest
         QueryGrid grid = new QueryGrid.QueryGridFinder(getDriver()).waitFor();
         int beforeDeleteCount = grid.getRecordCount();
         grid = deleteAPIKeyViaUI();
-        assertEquals("Number of keys after UI deletion not as expected", beforeDeleteCount-1, grid.getRecordCount());
+        assertEquals("Number of keys after UI deletion not as expected", beforeDeleteCount - 1, grid.getRecordCount());
 
         log("Verify existing active API key with disabled api key setting");
         goToAdminConsole()
                 .clickSiteSettings()
                 .setAllowApiKeys(false)
                 .save();
-        verifyValidAPIKey(apiKey);
+        verifyValidAPIKey(createApiKeyConnection(apiKey, false));
 
         log("Verify key deletion via UI with disabled api key generation works.");
         grid = deleteAPIKeyViaUI();
-        assertEquals("Number of keys after UI deletion not as expected", beforeDeleteCount-2, grid.getRecordCount());
+        assertEquals("Number of keys after UI deletion not as expected", beforeDeleteCount - 2, grid.getRecordCount());
 
         // skip testing api key expiration since it's already covered in unit test and 10 seconds expiration option is dev mode only
 
         log("Verify revoked/deleted api key");
         deleteAPIKeys(_generatedApiKeys);
-        verifyInvalidAPIKey(apiKey);
+        verifyInvalidAPIKey(createApiKeyConnection(apiKey, false), false);
+    }
+
+    /*
+        Regression coverage for Secure Issue 51637: Invalidate sessions when their API key becomes invalid
+     */
+    @Test
+    public void testSessionInvalidatesAfterAPIKeyChange() throws IOException
+    {
+        List<Map<String, Object>> _generatedApiKeys = new ArrayList<>();
+
+        log("Generating an apikey which expire in one week");
+        goToAdminConsole()
+                .clickSiteSettings()
+                .setAllowApiKeys(true)
+                .setApiKeyExpiration(CustomizeSitePage.KeyExpirationOptions.ONE_WEEK)
+                .save();
+
+        String apiKey1 = generateAPIKeyAndRecord(_generatedApiKeys);
+        Connection cn = createApiKeyConnection(apiKey1, false);
+        verifyValidAPIKey(cn);
+
+        log("Deleting the apikey");
+        deleteAPIKeys(_generatedApiKeys);
+
+        /*
+            Regression coverage for Issue 52004: Session associated with APIKey can used even after APIKey is deleted.
+         */
+        log("Verifying the session associated with deleted apikey is invalid");
+        verifyInvalidAPIKey(cn, false);
+
+        log("Verifying that new connection cannot be created after apikey is deleted");
+        verifyInvalidAPIKey(createApiKeyConnection(apiKey1, false), false);
+
+        log("Generating the apikey which expires in ten seconds");
+        goToAdminConsole()
+                .clickSiteSettings()
+                .setAllowApiKeys(true)
+                .setApiKeyExpiration(CustomizeSitePage.KeyExpirationOptions.TEN_SECONDS)
+                .save();
+
+        log("Verify apikey expiration");
+        goToExternalToolPage();
+        String apikey2 = ApiKeyPanel.panelFinder(getDriver()).find().generateApiKey();
+
+        log("Verify apikey can be used before expiring");
+        verifyValidAPIKey(createApiKeyConnection(apikey2, false));
+
+        sleep(10000); // Wait for apikey to expire
+
+        log("Verify apikey cannot be used after it has expired");
+        verifyInvalidAPIKey(createApiKeyConnection(apikey2, false), false);
     }
 
     @Test
@@ -335,6 +343,47 @@ public class ApiKeyTest extends BaseWebDriverTest
         }
     }
 
+    private void verifyValidAPIKey(Connection connection) throws IOException
+    {
+        try
+        {
+            GetSchemasCommand cmd = new GetSchemasCommand();
+            GetSchemasResponse resp = cmd.execute(connection, getProjectName());
+            List<String> schemaNames = resp.getSchemaNames().stream().map(String::toLowerCase).collect(Collectors.toList());
+            Set<String> missingSchemas = new HashSet<>(Arrays.asList("pipeline", "lists", "core"));
+            missingSchemas.removeAll(schemaNames);
+            assertTrue("Some expected schemas missing. Schemas missing: " + missingSchemas, missingSchemas.isEmpty());
+        }
+        catch (CommandException e)
+        {
+            throw new RuntimeException("Response: " + e.getStatusCode(), e);
+        }
+    }
+
+    private Connection createApiKeyConnection(String apiKey, boolean basicAuth)
+    {
+        return new Connection(WebTestHelper.getBaseURL(), basicAuth ? new BasicAuthCredentialsProvider(API_USERNAME, apiKey)
+                : new ApiKeyCredentialsProvider(apiKey));
+    }
+
+    private void verifyInvalidAPIKey(Connection connection, boolean isSessionKey) throws IOException
+    {
+        try
+        {
+            GetSchemasCommand cmd = new GetSchemasCommand();
+            cmd.execute(connection, getProjectName());
+            if (isSessionKey)
+                fail("Session key didn't invalidate after logout");
+            else
+                fail("API key should no longer be valid");
+        }
+        catch (CommandException e)
+        {
+            assertEquals("Wrong response for invalid " + (isSessionKey ? "session" : "API") + " key", HttpStatus.SC_UNAUTHORIZED, e.getStatusCode());
+            log("Success: command failed as expected.");
+        }
+    }
+
     private void verifyAPIKeysTablePresence(boolean isAdmin)
     {
         beginAt(new URLBuilder("query", "begin", getProjectName()).setFragment("sbh-ssp-core").buildURL());
@@ -413,7 +462,7 @@ public class ApiKeyTest extends BaseWebDriverTest
         String keyField = "RowId";
         Map<String, Object> record = response.getRows().get(0);
         Map<String, Object> newRow = new HashMap<>();
-        Integer rowId = (Integer)((Map<String, Object>)record.get(keyField)).get("value");
+        Integer rowId = (Integer) ((Map<String, Object>) record.get(keyField)).get("value");
         newRow.put(keyField, rowId);
 
         return newRow;
