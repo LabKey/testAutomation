@@ -89,6 +89,12 @@ public class GridFilterModal extends ModalDialog
         return elementCache().filterExpressionPanel();
     }
 
+    public GridFilterModal setFilter(FilterExpressionPanel.Expression expression)
+    {
+        selectExpressionTab().setFilter(expression);
+        return this;
+    }
+
     /**
      * Select the facet tab for the current field. Will throw <code>NoSuchElementException</code> if tab isn't present.
      * @return panel for configuring faceted filter
