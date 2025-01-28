@@ -3,7 +3,9 @@ package org.labkey.test.pages.user;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.components.core.login.SetPasswordForm;
 import org.labkey.test.pages.LabKeyPage;
+import org.labkey.test.util.PasswordUtil;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -34,6 +36,15 @@ public class UserDetailsPage extends LabKeyPage<UserDetailsPage.ElementCache>
         return new ClonePermissionsPage(getDriver());
     }
 
+    public SetPasswordForm clickChangePassword()
+    {
+        if (PasswordUtil.getUsername().equals(getCurrentUser()))
+            throw new IllegalArgumentException("Don't change the primary site admin user's password");
+
+        clickAndWait(elementCache().changePwdButton);
+        return new SetPasswordForm(getDriver());
+    }
+
     @Override
     protected ElementCache newElementCache()
     {
@@ -44,5 +55,6 @@ public class UserDetailsPage extends LabKeyPage<UserDetailsPage.ElementCache>
     {
         WebElement editButton = Locator.lkButton("Edit").findWhenNeeded(this);
         WebElement cloneButton = Locator.lkButton("Clone Permissions").findWhenNeeded(this);
+        WebElement changePwdButton = Locator.lkButton("Change Password").findWhenNeeded(this);
     }
 }

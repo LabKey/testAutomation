@@ -138,7 +138,7 @@ public class PasswordTest extends BaseWebDriverTest
         assertSignedInNotImpersonating();
         impersonate(USER);
 
-        SetPasswordForm changePasswordForm = goToChangePassword();
+        SetPasswordForm changePasswordForm = goToMyAccount().clickChangePassword();
         log("Verify strength gauge for 'ChangePasswordAction'");
         changePasswordForm.verifyPasswordStrengthGauge(USER, displayName);
 
@@ -183,7 +183,7 @@ public class PasswordTest extends BaseWebDriverTest
             assertTextNotPresent("Choose a new password.");
         }
         // fail, used 9 passwords ago.
-        goToChangePassword()
+        goToMyAccount().clickChangePassword()
                 .setOldPassword(currentPassword)
                 .setNewPassword(VERY_STRONG_PASSWORD + 1)
                 .clickSubmitExpectingError("Your password must not match a recently used password.");
@@ -357,19 +357,9 @@ public class PasswordTest extends BaseWebDriverTest
     @LogMethod (quiet = true)
     protected void changePassword(String oldPassword, @LoggedParam String password)
     {
-        goToChangePassword()
+        goToMyAccount().clickChangePassword()
                 .setOldPassword(oldPassword)
                 .setNewPassword(password)
                 .clickSubmit();
-    }
-
-    private SetPasswordForm goToChangePassword()
-    {
-        if (PasswordUtil.getUsername().equals(getCurrentUser()))
-            throw new IllegalArgumentException("Don't change the primary site admin user's password");
-
-        goToMyAccount();
-        clickButton("Change Password");
-        return new SetPasswordForm(getDriver());
     }
 }
