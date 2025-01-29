@@ -133,12 +133,13 @@ public class TestDataUtils
      */
     public static class TsvQuoter
     {
+        protected char _escapeChar = '\\';
         private static final char _chQuote = '"';
         private final char[] _escapedChars;
 
         public TsvQuoter(char delimiterChar)
         {
-            _escapedChars = new char[] {'\r', '\n', _chQuote, delimiterChar};
+            _escapedChars = new char[] {'\r', '\n', _escapeChar, _chQuote, delimiterChar};
         }
 
         public TsvQuoter()
