@@ -163,9 +163,7 @@ public class FieldSelectionDialog extends ModalDialog
 
         while(iterator.hasNext())
         {
-            String field = iterator.next().trim();
-            String fieldEncoded = field.contains("$D") ? field : EscapeUtil.fieldKeyEncodePart(field);
-            fieldKey.append(fieldEncoded);
+            fieldKey.append(iterator.next().trim());
 
             // If this isn't the last item in the collection keep expanding and building the expected data-fieldkey value.
             if(iterator.hasNext())
