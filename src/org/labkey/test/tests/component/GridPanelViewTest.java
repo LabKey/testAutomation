@@ -1227,6 +1227,39 @@ public class GridPanelViewTest extends GridPanelBaseTest
 
     }
 
+    @Test
+    public void testRemoveAllFields()
+    {
+
+        goToProjectHome();
+
+        resetDefaultView(VIEW_DIALOG_ST, DEFAULT_COLUMNS);
+
+        QueryGrid grid = beginAtQueryGrid(VIEW_DIALOG_ST);
+
+        log("Remove all the fields.");
+
+        FieldSelectionDialog customizeModal = grid.customizeView();
+        customizeModal.removeAllSelectedFields();
+
+        checker().verifyTrue("'Undo edits' is not enabled after removing all fields, it should be.",
+                customizeModal.isUndoEditsEnabled());
+
+        checker().verifyFalse("'Update Grid' should not be enabled after all fields are updated.",
+                        customizeModal.isUpdateGridEnabled());
+
+        checker().screenShotIfNewError("Remove_All_Dialog_Error");
+
+        log("Add a field back and validate.");
+
+        customizeModal.selectAvailableField(COL_STRING1)
+                .clickUpdateGrid();
+
+        checker().verifyEquals("Grid columns not as expected after removing all, and adding back a field.",
+                List.of(COL_STRING1), grid.getColumnNames());
+
+    }
+
     /**
      * Helper to validate the 'Views' menu.
      *
