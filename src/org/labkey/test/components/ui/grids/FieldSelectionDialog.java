@@ -7,7 +7,6 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.UpdatingComponent;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.html.Checkbox;
-import org.labkey.test.util.EscapeUtil;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -391,6 +390,8 @@ public class FieldSelectionDialog extends ModalDialog
 
         for (WebElement listItem : allItems)
         {
+            getWrapper().log(String.format("Removing field '%s' from selected fields.", listItem.getText()));
+
             WebElement removeIcon = Locator.tagWithClass("span", "view-field__action").findWhenNeeded(listItem);
 
             // In some usages there may be fields that are not removable.
@@ -405,7 +406,10 @@ public class FieldSelectionDialog extends ModalDialog
 
         // If a non-removable field is encountered, then skip check to see if all fields are removed.
         if (removedAll)
-            WebDriverWrapper.waitFor(()-> getSelectedFields().isEmpty(), "Did not remove all of the selected fields.", 500);
+        {
+            WebDriverWrapper.sleep(500);
+            WebDriverWrapper.waitFor(() -> getSelectedFields().isEmpty(), "Did not remove all of the selected fields.", 1_500);
+        }
 
         return this;
     }
