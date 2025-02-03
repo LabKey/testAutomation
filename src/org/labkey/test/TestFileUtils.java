@@ -83,6 +83,10 @@ public abstract class TestFileUtils
 {
     private static final Logger LOG = LogManager.getLogger(TestFileUtils.class);
 
+    private static final char _chQuote = '"';
+    // here we quote for both tab and comma, even though
+    private static final String _escapedCharsString = "\r\n\\" + _chQuote;
+
     private static File _labkeyRoot = null;
     private static File _buildDir = null;
     private static File _testRoot = null;

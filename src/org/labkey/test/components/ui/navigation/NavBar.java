@@ -16,8 +16,6 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
-
 public abstract class NavBar extends WebDriverComponent<NavBar.ElementCache>
 {
     private final WebDriver _driver;
@@ -113,14 +111,14 @@ public abstract class NavBar extends WebDriverComponent<NavBar.ElementCache>
 
     protected abstract class ElementCache extends Component<ElementCache>.ElementCache
     {
-        public WebElement headerLogo = Locator.tagWithClass("a", "header-logo__link").findWhenNeeded(this);
-        public WebElement headerLogoImage = Locator.tagWithClass("img", "header-logo__image").findWhenNeeded(this);
-        public WebElement userMenuButton = Locator.tagWithId("a", "user-menu-dropdown").findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
-        public WebElement userIcon = Locator.tagWithAttribute("img", "alt", "User Avatar").findWhenNeeded(this);
-        public WebElement projectNameDisplay = Locator.tagWithClass("span", "project-name").findWhenNeeded(this);
-        public Input searchBox = Input.Input(Locator.tagWithClass("input", "navbar__search-input"), getDriver()).findWhenNeeded(this);
-        public MultiMenu searchMenu = new MultiMenu.MultiMenuFinder(getDriver()).withButtonClass("navbar__find-and-search-button").findWhenNeeded(this);
-        public final ProductMenu productMenu = ProductMenu.finder(getDriver()).timeout(1000).findWhenNeeded(this);
-        public final ServerNotificationMenu notificationsMenu = ServerNotificationMenu.finder(getDriver()).timeout(1000).findWhenNeeded(this);
+        public WebElement headerLogo = Locator.tagWithClass("a", "header-logo__link").refindWhenNeeded(this);
+        public WebElement headerLogoImage = Locator.tagWithClass("img", "header-logo__image").refindWhenNeeded(this);
+        public WebElement userMenuButton = Locator.tagWithId("a", "user-menu-dropdown").refindWhenNeeded(this);
+        public WebElement userIcon = Locator.tagWithAttribute("img", "alt", "User Avatar").refindWhenNeeded(this);
+        public WebElement projectNameDisplay = Locator.tagWithClass("span", "project-name").refindWhenNeeded(this);
+        public Input searchBox = Input.Input(Locator.tagWithClass("input", "navbar__search-input"), getDriver()).refindWhenNeeded(this);
+        public MultiMenu searchMenu = new MultiMenu.MultiMenuFinder(getDriver()).withButtonClass("navbar__find-and-search-button").refindWhenNeeded(this);
+        public final ProductMenu productMenu = ProductMenu.finder(getDriver()).timeout(1000).refindWhenNeeded(this);
+        public final ServerNotificationMenu notificationsMenu = ServerNotificationMenu.finder(getDriver()).timeout(1000).refindWhenNeeded(this);
     }
 }
