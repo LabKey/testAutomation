@@ -162,6 +162,11 @@ public abstract class TestProperties
         return getBooleanProperty("webtest.dump.browser.console", false);
     }
 
+    public static String getBrowserTimeZone()
+    {
+        return System.getProperty("webtest.browser.tz");
+    }
+
     public static double getTimeoutMultiplier()
     {
         return Math.max(0, getDoubleProperty("webtest.timeout.multiplier", 1.0));

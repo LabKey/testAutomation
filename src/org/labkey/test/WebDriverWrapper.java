@@ -96,6 +96,7 @@ import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.firefox.GeckoDriverService;
 import org.openqa.selenium.ie.InternetExplorerDriver;
+import org.openqa.selenium.ie.InternetExplorerDriverService;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.service.DriverService;
@@ -210,6 +211,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
         WebDriver newWebDriver = null;
         DriverService oldDriverService = oldDriverAndService.getRight();
         DriverService newDriverService = null;
+        Map<String, String> browserEnv = new HashMap<>();
+        if (TestProperties.getBrowserTimeZone() != null)
+        {
+            browserEnv.put("TZ", TestProperties.getBrowserTimeZone());
+        }
 
         switch (browserType)
         {
@@ -236,7 +242,8 @@ public abstract class WebDriverWrapper implements WrapsDriver
                 }
                 if (oldWebDriver == null)
                 {
-                    newWebDriver = new InternetExplorerDriver();
+                    newDriverService = new InternetExplorerDriverService.Builder().withEnvironment(browserEnv).build();
+                    newWebDriver = new InternetExplorerDriver((InternetExplorerDriverService) newDriverService);
                 }
                 break;
             }
@@ -276,7 +283,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                         options.addArguments("headless");
                     }
 
-                    newDriverService = ChromeDriverService.createDefaultService();
+                    newDriverService = new ChromeDriverService.Builder().withEnvironment(browserEnv).build();
                     newWebDriver = new ChromeDriver((ChromeDriverService) newDriverService, options);
                 }
                 break;
@@ -373,7 +380,10 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     capabilities.setUnhandledPromptBehaviour(UnexpectedAlertBehaviour.IGNORE);
                     FirefoxOptions firefoxOptions = new FirefoxOptions(capabilities);
 
-                    newDriverService = GeckoDriverService.createDefaultService();
+                    GeckoDriverService.Builder driverServiceBuilder = new GeckoDriverService.Builder()
+                        .withEnvironment(browserEnv);
+
+                    newDriverService = driverServiceBuilder.build();
                     try
                     {
                         newWebDriver = new FirefoxDriver((FirefoxDriverService) newDriverService, firefoxOptions);
@@ -384,7 +394,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                         {
                             retry.printStackTrace(System.err);
                             newDriverService.stop();
-                            newDriverService = GeckoDriverService.createDefaultService();
+                            newDriverService = driverServiceBuilder.build();
                             sleep(10000);
                             newWebDriver = new FirefoxDriver((FirefoxDriverService) newDriverService, firefoxOptions);
                         }

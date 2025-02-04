@@ -88,6 +88,8 @@ selenium.reuseWebDriver=true
 #webtest.webdriver.headless=false
 ## Customize browser window size
 #webtest.window.size=1280x1024
+## Set browser time zone
+#webtest.browser.tz=America/New_York
 
 
 #==============================================================================
