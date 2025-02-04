@@ -73,7 +73,7 @@ import java.util.regex.Pattern;
 public class HarConverter
 {
     private static final Logger LOG = LogManager.getLogger(HarConverter.class);
-    private static final Set<ControllerActionId> excludedActions = Set.of(new ControllerActionId("login", "whoami"));
+    public static final Set<ControllerActionId> EXCLUDED_ACTIONS = Set.of(new ControllerActionId("login", "whoami"));
 
     private final String inputParam;
 
@@ -213,7 +213,7 @@ public class HarConverter
         try
         {
             ControllerActionId actionId = new ControllerActionId(url);
-            if (excludedActions.contains(actionId) || StringUtils.isBlank(actionId.getAction()) || "app".equals(actionId.getAction()))
+            if (EXCLUDED_ACTIONS.contains(actionId) || StringUtils.isBlank(actionId.getAction()) || "app".equals(actionId.getAction()))
             {
                 LOG.info("Skipping request: " + url);
                 return false;
