@@ -25,6 +25,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Wiki;
+import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.WikiHelper;
 import org.openqa.selenium.WebElement;
@@ -121,6 +122,10 @@ public class WikiLongTest extends BaseWebDriverTest
                     # Title MD
                     ## Subtitle MD
                     *italic text MD*
+
+                    <b>escaped</b>
+                    
+                    ${labkey.webPart(partName='Query', title='WebPart Macro', schemaName='core', queryName='containers', allowChooseQuery='true', allowChooseView='true')}
                     """;
 
     private static final String SAFE_LINK_HTML = "<a href=\"http://labkey.com\">Safe link</a>";
@@ -222,13 +227,18 @@ public class WikiLongTest extends BaseWebDriverTest
         _wikiHelper.setWikiBody(WIKI_PAGE7_CONTENT);
         _wikiHelper.saveWikiPage();
         // verify that after saving the markdown that it is rendered as html that does not include the markdown symbols
-        assertTextPresent("Title MD");
+        assertElementPresent(Locator.tagWithText("h1", "Title MD"));
+        assertElementPresent(Locator.tagWithText("p", "<b>escaped</b>"));
+        assertElementPresent(PortalHelper.Locators.webPart("WebPart Macro"));
+        assertElementPresent(DataRegionTable.Locators.dataRegionTable().descendant(Locator.linkWithText(getProjectName())));
         assertTextNotPresent("# Title MD");
         clickAndWait(Locator.linkWithText("Edit"));
         _wikiHelper.convertWikiFormat("HTML");
         // verify that after converting the markdown to html that it is rendered as html that does not include the markdown symbols
         _wikiHelper.saveWikiPage();
-        assertTextPresent("Title MD");
+        assertElementPresent(Locator.tagWithText("h1", "Title MD"));
+        assertElementPresent(Locator.tagWithText("p", "<b>escaped</b>"));
+        // Webpart macro
         assertTextNotPresent("# Title MD");
         searchFor(PROJECT_NAME, "italic text MD", 1, WIKI_PAGE7_TITLE);
 
