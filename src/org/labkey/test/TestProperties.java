@@ -164,7 +164,7 @@ public abstract class TestProperties
 
     public static String getBrowserTimeZone()
     {
-        return System.getProperty("webtest.browser.tz");
+        return StringUtils.trimToNull(System.getProperty("webtest.browser.tz"));
     }
 
     public static double getTimeoutMultiplier()
