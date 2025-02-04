@@ -251,6 +251,34 @@ public class APIAssayHelper extends AbstractAssayHelper
         return resultData;
     }
 
+    /**
+     * For a given container get rowIds for all assay protocols.
+     *
+     * @param containerPath Container path.
+     * @param connection remoteApi connection
+     * @return Map of assay rowIds by protocol name and assay type
+     * @throws IOException Can be thrown by the SelectRowsCommand.
+     * @throws CommandException Can be thrown by the SelectRowsCommand.
+     */
+    public static Map<String, Integer> getProtocolIds(String containerPath, Connection connection) throws IOException, CommandException
+    {
+        SelectRowsCommand cmd = new SelectRowsCommand("assay", "AssayList");
+        cmd.setColumns(Arrays.asList("Name", "Type", "RowId"));
+
+        Map<String, Integer> resultData = new HashMap<>();
+
+        SelectRowsResponse response = cmd.execute(connection, containerPath);
+        for(Row row : response.getRowset())
+        {
+            String type = (String) row.getValue("Type");
+            String name = (String) row.getValue("Name");
+            Integer rowId = (Integer) row.getValue("RowId");
+            resultData.put(type + "." + name, rowId);
+        }
+
+        return resultData;
+    }
+
     public void saveBatch(String assayName, String runName, Map<String, Object> runProperties, List<Map<String, Object>> resultRows, String projectName) throws IOException, CommandException
     {
         int assayId = getIdFromAssayName(assayName, projectName);

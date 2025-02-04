@@ -1,7 +1,13 @@
 package org.labkey.test.util.perf;
 
+import org.labkey.remoteapi.Command;
 import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.PostCommand;
+import org.labkey.remoteapi.ResponseObject;
+import org.labkey.remoteapi.assay.ImportRunCommand;
+import org.labkey.remoteapi.assay.ImportRunResponse;
 import org.labkey.remoteapi.miniprofiler.RequestInfo;
 import org.labkey.remoteapi.query.ImportDataCommand;
 import org.labkey.remoteapi.query.ImportDataResponse;
@@ -9,6 +15,7 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.params.perf.PerfScenario;
 import org.labkey.test.stress.AbstractScenario;
 import org.labkey.test.stress.RequestInfoTsvWriter;
+import org.labkey.test.util.APIAssayHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.TestDateUtils;
 import org.labkey.test.util.TestLogger;
@@ -35,14 +42,16 @@ public class JsonPerfScenarioHelper
     private final String containerPath;
     private final Connection connection;
     private final Function<String, File> perfDataFileSupplier;
+    private final Map<String, Integer> assayIds;
     private Function<Result, Result> resultHandler = Function.identity();
     private int importThreads = 3;
 
-    public JsonPerfScenarioHelper(String containerPath, Connection connection, File perfDataDir)
+    public JsonPerfScenarioHelper(String containerPath, Connection connection, File perfDataDir) throws IOException, CommandException
     {
         this.containerPath = containerPath;
         this.connection = connection;
         this.perfDataFileSupplier = perfDataDir == null ? TestFileUtils::getSampleData : name -> new File(perfDataDir, name);
+        this.assayIds = APIAssayHelper.getProtocolIds(containerPath, connection);
     }
 
     public JsonPerfScenarioHelper setResultHandler(Function<Result, Result> resultHandler)
@@ -72,7 +81,10 @@ public class JsonPerfScenarioHelper
                 expectedDuration += perfScenario.getAverage();
             }
             importExecutor.shutdown();
-            importExecutor.awaitTermination(expectedDuration, TimeUnit.MILLISECONDS);
+            if (!importExecutor.awaitTermination(expectedDuration, TimeUnit.MILLISECONDS))
+            {
+                TestLogger.warn("Import timed out");
+            }
             Map<String, Result> results = new LinkedHashMap<>();
             for (Map.Entry<String, Future<Result>> entry : futures.entrySet())
             {
@@ -92,18 +104,39 @@ public class JsonPerfScenarioHelper
         String schemaName = SCHEMA_NAMES.get(perfScenario.getType());
         if (schemaName == null)
         {
-            return null; // unsupported type
+            throw new IllegalArgumentException("Unsupported scenario type '%s' in '%s'".formatted(perfScenario.getType(), perfScenario.getName()));
         }
-        ImportDataCommand command = new ImportDataCommand(schemaName, perfScenario.getTypeName());
-        command.setFile(perfDataFileSupplier.apply(perfScenario.getFileName()));
+
+        PostCommand<?> command;
+        if (schemaName.startsWith("assay."))
+        {
+            String key = schemaName.split("\\.", 2)[1] + "." + perfScenario.getTypeName();
+            Integer assayId = assayIds.get(key);
+            if (assayId == null)
+            {
+                throw new IllegalArgumentException("'%s' not defined in '%s'. Found %s".formatted(key, containerPath, assayIds.keySet()));
+            }
+            command = new ImportRunCommand(assayId, perfDataFileSupplier.apply(perfScenario.getFileName()));
+        }
+        else
+        {
+            ImportDataCommand importDataCommand = new ImportDataCommand(schemaName, perfScenario.getTypeName());
+            importDataCommand.setFile(perfDataFileSupplier.apply(perfScenario.getFileName()));
+            importDataCommand.setInsertOption(ImportDataCommand.InsertOption.MERGE);
+
+            command = importDataCommand;
+        }
+
         command.setTimeout(Math.max(connection.getTimeout(), perfScenario.getAverage() * importThreads) * 2);
-        command.setInsertOption(ImportDataCommand.InsertOption.MERGE);
         Timer timer = new Timer();
         String msgSuffix = "";
         try
         {
-            ImportDataResponse response = command.execute(connection, containerPath);
-            msgSuffix = "Imported %d rows".formatted(response.getRowCount());
+            CommandResponse response = command.execute(connection, containerPath);
+            if (response instanceof ImportDataResponse idr)
+            {
+                msgSuffix = "Imported %d rows".formatted(idr.getRowCount());
+            }
             return new Result(perfScenario, response.getStatusCode(), timer);
         }
         catch (IOException e)
