@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -35,7 +36,6 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 /**
  * Simulation: A series of activities that represents some user workflow (e.g. loading the dashboard, navigating to the sample finder, and performing a search). For simplicity, API simulations in the initial proof of concept will consist of a single activity.
@@ -230,7 +230,10 @@ public class Simulation<T>
      *         {@link #_connectionFactory} - used to generate an API connection for the simulation to use
      *     </li>
      *     <li>
-     *         {@link #activityDefinitions} - {@link Activity} list that defines the simulation. These are deserialized from {@link ApiTestsDocument} XML files.
+     *         {@link #activityFiles} - {@link ApiTestsDocument} XML files that define the simulation. Used to generate {@link Activity} definitions.
+     *     </li>
+     *     <li>
+     *         {@link #replacements} - String replacements to inject into activity definitions. e.g. 'CONTAINER' or 'USERID'
      *     </li>
      *     <li>
      *         {@link #maxActivityThreads} - the size of thread pool to use for requests
@@ -248,7 +251,8 @@ public class Simulation<T>
     {
         private final Supplier<Connection> _connectionFactory;
 
-        private List<Activity> activityDefinitions = Collections.emptyList();
+        private List<File> activityFiles = new ArrayList<>();
+        private Map<String, String> replacements = Collections.emptyMap();
         private int maxActivityThreads = 6; // This seems to be the number of parallel requests browsers handle
         private int delayBetweenActivities = 5_000;
         private boolean runOnce = false;
@@ -287,15 +291,13 @@ public class Simulation<T>
 
         public Definition setActivityFiles(File... activityFiles)
         {
-            return setActivityFilesWithReplacements(
-                    Arrays.stream(activityFiles).collect(Collectors.toMap(f -> f, f -> Collections.emptyMap())));
+            this.activityFiles = Arrays.asList(activityFiles);
+            return this;
         }
 
-        public Definition setActivityFilesWithReplacements(Map<File, Map<String, String>> activityFilesWithReplacements)
+        public Definition setReplacements(Map<String, String> replacements)
         {
-            activityDefinitions = activityFilesWithReplacements.entrySet().stream()
-                    .map(entry -> new Activity(entry.getKey().getName(), Definition.parseTests(entry.getKey(), entry.getValue())))
-                    .toList();
+            this.replacements = new HashMap<>(replacements);
             return this;
         }
 
@@ -303,6 +305,17 @@ public class Simulation<T>
         {
             this.runOnce = runOnce;
             return this;
+        }
+
+        private List<Activity> buildActivityDefinitions()
+        {
+            if (activityFiles.isEmpty())
+            {
+                throw new IllegalArgumentException("No activity files specified");
+            }
+            return activityFiles.stream()
+                .map(file -> new Activity(file.getName(), Definition.parseTests(file, replacements)))
+                .toList();
         }
 
         /**
@@ -316,7 +329,7 @@ public class Simulation<T>
             Connection connection = _connectionFactory.get();
             // Prime connection before starting simulation to ensure credentials are good
             new WhoAmICommand().execute(connection, null);
-            return new Simulation<>(connection, activityDefinitions, delayBetweenActivities, maxActivityThreads, resultCollectorFactory.apply(connection), runOnce);
+            return new Simulation<>(connection, buildActivityDefinitions(), delayBetweenActivities, maxActivityThreads, resultCollectorFactory.apply(connection), runOnce);
         }
 
         public Simulation<RequestResult> startSimulation() throws IOException, CommandException
