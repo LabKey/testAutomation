@@ -65,7 +65,7 @@ public class DeleteConfirmationDialog<ConfirmPage extends WebDriverWrapper> exte
         WebDriverWrapper.waitFor(()-> elementCache().body.isDisplayed() &&
                         !elementCache().title.getText().isEmpty() &&
                         !BootstrapLocators.loadingSpinner.existsIn(this),
-                "The delete confirmation dialog did not become ready.", 1_000);
+                "The delete / archive confirmation dialog did not become ready.", 1_000);
     }
 
     public void cancelDelete()
@@ -80,7 +80,12 @@ public class DeleteConfirmationDialog<ConfirmPage extends WebDriverWrapper> exte
 
     public ConfirmPage confirmDelete(Integer waitSeconds)
     {
-        return _confirmationSynchronizationFunction.apply(() -> this.dismiss("Yes, Delete", waitSeconds));
+        return clickConfirmButton(waitSeconds, "Yes, Delete");
+    }
+
+    protected ConfirmPage clickConfirmButton(Integer waitSeconds, String buttonText)
+    {
+        return _confirmationSynchronizationFunction.apply(() -> this.dismiss(buttonText, waitSeconds));
     }
 
     public Boolean isDeleteEnabled()
