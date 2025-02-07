@@ -26,6 +26,8 @@ import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -69,6 +71,9 @@ public abstract class TestProperties
             ioe.printStackTrace(System.err);
         }
     }
+
+    // Initialize once so that value doesn't change if suite runs through midnight
+    private static final int DAY_OF_MONTH = LocalDateTime.now().getDayOfMonth();
 
     public static void load()
     {
@@ -164,7 +169,16 @@ public abstract class TestProperties
 
     public static String getBrowserTimeZone()
     {
-        return StringUtils.trimToNull(System.getProperty("webtest.browser.tz"));
+        String tz = StringUtils.trimToNull(System.getProperty("webtest.browser.tz"));
+        if (tz != null)
+        {
+            String[] split = tz.split("[, ]+");
+            tz = split[DAY_OF_MONTH % split.length];
+            // Verify that time zone is valid
+            ZoneId zoneId = ZoneId.of(tz);
+            TestLogger.warn("Starting browser with TZ = %s (%s)".formatted(tz, zoneId));
+        }
+        return tz;
     }
 
     public static double getTimeoutMultiplier()
