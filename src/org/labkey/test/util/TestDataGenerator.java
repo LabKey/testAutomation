@@ -59,6 +59,8 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
+import static org.labkey.test.BaseWebDriverTest.ILLEGAL_QUERY_KEY_CHARACTERS;
+
 
 /**
  * Use this class to generate random test data for a given column schema
@@ -353,6 +355,15 @@ public class TestDataGenerator
         while (domainName.length() < size || Pattern.matches("(.*\\s--[^ ].*)|(.*\\s-[^- ].*)", domainName)); // domain name must not contain space followed by dash. (command like: Issue 49161)
 
         return domainName;
+    }
+
+    public static String randomFieldName(String part)
+    {
+        // use the characters that we know are encoded in fieldKeys plus characters that we know clients are using
+        String chars = StringUtils.join(ILLEGAL_QUERY_KEY_CHARACTERS, "") + " %()=+-[]_|*`'\":;<>?!@#^";
+        int startChars = randomInt(0, 5);
+        int endChars = randomInt(0, 5);
+        return (randomString(startChars, null, chars) + part + randomString(endChars, null, chars)).trim();
     }
 
     public static int randomInt(int min, int max)
