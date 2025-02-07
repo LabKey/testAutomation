@@ -1377,7 +1377,7 @@ public class EditableGridTest extends BaseWebDriverTest
         mouseOver(testGrid.getCell(0, "Row")); // dismiss warning popup
         testGrid.setCellValue(1, REQ_INT_FIELD_NAME + " *", " ");
         checker().verifyEquals("Cell warning status not as expected at row " + 1 + " for col " + REQ_INT_FIELD_NAME, true, testGrid.hasCellWarning(1, REQ_INT_FIELD_NAME + " *"));
-        checker().verifyEquals("Cell warning msg not as expected at row " + 1 + " for col " + REQ_INT_FIELD_NAME, "Invalid integer. " + REQ_INT_FIELD_NAME + " is required.", testGrid.getCellPopoverText(1, REQ_INT_FIELD_NAME + " *"));
+        checker().verifyEquals("Cell warning msg not as expected at row " + 1 + " for col " + REQ_INT_FIELD_NAME, REQ_INT_FIELD_NAME + " is required.", testGrid.getCellPopoverText(1, REQ_INT_FIELD_NAME + " *"));
 
         log("Correct values should remove cell warning, keep entering wrong values should update warning");
         mouseOver(testGrid.getCell(0, "Row")); // dismiss warning popup

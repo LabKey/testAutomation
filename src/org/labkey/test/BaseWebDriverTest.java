@@ -37,6 +37,7 @@ import org.junit.rules.RuleChain;
 import org.junit.rules.TestRule;
 import org.junit.rules.Timeout;
 import org.junit.runner.Description;
+import org.junit.runners.model.MultipleFailureException;
 import org.junit.runners.model.Statement;
 import org.junit.runners.model.TestTimedOutException;
 import org.labkey.junit.rules.TestWatcher;
@@ -215,6 +216,11 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     public static final int MAX_WAIT_SECONDS = 10 * 60;
 
     public static final double DELTA = 10E-10;
+
+    // See QueryKey.ILLEGAL  TODO make that array public so it can be used here
+    public static final String[] ILLEGAL_QUERY_KEY_CHARACTERS = {"$", "/", "&", "}", "~", ",", "."};
+    // See TSVWriter.shouldQuote. Generally we are not able to use the tab and new line characters when creating field names in the UI, but including here for completeness
+    public static final String[] TRICKY_IMPORT_FIELD_CHARACTERS = {"\\", "\"", "\\t", ",", "\\n", "\\r"};
 
     public static final String TRICKY_CHARACTERS = "><&/%\\' \"1\u00E4\u00F6\u00FC\u00C5";
     public static final String TRICKY_CHARACTERS_NO_QUOTES = "></% 1\u00E4\u00F6\u00FC\u00C5";
@@ -928,7 +934,17 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         _testFailed = true;
         _anyTestFailed = true;
 
-        error.printStackTrace();
+        if (error instanceof MultipleFailureException mfe)
+        {
+            // Only "handle" primary test failure. Just log failures thrown during @After or @AfterClass methods.
+            error = mfe.getFailures().get(0);
+            for (int i = 1; i < mfe.getFailures().size(); i++)
+            {
+                TestLogger.error("Secondary error after test:", mfe.getFailures().get(i));
+            }
+        }
+
+        TestLogger.error("Primary test failure:", error);
 
         if (Thread.interrupted() || wasCausedBy(error, Arrays.asList(TestTimedOutException.class, InterruptedException.class)))
         {
@@ -1042,24 +1058,16 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
             try
             {
-                boolean inIFrame = Locator.css(":root").findElement(getDriver()).getSize().getHeight() > 0;
-                if (inIFrame)
+                try
                 {
-                    // TODO: Need a better way to detect when we are in an iFrame. Above method is not reliable
-                    //if (isFirefox()) // As of 2.45, Chromedriver screenshots are not restricted to currently focused iFrame
-                    //{
-                    //    getArtifactCollector().dumpPageSnapshot(testName + "-iframe", null, false); // Snapshot of iFrame
-                    //}
-                    try
-                    {
-                        // Switch to default content just in case we're in an iFrame
-                        getDriver().switchTo().defaultContent();
-                    }
-                    catch (UnhandledAlertException alert)
-                    {
-                        TestLogger.warn("Alert was triggered by iframe: " + WebDriverUtils.getUnhandledAlertText(alert, getDriver()));
-                    }
+                    // Switch to default content just in case we're in an iFrame
+                    getDriver().switchTo().defaultContent();
                 }
+                catch (UnhandledAlertException alert)
+                {
+                    TestLogger.warn("Alert was triggered by iframe: " + WebDriverUtils.getUnhandledAlertText(alert, getDriver()));
+                }
+
                 // Don't take screenshots if error was deferred and any screenshots were taken
                 if (!(error instanceof DeferredErrorCollector.DeferredAssertionError))
                 {

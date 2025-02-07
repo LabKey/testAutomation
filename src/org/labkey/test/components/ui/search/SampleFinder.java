@@ -27,6 +27,8 @@ import java.util.stream.Collectors;
  */
 public class SampleFinder extends WebDriverComponent<SampleFinder.ElementCache>
 {
+    public static final String ALL_SAMPLE_TYPES = "All Sample Types";
+
     private final WebElement _el;
     private final WebDriver _driver;
 

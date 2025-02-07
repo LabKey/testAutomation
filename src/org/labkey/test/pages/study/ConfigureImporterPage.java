@@ -11,11 +11,11 @@ import org.openqa.selenium.WebElement;
 import java.util.Optional;
 
 /**
- * If the current folder has 0 specimen importers (implemented in Professional, and FreezerPro) enabled in it,
+ * If the current folder has 0 specimen importers (implemented in Professional) enabled in it,
  * but the modules are available on the server, the user will be shown call to action to enable the modules.
  * If 0 importer modules are available, the user will be shown an upsell banner.
  *
- * If the user has >1, this page will show a configuration selection (pick which one- QueryBased, FreezerPro)
+ * If the user has >1, this page will show a configuration selection
  *
  * If the user has only 1, this page will show options for configuring it.
  *
@@ -38,8 +38,7 @@ public class ConfigureImporterPage extends LabKeyPage<ConfigureImporterPage.Elem
     {
         waitFor(()-> elementCache().EnableModuleBanner().isPresent() ||
                     elementCache().importOptionPickerBanner().isPresent() ||
-                    elementCache().configureQueryBasedConnectionPane().isPresent() ||
-                    elementCache().freezerProBanner().isPresent(),
+                    elementCache().configureQueryBasedConnectionPane().isPresent(),
                 "the page did not initialize in time", WAIT_FOR_JAVASCRIPT);
     }
 
@@ -63,10 +62,7 @@ public class ConfigureImporterPage extends LabKeyPage<ConfigureImporterPage.Elem
     }
 
     /**
-     * this action is only available if there are more than 1 options to pick from- querybased,  freezerpro (or others?)
-     * If either Professional(query-based) or Freezerpro are enabled on the folder, this page will not be shown
-     * at the end of the "configure specimen import" link on the Manage Study page, instead you will be directed to views
-     * from those modules so you can configure their importers accordingly
+     * This action is only available if there are more than 1 options to pick from
      *
      * @param option Use the text label next to the radio button
      * @return The current page
@@ -111,9 +107,5 @@ public class ConfigureImporterPage extends LabKeyPage<ConfigureImporterPage.Elem
                     .findOptionalElement(getDriver());
         }
 
-        Optional<WebElement> freezerProBanner()
-        {
-            return Locator.tagWithText("h3", "FreezerPro Configuration").findOptionalElement(getDriver());
-        }
     }
 }

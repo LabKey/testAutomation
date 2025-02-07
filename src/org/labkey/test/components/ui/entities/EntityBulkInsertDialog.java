@@ -1,5 +1,6 @@
 package org.labkey.test.components.ui.entities;
 
+import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
@@ -221,20 +222,24 @@ public class EntityBulkInsertDialog extends ModalDialog
      * object to use the picker to set the field. If a text value is passed in it is used as a literal and jut typed
      * into the textbox.
      *
-     * @param fieldKey Field to update.
+     * @param fieldName Field to update.
      * @param dateTime A LocalDateTime, LocalDate, LocalTime or String.
      * @return A reference to this page.
      */
-    public EntityBulkInsertDialog setDateTimeField(String fieldKey, Object dateTime)
+    public EntityBulkInsertDialog setDateTimeField(String fieldName, Object dateTime)
     {
-        ReactDateTimePicker dateTimePicker = elementCache().dateInput(fieldKey);
+        return setDateTimeField(fieldName, dateTime, null);
+    }
+    public EntityBulkInsertDialog setDateTimeField(String fieldName, Object dateTime, @Nullable String fieldKey)
+    {
+        ReactDateTimePicker dateTimePicker = elementCache().dateInput(fieldName, fieldKey);
         dateTimePicker.select(dateTime);
         return this;
     }
 
-    public String getDateTimeField(String fieldKey)
+    public String getDateTimeField(String fieldName, @Nullable String fieldKey)
     {
-        return elementCache().dateInput(fieldKey).get();
+        return elementCache().dateInput(fieldName, fieldKey).get();
     }
 
     public EntityBulkInsertDialog setBooleanField(String fieldKey, boolean checked)
@@ -381,10 +386,13 @@ public class EntityBulkInsertDialog extends ModalDialog
             return new Input(inputEl, getDriver());
         }
 
-        public ReactDateTimePicker dateInput(String fieldKey)
+        public ReactDateTimePicker dateInput(String fieldName, @Nullable String fieldKey)
         {
+            if (fieldKey == null)
+                fieldKey = fieldName;
+
             return new ReactDateTimePicker.ReactDateTimeInputFinder(getDriver())
-                    .withInputId(fieldKey).find(formRow(fieldKey));
+                    .withInputId(fieldKey).find(formRow(fieldName));
         }
 
         public List<WebElement> fieldNames()
