@@ -48,6 +48,10 @@ public class DiscussionLinkTest extends BaseWebDriverTest
     private void doSetup()
     {
         _containerHelper.createProject(getProjectName());
+
+        // Issue 51620: Remove the UI for Object-level discussions
+        goToAdminConsole().clickDeprecatedFeatures();
+        click(Locator.inputById("deprecatedObjectLevelDiscussions"));
     }
 
     @Before
