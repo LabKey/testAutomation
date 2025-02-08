@@ -157,6 +157,10 @@ public class WikiLongTest extends BaseWebDriverTest
     @Test
     public void testSteps()
     {
+        // Issue 51620: Remove the UI for Object-level discussions
+        goToAdminConsole().clickDeprecatedFeatures();
+        click(Locator.inputById("deprecatedObjectLevelDiscussions"));
+
         enableEmailRecorder();
         _containerHelper.createProject(PROJECT2_NAME, null);
         _containerHelper.enableModule(PROJECT2_NAME, "MS2");
