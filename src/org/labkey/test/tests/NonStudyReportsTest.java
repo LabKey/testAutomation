@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.After;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -26,6 +27,7 @@ import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Reports;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.OptionalFeatureHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelper;
 import org.labkey.test.util.ext4cmp.Ext4FileFieldRef;
@@ -35,6 +37,7 @@ import java.io.File;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.labkey.test.tests.announcements.DiscussionLinkTest.OBJECT_DISCUSSION_FEATURE;
 
 @Category({Daily.class, Reports.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 6)
@@ -80,6 +83,16 @@ public class NonStudyReportsTest extends ReportTest
         rReportHelper.ensureRConfig();
     }
 
+    /**
+     * Don't leave feature enabled. Warning banner might interfere with other tests
+     */
+    @After
+    public void disableDiscussions()
+    {
+        // Issue 51620: Remove the UI for Object-level discussions
+        OptionalFeatureHelper.disableOptionalFeature(createDefaultConnection(), OBJECT_DISCUSSION_FEATURE);
+    }
+
     @Override
     @LogMethod
     protected void doVerifySteps()
@@ -93,6 +106,9 @@ public class NonStudyReportsTest extends ReportTest
     @LogMethod
     private void doAttachmentReportTest()
     {
+        // Issue 51620: Remove the UI for Object-level discussions
+        OptionalFeatureHelper.enableOptionalFeature(createDefaultConnection(), OBJECT_DISCUSSION_FEATURE);
+
         clickProject(getProjectName());
         goToManageViews();
         BootstrapMenu.find(getDriver(), "Add Report").clickSubMenu(true, "Attachment Report");
