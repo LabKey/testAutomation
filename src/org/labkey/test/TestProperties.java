@@ -172,7 +172,7 @@ public abstract class TestProperties
         String tz = StringUtils.trimToNull(System.getProperty("webtest.browser.tz"));
         if (tz != null)
         {
-            String[] split = tz.split("[, ]+");
+            String[] split = tz.split("[,\\s]+");
             tz = split[DAY_OF_MONTH % split.length];
             // Verify that time zone is valid
             ZoneId zoneId = ZoneId.of(tz);
