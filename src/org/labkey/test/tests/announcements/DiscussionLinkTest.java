@@ -21,6 +21,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.pages.core.admin.ProjectSettingsPage;
 import org.labkey.test.util.OptionalFeatureHelper;
@@ -52,6 +53,13 @@ public class DiscussionLinkTest extends BaseWebDriverTest
 
         // Issue 51620: Remove the UI for Object-level discussions
         OptionalFeatureHelper.enableOptionalFeature(createDefaultConnection(), "deprecatedObjectLevelDiscussions");
+    }
+
+    @Override
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException
+    {
+        OptionalFeatureHelper.disableOptionalFeature(createDefaultConnection(), "deprecatedObjectLevelDiscussions");
+        super.doCleanup(afterTest);
     }
 
     @Before
