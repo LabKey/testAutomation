@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests.announcements;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -36,12 +37,14 @@ import static org.junit.Assert.assertEquals;
 @BaseWebDriverTest.ClassTimeout(minutes = 4)
 public class DiscussionLinkTest extends BaseWebDriverTest
 {
+    public static final String OBJECT_DISCUSSION_FEATURE = "deprecatedObjectLevelDiscussions";
+
     public static final String WIKI_NAME = "Link test";
 
     @BeforeClass
     public static void setupProject()
     {
-        DiscussionLinkTest init = (DiscussionLinkTest) getCurrentTest();
+        DiscussionLinkTest init = getCurrentTest();
 
         init.doSetup();
     }
@@ -51,13 +54,22 @@ public class DiscussionLinkTest extends BaseWebDriverTest
         _containerHelper.createProject(getProjectName());
 
         // Issue 51620: Remove the UI for Object-level discussions
-        OptionalFeatureHelper.enableOptionalFeature(createDefaultConnection(), "deprecatedObjectLevelDiscussions");
+        OptionalFeatureHelper.enableOptionalFeature(createDefaultConnection(), OBJECT_DISCUSSION_FEATURE);
     }
 
     @Before
     public void preTest()
     {
         goToProjectHome();
+    }
+
+    /**
+     * Don't leave feature enabled. Warning banner might interfere with other tests
+     */
+    @After public void disableDiscussions()
+    {
+        // Issue 51620: Remove the UI for Object-level discussions
+        OptionalFeatureHelper.disableOptionalFeature(createDefaultConnection(), OBJECT_DISCUSSION_FEATURE);
     }
 
     @Test

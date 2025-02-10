@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests.wiki;
 
+import org.junit.After;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
@@ -37,6 +38,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.labkey.test.tests.announcements.DiscussionLinkTest.OBJECT_DISCUSSION_FEATURE;
 
 @Category({Daily.class, Wiki.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 11)
@@ -153,6 +155,15 @@ public class WikiLongTest extends BaseWebDriverTest
     protected String getProjectName()
     {
         return PROJECT_NAME;
+    }
+
+    /**
+     * Don't leave feature enabled. Warning banner might interfere with other tests
+     */
+    @After public void disableDiscussions()
+    {
+        // Issue 51620: Remove the UI for Object-level discussions
+        OptionalFeatureHelper.disableOptionalFeature(createDefaultConnection(), OBJECT_DISCUSSION_FEATURE);
     }
 
     @Test

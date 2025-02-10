@@ -23,6 +23,7 @@ import org.labkey.test.pages.ConfigureReportsAndScriptsPage;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.pages.compliance.ComplianceSettingsAccountsPage;
 import org.labkey.test.pages.core.login.LoginConfigurePage;
+import org.labkey.test.util.OptionalFeatureHelper;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -133,8 +134,8 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
 
     public void clickDeprecatedFeatures()
     {
-        goToSettingsSection();
-        clickAndWait(elementCache().deprecatedFeaturesLink);
+        throw new UnsupportedOperationException("Use %s to manage experimental/optional/deprecated features"
+            .formatted(OptionalFeatureHelper.class.getSimpleName()));
     }
 
     public void clickEmailCustomization()
@@ -267,7 +268,6 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
         protected WebElement configurePageElements = Locator.linkWithText("configure page elements").findWhenNeeded(this);
         protected WebElement complianceSettings = Locator.linkWithText("Compliance Settings").findWhenNeeded(this);
         protected WebElement changeUserPropertiesLink = Locator.linkWithText("change user properties").findWhenNeeded(this);
-        protected WebElement deprecatedFeaturesLink = Locator.linkWithText("deprecated features").findWhenNeeded(this);
         protected WebElement emailCustomizationLink = Locator.linkWithText("email customization").findWhenNeeded(this);
         protected WebElement notificationServiceAdminLink = Locator.linkWithText("notification service admin").findWhenNeeded(this);
         protected WebElement filesLink = Locator.linkWithText("files").findWhenNeeded(this);
