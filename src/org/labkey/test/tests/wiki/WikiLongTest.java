@@ -781,6 +781,7 @@ public class WikiLongTest extends BaseWebDriverTest
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
+        OptionalFeatureHelper.disableOptionalFeature(createDefaultConnection(), "deprecatedObjectLevelDiscussions");
         deleteUsersIfPresent(USER1);
         _containerHelper.deleteProject(PROJECT2_NAME, afterTest);
         _containerHelper.deleteProject(PROJECT_NAME, afterTest);

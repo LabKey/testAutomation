@@ -26,6 +26,7 @@ import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Reports;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.OptionalFeatureHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelper;
 import org.labkey.test.util.ext4cmp.Ext4FileFieldRef;
@@ -65,6 +66,7 @@ public class NonStudyReportsTest extends ReportTest
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         _userHelper.deleteUsers(false, ATTACHMENT_USER);
+        OptionalFeatureHelper.disableOptionalFeature(createDefaultConnection(), "deprecatedObjectLevelDiscussions");
         super.doCleanup(afterTest);
     }
 
@@ -258,6 +260,9 @@ public class NonStudyReportsTest extends ReportTest
     @LogMethod
     private void doReportDiscussionTest()
     {
+        // Issue 51620: Remove the UI for Object-level discussions
+        OptionalFeatureHelper.enableOptionalFeature(createDefaultConnection(), "deprecatedObjectLevelDiscussions");
+
         clickProject(getProjectName());
 
         goToManageViews();
