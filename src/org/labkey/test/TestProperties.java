@@ -74,6 +74,7 @@ public abstract class TestProperties
 
     // Initialize once so that value doesn't change if suite runs through midnight
     private static final int DAY_OF_MONTH = LocalDateTime.now().getDayOfMonth();
+    private static ZoneId browserTimeZone = null;
 
     public static void load()
     {
@@ -167,18 +168,24 @@ public abstract class TestProperties
         return getBooleanProperty("webtest.dump.browser.console", false);
     }
 
-    public static String getBrowserTimeZone()
+    public static ZoneId getBrowserTimeZone()
     {
-        String tz = StringUtils.trimToNull(System.getProperty("webtest.browser.tz"));
-        if (tz != null)
+        if (browserTimeZone == null)
         {
-            String[] split = tz.split("[,\\s]+");
-            tz = split[DAY_OF_MONTH % split.length];
-            // Verify that time zone is valid
-            ZoneId zoneId = ZoneId.of(tz);
-            TestLogger.warn("Starting browser with TZ = %s (%s)".formatted(tz, zoneId));
+            String tz = StringUtils.trimToNull(System.getProperty("webtest.browser.tz"));
+            if (tz != null)
+            {
+                String[] split = tz.split("[,\\s]+");
+                tz = split[DAY_OF_MONTH % split.length];
+                // Verify that time zone is valid
+                browserTimeZone = ZoneId.of(tz);
+            }
+            else
+            {
+                browserTimeZone = ZoneId.systemDefault();
+            }
         }
-        return tz;
+        return browserTimeZone;
     }
 
     public static double getTimeoutMultiplier()

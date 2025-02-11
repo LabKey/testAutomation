@@ -120,6 +120,7 @@ import java.nio.file.StandardCopyOption;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -212,9 +213,15 @@ public abstract class WebDriverWrapper implements WrapsDriver
         DriverService oldDriverService = oldDriverAndService.getRight();
         DriverService newDriverService = null;
         Map<String, String> browserEnv = new HashMap<>();
-        if (TestProperties.getBrowserTimeZone() != null)
+        ZoneId browserTimeZone = TestProperties.getBrowserTimeZone();
+        if (browserTimeZone != ZoneId.systemDefault())
         {
-            browserEnv.put("TZ", TestProperties.getBrowserTimeZone());
+            TestLogger.info("Starting browser with TZ = " + browserTimeZone);
+            browserEnv.put("TZ", browserTimeZone.toString());
+        }
+        else
+        {
+            TestLogger.info("Starting browser with TZ = " + browserTimeZone + " (system default)");
         }
 
         switch (browserType)
