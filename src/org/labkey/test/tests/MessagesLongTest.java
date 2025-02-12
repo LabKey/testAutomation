@@ -74,8 +74,11 @@ public class MessagesLongTest extends BaseWebDriverTest
     private static final String USER3 = "messageslong_user3@messages.test";
     private static final String NOT_A_USER = "Squirrel";
     private static final String RESPONDER = "responder@messages.test";
+    private static final String MACRO_WEBPART = "${labkey.webPart(partName='Lists')}";
     private static final String HTML_BODY = "1 <b>x</b>\n" +
-            "<b>${labkey.webPart(partName='Lists')}</b>\n";
+            "<b>" +
+            MACRO_WEBPART +
+            "</b>\n";
     private static final String HTML_BODY_WEBPART_TEST = "manage lists";
     private static final String MEMBER_LIST = "memberListInput";
     private static final String TEMPLATE_TEXT = "***Please do not reply to this email notification. Replies to this email are routed to an unmonitored mailbox. Instead, please use the link below.***";
@@ -224,15 +227,19 @@ public class MessagesLongTest extends BaseWebDriverTest
         InsertPage markdownPage = new InsertPage(getDriver());
         assertEquals("default selection should be 'Markdown'",markdownPage.getRenderAs(), WikiHelper.WikiRendererType.MARKDOWN);
         markdownPage.setTitle("Markdown is a thing now")
-                .setBody("# Holy Header, Batman!\n" +
-                        "**bold as bold can possibly be**\n" +
-                        "\n" +
-                        "```var foo = bar.fooValue;```\n" +
-                        "\n" +
-                        "## List of things I don't like \n" +
-                        "+ hair clogs\n" +
-                        "+ stinky feet\n" +
-                        "+ internet trolls");
+                .setBody("""
+                        # Holy Header, Batman!
+                        **bold as bold can possibly be**
+
+                        ```var foo = bar.fooValue;```
+
+                        ## List of things I don't like\s
+                        + hair clogs
+                        + stinky feet
+                        + internet trolls
+
+                        <b>escaped</b>""" +
+                        "\n" + MACRO_WEBPART);
 
         // now look at the preview pane
         markdownPage.selectPreviewTab();
@@ -240,6 +247,9 @@ public class MessagesLongTest extends BaseWebDriverTest
         assertElementPresent(Locator.tagWithText("li", "hair clogs"));
         assertElementPresent(Locator.tagWithText("li", "stinky feet"));
         assertElementPresent(Locator.tagWithText("li", "internet trolls"));
+        assertElementPresent(Locator.tagWithText("p", "<b>escaped</b>"));
+        assertElementPresent(PortalHelper.Locators.webPart("Lists"));
+        assertElementPresent(Locator.linkWithText("manage lists"));
         clickButton("Submit");
         assertElementPresent(Locator.tagWithText("h1", "Holy Header, Batman!"));
         assertElementPresent(Locator.tagWithText("strong", "bold as bold can possibly be"));

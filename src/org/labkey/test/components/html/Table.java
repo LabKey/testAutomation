@@ -26,7 +26,9 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Table extends WebDriverComponent<Table.Elements>
 {
@@ -62,7 +64,7 @@ public class Table extends WebDriverComponent<Table.Elements>
         return new Elements();
     }
 
-    protected class Elements extends Component.ElementCache
+    protected class Elements extends Component<?>.ElementCache
     {
         List<WebElement> rows;
 
@@ -86,7 +88,7 @@ public class Table extends WebDriverComponent<Table.Elements>
      */
     public List<String> getTableHeaderTexts()
     {
-        List<WebElement> headerEls = Locator.xpath("//thead//th").findElements(this);
+        List<WebElement> headerEls = Locator.xpath("./thead/tr[1]/th").findElements(this);
         List<String> columnHeaders = new ArrayList<>();
         for(WebElement headerEl : headerEls){columnHeaders.add(headerEl.getText());}
         return columnHeaders;
@@ -94,7 +96,7 @@ public class Table extends WebDriverComponent<Table.Elements>
 
     public int getTableHeaderIndex(String headerText)
     {
-        List<WebElement> headerEls = Locator.xpath("//thead//th").findElements(this);
+        List<WebElement> headerEls = Locator.xpath("./thead/tr[1]/th").findElements(this);
         int counter = 1;
         for(WebElement headerEl : headerEls)
         {
@@ -103,6 +105,36 @@ public class Table extends WebDriverComponent<Table.Elements>
             counter++;
         }
         throw new RuntimeException( headerText + " column not found");
+    }
+
+    /**
+     * Get table data as a list of maps. Each map represents a row.<br>
+     * Assumes a simple table with a single header row with no colspans and unique header labels
+     * @return table data
+     */
+    public List<Map<String, String>> getTableData()
+    {
+        List<Map<String, String>> data = new ArrayList<>();
+
+        List<String> headerTexts = getTableHeaderTexts();
+        List<WebElement> rows = elementCache().getRows();
+
+        for (WebElement row : rows)
+        {
+            List<String> dataTexts = getWrapper().getTexts(Locator.tag("td").findElements(row));
+            if (headerTexts.size() != dataTexts.size())
+            {
+                throw new IllegalStateException("Size of row %s doesn't match table header %s".formatted(dataTexts, headerTexts));
+            }
+            Map<String, String> rowMap = new LinkedHashMap<>();
+            for (int i = 0; i < headerTexts.size(); i++)
+            {
+                rowMap.put(headerTexts.get(i), dataTexts.get(i));
+            }
+            data.add(rowMap);
+        }
+
+        return data;
     }
 
     public List<String> getTableHeaderColumnData(String headerText)
