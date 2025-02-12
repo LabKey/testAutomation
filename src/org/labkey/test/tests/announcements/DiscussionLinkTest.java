@@ -21,8 +21,10 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.pages.core.admin.ProjectSettingsPage;
+import org.labkey.test.util.OptionalFeatureHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.WikiHelper;
 
@@ -50,8 +52,14 @@ public class DiscussionLinkTest extends BaseWebDriverTest
         _containerHelper.createProject(getProjectName());
 
         // Issue 51620: Remove the UI for Object-level discussions
-        goToAdminConsole().clickDeprecatedFeatures();
-        click(Locator.inputById("deprecatedObjectLevelDiscussions"));
+        OptionalFeatureHelper.enableOptionalFeature(createDefaultConnection(), "deprecatedObjectLevelDiscussions");
+    }
+
+    @Override
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException
+    {
+        OptionalFeatureHelper.disableOptionalFeature(createDefaultConnection(), "deprecatedObjectLevelDiscussions");
+        super.doCleanup(afterTest);
     }
 
     @Before
