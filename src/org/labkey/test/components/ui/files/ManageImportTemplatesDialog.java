@@ -1,5 +1,6 @@
 package org.labkey.test.components.ui.files;
 
+import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.html.Input;
@@ -181,6 +182,19 @@ public class ManageImportTemplatesDialog extends ModalDialog
     public void clickSave()
     {
         dismiss("Save");
+    }
+
+    public void clickCancel()
+    {
+        dismiss("Cancel");
+    }
+
+    public String clickSaveExpectError()
+    {
+        Locators.dismissButton("Save").findElement(getComponentElement()).click();
+        return BootstrapLocators.errorBanner
+                .findWhenNeeded(this).withTimeout(5_000)
+                .getText();
     }
 
     @Override
