@@ -72,8 +72,6 @@ public abstract class TestProperties
         }
     }
 
-    // Initialize once so that value doesn't change if suite runs through midnight
-    private static final int DAY_OF_MONTH = LocalDateTime.now().getDayOfMonth();
     private static ZoneId browserTimeZone = null;
 
     public static void load()
@@ -176,7 +174,7 @@ public abstract class TestProperties
             if (tz != null)
             {
                 String[] split = tz.split("[,\\s]+");
-                tz = split[DAY_OF_MONTH % split.length];
+                tz = split[LocalDateTime.now().getDayOfMonth() % split.length];
                 // Verify that time zone is valid
                 browserTimeZone = ZoneId.of(tz);
             }
