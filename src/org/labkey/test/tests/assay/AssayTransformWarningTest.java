@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests.assay;
 
+import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -27,8 +28,11 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.pages.ReactAssayDesignerPage;
+import org.labkey.test.pages.assay.AssayImportPage;
+import org.labkey.test.pages.assay.AssayRunsPage;
 import org.labkey.test.pages.files.WebDavPage;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.assay.GeneralAssayDesign;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.QCAssayScriptHelper;
 import org.labkey.test.util.RReportHelper;
@@ -239,5 +243,105 @@ public class AssayTransformWarningTest extends BaseWebDriverTest
         WebDavPage.beginAt(this, getProjectName() + "/@scripts");
         waitForElement(Locators.labkeyErrorHeading.withText("/_webdav/" + getProjectName() + "/@scripts"));
         stopImpersonatingHTTP();
+    }
+
+    @Test
+    public void testEnableTransformForUpdate() throws Exception
+    {
+        String insertOrUpdateTransform = "insertOrUpdateTransform.R";
+        String insertOrUpdateTransformAssay = "insertOrUpdateTransformAssay";
+        String transformContent = """
+                library(Rlabkey);
+                
+                run.props = labkey.transform.readRunPropertiesFile("${runInfo}");
+                
+                run.data.file = labkey.transform.getRunPropertyValue(run.props, "runDataFile");
+                run.output.file = run.props$val3[run.props$name == "runDataFile"];
+                error.file = labkey.transform.getRunPropertyValue(run.props, "errorsFile");
+                
+                if (file.exists(run.data.file)) {
+                    run.data = read.delim(run.data.file, header=TRUE, sep="\\t");
+                    run.data$M2 = 111;
+                    run.data$TransformType = "${transformOperation} testing";
+                    write.table(run.data, file=run.output.file, sep="\\t", na="", row.names=FALSE, quote=FALSE);
+                }
+                """;
+        File transformFile = TestFileUtils.writeTempFile(insertOrUpdateTransform, transformContent);
+        var protocolResponse = new GeneralAssayDesign(insertOrUpdateTransformAssay)
+                .setDataFields(List.of(new FieldDefinition("M2", FieldDefinition.ColumnType.Decimal),
+                        new FieldDefinition("TransformType", FieldDefinition.ColumnType.String),
+                        new FieldDefinition("Comment", FieldDefinition.ColumnType.String)), true)
+                .createAssay(getProjectName(), createDefaultConnection());
+        goToProjectHome();
+
+        var assayDesignerPage = ReactAssayDesignerPage.beginAt(this, getProjectName(), protocolResponse.getProtocolId(),
+                "general", getURL().toString());
+        assayDesignerPage.addTransformScript(transformFile, true);
+
+        checker().verifyTrue("expect run on import to be enabled by default",
+                assayDesignerPage.isScriptActionCheckboxEnabled(insertOrUpdateTransform, "Run on Import"));
+        checker().verifyFalse("expect run on edit not to be enabled by default",
+                assayDesignerPage.isScriptActionCheckboxEnabled(insertOrUpdateTransform, "Run on Edit"));
+        checker().verifyTrue("expect run on import to be checked by default",
+                assayDesignerPage.getScriptActionCheckbox(insertOrUpdateTransform, "Run on Import"));
+        checker().verifyFalse("expect run on edit not to be checked by default",
+                assayDesignerPage.getScriptActionCheckbox(insertOrUpdateTransform, "Run on Edit"));
+
+        // now enable editable results
+        assayDesignerPage.setEditableResults(true);
+        checker().verifyTrue("expect run on edit to be enabled when editable results are enabled",
+                assayDesignerPage.isScriptActionCheckboxEnabled(insertOrUpdateTransform, "Run on Edit"));
+
+        // check the run on edit box
+        assayDesignerPage.setScriptActionCheckbox(insertOrUpdateTransform, "Run on Edit", true);
+        checker().verifyTrue("expect run on edit to be successfully enabled and checked",
+                assayDesignerPage.getScriptActionCheckbox(insertOrUpdateTransform, "Run on Edit"));
+
+        // disable editable results and verify that deselects the run on edit box
+        assayDesignerPage.setEditableResults(false);
+        checker().verifyFalse("expect run on edit to be disabled and deselected when editable results are disabled",
+                assayDesignerPage.getScriptActionCheckbox(insertOrUpdateTransform, "Run on Edit"));
+        checker().verifyFalse("expect run on edit to be disabled and deselected when editable results are disabled",
+                assayDesignerPage.isScriptActionCheckboxEnabled(insertOrUpdateTransform, "Run on Edit"));
+
+        // now re-enable editable results and check run on edit
+        assayDesignerPage.setEditableResults(true);
+        assayDesignerPage.setScriptActionCheckbox(insertOrUpdateTransform, "Run on Edit", true);
+        assayDesignerPage.clickSave();
+
+        // now import data and ensure the expected transform operation occurred
+        String importData = """
+                VisitID	ParticipantID	Comment
+                1	1	this is the import
+                1	2	also import
+                """;
+
+        clickAndWait(Locator.linkWithText(insertOrUpdateTransformAssay));
+        new AssayRunsPage(getDriver()).getTable().clickHeaderButton("Import Data");
+        clickButton("Next");
+        var importPage = new AssayImportPage(getDriver());
+        importPage.setNamedInputText("name", "transformTestImport");
+        importPage.setNamedTextAreaValue("TextAreaDataCollector.textArea", importData);
+        importPage.clickSaveAndFinish();
+
+        var assayDataPage = new AssayRunsPage(getDriver()).clickAssayIdLink("transformTestImport");
+        var m2Data = assayDataPage.getDataTable().getColumnDataAsText("M2");
+        var transformTypeData = assayDataPage.getDataTable().getColumnDataAsText("Transform Type");
+        checker().wrapAssertion(()-> Assertions.assertThat(m2Data)
+                .as("expect m2Data to contain only hard-coded transform value")
+                .containsOnly("111.0"));
+        checker().wrapAssertion(()-> Assertions.assertThat(transformTypeData)
+                .as("expect transformTypeData to contain only insert")
+                .containsOnly("INSERT testing"));
+        checker().screenShotIfNewError("unexpected import transform data");
+
+        assayDataPage.getDataTable().clickEditRow(0)
+                .setField("Comment", "this is the update")
+                .submit();
+
+        var dataMap = assayDataPage.getDataTable().getRowDataAsMap(0);
+        checker().verifyEquals("expect dataMap transform to show update",
+                "UPDATE testing", dataMap.get("TransformType"));
+        checker().screenShotIfNewError("unexpected update transform data");
     }
 }
