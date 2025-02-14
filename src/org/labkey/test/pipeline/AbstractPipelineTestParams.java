@@ -24,8 +24,7 @@ import org.labkey.test.components.dumbster.EmailRecordTable;
 import org.labkey.test.pages.pipeline.PipelineStatusDetailsPage;
 import org.labkey.test.util.ExperimentRunTable;
 import org.labkey.test.util.PasswordUtil;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.WebElement;
+import org.labkey.test.util.PipelineAnalysisHelper;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -39,11 +38,11 @@ import static org.junit.Assert.fail;
 abstract public class AbstractPipelineTestParams implements PipelineTestParams
 {
     protected PipelineWebTestBase _test;
-    private String _dataPath;
-    private String _protocolType;
+    private final String _dataPath;
+    private final String _protocolType;
     private String _parametersFile;
-    private String _protocolName;
-    private String[] _sampleNames;
+    private final String _protocolName;
+    private final String[] _sampleNames;
     private String[] _inputExtensions = new String[0];
     private String[] _outputExtensions = new String[0];
     private String[] _experimentLinks;
@@ -157,7 +156,7 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
                 ArrayList<String> listLinks = new ArrayList<>();
                 for (String name : _sampleNames)
                     listLinks.add(dataDirName + '/' + name + " (" + _protocolName + ")");
-                _experimentLinks = listLinks.toArray(new String[listLinks.size()]);
+                _experimentLinks = listLinks.toArray(new String[0]);
             }
         }
         return _experimentLinks;
@@ -234,7 +233,7 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
     {
         File analysisDir = new File(rootDir, getDataPath() + File.separatorChar + getProtocolType());
         if (analysisDir.exists())
-            fail("Pipeline files were not cleaned up; "+ analysisDir.toString() + " directory still exists");
+            fail("Pipeline files were not cleaned up; "+ analysisDir + " directory still exists");
     }
 
     @Override
@@ -252,18 +251,14 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
 
         clickActionButton();
 
-        int wait = BaseWebDriverTest.WAIT_FOR_JAVASCRIPT;
-        _test.log("Choose existing protocol " + getProtocolName());
-        _test.waitForElement(Locator.xpath("//select[@name='protocol']/option[.='" + getProtocolName() + "']" ), wait*12); // seems very long
-        _test.selectOptionByText(Locator.name("protocol"), getProtocolName());
-        WebDriverWrapper.sleep(wait);
-
+        PipelineAnalysisHelper helper = new PipelineAnalysisHelper(_test);
+        helper.waitForProtocolSelect();
+        helper.setProtocol(getProtocolName(), null);
         _test.log("Start data processing");
-        clickSubmitButton();
-        WebDriverWrapper.sleep(wait);
-    }
 
-    protected abstract void clickSubmitButton();
+        helper.analyzeOrRetry(true);
+        WebDriverWrapper.sleep(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+    }
 
     @Override
     public void remove()
