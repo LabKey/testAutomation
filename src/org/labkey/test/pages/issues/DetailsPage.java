@@ -101,6 +101,12 @@ public class DetailsPage extends BaseIssuePage<DetailsPage.ElementCache>
         return new InsertPage(getDriver());
     }
 
+    public InsertPage clickCreateNewIssue()
+    {
+        elementCache().getMoreMenu().clickSubMenu(false, "New issue");
+        return new InsertPage(getDriver());
+    }
+
     public DetailsPage clickShowRelatedIssueComment()
     {
         elementCache().getMoreMenu().clickSubMenu(false, "Show related comments");
