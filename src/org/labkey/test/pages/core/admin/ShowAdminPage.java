@@ -23,6 +23,7 @@ import org.labkey.test.pages.ConfigureReportsAndScriptsPage;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.pages.compliance.ComplianceSettingsAccountsPage;
 import org.labkey.test.pages.core.login.LoginConfigurePage;
+import org.labkey.test.util.OptionalFeatureHelper;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -129,6 +130,12 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
         goToSettingsSection();
         clickAndWait(elementCache().changeUserPropertiesLink);
         return new DomainDesignerPage(getDriver());
+    }
+
+    public void clickDeprecatedFeatures()
+    {
+        throw new UnsupportedOperationException("Use %s to manage experimental/optional/deprecated features"
+                .formatted(OptionalFeatureHelper.class.getSimpleName()));
     }
 
     public void clickEmailCustomization()

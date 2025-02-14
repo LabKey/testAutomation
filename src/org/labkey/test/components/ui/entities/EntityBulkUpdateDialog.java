@@ -77,7 +77,7 @@ public class EntityBulkUpdateDialog extends ModalDialog
 
     public List<String> getSelectionFieldValues(String fieldKey)
     {
-        return elementCache().getSelect(fieldKey).getSelections();
+        return enableAndWait(fieldKey, elementCache().getSelect(fieldKey)).getSelections();
     }
 
     public EntityBulkUpdateDialog setTextArea(String fieldKey, String text)
