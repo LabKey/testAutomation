@@ -43,7 +43,6 @@ public class PipelineProtocolArchiveTest extends BaseWebDriverTest
     public static final String WEB_PART_NAME_PIPELINE_PROTOCOLS = "Pipeline Protocols";
     public static final String PROTOCOL_NAME_B_R = "brainRadio";
     public static final String PROTOCOL_NAME_A_M = "toBeArchived";
-    public static final String PROTOCOL_NAME_NEW_PROTOCOL = "<New Protocol>";
     public static final String COLUMN_NAME = "name";
     public static final String COLUMN_PIPELINE = "pipeline";
     public static final String COLUMN_ARCHIVED = "Archived";
@@ -120,7 +119,7 @@ public class PipelineProtocolArchiveTest extends BaseWebDriverTest
         assertEquals("Wrong archived indication", "",protocol2_Archived);
 
         List<String> expectedOptions = new ArrayList<>(Arrays.asList(
-                PROTOCOL_NAME_NEW_PROTOCOL,
+                PipelineAnalysisHelper.PROTOCOL_NAME_NEW_PROTOCOL,
                 PROTOCOL_NAME_B_R,
                 PROTOCOL_NAME_A_M));
 
