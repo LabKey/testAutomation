@@ -343,7 +343,7 @@ public class GpatAssayTest extends BaseWebDriverTest
         ReactAssayDesignerPage assayDesignerPage = startCreateGpatAssay(trialData, invalidAssayName);
         List<String> errors = assayDesignerPage.clickSaveExpectingErrors();
         assayDesignerPage.clickCancel();
-        Assert.assertTrue("Error msg not as expected during assay creation", errors.contains("Invalid Assay Design name \"" + invalidAssayName + "\". Assay Design name must start with a letter or a number."));
+        Assert.assertTrue("Error msg not as expected during assay creation", errors.contains("Invalid Assay Design name '" + invalidAssayName + "'. Assay Design name must start with a letter or a number."));
 
         BaseSettingsPage.resetSettings(createDefaultConnection(), "/");
         BaseSettingsPage.resetSettings(createDefaultConnection(), getProjectName());
