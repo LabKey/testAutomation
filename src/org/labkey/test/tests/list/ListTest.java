@@ -1428,6 +1428,8 @@ public class ListTest extends BaseWebDriverTest
         table = new DataRegionTable("query", getDriver());
         checker().verifyEquals("Key value not as expected", "1", table.getDataAsText(0, keyName));
         checker().verifyEquals("Name value not as expected", nameValue, table.getDataAsText(0, "Name"));
+
+        _listHelper.deleteList();
     }
 
     private void viewRawTableMetadata(String listName)
