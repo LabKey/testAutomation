@@ -59,7 +59,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
-import static org.labkey.test.BaseWebDriverTest.ILLEGAL_QUERY_KEY_CHARACTERS;
+import static org.labkey.test.BaseWebDriverTest.ALL_ILLEGAL_QUERY_KEY_CHARACTERS;
 
 
 /**
@@ -359,11 +359,15 @@ public class TestDataGenerator
 
     public static String randomFieldName(String part)
     {
+        return randomFieldName(part, randomInt(0, 5), randomInt(0, 5));
+    }
+    public static String randomFieldName(String part, int numStartChars, int numEndChars)
+    {
         // use the characters that we know are encoded in fieldKeys plus characters that we know clients are using
-        String chars = StringUtils.join(ILLEGAL_QUERY_KEY_CHARACTERS, "") + " %()=+-[]_|*`'\":;<>?!@#^";
-        int startChars = randomInt(0, 5);
-        int endChars = randomInt(0, 5);
-        return (randomString(startChars, null, chars) + part + randomString(endChars, null, chars)).trim();
+        String chars = ALL_ILLEGAL_QUERY_KEY_CHARACTERS + " %()=+-[]_|*`'\":;<>?!@#^";
+        String randomFieldName = (randomString(numStartChars, null, chars) + part + randomString(numEndChars, null, chars)).trim();
+        TestLogger.log("Generated random field name: " + randomFieldName);
+        return randomFieldName;
     }
 
     public static int randomInt(int min, int max)
