@@ -25,6 +25,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Wiki;
+import org.labkey.test.pages.LabkeyErrorPage;
 import org.labkey.test.util.OptionalFeatureHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
@@ -469,7 +470,7 @@ public class WikiLongTest extends BaseWebDriverTest
         impersonate(USER1);
         assertElementNotPresent(Locator.linkWithText(PROJECT2_NAME));     // Project should not be visible
         popLocation();
-        assertTextPresent("User does not have permission to perform this operation.");  // Not authorized
+        new LabkeyErrorPage(getDriver()).assertUnauthorized(checker());
         goToHome();
         stopImpersonating();
 

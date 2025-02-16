@@ -23,15 +23,12 @@ import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.SimpleGetCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.pages.core.admin.CustomizeSitePage;
 import org.labkey.test.pages.core.login.LoginConfigRow;
 import org.labkey.test.pages.core.login.LoginConfigurePage;
-import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.LogMethod;
-import org.labkey.test.util.PermissionsHelper;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -45,16 +42,8 @@ import static org.junit.Assert.assertTrue;
 
 @Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 3)
-public class AdminConsoleTest extends BaseWebDriverTest
+public class AdminConsoleTest extends AbstractAdminConsoleTest
 {
-    protected static final String APP_ADMIN_USER = "app_admin_test_user@adminconsole.test";
-
-    @Override
-    public String getProjectName()
-    {
-        return null;
-    }
-
     @Test
     public void testServerHttpHeaderSetting()
     {
@@ -295,51 +284,10 @@ public class AdminConsoleTest extends BaseWebDriverTest
         assertTextPresent("JAR Files Distributed with the API Module");
     }
 
-
-
-    @Override
-    public List<String> getAssociatedModules()
-    {
-        return Arrays.asList("admin");
-    }
-
-    @Override
-    public void checkQueries()
-    {
-
-    }
-
-    @Override
-    public void checkViews()
-    {
-
-    }
-
     @BeforeClass
     public static void doSetup() throws Exception
     {
-        AdminConsoleTest initTest = (AdminConsoleTest)getCurrentTest();
-        initTest.createTestUser();
-    }
-
-    @Override
-    protected void doCleanup(boolean afterTest) throws TestTimeoutException
-    {
-        _userHelper.deleteUsers(false, APP_ADMIN_USER);
-    }
-
-    private void createTestUser()
-    {
-        int userId = _userHelper.createUser(APP_ADMIN_USER, true, false).getUserId();
-        setInitialPassword(userId);
-
-        ApiPermissionsHelper apiPermissionsHelper = new ApiPermissionsHelper(this);
-        apiPermissionsHelper.addMemberToRole(APP_ADMIN_USER, "Application Admin", PermissionsHelper.MemberType.user, "/");
-    }
-
-    @Override
-    protected BrowserType bestBrowser()
-    {
-        return BrowserType.CHROME;
+        AdminConsoleTest initTest = getCurrentTest();
+        initTest.createTestUsers();
     }
 }

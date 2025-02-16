@@ -23,7 +23,7 @@ public class LabkeyErrorPageTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        LabkeyErrorPageTest init = (LabkeyErrorPageTest) getCurrentTest();
+        LabkeyErrorPageTest init = getCurrentTest();
         init.doSetup();
     }
 
@@ -60,18 +60,12 @@ public class LabkeyErrorPageTest extends BaseWebDriverTest
     @Test
     public void testPermissionErrors()
     {
-        String imageTitle = "permission_error.svg";
-
         goToProjectHome();
         impersonate(READER_USER);
         beginAt(WebTestHelper.buildURL("test", "PermUpdate"));
-        LabkeyErrorPage errorPage = new LabkeyErrorPage(getDriver());
 
-        checker().verifyEquals("Incorrect error heading message", "Oops! An error has occurred.",
-                errorPage.getErrorHeading());
-        checker().verifyEquals("Incorrect error sub-heading message", "User does not have permission to perform this operation.",
-                errorPage.getSubErrorHeading());
-        checker().verifyThat("Incorrect error image", errorPage.getErrorImage(), CoreMatchers.containsString(imageTitle));
+        LabkeyErrorPage errorPage = new LabkeyErrorPage(getDriver());
+        errorPage.assertUnauthorized(checker());
 
         errorPage.clickViewDetails();
         scrollIntoView(Locator.button("Stop Impersonating"));
