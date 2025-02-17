@@ -64,6 +64,7 @@ public class LabkeyErrorPage extends LabKeyPage<LabkeyErrorPage.ElementCache>
         checker.verifyEquals("Incorrect error sub-heading message", UNAUTHORIZED_FULL_PAGE_MESSAGE,
                 getSubErrorHeading());
         checker.verifyThat("Incorrect error image", getErrorImage(), CoreMatchers.containsString(IMAGE_TITLE));
+        checker.verifyEquals("Incorrect response code", 403, getResponseCode());
     }
 
     protected class ElementCache extends LabKeyPage.ElementCache
