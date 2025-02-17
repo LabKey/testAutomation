@@ -283,11 +283,4 @@ public class AdminConsoleTest extends AbstractAdminConsoleTest
         log("Verifying the page is properly loaded");
         assertTextPresent("JAR Files Distributed with the API Module");
     }
-
-    @BeforeClass
-    public static void doSetup() throws Exception
-    {
-        AdminConsoleTest initTest = getCurrentTest();
-        initTest.createTestUsers();
-    }
 }

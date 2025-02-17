@@ -15,7 +15,7 @@
  */
 package org.labkey.test.tests;
 
-import org.junit.BeforeClass;
+import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
@@ -35,7 +35,6 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 @Category({Daily.class})
@@ -102,12 +101,14 @@ public class PostgresQueriesTest extends AbstractAdminConsoleTest implements Pos
         SelectRowsResponse activityResponse = selectRows(expectSuccess, "pg_stat_activity");
         if (expectSuccess)
         {
+            assertNotNull("Should have a response from a successful request", activityResponse);
             assertFalse("Should have at least one row", activityResponse.getRows().isEmpty());
             assertNotNull("Should have a pid", activityResponse.getRows().get(0).get("pid"));
         }
         SelectRowsResponse locksResponse = selectRows(expectSuccess, "pg_locks");
         if (expectSuccess)
         {
+            assertNotNull("Should have a response from a successful request", locksResponse);
             assertFalse("Should have at least one row", locksResponse.getRows().isEmpty());
             assertNotNull("Should have a pid", locksResponse.getRows().get(0).get("locktype"));
         }
@@ -161,13 +162,4 @@ public class PostgresQueriesTest extends AbstractAdminConsoleTest implements Pos
                 expectDelete ? 1 : 0,
                 table.getHeaderButtons().stream().filter(a -> "Delete".equals(a.getDomAttribute("data-original-title"))).count());
     }
-
-    @BeforeClass
-    public static void doSetup() throws Exception
-    {
-        AbstractAdminConsoleTest initTest = getCurrentTest();
-        initTest.createTestUsers();
-    }
-
-
 }
