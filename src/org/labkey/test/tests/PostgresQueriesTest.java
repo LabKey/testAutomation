@@ -154,8 +154,9 @@ public class PostgresQueriesTest extends AbstractAdminConsoleTest implements Pos
         DataRegionTable table = new DataRegionTable("query", this);
         List<String> cols = table.getColumnLabels();
         Assertions.assertThat(cols).as("pg_stat_activity columns").contains("Query", "Running Time Ms");
-        assertTextPresent("GREATEST(EXTRACT(MILLISECONDS FROM AGE(NOW(), query_start)), 0) END AS running_time_ms");
-        assertTextPresent("AsyncQueryRequest:");
+        assertTextPresent(
+            "GREATEST(EXTRACT(MILLISECONDS FROM AGE(NOW(), query_start)), 0) END AS running_time_ms", 
+            "AsyncQueryRequest:");
         assertEquals("Delete button should " + (expectDelete ? "" : "not ") + " be present",
                 expectDelete ? 1 : 0,
                 table.getHeaderButtons().stream().filter(a -> "Delete".equals(a.getDomAttribute("data-original-title"))).count());
