@@ -207,11 +207,26 @@ public abstract class WebDriverWrapper implements WrapsDriver
     }
 
     /**
+     * Number of minutes to add to convert browser Date to UTC.<br>
+     * <em> Note: The sign of this is the opposite of Java's concept of time zone offset </em>
      * @return Actual browser time zone offset in minutes
      */
-    public long getWebDriverTimeZoneOffset()
+    public int getWebDriverTimeZoneOffset()
     {
-        return executeScript("return new Date().getTimezoneOffset();", Long.class);
+        return Math.toIntExact(executeScript("return new Date().getTimezoneOffset();", Long.class));
+    }
+
+    /**
+     * Test process might be running in a different time zone from the browser. This allows shifting test date to
+     * browser dates.
+     * <pre>{@code
+     * TestDateUtils.diffFromTodaysDate(Calendar.MINUTE, getRelativeTimeZoneOffset())
+     * }</pre>
+     * @return The number of minutes to add to a system date to convert to the equivalent browser date
+     */
+    public int getRelativeTimeZoneOffset()
+    {
+        return ZoneId.systemDefault().getRules().getOffset(Instant.now()).getTotalSeconds() / 60 - getWebDriverTimeZoneOffset();
     }
 
     /**
