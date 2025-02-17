@@ -408,7 +408,7 @@ public class GpatAssayTest extends BaseWebDriverTest
 
         assayDesignerPage.setName(invalidAssayName);
         errors = assayDesignerPage.clickSaveExpectingErrors();
-        Assert.assertTrue("Error msg not as expected during assay update", errors.contains("Invalid Assay Design name \"" + invalidAssayName + "\". Assay Design name must start with a letter or a number."));
+        Assert.assertTrue("Error msg not as expected during assay update", errors.contains("Invalid Assay Design name '" + invalidAssayName + "'. Assay Design name must start with a letter or a number."));
 
         assayDesignerPage.setName(newAssayName);
 
