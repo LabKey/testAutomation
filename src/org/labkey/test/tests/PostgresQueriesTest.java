@@ -145,8 +145,7 @@ public class PostgresQueriesTest extends AbstractAdminConsoleTest implements Pos
         assertTextPresent("pg_locks");
         DataRegionTable table = new DataRegionTable("query", this);
         List<String> cols = table.getColumnLabels();
-        assertTrue("Didn't find a Locktype column: " + cols, cols.contains("Locktype"));
-        assertTrue("Didn't find a Virtualtransaction column: " + cols, cols.contains("Virtualtransaction"));
+        Assertions.assertThat(cols).as("pg_locks columns").contains("Locktype", "Virtualtransaction");
     }
 
     private void verifyActivityGrid(boolean expectDelete)
