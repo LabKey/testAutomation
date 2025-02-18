@@ -16,6 +16,7 @@ import org.labkey.remoteapi.announcements.MessageThreadResponse;
 import org.labkey.remoteapi.announcements.UpdateMessageThreadCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.categories.Daily;
+import org.labkey.test.pages.LabkeyErrorPage;
 import org.labkey.test.util.WikiHelper;
 
 import java.util.Arrays;
@@ -324,7 +325,7 @@ public class AnnouncementAPITest extends BaseWebDriverTest
         }
         catch (CommandException success)
         {
-             assertThat(success.getMessage(), is("User does not have permission to perform this operation."));
+             assertThat(success.getMessage(), is(LabkeyErrorPage.UNAUTHORIZED_FULL_PAGE_MESSAGE));
         }
 
         // respond to a thread
@@ -335,7 +336,7 @@ public class AnnouncementAPITest extends BaseWebDriverTest
         }
         catch (CommandException success)
         {
-            assertThat(success.getMessage(), is("User does not have permission to perform this operation."));
+            assertThat(success.getMessage(), is(LabkeyErrorPage.UNAUTHORIZED_FULL_PAGE_MESSAGE));
         }
 
         // delete a thread
@@ -347,7 +348,7 @@ public class AnnouncementAPITest extends BaseWebDriverTest
         }
         catch (CommandException success)
         {
-            assertThat(success.getMessage(), is("User does not have permission to perform this operation."));
+            assertThat(success.getMessage(), is(LabkeyErrorPage.UNAUTHORIZED_FULL_PAGE_MESSAGE));
         }
 
         // update a thread
@@ -359,7 +360,7 @@ public class AnnouncementAPITest extends BaseWebDriverTest
         }
         catch (CommandException success)
         {
-            assertThat(success.getMessage(), is("User does not have permission to perform this operation."));
+            assertThat(success.getMessage(), is(LabkeyErrorPage.UNAUTHORIZED_FULL_PAGE_MESSAGE));
         }
 
         stopImpersonatingHTTP();
