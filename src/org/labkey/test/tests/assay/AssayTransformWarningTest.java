@@ -28,6 +28,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.pages.ReactAssayDesignerPage;
+import org.labkey.test.pages.admin.UsageStatisticsPage;
 import org.labkey.test.pages.assay.AssayImportPage;
 import org.labkey.test.pages.assay.AssayRunsPage;
 import org.labkey.test.pages.files.WebDavPage;
@@ -382,5 +383,28 @@ public class AssayTransformWarningTest extends BaseWebDriverTest
         checker().verifyEquals("expect M2 transform data not to appear in M2 field",
                 " ", dataMap2.get("M2"));
         checker().screenShotIfNewError("unexpected update transform data");
+
+        // validate some metrics for this feature
+        var metricsPage = UsageStatisticsPage.beginAt(this);
+        metricsPage.setJsonPathInput("modules.Experiment.assay");
+        checker().verifyTrue("expect protocolsWithTransformScriptCount to be present",
+                metricsPage.isValidKeyPresent("protocolsWithTransformScriptCount"));
+        checker().verifyTrue("expect protocolsWithTransformScriptRunOnEditCount to be present",
+                metricsPage.isValidKeyPresent("protocolsWithTransformScriptRunOnEditCount"));
+        checker().verifyTrue("expect protocolsWithTransformScriptRunOnImportCount to be present",
+                metricsPage.isValidKeyPresent("protocolsWithTransformScriptRunOnImportCount"));
+        checker().screenShotIfNewError("missing metrics");
+
+        metricsPage.clickValidKey("protocolsWithTransformScriptRunOnImportCount");
+        int assaysWithTransformOnImport = Integer.parseInt(metricsPage.getValue());
+        checker().verifyTrue("expect protocolsWithTransformScriptCount to have value >0",
+                assaysWithTransformOnImport > 0);
+        checker().screenShotIfNewError("missing assayWithTranformOnImport");
+
+        metricsPage.clickClearButton();
+        metricsPage.setJsonPathInput("modules.Experiment.assay.protocolsWithTransformScriptCount");
+        int assaysWithTransformScripts = Integer.parseInt(metricsPage.getValue());
+        checker().verifyTrue("expect protocolsWithTransformScriptCount to have value >0",
+                assaysWithTransformScripts > 0);
     }
 }
