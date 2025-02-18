@@ -240,6 +240,18 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
         clickAndWait(elementCache().creditsLink);
     }
 
+    public void clickPostgresActivity()
+    {
+        goToSettingsSection();
+        clickAndWait(elementCache().postgresActivityLink);
+    }
+
+    public void clickPostgresLocks()
+    {
+        goToSettingsSection();
+        clickAndWait(elementCache().postgresLocksLink);
+    }
+
     public List<WebElement> getAllAdminConsoleLinks()
     {
         goToSettingsSection();
@@ -284,6 +296,9 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
         protected WebElement systemPropertiesLink = Locator.linkContainingText("system properties").findWhenNeeded(this);
         protected WebElement viewsAndScriptingLink = Locator.linkWithText("views and scripting").findWhenNeeded(this);
         protected WebElement creditsLink = Locator.linkWithText("credits").findWhenNeeded(this);
+
+        protected WebElement postgresActivityLink = Locator.linkWithText("postgres activity").findWhenNeeded(this);
+        protected WebElement postgresLocksLink = Locator.linkWithText("postgres locks").findWhenNeeded(this);
 
         protected List<WebElement> findActiveUsers()
         {

@@ -8,6 +8,7 @@ import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.user.ImpersonateRolesCommand;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Git;
+import org.labkey.test.pages.LabkeyErrorPage;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PermissionsHelper;
@@ -57,7 +58,7 @@ public class ImpersonatingTroubleshooterRoleTest extends TroubleshooterRoleTest
         Assertions.assertThatThrownBy(() -> apiAsTroubleshooter().addMemberToRole(USER, "Site Admin", PermissionsHelper.MemberType.user, "/"))
                 .as("Impersonating Troubleshooter assigning Site Admin over API").cause()
                 .isInstanceOf(CommandException.class)
-                .hasMessage("User does not have permission to perform this operation.");
+                .hasMessage(LabkeyErrorPage.UNAUTHORIZED_FULL_PAGE_MESSAGE);
 
         apiAsImpersonatingSiteAdmin().addMemberToRole(USER, "Site Admin", PermissionsHelper.MemberType.user, "/");
         Assertions.assertThat(_apiPermissionsHelper.getUserRoles("/", USER)).contains(PermissionsHelper.toRole("Site Administrator"));
