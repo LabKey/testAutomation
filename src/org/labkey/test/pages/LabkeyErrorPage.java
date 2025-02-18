@@ -1,11 +1,17 @@
 package org.labkey.test.pages;
 
+import org.hamcrest.CoreMatchers;
 import org.labkey.test.Locator;
+import org.labkey.test.util.DeferredErrorCollector;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 public class LabkeyErrorPage extends LabKeyPage<LabkeyErrorPage.ElementCache>
 {
+    public static final String UNAUTHORIZED_FULL_PAGE_MESSAGE = "User does not have permission to perform this operation.";
+    public static final String IMAGE_TITLE = "permission_error.svg";
+
+
     public LabkeyErrorPage(WebDriver driver)
     {
         super(driver);
@@ -49,6 +55,16 @@ public class LabkeyErrorPage extends LabKeyPage<LabkeyErrorPage.ElementCache>
     protected ElementCache newElementCache()
     {
         return new ElementCache();
+    }
+
+    public void assertUnauthorized(DeferredErrorCollector checker)
+    {
+        checker.verifyEquals("Incorrect error heading message", "Oops! An error has occurred.",
+                getErrorHeading());
+        checker.verifyEquals("Incorrect error sub-heading message", UNAUTHORIZED_FULL_PAGE_MESSAGE,
+                getSubErrorHeading());
+        checker.verifyThat("Incorrect error image", getErrorImage(), CoreMatchers.containsString(IMAGE_TITLE));
+        checker.verifyEquals("Incorrect response code", 403, getResponseCode());
     }
 
     protected class ElementCache extends LabKeyPage.ElementCache
