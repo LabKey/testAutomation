@@ -47,6 +47,7 @@ import org.labkey.test.components.ext4.Checkbox;
 import org.labkey.test.components.list.AdvancedListSettingsDialog;
 import org.labkey.test.pages.ImportDataPage;
 import org.labkey.test.pages.list.EditListDefinitionPage;
+import org.labkey.test.pages.list.GridPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldDefinition.LookupInfo;
 import org.labkey.test.params.FieldDefinition.StringLookup;
@@ -473,6 +474,29 @@ public class ListTest extends BaseWebDriverTest
         table.clickInsertNewRow();
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from insert view.
         clickButton("Cancel");
+    }
+
+    @Test
+    public void testNameTrimming()
+    {
+        goToProjectHome();
+        String trimmedName = "Trimmings";
+        log("Add list with leading spaces");
+        _listHelper.createList(getProjectName(), " Trimmings", new FieldDefinition(LIST_KEY_NAME2, LIST_KEY_TYPE), _listColFake);
+        log("Assure we can go to the page with the trimmed name");
+        GridPage grid = GridPage.beginAt(this, getProjectName(), trimmedName);
+        grid.click(Locator.linkWithText("Design"));
+        EditListDefinitionPage editList = new EditListDefinitionPage(this.getDriver());
+        checker().withScreenshot().verifyEquals("Name not trimmed as expected", trimmedName, editList.getName());
+
+        trimmedName = "Extra Trimmings";
+        log("Add list with leading and trailing spaces");
+        _listHelper.createList(getProjectName(), " Extra Trimmings   ", new FieldDefinition(LIST_KEY_NAME2, LIST_KEY_TYPE), _listColFake);
+        log("Assure we can go to the page with the trimmed name");
+        grid = GridPage.beginAt(this, getProjectName(), trimmedName);
+        grid.click(Locator.linkWithText("Design"));
+        editList = new EditListDefinitionPage(this.getDriver());
+        checker().withScreenshot().verifyEquals("Name not trimmed as expected", trimmedName, editList.getName());
     }
 
     @Test
@@ -1155,7 +1179,7 @@ public class ListTest extends BaseWebDriverTest
         EditListDefinitionPage listDefinitionPage = _listHelper.beginCreateList(PROJECT_VERIFY, invalidListName);
         listDefinitionPage.manuallyDefineFieldsWithAutoIncrementingKey("key");
         List<String> errors = listDefinitionPage.clickSaveExpectingErrors();
-        Assert.assertTrue("Error msg not as expected during list creation", errors.contains("Invalid IntList name \"" + invalidListName + "\". IntList name must start with a letter or a number."));
+        Assert.assertTrue("Error msg not as expected during list creation", errors.contains("Invalid IntList name '" + invalidListName + "'. IntList name must start with a letter or a number."));
 
         _listHelper.createList(PROJECT_VERIFY, listName, "key",
                 new FieldDefinition(origFieldName, ColumnType.String).setLabel(origFieldName).setDescription("first column"));
@@ -1163,7 +1187,7 @@ public class ListTest extends BaseWebDriverTest
         listDefinitionPage = _listHelper.goToEditDesign(listName);
         listDefinitionPage.setName(invalidListName);
         errors = listDefinitionPage.clickSaveExpectingErrors();
-        Assert.assertTrue("Error msg not as expected during list renaming", errors.contains("Invalid IntList name \"" + invalidListName + "\". IntList name must start with a letter or a number."));
+        Assert.assertTrue("Error msg not as expected during list renaming", errors.contains("Invalid IntList name '" + invalidListName + "'. IntList name must start with a letter or a number."));
         listDefinitionPage.setName(listName);
         listDefinitionPage.getFieldsPanel()
                 .getField(origFieldName)
