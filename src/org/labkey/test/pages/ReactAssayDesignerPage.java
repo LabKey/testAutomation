@@ -153,20 +153,20 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
         return elementCache().metadataInputSelect().get().get();
     }
 
-    public ReactAssayDesignerPage setScriptActionCheckbox(String fileName, String action, boolean checked)
+    public ReactAssayDesignerPage setScriptActionCheckbox(String fileName, ScriptFileEvent action, boolean checked)
     {
         expandPropertiesPanel();
         Checkbox(elementCache().runOnActionCheckboxLoc(fileName, action)).waitFor(elementCache().propertiesPanel).set(checked);
         return this;
     }
 
-    public boolean getScriptActionCheckbox(String fileName, String action)
+    public boolean getScriptActionCheckbox(String fileName, ScriptFileEvent action)
     {
         expandPropertiesPanel();
         return Checkbox(elementCache().runOnActionCheckboxLoc(fileName, action)).waitFor(elementCache().propertiesPanel).get();
     }
 
-    public boolean isScriptActionCheckboxEnabled(String fileName, String action)
+    public boolean isScriptActionCheckboxEnabled(String fileName, ScriptFileEvent action)
     {
         expandPropertiesPanel();
         return elementCache().runOnActionCheckboxLoc(fileName, action)
@@ -379,11 +379,11 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
             return OptionSelect.finder(Locator.id("assay-design-selectedMetadataInputFormat"), MetadataInputFormat.class)
                     .findOptional(propertiesPanel);
         }
-        Locator runOnActionCheckboxLoc(String fileName, String actionLabel) // actionLabel is Run on Import, or Run on Edit
+        Locator runOnActionCheckboxLoc(String fileName, ScriptFileEvent scriptFileEvent) // actionLabel is Run on Import, or Run on Edit
         {
             return Locator.tagWithClass("div", "transform-script-configuration")
                     .withChild(Locator.tagWithClass("div", "transform-script-card").withAttribute("title", fileName))
-                    .descendant(Locator.tagWithText("span", actionLabel))
+                    .descendant(Locator.tagWithText("span", scriptFileEvent.getLabel()))
                     .child("input");
         }
         final Checkbox saveScriptFilesCheckbox = Checkbox(Locator.checkboxById("assay-design-saveScriptFiles")).findWhenNeeded(propertiesPanel);
@@ -397,5 +397,21 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
         final WebElement hitSelectionCriteriaBtn = Locator.tagWithClass("div", "filter-criteria-input__button")
                 .child(Locator.button("Edit Criteria")).findWhenNeeded(propertiesPanel);
         final Locator hitSelectionCriteriaLoc = Locator.tagWithClass("li", "hit-criteria-renderer__field-value");
+    }
+
+    public enum ScriptFileEvent
+    {
+        Import("Run on Import"),
+        Edit("Run on Edit");
+
+        private final String label;
+        ScriptFileEvent(String label)
+        {
+            this.label = label;
+        }
+        public String getLabel()
+        {
+            return label;
+        }
     }
 }

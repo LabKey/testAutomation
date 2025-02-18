@@ -279,34 +279,34 @@ public class AssayTransformWarningTest extends BaseWebDriverTest
         assayDesignerPage.addTransformScript(transformFile, true);
 
         checker().verifyTrue("expect run on import to be enabled by default",
-                assayDesignerPage.isScriptActionCheckboxEnabled(insertOrUpdateTransform, "Run on Import"));
+                assayDesignerPage.isScriptActionCheckboxEnabled(insertOrUpdateTransform, ReactAssayDesignerPage.ScriptFileEvent.Import));
         checker().verifyFalse("expect run on edit not to be enabled by default",
-                assayDesignerPage.isScriptActionCheckboxEnabled(insertOrUpdateTransform, "Run on Edit"));
+                assayDesignerPage.isScriptActionCheckboxEnabled(insertOrUpdateTransform, ReactAssayDesignerPage.ScriptFileEvent.Edit));
         checker().verifyTrue("expect run on import to be checked by default",
-                assayDesignerPage.getScriptActionCheckbox(insertOrUpdateTransform, "Run on Import"));
+                assayDesignerPage.getScriptActionCheckbox(insertOrUpdateTransform, ReactAssayDesignerPage.ScriptFileEvent.Import));
         checker().verifyFalse("expect run on edit not to be checked by default",
-                assayDesignerPage.getScriptActionCheckbox(insertOrUpdateTransform, "Run on Edit"));
+                assayDesignerPage.getScriptActionCheckbox(insertOrUpdateTransform, ReactAssayDesignerPage.ScriptFileEvent.Edit));
 
         // now enable editable results
         assayDesignerPage.setEditableResults(true);
         checker().verifyTrue("expect run on edit to be enabled when editable results are enabled",
-                assayDesignerPage.isScriptActionCheckboxEnabled(insertOrUpdateTransform, "Run on Edit"));
+                assayDesignerPage.isScriptActionCheckboxEnabled(insertOrUpdateTransform, ReactAssayDesignerPage.ScriptFileEvent.Edit));
 
         // check the run on edit box
-        assayDesignerPage.setScriptActionCheckbox(insertOrUpdateTransform, "Run on Edit", true);
+        assayDesignerPage.setScriptActionCheckbox(insertOrUpdateTransform, ReactAssayDesignerPage.ScriptFileEvent.Edit, true);
         checker().verifyTrue("expect run on edit to be successfully enabled and checked",
-                assayDesignerPage.getScriptActionCheckbox(insertOrUpdateTransform, "Run on Edit"));
+                assayDesignerPage.getScriptActionCheckbox(insertOrUpdateTransform, ReactAssayDesignerPage.ScriptFileEvent.Edit));
 
         // disable editable results and verify that deselects the run on edit box
         assayDesignerPage.setEditableResults(false);
         checker().verifyFalse("expect run on edit to be disabled and deselected when editable results are disabled",
-                assayDesignerPage.getScriptActionCheckbox(insertOrUpdateTransform, "Run on Edit"));
+                assayDesignerPage.getScriptActionCheckbox(insertOrUpdateTransform, ReactAssayDesignerPage.ScriptFileEvent.Edit));
         checker().verifyFalse("expect run on edit to be disabled and deselected when editable results are disabled",
-                assayDesignerPage.isScriptActionCheckboxEnabled(insertOrUpdateTransform, "Run on Edit"));
+                assayDesignerPage.isScriptActionCheckboxEnabled(insertOrUpdateTransform, ReactAssayDesignerPage.ScriptFileEvent.Edit));
 
         // now re-enable editable results and check run on edit
         assayDesignerPage.setEditableResults(true);
-        assayDesignerPage.setScriptActionCheckbox(insertOrUpdateTransform, "Run on Edit", true);
+        assayDesignerPage.setScriptActionCheckbox(insertOrUpdateTransform, ReactAssayDesignerPage.ScriptFileEvent.Edit, true);
         assayDesignerPage.clickSave();
 
         // now import data and ensure the expected transform operation occurred
@@ -342,6 +342,45 @@ public class AssayTransformWarningTest extends BaseWebDriverTest
         var dataMap = assayDataPage.getDataTable().getRowDataAsMap(0);
         checker().verifyEquals("expect dataMap transform to show update",
                 "UPDATE testing", dataMap.get("TransformType"));
+        checker().screenShotIfNewError("unexpected update transform data");
+
+        // now let's disable both import and edit
+        assayDesignerPage = ReactAssayDesignerPage.beginAt(this, getProjectName(), protocolResponse.getProtocolId(),
+                "general", getURL().toString());
+        assayDesignerPage.setScriptActionCheckbox(transformFile.getName(), ReactAssayDesignerPage.ScriptFileEvent.Edit, false);
+        assayDesignerPage.setScriptActionCheckbox(transformFile.getName(), ReactAssayDesignerPage.ScriptFileEvent.Import, false);
+        assayDesignerPage.clickSave();
+
+        // now import some data to a new run called non_transform_import
+        goToProjectHome();
+        clickAndWait(Locator.linkWithText(insertOrUpdateTransformAssay));
+        new AssayRunsPage(getDriver()).getTable().clickHeaderButton("Import Data");
+        clickButton("Next");
+        importPage = new AssayImportPage(getDriver());
+        importPage.setNamedInputText("name", "non_transform_import");
+        importPage.setNamedTextAreaValue("TextAreaDataCollector.textArea", importData);
+        importPage.clickSaveAndFinish();
+
+        var assayDataPage2 = new AssayRunsPage(getDriver()).clickAssayIdLink("non_transform_import");
+        var m2Data2 = assayDataPage2.getDataTable().getColumnDataAsText("M2");
+        var transformTypeData2 = assayDataPage2.getDataTable().getColumnDataAsText("Transform Type");
+        checker().wrapAssertion(()-> Assertions.assertThat(m2Data2)
+                .as("expect m2Data not to contain any transform values")
+                .containsOnly(" "));
+        checker().wrapAssertion(()-> Assertions.assertThat(transformTypeData2)
+                .as("expect transformTypeData to contain no transform values")
+                .containsOnly(" "));
+        checker().screenShotIfNewError("unexpected import transform data");
+
+        // now update the data we just imported
+        assayDataPage.getDataTable().clickEditRow(0)
+                .setField("Comment", "this is an update but no transform should happen")
+                .submit();
+        var dataMap2 = assayDataPage.getDataTable().getRowDataAsMap(0);
+        checker().verifyEquals("expect dataMap transform data not to appear in transformType field",
+                " ", dataMap2.get("TransformType"));
+        checker().verifyEquals("expect M2 transform data not to appear in M2 field",
+                " ", dataMap2.get("M2"));
         checker().screenShotIfNewError("unexpected update transform data");
     }
 }
