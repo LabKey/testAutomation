@@ -72,7 +72,7 @@ public abstract class TestProperties
         }
     }
 
-    private static ZoneId browserTimeZone = null;
+    private static ZoneId browserZoneId = null;
 
     public static void load()
     {
@@ -166,9 +166,9 @@ public abstract class TestProperties
         return getBooleanProperty("webtest.dump.browser.console", false);
     }
 
-    public static ZoneId getBrowserTimeZone()
+    public static ZoneId getBrowserZoneId()
     {
-        if (browserTimeZone == null)
+        if (browserZoneId == null)
         {
             String tz = StringUtils.trimToNull(System.getProperty("webtest.browser.tz"));
             if (tz != null)
@@ -176,14 +176,14 @@ public abstract class TestProperties
                 String[] split = tz.split("[,\\s]+");
                 tz = split[LocalDateTime.now().getDayOfMonth() % split.length];
                 // Verify that time zone is valid
-                browserTimeZone = ZoneId.of(tz);
+                browserZoneId = ZoneId.of(tz);
             }
             else
             {
-                browserTimeZone = ZoneId.systemDefault();
+                browserZoneId = ZoneId.systemDefault();
             }
         }
-        return browserTimeZone;
+        return browserZoneId;
     }
 
     public static double getTimeoutMultiplier()

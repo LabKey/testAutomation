@@ -58,6 +58,15 @@ public class DataViewsTest extends ParticipantListTest
 
     private final PortalHelper _portalHelper = new PortalHelper(this);
 
+    /**
+     * 52268: Data Views Webpart behaves badly when the server is in a different time zone
+     */
+    @Override
+    protected boolean allowTimeZoneShifting()
+    {
+        return false;
+    }
+
     @Override @LogMethod
     protected void doCreateSteps()
     {

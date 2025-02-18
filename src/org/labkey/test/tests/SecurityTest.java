@@ -29,6 +29,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.components.dumbster.EmailRecordTable;
+import org.labkey.test.pages.LabkeyErrorPage;
 import org.labkey.test.pages.admin.PermissionsPage;
 import org.labkey.test.pages.user.ShowUsersPage;
 import org.labkey.test.util.ApiPermissionsHelper;
@@ -74,7 +75,6 @@ public class SecurityTest extends BaseWebDriverTest
     private static final String ADDED_USER = "fromprojectusers@security.test";
     protected static final String TO_BE_DELETED_USER = "delete_me@security.test";
     protected static final String SITE_ADMIN_USER = "siteadmin_securitytest@security.test";
-    protected static final String PERMISSION_ERROR = "User does not have permission to perform this operation.";
     protected static final String NOT_FOUND_ERROR = "notFound";
 
     protected static final String SIGN_IN_TEXT = "Sign In";
@@ -215,7 +215,7 @@ public class SecurityTest extends BaseWebDriverTest
         SimpleHttpResponse httpResponse = WebTestHelper.getHttpResponse(url);
 
         if ((HttpStatus.SC_FORBIDDEN != httpResponse.getResponseCode() ||
-                !httpResponse.getResponseBody().contains(PERMISSION_ERROR)) &&
+                !httpResponse.getResponseBody().contains(LabkeyErrorPage.UNAUTHORIZED_FULL_PAGE_MESSAGE)) &&
                 (HttpStatus.SC_NOT_FOUND != httpResponse.getResponseCode() ||
                 !httpResponse.getResponseBody().contains(NOT_FOUND_ERROR)))
         {
