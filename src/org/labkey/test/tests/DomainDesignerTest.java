@@ -257,6 +257,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         log("Creating a list used for look up");
         _listHelper.createList(getProjectName(), listName, "Id");
+        _listHelper.createList(getProjectName(), "anotherList", "Id");
 
         log("Creating a sample type with look up field to above list");
         FieldDefinition.LookupInfo lookupInfo1 = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", sampleType);
@@ -275,22 +276,28 @@ public class DomainDesignerTest extends BaseWebDriverTest
                 .collapse();
         domainDesignerPage.clickFinish();
 
-        log("Editing the list name");
+        log("Issue 52124: Editing the list name should update domain lookup");
         _listHelper.goToEditDesign(listName);
         EditListDefinitionPage editListDefinitionPage = new EditListDefinitionPage(getDriver());
         editListDefinitionPage.setName(editedListName)
                 .clickSave();
+        domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleType);
+        assertEquals("Look up should be updated after list renaming", "Current Folder > lists > " + editedListName, domainDesignerPage.fieldsPanel().getField("lookUpField").detailsMessage());
+
+        log("Delete the lookup list");
+        _listHelper.goToList(editedListName);
+        _listHelper.deleteList();
 
         log("Verifying the error message");
         domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleType);
         domainDesignerPage.fieldsPanel().getField("lookUpField").detailsMessage();
-        Assert.assertEquals("Missing invalid look up message", "Current Folder > lists > " + listName + " . Error: Lookup target table does not exist.",
+        Assert.assertEquals("Missing invalid look up message", "Current Folder > lists > " + editedListName + " . Error: Lookup target table does not exist.",
                 domainDesignerPage.fieldsPanel().getField("lookUpField").detailsMessage());
 
         log("Updating valid value for lookup field value ");
         domainDesignerPage.fieldsPanel().getField("lookUpField")
                 .expand()
-                .setFromTargetTable(editedListName + " (Integer)")
+                .setFromTargetTable("anotherList (Integer)")
                 .collapse();
         domainDesignerPage.clickFinish();
     }
