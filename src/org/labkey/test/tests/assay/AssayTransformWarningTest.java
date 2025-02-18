@@ -104,7 +104,6 @@ public class AssayTransformWarningTest extends BaseWebDriverTest
         String importData = "ParticipantId\nJavaWarned";
         String runName = "java transform run";
 
-        deleteFileIfAlreadyUploaded(JAVA_TRANSFORM_SCRIPT.getName());
         _assayHelper.createAssayDesign("General", assayName)
                 .addTransformScript(JAVA_TRANSFORM_SCRIPT, true)
                 .clickFinish();
@@ -135,13 +134,12 @@ public class AssayTransformWarningTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testRTransformWarning() throws Exception
+    public void testRTransformWarning()
     {
         String assayName = "transformWarningR";
         String importData = "ParticipantId\nRWarned";
         String runName = "R transform run";
 
-        deleteFileIfAlreadyUploaded(R_TRANSFORM_SCRIPT.getName());
         ReactAssayDesignerPage assayDesignerPage = _assayHelper.createAssayDesign("General", assayName)
             .addTransformScript(R_TRANSFORM_SCRIPT, true);
         assayDesignerPage.goToRunFields()
@@ -197,14 +195,16 @@ public class AssayTransformWarningTest extends BaseWebDriverTest
         String importData = "ParticipantId\tVisitID\n1\t1";
         String runName = "basic_import_no_transform";
 
-        deleteFileIfAlreadyUploaded(R_TRANSFORM_SCRIPT.getName());
+        // copy r_transform_script to a file of different name to avoid name/upload collisions with other test methods
+        File updateWarnRScript = TestFileUtils.writeTempFile("transformWarnUpdate.R", TestFileUtils.getFileContents(R_TRANSFORM_SCRIPT));
+
         // disable the transform on import, enable it on update
         ReactAssayDesignerPage assayDesignerPage = _assayHelper.createAssayDesign("General", assayName)
-                .addTransformScript(R_TRANSFORM_SCRIPT, true);
+                .addTransformScript(updateWarnRScript, true);
         assayDesignerPage.setEditableResults(true);
         assayDesignerPage.setEditableRuns(true);
-        assayDesignerPage.setScriptActionCheckbox(R_TRANSFORM_SCRIPT.getName(), Edit, true);
-        assayDesignerPage.setScriptActionCheckbox(R_TRANSFORM_SCRIPT.getName(), Import, false);
+        assayDesignerPage.setScriptActionCheckbox(updateWarnRScript.getName(), Edit, true);
+        assayDesignerPage.setScriptActionCheckbox(updateWarnRScript.getName(), Import, false);
         assayDesignerPage.goToResultsFields()
                 .addField("comment")
                 .setLabel("Comment")
@@ -231,13 +231,12 @@ public class AssayTransformWarningTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testRTransformError() throws Exception
+    public void testRTransformError()
     {
         String assayName = "transformErrorR";
         String importData = "ParticipantId\nRError";
         String runName = "R transform run";
 
-        deleteFileIfAlreadyUploaded(R_TRANSFORM_ERROR_SCRIPT.getName());
         ReactAssayDesignerPage assayDesignerPage = _assayHelper.createAssayDesign("General", assayName)
                 .addTransformScript(R_TRANSFORM_ERROR_SCRIPT);
         assayDesignerPage.goToRunFields()
@@ -266,14 +265,16 @@ public class AssayTransformWarningTest extends BaseWebDriverTest
         String importData = "ParticipantId\tVisitID\n1\t1";
         String runName = "basic_import_no_transform";
 
-        deleteFileIfAlreadyUploaded(R_TRANSFORM_ERROR_SCRIPT.getName());
+        // copy r_transform_script to a file of different name to avoid name/upload collisions with other test methods
+        File updateErrRScript = TestFileUtils.writeTempFile("transformErrUpdate.R", TestFileUtils.getFileContents(R_TRANSFORM_ERROR_SCRIPT));
+
         // configure the assay to only run the transform on update (not import)
         ReactAssayDesignerPage assayDesignerPage = _assayHelper.createAssayDesign("General", assayName)
-                .addTransformScript(R_TRANSFORM_ERROR_SCRIPT);
+                .addTransformScript(updateErrRScript);
         assayDesignerPage.setEditableResults(true);
         assayDesignerPage.setEditableRuns(true);
-        assayDesignerPage.setScriptActionCheckbox(R_TRANSFORM_ERROR_SCRIPT.getName(), Edit, true);
-        assayDesignerPage.setScriptActionCheckbox(R_TRANSFORM_ERROR_SCRIPT.getName(), Import, false);
+        assayDesignerPage.setScriptActionCheckbox(updateErrRScript.getName(), Edit, true);
+        assayDesignerPage.setScriptActionCheckbox(updateErrRScript.getName(), Import, false);
         assayDesignerPage.goToResultsFields()
                 .addField("comment")
                 .setLabel("Comment")
@@ -327,13 +328,4 @@ public class AssayTransformWarningTest extends BaseWebDriverTest
         stopImpersonatingHTTP();
     }
 
-    private void deleteFileIfAlreadyUploaded(String fileName) throws Exception
-    {
-        var path = WebDavUtils.buildBaseWebDavUrl(getProjectName(), "@scripts") + fileName;
-        var sardine = WebDavUtils.beginSardine(getCurrentUser());
-        if (sardine.exists(path))
-        {
-            sardine.delete(path);
-        }
-    }
 }
