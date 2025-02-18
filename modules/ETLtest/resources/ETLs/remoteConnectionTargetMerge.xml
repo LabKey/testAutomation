@@ -2,7 +2,7 @@
     <name>Remote connection with target option</name>
     <description>User Defined ETL</description>
     <transforms>
-        <transform id="step1forEditTest" type="org.labkey.di.pipeline.TransformTask">
+        <transform id="step1forEditTest" type="RemoteQueryTransformStep">
             <description>Copy to target via remote connection</description>
             <source queryName="source" remoteSource="EtlTest_RemoteConnection" schemaName="etltest"/>
             <destination queryName="target2" schemaName="etltest" targetOption="merge"/>
