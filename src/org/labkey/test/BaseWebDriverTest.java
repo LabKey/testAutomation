@@ -1997,7 +1997,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     /**
      * Used by CohortTest and StudyCohortExportTest
-     * Returns the data region for the the cohort table to enable setting
+     * Returns the data region for the cohort table to enable setting
      * or verifying the enrolled status of the cohort
      */
     public DataRegionTable getCohortDataRegionTable()
