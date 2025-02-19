@@ -161,6 +161,7 @@ public class ManageSampleStatusesPanel extends WebDriverComponent<ManageSampleSt
     public ManageSampleStatusesPanel clickAddStatus()
     {
         elementCache().addStatusButton.click();
+        waitForEditReady();
         return this;
     }
 
@@ -224,8 +225,6 @@ public class ManageSampleStatusesPanel extends WebDriverComponent<ManageSampleSt
     public ManageSampleStatusesPanel addStatus(String label, String description, SampleTypeHelper.StatusType statusType, String hexColor)
     {
         clickAddStatus();
-
-        waitForEditReady();
 
         setLabel(label)
                 .setColor(hexColor)
