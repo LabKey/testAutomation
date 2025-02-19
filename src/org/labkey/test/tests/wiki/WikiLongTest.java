@@ -27,7 +27,6 @@ import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Wiki;
 import org.labkey.test.pages.LabkeyErrorPage;
 import org.labkey.test.util.OptionalFeatureHelper;
-import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.WikiHelper;
 import org.openqa.selenium.WebElement;
@@ -119,6 +118,7 @@ public class WikiLongTest extends BaseWebDriverTest
             "The " + WIKI_SEARCH_TERM +
             " was called the African unicorn by Europeans and wasn't widely known to exist until 1901.\n";
 
+    private static final String WIKI_PAGE7_WEBPART_SUBSTITUTION = "${labkey.webPart(partName='Lists')}";
     private static final String WIKI_PAGE7_CONTENT =
             """
                     # Title MD
@@ -126,9 +126,8 @@ public class WikiLongTest extends BaseWebDriverTest
                     *italic text MD*
 
                     <b>escaped</b>
-                    
-                    ${labkey.webPart(partName='Query', title='WebPart Macro', schemaName='core', queryName='containers', allowChooseQuery='true', allowChooseView='true')}
-                    """;
+
+                    """ + WIKI_PAGE7_WEBPART_SUBSTITUTION;
 
     private static final String SAFE_LINK_HTML = "<a href=\"http://labkey.com\">Safe link</a>";
     private static final String FIXUP_LINK_HTML = "<a href=\"http://labkey.com\" target=\"_blank\">Fixup</a>";
@@ -234,8 +233,13 @@ public class WikiLongTest extends BaseWebDriverTest
         // verify that after saving the markdown that it is rendered as html that does not include the markdown symbols
         assertElementPresent(Locator.tagWithText("h1", "Title MD"));
         assertElementPresent(Locator.tagWithText("p", "<b>escaped</b>"));
-        assertElementPresent(PortalHelper.Locators.webPart("WebPart Macro"));
-        assertElementPresent(DataRegionTable.Locators.dataRegionTable().descendant(Locator.linkWithText(getProjectName())));
+
+        // Issue 52214: Remove markdown support for HTML substitution patterns
+        assertElementPresent(PortalHelper.Locators.webPart("Lists"));
+        assertElementPresent(Locator.linkWithText("manage lists"));
+        // TODO: Update assertion
+        // assertElementPresent(Locator.tagWithText("p", MACRO_WEBPART));
+
         assertTextNotPresent("# Title MD");
         clickAndWait(Locator.linkWithText("Edit"));
         _wikiHelper.convertWikiFormat("HTML");

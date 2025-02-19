@@ -74,10 +74,10 @@ public class MessagesLongTest extends BaseWebDriverTest
     private static final String USER3 = "messageslong_user3@messages.test";
     private static final String NOT_A_USER = "Squirrel";
     private static final String RESPONDER = "responder@messages.test";
-    private static final String MACRO_WEBPART = "${labkey.webPart(partName='Lists')}";
+    private static final String WEBPART_SUBSTITUTION = "${labkey.webPart(partName='Lists')}";
     private static final String HTML_BODY = "1 <b>x</b>\n" +
             "<b>" +
-            MACRO_WEBPART +
+            WEBPART_SUBSTITUTION +
             "</b>\n";
     private static final String HTML_BODY_WEBPART_TEST = "manage lists";
     private static final String MEMBER_LIST = "memberListInput";
@@ -238,8 +238,9 @@ public class MessagesLongTest extends BaseWebDriverTest
                         + stinky feet
                         + internet trolls
 
-                        <b>escaped</b>""" +
-                        "\n" + MACRO_WEBPART);
+                        <b>escaped</b>
+                        
+                        """ + WEBPART_SUBSTITUTION);
 
         // now look at the preview pane
         markdownPage.selectPreviewTab();
@@ -248,8 +249,13 @@ public class MessagesLongTest extends BaseWebDriverTest
         assertElementPresent(Locator.tagWithText("li", "stinky feet"));
         assertElementPresent(Locator.tagWithText("li", "internet trolls"));
         assertElementPresent(Locator.tagWithText("p", "<b>escaped</b>"));
+
+        // Issue 52214: Remove markdown support for HTML substitution patterns
         assertElementPresent(PortalHelper.Locators.webPart("Lists"));
         assertElementPresent(Locator.linkWithText("manage lists"));
+        // TODO: Update assertion
+        // assertElementPresent(Locator.tagWithText("p", MACRO_WEBPART));
+
         clickButton("Submit");
         assertElementPresent(Locator.tagWithText("h1", "Holy Header, Batman!"));
         assertElementPresent(Locator.tagWithText("strong", "bold as bold can possibly be"));
@@ -451,6 +457,9 @@ public class MessagesLongTest extends BaseWebDriverTest
         waitForTextWithRefresh(WAIT_FOR_JAVASCRIPT, "New posts");
         click(Locator.linkWithText("New posts to /" + PROJECT_NAME));
         assertTextPresent("The following new posts were made yesterday");
+
+        // Will be resolved by Issue 52214: Remove markdown support for HTML substitution patterns
+        checkExpectedErrors(1);
     }
 
     @Test

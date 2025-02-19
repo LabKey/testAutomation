@@ -107,6 +107,11 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
         return (null == disabledValue) || (!disabledValue.equalsIgnoreCase("true"));
     }
 
+    public String getErrorText()
+    {
+        return elementCache().dangerText.getText();
+    }
+
     public String getNameExpression()
     {
         expandPropertiesPanel();
@@ -378,6 +383,7 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
             WebDriverWrapper.sleep(500);
         }
 
+        protected final WebElement dangerText = Locator.tagWithClass("span", "text-danger").findWhenNeeded(this);
         protected final ValidatingInput nameInput = new ValidatingInput(Locator.id("entity-name").findWhenNeeded(propertiesPanel), getDriver());
         protected final Input nameExpressionInput = new ValidatingInput(Locator.id("entity-nameExpression").findWhenNeeded(propertiesPanel), getDriver());
         protected final Input descriptionInput = new ValidatingInput(Locator.id("entity-description").findWhenNeeded(propertiesPanel), getDriver());
