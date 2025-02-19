@@ -67,6 +67,10 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
         return this;
     }
 
+    public boolean isFieldPresent(String fieldCaption)
+    {
+        return elementCache().fieldValue(fieldCaption) != null;
+    }
     /**
      * Check to see if a field is editable. Could be state dependent, that is it returns false if the field is
      * loading but if checked later could return true.
@@ -515,7 +519,7 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
 
         public WebElement fieldValue(String caption)
         {
-            return Locator.tagWithAttribute("td", "data-caption", caption).findElement(editPanel);
+            return Locator.tagWithAttribute("td", "data-caption", caption).findElementOrNull(editPanel);
         }
 
         public FileUploadField fileField(String caption)
