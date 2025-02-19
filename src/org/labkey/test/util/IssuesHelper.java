@@ -101,19 +101,36 @@ public class IssuesHelper extends WebDriverWrapper
     @LogMethod
     public void createNewIssuesList(String name, AbstractContainerHelper containerHelper)
     {
+        createNewIssuesList(name, containerHelper, true, true, true);
+    }
+
+    @LogMethod
+    public void createNewIssuesList(
+            String name,
+            AbstractContainerHelper containerHelper,
+            boolean includeIssueDefinitionWebPart,
+            boolean includeIssueSummaryWebPart,
+            boolean includeSearchWebPart
+    )
+    {
         pushLocation();
         containerHelper.enableModule("Issues");
         PortalHelper portalHelper = new PortalHelper(getDriver());
-        portalHelper.addWebPart("Issue Definitions");
+        if (includeIssueDefinitionWebPart)
+            portalHelper.addWebPart("Issue Definitions");
         IssueListDefDataRegion.fromWebPart(getDriver()).createIssuesListDefinition(name);
         popLocation();
 
-        portalHelper.addWebPart("Issues Summary");
-        selectOptionByValue(Locator.name("issueDefName"), name.toLowerCase().replaceAll("[ -]+", ""));
-        clickAndWait(Locator.linkWithText("Submit"));
-        portalHelper.addWebPart("Search");
+        if (includeIssueSummaryWebPart)
+        {
+            portalHelper.addWebPart("Issues Summary");
+            selectOptionByValue(Locator.name("issueDefName"), name.toLowerCase().replaceAll("[ -]+", ""));
+            clickAndWait(Locator.linkWithText("Submit"));
+            assertElementPresent(Locator.tagWithText("div", "There are no issues in this list."));
+        }
 
-        assertElementPresent(Locator.tagWithText("div", "There are no issues in this list."));
+        if (includeSearchWebPart)
+            portalHelper.addWebPart("Search");
     }
 
     public void deleteIssueLists(String projectName, LabKeySiteWrapper test)
@@ -213,6 +230,12 @@ public class IssuesHelper extends WebDriverWrapper
     public void setIssueAssignmentUser(@Nullable @LoggedParam String user)
     {
         new IssuesAdminPage(getDriver()).setDefaultUser(user);
+    }
+
+    @LogMethod
+    public void setRestrictedIssueList(boolean restricted)
+    {
+        new IssuesAdminPage(getDriver()).setRestrictedList(restricted);
     }
 
     public IssuesAdminPage goToAdmin()
