@@ -88,7 +88,6 @@ import org.openqa.selenium.WrapsDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.firefox.FirefoxBinary;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxDriverLogLevel;
 import org.openqa.selenium.firefox.FirefoxDriverService;
@@ -120,6 +119,7 @@ import java.nio.file.StandardCopyOption;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
+import java.time.Instant;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -206,64 +206,93 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return createNewWebDriver(new ImmutablePair<>(null, null), browserType, downloadDir);
     }
 
+    /**
+     * Number of minutes to add to convert browser Date to UTC.<br>
+     * <em> Note: The sign of this is the opposite of Java's concept of time zone offset </em>
+     * @return Actual browser time zone offset in minutes
+     */
+    public int getWebDriverTimeZoneOffset()
+    {
+        return Math.toIntExact(executeScript("return new Date().getTimezoneOffset();", Long.class));
+    }
+
+    /**
+     * Test process might be running in a different time zone from the browser. This allows shifting test date to
+     * browser dates.
+     * <pre>{@code
+     * TestDateUtils.diffFromTodaysDate(Calendar.MINUTE, getRelativeTimeZoneOffset())
+     * }</pre>
+     * @return The number of minutes to add to a system date to convert to the equivalent browser date
+     */
+    public int getRelativeTimeZoneOffset()
+    {
+        return ZoneId.systemDefault().getRules().getOffset(Instant.now()).getTotalSeconds() / 60 - getWebDriverTimeZoneOffset();
+    }
+
+    /**
+     * Allow tests to disable time zone shifting. Warning: {@link TestProperties#getBrowserZoneId()} might not match actual
+     * browser time zone if this is false.
+     */
+    protected boolean allowTimeZoneShifting()
+    {
+        return true;
+    }
+
     protected Pair<WebDriver, DriverService> createNewWebDriver(@NotNull Pair<WebDriver, DriverService> oldDriverAndService, BrowserType browserType, File downloadDir)
     {
         WebDriver oldWebDriver = oldDriverAndService.getLeft();
-        WebDriver newWebDriver = null;
+        WebDriver newWebDriver;
         DriverService oldDriverService = oldDriverAndService.getRight();
-        DriverService newDriverService = null;
+        DriverService newDriverService;
+
         Map<String, String> browserEnv = new HashMap<>();
-        ZoneId browserTimeZone = TestProperties.getBrowserTimeZone();
-        if (browserTimeZone != ZoneId.systemDefault())
+        ZoneId targetBrowserTimeZone = allowTimeZoneShifting() ? TestProperties.getBrowserZoneId() : ZoneId.systemDefault();
+        int targetOffsetInSeconds = targetBrowserTimeZone.getRules().getOffset(Instant.now()).getTotalSeconds();
+
+        if (targetBrowserTimeZone != ZoneId.systemDefault())
         {
-            TestLogger.info("Starting browser with TZ = " + browserTimeZone);
-            browserEnv.put("TZ", browserTimeZone.toString());
-        }
-        else
-        {
-            TestLogger.info("Starting browser with TZ = " + browserTimeZone + " (system default)");
+            browserEnv.put("TZ", targetBrowserTimeZone.toString());
         }
 
-        switch (browserType)
+        if (oldWebDriver != null &&
+            (!browserType.matchesDriver(oldWebDriver) ||
+                new WebDriverWrapperImpl(oldWebDriver).getWebDriverTimeZoneOffset() * -60 != targetOffsetInSeconds))
         {
-            case REMOTE: //experimental
+            TestLogger.info("Quitting existing driver and service");
+            oldWebDriver.quit();
+            oldWebDriver = null;
+            if (oldDriverService != null && oldDriverService.isRunning())
+                oldDriverService.stop();
+        }
+
+        final Pair<WebDriver, DriverService> result;
+
+        if (oldWebDriver == null)
+        {
+            log("Starting new browser: " + browserType);
+
+            switch (browserType)
             {
-                try
+                case REMOTE: //experimental
                 {
-                    newWebDriver = new RemoteWebDriver(new URL("http://localhost:4444/wd/hub"), new ChromeOptions());
+                    try
+                    {
+                        newDriverService = null; // Remote service runs independently of tests
+                        newWebDriver = new RemoteWebDriver(new URL("http://localhost:4444/wd/hub"), new ChromeOptions());
+                    }
+                    catch (MalformedURLException e)
+                    {
+                        throw new RuntimeException(e);
+                    }
+                    break;
                 }
-                catch (MalformedURLException e)
-                {
-                    throw new RuntimeException(e);
-                }
-                break;
-            }
-            case IE: //experimental
-            {
-                if (oldWebDriver != null && !(oldWebDriver instanceof InternetExplorerDriver))
-                {
-                    oldWebDriver.quit();
-                    oldWebDriver = null;
-                    if (oldDriverService != null && oldDriverService.isRunning())
-                        oldDriverService.stop();
-                }
-                if (oldWebDriver == null)
+                case IE: //experimental
                 {
                     newDriverService = new InternetExplorerDriverService.Builder().withEnvironment(browserEnv).build();
                     newWebDriver = new InternetExplorerDriver((InternetExplorerDriverService) newDriverService);
+                    break;
                 }
-                break;
-            }
-            case CHROME:
-            {
-                if (oldWebDriver != null && !(oldWebDriver instanceof ChromeDriver))
-                {
-                    oldWebDriver.quit();
-                    oldWebDriver = null;
-                    if (oldDriverService != null && oldDriverService.isRunning())
-                        oldDriverService.stop();
-                }
-                if (oldWebDriver == null)
+                case CHROME:
                 {
                     configureChromeDriverLogging(downloadDir);
                     ChromeOptions options = new ChromeOptions();
@@ -292,19 +321,9 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
                     newDriverService = new ChromeDriverService.Builder().withEnvironment(browserEnv).build();
                     newWebDriver = new ChromeDriver((ChromeDriverService) newDriverService, options);
+                    break;
                 }
-                break;
-            }
-            case FIREFOX:
-            {
-                if (oldWebDriver != null && !(oldWebDriver instanceof FirefoxDriver))
-                {
-                    oldWebDriver.quit();
-                    oldWebDriver = null;
-                    if (oldDriverService != null && oldDriverService.isRunning())
-                        oldDriverService.stop();
-                }
-                if (oldWebDriver == null)
+                case FIREFOX:
                 {
                     configureGeckoDriverLogging(downloadDir);
                     final FirefoxProfile profile = new FirefoxProfile();
@@ -367,22 +386,17 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     capabilities.addPreference("--log", "WARN");
 
                     String browserPath = System.getProperty("selenium.firefox.binary", "");
-                    FirefoxBinary binary;
-                    if (browserPath.length() > 0)
+                    if (!browserPath.isEmpty())
                     {
-                        binary = new FirefoxBinary(new File(browserPath));
-                    }
-                    else
-                    {
-                        binary = new FirefoxBinary();
+                        capabilities.setBinary(browserPath);
                     }
 
                     if (TestProperties.isRunWebDriverHeadless())
                     {
                         TestLogger.warn("Launching Firefox in headless mode. This is still experimental");
-                        binary.addCommandLineOptions("--headless");
+                        capabilities.addArguments("--headless");
                     }
-                    capabilities.setBinary(binary);
+
                     // Firefox 128: UnhandledAlertException doesn't include alert text. Need to leave alerts to get text manually.
                     capabilities.setUnhandledPromptBehaviour(UnexpectedAlertBehaviour.IGNORE);
                     FirefoxOptions firefoxOptions = new FirefoxOptions(capabilities);
@@ -413,15 +427,13 @@ public abstract class WebDriverWrapper implements WrapsDriver
                                     "https://firefox-source-docs.mozilla.org/testing/geckodriver/Support.html", rethrow);
                         }
                     }
+                    break;
                 }
-                break;
+                default:
+                {
+                    throw new IllegalArgumentException("Browser not yet implemented: " + browserType);
+                }
             }
-            default:
-                throw new IllegalArgumentException("Browser not yet implemented: " + browserType);
-        }
-
-        if (newWebDriver != null)
-        {
 
             Optional<Dimension> windowSize = TestProperties.getWindowSize();
             if (windowSize.isPresent())
@@ -430,16 +442,21 @@ public abstract class WebDriverWrapper implements WrapsDriver
                 newWebDriver.manage().window().setSize(windowSize.get());
             }
 
-            Capabilities caps = ((HasCapabilities) newWebDriver).getCapabilities();
-            String browserName = caps.getBrowserName();
-            String browserVersion = caps.getBrowserVersion();
-            log("Browser: " + browserName + " " + browserVersion);
-            return new ImmutablePair<>(newWebDriver, newDriverService);
+            result = Pair.of(newWebDriver, newDriverService);
         }
         else
         {
-            return oldDriverAndService;
+            log("Reusing existing browser");
+            result = oldDriverAndService;
         }
+
+        Capabilities caps = ((HasCapabilities) result.getLeft()).getCapabilities();
+        String browserName = caps.getBrowserName();
+        String browserVersion = caps.getBrowserVersion();
+        log("Browser: " + browserName + " " + browserVersion);
+        log("Started browser with TZ = " + targetBrowserTimeZone + (targetBrowserTimeZone != ZoneId.systemDefault() ? "" : " (system default)"));
+
+        return result;
     }
 
     private void configureChromeDriverLogging(File downloadDir)
@@ -483,7 +500,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public boolean isFirefox()
     {
-        return getDriver().getClass().isAssignableFrom(FirefoxDriver.class);
+        return BrowserType.FIREFOX.matchesDriver(getDriver());
     }
 
     public Object executeScript(@Language("JavaScript") String script, Object... arguments)
@@ -553,11 +570,23 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public enum BrowserType
     {
-        REMOTE,
-        FIREFOX,
-        IE,
-        CHROME,
-        HTML
+        REMOTE(null),
+        FIREFOX(FirefoxDriver.class),
+        IE(InternetExplorerDriver.class),
+        CHROME(ChromeDriver.class),
+        ;
+
+        private final Class<?> _driverClass;
+
+        BrowserType(Class<?> driverClass)
+        {
+            _driverClass = driverClass;
+        }
+
+        boolean matchesDriver(@NotNull WebDriver oldDriver)
+        {
+            return _driverClass != null && oldDriver.getClass().isAssignableFrom(_driverClass);
+        }
     }
 
     public static void sleep(long ms)
