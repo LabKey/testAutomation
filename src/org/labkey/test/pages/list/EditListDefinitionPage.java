@@ -76,6 +76,12 @@ public class EditListDefinitionPage extends DomainDesigner<EditListDefinitionPag
 
     // List Properties
 
+    public String getName()
+    {
+        expandPropertiesPanel();
+        return elementCache().nameInput.getValue();
+    }
+
     public EditListDefinitionPage setName(String listName)
     {
         expandPropertiesPanel();
