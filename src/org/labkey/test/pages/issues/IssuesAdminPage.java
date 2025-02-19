@@ -19,6 +19,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.domain.DomainDesigner;
+import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.OptionSelect;
 import org.labkey.test.components.react.ReactSelect;
@@ -128,6 +129,16 @@ public class IssuesAdminPage extends DomainDesigner<IssuesAdminPage.ElementCache
         return this;
     }
 
+    public IssuesAdminPage setRestrictedList(boolean check)
+    {
+        expandPropertiesPanel();
+        if (check)
+            elementCache().restrictedList.check();
+        else
+            elementCache().restrictedList.uncheck();
+        return this;
+    }
+
     @Override
     public ListPage clickSave()
     {
@@ -185,5 +196,6 @@ public class IssuesAdminPage extends DomainDesigner<IssuesAdminPage.ElementCache
         ReactSelect assignedToSelect = ReactSelect.finder(getDriver()).findWhenNeeded(assignedToRow);
         WebElement defaultUserRow = Locator.tagWithClass("div", "row").containingIgnoreCase("Default User").findWhenNeeded(this);
         ReactSelect defaultUserSelect = ReactSelect.finder(getDriver()).findWhenNeeded(defaultUserRow);
+        Checkbox restrictedList = new Checkbox(Locator.checkboxByName("restrictedIssueList").findWhenNeeded(propertiesPanel));
     }
 }
