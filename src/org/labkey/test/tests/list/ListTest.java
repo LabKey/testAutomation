@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests.list;
 
+import org.apache.commons.lang3.StringUtils;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.MatcherAssert;
 import org.junit.Assert;
@@ -24,6 +25,7 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.api.query.QueryKey;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.domain.Domain;
 import org.labkey.remoteapi.domain.DomainResponse;
@@ -40,6 +42,7 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Data;
 import org.labkey.test.categories.Hosting;
+import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.domain.BaseDomainDesigner;
 import org.labkey.test.components.domain.ConditionalFormatDialog;
 import org.labkey.test.components.domain.DomainFieldRow;
@@ -48,6 +51,7 @@ import org.labkey.test.components.ext4.Checkbox;
 import org.labkey.test.components.list.AdvancedListSettingsDialog;
 import org.labkey.test.pages.ImportDataPage;
 import org.labkey.test.pages.list.EditListDefinitionPage;
+import org.labkey.test.pages.list.GridPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldDefinition.LookupInfo;
 import org.labkey.test.params.FieldDefinition.StringLookup;
@@ -477,6 +481,29 @@ public class ListTest extends BaseWebDriverTest
         table.clickInsertNewRow();
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from insert view.
         clickButton("Cancel");
+    }
+
+    @Test
+    public void testNameTrimming()
+    {
+        goToProjectHome();
+        String trimmedName = "Trimmings";
+        log("Add list with leading spaces");
+        _listHelper.createList(getProjectName(), " Trimmings", new FieldDefinition(LIST_KEY_NAME2, LIST_KEY_TYPE), _listColFake);
+        log("Assure we can go to the page with the trimmed name");
+        GridPage grid = GridPage.beginAt(this, getProjectName(), trimmedName);
+        grid.click(Locator.linkWithText("Design"));
+        EditListDefinitionPage editList = new EditListDefinitionPage(this.getDriver());
+        checker().withScreenshot().verifyEquals("Name not trimmed as expected", trimmedName, editList.getName());
+
+        trimmedName = "Extra Trimmings";
+        log("Add list with leading and trailing spaces");
+        _listHelper.createList(getProjectName(), " Extra Trimmings   ", new FieldDefinition(LIST_KEY_NAME2, LIST_KEY_TYPE), _listColFake);
+        log("Assure we can go to the page with the trimmed name");
+        grid = GridPage.beginAt(this, getProjectName(), trimmedName);
+        grid.click(Locator.linkWithText("Design"));
+        editList = new EditListDefinitionPage(this.getDriver());
+        checker().withScreenshot().verifyEquals("Name not trimmed as expected", trimmedName, editList.getName());
     }
 
     @Test
@@ -1178,7 +1205,7 @@ public class ListTest extends BaseWebDriverTest
         EditListDefinitionPage listDefinitionPage = _listHelper.beginCreateList(PROJECT_VERIFY, invalidListName);
         listDefinitionPage.manuallyDefineFieldsWithAutoIncrementingKey("key");
         List<String> errors = listDefinitionPage.clickSaveExpectingErrors();
-        Assert.assertTrue("Error msg not as expected during list creation", errors.contains("Invalid IntList name \"" + invalidListName + "\". IntList name must start with a letter or a number."));
+        Assert.assertTrue("Error msg not as expected during list creation", errors.contains("Invalid IntList name '" + invalidListName + "'. IntList name must start with a letter or a number."));
 
         _listHelper.createList(PROJECT_VERIFY, listName, "key",
                 new FieldDefinition(origFieldName, ColumnType.String).setLabel(origFieldName).setDescription("first column"));
@@ -1186,7 +1213,7 @@ public class ListTest extends BaseWebDriverTest
         listDefinitionPage = _listHelper.goToEditDesign(listName);
         listDefinitionPage.setName(invalidListName);
         errors = listDefinitionPage.clickSaveExpectingErrors();
-        Assert.assertTrue("Error msg not as expected during list renaming", errors.contains("Invalid IntList name \"" + invalidListName + "\". IntList name must start with a letter or a number."));
+        Assert.assertTrue("Error msg not as expected during list renaming", errors.contains("Invalid IntList name '" + invalidListName + "'. IntList name must start with a letter or a number."));
         listDefinitionPage.setName(listName);
         listDefinitionPage.getFieldsPanel()
                 .getField(origFieldName)
@@ -1418,6 +1445,51 @@ public class ListTest extends BaseWebDriverTest
         viewRawTableMetadata(listName);
         verifyTableIndices("unique_constraint_list_", List.of("field_name1", "fieldname_3"));
         assertTextNotPresent("unique_constraint_list_fieldname_2");
+    }
+
+    @Test // Issue 52247
+    public void testAutoIncrementKeyEncoded()
+    {
+        // setup a list with an auto-increment key that we need to make sure is encoded in the form input
+        String encodedListName = "autoIncrementEncodeList";
+        String keyName = "'><script>alert(\":(\")</script>'";
+        String encodedKeyName = StringUtils.replace(keyName, "\"", "&quot;");
+        _listHelper.createList(PROJECT_VERIFY, encodedListName, keyName, col("Name", ColumnType.String));
+        _listHelper.goToList(encodedListName);
+
+        DataRegionTable table = new DataRegionTable("query", getDriver());
+        CustomizeView customizeView = table.openCustomizeGrid();
+        customizeView.showHiddenItems();
+        customizeView.addColumn(QueryKey.encodePart(keyName));
+        customizeView.applyCustomView();
+
+        // insert a new row and verify the key is encoded in the form input
+        table.clickInsertNewRow();
+        String html = getHtmlSource();
+        checker().verifyFalse("List key hidden input not present.", html.contains("quf_" + encodedKeyName));
+        String nameValue = "test";
+        setFormElement(Locator.name("quf_Name"), nameValue);
+        clickButton("Submit");
+
+        // verify the name value is persisted
+        table = new DataRegionTable("query", getDriver());
+        checker().verifyEquals("Key value not as expected", "1", table.getDataAsText(0, keyName));
+        checker().verifyEquals("Name value not as expected", nameValue, table.getDataAsText(0, "Name"));
+
+        // verify name value can be updated
+        table.clickEditRow(0);
+        html = getHtmlSource();
+        checker().verifyTrue("List key hidden input not present.", html.contains("quf_" + encodedKeyName));
+        nameValue = "test updated";
+        setFormElement(Locator.name("quf_Name"), nameValue);
+        clickButton("Submit");
+
+        // verify the name value is persisted
+        table = new DataRegionTable("query", getDriver());
+        checker().verifyEquals("Key value not as expected", "1", table.getDataAsText(0, keyName));
+        checker().verifyEquals("Name value not as expected", nameValue, table.getDataAsText(0, "Name"));
+
+        _listHelper.deleteList();
     }
 
     private void viewRawTableMetadata(String listName)
