@@ -65,7 +65,7 @@ public class AssayTransformImportUpdateTest extends BaseWebDriverTest
                 error.file = labkey.transform.getRunPropertyValue(run.props, "errorsFile");
                 
                 if (file.exists(run.data.file)) {
-                    run.data = read.delim(run.data.file, header=TRUE, sep="\\t");
+                    run.data = read.delim(run.data.file, header=TRUE, sep="\\t", check.names = FALSE);
                     run.data$M2 = 111;
                     run.data$TransformType = "${transformOperation} testing";
                     write.table(run.data, file=run.output.file, sep="\\t", na="", row.names=FALSE, quote=FALSE);
