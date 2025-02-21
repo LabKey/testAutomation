@@ -217,16 +217,17 @@ public abstract class WebDriverWrapper implements WrapsDriver
     }
 
     /**
-     * Test process might be running in a different time zone from the browser. This allows shifting test date to
-     * browser dates.
+     * Test process might be running in a different time zone from the browser. This method give the number of minutes
+     * to add to a system date to convert to the equivalent browser date.
      * <pre>{@code
      * TestDateUtils.diffFromTodaysDate(Calendar.MINUTE, getRelativeTimeZoneOffset())
      * }</pre>
-     * @return The number of minutes to add to a system date to convert to the equivalent browser date
+     * A negative value indicates that the browser's time zone is West of the system time zone. Positive is East.
+     * @return minute offset of browser's time zone relative to the system's
      */
     public int getRelativeTimeZoneOffset()
     {
-        return ZoneId.systemDefault().getRules().getOffset(Instant.now()).getTotalSeconds() / 60 - getWebDriverTimeZoneOffset();
+        return -(ZoneId.systemDefault().getRules().getOffset(Instant.now()).getTotalSeconds() / 60 + getWebDriverTimeZoneOffset());
     }
 
     /**

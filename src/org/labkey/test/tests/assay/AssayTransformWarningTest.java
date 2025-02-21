@@ -32,6 +32,7 @@ import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.QCAssayScriptHelper;
 import org.labkey.test.util.RReportHelper;
+import org.labkey.test.util.core.webdav.WebDavUtils;
 
 import java.io.File;
 import java.util.Arrays;
@@ -39,6 +40,8 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.labkey.test.pages.ReactAssayDesignerPage.ScriptFileEvent.Edit;
+import static org.labkey.test.pages.ReactAssayDesignerPage.ScriptFileEvent.Import;
 
 @Category({Assays.class, Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 4)
@@ -95,15 +98,15 @@ public class AssayTransformWarningTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testJavaTransformWarning()
+    public void testJavaTransformWarning() throws Exception
     {
         String assayName = "transformWarningJar";
         String importData = "ParticipantId\nJavaWarned";
         String runName = "java transform run";
 
         _assayHelper.createAssayDesign("General", assayName)
-            .addTransformScript(JAVA_TRANSFORM_SCRIPT, true)
-            .clickFinish();
+                .addTransformScript(JAVA_TRANSFORM_SCRIPT, true)
+                .clickFinish();
 
         clickAndWait(Locator.linkWithText(assayName));
         clickButton("Import Data");
@@ -186,6 +189,48 @@ public class AssayTransformWarningTest extends BaseWebDriverTest
     }
 
     @Test
+    public void testRTransformUpdateWarning() throws Exception
+    {
+        String assayName = "transformUpdateWarningR";
+        String importData = "ParticipantId\tVisitID\n1\t1";
+        String runName = "basic_import_no_transform";
+
+        // copy r_transform_script to a file of different name to avoid name/upload collisions with other test methods
+        File updateWarnRScript = TestFileUtils.writeTempFile("transformWarnUpdate.R", TestFileUtils.getFileContents(R_TRANSFORM_SCRIPT));
+
+        // disable the transform on import, enable it on update
+        ReactAssayDesignerPage assayDesignerPage = _assayHelper.createAssayDesign("General", assayName)
+                .addTransformScript(updateWarnRScript, true);
+        assayDesignerPage.setEditableResults(true);
+        assayDesignerPage.setEditableRuns(true);
+        assayDesignerPage.setScriptActionCheckbox(updateWarnRScript.getName(), Edit, true);
+        assayDesignerPage.setScriptActionCheckbox(updateWarnRScript.getName(), Import, false);
+        assayDesignerPage.goToResultsFields()
+                .addField("comment")
+                .setLabel("Comment")
+                .setType(FieldDefinition.ColumnType.String);
+        assayDesignerPage.clickFinish();
+
+        clickAndWait(Locator.linkWithText(assayName));
+        clickButton("Import Data");
+        clickButton("Next");
+        setFormElement(Locator.name("name"), runName);
+        setFormElement(Locator.name("TextAreaDataCollector.textArea"), importData);
+        clickButton("Save and Finish");
+
+        // edit the result, expect warning
+        clickAndWait(Locator.linkWithText(runName));
+        DataRegionTable table = new DataRegionTable("Data", this);
+        table.clickEditRow(0)
+                .setField("comment", "commented")
+                .submit();
+
+        // note: we currently do not support warnings on update; Issue 52299 tracks this
+        // for now, expect warning-generating script events to show up as errors
+        assertTextPresent("An error occurred when running the script 'assayTransformWarning.R', exit code: 1.");
+    }
+
+    @Test
     public void testRTransformError()
     {
         String assayName = "transformErrorR";
@@ -211,6 +256,48 @@ public class AssayTransformWarningTest extends BaseWebDriverTest
         assertTextPresent("There are errors in the input file");
         assertElementPresent(Locator.tag("td").containing("Col1"));
         assertElementPresent(Locator.tag("td").containing("test2"));
+    }
+
+    @Test
+    public void testTransformErrorOnUpdate() throws Exception
+    {
+        String assayName = "transformErrorUpdateR";
+        String importData = "ParticipantId\tVisitID\n1\t1";
+        String runName = "basic_import_no_transform";
+
+        // copy r_transform_script to a file of different name to avoid name/upload collisions with other test methods
+        File updateErrRScript = TestFileUtils.writeTempFile("transformErrUpdate.R", TestFileUtils.getFileContents(R_TRANSFORM_ERROR_SCRIPT));
+
+        // configure the assay to only run the transform on update (not import)
+        ReactAssayDesignerPage assayDesignerPage = _assayHelper.createAssayDesign("General", assayName)
+                .addTransformScript(updateErrRScript);
+        assayDesignerPage.setEditableResults(true);
+        assayDesignerPage.setEditableRuns(true);
+        assayDesignerPage.setScriptActionCheckbox(updateErrRScript.getName(), Edit, true);
+        assayDesignerPage.setScriptActionCheckbox(updateErrRScript.getName(), Import, false);
+        assayDesignerPage.goToResultsFields()
+                .addField("comment")
+                .setLabel("Comment")
+                .setType(FieldDefinition.ColumnType.String);
+        assayDesignerPage.clickFinish();
+
+        // import a run to edit
+        clickAndWait(Locator.linkWithText(assayName));
+        clickButton("Import Data");
+        clickButton("Next");
+        setFormElement(Locator.name("name"), runName);
+        setFormElement(Locator.name("TextAreaDataCollector.textArea"), importData);
+
+        clickButton("Save and Finish");
+
+        // now edit the run, expect error
+        clickAndWait(Locator.linkWithText(runName));
+        DataRegionTable table = new DataRegionTable("Data", this);
+        table.clickEditRow(0)
+                .setField("comment", "commented")
+                .submit();
+
+        assertTextPresent("An error occurred when running the script 'assayTransformError.R', exit code: 1.");
     }
 
     @Test
@@ -240,4 +327,5 @@ public class AssayTransformWarningTest extends BaseWebDriverTest
         waitForElement(Locators.labkeyErrorHeading.withText("/_webdav/" + getProjectName() + "/@scripts"));
         stopImpersonatingHTTP();
     }
+
 }
