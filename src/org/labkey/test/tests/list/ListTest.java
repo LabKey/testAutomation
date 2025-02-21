@@ -32,6 +32,7 @@ import org.labkey.remoteapi.domain.DomainResponse;
 import org.labkey.remoteapi.domain.PropertyDescriptor;
 import org.labkey.remoteapi.domain.SaveDomainCommand;
 import org.labkey.remoteapi.query.Filter;
+import org.labkey.serverapi.reader.TabLoader;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
@@ -97,7 +98,10 @@ public class ListTest extends BaseWebDriverTest
     protected final static String LIST_NAME_COLORS = "A_Colors_" + DOMAIN_TRICKY_CHARACTERS;
     protected final static ColumnType LIST_KEY_TYPE = ColumnType.String;
     protected final static String LIST_KEY_NAME = "Key";
-    protected final static String LIST_KEY_NAME2 = "Color";
+
+    protected final static String LIST_KEY_NAME2 = "Color \"`~!@#$%^&*()_-+={}[]|\\:;<>,.?/";
+    protected final static String LIST_KEY_NAME2_BULK = "\"Color \"\"`~!@#$%^&*()_-+={}[]|\\:;<>,.?/\"";
+
     protected final static String LIST_DESCRIPTION = "A list of colors and what they are like";
     protected final static String FAKE_COL_NAME = "FakeName";
     protected final static String ALIASED_KEY_NAME = "Material";
@@ -135,12 +139,12 @@ public class ListTest extends BaseWebDriverTest
     private final static String LIST_ROW2 = TEST_DATA[TD_COLOR][1] + "\t" + TEST_DATA[TD_DESC][1] + "\t" + TEST_DATA[TD_TONE][1] + "\t" + VALID_MONTHS[1];
     private final static String LIST_ROW3 = TEST_DATA[TD_COLOR][2] + "\t" + TEST_DATA[TD_DESC][2] + "\t" + TEST_DATA[TD_TONE][2] + "\t" + VALID_MONTHS[2];
     private final String LIST_DATA =
-            LIST_KEY_NAME2 + "\t" + FAKE_COL_NAME + "\t" + _listColTone.getName() + "\t" + _listColMonth.getName() + "\n" +
+            LIST_KEY_NAME2_BULK + "\t" + FAKE_COL_NAME + "\t" + _listColTone.getName() + "\t" + _listColMonth.getName() + "\n" +
             LIST_ROW1 + "\n" +
             LIST_ROW2 + "\n" +
             LIST_ROW3;
     private final String LIST_DATA2 =
-            LIST_KEY_NAME2 + "\t" + FAKE_COL_NAME + "\t" + _listColTone.getName() + "\t" + _listColMonth.getName() + "\t" + _listColGood.getName() + "\t" + ALIASED_KEY_NAME + "\t" + _listColHidden.getName() + "\n" +
+            LIST_KEY_NAME2_BULK + "\t" + FAKE_COL_NAME + "\t" + _listColTone.getName() + "\t" + _listColMonth.getName() + "\t" + _listColGood.getName() + "\t" + ALIASED_KEY_NAME + "\t" + _listColHidden.getName() + "\n" +
             LIST_ROW1 + "\t" + TEST_DATA[TD_GOOD][0] + "\t" + TEST_DATA[TD_ALIAS][0] + "\t" + HIDDEN_TEXT + "\n" +
             LIST_ROW2 + "\t" + TEST_DATA[TD_GOOD][1] + "\t" + TEST_DATA[TD_ALIAS][1] + "\t" + HIDDEN_TEXT + "\n" +
             LIST_ROW3 + "\t" + TEST_DATA[TD_GOOD][2] + "\t" + TEST_DATA[TD_ALIAS][2] + "\t" + HIDDEN_TEXT;
@@ -170,7 +174,7 @@ public class ListTest extends BaseWebDriverTest
     protected final FieldDefinition _list3Col1 = new FieldDefinition(LIST3_KEY_NAME, new LookupInfo("/" + PROJECT_OTHER, "lists", LIST3_NAME_OWNERS).setTableType(ColumnType.String)).setDescription("Who owns the car");
     private final static String LIST3_COL2 = "Rich";
     private final String LIST2_DATA =
-            LIST2_KEY_NAME + "\t" + _list2Col1.getName()  + "\t" + LIST3_KEY_NAME + "\n" +
+            LIST2_KEY_NAME + "\t" + LIST_KEY_NAME2_BULK  + "\t" + LIST3_KEY_NAME + "\n" +
             LIST2_KEY + "\t" + LIST2_FOREIGN_KEY + "\n" +
             LIST2_KEY2  + "\t" + LIST2_FOREIGN_KEY2 + "\t" + LIST2_FOREIGN_KEY_OUTSIDE + "\n" +
             LIST2_KEY3  + "\t" + LIST2_FOREIGN_KEY3 + "\n" +
@@ -548,7 +552,7 @@ public class ListTest extends BaseWebDriverTest
 
         log("4725: Check Customize View can't remove all fields");
         _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.removeColumn(LIST_KEY_NAME2);
+        _customizeViewsHelper.removeColumn(EscapeUtil.fieldKeyEncodePart(LIST_KEY_NAME2));
         _customizeViewsHelper.removeColumn(_listColDesc.getName());
         _customizeViewsHelper.removeColumn(_listColMonth.getName());
         _customizeViewsHelper.removeColumn(_listColTone.getName());
@@ -644,11 +648,11 @@ public class ListTest extends BaseWebDriverTest
 
         log("Check that reference worked");
         _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.addColumn(_list2Col1.getName() + "/" + _listColDesc.getName(), _list2Col1.getLabel() + " " + _listColDesc.getLabel());
-        _customizeViewsHelper.addColumn(_list2Col1.getName() + "/" + _listColMonth.getName(), _list2Col1.getLabel() + " " + _listColMonth.getLabel());
-        _customizeViewsHelper.addColumn(_list2Col1.getName() + "/" + _listColGood.getName(), _list2Col1.getLabel() + " " + _listColGood.getLabel());
-        _customizeViewsHelper.addFilter(_list2Col1.getName() + "/" + _listColGood.getName(), _listColGood.getLabel(), "Is Less Than", "10");
-        _customizeViewsHelper.addSort(_list2Col1.getName() + "/" + _listColGood.getName(), _listColGood.getLabel(), SortDirection.ASC);
+        _customizeViewsHelper.addColumn(EscapeUtil.fieldKeyEncodePart(_list2Col1.getName()) + "/" + _listColDesc.getName(), _list2Col1.getLabel() + " " + _listColDesc.getLabel());
+        _customizeViewsHelper.addColumn(EscapeUtil.fieldKeyEncodePart(_list2Col1.getName()) + "/" + _listColMonth.getName(), _list2Col1.getLabel() + " " + _listColMonth.getLabel());
+        _customizeViewsHelper.addColumn(EscapeUtil.fieldKeyEncodePart(_list2Col1.getName()) + "/" + _listColGood.getName(), _list2Col1.getLabel() + " " + _listColGood.getLabel());
+        _customizeViewsHelper.addFilter(EscapeUtil.fieldKeyEncodePart(_list2Col1.getName()) + "/" + _listColGood.getName(), _listColGood.getLabel(), "Is Less Than", "10");
+        _customizeViewsHelper.addSort(EscapeUtil.fieldKeyEncodePart(_list2Col1.getName()) + "/" + _listColGood.getName(), _listColGood.getLabel(), SortDirection.ASC);
         _customizeViewsHelper.addColumn(_list3Col1.getName() + "/" + _list3Col1.getName(), _list3Col1.getLabel() + " " + _list3Col1.getLabel());
         _customizeViewsHelper.addColumn(_list3Col1.getName() + "/" + _list3Col2.getName(), _list3Col1.getLabel() + " " + _list3Col2.getLabel());
         _customizeViewsHelper.saveCustomView(TEST_VIEW);
@@ -671,19 +675,38 @@ public class ListTest extends BaseWebDriverTest
 
         DataRegionExportHelper helper = new DataRegionExportHelper(list);
         File expFile = helper.exportText(ColumnHeaderType.FieldKey, DataRegionExportHelper.TextSeparator.COMMA);
-        TextSearcher srch = new TextSearcher(expFile);
-        assertTextPresent(srch, LIST_KEY_NAME2 + '/' + _listColDesc.getName(),
-                LIST_KEY_NAME2 + '/' + _listColMonth.getName(),
-                LIST_KEY_NAME2 + '/' + _listColGood.getName(),
-                LIST2_FOREIGN_KEY_OUTSIDE,
-                LIST3_COL2);
-        assertTextNotPresent(srch, LIST2_KEY, LIST2_KEY4);
-        assertTextPresentInThisOrder(srch, LIST2_KEY3, LIST2_KEY2);
+
+        // Use TabLoader, it is easier to use than TextSearch when dealing with 'tricky characters'.
+        TabLoader tabLoader = new TabLoader(expFile, true);
+        tabLoader.parseAsCSV();
+
+        // According to Issue 52318 field keys are encoded.
+        List<String> expectedValues = List.of(EscapeUtil.fieldKeyEncodePart(LIST_KEY_NAME2) + '/' + _listColDesc.getName(),
+                EscapeUtil.fieldKeyEncodePart(LIST_KEY_NAME2) + '/' + _listColMonth.getName(),
+                EscapeUtil.fieldKeyEncodePart(LIST_KEY_NAME2) + '/' + _listColGood.getName());
+
+        List<Map<String, Object>> exportedFileData = tabLoader.load();
+        List<String> actualValues = exportedFileData.get(0).keySet().stream().toList();
+
+        assertTrue("Exported file does not contain expected header values.",
+                actualValues.containsAll(expectedValues));
+
+        assertEquals("Key value in row 0 not as expected.",
+                LIST2_KEY3, exportedFileData.get(0).get(LIST2_KEY_NAME));
+
+        assertEquals("Key value in row 1 not as expected.",
+                LIST2_KEY2, exportedFileData.get(1).get(LIST2_KEY_NAME));
+
+        assertEquals("Value of foreign key in row 1 not as expected.",
+                LIST2_FOREIGN_KEY_OUTSIDE, exportedFileData.get(1).get(LIST3_KEY_NAME));
+
+        assertEquals("Value of 'Wealth' column in row 1 not as expected.",
+                LIST3_COL2, exportedFileData.get(1).get(LIST3_KEY_NAME + "/" + _list3Col2.getName()));
 
         log("Test edit row");
         list.updateRow(LIST2_KEY3, Maps.of(
-                "Color", TEST_DATA[TD_DESC][1],
-                "Owner", LIST2_FOREIGN_KEY_OUTSIDE));
+                LIST_KEY_NAME2, TEST_DATA[TD_DESC][1],
+                LIST3_KEY_NAME, LIST2_FOREIGN_KEY_OUTSIDE));
 
         final DataRegionTable dt = DataRegion(getDriver()).withName("query").find();
         dt.goToView("Default");
@@ -1484,6 +1507,199 @@ public class ListTest extends BaseWebDriverTest
 
         for (String suffix : suffixes)
             assertTextPresentCaseInsensitive(prefix + suffix);
+    }
+
+    /**
+     * Test "tricky characters" in field names, including key field. This will test CrUD operation for list items in
+     * lists with an auto-key and user defined key. This  will also use file import for validation.
+     *
+     * @throws IOException Can be thrown by the file actions.
+     */
+    @Test
+    public void testTrickyCharacterFields() throws IOException
+    {
+        // These validate Issue 52070
+        testTricky("Tricky Field Character", false);
+        testTricky("TrickyField Character Auto Key", true);
+
+    }
+
+    private void testTricky(String listName, boolean autoKey) throws IOException
+    {
+
+        String keyField = "Key Field \"`~!@#$%^&*()_-+={}[]|\\:;<>,.?/\u5668\u9aa8";
+        String keyField_Bulk = "\"" + keyField.replace("\"", "\"\"") + "\"" ;
+        String intField = "Int Field \"`~!@#$%^&*()_-+={}[]|\\:;<>,.?/\u00a5\u00e6";
+        String intField_Bulk = "\"" + intField.replace("\"", "\"\"") + "\"";
+
+        log(String.format("Create list '%s' with key field '%s' and field '%s'.",
+                listName, keyField, intField));
+
+        if (!autoKey)
+        {
+            log("Key is not auto-increment.");
+            _listHelper.createList(PROJECT_VERIFY, listName,
+                    new FieldDefinition(keyField, ColumnType.Integer),
+                    new FieldDefinition(intField, ColumnType.Integer));
+        }
+        else
+        {
+            log("Key is auto-increment.");
+            _listHelper.createList(PROJECT_VERIFY, listName, keyField,
+                    new FieldDefinition(intField, ColumnType.Integer));
+        }
+
+        assertNoLabKeyErrors();
+
+        log("Insert a new row.");
+
+        Map<String, String> row = new HashMap<>();
+
+        List<Map<String, String>> expectedValues = new ArrayList<>();
+
+        if (!autoKey)
+        {
+            row.put(keyField, "1");
+
+            expectedValues.add(Map.of(EscapeUtil.fieldKeyEncodePart(keyField), "1",
+                    EscapeUtil.fieldKeyEncodePart(intField), "123"));
+        }
+        else
+        {
+            expectedValues.add(Map.of(EscapeUtil.fieldKeyEncodePart(intField), "123"));
+        }
+
+        row.put(intField, "123");
+
+        _listHelper.insertNewRow(row);
+
+        assertNoLabKeyErrors();
+
+        validateDataRegionTableForTricky(expectedValues);
+
+        log("Use the bulk import form to add a new row.");
+
+        StringBuilder sbBulkData = new StringBuilder();
+
+        if (!autoKey)
+        {
+            sbBulkData.append(keyField_Bulk);
+            sbBulkData.append("\t");
+        }
+
+        sbBulkData.append(intField_Bulk);
+        sbBulkData.append("\n");
+
+        if (!autoKey)
+        {
+            sbBulkData.append("2\t");
+
+            expectedValues.add(Map.of(EscapeUtil.fieldKeyEncodePart(keyField), "2",
+                    EscapeUtil.fieldKeyEncodePart(intField), "456"));
+        }
+        else
+        {
+            expectedValues.add(Map.of(EscapeUtil.fieldKeyEncodePart(intField), "456"));
+        }
+
+        sbBulkData.append("456");
+
+        _listHelper.bulkImportData(sbBulkData.toString());
+
+        assertNoLabKeyErrors();
+
+        validateDataRegionTableForTricky(expectedValues);
+
+        log("Use file import to add a new item.");
+        sbBulkData = new StringBuilder();
+        List<String> fileData = new ArrayList<>();
+
+        if (!autoKey)
+        {
+            sbBulkData.append(keyField_Bulk);
+            sbBulkData.append("\t");
+        }
+
+        sbBulkData.append(intField_Bulk);
+        fileData.add(sbBulkData.toString());
+
+        sbBulkData = new StringBuilder();
+
+        if (!autoKey)
+        {
+            sbBulkData.append("3\t");
+
+            expectedValues.add(Map.of(EscapeUtil.fieldKeyEncodePart(keyField), "3",
+                    EscapeUtil.fieldKeyEncodePart(intField), "789"));
+
+        }
+        else
+        {
+            expectedValues.add(Map.of(EscapeUtil.fieldKeyEncodePart(intField), "789"));
+        }
+
+        sbBulkData.append("789");
+        fileData.add(sbBulkData.toString());
+
+        File importFile = TestFileUtils.writeTempFile("ListTest_Tricky.tsv", String.join(System.lineSeparator(), fileData));
+
+        _listHelper.importDataFromFile(importFile);
+
+        assertNoLabKeyErrors();
+
+        validateDataRegionTableForTricky(expectedValues);
+
+        log(String.format("For row 0 update the value in field '%s' in the UI.", intField));
+
+        DataRegionTable dataRegionTable = new DataRegionTable("query", getDriver());
+        dataRegionTable.updateRow(0, Map.of(intField, "321"));
+
+        assertNoLabKeyErrors();
+
+        if (!autoKey)
+        {
+            expectedValues.set(0, Map.of(EscapeUtil.fieldKeyEncodePart(keyField), "1",
+                    EscapeUtil.fieldKeyEncodePart(intField), "321"));
+        }
+        else
+        {
+            expectedValues.set(0, Map.of(EscapeUtil.fieldKeyEncodePart(intField), "321"));
+        }
+
+        validateDataRegionTableForTricky(expectedValues);
+
+        // This will validate Issue 52069
+        log("Check the column tooltip.");
+        if (!autoKey)
+        {
+            assertEquals(String.format("Tooltip for column '%s' not as expected.", keyField),
+                    keyField, dataRegionTable.getColumnTitle(EscapeUtil.fieldKeyEncodePart(keyField)));
+        }
+
+        assertEquals(String.format("Tooltip for column '%s' not as expected.", intField),
+                intField, dataRegionTable.getColumnTitle(EscapeUtil.fieldKeyEncodePart(intField)));
+
+        log("Delete row 0.");
+
+        dataRegionTable = new DataRegionTable("query", getDriver());
+        dataRegionTable.checkCheckbox(0);
+        dataRegionTable.deleteSelectedRows();
+
+        assertNoLabKeyErrors();
+
+        expectedValues.remove(0);
+
+        validateDataRegionTableForTricky(expectedValues);
+
+    }
+
+    private void validateDataRegionTableForTricky(List<Map<String, String>> expectedValue)
+    {
+        DataRegionTable dataRegionTable = new DataRegionTable("query", getDriver());
+        List<Map<String, String>> actualValue = dataRegionTable.getTableData();
+
+        assertEquals("List data not as expected after action.",
+                expectedValue, actualValue);
     }
 
     //
