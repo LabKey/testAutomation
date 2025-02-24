@@ -110,10 +110,6 @@ public class ApiKeyTest extends BaseWebDriverTest
             .create(createDefaultConnection(), getProjectName());
     }
 
-    /**
-     * TODO: Update expected user once apiKey issue has been fixed
-     * Issue 52302: Java Client API doesn't work with session API key
-     */
     @Test
     public void testSessionKey() throws IOException
     {
@@ -125,7 +121,7 @@ public class ApiKeyTest extends BaseWebDriverTest
 
         String apiKey = generateSessionKey();
 
-        verifyValidAPIKey(createApiKeyConnection(apiKey), "guest");
+        verifyValidAPIKey(createApiKeyConnection(apiKey));
         verifySessionKeyCsrf(createApiKeyConnection(apiKey));
 
         log("Verify session key remains valid if key generation is turned off");
@@ -133,7 +129,7 @@ public class ApiKeyTest extends BaseWebDriverTest
                 .clickSiteSettings()
                 .setAllowSessionKeys(false)
                 .save();
-        verifyValidAPIKey(createApiKeyConnection(apiKey), "guest");
+        verifyValidAPIKey(createApiKeyConnection(apiKey));
         verifySessionKeyCsrf(createApiKeyConnection(apiKey));
 
         signOut();
@@ -376,10 +372,11 @@ public class ApiKeyTest extends BaseWebDriverTest
             assertEquals("Connection user", userEmail, whoAmI.getEmail());
 
             QueryApiHelper queryApiHelper = new QueryApiHelper(connection, getProjectName(), "lists", LIST_NAME);
-            SaveRowsResponse response = queryApiHelper.insertRows(List.of(Map.of(LIST_VALUE, "value" + valueCount.get())));
-            assertEquals("Rows saved", 1, response.getRowsAffected());
+            SaveRowsResponse saveResponse = queryApiHelper.insertRows(List.of(Map.of(LIST_VALUE, "value" + valueCount.get())));
+            assertEquals("Rows saved", 1, saveResponse.getRowsAffected());
 
-            assertEquals("Total rows", valueCount.incrementAndGet(), queryApiHelper.selectRows().getRowCount());
+            SelectRowsResponse selectResponse = queryApiHelper.selectRows();
+            assertEquals("Total rows", valueCount.incrementAndGet(), selectResponse.getRowCount());
 
             whoAmI = new WhoAmICommand().execute(connection, null);
             assertEquals("Connection user", userEmail, whoAmI.getEmail());
