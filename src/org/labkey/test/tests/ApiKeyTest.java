@@ -31,6 +31,7 @@ import org.labkey.remoteapi.query.DeleteRowsCommand;
 import org.labkey.remoteapi.query.GetQueryDetailsCommand;
 import org.labkey.remoteapi.query.GetQueryDetailsResponse;
 import org.labkey.remoteapi.query.GetSchemasCommand;
+import org.labkey.remoteapi.query.ImportDataResponse;
 import org.labkey.remoteapi.query.SaveRowsResponse;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
@@ -373,11 +374,18 @@ public class ApiKeyTest extends BaseWebDriverTest
             assertEquals("Connection user", userEmail, whoAmI.getEmail());
 
             QueryApiHelper queryApiHelper = new QueryApiHelper(connection, getProjectName(), "lists", LIST_NAME);
+
+            // ImportData doesn't return auth challenge. Make sure it works
+            ImportDataResponse importResponse = queryApiHelper.importData(LIST_VALUE + "\nvalue" + valueCount.get());
+            valueCount.incrementAndGet();
+            assertEquals("Rows imported", 1, importResponse.getRowCount());
+
             SaveRowsResponse saveResponse = queryApiHelper.insertRows(List.of(Map.of(LIST_VALUE, "value" + valueCount.get())));
-            assertEquals("Rows saved", 1, saveResponse.getRowsAffected());
+            valueCount.incrementAndGet();
+            assertEquals("Rows inserted", 1, saveResponse.getRowsAffected());
 
             SelectRowsResponse selectResponse = queryApiHelper.selectRows();
-            assertEquals("Total rows", valueCount.incrementAndGet(), selectResponse.getRowCount());
+            assertEquals("Total rows", valueCount.get(), selectResponse.getRowCount());
 
             whoAmI = new WhoAmICommand().execute(connection, null);
             assertEquals("Connection user", userEmail, whoAmI.getEmail());
