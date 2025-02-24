@@ -35,6 +35,25 @@
              ]]>
         </response>
     </test>
+    <test name="webdav.get showProgressBar=TRUE overwrite=TRUE" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+                c("file.create", file.create("%downloadDir%/overwriteMe.txt"))
+                c("initial size", file.info("%downloadDir%/overwriteMe.txt")$size)
+                c("webdav.get", labkey.webdav.get(baseUrl=labkey.url.base, folderPath="%projectName%", remoteFilePath="remote/readChecks/getMe.txt", localFilePath="%downloadDir%/overwriteMe.txt", showProgressBar=TRUE, overwrite=TRUE))
+                c("final size", file.info("%downloadDir%/overwriteMe.txt")$size)
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                [1] "file.create" "TRUE"
+                [1] "initial size" "0"
+                [1] "webdav.get" "TRUE"
+                [1] "final size" "5"
+             ]]>
+        </response>
+    </test>
     <test name="webdav.get overwrite=FALSE" type="post">
         <url>
             <![CDATA[
