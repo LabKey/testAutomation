@@ -17,6 +17,7 @@ package org.labkey.test.tests;
 
 import org.apache.hc.core5.http.HttpStatus;
 import org.jetbrains.annotations.Nullable;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -396,7 +397,7 @@ public class ApiKeyTest extends BaseWebDriverTest
             assertTrue("CSRF success", resp.getProperty("success"));
 
             WhoAmIResponse whoAmI = new WhoAmICommand().execute(connection, null);
-            whoAmI.getCSRF(); // Should this match the browser?
+            Assert.assertNotEquals("API CSRF", WebTestHelper.getCookies(PasswordUtil.getUsername()).get(Connection.X_LABKEY_CSRF).getValue(), whoAmI.getCSRF());
         }
         catch (CommandException e)
         {
