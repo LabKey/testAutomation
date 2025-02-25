@@ -16,10 +16,14 @@
 
 package org.labkey.test.tests.wiki;
 
+import org.assertj.core.api.Assertions;
+import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.Daily;
@@ -222,6 +226,117 @@ public class WikiTest extends BaseWebDriverTest
         searchFor(PROJECT_NAME, "commas", 1, null);
         Assert.assertEquals("Incorrect result with comma", Arrays.asList(wikiTitle + "\n/" + getProjectName() + "\n" + wikiContent), getTexts(new SearchResultsPage(getDriver()).getResults()));
     }
+
+    // Issue 51382
+    @Test
+    public void testCreateWikiWithHostileNameAndTitle() throws Exception
+    {
+        var newLine = '\u0081';
+        var stringTerminator = '\u009c';
+        String wikiName = "Wiki with " + stringTerminator + TRICKY_CHARACTERS + newLine;
+        String wikiTitle = "Title with " + stringTerminator + TRICKY_CHARACTERS + newLine;
+        String wikiContent = "<p>Content with " + stringTerminator + TRICKY_CHARACTERS + newLine + "</p>";
+
+        var createCmd = new SimplePostCommand("wiki", "saveWiki");
+        JSONObject json = new JSONObject();
+        json.put("title", wikiTitle);
+        json.put("content", wikiContent);
+        json.put("body", wikiContent);
+        json.put("pageVersionId", -1);
+        json.put("name", wikiName);
+        createCmd.setJsonObject(json);
+        try
+        {
+            createCmd.execute(createDefaultConnection(), getProjectName());
+            Assert.fail("Create command should have failed");
+        }
+        catch (CommandException success)
+        {
+            log("Error creating wiki page: " + success.getMessage());
+            checker().wrapAssertion(() -> Assertions.assertThat(success.getMessage())
+                    .as("expect error")
+                    .contains("Wiki name contains invalid characters"));
+            checker().verifyEquals("expect 400 for bad request", 400, success.getStatusCode());
+            var jsonProps = new JSONObject(success.getProperties());
+            var errors = jsonProps.getJSONArray("errors");
+
+            checker().wrapAssertion(() -> Assertions.assertThat(List.of(errors.getJSONObject(0), errors.getJSONObject(1)))
+                    .extracting(a -> a.get("msg"))
+                    .as("expect warnings for wiki name and title")
+                    .containsOnly("Wiki name contains invalid characters.", "Wiki title contains invalid characters."));
+            checker().wrapAssertion(() -> Assertions.assertThat(List.of(errors.getJSONObject(0), errors.getJSONObject(1)))
+                    .extracting(a -> a.get("severity"))
+                    .as("expect error severity")
+                    .containsOnly("Error"));
+            checker().wrapAssertion(() -> Assertions.assertThat(List.of(errors.getJSONObject(0), errors.getJSONObject(1)))
+                    .extracting(a -> a.get("field"))
+                    .as("expect errors for name, title")
+                    .containsOnly("name", "title"));
+        }
+    }
+
+    // Issue 51382
+    @Test
+    public void testUpdateWikiWithHostileNameAndTitle() throws Exception
+    {
+        var newLine = '\u0081';
+        var stringTerminator = '\u009c';
+        String wikiTitle = "Title with " + stringTerminator + TRICKY_CHARACTERS + newLine;
+        String wikiContent = "<p>This is my content " + stringTerminator + TRICKY_CHARACTERS + newLine + "</p>";
+        String wikiName = "hostileWiki";
+        String wikiTitleSafe = "wikiHostile";
+        var cn = createDefaultConnection();
+
+        // first, create a straightforward wiki
+        var createCmd = new SimplePostCommand("wiki", "saveWiki");
+        JSONObject createJson = new JSONObject();
+        createJson.put("name", wikiName);
+        createJson.put("title", wikiTitleSafe);
+        createJson.put("rendererType", "HTML");
+        createJson.put("body", "<p> content </p>");
+        createJson.put("pageVersionId", -1);
+        createCmd.setJsonObject(createJson);
+
+        var createResponse = createCmd.execute(cn, getProjectName());
+        var createResponseJson = new JSONObject(createResponse.getParsedData());
+        var wikiProps = createResponseJson.getJSONObject("wikiProps");
+        SearchAdminAPIHelper.waitForIndexer();
+
+        // now, update the wiki with hostile inputs, expecting error/failure
+        var updateJson = new JSONObject();
+        updateJson.put("name", wikiProps.getString("name"));
+        updateJson.put("title", wikiTitle);
+        updateJson.put("entityId", wikiProps.getString("entityId"));
+        updateJson.put("rendererType", wikiProps.getString("rendererType"));
+        updateJson.put("body", wikiContent);
+        updateJson.put("pageVersionId", wikiProps.getInt("pageVersionId"));
+        createCmd.setJsonObject(updateJson);
+        try {
+            createCmd.execute(cn, getProjectName());
+            Assert.fail("Update command should have failed with hostile input");
+        } catch (CommandException success)
+        {
+            checker().wrapAssertion(()-> Assertions.assertThat(success.getMessage())
+                    .as("expect error")
+                    .contains("Wiki title contains invalid characters"));
+            checker().verifyEquals("expect 400 for bad request", 400, success.getStatusCode());
+            var jsonProps =new JSONObject(success.getProperties());
+            var error = jsonProps.getJSONArray("errors").getJSONObject(0);
+
+            checker().wrapAssertion(()-> Assertions.assertThat(error)
+                    .extracting(a-> a.get("msg"))
+                    .as("expect warning for wiki title")
+                    .isEqualTo("Wiki title contains invalid characters."));
+            checker().wrapAssertion(()-> Assertions.assertThat(error)
+                    .extracting(a-> a.get("severity"))
+                    .as("expect error severity")
+                    .isEqualTo("Error"));
+            checker().wrapAssertion(()-> Assertions.assertThat(error)
+                    .extracting(a-> a.get("field"))
+                    .as("expect title field to be the source of the error")
+                    .isEqualTo("title"));
+        }
+}
 
     protected void verifyWikiPagePresent()
     {
