@@ -16,8 +16,8 @@ LuminexRTransformTest
 LuminexJavaTransformTest
 QueryExportTest
 MothershipReportTest
-SutdyDatasetFileFieldTest
-NonStandardDateAndTimeTest
+StudyDatasetFileFieldTest
+NonStandardDateAndTimeFormatTest
 ReportThumbnailTest
 MessagesAttachmentTest
 IssuesAttachmentTest
