@@ -105,7 +105,7 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
         expectedValues.add("C");
         expectedValues.add("A");
         expectedValues.add("\u00DC");
-        expectedValues.add("XYZ");
+        expectedValues.add("|X|Y|Z|withPipeChars");
         expectedValues.add("A string with spaces.");
         expectedValues.add("B");
 
@@ -119,6 +119,7 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
         String searchValue = "A";
         List<String> searchValuesExpected = new ArrayList<>();
         searchValuesExpected.add(expectedValues.get(1));
+        searchValuesExpected.add(expectedValues.get(3));
         searchValuesExpected.add(expectedValues.get(4));
 
         log(String.format("Create a new sample type named '%s'.", sampleTypeName));
@@ -161,7 +162,7 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
 
         checker().screenShotIfNewError("ST_Designer_Initial_Values_Not_Correct");
 
-        List<String> expectedConvertedValues = List.of("Apple", "Banana");
+        List<String> expectedConvertedValues = List.of("Apple", "Ba|na|na");
         log("Add some samples to the sample type and set the TextChoice field for some of the samples.");
         sampleTypeHelper.goToSampleType(sampleTypeName);
         List<Map<String, String>> samples = new ArrayList<>();
@@ -193,12 +194,14 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
         newValues.add("Q");
         newValues.add("R");
         newValues.add("S");
-        newValues.add(duplicateValue);
+        newValues.add("    "); // empty value should be removed/ignored
+        newValues.add("   " + duplicateValue + "   "); // make sure value is trimmed
 
         fieldRow.setTextChoiceValues(newValues);
 
-        // Remove the duplicate value from the list.
-        newValues.remove(duplicateValue);
+        // Remove the duplicate value from the list and the empty value.
+        newValues.remove(4);
+        newValues.remove(3);
 
         expectedValues.addAll(newValues);
 
@@ -312,7 +315,7 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
 
         // Some TextChoice values.
         List<String> expectedUnLockedValues = new ArrayList<>();
-        expectedUnLockedValues.add("\u00C5\u00C5");
+        expectedUnLockedValues.add("\u00C5|\u00C5");
         expectedUnLockedValues.add("BB");
         expectedUnLockedValues.add("CC");
         expectedUnLockedValues.add("DD");
@@ -551,9 +554,9 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
 
         // Some TextChoice values.
         List<String> tcValues = new ArrayList<>();
-        tcValues.add("\u00C6\u00C6");
+        tcValues.add("\u00C6||\u00C6");
         tcValues.add("BB");
-        tcValues.add("CC");
+        tcValues.add("C||C");
 
         TestDataGenerator dataGenerator = createSampleType(sampleTypeName, namePrefix, textChoiceFieldName, tcValues);
 

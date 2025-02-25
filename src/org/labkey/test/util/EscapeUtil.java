@@ -21,6 +21,8 @@ import org.eclipse.jetty.util.URIUtil;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * UNDONE: Refactor useful methods from PageFlowUtil into util.jar that can be used by the test harness then delete this class.
@@ -138,5 +140,12 @@ public class EscapeUtil
         str = StringUtils.replace(str, "$D", "$");
         str = StringUtils.replace(str, "$P", ".");
         return str;
+    }
+
+    public static String getTextChoiceValidatorExpression(List<String> options)
+    {
+        return options.stream()
+                .map(choice -> choice.replace("|", "\\|"))
+                .collect(Collectors.joining("|"));
     }
 }
