@@ -227,7 +227,7 @@ public class AssayTransformWarningTest extends BaseWebDriverTest
 
         // note: we currently do not support warnings on update; Issue 52299 tracks this
         // for now, expect warning-generating script events to show up as errors
-        assertTextPresent("An error occurred when running the script 'assayTransformWarning.R', exit code: 1.");
+        assertTextPresent("An error occurred when running the script 'transformWarnUpdate.R', exit code: 1.");
     }
 
     @Test
@@ -297,7 +297,7 @@ public class AssayTransformWarningTest extends BaseWebDriverTest
                 .setField("comment", "commented")
                 .submit();
 
-        assertTextPresent("An error occurred when running the script 'assayTransformError.R', exit code: 1.");
+        assertTextPresent("An error occurred when running the script 'transformErrUpdate.R', exit code: 1.");
     }
 
     @Test
