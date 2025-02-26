@@ -1546,6 +1546,21 @@ public class ClientAPITest extends BaseWebDriverTest
                 columns.stream().noneMatch(col -> col.getName().equalsIgnoreCase("Container")));
     }
 
+    @Test
+    public void testBootstrapButtonEncoding()
+    {
+        assumeTestModules();
+
+        beginAt(WebTestHelper.buildURL("simpletest", getProjectName(), "encodeButton"));
+        var buttonLocator = Locator.tagWithClass("button", "input-test");
+        waitForElement(buttonLocator);
+
+        // Prior to the patch for Issue 52402 clicking the button would result in a XSS injection
+        // which would result in an UnhandledAlertException.
+        click(buttonLocator);
+        waitForElement(Locator.buttonContainingText("<script>alert('XSS Input Success')</script><span>Loading XSS</span>"));
+    }
+
     @Override
     public BrowserType bestBrowser()
     {
