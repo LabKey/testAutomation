@@ -16,6 +16,7 @@
 package org.labkey.test.tests;
 
 import org.apache.hc.core5.http.HttpStatus;
+import org.assertj.core.api.Assertions;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Assume;
 import org.junit.Test;
@@ -199,13 +200,11 @@ public class KnitrReportTest extends AbstractKnitrReportTest
 
         createKnitrReport(rmdDependenciesReport, RReportHelper.ReportOption.knitrMarkdown);
 
-        pauseJsErrorChecker(); // Don't fail due to "$ is not a function"
-        {
-            _rReportHelper.clickReportTab();
-            waitForElement(Locator.id("mtcars_table"));
-            assertElementNotPresent(Locator.id("mtcars_table_wrapper")); // Created by jQuery
-        }
-        resumeJsErrorChecker();
+        _rReportHelper.clickReportTab();
+        waitForElement(Locator.id("mtcars_table"));
+        assertElementNotPresent(Locator.id("mtcars_table_wrapper")); // Created by jQuery
+        Assertions.assertThat(getServerErrors()).as("Server errors").contains("$(...).dataTable is not a function");
+        checkExpectedErrors(1); // JavaScript error: "$(...).dataTable is not a function"
 
         // now set the dependencies
         _rReportHelper.clickSourceTab();
