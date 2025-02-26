@@ -25,8 +25,8 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Wiki;
+import org.labkey.test.pages.LabkeyErrorPage;
 import org.labkey.test.util.OptionalFeatureHelper;
-import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.WikiHelper;
 import org.openqa.selenium.WebElement;
@@ -118,6 +118,7 @@ public class WikiLongTest extends BaseWebDriverTest
             "The " + WIKI_SEARCH_TERM +
             " was called the African unicorn by Europeans and wasn't widely known to exist until 1901.\n";
 
+    private static final String WIKI_PAGE7_WEBPART_SUBSTITUTION = "${labkey.webPart(partName='Lists')}";
     private static final String WIKI_PAGE7_CONTENT =
             """
                     # Title MD
@@ -125,9 +126,8 @@ public class WikiLongTest extends BaseWebDriverTest
                     *italic text MD*
 
                     <b>escaped</b>
-                    
-                    ${labkey.webPart(partName='Query', title='WebPart Macro', schemaName='core', queryName='containers', allowChooseQuery='true', allowChooseView='true')}
-                    """;
+
+                    """ + WIKI_PAGE7_WEBPART_SUBSTITUTION;
 
     private static final String SAFE_LINK_HTML = "<a href=\"http://labkey.com\">Safe link</a>";
     private static final String FIXUP_LINK_HTML = "<a href=\"http://labkey.com\" target=\"_blank\">Fixup</a>";
@@ -233,8 +233,9 @@ public class WikiLongTest extends BaseWebDriverTest
         // verify that after saving the markdown that it is rendered as html that does not include the markdown symbols
         assertElementPresent(Locator.tagWithText("h1", "Title MD"));
         assertElementPresent(Locator.tagWithText("p", "<b>escaped</b>"));
-        assertElementPresent(PortalHelper.Locators.webPart("WebPart Macro"));
-        assertElementPresent(DataRegionTable.Locators.dataRegionTable().descendant(Locator.linkWithText(getProjectName())));
+
+        assertElementPresent(Locator.tagWithText("p", WIKI_PAGE7_WEBPART_SUBSTITUTION));
+
         assertTextNotPresent("# Title MD");
         clickAndWait(Locator.linkWithText("Edit"));
         _wikiHelper.convertWikiFormat("HTML");
@@ -469,7 +470,7 @@ public class WikiLongTest extends BaseWebDriverTest
         impersonate(USER1);
         assertElementNotPresent(Locator.linkWithText(PROJECT2_NAME));     // Project should not be visible
         popLocation();
-        assertTextPresent("User does not have permission to perform this operation.");  // Not authorized
+        new LabkeyErrorPage(getDriver()).assertUnauthorized(checker());
         goToHome();
         stopImpersonating();
 

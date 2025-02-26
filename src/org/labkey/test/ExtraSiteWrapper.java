@@ -55,6 +55,12 @@ public class ExtraSiteWrapper extends LabKeySiteWrapper implements AutoCloseable
     }
 
     @Override
+    protected boolean allowTimeZoneShifting()
+    {
+        return false;
+    }
+
+    @Override
     public void pauseJsErrorChecker(){}
     @Override
     public void resumeJsErrorChecker(){}

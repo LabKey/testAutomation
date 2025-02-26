@@ -669,7 +669,7 @@ public class Ext4Helper
 
     public void clickTabContainingText(String tabText)
     {
-        _test.click(Locators.tab().containing(tabText));
+        _test.waitAndClick(Locators.tab().containing(tabText));
     }
 
     public void waitForMaskToDisappear()

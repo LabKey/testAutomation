@@ -74,11 +74,11 @@ public class MessagesLongTest extends BaseWebDriverTest
     private static final String USER3 = "messageslong_user3@messages.test";
     private static final String NOT_A_USER = "Squirrel";
     private static final String RESPONDER = "responder@messages.test";
-    private static final String MACRO_WEBPART = "${labkey.webPart(partName='Lists')}";
+    private static final String WEBPART_SUBSTITUTION = "${labkey.webPart(partName='Lists')}";
     private static final String HTML_BODY = "1 <b>x</b>\n" +
-            "<b>" +
-            MACRO_WEBPART +
-            "</b>\n";
+            "<p>" +
+            WEBPART_SUBSTITUTION +
+            "</p>\n";
     private static final String HTML_BODY_WEBPART_TEST = "manage lists";
     private static final String MEMBER_LIST = "memberListInput";
     private static final String TEMPLATE_TEXT = "***Please do not reply to this email notification. Replies to this email are routed to an unmonitored mailbox. Instead, please use the link below.***";
@@ -238,8 +238,9 @@ public class MessagesLongTest extends BaseWebDriverTest
                         + stinky feet
                         + internet trolls
 
-                        <b>escaped</b>""" +
-                        "\n" + MACRO_WEBPART);
+                        <b>escaped</b>
+                        
+                        """ + WEBPART_SUBSTITUTION);
 
         // now look at the preview pane
         markdownPage.selectPreviewTab();
@@ -248,8 +249,9 @@ public class MessagesLongTest extends BaseWebDriverTest
         assertElementPresent(Locator.tagWithText("li", "stinky feet"));
         assertElementPresent(Locator.tagWithText("li", "internet trolls"));
         assertElementPresent(Locator.tagWithText("p", "<b>escaped</b>"));
-        assertElementPresent(PortalHelper.Locators.webPart("Lists"));
-        assertElementPresent(Locator.linkWithText("manage lists"));
+
+        assertElementPresent(Locator.tagWithText("p", WEBPART_SUBSTITUTION));
+
         clickButton("Submit");
         assertElementPresent(Locator.tagWithText("h1", "Holy Header, Batman!"));
         assertElementPresent(Locator.tagWithText("strong", "bold as bold can possibly be"));
@@ -271,7 +273,9 @@ public class MessagesLongTest extends BaseWebDriverTest
                 .setBody(HTML_BODY)
                 .submit();
         assertElementPresent(Locator.tag("div").withClass("message-text").withPredicate("starts-with(normalize-space(), '1 x')"));
-        assertElementPresent(Locator.linkWithText(HTML_BODY_WEBPART_TEST));
+        // 52214: Remove messages and markdown support for HTML substitution patterns
+        assertElementPresent(Locator.tagWithText("p", WEBPART_SUBSTITUTION));
+        assertElementNotPresent(Locator.linkWithText(HTML_BODY_WEBPART_TEST));
 
         log("Check that edit works");
         clickAndWait(Locator.linkWithText("view message or respond"));
@@ -432,7 +436,9 @@ public class MessagesLongTest extends BaseWebDriverTest
         assertTextPresent("RE: " + MSG1_TITLE, 0); // Do not expect original title in "RE:" email subjects
         assertTextPresent("RE: " + RESP1_TITLE, 6); // "RE:" email subjects should include the title of the response
         click(Locator.linkWithText(MSG1_TITLE));
-        assertElementPresent(Locator.linkWithText("manage lists"));
+        // 52214: Remove messages and markdown support for HTML substitution patterns
+        assertElementPresent(Locator.tagWithText("p", WEBPART_SUBSTITUTION));
+        assertElementNotPresent(Locator.linkWithText(HTML_BODY_WEBPART_TEST));
         click(Locator.linkWithText(MSG1_TITLE).index(1));
         assertTextPresent("first message testing");
         assertElementNotPresent(Locator.linkWithText(MSG3_TITLE));
