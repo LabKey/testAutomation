@@ -17,22 +17,27 @@ package org.labkey.test.tests;
 
 import org.apache.hc.core5.http.HttpStatus;
 import org.jetbrains.annotations.Nullable;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.ApiKeyCredentialsProvider;
 import org.labkey.remoteapi.BasicAuthCredentialsProvider;
 import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.remoteapi.query.DeleteRowsCommand;
 import org.labkey.remoteapi.query.GetQueryDetailsCommand;
 import org.labkey.remoteapi.query.GetQueryDetailsResponse;
 import org.labkey.remoteapi.query.GetSchemasCommand;
-import org.labkey.remoteapi.query.GetSchemasResponse;
+import org.labkey.remoteapi.query.ImportDataResponse;
+import org.labkey.remoteapi.query.SaveRowsResponse;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.remoteapi.query.Sort;
+import org.labkey.remoteapi.security.WhoAmICommand;
+import org.labkey.remoteapi.security.WhoAmIResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
@@ -43,9 +48,13 @@ import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.core.ApiKeyPanel;
 import org.labkey.test.components.ui.grids.QueryGrid;
 import org.labkey.test.pages.core.admin.CustomizeSitePage;
+import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.list.IntListDefinition;
 import org.labkey.test.util.Maps;
+import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.TestUser;
 import org.labkey.test.util.URLBuilder;
+import org.labkey.test.util.query.QueryApiHelper;
 import org.openqa.selenium.WebElement;
 
 import java.io.IOException;
@@ -56,7 +65,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -70,10 +79,13 @@ public class ApiKeyTest extends BaseWebDriverTest
     private static final String APIKEYS_TABLE = "APIKeys";
     private static final String CRYPT_COLUMN = "crypt";
     private static final String API_USERNAME = "apikey";
+    private static final String LIST_NAME = "InsertTestList";
+    private static final String LIST_VALUE = "value";
     private static final TestUser EDITOR_USER = new TestUser("editor@apikey.test");
+    private static final AtomicInteger valueCount = new AtomicInteger();
 
     @BeforeClass
-    public static void setupProject()
+    public static void setupProject() throws Exception
     {
         ApiKeyTest init = getCurrentTest();
 
@@ -87,13 +99,17 @@ public class ApiKeyTest extends BaseWebDriverTest
         _userHelper.deleteUsers(false, EDITOR_USER);
     }
 
-    private void doSetup()
+    private void doSetup() throws Exception
     {
         _containerHelper.createProject(getProjectName(), null);
 
         EDITOR_USER.create(this)
                 .setInitialPassword()
                 .addPermission("Editor", getProjectName());
+
+        new IntListDefinition(LIST_NAME, "Key")
+            .addField(new FieldDefinition(LIST_VALUE))
+            .create(createDefaultConnection(), getProjectName());
     }
 
     @Test
@@ -107,21 +123,23 @@ public class ApiKeyTest extends BaseWebDriverTest
 
         String apiKey = generateSessionKey();
 
-        verifyValidAPIKey(createApiKeyConnection(apiKey, false));
+        verifyValidAPIKey(createApiKeyConnection(apiKey));
+        verifySessionKeyCsrf(createApiKeyConnection(apiKey));
 
         log("Verify session key remains valid if key generation is turned off");
         goToAdminConsole()
                 .clickSiteSettings()
                 .setAllowSessionKeys(false)
                 .save();
-        verifyValidAPIKey(createApiKeyConnection(apiKey, false));
+        verifyValidAPIKey(createApiKeyConnection(apiKey));
+        verifySessionKeyCsrf(createApiKeyConnection(apiKey));
 
         signOut();
         log("Verify that logging out invalidates session keys");
-        verifyInvalidAPIKey(createApiKeyConnection(apiKey, false), false);
+        verifyInvalidAPIKey(createApiKeyConnection(apiKey), true);
         simpleSignIn();
         log("Verify that session keys remain invalid after logging back in");
-        verifyInvalidAPIKey(createApiKeyConnection(apiKey, false), false);
+        verifyInvalidAPIKey(createApiKeyConnection(apiKey), true);
     }
 
     @Test
@@ -136,17 +154,17 @@ public class ApiKeyTest extends BaseWebDriverTest
         signOut();
 
         log("Log in as non-admin user.");
-        signIn(EDITOR_USER.getEmail(), EDITOR_USER.getPassword());
+        signIn(EDITOR_USER.getEmail());
         String keyDescription = "Key for editing";
         String apiKey = generateAPIKey(keyDescription);
-        verifyValidAPIKey(createApiKeyConnection(apiKey, false));
+        verifyValidAPIKey(createApiKeyConnection(apiKey), EDITOR_USER.getEmail());
 
         QueryGrid grid = new QueryGrid.QueryGridFinder(getDriver()).waitFor();
         int beforeDeleteCount = grid.getRecordCount();
         assertFalse("Row with description not found", grid.getRowMap("Description", keyDescription).isEmpty());
         grid = deleteAPIKeyViaUI();
         assertEquals("Number of keys after UI deletion not as expected", beforeDeleteCount - 1, grid.getRecordCount());
-        verifyInvalidAPIKey(createApiKeyConnection(apiKey, false), false);
+        verifyInvalidAPIKey(createApiKeyConnection(apiKey), false);
     }
 
     @Test
@@ -162,9 +180,9 @@ public class ApiKeyTest extends BaseWebDriverTest
 
         String apiKey = generateAPIKeyAndRecord(_generatedApiKeys);
         log("Verify active API key via api authentication");
-        verifyValidAPIKey(createApiKeyConnection(apiKey, false));
+        verifyValidAPIKey(createApiKeyConnection(apiKey));
         log("Verify active API key via basic authentication");
-        verifyValidAPIKey(createApiKeyConnection(apiKey, true));
+        verifyValidAPIKey(createBasicAuthConnection(apiKey));
 
         log("Generate two other keys for use in testing deletion.");
         generateAPIKey(null);
@@ -179,7 +197,7 @@ public class ApiKeyTest extends BaseWebDriverTest
                 .clickSiteSettings()
                 .setAllowApiKeys(false)
                 .save();
-        verifyValidAPIKey(createApiKeyConnection(apiKey, false));
+        verifyValidAPIKey(createApiKeyConnection(apiKey));
 
         log("Verify key deletion via UI with disabled api key generation works.");
         grid = deleteAPIKeyViaUI();
@@ -189,7 +207,7 @@ public class ApiKeyTest extends BaseWebDriverTest
 
         log("Verify revoked/deleted api key");
         deleteAPIKeys(_generatedApiKeys);
-        verifyInvalidAPIKey(createApiKeyConnection(apiKey, false), false);
+        verifyInvalidAPIKey(createApiKeyConnection(apiKey), false);
     }
 
     /*
@@ -208,7 +226,7 @@ public class ApiKeyTest extends BaseWebDriverTest
                 .save();
 
         String apiKey1 = generateAPIKeyAndRecord(_generatedApiKeys);
-        Connection cn = createApiKeyConnection(apiKey1, false);
+        Connection cn = createApiKeyConnection(apiKey1);
         verifyValidAPIKey(cn);
 
         log("Deleting the apikey");
@@ -221,7 +239,7 @@ public class ApiKeyTest extends BaseWebDriverTest
         verifyInvalidAPIKey(cn, false);
 
         log("Verifying that new connection cannot be created after apikey is deleted");
-        verifyInvalidAPIKey(createApiKeyConnection(apiKey1, false), false);
+        verifyInvalidAPIKey(createApiKeyConnection(apiKey1), false);
 
         log("Generating the apikey which expires in ten seconds");
         goToAdminConsole()
@@ -235,12 +253,12 @@ public class ApiKeyTest extends BaseWebDriverTest
         String apikey2 = ApiKeyPanel.panelFinder(getDriver()).find().generateApiKey();
 
         log("Verify apikey can be used before expiring");
-        verifyValidAPIKey(createApiKeyConnection(apikey2, false));
+        verifyValidAPIKey(createApiKeyConnection(apikey2));
 
         sleep(10000); // Wait for apikey to expire
 
         log("Verify apikey cannot be used after it has expired");
-        verifyInvalidAPIKey(createApiKeyConnection(apikey2, false), false);
+        verifyInvalidAPIKey(createApiKeyConnection(apikey2), false);
     }
 
     @Test
@@ -345,14 +363,32 @@ public class ApiKeyTest extends BaseWebDriverTest
 
     private void verifyValidAPIKey(Connection connection) throws IOException
     {
+        verifyValidAPIKey(connection, PasswordUtil.getUsername());
+    }
+
+    private void verifyValidAPIKey(Connection connection, String userEmail) throws IOException
+    {
         try
         {
-            GetSchemasCommand cmd = new GetSchemasCommand();
-            GetSchemasResponse resp = cmd.execute(connection, getProjectName());
-            List<String> schemaNames = resp.getSchemaNames().stream().map(String::toLowerCase).collect(Collectors.toList());
-            Set<String> missingSchemas = new HashSet<>(Arrays.asList("pipeline", "lists", "core"));
-            missingSchemas.removeAll(schemaNames);
-            assertTrue("Some expected schemas missing. Schemas missing: " + missingSchemas, missingSchemas.isEmpty());
+            WhoAmIResponse whoAmI = new WhoAmICommand().execute(connection, null);
+            assertEquals("Connection user", userEmail, whoAmI.getEmail());
+
+            QueryApiHelper queryApiHelper = new QueryApiHelper(connection, getProjectName(), "lists", LIST_NAME);
+
+            // ImportData doesn't return auth challenge. Make sure it works
+            ImportDataResponse importResponse = queryApiHelper.importData(LIST_VALUE + "\nvalue" + valueCount.get());
+            valueCount.incrementAndGet();
+            assertEquals("Rows imported", 1, importResponse.getRowCount());
+
+            SaveRowsResponse saveResponse = queryApiHelper.insertRows(List.of(Map.of(LIST_VALUE, "value" + valueCount.get())));
+            valueCount.incrementAndGet();
+            assertEquals("Rows inserted", 1, saveResponse.getRowsAffected());
+
+            SelectRowsResponse selectResponse = queryApiHelper.selectRows();
+            assertEquals("Total rows", valueCount.get(), selectResponse.getRowCount());
+
+            whoAmI = new WhoAmICommand().execute(connection, null);
+            assertEquals("Connection user", userEmail, whoAmI.getEmail());
         }
         catch (CommandException e)
         {
@@ -360,10 +396,31 @@ public class ApiKeyTest extends BaseWebDriverTest
         }
     }
 
-    private Connection createApiKeyConnection(String apiKey, boolean basicAuth)
+    private void verifySessionKeyCsrf(Connection connection) throws IOException
     {
-        return new Connection(WebTestHelper.getBaseURL(), basicAuth ? new BasicAuthCredentialsProvider(API_USERNAME, apiKey)
-                : new ApiKeyCredentialsProvider(apiKey));
+        try
+        {
+            SimplePostCommand cmd = new SimplePostCommand("login", "csrf");
+            CommandResponse resp = cmd.execute(connection, getProjectName());
+            assertTrue("CSRF success", resp.getProperty("success"));
+
+            WhoAmIResponse whoAmI = new WhoAmICommand().execute(connection, null);
+            Assert.assertNotEquals("API CSRF", WebTestHelper.getCookies(PasswordUtil.getUsername()).get(Connection.X_LABKEY_CSRF).getValue(), whoAmI.getCSRF());
+        }
+        catch (CommandException e)
+        {
+            throw new RuntimeException("Response: " + e.getStatusCode(), e);
+        }
+    }
+
+    private Connection createApiKeyConnection(String apiKey)
+    {
+        return new Connection(WebTestHelper.getBaseURL(), new ApiKeyCredentialsProvider(apiKey));
+    }
+
+    private Connection createBasicAuthConnection(String apiKey)
+    {
+        return new Connection(WebTestHelper.getBaseURL(), new BasicAuthCredentialsProvider(API_USERNAME, apiKey));
     }
 
     private void verifyInvalidAPIKey(Connection connection, boolean isSessionKey) throws IOException
