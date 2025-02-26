@@ -9,6 +9,8 @@ import org.labkey.remoteapi.domain.DropDomainCommand;
 import org.labkey.remoteapi.domain.GetDomainDetailsCommand;
 import org.labkey.remoteapi.query.DeleteRowsCommand;
 import org.labkey.remoteapi.query.Filter;
+import org.labkey.remoteapi.query.ImportDataCommand;
+import org.labkey.remoteapi.query.ImportDataResponse;
 import org.labkey.remoteapi.query.InsertRowsCommand;
 import org.labkey.remoteapi.query.SaveRowsResponse;
 import org.labkey.remoteapi.query.SelectRowsCommand;
@@ -18,6 +20,7 @@ import org.labkey.remoteapi.query.TruncateTableCommand;
 import org.labkey.remoteapi.query.TruncateTableResponse;
 import org.labkey.remoteapi.query.UpdateRowsCommand;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -95,6 +98,22 @@ public class QueryApiHelper
         updateRowsCommand.setRows(rows);
         updateRowsCommand.setTimeout(_insertTimout);
         return  updateRowsCommand.execute(_connection, _containerPath);
+    }
+
+    public ImportDataResponse importData(String text) throws IOException, CommandException
+    {
+        ImportDataCommand importDataCommand = new ImportDataCommand(_schema, _query);
+        importDataCommand.setText(text);
+        importDataCommand.setTimeout(_insertTimout);
+        return  importDataCommand.execute(_connection, _containerPath);
+    }
+
+    public ImportDataResponse importData(File file) throws IOException, CommandException
+    {
+        ImportDataCommand importDataCommand = new ImportDataCommand(_schema, _query);
+        importDataCommand.setFile(file);
+        importDataCommand.setTimeout(_insertTimout);
+        return  importDataCommand.execute(_connection, _containerPath);
     }
 
     /**
