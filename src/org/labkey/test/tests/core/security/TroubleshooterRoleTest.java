@@ -122,7 +122,7 @@ public class TroubleshooterRoleTest extends BaseWebDriverTest
                 isElementPresent(Locator.tagWithText("span","Save")));
 
         log("Verify permissions for External Redirect Hosts");
-        goToAdminConsole().goToSettingsSection().clickExternalRedirectHosts();
+        goToAdminConsole().goToSettingsSection().clickAllowedExternalRedirectHosts();
         checker().verifyEquals("Incorrect access for External Redirect Hosts", canSave,
                 isElementPresent(Locator.tagWithText("span","Save")));
 

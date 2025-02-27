@@ -253,7 +253,7 @@ public class AdminConsoleTest extends AbstractAdminConsoleTest
     public void testConfigureReturnURL()
     {
         String host = "google.com";
-        goToAdminConsole().clickExternalRedirectHosts();
+        goToAdminConsole().clickAllowedExternalRedirectHosts();
 
         log("Verifying host cannot be blank ");
         clickButton("Save");
