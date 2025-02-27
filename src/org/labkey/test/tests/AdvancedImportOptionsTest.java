@@ -16,6 +16,7 @@
 package org.labkey.test.tests;
 
 import org.junit.Assume;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
@@ -31,6 +32,7 @@ import org.labkey.test.pages.StartImportPage;
 import org.labkey.test.pages.study.ManageDatasetQCStatesPage;
 import org.labkey.test.pages.study.QCStateTableRow;
 import org.labkey.test.util.ApiPermissionsHelper;
+import org.labkey.test.util.OptionalFeatureHelper;
 import org.labkey.test.util.PermissionsHelper;
 import org.labkey.test.util.PostgresOnlyTest;
 import org.openqa.selenium.WebElement;
@@ -88,6 +90,13 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest implements Post
         return BrowserType.CHROME;
     }
 
+    @BeforeClass
+    public static void doSetup()
+    {
+        AdvancedImportOptionsTest test = getCurrentTest();
+        OptionalFeatureHelper.enableOptionalFeature(test.createDefaultConnection(), "studyDesignFlag");
+    }
+
     @Override
     public void doCleanup(boolean afterTest) throws TestTimeoutException
     {
@@ -96,6 +105,7 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest implements Post
         _containerHelper.deleteProject(IMPORT_PROJECT_FILE02, false);
         _containerHelper.deleteProject(IMPORT_PROJECT_FILE03, false);
         _containerHelper.deleteProject(IMPORT_PROJECT_MULTI, false);
+        OptionalFeatureHelper.disableOptionalFeature(createDefaultConnection(), "studyDesignFlag");
 
         _userHelper.deleteUser(LIMITED_USER);
     }
