@@ -825,6 +825,22 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         assertEquals("Dave", table.getDataAsText(1, "Crazy " + D_PEOPLE_METADATA_TITLE));
     }
 
+    @Test
+    public void testCoreLinkedSchema()
+    {
+        // Coverage for Issue 52417: StackOverflowError trying to analyze queries in container with linked schema over Core
+        String linkedSchemaName = "linkedCore";
+        String sourceContainerPath = "/" + getProjectName() + "/" + STUDY_FOLDER;
+
+        log("Create the linked schema on core");
+        _schemaHelper.createLinkedSchema(sourceContainerPath, linkedSchemaName, sourceContainerPath, null, "core", null, null);
+
+        goToSchemaBrowser();
+        DataRegionTable table = viewQueryData(linkedSchemaName, "Modules");
+        List<String> colNames = table.getColumnNames();
+        assertTrue("Columns should have included 'Name': " + colNames, colNames.contains("Name"));
+    }
+
     /*
         Test coverage : Issue 45347: Audit table data not available in linked schema
      */
