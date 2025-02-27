@@ -234,11 +234,7 @@ public class WikiLongTest extends BaseWebDriverTest
         assertElementPresent(Locator.tagWithText("h1", "Title MD"));
         assertElementPresent(Locator.tagWithText("p", "<b>escaped</b>"));
 
-        // Issue 52214: Remove markdown support for HTML substitution patterns
-        assertElementPresent(PortalHelper.Locators.webPart("Lists"));
-        assertElementPresent(Locator.linkWithText("manage lists"));
-        // TODO: Update assertion
-        // assertElementPresent(Locator.tagWithText("p", MACRO_WEBPART));
+        assertElementPresent(Locator.tagWithText("p", WIKI_PAGE7_WEBPART_SUBSTITUTION));
 
         assertTextNotPresent("# Title MD");
         clickAndWait(Locator.linkWithText("Edit"));

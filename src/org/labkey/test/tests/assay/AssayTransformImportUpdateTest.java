@@ -188,6 +188,13 @@ public class AssayTransformImportUpdateTest extends BaseWebDriverTest
                 " ", dataMap2.get("M2"));
         checker().screenShotIfNewError("unexpected update transform data");
 
+        // re-enable protocol run-on-import and edit so we can measure their metrics
+        assayDesignerPage = ReactAssayDesignerPage.beginAt(this, getProjectName(), protocolResponse.getProtocolId(),
+                "general", getURL().toString());
+        assayDesignerPage.setScriptActionCheckbox(transformFile.getName(), Edit, true);
+        assayDesignerPage.setScriptActionCheckbox(transformFile.getName(), Import, true);
+        assayDesignerPage.clickSave();
+
         // validate some metrics for this feature
         var metricsPage = UsageStatisticsPage.beginAt(this);
         metricsPage.setJsonPathInput("modules.Experiment.assay");
