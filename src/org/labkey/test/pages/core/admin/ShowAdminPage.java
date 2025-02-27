@@ -85,7 +85,7 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
         clickAndWait(elementCache().analyticsSettingsLink);
     }
 
-    public void clickExternalRedirectHosts()
+    public void clickAllowedExternalRedirectHosts()
     {
         goToSettingsSection();
         clickAndWait(elementCache().externalRedirectHostLink);
@@ -273,7 +273,7 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
         protected WebElement sectionActiveUsers = Locator.linkWithText("Active Users").findWhenNeeded(this);
 
         protected WebElement analyticsSettingsLink = Locator.linkWithText("analytics settings").findWhenNeeded(this);
-        protected WebElement externalRedirectHostLink = Locator.linkWithText("external redirect hosts").findElement(this);
+        protected WebElement externalRedirectHostLink = Locator.linkWithText("allowed external redirect hosts").findElement(this);
         protected WebElement auditLogLink = Locator.linkWithText("audit log").findWhenNeeded(this);
         protected WebElement auditLogMaintenanceLink = Locator.linkWithText("Audit Log Maintenance").findWhenNeeded(this);
         protected WebElement authenticationLink = Locator.linkWithText("authentication").findWhenNeeded(this);
