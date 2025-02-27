@@ -78,6 +78,42 @@ public class FieldDefinition extends PropertyDescriptor
         this(name, ColumnType.String);
     }
 
+    // See BaseColumnInfo.labelFromName
+    public static String labelFromName(String name)
+    {
+        if (name == null)
+            return null;
+
+        if (name.length() == 0)
+            return name;
+
+        StringBuilder buf = new StringBuilder(name.length() + 10);
+        char[] chars = new char[name.length()];
+        name.getChars(0, name.length(), chars, 0);
+        buf.append(Character.toUpperCase(chars[0]));
+        for (int i = 1; i < name.length(); i++)
+        {
+            char c = chars[i];
+            if (c == '_' && i < name.length() - 1)
+            {
+                buf.append(" ");
+                i++;
+                buf.append(Character.isLowerCase(chars[i]) ? Character.toUpperCase(chars[i]) : chars[i]);
+            }
+            else if (Character.isUpperCase(c) && Character.isLowerCase(chars[i - 1]))
+            {
+                buf.append(" ");
+                buf.append(c);
+            }
+            else
+            {
+                buf.append(c);
+            }
+        }
+
+        return buf.toString();
+    }
+
     @Override
     public Map<String, Object> getAllProperties()
     {
