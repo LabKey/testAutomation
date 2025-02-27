@@ -31,8 +31,8 @@ import static org.junit.Assert.assertTrue;
 @BaseWebDriverTest.ClassTimeout(minutes = 10)
 public class DataViewsPermissionsTest extends StudyBaseTest
 {
-    public static final String AUTHOR_USER = "author@dataviews.test";
-    public static final String EDITOR_USER = "editor@dataviews.test";
+    public static final String AUTHOR_USER = "dvp_author@dataviews.test";
+    public static final String EDITOR_USER = "dvp_editor@dataviews.test";
     private final PortalHelper portalHelper = new PortalHelper(this);
 
     @Override
@@ -121,7 +121,7 @@ public class DataViewsPermissionsTest extends StudyBaseTest
         clickFolder(getFolderName());
         click(Locator.tag("a").withAttributeContaining("href", "editDataViews"));
         openEditPanel("Report 2");
-        _ext4Helper.selectComboBoxItem("Author","author");
+        _ext4Helper.selectComboBoxItem("Author", _userHelper.getDisplayNameForEmail(AUTHOR_USER));
         _ext4Helper.checkCheckbox("Shared");
         sleep(1000);
         _ext4Helper.clickWindowButton("Report 2","Save",0,0);
@@ -129,7 +129,7 @@ public class DataViewsPermissionsTest extends StudyBaseTest
         clickFolder(getFolderName());
         click(Locator.tag("a").withAttributeContaining("href", "editDataViews"));
         openEditPanel("Report 3");
-        _ext4Helper.selectComboBoxItem("Author","editor");
+        _ext4Helper.selectComboBoxItem("Author", _userHelper.getDisplayNameForEmail(EDITOR_USER));
         _ext4Helper.checkCheckbox("Shared");
         sleep(1000);
         _ext4Helper.clickWindowButton("Report 3","Save",0,0);
