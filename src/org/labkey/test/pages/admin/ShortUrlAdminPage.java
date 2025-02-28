@@ -1,0 +1,94 @@
+package org.labkey.test.pages.admin;
+
+import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.WebTestHelper;
+import org.labkey.test.components.html.Input;
+import org.labkey.test.pages.LabKeyPage;
+import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.PortalHelper;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.io.IOException;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+public class ShortUrlAdminPage extends LabKeyPage<ShortUrlAdminPage.ElementCache>
+{
+    public static final String SHORT_URL_COL = "ShortURL";
+    public static final String TARGET_URL_COL = "FullURL";
+
+    public ShortUrlAdminPage(WebDriver driver)
+    {
+        super(driver);
+    }
+
+    public static ShortUrlAdminPage beginAt(WebDriverWrapper webDriverWrapper)
+    {
+        webDriverWrapper.beginAt(WebTestHelper.buildURL("admin", "shortURLAdmin"));
+        return new ShortUrlAdminPage(webDriverWrapper.getDriver());
+    }
+
+    @Override
+    protected void waitForPage()
+    {
+        shortWait().until(ExpectedConditions.visibilityOf(elementCache().shortUrlsTable.getComponentElement()));
+    }
+
+    public void createNewShortUrl(String shortUrl, String targetUrl)
+    {
+        elementCache().shortUrlInput.set(shortUrl);
+        elementCache().targetUrlInput.set(targetUrl);
+
+        clickAndWait(elementCache().submitButton);
+
+        clearCache();
+    }
+
+    public String clickCopyToClipboard(String shortUrl) throws IOException, UnsupportedFlavorException
+    {
+        int rowIndex = getRowIndex(shortUrl);
+        WebElement copyToClipboardCell = getShortUrlGrid().findCell(rowIndex, "CopyToClipboard");
+        Locator.tagWithClass("a", "fa-clipboard").findElement(copyToClipboardCell).click();
+
+        return getClipboardContent();
+    }
+
+    public Map<String, String> getUrlsFromGrid()
+    {
+        List<List<String>> rows = elementCache().shortUrlsTable.getRows(SHORT_URL_COL, TARGET_URL_COL);
+        Map<String, String> urls = new LinkedHashMap<>(rows.size());
+        rows.forEach(row -> urls.put(row.get(0), row.get(1)));
+        return urls;
+    }
+
+    private int getRowIndex(String shortUrl)
+    {
+        return getShortUrlGrid().getRowIndex(SHORT_URL_COL, shortUrl);
+    }
+
+    public DataRegionTable getShortUrlGrid()
+    {
+        return elementCache().shortUrlsTable;
+    }
+
+    @Override
+    protected ElementCache newElementCache()
+    {
+        return new ElementCache();
+    }
+
+    protected class ElementCache extends LabKeyPage<ElementCache>.ElementCache
+    {
+        WebElement createNewShortUrlPanel = PortalHelper.Locators.webPart("Create New Short URL").findWhenNeeded(this);
+        Input shortUrlInput = Input.Input(Locator.id("shortURLTextField"), getDriver()).findWhenNeeded(createNewShortUrlPanel);
+        Input targetUrlInput = Input.Input(Locator.id("targetURLTextField"), getDriver()).findWhenNeeded(createNewShortUrlPanel);
+        WebElement submitButton = Locator.lkButton("Submit").findWhenNeeded(createNewShortUrlPanel);
+
+        DataRegionTable shortUrlsTable = DataRegionTable.DataRegion(getDriver()).withName("ShortURL").findWhenNeeded(this);
+    }
+}

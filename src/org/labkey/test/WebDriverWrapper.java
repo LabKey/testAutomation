@@ -105,7 +105,10 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -3547,6 +3550,50 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     .keyUp(cmdKey)
                     .perform();
         }
+    }
+
+    public String getClipboardContent() throws IOException, UnsupportedFlavorException
+    {
+        DataFlavor[] flavors = Toolkit.getDefaultToolkit().getSystemClipboard().getAvailableDataFlavors();
+        Transferable t = Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null);
+
+        // Adding debug info for TeamCity run.
+        // Windows is not giving DataFlavor (MIME Type) for the data on the clipboard.
+        log("Available flavors: " + Arrays.stream(flavors).toList());
+        log("Best flavor: " + DataFlavor.selectBestTextFlavor(flavors));
+
+        if (t != null)
+        {
+
+            // Adding debug info for TeamCity run.
+            log("Is DataFlavor.imageFlavor supported? " + t.isDataFlavorSupported(DataFlavor.imageFlavor));
+            log("Is DataFlavor.allHtmlFlavor supported? " + t.isDataFlavorSupported(DataFlavor.allHtmlFlavor));
+            log("Is DataFlavor.fragmentHtmlFlavor supported? " + t.isDataFlavorSupported(DataFlavor.fragmentHtmlFlavor));
+            log("Is DataFlavor.selectionHtmlFlavor supported? " + t.isDataFlavorSupported(DataFlavor.selectionHtmlFlavor));
+            log("Is DataFlavor.javaFileListFlavor supported? " + t.isDataFlavorSupported(DataFlavor.javaFileListFlavor));
+            log("Is DataFlavor.stringFlavor supported? " + t.isDataFlavorSupported(DataFlavor.stringFlavor));
+
+            DataFlavor[] transferFlavors = t.getTransferDataFlavors();
+            log("Transferable supported data flavors: " + Arrays.stream(transferFlavors).toList());
+
+            if (flavors.length > 0)
+            {
+                log("Best Text Flavor: " + DataFlavor.selectBestTextFlavor(flavors));
+                return (String) Toolkit.getDefaultToolkit().getSystemClipboard()
+                    .getData(DataFlavor.selectBestTextFlavor(flavors));
+            }
+            else
+            {
+                // Return a value to indicate something is on the clipboard but no DataFlavor was provided.
+                return "There are no DataFlavors to use.";
+            }
+
+        }
+        else
+        {
+            return null;
+        }
+
     }
 
     private static final List<String> html5InputTypes = Arrays.asList("color", "date", "datetime-local", "email", "month", "number", "range", "search", "tel", "time", "url", "week");
