@@ -147,6 +147,6 @@ public class EscapeUtil
         return options.stream()
                 .map(String::trim)
                 .map(value -> value.replaceAll("([\\\\|])", "\\\\$1"))
-                .collect(Collectors.joining(" | "));
+                .collect(Collectors.joining("|"));
     }
 }
