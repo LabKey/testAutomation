@@ -128,7 +128,7 @@ public class FileUploadPanel extends WebDriverComponent<FileUploadPanel.ElementC
                 .withChild(Locator.tagWithClass("span", "fa-times-circle"));
         Locator.XPathLocator attachedFileContainerOld = Locator.tagWithClass("div", "attached-file--container")
                 .withChild(Locator.tagWithClass("span", "fa-times-circle"));
-        WebElement downloadTemplate = Locator.linkWithTitle("Download Template").findElementOrNull(getDriver());
+        WebElement downloadTemplate = Locator.tagWithAttribute("span", "title", "Download Template").findElementOrNull(getDriver());
 
         Locator attachedFileContainer(String fileName)
         {
