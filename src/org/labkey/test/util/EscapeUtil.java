@@ -145,7 +145,8 @@ public class EscapeUtil
     public static String getTextChoiceValidatorExpression(List<String> options)
     {
         return options.stream()
-                .map(choice -> choice.replace("|", "\\|"))
-                .collect(Collectors.joining("|"));
+                .map(String::trim)
+                .map(value -> value.replaceAll("([\\\\|])", "\\\\$1"))
+                .collect(Collectors.joining(" | "));
     }
 }
