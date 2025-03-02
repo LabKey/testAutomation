@@ -564,6 +564,14 @@ public class FieldSelectionDialog extends ModalDialog
         });
     }
 
+    public void clickCancel()
+    {
+        linkedComponent.doAndWaitForUpdate(() -> {
+            elementCache().cancelButton.click();
+            waitForClose();
+        });
+    }
+
     /**
      * Is the 'Update Grid' button enabled.
      *
@@ -613,6 +621,9 @@ public class FieldSelectionDialog extends ModalDialog
                 .findWhenNeeded(this));
 
         protected final WebElement updateGridButton = Locator.button("Update Grid")
+                .findWhenNeeded(this);
+
+        protected final WebElement cancelButton = Locator.button("Cancel")
                 .findWhenNeeded(this);
 
         // The 'pencil' to edit a field label. Only in the Shown in Grid panel.
