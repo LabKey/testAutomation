@@ -566,10 +566,7 @@ public class FieldSelectionDialog extends ModalDialog
 
     public void clickCancel()
     {
-        linkedComponent.doAndWaitForUpdate(() -> {
-            elementCache().cancelButton.click();
-            waitForClose();
-        });
+        elementCache().cancelButton.click();
     }
 
     /**
