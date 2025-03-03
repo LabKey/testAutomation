@@ -15,7 +15,6 @@
  */
 package org.labkey.test.tests;
 
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
@@ -253,23 +252,23 @@ public class AdminConsoleTest extends AbstractAdminConsoleTest
     public void testConfigureReturnURL()
     {
         String host = "google.com";
-        goToAdminConsole().clickExternalRedirectHosts();
+        goToAdminConsole().clickAllowedExternalRedirectHosts();
 
         log("Verifying host cannot be blank ");
         clickButton("Save");
-        assertElementPresent(Locator.css(".labkey-error").withText("External host name must not be blank."));
+        assertElementPresent(Locator.css(".labkey-error").withText("Redirect host name must not be blank."));
 
         log("Setting the host URL");
-        setFormElement(Locator.name("newExternalHost"), host);
+        setFormElement(Locator.name("newValue"), host);
         clickButton("Save");
 
         log("Verifying url got added correctly");
-        assertEquals(host, getFormElement(Locator.name("existingExternalHost1")));
+        assertEquals(host, getFormElement(Locator.name("existingValue1")));
 
         log("Verifying cannot be duplicate");
-        setFormElement(Locator.name("newExternalHost"), host);
+        setFormElement(Locator.name("newValue"), host);
         clickButton("Save");
-        assertElementPresent(Locator.css(".labkey-error").withText("'" + host + "' already exists. Duplicate hosts not allowed."));
+        assertElementPresent(Locator.css(".labkey-error").withText("'" + host + "' already exists. Duplicate values not allowed."));
     }
 
     /*
