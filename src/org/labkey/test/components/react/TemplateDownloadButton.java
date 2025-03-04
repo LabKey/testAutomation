@@ -9,6 +9,16 @@ import java.io.File;
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 import static org.labkey.test.WebDriverWrapper.waitFor;
 
+/**
+ * This is a test component for the <TemplateDownloadButton/> React component found in the @labkey/components package.
+ * This is not a typical dropdown menu (a.k.a. MultiMenu) in that it has a couple of unique behaviors:
+ * 1. It always renders as a dropdown toggle menu button.
+ * 2. When the button is clicked it will fetch/resolve custom templates for the related entity.
+ * 3. If there are custom templates, then the button will display a dropdown menu from which custom templates can
+ * be downloaded.
+ * 4. If there are no custom templates, then the default template file will be downloaded immediately without a menu
+ * being displayed.
+ */
 public class TemplateDownloadButton extends MultiMenu
 {
     private static final String DEFAULT_TEMPLATE_NAME = "Default Template";
@@ -23,13 +33,14 @@ public class TemplateDownloadButton extends MultiMenu
     private File download(String templateName)
     {
         return getWrapper().doAndWaitForDownload(() -> {
-            clickAndWaitForLoaded();
+            clickAndWaitForLoaded(); // Will trigger download if there are no custom templates
 
             boolean hasTemplates = hasCustomTemplates();
             boolean isDefaultDownload = DEFAULT_TEMPLATE_NAME.equals(templateName);
 
             if (hasTemplates)
             {
+                // When custom templates are available the default template download will appear as a menu item
                 if (isDefaultDownload)
                     doMenuAction(DEFAULT_TEMPLATE_NAME);
                 else
@@ -41,13 +52,13 @@ public class TemplateDownloadButton extends MultiMenu
         });
     }
 
-    // This will error if there are no custom templates.
-    public MultiMenu expandDropdown()
+    @Override
+    public void expand()
     {
         if (!isDropdown())
             throw new Error("Custom Templates are not available.");
 
-        return this;
+        super.expand();
     }
 
     public boolean isDropdown()
@@ -71,14 +82,15 @@ public class TemplateDownloadButton extends MultiMenu
     private void clickAndWaitForLoaded()
     {
         boolean wasLoaded = isLoaded();
-        getComponentElement().click();
+        elementCache().toggleAnchor.click();
         if (!wasLoaded)
             waitFor(this::isLoaded, "Template download button failed to load in time", WAIT_FOR_JAVASCRIPT);
     }
 
     private boolean hasButtonClass(String cls)
     {
-        return Locator.tagWithClass("button", cls).existsIn(getComponentElement());
+        String cssClass = elementCache().toggleAnchor.getDomAttribute("class");
+        return cssClass != null && cssClass.contains(cls);
     }
 
     private boolean hasCustomTemplates()
