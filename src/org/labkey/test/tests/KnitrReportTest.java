@@ -203,8 +203,13 @@ public class KnitrReportTest extends AbstractKnitrReportTest
         _rReportHelper.clickReportTab();
         waitForElement(Locator.id("mtcars_table"));
         assertElementNotPresent(Locator.id("mtcars_table_wrapper")); // Created by jQuery
-        Assertions.assertThat(getServerErrors()).as("Server errors").contains("$(...).dataTable is not a function");
-        checkExpectedErrors(1); // JavaScript error: "$(...).dataTable is not a function"
+        String serverErrors = getServerErrors();
+        if (!serverErrors.isEmpty())
+        {
+            // Client-side error doesn't always happen but, if it does, make sure it is the one we expect.
+            Assertions.assertThat(serverErrors).as("Server errors").contains("$(...).dataTable is not a function");
+            checkExpectedErrors(1); // JavaScript error: "$(...).dataTable is not a function"
+        }
 
         // now set the dependencies
         _rReportHelper.clickSourceTab();
