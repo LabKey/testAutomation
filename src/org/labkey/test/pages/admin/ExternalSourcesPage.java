@@ -74,8 +74,8 @@ public class ExternalSourcesPage extends LabKeyPage<ExternalSourcesPage.ElementC
 
     public Map<Directive, List<Input>> getExistingHostInputs()
     {
-        List<WebElement> directiveColumn = elementCache().existingValuesTable.getColumnAsElement(1, 0);
-        List<WebElement> hostsColumn = elementCache().existingValuesTable.getColumnAsElement(2, 0);
+        List<WebElement> directiveColumn = elementCache().existingValuesTable.getColumnAsElement(1);
+        List<WebElement> hostsColumn = elementCache().existingValuesTable.getColumnAsElement(2);
 
         Map<Directive, List<Input>> existingHosts = new HashMap<>();
 
@@ -104,7 +104,7 @@ public class ExternalSourcesPage extends LabKeyPage<ExternalSourcesPage.ElementC
         final WebElement addButton = Locator.lkButton("Add").findWhenNeeded(addHostForm);
 
         final WebElement existingValuesForm = Locator.name("existingValues").findWhenNeeded(this);
-        final Table existingValuesTable = new Table(getDriver(), Locator.byClass("labkey-data-region-legacy").findWhenNeeded(existingValuesForm));
+        final Table existingValuesTable = new Table(getDriver(), Locator.byClass("labkey-data-region-legacy").findWhenNeeded(existingValuesForm), 0);
     }
 
     public enum Directive implements OptionSelect.SelectOption
