@@ -28,6 +28,8 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Wiki;
+import org.labkey.test.pages.admin.ExternalSourcesPage;
+import org.labkey.test.pages.admin.ExternalSourcesPage.Directive;
 import org.labkey.test.pages.search.SearchResultsPage;
 import org.labkey.test.pages.wiki.EditPage;
 import org.labkey.test.util.DataRegionTable;
@@ -159,13 +161,17 @@ public class WikiTest extends BaseWebDriverTest
     @Test
     public void testEmbeddedVideoInWiki()
     {
+        String videoHost = "https://www.youtube.com";
+        String videoUrl = videoHost + "/embed/JEE4807UHN4";
         String wikiName = "Wiki with video";
         String wikiTitle = "Sample finder video";
         String wikiContent = """
                 Some random content start : Have fun watching video below
-                {video:https://www.youtube.com/embed/JEE4807UHN4|height:350|width:500}
+                {video:%s|height:350|width:500}
                 Hope you had fun watching the video..!
-                """;
+                """.formatted(videoUrl);
+
+        ExternalSourcesPage.beginAt(this).ensureHost(Directive.Frame, videoHost);
 
         goToProjectHome();
         log("Creating the wiki with video");
@@ -177,7 +183,7 @@ public class WikiTest extends BaseWebDriverTest
         wikiHelper.setWikiBody(wikiContent);
         wikiHelper.saveWikiPage();
 
-        Assert.assertEquals("Video is missing", "https://www.youtube.com/embed/JEE4807UHN4",
+        Assert.assertEquals("Video is missing", videoUrl,
                 getAttribute(Locator.tag("iframe"), "src"));
     }
 
