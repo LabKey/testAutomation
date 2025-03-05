@@ -86,6 +86,11 @@ public class FileUploadPanel extends WebDriverComponent<FileUploadPanel.ElementC
         return elementCache().templateDownloadButton().downloadCustomTemplate(templateName);
     }
 
+    public void waitForTemplateDownloadDropdown()
+    {
+        elementCache().templateDownloadButton().expand();
+    }
+
     public boolean isTemplateDownloadDropdown()
     {
         return elementCache().templateDownloadButton().isDropdown();

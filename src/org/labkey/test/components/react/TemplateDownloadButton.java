@@ -55,17 +55,21 @@ public class TemplateDownloadButton extends MultiMenu
     @Override
     public void expand()
     {
-        if (!isDropdown())
-            throw new Error("Custom Templates are not available.");
+        if (!isExpanded())
+        {
+            if (!isLoaded())
+                clickAndWaitForLoaded();
+
+            if (!isDropdown())
+                return; // Not a dropdown, do not attempt to expand
+        }
 
         super.expand();
     }
 
     public boolean isDropdown()
     {
-        if (!isLoaded())
-            clickAndWaitForLoaded();
-        return hasCustomTemplates();
+        return isLoaded() && hasCustomTemplates();
     }
 
     public File downloadDefaultTemplate()
