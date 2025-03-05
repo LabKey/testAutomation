@@ -106,7 +106,7 @@ public class CrossFolderListTest extends BaseWebDriverTest
                 .setName(newListName)
                 .clickSave();
 
-        // Issue 47356: Rewrite returnURL in the event of a list name change
+        // Issue 47356: Rewrite returnUrl in the event of a list name change
         new GridPage(getDriver()).getGrid();
         assertThat(getURL().getQuery()).contains("name=" + newListName);
         assertThat(getURL().getPath()).contains("/" + SUBFOLDER_A);
