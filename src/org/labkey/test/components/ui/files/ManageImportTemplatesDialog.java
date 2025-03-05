@@ -6,6 +6,7 @@ import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.html.Input;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -90,10 +91,13 @@ public class ManageImportTemplatesDialog extends ModalDialog
     {
         int previousRowCount = templateRowCount();
         WebElement row = elementCache().templateRow(rowInd);
-        Locator.tagWithClass("span", "import-template-delete-icon").findElement(row).click();
+
+        WebElement icon = Locator.tagWithClass("span", "import-template-delete-icon").findElement(row);
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(icon));
+        icon.click();
 
         waitFor(() -> templateRowCount() < previousRowCount,
-                "Unable to delete a template.",
+                String.format("Unable to delete a template at row index: %d. Previous row count: %d ", rowInd, previousRowCount),
                 1_000);
     }
 
@@ -212,10 +216,6 @@ public class ManageImportTemplatesDialog extends ModalDialog
 
     protected class ElementCache extends ModalDialog.ElementCache
     {
-        final Input nameInput = Input.Input(Locator.name("Name"), getDriver()).timeout(1500).findWhenNeeded();
-        final Input descriptionInput = Input.Input(Locator.name("Description"), getDriver()).timeout(1500).
-                findWhenNeeded();
-
         WebElement addTemplateRow = Locator.tagWithClassContaining("span", "container--action-button")
                 .withText("Add a Template").findWhenNeeded(getComponentElement());
 
@@ -223,13 +223,12 @@ public class ManageImportTemplatesDialog extends ModalDialog
 
         public List<WebElement> templateRows()
         {
-            return Locator.tagWithClass("", "file-listing-row--container").findElements(getComponentElement());
+            return Locator.tagWithClass("div", "file-listing-row--container").findElements(getComponentElement());
         }
 
         public WebElement templateRow(int index)
         {
             return templateRows().get(index);
         }
-
     }
 }
