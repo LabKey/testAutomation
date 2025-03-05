@@ -19,6 +19,7 @@ import java.util.Map;
 
 public class ShortUrlAdminPage extends LabKeyPage<ShortUrlAdminPage.ElementCache>
 {
+    public static final String SHORT_URL_QUERY = "ShortURL";
     public static final String SHORT_URL_COL = "ShortURL";
     public static final String TARGET_URL_COL = "FullURL";
 
@@ -30,6 +31,13 @@ public class ShortUrlAdminPage extends LabKeyPage<ShortUrlAdminPage.ElementCache
     public static ShortUrlAdminPage beginAt(WebDriverWrapper webDriverWrapper)
     {
         webDriverWrapper.beginAt(WebTestHelper.buildURL("admin", "shortURLAdmin"));
+        return new ShortUrlAdminPage(webDriverWrapper.getDriver());
+    }
+
+    public static ShortUrlAdminPage beginAtFiltered(WebDriverWrapper webDriverWrapper, String contains)
+    {
+        webDriverWrapper.beginAt(WebTestHelper.buildURL("admin", "shortURLAdmin",
+                Map.of("%s.%s~contains".formatted(SHORT_URL_QUERY, SHORT_URL_COL), contains)));
         return new ShortUrlAdminPage(webDriverWrapper.getDriver());
     }
 
@@ -74,6 +82,16 @@ public class ShortUrlAdminPage extends LabKeyPage<ShortUrlAdminPage.ElementCache
     public DataRegionTable getShortUrlGrid()
     {
         return elementCache().shortUrlsTable;
+    }
+
+    public void deleteAll()
+    {
+        DataRegionTable shortUrlGrid = getShortUrlGrid();
+        if (shortUrlGrid.getDataRowCount() > 0)
+        {
+            shortUrlGrid.checkAllOnPage();
+            shortUrlGrid.deleteSelectedRows();
+        }
     }
 
     @Override
