@@ -42,7 +42,7 @@ public class EmailRecordTable extends Table
 
     public EmailRecordTable(WebDriver driver)
     {
-        super(driver, new RefindingWebElement(gridLocator, driver).withTimeout(WAIT_FOR_JAVASCRIPT));
+        super(driver, new RefindingWebElement(gridLocator, driver).withTimeout(WAIT_FOR_JAVASCRIPT), _headerRows);
         ((RefindingWebElement) getComponentElement()).withRefindListener(el -> clearElementCache());
     }
 
@@ -67,7 +67,7 @@ public class EmailRecordTable extends Table
         }
         catch (IllegalArgumentException fallback)
         {
-            return super.getColumnIndex(headerLabel, _headerRows);
+            return super.getColumnIndex(headerLabel);
         }
     }
 
@@ -171,7 +171,7 @@ public class EmailRecordTable extends Table
 
     public List<Integer> getTableIndexesWhereTextAppears(String header, String text)
     {
-        List<String> columnText = getColumnAsText(header, _headerRows);
+        List<String> columnText = getColumnAsText(header);
         List<Integer> colsWithString = new ArrayList<>();
         for(int i = 1; i <= columnText.size(); i++)
         {
@@ -231,12 +231,7 @@ public class EmailRecordTable extends Table
 
     public List<String> getColumnDataAsText(String column)
     {
-        return getColumnAsText(column , _headerRows);
-    }
-
-    public int getHeaderRowCount()
-    {
-        return _headerRows;
+        return getColumnAsText(column);
     }
 
     public static class EmailMessage

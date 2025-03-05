@@ -243,7 +243,7 @@ public class EntityBulkUpdateDialog extends ModalDialog
     @Override
     protected ElementCache elementCache()
     {
-        return new ElementCache();
+        return (ElementCache) super.elementCache();
     }
 
     protected class ElementCache extends ModalDialog.ElementCache
