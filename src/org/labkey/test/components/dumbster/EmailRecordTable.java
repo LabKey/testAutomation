@@ -36,13 +36,11 @@ public class EmailRecordTable extends Table
 {
     private static final String RECORDER_CHECKBOX_NAME = "emailRecordOn";
     private static final String _regionName = "EmailRecord";
-    private static final Locator gridLocator = Locator.xpath("//table[@lk-region-name='"+ _regionName +"']");
-    private static final int _headerRows = 2;
-    private static final int _footerRows = 1;
+    private static final Locator gridLocator = Locator.tagWithAttributeContaining("table", "id", _regionName);
 
     public EmailRecordTable(WebDriver driver)
     {
-        super(driver, new RefindingWebElement(gridLocator, driver).withTimeout(WAIT_FOR_JAVASCRIPT), _headerRows);
+        super(driver, new RefindingWebElement(gridLocator, driver).withTimeout(WAIT_FOR_JAVASCRIPT), 0);
         ((RefindingWebElement) getComponentElement()).withRefindListener(el -> clearElementCache());
     }
 
@@ -73,8 +71,7 @@ public class EmailRecordTable extends Table
 
     public int getEmailCount()
     {
-        //3 rows in the table do not contain email messages
-        return getRowCount() - (_headerRows + _footerRows);
+        return getRowCount();
     }
 
     public void startRecording()
@@ -138,12 +135,12 @@ public class EmailRecordTable extends Table
     private List<EmailMessage> getMessages(Predicate<String> subjectFilter)
     {
         List<EmailMessage> messages = new ArrayList<>();
-        int rows = getRowCount() - _footerRows;
+        int rows = getRowCount();
 
         if (rows > 0)
         {
             int colMessage = getColumnIndex("Message");
-            for (int i = _headerRows + 1; i <= rows; i++)
+            for (int i = 1; i <= rows; i++)
             {
                 String message = getDataAsText(i, colMessage);
                 String[] lines = trimAll(StringUtils.split(message, "\n"));
@@ -176,7 +173,7 @@ public class EmailRecordTable extends Table
         for(int i = 1; i <= columnText.size(); i++)
         {
             int arrayIndex = i-1;
-            if(columnText.get(arrayIndex).equals(text)){colsWithString.add(i + _headerRows);}
+            if(columnText.get(arrayIndex).equals(text)){colsWithString.add(i);}
         }
         return colsWithString;
     }
