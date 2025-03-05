@@ -36,7 +36,9 @@ import org.apache.hc.core5.http.protocol.HttpContext;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
 import org.junit.Assume;
+import org.labkey.api.data.ContainerManager;
 import org.labkey.api.data.dialect.DatabaseNotSupportedException;
+import org.labkey.api.settings.LookAndFeelProperties;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
@@ -1682,6 +1684,12 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     // Example: "Could not convert value '2.34' (Double) for Boolean field 'Medical History.Dep Diagnosed in Last 18 Months'"
     public String getConversionErrorMessage(Object value, String fieldName, Class<?> targetClass)
     {
-        return "Could not convert value '" + value + "' (" + value.getClass().getSimpleName() + ") for " + targetClass.getSimpleName() + " field '" + fieldName + "'";
+        String fieldType = targetClass.getSimpleName();
+
+        // Issue 50768: Need a better error message if date value is not in the expected format.
+        if (fieldType.equalsIgnoreCase("date") || fieldType.equalsIgnoreCase("datetime") || fieldType.equalsIgnoreCase("timestamp"))
+            return "'" + value + "’ is not a valid " + fieldType + " for " + fieldName + " using " + LookAndFeelProperties.getInstance(ContainerManager.getRoot()).getDateParsingMode().getDisplayString();
+
+        return "Could not convert value '" + value + "' (" + value.getClass().getSimpleName() + ") for " + fieldType + " field '" + fieldName + "'" ;
     }
 }

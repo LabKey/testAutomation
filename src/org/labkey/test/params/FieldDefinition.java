@@ -24,6 +24,7 @@ import org.labkey.api.exp.query.ExpSchema;
 import org.labkey.remoteapi.domain.PropertyDescriptor;
 import org.labkey.remoteapi.query.Filter;
 import org.labkey.test.components.html.OptionSelect;
+import org.labkey.test.util.EscapeUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -1084,7 +1085,7 @@ public class FieldDefinition extends PropertyDescriptor
         @Override
         protected String getExpression()
         {
-            return String.join("|", _values);
+            return EscapeUtil.getTextChoiceValidatorExpression(_values);
         }
 
         public List<String> getValues()
