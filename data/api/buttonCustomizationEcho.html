@@ -5,7 +5,7 @@
     var parameters = LABKEY.ActionURL.getParameters();
     for (var p in parameters) {
         if (parameters.hasOwnProperty(p)) {
-            html += p + ": " + parameters[p] + "<br>";
+            html += document.createTextNode(p + ": " + parameters[p]).textContent + "<br>";
         }
     }
     document.getElementById("params").innerHTML = html;
