@@ -112,7 +112,7 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest implements Post
             OptionalFeatureHelper.setOptionalFeature(createDefaultConnection(), "studyDesignFlag", _studyDesignPreviouslyEnabled);
 
         if (_advancedImportOptionsEnabled != null)
-            OptionalFeatureHelper.setOptionalFeature(createDefaultConnection(), "advancedImportFlag", false);
+            OptionalFeatureHelper.setOptionalFeature(createDefaultConnection(), "advancedImportFlag", _advancedImportOptionsEnabled);
 
         _userHelper.deleteUser(LIMITED_USER);
     }
