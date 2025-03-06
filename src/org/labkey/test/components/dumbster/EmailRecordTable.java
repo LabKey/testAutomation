@@ -36,7 +36,7 @@ public class EmailRecordTable extends Table
 {
     private static final String RECORDER_CHECKBOX_NAME = "emailRecordOn";
     private static final String _regionName = "EmailRecord";
-    private static final Locator gridLocator = Locator.xpath("//table[@lk-region-name='"+ _regionName +"']");
+    private static final Locator gridLocator = Locator.xpath("//table[@data-region-name='"+ _regionName +"']");
     private static final int _headerRows = 2;
     private static final int _footerRows = 1;
 
