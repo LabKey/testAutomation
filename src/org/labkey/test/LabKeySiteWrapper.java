@@ -1678,10 +1678,24 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         clickButton("Confirm Delete");
     }
 
-    // Note: Keep in sync with ConvertHelper.getStandardConversionErrorMessage()
-    // Example: "Could not convert value '2.34' (Double) for Boolean field 'Medical History.Dep Diagnosed in Last 18 Months'"
     public String getConversionErrorMessage(Object value, String fieldName, Class<?> targetClass)
     {
-        return "Could not convert value '" + value + "' (" + value.getClass().getSimpleName() + ") for " + targetClass.getSimpleName() + " field '" + fieldName + "'";
+        return getConversionErrorMessage(value, fieldName, targetClass, true);
+    }
+
+    // Note: Keep in sync with ConvertHelper.getStandardConversionErrorMessage()
+    // Example: "Could not convert value '2.34' (Double) for Boolean field 'Medical History.Dep Diagnosed in Last 18 Months'"
+    public String getConversionErrorMessage(Object value, String fieldName, Class<?> targetClass, boolean useUSDateParsing)
+    {
+        String fieldType = targetClass.getSimpleName();
+
+        // Issue 50768: Need a better error message if date value is not in the expected format.
+        if (fieldType.equalsIgnoreCase("date") || fieldType.equalsIgnoreCase("datetime") || fieldType.equalsIgnoreCase("timestamp"))
+        {
+            String parsingMode = useUSDateParsing ? "U.S. date parsing (MDY)" : "Non-U.S. date parsing (DMY)";
+            return "'" + value + "’ is not a valid " + fieldType + " for " + fieldName + " using " + parsingMode;
+        }
+
+        return "Could not convert value '" + value + "' (" + value.getClass().getSimpleName() + ") for " + fieldType + " field '" + fieldName + "'" ;
     }
 }
