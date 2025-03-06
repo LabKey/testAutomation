@@ -344,12 +344,17 @@ public class TestDataGenerator
 
     public static String randomDomainName(int size)
     {
+        return randomDomainName(size, null);
+    }
+
+    public static String randomDomainName(int size, @Nullable String prefix)
+    {
         String domainName = "";
         do
         {
-            String prefix = randomString(1, null, ALPHANUMERIC_STRING); // domain needs to start with alphanumeric char
-            final String charset = ALPHANUMERIC_STRING + DOMAIN_SPECIAL_STRING;
-            domainName = prefix + randomString(size - 1, null, charset);
+            String _prefix = prefix != null ? prefix : randomString(1, null, ALPHANUMERIC_STRING); // domain needs to start with alphanumeric char
+            final String charset = prefix != null ? DOMAIN_SPECIAL_STRING : ALPHANUMERIC_STRING + DOMAIN_SPECIAL_STRING;
+            domainName = _prefix + randomString(size - 1, null, charset);
             domainName = domainName.trim();
         }
         while (domainName.length() < size || Pattern.matches("(.*\\s--[^ ].*)|(.*\\s-[^- ].*)", domainName)); // domain name must not contain space followed by dash. (command like: Issue 49161)
