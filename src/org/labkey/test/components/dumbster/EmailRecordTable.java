@@ -20,6 +20,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.components.html.Table;
 import org.labkey.test.selenium.RefindingWebElement;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -212,17 +213,28 @@ public class EmailRecordTable extends Table
     private void parseViewCell(EmailMessage emailMessage)
     {
         List<String> views = new ArrayList<>();
-        String view;
+        boolean done = false;
         int rowIndex = emailMessage.getRowIndex();
         int colIndex = EmailColumn.View.getIndex();
         do
         {
-            view = getDataAsText(rowIndex, colIndex++);
-            if (view != null && !view.isBlank())
+            try
             {
-                views.add(view.trim());
+                WebElement viewEl = getDataAsElement(rowIndex, colIndex++);
+                if (Locator.tag("a").existsIn(viewEl))
+                {
+                    String view = viewEl.getText();
+                    if (!view.isBlank())
+                    {
+                        views.add(view.trim());
+                    }
+                }
             }
-        } while (view != null);
+            catch (NoSuchElementException nse)
+            {
+                done = true;
+            }
+        } while (!done);
         emailMessage.setViews(views);
     }
 
