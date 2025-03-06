@@ -17,6 +17,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.junit.Assert.assertEquals;
+
 public class ShortUrlAdminPage extends LabKeyPage<ShortUrlAdminPage.ElementCache>
 {
     public static final String SHORT_URL_QUERY = "ShortURL";
@@ -49,9 +51,16 @@ public class ShortUrlAdminPage extends LabKeyPage<ShortUrlAdminPage.ElementCache
 
     public void createNewShortUrl(String shortUrl, String targetUrl)
     {
+        int initialCount = getShortUrlGrid().getDataRowCount();
         elementCache().shortUrlInput.set(shortUrl);
         elementCache().targetUrlInput.set(targetUrl);
 
+        clickSubmit();
+        assertEquals("shortUrl count", initialCount + 1, getShortUrlGrid().getDataRowCount());
+    }
+
+    private void clickSubmit()
+    {
         clickAndWait(elementCache().submitButton);
 
         clearCache();

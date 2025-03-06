@@ -1,23 +1,31 @@
 package org.labkey.test.tests.core.admin;
 
-import org.assertj.core.api.Assertions;
+import org.jetbrains.annotations.NotNull;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.Connection;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.categories.Daily;
+import org.labkey.test.categories.BVT;
 import org.labkey.test.pages.admin.ShortUrlAdminPage;
+import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.list.IntListDefinition;
+import org.labkey.test.util.DataRegionTable;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.labkey.test.WebTestHelper.buildRelativeUrl;
 
-@Category({Daily.class})
+@Category({BVT.class}) // TODO: switch to Daily
 public class ShortUrlTest extends BaseWebDriverTest
 {
+    private static final String PROJECT_NAME = "ShortUrlTest Project";
     private static final String URL_PREFIX = "surl_test_";
     private static final String URL_SUFFIX = ".url";
     private static final String USER = "shorturl_user@shorturltest.test";
@@ -46,36 +54,92 @@ public class ShortUrlTest extends BaseWebDriverTest
         _containerHelper.createProject(getProjectName());
     }
 
+    /**
+     * Verify basic shortUrl functionality
+     */
     @Test
-    public void testShortUrl()
+    public void testShortUrl() throws Exception
     {
-        String shortUrl = getShortUrl();
-        String targetUrl = buildRelativeUrl("project", "home", "begin");
+        String shortUrl = nextUrlKey();
+        String targetUrl = buildRelativeUrl("project", getProjectName(), "begin");
 
         ShortUrlAdminPage adminPage = ShortUrlAdminPage.beginAt(this);
         adminPage.createNewShortUrl(shortUrl, targetUrl);
 
-        Assertions.assertThat(adminPage.getUrlsFromGrid()).as("short Urls").containsEntry(shortUrl, targetUrl);
+        assertThat(adminPage.getUrlsFromGrid()).as("short Urls").containsEntry(shortUrl, targetUrl);
+        String urlFromClipboard = adminPage.clickCopyToClipboard(shortUrl);
+        String absoluteShortUrl = getAbsoluteShortUrl(shortUrl);
+        assertEquals("Url copied to clipboard", absoluteShortUrl, urlFromClipboard);
 
-        beginAtShortUrl(shortUrl);
+        impersonate(USER);
 
-        Assertions.assertThat(getDriver().getCurrentUrl()).endsWith(targetUrl);
+        beginAt(absoluteShortUrl);
+
+        assertEquals("destination containerPath", "/" + getProjectName(), getCurrentContainerPath());
+        assertThat(getDriver().getCurrentUrl()).endsWith(targetUrl);
+        assertEquals("Short URL should not avoid container permissions", 403, getResponseCode());
     }
 
-    private String getShortUrl()
+    /**
+     * Verify that shortUrls can target urls with tricky container paths and query parameters
+     */
+    @Test
+    public void testTrickyCharacters() throws Exception
+    {
+        String trickyFolder = "Subfolder " + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
+        String folderPath = PROJECT_NAME + "/" + trickyFolder;
+
+        _containerHelper.createSubfolder(getProjectName(), trickyFolder);
+
+        String listName = "TrickyList";
+        String textField = "TextField";
+        String trickyValue = "Value" + TRICKY_CHARACTERS;
+
+        Connection connection = createDefaultConnection();
+        new IntListDefinition(listName, "key")
+                .addField(new FieldDefinition(textField))
+                .create(connection, folderPath)
+                .insertRows(connection, List.of(
+                        Map.of(textField, trickyValue),
+                        Map.of(textField, "boring")
+                ));
+
+        DataRegionTable drt = goToManageLists().getGrid().viewListData(listName);
+        assertEquals("Row count without filter", 2, drt.getDataRowCount());
+        drt.setFilter(textField, "Equals", trickyValue);
+        assertEquals("Row count with filter", 1, drt.getDataRowCount());
+
+        String shortUrl = nextUrlKey();
+        String targetUrl = getCurrentRelativeURL();
+
+        ShortUrlAdminPage adminPage = ShortUrlAdminPage.beginAt(this);
+        adminPage.createNewShortUrl(shortUrl, targetUrl);
+
+        assertThat(adminPage.getUrlsFromGrid().keySet()).as("short Urls").contains(shortUrl);
+
+        beginAt(getAbsoluteShortUrl(shortUrl));
+
+        assertEquals("destination containerPath", "/" + folderPath, getCurrentContainerPath());
+        assertTextPresent(trickyValue);
+        drt = new DataRegionTable("query", this);
+        assertEquals("Row count after navigating to short URL", 1, drt.getDataRowCount());
+    }
+
+    private String nextUrlKey()
     {
         return URL_PREFIX + count.getAndIncrement();
     }
 
-    private void beginAtShortUrl(String shortUrl)
+    @NotNull
+    private static String getAbsoluteShortUrl(String shortUrl)
     {
-        beginAt(WebTestHelper.getBaseURL() + "/" + shortUrl + URL_SUFFIX);
+        return WebTestHelper.getBaseURL() + "/" + shortUrl + URL_SUFFIX;
     }
 
     @Override
     protected String getProjectName()
     {
-        return "ShortUrlTest " + TRICKY_CHARACTERS_FOR_PROJECT_NAMES + " Project";
+        return PROJECT_NAME;
     }
 
     @Override
