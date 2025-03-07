@@ -52,11 +52,18 @@ public class ShortUrlAdminPage extends LabKeyPage<ShortUrlAdminPage.ElementCache
     public void createNewShortUrl(String shortUrl, String targetUrl)
     {
         int initialCount = getShortUrlGrid().getDataRowCount();
+        boolean alreadyExists = getShortUrlGrid().getColumnDataAsText(SHORT_URL_COL).contains(shortUrl);
+
+        submitShortUrl(shortUrl, targetUrl);
+        assertEquals("shortUrl count", initialCount + (alreadyExists ? 0 : 1), getShortUrlGrid().getDataRowCount());
+    }
+
+    public void submitShortUrl(String shortUrl, String targetUrl)
+    {
         elementCache().shortUrlInput.set(shortUrl);
         elementCache().targetUrlInput.set(targetUrl);
 
         clickSubmit();
-        assertEquals("shortUrl count", initialCount + 1, getShortUrlGrid().getDataRowCount());
     }
 
     private void clickSubmit()
