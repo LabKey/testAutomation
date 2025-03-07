@@ -43,11 +43,11 @@ package com.dumbster.smtp;
  */
 public class SmtpRequest {
   /** SMTP action received from client. */
-  private SmtpActionType action;
+  private final SmtpActionType action;
   /** Current state of the SMTP state table. */
-  private SmtpState state;
+  private final SmtpState state;
   /** Additional information passed from the client with the SMTP action. */
-  private String params;
+  private final String params;
 
   /**
    * Create a new SMTP client request.
@@ -66,7 +66,7 @@ public class SmtpRequest {
    * @return response to the request
    */
   public SmtpResponse execute() {
-    SmtpResponse response = null;
+    SmtpResponse response;
     if (action.isStateless()) {
       if (SmtpActionType.EXPN == action || SmtpActionType.VRFY == action) {
         response = new SmtpResponse(252, "Not supported", this.state);
@@ -74,8 +74,6 @@ public class SmtpRequest {
         response = new SmtpResponse(211, "No help available", this.state);
       } else if (SmtpActionType.NOOP == action) {
         response = new SmtpResponse(250, "OK", this.state);
-      } else if (SmtpActionType.VRFY == action) {
-        response = new SmtpResponse(252, "Not supported", this.state);
       } else if (SmtpActionType.RSET == action) {
         response = new SmtpResponse(250, "OK", SmtpState.GREET);
       } else {
@@ -152,13 +150,13 @@ public class SmtpRequest {
    * @return a populated SmtpRequest object
    */
   public static SmtpRequest createRequest(String s, SmtpState state) {
-    SmtpActionType action = null;
+    SmtpActionType action;
     String params = null;
 
     if (state == SmtpState.DATA_HDR) {
       if (s.equals(".")) {
         action = SmtpActionType.DATA_END;
-      } else if (s.length() < 1) {
+      } else if (s.isEmpty()) {
         action = SmtpActionType.BLANK_LINE;
       } else {
         action = SmtpActionType.UNRECOG;
@@ -201,12 +199,11 @@ public class SmtpRequest {
       }
     }
 
-    SmtpRequest req = new SmtpRequest(action, params, state);
-    return req;
+      return new SmtpRequest(action, params, state);
   }
 
   /**
-   * Get the parameters of this request (remainder of command line once the command is removed.
+   * Get the parameters of this request (remainder of command line once the command is removed).
    * @return parameters
    */
   public String getParams() {
