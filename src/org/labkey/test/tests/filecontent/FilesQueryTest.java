@@ -95,6 +95,7 @@ public class FilesQueryTest extends BaseWebDriverTest
     @Test
     public void testFileRecordsWithCustomProp()
     {
+        goToProjectHome();
         log("Upload a file to file root from file browser");
         final File testFile1 = TestFileUtils.getSampleData("security/InlineFile.html");
         final String customPropValue1 = "CustomPropValue1";
