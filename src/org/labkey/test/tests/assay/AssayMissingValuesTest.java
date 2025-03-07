@@ -263,6 +263,18 @@ public class AssayMissingValuesTest extends MissingValueIndicatorsTest
         clickAndWait(Locator.linkWithText("view results"));
         var dataRegion = DataRegionTable.DataRegion(getDriver()).waitFor();
 
+        // if the test gets to the dataregion before the data is there, refresh and re-check
+        for (int i = 0; i < 3; i++)
+        {
+            if (dataRegion.getDataRowCount() == 0)
+            {
+                sleep(500);
+                refresh();
+            }
+            else
+                break;
+        }
+
         // expect 3 rows in this assay, p2 and p3 should get mv indicators in the count column
         Map<String, List<String>> expectedData = new HashMap<>();
         expectedData.put("Participant ID", List.of("p1", "p2", "p3"));
