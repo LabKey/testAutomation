@@ -28,9 +28,10 @@ public class UpdateShortUrlPage extends LabKeyPage<UpdateShortUrlPage.ElementCac
         return elementCache().shortUrlDisplay.getText().trim();
     }
 
-    public String setTargetUrl(String targetUrl)
+    public UpdateShortUrlPage setTargetUrl(String targetUrl)
     {
-        return elementCache().targetUrlInput.get();
+        elementCache().targetUrlInput.set(targetUrl);
+        return this;
     }
 
     public String getTargetUrl()

@@ -12,6 +12,7 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.pages.admin.ShortUrlAdminPage;
 import org.labkey.test.pages.admin.UpdateShortUrlPage;
+import org.labkey.test.pages.query.ExecuteQueryPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.list.IntListDefinition;
 import org.labkey.test.util.DataRegionTable;
@@ -19,7 +20,6 @@ import org.labkey.test.util.DataRegionTable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -32,7 +32,7 @@ public class ShortUrlTest extends BaseWebDriverTest
     private static final String URL_PREFIX = "surl_test_";
     private static final String URL_SUFFIX = ".url";
     private static final String USER = "shorturl_user@shorturltest.test";
-    private static final AtomicInteger count = new AtomicInteger();
+    private static int count = 0;
 
     @Override
     protected void doCleanup(boolean afterTest)
@@ -140,9 +140,28 @@ public class ShortUrlTest extends BaseWebDriverTest
         assertEquals("Row count after navigating to short URL", 1, drt.getDataRowCount());
     }
 
+    @Test
+    public void testUpdateAndDeleteShortUrl()
+    {
+        String shortUrl = nextUrlKey();
+        String targetUrl = buildRelativeUrl("project", getProjectName(), "begin");
+
+        ShortUrlAdminPage.beginAt(this)
+                .createNewShortUrl(shortUrl, targetUrl);
+
+        ExecuteQueryPage queryPage = ExecuteQueryPage.beginAt(this, "core", ShortUrlAdminPage.SHORT_URL_QUERY);
+        queryPage.getDataRegion().clickInsertNewRow();
+    }
+
+    @Test
+    public void testShortUrlPermissions()
+    {
+
+    }
+
     private String nextUrlKey()
     {
-        return URL_PREFIX + count.getAndIncrement();
+        return URL_PREFIX + count++;
     }
 
     @NotNull
