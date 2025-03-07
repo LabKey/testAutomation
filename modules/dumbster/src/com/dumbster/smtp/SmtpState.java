@@ -21,7 +21,7 @@ package com.dumbster.smtp;
  */
 public class SmtpState {
   /** Internal representation of the state. */
-  private byte value;
+  private final byte value;
 
   /** Internal representation of the CONNECT state. */
   private static final byte CONNECT_BYTE      = (byte) 1;
