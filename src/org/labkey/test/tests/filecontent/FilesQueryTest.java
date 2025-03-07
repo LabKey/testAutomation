@@ -98,7 +98,6 @@ public class FilesQueryTest extends BaseWebDriverTest
         log("Upload a file to file root from file browser");
         final File testFile1 = TestFileUtils.getSampleData("security/InlineFile.html");
         final String customPropValue1 = "CustomPropValue1";
-        goToProjectHome();
         uploadFile(testFile1, customPropValue1, "This is an html file");
 
         log("Create a sub directory and upload a file to the sub directory");
