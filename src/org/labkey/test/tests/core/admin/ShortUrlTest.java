@@ -9,8 +9,9 @@ import org.labkey.remoteapi.Connection;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.TestProperties;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.categories.BVT;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.pages.admin.ShortUrlAdminPage;
+import org.labkey.test.pages.admin.UpdateShortUrlPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.list.IntListDefinition;
 import org.labkey.test.util.DataRegionTable;
@@ -24,7 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.labkey.test.WebTestHelper.buildRelativeUrl;
 
-@Category({BVT.class}) // TODO: switch to Daily
+@Category({Daily.class})
 public class ShortUrlTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "ShortUrlTest Project";
@@ -84,6 +85,14 @@ public class ShortUrlTest extends BaseWebDriverTest
         assertEquals("destination containerPath", "/" + getProjectName(), getCurrentContainerPath());
         assertThat(getDriver().getCurrentUrl()).endsWith(targetUrl);
         assertEquals("Short URL should not avoid container permissions", 403, getResponseCode());
+
+        stopImpersonating();
+
+        UpdateShortUrlPage.beginAt(this, shortUrl).clickDeleteAndConfirm();
+
+        beginAt(absoluteShortUrl);
+        assertThat(getDriver().getCurrentUrl()).endsWith(shortUrl + URL_SUFFIX);
+        assertEquals("Short URL should not avoid container permissions", 404, getResponseCode());
     }
 
     /**

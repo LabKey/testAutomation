@@ -83,14 +83,22 @@ public class ShortUrlAdminPage extends LabKeyPage<ShortUrlAdminPage.ElementCache
         return urls;
     }
 
-    private int getRowIndex(String shortUrl)
+    public UpdateShortUrlPage editShortUrl(String shortUrl)
     {
-        return getShortUrlGrid().getRowIndex(SHORT_URL_COL, shortUrl);
+        int rowIndex = getRowIndex(shortUrl);
+        getShortUrlGrid().clickEditRow(rowIndex);
+
+        return new UpdateShortUrlPage(getDriver());
     }
 
     public DataRegionTable getShortUrlGrid()
     {
         return elementCache().shortUrlsTable;
+    }
+
+    private int getRowIndex(String shortUrl)
+    {
+        return getShortUrlGrid().getRowIndexStrict(SHORT_URL_COL, shortUrl);
     }
 
     public void deleteAll()
@@ -111,11 +119,11 @@ public class ShortUrlAdminPage extends LabKeyPage<ShortUrlAdminPage.ElementCache
 
     protected class ElementCache extends LabKeyPage<ElementCache>.ElementCache
     {
-        WebElement createNewShortUrlPanel = PortalHelper.Locators.webPart("Create New Short URL").findWhenNeeded(this);
-        Input shortUrlInput = Input.Input(Locator.id("shortURLTextField"), getDriver()).findWhenNeeded(createNewShortUrlPanel);
-        Input targetUrlInput = Input.Input(Locator.id("targetURLTextField"), getDriver()).findWhenNeeded(createNewShortUrlPanel);
-        WebElement submitButton = Locator.lkButton("Submit").findWhenNeeded(createNewShortUrlPanel);
+        final WebElement createNewShortUrlPanel = PortalHelper.Locators.webPart("Create New Short URL").findWhenNeeded(this);
+        final Input shortUrlInput = Input.Input(Locator.id("shortURLTextField"), getDriver()).findWhenNeeded(createNewShortUrlPanel);
+        final Input targetUrlInput = Input.Input(Locator.id("targetURLTextField"), getDriver()).findWhenNeeded(createNewShortUrlPanel);
+        final WebElement submitButton = Locator.lkButton("Submit").findWhenNeeded(createNewShortUrlPanel);
 
-        DataRegionTable shortUrlsTable = DataRegionTable.DataRegion(getDriver()).withName("ShortURL").findWhenNeeded(this);
+        final DataRegionTable shortUrlsTable = DataRegionTable.DataRegion(getDriver()).withName("ShortURL").findWhenNeeded(this);
     }
 }

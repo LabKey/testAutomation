@@ -8,6 +8,8 @@ import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import java.util.Map;
+
 public class UpdateShortUrlPage extends LabKeyPage<UpdateShortUrlPage.ElementCache>
 {
     public UpdateShortUrlPage(WebDriver driver)
@@ -15,9 +17,9 @@ public class UpdateShortUrlPage extends LabKeyPage<UpdateShortUrlPage.ElementCac
         super(driver);
     }
 
-    public static UpdateShortUrlPage beginAt(WebDriverWrapper webDriverWrapper)
+    public static UpdateShortUrlPage beginAt(WebDriverWrapper webDriverWrapper, String shortUrl)
     {
-        webDriverWrapper.beginAt(WebTestHelper.buildURL("admin", "updateShortURL"));
+        webDriverWrapper.beginAt(WebTestHelper.buildURL("admin", "updateShortURL", Map.of("shortURL", shortUrl)));
         return new UpdateShortUrlPage(webDriverWrapper.getDriver());
     }
 
@@ -52,8 +54,10 @@ public class UpdateShortUrlPage extends LabKeyPage<UpdateShortUrlPage.ElementCac
 
     public ShortUrlAdminPage clickDeleteAndConfirm()
     {
-        elementCache().deleteButton.click();
-        doAndWaitForPageToLoad(this::acceptAlert);
+        doAndWaitForPageToLoad(() -> {
+            elementCache().deleteButton.click();
+            acceptAlert();
+        });
 
         return new ShortUrlAdminPage(getDriver());
     }
@@ -66,11 +70,11 @@ public class UpdateShortUrlPage extends LabKeyPage<UpdateShortUrlPage.ElementCac
 
     protected class ElementCache extends LabKeyPage<ElementCache>.ElementCache
     {
-        WebElement shortUrlDisplay = Locator.name("shortURL").parent().findWhenNeeded(this);
-        Input targetUrlInput = Input.Input(Locator.name("fullURL"), getDriver()).findWhenNeeded(this);
+        final WebElement shortUrlDisplay = Locator.name("shortURL").parent().findWhenNeeded(this);
+        final Input targetUrlInput = Input.Input(Locator.name("fullURL"), getDriver()).findWhenNeeded(this);
 
-        WebElement updateButton = Locator.lkButton("Update").findWhenNeeded(this);
-        WebElement cancelButton = Locator.lkButton("Cancel").findWhenNeeded(this);
-        WebElement deleteButton = Locator.lkButton("Delete").findWhenNeeded(this);
+        final WebElement updateButton = Locator.lkButton("Update").findWhenNeeded(this);
+        final WebElement cancelButton = Locator.lkButton("Cancel").findWhenNeeded(this);
+        final WebElement deleteButton = Locator.lkButton("Delete").findWhenNeeded(this);
     }
 }
