@@ -309,7 +309,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     public static final List<FieldDefinition> REALISTIC_SOURCE_FIELDS = List.of(
             new FieldDefinition("Patient Race / Ethnicity", FieldDefinition.ColumnType.TextChoice).setTextChoiceValues(List.of("American Indian or Alaska Native", "Asian",  "Black", "Native Hawaiian or Pacific Islander", "White", "Other", "Unknown" )),
             new FieldDefinition("Tumor%", FieldDefinition.ColumnType.Decimal),
-            new FieldDefinition("Viable_cells%", FieldDefinition.ColumnType.Decimal),
+            new FieldDefinition("Viable_cells%", FieldDefinition.ColumnType.Decimal).setLabel("Viable Cells%"),
             new FieldDefinition("Гемоглобін тех.", FieldDefinition.ColumnType.Date),
             new FieldDefinition("Disposition (per SOW/MTA)", FieldDefinition.ColumnType.String),
             new FieldDefinition("~ Height (T to B) (mm)", FieldDefinition.ColumnType.Integer),
