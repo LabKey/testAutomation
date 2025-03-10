@@ -3569,17 +3569,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
             }
             else
             {
-                String inputId = "testClipboardInput";
-                executeScript("""
-                        let input = document.createElement('input');
-                        input.id = arguments[0];
-                        document.getElementsByTagName('body')[0].appendChild(input);""", inputId);
-
-                new Actions(getDriver())
-                        .keyDown(WebDriverUtils.MODIFIER_KEY)
-                        .sendKeys(Locator.id(inputId).findElement(getDriver()), "v")
-                        .keyUp(WebDriverUtils.MODIFIER_KEY)
-                        .perform();
                 throw new UnsupportedOperationException("There are no clipboard DataFlavors to use");
             }
         }
