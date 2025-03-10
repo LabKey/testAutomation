@@ -344,12 +344,23 @@ public class TestDataGenerator
 
     public static String randomDomainName(int size)
     {
+        return randomDomainName(size, null);
+    }
+
+    /**
+     * Generate a random domain name of the specified size.
+     * @param size
+     * @param prefix If a prefix is provided, the domain name will start with it. Pass null to generate a random alphanumeric character string for the prefix.
+     * @return
+     */
+    public static String randomDomainName(int size, @Nullable String prefix)
+    {
         String domainName = "";
         do
         {
-            String prefix = randomString(1, null, ALPHANUMERIC_STRING); // domain needs to start with alphanumeric char
-            final String charset = ALPHANUMERIC_STRING + DOMAIN_SPECIAL_STRING;
-            domainName = prefix + randomString(size - 1, null, charset);
+            String _prefix = prefix != null ? prefix : randomString(1, null, ALPHANUMERIC_STRING); // domain needs to start with alphanumeric char
+            final String charset = prefix != null ? DOMAIN_SPECIAL_STRING : ALPHANUMERIC_STRING + DOMAIN_SPECIAL_STRING;
+            domainName = _prefix + randomString(size - 1, null, charset);
             domainName = domainName.trim();
         }
         while (domainName.length() < size || Pattern.matches("(.*\\s--[^ ].*)|(.*\\s-[^- ].*)", domainName)); // domain name must not contain space followed by dash. (command like: Issue 49161)
