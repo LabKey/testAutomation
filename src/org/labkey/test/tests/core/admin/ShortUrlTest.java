@@ -1,6 +1,5 @@
 package org.labkey.test.tests.core.admin;
 
-import org.apache.commons.lang3.SystemUtils;
 import org.assertj.core.api.Assertions;
 import org.jetbrains.annotations.NotNull;
 import org.junit.BeforeClass;
@@ -9,7 +8,6 @@ import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.Connection;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.BootstrapLocators;
-import org.labkey.test.TestProperties;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.pages.admin.ShortUrlAdminPage;
@@ -83,7 +81,7 @@ public class ShortUrlTest extends BaseWebDriverTest
         assertThat(adminPage.getUrlsFromGrid()).as("short Urls").containsEntry(shortUrl, targetUrl);
         String absoluteShortUrl = getAbsoluteShortUrl(shortUrl);
 
-        if (!SystemUtils.IS_OS_WINDOWS || !TestProperties.isTestRunningOnTeamCity()) // Can't inspect clipboard on headless Windows
+//        if (!SystemUtils.IS_OS_WINDOWS || !TestProperties.isTestRunningOnTeamCity()) // Can't inspect clipboard on headless Windows
         {
             String urlFromClipboard = adminPage.clickCopyToClipboard(shortUrl);
             assertEquals("Url copied to clipboard", absoluteShortUrl, urlFromClipboard);

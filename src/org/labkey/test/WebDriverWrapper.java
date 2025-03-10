@@ -3554,46 +3554,39 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public String getClipboardContent() throws IOException, UnsupportedFlavorException
     {
-        DataFlavor[] flavors = Toolkit.getDefaultToolkit().getSystemClipboard().getAvailableDataFlavors();
         Transferable t = Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null);
-
-        // Adding debug info for TeamCity run.
-        // Windows is not giving DataFlavor (MIME Type) for the data on the clipboard.
-        log("Available flavors: " + Arrays.stream(flavors).toList());
-        log("Best flavor: " + DataFlavor.selectBestTextFlavor(flavors));
 
         if (t != null)
         {
+            DataFlavor[] flavors = t.getTransferDataFlavors();
 
-            // Adding debug info for TeamCity run.
-            log("Is DataFlavor.imageFlavor supported? " + t.isDataFlavorSupported(DataFlavor.imageFlavor));
-            log("Is DataFlavor.allHtmlFlavor supported? " + t.isDataFlavorSupported(DataFlavor.allHtmlFlavor));
-            log("Is DataFlavor.fragmentHtmlFlavor supported? " + t.isDataFlavorSupported(DataFlavor.fragmentHtmlFlavor));
-            log("Is DataFlavor.selectionHtmlFlavor supported? " + t.isDataFlavorSupported(DataFlavor.selectionHtmlFlavor));
-            log("Is DataFlavor.javaFileListFlavor supported? " + t.isDataFlavorSupported(DataFlavor.javaFileListFlavor));
-            log("Is DataFlavor.stringFlavor supported? " + t.isDataFlavorSupported(DataFlavor.stringFlavor));
-
-            DataFlavor[] transferFlavors = t.getTransferDataFlavors();
-            log("Transferable supported data flavors: " + Arrays.stream(transferFlavors).toList());
+            TestLogger.debug("Available clipboard flavors: " + Arrays.asList(flavors));
+            TestLogger.debug("Best clipboard flavor: " + DataFlavor.selectBestTextFlavor(flavors));
 
             if (flavors.length > 0)
             {
-                log("Best Text Flavor: " + DataFlavor.selectBestTextFlavor(flavors));
-                return (String) Toolkit.getDefaultToolkit().getSystemClipboard()
-                    .getData(DataFlavor.selectBestTextFlavor(flavors));
+                return (String) t.getTransferData(DataFlavor.selectBestTextFlavor(flavors));
             }
             else
             {
-                // Return a value to indicate something is on the clipboard but no DataFlavor was provided.
-                return "There are no DataFlavors to use.";
-            }
+                String inputId = "testClipboardInput";
+                executeScript("""
+                        let input = document.createElement('input');
+                        input.id = arguments[0];
+                        document.getElementsByTagName('body')[0].appendChild(input);""", inputId);
 
+                new Actions(getDriver())
+                        .keyDown(WebDriverUtils.MODIFIER_KEY)
+                        .sendKeys(Locator.id(inputId).findElement(getDriver()), "v")
+                        .keyUp(WebDriverUtils.MODIFIER_KEY)
+                        .perform();
+                throw new UnsupportedOperationException("There are no clipboard DataFlavors to use");
+            }
         }
         else
         {
             return null;
         }
-
     }
 
     private static final List<String> html5InputTypes = Arrays.asList("color", "date", "datetime-local", "email", "month", "number", "range", "search", "tel", "time", "url", "week");
