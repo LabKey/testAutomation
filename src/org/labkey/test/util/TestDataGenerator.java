@@ -347,6 +347,12 @@ public class TestDataGenerator
         return randomDomainName(size, null);
     }
 
+    /**
+     * Generate a random domain name of the specified size.
+     * @param size
+     * @param prefix If a prefix is provided, the domain name will start with it. Pass null to generate a random alphanumeric character string for the prefix.
+     * @return
+     */
     public static String randomDomainName(int size, @Nullable String prefix)
     {
         String domainName = "";
