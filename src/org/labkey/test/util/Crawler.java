@@ -55,7 +55,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.AbstractMap;
@@ -1355,9 +1354,8 @@ public class Crawler
             List<Map.Entry<String,String>> injectParams = new ArrayList<>(params);
             //noinspection SuspiciousListRemoveInLoop
             injectParams.remove(i);
-            String xss = (random.nextInt()%2)==0 ? injectScriptBlock : injectAttributeScript;
-            xss = URLEncoder.encode(xss, StandardCharsets.UTF_8);
-            String paramMalicious = key + "=" + xss;
+            String xssValue = (random.nextInt()%2)==0 ? injectScriptBlock : injectAttributeScript;
+            String paramMalicious = EscapeUtil.encode(key) + "=" + EscapeUtil.encode(xssValue);
             String queryMalicious = paramMalicious + "&" + queryStringFromEntries(injectParams);
             String urlMalicious = base + "?" + queryMalicious;
             try
