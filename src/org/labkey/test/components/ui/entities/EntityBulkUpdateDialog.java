@@ -1,5 +1,6 @@
 package org.labkey.test.components.ui.entities;
 
+import org.labkey.api.query.QueryKey;
 import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
@@ -117,7 +118,7 @@ public class EntityBulkUpdateDialog extends ModalDialog
 
     public EntityBulkUpdateDialog setDateField(String fieldKey, String dateString)
     {
-        enableAndWait(fieldKey, elementCache().dateInput("sampleDate")).set(dateString);
+        enableAndWait(fieldKey, elementCache().dateInput(fieldKey)).set(dateString);
         return this;
     }
 
@@ -286,7 +287,7 @@ public class EntityBulkUpdateDialog extends ModalDialog
         public ReactDateTimePicker dateInput(String fieldKey)
         {
             return new ReactDateTimePicker.ReactDateTimeInputFinder(getDriver())
-                    .withInputId(fieldKey).waitFor(formRow(fieldKey));
+                    .withInputId(QueryKey.encodePart(fieldKey)).waitFor(formRow(fieldKey));
         }
 
         public FileAttachmentContainer fileUploadField(String fieldKey)
