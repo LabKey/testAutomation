@@ -39,13 +39,13 @@ public class TextChoiceImportExportAndOtherDomainsTest extends TextChoiceTest
     private static final String LIST_NAME = "Simple_TC_List";
     private static final String LIST_TC_FIELD = "LTC_Field";
     private static final String LIST_TEXT_FIELD = "Str";
-    private static final List<String> LIST_VALUES = Arrays.asList("L1", "L2", "L3", "L4");
+    private static final List<String> LIST_VALUES = Arrays.asList("L1", "L2|withPipes|", "L3", "L4");
     private static List<Map<String, String>> listData = new ArrayList<>();
 
     // Issue names, etc...
     private static final String ISSUE_DESIGN_NAME = "Simple_TC_Issue";
     private static final String ISSUE_TC_FIELD = "Issue_TC_Field";
-    private static final List<String> ISSUE_FIELD_VALUES = List.of("I1", "I2", "I3", "I4");
+    private static final List<String> ISSUE_FIELD_VALUES = List.of("I1", "I2|withPipes|", "I3", "I4");
     private static final String ISSUE_TITLE = "Issue to validate TextChoice fields";
     private static final String ISSUE_VALUE = ISSUE_FIELD_VALUES.get(2);
 
