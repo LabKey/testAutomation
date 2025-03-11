@@ -121,6 +121,12 @@ public class EntityBulkUpdateDialog extends ModalDialog
         return this;
     }
 
+    public EntityBulkUpdateDialog setCustomDateField(String fieldKey, String dateString)
+    {
+        enableAndWait(fieldKey, elementCache().dateInput(fieldKey)).set(dateString);
+        return this;
+    }
+
     public String getDateField(String fieldKey)
     {
         return elementCache().dateInput(fieldKey).get();
