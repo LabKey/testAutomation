@@ -526,6 +526,19 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         return gridCell;
     }
 
+    public EditableGrid setRecordValues(List<Map<String, Object>> rowValues)
+    {
+        for (int i = 0; i < rowValues.size(); i++)
+        {
+            Map<String, Object> columnValues = rowValues.get(i);
+            for(String columnName : columnValues.keySet())
+            {
+                setCellValue(i, columnName, columnValues.get(columnName));
+            }
+        }
+        return this;
+    }
+
     /**
      * Set the value of a multi-line field for the given row & column. This uses javascript to set the value, not sendKeys.
      * Use '\n' for a new line.
