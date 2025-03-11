@@ -13,6 +13,7 @@ import org.labkey.test.components.react.ReactDateTimePicker;
 import org.labkey.test.components.react.ReactSelect;
 import org.labkey.test.components.ui.entities.EntityBulkInsertDialog;
 import org.labkey.test.components.ui.entities.EntityBulkUpdateDialog;
+import org.labkey.test.util.selenium.ScrollUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
@@ -47,6 +48,7 @@ import static org.awaitility.Awaitility.await;
 import static org.labkey.test.BaseWebDriverTest.WAIT_FOR_JAVASCRIPT;
 import static org.labkey.test.WebDriverWrapper.waitFor;
 import static org.labkey.test.util.TestLogger.log;
+import static org.labkey.test.util.selenium.ScrollUtils.Alignment.center;
 import static org.labkey.test.util.selenium.WebDriverUtils.MODIFIER_KEY;
 
 public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
@@ -921,7 +923,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
      */
     private void selectCell(WebElement cell)
     {
-        getWrapper().scrollIntoView(cell);
+        ScrollUtils.scrollIntoView(cell, center, center);
 
         if (isCellSelected(cell))
             return;
