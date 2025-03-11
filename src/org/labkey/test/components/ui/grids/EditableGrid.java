@@ -386,7 +386,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
      */
     public WebElement setCellValue(int row, String columnName, Object value)
     {
-        return setCellValue(row, columnName, value, true);
+        return setCellValue(row, columnName, value, true, false);
     }
 
     /**
@@ -433,13 +433,16 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
      *                   Will be true most of the time but can be false if the field has formatting that may alter the value passed in like date values.
      * @return cell WebElement
      */
-    public WebElement setCellValue(int row, String columnName, Object value, boolean checkContains)
+    public WebElement setCellValue(int row, String columnName, Object value, boolean checkContains, boolean centerSelectedCell)
     {
         // Normalize date values
         if (value instanceof Date date)
         {
             value = LocalDateTime.ofInstant(date.toInstant(), TimeZone.getDefault().toZoneId());
         }
+
+        if (centerSelectedCell)
+            ScrollUtils.scrollIntoView(getCell(row, columnName), center, center);
 
         WebElement gridCell = selectCell(row, columnName);
 
@@ -532,9 +535,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         {
             Map<String, Object> columnValues = rowValues.get(i);
             for(String columnName : columnValues.keySet())
-            {
-                setCellValue(i, columnName, columnValues.get(columnName));
-            }
+                setCellValue(i, columnName, columnValues.get(columnName), true, true);
         }
         return this;
     }
@@ -936,7 +937,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
      */
     private void selectCell(WebElement cell)
     {
-        ScrollUtils.scrollIntoView(cell, center, center);
+        getWrapper().scrollIntoView(cell);
 
         if (isCellSelected(cell))
             return;
