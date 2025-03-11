@@ -300,7 +300,7 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
 
         expectedRowValues = new HashMap<>();
         expectedRowValues.put(dateCol01, "01/04/21");
-        expectedRowValues.put(timeCol01, String.format("0:32:0 AM %s00", TIME_ZONE.getDisplayName(false, 0, Locale.getDefault())));
+        expectedRowValues.put(timeCol01, String.format("0:32:0 AM %s00", getTimezoneOffset(TIME_ZONE.getRawOffset())));
 
         if (SystemUtils.IS_OS_WINDOWS)
         {
