@@ -1,6 +1,5 @@
 package org.labkey.test.components.ui.entities;
 
-import org.labkey.api.query.QueryKey;
 import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
@@ -13,6 +12,7 @@ import org.labkey.test.components.react.FilteringReactSelect;
 import org.labkey.test.components.react.ReactDateTimePicker;
 import org.labkey.test.components.react.ToggleButton;
 import org.labkey.test.components.ui.files.FileAttachmentContainer;
+import org.labkey.test.util.EscapeUtil;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -287,7 +287,7 @@ public class EntityBulkUpdateDialog extends ModalDialog
         public ReactDateTimePicker dateInput(String fieldKey)
         {
             return new ReactDateTimePicker.ReactDateTimeInputFinder(getDriver())
-                    .withInputId(QueryKey.encodePart(fieldKey)).waitFor(formRow(fieldKey));
+                    .withInputId(EscapeUtil.fieldKeyEncodePart(fieldKey)).waitFor(formRow(fieldKey));
         }
 
         public FileAttachmentContainer fileUploadField(String fieldKey)
