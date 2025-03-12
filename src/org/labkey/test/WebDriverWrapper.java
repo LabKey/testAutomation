@@ -84,6 +84,7 @@ import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.WindowType;
 import org.openqa.selenium.WrapsDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeDriverService;
@@ -3569,13 +3570,48 @@ public abstract class WebDriverWrapper implements WrapsDriver
             }
             else
             {
-                throw new UnsupportedOperationException("There are no clipboard DataFlavors to use");
+                // No available flavors, try pasting into a new input.
+                String value = doInNewTab(() -> {
+                    String inputId = "testClipboardInput";
+                    executeScript("""
+                        let input = document.createElement('input');
+                        input.id = arguments[0];
+                        document.getElementsByTagName('body')[0].appendChild(input);""", inputId);
+
+                    WebElement inputElement = Locator.id(inputId).findElement(getDriver());
+                    new Actions(getDriver())
+                        .keyDown(WebDriverUtils.MODIFIER_KEY)
+                        .sendKeys(inputElement, "v")
+                        .keyUp(WebDriverUtils.MODIFIER_KEY)
+                        .perform();
+
+                    return inputElement.getDomProperty("value");
+                });
+                if (StringUtils.isEmpty(value))
+                {
+                    throw new UnsupportedFlavorException(null);
+                }
+                return value;
             }
         }
         else
         {
             return null;
         }
+    }
+
+    @Nullable
+    public <T> T doInNewTab(Supplier<T> supplier)
+    {
+        String initialWindow = getDriver().getWindowHandle();
+        getDriver().switchTo().newWindow(WindowType.TAB);
+
+        T result = supplier.get();
+
+        getDriver().close();
+        getDriver().switchTo().window(initialWindow);
+
+        return result;
     }
 
     private static final List<String> html5InputTypes = Arrays.asList("color", "date", "datetime-local", "email", "month", "number", "range", "search", "tel", "time", "url", "week");
