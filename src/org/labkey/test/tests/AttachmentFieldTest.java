@@ -62,6 +62,7 @@ public class AttachmentFieldTest extends BaseWebDriverTest
         String sampleTypeName = "Sample type with attachment";
         String fieldName = "testFile";
         SampleTypeHelper sampleTypeHelper = new SampleTypeHelper(this);
+        goToProjectHome();
 
         log("Create a sample type with attachment field");
         sampleTypeHelper.createSampleType(new SampleTypeDefinition(sampleTypeName)

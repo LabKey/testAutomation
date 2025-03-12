@@ -191,7 +191,7 @@ public class DatasetFacetPanel extends Component<DatasetFacetPanel.Elements>
     {
         private static Locator.XPathLocator facetPanel(String regionName)
         {
-            return Locator.tagWithAttribute("div", "lk-region-facet-name", regionName);
+            return Locator.tagWithAttribute("div", "data-region-facet-name", regionName);
         }
 
         public static Locator.XPathLocator expandedFacetPanel(String regionName)
