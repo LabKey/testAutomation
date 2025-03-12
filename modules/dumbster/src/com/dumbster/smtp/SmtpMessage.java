@@ -16,26 +16,32 @@
  */
 package com.dumbster.smtp;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Container for a complete SMTP message - headers and message body.
  */
 public class SmtpMessage {
   /** Headers: Map of List of String hashed on header name. */
-  private Map headers;
+  private final Map<String, List<String>> headers;
   private String headerLast;
   /** Message body. */
-  private StringBuffer body;
+  private final StringBuffer body;
   private boolean inBody;
-  private Date createdTimestamp = new Date();
+  private final Date createdTimestamp = new Date();
 
 
   /**
    * Constructor. Initializes headers Map and body buffer.
    */
   public SmtpMessage() {
-    headers = new HashMap(10);
+    headers = new HashMap<>(10);
     body = new StringBuffer();
   }
 
@@ -69,8 +75,8 @@ public class SmtpMessage {
    * Get an Iterator over the header names.
    * @return an Iterator over the set of header names (String)
    */
-  public Iterator getHeaderNames() {
-    Set nameSet = headers.keySet();
+  public Iterator<String> getHeaderNames() {
+    Set<String> nameSet = headers.keySet();
     return nameSet.iterator();
   }
 
@@ -80,11 +86,11 @@ public class SmtpMessage {
    * @return value(s) associated with the header name
    */
   public String[] getHeaderValues(String name) {
-    List values = (List)headers.get(name);
+    List<String> values = headers.get(name);
     if (values == null) {
       return new String[0];
     } else {
-      return (String[])values.toArray(new String[0]);
+      return values.toArray(new String[0]);
     }
   }
 
@@ -94,12 +100,12 @@ public class SmtpMessage {
    * @return first value associated with the header name
    */
   public String getHeaderValue(String name) {
-    List values = (List)headers.get(name);
+    List<String> values = headers.get(name);
     if (values == null) {
       return null;
     } else {
-      Iterator iterator = values.iterator();
-      return (String)iterator.next();
+      Iterator<String> iterator = values.iterator();
+      return iterator.next();
     }
   }
 
@@ -117,9 +123,9 @@ public class SmtpMessage {
    * @param value header value
    */
   private void addHeader(String name, String value) {
-    List valueList = (List)headers.get(name);
+    List<String> valueList = headers.get(name);
     if (valueList == null) {
-      valueList = new ArrayList(1);
+      valueList = new ArrayList<>(1);
       headers.put(name, valueList);
     }
     valueList.add(value);
@@ -131,9 +137,9 @@ public class SmtpMessage {
    * @param value header value
    */
   private void appendHeader(String name, String value) {
-    List valueList = (List)headers.get(name);
+    List<String> valueList = headers.get(name);
     if (valueList == null) {
-      valueList = new ArrayList(1);
+      valueList = new ArrayList<>(1);
       headers.put(name, valueList);
     }
     valueList.set(0, valueList.get(0) + value);
@@ -144,12 +150,12 @@ public class SmtpMessage {
    * @return a String
    */
   public String toString() {
-    StringBuffer msg = new StringBuffer();
-    for(Iterator i = headers.keySet().iterator(); i.hasNext();) {
-      String name = (String)i.next();
-      List values = (List)headers.get(name);
-      for(Iterator j = values.iterator(); j.hasNext();) {
-        String value = (String)j.next();
+    StringBuilder msg = new StringBuilder();
+    for(Iterator<String> i = headers.keySet().iterator(); i.hasNext();) {
+      String name = i.next();
+      List<String> values = headers.get(name);
+      for(Iterator<String> j = values.iterator(); j.hasNext();) {
+        String value = j.next();
         msg.append(name);
         msg.append(": ");
         msg.append(value);

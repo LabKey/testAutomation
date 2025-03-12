@@ -16,9 +16,10 @@
  */
 %>
 <%@ page import="com.dumbster.smtp.SmtpMessage" %>
+<%@ page import="jakarta.mail.MessagingException" %>
+<%@ page import="jakarta.mail.internet.MimeMessage" %>
 <%@ page import="org.apache.commons.lang3.ArrayUtils" %>
 <%@ page import="org.labkey.api.data.Container" %>
-<%@ page import="org.labkey.api.data.DataRegion" %>
 <%@ page import="org.labkey.api.util.HtmlString" %>
 <%@ page import="org.labkey.api.util.MailHelper" %>
 <%@ page import="org.labkey.api.view.HttpView" %>
@@ -27,8 +28,6 @@
 <%@ page import="org.labkey.dumbster.DumbsterController" %>
 <%@ page import="org.labkey.dumbster.model.DumbsterManager" %>
 <%@ page import="org.labkey.dumbster.view.MailPage" %>
-<%@ page import="jakarta.mail.MessagingException" %>
-<%@ page import="jakarta.mail.internet.MimeMessage" %>
 <%@ page import="java.util.Iterator" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="static org.labkey.api.util.DOM.Attribute.*" %>
@@ -43,17 +42,15 @@
     }
 %>
 <%
-    JspView<MailPage> me = (JspView<MailPage>) HttpView.currentView();
+    JspView<MailPage> me = HttpView.currentView();
     MailPage pageInfo = me.getModelBean();
     Container c = getContainer();
     SmtpMessage[] messages = pageInfo.getMessages();
     if ("true".equals(request.getParameter("reverse"))) ArrayUtils.reverse(messages);
     boolean recorder = pageInfo.isEnableRecorder();
 
-    DataRegion emailRegion = new DataRegion();
-    emailRegion.setName("EmailRecord");
-
-    String renderId = "emailRecordEmpty-" + getRequestScopedUID();
+    String tableId = makeId("EmailRecord");
+    String renderId = makeId("emailRecordEmpty-");
 
     %><p id="emailRecordError" class="labkey-error" style="display: none;">&nbsp;</p><%
 
@@ -105,9 +102,9 @@ function toggleRecorder(checkbox)
 
             if (checked)
             {
-                var t = document.getElementById(<%=q(emailRegion.getDomId())%>);
+                var t = document.getElementById(<%=q(tableId)%>);
                 var len = t.rows.length;
-                for (var i = len - 2; i > 0; i--)
+                for (var i = len - 1; i > 1; i--)
                     t.deleteRow(i);
                 Ext4.get(<%=q(renderId)%>).setDisplayed("");
             }
@@ -123,18 +120,19 @@ function toggleRecorder(checkbox)
 }
 </script>
 <!--Fake data region for ease of testing.-->
-<table id="<%=h(emailRegion.getDomId())%>" lk-region-name="<%=h(emailRegion.getName())%>" class="labkey-data-region-legacy labkey-show-borders">
-    <colgroup><col width="120"/><col width="120"/><col width="125"/><col width="400"></colgroup>
-    <!-- hidden TRs where the header region and message box would normally be in a real data region -->
-    <tr style="display:none"><td colspan="5">&nbsp;</td></tr>
+<table id="<%=h(tableId)%>" class="labkey-data-region-legacy labkey-show-borders">
+    <colgroup><col style="width: 120px"/><col style="width: 120px"/><col style="width: 125px"/><col style="width: 400px"></colgroup>
+    <thead>
     <tr>
-        <td class="labkey-column-header labkey-col-header-filter" align="left"><div>To</div></td>
-        <td class="labkey-column-header labkey-col-header-filter" align="left"><div>From</div></td>
-        <td class="labkey-column-header labkey-col-header-filter" align="left"><div>Date/Time</div></td>
-        <td class="labkey-column-header labkey-col-header-filter" align="left"><div>Message</div></td>
-        <td class="labkey-column-header labkey-col-header-filter" align="left"><div>Headers</div></td>
-        <td colspan="3" class="labkey-column-header labkey-col-header-filter" align="center"><div>View</div></td>
+        <th class="labkey-column-header labkey-col-header-filter" style="text-align: left;"><div>To</div></th>
+        <th class="labkey-column-header labkey-col-header-filter" style="text-align: left;"><div>From</div></th>
+        <th class="labkey-column-header labkey-col-header-filter" style="text-align: left;"><div>Date/Time</div></th>
+        <th class="labkey-column-header labkey-col-header-filter" style="text-align: left;"><div>Message</div></th>
+        <th class="labkey-column-header labkey-col-header-filter" style="text-align: left;"><div>Headers</div></th>
+        <th colspan="3" class="labkey-column-header labkey-col-header-filter" style="text-align: center;"><div>View</div></th>
     </tr>
+    <tr id="<%=h(renderId)%>" style="display: <%=unsafe(messages.length > 0 ? "none" : "")%>;"><td colspan="6">No email recorded.</td></tr>
+    </thead>
     <%
     if (messages.length > 0)
     {
@@ -148,11 +146,11 @@ function toggleRecorder(checkbox)
 
 
             StringBuilder headers = new StringBuilder();
-            Iterator i = m.getHeaderNames();
+            Iterator<String> i = m.getHeaderNames();
 
             while (i.hasNext())
             {
-                String header = (String)i.next();
+                String header = i.next();
                 headers.append(h(header));
                 headers.append(": ");
                 headers.append(h(m.getHeaderValue(header)));
@@ -201,15 +199,14 @@ function toggleRecorder(checkbox)
                 <div id="email_body_<%=rowIndex%>" style="display: none;"><hr><%=body%></div></td>
             <td><a id="<%=h(idHeaders)%>">View headers</a>
                 <div id="email_headers_<%=rowIndex%>" style="display: none;"><hr><%=unsafe(headers.toString())%></div></td>
-            <%=hasHtml ? createHtml(TD(A(at(href, DumbsterController.getViewMessageURL(c, rowIndex - 1, "html")).at(target, "_messageHtml"), "HTML"))) : createHtml(TD())%>
-            <%=hasText ? createHtml(TD(A(at(href, DumbsterController.getViewMessageURL(c, rowIndex - 1, "text")).at(target, "_messageText"), "Text"))) : createHtml(TD())%>
+            <%=hasHtml ? createHtml(TD(A(at(href, DumbsterController.getViewMessageURL(c, rowIndex - 1, "html")).at(target, "_messageHtml"), "HTML"))) : createHtml(TD(SPAN(cl("text-muted"), "HTML")))%>
+            <%=hasText ? createHtml(TD(A(at(href, DumbsterController.getViewMessageURL(c, rowIndex - 1, "text")).at(target, "_messageText"), "Text"))) : createHtml(TD(SPAN(cl("text-muted"), "Text")))%>
             <%=createHtml(TD(A(at(href, DumbsterController.getViewMessageURL(c, rowIndex - 1, "raw")).at(target, "_messageText"), "Raw")))%>
         </tr>
 <%
         }
     }
 %>
-    <tr id="<%=h(renderId)%>" style="display: <%=unsafe(messages.length > 0 ? "none" : "")%>;"><td colspan="6">No email recorded.</td></tr>
 </table>
 <%
     if (getUser().hasRootAdminPermission())
