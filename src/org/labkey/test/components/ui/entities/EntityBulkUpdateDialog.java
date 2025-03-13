@@ -12,6 +12,7 @@ import org.labkey.test.components.react.FilteringReactSelect;
 import org.labkey.test.components.react.ReactDateTimePicker;
 import org.labkey.test.components.react.ToggleButton;
 import org.labkey.test.components.ui.files.FileAttachmentContainer;
+import org.labkey.test.util.EscapeUtil;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -115,9 +116,9 @@ public class EntityBulkUpdateDialog extends ModalDialog
         return elementCache().numericInput(fieldKey).get();
     }
 
-    public EntityBulkUpdateDialog setDateField(String fieldKey, String dateString)
+    public EntityBulkUpdateDialog setDateField(String fieldLabel, String dateString)
     {
-        enableAndWait(fieldKey, elementCache().dateInput("sampleDate")).set(dateString);
+        enableAndWait(fieldLabel, elementCache().dateInput(fieldLabel)).set(dateString);
         return this;
     }
 
@@ -289,10 +290,10 @@ public class EntityBulkUpdateDialog extends ModalDialog
             return new Input(inputEl, getDriver());
         }
 
-        public ReactDateTimePicker dateInput(String fieldKey)
+        public ReactDateTimePicker dateInput(String fieldLabel)
         {
             return new ReactDateTimePicker.ReactDateTimeInputFinder(getDriver())
-                    .withInputId(fieldKey).waitFor(formRow(fieldKey));
+                    .withInputId(EscapeUtil.fieldKeyEncodePart(fieldLabel)).waitFor(formRow(fieldLabel));
         }
 
         public FileAttachmentContainer fileUploadField(String fieldKey)
