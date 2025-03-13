@@ -25,7 +25,6 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.labkey.api.query.QueryKey;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.domain.Domain;
 import org.labkey.remoteapi.domain.DomainResponse;
@@ -1460,7 +1459,7 @@ public class ListTest extends BaseWebDriverTest
         DataRegionTable table = new DataRegionTable("query", getDriver());
         CustomizeView customizeView = table.openCustomizeGrid();
         customizeView.showHiddenItems();
-        customizeView.addColumn(QueryKey.encodePart(keyName));
+        customizeView.addColumn(EscapeUtil.fieldKeyEncodePart(keyName));
         customizeView.applyCustomView();
 
         // insert a new row and verify the key is encoded in the form input
