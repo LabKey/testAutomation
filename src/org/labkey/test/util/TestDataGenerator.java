@@ -332,6 +332,16 @@ public class TestDataGenerator
         return val.toString();
     }
 
+    public static String randomMultiLineString(int size)
+    {
+        return randomMultiLineString(size, null);
+    }
+
+    public static String randomMultiLineString(int size, @Nullable String exclusion)
+    {
+        return randomString(size, exclusion, CHARSET_STRING + "\t\n\n\n");
+    }
+
     public static String randomDomainName()
     {
         return randomDomainName(10);
@@ -385,6 +395,11 @@ public class TestDataGenerator
         String randomFieldName = (randomString(numStartChars, exclusion, chars) + part + randomString(numEndChars, null, chars)).trim();
         TestLogger.log("Generated random field name: " + randomFieldName);
         return randomFieldName;
+    }
+
+    public static String randomChoice(List<String> choices)
+    {
+        return choices.get(randomInt(0, choices.size() - 1));
     }
 
     public static int randomInt(int min, int max)
