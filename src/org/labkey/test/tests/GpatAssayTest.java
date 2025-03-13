@@ -150,7 +150,7 @@ public class GpatAssayTest extends BaseWebDriverTest
             clickButton("OK", defaultWaitForPage);
         clickButton("Next", defaultWaitForPage);
 
-        WebElement runPropertiesPanel = Locator.tagWithAttributeContaining("form", "lk-region-form", "Runs")
+        WebElement runPropertiesPanel = Locator.tagWithAttributeContaining("form", "data-region-form", "Runs")
                 .findElement(getDriver());
 
         setFormElement(Locator.name("date").findElement(runPropertiesPanel),

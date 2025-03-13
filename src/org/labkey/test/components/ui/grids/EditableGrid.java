@@ -13,6 +13,7 @@ import org.labkey.test.components.react.ReactDateTimePicker;
 import org.labkey.test.components.react.ReactSelect;
 import org.labkey.test.components.ui.entities.EntityBulkInsertDialog;
 import org.labkey.test.components.ui.entities.EntityBulkUpdateDialog;
+import org.labkey.test.util.selenium.ScrollUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
@@ -47,6 +48,7 @@ import static org.awaitility.Awaitility.await;
 import static org.labkey.test.BaseWebDriverTest.WAIT_FOR_JAVASCRIPT;
 import static org.labkey.test.WebDriverWrapper.waitFor;
 import static org.labkey.test.util.TestLogger.log;
+import static org.labkey.test.util.selenium.ScrollUtils.Alignment.center;
 import static org.labkey.test.util.selenium.WebDriverUtils.MODIFIER_KEY;
 
 public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
@@ -384,7 +386,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
      */
     public WebElement setCellValue(int row, String columnName, Object value)
     {
-        return setCellValue(row, columnName, value, true);
+        return setCellValue(row, columnName, value, true, false);
     }
 
     /**
@@ -431,13 +433,16 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
      *                   Will be true most of the time but can be false if the field has formatting that may alter the value passed in like date values.
      * @return cell WebElement
      */
-    public WebElement setCellValue(int row, String columnName, Object value, boolean checkContains)
+    public WebElement setCellValue(int row, String columnName, Object value, boolean checkContains, boolean centerSelectedCell)
     {
         // Normalize date values
         if (value instanceof Date date)
         {
             value = LocalDateTime.ofInstant(date.toInstant(), TimeZone.getDefault().toZoneId());
         }
+
+        if (centerSelectedCell)
+            ScrollUtils.scrollIntoView(getCell(row, columnName), center, center);
 
         WebElement gridCell = selectCell(row, columnName);
 
@@ -522,6 +527,17 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
             }
         }
         return gridCell;
+    }
+
+    public EditableGrid setRecordValues(List<Map<String, Object>> rowValues)
+    {
+        for (int i = 0; i < rowValues.size(); i++)
+        {
+            Map<String, Object> columnValues = rowValues.get(i);
+            for(String columnName : columnValues.keySet())
+                setCellValue(i, columnName, columnValues.get(columnName), true, true);
+        }
+        return this;
     }
 
     /**

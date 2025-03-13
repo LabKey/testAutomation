@@ -309,7 +309,7 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
 
         log("Again check that data validation works as expected.");
         checker().verifyTrue("Expected error message 'is not a valid Date' is not present.",
-                isTextPresent("'BadDate’ is not a valid Date for DateCol "));
+                isTextPresent("'BadDate' is not a valid Date for DateCol "));
         setFormElement(Locator.name("outputSample1_DateCol"), "1/1/2007");
         clickButton("Submit");
 

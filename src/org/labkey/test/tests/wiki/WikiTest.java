@@ -99,6 +99,8 @@ public class WikiTest extends BaseWebDriverTest
     @Test
     public void testSteps()
     {
+        goToProjectHome();
+
         log("test create new html page with a webpart");
         WikiHelper wikiHelper = new WikiHelper(this);
         wikiHelper.createNewWikiPage("HTML");
