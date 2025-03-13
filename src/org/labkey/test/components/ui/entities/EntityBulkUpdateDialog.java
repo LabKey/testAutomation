@@ -116,9 +116,9 @@ public class EntityBulkUpdateDialog extends ModalDialog
         return elementCache().numericInput(fieldKey).get();
     }
 
-    public EntityBulkUpdateDialog setDateField(String fieldKey, String dateString)
+    public EntityBulkUpdateDialog setDateField(String fieldLabel, String dateString)
     {
-        enableAndWait(fieldKey, elementCache().dateInput(fieldKey)).set(dateString);
+        enableAndWait(fieldLabel, elementCache().dateInput(fieldLabel)).set(dateString);
         return this;
     }
 
@@ -284,10 +284,10 @@ public class EntityBulkUpdateDialog extends ModalDialog
             return new Input(inputEl, getDriver());
         }
 
-        public ReactDateTimePicker dateInput(String fieldKey)
+        public ReactDateTimePicker dateInput(String fieldLabel)
         {
             return new ReactDateTimePicker.ReactDateTimeInputFinder(getDriver())
-                    .withInputId(EscapeUtil.fieldKeyEncodePart(fieldKey)).waitFor(formRow(fieldKey));
+                    .withInputId(EscapeUtil.fieldKeyEncodePart(fieldLabel)).waitFor(formRow(fieldLabel));
         }
 
         public FileAttachmentContainer fileUploadField(String fieldKey)
