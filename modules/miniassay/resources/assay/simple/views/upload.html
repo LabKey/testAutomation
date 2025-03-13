@@ -223,8 +223,10 @@ function renderRunsWebPart()
       showRecordSelectors: false
     });
   }
-
-  if (webpart) webpart.render();
+  else
+  {
+    if (webpart) webpart.render();
+  }
 }
 
 // Assume the test sample type exists for the purposes of the ModuleAssayTest
