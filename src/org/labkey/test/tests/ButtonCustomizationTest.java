@@ -194,7 +194,7 @@ public class ButtonCustomizationTest extends BaseWebDriverTest
 
         // Verify that link buttons don't send parameters at all:
         clickButton(METADATA_LINK_BUTTON);
-        assertElementNotPresent(Locator.id("params").containing(".select"));
+        assertElementNotPresent(Locator.id("params").withText());
 
         // wait for the button to enable:
         waitForElement(Locator.lkButton(METADATA_GET_BUTTON), 10000);
