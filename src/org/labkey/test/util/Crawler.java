@@ -458,7 +458,7 @@ public class Crawler
         private final int _depth;
         private boolean _isFromForm = false;
 
-        public UrlToCheck(URL origin, String urlText, int depth)
+        public UrlToCheck(final URL origin, final String urlText, final int depth)
         {
             if (depth < 0)
             {
@@ -468,39 +468,22 @@ public class Crawler
             _urlText = urlText;
             _depth = depth;
 
-            // Make sure it is a link to inside the page
-            if (urlText.startsWith("http://") ||
-                    urlText.startsWith("https://") ||
-                    urlText.startsWith("javascript:") ||
-                    urlText.startsWith("ftp://"))
+            if (isLabKeyShortUrl(urlText)) // Don't crawl short URLs
             {
-                if (!urlText.contains(WebTestHelper.getBaseURL()) || urlText.equals(WebTestHelper.getBaseURL()) || isLabKeyShortUrl(urlText))
+                _relativeURL = null;
+            }
+            else if (isAbsoluteUrl(urlText)) // Make sure it is a link to inside the page
+            {
+                String relativeURL;
+                try
                 {
-                    _relativeURL = null;
-                    _actionId = null;
+                    relativeURL = WebTestHelper.makeRelativeUrl(urlText);
                 }
-                else
+                catch (IllegalArgumentException iae)
                 {
-                    int relativeURLStart = urlText.lastIndexOf(WebTestHelper.getBaseURL()) + WebTestHelper.getBaseURL().length();
-                    final String relativeURL = urlText.substring(relativeURLStart);
-                    if (!relativeURL.isBlank() && "/".equals(relativeURL))
-                    {
-                        _relativeURL = relativeURL;
-
-                        ControllerActionId tempActionId = null;
-                        try
-                        {
-                            tempActionId = new ControllerActionId(_relativeURL);
-                        }
-                        catch (IllegalArgumentException ignore) { } // Probably a resource, not an action.
-                        _actionId = tempActionId;
-                    }
-                    else
-                    {
-                        _relativeURL = null;
-                        _actionId = null;
-                    }
+                    relativeURL = null;
                 }
+                _relativeURL = StringUtils.trimToEmpty(relativeURL);
             }
             else
             {
@@ -513,8 +496,26 @@ public class Crawler
                     _relativeURL = stripQueryParams(origin.toString()) + urlText;
                 else
                     _relativeURL = getURLBase(origin) + urlText;
+            }
 
-                _actionId = new ControllerActionId(_relativeURL);
+            if (_relativeURL != null)
+            {
+                ControllerActionId tempActionId = null;
+                try
+                {
+                    tempActionId = new ControllerActionId(_relativeURL);
+                }
+                catch (IllegalArgumentException badUrl) {
+                    if (!isAbsoluteUrl(urlText))
+                    {
+                        throw badUrl; // We should know how to handle all relative URLs
+                    }
+                }
+                _actionId = tempActionId;
+            }
+            else
+            {
+                _actionId = null;
             }
 
             int p = _depth;
@@ -539,9 +540,17 @@ public class Crawler
             }
         }
 
+        private static boolean isAbsoluteUrl(String urlText)
+        {
+            return urlText.startsWith("http://") ||
+                    urlText.startsWith("https://") ||
+                    urlText.startsWith("javascript:") ||
+                    urlText.startsWith("ftp://");
+        }
+
         private boolean isLabKeyShortUrl(String urlText)
         {
-            return urlText.startsWith(WebTestHelper.getBaseURL()) && urlText.endsWith(".url");
+            return urlText.endsWith(".url") && (urlText.startsWith(WebTestHelper.getBaseURL()) || !isAbsoluteUrl(urlText));
         }
 
         public boolean isFromForm()
