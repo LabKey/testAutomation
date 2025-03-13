@@ -105,7 +105,10 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -3546,6 +3549,32 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     .sendKeys(input, "v")       // paste the contents of the clipboard into the input
                     .keyUp(cmdKey)
                     .perform();
+        }
+    }
+
+    public String getClipboardContent() throws IOException, UnsupportedFlavorException
+    {
+        Transferable t = Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null);
+
+        if (t != null)
+        {
+            DataFlavor[] flavors = t.getTransferDataFlavors();
+
+            TestLogger.debug("Available clipboard flavors: " + Arrays.asList(flavors));
+            TestLogger.debug("Best clipboard flavor: " + DataFlavor.selectBestTextFlavor(flavors));
+
+            if (flavors.length > 0)
+            {
+                return (String) t.getTransferData(DataFlavor.selectBestTextFlavor(flavors));
+            }
+            else
+            {
+                throw new UnsupportedOperationException("There are no clipboard DataFlavors to use");
+            }
+        }
+        else
+        {
+            return null;
         }
     }
 
