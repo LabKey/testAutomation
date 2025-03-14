@@ -477,7 +477,7 @@ public class Crawler
                 String relativeURL;
                 try
                 {
-                    relativeURL = WebTestHelper.makeRelativeUrl(urlText);
+                    relativeURL = "/" + WebTestHelper.makeRelativeUrl(urlText);
                 }
                 catch (IllegalArgumentException iae)
                 {
@@ -1071,9 +1071,15 @@ public class Crawler
 
                         int nextDepth = depth + 1;
 
-                        for (Pair<String, ?> p : linksWithAttributes)
+                        for (Pair<String, Map<String, String>> p : linksWithAttributes)
                         {
                             String url = p.getLeft();
+                            // Handle popup menus
+                            String dataQuery = p.getRight().getOrDefault("data-query", "");
+                            if (dataQuery.startsWith("?"))
+                            {
+                                url = url + dataQuery;
+                            }
                             try
                             {
                                 newUrlsToCheck.add(new UrlToCheck(actualUrl, url, nextDepth));
