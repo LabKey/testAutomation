@@ -472,7 +472,7 @@ public class Crawler
             {
                 _relativeURL = null;
             }
-            else if (isAbsoluteUrl(urlText)) // Make sure it is a link to inside the page
+            else if (isAbsoluteUrl(urlText)) // Make sure it is a link to the site under test
             {
                 String relativeURL;
                 try
@@ -483,7 +483,7 @@ public class Crawler
                 {
                     relativeURL = null;
                 }
-                _relativeURL = StringUtils.trimToEmpty(relativeURL);
+                _relativeURL = StringUtils.trimToNull(relativeURL);
             }
             else
             {
@@ -536,7 +536,7 @@ public class Crawler
             catch (RuntimeException ex)
             {
                 // Get a more useful exception if we hit a URL that we REALLY don't understand
-                throw new IllegalArgumentException("Failed to parse action from URL [%s] found on page [%s]".formatted(getUrlText(), getOrigin()));
+                throw new IllegalArgumentException("Failed to parse action from URL [%s] found on page [%s]".formatted(getUrlText(), getOrigin()), ex);
             }
         }
 
@@ -609,7 +609,7 @@ public class Crawler
 
         public boolean isVisitableURL()
         {
-            if (getRelativeURL() == null)
+            if (StringUtils.isBlank(getRelativeURL()))
                 return false;
 
             String strippedRelativeURL = stripQueryParams(getRelativeURL());
