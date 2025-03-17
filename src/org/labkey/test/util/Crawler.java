@@ -472,18 +472,18 @@ public class Crawler
             {
                 _relativeURL = null;
             }
-            else if (isAbsoluteUrl(urlText)) // Make sure it is a link to inside the page
+            else if (isAbsoluteUrl(urlText)) // Make sure it is a link to the site under test
             {
                 String relativeURL;
                 try
                 {
-                    relativeURL = WebTestHelper.makeRelativeUrl(urlText);
+                    relativeURL = "/" + WebTestHelper.makeRelativeUrl(urlText);
                 }
                 catch (IllegalArgumentException iae)
                 {
                     relativeURL = null;
                 }
-                _relativeURL = StringUtils.trimToEmpty(relativeURL);
+                _relativeURL = StringUtils.trimToNull(relativeURL);
             }
             else
             {
@@ -536,7 +536,7 @@ public class Crawler
             catch (RuntimeException ex)
             {
                 // Get a more useful exception if we hit a URL that we REALLY don't understand
-                throw new IllegalArgumentException("Failed to parse action from URL [%s] found on page [%s]".formatted(getUrlText(), getOrigin()));
+                throw new IllegalArgumentException("Failed to parse action from URL [%s] found on page [%s]".formatted(getUrlText(), getOrigin()), ex);
             }
         }
 
@@ -609,7 +609,7 @@ public class Crawler
 
         public boolean isVisitableURL()
         {
-            if (getRelativeURL() == null)
+            if (StringUtils.isBlank(getRelativeURL()))
                 return false;
 
             String strippedRelativeURL = stripQueryParams(getRelativeURL());
@@ -1071,9 +1071,15 @@ public class Crawler
 
                         int nextDepth = depth + 1;
 
-                        for (Pair<String, ?> p : linksWithAttributes)
+                        for (Pair<String, Map<String, String>> p : linksWithAttributes)
                         {
                             String url = p.getLeft();
+                            // Handle popup menus
+                            String dataQuery = p.getRight().getOrDefault("data-query", "");
+                            if (dataQuery.startsWith("?"))
+                            {
+                                url = url + dataQuery;
+                            }
                             try
                             {
                                 newUrlsToCheck.add(new UrlToCheck(actualUrl, url, nextDepth));
