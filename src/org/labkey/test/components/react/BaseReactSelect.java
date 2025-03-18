@@ -624,6 +624,13 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
             return this;
         }
 
+        public BaseReactSelectFinder<Select> withinFormGroupSkipSelect(String labelText)
+        {
+            _locator = Locator.tagWithClass("div", "form-group")
+                    .withChild(Locator.tag("label").withPredicate("text() = " + Locator.xq(labelText)));
+            return this;
+        }
+
         public BaseReactSelectFinder<Select> enabled()
         {
             _mustBeEnabled = true;
