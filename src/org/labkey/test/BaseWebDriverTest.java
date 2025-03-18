@@ -2362,6 +2362,12 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         return new DataRegionTable("query", this);
     }
 
+    public SourceQueryPage editQuerySource(String schemaName, String queryName)
+    {
+        selectQuery(schemaName, queryName);
+        clickAndWait(Locator.linkContainingText("edit source"));
+        return new SourceQueryPage(getDriver());
+    }
     public void editQueryProperties(String schemaName, String queryName)
     {
         selectQuery(schemaName, queryName);
