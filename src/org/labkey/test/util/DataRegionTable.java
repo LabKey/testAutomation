@@ -492,7 +492,7 @@ public class DataRegionTable extends DataRegion
             List<WebElement> columnHeaders = elementCache().getColumnHeaders();
             for (int i = hasSelectors() ? 1 : 0; i < columnHeaders.size(); i++)
             {
-                String columnName = columnHeaders.get(i).getAttribute("column-name");
+                String columnName = columnHeaders.get(i).getAttribute("data-column-name");
                 if (columnName.startsWith(getDataRegionName() + ":"))
                     columnName = columnName.substring(getDataRegionName().length() + 1);
                 _columnNames.add(columnName);
@@ -1503,7 +1503,7 @@ public class DataRegionTable extends DataRegion
 
         public static Locator.XPathLocator columnHeader(String regionName, String fieldName)
         {
-            return Locator.tagWithAttribute("th", "column-name", regionName + ":" + fieldName);
+            return Locator.tagWithAttribute("th", "data-column-name", regionName + ":" + fieldName);
         }
 
         public static Locator.XPathLocator floatingHeader()
