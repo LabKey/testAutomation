@@ -59,6 +59,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.params.FieldDefinition.DOMAIN_TRICKY_CHARACTERS;
+import static org.labkey.test.util.TestDataUtils.getEscapedNameExpression;
 
 @Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 5)
@@ -68,7 +69,7 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
     private static final String DEFAULT_SAMPLE_PARENT_VALUE = "SS";
 
     private static final String PARENT_SAMPLE_TYPE = "PS" + DOMAIN_TRICKY_CHARACTERS;
-    private static final String PARENT_SAMPLE_TYPE_INPUT = "PS" + DOMAIN_TRICKY_CHARACTERS.replace("/", "$S");
+    private static final String PARENT_SAMPLE_TYPE_INPUT = "PS" + getEscapedNameExpression(DOMAIN_TRICKY_CHARACTERS);
 
     private static final String PARENT_SAMPLE_01 = "parent01";
     private static final String PARENT_SAMPLE_02 = "parent02";
