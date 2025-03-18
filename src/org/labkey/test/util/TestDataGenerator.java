@@ -393,10 +393,12 @@ public class TestDataGenerator
         // use the characters that we know are encoded in fieldKeys plus characters that we know clients are using
         String chars = ALL_ILLEGAL_QUERY_KEY_CHARACTERS + " %()=+-[]_|*`'\":;<>?!@#^";
 
-        String randomFieldName = (randomString(numStartChars, exclusion, chars) + part + randomString(numEndChars, null, chars)).trim();
-        // remove any duplicate spaces, those don't work in our test helpers
-        randomFieldName = randomFieldName.replaceAll("\\s+", " ");
-
+        // Having double space is allowed in a field name but is a problem for automation.
+        // We render double spaces as a single space as column headers in grids and the like, but we maintain the double
+        // space in the name. This trips up helpers for various components. See Issue 52193 for details.
+        String randomFieldName = (randomString(numStartChars, exclusion, chars).replaceAll("\\s+"," ") +
+                part +
+                randomString(numEndChars, null, chars).replaceAll("\\s+"," ")).trim();
         TestLogger.log("Generated random field name: " + randomFieldName);
         return randomFieldName;
     }
