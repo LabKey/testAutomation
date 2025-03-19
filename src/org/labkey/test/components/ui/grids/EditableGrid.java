@@ -1017,24 +1017,23 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         return (isInSelection(indexCell) && isInSelection(endCell));
     }
 
-    public boolean hasCellWarning(int row, String column)
+    public boolean hasCellError(int row, String column)
     {
         WebElement gridCell = getCell(row, column);
-
-        return cellHasWarning(gridCell);
+        return cellHasError(gridCell);
     }
 
-    private boolean cellHasWarning(WebElement cell)
+    private boolean cellHasError(WebElement cell)
     {
-        return Locator.tagWithClass("div", "cell-warning").existsIn(cell);
+        return Locator.tagWithClass("div", "cell-error").existsIn(cell);
     }
 
     public String getCellError(int row, String column)
     {
         WebElement gridCell = getCell(row, column);
 
-        if (cellHasWarning(gridCell))
-            return Locator.tagWithClass("div", "cell-warning").findElement(gridCell).getText();
+        if (cellHasError(gridCell))
+            return Locator.tagWithClass("div", "cell-error").findElement(gridCell).getText();
         return null;
     }
 
@@ -1051,7 +1050,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
     public List<WebElement> getCellErrors()
     {
-        return Locator.tagWithClass("div", "cell-warning").findElements(this);
+        return Locator.tagWithClass("div", "cell-error").findElements(this);
     }
 
     public boolean isDisplayed()
