@@ -582,7 +582,8 @@ public class StudyHelper
     public enum TimepointType
     {
         DATE,
-        VISIT
+        VISIT,
+        CONTINUOUS
     }
 
     public enum SecurityMode
