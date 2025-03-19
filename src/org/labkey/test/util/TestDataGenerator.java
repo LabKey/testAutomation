@@ -380,8 +380,14 @@ public class TestDataGenerator
 
     public static String randomFieldName(String part)
     {
-        return randomFieldName(part, randomInt(0, 5), randomInt(0, 5));
+        return randomFieldName(part, null);
     }
+
+    public static String randomFieldName(String part, @Nullable String exclusion)
+    {
+        return randomFieldName(part, randomInt(0, 5), randomInt(0, 5), exclusion);
+    }
+
 
     public static String randomFieldName(String part, int numStartChars, int numEndChars)
     {
@@ -398,7 +404,7 @@ public class TestDataGenerator
         // space in the name. This trips up helpers for various components. See Issue 52193 for details.
         String randomFieldName = (randomString(numStartChars, exclusion, chars).replaceAll("\\s\\s+"," ") +
                 part +
-                randomString(numEndChars, null, chars).replaceAll("\\s\\s+"," ")).trim();
+                randomString(numEndChars, exclusion, chars).replaceAll("\\s\\s+"," ")).trim();
         TestLogger.log("Generated random field name: " + randomFieldName);
         return randomFieldName;
     }
