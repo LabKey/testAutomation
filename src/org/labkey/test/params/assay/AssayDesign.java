@@ -8,6 +8,7 @@ import org.labkey.remoteapi.assay.ProtocolResponse;
 import org.labkey.remoteapi.assay.SaveProtocolCommand;
 import org.labkey.remoteapi.domain.Domain;
 import org.labkey.remoteapi.domain.PropertyDescriptor;
+import org.labkey.test.util.TestLogger;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -27,7 +28,7 @@ public abstract class AssayDesign<T extends AssayDesign<T>>
 
     public static AssayDesign<?> of(String providerName, String name)
     {
-        return new AssayDesignImpl(name, providerName);
+        return new AssayDesignImpl(providerName, name);
     }
 
     public T addProtocolTransformer(Consumer<Protocol> transformer)
@@ -60,15 +61,20 @@ public abstract class AssayDesign<T extends AssayDesign<T>>
 
     public Protocol createAssay(String containerPath, Connection connection) throws IOException, CommandException
     {
+        TestLogger.info(String.format("Creating %s assay in '%s'", _providerName, containerPath));
+
         GetProtocolCommand getProtocolCommand = new GetProtocolCommand(_providerName);
         ProtocolResponse getProtocolResponse = getProtocolCommand.execute(connection, containerPath);
 
-        Protocol protocol = getProtocolResponse.getProtocol();
+        Protocol protocol = updateProtocol(containerPath, connection, getProtocolResponse.getProtocol());
 
-        return updateProtocol(containerPath, connection, protocol);
+        TestLogger.info(String.format("Successfully created %s assay '%s' in '%s':\n%s", _providerName,
+            protocol.getName(), containerPath, protocol.toJSONObject().toString(2)));
+
+        return protocol;
     }
 
-    public Protocol updateProtocol(String containerPath, Connection connection, Protocol protocol) throws IOException, CommandException
+    private Protocol updateProtocol(String containerPath, Connection connection, Protocol protocol) throws IOException, CommandException
     {
         for (var transformer : _transformers)
         {
@@ -100,7 +106,7 @@ public abstract class AssayDesign<T extends AssayDesign<T>>
 
 class AssayDesignImpl extends AssayDesign<AssayDesignImpl>
 {
-    public AssayDesignImpl(String name, String providerName)
+    public AssayDesignImpl(String providerName, String name)
     {
         super(providerName, name);
     }
