@@ -1,5 +1,6 @@
 package org.labkey.test.components.ui.entities;
 
+import org.labkey.api.query.QueryKey;
 import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
@@ -12,6 +13,7 @@ import org.labkey.test.components.react.FilteringReactSelect;
 import org.labkey.test.components.react.ReactDateTimePicker;
 import org.labkey.test.components.react.ToggleButton;
 import org.labkey.test.components.ui.files.FileAttachmentContainer;
+import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.EscapeUtil;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -57,6 +59,21 @@ public class EntityBulkUpdateDialog extends ModalDialog
     private WebDriverWait waiter()
     {
         return new WebDriverWait(getDriver(), Duration.ofMillis(WAIT_TIMEOUT));
+    }
+
+    // For use when the field is of an unknown type, as can occur in fuzz tests
+    public void setValue(FieldDefinition field, Object newValue, EntityBulkUpdateDialog bulkEditDialog)
+    {
+        if (field.getType() == FieldDefinition.ColumnType.TextChoice)
+            bulkEditDialog.setSelectionField(QueryKey.encodePart(field.getName()), List.of((String) newValue));
+        else if (field.getType() == FieldDefinition.ColumnType.Integer || field.getType() == FieldDefinition.ColumnType.Decimal || field.getType() == FieldDefinition.ColumnType.Double)
+            bulkEditDialog.setNumericField(QueryKey.encodePart(field.getName()), String.valueOf(newValue));
+        else if (field.getType() == FieldDefinition.ColumnType.Date || field.getType() == FieldDefinition.ColumnType.DateAndTime || field.getType() == FieldDefinition.ColumnType.Time)
+            bulkEditDialog.setCustomDateField(QueryKey.encodePart(field.getName()), (String) newValue);
+        else if (field.getType() == FieldDefinition.ColumnType.Boolean)
+            bulkEditDialog.setBooleanField(QueryKey.encodePart(field.getName()), (Boolean) newValue);
+        else
+            bulkEditDialog.setTextField(QueryKey.encodePart(field.getName()), (String) newValue);
     }
 
     // interact with selection fields
