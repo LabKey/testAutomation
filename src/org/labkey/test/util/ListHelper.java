@@ -42,6 +42,7 @@ import static org.labkey.test.util.DataRegionTable.DataRegion;
 public class ListHelper extends LabKeySiteWrapper
 {
     public static final String IMPORT_ERROR_SIGNAL = "importFailureSignal"; // See query/import.jsp
+    public static final String LIST_SCHEMA = "lists";
     private final WrapsDriver _wrapsDriver;
 
     public ListHelper(WrapsDriver wrapsDriver)
