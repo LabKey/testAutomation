@@ -8,6 +8,8 @@ import org.labkey.test.Locator;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Data;
 import org.labkey.test.categories.Hosting;
+import org.labkey.test.components.DomainDesignerPage;
+import org.labkey.test.components.html.OptionSelect;
 import org.labkey.test.pages.LabkeyErrorPage;
 import org.labkey.test.pages.list.GridPage;
 import org.labkey.test.params.FieldDefinition;
@@ -15,7 +17,9 @@ import org.labkey.test.params.list.IntListDefinition;
 import org.labkey.test.params.list.ListDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.DomainUtils;
+import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.TestDataGenerator;
 import org.labkey.test.util.query.QueryApiHelper;
 
 import java.util.Arrays;
@@ -27,6 +31,7 @@ import java.util.stream.Collectors;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.labkey.test.util.ListHelper.LIST_SCHEMA;
 
 @Category({Daily.class, Data.class, Hosting.class})
 public class CrossFolderListTest extends BaseWebDriverTest
@@ -34,20 +39,19 @@ public class CrossFolderListTest extends BaseWebDriverTest
     private static final String PROJECT_NAME = "CrossFolderListTest Project";
     private static final String SUBFOLDER_A = "subA";
     private static final String SUBFOLDER_A_PATH = PROJECT_NAME + "/" + SUBFOLDER_A;
-
     private static final String SHARED_LIST = "shared_list_for_crossfolder_test";
 
     @Override
     protected void doCleanup(boolean afterTest)
     {
         _containerHelper.deleteProject(getProjectName(), afterTest);
-        DomainUtils.ensureDeleted("/Shared", "lists", SHARED_LIST);
+        DomainUtils.ensureDeleted("/Shared", LIST_SCHEMA, SHARED_LIST);
     }
 
     @BeforeClass
     public static void setupProject()
     {
-        CrossFolderListTest init = (CrossFolderListTest) getCurrentTest();
+        CrossFolderListTest init = getCurrentTest();
         init.doSetup();
     }
 
@@ -184,7 +188,7 @@ public class CrossFolderListTest extends BaseWebDriverTest
         );
 
         // insert 2 records into the list, in the subfolder
-        var qah = new QueryApiHelper(createDefaultConnection(), SUBFOLDER_A_PATH, "lists", listName);
+        var qah = new QueryApiHelper(createDefaultConnection(), SUBFOLDER_A_PATH, LIST_SCHEMA, listName);
         qah.insertRows(rowsToInsert);
         var subFolderListPage = GridPage.beginAt(this, SUBFOLDER_A_PATH, listName);
 
@@ -211,7 +215,7 @@ public class CrossFolderListTest extends BaseWebDriverTest
                         "stringColumn", "meta", "dateColumn", "11/14/2023", "boolColumn", true));
 
         // insert 1 record into the list, in the subfolder
-        var qah = new QueryApiHelper(createDefaultConnection(), SUBFOLDER_A_PATH, "lists", listName);
+        var qah = new QueryApiHelper(createDefaultConnection(), SUBFOLDER_A_PATH, LIST_SCHEMA, listName);
         qah.insertRows(rowToInsert);
         var subFolderListPage = GridPage.beginAt(this, SUBFOLDER_A_PATH, listName);
 
@@ -286,6 +290,69 @@ public class CrossFolderListTest extends BaseWebDriverTest
         subfolderPage.getGrid().setContainerFilter(DataRegionTable.ContainerFilterType.CURRENT_PLUS_PROJECT_AND_SHARED);
         assertEquals("expect the view in the top folder to only show current list data even with different subfolder list by the same name",
                 new HashSet<>(subfolderData), new HashSet<>(subfolderPage.getGrid().getColumnDataAsText("String Column")));
+    }
+
+    @Test // Issue 52501
+    public void testLookupValidatorFolderScope() throws Exception
+    {
+        // Arrange
+        var firstListName = "First" + TestDataGenerator.randomDomainName();
+        var secondListName = "Second" + TestDataGenerator.randomDomainName();
+        var textColumnName = TestDataGenerator.randomFieldName("Text");
+        var lookupFieldName = TestDataGenerator.randomFieldName("LookAtFirst");
+        var encodedLookupFieldName = EscapeUtil.fieldKeyEncodePart(lookupFieldName);
+
+        // Create and configure list definitions
+        {
+            createListDef(firstListName, List.of(new FieldDefinition(textColumnName)))
+                    .create(createDefaultConnection(), getProjectName());
+
+            createListDef(secondListName, List.of(
+                new FieldDefinition("Name"),
+                new FieldDefinition(lookupFieldName, new FieldDefinition.IntLookup(null, LIST_SCHEMA, firstListName))
+            )).create(createDefaultConnection(), getProjectName());
+
+            // Update the lookup to require validation
+            var domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), LIST_SCHEMA, secondListName);
+            domainDesignerPage.fieldsPanel()
+                    .getField(lookupFieldName)
+                    .setLookupValidatorEnabled(true);
+            domainDesignerPage.clickFinish();
+        }
+
+        // Insert data into the first list
+        {
+            var projectApi = new QueryApiHelper(createDefaultConnection(), getProjectName(), LIST_SCHEMA, firstListName);
+            projectApi.insertRows(List.of(Map.of(textColumnName, "Alpha"), Map.of(textColumnName, "Aileron"), Map.of(textColumnName, "Alpaca")));
+
+            var subfolderApi = new QueryApiHelper(createDefaultConnection(), SUBFOLDER_A_PATH, LIST_SCHEMA, firstListName);
+            subfolderApi.insertRows(List.of(Map.of(textColumnName, "Beta"), Map.of(textColumnName, "Bingo"), Map.of(textColumnName, "Beep")));
+        }
+
+        var secondListGridPage = GridPage.beginAt(this, SUBFOLDER_A_PATH, secondListName);
+        secondListGridPage.getGrid()
+                .clickInsertNewRow()
+                .setField("Name", "OnFirst")
+                .setField(lookupFieldName, OptionSelect.SelectOption.textOption("Beep"))
+                .submit();
+        secondListGridPage = new GridPage(getDriver());
+
+        // Act
+        // Attempt to update a validated list lookup
+        secondListGridPage.getGrid()
+                .clickEditRow(0)
+                .setField(lookupFieldName, OptionSelect.SelectOption.textOption("Bingo"))
+                .submit();
+
+        // Assert
+        // Expect to be navigated back to the grid
+        secondListGridPage = new GridPage(getDriver());
+        var grid = secondListGridPage.getGrid();
+        assertEquals("Unexpected number of rows in the list", 1, grid.getDataRowCount());
+
+        var rowMap = grid.getRowDataAsMap(0);
+        assertEquals("Unexpected number of column values", 2, rowMap.size());
+        assertEquals(String.format("Unexpected value for the lookup field \"%s\"", lookupFieldName), "Bingo", rowMap.get(encodedLookupFieldName));
     }
 
     private ListDefinition createListDef(String listName, List<FieldDefinition> listColumns)

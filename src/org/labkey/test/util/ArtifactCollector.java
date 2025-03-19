@@ -53,13 +53,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Pattern;
 
 import static org.labkey.test.TestProperties.isTestRunningOnTeamCity;
 import static org.labkey.test.WebTestHelper.isLocalServer;
 
 public class ArtifactCollector
 {
-    private static final Map<String, Integer> _shotCounters = new HashMap<>();
+    private static final Map<String, AtomicInteger> _shotCounters = new HashMap<>();
+    private static final Pattern _illegalFileCharactersPattern = SystemUtils.IS_OS_WINDOWS
+            ? Pattern.compile("[\\\\/:*?|\"<>]")
+            : Pattern.compile("/");
 
     private final WebDriverWrapper _driver;
     private final String _dumpDirName;
@@ -103,8 +108,14 @@ public class ArtifactCollector
     public static File ensureDumpDir(String testClassName)
     {
         File dumpDir = new File(TestProperties.getDumpDir(), testClassName);
-        if ( !dumpDir.exists() )
-            dumpDir.mkdirs();
+        try
+        {
+            FileUtils.forceMkdir(dumpDir);
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException(e);
+        }
 
         return dumpDir;
     }
@@ -148,20 +159,25 @@ public class ArtifactCollector
             return;
 
         File threadDumpRequest = new File(TestFileUtils.getModulesDir().getParentFile(), "threadDumpRequest");
-        threadDumpRequest.setLastModified(System.currentTimeMillis()); // Touch file to trigger automatic thread dump.
-        TestLogger.log("Threads dumped to standard labkey log file");
+        try
+        {
+            FileUtils.touch(threadDumpRequest); // Touch file to trigger automatic thread dump.
+            TestLogger.log("Threads dumped to standard labkey log file");
+        }
+        catch (IOException e)
+        {
+            TestLogger.warn("Failed to dump threads", e);
+        }
     }
 
     private String buildBaseName(@NotNull String suffix)
     {
-        return getAndIncrementShotCounter() + "_" + suffix;
+        return getAndIncrementShotCounter() + "_" + _illegalFileCharactersPattern.matcher(suffix).replaceAll("_");
     }
 
     private int getAndIncrementShotCounter()
     {
-        Integer shotCounter = _shotCounters.getOrDefault(_dumpDirName, 0);
-        _shotCounters.put(_dumpDirName, shotCounter + 1);
-        return shotCounter;
+        return _shotCounters.computeIfAbsent(_dumpDirName, v -> new AtomicInteger()).getAndIncrement();
     }
 
     public String dumpPageSnapshot(String snapshotName)
@@ -175,8 +191,14 @@ public class ArtifactCollector
         if (!StringUtils.isBlank(subdir))
         {
             dumpDir = new File(dumpDir, subdir);
-            if ( !dumpDir.exists() )
-                dumpDir.mkdirs();
+            try
+            {
+                FileUtils.forceMkdir(dumpDir);
+            }
+            catch (IOException e)
+            {
+                throw new RuntimeException(e);
+            }
         }
 
         String baseName = buildBaseName(snapshotName);
@@ -276,7 +298,7 @@ public class ArtifactCollector
         }
         catch (IOException e)
         {
-            e.printStackTrace();
+            TestLogger.warn("Failed to dump page HTML", e);
             return null;
         }
     }
@@ -312,15 +334,14 @@ public class ArtifactCollector
             if ( file.isFile() )
             {
                 File dest = new File(dumpDir, file.getParent().substring(artifactDir.toString().length()));
-                if (!dest.exists())
-                    dest.mkdirs();
                 try
                 {
+                    FileUtils.forceMkdir(dest);
                     FileUtils.copyFile(file, new File(dest, file.getName()));
                 }
                 catch (IOException log)
                 {
-                    TestLogger.log("Failed to collect test artifact: " + file.toString().substring(artifactDir.toString().length()));
+                    TestLogger.warn("Failed to collect test artifact: " + file.toString().substring(artifactDir.toString().length()), log);
                 }
             }
         }
