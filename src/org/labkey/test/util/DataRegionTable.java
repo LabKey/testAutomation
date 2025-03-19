@@ -81,7 +81,7 @@ public class DataRegionTable extends DataRegion
     private final Map<Integer, Map<Integer, String>> _dataCache = new TreeMap<>();
 
     /**
-     * @param regionName 'lk-region-name' of the table
+     * @param regionName 'data-region-name' of the table
      */
     public DataRegionTable(String regionName, WebDriverWrapper driverWrapper)
     {
@@ -492,7 +492,7 @@ public class DataRegionTable extends DataRegion
             List<WebElement> columnHeaders = elementCache().getColumnHeaders();
             for (int i = hasSelectors() ? 1 : 0; i < columnHeaders.size(); i++)
             {
-                String columnName = columnHeaders.get(i).getAttribute("column-name");
+                String columnName = columnHeaders.get(i).getAttribute("data-column-name");
                 if (columnName.startsWith(getDataRegionName() + ":"))
                     columnName = columnName.substring(getDataRegionName().length() + 1);
                 _columnNames.add(columnName);
@@ -1471,7 +1471,7 @@ public class DataRegionTable extends DataRegion
 
         public static Locator.XPathLocator dataRegionTable()
         {
-            return form().withAttributeMatchingOtherElementAttribute("lk-region-form", Locator.xpath(".//table"), "lk-region-name");
+            return form().withAttributeMatchingOtherElementAttribute("data-region-form", Locator.xpath(".//table"), "data-region-name");
         }
 
         public static Locator.XPathLocator dataRegionTable(String regionName)
@@ -1481,19 +1481,19 @@ public class DataRegionTable extends DataRegion
 
         public static Locator.XPathLocator table()
         {
-            return Locator.tag("table").withAttribute("lk-region-name");
+            return Locator.tag("table").withAttribute("data-region-name");
         }
 
         public static Locator.XPathLocator table(String regionName)
         {
-            return Locator.tagWithAttribute("table", "lk-region-name", regionName);
+            return Locator.tagWithAttribute("table", "data-region-name", regionName);
         }
 
         public static Locator.XPathLocator facetRow(String category)
         {
             return Locator.xpath("//div").withClass("x4-grid-body")
-                    .withPredicate(Locator.xpath("//div").withClass("lk-filter-panel-label")
-                            .withText(category));
+                .withPredicate(Locator.xpath("//div").withClass("lk-filter-panel-label")
+                    .withText(category));
         }
 
         public static Locator.XPathLocator facetRowCheckbox(String category)
@@ -1503,7 +1503,7 @@ public class DataRegionTable extends DataRegion
 
         public static Locator.XPathLocator columnHeader(String regionName, String fieldName)
         {
-            return Locator.tagWithAttribute("th", "column-name", regionName + ":" + fieldName);
+            return Locator.tagWithAttribute("th", "data-column-name", regionName + ":" + fieldName);
         }
 
         public static Locator.XPathLocator floatingHeader()

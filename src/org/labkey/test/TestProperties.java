@@ -16,6 +16,7 @@
 package org.labkey.test;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.labkey.serverapi.reader.Readers;
 import org.labkey.test.util.TestLogger;
 import org.openqa.selenium.Dimension;
@@ -171,7 +172,8 @@ public abstract class TestProperties
         if (browserZoneId == null)
         {
             String tz = StringUtils.trimToNull(System.getProperty("webtest.browser.tz"));
-            if (tz != null)
+            // TZ environment variable doesn't work on Windows
+            if (tz != null && !SystemUtils.IS_OS_WINDOWS)
             {
                 String[] split = tz.split("[,\\s]+");
                 tz = split[LocalDateTime.now().getDayOfMonth() % split.length];
