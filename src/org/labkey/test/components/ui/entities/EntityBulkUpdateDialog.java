@@ -65,15 +65,15 @@ public class EntityBulkUpdateDialog extends ModalDialog
     public void setValue(FieldDefinition field, Object newValue, EntityBulkUpdateDialog bulkEditDialog)
     {
         if (field.getType() == FieldDefinition.ColumnType.TextChoice)
-            bulkEditDialog.setSelectionField(QueryKey.encodePart(field.getName()), List.of((String) newValue));
+            bulkEditDialog.setSelectionField(EscapeUtil.fieldKeyEncodePart(field.getName()), newValue instanceof String ? List.of((String) newValue) : (List<String>) newValue);
         else if (field.getType() == FieldDefinition.ColumnType.Integer || field.getType() == FieldDefinition.ColumnType.Decimal || field.getType() == FieldDefinition.ColumnType.Double)
-            bulkEditDialog.setNumericField(QueryKey.encodePart(field.getName()), String.valueOf(newValue));
+            bulkEditDialog.setNumericField(EscapeUtil.fieldKeyEncodePart(field.getName()), String.valueOf(newValue));
         else if (field.getType() == FieldDefinition.ColumnType.Date || field.getType() == FieldDefinition.ColumnType.DateAndTime || field.getType() == FieldDefinition.ColumnType.Time)
-            bulkEditDialog.setCustomDateField(QueryKey.encodePart(field.getName()), (String) newValue);
+            bulkEditDialog.setCustomDateField(EscapeUtil.fieldKeyEncodePart(field.getName()), (String) newValue);
         else if (field.getType() == FieldDefinition.ColumnType.Boolean)
-            bulkEditDialog.setBooleanField(QueryKey.encodePart(field.getName()), (Boolean) newValue);
+            bulkEditDialog.setBooleanField(EscapeUtil.fieldKeyEncodePart(field.getName()), (Boolean) newValue);
         else
-            bulkEditDialog.setTextField(QueryKey.encodePart(field.getName()), (String) newValue);
+            bulkEditDialog.setTextField(EscapeUtil.fieldKeyEncodePart(field.getName()), (String) newValue);
     }
 
     // interact with selection fields

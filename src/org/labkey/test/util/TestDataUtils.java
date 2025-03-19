@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static org.labkey.test.util.TestDataGenerator.getTsvQuotedValue;
+
 public class TestDataUtils
 {
     private TestDataUtils()
@@ -104,14 +106,16 @@ public class TestDataUtils
                                     char delimiter, boolean includeHeaders)
     {
         StringBuilder builder = new StringBuilder();
+        TsvQuoter q = new TsvQuoter(delimiter);
 
         if (includeHeaders)
         {
-            builder.append(String.join(String.valueOf(delimiter), columns));
+            List<String> headers = new ArrayList<>();
+            for (String fieldName : columns)
+                headers.add(getTsvQuotedValue(fieldName, q));
+            builder.append(String.join(String.valueOf(delimiter), headers));
             builder.append("\n");
         }
-
-        TsvQuoter q = new TsvQuoter(delimiter);
 
         for (Map<String, Object> row : rowMaps)
         {
