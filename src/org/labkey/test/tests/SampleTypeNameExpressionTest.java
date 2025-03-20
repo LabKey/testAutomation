@@ -66,7 +66,7 @@ import static org.labkey.test.util.TestDataUtils.getEscapedNameExpression;
 public class SampleTypeNameExpressionTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "SampleType_Name_Expression_Test";
-    private static final String DEFAULT_SAMPLE_PARENT_VALUE = "SS";
+    private static final String DEFAULT_SAMPLE_PARENT_VALUE = "SS" + TestDataGenerator.randomString(3);
 
     private static final String PARENT_SAMPLE_TYPE = "PS" + DOMAIN_TRICKY_CHARACTERS;
     private static final String PARENT_SAMPLE_TYPE_INPUT = "PS" + getEscapedNameExpression(DOMAIN_TRICKY_CHARACTERS);
@@ -534,7 +534,7 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         DataRegionTable materialTable = new DataRegionTable("Material", this);
         List<String> names = materialTable.getColumnDataAsText("Name");
 
-        assertTrue("First name (" + names.get(0) + ") not as expected", names.get(0).startsWith(DEFAULT_SAMPLE_PARENT_VALUE + "_"));
+        assertTrue("First name (" + names.get(0) + ") expected to start with " + DEFAULT_SAMPLE_PARENT_VALUE + "_ but it did not", names.get(0).startsWith(DEFAULT_SAMPLE_PARENT_VALUE + "_"));
         String batchRandomId = names.get(0).split("_")[1];
 
         assertEquals("Second name not as expected", name2 + "_" + batchRandomId, names.get(1));
