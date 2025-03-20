@@ -15,15 +15,14 @@ import java.util.List;
 
 @Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 7)
-public class LabkeyErrorPageTest extends BaseWebDriverTest
+public class LabkeyErrPageTest extends BaseWebDriverTest
 {
     private static final String READER_USER = "reader_user@user.test";
-    private static final String PROJECT_NAME = "Labkey Error Page Test";
 
     @BeforeClass
     public static void setupProject()
     {
-        LabkeyErrorPageTest init = getCurrentTest();
+        LabkeyErrPageTest init = getCurrentTest();
         init.doSetup();
     }
 
@@ -112,7 +111,7 @@ public class LabkeyErrorPageTest extends BaseWebDriverTest
     @Override
     protected @Nullable String getProjectName()
     {
-        return PROJECT_NAME;
+        return  getClass().getSimpleName() + " Project";
     }
 
     @Override
