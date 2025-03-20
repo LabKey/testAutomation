@@ -84,7 +84,7 @@ public class PivotQueryTest extends ReportTest
         DataRegionTable pivotTable = new DataRegionTable("query", this);
         pivotTable.setSort("ParticipantId", SortDirection.ASC);
 
-        Locator.XPathLocator region = Locator.tagWithAttribute("table", "lk-region-name", "query");
+        Locator.XPathLocator region = Locator.tagWithAttribute("table", "data-region-name", "query");
 
         log("** Verifying pivot table headers");
         Locator AnalyteName_header = region.append("/thead[1]/tr[1]/th[2]");

@@ -70,6 +70,12 @@ public class FieldDefinition extends PropertyDescriptor
         setMvEnabled(null);
     }
 
+    public FieldDefinition withNewName(String newName)
+    {
+        setName(newName);
+        return this;
+    }
+
     /**
      * Define a String field
      * @param name field name

@@ -297,7 +297,7 @@ public class AssayRenameExportImportTest extends BaseWebDriverTest
 
         waitAndClick(Locator.lkButton("Next"));
 
-        WebElement runPropertiesPanel = Locator.tagWithAttributeContaining("form", "lk-region-form", "Runs")
+        WebElement runPropertiesPanel = Locator.tagWithAttributeContaining("form", "data-region-form", "Runs")
                 .findElement(getDriver());
 
         setFormElement(Locator.name("runDate").findElement(runPropertiesPanel),

@@ -191,4 +191,12 @@ public class TestDataUtils
             return StringUtils.containsAny(value, _escapedChars);
         }
     }
+
+    public static final String[] DECODED = {"\\", "$", "/", "&", "}", "~", ",", "."};
+    public static final String[] ENCODED = {"\\\\", "\\$", "\\/", "\\&", "\\}", "\\~", "\\,", "\\."};
+    public static String getEscapedNameExpression(String encoded)
+    {
+        return StringUtils.replaceEach(encoded, DECODED, ENCODED);
+    }
+
 }

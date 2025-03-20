@@ -243,8 +243,10 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             new FieldDefinition("Consumption Rate, Glucose", FieldDefinition.ColumnType.Decimal),
             new FieldDefinition("Measurement Date/Time", FieldDefinition.ColumnType.DateAndTime),
             new FieldDefinition("A260/A280", FieldDefinition.ColumnType.Decimal),
-            new FieldDefinition("Nucleic Acid (ng/uL)", FieldDefinition.ColumnType.Decimal),
-            new FieldDefinition("Concentration (by Qubit ng/uL)", FieldDefinition.ColumnType.Decimal),
+            new FieldDefinition("Nucleic Acid (ng/uL)", FieldDefinition.ColumnType.Decimal)
+                    .setLabel("Nucleic Acid (ng/uL)"),
+            new FieldDefinition("Concentration (by Qubit ng/uL)", FieldDefinition.ColumnType.Decimal)
+                    .setLabel("Concentration (by Qubit ng/uL)"),
             new FieldDefinition("Dead (cells/ml)", FieldDefinition.ColumnType.Decimal),
             new FieldDefinition("PDGF-AA/BB", FieldDefinition.ColumnType.Decimal),
             new FieldDefinition("Run End Data/Time", FieldDefinition.ColumnType.DateAndTime),
@@ -256,10 +258,14 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             new FieldDefinition("FAM-Lambda..cp.Rxn."),
             new FieldDefinition("VIC-Precision...1"),
             new FieldDefinition("Product.Type"),
-            new FieldDefinition("Weight.Balance_%", FieldDefinition.ColumnType.Decimal),
-            new FieldDefinition("Cumulative.Yield.DCW/Glucose.Consumed_g/g", FieldDefinition.ColumnType.Decimal),
-            new FieldDefinition("Average.Volume.Productivity_g/L/day", FieldDefinition.ColumnType.Decimal),
+            new FieldDefinition("Weight.Balance_%", FieldDefinition.ColumnType.Decimal)
+                    .setLabel("Weight.Balance %"),
+            new FieldDefinition("Cumulative.Yield.DCW/Glucose.Consumed_g/g", FieldDefinition.ColumnType.Decimal)
+                    .setLabel("Cumulative.Yield.DCW/Glucose.Consumed g/g"),
+            new FieldDefinition("Average.Volume.Productivity_g/L/day", FieldDefinition.ColumnType.Decimal)
+                    .setLabel("Average.Volume.Productivity g/L/day"),
             new FieldDefinition("Cmol.Biomass/Cmol.Glucose.Consumed_%", FieldDefinition.ColumnType.Decimal)
+                    .setLabel("Cmol.Biomass/Cmol.Glucose.Consumed %")
     );
 
     public static final List<FieldDefinition> REALISTIC_SAMPLE_FIELDS = List.of(
@@ -2362,6 +2368,12 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         return new DataRegionTable("query", this);
     }
 
+    public SourceQueryPage editQuerySource(String schemaName, String queryName)
+    {
+        selectQuery(schemaName, queryName);
+        clickAndWait(Locator.linkContainingText("edit source"));
+        return new SourceQueryPage(getDriver());
+    }
     public void editQueryProperties(String schemaName, String queryName)
     {
         selectQuery(schemaName, queryName);
