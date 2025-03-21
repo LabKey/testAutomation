@@ -74,6 +74,17 @@ public class UIPermissionsHelper extends PermissionsHelper
     }
 
     @LogMethod
+    public void deleteGlobalGroupFromDetailsPage(@LoggedParam String groupName)
+    {
+        goToSiteGroupScreen(groupName);
+        Locator.XPathLocator deleteButton = Locator.lkButton("Delete Empty Group");
+        _driver.waitForElement(deleteButton);
+        _driver.click(deleteButton);
+        _driver.assertAlert("Permanently delete group /" + groupName + "?");
+        _driver.waitForElement(Ext4Helper.Locators.ext4Button("Save and Finish"));
+    }
+
+    @LogMethod
     public Integer createGlobalPermissionsGroup(@LoggedParam String groupName, boolean failIfAlreadyExists, @LoggedParam String... users)
     {
         startCreateGlobalPermissionsGroup(groupName, failIfAlreadyExists);
@@ -228,6 +239,12 @@ public class UIPermissionsHelper extends PermissionsHelper
     @Override
     public void addUserToSiteGroup(String userName, String groupName)
     {
+        goToSiteGroupScreen(groupName);
+        addUserToGroupFromGroupScreen(userName);
+    }
+
+    private void goToSiteGroupScreen(String groupName)
+    {
         _driver.ensureAdminMode();
         switch (groupName)
         {
@@ -244,7 +261,6 @@ public class UIPermissionsHelper extends PermissionsHelper
                 _driver.click(groupLoc);
                 _driver.clickAndWait(Locator.linkContainingText("manage group"));
         }
-        addUserToGroupFromGroupScreen(userName);
     }
 
     @Override

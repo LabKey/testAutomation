@@ -19,6 +19,10 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.query.Filter;
+import org.labkey.remoteapi.query.SelectRowsCommand;
+import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
@@ -32,6 +36,7 @@ import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.WikiHelper;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -48,6 +53,7 @@ public class GroupTest extends BaseWebDriverTest
     protected static final String COMPOUND_GROUP = "group2";
     protected static final String BAD_GROUP = "group3";
     protected static final String CHILD_GROUP = "group4";
+    protected static final String EMPTY_GROUP = "emptyGroupToDelete";
     protected static final String[] TEST_USERS_FOR_GROUP = {"user1_grouptest@" + SIMPLE_GROUP + ".group.test", "user2_grouptest@" + SIMPLE_GROUP + ".group.test", "user3_grouptest@" + COMPOUND_GROUP + ".group.test"};
     protected static final String[] TEST_DISPLAY_NAMES_FOR_GROUP = {"user1 grouptest", "user2 grouptest", "user3 grouptest"};
     protected static final String SITE_USER_IN_GROUP = "useringroup";
@@ -79,6 +85,7 @@ public class GroupTest extends BaseWebDriverTest
         permissionsHelper.deleteGroup(CHILD_GROUP);
         permissionsHelper.deleteGroup(SITE_USER_GROUP);
         permissionsHelper.deleteGroup(API_SITE_GROUP);
+        permissionsHelper.deleteGroup(EMPTY_GROUP);
         _userHelper.deleteUsers(false, TEST_USERS_FOR_GROUP);
         _userHelper.deleteUsers(false, SITE_USER_EMAILS);
         _containerHelper.deleteProject(getProjectName(), afterTest);
@@ -93,7 +100,7 @@ public class GroupTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testSteps()
+    public void testSteps() throws IOException, CommandException
     {
         for (String user : TEST_USERS_FOR_GROUP)
         {
@@ -110,6 +117,7 @@ public class GroupTest extends BaseWebDriverTest
 
         _permissionsHelper.createGlobalPermissionsGroup(SIMPLE_GROUP, TEST_USERS_FOR_GROUP[0], TEST_USERS_FOR_GROUP[1]);
         _permissionsHelper.createGlobalPermissionsGroup(COMPOUND_GROUP, SIMPLE_GROUP,  TEST_USERS_FOR_GROUP[2]);
+        _permissionsHelper.createGlobalPermissionsGroup(EMPTY_GROUP);
 
         verifyExportFunction();
 
@@ -134,6 +142,13 @@ public class GroupTest extends BaseWebDriverTest
         _permissionsHelper.enterPermissionsUI();
         waitForText("Author");
         _securityHelper.setSiteGroupPermissions("All Site Users", "Author");
+
+        // Ensure that deleting from the group's page works too. Issue
+        _permissionsHelper.deleteGlobalGroupFromDetailsPage(EMPTY_GROUP);
+        SelectRowsCommand selectRowsCommand = new SelectRowsCommand("core", "Groups");
+        selectRowsCommand.setFilters(List.of(new Filter("Name", EMPTY_GROUP)));
+        SelectRowsResponse response = selectRowsCommand.execute(createDefaultConnection(), "/");
+        assertEquals(EMPTY_GROUP + " should have been deleted", 0, response.getRows().size());
 
         permissionsReportTest();
 
