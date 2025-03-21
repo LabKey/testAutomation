@@ -142,6 +142,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -231,96 +232,97 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     public static final String INJECT_CHARS_1 = Crawler.injectScriptBlock;
     public static final String INJECT_CHARS_2 = Crawler.injectAttributeScript;
 
-    public static final List<FieldDefinition> REALISTIC_ASSAY_FIELDS = List.of(
-            new FieldDefinition("Addition or Removal (0= addition, 1=removal)", FieldDefinition.ColumnType.Integer),
-            new FieldDefinition("Source (0=external, 1 = internal to system)", FieldDefinition.ColumnType.Integer),
-            new FieldDefinition("Raw Sample [Al] g/L", FieldDefinition.ColumnType.Decimal),
-            new FieldDefinition("Raw Sample [H+] g/L or %", FieldDefinition.ColumnType.Decimal),
-            new FieldDefinition("KJ/Day", FieldDefinition.ColumnType.Decimal),
-            new FieldDefinition("EE KCal/kg0.75", FieldDefinition.ColumnType.Decimal),
-            new FieldDefinition("Ratio EE in Kcal/Day to Lean Mass", FieldDefinition.ColumnType.Decimal),
-            new FieldDefinition("Feed %", FieldDefinition.ColumnType.Decimal),
-            new FieldDefinition("Consumption Rate, Glucose", FieldDefinition.ColumnType.Decimal),
-            new FieldDefinition("Measurement Date/Time", FieldDefinition.ColumnType.DateAndTime),
-            new FieldDefinition("A260/A280", FieldDefinition.ColumnType.Decimal),
-            new FieldDefinition("Nucleic Acid (ng/uL)", FieldDefinition.ColumnType.Decimal)
+    // 'FieldDefinition's are mutable, don't store them as global constants
+    public static final List<Supplier<FieldDefinition>> REALISTIC_ASSAY_FIELDS = List.of(
+            () -> new FieldDefinition("Addition or Removal (0= addition, 1=removal)", FieldDefinition.ColumnType.Integer),
+            () -> new FieldDefinition("Source (0=external, 1 = internal to system)", FieldDefinition.ColumnType.Integer),
+            () -> new FieldDefinition("Raw Sample [Al] g/L", FieldDefinition.ColumnType.Decimal),
+            () -> new FieldDefinition("Raw Sample [H+] g/L or %", FieldDefinition.ColumnType.Decimal),
+            () -> new FieldDefinition("KJ/Day", FieldDefinition.ColumnType.Decimal),
+            () -> new FieldDefinition("EE KCal/kg0.75", FieldDefinition.ColumnType.Decimal),
+            () -> new FieldDefinition("Ratio EE in Kcal/Day to Lean Mass", FieldDefinition.ColumnType.Decimal),
+            () -> new FieldDefinition("Feed %", FieldDefinition.ColumnType.Decimal),
+            () -> new FieldDefinition("Consumption Rate, Glucose", FieldDefinition.ColumnType.Decimal),
+            () -> new FieldDefinition("Measurement Date/Time", FieldDefinition.ColumnType.DateAndTime),
+            () -> new FieldDefinition("A260/A280", FieldDefinition.ColumnType.Decimal),
+            () -> new FieldDefinition("Nucleic Acid (ng/uL)", FieldDefinition.ColumnType.Decimal)
                     .setLabel("Nucleic Acid (ng/uL)"),
-            new FieldDefinition("Concentration (by Qubit ng/uL)", FieldDefinition.ColumnType.Decimal)
+            () -> new FieldDefinition("Concentration (by Qubit ng/uL)", FieldDefinition.ColumnType.Decimal)
                     .setLabel("Concentration (by Qubit ng/uL)"),
-            new FieldDefinition("Dead (cells/ml)", FieldDefinition.ColumnType.Decimal),
-            new FieldDefinition("PDGF-AA/BB", FieldDefinition.ColumnType.Decimal),
-            new FieldDefinition("Run End Data/Time", FieldDefinition.ColumnType.DateAndTime),
-            new FieldDefinition("Run Start Date/Time", FieldDefinition.ColumnType.DateAndTime),
-            new FieldDefinition("Algorithm Parameter: Calc. Top", FieldDefinition.ColumnType.Integer),
-            new FieldDefinition("1.0", FieldDefinition.ColumnType.Integer),
-            new FieldDefinition("2.0"),
-            new FieldDefinition("12.0"),
-            new FieldDefinition("FAM-Lambda..cp.Rxn."),
-            new FieldDefinition("VIC-Precision...1"),
-            new FieldDefinition("Product.Type"),
-            new FieldDefinition("Weight.Balance_%", FieldDefinition.ColumnType.Decimal)
+            () -> new FieldDefinition("Dead (cells/ml)", FieldDefinition.ColumnType.Decimal),
+            () -> new FieldDefinition("PDGF-AA/BB", FieldDefinition.ColumnType.Decimal),
+            () -> new FieldDefinition("Run End Data/Time", FieldDefinition.ColumnType.DateAndTime),
+            () -> new FieldDefinition("Run Start Date/Time", FieldDefinition.ColumnType.DateAndTime),
+            () -> new FieldDefinition("Algorithm Parameter: Calc. Top", FieldDefinition.ColumnType.Integer),
+            () -> new FieldDefinition("1.0", FieldDefinition.ColumnType.Integer),
+            () -> new FieldDefinition("2.0"),
+            () -> new FieldDefinition("12.0"),
+            () -> new FieldDefinition("FAM-Lambda..cp.Rxn."),
+            () -> new FieldDefinition("VIC-Precision...1"),
+            () -> new FieldDefinition("Product.Type"),
+            () -> new FieldDefinition("Weight.Balance_%", FieldDefinition.ColumnType.Decimal)
                     .setLabel("Weight.Balance %"),
-            new FieldDefinition("Cumulative.Yield.DCW/Glucose.Consumed_g/g", FieldDefinition.ColumnType.Decimal)
+            () -> new FieldDefinition("Cumulative.Yield.DCW/Glucose.Consumed_g/g", FieldDefinition.ColumnType.Decimal)
                     .setLabel("Cumulative.Yield.DCW/Glucose.Consumed g/g"),
-            new FieldDefinition("Average.Volume.Productivity_g/L/day", FieldDefinition.ColumnType.Decimal)
+            () -> new FieldDefinition("Average.Volume.Productivity_g/L/day", FieldDefinition.ColumnType.Decimal)
                     .setLabel("Average.Volume.Productivity g/L/day"),
-            new FieldDefinition("Cmol.Biomass/Cmol.Glucose.Consumed_%", FieldDefinition.ColumnType.Decimal)
+            () -> new FieldDefinition("Cmol.Biomass/Cmol.Glucose.Consumed_%", FieldDefinition.ColumnType.Decimal)
                     .setLabel("Cmol.Biomass/Cmol.Glucose.Consumed %")
     );
 
-    public static final List<FieldDefinition> REALISTIC_SAMPLE_FIELDS = List.of(
-            new FieldDefinition("MW (g/mol)", FieldDefinition.ColumnType.Decimal),
-            new FieldDefinition("Batch FW (g/mol)", FieldDefinition.ColumnType.Decimal),
-            new FieldDefinition("Sequence (5'-3')"),
-            new FieldDefinition("Tumor%", FieldDefinition.ColumnType.Decimal),
-            new FieldDefinition("Viable_cells%", FieldDefinition.ColumnType.Decimal),
-            new FieldDefinition("Sample no."),
-            new FieldDefinition("Pass/Fail" , FieldDefinition.ColumnType.TextChoice).setTextChoiceValues(List.of("Pass", "Fail")),
-            new FieldDefinition("Final Positivity %", FieldDefinition.ColumnType.Decimal),
-            new FieldDefinition("Optimised Yes/No", FieldDefinition.ColumnType.Boolean),
-            new FieldDefinition("G-Band Pass/Fail", FieldDefinition.ColumnType.Boolean),
-            new FieldDefinition("Positivity/negativity notes"),
-            new FieldDefinition("Useful for R&D/Production ?", FieldDefinition.ColumnType.Boolean),
-            new FieldDefinition("NaCl Lot Number (External), 0.9% NaCl Expiry (In-House)"),
-            new FieldDefinition("'GURR' 6.8 buffer tablets Lot number (External)"),
-            new FieldDefinition("Giemsa Stain Lot number, Expiry"),
-            new FieldDefinition("Trypsin 2.5% Lot number (External), Expiry"),
-            new FieldDefinition("Lot No.", FieldDefinition.ColumnType.Integer),
-            new FieldDefinition("Sample Origin / Owner"),
-            new FieldDefinition("PSS Tracking No."),
-            new FieldDefinition("Product/bottle size", FieldDefinition.ColumnType.Decimal),
-            new FieldDefinition("Time point / Pull Date", FieldDefinition.ColumnType.DateAndTime),
-            new FieldDefinition("Cell Type (Epz, Spz, PS)"),
-            new FieldDefinition("Concentration (ng/uL)", FieldDefinition.ColumnType.Decimal),
-            new FieldDefinition("Lot no. (Replacement tube) 1"),
-            new FieldDefinition("Date of Collection (DD/MMM/YYY)", FieldDefinition.ColumnType.Date),
-            new FieldDefinition("Freezer/Fridge ID"),
-            new FieldDefinition( "X Position (i.e., box row)", FieldDefinition.ColumnType.Integer),
-            new FieldDefinition("[Analysis 2] 2. Time In (Fridge)", FieldDefinition.ColumnType.Time),
-            new FieldDefinition("Aliquot_No._/_ID"),
-            new FieldDefinition("VIAL_ID/BARCODE/ACCESSION_No."),
-            new FieldDefinition("No.=_464"),
-            new FieldDefinition("Specimen_condition_(Hämolyse/insufficient_volume/…)", FieldDefinition.ColumnType.Decimal),
-            new FieldDefinition("CHECKOUT_(x),_Removed_(1)"),
-            new FieldDefinition("Age <18 years of age or >65 years of age.", FieldDefinition.ColumnType.Boolean),
-            new FieldDefinition("CTS&L_LLS_Visit_Code_"),
-            new FieldDefinition("Collection Tube Type & Volume 1"),
-            new FieldDefinition("Row_&_Col"),
-            new FieldDefinition("The participant has received any investigational compound from a different trial within 30 days or 5 half-lives (whichever is greater)."),
-            new FieldDefinition("Barcode e.g FG30000A001"),
-            new FieldDefinition("Information pertaining to patient recruitment e.g advertisements, bulletins and information placed on the internet - TMAR"),
-            new FieldDefinition("Data Collection Tools (CRF's, Info Sheets, etc.)")
+    public static final List<Supplier<FieldDefinition>> REALISTIC_SAMPLE_FIELDS = List.of(
+            () -> new FieldDefinition("MW (g/mol)", FieldDefinition.ColumnType.Decimal),
+            () -> new FieldDefinition("Batch FW (g/mol)", FieldDefinition.ColumnType.Decimal),
+            () -> new FieldDefinition("Sequence (5'-3')"),
+            () -> new FieldDefinition("Tumor%", FieldDefinition.ColumnType.Decimal),
+            () -> new FieldDefinition("Viable_cells%", FieldDefinition.ColumnType.Decimal),
+            () -> new FieldDefinition("Sample no."),
+            () -> new FieldDefinition("Pass/Fail" , FieldDefinition.ColumnType.TextChoice).setTextChoiceValues(List.of("Pass", "Fail")),
+            () -> new FieldDefinition("Final Positivity %", FieldDefinition.ColumnType.Decimal),
+            () -> new FieldDefinition("Optimised Yes/No", FieldDefinition.ColumnType.Boolean),
+            () -> new FieldDefinition("G-Band Pass/Fail", FieldDefinition.ColumnType.Boolean),
+            () -> new FieldDefinition("Positivity/negativity notes"),
+            () -> new FieldDefinition("Useful for R&D/Production ?", FieldDefinition.ColumnType.Boolean),
+            () -> new FieldDefinition("NaCl Lot Number (External), 0.9% NaCl Expiry (In-House)"),
+            () -> new FieldDefinition("'GURR' 6.8 buffer tablets Lot number (External)"),
+            () -> new FieldDefinition("Giemsa Stain Lot number, Expiry"),
+            () -> new FieldDefinition("Trypsin 2.5% Lot number (External), Expiry"),
+            () -> new FieldDefinition("Lot No.", FieldDefinition.ColumnType.Integer),
+            () -> new FieldDefinition("Sample Origin / Owner"),
+            () -> new FieldDefinition("PSS Tracking No."),
+            () -> new FieldDefinition("Product/bottle size", FieldDefinition.ColumnType.Decimal),
+            () -> new FieldDefinition("Time point / Pull Date", FieldDefinition.ColumnType.DateAndTime),
+            () -> new FieldDefinition("Cell Type (Epz, Spz, PS)"),
+            () -> new FieldDefinition("Concentration (ng/uL)", FieldDefinition.ColumnType.Decimal),
+            () -> new FieldDefinition("Lot no. (Replacement tube) 1"),
+            () -> new FieldDefinition("Date of Collection (DD/MMM/YYY)", FieldDefinition.ColumnType.Date),
+            () -> new FieldDefinition("Freezer/Fridge ID"),
+            () -> new FieldDefinition( "X Position (i.e., box row)", FieldDefinition.ColumnType.Integer),
+            () -> new FieldDefinition("[Analysis 2] 2. Time In (Fridge)", FieldDefinition.ColumnType.Time),
+            () -> new FieldDefinition("Aliquot_No._/_ID"),
+            () -> new FieldDefinition("VIAL_ID/BARCODE/ACCESSION_No."),
+            () -> new FieldDefinition("No.=_464"),
+            () -> new FieldDefinition("Specimen_condition_(Hämolyse/insufficient_volume/…)", FieldDefinition.ColumnType.Decimal),
+            () -> new FieldDefinition("CHECKOUT_(x),_Removed_(1)"),
+            () -> new FieldDefinition("Age <18 years of age or >65 years of age.", FieldDefinition.ColumnType.Boolean),
+            () -> new FieldDefinition("CTS&L_LLS_Visit_Code_"),
+            () -> new FieldDefinition("Collection Tube Type & Volume 1"),
+            () -> new FieldDefinition("Row_&_Col"),
+            () -> new FieldDefinition("The participant has received any investigational compound from a different trial within 30 days or 5 half-lives (whichever is greater)."),
+            () -> new FieldDefinition("Barcode e.g FG30000A001"),
+            () -> new FieldDefinition("Information pertaining to patient recruitment e.g advertisements, bulletins and information placed on the internet - TMAR"),
+            () -> new FieldDefinition("Data Collection Tools (CRF's, Info Sheets, etc.)")
     );
 
-    public static final List<FieldDefinition> REALISTIC_SOURCE_FIELDS = List.of(
-            new FieldDefinition("Patient Race / Ethnicity", FieldDefinition.ColumnType.TextChoice).setTextChoiceValues(List.of("American Indian or Alaska Native", "Asian",  "Black", "Native Hawaiian or Pacific Islander", "White", "Other", "Unknown" )),
-            new FieldDefinition("Tumor%", FieldDefinition.ColumnType.Decimal),
-            new FieldDefinition("Viable_cells%", FieldDefinition.ColumnType.Decimal),
-            new FieldDefinition("Гемоглобін тех.", FieldDefinition.ColumnType.Date),
-            new FieldDefinition("Disposition (per SOW/MTA)", FieldDefinition.ColumnType.String),
-            new FieldDefinition("~ Height (T to B) (mm)", FieldDefinition.ColumnType.Integer),
-            new FieldDefinition("OD/DCW factor", FieldDefinition.ColumnType.String),
-            new FieldDefinition("Age (years)", FieldDefinition.ColumnType.Integer)
+    public static final List<Supplier<FieldDefinition>> REALISTIC_SOURCE_FIELDS = List.of(
+            () -> new FieldDefinition("Patient Race / Ethnicity", FieldDefinition.ColumnType.TextChoice).setTextChoiceValues(List.of("American Indian or Alaska Native", "Asian",  "Black", "Native Hawaiian or Pacific Islander", "White", "Other", "Unknown" )),
+            () -> new FieldDefinition("Tumor%", FieldDefinition.ColumnType.Decimal),
+            () -> new FieldDefinition("Viable_cells%", FieldDefinition.ColumnType.Decimal),
+            () -> new FieldDefinition("Гемоглобін тех.", FieldDefinition.ColumnType.Date),
+            () -> new FieldDefinition("Disposition (per SOW/MTA)", FieldDefinition.ColumnType.String),
+            () -> new FieldDefinition("~ Height (T to B) (mm)", FieldDefinition.ColumnType.Integer),
+            () -> new FieldDefinition("OD/DCW factor", FieldDefinition.ColumnType.String),
+            () -> new FieldDefinition("Age (years)", FieldDefinition.ColumnType.Integer)
     );
 
     /** Have we already done a memory leak and error check in this test harness VM instance? */
