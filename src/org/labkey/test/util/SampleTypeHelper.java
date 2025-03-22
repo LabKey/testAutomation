@@ -184,7 +184,7 @@ public class SampleTypeHelper extends WebDriverWrapper
 
     public DataRegionTable getSampleTypesList()
     {
-        return new DataRegionTable.DataRegionFinder(getDriver()).withName(SAMPLE_TYPE_DATA_REGION_NAME).find();
+        return new DataRegionTable.DataRegionFinder(getDriver()).withName(SAMPLE_TYPE_DATA_REGION_NAME).waitFor();
     }
 
     public DataRegionTable getSamplesDataRegionTable()

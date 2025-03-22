@@ -5,6 +5,7 @@ import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.domain.CreateDomainCommand;
 import org.labkey.remoteapi.domain.Domain;
+import org.labkey.remoteapi.domain.DomainResponse;
 import org.labkey.test.util.TestDataGenerator;
 import org.labkey.test.util.TestLogger;
 
@@ -26,7 +27,23 @@ public abstract class DomainProps
 
     public final CreateDomainCommand getCreateCommand()
     {
-        CreateDomainCommand command = new CreateDomainCommand(getKind(), getDomainDesign().getName());
+        CreateDomainCommand command = new CreateDomainCommand(getKind(), getDomainDesign().getName())
+        {
+            @Override
+            public DomainResponse execute(Connection connection, String folderPath) throws IOException, CommandException
+            {
+                TestLogger.info(String.format("Creating %s domain '%s.%s' in '%s'", getKind(), getSchemaName(), getQueryName(), folderPath));
+
+                DomainResponse response = super.execute(connection, folderPath);
+
+                TestLogger.log("Successfully created domain, '%s':\n%s"
+                    .formatted(
+                        response.getDomain().getName(),
+                        response.getDomain().toJSONObject().toString(2)));
+
+                return response;
+            }
+        };
         command.setOptions(new HashMap<>(getOptions()));
         command.setDomainDesign(getDomainDesign());
         return command;
@@ -39,7 +56,6 @@ public abstract class DomainProps
 
     public final TestDataGenerator create(Connection connection, String containerPath) throws IOException, CommandException
     {
-        TestLogger.info(String.format("Creating %s domain '%s.%s' in '%s'", getKind(), getSchemaName(), getQueryName(), containerPath));
         getCreateCommand().execute(connection, containerPath);
         return getTestDataGenerator(containerPath);
     }
