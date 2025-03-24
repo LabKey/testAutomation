@@ -63,10 +63,10 @@ public class WebDavPage extends LabKeyPage<WebDavPage.ElementCache>
     {
         WebElement htmlViewButton = Locator.button("HTML View").findWhenNeeded(this);
 
-        WebElement fbDetailsTable = Locator.tagWithClass("table", "fb-details").findWhenNeeded(this);
+        WebElement fbDetailsTable = Locator.tagWithClass("table", "fb-details").refindWhenNeeded(this);
         WebElement webDavUrlElement = Locator.tagWithText("th", "WebDav URL:").followingSibling("td").childTag("a")
-                .findWhenNeeded(fbDetailsTable);
+                .refindWhenNeeded(fbDetailsTable);
         WebElement absolutePathElement = Locator.tagWithText("th", "Absolute Path:").followingSibling("td")
-            .findWhenNeeded(fbDetailsTable);
+            .refindWhenNeeded(fbDetailsTable);
     }
 }
