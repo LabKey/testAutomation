@@ -615,7 +615,7 @@ public class FieldDefinition extends PropertyDescriptor
 
         static List<ColumnType> values()
         {
-            return ColumnTypeImpl.COLUMN_TYPES;
+            return Collections.unmodifiableList(ColumnTypeImpl.COLUMN_TYPES);
         }
     }
 
