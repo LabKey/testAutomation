@@ -12,6 +12,7 @@ import org.labkey.test.components.react.FilteringReactSelect;
 import org.labkey.test.components.react.ReactDateTimePicker;
 import org.labkey.test.components.react.ReactSelect;
 import org.labkey.test.components.ui.files.FileUploadField;
+import org.labkey.test.params.FieldDefinition;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
@@ -413,6 +414,19 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
     {
         return new ReactDateTimePicker.ReactDateTimeInputFinder(getDriver())
                 .withInputId(fieldCaption).find(this);
+    }
+
+    // For use when the field is of an unknown type, as can occur in fuzz tests
+    public void setDetails(FieldDefinition field, Object newValue, DetailTableEdit editTable)
+    {
+        if (field.getType() == FieldDefinition.ColumnType.TextChoice)
+            editTable.setSelectValue(field.getName(), (List<String>) newValue);
+        else if (field.getType() == FieldDefinition.ColumnType.Date || field.getType() == FieldDefinition.ColumnType.DateAndTime || field.getType() == FieldDefinition.ColumnType.Time)
+            editTable.setDateTimeField(field.getName(), newValue);
+        else if (field.getType() == FieldDefinition.ColumnType.Boolean)
+            editTable.setBooleanField(field.getName(), (Boolean) newValue);
+        else
+            editTable.setTextField(field.getName(), String.valueOf(newValue));
     }
 
     /**
