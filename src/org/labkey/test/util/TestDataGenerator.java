@@ -354,7 +354,8 @@ public class TestDataGenerator
         }
         while (domainName.length() < size || Pattern.matches("(.*\\s--[^ ].*)|(.*\\s-[^- ].*)", domainName)); // domain name must not contain space followed by dash. (command like: Issue 49161)
 
-        return domainName;
+        // Multiple spaces in the UI are collapsed into a single space. If we need to test for handling of multiple spaces, we'll not use this generator
+        return domainName.replaceAll("\\s+", " ");
     }
 
     public static String randomFieldName(String part)
