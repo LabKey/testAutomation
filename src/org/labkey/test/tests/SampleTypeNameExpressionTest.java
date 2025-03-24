@@ -295,7 +295,7 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
 
         SampleTypeHelper sampleTypeHelper = new SampleTypeHelper(this);
 
-        final String sampleTypeName = "Tricky_" + TestDataGenerator.randomDomainName();
+        final String sampleTypeName = TestDataGenerator.randomDomainName("Tricky_");
 
         CreateSampleTypePage createPage = sampleTypeHelper.goToCreateNewSampleType();
 
