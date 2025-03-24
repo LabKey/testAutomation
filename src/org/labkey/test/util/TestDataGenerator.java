@@ -372,7 +372,7 @@ public class TestDataGenerator
 
     public static String randomDomainName(@Nullable String part)
     {
-        return randomDomainName(part, randomInt(0, 5), randomInt(0, 10));
+        return randomDomainName(part, randomInt(0, 10));
     }
 
     public static String randomInvalidDomainName(@Nullable String namePart, int numStartChars, int numEndChars)
@@ -384,25 +384,25 @@ public class TestDataGenerator
 
     public static String randomDomainName(int numEndChars)
     {
-        return randomDomainName(null, 0, numEndChars);
+        return randomDomainName(null, numEndChars);
     }
 
     /**
      * Generate a random domain name of the specified size.
      *
-     * @param namePart       If a namePart is provided, the domain name will contain it. Pass null to generate a random alphanumeric character string for the prefix.
-     * @param numStartChars  Number of random characters at start of name
-     * @param numEndChars    Number of random characters at end of name
+     * @param namePart    If a namePart is provided, the domain name will contain it. Pass null to generate a random alphanumeric single character for the prefix.
+     * @param numEndChars Number of random characters at end of name
      * @return name containing the given name part and appended random characters that should be a valid domain name
      */
-    public static String randomDomainName(@Nullable String namePart, int numStartChars, int numEndChars)
+    public static String randomDomainName(@Nullable String namePart, int numEndChars)
     {
         String domainName = "";
         do
         {
-            String _namePart = namePart != null ? namePart : randomString(1, null, ALPHANUMERIC_STRING); // domain needs to start with alphanumeric char
+            String firstChar = namePart != null ? namePart.charAt(0) + "" : randomString(1, null, ALPHANUMERIC_STRING); // domain needs to start with alphanumeric char;
+            String _namePart = namePart != null ? namePart.substring(1) : "";
             final String charset = namePart != null ? DOMAIN_SPECIAL_STRING : ALPHANUMERIC_STRING + DOMAIN_SPECIAL_STRING;
-            domainName = randomName(_namePart, numStartChars, numEndChars, charset);
+            domainName = firstChar + randomName(_namePart, 0, numEndChars, charset);
         }
         while (Pattern.matches("(.*\\s--[^ ].*)|(.*\\s-[^- ].*)", domainName)); // domain name must not contain space followed by dash. (command like: Issue 49161)
 
