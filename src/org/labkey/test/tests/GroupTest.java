@@ -143,7 +143,7 @@ public class GroupTest extends BaseWebDriverTest
         waitForText("Author");
         _securityHelper.setSiteGroupPermissions("All Site Users", "Author");
 
-        // Ensure that deleting from the group's page works too. Issue
+        // Ensure that deleting from the group's page works too. Issue 52614
         _permissionsHelper.deleteGlobalGroupFromDetailsPage(EMPTY_GROUP);
         SelectRowsCommand selectRowsCommand = new SelectRowsCommand("core", "Groups");
         selectRowsCommand.setFilters(List.of(new Filter("Name", EMPTY_GROUP)));
