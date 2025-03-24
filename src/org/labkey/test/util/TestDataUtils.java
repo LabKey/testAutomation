@@ -15,7 +15,7 @@ import java.util.function.Supplier;
 
 public class TestDataUtils
 {
-    // 'FieldDefinition's are mutable, don't store them as global constants
+    // 'FieldDefinition's are mutable; don't store them as global constants
     public static final List<Supplier<FieldDefinition>> REALISTIC_ASSAY_FIELDS = List.of(
             () -> new FieldDefinition("Addition or Removal (0= addition, 1=removal)", FieldDefinition.ColumnType.Integer),
             () -> new FieldDefinition("Source (0=external, 1 = internal to system)", FieldDefinition.ColumnType.Integer),
