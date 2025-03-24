@@ -53,7 +53,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Supplier;
@@ -413,24 +412,23 @@ public class TestDataGenerator
         if (min >= max)
             throw new IllegalArgumentException("min must be less than max");
 
-        Random r = new Random();
-        return r.nextInt((max - min) + 1) + min;
+        return ThreadLocalRandom.current().nextInt((max - min) + 1) + min;
     }
 
     public float randomFloat(float min, float max)
     {
         if (min >= max)
             throw new IllegalArgumentException("min must be less than max");
-        Random r = new Random();
-        return  min + r.nextFloat() * (max - min);
+
+        return  min + ThreadLocalRandom.current().nextFloat() * (max - min);
     }
 
     public Double randomDouble(double min, double max)
     {
         if (min >= max)
             throw new IllegalArgumentException("min must be less than max");
-        Random r = new Random();
-        return  min + r.nextDouble() * (max - min);
+
+        return  min + ThreadLocalRandom.current().nextDouble() * (max - min);
     }
 
     public String randomDateString(Date min, Date max)
@@ -664,27 +662,20 @@ public class TestDataGenerator
 
     public static <T> List<T> shuffleSelect(List<T> allFields, int selectCount)
     {
-        return shuffleSelect(allFields, selectCount, false);
+        List<T> shuffled = new ArrayList<>(allFields);
+        Collections.shuffle(shuffled);
+        return shuffled.subList(0, selectCount);
     }
 
-    public static <T> List<T> shuffleSelect(List<T> allFields, int selectCount, boolean canRepeat)
+    // Require suppliers to provide reassurance that mutable objects are only reused intentionally
+    public static <T> List<T> randomSelect(List<Supplier<T>> allFields, int selectCount)
     {
-        if (!canRepeat)
+        List<T> selected = new ArrayList<>();
+        for (int i = 0; i < selectCount; i++)
         {
-            List<T> shuffled = new ArrayList<>(allFields);
-            Collections.shuffle(shuffled);
-            return shuffled.subList(0, selectCount - 1);
+            selected.add(allFields.get(randomInt(0, allFields.size())).get());
         }
-        else
-        {
-            List<T> selected = new ArrayList<>();
-            for (int i = 0; i < selectCount; i++)
-            {
-                selected.add(allFields.get(randomInt(0, allFields.size())));
-            }
-            return selected;
-        }
-
+        return selected;
     }
 
     /**
