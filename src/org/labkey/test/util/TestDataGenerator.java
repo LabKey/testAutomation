@@ -20,6 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.poi.xssf.streaming.SXSSFRow;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
 import org.labkey.api.collections.CaseInsensitiveLinkedHashMap;
@@ -53,7 +54,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Supplier;
@@ -342,45 +342,86 @@ public class TestDataGenerator
         return randomString(size, exclusion, CHARSET_STRING + "\t\n\n\n");
     }
 
+    /**
+     * Creates a String containing the given part with random characters from charSet surrounding it. The name
+     * will have leading and trailing spaces removed and multiple internal spaces collapsed to a single space
+     * in order to be compatible with UI display. Because of this space treatment, there may be fewer than the
+     * sepcified number of charcters before and after the given part.
+     *
+     * @param part          the part that is to be included between random strings
+     * @param numStartChars maximum number of random characters from charSet
+     * @param numEndChars   maximum number of random characters from charSet at the end of the string
+     * @param charSet       the set of characters to draw randomly from
+     * @param exclusions    characters that are to be excluded from the random parts of the name
+     * @return a name with given characters that will be displayed as returned in the UI.
+     */
+    public static String randomName(@NotNull String part, int numStartChars, int numEndChars, String charSet, @Nullable String exclusions)
+    {
+        String name = randomString(numStartChars, exclusions, charSet) + part + randomString(numEndChars, exclusions, charSet);
+
+        // Multiple spaces in the UI are collapsed into a single space so we collapse them here so we can find things by name.
+        // See Issue 52193 for details.
+        // If we need to test for handling of multiple spaces, we'll not use this generator.
+        name = name.trim().replaceAll("\\s+", " ");
+        return name;
+    }
+
     public static String randomDomainName()
     {
-        return randomDomainName(10);
+        return randomDomainName(null);
     }
 
-    public static String randomInvalidDomainName(int size)
+    public static String randomDomainName(@Nullable String part)
     {
-        return randomString(size, null, ILLEGAL_DOMAIN_NAME_CHARSET);
+        return randomDomainName(part, randomInt(0, 10));
     }
 
-    public static String randomDomainName(int size)
+    public static String randomInvalidDomainName(@Nullable String namePart, int numStartChars, int numEndChars)
     {
-        return randomDomainName(size, null);
+        String domainName = randomName(namePart == null ? "" : namePart, numStartChars, numEndChars, ILLEGAL_DOMAIN_NAME_CHARSET, null);
+        TestLogger.log("Generated random invalid domain name: " + domainName);
+        return domainName;
+    }
+
+    public static String randomDomainName(int numEndChars)
+    {
+        return randomDomainName(null, numEndChars);
     }
 
     /**
      * Generate a random domain name of the specified size.
-     * @param size
-     * @param prefix If a prefix is provided, the domain name will start with it. Pass null to generate a random alphanumeric character string for the prefix.
-     * @return
+     *
+     * @param namePart    If a namePart is provided, the domain name will contain it. Pass null to generate a random alphanumeric single character for the prefix.
+     * @param numEndChars Number of random characters at end of name
+     * @return name containing the given name part and appended random characters that should be a valid domain name
      */
-    public static String randomDomainName(int size, @Nullable String prefix)
+    public static String randomDomainName(@Nullable String namePart, int numEndChars)
     {
         String domainName = "";
         do
         {
-            String _prefix = prefix != null ? prefix : randomString(1, null, ALPHANUMERIC_STRING); // domain needs to start with alphanumeric char
-            final String charset = prefix != null ? DOMAIN_SPECIAL_STRING : ALPHANUMERIC_STRING + DOMAIN_SPECIAL_STRING;
-            domainName = _prefix + randomString(size - 1, null, charset);
-            domainName = domainName.trim();
+            String firstChar = namePart != null ? namePart.charAt(0) + "" : randomString(1, null, ALPHANUMERIC_STRING); // domain needs to start with alphanumeric char;
+            String _namePart = namePart != null ? namePart.substring(1) : "";
+            final String charset = namePart != null ? DOMAIN_SPECIAL_STRING : ALPHANUMERIC_STRING + DOMAIN_SPECIAL_STRING;
+            domainName = firstChar + randomName(_namePart, 0, numEndChars, charset, null);
         }
-        while (domainName.length() < size || Pattern.matches("(.*\\s--[^ ].*)|(.*\\s-[^- ].*)", domainName)); // domain name must not contain space followed by dash. (command like: Issue 49161)
+        while (Pattern.matches("(.*\\s--[^ ].*)|(.*\\s-[^- ].*)", domainName)); // domain name must not contain space followed by dash. (command like: Issue 49161)
 
+        // Multiple spaces in the UI are collapsed into a single space. If we need to test for handling of multiple spaces, we'll not use this generator
+        domainName = domainName.replaceAll("\\s+", " ");
+
+        TestLogger.log("Generated random domain name: " + domainName);
         return domainName;
     }
 
     public static String randomFieldName(String part)
     {
-        return randomFieldName(part, randomInt(0, 5), randomInt(0, 5));
+        return randomFieldName(part, null);
+    }
+
+    public static String randomFieldName(String part, @Nullable String exclusion)
+    {
+        return randomFieldName(part, randomInt(0, 5), randomInt(0, 5), exclusion);
     }
 
     public static String randomFieldName(String part, int numStartChars, int numEndChars)
@@ -388,17 +429,13 @@ public class TestDataGenerator
        return randomFieldName(part, numStartChars, numEndChars, null);
     }
 
-    public static String randomFieldName(String part, int numStartChars, int numEndChars, @Nullable String exclusion)
+    public static String randomFieldName(@NotNull String part, int numStartChars, int numEndChars, @Nullable String exclusion)
     {
         // use the characters that we know are encoded in fieldKeys plus characters that we know clients are using
         String chars = ALL_ILLEGAL_QUERY_KEY_CHARACTERS + " %()=+-[]_|*`'\":;<>?!@#^";
 
-        // Having double space is allowed in a field name but is a problem for automation.
-        // We render double spaces as a single space as column headers in grids and the like, but we maintain the double
-        // space in the name. This trips up helpers for various components. See Issue 52193 for details.
-        String randomFieldName = (randomString(numStartChars, exclusion, chars).replaceAll("\\s\\s+"," ") +
-                part +
-                randomString(numEndChars, null, chars).replaceAll("\\s\\s+"," ")).trim();
+
+        String randomFieldName = randomName(part, numStartChars, numEndChars, chars, exclusion);
         TestLogger.log("Generated random field name: " + randomFieldName);
         return randomFieldName;
     }
@@ -413,24 +450,23 @@ public class TestDataGenerator
         if (min >= max)
             throw new IllegalArgumentException("min must be less than max");
 
-        Random r = new Random();
-        return r.nextInt((max - min) + 1) + min;
+        return ThreadLocalRandom.current().nextInt((max - min) + 1) + min;
     }
 
     public float randomFloat(float min, float max)
     {
         if (min >= max)
             throw new IllegalArgumentException("min must be less than max");
-        Random r = new Random();
-        return  min + r.nextFloat() * (max - min);
+
+        return  min + ThreadLocalRandom.current().nextFloat() * (max - min);
     }
 
     public Double randomDouble(double min, double max)
     {
         if (min >= max)
             throw new IllegalArgumentException("min must be less than max");
-        Random r = new Random();
-        return  min + r.nextDouble() * (max - min);
+
+        return  min + ThreadLocalRandom.current().nextDouble() * (max - min);
     }
 
     public String randomDateString(Date min, Date max)
@@ -664,27 +700,20 @@ public class TestDataGenerator
 
     public static <T> List<T> shuffleSelect(List<T> allFields, int selectCount)
     {
-        return shuffleSelect(allFields, selectCount, false);
+        List<T> shuffled = new ArrayList<>(allFields);
+        Collections.shuffle(shuffled);
+        return shuffled.subList(0, selectCount);
     }
 
-    public static <T> List<T> shuffleSelect(List<T> allFields, int selectCount, boolean canRepeat)
+    // Require suppliers to provide reassurance that mutable objects are only reused intentionally
+    public static <T> List<T> randomSelect(List<Supplier<T>> allFields, int selectCount)
     {
-        if (!canRepeat)
+        List<T> selected = new ArrayList<>();
+        for (int i = 0; i < selectCount; i++)
         {
-            List<T> shuffled = new ArrayList<>(allFields);
-            Collections.shuffle(shuffled);
-            return shuffled.subList(0, selectCount - 1);
+            selected.add(allFields.get(randomInt(0, allFields.size())).get());
         }
-        else
-        {
-            List<T> selected = new ArrayList<>();
-            for (int i = 0; i < selectCount; i++)
-            {
-                selected.add(allFields.get(randomInt(0, allFields.size())));
-            }
-            return selected;
-        }
-
+        return selected;
     }
 
     /**

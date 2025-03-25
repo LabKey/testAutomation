@@ -118,7 +118,9 @@ public class FieldDefinition extends PropertyDescriptor
             }
         }
 
-        return buf.toString();
+        // This differs from BaseColumnInfo.labelForName because for testing purposes
+        // we need the label as shown in the UI, which will contract multiple spaces
+        return buf.toString().replaceAll("\\s+", " ");
     }
 
     @Override
@@ -613,7 +615,7 @@ public class FieldDefinition extends PropertyDescriptor
 
         static List<ColumnType> values()
         {
-            return ColumnTypeImpl.COLUMN_TYPES;
+            return Collections.unmodifiableList(ColumnTypeImpl.COLUMN_TYPES);
         }
     }
 

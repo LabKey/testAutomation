@@ -100,8 +100,8 @@ public class LabkeyErrPageTest extends BaseWebDriverTest
 
         checker().verifyEquals("Incorrect error heading message", "Oops! An error has occurred.",
                 errorPage.getErrorHeading());
-        checker().verifyEquals("Incorrect error instructions", "Please report this bug to LabKey Support by copying " +
-                        "and pasting both your unique reference code and the full stack trace in the View Details section below.",
+        checker().verifyEquals("Incorrect error instructions", "You can find help resources here and may " +
+                "find troubleshooting hints by reading the full stack trace in the View Details section below.",
                 errorPage.getErrorInstruction());
         checker().verifyThat("Incorrect error image", errorPage.getErrorImage(), CoreMatchers.containsString(imageTitle));
 

@@ -339,7 +339,7 @@ public class GpatAssayTest extends BaseWebDriverTest
     {
         File trialData = TestFileUtils.getSampleData("GPAT/renameAssayTrial.xls");
 
-        String invalidAssayName = TestDataGenerator.randomInvalidDomainName(10);
+        String invalidAssayName = TestDataGenerator.randomInvalidDomainName(null, 0, 10);
         ReactAssayDesignerPage assayDesignerPage = startCreateGpatAssay(trialData, invalidAssayName);
         List<String> errors = assayDesignerPage.clickSaveExpectingErrors();
         assayDesignerPage.clickCancel();

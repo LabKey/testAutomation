@@ -295,9 +295,8 @@ public class CrossFolderListTest extends BaseWebDriverTest
     @Test // Issue 52501
     public void testLookupValidatorFolderScope() throws Exception
     {
-        // Arrange
-        var firstListName = "First" + TestDataGenerator.randomDomainName();
-        var secondListName = "Second" + TestDataGenerator.randomDomainName();
+        var firstListName = TestDataGenerator.randomDomainName("First");
+        var secondListName = TestDataGenerator.randomDomainName("Second");
         var textColumnName = TestDataGenerator.randomFieldName("Text");
         var lookupFieldName = TestDataGenerator.randomFieldName("LookAtFirst");
         var encodedLookupFieldName = EscapeUtil.fieldKeyEncodePart(lookupFieldName);

@@ -125,6 +125,7 @@ import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -137,6 +138,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.Stack;
+import java.util.TimeZone;
 import java.util.WeakHashMap;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -232,6 +234,14 @@ public abstract class WebDriverWrapper implements WrapsDriver
     public int getRelativeTimeZoneOffset()
     {
         return -(ZoneId.systemDefault().getRules().getOffset(Instant.now()).getTotalSeconds() / 60 + getWebDriverTimeZoneOffset());
+    }
+
+    /**
+     * Get an unnamed time zone with the browser's offset
+     */
+    public TimeZone getClientTimeZone()
+    {
+        return TimeZone.getTimeZone(ZoneOffset.ofTotalSeconds(-getWebDriverTimeZoneOffset() * 60));
     }
 
     /**
