@@ -118,7 +118,9 @@ public class Tabs extends WebDriverComponent<Tabs.ElementCache>
                 WebElement tabEl;
                 try
                 {
-                    tabEl = tabLoc.withText(tabText).findElement(tabList);
+                    // Use 'containing' here because it may happen that the counts get loaded into the tabs after the call to this method,
+                    // which causes the name to change from, say 'Included Samples' to 'Included Samples (7)'.
+                    tabEl = tabLoc.containing(tabText).findElement(tabList);
                 }
                 catch (NoSuchElementException ex)
                 {
