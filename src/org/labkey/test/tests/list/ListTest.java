@@ -1200,7 +1200,7 @@ public class ListTest extends BaseWebDriverTest
         String listName = "new";
         String origFieldName = "BarBar";
         String newFieldName = "FooFoo";
-        String invalidListName = TestDataGenerator.randomInvalidDomainName(5);
+        String invalidListName = TestDataGenerator.randomInvalidDomainName(null, 0, 5);
         EditListDefinitionPage listDefinitionPage = _listHelper.beginCreateList(PROJECT_VERIFY, invalidListName);
         listDefinitionPage.manuallyDefineFieldsWithAutoIncrementingKey("key");
         List<String> errors = listDefinitionPage.clickSaveExpectingErrors();
