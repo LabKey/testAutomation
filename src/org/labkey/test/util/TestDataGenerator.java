@@ -370,9 +370,10 @@ public class TestDataGenerator
         // Having double space is allowed in a field name but is a problem for automation.
         // We render double spaces as a single space as column headers in grids and the like, but we maintain the double
         // space in the name. This trips up helpers for various components. See Issue 52193 for details.
-        String randomFieldName = (randomString(numStartChars, null, chars).replaceAll("\\s\\s+"," ") +
+        String randomFieldName = (randomString(numStartChars, null, chars) +
                 part +
-                randomString(numEndChars, null, chars).replaceAll("\\s\\s+"," ")).trim();
+                randomString(numEndChars, null, chars));
+        randomFieldName = randomFieldName.replaceAll("\\s+", " ").trim();
         TestLogger.log("Generated random field name: " + randomFieldName);
         return randomFieldName;
     }
