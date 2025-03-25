@@ -1040,7 +1040,7 @@ public class GridPanelTest extends GridPanelBaseTest
 
         filterDialog.selectFacetTab();
 
-        String oneOfFilter = String.format("%s;%s;%s", stringSetMembers.get(0), stringSetMembers.get(1), stringSetMembers.get(2));
+        String oneOfFilter = String.format("%s\n%s\n%s", stringSetMembers.get(0), stringSetMembers.get(1), stringSetMembers.get(2));
 
         log(String.format("Filter '%s' to have one of '%s'.", FILTER_STRING_COL, oneOfFilter));
 
@@ -1131,7 +1131,7 @@ public class GridPanelTest extends GridPanelBaseTest
 
         filterDialog.selectField(FILTER_STRING_COL);
 
-        String oneOfFilter = String.format("%s;%s;%s", stringSetMembers.get(0), stringSetMembers.get(1), stringSetMembers.get(2));
+        String oneOfFilter = String.format("%s\n%s\n%s", stringSetMembers.get(0), stringSetMembers.get(1), stringSetMembers.get(2));
 
         log(String.format("Filter '%s' to have one of '%s'.", FILTER_STRING_COL, oneOfFilter));
 
@@ -1158,7 +1158,7 @@ public class GridPanelTest extends GridPanelBaseTest
         expectedValues = new ArrayList<>();
         expectedValues.add(pillToRemove);
         expectedValues.add(String.format("%s > %d", FILTER_INT_COL, low));
-        expectedValues.add(String.format("%s Contains One Of %s", FILTER_STRING_COL, oneOfFilter.replace(";", ", ")));
+        expectedValues.add(String.format("%s Contains One Of %s", FILTER_STRING_COL, oneOfFilter.replace("\n", ", ")));
 
         List<FilterStatusValue> filterPills = grid.getFilterStatusValues();
 
