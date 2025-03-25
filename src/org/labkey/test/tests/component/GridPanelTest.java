@@ -56,6 +56,10 @@ public class GridPanelTest extends GridPanelBaseTest
     private static final int FILTER_SAMPLE_TYPE_SIZE = 300;
     private static final String FILTER_SAMPLE_PREFIX = "FST-";
 
+    // Issue 52068: create a sample type with values that have semicolons for testing filtering
+    private static final String SEMICOLON_SAMPLE_TYPE = "Semicolon_SampleType";
+    private static final String[] SEMICOLON_VALUES = new String[]{"A", "B", "A;B", "A;B;", "A;A"};
+
     // Column names.
     private static final String FILTER_NAME_COL = "Name";
     private static final String FILTER_EXPDATE_COL = "Expiration Date";
@@ -129,9 +133,7 @@ public class GridPanelTest extends GridPanelBaseTest
         stringSets.remove(0);
 
         createSmallSampleType();
-
         createFilterSampleType();
-
     }
 
     // Create a small sample type that has one page of data by default (used in paging testing).
@@ -194,7 +196,7 @@ public class GridPanelTest extends GridPanelBaseTest
         cv.saveCustomView(VIEW_FEWER_COLUMNS);
 
         log(String.format("Finally create a view named '%s' for '%s' that only has a filter.", VIEW_FILTERED_COLUMN, SMALL_SAMPLE_TYPE));
-        drtSamples.setFilter(FILTER_STRING_COL, "Contains One Of", String.format("%1$s;%1$s%2$s", stringSetMembers.get(0), stringSetMembers.get(1)));
+        drtSamples.setFilter(FILTER_STRING_COL, "Contains One Of", String.format("%1$s\n%1$s%2$s", stringSetMembers.get(0), stringSetMembers.get(1)));
         cv = drtSamples.openCustomizeGrid();
         cv.saveCustomView(VIEW_FILTERED_COLUMN);
 
@@ -1262,6 +1264,111 @@ public class GridPanelTest extends GridPanelBaseTest
 
         checker().screenShotIfNewError("Populated_Filter_Int_Field_Error");
 
+    }
+
+    private void createSemicolonSampleType() throws IOException, CommandException
+    {
+        SampleTypeDefinition props = new SampleTypeDefinition(SEMICOLON_SAMPLE_TYPE)
+                .setFields(Arrays.asList(new FieldDefinition(FILTER_STRING_COL, FieldDefinition.ColumnType.String)));
+
+        TestDataGenerator sampleSetDataGenerator = SampleTypeAPIHelper.createEmptySampleType(getProjectName(), props);
+        for (int i = 0; i < SEMICOLON_VALUES.length; i++)
+            sampleSetDataGenerator.addCustomRow(Map.of(FILTER_NAME_COL, "Semi_" + i, FILTER_STRING_COL, SEMICOLON_VALUES[i]));
+        // add a second for one of the values to test with filtering behavior
+        sampleSetDataGenerator.addCustomRow(Map.of(FILTER_NAME_COL, "Semi_5", FILTER_STRING_COL, SEMICOLON_VALUES[4]));
+        sampleSetDataGenerator.insertRows();
+    }
+
+    @Test
+    public void testFilterValueWithSemicolon() throws IOException, CommandException
+    {
+        createSemicolonSampleType();
+        QueryGrid grid = beginAtQueryGrid(SEMICOLON_SAMPLE_TYPE);
+
+        log("Testing filtering for each value separately with equals filter type");
+        for (String value : SEMICOLON_VALUES)
+        {
+            grid.filterColumn(FILTER_STRING_COL, Filter.Operator.EQUAL, value);
+            int expectedCount = value.equals(SEMICOLON_VALUES[4]) ? 2 : 1;
+            checker().verifyEquals("Number of records returned from filter not as expected.",
+                    expectedCount, grid.getRecordCount());
+            grid.clearFilters();
+        }
+
+        log("Testing filtering for combinations of values with equals one of filter type");
+        grid.filterColumn(FILTER_STRING_COL, Filter.Operator.IN, String.join("\n", SEMICOLON_VALUES));
+        checker().verifyEquals("Number of records returned from filter not as expected.", 6, grid.getRecordCount());
+        grid.clearFilters().filterColumn(FILTER_STRING_COL, Filter.Operator.IN, String.join(";", SEMICOLON_VALUES));
+        checker().verifyEquals("Number of records returned from filter not as expected.", 0, grid.getRecordCount());
+        grid.clearFilters().filterColumn(FILTER_STRING_COL, Filter.Operator.IN, SEMICOLON_VALUES[0] + "\n" + SEMICOLON_VALUES[1] + "\n" + SEMICOLON_VALUES[2]);
+        checker().verifyEquals("Number of records returned from filter not as expected.", 3, grid.getRecordCount());
+        grid.clearFilters().filterColumn(FILTER_STRING_COL, Filter.Operator.IN, SEMICOLON_VALUES[0] + ";" + SEMICOLON_VALUES[1] + ";" + SEMICOLON_VALUES[2]);
+        checker().verifyEquals("Number of records returned from filter not as expected.", 0, grid.getRecordCount());
+        grid.clearFilters().filterColumn(FILTER_STRING_COL, Filter.Operator.IN, SEMICOLON_VALUES[3] + "\n" + SEMICOLON_VALUES[4]);
+        checker().verifyEquals("Number of records returned from filter not as expected.", 3, grid.getRecordCount());
+        grid.clearFilters().filterColumn(FILTER_STRING_COL, Filter.Operator.IN, SEMICOLON_VALUES[3] + ";" + SEMICOLON_VALUES[4]);
+        checker().verifyEquals("Number of records returned from filter not as expected.", 0, grid.getRecordCount());
+        grid.clearFilters();
+
+        log("Testing filtering for combination of values with contains one of filter type");
+        grid.filterColumn(FILTER_STRING_COL, Filter.Operator.CONTAINS_ONE_OF, String.join("\n", SEMICOLON_VALUES));
+        checker().verifyEquals("Number of records returned from filter not as expected.", 6, grid.getRecordCount());
+        grid.clearFilters().filterColumn(FILTER_STRING_COL, Filter.Operator.CONTAINS_ONE_OF, String.join(";", SEMICOLON_VALUES));
+        checker().verifyEquals("Number of records returned from filter not as expected.", 0, grid.getRecordCount());
+        grid.clearFilters().filterColumn(FILTER_STRING_COL, Filter.Operator.CONTAINS_ONE_OF, SEMICOLON_VALUES[0] + "\n" + SEMICOLON_VALUES[1]);
+        checker().verifyEquals("Number of records returned from filter not as expected.", 6, grid.getRecordCount());
+        grid.clearFilters().filterColumn(FILTER_STRING_COL, Filter.Operator.CONTAINS_ONE_OF, SEMICOLON_VALUES[0] + ";" + SEMICOLON_VALUES[1]);
+        checker().verifyEquals("Number of records returned from filter not as expected.", 2, grid.getRecordCount());
+        grid.clearFilters();
+
+        log("Testing filtering for individual values using faceted filter tab");
+        for (String value : SEMICOLON_VALUES)
+        {
+            GridFilterModal filterModal = grid.getGridBar().openFilterDialog().selectField(FILTER_STRING_COL);
+            filterModal.selectFacetTab().selectValue(value);
+            filterModal.confirm();
+            int expectedCount = value.equals(SEMICOLON_VALUES[4]) ? 2 : 1;
+            checker().verifyEquals("Number of records returned from filter not as expected.",
+                    expectedCount, grid.getRecordCount());
+            grid.clearFilters();
+        }
+
+        log("Testing selected faceted value, switching tabs, and confirming Equals filter");
+        for (String value : SEMICOLON_VALUES)
+        {
+            GridFilterModal filterModal = grid.getGridBar().openFilterDialog().selectField(FILTER_STRING_COL);
+            filterModal.selectFacetTab().selectValue(value);
+            FilterExpressionPanel expressionPanel = filterModal.selectExpressionTab();
+            checker().verifyTrue("Filter type not as expected", expressionPanel.hasFilterType(0, "Equals"));
+            checker().verifyEquals("Filter value not as expected", expressionPanel.getFilterTextValue(0), value);
+            filterModal.confirm();
+            int expectedCount = value.equals(SEMICOLON_VALUES[4]) ? 2 : 1;
+            checker().verifyEquals("Number of records returned from filter not as expected.",
+                    expectedCount, grid.getRecordCount());
+            grid.clearFilters();
+        }
+
+        log("Testing combination of selected faceted values, switching tabs, and confirming Equals One Of filter type/values");
+        GridFilterModal filterModal = grid.getGridBar().openFilterDialog().selectField(FILTER_STRING_COL);
+        FilterFacetedPanel facetedPanel = filterModal.selectFacetTab();
+        facetedPanel.selectValue(SEMICOLON_VALUES[0]);
+        facetedPanel.checkValues(SEMICOLON_VALUES[4]);
+        FilterExpressionPanel expressionPanel = filterModal.selectExpressionTab();
+        checker().verifyTrue("Filter type not as expected", expressionPanel.hasFilterType(0, "Equals One Of"));
+        checker().verifyEquals("Filter value not as expected", expressionPanel.getFilterTextValue(0), SEMICOLON_VALUES[0] + "\n" + SEMICOLON_VALUES[4]);
+        filterModal.confirm();
+        checker().verifyEquals("Number of records returned from filter not as expected.", 3, grid.getRecordCount());
+        filterModal = grid.getGridBar().openFilterDialog().selectField(FILTER_STRING_COL);
+        facetedPanel = filterModal.selectFacetTab();
+        facetedPanel.selectValue(SEMICOLON_VALUES[0]);
+        facetedPanel.checkValues(SEMICOLON_VALUES[4]);
+        facetedPanel.checkValues(SEMICOLON_VALUES[2]);
+        expressionPanel = filterModal.selectExpressionTab();
+        checker().verifyTrue("Filter type not as expected", expressionPanel.hasFilterType(0, "Does Not Equal Any Of"));
+        checker().verifyEquals("Filter value not as expected", expressionPanel.getFilterTextValue(0), SEMICOLON_VALUES[3] + "\n" + SEMICOLON_VALUES[1]);
+        filterModal.confirm();
+        checker().verifyEquals("Number of records returned from filter not as expected.", 4, grid.getRecordCount());
+        grid.clearFilters();
     }
 
     /**
