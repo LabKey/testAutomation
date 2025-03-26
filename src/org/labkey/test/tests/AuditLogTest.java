@@ -211,7 +211,7 @@ public class AuditLogTest extends BaseWebDriverTest
             pass = false;
         }
 
-        // Check to see if all of the expected values did show up.
+        // Check to see if all the expected values did show up.
         for (String expectedValue : expectedValues)
         {
             log("Searching Audit Log file for entry: '" + expectedValue + "'.");
@@ -237,7 +237,7 @@ public class AuditLogTest extends BaseWebDriverTest
         }
 
         // If there is anything left in the list it means there was an log message recorded that we weren't expecting.
-        if (diff.size() > 0)
+        if (!diff.isEmpty())
         {
             pass = false;
             for (String extraLog : diff)
@@ -346,10 +346,13 @@ public class AuditLogTest extends BaseWebDriverTest
         expectedLogValues.add("Project /" + AUDIT_TEST_PROJECT + " was deleted");
         expectedLogValues.add("A new security policy was established for " + AUDIT_TEST_PROJECT + ". It will no longer inherit permissions from /");
         expectedLogValues.add("The group Guests was assigned to the security role No Permissions.");
+        expectedLogValues.add("A new security group named Users was created.");
+        expectedLogValues.add("The security group named Users was deleted.");
+        expectedLogValues.add("The security group named Testers was deleted.");
 
-        verifyAuditEvent(this, GROUP_AUDIT_EVENT, COMMENT_COLUMN, expectedLogValues.get(1), 10);
-        verifyAuditEvent(this, GROUP_AUDIT_EVENT, COMMENT_COLUMN, expectedLogValues.get(3), 10);
-        verifyAuditEvent(this, GROUP_AUDIT_EVENT, COMMENT_COLUMN, expectedLogValues.get(5), 10);
+        verifyAuditEvent(this, GROUP_AUDIT_EVENT, COMMENT_COLUMN, expectedLogValues.get(1), expectedLogValues.size());
+        verifyAuditEvent(this, GROUP_AUDIT_EVENT, COMMENT_COLUMN, expectedLogValues.get(3), expectedLogValues.size());
+        verifyAuditEvent(this, GROUP_AUDIT_EVENT, COMMENT_COLUMN, expectedLogValues.get(5), expectedLogValues.size());
         verifyAuditEvent(this, USER_AUDIT_EVENT, COMMENT_COLUMN, expectedLogValues.get(6), 10);
 
         log("testing project audit events");
@@ -400,7 +403,9 @@ public class AuditLogTest extends BaseWebDriverTest
         stopImpersonating();
         // now give access to the sub-folder
         navigateToFolder(AUDIT_TEST_PROJECT, AUDIT_TEST_SUBFOLDER);
-        _securityHelper.setProjectPerm(AUDIT_TEST_USER2, "Folder Administrator");
+
+        ApiPermissionsHelper ph = new ApiPermissionsHelper(this);
+        ph.addMemberToRole(AUDIT_TEST_USER2,"Folder Administrator", PermissionsHelper.MemberType.user);
         impersonate(AUDIT_TEST_USER2);
         verifyListAuditLogQueries(Visibility.All);
         stopImpersonating();
@@ -599,8 +604,7 @@ public class AuditLogTest extends BaseWebDriverTest
         List<Map<String, Object>> domainPropertyEventRows = getDomainPropertyEventsFromDomainEvents(AUDIT_PROPERTY_EVENTS_PROJECT, LIST_CHECK_LOG, null);
 
         // Add the list of the event ids to an ignore list so future tests don't look at them again.
-        List<String> ignoreIds = new ArrayList<>();
-        ignoreIds.addAll(getDomainEventIdsFromPropertyEvents(domainPropertyEventRows));
+        List<String> ignoreIds = new ArrayList<>(getDomainEventIdsFromPropertyEvents(domainPropertyEventRows));
 
         if(domainPropertyEventRows.size() != 3)
         {
@@ -687,8 +691,7 @@ public class AuditLogTest extends BaseWebDriverTest
         listDefinitionPage = _listHelper.goToEditDesign(LIST_CHECK_LOG);
         listDefinitionPage.getFieldsPanel()
                 .addField(new FieldDefinition(FIELD03_NAME,
-                        new FieldDefinition.LookupInfo(null, "lists", LOOK_UP_LIST01)
-                                .setTableType(ColumnType.Integer))
+                        new FieldDefinition.IntLookup(null, "lists", LOOK_UP_LIST01))
                         .setLabel(FIELD03_LABEL));
         listDefinitionPage.clickSave();
 
@@ -896,7 +899,7 @@ public class AuditLogTest extends BaseWebDriverTest
         {
             StringBuilder stringBuilder = new StringBuilder();
             eventIds.forEach((id)->{
-                if(stringBuilder.length() != 0)
+                if(!stringBuilder.isEmpty())
                     stringBuilder.append(";");
                 stringBuilder.append(id);
             });
@@ -920,7 +923,7 @@ public class AuditLogTest extends BaseWebDriverTest
         catch(IOException | CommandException ex)
         {
             // Just fail here, don't toss the exception up the stack.
-            Assert.assertTrue("There was a command exception when getting the log: " + ex.toString(), false);
+            fail("There was a command exception when getting the log: " + ex);
         }
 
         return rowsReturned;
