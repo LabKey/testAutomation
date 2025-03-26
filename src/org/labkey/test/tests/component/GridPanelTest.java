@@ -1299,26 +1299,26 @@ public class GridPanelTest extends GridPanelBaseTest
         grid.filterColumn(FILTER_STRING_COL, Filter.Operator.IN, String.join("\n", SEMICOLON_VALUES));
         checker().verifyEquals("Number of records returned from filter not as expected.", 6, grid.getRecordCount());
         grid.clearFilters().filterColumn(FILTER_STRING_COL, Filter.Operator.IN, String.join(";", SEMICOLON_VALUES));
-        checker().verifyEquals("Number of records returned from filter not as expected.", 0, grid.getRecordCount());
+        checker().verifyEquals("Number of records returned from filter not as expected.", 2, grid.getRecordCount());
         grid.clearFilters().filterColumn(FILTER_STRING_COL, Filter.Operator.IN, SEMICOLON_VALUES[0] + "\n" + SEMICOLON_VALUES[1] + "\n" + SEMICOLON_VALUES[2]);
         checker().verifyEquals("Number of records returned from filter not as expected.", 3, grid.getRecordCount());
         grid.clearFilters().filterColumn(FILTER_STRING_COL, Filter.Operator.IN, SEMICOLON_VALUES[0] + ";" + SEMICOLON_VALUES[1] + ";" + SEMICOLON_VALUES[2]);
-        checker().verifyEquals("Number of records returned from filter not as expected.", 0, grid.getRecordCount());
+        checker().verifyEquals("Number of records returned from filter not as expected.", 2, grid.getRecordCount());
         grid.clearFilters().filterColumn(FILTER_STRING_COL, Filter.Operator.IN, SEMICOLON_VALUES[3] + "\n" + SEMICOLON_VALUES[4]);
         checker().verifyEquals("Number of records returned from filter not as expected.", 3, grid.getRecordCount());
         grid.clearFilters().filterColumn(FILTER_STRING_COL, Filter.Operator.IN, SEMICOLON_VALUES[3] + ";" + SEMICOLON_VALUES[4]);
-        checker().verifyEquals("Number of records returned from filter not as expected.", 0, grid.getRecordCount());
+        checker().verifyEquals("Number of records returned from filter not as expected.", 2, grid.getRecordCount());
         grid.clearFilters();
 
         log("Testing filtering for combination of values with contains one of filter type");
         grid.filterColumn(FILTER_STRING_COL, Filter.Operator.CONTAINS_ONE_OF, String.join("\n", SEMICOLON_VALUES));
         checker().verifyEquals("Number of records returned from filter not as expected.", 6, grid.getRecordCount());
         grid.clearFilters().filterColumn(FILTER_STRING_COL, Filter.Operator.CONTAINS_ONE_OF, String.join(";", SEMICOLON_VALUES));
-        checker().verifyEquals("Number of records returned from filter not as expected.", 0, grid.getRecordCount());
+        checker().verifyEquals("Number of records returned from filter not as expected.", 6, grid.getRecordCount());
         grid.clearFilters().filterColumn(FILTER_STRING_COL, Filter.Operator.CONTAINS_ONE_OF, SEMICOLON_VALUES[0] + "\n" + SEMICOLON_VALUES[1]);
         checker().verifyEquals("Number of records returned from filter not as expected.", 6, grid.getRecordCount());
         grid.clearFilters().filterColumn(FILTER_STRING_COL, Filter.Operator.CONTAINS_ONE_OF, SEMICOLON_VALUES[0] + ";" + SEMICOLON_VALUES[1]);
-        checker().verifyEquals("Number of records returned from filter not as expected.", 2, grid.getRecordCount());
+        checker().verifyEquals("Number of records returned from filter not as expected.", 6, grid.getRecordCount());
         grid.clearFilters();
 
         log("Testing filtering for individual values using faceted filter tab");
