@@ -477,7 +477,7 @@ public class Crawler
                 String relativeURL;
                 try
                 {
-                    relativeURL = "/" + WebTestHelper.makeRelativeUrl(urlText);
+                    relativeURL = WebTestHelper.makeRelativeUrl(urlText);
                 }
                 catch (IllegalArgumentException iae)
                 {
