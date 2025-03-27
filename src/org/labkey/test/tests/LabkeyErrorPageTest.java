@@ -106,7 +106,7 @@ public class LabkeyErrorPageTest extends BaseWebDriverTest
                 errorPage.getErrorInstruction());
         checker().verifyThat("Incorrect error image", errorPage.getErrorImage(), CoreMatchers.containsString(imageTitle));
 
-        checkExpectedErrors(3);
+        checkExpectedErrors(2);
     }
 
     @Override
