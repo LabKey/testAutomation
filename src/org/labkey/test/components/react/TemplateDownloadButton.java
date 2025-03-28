@@ -21,7 +21,7 @@ import static org.labkey.test.WebDriverWrapper.waitFor;
  */
 public class TemplateDownloadButton extends MultiMenu
 {
-    private static final String DEFAULT_TEMPLATE_NAME = "Default Template";
+    public static final String DEFAULT_TEMPLATE_NAME = "Default Template";
     private static final String BUTTON_CLASS = "template-download-button";
     public static final Locator LOCATOR = Locator.tagWithClass("button", BUTTON_CLASS);
 

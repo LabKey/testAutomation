@@ -55,7 +55,7 @@ public class URLBuilder
     private Map<String, ?> _secondaryQuery;
 
     /**
-     * Intialize a URLBuilder for a LabKey URL
+     * Initialize a URLBuilder for a LabKey URL
      * @param controller the controller name (e.g. "login" for "LoginController")
      * @param action the action name (e.g. "whoami" for "WhoAmIAction")
      *              The action type will be assumed to be ".view" if not specified.
