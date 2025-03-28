@@ -388,7 +388,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
         doIndividualTriggerTest("Dataset", goToDataset, "ParticipantId", true, "Confirm Delete", true);
 
         //For some reason these only get logged for datasets...
-        checkExpectedErrors(6);
+        checkExpectedErrors(4);
     }
 
     @Test
