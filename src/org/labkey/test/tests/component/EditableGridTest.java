@@ -1366,17 +1366,16 @@ public class EditableGridTest extends BaseWebDriverTest
         EditableGrid testGrid = goToEditableGrid(ALL_TYPE_SAMPLE_TYPE);
         testGrid.addRows(2);
 
-        log("Verify no warnings when page first load");
-        checker().verifyEquals("Cell warning should be absent when a row is added on page load",
-                0, Locator.tagWithClass("div", "cell-warning").findElements(testGrid).size());
+        log("Verify no cell errors when page first load");
+        checker().verifyEquals("Cell error should be absent when a row is added on page load", 0, testGrid.getCellErrors().size());
 
         log("Input empty string for required field should trigger cell warning.");
         testGrid.setCellValue(1, REQ_STR_FIELD_NAME + " *", " ");
-        checker().verifyEquals("Cell warning status not as expected at row " + 1 + " for col " + REQ_STR_FIELD_NAME, true, testGrid.hasCellWarning(1, REQ_STR_FIELD_NAME + " *"));
+        checker().verifyEquals("Cell warning status not as expected at row " + 1 + " for col " + REQ_STR_FIELD_NAME, true, testGrid.hasCellError(1, REQ_STR_FIELD_NAME + " *"));
         checker().verifyEquals("Cell warning msg not as expected at row " + 1 + " for col " + REQ_STR_FIELD_NAME, REQ_STR_FIELD_NAME + " is required.", testGrid.getCellPopoverText(1, REQ_STR_FIELD_NAME + " *"));
         mouseOver(testGrid.getCell(0, "Row")); // dismiss warning popup
         testGrid.setCellValue(1, REQ_INT_FIELD_NAME + " *", " ");
-        checker().verifyEquals("Cell warning status not as expected at row " + 1 + " for col " + REQ_INT_FIELD_NAME, true, testGrid.hasCellWarning(1, REQ_INT_FIELD_NAME + " *"));
+        checker().verifyEquals("Cell warning status not as expected at row " + 1 + " for col " + REQ_INT_FIELD_NAME, true, testGrid.hasCellError(1, REQ_INT_FIELD_NAME + " *"));
         checker().verifyEquals("Cell warning msg not as expected at row " + 1 + " for col " + REQ_INT_FIELD_NAME, REQ_INT_FIELD_NAME + " is required.", testGrid.getCellPopoverText(1, REQ_INT_FIELD_NAME + " *"));
 
         log("Correct values should remove cell warning, keep entering wrong values should update warning");
@@ -1388,9 +1387,9 @@ public class EditableGridTest extends BaseWebDriverTest
         testGrid.setCellValue(0, REQ_STR_FIELD_NAME + " *", "good");
         mouseOver(testGrid.getCell(0, "Row"));
         testGrid.setCellValue(1, REQ_STR_FIELD_NAME + " *", "This value is too long");
-        checker().verifyEquals("Cell warning status not as expected at row " + 0 + " for col " + STR_FIELD_NAME, false, testGrid.hasCellWarning(0, STR_FIELD_NAME));
+        checker().verifyEquals("Cell warning status not as expected at row " + 0 + " for col " + STR_FIELD_NAME, false, testGrid.hasCellError(0, STR_FIELD_NAME));
         checker().verifyEquals("Cell warning msg not as expected at row " + 1 + " for col " + STR_FIELD_NAME, "22/10 characters", testGrid.getCellPopoverText(1, STR_FIELD_NAME));
-        checker().verifyEquals("Cell warning status not as expected at row " + 0 + " for col " + REQ_STR_FIELD_NAME, false, testGrid.hasCellWarning(0, REQ_STR_FIELD_NAME + " *"));
+        checker().verifyEquals("Cell warning status not as expected at row " + 0 + " for col " + REQ_STR_FIELD_NAME, false, testGrid.hasCellError(0, REQ_STR_FIELD_NAME + " *"));
         checker().verifyEquals("Cell warning msg not as expected at row " + 1 + " for col " + REQ_STR_FIELD_NAME, "22/10 characters", testGrid.getCellPopoverText(1, REQ_STR_FIELD_NAME + " *"));
 
         log("Input invalid data type value should trigger cell warnings.");
@@ -1407,13 +1406,13 @@ public class EditableGridTest extends BaseWebDriverTest
         log("Correct values should remove data type warning.");
         mouseOver(testGrid.getCell(0, "Row")); // dismiss warning popup
         testGrid.setCellValue(0, INT_FIELD_NAME, "123");
-        checker().verifyFalse("Cell warning should disappear after correcting value", testGrid.hasCellWarning(0, INT_FIELD_NAME));
+        checker().verifyFalse("Cell warning should disappear after correcting value", testGrid.hasCellError(0, INT_FIELD_NAME));
 
         log("Required value warning should be absent before the cell is acted on");
-        checker().verifyFalse("Required value warning should not be present on page init", testGrid.hasCellWarning(0, REQ_STR_FIELD_NAME + " *"));
+        checker().verifyFalse("Required value warning should not be present on page init", testGrid.hasCellError(0, REQ_STR_FIELD_NAME + " *"));
         mouseOver(testGrid.getCell(0, "Row")); // dismiss warning popup
         testGrid.clearCellValue(1, REQ_STR_FIELD_NAME + " *");
-        checker().verifyTrue("Required value warning should show up after removing a value from cell", testGrid.hasCellWarning(1, REQ_STR_FIELD_NAME + " *"));
+        checker().verifyTrue("Required value warning should show up after removing a value from cell", testGrid.hasCellError(1, REQ_STR_FIELD_NAME + " *"));
     }
 
     @Test
@@ -1454,7 +1453,7 @@ public class EditableGridTest extends BaseWebDriverTest
 
         log("Correct missing required fields should remove corresponding cell warnings");
         testGrid.setCellValue(1, REQ_STR_FIELD_NAME + " *", " ");
-        checker().verifyTrue("Cell warning should be present after setting another invalid value", testGrid.hasCellWarning(1, REQ_STR_FIELD_NAME + " *"));
+        checker().verifyTrue("Cell warning should be present after setting another invalid value", testGrid.hasCellError(1, REQ_STR_FIELD_NAME + " *"));
         mouseOver(testGrid.getCell(0, STR_FIELD_NAME)); // dismiss warning popup
         testGrid.setCellValue(1, REQ_INT_FIELD_NAME + " *", "2");
         mouseOver(testGrid.getCell(0, STR_FIELD_NAME)); // dismiss warning popup
@@ -1474,12 +1473,12 @@ public class EditableGridTest extends BaseWebDriverTest
             if (colName.endsWith(" Req"))
                 colName += " *";
 
-            checker().verifyFalse("Cell warning be absent after required values are provided: " + colName, testGrid.hasCellWarning(1, colName));
+            checker().verifyFalse("Cell warning be absent after required values are provided: " + colName, testGrid.hasCellError(1, colName));
         }
 
         log("Enter another bad value should retain cell warning");
         testGrid.setCellValue(2, INT_FIELD_NAME, "bad");
-        checker().verifyTrue("Cell warning should be present after setting another invalid value", testGrid.hasCellWarning(2, INT_FIELD_NAME));
+        checker().verifyTrue("Cell warning should be present after setting another invalid value", testGrid.hasCellError(2, INT_FIELD_NAME));
         checker().screenShotIfNewError("after required value correction error");
 
         log("Correct bad data type values should remove paste data warnings");
@@ -1504,7 +1503,7 @@ public class EditableGridTest extends BaseWebDriverTest
             if (colName.endsWith(" Req"))
                 colName += " *";
 
-            checker().verifyFalse("Cell warning should be absent after correct values are provided: " + colName, testGrid.hasCellWarning(2, colName));
+            checker().verifyFalse("Cell warning should be absent after correct values are provided: " + colName, testGrid.hasCellError(2, colName));
         }
         checker().screenShotIfNewError("after data correction error");
 
@@ -1516,7 +1515,7 @@ public class EditableGridTest extends BaseWebDriverTest
                 colName += " *";
 
             // start date before year 1000 shouldn't trigger warning
-            checker().verifyFalse("Cell warning should not be present for: " + colName, testGrid.hasCellWarning(0, colName));
+            checker().verifyFalse("Cell warning should not be present for: " + colName, testGrid.hasCellError(0, colName));
         }
 
         log("Verify UI is interactable with values before 1000-01-01");
@@ -1540,7 +1539,7 @@ public class EditableGridTest extends BaseWebDriverTest
             if (colName.endsWith(" Req"))
                 colName += " *";
 
-            checker().verifyEquals("Cell warning status not as expected at row " + rowId + " for col " + colName, !StringUtils.isEmpty(expectedWarning), testGrid.hasCellWarning(rowId, colName));
+            checker().verifyEquals("Cell warning status not as expected at row " + rowId + " for col " + colName, !StringUtils.isEmpty(expectedWarning), testGrid.hasCellError(rowId, colName));
             if (!StringUtils.isEmpty(expectedWarning))
                 checker().verifyEquals("Cell warning msg not as expected at row " + rowId + " for col " + colName, expectedWarning, testGrid.getCellPopoverText(rowId, colName));
         }
