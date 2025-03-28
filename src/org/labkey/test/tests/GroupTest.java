@@ -110,7 +110,7 @@ public class GroupTest extends BaseWebDriverTest
         //double check that user can't see the project yet- otherwise our later check will be invalid
 
         impersonate(TEST_USERS_FOR_GROUP[0]);
-        openProjectMenu();
+        projectMenu().open();
         assertElementNotPresent(Locator.linkWithText(getProjectName()));
         stopImpersonating();
         //create users
@@ -142,6 +142,7 @@ public class GroupTest extends BaseWebDriverTest
         _permissionsHelper.enterPermissionsUI();
         waitForText("Author");
         _securityHelper.setSiteGroupPermissions("All Site Users", "Author");
+        permissionsReportTest();
 
         // Ensure that deleting from the group's page works too. Issue 52614
         _permissionsHelper.deleteGlobalGroupFromDetailsPage(EMPTY_GROUP);
@@ -149,8 +150,6 @@ public class GroupTest extends BaseWebDriverTest
         selectRowsCommand.setFilters(List.of(new Filter("Name", EMPTY_GROUP)));
         SelectRowsResponse response = selectRowsCommand.execute(createDefaultConnection(), "/");
         assertEquals(EMPTY_GROUP + " should have been deleted", 0, response.getRows().size());
-
-        permissionsReportTest();
 
         goToProjectHome();
 

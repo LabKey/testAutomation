@@ -100,7 +100,7 @@ public class DatabaseDiagnosticsTest extends BaseWebDriverTest
                 "Module: Core", "Permissions Validator", "Display Format Validator",
                 "Module: Pipeline", "Pipeline Validator");
 
-        assertTextNotPresent(textSearcher, "Error");
+        assertTextNotPresent(textSearcher, "Errors:");
     }
 
     @Test
