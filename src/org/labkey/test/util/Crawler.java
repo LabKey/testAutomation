@@ -189,11 +189,9 @@ public class Crawler
             new ControllerActionId("dumbster", "begin"),
             new ControllerActionId("filetransfer", "auth"), // redirects to external site
             new ControllerActionId("genotyping", "analyze"),    // Crawler doesn't like NotFoundException that the test generates
-            new ControllerActionId("login", "createToken"),
             new ControllerActionId("login", "logout"),
             new ControllerActionId("login", "setAuthenticationParameter"),
             new ControllerActionId("login", "setPassword"),
-            new ControllerActionId("login", "verifyToken"), // returns XML, which WDW.waitForPageToLoad can't handle
             new ControllerActionId("ms2", "showList"),
             new ControllerActionId("ms2", "showParamsFile"),
             new ControllerActionId("nlp", "runPipeline"),
@@ -326,7 +324,6 @@ public class Crawler
     protected Map<ControllerActionId, List<String>> getExcludedParametersFromInjection()
     {
         Map<ControllerActionId, List<String>> map = new HashMap<>();
-        map.put(new ControllerActionId("study-designer", "designer"), Collections.singletonList("panel")); // TODO: 16768: study-designer.DesignerAction: IllegalArgumentException on bad 'panel'
 
         // Permanent exclusions
         map.put(new ControllerActionId("plate", "designer"), Arrays.asList("colCount", "rowCount")); // 37208: Plate designer dumps stack trace from bad URL parameters
