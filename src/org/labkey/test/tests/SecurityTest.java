@@ -254,7 +254,7 @@ public class SecurityTest extends BaseWebDriverTest
     protected void addRemoveSiteAdminTest()
     {
         // Issue 13921:
-        goToSiteAdmins();
+        _permissionsHelper.goToSiteGroupScreen("Administrators");
         setFormElement(Locator.name("names"), NORMAL_USER);
         uncheckCheckbox(Locator.checkboxByName("sendEmail"));
         clickButton("Update Group Membership");
