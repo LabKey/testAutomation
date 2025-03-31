@@ -203,6 +203,13 @@ public class KnitrReportTest extends AbstractKnitrReportTest
         _rReportHelper.clickReportTab();
         waitForElement(Locator.id("mtcars_table"));
         assertElementNotPresent(Locator.id("mtcars_table_wrapper")); // Created by jQuery
+
+        // now set the dependencies
+        _rReportHelper.clickSourceTab();
+        _rReportHelper.ensureFieldSetExpanded("knitr");
+        setFormElement(Locator.name("scriptDependencies"), dependencies);
+        saveAndVerifyKnitrReport(rmdDependenciesReport.getFileName() + " " + viewName, reportContains, reportNotContains);
+
         String serverErrors = getServerErrors();
         if (!serverErrors.isEmpty())
         {
@@ -210,11 +217,5 @@ public class KnitrReportTest extends AbstractKnitrReportTest
             Assertions.assertThat(serverErrors).as("Server errors").contains("$(...).dataTable is not a function");
             checkExpectedErrors(1); // JavaScript error: "$(...).dataTable is not a function"
         }
-
-        // now set the dependencies
-        _rReportHelper.clickSourceTab();
-        _rReportHelper.ensureFieldSetExpanded("knitr");
-        setFormElement(Locator.name("scriptDependencies"), dependencies);
-        saveAndVerifyKnitrReport(rmdDependenciesReport.getFileName() + " " + viewName, reportContains, reportNotContains);
     }
 }
