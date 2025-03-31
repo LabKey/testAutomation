@@ -1009,15 +1009,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
             clickAdminMenuItem("Site", "Site Permissions");
     }
 
-    public void goToSiteAdmins()
-    {
-
-        if (!isElementPresent(Locator.id("labkey-nav-trail-current-page").withText("Administrators Group")))
-        {
-            clickAdminMenuItem("Site", "Site Admins");
-        }
-    }
-
     public ManageViewsPage goToManageViews()
     {
         clickAdminMenuItem("Manage Views");
