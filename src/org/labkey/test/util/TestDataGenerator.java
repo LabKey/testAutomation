@@ -434,7 +434,6 @@ public class TestDataGenerator
         // use the characters that we know are encoded in fieldKeys plus characters that we know clients are using
         String chars = ALL_ILLEGAL_QUERY_KEY_CHARACTERS + " %()=+-[]_|*`'\":;<>?!@#^";
 
-
         String randomFieldName = randomName(part, numStartChars, numEndChars, chars, exclusion);
         TestLogger.log("Generated random field name: " + randomFieldName);
         return randomFieldName;
