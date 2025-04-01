@@ -19,6 +19,7 @@ import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Charting;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Hosting;
@@ -291,8 +292,15 @@ public class BarPlotTest extends GenericChartsTest
         goToProjectHome();
         clickFolder(getFolderName());
         clickTab("Clinical and Assay Data");
-        waitAndClickAndWait(Locator.linkWithText(DATA_SOURCE_1));
-
+        try
+        {
+            waitAndClickAndWait(Locator.linkWithText(DATA_SOURCE_1));
+        }
+        catch(TestTimeoutException e)
+        {
+            //click again, workaround for sqlserver failure.
+            clickAndWait(Locator.linkWithText(DATA_SOURCE_1));
+        }
         dataRegionTable = new DataRegionTable("Dataset", getDriver());
 
         log("Create a bar plot.");
