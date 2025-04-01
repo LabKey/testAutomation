@@ -1,6 +1,7 @@
 package org.labkey.test.components.ui.grids;
 
 import org.junit.Assert;
+import org.labkey.api.query.QueryKey;
 import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
@@ -420,13 +421,13 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
     public void setDetails(FieldDefinition field, Object newValue, DetailTableEdit editTable)
     {
         if (field.getType() == FieldDefinition.ColumnType.TextChoice)
-            editTable.setSelectValue(field.getName(), (List<String>) newValue);
+            editTable.setSelectValue(field.getLabel(), (List<String>) newValue);
         else if (field.getType() == FieldDefinition.ColumnType.Date || field.getType() == FieldDefinition.ColumnType.DateAndTime || field.getType() == FieldDefinition.ColumnType.Time)
-            editTable.setDateTimeField(field.getName(), newValue);
+            editTable.setDateTimeField(QueryKey.encodePart(field.getName()), newValue);
         else if (field.getType() == FieldDefinition.ColumnType.Boolean)
-            editTable.setBooleanField(field.getName(), (Boolean) newValue);
+            editTable.setBooleanField(field.getLabel(), (Boolean) newValue);
         else
-            editTable.setTextField(field.getName(), String.valueOf(newValue));
+            editTable.setTextField(field.getLabel(), String.valueOf(newValue));
     }
 
     /**
