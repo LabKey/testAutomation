@@ -140,6 +140,11 @@ public class FilterExpressionPanel extends WebDriverComponent<FilterExpressionPa
         return elementCache().filterTypeSelects.get(index).getOptions().contains(filterCaption);
     }
 
+    public String getFilterTextValue(int index)
+    {
+        return elementCache().textValuesFirst.get(index).getValue();
+    }
+
     @Override
     protected ElementCache newElementCache()
     {

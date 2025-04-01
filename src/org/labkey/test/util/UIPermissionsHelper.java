@@ -193,7 +193,7 @@ public class UIPermissionsHelper extends PermissionsHelper
     public void setSiteAdminRoleUserPermissions(@LoggedParam String userName, @LoggedParam String permissionString)
     {
         _driver.log(new Date().toString());
-        _driver.goToSiteAdmins();
+        goToSiteGroupScreen("Administrators");
         _driver.clickAndWait(Locator.tag("ol").append(Locator.linkContainingText("Permissions")));
         _driver._ext4Helper.clickTabContainingText("Permissions");
         _selectPermission(userName, userName, permissionString);
@@ -243,24 +243,16 @@ public class UIPermissionsHelper extends PermissionsHelper
         addUserToGroupFromGroupScreen(userName);
     }
 
-    private void goToSiteGroupScreen(String groupName)
+    public void goToSiteGroupScreen(String groupName)
     {
+        if ("Administrators".equals(groupName))
+            groupName = "Site Administrators";
         _driver.ensureAdminMode();
-        switch (groupName)
-        {
-            case "Administrators":
-                _driver.goToSiteAdmins();
-                break;
-            case "Developers":
-                _driver.goToSiteDevelopers();
-                break;
-            default:
-                _driver.goToSiteGroups();
-                Locator.XPathLocator groupLoc = Locator.tagWithText("div", groupName);
-                _driver.waitForElement(groupLoc, _driver.defaultWaitForPage);
-                _driver.click(groupLoc);
-                _driver.clickAndWait(Locator.linkContainingText("manage group"));
-        }
+        _driver.goToSiteGroups();
+        Locator.XPathLocator groupLoc = Locator.tagWithText("div", groupName);
+        _driver.waitForElement(groupLoc, _driver.defaultWaitForPage);
+        _driver.click(groupLoc);
+        _driver.clickAndWait(Locator.linkContainingText("manage group"));
     }
 
     @Override
