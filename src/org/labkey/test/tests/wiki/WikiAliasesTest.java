@@ -85,13 +85,13 @@ public class WikiAliasesTest extends BaseWebDriverTest
         log("Setting aliases in aliases textarea");
         wikiHelper.manageWikiConfiguration().setAliases(aliases).save();
 
-        log("Verifying  all the aliases added works with wiki-page.view");
+        log("Verifying all the aliases added works with wiki-page.view");
         manageWikiConfigurationPage = wikiHelper.manageWikiConfiguration();
-        String listOfAliases[] = (manageWikiConfigurationPage.getAliases() + "\n" + manageWikiConfigurationPage.getAliases().toLowerCase()).split("\n");
-        for (int i = 0; i < listOfAliases.length; i++)
+        String[] listOfAliases = (manageWikiConfigurationPage.getAliases() + "\n" + manageWikiConfigurationPage.getAliases().toLowerCase()).split("\n");
+        for (String listOfAlias : listOfAliases)
         {
-            beginAt(WebTestHelper.buildURL("wiki", getProjectName(), "page", Map.of("name", listOfAliases[i])));
-            Assert.assertEquals("Incorrect wiki body for alias " + listOfAliases[i], wikiBody,
+            beginAt(WebTestHelper.buildURL("wiki", getProjectName(), "page", Map.of("name", listOfAlias)));
+            Assert.assertEquals("Incorrect wiki body for alias " + listOfAlias, wikiBody,
                     Locator.tagWithClass("div", "labkey-wiki").findElement(getDriver()).getText());
         }
 
