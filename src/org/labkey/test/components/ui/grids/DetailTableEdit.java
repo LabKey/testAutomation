@@ -420,6 +420,9 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
     // For use when the field is of an unknown type, as can occur in fuzz tests
     public void setDetails(FieldDefinition field, Object newValue, DetailTableEdit editTable)
     {
+        if (newValue == null)
+            return;
+
         if (field.getType() == FieldDefinition.ColumnType.TextChoice)
             editTable.setSelectValue(field.getLabel(), (List<String>) newValue);
         else if (field.getType() == FieldDefinition.ColumnType.Date || field.getType() == FieldDefinition.ColumnType.DateAndTime || field.getType() == FieldDefinition.ColumnType.Time)
