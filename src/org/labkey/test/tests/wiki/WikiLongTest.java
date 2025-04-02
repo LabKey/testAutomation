@@ -26,7 +26,6 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Wiki;
 import org.labkey.test.pages.LabkeyErrorPage;
-import org.labkey.test.pages.wiki.ManageWikiConfigurationPage;
 import org.labkey.test.util.OptionalFeatureHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.WikiHelper;
@@ -39,7 +38,6 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 @Category({Daily.class, Wiki.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 11)
