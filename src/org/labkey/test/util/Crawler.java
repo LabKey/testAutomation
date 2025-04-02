@@ -43,7 +43,6 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.core.ProjectMenu;
 import org.labkey.test.util.selenium.WebDriverUtils;
-import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
@@ -189,11 +188,9 @@ public class Crawler
             new ControllerActionId("dumbster", "begin"),
             new ControllerActionId("filetransfer", "auth"), // redirects to external site
             new ControllerActionId("genotyping", "analyze"),    // Crawler doesn't like NotFoundException that the test generates
-            new ControllerActionId("login", "createToken"),
             new ControllerActionId("login", "logout"),
             new ControllerActionId("login", "setAuthenticationParameter"),
             new ControllerActionId("login", "setPassword"),
-            new ControllerActionId("login", "verifyToken"), // returns XML, which WDW.waitForPageToLoad can't handle
             new ControllerActionId("ms2", "showList"),
             new ControllerActionId("ms2", "showParamsFile"),
             new ControllerActionId("nlp", "runPipeline"),
@@ -326,7 +323,6 @@ public class Crawler
     protected Map<ControllerActionId, List<String>> getExcludedParametersFromInjection()
     {
         Map<ControllerActionId, List<String>> map = new HashMap<>();
-        map.put(new ControllerActionId("study-designer", "designer"), Collections.singletonList("panel")); // TODO: 16768: study-designer.DesignerAction: IllegalArgumentException on bad 'panel'
 
         // Permanent exclusions
         map.put(new ControllerActionId("plate", "designer"), Arrays.asList("colCount", "rowCount")); // 37208: Plate designer dumps stack trace from bad URL parameters
@@ -477,7 +473,7 @@ public class Crawler
                 String relativeURL;
                 try
                 {
-                    relativeURL = "/" + WebTestHelper.makeRelativeUrl(urlText);
+                    relativeURL = WebTestHelper.makeRelativeUrl(urlText);
                 }
                 catch (IllegalArgumentException iae)
                 {
@@ -489,13 +485,13 @@ public class Crawler
             {
                 // Make sure it is correctly formatted
                 if (urlText.startsWith("/"))
-                    _relativeURL = urlText;
+                    _relativeURL = urlText.substring(1);
                 else if (urlText.startsWith("#"))
-                    _relativeURL = stripHash(origin.toString()) + urlText;
+                    _relativeURL = makeRelativeUrl(stripHash(origin.toString())) + urlText;
                 else if (urlText.startsWith("?"))
-                    _relativeURL = stripQueryParams(origin.toString()) + urlText;
+                    _relativeURL = makeRelativeUrl(stripQueryParams(origin.toString())) + urlText;
                 else
-                    _relativeURL = getURLBase(origin) + urlText;
+                    _relativeURL = makeRelativeUrl(getURLBase(origin)) + urlText;
             }
 
             if (_relativeURL != null)
@@ -1107,7 +1103,7 @@ public class Crawler
             else
             {
                 // Did not navigate. Test download URL for injection
-                actualUrl = new URL(WebTestHelper.getBaseURL() + relativeURL);
+                actualUrl = new URL(WebTestHelper.getBaseURL() + "/" + relativeURL);
             }
         }
         catch (RuntimeException | AssertionError rethrow)
@@ -1129,9 +1125,6 @@ public class Crawler
 
             if (rethrow instanceof AssertionError)
                 throw rethrow; // AssertionErrors already contain page and origin information.
-            else if (rethrow instanceof TimeoutException)
-                throw new RuntimeException(relativeURL + " failed to render. " + originMessage +
-                        " It may be a file download which is unsupported by the crawler", rethrow); // Improve error reporting for downloads, see issue 42661
             else
                 throw new RuntimeException("Crawler threw " + rethrow.getClass().getSimpleName() + ".\n" +
                     "Target page: " + relativeURL + "\n" +
