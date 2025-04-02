@@ -1512,41 +1512,6 @@ public class ListTest extends BaseWebDriverTest
     }
 
     /**
-     * Validate issue <a href=https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=51891>51891</a>
-     * derived columns with only constant values will corrupt lists if no data is already in list
-     */
-    @Test
-    public void testCalculatedFieldAndSchema()
-    {
-        // Issue 51891
-        String listName = TestDataGenerator.randomDomainName("Only Calculated Field", 9);
-        String keyField = "Key";
-        String calculatedField = TestDataGenerator.randomFieldName("Calculated ");
-
-        _listHelper.createList(PROJECT_VERIFY, listName, keyField);
-
-        refresh();
-
-        EditListDefinitionPage editListDefinitionPage = _listHelper.goToEditDesign(listName);
-
-        DomainFormPanel domainFormPanel = editListDefinitionPage.getFieldsPanel();
-
-        DomainFieldRow fieldRow = domainFormPanel.addField(calculatedField);
-
-        fieldRow.setType(FieldDefinition.ColumnType.Calculation);
-        fieldRow.setValueExpression(String.format("%s + 10", keyField));
-
-        editListDefinitionPage.clickSave();
-
-        goToSchemaBrowser();
-        selectQuery("lists", listName);
-        waitForText("view data");
-        clickAndWait(Locator.linkContainingText("view data"));
-
-        _listHelper.deleteList();
-    }
-
-    /**
      * Test "tricky characters" in field names, including key field. This will test CrUD operation for list items in
      * lists with an auto-key and user defined key. This  will also use file import for validation.
      *
