@@ -66,6 +66,7 @@ import org.labkey.test.util.TestDataGenerator;
 import org.labkey.test.util.TextSearcher;
 import org.labkey.test.util.search.SearchAdminAPIHelper;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
@@ -205,7 +206,7 @@ public class ListTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        ListTest init = (ListTest)getCurrentTest();
+        ListTest init = getCurrentTest();
         init.doSetup();
     }
 
@@ -882,27 +883,29 @@ public class ListTest extends BaseWebDriverTest
     }
 
     @Test
-    @Ignore // ignore until remoteAPI supports rename
-    public void testChangeListName() throws Exception
+    public void testChangeListName()
     {
-        List<FieldDefinition> cols = Arrays.asList(
+
+        String listNameBefore = TestDataGenerator.randomDomainName("Before Rename", 7);
+
+        _listHelper.createList(PROJECT_VERIFY, listNameBefore,
                 new FieldDefinition("name", ColumnType.String),
                 new FieldDefinition("title", ColumnType.String),
-                new FieldDefinition("dewey", ColumnType.Decimal)
-        );
-        String listName = "remoteAPIBeforeRename";
-        FieldDefinition.LookupInfo info = new FieldDefinition.LookupInfo(getProjectName(), "lists", listName);
-        TestDataGenerator dgen = new TestDataGenerator(info)
-                .withColumns(cols);
-        DomainResponse createResponse = dgen.createList(createDefaultConnection(), "key");
-        Domain listDomain = createResponse.getDomain();
-        listDomain.setName("remoteAPIAfterRename");
+                new FieldDefinition("dewey", ColumnType.Decimal));
 
-        SaveDomainCommand saveCmd = new SaveDomainCommand(listDomain.getDomainId());
-        saveCmd.setDomainDesign(listDomain);
-        DomainResponse saveResponse = saveCmd.execute(createDefaultConnection(), info.getFolder());
+        String listNameAfter = TestDataGenerator.randomDomainName("After Rename", 8);
+        _listHelper.goToEditDesign(listNameBefore)
+                .setName(listNameAfter)
+                .clickSave();
 
-        assertEquals("remoteAPIAfterRename", saveResponse.getDomain().getName());
+        List<String> actualLists = goToManageLists().getGrid().getListNames();
+
+        assertTrue(String.format("Updated list name '%s' is not there.", listNameAfter),
+                actualLists.contains(listNameAfter));
+
+        assertFalse(String.format("Previous list name '%s' is there, it should not be.", listNameBefore),
+                actualLists.contains(listNameBefore));
+
     }
 
     /*  Issue 6883: Create test for list self join
@@ -1509,6 +1512,41 @@ public class ListTest extends BaseWebDriverTest
     }
 
     /**
+     * Validate issue <a href=https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=51891>51891</a>
+     * derived columns with only constant values will corrupt lists if no data is already in list
+     */
+    @Test
+    public void testCalculatedFieldAndSchema()
+    {
+        // Issue 51891
+        String listName = TestDataGenerator.randomDomainName("Only Calculated Field", 9);
+        String keyField = "Key";
+        String calculatedField = TestDataGenerator.randomFieldName("Calculated ");
+
+        _listHelper.createList(PROJECT_VERIFY, listName, keyField);
+
+        refresh();
+
+        EditListDefinitionPage editListDefinitionPage = _listHelper.goToEditDesign(listName);
+
+        DomainFormPanel domainFormPanel = editListDefinitionPage.getFieldsPanel();
+
+        DomainFieldRow fieldRow = domainFormPanel.addField(calculatedField);
+
+        fieldRow.setType(FieldDefinition.ColumnType.Calculation);
+        fieldRow.setValueExpression(String.format("%s + 10", keyField));
+
+        editListDefinitionPage.clickSave();
+
+        goToSchemaBrowser();
+        selectQuery("lists", listName);
+        waitForText("view data");
+        clickAndWait(Locator.linkContainingText("view data"));
+
+        _listHelper.deleteList();
+    }
+
+    /**
      * Test "tricky characters" in field names, including key field. This will test CrUD operation for list items in
      * lists with an auto-key and user defined key. This  will also use file import for validation.
      *
@@ -1517,7 +1555,7 @@ public class ListTest extends BaseWebDriverTest
     @Test
     public void testTrickyCharacterFields() throws IOException
     {
-        // These validate Issue 52070
+        // These validate Issue 52069 Issue 52070 Issue 52071
         testTricky("Tricky Field Character", false);
         testTricky("TrickyField Character Auto Key", true);
 
@@ -1530,22 +1568,26 @@ public class ListTest extends BaseWebDriverTest
         String keyField_Bulk = "\"" + keyField.replace("\"", "\"\"") + "\"" ;
         String intField = "Int Field \"`~!@#$%^&*()_-+={}[]|\\:;<>,.?/\u00a5\u00e6";
         String intField_Bulk = "\"" + intField.replace("\"", "\"\"") + "\"";
+        String trickyField = "\u5668\u9aa8\u00a5\u00e6\"`~!@#$%^&*()_-+={}[]|\\:;<>,.?/";
+        String trickyField_Bulk = "\"" + trickyField.replace("\"", "\"\"") + "\"";
 
-        log(String.format("Create list '%s' with key field '%s' and field '%s'.",
-                listName, keyField, intField));
+        log(String.format("Create list '%s' with key field '%s' and fields '%s', '%s'.",
+                listName, keyField, intField, trickyField));
 
         if (!autoKey)
         {
             log("Key is not auto-increment.");
             _listHelper.createList(PROJECT_VERIFY, listName,
                     new FieldDefinition(keyField, ColumnType.Integer),
-                    new FieldDefinition(intField, ColumnType.Integer));
+                    new FieldDefinition(intField, ColumnType.Integer),
+                    new FieldDefinition(trickyField, ColumnType.Integer));
         }
         else
         {
             log("Key is auto-increment.");
             _listHelper.createList(PROJECT_VERIFY, listName, keyField,
-                    new FieldDefinition(intField, ColumnType.Integer));
+                    new FieldDefinition(intField, ColumnType.Integer),
+                    new FieldDefinition(trickyField, ColumnType.Integer));
         }
 
         assertNoLabKeyErrors();
@@ -1561,14 +1603,17 @@ public class ListTest extends BaseWebDriverTest
             row.put(keyField, "1");
 
             expectedValues.add(Map.of(EscapeUtil.fieldKeyEncodePart(keyField), "1",
-                    EscapeUtil.fieldKeyEncodePart(intField), "123"));
+                    EscapeUtil.fieldKeyEncodePart(intField), "100",
+                    EscapeUtil.fieldKeyEncodePart(trickyField), "101"));
         }
         else
         {
-            expectedValues.add(Map.of(EscapeUtil.fieldKeyEncodePart(intField), "123"));
+            expectedValues.add(Map.of(EscapeUtil.fieldKeyEncodePart(intField), "100",
+                    EscapeUtil.fieldKeyEncodePart(trickyField), "101"));
         }
 
-        row.put(intField, "123");
+        row.put(intField, "100");
+        row.put(trickyField, "101");
 
         _listHelper.insertNewRow(row);
 
@@ -1587,6 +1632,8 @@ public class ListTest extends BaseWebDriverTest
         }
 
         sbBulkData.append(intField_Bulk);
+        sbBulkData.append("\t");
+        sbBulkData.append(trickyField_Bulk);
         sbBulkData.append("\n");
 
         if (!autoKey)
@@ -1594,14 +1641,16 @@ public class ListTest extends BaseWebDriverTest
             sbBulkData.append("2\t");
 
             expectedValues.add(Map.of(EscapeUtil.fieldKeyEncodePart(keyField), "2",
-                    EscapeUtil.fieldKeyEncodePart(intField), "456"));
+                    EscapeUtil.fieldKeyEncodePart(intField), "200",
+                    EscapeUtil.fieldKeyEncodePart(trickyField), "202"));
         }
         else
         {
-            expectedValues.add(Map.of(EscapeUtil.fieldKeyEncodePart(intField), "456"));
+            expectedValues.add(Map.of(EscapeUtil.fieldKeyEncodePart(intField), "200",
+                    EscapeUtil.fieldKeyEncodePart(trickyField), "202"));
         }
 
-        sbBulkData.append("456");
+        sbBulkData.append("200\t202");
 
         _listHelper.bulkImportData(sbBulkData.toString());
 
@@ -1620,6 +1669,8 @@ public class ListTest extends BaseWebDriverTest
         }
 
         sbBulkData.append(intField_Bulk);
+        sbBulkData.append("\t");
+        sbBulkData.append(trickyField_Bulk);
         fileData.add(sbBulkData.toString());
 
         sbBulkData = new StringBuilder();
@@ -1629,15 +1680,17 @@ public class ListTest extends BaseWebDriverTest
             sbBulkData.append("3\t");
 
             expectedValues.add(Map.of(EscapeUtil.fieldKeyEncodePart(keyField), "3",
-                    EscapeUtil.fieldKeyEncodePart(intField), "789"));
+                    EscapeUtil.fieldKeyEncodePart(intField), "300",
+                    EscapeUtil.fieldKeyEncodePart(trickyField), "303"));
 
         }
         else
         {
-            expectedValues.add(Map.of(EscapeUtil.fieldKeyEncodePart(intField), "789"));
+            expectedValues.add(Map.of(EscapeUtil.fieldKeyEncodePart(intField), "300",
+                    EscapeUtil.fieldKeyEncodePart(trickyField), "303"));
         }
 
-        sbBulkData.append("789");
+        sbBulkData.append("300\t303");
         fileData.add(sbBulkData.toString());
 
         File importFile = TestFileUtils.writeTempFile("ListTest_Tricky.tsv", String.join(System.lineSeparator(), fileData));
@@ -1648,21 +1701,24 @@ public class ListTest extends BaseWebDriverTest
 
         validateDataRegionTableForTricky(expectedValues);
 
-        log(String.format("For row 0 update the value in field '%s' in the UI.", intField));
+        log(String.format("For row 0 update the value in fields '%s' and '%s' in the UI.", intField, trickyField));
 
         DataRegionTable dataRegionTable = new DataRegionTable("query", getDriver());
-        dataRegionTable.updateRow(0, Map.of(intField, "321"));
+        dataRegionTable.updateRow(0, Map.of(intField, "123",
+                trickyField, "456"));
 
         assertNoLabKeyErrors();
 
         if (!autoKey)
         {
             expectedValues.set(0, Map.of(EscapeUtil.fieldKeyEncodePart(keyField), "1",
-                    EscapeUtil.fieldKeyEncodePart(intField), "321"));
+                    EscapeUtil.fieldKeyEncodePart(intField), "123",
+                    EscapeUtil.fieldKeyEncodePart(trickyField), "456"));
         }
         else
         {
-            expectedValues.set(0, Map.of(EscapeUtil.fieldKeyEncodePart(intField), "321"));
+            expectedValues.set(0, Map.of(EscapeUtil.fieldKeyEncodePart(intField), "123",
+                    EscapeUtil.fieldKeyEncodePart(trickyField), "456"));
         }
 
         validateDataRegionTableForTricky(expectedValues);
@@ -1678,6 +1734,9 @@ public class ListTest extends BaseWebDriverTest
         assertEquals(String.format("Tooltip for column '%s' not as expected.", intField),
                 intField, dataRegionTable.getColumnTitle(EscapeUtil.fieldKeyEncodePart(intField)));
 
+        assertEquals(String.format("Tooltip for column '%s' not as expected.", trickyField),
+                trickyField, dataRegionTable.getColumnTitle(EscapeUtil.fieldKeyEncodePart(trickyField)));
+
         log("Delete row 0.");
 
         dataRegionTable = new DataRegionTable("query", getDriver());
@@ -1689,6 +1748,27 @@ public class ListTest extends BaseWebDriverTest
         expectedValues.remove(0);
 
         validateDataRegionTableForTricky(expectedValues);
+
+        // Validates Issue 52071
+        dataRegionTable.clickRowDetails(0);
+
+        List<String> actualFields = Locator.tagWithClass("td", "lk-form-label").findElements(getDriver()).stream().map(WebElement::getText).toList();
+
+        List<String> expectedFields = new ArrayList<>();
+        // Replace the _ with a space and add a : at the end.
+        if (!autoKey)
+        {
+            expectedFields.add(keyField.replace("_", " ") + ":");
+        }
+
+        expectedFields.add(intField.replace("_", " ") + ":");
+        expectedFields.add(trickyField.replace("_", " ") + ":");
+
+        for (int i = 0; i < expectedFields.size(); i++)
+        {
+            assertEquals(String.format("Row detail for column '%s' not as expected.", expectedFields.get(i)),
+                    expectedFields.get(i), actualFields.get(i));
+        }
 
     }
 
