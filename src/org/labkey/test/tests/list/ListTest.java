@@ -506,6 +506,50 @@ public class ListTest extends BaseWebDriverTest
         checker().withScreenshot().verifyEquals("Name not trimmed as expected", trimmedName, editList.getName());
     }
 
+    /* Issue 51572: Bug with creating a new list by uploading a csv file in "UTF-8 with BOM" format
+     */
+    @Test
+    public void testCreateListWithBOMFile()
+    {
+        String listName = TestDataGenerator.randomDomainName("From BOM File", 4);
+        File bomFile = TestFileUtils.getSampleData("lists/TestUTF8_BOM.csv");
+
+        EditListDefinitionPage listEditPage = _listHelper.beginCreateList(getProjectName(), listName);
+        listEditPage.getFieldsPanel()
+                .setInferFieldFile(bomFile);
+
+        String keyName = "KeyValue";
+        listEditPage.selectKeyField(keyName);
+        listEditPage.clickSave();
+
+        List<FieldDefinition> fields = List.of(
+                new FieldDefinition(keyName, ColumnType.Integer),
+                new FieldDefinition("A", ColumnType.String),
+                new FieldDefinition("B", ColumnType.String),
+                new FieldDefinition("C", ColumnType.String)
+        );
+
+        int rows = 10;
+        int columns = 4;
+        String[][] data = new String[rows][columns];
+
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < columns; j++) {
+                data[i][j] = switch (j)
+                {
+                    case 0 -> Integer.toString(i + 101);
+                    case 1 -> String.format("A%d", i + 2);
+                    case 2 -> String.format("B%d", i + 2);
+                    case 3 -> String.format("C%d", i + 2);
+                    default -> throw new IllegalStateException("Unexpected value: " + j);
+                };
+            }
+        }
+
+        _listHelper.verifyListData(fields, data, checker());
+
+    }
+
     @Test
     public void testCustomViews()
     {
@@ -581,8 +625,8 @@ public class ListTest extends BaseWebDriverTest
         clickProject(getProjectName());
 
         log("Test that sort only affects one web part");
-        DataRegionTable firstList = DataRegionTable.DataRegion(getDriver()).find();
-        DataRegionTable secondList = DataRegionTable.DataRegion(getDriver()).index(1).find();
+        DataRegionTable firstList = DataRegion(getDriver()).find();
+        DataRegionTable secondList = DataRegion(getDriver()).index(1).find();
         firstList.setSort(_listColGood.getName(), SortDirection.ASC);
         List<String> expectedColumn = new ArrayList<>(Arrays.asList(TEST_DATA[TD_GOOD]));
         List<String> firstListColumn = secondList.getColumnDataAsText(_listColGood.getName());
@@ -829,7 +873,7 @@ public class ListTest extends BaseWebDriverTest
                 new FieldDefinition("dewey", ColumnType.Decimal)
         );
         String listName = "remoteApiListTestAddColumn";
-        FieldDefinition.LookupInfo info = new FieldDefinition.LookupInfo(getProjectName(), "lists", listName);
+        LookupInfo info = new LookupInfo(getProjectName(), "lists", listName);
         TestDataGenerator dgen = new TestDataGenerator(info)
                 .withColumns(cols);
         DomainResponse createResponse = dgen.createList(createDefaultConnection(), "key");
@@ -864,7 +908,7 @@ public class ListTest extends BaseWebDriverTest
                 new FieldDefinition("removeMe", ColumnType.Decimal)
         );
         String listName = "remoteApiListTestRemoveColumn";
-        FieldDefinition.LookupInfo info = new FieldDefinition.LookupInfo(getProjectName(), "lists", listName);
+        LookupInfo info = new LookupInfo(getProjectName(), "lists", listName);
         TestDataGenerator dgen = new TestDataGenerator(info)
                 .withColumns(cols);
         DomainResponse createResponse = dgen.createList(createDefaultConnection(), "key");
@@ -883,6 +927,29 @@ public class ListTest extends BaseWebDriverTest
     }
 
     @Test
+    public void testChangeListNameOverAPI() throws Exception
+    {
+        List<FieldDefinition> cols = Arrays.asList(
+                new FieldDefinition("name", ColumnType.String),
+                new FieldDefinition("title", ColumnType.String),
+                new FieldDefinition("dewey", ColumnType.Decimal)
+        );
+        String listName = "remoteAPIBeforeRename";
+        LookupInfo info = new LookupInfo(getProjectName(), "lists", listName);
+        TestDataGenerator dgen = new TestDataGenerator(info)
+                .withColumns(cols);
+        DomainResponse createResponse = dgen.createList(createDefaultConnection(), "key");
+        Domain listDomain = createResponse.getDomain();
+        listDomain.setName("remoteAPIAfterRename");
+
+        SaveDomainCommand saveCmd = new SaveDomainCommand(listDomain.getDomainId());
+        saveCmd.setDomainDesign(listDomain);
+        DomainResponse saveResponse = saveCmd.execute(createDefaultConnection(), info.getFolder());
+
+        assertEquals("remoteAPIAfterRename", saveResponse.getDomain().getName());
+    }
+
+    @Test
     public void testChangeListName()
     {
 
@@ -893,7 +960,7 @@ public class ListTest extends BaseWebDriverTest
                 new FieldDefinition("title", ColumnType.String),
                 new FieldDefinition("dewey", ColumnType.Decimal));
 
-        String listNameAfter = TestDataGenerator.randomDomainName("After Rename", 8);
+        String listNameAfter = "After Rename (Issue 52694) /";
         _listHelper.goToEditDesign(listNameBefore)
                 .setName(listNameAfter)
                 .clickSave();
@@ -905,6 +972,10 @@ public class ListTest extends BaseWebDriverTest
 
         assertFalse(String.format("Previous list name '%s' is there, it should not be.", listNameBefore),
                 actualLists.contains(listNameBefore));
+
+        clickAndWait(Locator.linkWithText(listNameAfter));
+
+        assertElementVisible(Locator.tagContainingText("h3", listNameAfter));
 
     }
 
@@ -934,7 +1005,7 @@ public class ListTest extends BaseWebDriverTest
                 new FieldDefinition(dummyCol, ColumnType.String)
         };
         FieldDefinition lookupCol = new FieldDefinition(lookupField,
-                new FieldDefinition.LookupInfo(null, lookupSchema, lookupTable).setTableType(ColumnType.Integer));
+                new LookupInfo(null, lookupSchema, lookupTable).setTableType(ColumnType.Integer));
         // create the list
         _listHelper.createList(PROJECT_VERIFY, listName, keyCol, columns);
         // now add the lookup column (which references the new table)
@@ -1199,15 +1270,19 @@ public class ListTest extends BaseWebDriverTest
     @Test
     public void doRenameFieldsTest()
     {
+        // Issue 8329
         log("8329: Test that renaming a field then creating a new field with the old name doesn't result in awful things");
         String listName = "new";
-        String origFieldName = "BarBar";
-        String newFieldName = "FooFoo";
+
+        // Issue 52480
+        String origFieldName = ": random 1 /@\".";
+        String newFieldName = "random 1";
+
         String invalidListName = TestDataGenerator.randomInvalidDomainName(null, 0, 5);
         EditListDefinitionPage listDefinitionPage = _listHelper.beginCreateList(PROJECT_VERIFY, invalidListName);
         listDefinitionPage.manuallyDefineFieldsWithAutoIncrementingKey("key");
         List<String> errors = listDefinitionPage.clickSaveExpectingErrors();
-        Assert.assertTrue("Error msg not as expected during list creation", errors.contains("Invalid IntList name '" + invalidListName + "'. IntList name must start with a letter or a number."));
+        assertTrue("Error msg not as expected during list creation", errors.contains("Invalid IntList name '" + invalidListName + "'. IntList name must start with a letter or a number."));
 
         _listHelper.createList(PROJECT_VERIFY, listName, "key",
                 new FieldDefinition(origFieldName, ColumnType.String).setLabel(origFieldName).setDescription("first column"));
@@ -1215,7 +1290,7 @@ public class ListTest extends BaseWebDriverTest
         listDefinitionPage = _listHelper.goToEditDesign(listName);
         listDefinitionPage.setName(invalidListName);
         errors = listDefinitionPage.clickSaveExpectingErrors();
-        Assert.assertTrue("Error msg not as expected during list renaming", errors.contains("Invalid IntList name '" + invalidListName + "'. IntList name must start with a letter or a number."));
+        assertTrue("Error msg not as expected during list renaming", errors.contains("Invalid IntList name '" + invalidListName + "'. IntList name must start with a letter or a number."));
         listDefinitionPage.setName(listName);
         listDefinitionPage.getFieldsPanel()
                 .getField(origFieldName)
@@ -1762,7 +1837,7 @@ public class ListTest extends BaseWebDriverTest
 
     FieldDefinition col(String folder, String name, ColumnType type, String table)
     {
-        return new FieldDefinition(name, new FieldDefinition.LookupInfo(folder, "lists", table).setTableType(type));
+        return new FieldDefinition(name, new LookupInfo(folder, "lists", table).setTableType(type));
     }
 
     FieldDefinition colURL(String name, ColumnType type, String url)
