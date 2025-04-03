@@ -85,7 +85,7 @@ public class FieldSelectionDialog extends ModalDialog
      *
      * @return The list of field names.
      */
-    public List<String> getAvailableFields()
+    public List<String> getAvailableFieldLabels()
     {
         List<WebElement> listItemElements = elementCache().getListItemNameElements(elementCache().availableFieldsPanel);
         return listItemElements.stream().map(WebElement::getText).collect(Collectors.toList());
@@ -94,29 +94,29 @@ public class FieldSelectionDialog extends ModalDialog
     /**
      * Check to see if the available field listed is shown as selected, has a checkmark, in the 'Available Fields' panel.
      *
-     * @param fieldName Can be an individual field or a path to a nested field.
+     * @param fieldKeyParts Can be an individual field or a path to a nested field.
      * @return True if row has the checkmark, false otherwise.
      */
-    public boolean isAvailableFieldSelected(String... fieldName)
+    public boolean isAvailableFieldSelected(String... fieldKeyParts)
     {
-        WebElement listItem = elementCache().getListItemElementByFieldKey(expandAvailableFields(fieldName));
+        WebElement listItem = elementCache().getListItemElementByFieldKey(expandAvailableFields(fieldKeyParts));
         return Locator.tagWithClass("i", "fa-check").findWhenNeeded(listItem).isDisplayed();
     }
 
-    public boolean isFieldAvailable(String... fieldName)
+    public boolean isFieldAvailable(String... fieldKeyParts)
     {
-        return elementCache().getListItemElementByFieldKeyOrNull(expandAvailableFields(fieldName)) != null;
+        return elementCache().getListItemElementByFieldKeyOrNull(expandAvailableFields(fieldKeyParts)) != null;
     }
 
     /**
      * Select a field the list of available fields. If more than one value is passed in it is assumed to be an expandable path.
      *
-     * @param fieldName Either an individual field or the path to a field to add.
+     * @param fieldKeyParts Either an individual field or the path to a field to add.
      * @return This dialog.
      */
-    public FieldSelectionDialog selectAvailableField(String... fieldName)
+    public FieldSelectionDialog selectAvailableField(String... fieldKeyParts)
     {
-        return addFieldByFieldKeyToGrid(expandAvailableFields(fieldName));
+        return addFieldByFieldKeyToGrid(expandAvailableFields(fieldKeyParts));
     }
 
     public WebElement getAvailableFieldElement(String fieldName)
@@ -148,17 +148,17 @@ public class FieldSelectionDialog extends ModalDialog
     }
 
     /**
-     * Expand a field or a hierarchy of fields. If a single field is passed in only it will be expanded. If multiple values
-     * are passed in it is assumed to be a path and all fields will be expanded to the last field.
+     * Expand a field or a hierarchy of fieldKeyParts. If a single field is passed in only it will be expanded. If multiple values
+     * are passed in it is assumed to be a path and all fieldKeyParts will be expanded to the last field.
      *
-     * @param fields The list of fields to expand.
+     * @param fieldKeyParts The list of fieldKeyParts to expand.
      * @return key for the expanded field.
      */
-    private String expandAvailableFields(String... fields)
+    private String expandAvailableFields(String... fieldKeyParts)
     {
         StringBuilder fieldKey = new StringBuilder();
 
-        Iterator<String> iterator = Arrays.stream(fields).iterator();
+        Iterator<String> iterator = Arrays.stream(fieldKeyParts).iterator();
 
         while(iterator.hasNext())
         {
@@ -249,7 +249,7 @@ public class FieldSelectionDialog extends ModalDialog
      *
      * @return The list of selected fields.
      */
-    public List<String> getSelectedFields()
+    public List<String> getSelectedFieldLabels()
     {
         List<WebElement> listItemElements = elementCache().getListItemNameElements(elementCache().selectedFieldsPanel);
         return listItemElements.stream().map(WebElement::getText).collect(Collectors.toList());
@@ -260,7 +260,7 @@ public class FieldSelectionDialog extends ModalDialog
      *
      * @return Text of highlighted (active) selected field. Empty string if none is highlighted.
      */
-    public String getActiveSelectedField()
+    public String getActiveSelectedFieldLabel()
     {
         WebElement active = Locator.tagWithClass("div", "list-group-item")
                 .withClass("active")
@@ -408,7 +408,7 @@ public class FieldSelectionDialog extends ModalDialog
         if (removedAll)
         {
             WebDriverWrapper.sleep(500);
-            WebDriverWrapper.waitFor(() -> getSelectedFields().isEmpty(), "Did not remove all of the selected fields.", 1_500);
+            WebDriverWrapper.waitFor(() -> getSelectedFieldLabels().isEmpty(), "Did not remove all of the selected fields.", 1_500);
         }
 
         return this;

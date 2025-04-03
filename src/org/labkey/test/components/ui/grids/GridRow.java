@@ -84,9 +84,9 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
     /**
      * gets the cell corresponding to the specified column
      */
-    public WebElement getCell(String columnHeader)
+    public WebElement getCell(String columnLabel)
     {
-        return getCell(_grid.getColumnIndex(columnHeader));
+        return getCell(_grid.getColumnIndex(columnLabel));
     }
 
     /**
