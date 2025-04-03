@@ -41,6 +41,7 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.query.QueryApiHelper;
+import org.labkey.test.util.samplemanagement.SMTestUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -49,6 +50,7 @@ import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -58,8 +60,12 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static org.labkey.test.BaseWebDriverTest.ALL_ILLEGAL_QUERY_KEY_CHARACTERS;
+import static org.labkey.test.util.TestDataUtils.REALISTIC_ASSAY_FIELDS;
+import static org.labkey.test.util.TestDataUtils.REALISTIC_SAMPLE_FIELDS;
+import static org.labkey.test.util.TestDataUtils.REALISTIC_SOURCE_FIELDS;
 
 
 /**
@@ -105,6 +111,160 @@ public class TestDataGenerator
     public TestDataGenerator(FieldDefinition.LookupInfo lookupInfo)
     {
         this(lookupInfo.getSchema(), lookupInfo.getTable(), lookupInfo.getFolder());
+    }
+
+    public static File writeCsvFile(List<FieldDefinition> fields, List<Map<String, Object>> entityData, String fileName) throws IOException
+    {
+        List<Map<String, Object>> fileData = new ArrayList<>();
+        List<String> fieldNamesForFile = fields.stream().map(FieldDefinition::getName).collect(Collectors.toList());
+        for (Map<String, Object> row : entityData)
+        {
+            Map<String, Object> fileRow = new HashMap<>();
+            for (FieldDefinition field : fields)
+            {
+                String key = field.getLabel() == null ? field.getName() : field.getLabel();
+                Object value = row.get(key);
+                Object valueToWrite = value;
+                if (value instanceof List<?>)
+                    valueToWrite = StringUtils.join((List<?>)value, ",");
+                fileRow.put(field.getName(), valueToWrite);
+            }
+            fileData.add(fileRow);
+        }
+        var fileContents = TestDataUtils.csvStringFromRowMaps(fileData, fieldNamesForFile, true);
+        return TestFileUtils.writeTempFile(fileName, fileContents);
+    }
+
+    public static List<Map<String, Object>> generateEntityData(List<FieldDefinition> fields, String nameField, String namePrefix, int startingCount, int size, boolean addLineage, boolean includeAliquots, String queryName, boolean forGridInsert)
+    {
+        // Hard to deal with plain PropertyDescriptors and we're unlikely to need to
+        List<FieldDefinition> populatableFields = new ArrayList<>(fields);
+
+        populatableFields.removeIf(field -> field.getLookup() != null);
+
+        List<Map<String, Object>> allEntityData = new ArrayList<>();
+        for (int i = startingCount; i < (size + startingCount); i++)
+        {
+            Map<String, Object> entityData = new HashMap<>();
+
+            // Since this will be using the api to populate the sample type need to pass in the column name
+            // as it appears in the schema, for example COL_STR_NAME.
+            if (nameField != null)
+                entityData.put(nameField, namePrefix + i);
+
+            for (FieldDefinition fieldDefinition : populatableFields)
+            {
+                if (!fieldDefinition.getName().equalsIgnoreCase(nameField)) // Name already set
+                {
+                    String key = fieldDefinition.getLabel() != null ? fieldDefinition.getLabel() : FieldDefinition.labelFromName(fieldDefinition.getName());
+                    if (fieldDefinition.getType().equals(FieldDefinition.ColumnType.Date))
+                        entityData.put(key, SMTestUtils.UI_DATE_FORMAT.get().format(TestDateUtils.diffFromTodaysDate(Calendar.HOUR, i * 24)));
+                    else if (fieldDefinition.getType().equals(FieldDefinition.ColumnType.DateAndTime))
+                        entityData.put(key, SMTestUtils.UI_DATE_TIME_FORMAT.get().format(TestDateUtils.diffFromTodaysDate(Calendar.HOUR, i * 24)));
+                    else if (fieldDefinition.getType().equals(FieldDefinition.ColumnType.Time))
+                        entityData.put(key, SMTestUtils.TIME_FORMAT.get().format(TestDateUtils.diffFromTodaysDate(Calendar.HOUR, i * 24)));
+                    else if (fieldDefinition.getType().equals(FieldDefinition.ColumnType.Integer))
+                    {
+                        entityData.put(key, i);
+                    }
+                    else if (fieldDefinition.getType().equals(FieldDefinition.ColumnType.Decimal))
+                    {
+                        entityData.put(key, (i + (i * .10)));
+                    }
+                    else if (fieldDefinition.getType().equals(FieldDefinition.ColumnType.Boolean))
+                    {
+                        entityData.put(key, i % 2 == 0);
+                    }
+                    else if (fieldDefinition.getType().equals(FieldDefinition.ColumnType.String))
+                    {
+                        entityData.put(key, "Entity " + i);
+                    }
+                    else if (fieldDefinition.getType().equals(FieldDefinition.ColumnType.TextChoice))
+                    {
+                        FieldDefinition.TextChoiceValidator validator =
+                                (FieldDefinition.TextChoiceValidator) fieldDefinition.getValidators().get(0);
+                        List<String> textChoices = validator.getValues();
+                        int textChoiceIndex = i % textChoices.size();
+                        if (forGridInsert)
+                            entityData.put(key, List.of(textChoices.get(textChoiceIndex)));
+                        else
+                            entityData.put(key, textChoices.get(textChoiceIndex));
+                    }
+                }
+            }
+
+            // Caution if you change this code. There are one or two places in the test code that are expecting lineage
+            // or aliquots based on this calculation.
+            if (addLineage && (i > (size / 2)))
+            {
+                if (i < size * 0.9 || !includeAliquots)
+                {
+                    entityData.put("materialInputs/" + queryName, namePrefix + (i - (size / 3)));
+                }
+                else
+                {
+                    entityData.put("AliquotedFrom", namePrefix + (i >= size * 0.95 ? 1 : 0));
+                }
+            }
+            allEntityData.add(entityData);
+        }
+        return allEntityData;
+    }
+
+    public static List<FieldDefinition> createSourceTypeFieldList(int numFields, int minNumRandomFields)
+    {
+        return createFieldList(numFields, minNumRandomFields, REALISTIC_SOURCE_FIELDS);
+    }
+
+    public static List<FieldDefinition> createSampleTypeFieldList(int numFields, int minNumRandomFields)
+    {
+        return createFieldList(numFields, minNumRandomFields, REALISTIC_SAMPLE_FIELDS);
+    }
+
+    public static List<FieldDefinition> createAssayDataFieldList(int numFields, int minNumRandomFields)
+    {
+        return createFieldList(numFields, minNumRandomFields, REALISTIC_ASSAY_FIELDS);
+    }
+
+    public static List<FieldDefinition> createFieldList(int numFields, int minNumRandomFields, List<Supplier<
+    FieldDefinition>> fieldChoices)
+    {
+        // first choose numFields - numRandomFields from given field choices
+        List<FieldDefinition> fields = new ArrayList<>(shuffleSelect(fieldChoices, Math.min(numFields - minNumRandomFields, fieldChoices.size())).stream().map(Supplier::get).toList());
+        // fill in the rest with random field names
+        for (int i = 0; i < Math.max(minNumRandomFields, numFields - fields.size()); i++)
+        {
+            String randomField = randomFieldName(String.format(" random %d ", i + 1));
+
+            FieldDefinition fieldDefinition;
+            if (i % 5 == 0)
+                fieldDefinition = new FieldDefinition(randomField, FieldDefinition.ColumnType.Decimal);
+            else if (i % 5 == 1)
+                fieldDefinition = new FieldDefinition(randomField, FieldDefinition.ColumnType.Time);
+            else if (i % 5 == 2)
+                fieldDefinition = new FieldDefinition(randomField, FieldDefinition.ColumnType.Date);
+            else if (i % 5 == 3)
+                fieldDefinition = new FieldDefinition(randomField, FieldDefinition.ColumnType.DateAndTime);
+            else
+                fieldDefinition = new FieldDefinition(randomField, FieldDefinition.ColumnType.Integer);
+
+            fields.add(fieldDefinition);
+        }
+        Collections.shuffle(fields);
+
+        TestLogger.log("Creating fields: ");
+        fields.forEach(obj -> {
+            TestLogger.log(obj.getName() + " : " + obj.getType().getLabel());
+        });
+        return fields;
+    }
+
+    public static void setFieldCaptionsFromNames(List<FieldDefinition> fields)
+    {
+        fields.forEach(f -> {
+            if (f.getLabel() == null)
+                f.setLabel(FieldDefinition.labelFromName(f.getName()));
+        });
     }
 
     public String getSchema()
