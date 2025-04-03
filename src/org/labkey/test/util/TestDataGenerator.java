@@ -41,7 +41,6 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.query.QueryApiHelper;
-import org.labkey.test.util.samplemanagement.SMTestUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -78,6 +77,13 @@ public class TestDataGenerator
     public static final String ALPHANUMERIC_STRING = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvxyz";
     public static final String DOMAIN_SPECIAL_STRING =  "+- _.:&()/";
     public static final String ILLEGAL_DOMAIN_NAME_CHARSET = "<>[]{};,`\"~!@#$%^*=|?\\";
+    // Used to set value of date pickers
+    public static final Supplier<SimpleDateFormat> INPUT_DATE_FORMAT = () -> new SimpleDateFormat("MM/dd/yyyy");
+    public static final Supplier<SimpleDateFormat> INPUT_DATETIME_FORMAT = () -> new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+    // Default display format
+    public static final Supplier<SimpleDateFormat> UI_DATE_FORMAT = () -> new SimpleDateFormat("yyyy-MM-dd");
+    public static final Supplier<SimpleDateFormat> UI_DATE_TIME_FORMAT = () -> new SimpleDateFormat("yyyy-MM-dd HH:mm");
+    public static final Supplier<SimpleDateFormat> TIME_FORMAT = () -> new SimpleDateFormat("HH:mm:ss");
 
     private final Map<String, PropertyDescriptor> _columns = new CaseInsensitiveLinkedHashMap<>();
     private final Map<String, Supplier<Object>> _dataSuppliers = new CaseInsensitiveHashMap<>();
@@ -158,11 +164,11 @@ public class TestDataGenerator
                 {
                     String key = fieldDefinition.getLabel() != null ? fieldDefinition.getLabel() : FieldDefinition.labelFromName(fieldDefinition.getName());
                     if (fieldDefinition.getType().equals(FieldDefinition.ColumnType.Date))
-                        entityData.put(key, SMTestUtils.UI_DATE_FORMAT.get().format(TestDateUtils.diffFromTodaysDate(Calendar.HOUR, i * 24)));
+                        entityData.put(key, UI_DATE_FORMAT.get().format(TestDateUtils.diffFromTodaysDate(Calendar.HOUR, i * 24)));
                     else if (fieldDefinition.getType().equals(FieldDefinition.ColumnType.DateAndTime))
-                        entityData.put(key, SMTestUtils.UI_DATE_TIME_FORMAT.get().format(TestDateUtils.diffFromTodaysDate(Calendar.HOUR, i * 24)));
+                        entityData.put(key, UI_DATE_TIME_FORMAT.get().format(TestDateUtils.diffFromTodaysDate(Calendar.HOUR, i * 24)));
                     else if (fieldDefinition.getType().equals(FieldDefinition.ColumnType.Time))
-                        entityData.put(key, SMTestUtils.TIME_FORMAT.get().format(TestDateUtils.diffFromTodaysDate(Calendar.HOUR, i * 24)));
+                        entityData.put(key, TIME_FORMAT.get().format(TestDateUtils.diffFromTodaysDate(Calendar.HOUR, i * 24)));
                     else if (fieldDefinition.getType().equals(FieldDefinition.ColumnType.Integer))
                     {
                         entityData.put(key, i);
