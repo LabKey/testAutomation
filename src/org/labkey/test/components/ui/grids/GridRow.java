@@ -169,7 +169,7 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
         if (_rowMap == null)
         {
             _rowMap = new CaseInsensitiveHashMap<>();
-            List<String> columns = _grid.getColumnNames();
+            List<String> columns = _grid.getColumnLabels();
             List<String> rowCellTexts = getTexts();
             for (int i = 0; i < columns.size(); i++)
             {

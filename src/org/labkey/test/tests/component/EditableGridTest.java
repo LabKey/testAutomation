@@ -674,8 +674,8 @@ public class EditableGridTest extends BaseWebDriverTest
         editableGrid.addRows(1);
 
         // Scroll the last column into view it will make any failure screenshots more useful.
-        String lastColumnName = editableGrid.getColumnNames().get(editableGrid.getColumnNames().size() - 1);
-        scrollIntoView(editableGrid.getCell(0, lastColumnName));
+        String lastColumn = editableGrid.getColumnLabels().get(editableGrid.getColumnLabels().size() - 1);
+        scrollIntoView(editableGrid.getCell(0, lastColumn));
 
         int emptyWidth = editableGrid.getCell(0, PASTE_ML).getSize().getWidth();
         int emptyHeight = editableGrid.getCell(0, PASTE_ML).getSize().getHeight();
@@ -740,7 +740,7 @@ public class EditableGridTest extends BaseWebDriverTest
                 .build()
                 .perform();
 
-        scrollIntoView(editableGrid.getCell(0, lastColumnName));
+        scrollIntoView(editableGrid.getCell(0, lastColumn));
 
         checker().verifyTrue("TextArea should have gone away after hitting <Enter>.",
                 shortWait().until(ExpectedConditions.stalenessOf(editCell)).booleanValue());
@@ -767,7 +767,7 @@ public class EditableGridTest extends BaseWebDriverTest
 
         log("Enter one long line.");
         editableGrid.addRows(1);
-        scrollIntoView(editableGrid.getCell(0, lastColumnName));
+        scrollIntoView(editableGrid.getCell(0, lastColumn));
 
         editCell = editableGrid.activateCellUsingDoubleClick(0, PASTE_ML);
 
@@ -777,7 +777,7 @@ public class EditableGridTest extends BaseWebDriverTest
                 .perform();
 
         // This should scroll the last cell into view.
-        editableGrid.getCell(0, lastColumnName).click();
+        editableGrid.getCell(0, lastColumn).click();
 
         checker().verifyTrue("TextArea should have gone away after clicking out of the edit cell.",
                 shortWait().until(ExpectedConditions.stalenessOf(editCell)).booleanValue());
@@ -805,7 +805,7 @@ public class EditableGridTest extends BaseWebDriverTest
 
         log("Enter many short lines.");
         editableGrid.addRows(1);
-        scrollIntoView(editableGrid.getCell(0, lastColumnName));
+        scrollIntoView(editableGrid.getCell(0, lastColumn));
 
         editCell = editableGrid.activateCellUsingDoubleClick(0, PASTE_ML);
 
@@ -829,7 +829,7 @@ public class EditableGridTest extends BaseWebDriverTest
         checker().verifyTrue("TextArea should have gone away after hitting <Enter>.",
                 shortWait().until(ExpectedConditions.stalenessOf(editCell)).booleanValue());
 
-        scrollIntoView(editableGrid.getCell(0, lastColumnName));
+        scrollIntoView(editableGrid.getCell(0, lastColumn));
 
         WebElement updatedGridCell03 = editableGrid.getCell(0, PASTE_ML);
         checker().verifyTrue("Cell not updated with many short lines.",
@@ -853,7 +853,7 @@ public class EditableGridTest extends BaseWebDriverTest
 
         log("Validate <esc> exits edit mode and does not save.");
         editableGrid.addRows(1);
-        scrollIntoView(editableGrid.getCell(0, lastColumnName));
+        scrollIntoView(editableGrid.getCell(0, lastColumn));
 
         editCell = editableGrid.activateCellUsingDoubleClick(0, PASTE_ML);
 
@@ -877,7 +877,7 @@ public class EditableGridTest extends BaseWebDriverTest
         checker().verifyTrue("TextArea should have gone away after hitting <Esc>.",
                 shortWait().until(ExpectedConditions.stalenessOf(editCell)).booleanValue());
 
-        scrollIntoView(editableGrid.getCell(0, lastColumnName));
+        scrollIntoView(editableGrid.getCell(0, lastColumn));
 
         WebElement updatedGridCell04 = editableGrid.getCell(0, PASTE_ML);
         checker().verifyTrue("Cell should not be updated after hitting <esc>.",
@@ -914,7 +914,7 @@ public class EditableGridTest extends BaseWebDriverTest
                 .verifyEquals("There should be no grid cells already selected. Fatal error.",
                         0, editableGrid.getSelectedCells().size());
 
-        List<String> columns = editableGrid.getColumnNames();
+        List<String> columns = editableGrid.getColumnLabels();
         int column = columns.size() / 2;
 
         int startRow = 4;
@@ -1027,7 +1027,7 @@ public class EditableGridTest extends BaseWebDriverTest
                 .verifyEquals("There should be no grid cells already selected. Fatal error.",
                         0, editableGrid.getSelectedCells().size());
 
-        List<String> columns = editableGrid.getColumnNames();
+        List<String> columns = editableGrid.getColumnLabels();
         int startColumn = columns.indexOf(PASTE_1);
 
         int gridRow = 4;
@@ -1165,7 +1165,7 @@ public class EditableGridTest extends BaseWebDriverTest
                 .verifyEquals("There should be no grid cells already selected. Fatal error.",
                         0, editableGrid.getSelectedCells().size());
 
-        List<String> columns = editableGrid.getColumnNames();
+        List<String> columns = editableGrid.getColumnLabels();
         int startColumn = columns.indexOf("Description");
 
         int startRow = 5;
@@ -1275,7 +1275,7 @@ public class EditableGridTest extends BaseWebDriverTest
         checker().verifyEquals("Number of cells selected not as expected.",
                 expectedSelectedCount, selectedSizeAfter);
 
-        List<String> columnNames = editableGrid.getColumnNames();
+        List<String> columnNames = editableGrid.getColumnLabels();
 
         for(int colIndex = startCol; colIndex <= endCol; colIndex++)
         {
@@ -1560,8 +1560,8 @@ public class EditableGridTest extends BaseWebDriverTest
         actionPaste(null, rowsToString(clipRows));
 
         // Scroll one column to the right into view, this will help ensure the REQ_LOOKUP_FIELD_NAME is within the viewport.
-        var index = testGrid.getColumnNames().indexOf(REQ_LOOKUP_FIELD_NAME + " *") + 1;
-        scrollIntoView(testGrid.getCell(0, testGrid.getColumnNames().get(index)));
+        var index = testGrid.getColumnLabels().indexOf(REQ_LOOKUP_FIELD_NAME + " *") + 1;
+        scrollIntoView(testGrid.getCell(0, testGrid.getColumnLabels().get(index)));
 
         WebElement fillFrom = testGrid.getCell(0, REQ_LOOKUP_FIELD_NAME + " *");
         WebElement fillTo = testGrid.getCell(2, REQ_LOOKUP_FIELD_NAME + " *");

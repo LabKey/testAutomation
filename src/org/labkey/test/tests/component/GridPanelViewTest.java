@@ -919,7 +919,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
         customizeModal.clickUpdateGrid();
 
         log(String.format("Validate that the order of the fields in the grid, specifically that '%s' is after '%s'.", columnToAdd, selectedColumn));
-        List<String> columns = grid.getColumnNames();
+        List<String> columns = grid.getColumnLabels();
         checker().verifyTrue("Order of column headers in grid is not as expected.",
                 Collections.indexOfSubList(columns, Arrays.asList(selectedColumn, columnToAdd)) >= 0);
 
@@ -1032,7 +1032,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
         log("Validate that the grid shows the new field with the updated label.");
 
         checker().verifyTrue(String.format("Did not find the field labeled '%s' in the grid.", newFieldLabel),
-                grid.getColumnNames().contains(newFieldLabel));
+                grid.getColumnLabels().contains(newFieldLabel));
 
     }
 
@@ -1256,7 +1256,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
                 .clickUpdateGrid();
 
         checker().verifyEquals("Grid columns not as expected after removing all, and adding back a field.",
-                List.of(COL_STRING1), grid.getColumnNames());
+                List.of(COL_STRING1), grid.getColumnLabels());
 
     }
 
@@ -1291,7 +1291,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
     {
         checker().setErrorMark();
 
-        List<String> actualColumns = grid.getColumnNames();
+        List<String> actualColumns = grid.getColumnLabels();
 
         checker().verifyEqualsSorted("Grid columns not as expected.",
                 expectedColumns.keySet(), actualColumns);

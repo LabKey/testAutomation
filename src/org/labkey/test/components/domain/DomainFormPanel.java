@@ -496,7 +496,7 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
 
     public List<String> getSummaryModeColumns()
     {
-        var rawColumns = getSummaryModeGrid().getColumnNames();
+        var rawColumns = getSummaryModeGrid().getColumnLabels();
         return rawColumns.subList(1, rawColumns.size());    // omit the 'select' column, it is an empty value
     }
 

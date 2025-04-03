@@ -245,7 +245,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
      */
     public FieldSelectionDialog insertColumn()
     {
-        return insertColumn(getColumnNames().get(0));
+        return insertColumn(getColumnLabels().get(0));
     }
 
     /**
@@ -498,7 +498,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
      */
     public List<GridRow> getSelectedRows()
     {
-        elementCache().getColumnNames();     // force-initialize the element cache, wait for loaded
+        elementCache().getColumnLabels();     // force-initialize the element cache, wait for loaded
         return new GridRow.GridRowFinder(this).findAll(this)
                 .stream().filter(GridRow::isSelected).collect(Collectors.toList());
     }
@@ -612,9 +612,9 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
      *
      * @return a List&#60;String&#62; containing the text of each column header
      */
-    public List<String> getColumnNames()
+    public List<String> getColumnLabels()
     {
-        return elementCache().getColumnNames();
+        return elementCache().getColumnLabels();
     }
 
     /**
@@ -706,7 +706,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
 
     /** The responsiveGrid now supports redacting fields
      *
-     * @param columnText the column name.  (uses starts-with matching)
+     * @param columnText the column label.  (uses starts-with matching)
      * @return  true if the specified grid header cell has the 'phi-protected' class on it
      */
     public boolean getColumnPHIProtected(String columnText)
@@ -816,11 +816,11 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
             return headerCells.get(headerText);
         }
 
-        protected List<String> columnNames;
+        protected List<String> columnLabels;
         protected Map<String, ColumnIndex> indexes;
         protected Map<String, ColumnIndex> initColumnsAndIndices()
         {
-            if (columnNames == null || indexes == null)
+            if (columnLabels == null || indexes == null)
             {
                 List<WebElement> headerCellElements = Locators.headerCells.findElements(this);
                 int offset = 0;
@@ -829,12 +829,12 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
                     headerCellElements.remove(0);
                     offset = 1;
                 }
-                columnNames = getWrapper().getTexts(headerCellElements);
+                columnLabels = getWrapper().getTexts(headerCellElements);
                 indexes = new HashMap<>();
                 for (int i = 0; i < headerCellElements.size(); i++)
                 {
-                    headerCells.put(columnNames.get(i), headerCellElements.get(i)); // Fill out the headerCells Map since we have them all
-                    indexes.put(columnNames.get(i), new ColumnIndex(columnNames.get(i), i+offset, i));
+                    headerCells.put(columnLabels.get(i), headerCellElements.get(i)); // Fill out the headerCells Map since we have them all
+                    indexes.put(columnLabels.get(i), new ColumnIndex(columnLabels.get(i), i+offset, i));
                 }
             }
             return indexes;
@@ -851,10 +851,10 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
             return columnIndex.getRawIndex();
         }
 
-        protected List<String> getColumnNames()
+        protected List<String> getColumnLabels()
         {
             initColumnsAndIndices();
-            return columnNames;
+            return columnLabels;
         }
 
         protected List<Map<String, String>> mapList;
