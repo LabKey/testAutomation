@@ -1,7 +1,6 @@
 package org.labkey.test.tests.wiki;
 
 import org.jetbrains.annotations.Nullable;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -54,7 +53,7 @@ public class WikiCspTest extends BaseWebDriverTest
     }
 
     @Override
-    protected void checkLeaks()
+    protected void checkLinks()
     {
         // No-op to avoid triggering the CSP violation during the crawl
     }
