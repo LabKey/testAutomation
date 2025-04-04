@@ -105,10 +105,25 @@ public class TestDataUtils
             () -> new FieldDefinition("OD/DCW factor", FieldDefinition.ColumnType.String),
             () -> new FieldDefinition("Age (years)", FieldDefinition.ColumnType.Integer)
     );
+    public static final List<String> REALISTIC_PLATE_NAMES = List.of(
+            "123456.01",
+            "Example Plate (96-well)",
+            "2024-01-01 Luminex Plate #1",
+            "Study ABC Serum/Plasma",
+            "- Plate 1 this one is from an instrument file",
+            "Miniprep Quant BL 18JAN2023",
+            "CIS43LS ABCD PK Pre-Qual Run 3",
+            TestDataGenerator.randomFieldName("plate name")
+    );
 
     private TestDataUtils()
     {
         // Utility class. Do not instantiate.
+    }
+
+    public static String getRealisticPlateName()
+    {
+        return REALISTIC_PLATE_NAMES.get(TestDataGenerator.randomInt(0, REALISTIC_PLATE_NAMES.size()));
     }
 
     public static List<Map<String, Object>> rowMapsFromTsv(String tsvString) throws IOException
