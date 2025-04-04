@@ -116,6 +116,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -460,6 +461,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         String browserVersion = caps.getBrowserVersion();
         log("Browser: " + browserName + " " + browserVersion);
         log("Started browser with TZ = " + targetBrowserTimeZone + (targetBrowserTimeZone != ZoneId.systemDefault() ? "" : " (system default)"));
+        log(String.format("charset is %s", Charset.defaultCharset().displayName()));
 
         return result;
     }
