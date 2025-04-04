@@ -13,6 +13,7 @@ import org.labkey.test.components.react.ReactDateTimePicker;
 import org.labkey.test.components.react.ReactSelect;
 import org.labkey.test.components.ui.entities.EntityBulkInsertDialog;
 import org.labkey.test.components.ui.entities.EntityBulkUpdateDialog;
+import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.selenium.ScrollUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
@@ -527,6 +528,20 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
             }
         }
         return gridCell;
+    }
+
+    public void setEntityData(List<Map<String, Object> >data, List<FieldDefinition> fields)
+    {
+        for (int i = 0; i < data.size(); i++)
+        {
+            Map<String, Object> rowData = data.get(i);
+            for (FieldDefinition field : fields) {
+                String key = field.getLabel() != null ? field.getLabel() : field.getName();
+                Object value = rowData.get(key);
+                if (value != null)
+                    setCellValue(i, key, value);
+            }
+        }
     }
 
     public EditableGrid setRecordValues(List<Map<String, Object>> rowValues)
