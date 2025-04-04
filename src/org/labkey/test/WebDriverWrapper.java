@@ -1321,7 +1321,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return (String)executeScript("return LABKEY.container.id;");
     }
 
-    public String getCurrentContainerName()
+    public String getCurrentContainer()
     {
         return (String)executeScript("return LABKEY.container.name;");
     }
