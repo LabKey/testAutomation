@@ -81,6 +81,12 @@ public class ManageSampleStatusesPanel extends WebDriverComponent<ManageSampleSt
         return selectStatus(name, null);
     }
 
+    public boolean isStatusLocked(String name)
+    {
+        selectStatus(name);
+        return isLocked();
+    }
+
     public SampleStatus selectStatus(String name, SampleTypeHelper.StatusType statusType)
     {
         elementCache().statusItem(name).click();
