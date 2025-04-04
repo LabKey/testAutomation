@@ -1,6 +1,5 @@
 package org.labkey.test.components.ui.entities;
 
-import org.labkey.api.query.QueryKey;
 import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
@@ -62,18 +61,18 @@ public class EntityBulkUpdateDialog extends ModalDialog
     }
 
     // For use when the field is of an unknown type, as can occur in fuzz tests
-    public void setValue(FieldDefinition field, Object newValue, EntityBulkUpdateDialog bulkEditDialog)
+    public void setValue(FieldDefinition field, Object newValue)
     {
         if (field.getType() == FieldDefinition.ColumnType.TextChoice)
-            bulkEditDialog.setSelectionField(EscapeUtil.fieldKeyEncodePart(field.getName()), newValue instanceof String ? List.of((String) newValue) : (List<String>) newValue);
+            setSelectionField(EscapeUtil.fieldKeyEncodePart(field.getName()), newValue instanceof String ? List.of((String) newValue) : (List<String>) newValue);
         else if (field.getType() == FieldDefinition.ColumnType.Integer || field.getType() == FieldDefinition.ColumnType.Decimal || field.getType() == FieldDefinition.ColumnType.Double)
-            bulkEditDialog.setNumericField(EscapeUtil.fieldKeyEncodePart(field.getName()), String.valueOf(newValue));
+            setNumericField(EscapeUtil.fieldKeyEncodePart(field.getName()), String.valueOf(newValue));
         else if (field.getType() == FieldDefinition.ColumnType.Date || field.getType() == FieldDefinition.ColumnType.DateAndTime || field.getType() == FieldDefinition.ColumnType.Time)
-            bulkEditDialog.setCustomDateField(EscapeUtil.fieldKeyEncodePart(field.getName()), (String) newValue);
+            setDateField(field.getLabel() == null ? field.getName() : field.getLabel(), (String) newValue);
         else if (field.getType() == FieldDefinition.ColumnType.Boolean)
-            bulkEditDialog.setBooleanField(EscapeUtil.fieldKeyEncodePart(field.getName()), (Boolean) newValue);
+            setBooleanField(EscapeUtil.fieldKeyEncodePart(field.getName()), (Boolean) newValue);
         else
-            bulkEditDialog.setTextField(EscapeUtil.fieldKeyEncodePart(field.getName()), (String) newValue);
+            setTextField(EscapeUtil.fieldKeyEncodePart(field.getName()), (String) newValue);
     }
 
     // interact with selection fields
@@ -136,12 +135,6 @@ public class EntityBulkUpdateDialog extends ModalDialog
     public EntityBulkUpdateDialog setDateField(String fieldLabel, String dateString)
     {
         enableAndWait(fieldLabel, elementCache().dateInput(fieldLabel)).set(dateString);
-        return this;
-    }
-
-    public EntityBulkUpdateDialog setCustomDateField(String fieldKey, String dateString)
-    {
-        enableAndWait(fieldKey, elementCache().dateInput(fieldKey)).set(dateString);
         return this;
     }
 
