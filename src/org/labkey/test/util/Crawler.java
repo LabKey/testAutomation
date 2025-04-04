@@ -1190,7 +1190,7 @@ public class Crawler
 
     private boolean doesUrlExist(UrlToCheck urlToCheck)
     {
-        final String url = stripQueryParams(urlToCheck.getRelativeURL());
+        final String url = WebTestHelper.makeAbsoluteUrl(stripQueryParams(urlToCheck.getRelativeURL()));
 
         // Check whether 404 was due to a missing action
         HttpContext context = WebTestHelper.getBasicHttpContext();
