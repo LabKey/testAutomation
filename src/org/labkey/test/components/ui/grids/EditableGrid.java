@@ -886,8 +886,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
                 .build()
                 .perform();
 
-        return (String) Toolkit.getDefaultToolkit().getSystemClipboard()
-                .getData(DataFlavor.stringFlavor);
+        return getWrapper().getClipboardContent();
     }
 
     public void dragFill(WebElement startCell, WebElement endCell)
