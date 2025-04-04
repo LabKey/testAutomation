@@ -975,16 +975,6 @@ public abstract class Locator extends By
         return Quotes.escape(value);
     }
 
-    /**
-     * Equivalent to XPath {@code normalize-space()}:<br>
-     * "The normalize-space function strips leading and trailing white-space from a string, replaces sequences of
-     * whitespace characters by a single space, and returns the resulting string."
-     */
-    private static String ns(String value)
-    {
-        return value.replaceAll("\\s+", " ").trim();
-    }
-
     public static String cq(String value)
     {
         return "\"" + value.replace("\\", "\\\\").replace("\"", "\\\"") + "\"";
@@ -1199,7 +1189,7 @@ public abstract class Locator extends By
         public XPathLocator containing(String contains)
         {
             if (contains != null && !contains.isEmpty())
-                return this.withPredicate("contains(normalize-space(), " + xq(ns(contains)) + ")");
+                return this.withPredicate("contains(normalize-space(), "+xq(contains)+")");
             else
                 return this;
         }
@@ -1207,20 +1197,20 @@ public abstract class Locator extends By
         public XPathLocator containingIgnoreCase(String contains)
         {
             if (contains != null && !contains.isEmpty())
-                return this.withPredicate("contains(translate(normalize-space(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), "+ xq(ns(contains.toLowerCase())) + ")");
+                return this.withPredicate("contains(translate(normalize-space(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), "+xq(contains.toLowerCase())+")");
             else
                 return this;
         }
 
         public XPathLocator notContaining(String contains)
         {
-            return this.withPredicate("not(contains(normalize-space(), " + xq(ns(contains)) + "))");
+            return this.withPredicate("not(contains(normalize-space(), "+xq(contains)+"))");
         }
 
         public XPathLocator notContainingIgnoreCase(String contains)
         {
             if (contains != null && !contains.isEmpty())
-                return this.withPredicate("not(contains(translate(normalize-space(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), " + xq(ns(contains.toLowerCase())) + "))");
+                return this.withPredicate("not(contains(translate(normalize-space(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), "+xq(contains.toLowerCase())+"))");
             else
                 return this;
         }
@@ -1228,7 +1218,7 @@ public abstract class Locator extends By
         @Override
         public XPathLocator withText(String text)
         {
-            return this.withPredicate("normalize-space()=" + xq(ns(text)));
+            return this.withPredicate("normalize-space()="+xq(text));
         }
 
         public XPathLocator withText()
@@ -1238,7 +1228,7 @@ public abstract class Locator extends By
 
         public XPathLocator withoutText(String text)
         {
-            return this.withPredicate("not(normalize-space()=" + xq(ns(text)) + ")");
+            return this.withPredicate("not(normalize-space()=" + xq(text) + ")");
         }
 
         public XPathLocator withoutText()
@@ -1253,12 +1243,12 @@ public abstract class Locator extends By
 
         public XPathLocator startsWith(String text)
         {
-            return this.withPredicate("starts-with(normalize-space(), " + xq(ns(text)) + ")");
+            return this.withPredicate("starts-with(normalize-space(), "+xq(text)+")");
         }
 
         public XPathLocator startsWithIgnoreCase(String text)
         {
-            return this.withPredicate("starts-with(translate(normalize-space(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), "+ xq(ns(text.toLowerCase())) +")");
+            return this.withPredicate("starts-with(translate(normalize-space(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), "+xq(text.toLowerCase())+")");
         }
 
         @Override
@@ -1414,7 +1404,7 @@ public abstract class Locator extends By
 
         public XPathLocator endsWith(String substring)
         {
-            return this.endsWith("normalize-space()", ns(substring));
+            return this.endsWith("normalize-space()", substring);
         }
 
         private XPathLocator endsWith(String expression, String substring)
@@ -1827,6 +1817,6 @@ public abstract class Locator extends By
 
     private static String normalizeCssClass(String cssClass)
     {
-        return StringUtils.strip(ns(cssClass), " .");
+        return StringUtils.strip(cssClass, " .");
     }
 }
