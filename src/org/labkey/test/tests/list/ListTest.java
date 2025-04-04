@@ -72,6 +72,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -509,7 +510,7 @@ public class ListTest extends BaseWebDriverTest
     /* Issue 51572: Bug with creating a new list by uploading a csv file in "UTF-8 with BOM" format
      */
     @Test
-    public void testCreateListWithBOMFile()
+    public void testCreateListWithBOMFile() throws IOException
     {
         String listName = TestDataGenerator.randomDomainName("From BOM File", 4);
         File bomFile = TestFileUtils.getSampleData("lists/TestUTF8_BOM.csv");
@@ -529,8 +530,10 @@ public class ListTest extends BaseWebDriverTest
                 new FieldDefinition("C", ColumnType.String)
         );
 
-        int rows = 10;
-        int columns = 4;
+        // First line of the file are the column headers.
+        int rows = (int) Files.lines(bomFile.toPath()).count() - 1;
+        int columns = fields.size();
+
         String[][] data = new String[rows][columns];
 
         for (int i = 0; i < rows; i++) {
