@@ -1,6 +1,7 @@
 package org.labkey.test.components.ui.grids;
 
 import org.junit.Assert;
+import org.labkey.api.query.QueryKey;
 import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
@@ -417,16 +418,19 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
     }
 
     // For use when the field is of an unknown type, as can occur in fuzz tests
-    public void setDetails(FieldDefinition field, Object newValue, DetailTableEdit editTable)
+    public void setDetails(FieldDefinition field, Object newValue)
     {
+        if (newValue == null)
+            return;
+
         if (field.getType() == FieldDefinition.ColumnType.TextChoice)
-            editTable.setSelectValue(field.getName(), (List<String>) newValue);
+            setSelectValue(field.getLabel(), (List<String>) newValue);
         else if (field.getType() == FieldDefinition.ColumnType.Date || field.getType() == FieldDefinition.ColumnType.DateAndTime || field.getType() == FieldDefinition.ColumnType.Time)
-            editTable.setDateTimeField(field.getName(), newValue);
+            setDateTimeField(QueryKey.encodePart(field.getName()), newValue);
         else if (field.getType() == FieldDefinition.ColumnType.Boolean)
-            editTable.setBooleanField(field.getName(), (Boolean) newValue);
+            setBooleanField(field.getLabel(), (Boolean) newValue);
         else
-            editTable.setTextField(field.getName(), String.valueOf(newValue));
+            setTextField(field.getLabel(), String.valueOf(newValue));
     }
 
     /**
