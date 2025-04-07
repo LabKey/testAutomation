@@ -212,14 +212,13 @@ public class TestDataUtils
                                     char delimiter, boolean includeHeaders)
     {
         StringBuilder builder = new StringBuilder();
+        TsvQuoter q = new TsvQuoter(delimiter);
 
         if (includeHeaders)
         {
-            builder.append(String.join(String.valueOf(delimiter), columns));
+            builder.append(String.join(String.valueOf(delimiter), columns.stream().map(q::quoteValue).toList()));
             builder.append("\n");
         }
-
-        TsvQuoter q = new TsvQuoter(delimiter);
 
         for (Map<String, Object> row : rowMaps)
         {
