@@ -112,8 +112,7 @@ public class TestDataUtils
             "Study ABC Serum/Plasma",
             "- Plate 1 this one is from an instrument file",
             "Miniprep Quant BL 18JAN2023",
-            "CIS43LS ABCD PK Pre-Qual Run 3",
-            TestDataGenerator.randomFieldName("plate name")
+            "CIS43LS ABCD PK Pre-Qual Run 3"
     );
 
     private TestDataUtils()
