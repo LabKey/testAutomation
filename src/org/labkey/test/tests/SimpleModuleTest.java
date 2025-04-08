@@ -467,6 +467,8 @@ public class SimpleModuleTest extends BaseWebDriverTest
         assertTextPresentInThisOrder("A customized web part", "Data Pipeline", "Experiment Runs", "Sample Type", "Assay List");
         assertTextPresent("Run Groups");
         assertElementNotPresent(Locator.linkWithText("Create Run Group")); // Not in small Run Groups web-part.
+        // ensure the mouse isn't inadvertently hovering something else, causing obscuring popup
+        mouseOver(portalHelper.getBodyWebPart("A customized web part").getComponentElement());
         portalHelper.checkWebpartPermission("A customized web part", "Read", null);
         portalHelper.checkWebpartPermission("Data Pipeline", "Read", null);
     }
@@ -1050,7 +1052,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
     {
         log("Testing web parts in modules...");
         //go to project portal
-        clickProject(getProjectName());
+        goToProjectHome();
 
         //add Simple Module Web Part
         new PortalHelper(this).addWebPart("Simple Module Web Part");
@@ -1064,7 +1066,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
     protected void createList() throws Exception
     {
         //create a list for our query
-        clickProject(getProjectName());
+        goToProjectHome();
         new PortalHelper(this).addWebPart("Lists");
 
         log("Creating list for query/view/report test...");
@@ -1090,7 +1092,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         log("Testing queries in modules...");
 
         //go to query module portal
-        clickProject(getProjectName());
+        goToProjectHome();
         goToModule("Query");
         viewQueryData("lists", "TestQuery");
 
@@ -1102,7 +1104,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
     private void doTestQueryViews()
     {
         log("Testing module-based custom query views...");
-        clickProject(getProjectName());
+        goToProjectHome();
         clickAndWait(Locator.linkWithText(LIST_NAME));
 
         DataRegionTable table = new DataRegionTable("query", getDriver());
@@ -1133,13 +1135,13 @@ public class SimpleModuleTest extends BaseWebDriverTest
         _rReportHelper.ensureRConfig();
 
         log("Testing module-based JS reports...");
-        clickProject(getProjectName());
+        goToProjectHome();
         clickAndWait(Locator.linkWithText(LIST_NAME));
         DataRegionTable table = new DataRegionTable("query", getDriver());
         table.goToReport("Want To Be Cool");
         waitForText(WAIT_FOR_JAVASCRIPT, "Less cool than expected. Loaded dependent scripts.");
 
-        clickProject(getProjectName());
+        goToProjectHome();
         portalHelper.addWebPart("Report");
         setFormElement(Locator.name("title"), "Report Tester Part");
         selectOptionByValue(Locator.name("reportId"), "module:simpletest/reports/schemas/lists/People/Less Cool JS Report.js");
@@ -1241,7 +1243,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         log("Testing import templates...");
 
         //go to query module portal
-        clickProject(getProjectName());
+        goToProjectHome();
         goToModule("Query");
         viewQueryData(VEHICLE_SCHEMA, "Vehicles");
         DataRegionTable table = new DataRegionTable("query", getDriver());
@@ -1848,7 +1850,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
     private void doTestRestrictedModule()
     {
         log("Create folder with restricted");
-        clickProject(getProjectName());
+        goToProjectHome();
         _containerHelper.createSubfolder(getProjectName(), RESTRICTED_FOLDER_NAME, RESTRICTED_FOLDER_TYPE);
         PortalHelper portalHelper = new PortalHelper(this);
         portalHelper.addWebPart("Restricted Module Web Part");
@@ -1860,7 +1862,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         impersonateRole("Reader");
         assertTextPresent("This is a web part view in the restricted module.");     // Can still see web part
         stopImpersonating();
-        clickProject(getProjectName());
+        goToProjectHome();
         navigateToFolder(getProjectName(), RESTRICTED_FOLDER_NAME);
         impersonateRole("Folder Administrator");
         goToFolderManagement();
