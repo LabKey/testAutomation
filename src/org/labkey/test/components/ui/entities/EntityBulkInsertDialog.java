@@ -10,6 +10,8 @@ import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.components.react.FilteringReactSelect;
 import org.labkey.test.components.react.ReactDateTimePicker;
+import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.util.EscapeUtil;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -17,6 +19,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class EntityBulkInsertDialog extends ModalDialog
@@ -215,6 +218,27 @@ public class EntityBulkInsertDialog extends ModalDialog
     public String getFieldWithId(String id)
     {
         return getWrapper().getFormElement(Locator.tagWithId("input", id));
+    }
+
+    public void setInsertFieldValues(List<FieldDefinition> fields, Map<String, Object> data)
+    {
+        for (FieldDefinition field : fields)
+        {
+            String fieldKey = EscapeUtil.fieldKeyEncodePart(field.getName());
+            Object value = data.get(field.getLabel() != null ? field.getLabel() : FieldDefinition.labelFromName(field.getName()));
+            if (value == null)
+                continue;
+            if (field.getType() == FieldDefinition.ColumnType.Boolean)
+                setBooleanField(fieldKey, (Boolean) value);
+            else if (field.getType() == FieldDefinition.ColumnType.Integer || field.getType() == FieldDefinition.ColumnType.Decimal || field.getType() == FieldDefinition.ColumnType.Double)
+                setNumericField(fieldKey, String.valueOf(value));
+            else if (field.getType() == FieldDefinition.ColumnType.Date || field.getType() == FieldDefinition.ColumnType.DateAndTime || field.getType() == FieldDefinition.ColumnType.Time)
+                setDateTimeField(field.getName(), value, fieldKey);
+            else if (field.getType() == FieldDefinition.ColumnType.TextChoice)
+                setSelectionField(field.getLabel(), (List<String>) value);
+            else
+                setTextField(fieldKey, (String) value);
+        }
     }
 
     /**
