@@ -1,4 +1,4 @@
-package org.labkey.test.tests;
+package org.labkey.test.tests.list;
 
 import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
@@ -48,7 +48,7 @@ public class ListArchiveExportTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject() throws IOException, CommandException
     {
-        ListArchiveExportTest initTest = (ListArchiveExportTest) getCurrentTest();
+        ListArchiveExportTest initTest = getCurrentTest();
         initTest.doSetUp();
     }
 
