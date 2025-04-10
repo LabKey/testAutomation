@@ -79,36 +79,6 @@ public class FolderFormatsPage extends BaseSettingsPage
         setInherited("defaultNumberFormatInherited", enable);
     }
 
-    public boolean getAdditionalParsingPatternDatesInherited()
-    {
-        return getInherited("extraDateParsingPatternInherited");
-    }
-
-    public void setAdditionalParsingPatternDatesInherited(boolean enable)
-    {
-        setInherited("extraDateParsingPatternInherited", enable);
-    }
-
-    public boolean getAdditionalParsingPatternDateAndTimeInherited()
-    {
-        return getInherited("extraDateTimeParsingPatternInherited");
-    }
-
-    public void setAdditionalParsingPatternDateAndTimeInherited(boolean enable)
-    {
-        setInherited("extraDateTimeParsingPatternInherited", enable);
-    }
-
-    public boolean getAdditionalParsingPatternTimesInherited()
-    {
-        return getInherited("extraTimeParsingPatternInherited");
-    }
-
-    public void setAdditionalParsingPatternTimesInherited(boolean enable)
-    {
-        setInherited("extraTimeParsingPatternInherited", enable);
-    }
-
     public boolean getRestrictChartingColsInherited()
     {
         return getInherited("restrictedColumnsEnabledInherited");

@@ -56,7 +56,7 @@ public class WikiCspTest extends BaseWebDriverTest
     }
 
     @Override
-    protected void checkLeaks()
+    protected void checkLinks()
     {
         // No-op to avoid triggering the CSP violation during the crawl
     }
