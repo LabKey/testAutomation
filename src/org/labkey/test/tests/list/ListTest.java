@@ -530,24 +530,16 @@ public class ListTest extends BaseWebDriverTest
                 new FieldDefinition("C", ColumnType.String)
         );
 
-        // First line of the file are the column headers.
-        int rows = (int) Files.lines(bomFile.toPath()).count() - 1;
-        int columns = fields.size();
-
-        String[][] data = new String[rows][columns];
-
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < columns; j++) {
-                data[i][j] = switch (j)
-                {
-                    case 0 -> Integer.toString(i + 101);
-                    case 1 -> String.format("A%d", i + 2);
-                    case 2 -> String.format("B%d", i + 2);
-                    case 3 -> String.format("C%d", i + 2);
-                    default -> throw new IllegalStateException("Unexpected value: " + j);
-                };
-            }
-        }
+        String [][] data = { {"101","A2","B2","C2"},
+                {"102","A3","B3","C3"},
+                {"103","A4","B4","C4"},
+                {"104","A5","B5","C5"},
+                {"105","A6","B6","C6"},
+                {"106","A7","B7","C7"},
+                {"107","A8","B8","C8"},
+                {"108","A9","B9","C9"},
+                {"109","A10","B10","C10"},
+                {"110","A11","B11","C11"} };
 
         _listHelper.verifyListData(fields, data, checker());
 
@@ -952,6 +944,7 @@ public class ListTest extends BaseWebDriverTest
         assertEquals("remoteAPIAfterRename", saveResponse.getDomain().getName());
     }
 
+    // Issue 52694 Links broken to list, data classes from the (list)-begin.view page if their names end with a /
     @Test
     public void testChangeListName()
     {
@@ -1278,8 +1271,8 @@ public class ListTest extends BaseWebDriverTest
         String listName = "new";
 
         // Issue 52480
-        String origFieldName = ": random 1 /@\".";
-        String newFieldName = "random 1";
+        String origFieldName = ": Some Field Name 1 /@\".";
+        String newFieldName = "Some Field Name 1";
 
         String invalidListName = TestDataGenerator.randomInvalidDomainName(null, 0, 5);
         EditListDefinitionPage listDefinitionPage = _listHelper.beginCreateList(PROJECT_VERIFY, invalidListName);
@@ -1798,14 +1791,18 @@ public class ListTest extends BaseWebDriverTest
         List<String> actualFields = Locator.tagWithClass("td", "lk-form-label").findElements(getDriver()).stream().map(WebElement::getText).toList();
 
         List<String> expectedFields = new ArrayList<>();
-        // Replace the _ with a space and add a : at the end.
+
+        // Add the expected files in the expected display order.
         if (!autoKey)
         {
-            expectedFields.add(keyField.replace("_", " ") + ":");
+            expectedFields.add(keyField);
         }
 
-        expectedFields.add(intField.replace("_", " ") + ":");
-        expectedFields.add(trickyField.replace("_", " ") + ":");
+        expectedFields.add(intField);
+        expectedFields.add(trickyField);
+
+        // Replace the _ with a space and add a : at the end.
+        expectedFields.replaceAll(f -> f.replace("_", " ") + ":");
 
         for (int i = 0; i < expectedFields.size(); i++)
         {
