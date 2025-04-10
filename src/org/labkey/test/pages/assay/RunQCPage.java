@@ -16,6 +16,7 @@
 package org.labkey.test.pages.assay;
 
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.PlateGrid;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.selenium.LazyWebElement;
@@ -33,6 +34,14 @@ public class RunQCPage<EC extends RunQCPage.ElementCache> extends LabKeyPage<EC>
     public RunQCPage(WebDriver driver){
         super(driver);
         _driver = driver;
+    }
+
+    @Override
+    protected void waitForPage()
+    {
+        Locator waitMsg = Locator.tagWithClass("div", "x4-mask-msg-text").withText("Requesting QC information");
+        WebDriverWrapper.waitFor(()-> !waitMsg.isDisplayed(getDriver()),
+                "Took too long to display the page", WAIT_FOR_JAVASCRIPT);
     }
 
     public WebElement getSpecimenSection(String sectionTitle)
@@ -74,7 +83,7 @@ public class RunQCPage<EC extends RunQCPage.ElementCache> extends LabKeyPage<EC>
         String xpath = elementCache().PLATE_CONTROLS_VALUES_XPATH.replace("$", plateTitle);
         for(String value : valuesToIgnore)
         {
-            click(Locator.xpath(xpath + "//label[text()='" + value + "']"));
+            waitAndClick(Locator.xpath(xpath + "//label[text()='" + value + "']"));
         }
     }
 
@@ -83,7 +92,7 @@ public class RunQCPage<EC extends RunQCPage.ElementCache> extends LabKeyPage<EC>
         String xpath = elementCache().DILUTION_SUMMARY_VALUES_XPATH.replace("$", sectionTitle);
         for(String value : valuesToIgnore)
         {
-            click(Locator.xpath(xpath + "//label[text()='" + value + "']"));
+            waitAndClick(Locator.xpath(xpath + "//label[text()='" + value + "']"));
         }
     }
 
