@@ -355,6 +355,29 @@ public class WebTestHelper
         return StringUtils.stripStart(url, "/");
     }
 
+    /**
+     * Append the test server's base URL to the front of a relative URL. Absolute URLs will be returned unchanged.
+     * @param url Absolute or relative URL
+     * @return Absolute URL
+     */
+    public static String makeAbsoluteUrl(String url)
+    {
+        if (isAbsoluteUrl(url))
+        {
+            return url;
+        }
+        else
+        {
+            StringBuilder sb = new StringBuilder(getBaseURL());
+            if (!url.startsWith("/"))
+            {
+                sb.append("/");
+            }
+            sb.append(url);
+            return sb.toString();
+        }
+    }
+
     public static boolean isAbsoluteUrl(String url)
     {
         return url.startsWith("http://") || url.startsWith("https://");
