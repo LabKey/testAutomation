@@ -122,7 +122,7 @@ public class TestDataUtils
 
     public static String getRealisticPlateName()
     {
-        return REALISTIC_PLATE_NAMES.get(TestDataGenerator.randomInt(0, REALISTIC_PLATE_NAMES.size()));
+        return REALISTIC_PLATE_NAMES.get(TestDataGenerator.randomInt(0, REALISTIC_PLATE_NAMES.size() - 1));
     }
 
     public static List<Map<String, Object>> rowMapsFromTsv(String tsvString) throws IOException
