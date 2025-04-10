@@ -486,7 +486,7 @@ public class ApiPermissionsHelper extends PermissionsHelper
     }
 
     @Override
-    public void setSiteAdminRoleUserPermissions(@LoggedParam String userName, @LoggedParam String permissionString)
+    public void setSiteRoleUserPermissions(@LoggedParam String userName, @LoggedParam String permissionString)
     {
         addMemberToRole(userName, permissionString, MemberType.user, "/");
     }

@@ -95,7 +95,7 @@ public class UIPermissionsHelper extends PermissionsHelper
             namesList.append(member).append("\n");
         }
 
-        _driver.log("Adding [" + namesList.toString() + "] to group " + groupName + "...");
+        _driver.log("Adding [" + namesList + "] to group " + groupName + "...");
         _driver.waitAndClickAndWait(Locator.tagContainingText("a", "manage group"));
         _driver.waitForElement(Locator.name("names"));
         _driver.uncheckCheckbox(Locator.name("sendEmail"));
@@ -190,12 +190,10 @@ public class UIPermissionsHelper extends PermissionsHelper
 
     @Override
     @LogMethod
-    public void setSiteAdminRoleUserPermissions(@LoggedParam String userName, @LoggedParam String permissionString)
+    public void setSiteRoleUserPermissions(@LoggedParam String userName, @LoggedParam String permissionString)
     {
         _driver.log(new Date().toString());
-        goToSiteGroupScreen("Administrators");
-        _driver.clickAndWait(Locator.tag("ol").append(Locator.linkContainingText("Permissions")));
-        _driver._ext4Helper.clickTabContainingText("Permissions");
+        PermissionsPage.beginAt(_driver, "/");
         _selectPermission(userName, userName, permissionString);
         _driver.log(new Date().toString());
     }
@@ -245,8 +243,6 @@ public class UIPermissionsHelper extends PermissionsHelper
 
     public void goToSiteGroupScreen(String groupName)
     {
-        if ("Administrators".equals(groupName))
-            groupName = "Site Administrators";
         _driver.ensureAdminMode();
         _driver.goToSiteGroups();
         Locator.XPathLocator groupLoc = Locator.tagWithText("div", groupName);
