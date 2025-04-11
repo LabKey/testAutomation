@@ -37,6 +37,7 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
     private final WebDriver _driver;
     private String _title;
     private int _readyTimeout = WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
+    protected int _changeCounter = 0;
 
     protected DetailTableEdit(WebElement formElement, WebDriver driver)
     {
@@ -66,6 +67,16 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
     public DetailTableEdit setReadyTimeout(int readyTimeout)
     {
         _readyTimeout = readyTimeout;
+        return this;
+    }
+
+    /**
+     * If for some reason your test set a field but it actually didn't change the value, you can use this helper
+     * to set the change counter to a specific value.
+     */
+    public DetailTableEdit setChangeCounter(int changeCounter)
+    {
+        _changeCounter = changeCounter;
         return this;
     }
 
@@ -154,6 +165,7 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
             throw new IllegalArgumentException("Field with caption '" + fieldCaption + "' is read-only. This field can not be set.");
         }
 
+        _changeCounter++;
         return this;
     }
 
@@ -164,6 +176,7 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
         Input input = Input.Input(inputloc,
                 getDriver()).waitFor();
         input.set(value);
+        _changeCounter++;
         return this;
     }
 
@@ -174,6 +187,7 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
         Input input = Input.Input(inputloc,
                 getDriver()).waitFor();
         input.set(value);
+        _changeCounter++;
         return this;
     }
 
@@ -217,6 +231,7 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
 
         checkbox.set(value);
 
+        _changeCounter++;
         return this;
     }
 
@@ -253,6 +268,7 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
         getFileField(fieldCaption)
                 .setFile(file);
 
+        _changeCounter++;
         return this;
     }
 
@@ -260,6 +276,7 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
     {
         getFileField(fieldCaption).removeFile();
 
+        _changeCounter++;
         return this;
     }
 
@@ -323,6 +340,7 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
     {
         FilteringReactSelect reactSelect = elementCache().findSelect(fieldCaption);
         selectValues.forEach(reactSelect::typeAheadSelect);
+        _changeCounter++;
         return this;
     }
 
@@ -358,6 +376,7 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
             }
         }
         select.clearSelection();
+        _changeCounter++;
         return this;
     }
 
@@ -396,6 +415,7 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
                     String.format("Unable to use type %s to set a DateTime, Date or Time field.", dateTime.getClass()));
         }
 
+        _changeCounter++;
         return this;
     }
 
@@ -409,6 +429,7 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
     {
         ReactDateTimePicker dateTimePicker = getDateTimePicker(fieldCaption);
         dateTimePicker.clear();
+        _changeCounter++;
     }
 
     private ReactDateTimePicker getDateTimePicker(String fieldCaption)
