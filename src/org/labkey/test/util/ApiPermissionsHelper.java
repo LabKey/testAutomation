@@ -441,19 +441,19 @@ public class ApiPermissionsHelper extends PermissionsHelper
     }
 
     @Override
-    public void addMemberToRole(String userOrGroupName, String permissionString, MemberType memberType)
+    public void addMemberToRole(String userOrGroupName, String roleName, MemberType memberType)
     {
-        addMemberToRole(userOrGroupName, permissionString, memberType, getContainerPath());
+        addMemberToRole(userOrGroupName, roleName, memberType, getContainerPath());
     }
 
-    public void addMemberToRole(String userOrGroupName, String permissionString, MemberType memberType, String container)
+    public void addMemberToRole(String userOrGroupName, String roleName, MemberType memberType, String container)
     {
         AddAssignmentCommand command = new AddAssignmentCommand();
         Connection connection = getConnection();
 
         Integer principalId = getPrincipalId(userOrGroupName, memberType, container);
         command.setPrincipalId(principalId);
-        command.setRoleClassName(toRole(permissionString));
+        command.setRoleClassName(toRole(roleName));
 
         try
         {
@@ -486,7 +486,7 @@ public class ApiPermissionsHelper extends PermissionsHelper
     }
 
     @Override
-    public void setSiteAdminRoleUserPermissions(@LoggedParam String userName, @LoggedParam String permissionString)
+    public void setSiteRoleUserPermissions(@LoggedParam String userName, @LoggedParam String permissionString)
     {
         addMemberToRole(userName, permissionString, MemberType.user, "/");
     }

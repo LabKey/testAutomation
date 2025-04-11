@@ -105,7 +105,7 @@ public class PermissionsTestForJavascriptExecution extends BaseWebDriverTest
         stopImpersonating();
 
         log("Adding developer role to the user");
-        _apiPermissionsHelper.setSiteAdminRoleUserPermissions(USER, "Platform Developer");
+        _apiPermissionsHelper.setSiteRoleUserPermissions(USER, "Platform Developer");
 
         log("Verifying editing metadata is success");
         goToProjectHome();

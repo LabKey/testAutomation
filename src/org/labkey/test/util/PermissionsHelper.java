@@ -118,7 +118,7 @@ public abstract class PermissionsHelper
     }
 
     @LogMethod
-    public abstract void setSiteAdminRoleUserPermissions(@LoggedParam String userName, @LoggedParam String permissionString);
+    public abstract void setSiteRoleUserPermissions(@LoggedParam String userName, @LoggedParam String permissionString);
     protected abstract void addMemberToRole(String userOrGroupName, String permissionString, MemberType memberType);
 
     public void removeSiteGroupPermission(String groupName, String permissionString)
