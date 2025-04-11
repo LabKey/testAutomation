@@ -1378,11 +1378,6 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         projectMenu().navigateToFolder(project, folderName);
     }
 
-    public String getCurrentContainer()
-    {
-        return (String) executeScript( "return LABKEY.container.title;");
-    }
-
     public void impersonateGroup(String group, boolean isSiteGroup)
     {
         navBar().userMenu().impersonateGroup(group, isSiteGroup);

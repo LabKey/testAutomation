@@ -461,7 +461,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
     @LogMethod
     private void doTestCustomFolder()
     {
-        clickProject(getProjectName());
+        goToProjectHome();
         PortalHelper portalHelper = new PortalHelper(this);
 
         assertTextPresentInThisOrder("A customized web part", "Data Pipeline", "Experiment Runs", "Sample Type", "Assay List");
