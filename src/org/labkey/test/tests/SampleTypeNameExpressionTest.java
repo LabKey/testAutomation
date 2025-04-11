@@ -389,37 +389,45 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
     {
         verifyNames(
                 "InputsExpressionTest",
-                "Name\tB\tMaterialInputs/InputsExpressionTest",
+                "Name\tFieldB\tMaterialInputs/InputsExpressionTest",
                 "${Inputs:first:defaultValue('" + DEFAULT_SAMPLE_PARENT_VALUE + "')}_${batchRandomId}",
                 null, "Pat");
 
+
+        final String urlLikeDefaultVal = "a+b%c#d";
+        verifyNames(
+                "InputsExpressionTest2",
+                "Name\tFieldB\tMaterialInputs/InputsExpressionTest2",
+                "${Inputs:first:defaultValue('" + urlLikeDefaultVal + "')}_${batchRandomId}",
+                null, "Fed", true, urlLikeDefaultVal);
+
         verifyNames(
                 "Inputs/ExpressionTest2",
-                "Name\tB\tMaterialInputs/Inputs$SExpressionTest2",
+                "Name\tFieldB\tMaterialInputs/Inputs$SExpressionTest2",
                 "${Inputs:defaultValue('" + DEFAULT_SAMPLE_PARENT_VALUE + "')}_${batchRandomId}",
                 null, "Bat", false);
 
         verifyNames(
                 "Inputs/WithDataTypeExpression",
-                "Name\tB\tMaterialInputs/Inputs/WithDataTypeExpression",
+                "Name\tFieldB\tMaterialInputs/Inputs/WithDataTypeExpression",
                 "${Inputs/Inputs$SWithDataTypeExpression:first:defaultValue('" + DEFAULT_SAMPLE_PARENT_VALUE + "')}_${batchRandomId}",
                 null, "Red");
 
         verifyNames(
                 "Inputs/WithDataTypeExpression2",
-                "Name\tB\tMaterialInputs/Inputs$SWithDataTypeExpression2",
+                "Name\tFieldB\tMaterialInputs/Inputs$SWithDataTypeExpression2",
                 "${Inputs/Inputs$SWithDataTypeExpression2:defaultValue('" + DEFAULT_SAMPLE_PARENT_VALUE + "')}_${batchRandomId}",
                 null, "Ted", false);
 
         verifyNames(
                 "Material/WithDataTypeExpression",
-                "Name\tB\tMaterialInputs/Material/WithDataTypeExpression",
+                "Name\tFieldB\tMaterialInputs/Material/WithDataTypeExpression",
                 "${MaterialInputs/Material$SWithDataTypeExpression:first:defaultValue('" + DEFAULT_SAMPLE_PARENT_VALUE + "')}_${batchRandomId}",
                 null, "Ned");
 
         verifyNames(
                 "Material/WithDataTypeExpression2",
-                "Name\tB\tMaterialInputs/Material$SWithDataTypeExpression2",
+                "Name\tFieldB\tMaterialInputs/Material$SWithDataTypeExpression2",
                 "${MaterialInputs/Material$SWithDataTypeExpression2:defaultValue('" + DEFAULT_SAMPLE_PARENT_VALUE + "')}_${batchRandomId}",
                 null, "Med", false);
 
@@ -430,7 +438,7 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
     {
         verifyNames(
                 "ParentAliasInputsExpressionTest",
-                "Name\tB\tParent",
+                "Name\tFieldB\tParent",
                 "${Parent:first:defaultValue('" + DEFAULT_SAMPLE_PARENT_VALUE + "')}_${batchRandomId}",
                 "Parent", "Jessi");
     }
@@ -490,7 +498,7 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
     {
         verifyNames(
                 "MaterialInputsExpressionWithParentAliasData",
-                "Name\tB\tParent",
+                "Name\tFieldB\tParent",
                 "${MaterialInputs:first:defaultValue('" + DEFAULT_SAMPLE_PARENT_VALUE + "')}_${batchRandomId}",
                 "Parent", "Sam");
     }
@@ -501,6 +509,11 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
     }
 
     private void verifyNames(String sampleTypeName, String header, String nameExpression, @Nullable String currentTypeAlias, String namePrefix, boolean useFirst)
+    {
+        verifyNames(sampleTypeName, header, nameExpression, currentTypeAlias, namePrefix, useFirst, DEFAULT_SAMPLE_PARENT_VALUE);
+    }
+
+    private void verifyNames(String sampleTypeName, String header, String nameExpression, @Nullable String currentTypeAlias, String namePrefix, boolean useFirst, String defaultValue)
     {
         goToProjectHome();
 
@@ -526,7 +539,7 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
                 .setNameExpression(nameExpression);
         if (currentTypeAlias != null)
             definition = definition.setParentAliases(Map.of(currentTypeAlias, "(Current Sample Type)"));
-        definition = definition.setFields(List.of(new FieldDefinition("B", FieldDefinition.ColumnType.String)));
+        definition = definition.setFields(List.of(new FieldDefinition("FieldB", FieldDefinition.ColumnType.String)));
         sampleHelper.createSampleType(definition, data);
 
         assertTextPresent(nameExpression);
@@ -534,7 +547,7 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         DataRegionTable materialTable = new DataRegionTable("Material", this);
         List<String> names = materialTable.getColumnDataAsText("Name");
 
-        assertTrue("First name (" + names.get(0) + ") expected to start with " + DEFAULT_SAMPLE_PARENT_VALUE + "_ but it did not", names.get(0).startsWith(DEFAULT_SAMPLE_PARENT_VALUE + "_"));
+        assertTrue("First name (" + names.get(0) + ") expected to start with " + defaultValue + "_ but it did not", names.get(0).startsWith(defaultValue + "_"));
         String batchRandomId = names.get(0).split("_")[1];
 
         assertEquals("Second name not as expected", name2 + "_" + batchRandomId, names.get(1));

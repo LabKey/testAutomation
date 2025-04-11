@@ -63,7 +63,7 @@ public class EntityBulkUpdateDialog extends ModalDialog
     // For use when the field is of an unknown type, as can occur in fuzz tests
     public void setValue(FieldDefinition field, Object newValue)
     {
-        if (field.getType() == FieldDefinition.ColumnType.TextChoice)
+        if (field.getType() == FieldDefinition.ColumnType.TextChoice || field.getLookup() != null)
             setSelectionField(EscapeUtil.fieldKeyEncodePart(field.getName()), newValue instanceof String ? List.of((String) newValue) : (List<String>) newValue);
         else if (field.getType() == FieldDefinition.ColumnType.Integer || field.getType() == FieldDefinition.ColumnType.Decimal || field.getType() == FieldDefinition.ColumnType.Double)
             setNumericField(EscapeUtil.fieldKeyEncodePart(field.getName()), String.valueOf(newValue));
@@ -71,6 +71,8 @@ public class EntityBulkUpdateDialog extends ModalDialog
             setDateField(field.getLabel() == null ? field.getName() : field.getLabel(), (String) newValue);
         else if (field.getType() == FieldDefinition.ColumnType.Boolean)
             setBooleanField(EscapeUtil.fieldKeyEncodePart(field.getName()), (Boolean) newValue);
+        else if (field.getType() == FieldDefinition.ColumnType.MultiLine)
+            setTextArea(EscapeUtil.fieldKeyEncodePart(field.getName()), (String) newValue);
         else
             setTextField(EscapeUtil.fieldKeyEncodePart(field.getName()), (String) newValue);
     }

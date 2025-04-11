@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.labkey.test.tests;
+package org.labkey.test.tests.list;
 
 import org.junit.BeforeClass;
 import org.junit.experimental.categories.Category;
@@ -23,6 +23,7 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Hosting;
+import org.labkey.test.tests.AbstractExportTest;
 import org.labkey.test.util.AbstractDataRegionExportOrSignHelper.ColumnHeaderType;
 
 import java.io.File;
@@ -123,7 +124,7 @@ public class ListExportTest extends AbstractExportTest
     @BeforeClass
     public static void doSetup() throws Exception
     {
-        ListExportTest initTest = (ListExportTest)getCurrentTest();
+        ListExportTest initTest = getCurrentTest();
 
         initTest._containerHelper.createProject(initTest.getProjectName(), null);
         initTest._listHelper.importListArchive(initTest.getProjectName(), LIST_ARCHIVE);
