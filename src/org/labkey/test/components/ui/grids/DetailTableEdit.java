@@ -14,6 +14,7 @@ import org.labkey.test.components.react.ReactDateTimePicker;
 import org.labkey.test.components.react.ReactSelect;
 import org.labkey.test.components.ui.files.FileUploadField;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.FieldKey;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
@@ -160,7 +161,7 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
     public DetailTableEdit setInputByFieldName(String fieldName, String value)
     {
         Locator inputloc = Locator.tagWithClass("input", "form-control")
-            .withAttribute("name",  fieldName);
+            .withAttribute("name", FieldKey.encodePart(fieldName));
         Input input = Input.Input(inputloc,
                 getDriver()).waitFor();
         input.set(value);
@@ -170,7 +171,7 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
     public DetailTableEdit setTextareaByFieldName(String fieldName, String value)
     {
         Locator inputloc = Locator.tagWithClass("textarea", "form-control")
-                .withAttribute("name",  fieldName);
+                .withAttribute("name",  FieldKey.encodePart(fieldName));
         Input input = Input.Input(inputloc,
                 getDriver()).waitFor();
         input.set(value);
@@ -180,16 +181,16 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
     /**
      * Get the value of a boolean field.
      *
-     * @param inputName The caption/label of the field to get.
+     * @param fieldCaption The caption/label of the field to get.
      * @return The value of the field.
      **/
-    public boolean getBooleanField(String inputName)
+    public boolean getBooleanField(String fieldCaption)
     {
         // The text used in the field caption and the value of the name attribute in the checkbox don't always have the same case.
-        WebElement editableElement = Locator.tagWithAttributeIgnoreCase("input", "name", inputName).findElement(getComponentElement());
-        String elementType = editableElement.getAttribute("type").toLowerCase().trim();
+        WebElement editableElement = Locator.tag("input").findElement(elementCache().fieldValue(fieldCaption));
+        String elementType = editableElement.getDomAttribute("type").toLowerCase().trim();
 
-        Assert.assertEquals(String.format("Field '%s' is not a checkbox. Cannot be get true/false value.", inputName), "checkbox", elementType);
+        Assert.assertEquals(String.format("Field '%s' is not a checkbox. Cannot be get true/false value.", fieldCaption), "checkbox", elementType);
 
         return new Checkbox(editableElement).isChecked();
     }
@@ -438,10 +439,10 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
      *
      * @return A list of string with the displayed field names.
      */
-    public List<String> getDisplayedFieldNames()
+    public List<String> getDisplayedFieldCaptions()
     {
         return Locator.tagWithAttribute("td", "data-fieldkey").findElements(this)
-                .stream().map(el -> el.getAttribute("data-caption")).collect(Collectors.toList());
+                .stream().map(el -> el.getDomAttribute("data-caption")).collect(Collectors.toList());
     }
 
     private String getSourceTitle()
