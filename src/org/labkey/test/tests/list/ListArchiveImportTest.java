@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.labkey.test.tests;
+package org.labkey.test.tests.list;
 
 import org.jetbrains.annotations.Nullable;
 import org.junit.BeforeClass;
@@ -53,7 +53,7 @@ public class ListArchiveImportTest extends BaseWebDriverTest
     @BeforeClass
     public static void doSetup()
     {
-        ListArchiveImportTest initTest = (ListArchiveImportTest) getCurrentTest();
+        ListArchiveImportTest initTest = getCurrentTest();
         initTest._containerHelper.createProject(initTest.getProjectName(), null);
     }
 
