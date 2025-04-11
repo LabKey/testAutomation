@@ -1,5 +1,6 @@
 package org.labkey.test.components.ui.grids;
 
+import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
 import org.labkey.api.query.QueryKey;
 import org.labkey.test.BootstrapLocators;
@@ -37,7 +38,7 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
     private final WebDriver _driver;
     private String _title;
     private int _readyTimeout = WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
-    protected int _changeCounter = 0;
+    protected Integer _changeCounter = 0;
 
     protected DetailTableEdit(WebElement formElement, WebDriver driver)
     {
@@ -72,9 +73,9 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
 
     /**
      * If for some reason your test set a field but it actually didn't change the value, you can use this helper
-     * to set the change counter to a specific value.
+     * to set the change counter to a specific value. Use null to skip the changeCounter check on save.
      */
-    public DetailTableEdit setChangeCounter(int changeCounter)
+    public DetailTableEdit setChangeCounter(@Nullable Integer changeCounter)
     {
         _changeCounter = changeCounter;
         return this;
