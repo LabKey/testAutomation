@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tables xmlns="http://labkey.org/data/xml">
+  <table tableName="mvdataset" tableDbType="TABLE">
+    <description>Contains up to one row of mvdataset (MV Dataset) data for each Participant/Visit combination.</description>
+    <columns>
+      <column columnName="ParticipantId">
+        <datatype>varchar</datatype>
+        <columnTitle>Participant ID</columnTitle>
+        <description>Subject identifier</description>
+        <propertyURI>http://cpas.labkey.com/Study#ParticipantId</propertyURI>
+        <nullable>false</nullable>
+        <url replaceMissing="blankValue">/study-participant.view?participantId=${ParticipantId}</url>
+        <importAliases>
+          <importAlias>participantid</importAlias>
+          <importAlias>ptid</importAlias>
+        </importAliases>
+        <fk>
+          <fkDbSchema>study</fkDbSchema>
+          <fkTable>Participant</fkTable>
+          <fkColumnName>ParticipantId</fkColumnName>
+        </fk>
+        <scale>32</scale>
+      </column>
+      <column columnName="SequenceNum">
+        <datatype>double</datatype>
+        <columnTitle>Sequence Num</columnTitle>
+        <propertyURI>http://cpas.labkey.com/Study#SequenceNum</propertyURI>
+        <nullable>false</nullable>
+        <importAliases>
+          <importAlias>visit</importAlias>
+          <importAlias>visitid</importAlias>
+        </importAliases>
+      </column>
+      <column columnName="date">
+        <datatype>timestamp</datatype>
+        <columnTitle>Date</columnTitle>
+        <propertyURI>http://cpas.labkey.com/Study#VisitDate</propertyURI>
+        <formatString>Date</formatString>
+      </column>
+      <column columnName="Age with space">
+        <datatype>integer</datatype>
+        <columnTitle>Age with space</columnTitle>
+        <rangeURI>http://www.w3.org/2001/XMLSchema#int</rangeURI>
+        <required>true</required>
+        <measure>false</measure>
+        <isMvEnabled>true</isMvEnabled>
+      </column>
+      <column columnName="Sex">
+        <datatype>varchar</datatype>
+        <columnTitle>Sex</columnTitle>
+        <rangeURI>http://www.w3.org/2001/XMLSchema#string</rangeURI>
+        <required>true</required>
+        <isMvEnabled>true</isMvEnabled>
+        <scale>4000</scale>
+      </column>
+    </columns>
+    <tableTitle>MV Dataset</tableTitle>
+  </table>
+</tables>
