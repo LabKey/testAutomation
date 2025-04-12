@@ -387,7 +387,7 @@ public class AuditLogTest extends BaseWebDriverTest
 
         // now grant CanSeeAuditLog permission to our audit user and verify
         // we see audit information
-        permissionsHelper.setSiteAdminRoleUserPermissions(AUDIT_TEST_USER, "See Audit Log Events");
+        permissionsHelper.setSiteRoleUserPermissions(AUDIT_TEST_USER, "See Audit Log Events");
         impersonate(AUDIT_TEST_USER);
         verifyAuditQueries(true);
 
