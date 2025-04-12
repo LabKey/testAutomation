@@ -121,9 +121,9 @@ public class UserClonePermissionTest extends BaseWebDriverTest
 
         Assert.assertEquals("Incorrect audit rows for " + _userHelper.getDisplayNameForEmail(CLONED_TARGET_SITE_USER), 7, table.getDataRowCount());
         Assert.assertEquals("Incorrect audit log messages for " + _userHelper.getDisplayNameForEmail(CLONED_TARGET_SITE_USER), new HashSet<>(Arrays.asList("The user " + CLONED_TARGET_SITE_USER + " was assigned to the security role Author.",
-                        "User: " + CLONED_TARGET_SITE_USER + " was added as a member to Group: Developers",
+                        "The user " + CLONED_TARGET_SITE_USER + " was assigned to the security role Platform Developer.",
                         "User: " + CLONED_TARGET_SITE_USER + " was added as a member to Group: Test clone group",
-                        "User: " + CLONED_TARGET_SITE_USER + " was added as a member to Group: Administrators",
+                        "The user " + CLONED_TARGET_SITE_USER + " was assigned to the security role Site Administrator.",
                         "The user " + CLONED_TARGET_SITE_USER + " was removed from the security role Submitter.",
                         "The user " + CLONED_TARGET_SITE_USER + " had their group memberships and role assignments deleted and replaced with those of user sourcesiteuser@clonepermission.test",
                         "The user " + CLONED_TARGET_SITE_USER + " was assigned to the security role Submitter.")),
