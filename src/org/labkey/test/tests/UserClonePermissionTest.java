@@ -54,7 +54,7 @@ public class UserClonePermissionTest extends BaseWebDriverTest
         _permissionsHelper = new ApiPermissionsHelper(this);
 
         _userHelper.createUser(CLONED_SOURCE_SITE_USER);
-        _permissionsHelper.addUserToSiteGroup(CLONED_SOURCE_SITE_USER, "Site Administrators");
+        _permissionsHelper.setSiteRoleUserPermissions(CLONED_SOURCE_SITE_USER, "Site Administrator");
 
         _userHelper.createUser(CLONED_SOURCE_APP_USER);
         _permissionsHelper.addUserAsAppAdmin(CLONED_SOURCE_APP_USER);
@@ -67,7 +67,7 @@ public class UserClonePermissionTest extends BaseWebDriverTest
         _permissionsHelper.addMemberToRole(CLONED_SOURCE_SITE_USER, "Author", PermissionsHelper.MemberType.user);
         _permissionsHelper.addUserToProjGroup(CLONED_SOURCE_APP_USER, getProjectName(), CLONE_GROUP);
 
-        _permissionsHelper.addUserToSiteGroup(CLONED_SOURCE_SITE_USER, "Developers");
+        _permissionsHelper.setSiteRoleUserPermissions(CLONED_SOURCE_SITE_USER, "Platform Developer");
 
         _userHelper.createUser(CLONED_TARGET_SITE_USER);
         _permissionsHelper.addMemberToRole(CLONED_TARGET_SITE_USER, "Submitter", PermissionsHelper.MemberType.user);
