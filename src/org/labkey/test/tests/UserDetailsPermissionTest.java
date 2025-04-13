@@ -104,7 +104,7 @@ public class UserDetailsPermissionTest extends BaseWebDriverTest
 
         _containerHelper.createProject(getProjectName(), null);
 
-        new ApiPermissionsHelper(this).addUserToSiteGroup(ADMIN_USER, "Site Administrators");
+        new ApiPermissionsHelper(this).setSiteRoleUserPermissions(ADMIN_USER, "Site Administrator");
         // Use created user to ensure we have a known 'Modified by' column for created users
         ApiPermissionsHelper apiPermissionsHelper = new ApiPermissionsHelper(this,
                 () -> new Connection(WebTestHelper.getBaseURL(), ADMIN_USER, PasswordUtil.getPassword()));
