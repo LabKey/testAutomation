@@ -149,4 +149,32 @@ public class EscapeUtil
                 .map(value -> value.replaceAll("([\\\\|])", "\\\\$1"))
                 .collect(Collectors.joining("|"));
     }
+
+    /**
+     * Takes an identifier (a field or domain value) and enquotes it, while also escaping any quotes
+     * it might have.  This his helpful for using randomly-generated identifiers in sql queries.
+     * @param value
+     * @return
+     */
+    public static String getSqlQuotedValue(String value)
+    {
+        return String.format("\"%s\"", value.replaceAll("\"", "\"\""));
+    }
+
+    /**
+     * Takes an identifier (say, a field value) to be used in XML configuration or as HTML and escapes
+     * reserved markup language characters.  This is helpful for configuring randomly-generated identifiers
+     * in configXml
+     * @param value
+     * @return
+     */
+    public static String getMarkupEscapedValue(String value)
+    {
+        return value
+                .replace("&", "&amp;")
+                .replace("<", "&lt;")
+                .replace(">", "&gt;")
+                .replace("\"", "&quot;")
+                .replace("'", "&apos;");
+    }
 }
