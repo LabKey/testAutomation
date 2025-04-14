@@ -468,7 +468,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         assertTextPresent("Run Groups");
         assertElementNotPresent(Locator.linkWithText("Create Run Group")); // Not in small Run Groups web-part.
         // ensure the mouse isn't inadvertently hovering something else, causing obscuring popup
-        mouseOver(portalHelper.getBodyWebPart("A customized web part").getComponentElement());
+        mouseOver(Locator.tagWithClass("a", "brand-logo"));
         portalHelper.checkWebpartPermission("A customized web part", "Read", null);
         portalHelper.checkWebpartPermission("Data Pipeline", "Read", null);
     }
