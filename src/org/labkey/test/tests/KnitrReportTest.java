@@ -16,7 +16,6 @@
 package org.labkey.test.tests;
 
 import org.apache.hc.core5.http.HttpStatus;
-import org.assertj.core.api.Assertions;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Assume;
 import org.junit.Test;
@@ -203,13 +202,6 @@ public class KnitrReportTest extends AbstractKnitrReportTest
         _rReportHelper.clickReportTab();
         waitForElement(Locator.id("mtcars_table"));
         assertElementNotPresent(Locator.id("mtcars_table_wrapper")); // Created by jQuery
-        String serverErrors = getServerErrors();
-        if (!serverErrors.isEmpty())
-        {
-            // Client-side error doesn't always happen but, if it does, make sure it is the one we expect.
-            Assertions.assertThat(serverErrors).as("Server errors").contains("$(...).dataTable is not a function");
-            checkExpectedErrors(1); // JavaScript error: "$(...).dataTable is not a function"
-        }
 
         // now set the dependencies
         _rReportHelper.clickSourceTab();
