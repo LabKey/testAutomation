@@ -1,5 +1,6 @@
 package org.labkey.test.components.ui.entities;
 
+import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
@@ -13,12 +14,14 @@ import org.labkey.test.components.react.ReactDateTimePicker;
 import org.labkey.test.components.react.ToggleButton;
 import org.labkey.test.components.ui.files.FileAttachmentContainer;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.util.AuditLogHelper;
 import org.labkey.test.util.EscapeUtil;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +33,8 @@ public class EntityBulkUpdateDialog extends ModalDialog
 {
     private final int WAIT_TIMEOUT = 2000;
     private final UpdatingComponent _updatingComponent;
+    private int _changeCounter = 0;
+    private Integer _selectedCount = null;
 
     public EntityBulkUpdateDialog(WebDriver driver)
     {
@@ -42,6 +47,25 @@ public class EntityBulkUpdateDialog extends ModalDialog
         _updatingComponent = updatingComponent;
     }
 
+    /**
+     * If for some reason your test set a field but it actually didn't change the value, you can use this helper
+     * to set the change counter to a specific value.
+     */
+    public EntityBulkUpdateDialog setChangeCounter(int changeCounter)
+    {
+        _changeCounter = changeCounter;
+        return this;
+    }
+
+    /**
+     * Set the number of selected samples. This is used to check the number of audit log events for this transaction.
+     */
+    public EntityBulkUpdateDialog setSelectedCount(int selectedCount)
+    {
+        _selectedCount = selectedCount;
+        return this;
+    }
+
     // enable/disable field editable state
 
     public boolean isFieldEnabled(String fieldKey)
@@ -52,6 +76,8 @@ public class EntityBulkUpdateDialog extends ModalDialog
     public EntityBulkUpdateDialog setEditableState(String fieldKey, boolean enable)
     {
         elementCache().getToggle(fieldKey).set(enable);
+        if (enable) _changeCounter++;
+        else _changeCounter--;
         return this;
     }
 
@@ -153,6 +179,7 @@ public class EntityBulkUpdateDialog extends ModalDialog
     public EntityBulkUpdateDialog removeFile(String fieldKey)
     {
         getFileField(fieldKey).removeFile();
+        _changeCounter++;
         return this;
     }
 
@@ -241,11 +268,32 @@ public class EntityBulkUpdateDialog extends ModalDialog
 
     public void clickUpdate()
     {
+        clickUpdate(false);
+    }
+
+    public void clickUpdate(boolean skipChangeCounterCheck)
+    {
         _updatingComponent.doAndWaitForUpdate(() ->
         {
             elementCache().updateButton.click();
             waitForClose();
         });
+
+        // check for the expected number of Data Changes in the latest audit event records
+        String auditEventName = AuditLogHelper.getAuditEventNameFromURL();
+        if (!skipChangeCounterCheck && auditEventName != null)
+        {
+            try
+            {
+                String projectName = getWrapper().getCurrentProject();
+                String folderName = getWrapper().getCurrentContainer();
+                AuditLogHelper.checkTimelineAuditEventDiffCountForLastTransaction(projectName, folderName, auditEventName, _changeCounter, _selectedCount);
+            }
+            catch (CommandException | IOException e)
+            {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     public void clickCancel()
