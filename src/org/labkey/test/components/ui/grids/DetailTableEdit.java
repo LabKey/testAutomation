@@ -3,6 +3,7 @@ package org.labkey.test.components.ui.grids;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
 import org.labkey.api.query.QueryKey;
+import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
@@ -15,6 +16,7 @@ import org.labkey.test.components.react.ReactDateTimePicker;
 import org.labkey.test.components.react.ReactSelect;
 import org.labkey.test.components.ui.files.FileUploadField;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.util.AuditLogHelper;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
@@ -22,11 +24,13 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -484,12 +488,32 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
             return "";
     }
 
+    private boolean isSampleEdit()
+    {
+        return Objects.requireNonNull(getDriver().getCurrentUrl()).contains("#/samples/");
+    }
+
+    private boolean isSourceEdit()
+    {
+        return Objects.requireNonNull(getDriver().getCurrentUrl()).contains("#/sources/");
+    }
+
+    private boolean isDataClassEdit()
+    {
+        return isSourceEdit() || Objects.requireNonNull(getDriver().getCurrentUrl()).contains("#/registry/");
+    }
+
     public boolean isSaveButtonEnabled()
     {
         return elementCache().saveButton.isEnabled();
     }
 
     public DetailDataPanel clickSave()
+    {
+        return clickSave(false);
+    }
+
+    public DetailDataPanel clickSave(boolean skipChangeCounterCheck)
     {
         String title = getSourceTitle();
         getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().saveButton));
@@ -498,6 +522,23 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
         // If save causes some update, wait until it is completed.
         getWrapper().longWait().withMessage("Update took too long to complete.")
                 .until(ExpectedConditions.stalenessOf(elementCache().saveButton));
+
+        // check for the expected number of Data Changes in the latest SampleTimelineEvent records
+        String auditEventName = isSampleEdit() ? "SampleTimelineEvent" : isDataClassEdit() ? "SourcesAuditEvent" : null;
+        if (!skipChangeCounterCheck && _changeCounter != null && auditEventName != null)
+        {
+            try
+            {
+                String projectName = getWrapper().getCurrentProject();
+                String folderName = getWrapper().getCurrentContainer();
+                int changeCounter = isSourceEdit() ? _changeCounter + 1 : _changeCounter; // Source updates include the name value in the diff (even when not changed)
+                AuditLogHelper.checkTimelineAuditEventDiffCountForLastTransaction(projectName, folderName, auditEventName, changeCounter, 1);
+            }
+            catch (CommandException | IOException e)
+            {
+                throw new RuntimeException(e);
+            }
+        }
 
         return new DetailDataPanel.DetailDataPanelFinder(getDriver()).withTitle(title).waitFor();
     }
