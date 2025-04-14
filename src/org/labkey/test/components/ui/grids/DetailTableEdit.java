@@ -488,21 +488,6 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
             return "";
     }
 
-    private boolean isSampleEdit()
-    {
-        return Objects.requireNonNull(getDriver().getCurrentUrl()).contains("#/samples/");
-    }
-
-    private boolean isSourceEdit()
-    {
-        return Objects.requireNonNull(getDriver().getCurrentUrl()).contains("#/sources/");
-    }
-
-    private boolean isDataClassEdit()
-    {
-        return isSourceEdit() || Objects.requireNonNull(getDriver().getCurrentUrl()).contains("#/registry/");
-    }
-
     public boolean isSaveButtonEnabled()
     {
         return elementCache().saveButton.isEnabled();
@@ -523,15 +508,15 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
         getWrapper().longWait().withMessage("Update took too long to complete.")
                 .until(ExpectedConditions.stalenessOf(elementCache().saveButton));
 
-        // check for the expected number of Data Changes in the latest SampleTimelineEvent records
-        String auditEventName = isSampleEdit() ? "SampleTimelineEvent" : isDataClassEdit() ? "SourcesAuditEvent" : null;
+        // check for the expected number of Data Changes in the latest audit event records
+        String auditEventName = AuditLogHelper.getAuditEventNameFromURL();
         if (!skipChangeCounterCheck && _changeCounter != null && auditEventName != null)
         {
             try
             {
                 String projectName = getWrapper().getCurrentProject();
                 String folderName = getWrapper().getCurrentContainer();
-                int changeCounter = isSourceEdit() ? _changeCounter + 1 : _changeCounter; // Source updates include the name value in the diff (even when not changed)
+                int changeCounter = AuditLogHelper.isSourcesRoute() ? _changeCounter + 1 : _changeCounter; // Source updates include the name value in the diff (even when not changed)
                 AuditLogHelper.checkTimelineAuditEventDiffCountForLastTransaction(projectName, folderName, auditEventName, changeCounter, 1);
             }
             catch (CommandException | IOException e)

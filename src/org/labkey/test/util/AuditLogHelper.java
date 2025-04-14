@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 public class AuditLogHelper
@@ -110,6 +111,10 @@ public class AuditLogHelper
      * newRecordMap for an audit entry. If a transactionId is provided, it will check all rows for that
      * transactionId. If no transactionId is provided, it will check just the latest row.
      */
+    public static void checkTimelineAuditEventDiffCount(String projectName, String folderName, List<Integer> expectedDiffCounts) throws IOException, CommandException
+    {
+        checkTimelineAuditEventDiffCount(projectName, folderName, getAuditEventNameFromURL(), expectedDiffCounts);
+    }
     public static void checkTimelineAuditEventDiffCount(String projectName, String folderName, String auditEventName, List<Integer> expectedDiffCounts) throws IOException, CommandException
     {
         Integer maxRows = expectedDiffCounts.size();
@@ -131,6 +136,10 @@ public class AuditLogHelper
      * Check for th expected number of diffs in the audit event for the last transactionId.
      * If an expectedEventCount is also provided, it will check that the number of events for that transactionId matches the expectedEventCount.
      */
+    public static void checkTimelineAuditEventDiffCountForLastTransaction(String projectName, String folderName, int expectedDiffCount, @Nullable Integer expectedEventCount) throws IOException, CommandException
+    {
+        checkTimelineAuditEventDiffCountForLastTransaction(projectName, folderName, getAuditEventNameFromURL(), expectedDiffCount, expectedEventCount);
+    }
     public static void checkTimelineAuditEventDiffCountForLastTransaction(String projectName, String folderName, String auditEventName, int expectedDiffCount, @Nullable Integer expectedEventCount) throws IOException, CommandException
     {
         Integer transactionId = (Integer) getAuditLogsFromLKS(projectName, folderName, auditEventName, List.of("TransactionId"), Collections.emptyList(), 1)
@@ -141,6 +150,30 @@ public class AuditLogHelper
             BaseWebDriverTest.getCurrentTest().checker().verifyEquals("Unexpected number of events for transactionId " + transactionId, expectedEventCount.intValue(), eventCount);
         List<Integer> expectedChangeCounts = Collections.nCopies(eventCount, expectedDiffCount);
         checkTimelineAuditEventDiffCount(projectName, folderName, auditEventName, expectedChangeCounts);
+    }
+
+    public static String getAuditEventNameFromURL()
+    {
+        if (isSamplesRoute())
+            return "SampleTimelineEvent";
+        else if (isDataClassRoute())
+            return "SourcesAuditEvent";
+        return null;
+    }
+
+    public static boolean isSamplesRoute()
+    {
+        return Objects.requireNonNull(BaseWebDriverTest.getCurrentTest().getURL().toString()).contains("#/samples/");
+    }
+
+    public static boolean isSourcesRoute()
+    {
+        return Objects.requireNonNull(BaseWebDriverTest.getCurrentTest().getURL().toString()).contains("#/sources/");
+    }
+
+    public static boolean isDataClassRoute()
+    {
+        return isSourcesRoute() || Objects.requireNonNull(BaseWebDriverTest.getCurrentTest().getURL().toString()).contains("#/registry/");
     }
 
     public interface ConnectionSupplier
