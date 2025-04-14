@@ -54,7 +54,7 @@ public class UserClonePermissionTest extends BaseWebDriverTest
         _permissionsHelper = new ApiPermissionsHelper(this);
 
         _userHelper.createUser(CLONED_SOURCE_SITE_USER);
-        _permissionsHelper.addUserToSiteGroup(CLONED_SOURCE_SITE_USER, "Site Administrators");
+        _permissionsHelper.setSiteRoleUserPermissions(CLONED_SOURCE_SITE_USER, "Site Administrator");
 
         _userHelper.createUser(CLONED_SOURCE_APP_USER);
         _permissionsHelper.addUserAsAppAdmin(CLONED_SOURCE_APP_USER);
@@ -67,7 +67,7 @@ public class UserClonePermissionTest extends BaseWebDriverTest
         _permissionsHelper.addMemberToRole(CLONED_SOURCE_SITE_USER, "Author", PermissionsHelper.MemberType.user);
         _permissionsHelper.addUserToProjGroup(CLONED_SOURCE_APP_USER, getProjectName(), CLONE_GROUP);
 
-        _permissionsHelper.addUserToSiteGroup(CLONED_SOURCE_SITE_USER, "Developers");
+        _permissionsHelper.setSiteRoleUserPermissions(CLONED_SOURCE_SITE_USER, "Platform Developer");
 
         _userHelper.createUser(CLONED_TARGET_SITE_USER);
         _permissionsHelper.addMemberToRole(CLONED_TARGET_SITE_USER, "Submitter", PermissionsHelper.MemberType.user);
@@ -121,9 +121,9 @@ public class UserClonePermissionTest extends BaseWebDriverTest
 
         Assert.assertEquals("Incorrect audit rows for " + _userHelper.getDisplayNameForEmail(CLONED_TARGET_SITE_USER), 7, table.getDataRowCount());
         Assert.assertEquals("Incorrect audit log messages for " + _userHelper.getDisplayNameForEmail(CLONED_TARGET_SITE_USER), new HashSet<>(Arrays.asList("The user " + CLONED_TARGET_SITE_USER + " was assigned to the security role Author.",
-                        "User: " + CLONED_TARGET_SITE_USER + " was added as a member to Group: Developers",
+                        "The user " + CLONED_TARGET_SITE_USER + " was assigned to the security role Platform Developer.",
                         "User: " + CLONED_TARGET_SITE_USER + " was added as a member to Group: Test clone group",
-                        "User: " + CLONED_TARGET_SITE_USER + " was added as a member to Group: Administrators",
+                        "The user " + CLONED_TARGET_SITE_USER + " was assigned to the security role Site Administrator.",
                         "The user " + CLONED_TARGET_SITE_USER + " was removed from the security role Submitter.",
                         "The user " + CLONED_TARGET_SITE_USER + " had their group memberships and role assignments deleted and replaced with those of user sourcesiteuser@clonepermission.test",
                         "The user " + CLONED_TARGET_SITE_USER + " was assigned to the security role Submitter.")),

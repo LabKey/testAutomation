@@ -118,25 +118,25 @@ public abstract class PermissionsHelper
     }
 
     @LogMethod
-    public abstract void setSiteAdminRoleUserPermissions(@LoggedParam String userName, @LoggedParam String permissionString);
-    protected abstract void addMemberToRole(String userOrGroupName, String permissionString, MemberType memberType);
+    public abstract void setSiteRoleUserPermissions(@LoggedParam String userName, @LoggedParam String roleName);
+    protected abstract void addMemberToRole(String userOrGroupName, String roleName, MemberType memberType);
 
-    public void removeSiteGroupPermission(String groupName, String permissionString)
+    public void removeSiteGroupPermission(String groupName, String roleName)
     {
-        removeRoleAssignment(groupName, permissionString, MemberType.siteGroup);
+        removeRoleAssignment(groupName, roleName, MemberType.siteGroup);
     }
 
-    public void removePermission(String groupName, String permissionString)
+    public void removePermission(String groupName, String roleName)
     {
-        removeRoleAssignment(groupName, permissionString, MemberType.group);
+        removeRoleAssignment(groupName, roleName, MemberType.group);
     }
 
-    public void removeUserRole(String groupName, String permissionString)
+    public void removeUserRole(String groupName, String roleName)
     {
-        removeRoleAssignment(groupName, permissionString, MemberType.user);
+        removeRoleAssignment(groupName, roleName, MemberType.user);
     }
 
-    protected abstract void removeRoleAssignment(String groupName, String permissionString, MemberType memberType);
+    protected abstract void removeRoleAssignment(String groupName, String roleName, MemberType memberType);
     public abstract void addUserToSiteGroup(String userName, String groupName);
 
     /**

@@ -32,7 +32,7 @@ public class StudyMissingValuesTest extends MissingValueIndicatorsTest
     @BeforeClass
     public static void beforeTestClass()
     {
-        StudyMissingValuesTest init = (StudyMissingValuesTest)getCurrentTest();
+        StudyMissingValuesTest init = getCurrentTest();
 
         init.setupProject();
     }
@@ -58,47 +58,46 @@ public class StudyMissingValuesTest extends MissingValueIndicatorsTest
     public void testDatasetMV()
     {
         final String datasetName = "MV Dataset";
-        final File DATASET_SCHEMA_FILE = TestFileUtils.getSampleData("mvIndicators/dataset_schema.tsv");
-        final String TEST_DATA_SINGLE_COLUMN_DATASET =
-                "participantid\tSequenceNum\tAge with space\tSex\n" +
-                        "Ted\t1\tN\tmale\n" +
-                        "Alice\t1\t17\tfemale\n" +
-                        "Bob\t1\tQ\tN";
-        final String TEST_DATA_TWO_COLUMN_DATASET =
-                "participantid\tSequenceNum\tAge with space\tAge with spaceMVIndicator\tSex\tSexMVIndicator\n" +
-                        "Franny\t1\t\tN\tmale\t\n" +
-                        "Zoe\t1\t25\tQ\tfemale\t\n" +
-                        "J.D.\t1\t50\t\tmale\tQ";
-        final String TEST_DATA_SINGLE_COLUMN_DATASET_BAD =
-                "participantid\tSequenceNum\tAge with space\tSex\n" +
-                        "Ted\t1\t.N\tmale\n" +
-                        "Alice\t1\t17\tfemale\n" +
-                        "Bob\t1\tQ\tN";
-        final String TEST_DATA_TWO_COLUMN_DATASET_BAD =
-                "participantid\tSequenceNum\tAge with space\tAge with spaceMVIndicator\tSex\tSexMVIndicator\n" +
-                        "Franny\t1\t\tN\tmale\t\n" +
-                        "Zoe\t1\t25\tQ\tfemale\t\n" +
-                        "J.D.\t1\t50\t\tmale\t.Q";
+        final File DATASETS_MANIFEST = TestFileUtils.getSampleData("mvIndicators/datasets_manifest.xml");
+        final File DATASETS_METADATA = TestFileUtils.getSampleData("mvIndicators/datasets_metadata.xml");
+        final String TEST_DATA_SINGLE_COLUMN_DATASET = """
+            participantid\tSequenceNum\tAge with space\tSex
+            Ted\t1\tN\tmale
+            Alice\t1\t17\tfemale
+            Bob\t1\tQ\tN""";
+        final String TEST_DATA_TWO_COLUMN_DATASET = """
+            participantid\tSequenceNum\tAge with space\tAge with spaceMVIndicator\tSex\tSexMVIndicator
+            Franny\t1\t\tN\tmale\t
+            Zoe\t1\t25\tQ\tfemale\t
+            J.D.\t1\t50\t\tmale\tQ""";
+        final String TEST_DATA_SINGLE_COLUMN_DATASET_BAD = """
+            participantid\tSequenceNum\tAge with space\tSex
+            Ted\t1\t.N\tmale
+            Alice\t1\t17\tfemale
+            Bob\t1\tQ\tN""";
+        final String TEST_DATA_TWO_COLUMN_DATASET_BAD = """
+            participantid\tSequenceNum\tAge with space\tAge with spaceMVIndicator\tSex\tSexMVIndicator
+            Franny\t1\t\tN\tmale\t
+            Zoe\t1\t25\tQ\tfemale\t
+            J.D.\t1\t50\t\tmale\t.Q""";
 
-        // Dummy visit map data (probably non-sensical), but enough to get a placeholder created for dataset #1:
+        // Dummy visit map data (probably nonsensical), but enough to get a placeholder created for dataset #1:
         _studyHelper.goToManageVisits().goToImportVisitMap();
-        setFormElement(Locator.name("content"), "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-                "<visitMap xmlns=\"http://labkey.org/study/xml\">\n" +
-                "  <visit label=\"Only Visit\" typeCode=\"S\" sequenceNum=\"20.0\" visitDateDatasetId=\"1\" sequenceNumHandling=\"normal\">\n" +
-                "    <datasets>\n" +
-                "      <dataset id=\"1\" type=\"REQUIRED\"/>\n" +
-                "    </datasets>\n" +
-                "  </visit>\n" +
-                "</visitMap>");
+        setFormElement(Locator.name("content"), """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <visitMap xmlns="http://labkey.org/study/xml">
+              <visit label="Only Visit" typeCode="S" sequenceNum="20.0" visitDateDatasetId="1" sequenceNumHandling="normal">
+                <datasets>
+                  <dataset id="1" type="REQUIRED"/>
+                </datasets>
+              </visit>
+            </visitMap>""");
         clickButton("Import");
         clickAndWait(Locator.linkWithText("Manage Study"));
         clickAndWait(Locator.linkWithText("Manage Datasets"));
-        clickAndWait(Locator.linkWithText("Define Dataset Schemas"));
-        clickAndWait(Locator.linkWithText("Bulk Import Schemas"));
-        setFormElement(Locator.name("typeNameColumn"), "datasetName");
-        setFormElement(Locator.name("labelColumn"), "datasetLabel");
-        setFormElement(Locator.name("typeIdColumn"), "datasetId");
-        setFormElementJS(Locator.name("tsv"), TestFileUtils.getFileContents(DATASET_SCHEMA_FILE));
+        clickAndWait(Locator.linkWithText("Import Dataset Schema"));
+        setFormElement(Locator.name("manifest"), TestFileUtils.getFileContents(DATASETS_MANIFEST));
+        setFormElement(Locator.name("metadata"), TestFileUtils.getFileContents(DATASETS_METADATA));
         clickButton("Submit", 180000);
         assertNoLabKeyErrors();
         assertTextPresent(datasetName);
@@ -106,15 +105,15 @@ public class StudyMissingValuesTest extends MissingValueIndicatorsTest
         log("Import dataset data");
         clickAndWait(Locator.linkWithText(datasetName));
         ImportDataPage importDataPage = new DatasetPropertiesPage(getDriver())
-                .clickViewData()
-                .getDataRegion()
-                .clickImportBulkData();
+            .clickViewData()
+            .getDataRegion()
+            .clickImportBulkData();
 
         importDataPage.setText(TEST_DATA_SINGLE_COLUMN_DATASET_BAD)
-                .submitExpectingError();
+            .submitExpectingError();
 
         importDataPage.setText(TEST_DATA_SINGLE_COLUMN_DATASET)
-                .submit();
+            .submit();
 
         assertNoLabKeyErrors();
 
@@ -190,11 +189,11 @@ public class StudyMissingValuesTest extends MissingValueIndicatorsTest
     {
         final String ASSAY_NAME = "MVAssay";
         final String ASSAY_RUN_SINGLE_COLUMN = "MVAssayRunSingleColumn";
-        final String TEST_DATA_SINGLE_COLUMN_ASSAY =
-                "SpecimenID\tParticipantID\tVisitID\tDate\tage\tsex\n" +
-                        "1\tTed\t1\t01-Jan-09\tN\tmale\n" +
-                        "2\tAlice\t1\t01-Jan-09\t17\tfemale\n" +
-                        "3\tBob\t1\t01-Jan-09\tQ\tN";
+        final String TEST_DATA_SINGLE_COLUMN_ASSAY = """
+            SpecimenID\tParticipantID\tVisitID\tDate\tage\tsex
+            1\tTed\t1\t01-Jan-09\tN\tmale
+            2\tAlice\t1\t01-Jan-09\t17\tfemale
+            3\tBob\t1\t01-Jan-09\tQ\tN""";
 
         defineAssay(ASSAY_NAME);
 
@@ -237,7 +236,6 @@ public class StudyMissingValuesTest extends MissingValueIndicatorsTest
 
         checkDataregionData(dataRegion, expectedData);
         checkMvIndicatorPresent(dataRegion, expectedMVIndicators);
-
     }
 
     private void deleteDatasetData(int rowCount)
