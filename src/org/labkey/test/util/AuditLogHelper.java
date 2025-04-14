@@ -128,6 +128,7 @@ public class AuditLogHelper
             String[] dataChanges = dataChangesStr != null ? dataChangesStr.split("&") : new String[0];
             // filter out SampleStateLabel as that is not a change, it is added for display purposes
             dataChanges = Stream.of(dataChanges).filter(s -> !s.toLowerCase().startsWith("samplestatelabel=")).toArray(String[]::new);
+            BaseWebDriverTest.getCurrentTest().log("Audit record data changes diff count check: " + dataChangesStr);
             BaseWebDriverTest.getCurrentTest().checker().verifyEquals("Audit record data changes did not include the expected number of diffs, expected " + expectedDiffCount + " but was " + dataChanges.length + ": " + dataChangesStr,
                     expectedDiffCount, dataChanges.length);
         }
