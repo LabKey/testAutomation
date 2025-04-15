@@ -34,6 +34,8 @@ import java.util.Map;
 
 public class ETLSchedulerPage extends LabKeyPage<ETLSchedulerPage.Elements>
 {
+    public static final String TRANSFORMID_ATTR = "data-transformid";
+
     public ETLSchedulerPage(BaseWebDriverTest test)
     {
         super(test);
@@ -57,7 +59,7 @@ public class ETLSchedulerPage extends LabKeyPage<ETLSchedulerPage.Elements>
      */
     public TransformRow getTransform(String transformName)
     {
-        var queryRowLoc = Locator.tag("tr").withAttribute("transformid")
+        var queryRowLoc = Locator.tag("tr").withAttribute(TRANSFORMID_ATTR)
                 .withChild(Locator.tagWithText("td", transformName));
 
         return new TransformRow(queryRowLoc.findElement(getDriver()));
@@ -76,7 +78,7 @@ public class ETLSchedulerPage extends LabKeyPage<ETLSchedulerPage.Elements>
 
     public int rowCount()
     {
-        return Locator.tagWithAttribute("tr", "data-transformid").findElements(getDriver()).size();
+        return Locator.tagWithAttribute("tr", TRANSFORMID_ATTR).findElements(getDriver()).size();
     }
 
     @Override
@@ -92,7 +94,7 @@ public class ETLSchedulerPage extends LabKeyPage<ETLSchedulerPage.Elements>
         protected TransformRow findTransformRow(String transformId)
         {
             if (!transformRows.containsKey(transformId))
-                transformRows.put(transformId, new TransformRow(Locator.tagWithAttribute("tr", "data-transformid", transformId).findWhenNeeded(this)));
+                transformRows.put(transformId, new TransformRow(Locator.tagWithAttribute("tr", TRANSFORMID_ATTR, transformId).findWhenNeeded(this)));
             return transformRows.get(transformId);
         }
         protected WebElement viewProcessedJobsButton = Locator.lkButton("View Processed Jobs").findWhenNeeded(this);
