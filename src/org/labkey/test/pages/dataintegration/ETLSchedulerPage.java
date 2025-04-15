@@ -79,10 +79,10 @@ public class ETLSchedulerPage extends LabKeyPage<ETLSchedulerPage.Elements>
         protected TransformRow findTransformRow(String transformId)
         {
             if (!transformRows.containsKey(transformId))
-                transformRows.put(transformId, new TransformRow(new LazyWebElement(Locator.css("tr[transformid=\"" + transformId + "\"]"), this)));
+                transformRows.put(transformId, new TransformRow(Locator.tagWithAttribute("tr", "data-transformid", transformId).findWhenNeeded(this)));
             return transformRows.get(transformId);
         }
-        protected WebElement viewProcessedJobsButton = new LazyWebElement(Locator.lkButton("View Processed Jobs"), this);
+        protected WebElement viewProcessedJobsButton = Locator.lkButton("View Processed Jobs").findWhenNeeded(this);
     }
 
     public class TransformRow extends Component<TransformRow.RowElements>
