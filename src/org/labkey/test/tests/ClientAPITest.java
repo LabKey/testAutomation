@@ -300,7 +300,7 @@ public class ClientAPITest extends BaseWebDriverTest
     private void createStudies()
     {
         // create time-based study
-        projectMenu().navigateToFolder(getProjectName(), TIME_STUDY_FOLDER);
+        goToProjectFolder(getProjectName(), TIME_STUDY_FOLDER);
         navBar().goToModule("Study");
         CreateStudyPage createStudyPage = _studyHelper.startCreateStudy();
         createStudyPage.setLabel(TIME_STUDY_NAME)
@@ -336,7 +336,7 @@ public class ClientAPITest extends BaseWebDriverTest
     {
         // this test case attempts to create a time-keyed dataset in a visit-based study folder, which should
         // fail on create.
-        goToProjectFolder(getProjectName(), VISIT_STUDY_FOLDER);
+        projectMenu().navigateToFolder(getProjectName(), VISIT_STUDY_FOLDER);
         String dataSetName = "ThisShouldBlowUp";
         String create = "LABKEY.Domain.create({\n" +
                 "   kind: \"StudyDatasetVisit\",\n" +
@@ -379,7 +379,7 @@ public class ClientAPITest extends BaseWebDriverTest
     public void validateStudyDatasetDateDomainKindInVisitBasedStudy()
     {
         // make sure you can't use StudyDatasetDate domain kind in a visit-based study
-        goToProjectFolder(getProjectName(), VISIT_STUDY_FOLDER);
+        projectMenu().navigateToFolder(getProjectName(), VISIT_STUDY_FOLDER);
         String dataSetName = "ThisShouldBlowUp";
         String create = "LABKEY.Domain.create({\n" +
                 "   kind: \"StudyDatasetDate\",\n" +
@@ -399,7 +399,7 @@ public class ClientAPITest extends BaseWebDriverTest
     public void validateUseTimeKeyFieldWithKeyPropertyName()
     {
         // make sure you can't set the useTimeKeyField and keyPropertyName at the same time
-        goToProjectFolder(getProjectName(), VISIT_STUDY_FOLDER);
+        projectMenu().navigateToFolder(getProjectName(), VISIT_STUDY_FOLDER);
         String dataSetName = "ThisShouldBlowUp";
         String create = "LABKEY.Domain.create({\n" +
                 "   kind: \"StudyDatasetVisit\",\n" +
@@ -423,7 +423,7 @@ public class ClientAPITest extends BaseWebDriverTest
     public void validateUseTimeKeyFieldWithKeyPropertyManaged()
     {
         // make sure you can't set the useTimeKeyField and keyPropertyName at the same time
-        goToProjectFolder(getProjectName(), VISIT_STUDY_FOLDER);
+        projectMenu().navigateToFolder(getProjectName(), VISIT_STUDY_FOLDER);
         String dataSetName = "ThisShouldBlowUp";
         String create = "LABKEY.Domain.create({\n" +
                 "   kind: \"StudyDatasetVisit\",\n" +
@@ -447,7 +447,7 @@ public class ClientAPITest extends BaseWebDriverTest
     @Test
     public void validateDemographicDataWithKeyPropertyName()
     {
-        goToProjectFolder(getProjectName(), VISIT_STUDY_FOLDER);
+        projectMenu().navigateToFolder(getProjectName(), VISIT_STUDY_FOLDER);
         String dataSetName = "ThisShouldBlowUp";
         String create = "LABKEY.Domain.create({\n" +
                 "   kind: \"StudyDatasetVisit\",\n" +
@@ -470,7 +470,7 @@ public class ClientAPITest extends BaseWebDriverTest
     @Test
     public void validateKeyPropertyManagedDataType()
     {
-        goToProjectFolder(getProjectName(), VISIT_STUDY_FOLDER);
+        projectMenu().navigateToFolder(getProjectName(), VISIT_STUDY_FOLDER);
         String dataSetName = "ThisShouldBlowUp";
         String create = "LABKEY.Domain.create({\n" +
                 "   kind: \"StudyDatasetVisit\",\n" +
@@ -493,7 +493,7 @@ public class ClientAPITest extends BaseWebDriverTest
     @Test
     public void validateKeyPropertyManagedWithoutKeyPropertyName()
     {
-        goToProjectFolder(getProjectName(), VISIT_STUDY_FOLDER);
+        projectMenu().navigateToFolder(getProjectName(), VISIT_STUDY_FOLDER);
         String dataSetName = "ThisShouldBlowUp";
         String create = "LABKEY.Domain.create({\n" +
                 "   kind: \"StudyDatasetVisit\",\n" +
@@ -515,7 +515,7 @@ public class ClientAPITest extends BaseWebDriverTest
     @Test
     public void validateKeyPropertyNameExistsInDomain()
     {
-        goToProjectFolder(getProjectName(), VISIT_STUDY_FOLDER);
+        projectMenu().navigateToFolder(getProjectName(), VISIT_STUDY_FOLDER);
         String dataSetName = "ThisShouldBlowUp";
         String create = "LABKEY.Domain.create({\n" +
                 "   kind: \"StudyDatasetVisit\",\n" +
@@ -537,7 +537,7 @@ public class ClientAPITest extends BaseWebDriverTest
     @Test
     public void validateKeyPropertyNameIsNotBlank()
     {
-        goToProjectFolder(getProjectName(), VISIT_STUDY_FOLDER);
+        projectMenu().navigateToFolder(getProjectName(), VISIT_STUDY_FOLDER);
         String dataSetName = "ThisShouldBlowUp";
         String create = "LABKEY.Domain.create({\n" +
                 "   kind: \"StudyDatasetVisit\",\n" +
@@ -559,7 +559,7 @@ public class ClientAPITest extends BaseWebDriverTest
     @Test
     public void validateDatasetDuplicateName()
     {
-        goToProjectFolder(getProjectName(), VISIT_STUDY_FOLDER);
+        projectMenu().navigateToFolder(getProjectName(), VISIT_STUDY_FOLDER);
         String dataSetName = "DatasetDuplicateNameCheck";
         String create = "LABKEY.Domain.create({\n" +
                 "   kind: \"StudyDatasetVisit\",\n" +
@@ -578,7 +578,7 @@ public class ClientAPITest extends BaseWebDriverTest
     @Test
     public void validateDatasetDuplicateLabel()
     {
-        goToProjectFolder(getProjectName(), VISIT_STUDY_FOLDER);
+        projectMenu().navigateToFolder(getProjectName(), VISIT_STUDY_FOLDER);
         String dataSetName = "DatasetDuplicateLabelCheck";
         String dataSetLabel = "Dataset Duplicate Label Check";
         String create = "LABKEY.Domain.create({\n" +
@@ -616,7 +616,7 @@ public class ClientAPITest extends BaseWebDriverTest
     @Test
     public void validateDatasetNameIsNotBlank()
     {
-        goToProjectFolder(getProjectName(), VISIT_STUDY_FOLDER);
+        projectMenu().navigateToFolder(getProjectName(), VISIT_STUDY_FOLDER);
         String create = "LABKEY.Domain.create({\n" +
                 "   kind: \"StudyDatasetVisit\",\n" +
                 "   domainDesign: {\n" +
@@ -634,7 +634,7 @@ public class ClientAPITest extends BaseWebDriverTest
     public void validateDatasetNameMaxLength()
     {
         // max length allowed should be 200, this name's length is 201
-        goToProjectFolder(getProjectName(), VISIT_STUDY_FOLDER);
+        projectMenu().navigateToFolder(getProjectName(), VISIT_STUDY_FOLDER);
         String create = "LABKEY.Domain.create({\n" +
                 "   kind: \"StudyDatasetVisit\",\n" +
                 "   domainDesign: {\n" +
@@ -651,7 +651,7 @@ public class ClientAPITest extends BaseWebDriverTest
     @Test
     public void createVisitBasedDomain()
     {
-        goToProjectFolder(getProjectName(), VISIT_STUDY_FOLDER);
+        projectMenu().navigateToFolder(getProjectName(), VISIT_STUDY_FOLDER);
         String dataSetName = "MyVisitBasedDataSet";
         String create = "LABKEY.Domain.create({\n" +
                 "   kind: \"StudyDatasetVisit\",\n" +
