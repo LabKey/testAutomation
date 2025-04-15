@@ -63,7 +63,7 @@ public class ETLSchedulerPage extends LabKeyPage<ETLSchedulerPage.Elements>
 
     public int rowCount()
     {
-        return Locator.xpath("//tr[@transformId]").findElements(getDriver()).size();
+        return Locator.tagWithAttribute("tr", "data-transformid").findElements(getDriver()).size();
     }
 
     @Override
