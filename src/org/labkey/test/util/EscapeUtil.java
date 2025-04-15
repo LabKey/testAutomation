@@ -16,6 +16,7 @@
 package org.labkey.test.util;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.eclipse.jetty.util.URIUtil;
 
 import java.net.URLDecoder;
@@ -148,5 +149,15 @@ public class EscapeUtil
                 .map(String::trim)
                 .map(value -> value.replaceAll("([\\\\|])", "\\\\$1"))
                 .collect(Collectors.joining("|"));
+    }
+
+    public static String getSqlQuotedValue(String value)
+    {
+        return String.format("\"%s\"", value.replaceAll("\"", "\"\""));
+    }
+
+    public static String getMarkupEscapedValue(String value)
+    {
+        return StringEscapeUtils.escapeXml11(value);
     }
 }
