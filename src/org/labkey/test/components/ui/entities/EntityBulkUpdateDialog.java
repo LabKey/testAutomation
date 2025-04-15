@@ -34,7 +34,6 @@ public class EntityBulkUpdateDialog extends ModalDialog
     private final int WAIT_TIMEOUT = 2000;
     private final UpdatingComponent _updatingComponent;
     private int _changeCounter = 0;
-    private Integer _selectedCount = null;
 
     public EntityBulkUpdateDialog(WebDriver driver)
     {
@@ -51,18 +50,9 @@ public class EntityBulkUpdateDialog extends ModalDialog
      * If for some reason your test set a field but it actually didn't change the value, you can use this helper
      * to set the change counter to a specific value.
      */
-    public EntityBulkUpdateDialog setChangeCounter(int changeCounter)
+    public EntityBulkUpdateDialog adjustChangeCounter(int change)
     {
-        _changeCounter = changeCounter;
-        return this;
-    }
-
-    /**
-     * Set the number of selected samples. This is used to check the number of audit log events for this transaction.
-     */
-    public EntityBulkUpdateDialog setSelectedCount(int selectedCount)
-    {
-        _selectedCount = selectedCount;
+        _changeCounter = _changeCounter + change;
         return this;
     }
 
@@ -251,6 +241,24 @@ public class EntityBulkUpdateDialog extends ModalDialog
         return this;
     }
 
+    public Integer getCountFromTitle()
+    {
+        // expecting title to be like "Update N items"
+        String title = getTitle();
+        String[] parts = title.split(" ");
+        if (parts.length > 1)
+        {
+            try
+            {
+                return Integer.parseInt(parts[1]);
+            }
+            catch (NumberFormatException nfe)
+            {
+                return null;
+            }
+        }
+        return null;
+    }
 
     // dismiss the dialog
 
@@ -273,6 +281,8 @@ public class EntityBulkUpdateDialog extends ModalDialog
 
     public void clickUpdate(boolean skipChangeCounterCheck)
     {
+        Integer rowCount = getCountFromTitle();
+
         _updatingComponent.doAndWaitForUpdate(() ->
         {
             elementCache().updateButton.click();
@@ -285,9 +295,7 @@ public class EntityBulkUpdateDialog extends ModalDialog
         {
             try
             {
-                String projectName = getWrapper().getCurrentProject();
-                String folderName = getWrapper().getCurrentContainer();
-                AuditLogHelper.checkTimelineAuditEventDiffCountForLastTransaction(projectName, folderName, auditEventName, _changeCounter, _selectedCount);
+                new AuditLogHelper(getWrapper()).checkTimelineAuditEventDiffCountForLastTransaction(getWrapper().getCurrentContainerPath(), auditEventName, _changeCounter, rowCount);
             }
             catch (CommandException | IOException e)
             {

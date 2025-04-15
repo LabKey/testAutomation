@@ -1,6 +1,5 @@
 package org.labkey.test.components.ui.grids;
 
-import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
 import org.labkey.api.query.QueryKey;
 import org.labkey.remoteapi.CommandException;
@@ -30,7 +29,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -42,7 +40,7 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
     private final WebDriver _driver;
     private String _title;
     private int _readyTimeout = WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
-    protected Integer _changeCounter = 0;
+    protected int _changeCounter = 0;
 
     protected DetailTableEdit(WebElement formElement, WebDriver driver)
     {
@@ -77,11 +75,11 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
 
     /**
      * If for some reason your test set a field but it actually didn't change the value, you can use this helper
-     * to set the change counter to a specific value. Use null to skip the changeCounter check on save.
+     * to set the change counter to a specific value.
      */
-    public DetailTableEdit setChangeCounter(@Nullable Integer changeCounter)
+    public DetailTableEdit adjustChangeCounter(int change)
     {
-        _changeCounter = changeCounter;
+        _changeCounter = _changeCounter + change;
         return this;
     }
 
@@ -510,14 +508,12 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
 
         // check for the expected number of Data Changes in the latest audit event records
         String auditEventName = AuditLogHelper.getAuditEventNameFromURL();
-        if (!skipChangeCounterCheck && _changeCounter != null && auditEventName != null)
+        if (!skipChangeCounterCheck && auditEventName != null)
         {
             try
             {
-                String projectName = getWrapper().getCurrentProject();
-                String folderName = getWrapper().getCurrentContainer();
                 int changeCounter = AuditLogHelper.isSourcesRoute() ? _changeCounter + 1 : _changeCounter; // Source updates include the name value in the diff (even when not changed)
-                AuditLogHelper.checkTimelineAuditEventDiffCountForLastTransaction(projectName, folderName, auditEventName, changeCounter, 1);
+                new AuditLogHelper(getWrapper()).checkTimelineAuditEventDiffCountForLastTransaction(getWrapper().getCurrentContainerPath(), auditEventName, changeCounter, 1);
             }
             catch (CommandException | IOException e)
             {
