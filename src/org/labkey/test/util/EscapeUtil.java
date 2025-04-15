@@ -16,6 +16,7 @@
 package org.labkey.test.util;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.eclipse.jetty.util.URIUtil;
 
 import java.net.URLDecoder;
@@ -157,11 +158,6 @@ public class EscapeUtil
 
     public static String getMarkupEscapedValue(String value)
     {
-        return value
-                .replace("&", "&amp;")
-                .replace("<", "&lt;")
-                .replace(">", "&gt;")
-                .replace("\"", "&quot;")
-                .replace("'", "&apos;");
+        return StringEscapeUtils.escapeXml11(value);
     }
 }
