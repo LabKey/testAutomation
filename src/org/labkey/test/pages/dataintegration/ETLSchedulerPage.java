@@ -50,6 +50,19 @@ public class ETLSchedulerPage extends LabKeyPage<ETLSchedulerPage.Elements>
         return new ETLSchedulerPage(test);
     }
 
+    /**
+     * gets the ETL given its name.
+     * @param transformName
+     * @return
+     */
+    public TransformRow getTransform(String transformName)
+    {
+        var queryRowLoc = Locator.tag("tr").withAttribute("transformid")
+                .withChild(Locator.tagWithText("td", transformName));
+
+        return new TransformRow(queryRowLoc.findElement(getDriver()));
+    }
+
     public TransformRow transform(String transformId)
     {
         return elementCache().findTransformRow(transformId);

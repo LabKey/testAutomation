@@ -283,12 +283,12 @@ public class AuditLogTest extends BaseWebDriverTest
         stopImpersonating();
         expectedLogValues.add(getUsername() + " stopped impersonating roles: " + PROJECT_ADMIN_ROLE + ", " + AUTHOR_ROLE);
 
-        String adminGroup = "Administrator";
-        impersonateGroup(adminGroup, true);
-        expectedLogValues.add(getUsername() + " impersonated group: " + adminGroup);
+        String usersGroup = "Users";
+        impersonateGroup(usersGroup, true);
+        expectedLogValues.add(getUsername() + " impersonated group: " + usersGroup);
 
         stopImpersonating();
-        expectedLogValues.add(getUsername() + " stopped impersonating group: " + adminGroup);
+        expectedLogValues.add(getUsername() + " stopped impersonating group: " + usersGroup);
 
         navBar().userMenu().signOut();
         expectedLogValues.add(getUsername() + " logged out.");
@@ -387,7 +387,7 @@ public class AuditLogTest extends BaseWebDriverTest
 
         // now grant CanSeeAuditLog permission to our audit user and verify
         // we see audit information
-        permissionsHelper.setSiteAdminRoleUserPermissions(AUDIT_TEST_USER, "See Audit Log Events");
+        permissionsHelper.setSiteRoleUserPermissions(AUDIT_TEST_USER, "See Audit Log Events");
         impersonate(AUDIT_TEST_USER);
         verifyAuditQueries(true);
 

@@ -1,7 +1,10 @@
 <libraries xmlns="http://labkey.org/clientLibrary/xml/">
-    <library compileInProductionMode="false"/>
+    <library compileInProductionMode="false">
+        <script path="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css"/>
+        <script path="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"/>
+    </library>
     <dependencies>
-        <dependency path="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"/>
+        <dependency path="internal/jQuery"/>
     </dependencies>
 </libraries>
 
