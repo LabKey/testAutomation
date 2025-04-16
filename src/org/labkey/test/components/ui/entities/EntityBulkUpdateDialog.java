@@ -296,7 +296,8 @@ public class EntityBulkUpdateDialog extends ModalDialog
         {
             try
             {
-                auditLogHelper.checkTimelineAuditEventDiffCountForLastTransaction(getWrapper().getCurrentContainerPath(), auditEventName, _changeCounter, rowCount);
+                int changeCounter = auditLogHelper.isSourcesRoute() ? _changeCounter + 1 : _changeCounter; // Source updates include the name value in the diff (even when not changed)
+                auditLogHelper.checkTimelineAuditEventDiffCountForLastTransaction(getWrapper().getCurrentContainerPath(), auditEventName, changeCounter, rowCount);
             }
             catch (CommandException | IOException e)
             {
