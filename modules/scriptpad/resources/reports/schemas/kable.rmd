@@ -10,7 +10,9 @@ kable(mtcars, 'html', table.attr='id="mtcars_table"')
 If we hadn't included jquery, this will not render correctly.
 
 <script type="text/javascript" charset="utf-8">
-  $(document).ready(function() {
+  // Issue 52793: KnitrReportTest fails intermittently with client error
+  // Wait for assets to load (i.e. jquery.dataTables)
+  $(window).on('load', function() {
 		$('#mtcars_table').dataTable();
 	} );
 </script>
