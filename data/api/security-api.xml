@@ -11,26 +11,6 @@
                     "isInheritingPerms": false,
                     "groups": [
                         {
-                            "id": -1,
-                            "name": "Site Administrators",
-                            "roles": [],
-                            "isSystemGroup": true,
-                            "isProjectGroup": false,
-                            "type": "g",
-                            "effectivePermissions": [],
-                            "groups": []
-                        },
-                        {
-                            "isSystemGroup": true,
-                            "roles": [],
-                            "name": "Developers",
-                            "effectivePermissions": [],
-                            "groups": [],
-                            "id": -4,
-                            "type": "g",
-                            "isProjectGroup": false,
-                        },
-                        {
                             "id": -3,
                             "name": "Guests",
                             "roles": [],
@@ -126,12 +106,6 @@
                     {
                         "id": -2,
                         "name": "All Site Users",
-                        "isSystemGroup": true,
-                        "isProjectGroup": false
-                    },
-                    {
-                        "id": -1,
-                        "name": "Site Administrators",
                         "isSystemGroup": true,
                         "isProjectGroup": false
                     }
