@@ -26,6 +26,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
+
 /**
  * automates /QueryModel/DetailPanel.tsx in its editable mode
  */
@@ -34,7 +36,7 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
     private final WebElement _formElement;
     private final WebDriver _driver;
     private String _title;
-    private int _readyTimeout = WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
+    private int _readyTimeout = WAIT_FOR_JAVASCRIPT;
 
     protected DetailTableEdit(WebElement formElement, WebDriver driver)
     {
@@ -452,12 +454,16 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
     public DetailDataPanel clickSave()
     {
         String title = getSourceTitle();
+        var componentEl = getComponentElement();
         getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().saveButton));
         elementCache().saveButton.click();
 
         // If save causes some update, wait until it is completed.
         getWrapper().longWait().withMessage("Update took too long to complete.")
                 .until(ExpectedConditions.stalenessOf(elementCache().saveButton));
+
+        // ensure we don't find the current component; wait for it to become stale before searching
+        getWrapper().shortWait().until(ExpectedConditions.stalenessOf(componentEl));
 
         return new DetailDataPanel.DetailDataPanelFinder(getDriver()).withTitle(title).waitFor();
     }
