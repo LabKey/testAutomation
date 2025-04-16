@@ -113,6 +113,7 @@ public class AuditLogHelper
     {
         Integer maxRows = expectedDiffCounts.size();
         List<Map<String, Object>> events = getAuditLogsFromLKS(containerPath, auditEventName, List.of("NewRecordMap"), Collections.emptyList(), maxRows).getRows();
+        assertEquals("Unexpected number of events", expectedDiffCounts.size(), events.size());
         for (int i = 0; i < expectedDiffCounts.size(); i++)
         {
             int expectedDiffCount = expectedDiffCounts.get(i);
