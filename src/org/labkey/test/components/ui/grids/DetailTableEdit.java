@@ -507,13 +507,14 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
                 .until(ExpectedConditions.stalenessOf(elementCache().saveButton));
 
         // check for the expected number of Data Changes in the latest audit event records
-        String auditEventName = AuditLogHelper.getAuditEventNameFromURL();
+        AuditLogHelper auditLogHelper = new AuditLogHelper(getWrapper());
+        String auditEventName = auditLogHelper.getAuditEventNameFromURL();
         if (!skipChangeCounterCheck && auditEventName != null)
         {
             try
             {
-                int changeCounter = AuditLogHelper.isSourcesRoute() ? _changeCounter + 1 : _changeCounter; // Source updates include the name value in the diff (even when not changed)
-                new AuditLogHelper(getWrapper()).checkTimelineAuditEventDiffCountForLastTransaction(getWrapper().getCurrentContainerPath(), auditEventName, changeCounter, 1);
+                int changeCounter = auditLogHelper.isSourcesRoute() ? _changeCounter + 1 : _changeCounter; // Source updates include the name value in the diff (even when not changed)
+                auditLogHelper.checkTimelineAuditEventDiffCountForLastTransaction(getWrapper().getCurrentContainerPath(), auditEventName, changeCounter, 1);
             }
             catch (CommandException | IOException e)
             {

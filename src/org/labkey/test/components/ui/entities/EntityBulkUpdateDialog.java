@@ -290,12 +290,13 @@ public class EntityBulkUpdateDialog extends ModalDialog
         });
 
         // check for the expected number of Data Changes in the latest audit event records
-        String auditEventName = AuditLogHelper.getAuditEventNameFromURL();
+        AuditLogHelper auditLogHelper = new AuditLogHelper(getWrapper());
+        String auditEventName = auditLogHelper.getAuditEventNameFromURL();
         if (!skipChangeCounterCheck && auditEventName != null)
         {
             try
             {
-                new AuditLogHelper(getWrapper()).checkTimelineAuditEventDiffCountForLastTransaction(getWrapper().getCurrentContainerPath(), auditEventName, _changeCounter, rowCount);
+                auditLogHelper.checkTimelineAuditEventDiffCountForLastTransaction(getWrapper().getCurrentContainerPath(), auditEventName, _changeCounter, rowCount);
             }
             catch (CommandException | IOException e)
             {

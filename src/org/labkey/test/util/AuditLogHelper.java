@@ -8,10 +8,8 @@ import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.remoteapi.query.Sort;
-import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
-import org.labkey.test.WebTestHelper;
 import org.labkey.test.pages.core.admin.ShowAdminPage;
 import org.labkey.test.pages.core.admin.ShowAuditLogPage;
 
@@ -69,7 +67,6 @@ public class AuditLogHelper
     {
         if (!_wrapper.isTextPresent("Audit Log"))
         {
-//            _wrapper.goToAdminConsole().clickAuditLog();
             ShowAdminPage.beginAt(_wrapper).clickAuditLog();
         }
 
@@ -100,9 +97,7 @@ public class AuditLogHelper
         filters.forEach(cmd::addFilter);
         if (maxRows != null)
             cmd.setMaxRows(maxRows);
-        if (!containerPath.startsWith("/"))
-            containerPath = "/" + containerPath;
-        return cmd.execute(WebTestHelper.getRemoteApiConnection(), containerPath);
+        return cmd.execute(_connectionSupplier.get(), containerPath);
     }
 
     /**
@@ -131,8 +126,6 @@ public class AuditLogHelper
             dataChanges = Stream.of(dataChanges).filter(s -> !s.toLowerCase().startsWith("rowid=")).toArray(String[]::new);
 
             TestLogger.log("Audit record data changes diff count check: " + dataChangesStr);
-//            _wrapper.checker().verifyEquals("Audit record data changes did not include the expected number of diffs, expected " + expectedDiffCount + " but was " + dataChanges.length + ": " + dataChangesStr,
-//                    expectedDiffCount, dataChanges.length);
             assertEquals("Audit record data changes did not include the expected number of diffs, expected " + expectedDiffCount + " but was " + dataChanges.length + ": " + dataChangesStr,
                     expectedDiffCount, dataChanges.length);
         }
@@ -149,13 +142,12 @@ public class AuditLogHelper
         List<Filter> transactionFilter = List.of(new Filter("TransactionId", transactionId, Filter.Operator.EQUAL));
         int eventCount = getAuditLogsFromLKS(containerPath, auditEventName, List.of("NewRecordMap"), transactionFilter, null).getRows().size();
         if (expectedEventCount != null)
-//            _wrapper.checker().verifyEquals("Unexpected number of events for transactionId " + transactionId, expectedEventCount.intValue(), eventCount);
             assertEquals("Unexpected number of events for transactionId " + transactionId, expectedEventCount.intValue(), eventCount);
         List<Integer> expectedChangeCounts = Collections.nCopies(eventCount, expectedDiffCount);
         checkTimelineAuditEventDiffCount(containerPath, auditEventName, expectedChangeCounts);
     }
 
-    public static String getAuditEventNameFromURL()
+    public String getAuditEventNameFromURL()
     {
         if (isSamplesRoute())
             return "SampleTimelineEvent";
@@ -164,9 +156,9 @@ public class AuditLogHelper
         return null;
     }
 
-    public static boolean isSamplesRoute()
+    public boolean isSamplesRoute()
     {
-        URL url = BaseWebDriverTest.getCurrentTest().getURL();
+        URL url = _wrapper.getURL();
         if (url != null)
             return url.toString().toLowerCase().contains("#/samples")
                     || url.toString().toLowerCase().contains("#/media/mixturebatches")
@@ -174,16 +166,16 @@ public class AuditLogHelper
         return false;
     }
 
-    public static boolean isSourcesRoute()
+    public boolean isSourcesRoute()
     {
-        return Objects.requireNonNull(BaseWebDriverTest.getCurrentTest().getURL().toString()).contains("#/sources");
+        return Objects.requireNonNull(_wrapper.getURL().toString()).contains("#/sources");
     }
 
-    public static boolean isDataClassRoute()
+    public boolean isDataClassRoute()
     {
         if (isSourcesRoute()) return true;
 
-        URL url = BaseWebDriverTest.getCurrentTest().getURL();
+        URL url = _wrapper.getURL();
         if (url != null)
             return url.toString().toLowerCase().contains("#/registry")
                     || url.toString().toLowerCase().contains("#/media/ingredients")
