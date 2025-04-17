@@ -20,12 +20,14 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.pages.core.admin.ShowAuditLogPage;
+import org.labkey.test.params.list.IntListDefinition;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegion;
 import org.labkey.test.util.DataRegionTable;
@@ -35,6 +37,7 @@ import org.labkey.test.util.TestDataGenerator;
 import org.openqa.selenium.WebElement;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -275,13 +278,15 @@ public class UserPermissionsTest extends BaseWebDriverTest
         Regression coverage for Secure Issue 52229: Current folder filter circumvents permission checking on admin-only tables
      */
     @Test
-    public void testFolderFiltersOnAdminOnlyTables()
+    public void testFolderFiltersOnAdminOnlyTables() throws IOException, CommandException
     {
         String listName = TestDataGenerator.randomDomainName("for_Audit_entries");
 
         goToProjectHome();
         log("Add list to create the listAuditLogs events");
-        _listHelper.createList(getProjectName(), listName, "List_key");
+        new IntListDefinition(listName, "List_key")
+                .create(createDefaultConnection(), getProjectName());
+
         goToSchemaBrowser();
         DataRegionTable table = viewQueryData("auditLog", "ListAuditEvent");
         Assert.assertTrue("Table does not have any entries", table.getDataRowCount() > 0);
