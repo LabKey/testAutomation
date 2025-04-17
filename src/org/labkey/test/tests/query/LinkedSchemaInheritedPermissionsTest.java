@@ -1,4 +1,4 @@
-package org.labkey.test.tests;
+package org.labkey.test.tests.query;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -70,14 +70,13 @@ public class LinkedSchemaInheritedPermissionsTest extends BaseWebDriverTest
 
         goToSchemaBrowser();
         selectQuery(linkedSchemaName, queryName);
-        assertTextPresent("Query or table not found: /LinkedSchemaInheritedPermissionsTest Project.lists.People");
-
+        assertTextPresent("Query or table not found: /" + getProjectName() + ".lists.People");
     }
 
     @Override
     protected String getProjectName()
     {
-        return "LinkedSchemaInheritedPermissionsTest Project";
+        return "LinkedSchemaInheritedPermissionsTest Project" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
     }
 
     @Override
