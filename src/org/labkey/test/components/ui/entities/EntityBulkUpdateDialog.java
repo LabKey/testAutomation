@@ -1,5 +1,6 @@
 package org.labkey.test.components.ui.entities;
 
+import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
@@ -13,12 +14,14 @@ import org.labkey.test.components.react.ReactDateTimePicker;
 import org.labkey.test.components.react.ToggleButton;
 import org.labkey.test.components.ui.files.FileAttachmentContainer;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.util.AuditLogHelper;
 import org.labkey.test.util.EscapeUtil;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +33,7 @@ public class EntityBulkUpdateDialog extends ModalDialog
 {
     private final int WAIT_TIMEOUT = 2000;
     private final UpdatingComponent _updatingComponent;
+    private int _changeCounter = 0;
 
     public EntityBulkUpdateDialog(WebDriver driver)
     {
@@ -42,6 +46,16 @@ public class EntityBulkUpdateDialog extends ModalDialog
         _updatingComponent = updatingComponent;
     }
 
+    /**
+     * If for some reason your test set a field but it actually didn't change the value, you can use this helper
+     * to set the change counter to a specific value.
+     */
+    public EntityBulkUpdateDialog adjustChangeCounter(int change)
+    {
+        _changeCounter = _changeCounter + change;
+        return this;
+    }
+
     // enable/disable field editable state
 
     public boolean isFieldEnabled(String fieldKey)
@@ -52,6 +66,8 @@ public class EntityBulkUpdateDialog extends ModalDialog
     public EntityBulkUpdateDialog setEditableState(String fieldKey, boolean enable)
     {
         elementCache().getToggle(fieldKey).set(enable);
+        if (enable) _changeCounter++;
+        else _changeCounter--;
         return this;
     }
 
@@ -153,6 +169,7 @@ public class EntityBulkUpdateDialog extends ModalDialog
     public EntityBulkUpdateDialog removeFile(String fieldKey)
     {
         getFileField(fieldKey).removeFile();
+        _changeCounter++;
         return this;
     }
 
@@ -224,6 +241,24 @@ public class EntityBulkUpdateDialog extends ModalDialog
         return this;
     }
 
+    public Integer getCountFromTitle()
+    {
+        // expecting title to be like "Update N items"
+        String title = getTitle();
+        String[] parts = title.split(" ");
+        if (parts.length > 1)
+        {
+            try
+            {
+                return Integer.parseInt(parts[1]);
+            }
+            catch (NumberFormatException nfe)
+            {
+                return null;
+            }
+        }
+        return null;
+    }
 
     // dismiss the dialog
 
@@ -241,11 +276,34 @@ public class EntityBulkUpdateDialog extends ModalDialog
 
     public void clickUpdate()
     {
+        clickUpdate(false);
+    }
+
+    public void clickUpdate(boolean skipChangeCounterCheck)
+    {
+        Integer rowCount = getCountFromTitle();
+
         _updatingComponent.doAndWaitForUpdate(() ->
         {
             elementCache().updateButton.click();
             waitForClose();
         });
+
+        // check for the expected number of Data Changes in the latest audit event records
+        AuditLogHelper auditLogHelper = new AuditLogHelper(getWrapper());
+        String auditEventName = auditLogHelper.getAuditEventNameFromURL();
+        if (!skipChangeCounterCheck && auditEventName != null)
+        {
+            try
+            {
+                int changeCounter = auditLogHelper.isSourcesRoute() ? _changeCounter + 1 : _changeCounter; // Source updates include the name value in the diff (even when not changed)
+                auditLogHelper.checkTimelineAuditEventDiffCountForLastTransaction(getWrapper().getCurrentContainerPath(), auditEventName, changeCounter, rowCount);
+            }
+            catch (CommandException | IOException e)
+            {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     public void clickCancel()
