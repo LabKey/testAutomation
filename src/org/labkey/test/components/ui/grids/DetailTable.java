@@ -88,9 +88,9 @@ public class DetailTable extends WebDriverComponent<DetailTable.ElementCache>
      */
     private WebElement getField(String identifier)
     {
-        if(elementCache().dataCaptionField(identifier).isDisplayed())
+        if(elementCache().dataByLabel(identifier).isDisplayed())
         {
-            return elementCache().dataCaptionField(identifier);
+            return elementCache().dataByLabel(identifier);
         }
         else if (elementCache().siblingField(identifier).isDisplayed())
         {
@@ -105,12 +105,12 @@ public class DetailTable extends WebDriverComponent<DetailTable.ElementCache>
     /**
      * Return the value of a cell identified by the text in the left most column.
      *
-     * @param fieldCaption The caption/label of the field to get.
+     * @param fieldlabel The label of the field to get.
      * @return A value of the cell as a string.
      **/
-    public String getFieldValue(String fieldCaption)
+    public String getFieldValue(String fieldlabel)
     {
-        return getField(fieldCaption).getText();
+        return getField(fieldlabel).getText();
     }
 
     /**
@@ -126,18 +126,18 @@ public class DetailTable extends WebDriverComponent<DetailTable.ElementCache>
     /**
      * Click on a cell in a grid.
      *
-     * @param fieldCaption The caption/label of the field to click.
+     * @param fieldLabel The label of the field to click.
      **/
-    public void clickField(String fieldCaption)
+    public void clickField(String fieldLabel)
     {
         String urlBefore = getWrapper().getCurrentRelativeURL().toLowerCase();
 
         // Should not click the container, it could be a td which would miss the clickable element.
         // Maybe this shouldn't assume an anchor but should be a generic(*)?
-        Locator.tag("a").waitForElement(getField(fieldCaption), _queryWaitMsec).click();
+        Locator.tag("a").waitForElement(getField(fieldLabel), _queryWaitMsec).click();
 
         WebDriverWrapper.waitFor(()->!urlBefore.equals(getWrapper().getCurrentRelativeURL().toLowerCase()),
-                String.format("Clicking field (link) '%s' did not navigate.", fieldCaption), 500);
+                String.format("Clicking field (link) '%s' did not navigate.", fieldLabel), 500);
 
     }
 
@@ -179,9 +179,9 @@ public class DetailTable extends WebDriverComponent<DetailTable.ElementCache>
 
     protected class ElementCache extends Component<?>.ElementCache
     {
-        public final WebElement dataCaptionField(String caption)
+        public final WebElement dataByLabel(String fieldLabel)
         {
-            return Locator.tagWithAttribute("td", "data-caption", caption).findWhenNeeded(this);
+            return Locator.tagWithAttribute("td", "data-caption", fieldLabel).findWhenNeeded(this);
         }
 
         public final WebElement dataFieldByKey(String fieldKey)
@@ -190,9 +190,9 @@ public class DetailTable extends WebDriverComponent<DetailTable.ElementCache>
         }
 
         // Some tables will show a value in a td with no attributes, use the td that has the text (label) to find the value.
-        public final WebElement siblingField(String caption)
+        public final WebElement siblingField(String fieldLabel)
         {
-            return Locator.tagContainingText("td", caption).followingSibling("td").findWhenNeeded(this);
+            return Locator.tagContainingText("td", fieldLabel).followingSibling("td").findWhenNeeded(this);
         }
 
     }

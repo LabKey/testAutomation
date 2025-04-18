@@ -180,18 +180,6 @@ public class FieldSelectionDialog extends ModalDialog
     }
 
     /**
-     * Collapse a top level field in 'Available Fields' panel.
-     *
-     * @param fieldName Name of the field to collapse.
-     * @return This dialog.
-     */
-    public FieldSelectionDialog collapseAvailableField(String fieldName)
-    {
-        expandOrCollapseByFieldKey(fieldName.replace(" ", ""), false);
-        return this;
-    }
-
-    /**
      * Private helper function that will expand or collapse a row in the 'Available Fields' panel.
      *
      * @param fieldKey The data-fieldkey value of the field to expand.
@@ -628,19 +616,19 @@ public class FieldSelectionDialog extends ModalDialog
         protected final WebElement fieldLabelEdit = Locator.tagWithClass("input", "form-control")
                 .refindWhenNeeded(selectedFieldsPanel);
 
-        // Will get all the list items that match the fieldName.
-        protected List<WebElement> getListItemElements(WebElement panel, String fieldName)
+        // Will get all the list items that match the fieldLabel.
+        protected List<WebElement> getListItemElements(WebElement panel, String fieldLabel)
         {
             return Locator.tagWithClass("div", "list-group-item")
-                    .withDescendant(Locator.tagWithClass("div", "field-name").withText(fieldName))
+                    .withDescendant(Locator.tagWithClass("div", "field-name").withText(fieldLabel))
                     .findElements(panel);
         }
 
-        // Will get the first list item that matches the fieldName.
-        protected WebElement getListItemElement(WebElement panel, String fieldName)
+        // Will get the first list item that matches the fieldLabel.
+        protected WebElement getListItemElement(WebElement panel, String fieldLabel)
         {
             return Locator.tagWithClass("div", "list-group-item")
-                    .withDescendant(Locator.tagWithClass("div", "field-name").withText(fieldName))
+                    .withDescendant(Locator.tagWithClass("div", "field-name").withText(fieldLabel))
                     .findElement(panel);
         }
 

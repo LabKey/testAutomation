@@ -73,7 +73,7 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
 
     /**
      * gets the cell at the specified index
-     * use columnHeader, which computes the appropriate index
+     * use fieldLabel, which computes the appropriate index
      * This method is intended for short-term use, until we can offload usages in the heatmap to its own component
      */
     public WebElement getCell(int colIndex)
@@ -84,9 +84,9 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
     /**
      * gets the cell corresponding to the specified column
      */
-    public WebElement getCell(String columnLabel)
+    public WebElement getCell(String fieldLabel)
     {
-        return getCell(_grid.getColumnIndex(columnLabel));
+        return getCell(_grid.getColumnIndex(fieldLabel));
     }
 
     /**
@@ -128,25 +128,25 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
     /**
      * finds a AttachmentCard in the specified column, clicks it, and waits for the image to display in a modal
      */
-    public ImageFileViewDialog clickImgFile(String columnTitle)
+    public ImageFileViewDialog clickImgFile(String fieldLabel)
     {
-        return elementCache().waitForAttachment(columnTitle).viewImgFile();
+        return elementCache().waitForAttachment(fieldLabel).viewImgFile();
     }
 
     /**
      * finds a AttachmentCard specified filename, clicks it, and waits for the file to download
      */
-    public File clickNonImgFile(String columnTitle)
+    public File clickNonImgFile(String fieldLabel)
     {
-        return elementCache().waitForAttachment(columnTitle).clickOnNonImgFile();
+        return elementCache().waitForAttachment(fieldLabel).clickOnNonImgFile();
     }
 
     /**
      * Returns the text in the row for the specified column
      */
-    public String getText(String columnText)
+    public String getText(String fieldLabel)
     {
-        return getCell(columnText).getText();
+        return getCell(fieldLabel).getText();
     }
 
     /**
@@ -202,9 +202,9 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
         public ReactCheckBox selectCheckbox = new ReactCheckBox(Locator.tagWithAttribute("input", "type", "checkbox")
             .findWhenNeeded(this));
 
-        public AttachmentCard waitForAttachment(String columnTitle)
+        public AttachmentCard waitForAttachment(String fieldLabel)
         {
-            return new AttachmentCard.FileAttachmentCardFinder(getDriver()).waitFor(getCell(columnTitle));
+            return new AttachmentCard.FileAttachmentCardFinder(getDriver()).waitFor(getCell(fieldLabel));
         }
     }
 
