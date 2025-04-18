@@ -18,7 +18,6 @@ import java.util.List;
 public class LabkeyErrorPageTest extends BaseWebDriverTest
 {
     private static final String READER_USER = "reader_user@user.test";
-    private static final String PROJECT_NAME = "Labkey Error Page Test";
 
     @BeforeClass
     public static void setupProject()
@@ -112,7 +111,7 @@ public class LabkeyErrorPageTest extends BaseWebDriverTest
     @Override
     protected @Nullable String getProjectName()
     {
-        return PROJECT_NAME;
+        return  "LabkeyErrPageTest Project";
     }
 
     @Override
