@@ -25,7 +25,7 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
 {
     final WebElement _el;
     final ResponsiveGrid<?> _grid;
-    private Map<String, String> _rowMap = null;
+    private Map<String, String> _rowMapByLabel = null;
 
     protected GridRow(ResponsiveGrid<?> grid, WebElement element)
     {
@@ -162,21 +162,21 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
     }
 
     /**
-     * gets a map of the row's values, keyed by column name
+     * gets a map of the row's values, keyed by column label
      */
-    public Map<String, String> getRowMap()
+    public Map<String, String> getRowMapByLabel()
     {
-        if (_rowMap == null)
+        if (_rowMapByLabel == null)
         {
-            _rowMap = new CaseInsensitiveHashMap<>();
+            _rowMapByLabel = new CaseInsensitiveHashMap<>();
             List<String> columns = _grid.getColumnLabels();
             List<String> rowCellTexts = getTexts();
             for (int i = 0; i < columns.size(); i++)
             {
-                _rowMap.put(columns.get(i), rowCellTexts.get(i));
+                _rowMapByLabel.put(columns.get(i), rowCellTexts.get(i));
             }
         }
-        return _rowMap;
+        return _rowMapByLabel;
     }
 
     @Override

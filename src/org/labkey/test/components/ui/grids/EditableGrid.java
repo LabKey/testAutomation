@@ -267,7 +267,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         return gridData;
     }
 
-    public List<String> getColumnData(String fieldLabel)
+    public List<String> getColumnDataByLabel(String fieldLabel)
     {
         return getGridData(fieldLabel).stream().map(a-> a.get(fieldLabel)).collect(Collectors.toList());
     }
@@ -289,7 +289,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     {
         int index = -1;
 
-        List<String> columnData = getColumnData(fieldLabel);
+        List<String> columnData = getColumnDataByLabel(fieldLabel);
         for (int i = 0; i < columnData.size(); i++)
         {
             if (columnData.get(i).equals(text))

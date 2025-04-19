@@ -209,7 +209,7 @@ public class EditableGridTest extends BaseWebDriverTest
                 "Unable to paste. Cannot paste columns beyond the columns found in the grid.",
                 testGrid.getCellPopoverText(0, "Description"));
         assertThat("Expect failed paste to leave data unchanged",
-                testGrid.getColumnData("Name"), everyItem(is("")));
+                testGrid.getColumnDataByLabel("Name"), everyItem(is("")));
     }
 
     @Test
@@ -226,8 +226,8 @@ public class EditableGridTest extends BaseWebDriverTest
         assertEquals("Initial editable grid row count", 0, testGrid.getRowCount());
         testGrid.addRows(1);
         testGrid.pasteFromCell(0, DESC_STRING, tallShape);
-        List<String> pastedColData = testGrid.getColumnData(DESC_STRING);
-        List<String> unpastedColData = testGrid.getColumnData(ASC_STRING);
+        List<String> pastedColData = testGrid.getColumnDataByLabel(DESC_STRING);
+        List<String> unpastedColData = testGrid.getColumnDataByLabel(ASC_STRING);
 
         assertEquals("Didn't get correct values", List.of("42", "41", "40", "39", "38"), pastedColData);
         assertThat("expect other column to remain empty",
@@ -253,16 +253,16 @@ public class EditableGridTest extends BaseWebDriverTest
         List<String> expectedDecreasing = List.of("4", "2", "0", "-2", "-4", "");
         assertEquals("Drag-fill should have extrapolated " + ASC_STRING,
                 expectedIncreasing,
-                testGrid.getColumnData(ASC_STRING));
+                testGrid.getColumnDataByLabel(ASC_STRING));
         assertEquals("Drag-fill should have extrapolated " + DESC_STRING,
                 expectedDecreasing,
-                testGrid.getColumnData(DESC_STRING));
+                testGrid.getColumnDataByLabel(DESC_STRING));
         assertEquals("Drag-fill should have extrapolated " + ASC_INT,
                 expectedIncreasing,
-                testGrid.getColumnData(ASC_INT));
+                testGrid.getColumnDataByLabel(ASC_INT));
         assertEquals("Drag-fill should have extrapolated " + DESC_INT,
                 expectedDecreasing,
-                testGrid.getColumnData(DESC_INT));
+                testGrid.getColumnDataByLabel(DESC_INT));
     }
 
     @Test
@@ -282,10 +282,10 @@ public class EditableGridTest extends BaseWebDriverTest
         List<String> expectedDecreasing = List.of("ABC-4", "ABC-2", "ABC-0", "ABC--2", "ABC--4", "");
         assertEquals("Drag-fill should have extrapolated " + ASC_STRING,
                 expectedIncreasing,
-                testGrid.getColumnData(ASC_STRING));
+                testGrid.getColumnDataByLabel(ASC_STRING));
         assertEquals("Drag-fill should have extrapolated " + DESC_STRING,
                 expectedDecreasing,
-                testGrid.getColumnData(DESC_STRING));
+                testGrid.getColumnDataByLabel(DESC_STRING));
     }
 
     @Test
@@ -326,19 +326,19 @@ public class EditableGridTest extends BaseWebDriverTest
 
         checker().verifyEquals("Drag-fill should have filled " + FILL_STRING,
                 List.of(stringValue, stringValue, stringValue, ""),
-                testGrid.getColumnData(FILL_STRING));
+                testGrid.getColumnDataByLabel(FILL_STRING));
         checker().verifyEquals("Drag-fill should have filled " + FILL_MULTI_LINE,
                 List.of(multiLineValue, multiLineValue, multiLineValue, ""),
-                testGrid.getColumnData(FILL_MULTI_LINE));
+                testGrid.getColumnDataByLabel(FILL_MULTI_LINE));
         checker().verifyEquals("Drag-fill should have filled " + FILL_INT,
                 List.of(intValue, intValue, intValue, ""),
-                testGrid.getColumnData(FILL_INT));
+                testGrid.getColumnDataByLabel(FILL_INT));
         checker().verifyEquals("Drag-fill should have filled " + FILL_DATE,
                 List.of(EditableGrid.DATE_FORMAT.format(now),
                         EditableGrid.DATE_FORMAT.format(now.plusDays(1)),
                         EditableGrid.DATE_FORMAT.format(now.plusDays(2)),
                         ""),
-                testGrid.getColumnData(FILL_DATE));
+                testGrid.getColumnDataByLabel(FILL_DATE));
 
         // Check that pasting increased the size of all the rows.
         var totalHeightAfter = new Object(){int size = 0; };
@@ -374,10 +374,10 @@ public class EditableGridTest extends BaseWebDriverTest
 
         checker().verifyEquals("Drag-fill should have filled " + FILL_STRING,
                 List.of("QWE", "ASD", "ZXC", "QWE", "ASD", "ZXC", ""),
-                testGrid.getColumnData(FILL_STRING));
+                testGrid.getColumnDataByLabel(FILL_STRING));
         checker().verifyEquals("Drag-fill should have filled " + FILL_MULTI_LINE,
                 List.of(mlRow1, "", mlRow2, mlRow1, "", mlRow2, ""),
-                testGrid.getColumnData(FILL_MULTI_LINE));
+                testGrid.getColumnDataByLabel(FILL_MULTI_LINE));
         checker().verifyEquals("Drag-fill should have filled " + FILL_DATE,
                 List.of(EditableGrid.DATE_FORMAT.format(now),
                         EditableGrid.DATE_FORMAT.format(now.plusDays(3)),
@@ -386,7 +386,7 @@ public class EditableGridTest extends BaseWebDriverTest
                         EditableGrid.DATE_FORMAT.format(now.plusDays(3)),
                         EditableGrid.DATE_FORMAT.format(now.plusDays(1)),
                         ""),
-                testGrid.getColumnData(FILL_DATE));
+                testGrid.getColumnDataByLabel(FILL_DATE));
     }
 
     @Test
@@ -644,7 +644,7 @@ public class EditableGridTest extends BaseWebDriverTest
                 waitFor(()->expectedValues.size() == editableGrid.getRowCount(), 1_000));
 
         checker().verifyEquals(String.format("Values in column '%s' not as expected.", PASTE_ML),
-                expectedValues, editableGrid.getColumnData(PASTE_ML));
+                expectedValues, editableGrid.getColumnDataByLabel(PASTE_ML));
 
         checker().screenShotIfNewError("Paste_Into_Multiple_Cells_Error");
 

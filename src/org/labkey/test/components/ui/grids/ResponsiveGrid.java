@@ -636,9 +636,9 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
      * @param rowIndex  the index of the desired row
      * @return  A Map containing column/value pairs for the specified row
      */
-    public Map<String, String> getRowMap(int rowIndex)
+    public Map<String, String> getRowMapByLabel(int rowIndex)
     {
-        return getRow(rowIndex).getRowMap();
+        return getRow(rowIndex).getRowMapByLabel();
     }
 
     /**
@@ -653,7 +653,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
      *
      * @return a list of Map&#60;String, String&#62; containing keys and values for each row
      */
-    public List<Map<String, String>> getRowMaps()
+    public List<Map<String, String>> getRowMapsByLabel()
     {
         if(null == elementCache().mapList)
         {
@@ -865,7 +865,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
             gridRows = getRows();
             for(GridRow row : gridRows)
             {
-                rowMaps.add(row.getRowMap());
+                rowMaps.add(row.getRowMapByLabel());
             }
             return rowMaps;
         }

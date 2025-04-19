@@ -147,7 +147,7 @@ public class DetailTable extends WebDriverComponent<DetailTable.ElementCache>
      *
      * @return A map with string values.
      **/
-    public Map<String, String> getTableData()
+    public Map<String, String> getTableDataByLabel()
     {
         Map<String, String> tableData = new HashMap<>();
 

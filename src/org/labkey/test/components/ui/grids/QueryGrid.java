@@ -72,9 +72,9 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
      * @param text column text to search for
      * @return row data
      */
-    public Map<String, String> getRowMap(String text)
+    public Map<String, String> getRowMapByLabel(String text)
     {
-        return getRow(text).getRowMap();
+        return getRow(text).getRowMapByLabel();
     }
 
     /**
@@ -83,10 +83,10 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
      * @param text text in the data cell
      * @return row data
      */
-    public Map<String, String> getRowMap(String fieldLabel, String text)
+    public Map<String, String> getRowMapByLabel(String fieldLabel, String text)
     {
         GridRow row = getRow(fieldLabel, text);
-        return row.getRowMap();
+        return row.getRowMapByLabel();
     }
 
     /**
@@ -94,9 +94,9 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
      * @param partialMap Map where keys are columnText, values are full text
      * @return row data
      */
-    public Map<String, String> getRowMap(Map<String, String> partialMap)
+    public Map<String, String> getRowMapByLabel(Map<String, String> partialMap)
     {
-        return getRow(partialMap).getRowMap();
+        return getRow(partialMap).getRowMapByLabel();
     }
 
     /**
@@ -104,9 +104,9 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
      * @param containing Locator for an element in the row
      * @return row data
      */
-    public Map<String, String> getRowMap(Locator.XPathLocator containing)
+    public Map<String, String> getRowMapByLabel(Locator.XPathLocator containing)
     {
-        return getRow(containing).getRowMap();
+        return getRow(containing).getRowMapByLabel();
     }
 
     // row selection
