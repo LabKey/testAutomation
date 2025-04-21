@@ -15,7 +15,6 @@ import org.labkey.test.components.react.ReactDateTimePicker;
 import org.labkey.test.components.react.ReactSelect;
 import org.labkey.test.components.ui.files.FileUploadField;
 import org.labkey.test.params.FieldDefinition;
-import org.labkey.test.params.FieldKey;
 import org.labkey.test.util.AuditLogHelper;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
@@ -176,7 +175,7 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
     public DetailTableEdit setInputByFieldName(String fieldName, String value)
     {
         Locator inputloc = Locator.tagWithClass("input", "form-control")
-            .withAttribute("name", FieldKey.encodePart(fieldName));
+            .withAttribute("name", fieldName);
         Input input = Input.Input(inputloc,
                 getDriver()).waitFor();
         input.set(value);
@@ -187,7 +186,7 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
     public DetailTableEdit setTextareaByFieldName(String fieldName, String value)
     {
         Locator inputloc = Locator.tagWithClass("textarea", "form-control")
-                .withAttribute("name",  FieldKey.encodePart(fieldName));
+                .withAttribute("name", fieldName);
         Input input = Input.Input(inputloc,
                 getDriver()).waitFor();
         input.set(value);
