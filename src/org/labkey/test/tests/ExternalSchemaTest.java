@@ -377,6 +377,8 @@ public class ExternalSchemaTest extends BaseWebDriverTest
 //            assertEquals("The row is from the wrong container.", ex.getMessage());
 //            assertEquals("org.labkey.api.view.UnauthorizedException", ex.getProperties().get("exceptionClass"));
         }
+
+        updateDuplicateRows(PROJECT_NAME, cn, updated);
         
         try
         {
@@ -458,6 +460,28 @@ public class ExternalSchemaTest extends BaseWebDriverTest
             assertEquals(rows[i], updated[i]);
         }
         return updated;
+    }
+
+    // Issue 52728: Update the same data twice should fail
+    void updateDuplicateRows(String containerPath, Connection cn, Row... rows) throws ParseException, IOException, CommandException
+    {
+        log("** Updating twice in a single request via api...");
+        UpdateRowsCommand cmd = new UpdateRowsCommand(USER_SCHEMA_NAME, TABLE_NAME);
+
+        for (Row row : rows)
+            cmd.addRow(row.toMap());
+        cmd.addRow(rows[0].toMap()); // add the 1st row twice
+
+        try
+        {
+            cmd.execute(cn, containerPath);
+            fail("expected exception when trying to update the same keys twice");
+        }
+        catch (CommandException ex)
+        {
+            assertEquals(400, ex.getStatusCode());
+        }
+
     }
     
     void deleteViaJavaApi(String containerPath, Connection cn, int... pks) throws IOException, CommandException
