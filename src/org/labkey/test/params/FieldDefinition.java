@@ -118,9 +118,7 @@ public class FieldDefinition extends PropertyDescriptor
             }
         }
 
-        // This differs from BaseColumnInfo.labelForName because for testing purposes
-        // we need the label as shown in the UI, which will contract multiple spaces
-        return buf.toString().replaceAll("\\s+", " ");
+        return buf.toString();
     }
 
     @Override
