@@ -85,13 +85,8 @@ public class FieldDefinition extends PropertyDescriptor
         this(name, ColumnType.String);
     }
 
-    public static String labelFromName(String name)
-    {
-        return labelFromName(name, true);
-    }
-
     // See BaseColumnInfo.labelFromName
-    public static String labelFromName(String name, boolean collapseSpaces)
+    public static String labelFromName(String name)
     {
         if (name == null)
             return null;
@@ -123,13 +118,9 @@ public class FieldDefinition extends PropertyDescriptor
             }
         }
 
-        if (collapseSpaces)
-        {
-            // This differs from BaseColumnInfo.labelForName because for testing purposes
-            // we need the label as shown in the UI, which will contract multiple spaces
-            return buf.toString().replaceAll("\\s+", " ");
-        }
-        return buf.toString();
+        // This differs from BaseColumnInfo.labelForName because for testing purposes
+        // we need the label as shown in the UI, which will contract multiple spaces
+        return buf.toString().replaceAll("\\s+", " ");
     }
 
     @Override

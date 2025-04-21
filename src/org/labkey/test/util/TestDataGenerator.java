@@ -523,13 +523,7 @@ public class TestDataGenerator
      */
     public static String randomName(@NotNull String part, int numStartChars, int numEndChars, String charSet, @Nullable String exclusions)
     {
-        String name = randomString(numStartChars, exclusions, charSet) + part + randomString(numEndChars, exclusions, charSet);
-
-        // Multiple spaces in the UI are collapsed into a single space so we collapse them here so we can find things by name.
-        // See Issue 52193 for details.
-        // If we need to test for handling of multiple spaces, we'll not use this generator.
-        name = name.trim().replaceAll("\\s+", " ");
-        return name;
+        return randomString(numStartChars, exclusions, charSet) + part + randomString(numEndChars, exclusions, charSet);
     }
 
     public static String randomDomainName()

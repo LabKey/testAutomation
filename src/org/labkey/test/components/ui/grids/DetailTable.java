@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
+import static org.labkey.test.util.selenium.WebDriverUtils.getTextContent;
 
 /**
  * This is a 'special' table that has only two columns, and no header. An example of this table can be seen in the
@@ -155,7 +156,7 @@ public class DetailTable extends WebDriverComponent<DetailTable.ElementCache>
         {
             List<WebElement> tds = tableRow.findElements(By.tagName("td"));
 
-            tableData.put(tds.get(0).getText(), tds.get(1).getText());
+            tableData.put(getTextContent(tds.get(0)), tds.get(1).getText());
         }
 
         return tableData;

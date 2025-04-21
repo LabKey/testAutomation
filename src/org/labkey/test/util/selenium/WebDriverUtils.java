@@ -147,6 +147,23 @@ public abstract class WebDriverUtils
     }
 
     /**
+     * {@link WebElement#getText()} matches the browser's rendering, which collapses and trims whitespace.
+     * If you need the actual text written by the server, the element's {@code textContent} property is unmodified.<br>
+     * Given a WebElement representing the following div:
+     * <pre>{@code
+     * <div> three   spaces </div>
+     * }</pre>
+     * {@link WebElement#getText()} would return {@code "three spaces"} but this method will retain the extra spaces.
+     * @param element element to inspect
+     * @return textContent for the given element
+     */
+    @SuppressWarnings("unchecked")
+    public static String getTextContent(WebElement element)
+    {
+        return element.getDomProperty("textContent");
+    }
+
+    /**
      * Attempts to get alert text from an {@link UnhandledAlertException}. If exception does not supply the alert text,
      * attempt to get it from the alert directly (requires {@link org.openqa.selenium.UnexpectedAlertBehaviour#IGNORE}).
      * Either way, the alert will be dismissed if present.

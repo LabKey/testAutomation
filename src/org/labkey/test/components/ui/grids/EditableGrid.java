@@ -49,6 +49,7 @@ import static org.labkey.test.WebDriverWrapper.waitFor;
 import static org.labkey.test.util.TestLogger.log;
 import static org.labkey.test.util.selenium.ScrollUtils.Alignment.center;
 import static org.labkey.test.util.selenium.WebDriverUtils.MODIFIER_KEY;
+import static org.labkey.test.util.selenium.WebDriverUtils.getTextContent;
 
 public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 {
@@ -1136,7 +1137,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
             {
                 for (WebElement el : headerCells)
                 {
-                    fieldLabels.add(el.getText().trim());
+                    fieldLabels.add(getTextContent(el));
                 }
 
                 int rowNumberColumn = 0;
