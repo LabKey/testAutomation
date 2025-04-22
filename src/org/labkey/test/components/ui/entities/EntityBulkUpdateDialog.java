@@ -208,18 +208,18 @@ public class EntityBulkUpdateDialog extends ModalDialog
         return BootstrapLocators.warningBanner.waitForElement(elementCache(), getWrapper().defaultWaitForPage).getText();
     }
 
-    public List<String> getColumns()
+    public List<String> getFieldNames()
     {
         List<WebElement> labels = Locator.tagWithClass("label", "control-label").withAttribute("for")
                 .waitForElements(elementCache(), 2_000);
         List<String> columns = new ArrayList<>();
-        labels.forEach(a -> columns.add(a.getAttribute("for")));
+        labels.forEach(a -> columns.add(a.getDomAttribute("for")));
         return columns;
     }
 
-    public EntityBulkUpdateDialog waitForColumnsToBe(List<String> expectedColumns, int waitMilliseconds)
+    public EntityBulkUpdateDialog waitForFieldsToBe(List<String> expectedFieldNames, int waitMilliseconds)
     {
-        WebDriverWrapper.waitFor(()-> expectedColumns.equals(getColumns()),
+        WebDriverWrapper.waitFor(()-> expectedFieldNames.equals(getFieldNames()),
                 "Wrong editable fields", waitMilliseconds);
         return this;
     }
