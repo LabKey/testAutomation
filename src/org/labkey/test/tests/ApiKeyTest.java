@@ -161,7 +161,7 @@ public class ApiKeyTest extends BaseWebDriverTest
 
         QueryGrid grid = new QueryGrid.QueryGridFinder(getDriver()).waitFor();
         int beforeDeleteCount = grid.getRecordCount();
-        assertFalse("Row with description not found", grid.getRowMap("Description", keyDescription).isEmpty());
+        assertFalse("Row with description not found", grid.getRowMapByLabel("Description", keyDescription).isEmpty());
         grid = deleteAPIKeyViaUI();
         assertEquals("Number of keys after UI deletion not as expected", beforeDeleteCount - 1, grid.getRecordCount());
         verifyInvalidAPIKey(createApiKeyConnection(apiKey), false);

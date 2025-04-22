@@ -170,11 +170,11 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
 
     /**
      * Click a button on the grid bar with the given text.
-     * @param buttonCaption Button caption.
+     * @param buttonText Button text.
      */
-    public void clickButton(String buttonCaption)
+    public void clickButton(String buttonText)
     {
-        var btn = BootstrapLocators.button(buttonCaption).waitForElement(this, 5_000);
+        var btn = BootstrapLocators.button(buttonText).waitForElement(this, 5_000);
         getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(btn));   // for cases when a disabled button
         btn.click();                                                                    // awaits being enabled, for example by selecting grid items
     }
@@ -252,7 +252,7 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
             }
             catch (NoSuchElementException nse)
             {
-                getWrapper().log("Couldn't find menu button with caption '" + buttonText + "', trying again.");
+                getWrapper().log("Couldn't find menu button with text '" + buttonText + "', trying again.");
                 tries++;
                 sleep(500);
             }
@@ -261,7 +261,7 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
         if(found)
             return multiMenu.getMenuText();
 
-        throw new NoSuchElementException("Couldn't find menu button with caption '" + buttonText + "'.");
+        throw new NoSuchElementException("Couldn't find menu button with text '" + buttonText + "'.");
     }
 
     /**

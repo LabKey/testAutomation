@@ -200,7 +200,7 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
 
     public List<String> getColumnHeaders()
     {
-        return getEditableGrid().getColumnNames();
+        return getEditableGrid().getColumnLabels();
     }
 
     public List<Map<String, String>> getGridData()
