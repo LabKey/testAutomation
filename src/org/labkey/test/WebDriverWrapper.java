@@ -3530,9 +3530,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         Keys cmdKey = WebDriverUtils.MODIFIER_KEY;
 
-        Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
-        StringSelection sel = new StringSelection(text);
-        c.setContents(sel, sel);
+        setClipboardContent(text);
 
         if (input == null)
         {
@@ -3551,6 +3549,18 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     .keyUp(cmdKey)
                     .perform();
         }
+    }
+
+    public void clearClipboardContent()
+    {
+        setClipboardContent("");
+    }
+
+    protected void setClipboardContent(String text)
+    {
+        Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
+        StringSelection sel = new StringSelection(text);
+        c.setContents(sel, sel);
     }
 
     public String getClipboardContent() throws IOException, UnsupportedFlavorException
