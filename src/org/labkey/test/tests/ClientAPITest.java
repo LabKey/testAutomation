@@ -300,7 +300,7 @@ public class ClientAPITest extends BaseWebDriverTest
     private void createStudies()
     {
         // create time-based study
-        projectMenu().navigateToFolder(getProjectName(), TIME_STUDY_FOLDER);
+        goToProjectFolder(getProjectName(), TIME_STUDY_FOLDER);
         navBar().goToModule("Study");
         CreateStudyPage createStudyPage = _studyHelper.startCreateStudy();
         createStudyPage.setLabel(TIME_STUDY_NAME)
@@ -308,7 +308,7 @@ public class ClientAPITest extends BaseWebDriverTest
                 .createStudy();
 
         // create a visit-based study in a different container
-        projectMenu().navigateToFolder(getProjectName(), VISIT_STUDY_FOLDER);
+        goToProjectFolder(getProjectName(), VISIT_STUDY_FOLDER);
         navBar().goToModule("Study");
         CreateStudyPage createVisitStudyPage = _studyHelper.startCreateStudy();
         createVisitStudyPage.setLabel(VISIT_STUDY_NAME)
