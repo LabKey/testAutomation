@@ -96,14 +96,14 @@ public class LineageGrid extends WebDriverComponent<LineageGrid.ElementCache>
                 .collect(Collectors.toList());
     }
 
-    public Map<String, String> getRowMap(String lineageName)
+    public Map<String, String> getRowMapsByLabel(String lineageName)
     {
-        return elementCache().table.getRow("ID", lineageName).getRowMap();
+        return elementCache().table.getRow("ID", lineageName).getRowMapByLabel();
     }
 
-    public List<Map<String, String>> getRowMaps()
+    public List<Map<String, String>> getRowMapsByLabel()
     {
-        return elementCache().table.getRowMaps();
+        return elementCache().table.getRowMapsByLabel();
     }
 
     public List<String> getLineageNamesOnPage()
@@ -173,7 +173,7 @@ public class LineageGrid extends WebDriverComponent<LineageGrid.ElementCache>
         }
 
 
-        ResponsiveGrid table = new ResponsiveGrid.ResponsiveGridFinder(getDriver()).find(this);
+        ResponsiveGrid<?> table = new ResponsiveGrid.ResponsiveGridFinder(getDriver()).find(this);
 
         WebElement generationLimitMsgEl = Locator.tagWithClass("div", "lineage-grid-generation-limit-msg")
                 .findWhenNeeded(this);
