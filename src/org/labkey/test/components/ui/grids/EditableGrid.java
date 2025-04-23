@@ -15,7 +15,7 @@ import org.labkey.test.components.ui.entities.EntityBulkInsertDialog;
 import org.labkey.test.components.ui.entities.EntityBulkUpdateDialog;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.selenium.ScrollUtils;
-import org.labkey.test.util.selenium.WebDriverUtils;
+import org.labkey.test.util.selenium.WebElementUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
@@ -1163,7 +1163,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         private String getLabelFromHeaderCell(WebElement el)
         {
             // Use text nodes to ignore browser whitespace formatting
-            List<String> textNodes = WebDriverUtils.getTextNodesWithin(el);
+            List<String> textNodes = WebElementUtils.getTextNodesWithin(el);
             if (textNodes.isEmpty())
             {
                 List<WebElement> children = Locator.xpath("./*").findElements(el);

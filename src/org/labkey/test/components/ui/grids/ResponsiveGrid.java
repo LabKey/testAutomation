@@ -15,7 +15,7 @@ import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.components.react.ReactCheckBox;
 import org.labkey.test.components.ui.search.FilterExpressionPanel;
-import org.labkey.test.util.selenium.WebDriverUtils;
+import org.labkey.test.util.selenium.WebElementUtils;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.NotFoundException;
@@ -319,7 +319,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
                 .until(ExpectedConditions.stalenessOf(textEdit));
 
         doAndWaitForUpdate(()->
-                WebDriverWrapper.waitFor(()-> WebDriverUtils.getTextContent(headerCell).equals(newColumnLabel),
+                WebDriverWrapper.waitFor(()-> WebElementUtils.getTextContent(headerCell).equals(newColumnLabel),
                         "Column header not updated.", 1_000)
         );
         waitForLoaded();
@@ -830,7 +830,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
                     headerCellElements.remove(0);
                     offset = 1;
                 }
-                fieldLabels = headerCellElements.stream().map(WebDriverUtils::getTextContent).toList();
+                fieldLabels = headerCellElements.stream().map(WebElementUtils::getTextContent).toList();
                 indexes = new HashMap<>();
                 for (int i = 0; i < headerCellElements.size(); i++)
                 {

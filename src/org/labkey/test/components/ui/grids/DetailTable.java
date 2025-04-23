@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
-import static org.labkey.test.util.selenium.WebDriverUtils.getTextContent;
+import static org.labkey.test.util.selenium.WebElementUtils.getTextContent;
 
 /**
  * This is a 'special' table that has only two columns, and no header. An example of this table can be seen in the
