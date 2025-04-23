@@ -523,7 +523,7 @@ public class TestDataGenerator
      */
     public static String randomName(@NotNull String part, int numStartChars, int numEndChars, String charSet, @Nullable String exclusions)
     {
-        return randomString(numStartChars, exclusions, charSet) + part + randomString(numEndChars, exclusions, charSet);
+        return (randomString(numStartChars, exclusions, charSet) + part + randomString(numEndChars, exclusions, charSet)).trim();
     }
 
     public static String randomDomainName()
