@@ -1142,7 +1142,7 @@ public class GridPanelTest extends GridPanelBaseTest
         expectedValues.add(FILTER_INT_COL);
         expectedValues.add(FILTER_STRING_COL);
 
-        List<String> actualValues = filterDialog.getFilteredFields();
+        List<String> actualValues = filterDialog.getFilteredFieldLabels();
 
         Collections.sort(expectedValues);
         Collections.sort(actualValues);
@@ -1222,7 +1222,7 @@ public class GridPanelTest extends GridPanelBaseTest
         expectedValues.add(FILTER_INT_COL);
         expectedValues.add(FILTER_STRING_COL);
 
-        actualValues = filterDialog.getFilteredFields();
+        actualValues = filterDialog.getFilteredFieldLabels();
 
         Collections.sort(expectedValues);
         Collections.sort(actualValues);
@@ -1667,7 +1667,7 @@ public class GridPanelTest extends GridPanelBaseTest
 
         GridFilterModal filterDialog = grid.getGridBar().openFilterDialog();
 
-        List<String> actualList = filterDialog.getAvailableFields();
+        List<String> actualList = filterDialog.getAvailableFieldLabels();
 
         List<String> expectedList = new ArrayList<>(extraColumnsHeaders);
         expectedList.add(FILTER_NAME_COL);
@@ -1690,7 +1690,7 @@ public class GridPanelTest extends GridPanelBaseTest
         expectedList.removeAll(removedColumns);
 
         filterDialog = grid.getGridBar().openFilterDialog();
-        actualList = filterDialog.getAvailableFields();
+        actualList = filterDialog.getAvailableFieldLabels();
 
         checker().verifyTrue(String.format("The fields listed in the dialog are not as expected. Expected '%s'.", expectedList),
                         actualList.containsAll(expectedList));
@@ -1726,7 +1726,7 @@ public class GridPanelTest extends GridPanelBaseTest
 
         filterDialog = grid.getGridBar().openFilterDialog();
 
-        actualList = filterDialog.getFilteredFields();
+        actualList = filterDialog.getFilteredFieldLabels();
 
         checker().verifyTrue("No fields should be shown as filtered.",
                 actualList.isEmpty());
@@ -1739,7 +1739,7 @@ public class GridPanelTest extends GridPanelBaseTest
         expectedList.add(FILTER_DATE_COL);
         expectedList.add(FILTER_STORED_AMOUNT_COL);
 
-        actualList = filterDialog.getAvailableFields();
+        actualList = filterDialog.getAvailableFieldLabels();
 
         Collections.sort(expectedList);
         Collections.sort(actualList);
@@ -1800,7 +1800,7 @@ public class GridPanelTest extends GridPanelBaseTest
 
         filterDialog = grid.getGridBar().openFilterDialog();
 
-        actualList = filterDialog.getAvailableFields();
+        actualList = filterDialog.getAvailableFieldLabels();
 
         Collections.sort(expectedList);
         Collections.sort(actualList);
@@ -1809,7 +1809,7 @@ public class GridPanelTest extends GridPanelBaseTest
                 expectedList, actualList);
 
         expectedList = Arrays.asList(FILTER_BOOL_COL);
-        actualList = filterDialog.getFilteredFields();
+        actualList = filterDialog.getFilteredFieldLabels();
 
         checker().verifyEquals(String.format("List of filtered fields with view '%s' not as expected.", FILTER_BOOL_COL),
                 expectedList, actualList);
@@ -1826,7 +1826,7 @@ public class GridPanelTest extends GridPanelBaseTest
         filterDialog = grid.getGridBar().openFilterDialog();
 
         log("Make sure no fields are shown as filtered.");
-        actualList = filterDialog.getFilteredFields();
+        actualList = filterDialog.getFilteredFieldLabels();
 
         checker().verifyTrue(String.format("The fields '%s' are shown as being filtered. They should not be.", actualList),
                 actualList.isEmpty());

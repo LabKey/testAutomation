@@ -95,7 +95,7 @@ public class UIPermissionsHelper extends PermissionsHelper
             namesList.append(member).append("\n");
         }
 
-        _driver.log("Adding [" + namesList.toString() + "] to group " + groupName + "...");
+        _driver.log("Adding [" + namesList + "] to group " + groupName + "...");
         _driver.waitAndClickAndWait(Locator.tagContainingText("a", "manage group"));
         _driver.waitForElement(Locator.name("names"));
         _driver.uncheckCheckbox(Locator.name("sendEmail"));
@@ -190,20 +190,18 @@ public class UIPermissionsHelper extends PermissionsHelper
 
     @Override
     @LogMethod
-    public void setSiteAdminRoleUserPermissions(@LoggedParam String userName, @LoggedParam String permissionString)
+    public void setSiteRoleUserPermissions(@LoggedParam String userName, @LoggedParam String roleName)
     {
         _driver.log(new Date().toString());
-        goToSiteGroupScreen("Administrators");
-        _driver.clickAndWait(Locator.tag("ol").append(Locator.linkContainingText("Permissions")));
-        _driver._ext4Helper.clickTabContainingText("Permissions");
-        _selectPermission(userName, userName, permissionString);
+        PermissionsPage.beginAt(_driver, "/");
+        _selectPermission(userName, userName, roleName);
         _driver.log(new Date().toString());
     }
 
     @Override
-    protected void addMemberToRole(String userOrGroupName, String permissionString, MemberType memberType)
+    protected void addMemberToRole(String userOrGroupName, String roleName, MemberType memberType)
     {
-        String role = toRole(permissionString);
+        String role = toRole(roleName);
         if ("org.labkey.api.security.roles.NoPermissionsRole".equals(role))
         {
             throw new IllegalArgumentException("Can't set NoPermissionRole; call removePermission()");
@@ -218,22 +216,22 @@ public class UIPermissionsHelper extends PermissionsHelper
             String group = userOrGroupName;
             if (memberType == MemberType.siteGroup)
                 group = "Site: " + group;
-            _selectPermission(userOrGroupName, group, permissionString);
+            _selectPermission(userOrGroupName, group, roleName);
         }
     }
 
-    private void _selectPermission(String userOrGroupName, String group, String permissionString)
+    private void _selectPermission(String userOrGroupName, String group, String roleName)
     {
-        Locator.XPathLocator roleCombo = Locator.xpath("//div[contains(@class, 'rolepanel')][.//h3[text()='" + permissionString + "']]");
+        Locator.XPathLocator roleCombo = Locator.xpath("//div[contains(@class, 'rolepanel')][.//h3[text()='" + roleName + "']]");
         _driver.waitForElement(roleCombo);
         _driver.scrollIntoView(roleCombo);
         _driver._ext4Helper.selectComboBoxItem(roleCombo, Ext4Helper.TextMatchTechnique.STARTS_WITH, group);
-        _driver.waitForElement(Locator.permissionButton(userOrGroupName, permissionString));
-        String oldId = _driver.getAttribute(Locator.permissionButton(userOrGroupName, permissionString), "id");
+        _driver.waitForElement(Locator.permissionButton(userOrGroupName, roleName));
+        String oldId = _driver.getAttribute(Locator.permissionButton(userOrGroupName, roleName), "id");
         savePermissions();
         _driver._ext4Helper.waitForMaskToDisappear();
         _driver.waitForElementToDisappear(Locator.id(oldId), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT); // Elements get new ids after save
-        assertPermissionSetting(userOrGroupName, permissionString);
+        assertPermissionSetting(userOrGroupName, roleName);
     }
 
     @Override
@@ -245,8 +243,6 @@ public class UIPermissionsHelper extends PermissionsHelper
 
     public void goToSiteGroupScreen(String groupName)
     {
-        if ("Administrators".equals(groupName))
-            groupName = "Site Administrators";
         _driver.ensureAdminMode();
         _driver.goToSiteGroups();
         Locator.XPathLocator groupLoc = Locator.tagWithText("div", groupName);
@@ -256,15 +252,15 @@ public class UIPermissionsHelper extends PermissionsHelper
     }
 
     @Override
-    protected void removeRoleAssignment(String groupName, String permissionString, MemberType memberType)
+    protected void removeRoleAssignment(String groupName, String roleName, MemberType memberType)
     {
-        Locator close = Locator.closePermissionButton(groupName,permissionString);
+        Locator close = Locator.closePermissionButton(groupName, roleName);
         if (_driver.isElementPresent(close))
         {
             _driver.click(close);
             _driver.waitForElementToDisappear(close);
             savePermissions();
-            assertNoPermission(groupName, permissionString);
+            assertNoPermission(groupName, roleName);
         }
     }
 

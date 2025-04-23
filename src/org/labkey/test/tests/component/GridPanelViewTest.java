@@ -890,10 +890,10 @@ public class GridPanelViewTest extends GridPanelBaseTest
         log("Validate that the 'Available Fields' and 'Shown in Grid' panels are as expected.");
 
         checker().verifyEquals(String.format("Column '%s' should be selected in the dialog, it is not.", selectedColumn),
-                selectedColumn, customizeModal.getActiveSelectedField());
+                selectedColumn, customizeModal.getActiveSelectedFieldLabel());
 
         checker().verifyEqualsSorted("Field displayed in 'Show in Grid' panel not as expected.",
-                expectedFields, customizeModal.getSelectedFields());
+                expectedFields, customizeModal.getSelectedFieldLabels());
 
         for (String field : expectedFields)
         {
@@ -913,13 +913,13 @@ public class GridPanelViewTest extends GridPanelBaseTest
         log("Validate that the order of the fields in the 'Shown in Grid' column are as expected.");
         expectedFields = List.of(COL_NAME, COL_STRING1, COL_STRING2, COL_INT, COL_BOOL);
         checker().verifyEquals(String.format("After adding '%s' fields displayed in 'Show in Grid' panel not as expected.", columnToAdd),
-                expectedFields, customizeModal.getSelectedFields());
+                expectedFields, customizeModal.getSelectedFieldLabels());
 
         checker().screenShotIfNewError("InsertionOrder_Customize_Dialog_Error");
         customizeModal.clickUpdateGrid();
 
         log(String.format("Validate that the order of the fields in the grid, specifically that '%s' is after '%s'.", columnToAdd, selectedColumn));
-        List<String> columns = grid.getColumnNames();
+        List<String> columns = grid.getColumnLabels();
         checker().verifyTrue("Order of column headers in grid is not as expected.",
                 Collections.indexOfSubList(columns, Arrays.asList(selectedColumn, columnToAdd)) >= 0);
 
@@ -958,8 +958,8 @@ public class GridPanelViewTest extends GridPanelBaseTest
                 customizeModal.isUndoEditsEnabled());
 
         log("Validate that using the menu to open the dialog results in no fields being selected in the 'Shown in Grid' panel.");
-        checker().verifyTrue(String.format("Field '%s' is selected in the 'Shown in Grid' panel, there should be no selected fields.", customizeModal.getActiveSelectedField()),
-                customizeModal.getActiveSelectedField().isEmpty());
+        checker().verifyTrue(String.format("Field '%s' is selected in the 'Shown in Grid' panel, there should be no selected fields.", customizeModal.getActiveSelectedFieldLabel()),
+                customizeModal.getActiveSelectedFieldLabel().isEmpty());
 
         if (!checker().verifyFalse("The 'Show all system and user-defined fields' should not be checked.",
                 customizeModal.isShowAllChecked()))
@@ -972,7 +972,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
         String materialIDFieldName = "Material Source Id";
         log(String.format("Validate that field '%s' is not visible before checking 'Show all'.", materialIDField));
 
-        List<String> actualFields = customizeModal.getAvailableFields();
+        List<String> actualFields = customizeModal.getAvailableFieldLabels();
 
         checker().fatal()
                 .verifyFalse(String.format("Field '%s' is already present in 'Available Fields' panel. Fatal error.", materialIDField),
@@ -982,7 +982,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
 
         customizeModal.setShowAll(true);
 
-        actualFields = customizeModal.getAvailableFields();
+        actualFields = customizeModal.getAvailableFieldLabels();
 
         checker().verifyTrue(String.format("Field '%s' is not present in 'Available Fields' panel, it should be.", materialIDFieldName),
                 actualFields.contains(materialIDFieldName));
@@ -996,7 +996,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
 
         log("Because no fields should be selected validate this field is added to the end of the list.");
         checker().verifyEquals(String.format("Position of field '%s' is not as expected in the dialog.", materialNameField),
-                expectedFields, customizeModal.getSelectedFields());
+                expectedFields, customizeModal.getSelectedFieldLabels());
 
         checker().screenShotIfNewError("ShowAll_Label_Edit_Dialog_Error");
 
@@ -1006,7 +1006,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
             customizeModal.clickUndoEdits();
             expectedFields = new ArrayList<>(DEFAULT_COLUMNS);
             if(checker().verifyEquals("After clicking 'Undo edits' fields in 'Shown in Grid' dialog not as expected.",
-                    expectedFields, customizeModal.getSelectedFields()))
+                    expectedFields, customizeModal.getSelectedFieldLabels()))
             {
                 log(String.format("Add field '%s / %s' back.", materialIDField, materialNameField));
                 customizeModal.selectAvailableField(materialIDField, materialNameField);
@@ -1032,7 +1032,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
         log("Validate that the grid shows the new field with the updated label.");
 
         checker().verifyTrue(String.format("Did not find the field labeled '%s' in the grid.", newFieldLabel),
-                grid.getColumnNames().contains(newFieldLabel));
+                grid.getColumnLabels().contains(newFieldLabel));
 
     }
 
@@ -1256,7 +1256,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
                 .clickUpdateGrid();
 
         checker().verifyEquals("Grid columns not as expected after removing all, and adding back a field.",
-                List.of(COL_STRING1), grid.getColumnNames());
+                List.of(COL_STRING1), grid.getColumnLabels());
 
     }
 
@@ -1291,7 +1291,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
     {
         checker().setErrorMark();
 
-        List<String> actualColumns = grid.getColumnNames();
+        List<String> actualColumns = grid.getColumnLabels();
 
         checker().verifyEqualsSorted("Grid columns not as expected.",
                 expectedColumns.keySet(), actualColumns);

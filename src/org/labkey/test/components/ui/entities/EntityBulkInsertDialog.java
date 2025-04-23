@@ -124,20 +124,20 @@ public class EntityBulkInsertDialog extends ModalDialog
      *
      * @return A list of the fields for the entity.
      */
-    public List<String> getDisplayedFieldNames()
+    public List<String> getDisplayedFieldLabels()
     {
         // Could be shortened to do something like this, but wanted to clean up the values returned.
-        // return elementCache().fieldNames().stream().map(el -> el.getText().trim()).collect(Collectors.toList());
+        // return elementCache().fieldLabels().stream().map(el -> el.getText().trim()).collect(Collectors.toList());
 
-        List<String> fieldNames = new ArrayList<>();
+        List<String> fieldLabels = new ArrayList<>();
 
-        for(WebElement el : elementCache().fieldNames())
+        for(WebElement el : elementCache().fieldLabels())
         {
             String temp = el.getText();
-            fieldNames.add(temp.replace("*", "").trim());
+            fieldLabels.add(temp.replace("*", "").trim());
         }
 
-        return fieldNames;
+        return fieldLabels;
     }
 
     /**
@@ -419,7 +419,7 @@ public class EntityBulkInsertDialog extends ModalDialog
                     .withInputId(fieldKey).find(formRow(fieldName));
         }
 
-        public List<WebElement> fieldNames()
+        public List<WebElement> fieldLabels()
         {
             return fieldLabels.findElements(this);
         }

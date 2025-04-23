@@ -70,9 +70,9 @@ public class ParentDetailPanel extends WebDriverComponent<ParentDetailPanel.Elem
         return elementCache().optionalEditBtn().isPresent();
     }
 
-    public Map<String, ResponsiveGrid> getParentDetailsPanelGrids()
+    public Map<String, ResponsiveGrid<?>> getParentDetailsPanelGrids()
     {
-        Map detailsGridMap = new HashMap();
+        Map<String, ResponsiveGrid<?>> detailsGridMap = new HashMap<>();
         for (String parentType : getParentTypes())
             detailsGridMap.put(parentType, getParentsGridFor(parentType));
         return detailsGridMap;
@@ -99,7 +99,7 @@ public class ParentDetailPanel extends WebDriverComponent<ParentDetailPanel.Elem
     /*
         gets the grid containing parents/sources for the given parent/source type
      */
-    public ResponsiveGrid getParentsGridFor(String type)
+    public ResponsiveGrid<?> getParentsGridFor(String type)
     {
         return elementCache().responsiveGridFor(type);
     }
@@ -137,7 +137,7 @@ public class ParentDetailPanel extends WebDriverComponent<ParentDetailPanel.Elem
                             table.waitForReady();
 
                             // each table must show an indicator of having no source or parent types, or have a linked parent/source type
-                            if (table.getTableData().values().isEmpty())
+                            if (table.getTableDataByLabel().values().isEmpty())
                                 return false;
                         }
                         return true;
@@ -190,7 +190,7 @@ public class ParentDetailPanel extends WebDriverComponent<ParentDetailPanel.Elem
             return new DetailTable.DetailTableFinder(getDriver()).waitFor(detailGroupContainer(type));
         }
 
-        public ResponsiveGrid responsiveGridFor(String type)
+        public ResponsiveGrid<?> responsiveGridFor(String type)
         {
             return new ResponsiveGrid.ResponsiveGridFinder(getDriver()).withGridId("model").waitFor(detailGroupContainer(type));
         }

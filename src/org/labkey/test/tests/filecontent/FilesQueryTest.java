@@ -89,7 +89,7 @@ public class FilesQueryTest extends BaseWebDriverTest
         ApiPermissionsHelper permissionsHelper = new ApiPermissionsHelper(this);
         permissionsHelper.createPermissionsGroup(TEST_GROUP, TEST_USER, TEST_USER_NO_PATHS);
         permissionsHelper.setPermissions(TEST_GROUP, "Project Administrator");
-        permissionsHelper.setSiteAdminRoleUserPermissions(TEST_USER, "See Absolute File Paths");
+        permissionsHelper.setSiteRoleUserPermissions(TEST_USER, "See Absolute File Paths");
     }
 
     @Test

@@ -135,7 +135,6 @@ public class SecurityTest extends BaseWebDriverTest
             impersonationTest();
             guestTest();
             disableGuestAccountTest();
-            addRemoveSiteAdminTest();
         }
 
         if (!TestProperties.isWithoutTestModules())
@@ -248,24 +247,6 @@ public class SecurityTest extends BaseWebDriverTest
     {
         DataRegionTable users = new DataRegionTable("Users", getDriver());
         users.setFilter("Email", "Equals", email);
-    }
-
-    @LogMethod
-    protected void addRemoveSiteAdminTest()
-    {
-        // Issue 13921:
-        _permissionsHelper.goToSiteGroupScreen("Administrators");
-        setFormElement(Locator.name("names"), NORMAL_USER);
-        uncheckCheckbox(Locator.checkboxByName("sendEmail"));
-        clickButton("Update Group Membership");
-        assertTextPresent(NORMAL_USER);
-        checkCheckbox(Locator.checkboxByNameAndValue("delete", NORMAL_USER));
-        doAndWaitForPageToLoad(() -> {
-            clickButton("Update Group Membership", 0);
-            assertAlert("Are you sure you want to permanently remove the selected user from this group?");
-        });
-        assertElementNotPresent(Locator.checkboxByNameAndValue("delete", NORMAL_USER));
-        goToProjectHome();
     }
 
     @LogMethod

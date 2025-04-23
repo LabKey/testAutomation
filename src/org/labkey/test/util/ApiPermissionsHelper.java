@@ -385,25 +385,25 @@ public class ApiPermissionsHelper extends PermissionsHelper
     }
 
     @Override
-    protected void removeRoleAssignment(String userOrGroupName, String permissionString, MemberType memberType)
+    protected void removeRoleAssignment(String userOrGroupName, String roleName, MemberType memberType)
     {
         String container = getContainerPath();
         if (memberType == MemberType.user)
-            removeUserRoleAssignment(userOrGroupName, permissionString, container);
+            removeUserRoleAssignment(userOrGroupName, roleName, container);
         else
         {
             Integer principalId = getPrincipalId(userOrGroupName, memberType, container);
-            removeRoleAssignment(principalId, permissionString, container);
+            removeRoleAssignment(principalId, roleName, container);
         }
     }
 
-    public void removeUserRoleAssignment(String userEmail, String permissionString, String container)
+    public void removeUserRoleAssignment(String userEmail, String roleName, String container)
     {
         RemoveAssignmentCommand command = new RemoveAssignmentCommand();
         Connection connection = getConnection();
 
         command.setEmail(userEmail);
-        String roleClassName = toRole(permissionString);
+        String roleClassName = toRole(roleName);
         command.setRoleClassName(roleClassName);
         command.setConfirm(true);
 
@@ -441,19 +441,19 @@ public class ApiPermissionsHelper extends PermissionsHelper
     }
 
     @Override
-    public void addMemberToRole(String userOrGroupName, String permissionString, MemberType memberType)
+    public void addMemberToRole(String userOrGroupName, String roleName, MemberType memberType)
     {
-        addMemberToRole(userOrGroupName, permissionString, memberType, getContainerPath());
+        addMemberToRole(userOrGroupName, roleName, memberType, getContainerPath());
     }
 
-    public void addMemberToRole(String userOrGroupName, String permissionString, MemberType memberType, String container)
+    public void addMemberToRole(String userOrGroupName, String roleName, MemberType memberType, String container)
     {
         AddAssignmentCommand command = new AddAssignmentCommand();
         Connection connection = getConnection();
 
         Integer principalId = getPrincipalId(userOrGroupName, memberType, container);
         command.setPrincipalId(principalId);
-        command.setRoleClassName(toRole(permissionString));
+        command.setRoleClassName(toRole(roleName));
 
         try
         {
@@ -465,9 +465,9 @@ public class ApiPermissionsHelper extends PermissionsHelper
         }
     }
 
-    public void addMemberToRoles(String userOrGroupName, List<String> permissionStrings, MemberType memberType)
+    public void addMemberToRoles(String userOrGroupName, List<String> roleNames, MemberType memberType)
     {
-        permissionStrings.forEach(permissionString -> {addMemberToRole(userOrGroupName, permissionString, memberType);});
+        roleNames.forEach(roleName -> {addMemberToRole(userOrGroupName, roleName, memberType);});
     }
 
     protected Integer getPrincipalId(String userOrGroupName, MemberType principalType, String project)
@@ -486,9 +486,9 @@ public class ApiPermissionsHelper extends PermissionsHelper
     }
 
     @Override
-    public void setSiteAdminRoleUserPermissions(@LoggedParam String userName, @LoggedParam String permissionString)
+    public void setSiteRoleUserPermissions(@LoggedParam String userName, @LoggedParam String roleName)
     {
-        addMemberToRole(userName, permissionString, MemberType.user, "/");
+        addMemberToRole(userName, roleName, MemberType.user, "/");
     }
 
     @Override

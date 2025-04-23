@@ -65,12 +65,12 @@ public class GridFilterModal extends ModalDialog
      * Get fields for currently selected query
      * @return visible field labels
      */
-    public List<String> getAvailableFields()
+    public List<String> getAvailableFieldLabels()
     {
         return getWrapper().getTexts(elementCache().findFieldOptions());
     }
 
-    public List<String> getFilteredFields()
+    public List<String> getFilteredFieldLabels()
     {
         List<WebElement> filteredElements = Locator.byClass("list-group-item").withChild(
                 Locator.tagWithClass("span", "field-modal__field_dot"))
