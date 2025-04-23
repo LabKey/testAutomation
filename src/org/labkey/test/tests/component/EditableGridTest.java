@@ -2,6 +2,7 @@ package org.labkey.test.tests.component;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
@@ -288,8 +289,8 @@ public class EditableGridTest extends BaseWebDriverTest
                 testGrid.getColumnData(DESC_STRING));
     }
 
-    // Test disabled until Issue 52226, Issue 51927 are resolved
-//    @Test
+    @Test
+    @Ignore  // Test disabled until Issue 52226, Issue 51927 are resolved
     public void testDragFillSingleRow()
     {
         final LocalDateTime now = LocalDate.of(2019, 1, 30).atTime(16, 30);
@@ -350,8 +351,8 @@ public class EditableGridTest extends BaseWebDriverTest
                         totalHeightBefore.size + (3 * rowHeightBefore) >= totalHeightAfter.size);
     }
 
-    // Test disabled until Issue 52226, Issue 51927 are resolved
-//    @Test
+    @Test
+    @Ignore  // Test disabled until Issue 52226, Issue 51927 are resolved
     public void testDragFillMultipleRows()
     {
         final LocalDateTime now = LocalDate.of(2019, 1, 30).atTime(14, 30);
