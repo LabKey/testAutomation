@@ -3553,7 +3553,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public void clearClipboardContent()
     {
-        setClipboardContent("");
+        setClipboardContent(" ");
     }
 
     protected void setClipboardContent(String text)
