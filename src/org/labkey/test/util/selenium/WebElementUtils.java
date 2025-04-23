@@ -9,6 +9,8 @@ import org.openqa.selenium.WebElement;
 import java.util.Collections;
 import java.util.List;
 
+import static org.labkey.test.Locator.NBSP;
+
 public abstract class WebElementUtils
 {
     private WebElementUtils() {}
@@ -91,6 +93,6 @@ public abstract class WebElementUtils
      */
     public static String getTextContent(WebElement element)
     {
-        return element.getDomProperty("textContent");
+        return element.getDomProperty("textContent").replace(NBSP, " ");
     }
 }
