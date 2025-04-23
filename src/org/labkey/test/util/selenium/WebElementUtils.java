@@ -6,6 +6,7 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 
+import java.util.Collections;
 import java.util.List;
 
 public abstract class WebElementUtils
@@ -59,7 +60,7 @@ public abstract class WebElementUtils
             nodeTexts = (List<Object>) executor.executeScript(script, element);
         }
 
-        return nodeTexts.stream().map(t -> (String) t).toList();
+        return nodeTexts != null ? nodeTexts.stream().map(t -> (String) t).toList() : Collections.emptyList();
     }
 
     /**
