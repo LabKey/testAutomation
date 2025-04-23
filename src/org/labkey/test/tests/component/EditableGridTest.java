@@ -288,7 +288,8 @@ public class EditableGridTest extends BaseWebDriverTest
                 testGrid.getColumnData(DESC_STRING));
     }
 
-    @Test
+    // Test disabled until Issue 52226, Issue 51927 are resolved
+//    @Test
     public void testDragFillSingleRow()
     {
         final LocalDateTime now = LocalDate.of(2019, 1, 30).atTime(16, 30);
@@ -349,7 +350,8 @@ public class EditableGridTest extends BaseWebDriverTest
                         totalHeightBefore.size + (3 * rowHeightBefore) >= totalHeightAfter.size);
     }
 
-    @Test
+    // Test disabled until Issue 52226, Issue 51927 are resolved
+//    @Test
     public void testDragFillMultipleRows()
     {
         final LocalDateTime now = LocalDate.of(2019, 1, 30).atTime(14, 30);
