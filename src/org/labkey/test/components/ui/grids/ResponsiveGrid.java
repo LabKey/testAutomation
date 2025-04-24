@@ -830,7 +830,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
                     headerCellElements.remove(0);
                     offset = 1;
                 }
-                fieldLabels = headerCellElements.stream().map(WebElementUtils::getTextContent).toList();
+                fieldLabels = headerCellElements.stream().map(el -> WebElementUtils.getTextContent(el).trim()).toList();
                 indexes = new HashMap<>();
                 for (int i = 0; i < headerCellElements.size(); i++)
                 {
