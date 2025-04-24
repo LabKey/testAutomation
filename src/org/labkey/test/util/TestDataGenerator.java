@@ -581,7 +581,7 @@ public class TestDataGenerator
 
     public static String randomFieldName(String part, @Nullable String exclusion)
     {
-        return randomFieldName(part, randomInt(0, 5), randomInt(0, 5), exclusion);
+        return randomFieldName(part, randomInt(0, 5), randomInt(1, 5), exclusion);
     }
 
     public static String randomFieldName(String part, int numStartChars, int numEndChars)
@@ -594,7 +594,7 @@ public class TestDataGenerator
         // use the characters that we know are encoded in fieldKeys plus characters that we know clients are using
         String chars = ALL_ILLEGAL_QUERY_KEY_CHARACTERS + " %()=+-[]_|*`'\":;<>?!@#^";
 
-        String randomFieldName = randomName(part, numStartChars, numEndChars, chars, exclusion);
+        String randomFieldName = randomName(part + "  ", numStartChars, numEndChars, chars, exclusion);
         TestLogger.log("Generated random field name: " + randomFieldName);
         return randomFieldName;
     }
