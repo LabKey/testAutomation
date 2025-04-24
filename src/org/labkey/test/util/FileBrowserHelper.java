@@ -550,14 +550,7 @@ public class FileBrowserHelper extends WebDriverWrapper
     {
         int initialCount = waitForFileGridReady();
 
-        openUploadPanel();
-
-        waitFor(() -> getFormElement(Locator.xpath("//label[text() = 'Choose a File:']/../..//input[contains(@class, 'x4-form-field')]")).isEmpty(),
-                "Upload field did not clear after upload.", WAIT_FOR_JAVASCRIPT);
-
-        setFormElement(Locator.css(".single-upload-panel input:last-of-type[type=file]"), file);
-        waitFor(() -> getFormElement(Locator.xpath("//label[text() = 'Choose a File:']/../..//input[contains(@class, 'x4-form-field')]")).contains(file.getName()),
-                "Upload field was not set to '" + file.getName() + "'.", WAIT_FOR_JAVASCRIPT);
+        setChooseAFile(file);
 
         if (description != null)
             setFormElement(Locator.name("description"), description);
@@ -600,6 +593,25 @@ public class FileBrowserHelper extends WebDriverWrapper
 
         // verify that the description field is empty
         assertEquals("Description didn't clear after upload", "", getFormElement(Locator.name("description")));
+    }
+
+    @LogMethod
+    public Window uploadFileExpectingError(File file)
+    {
+        waitForFileGridReady();
+        setChooseAFile(file);
+        clickButton("Upload", WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
+        return new Window.WindowFinder(getDriver()).withTitle("Error").waitFor();
+    }
+
+    private void setChooseAFile(File file)
+    {
+        openUploadPanel();
+        waitFor(() -> getFormElement(Locator.xpath("//label[text() = 'Choose a File:']/../..//input[contains(@class, 'x4-form-field')]")).isEmpty(),
+                "Upload field did not clear after upload.", WAIT_FOR_JAVASCRIPT);
+        setFormElement(Locator.css(".single-upload-panel input:last-of-type[type=file]"), file);
+        waitFor(() -> getFormElement(Locator.xpath("//label[text() = 'Choose a File:']/../..//input[contains(@class, 'x4-form-field')]")).contains(file.getName()),
+                "Upload field was not set to '" + file.getName() + "'.", WAIT_FOR_JAVASCRIPT);
     }
 
     private void dragAndDropFileInDropZone(File file)
