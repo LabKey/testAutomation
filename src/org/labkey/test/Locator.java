@@ -25,6 +25,7 @@ import org.labkey.test.selenium.LazyWebElement;
 import org.labkey.test.selenium.ReclickingWebElement;
 import org.labkey.test.selenium.RefindingWebElement;
 import org.labkey.test.util.TestLogger;
+import org.labkey.test.util.TextUtils;
 import org.labkey.test.util.selenium.WebDriverUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.InvalidSelectorException;
@@ -185,23 +186,30 @@ public abstract class Locator extends By
      */
     public static WebElement waitForAnyElement(FluentWait<? extends SearchContext> wait, final Locator... locators)
     {
-        return wait.until(new Function<SearchContext, WebElement>()
+        try
         {
-            @Override
-            public WebElement apply(SearchContext context)
+            return wait.until(new Function<SearchContext, WebElement>()
             {
-                return findAnyElementOrNull(context, locators);
-            }
+                @Override
+                public WebElement apply(SearchContext context)
+                {
+                    return findAnyElementOrNull(context, locators);
+                }
 
-            @Override
-            public String toString()
-            {
-                List<String> locDescriptions = new ArrayList<>();
-                Arrays.stream(locators).forEach(loc -> locDescriptions.add(loc.getLoggableDescription()));
-                SearchContext searchContext = extractInputFromFluentWait(wait);
-                return String.join("\n--OR--\n", locDescriptions) + (searchContext instanceof WebDriver ? "" : "\nIN: " + searchContext.toString());
-            }
-        });
+                @Override
+                public String toString()
+                {
+                    List<String> locDescriptions = new ArrayList<>();
+                    Arrays.stream(locators).forEach(loc -> locDescriptions.add(loc.getLoggableDescription()));
+                    SearchContext searchContext = extractInputFromFluentWait(wait);
+                    return String.join("\n--OR--\n", locDescriptions) + (searchContext instanceof WebDriver ? "" : "\nIN: " + searchContext.toString());
+                }
+            });
+        }
+        catch (TimeoutException e)
+        {
+            throw new NoSuchElementException(e.getMessage(), e);
+        }
     }
 
     /**
@@ -210,28 +218,34 @@ public abstract class Locator extends By
      */
     public static List<WebElement> waitForElements(FluentWait<? extends SearchContext> wait, final Locator... locators)
     {
-        return wait.until(new Function<SearchContext, List<WebElement>>()
+        try
         {
-            @Override
-            public List<WebElement> apply(SearchContext context)
+            return wait.until(new Function<SearchContext, List<WebElement>>()
             {
-                List<WebElement> els = findElements(context, locators);
-                if (els.size() > 0)
-                    return els;
-                else
-                    return null;
-            }
+                @Override
+                public List<WebElement> apply(SearchContext context)
+                {
+                    List<WebElement> els = findElements(context, locators);
+                    if (!els.isEmpty())
+                        return els;
+                    else
+                        return null;
+                }
 
-            @Override
-            public String toString()
-            {
-                List<String> locDescriptions = new ArrayList<>();
-                Arrays.stream(locators).forEach(loc -> locDescriptions.add(loc.getLoggableDescription()));
-                SearchContext searchContext = extractInputFromFluentWait(wait);
-                return String.join("\n--OR--\n", locDescriptions) + (searchContext instanceof WebDriver ? "" : "\nIN: " + searchContext.toString());
-            }
-        });
-
+                @Override
+                public String toString()
+                {
+                    List<String> locDescriptions = new ArrayList<>();
+                    Arrays.stream(locators).forEach(loc -> locDescriptions.add(loc.getLoggableDescription()));
+                    SearchContext searchContext = extractInputFromFluentWait(wait);
+                    return String.join("\n--OR--\n", locDescriptions) + (searchContext instanceof WebDriver ? "" : "\nIN: " + searchContext.toString());
+                }
+            });
+        }
+        catch (TimeoutException e)
+        {
+            throw new NoSuchElementException(e.getMessage(), e);
+        }
     }
 
     public static List<WebElement> findElements(SearchContext context, final Locator... locators)
@@ -984,7 +998,7 @@ public abstract class Locator extends By
      */
     private static String ns(String value)
     {
-        return value.replaceAll("\\s+", " ").trim();
+        return TextUtils.normalizeSpace(value);
     }
 
     public static String cq(String value)
