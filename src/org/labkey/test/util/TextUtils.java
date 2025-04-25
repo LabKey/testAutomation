@@ -1,5 +1,6 @@
 package org.labkey.test.util;
 
+import java.util.List;
 import java.util.regex.Pattern;
 
 public class TextUtils
@@ -18,6 +19,11 @@ public class TextUtils
         return NS_PATTERN.matcher(value).replaceAll(" ").trim();
     }
 
+    public static List<String> normalizeSpace(List<String> values)
+    {
+        return values.stream().map(TextUtils::normalizeSpace).toList();
+    }
+
     public static String normalizeSpaceMultiline(String value)
     {
         String[] lines = value.split("\n");
@@ -26,5 +32,10 @@ public class TextUtils
             lines[i] = normalizeSpace(lines[i]);
         }
         return String.join("\n", lines);
+    }
+
+    public static List<String> normalizeSpaceMultiline(List<String> values)
+    {
+        return values.stream().map(TextUtils::normalizeSpaceMultiline).toList();
     }
 }

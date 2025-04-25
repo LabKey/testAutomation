@@ -13,7 +13,6 @@ import org.labkey.test.components.html.SelectWrapper;
 import org.labkey.test.components.html.ValidatingInput;
 import org.labkey.test.components.react.ReactSelect;
 import org.labkey.test.params.FieldDefinition;
-import org.labkey.test.util.selenium.WebElementUtils;
 import org.openqa.selenium.NotFoundException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -130,7 +129,7 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
     {
         getWrapper().mouseOver(elementCache().helpTarget("Naming "));
         waitFor(()->elementCache().popover.isDisplayed(), "No tooltip was shown for the Name Expression.", 1_000);
-        return WebElementUtils.getTextContent(Locator.tag("p").index(1).findElement(elementCache().popover)).split(": ", 2)[1];
+        return elementCache().popover.getText();
     }
 
     public T dismissToolTip()
