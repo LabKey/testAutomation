@@ -26,6 +26,7 @@ project.dependencies {
     implementation("commons-io:commons-io:${commonsIoVersion}")
     implementation("com.fasterxml.jackson.core:jackson-annotations:${jacksonAnnotationsVersion}")
     implementation("org.bouncycastle:bcprov-jdk18on:${bouncycastleVersion}")
+    implementation("org.apache.commons:commons-csv:${apacheCommonsCsvVersion}")
 
     //api "org.seleniumhq.selenium:selenium-server:${seleniumVersion}"
     implementation("org.seleniumhq.selenium:selenium-firefox-driver:${seleniumVersion}")

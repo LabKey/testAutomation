@@ -1,10 +1,16 @@
 package org.labkey.test.util;
 
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.labkey.serverapi.reader.TabLoader;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.params.FieldDefinition;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -231,6 +237,21 @@ public class TestDataUtils
             builder.append("\n");
         }
         return builder.toString();
+    }
+
+    public static File writeRowsToTsv(String fileName, List<List<String>> rows) throws IOException
+    {
+        File file = new File(TestFileUtils.getTestTempDir(), fileName);
+        FileUtils.forceMkdirParent(file);
+
+        try (CSVPrinter printer = new CSVPrinter(new FileWriter(file, StandardCharsets.UTF_8), CSVFormat.TDF)) {
+            for (List<String> row : rows)
+            {
+                printer.printRecord(row);
+            }
+        }
+
+        return file;
     }
 
     /**
