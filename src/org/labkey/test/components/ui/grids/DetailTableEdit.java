@@ -592,7 +592,7 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
 
         public WebElement valueCellWithName(String fieldName)
         {
-            return Locator.tagWithAttribute("td", "data-fieldkey", EscapeUtil.fieldKeyEncodePart(fieldName)).findElement(editPanel);
+            return Locator.tagWithAttribute("td", "data-fieldkey", EscapeUtil.fieldKeyEncodePart(fieldName).toLowerCase()).findElement(editPanel);
         }
 
         public FileUploadField fileField(String label)
