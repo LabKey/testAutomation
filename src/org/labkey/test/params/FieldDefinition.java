@@ -16,6 +16,7 @@
 package org.labkey.test.params;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -31,6 +32,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static org.labkey.test.util.TestDataGenerator.DOMAIN_SPECIAL_STRING;
 
@@ -60,7 +62,7 @@ public class FieldDefinition extends PropertyDescriptor
      * @param name field name
      * @param type field type
      */
-    public FieldDefinition(String name, ColumnType type)
+    public FieldDefinition(@NotNull String name, @NotNull ColumnType type)
     {
         setName(name);
         setType(type);
@@ -91,7 +93,7 @@ public class FieldDefinition extends PropertyDescriptor
         if (name == null)
             return null;
 
-        if (name.length() == 0)
+        if (name.isEmpty())
             return name;
 
         StringBuilder buf = new StringBuilder(name.length() + 10);
@@ -119,6 +121,11 @@ public class FieldDefinition extends PropertyDescriptor
         }
 
         return buf.toString();
+    }
+
+    public String getEffectiveLabel()
+    {
+        return Objects.requireNonNullElseGet(getLabel(), () -> labelFromName(getName()));
     }
 
     @Override
