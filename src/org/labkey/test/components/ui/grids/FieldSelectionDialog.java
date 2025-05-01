@@ -7,6 +7,7 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.UpdatingComponent;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.html.Checkbox;
+import org.labkey.test.util.EscapeUtil;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -94,29 +95,29 @@ public class FieldSelectionDialog extends ModalDialog
     /**
      * Check to see if the available field listed is shown as selected, has a checkmark, in the 'Available Fields' panel.
      *
-     * @param fieldKeyParts Can be an individual field or a path to a nested field.
+     * @param fieldNameParts Can be an individual field or a path to a nested field.
      * @return True if row has the checkmark, false otherwise.
      */
-    public boolean isAvailableFieldSelected(String... fieldKeyParts)
+    public boolean isAvailableFieldSelected(String... fieldNameParts)
     {
-        WebElement listItem = elementCache().getListItemElementByFieldKey(expandAvailableFields(fieldKeyParts));
+        WebElement listItem = elementCache().getListItemElementByFieldKey(expandAvailableFields(fieldNameParts));
         return Locator.tagWithClass("i", "fa-check").findWhenNeeded(listItem).isDisplayed();
     }
 
-    public boolean isFieldAvailable(String... fieldKeyParts)
+    public boolean isFieldAvailable(String... fieldNameParts)
     {
-        return elementCache().getListItemElementByFieldKeyOrNull(expandAvailableFields(fieldKeyParts)) != null;
+        return elementCache().getListItemElementByFieldKeyOrNull(expandAvailableFields(fieldNameParts)) != null;
     }
 
     /**
      * Select a field the list of available fields. If more than one value is passed in it is assumed to be an expandable path.
      *
-     * @param fieldKeyParts Either an individual field or the path to a field to add.
+     * @param fieldNameParts Either an individual field or the path to a field to add.
      * @return This dialog.
      */
-    public FieldSelectionDialog selectAvailableField(String... fieldKeyParts)
+    public FieldSelectionDialog selectAvailableField(String... fieldNameParts)
     {
-        return addFieldByFieldKeyToGrid(expandAvailableFields(fieldKeyParts));
+        return addFieldByFieldKeyToGrid(expandAvailableFields(fieldNameParts));
     }
 
     public WebElement getAvailableFieldElement(String fieldName)
@@ -151,18 +152,18 @@ public class FieldSelectionDialog extends ModalDialog
      * Expand a field or a hierarchy of fieldKeyParts. If a single field is passed in only it will be expanded. If multiple values
      * are passed in it is assumed to be a path and all fieldKeyParts will be expanded to the last field.
      *
-     * @param fieldKeyParts The list of fieldKeyParts to expand.
+     * @param fieldNameParts The list of fieldKeyParts to expand.
      * @return key for the expanded field.
      */
-    private String expandAvailableFields(String... fieldKeyParts)
+    private String expandAvailableFields(String... fieldNameParts)
     {
         StringBuilder fieldKey = new StringBuilder();
 
-        Iterator<String> iterator = Arrays.stream(fieldKeyParts).iterator();
+        Iterator<String> iterator = Arrays.stream(fieldNameParts).iterator();
 
         while(iterator.hasNext())
         {
-            fieldKey.append(iterator.next().trim());
+            fieldKey.append(EscapeUtil.fieldKeyEncodePart(iterator.next().trim()));
 
             // If this isn't the last item in the collection keep expanding and building the expected data-fieldkey value.
             if(iterator.hasNext())
