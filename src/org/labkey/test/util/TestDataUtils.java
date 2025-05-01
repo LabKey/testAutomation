@@ -188,11 +188,15 @@ public class TestDataUtils
             List<String> rowList = new ArrayList<>();
             for (String column : columns)
             {
-                var value = rowMap.getOrDefault(column, preserveEmptyValues ? "" : null);
+                var value = rowMap.get(column);
                 if (value == null)
-                    throw new IllegalArgumentException("Missing value for column '" + column + "' in row: " +  rowMap);
-                else
-                    rowList.add(value.toString());
+                {
+                    if (preserveEmptyValues)
+                        value = "";
+                    else
+                        throw new IllegalArgumentException("Missing value for column '" + column + "' in row: " +  rowMap);
+                }
+                rowList.add(value.toString());
             }
             lists.add(rowList);
         }
