@@ -119,28 +119,17 @@ public class EscapeUtil
         return URIUtil.decodePath(path);
     }
 
-    public static String fieldKeyEncodePart(String str)
+    private static final String[] ILLEGAL = {"$", "/", "&", "}", "~", ",", "."};
+    private static final String[] REPLACEMENT = {"$D", "$S", "$A", "$B", "$T", "$C", "$P"};
+
+    static public String fieldKeyEncodePart(String str)
     {
-        str = StringUtils.replace(str, "$", "$D");
-        str = StringUtils.replace(str, "/", "$S");
-        str = StringUtils.replace(str, "&", "$A");
-        str = StringUtils.replace(str, "}", "$B");
-        str = StringUtils.replace(str, "~", "$T");
-        str = StringUtils.replace(str, ",", "$C");
-        str = StringUtils.replace(str, ".", "$P");
-        return str;
+        return StringUtils.replaceEach(str, ILLEGAL, REPLACEMENT);
     }
 
-    public static String fieldKeyDecodePart(String str)
+    static public String fieldKeyDecodePart(String str)
     {
-        str = StringUtils.replace(str, "$C", ",");
-        str = StringUtils.replace(str, "$T", "~");
-        str = StringUtils.replace(str, "$B", "}");
-        str = StringUtils.replace(str, "$A", "&");
-        str = StringUtils.replace(str, "$S", "/");
-        str = StringUtils.replace(str, "$D", "$");
-        str = StringUtils.replace(str, "$P", ".");
-        return str;
+        return StringUtils.replaceEach(str, REPLACEMENT, ILLEGAL);
     }
 
     public static String getTextChoiceValidatorExpression(List<String> options)

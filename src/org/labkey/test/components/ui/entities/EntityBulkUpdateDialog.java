@@ -44,6 +44,7 @@ public class EntityBulkUpdateDialog extends ModalDialog
     {
         super(new ModalDialogFinder(driver).withTitle("Update "));
         _updatingComponent = updatingComponent;
+        getWrapper().mouseOver(elementCache().title); // avoid accidentally triggering tooltips
     }
 
     /**
