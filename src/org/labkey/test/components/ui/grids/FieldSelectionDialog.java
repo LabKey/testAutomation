@@ -260,7 +260,7 @@ public class FieldSelectionDialog extends ModalDialog
 
         if(active.isDisplayed())
         {
-            return getTextContent(Locator.tagWithClass("div", "field-name").findElement(active));
+            return getTextContent(Locator.tagWithClass("div", "field-caption").findElement(active));
         }
         else
         {
@@ -601,7 +601,7 @@ public class FieldSelectionDialog extends ModalDialog
         protected WebElement selectedFieldsPanel = contentPanelLocator.index(1).findWhenNeeded(this);
 
         // This is present to items in both panels.
-        protected final Locator listItemName = Locator.tagWithClass("div", "field-name");
+        protected final Locator listItemName = Locator.tagWithClass("div", "field-caption");
 
         protected final WebElement undoEditsButton = Locator.tagWithText("span", "Undo edits")
                 .refindWhenNeeded(this);
@@ -624,7 +624,7 @@ public class FieldSelectionDialog extends ModalDialog
         protected List<WebElement> getListItemElements(WebElement panel, String fieldLabel)
         {
             return Locator.tagWithClass("div", "list-group-item")
-                    .withDescendant(Locator.tagWithClass("div", "field-name").withText(fieldLabel))
+                    .withDescendant(Locator.tagWithClass("div", "field-caption").withText(fieldLabel))
                     .findElements(panel);
         }
 
@@ -632,7 +632,7 @@ public class FieldSelectionDialog extends ModalDialog
         protected WebElement getListItemElement(WebElement panel, String fieldLabel)
         {
             return Locator.tagWithClass("div", "list-group-item")
-                    .withDescendant(Locator.tagWithClass("div", "field-name").withText(fieldLabel))
+                    .withDescendant(Locator.tagWithClass("div", "field-caption").withText(fieldLabel))
                     .findElement(panel);
         }
 
