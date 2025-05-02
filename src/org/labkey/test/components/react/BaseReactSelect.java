@@ -23,6 +23,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
@@ -365,7 +366,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
      *
      * @return List of strings for the values in the list.
      */
-    public List<String> getOptions()
+    public List<String> getOptions(Function<WebElement, String> optionMapper)
     {
 
         boolean alreadyOpened = isExpanded();
@@ -374,16 +375,20 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
         if (!alreadyOpened)
             open();
 
-        List<WebElement> selectedItems = Locators.listItems.findElements(getComponentElement());
-        List<String> rawItems = getWrapper().getTexts(selectedItems);
+        List<WebElement> optionElements = Locators.listItems.findElements(getComponentElement());
+        List<String> rawItems = optionElements.stream().map(optionMapper).toList();
 
         // If it wasn't open before close it, otherwise leave it in the open state.
         if (!alreadyOpened)
             close();
 
-        return rawItems.stream().map(String::trim).collect(Collectors.toList());
+        return rawItems;
     }
 
+    public List<String> getOptions()
+    {
+        return getOptions(el -> el.getText().trim());
+    }
 
     public String getName()
     {

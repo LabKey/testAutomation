@@ -163,7 +163,7 @@ public class FilteringReactSelect extends BaseReactSelect<FilteringReactSelect>
         return this;
     }
 
-    private List<WebElement> setFilter(String value)
+    public List<WebElement> setFilter(String value)
     {
         open();
         elementCache().input.sendKeys(value);

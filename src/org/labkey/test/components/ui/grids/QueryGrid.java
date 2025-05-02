@@ -14,7 +14,7 @@ import org.labkey.test.components.react.QueryChartDialog;
 import org.labkey.test.components.react.QueryChartPanel;
 import org.labkey.test.components.react.ReactCheckBox;
 import org.labkey.test.components.ui.FilterStatusValue;
-import org.labkey.test.util.selenium.WebDriverUtils;
+import org.labkey.test.util.selenium.WebElementUtils;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -587,7 +587,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         if(panelHeader.isDisplayed())
         {
             // The view name in the header is not in a separate element.
-            viewName = WebDriverUtils.getTextNodeWithin(panelHeader);
+            viewName = WebElementUtils.getTextNodeWithin(panelHeader);
         }
         else
         {
