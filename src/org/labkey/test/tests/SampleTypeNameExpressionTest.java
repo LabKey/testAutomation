@@ -38,6 +38,7 @@ import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
 import org.labkey.test.util.TestDataGenerator;
+import org.labkey.test.util.TextUtils;
 import org.labkey.test.util.exp.SampleTypeAPIHelper;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
@@ -696,7 +697,7 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         if(expectedPreview != null)
         {
             expectedToolTip.append("Example of name that will be generated from the current pattern: ");
-            expectedToolTip.append(expectedPreview);
+            expectedToolTip.append(TextUtils.normalizeSpace(expectedPreview));
             expectedToolTip.append("\n");
         }
 

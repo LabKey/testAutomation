@@ -15,6 +15,7 @@ import org.labkey.test.components.ui.entities.EntityBulkInsertDialog;
 import org.labkey.test.components.ui.entities.EntityBulkUpdateDialog;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.selenium.ScrollUtils;
+import org.labkey.test.util.selenium.WebElementUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
@@ -1136,7 +1137,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
             {
                 for (WebElement el : headerCells)
                 {
-                    fieldLabels.add(el.getText().trim());
+                    fieldLabels.add(getLabelFromHeaderCell(el));
                 }
 
                 int rowNumberColumn = 0;
@@ -1153,6 +1154,35 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
             }
 
             return fieldLabels;
+        }
+
+        /**
+         * Extract label from header cell. Editable grid header cells have several different layouts. What they have in
+         * common is that the label is the first text node in the cell, possibly within a &lt;span&gt;
+         */
+        private String getLabelFromHeaderCell(WebElement el)
+        {
+            // Use text nodes to ignore browser whitespace formatting
+            List<String> textNodes = WebElementUtils.getTextNodesWithin(el);
+            if (textNodes.isEmpty())
+            {
+                List<WebElement> children = Locator.xpath("./*").findElements(el);
+                if (children.isEmpty())
+                {
+                    return ""; // probably the selection checkbox column
+                }
+                else
+                {
+                    // Depth-first search until we find some text
+                    return getLabelFromHeaderCell(children.get(0));
+                }
+            }
+            else
+            {
+                boolean required = Locator.byClass("required-symbol").existsIn(el);
+                String label = textNodes.get(0).trim(); // trim trailing NBSP
+                return label + (required ? " *" : ""); // re-add required asterisk for tests that expect it
+            }
         }
 
         public WebElement inputCell()

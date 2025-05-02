@@ -16,6 +16,7 @@
 package org.labkey.test.params;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -31,6 +32,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static org.labkey.test.util.TestDataGenerator.DOMAIN_SPECIAL_STRING;
 
@@ -60,7 +62,7 @@ public class FieldDefinition extends PropertyDescriptor
      * @param name field name
      * @param type field type
      */
-    public FieldDefinition(String name, ColumnType type)
+    public FieldDefinition(@NotNull String name, @NotNull ColumnType type)
     {
         setName(name);
         setType(type);
@@ -85,18 +87,13 @@ public class FieldDefinition extends PropertyDescriptor
         this(name, ColumnType.String);
     }
 
-    public static String labelFromName(String name)
-    {
-        return labelFromName(name, true);
-    }
-
     // See BaseColumnInfo.labelFromName
-    public static String labelFromName(String name, boolean collapseSpaces)
+    public static String labelFromName(String name)
     {
         if (name == null)
             return null;
 
-        if (name.length() == 0)
+        if (name.isEmpty())
             return name;
 
         StringBuilder buf = new StringBuilder(name.length() + 10);
@@ -123,13 +120,12 @@ public class FieldDefinition extends PropertyDescriptor
             }
         }
 
-        if (collapseSpaces)
-        {
-            // This differs from BaseColumnInfo.labelForName because for testing purposes
-            // we need the label as shown in the UI, which will contract multiple spaces
-            return buf.toString().replaceAll("\\s+", " ");
-        }
         return buf.toString();
+    }
+
+    public String getEffectiveLabel()
+    {
+        return Objects.requireNonNullElseGet(getLabel(), () -> labelFromName(getName()));
     }
 
     @Override

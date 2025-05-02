@@ -7,6 +7,7 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.UpdatingComponent;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.html.Checkbox;
+import org.labkey.test.util.selenium.WebElementUtils;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -19,6 +20,8 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static org.labkey.test.util.selenium.WebElementUtils.getTextContent;
 
 /**
  * Wraps ColumnSelectionModal.tsx in UI components.
@@ -88,7 +91,7 @@ public class FieldSelectionDialog extends ModalDialog
     public List<String> getAvailableFieldLabels()
     {
         List<WebElement> listItemElements = elementCache().getListItemNameElements(elementCache().availableFieldsPanel);
-        return listItemElements.stream().map(WebElement::getText).collect(Collectors.toList());
+        return listItemElements.stream().map(WebElementUtils::getTextContent).collect(Collectors.toList());
     }
 
     /**
@@ -240,7 +243,7 @@ public class FieldSelectionDialog extends ModalDialog
     public List<String> getSelectedFieldLabels()
     {
         List<WebElement> listItemElements = elementCache().getListItemNameElements(elementCache().selectedFieldsPanel);
-        return listItemElements.stream().map(WebElement::getText).collect(Collectors.toList());
+        return listItemElements.stream().map(WebElementUtils::getTextContent).collect(Collectors.toList());
     }
 
     /**
@@ -256,7 +259,7 @@ public class FieldSelectionDialog extends ModalDialog
 
         if(active.isDisplayed())
         {
-            return Locator.tagWithClass("div", "field-name").findElement(active).getText();
+            return getTextContent(Locator.tagWithClass("div", "field-name").findElement(active));
         }
         else
         {

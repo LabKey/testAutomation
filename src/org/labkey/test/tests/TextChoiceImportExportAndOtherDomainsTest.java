@@ -168,17 +168,7 @@ public class TextChoiceImportExportAndOtherDomainsTest extends TextChoiceTest
         log("Validate that a new issue can be inserted that uses the TextChoice field.");
         IssuesHelper issuesHelper = new IssuesHelper(getDriver());
 
-        String tcFieldName;
-
-        // Looks like field name is cased differently in MSSQL.
-        if (WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.PostgreSQL)
-        {
-            tcFieldName = ISSUE_TC_FIELD.toLowerCase();
-        }
-        else
-        {
-            tcFieldName = getSelectControlName(ISSUE_TC_FIELD);
-        }
+        String tcFieldName = getSelectControlName(ISSUE_TC_FIELD);;
 
         Map<String, String> issueDetails = Map.of("title", ISSUE_TITLE, "assignedTo", getDisplayName(), tcFieldName, ISSUE_VALUE);
 
