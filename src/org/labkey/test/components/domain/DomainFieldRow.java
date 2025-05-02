@@ -19,6 +19,7 @@ import org.labkey.test.pages.core.admin.BaseSettingsPage.DATE_FORMAT;
 import org.labkey.test.pages.core.admin.BaseSettingsPage.TIME_FORMAT;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.LabKeyExpectedConditions;
+import org.labkey.test.util.selenium.WebElementUtils;
 import org.openqa.selenium.ElementNotInteractableException;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
@@ -1795,8 +1796,8 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
 
         public List<String> hitSelectionCriteria()
         {
-            return getWrapper().getTexts(Locator.tagWithClass("li", "hit-criteria-renderer__field-value")
-                    .findElements(this));
+            return Locator.tagWithClass("li", "hit-criteria-renderer__field-value")
+                    .findElements(this).stream().map(WebElementUtils::getTextContent).toList();
         }
 
         public RadioButton aliquotOption(ExpSchema.DerivationDataScopeType option)
