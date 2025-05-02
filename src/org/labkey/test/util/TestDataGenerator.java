@@ -581,7 +581,7 @@ public class TestDataGenerator
 
     public static String randomFieldName(String part, @Nullable String exclusion)
     {
-        return randomFieldName(part, randomInt(0, 5), randomInt(1, 5), exclusion);
+        return randomFieldName(part, randomInt(0, 5), randomInt(0, 5), exclusion);
     }
 
     public static String randomFieldName(String part, int numStartChars, int numEndChars)
