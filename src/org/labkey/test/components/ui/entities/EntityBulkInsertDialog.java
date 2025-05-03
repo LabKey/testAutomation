@@ -233,7 +233,7 @@ public class EntityBulkInsertDialog extends ModalDialog
             else if (field.getType() == FieldDefinition.ColumnType.Integer || field.getType() == FieldDefinition.ColumnType.Decimal || field.getType() == FieldDefinition.ColumnType.Double)
                 setNumericField(fieldKey, String.valueOf(value));
             else if (field.getType() == FieldDefinition.ColumnType.Date || field.getType() == FieldDefinition.ColumnType.DateAndTime || field.getType() == FieldDefinition.ColumnType.Time)
-                setDateTimeField(field.getName(), value, fieldKey);
+                setDateTimeField(fieldKey, value);
             else if (field.getType() == FieldDefinition.ColumnType.TextChoice)
                 setSelectionField(field.getLabel(), (List<String>) value);
             else
@@ -246,24 +246,20 @@ public class EntityBulkInsertDialog extends ModalDialog
      * object to use the picker to set the field. If a text value is passed in it is used as a literal and jut typed
      * into the textbox.
      *
-     * @param fieldName Field to update.
+     * @param fieldKey Field to update.
      * @param dateTime A LocalDateTime, LocalDate, LocalTime or String.
      * @return A reference to this page.
      */
-    public EntityBulkInsertDialog setDateTimeField(String fieldName, Object dateTime)
+    public EntityBulkInsertDialog setDateTimeField(String fieldKey, Object dateTime)
     {
-        return setDateTimeField(fieldName, dateTime, null);
-    }
-    public EntityBulkInsertDialog setDateTimeField(String fieldName, Object dateTime, @Nullable String fieldKey)
-    {
-        ReactDateTimePicker dateTimePicker = elementCache().dateInput(fieldName, fieldKey);
+        ReactDateTimePicker dateTimePicker = elementCache().dateInput(fieldKey);
         dateTimePicker.select(dateTime);
         return this;
     }
 
-    public String getDateTimeField(String fieldName, @Nullable String fieldKey)
+    public String getDateTimeField(String fieldKey)
     {
-        return elementCache().dateInput(fieldName, fieldKey).get();
+        return elementCache().dateInput(fieldKey).get();
     }
 
     public EntityBulkInsertDialog setBooleanField(String fieldKey, boolean checked)
@@ -410,13 +406,10 @@ public class EntityBulkInsertDialog extends ModalDialog
             return new Input(inputEl, getDriver());
         }
 
-        public ReactDateTimePicker dateInput(String fieldName, @Nullable String fieldKey)
+        public ReactDateTimePicker dateInput(String fieldKey)
         {
-            if (fieldKey == null)
-                fieldKey = fieldName;
-
             return new ReactDateTimePicker.ReactDateTimeInputFinder(getDriver())
-                    .withInputId(fieldKey).find(formRow(fieldName));
+                    .withInputId(fieldKey).find(formRow(fieldKey));
         }
 
         public List<WebElement> fieldLabels()
