@@ -85,7 +85,7 @@ public class EntityBulkUpdateDialog extends ModalDialog
         else if (field.getType() == FieldDefinition.ColumnType.Integer || field.getType() == FieldDefinition.ColumnType.Decimal || field.getType() == FieldDefinition.ColumnType.Double)
             setNumericField(EscapeUtil.fieldKeyEncodePart(field.getName()), String.valueOf(newValue));
         else if (field.getType() == FieldDefinition.ColumnType.Date || field.getType() == FieldDefinition.ColumnType.DateAndTime || field.getType() == FieldDefinition.ColumnType.Time)
-            setDateField(field.getLabel() == null ? field.getName() : field.getLabel(), (String) newValue);
+            setDateField(EscapeUtil.fieldKeyEncodePart(field.getName()), (String) newValue);
         else if (field.getType() == FieldDefinition.ColumnType.Boolean)
             setBooleanField(EscapeUtil.fieldKeyEncodePart(field.getName()), (Boolean) newValue);
         else if (field.getType() == FieldDefinition.ColumnType.MultiLine)
@@ -151,9 +151,9 @@ public class EntityBulkUpdateDialog extends ModalDialog
         return elementCache().numericInput(fieldKey).get();
     }
 
-    public EntityBulkUpdateDialog setDateField(String fieldLabel, String dateString)
+    public EntityBulkUpdateDialog setDateField(String fieldKey, String dateString)
     {
-        enableAndWait(fieldLabel, elementCache().dateInput(fieldLabel)).set(dateString);
+        enableAndWait(fieldKey, elementCache().dateInput(fieldKey)).set(dateString);
         return this;
     }
 
@@ -360,10 +360,10 @@ public class EntityBulkUpdateDialog extends ModalDialog
             return new Input(inputEl, getDriver());
         }
 
-        public ReactDateTimePicker dateInput(String fieldLabel)
+        public ReactDateTimePicker dateInput(String fieldKey)
         {
             return new ReactDateTimePicker.ReactDateTimeInputFinder(getDriver())
-                    .withInputId(EscapeUtil.fieldKeyEncodePart(fieldLabel)).waitFor(formRow(fieldLabel));
+                    .withInputId(fieldKey).waitFor(formRow(fieldKey));
         }
 
         public FileAttachmentContainer fileUploadField(String fieldKey)
