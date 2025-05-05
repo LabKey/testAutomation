@@ -1,12 +1,19 @@
 package org.labkey.test.util;
 
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.labkey.serverapi.reader.TabLoader;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.params.FieldDefinition;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -144,13 +151,13 @@ public class TestDataUtils
     public static String tsvStringFromRowMaps(List<Map<String, Object>> rowMaps, List<String> columns,
                                               boolean includeHeaders)
     {
-        return toTabular(rowMaps, columns, '\t', includeHeaders);
+        return writeRowsToString(rowListsFromMaps(rowMaps, columns, includeHeaders, true), CSVFormat.TDF);
     }
 
     public static String csvStringFromRowMaps(List<Map<String, Object>> rowMaps, List<String> columns,
                                               boolean includeHeaders)
     {
-        return toTabular(rowMaps, columns, ',', includeHeaders);
+        return writeRowsToString(rowListsFromMaps(rowMaps, columns, includeHeaders, true), CSVFormat.DEFAULT);
     }
 
 
@@ -164,7 +171,6 @@ public class TestDataUtils
      * @param rowMaps   Source data
      * @param columns   keys contained in each map, will copy values associated with them to the resulting list
      * @return A List<List<String>> containing values
-     * @throws IOException
      */
     public static List<List<String>> rowListsFromMaps(List<Map<String, Object>> rowMaps, List<String> columns, boolean includeHeaders, boolean preserveEmptyValues)
     {
@@ -172,65 +178,67 @@ public class TestDataUtils
 
         if (includeHeaders)
         {
-            List<String> headers = new ArrayList<>();
-            for(String col : columns)
-                headers.add(col);
+            List<String> headers = new ArrayList<>(columns);
 
             lists.add(headers);
         }
 
-        for (int i=0; i<rowMaps.size(); i++)
+        for (Map<String, Object> rowMap : rowMaps)
         {
             List<String> rowList = new ArrayList<>();
-            var rowMap = rowMaps.get(i);
-            for(String column : columns)
+            for (String column : columns)
             {
-                var value = (String) rowMap.get(column);
-                if (value == null && preserveEmptyValues)
-                    rowList.add("");
-                else
-                    rowList.add(value);
+                var value = rowMap.get(column);
+                if (value == null)
+                {
+                    if (preserveEmptyValues)
+                        value = "";
+                    else
+                        throw new IllegalArgumentException("Missing value for column '" + column + "' in row: " +  rowMap);
+                }
+                rowList.add(value.toString());
             }
             lists.add(rowList);
         }
         return lists;
     }
 
-    /**
-     * Convert a list of Map<String, Object>> to tabluar (tsv, csv) format
-     * (assumes the rowMaps all share the same keyset/schema)
-     * can be used to generate edit-grid paste data, if delimiter is \t and includeHeaders is false
-     *
-     * @param rowMaps data to be written into tabular format
-     * @param columns the fields (in order) from the rowMaps to include in tabular output
-     * @param delimiter comma [,] for csv tab [\t] for tsv
-     * @param includeHeaders    whether to write the keys as column names on the first line of the output string
-     * @return
-     */
-    private static String toTabular(List<Map<String, Object>> rowMaps, List<String> columns,
-                                    char delimiter, boolean includeHeaders)
+    public static File writeRowsToTsv(String fileName, List<List<String>> rows) throws IOException
     {
-        StringBuilder builder = new StringBuilder();
-        TsvQuoter q = new TsvQuoter(delimiter);
+        File file = new File(TestFileUtils.getTestTempDir(), fileName);
+        FileUtils.forceMkdirParent(file);
 
-        if (includeHeaders)
-        {
-            builder.append(String.join(String.valueOf(delimiter), columns.stream().map(q::quoteValue).toList()));
-            builder.append("\n");
-        }
-
-        for (Map<String, Object> row : rowMaps)
-        {
-            List<String> values = new ArrayList<>();
-            for (String name : columns)
+        try (CSVPrinter printer = new CSVPrinter(new FileWriter(file, StandardCharsets.UTF_8), CSVFormat.TDF)) {
+            for (List<String> row : rows)
             {
-                String value = q.quoteValue(row.get(name));
-                values.add(value);
+                printer.printRecord(row);
             }
-            builder.append(String.join(String.valueOf(delimiter), values));
-            builder.append("\n");
         }
-        return builder.toString();
+
+        return file;
+    }
+
+    public static String writeRowsToTsvString(List<List<String>> rows) throws IOException
+    {
+        return writeRowsToString(rows, CSVFormat.TDF);
+    }
+
+    public static String writeRowsToString(List<List<String>> rows, CSVFormat format)
+    {
+        StringWriter stringWriter = new StringWriter();
+
+        try (CSVPrinter printer = new CSVPrinter(stringWriter, format)) {
+            for (List<String> row : rows)
+            {
+                printer.printRecord(row);
+            }
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException(e);
+        }
+
+        return stringWriter.toString();
     }
 
     /**

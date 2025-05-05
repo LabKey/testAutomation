@@ -1,5 +1,6 @@
 package org.labkey.test.tests;
 
+import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -17,10 +18,12 @@ import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.TestDataGenerator;
 import org.labkey.test.util.exp.DataClassAPIHelper;
+import org.labkey.test.util.search.SearchAdminAPIHelper;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -99,11 +102,11 @@ public class DataClassFolderExportImportTest extends BaseWebDriverTest
 
         TestDataGenerator testDgen = DataClassAPIHelper.createEmptyDataClass(subfolderPath, testType);
 
-        testDgen.addCustomRow(Map.of("Name", "class1", "intColumn", 1, "decimalColumn", 1.1, "stringColumn", "one"));
-        testDgen.addCustomRow(Map.of("Name", "class2", "intColumn", 2, "decimalColumn", 2.2, "stringColumn", "two"));
-        testDgen.addCustomRow(Map.of("Name", "class3", "intColumn", 3, "decimalColumn", 3.3, "stringColumn", "three"));
-        testDgen.addCustomRow(Map.of("Name", "class4", "intColumn", 4, "decimalColumn", 4.4, "stringColumn", "four"));
-        testDgen.addCustomRow(Map.of("Name", "class5", "intColumn", 5, "decimalColumn", 5.5, "stringColumn", "five"));
+        testDgen.addCustomRow(Map.of("Name", "class1", "intColumn", 7771, "decimalColumn", 1.1, "stringColumn", "one"));
+        testDgen.addCustomRow(Map.of("Name", "class2", "intColumn", 7772, "decimalColumn", 2.2, "stringColumn", "two"));
+        testDgen.addCustomRow(Map.of("Name", "class3", "intColumn", 7773, "decimalColumn", 3.3, "stringColumn", "three"));
+        testDgen.addCustomRow(Map.of("Name", "class4", "intColumn", 7774, "decimalColumn", 4.4, "stringColumn", "four"));
+        testDgen.addCustomRow(Map.of("Name", "class5", "intColumn", 7775, "decimalColumn", 5.5, "stringColumn", "five"));
         testDgen.insertRows();
 
         PortalHelper portalHelper = new PortalHelper(this);
@@ -158,6 +161,14 @@ public class DataClassFolderExportImportTest extends BaseWebDriverTest
             assertNotNull("expect all matching rows to come through", matchingMap);
             assertEquals("Expect imported rows to be equivalent to exported ones", exportedRow, matchingMap);
         }
+
+        SearchAdminAPIHelper.waitForIndexer();
+
+        var searchResultPage = navBar().search("7774");
+        // Issue 52961: DataClass: Integer fields are not index for data class, unlike sample types
+        checker().withScreenshot("Search by int value after folder import").awaiting(Duration.ofSeconds(2),
+                ()-> Assertions.assertThat(searchResultPage.getResultCount() >= 2).isTrue());
+
     }
 
     @Test

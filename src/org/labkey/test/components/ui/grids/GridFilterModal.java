@@ -7,6 +7,7 @@ import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.react.Tabs;
 import org.labkey.test.components.ui.search.FilterExpressionPanel;
 import org.labkey.test.components.ui.search.FilterFacetedPanel;
+import org.labkey.test.util.selenium.WebElementUtils;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -67,7 +68,7 @@ public class GridFilterModal extends ModalDialog
      */
     public List<String> getAvailableFieldLabels()
     {
-        return getWrapper().getTexts(elementCache().findFieldOptions());
+        return elementCache().findFieldOptions().stream().map(WebElementUtils::getTextContent).collect(Collectors.toList());
     }
 
     public List<String> getFilteredFieldLabels()
@@ -76,7 +77,7 @@ public class GridFilterModal extends ModalDialog
                 Locator.tagWithClass("span", "field-modal__field_dot"))
                 .findElements(elementCache().fieldsSelectionPanel);
 
-        return filteredElements.stream().map(WebElement::getText).collect(Collectors.toList());
+        return filteredElements.stream().map(WebElementUtils::getTextContent).collect(Collectors.toList());
     }
 
     /**

@@ -38,6 +38,7 @@ import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
 import org.labkey.test.util.TestDataGenerator;
+import org.labkey.test.util.TextUtils;
 import org.labkey.test.util.exp.SampleTypeAPIHelper;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
@@ -66,7 +67,7 @@ import static org.labkey.test.util.TestDataUtils.getEscapedNameExpression;
 public class SampleTypeNameExpressionTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "SampleType_Name_Expression_Test";
-    private static final String DEFAULT_SAMPLE_PARENT_VALUE = "SS" + TestDataGenerator.randomString(3).replaceAll("_", "."); // '_' is used as delimiter to get batchRandomId
+    private static final String DEFAULT_SAMPLE_PARENT_VALUE = "SS" + TestDataGenerator.randomString(3).replaceAll("[_)]", "."); // '_' is used as delimiter to get batchRandomId and ) is used to close the defaultValue()
 
     private static final String PARENT_SAMPLE_TYPE = "PS" + DOMAIN_TRICKY_CHARACTERS;
     private static final String PARENT_SAMPLE_TYPE_INPUT = "PS" + getEscapedNameExpression(DOMAIN_TRICKY_CHARACTERS);
@@ -696,7 +697,7 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         if(expectedPreview != null)
         {
             expectedToolTip.append("Example of name that will be generated from the current pattern: ");
-            expectedToolTip.append(expectedPreview);
+            expectedToolTip.append(TextUtils.normalizeSpace(expectedPreview));
             expectedToolTip.append("\n");
         }
 

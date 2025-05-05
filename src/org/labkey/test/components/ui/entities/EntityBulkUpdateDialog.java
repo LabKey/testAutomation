@@ -44,6 +44,7 @@ public class EntityBulkUpdateDialog extends ModalDialog
     {
         super(new ModalDialogFinder(driver).withTitle("Update "));
         _updatingComponent = updatingComponent;
+        getWrapper().mouseOver(elementCache().title); // avoid accidentally triggering tooltips
     }
 
     /**
@@ -212,9 +213,8 @@ public class EntityBulkUpdateDialog extends ModalDialog
     {
         List<WebElement> labels = Locator.tagWithClass("label", "control-label").withAttribute("for")
                 .waitForElements(elementCache(), 2_000);
-        List<String> columns = new ArrayList<>();
-        labels.forEach(a -> columns.add(a.getDomAttribute("for")));
-        return columns;
+
+        return labels.stream().map(a -> EscapeUtil.fieldKeyDecodePart(a.getDomAttribute("for"))).toList();
     }
 
     public EntityBulkUpdateDialog waitForFieldsToBe(List<String> expectedFieldNames, int waitMilliseconds)
