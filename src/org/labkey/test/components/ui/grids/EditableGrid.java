@@ -6,6 +6,7 @@ import org.jetbrains.annotations.Nullable;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
+import org.labkey.test.components.UpdatingComponent;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
@@ -14,6 +15,7 @@ import org.labkey.test.components.react.ReactSelect;
 import org.labkey.test.components.ui.entities.EntityBulkInsertDialog;
 import org.labkey.test.components.ui.entities.EntityBulkUpdateDialog;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.FieldKey;
 import org.labkey.test.util.selenium.ScrollUtils;
 import org.labkey.test.util.selenium.WebElementUtils;
 import org.openqa.selenium.By;
@@ -35,11 +37,13 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
@@ -51,7 +55,7 @@ import static org.labkey.test.util.TestLogger.log;
 import static org.labkey.test.util.selenium.ScrollUtils.Alignment.center;
 import static org.labkey.test.util.selenium.WebDriverUtils.MODIFIER_KEY;
 
-public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
+public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache> implements UpdatingComponent
 {
     public static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
     public static final String SELECT_COLUMN_HEADER = "<select>";
@@ -83,7 +87,8 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         return _gridElement;
     }
 
-    public void waitForLoaded()
+    @Override
+    public void waitForReady()
     {
         Locators.loadingGrid.waitForElementToDisappear(this, 30000);
         Locators.spinner.waitForElementToDisappear(this, 30000);
@@ -91,7 +96,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
     public void clickDelete()
     {
-        doAndWaitForUpdate(() -> elementCache().deleteRowsBtn.click());
+        doAndWaitForRowCountUpdate(() -> elementCache().deleteRowsBtn.click());
     }
 
     public EntityBulkInsertDialog clickBulkAdd()
@@ -133,9 +138,12 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
     public EditableGrid removeColumn(String fieldLabel)
     {
-        WebElement headerCell = elementCache().getGridCellHeader(fieldLabel);
-        Locator.byClass("fa-chevron-circle-down").findElement(headerCell).click();
-        Locator.tagWithText("a", "Remove Column").findElement(headerCell).click();
+        doAndWaitForUpdate(() ->
+        {
+            WebElement headerCell = elementCache().getGridCellHeader(fieldLabel);
+            Locator.byClass("fa-chevron-circle-down").findElement(headerCell).click();
+            Locator.tagWithText("a", "Remove Column").findElement(headerCell).click();
+        });
         return this;
     }
 
@@ -219,7 +227,6 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
     private List<WebElement> getRows()
     {
-        waitForLoaded();
         return Locators.rows.findElements(elementCache().table);
     }
 
@@ -1086,18 +1093,34 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     public void addRows(int count)
     {
         setAddRows(count);
-        doAndWaitForUpdate(() -> {
+        doAndWaitForRowCountUpdate(() -> {
             elementCache().addRowsButton.click();
         });
     }
 
-    private void doAndWaitForUpdate(Runnable func)
+    private void doAndWaitForRowCountUpdate(Runnable func)
     {
         int initialCount = getRowCount();
 
         func.run();
 
         waitFor(() -> getRowCount() != initialCount, "Failed to add/remove rows", 5_000);
+    }
+
+    /**
+     * Wait for column count to change after the provided action
+     */
+    @Override
+    public void doAndWaitForUpdate(Runnable func)
+    {
+        int initialCount = elementCache().findColumnHeaders().size();
+
+        func.run();
+
+        waitFor(() -> {
+            clearElementCache();
+            return elementCache().findColumnHeaders().size() != initialCount;
+        }, "Failed to add/remove column", 5_000);
     }
 
     @Override
@@ -1121,25 +1144,15 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
             return Locator.byClass("grid-header-cell").withDescendant(Locator.tagContainingText("span", label)).findWhenNeeded(table);
         }
 
-        private List<String> fieldLabels = new ArrayList<>();
+        private List<WebElement> columnHeaders = Collections.emptyList();
+        private List<String> fieldLabels = Collections.emptyList();
+        private List<FieldKey> fieldKeys = Collections.emptyList();
 
         public List<String> getColumnLabels()
         {
-            // If the number of header cells is not equal to the list of fieldLabels the columns have been modified since
-            // the last call to getColumnLabels so get the column labels again.
-            List<WebElement> headerCells = Locators.headerCells.waitForElements(table, WAIT_FOR_JAVASCRIPT);
-            if (fieldLabels.size() != headerCells.size())
-            {
-                fieldLabels = new ArrayList<>();
-            }
-
             if (fieldLabels.isEmpty())
             {
-                for (WebElement el : headerCells)
-                {
-                    fieldLabels.add(getLabelFromHeaderCell(el));
-                }
-
+                fieldLabels = new ArrayList<>(findColumnHeaders().stream().map(this::getLabelFromHeaderCell).toList());
                 int rowNumberColumn = 0;
                 if (hasSelectColumn())
                 {
@@ -1151,9 +1164,32 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
                 {
                     fieldLabels.set(rowNumberColumn, ROW_NUMBER_COLUMN_HEADER);
                 }
+                fieldLabels = Collections.unmodifiableList(fieldLabels);
             }
-
             return fieldLabels;
+        }
+
+        public List<FieldKey> getColumnFieldKeys()
+        {
+            if (fieldKeys.isEmpty())
+            {
+                fieldKeys = findColumnHeaders().stream().map(el ->
+                    Optional.ofNullable(el.getDomAttribute("id"))
+                        .map(FieldKey::fromFieldKey)
+                        .orElse(null)).toList();
+            }
+            return fieldKeys;
+        }
+
+        protected List<WebElement> findColumnHeaders()
+        {
+            if (columnHeaders.isEmpty())
+            {
+                columnHeaders = Locators.headerCells.waitForElements(table, WAIT_FOR_JAVASCRIPT);
+                fieldLabels = new ArrayList<>();
+                fieldKeys = new ArrayList<>();
+            }
+            return columnHeaders;
         }
 
         /**

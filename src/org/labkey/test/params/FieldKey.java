@@ -1,56 +1,96 @@
 package org.labkey.test.params;
 
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class FieldKey
 {
-    private final List<String> _parts;
-    private String _label;
+    private final FieldKey _parent;
+    private final String _name;
+    private final String _encodedName;
 
-    private FieldKey(String... parts)
+    private FieldKey(FieldKey parent, String name)
     {
-        if (parts.length == 0)
-        {
-            throw new IllegalArgumentException("No field key parts were provided.");
-        }
-        // '/' is used as a separator character in fieldKeys. Slashes in field names are encoded as '$S'
-        _parts = Arrays.stream(parts)
-                .map(part -> part.replace("/", "$S"))
-                .collect(Collectors.toList());
-        _label = parts[parts.length - 1];
+        _parent = parent;
+        _name = name;
+        _encodedName = encodePart(name);
+    }
+
+    public static FieldKey fromParts(List<String> parts)
+    {
+        if (parts.isEmpty())
+            return null;
+
+        if (parts.stream().anyMatch(StringUtils::isBlank))
+            throw new IllegalArgumentException("parts contains blank: " + parts);
+
+        FieldKey parent = FieldKey.fromParts(parts.subList(0, parts.size() - 1));
+        return new FieldKey(parent, parts.get(parts.size() - 1));
     }
 
     public static FieldKey fromParts(String... parts)
     {
-        return new FieldKey(parts);
+        return fromParts(Arrays.asList(parts));
     }
 
     public static FieldKey fromPath(String path)
     {
-        return new FieldKey(path.split("/"));
+        return fromParts(path.split("/"));
     }
 
-    public String getLabel()
+    public static FieldKey fromFieldKey(String path)
     {
-        return _label;
+        return fromParts(Arrays.stream(path.split("/")).map(FieldKey::decodePart).toList());
     }
 
-    public FieldKey setLabel(String label)
+    private static final String[] ILLEGAL = {"$", "/", "&", "}", "~", ",", "."};
+    private static final String[] REPLACEMENT = {"$D", "$S", "$A", "$B", "$T", "$C", "$P"};
+
+    public static String encodePart(String str)
     {
-        _label = label;
-        return this;
+        return StringUtils.replaceEach(str, ILLEGAL, REPLACEMENT);
     }
 
-    public List<String> getParts()
+    public static String decodePart(String str)
     {
-        return _parts;
+        return StringUtils.replaceEach(str, REPLACEMENT, ILLEGAL);
+    }
+
+    public FieldKey getParent()
+    {
+        return _parent;
+    }
+
+    public List<String> getParts(boolean encode)
+    {
+        List<String> parts = new ArrayList<>();
+        if (_parent != null)
+        {
+            parts.addAll(_parent.getParts(encode));
+        }
+        parts.add(encode ? _encodedName : _name);
+        return parts;
+    }
+
+    public List<FieldKey> getHierarchy()
+    {
+        List<FieldKey> parts = new ArrayList<>();
+        if (_parent != null)
+        {
+            parts.addAll(_parent.getHierarchy());
+        }
+        parts.add(this);
+        return parts;
     }
 
     @Override
     public String toString()
     {
-        return String.join("/", getParts());
+        return String.join("/", getParts(true));
     }
 }
