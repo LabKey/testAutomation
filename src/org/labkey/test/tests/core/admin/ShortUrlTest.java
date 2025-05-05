@@ -73,7 +73,7 @@ public class ShortUrlTest extends BaseWebDriverTest
     public void testShortUrl() throws Exception
     {
         String shortUrl = nextUrlKey();
-        String targetUrl = buildRelativeUrl("project", getProjectName(), "begin");
+        String targetUrl = WebTestHelper.getContextPath() + buildRelativeUrl("project", getProjectName(), "begin");
 
         ShortUrlAdminPage adminPage = ShortUrlAdminPage.beginAt(this);
         adminPage.createNewShortUrl(shortUrl, targetUrl);
@@ -95,7 +95,7 @@ public class ShortUrlTest extends BaseWebDriverTest
         });
 
         log("Update shortUrl target");
-        String updatedTargetUrl = buildRelativeUrl("project", "home", "begin");
+        String updatedTargetUrl = WebTestHelper.getContextPath() + buildRelativeUrl("project", "home", "begin");
 
         adminPage = ShortUrlAdminPage.beginAt(this);
         adminPage.createNewShortUrl(shortUrl, updatedTargetUrl);
@@ -149,7 +149,7 @@ public class ShortUrlTest extends BaseWebDriverTest
         assertEquals("Row count with filter", 1, drt.getDataRowCount());
 
         String shortUrl = nextUrlKey();
-        String targetUrl = getCurrentRelativeURL();
+        String targetUrl = WebTestHelper.getContextPath() + getCurrentRelativeURL();
 
         ShortUrlAdminPage adminPage = ShortUrlAdminPage.beginAt(this);
         adminPage.createNewShortUrl(shortUrl, targetUrl);
