@@ -131,7 +131,7 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
     {
         WebElement fieldValueElement = elementCache().valueCellWithLabel(fieldLabel);
         WebElement textElement = fieldValueElement.findElement(By.xpath("./div/div/*"));
-        if(textElement.getTagName().equalsIgnoreCase("textarea"))
+        if (textElement.getTagName().equalsIgnoreCase("textarea"))
             return textElement.getText();
         else
             return textElement.getAttribute("value");
@@ -146,14 +146,14 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
      **/
     public DetailTableEdit setTextField(String fieldLabel, String value)
     {
-        if(isFieldEditable(fieldLabel))
+        if (isFieldEditable(fieldLabel))
         {
             WebElement fieldValueElement = elementCache().valueCellWithLabel(fieldLabel);
 
             WebElement editableElement = fieldValueElement.findElement(By.xpath("./div/div/*"));
             String elementType = editableElement.getTagName().toLowerCase().trim();
 
-            switch(elementType)
+            switch (elementType)
             {
                 case "textarea":
                 case "input":
@@ -291,6 +291,11 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
                 .hasAttachedFile();
     }
 
+    public FilteringReactSelect getSelectField(String fieldLabel)
+    {
+        return elementCache().findSelect(fieldLabel);
+    }
+
     /**
      * Get the value of a select field.
      *
@@ -299,17 +304,18 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
      **/
     public String getSelectedValue(String fieldLabel)
     {
-        FilteringReactSelect reactSelect = elementCache().findSelect(fieldLabel);
-        return reactSelect.getValue();
+        return getSelectField(fieldLabel).getValue();
     }
 
-    /*
-        This allows you to query a given select in the edit panel to see what options it offers
-     */
+    /**
+     * This allows you to query a given select in the edit panel to see what options it offers.
+     *
+     * @param fieldLabel The label of the field to get.
+     * @return List of strings for the values in the list.
+     **/
     public List<String> getSelectOptions(String fieldLabel)
     {
-        FilteringReactSelect reactSelect = elementCache().findSelect(fieldLabel);
-        return reactSelect.getOptions();
+        return getSelectField(fieldLabel).getOptions();
     }
 
     /**
@@ -333,7 +339,6 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
         return this;
     }
 
-
     /**
      * Select multiple values from a select list.
      *
@@ -343,7 +348,7 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
      **/
     public DetailTableEdit setSelectValue(String fieldLabel, List<String> selectValues)
     {
-        FilteringReactSelect reactSelect = elementCache().findSelect(fieldLabel);
+        FilteringReactSelect reactSelect = getSelectField(fieldLabel);
         selectValues.forEach(reactSelect::typeAheadSelect);
         _changeCounter++;
         return this;
@@ -361,24 +366,25 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
     }
 
     /**
-     * Clear a given select field
+     * Clear a given select field.
+     *
      * @param fieldLabel The label of the field to clear.
      * @param waitForSelection If true, wait for the select to have a selection before clearing it
      * @param assertSelection  If true, assert if no selection appears (note: does nothing if waitForSelection is not true)
-     * @return
+     * @return A reference to this editable detail table.
      */
     public DetailTableEdit clearSelectValue(String fieldLabel, boolean waitForSelection, boolean assertSelection)
     {
-        var select = elementCache().findSelect(fieldLabel);
+        var select = getSelectField(fieldLabel);
         if (waitForSelection)
         {
-            if (assertSelection) {
-                WebDriverWrapper.waitFor(() -> select.hasSelection(),
+            if (assertSelection)
+            {
+                WebDriverWrapper.waitFor(select::hasSelection,
                         String.format("The %s select did not have any selection in time", fieldLabel), _readyTimeout);
             }
-            else {
-                WebDriverWrapper.waitFor(() -> select.hasSelection(), 1000);
-            }
+            else
+                WebDriverWrapper.waitFor(select::hasSelection, 1_000);
         }
         select.clearSelection();
         _changeCounter++;
@@ -398,19 +404,19 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
     public DetailTableEdit setDateTimeField(String fieldName, Object dateTime)
     {
         ReactDateTimePicker dateTimePicker = getDateTimePicker(fieldName);
-        if(dateTime instanceof LocalDateTime localDateTime)
+        if (dateTime instanceof LocalDateTime localDateTime)
         {
             dateTimePicker.select(localDateTime);
         }
-        else if(dateTime instanceof LocalDate localDate)
+        else if (dateTime instanceof LocalDate localDate)
         {
             dateTimePicker.selectDate(localDate);
         }
-        else if(dateTime instanceof LocalTime localTime)
+        else if (dateTime instanceof LocalTime localTime)
         {
             dateTimePicker.selectTime(localTime);
         }
-        else if(dateTime instanceof String setValue)
+        else if (dateTime instanceof String setValue)
         {
             dateTimePicker.set(setValue, true);
         }
@@ -481,7 +487,7 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
      */
     public String getValidationMessage()
     {
-        if(elementCache().validationMsg.existsIn(this))
+        if (elementCache().validationMsg.existsIn(this))
             return elementCache().validationMsg.findElement(getDriver()).getText();
         else
             return "";
@@ -534,8 +540,7 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
     {
         elementCache().saveButton.click();
         WebElement errorBanner = BootstrapLocators.errorBanner.findWhenNeeded(this);
-        WebDriverWrapper.waitFor(()->errorBanner.isDisplayed(),
-                "No error message was shown.", 1_000);
+        WebDriverWrapper.waitFor(errorBanner::isDisplayed, "No error message was shown.", 1_000);
         return errorBanner.getText();
     }
 
@@ -550,8 +555,7 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
     {
         elementCache().cancelButton.click();
         WebElement errorBanner = BootstrapLocators.errorBanner.findWhenNeeded(this);
-        WebDriverWrapper.waitFor(()->errorBanner.isDisplayed(),
-                "No error message was shown.", 1_000);
+        WebDriverWrapper.waitFor(errorBanner::isDisplayed, "No error message was shown.", 1_000);
         return errorBanner.getText();
     }
 
@@ -647,5 +651,4 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
             return _locator;
         }
     }
-
 }
