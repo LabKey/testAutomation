@@ -53,9 +53,9 @@ public class Tabs extends WebDriverComponent<Tabs.ElementCache>
         return _driver;
     }
 
-    public WebElement findTab(String tabKey)
+    public WebElement findTab(String tabText)
     {
-        return elementCache().findTab(tabKey);
+        return elementCache().findTab(tabText);
     }
 
     public WebElement findPanelForTab(String tabText)
@@ -131,25 +131,25 @@ public class Tabs extends WebDriverComponent<Tabs.ElementCache>
             return tabs;
         }
 
-        WebElement findTab(String tabKey)
+        WebElement findTab(String tabText)
         {
-            if (!tabMap.containsKey(tabKey))
+            if (!tabMap.containsKey(tabText))
             {
                 WebElement tabEl;
                 try
                 {
                     // Use 'containing' here because it may happen that the counts get loaded into the tabs after the call to this method,
                     // which causes the name to change from, say 'Included Samples' to 'Included Samples (7)'.
-                    tabEl = tabLoc.withAttribute("data-event-key", tabKey).findElement(tabList);
+                    tabEl = tabLoc.containing(tabText).findElement(tabList);
                 }
                 catch (NoSuchElementException ex)
                 {
                     throw new NoSuchElementException(String.format("'%s' not among available tabs: %s",
-                            tabKey, getWrapper().getTexts(findAllTabs())), ex);
+                        tabText, getWrapper().getTexts(findAllTabs())), ex);
                 }
-                tabMap.put(tabKey, tabEl);
+                tabMap.put(tabText, tabEl);
             }
-            return tabMap.get(tabKey);
+            return tabMap.get(tabText);
         }
 
         // Tab panels can be updated and changed when flipping between tabs. Don't persist the panel element find it each time.
