@@ -156,6 +156,22 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
         return placeholder != null && placeholder.isDisplayed();
     }
 
+    public @Nullable String getHelpBlockText()
+    {
+        waitForReady();
+
+        if (!isHelpBlockVisible())
+            return null;
+
+        return Locators.helpBlock.findElement(getComponentElement()).getText().trim();
+    }
+
+    public boolean isHelpBlockVisible()
+    {
+        var helpBlock = Locators.helpBlock.findElementOrNull(getComponentElement());
+        return helpBlock != null && helpBlock.isDisplayed();
+    }
+
     public String getValue()
     {
         waitForReady();
@@ -499,6 +515,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
         public static final Locator.XPathLocator singleValueLabel = Locator.tagWithClass("div", "select-input__single-value");
         public static final Locator loadingSpinner = Locator.tagWithClass("span", "select-input__loading-indicator");
         public static final Locator listItems = Locator.tagWithClass("div", "select-input__option");
+        public static final Locator.XPathLocator helpBlock = Locator.tagWithClass("span", "help-block");
 
         public static Locator.XPathLocator selectContainer()
         {
