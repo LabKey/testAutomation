@@ -79,7 +79,7 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
     {
         Assert.assertTrue("Add Parent menu not present", isAddParentMenuPresent());
         getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().addParent.getComponentElement()));
-        getEditableGrid().doAndWaitForUpdate(() -> elementCache().addParent.doMenuAction(parentType));
+        getEditableGrid().doAndWaitForColumnUpdate(() -> elementCache().addParent.doMenuAction(parentType));
         return this;
     }
 
@@ -106,7 +106,7 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
     {
         Assert.assertTrue("Add Source menu not present", isAddSourceMenuPresent());
         getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().addSource.getComponentElement()));
-        getEditableGrid().doAndWaitForUpdate(() -> elementCache().addSource.doMenuAction(sourceType));
+        getEditableGrid().doAndWaitForColumnUpdate(() -> elementCache().addSource.doMenuAction(sourceType));
         return this;
     }
 
@@ -213,7 +213,7 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
 
     public List<Map<String, String>> getGridData()
     {
-        return getEditableGrid().getGridData();
+        return getEditableGrid().getGridDataByLabel();
     }
 
     public boolean isGridVisible()
