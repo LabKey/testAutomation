@@ -99,7 +99,7 @@ public class TestDataGenerator
     private final String _containerPath;
     private String _excludedChars;
     private boolean _alphaNumericStr;
-    private final CSVFormat _format = CSVFormat.DEFAULT;
+    private final CSVFormat _format = CSVFormat.TDF;
 
     /**
      *  use TestDataGenerator to generate data to a specific fieldSet
