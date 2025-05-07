@@ -225,7 +225,7 @@ public class EntityBulkInsertDialog extends ModalDialog
         for (FieldDefinition field : fields)
         {
             String fieldKey = EscapeUtil.fieldKeyEncodePart(field.getName());
-            Object value = data.get(field.getLabel() != null ? field.getLabel() : FieldDefinition.labelFromName(field.getName()));
+            Object value = data.get(field.getEffectiveLabel());
             if (value == null)
                 continue;
             if (field.getType() == FieldDefinition.ColumnType.Boolean)

@@ -1,4 +1,4 @@
-package org.labkey.test.util;
+package org.labkey.test.util.data;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.labkey.serverapi.reader.TabLoader;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.util.TestDataGenerator;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -17,9 +18,14 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public class TestDataUtils
 {
@@ -172,13 +178,28 @@ public class TestDataUtils
         return rowListsFromMaps(rowMaps, columns, false, true);
     }
 
+    public static List<List<String>> rowListsFromMaps(List<Map<String, Object>> rowMaps, List<String> columns, boolean includeHeaders)
+    {
+        return rowListsFromMaps(rowMaps, columns, includeHeaders, true);
+    }
+
+    public static List<List<String>> rowListsFromMaps(List<Map<String, Object>> rowMaps)
+    {
+        Set<String> columns = new LinkedHashSet<>();
+        for (Map<String, Object> row : rowMaps)
+        {
+            columns.addAll(row.keySet());
+        }
+        return rowListsFromMaps(rowMaps, new ArrayList<>(columns), true, true);
+    }
+
     /**
      * convert a List of Map<String, Object> to a list of List<String>
      * @param rowMaps   Source data
      * @param columns   keys contained in each map, will copy values associated with them to the resulting list
      * @return A List<List<String>> containing values
      */
-    public static List<List<String>> rowListsFromMaps(List<Map<String, Object>> rowMaps, List<String> columns, boolean includeHeaders, boolean preserveEmptyValues)
+    public static List<List<String>> rowListsFromMaps(List<Map<String, Object>> rowMaps, List<String> columns, boolean includeHeaders, boolean allowMissingValues)
     {
         List<List<String>> lists = new ArrayList<>();
 
@@ -197,16 +218,30 @@ public class TestDataUtils
                 var value = rowMap.get(column);
                 if (value == null)
                 {
-                    if (preserveEmptyValues)
+                    if (allowMissingValues)
                         value = "";
                     else
                         throw new IllegalArgumentException("Missing value for column '" + column + "' in row: " +  rowMap);
+                }
+                if (value instanceof Collection<?> c)
+                {
+                    value = c.stream().map(Object::toString).collect(Collectors.joining(","));
                 }
                 rowList.add(value.toString());
             }
             lists.add(rowList);
         }
         return lists;
+    }
+
+    public static List<List<String>> replaceColumnHeaders(List<List<String>> rowLists, Function<String, String> columnMapper)
+    {
+        List<String> headerRow = rowLists.get(0);
+        for (int i = 1; i < rowLists.size(); i++)
+        {
+            headerRow.set(i, columnMapper.apply(headerRow.get(i)));
+        }
+        return rowLists;
     }
 
     public static File writeRowsToTsv(String fileName, List<List<String>> rows) throws IOException

@@ -542,7 +542,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         {
             Map<String, Object> rowData = data.get(i);
             for (FieldDefinition field : fields) {
-                String key = field.getLabel() != null ? field.getLabel() : field.getName();
+                String key = field.getEffectiveLabel();
                 Object value = rowData.get(key);
                 if (value != null)
                     setCellValue(i, key, value);

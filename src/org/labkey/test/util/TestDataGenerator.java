@@ -40,6 +40,8 @@ import org.labkey.serverapi.reader.TabLoader;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.util.data.ColumnNameMapper;
+import org.labkey.test.util.data.TestDataUtils;
 import org.labkey.test.util.query.QueryApiHelper;
 
 import java.io.File;
@@ -61,9 +63,9 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static org.labkey.test.BaseWebDriverTest.ALL_ILLEGAL_QUERY_KEY_CHARACTERS;
-import static org.labkey.test.util.TestDataUtils.REALISTIC_ASSAY_FIELDS;
-import static org.labkey.test.util.TestDataUtils.REALISTIC_SAMPLE_FIELDS;
-import static org.labkey.test.util.TestDataUtils.REALISTIC_SOURCE_FIELDS;
+import static org.labkey.test.util.data.TestDataUtils.REALISTIC_ASSAY_FIELDS;
+import static org.labkey.test.util.data.TestDataUtils.REALISTIC_SAMPLE_FIELDS;
+import static org.labkey.test.util.data.TestDataUtils.REALISTIC_SOURCE_FIELDS;
 
 
 /**
@@ -120,24 +122,10 @@ public class TestDataGenerator
 
     public static File writeCsvFile(List<FieldDefinition> fields, List<Map<String, Object>> entityData, String fileName) throws IOException
     {
-        List<Map<String, Object>> fileData = new ArrayList<>();
-        List<String> fieldNamesForFile = fields.stream().map(FieldDefinition::getName).collect(Collectors.toList());
-        for (Map<String, Object> row : entityData)
-        {
-            Map<String, Object> fileRow = new HashMap<>();
-            for (FieldDefinition field : fields)
-            {
-                String key = field.getLabel() == null ? field.getName() : field.getLabel();
-                Object value = row.get(key);
-                Object valueToWrite = value;
-                if (value instanceof List<?>)
-                    valueToWrite = StringUtils.join((List<?>)value, ",");
-                fileRow.put(field.getName(), valueToWrite);
-            }
-            fileData.add(fileRow);
-        }
-        var fileContents = TestDataUtils.csvStringFromRowMaps(fileData, fieldNamesForFile, true);
-        return TestFileUtils.writeTempFile(fileName, fileContents);
+        List<List<String>> rows = TestDataUtils.rowListsFromMaps(entityData);
+        TestDataUtils.replaceColumnHeaders(rows, ColumnNameMapper.labelToName(fields)); // Use field names
+
+        return TestDataUtils.writeRowsToFile(fileName, rows);
     }
 
     public static List<Map<String, Object>> generateEntityData(List<FieldDefinition> fields, String nameField, String namePrefix, int startingCount, int size, boolean addLineage, boolean includeAliquots, String queryName, boolean forGridInsert)
@@ -161,7 +149,7 @@ public class TestDataGenerator
             {
                 if (!fieldDefinition.getName().equalsIgnoreCase(nameField)) // Name already set
                 {
-                    String key = fieldDefinition.getLabel() != null ? fieldDefinition.getLabel() : FieldDefinition.labelFromName(fieldDefinition.getName());
+                    String key = fieldDefinition.getEffectiveLabel();
                     if (fieldDefinition.getType().equals(FieldDefinition.ColumnType.Date))
                         entityData.put(key, UI_DATE_FORMAT.get().format(TestDateUtils.diffFromTodaysDate(Calendar.HOUR, i * 24)));
                     else if (fieldDefinition.getType().equals(FieldDefinition.ColumnType.DateAndTime))
@@ -262,14 +250,6 @@ public class TestDataGenerator
             TestLogger.log(obj.getName() + " : " + obj.getType().getLabel());
         });
         return fields;
-    }
-
-    public static void setFieldCaptionsFromNames(List<FieldDefinition> fields)
-    {
-        fields.forEach(f -> {
-            if (f.getLabel() == null)
-                f.setLabel(FieldDefinition.labelFromName(f.getName()));
-        });
     }
 
     public String getSchema()
