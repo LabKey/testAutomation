@@ -11,18 +11,23 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Git;
 import org.labkey.test.components.ext4.Window;
+import org.labkey.test.components.html.FileInput;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.pages.core.admin.AllowedFileExtensionAdminPage;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.params.list.IntListDefinition;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.SampleTypeHelper;
 import org.labkey.test.util.TestDataGenerator;
+import org.labkey.test.util.exp.SampleTypeAPIHelper;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -74,6 +79,7 @@ public class AllowedFileExtensionAdminTest extends BaseWebDriverTest
         goToProjectHome();
         new PortalHelper(getDriver()).addWebPart("Files");
         new PortalHelper(getDriver()).addWebPart("Sample Types");
+        new PortalHelper(getDriver()).addWebPart("Lists");
         new PortalHelper(getDriver()).addWebPart("Messages List");
     }
 
@@ -88,6 +94,25 @@ public class AllowedFileExtensionAdminTest extends BaseWebDriverTest
         _fileBrowserHelper.deleteAll();
     }
 
+    /**
+     * <p>
+     *     Test the 'Allowed File Extension Admin' page and use the files web part as part of the validation process.
+     * </p>
+     * <p>
+     *     This test will:
+     *     <ul>
+     *         <li>Add several file extensions as allowed extensions, then upload files of that type.</li>
+     *         <li>Upload a file that is not allowed and validate it is rejected.</li>
+     *         <li>Remove an allowed file type and validate files of that type can not be uploaded.</li>
+     *         <li>Click 'Delete All' and cancel out of confirmation, validate no change.</li>
+     *         <li>Click 'Delete All' and validate any file type can be uploaded.</li>
+     *         <li>Edit an allowed extension, .xls to .xlsx, and validate .xlsx files can be uploaded but .xls can not.</li>
+     *         <li>Validate extension value must start with a '.'</li>
+     *         <li>Validate duplicate extensions are not allowed.</li>
+     *         <li>Validate blank extension type is not allowed.</li>
+     *     </ul>
+     * </p>
+     */
     @Test
     public void testAddUpdateAndDelete()
     {
@@ -103,51 +128,16 @@ public class AllowedFileExtensionAdminTest extends BaseWebDriverTest
                 allowedTypes.add(extension);
         }
 
-        log(String.format("Add the following as extensions: %s", allowedTypes));
-
-        AllowedFileExtensionAdminPage allowedFileExtensionAdminPage = goToAdminConsole().clickAllowedFileExtensions();
-
-        for (String extension : allowedTypes)
-        {
-            allowedFileExtensionAdminPage.setExtension(extension);
-            allowedFileExtensionAdminPage.clickSaveExtension();
-        }
-
-        List<Input> extensions = allowedFileExtensionAdminPage.getAllowedExtensions();
-
-        checker().withScreenshot()
-                .verifyEqualsSorted("List of 'Allowed extensions' is not as expected.",
-                        allowedTypes, extensions.stream().map(Input::getValue).toList());
+        log(String.format("Add the following as allowed extensions: %s", allowedTypes));
+        setAllowedExtensions(allowedTypes, allowedTypes);
 
         log("Verify upload of allowed file types is successful.");
-        goToProjectHome();
-
-        List<String> expectedFiles = new ArrayList<>();
-        for (Map.Entry<String, File> entry : fileMap.entrySet())
-        {
-            if (!excludedTypes.contains(entry.getKey()))
-            {
-                _fileBrowserHelper.uploadFile(entry.getValue());
-                expectedFiles.add(entry.getValue().getName());
-            }
-        }
-
-        List<String> actualFiles = _fileBrowserHelper.getFileList();
-
-        checker().withScreenshot()
-                .verifyEqualsSorted("Uploaded files not as expected.",
-                        expectedFiles, actualFiles);
+        uploadToFileWebPartAllowed(excludedTypes);
 
         log(String.format("Verify upload of '%s' fails", excludedType));
-        Window<?> errorWindow = _fileBrowserHelper.uploadFileExpectingError(fileMap.get(excludedType));
+        uploadToFileWebPartExcluded(excludedTypes);
 
-        checker().withScreenshot()
-                .verifyEquals(String.format("Error message for excluded file type '%s' not as expected.", excludedType),
-                        String.format("This file type [%s] is not allowed.", excludedType.replace(".", "")), errorWindow.getBody());
-
-        click(Ext4Helper.Locators.ext4Button("OK"));
-
-        allowedFileExtensionAdminPage = goToAdminConsole().clickAllowedFileExtensions();
+        AllowedFileExtensionAdminPage allowedFileExtensionAdminPage = goToAdminConsole().clickAllowedFileExtensions();
 
         allowedFileExtensionAdminPage.deleteExtension(allowedTypes.get(0));
         excludedType = allowedTypes.remove(0);
@@ -155,24 +145,14 @@ public class AllowedFileExtensionAdminTest extends BaseWebDriverTest
 
         log(String.format("Remove '%s' as an allowed extension.", excludedType));
 
-        extensions = allowedFileExtensionAdminPage.getAllowedExtensions();
+        List<Input> extensions = allowedFileExtensionAdminPage.getAllowedExtensions();
 
         checker().withScreenshot()
                 .verifyEqualsSorted(String.format("List of 'Allowed extensions' is not as expected after removing '%s'.", excludedType),
                         allowedTypes, extensions.stream().map(Input::getValue).toList());
 
-        goToProjectHome();
-        log(String.format("Remove the '%s' file from the upload.", excludedType));
-        _fileBrowserHelper.deleteFile(fileMap.get(excludedType).getName());
-
         log(String.format("Verify upload of '%s' fails.", excludedType));
-        errorWindow = _fileBrowserHelper.uploadFileExpectingError(fileMap.get(excludedType));
-
-        checker().withScreenshot()
-                .verifyEquals(String.format("Error message is not as expected after removing type '%s'.", excludedType),
-                        String.format("This file type [%s] is not allowed.", excludedType.replace(".", "")), errorWindow.getBody());
-
-        click(Ext4Helper.Locators.ext4Button("OK"));
+        uploadToFileWebPartExcluded(excludedTypes);
 
         allowedFileExtensionAdminPage = goToAdminConsole().clickAllowedFileExtensions();
 
@@ -196,26 +176,8 @@ public class AllowedFileExtensionAdminTest extends BaseWebDriverTest
                 .verifyTrue("List of 'Allowed extensions' is not as expected after 'Delete All'.",
                         extensions.isEmpty());
 
-        excludedTypes = new ArrayList<>();
-
         log("Validate 'all' file types can be uploaded.");
-        goToProjectHome();
-        _fileBrowserHelper.deleteAll();
-
-        expectedFiles = new ArrayList<>();
-        for (Map.Entry<String, File> entry : fileMap.entrySet())
-        {
-            _fileBrowserHelper.uploadFile(entry.getValue());
-            expectedFiles.add(entry.getValue().getName());
-        }
-
-        actualFiles = _fileBrowserHelper.getFileList();
-
-        checker().withScreenshot()
-                .verifyEqualsSorted("Uploaded files not as expected.",
-                        expectedFiles, actualFiles);
-
-        _fileBrowserHelper.deleteAll();
+        uploadToFileWebPartAllowed(new ArrayList<>());
 
         allowedTypes = new ArrayList<>();
         excludedTypes = new ArrayList<>();
@@ -229,14 +191,7 @@ public class AllowedFileExtensionAdminTest extends BaseWebDriverTest
         }
 
         log(String.format("Add these extensions back: %s", allowedTypes));
-
-        allowedFileExtensionAdminPage = goToAdminConsole().clickAllowedFileExtensions();
-
-        for (String extension : allowedTypes)
-        {
-            allowedFileExtensionAdminPage.setExtension(extension);
-            allowedFileExtensionAdminPage.clickSaveExtension();
-        }
+        allowedFileExtensionAdminPage = setAllowedExtensions(allowedTypes, allowedTypes);
 
         String oldExtension = ".xls";
         String newExtension = excludedType;
@@ -246,79 +201,293 @@ public class AllowedFileExtensionAdminTest extends BaseWebDriverTest
         Input editExtension = allowedFileExtensionAdminPage.getAllowedExtension(allowedFileExtensionAdminPage.getAllowedExtensionIndex(oldExtension));
 
         editExtension.setValue(newExtension);
+
+        // Issue 53039 If that issue is fixed code should be added here to validate dirty bit warning.
+
         allowedFileExtensionAdminPage.clickSaveUpdateExtension();
 
         allowedTypes.remove(oldExtension);
         allowedTypes.add(newExtension);
 
+        excludedTypes = List.of(oldExtension);
         extensions = allowedFileExtensionAdminPage.getAllowedExtensions();
 
         checker().withScreenshot()
                 .verifyEqualsSorted("List of 'Allowed extensions' is not as expected.",
                         allowedTypes, extensions.stream().map(Input::getValue).toList());
 
-        goToProjectHome();
-        _fileBrowserHelper.uploadFile(fileMap.get(newExtension));
-
-        actualFiles = _fileBrowserHelper.getFileList();
-
-        checker().withScreenshot()
-                .verifyTrue(String.format("File '%s' should have been uploaded.", fileMap.get(newExtension).getName()),
-                        actualFiles.contains(fileMap.get(newExtension).getName()));
+        uploadToFileWebPartAllowed(excludedTypes);
 
         log(String.format("Verify file with the old extension '%s' is excluded.", oldExtension));
+        uploadToFileWebPartExcluded(excludedTypes);
 
-        errorWindow = _fileBrowserHelper.uploadFileExpectingError(fileMap.get(oldExtension));
+        allowedFileExtensionAdminPage = goToAdminConsole().clickAllowedFileExtensions();
+        allowedFileExtensionAdminPage.setExtension("not .an extension");
+        String expectedValue = "File extension must start with a '.'";
+        String actualValue = allowedFileExtensionAdminPage.clickSaveExpectingError();
+        checker().withScreenshot()
+                .verifyEquals("Incorrect error message for invalid extension.",
+                        expectedValue, actualValue);
+
+        allowedFileExtensionAdminPage.setExtension(allowedTypes.get(0));
+        expectedValue = String.format("'%s' already exists. Duplicate values not allowed.", allowedTypes.get(0));
+        actualValue = allowedFileExtensionAdminPage.clickSaveExpectingError();
+        checker().withScreenshot()
+                .verifyEquals("Incorrect error message for duplicate extension.",
+                        expectedValue, actualValue);
+
+        allowedFileExtensionAdminPage.setExtension(allowedTypes.get(1).toUpperCase());
+        expectedValue = String.format("'%s' already exists. Duplicate values not allowed.", allowedTypes.get(1).toUpperCase());
+        actualValue = allowedFileExtensionAdminPage.clickSaveExpectingError();
+        checker().withScreenshot()
+                .verifyEquals("Incorrect error message for duplicate extension but different case.",
+                        expectedValue, actualValue);
+
+        allowedFileExtensionAdminPage.setExtension("");
+        expectedValue = "File extension must not be blank.";
+        actualValue = allowedFileExtensionAdminPage.clickSaveExpectingError();
+        checker().withScreenshot()
+                .verifyEquals("Incorrect error message for blank extension value.",
+                        expectedValue, actualValue);
+
+    }
+
+    private void uploadToFileWebPartAllowed(List<String> excludedTypes)
+    {
+        goToProjectHome();
+        _fileBrowserHelper.deleteAll();
+
+        List<String> expectedFiles = new ArrayList<>();
+        for (Map.Entry<String, File> entry : fileMap.entrySet())
+        {
+            if (!excludedTypes.contains(entry.getKey()))
+            {
+                _fileBrowserHelper.uploadFile(entry.getValue());
+                expectedFiles.add(entry.getValue().getName());
+            }
+        }
+
+        List<String> actualFiles = _fileBrowserHelper.getFileList();
 
         checker().withScreenshot()
-                .verifyEquals(String.format("Error message is not as expected after removing type '%s'.", oldExtension),
-                        String.format("This file type [%s] is not allowed.", oldExtension.replace(".", "")), errorWindow.getBody());
+                .verifyEqualsSorted("Uploaded files not as expected.",
+                        expectedFiles, actualFiles);
+
+    }
+
+    private void uploadToFileWebPartExcluded(List<String> excludedTypes)
+    {
+
+        goToProjectHome();
+
+        for (String excludedType : excludedTypes)
+        {
+
+            if (_fileBrowserHelper.fileIsPresent(fileMap.get(excludedType).getName()))
+            {
+                log(String.format("Remove the '%s' file from the upload.", excludedType));
+                _fileBrowserHelper.deleteFile(fileMap.get(excludedType).getName());
+                refresh();
+            }
+
+            Window<?> errorWindow = _fileBrowserHelper.uploadFileExpectingError(fileMap.get(excludedType));
+
+            checker().withScreenshot()
+                    .verifyEquals(String.format("Error message for excluded file type '%s' not as expected.", excludedType),
+                            String.format("This file type [%s] is not allowed.", excludedType.replace(".", "")), errorWindow.getBody());
+
+            click(Ext4Helper.Locators.ext4Button("OK"));
+        }
 
     }
 
     @Test
     public void testAllowedFileExtensionsInLists() throws IOException, CommandException
     {
-        log("Verify and set allowed file extensions in admin console");
-        AllowedFileExtensionAdminPage allowedFileExtensionAdminPage = goToAdminConsole().clickAllowedFileExtensions();
-        checker().withScreenshot()
-                .verifyEquals("Incorrect error message for invalid extension",
-                        "File extension must start with a '.'", allowedFileExtensionAdminPage.setExtension("jpg").clickSaveExpectingError());
-        allowedFileExtensionAdminPage.setExtension(".xls").clickSaveExtension();
-        checker().withScreenshot()
-                .verifyEquals("Incorrect error message for duplicate extension",
-                        "'.xls' already exists. Duplicate values not allowed.", allowedFileExtensionAdminPage.setExtension(".xls").clickSaveExpectingError());
 
-        log("Create a list with attachment field");
+        List<String> allowedTypes = new ArrayList<>();
+        String excludedType = ".csv";
+
+        for (String extension : fileMap.keySet())
+        {
+            if (!extension.equals(excludedType))
+                allowedTypes.add(extension);
+        }
+
+        log(String.format("Add the following as allowed extensions: %s", allowedTypes));
+        setAllowedExtensions(allowedTypes, allowedTypes);
+
         goToProjectHome();
-        String listName = "ListWithAttachments";
-        new IntListDefinition(listName, "List_key")
-                .setFields(List.of(new FieldDefinition("File_Upload_1", FieldDefinition.ColumnType.Attachment)))
-                .create(createDefaultConnection(), getProjectName());
+        String listName = "Test Allowed Attachments";
+        String keyField = "Key";
+        String attachmentField = "Attachment Field";
+
+        log(String.format("Create a list '%s' with attachment field and auto-increment key.", listName));
+        _listHelper.createList(getProjectName(), listName, keyField,
+                new FieldDefinition(attachmentField, FieldDefinition.ColumnType.Attachment));
 
         goToManageLists();
-        waitAndClickAndWait(Locator.linkWithText(listName));
-        _listHelper.insertNewRow(Map.of("File_Upload_1", XLS_FILE.getAbsolutePath()), false);
+        _listHelper.goToList(listName);
 
-        //import from file.
+        String [][] expectedData = new String [allowedTypes.size()][1];
+        int index = 0;
+        for (String allowedType : allowedTypes)
+        {
+            _listHelper.insertNewRow(Map.of(attachmentField, fileMap.get(allowedType).getAbsolutePath()), false);
+            // Add a space before the name to allow for the icon.
+            expectedData [index++][0] = String.format(" %s", fileMap.get(allowedType).getName());
+        }
+
+        goToManageLists();
+        _listHelper.goToList(listName);
+        _listHelper.verifyListData(List.of(new FieldDefinition(attachmentField, FieldDefinition.ColumnType.Attachment)), expectedData, checker());
+
+        _listHelper.goToList(listName);
+        _listHelper.insertNewRow(Map.of(attachmentField, fileMap.get(excludedType).getAbsolutePath()), false);
+
+        // Not sure why we record two exceptions.
+        checkExpectedErrors(2);
 
     }
 
+    /**
+     * <p>
+     *     Validate sample types work well with the allowed extension list.
+     * </p>
+     * <p>
+     *     This test will set several extension as allowed type, create a sample type with a file field, and then:
+     *     <ul>
+     *         <li>Validate a row(s) can be inserted with the allowed file types.</li>
+     *         <li>Validate a row cannot be inserted with a disallowed file type.</li>
+     *         <li>Validate that removing the disallowed type from the file field allows for the row to be inserted.</li>
+     *     </ul>
+     *     <b>Note:</b> This test does not exercise bulk or import by file. In those scenarios the file would have had
+     *     to already been uploaded to the server for it to be referenced in the input or bulk file / data. Uploading to
+     *     the server is covered in the testAddUpdateAndDelete test.
+     * </p>
+     */
     @Test
-    public void testAllowedFileExtensionsInSampleType() throws IOException, CommandException
+    public void testAllowedFileExtensionsInSampleType()
     {
-        String allowedExtension = ".tsv";
-        log("Set allowed file extensions in admin console");
-        AllowedFileExtensionAdminPage allowedFileExtensionAdminPage = goToAdminConsole().clickAllowedFileExtensions();
-        allowedFileExtensionAdminPage.setExtension(allowedExtension).clickSaveExtension();
+        List<String> allowedTypes = new ArrayList<>();
+        List<String> excludedTypes = new ArrayList<>();
+        String excludedType = ".xlsx";
+        excludedTypes.add(excludedType);
 
-        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", "Sample type Testing");
-        TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
-                .withColumns(List.of(
-                        new FieldDefinition("name", FieldDefinition.ColumnType.String),
-                        new FieldDefinition("File_Upload_1", FieldDefinition.ColumnType.File)
-                ));
-        dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
+        for (String extension : fileMap.keySet())
+        {
+            if (!excludedTypes.contains(extension))
+                allowedTypes.add(extension);
+        }
+
+        log(String.format("Add the following as allowed extensions: %s", allowedTypes));
+        setAllowedExtensions(allowedTypes, allowedTypes);
+
+        goToProjectHome();
+
+        String stName = "Allowed File Extension Testing";
+        SampleTypeDefinition stDefinition = new SampleTypeDefinition(stName);
+
+        String stFileField = "File Upload Test";
+        stDefinition.addField(new FieldDefinition("File Upload Test", FieldDefinition.ColumnType.File));
+        SampleTypeAPIHelper.createEmptySampleType(getProjectName(), stDefinition);
+
+        refresh();
+        waitForElement(Locator.linkWithText(stName));
+
+        SampleTypeHelper sampleTypeHelper = new SampleTypeHelper(this);
+        sampleTypeHelper.goToSampleType(stName);
+
+        log("Add rows in the sample type with the allowed file types.");
+        int i = 1;
+        Map<String, String> fieldMap;
+        List<String> expectedValues = new ArrayList<>();
+        for (String allowedType : allowedTypes)
+        {
+            fieldMap = Map.of("Name", String.format("S-%d", i), stFileField, fileMap.get(allowedType).getAbsolutePath());
+            sampleTypeHelper.insertRow(fieldMap);
+            expectedValues.add(String.format(" sampletype/%s", fileMap.get(allowedType).getName()));
+            i++;
+        }
+
+        // The order of the grid is last one added is at the top, which is opposite of how they were added to the list.
+        Collections.reverse(expectedValues);
+
+        List<String> actualValues = sampleTypeHelper.getSamplesDataRegionTable().getColumnDataAsText(stFileField);
+        checker().verifyEquals(String.format("Values in the '%s' column not as expected.", stFileField),
+                expectedValues, actualValues);
+
+        log("Create a sample that tries to upload a disallowed file type.");
+        String sampleId = String.format("S-%d", i);
+        String description= "Some text for the description.";
+        String amount = "5.00";
+
+        fieldMap = Map.of("Name", sampleId,
+                "Description", description,
+                stFileField, fileMap.get(excludedType).getAbsolutePath(),
+                "StoredAmount", amount);
+        sampleTypeHelper.insertRow(fieldMap);
+
+        // Not sure why we record two exceptions.
+        checkExpectedErrors(2);
+
+        // Issue 53026 (or at least part of it)
+        log("Click 'Back' button and validate that the fields still have all the expected values.");
+        waitForElement(Locator.button("Back"));
+        clickButton("Back");
+
+        waitForElement(Locator.name("quf_" + stFileField));
+
+        checker().verifyEquals("'Name' field does not have expected value.",
+                sampleId, getFormElement(Locator.name("quf_Name")));
+
+        checker().verifyEquals("'Description' field does not have expected value.",
+                description, getFormElement(Locator.name("quf_Description")));
+
+        checker().verifyEquals("'StoredAmount' field does not have expected value.",
+                amount, getFormElement(Locator.name("quf_StoredAmount")));
+
+        checker().screenShotIfNewError("Field_Values_Error");
+
+        // Issue 53027
+        log("Clear the file field and resubmit.");
+        FileInput el = FileInput.FileInput(Locator.name("quf_" + stFileField), getDriver()).findWhenNeeded();
+        executeScript("arguments[0].value = '';", el.getComponentElement());
+
+        clickButton("Submit");
+
+        Map<String, String> rowMap = sampleTypeHelper.getSamplesDataRegionTable().getRowDataAsMap(0);
+
+        checker().verifyEquals("'Name' field in grid does not have expected value.",
+                sampleId, rowMap.get("Name"));
+
+        checker().verifyEquals("'Amount' field in grid does not have expected value.",
+                amount, rowMap.get("Amount"));
+
+        checker().verifyEquals(String.format("'%s' field in grid does not have expected value.", stFileField),
+                "", rowMap.get(stFileField));
+
+        checker().screenShotIfNewError("Field_Values_Error");
+
+    }
+
+    private AllowedFileExtensionAdminPage setAllowedExtensions(List<String> allowedTypes, List<String> expectedTypes)
+    {
+        AllowedFileExtensionAdminPage allowedFileExtensionAdminPage = goToAdminConsole().clickAllowedFileExtensions();
+
+        for (String extension : allowedTypes)
+        {
+            allowedFileExtensionAdminPage.setExtension(extension);
+            allowedFileExtensionAdminPage.clickSaveExtension();
+        }
+
+        List<Input> extensions = allowedFileExtensionAdminPage.getAllowedExtensions();
+
+        checker().withScreenshot()
+                .verifyEqualsSorted("List of 'Allowed extensions' is not as expected.",
+                        expectedTypes, extensions.stream().map(Input::getValue).toList());
+
+        return allowedFileExtensionAdminPage;
     }
 
     private void deleteAllAllowedFileExtension() throws IOException, CommandException
