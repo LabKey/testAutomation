@@ -501,7 +501,7 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
     protected class ElementCache extends Component<?>.ElementCache
     {
         final WebElement saveButton = Locator.byClass("btn-success").withText("Save").findWhenNeeded(this);
-        final WebElement cancelButton = Locator.byClass("btn-default").withText("Cancel").findWhenNeeded(this);
+        final WebElement cancelButton = Locator.byClass("btn-default").withText("Cancel").refindWhenNeeded(this);
 
         // This is the 'Add' button that is contained inside the panel.
         final WebElement addButton = Locator
