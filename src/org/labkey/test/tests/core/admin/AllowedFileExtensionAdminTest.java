@@ -16,12 +16,14 @@ import org.labkey.test.components.html.Input;
 import org.labkey.test.pages.core.admin.AllowedFileExtensionAdminPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
-import org.labkey.test.params.list.IntListDefinition;
+import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
-import org.labkey.test.util.TestDataGenerator;
 import org.labkey.test.util.exp.SampleTypeAPIHelper;
+import org.labkey.test.pages.announcements.InsertPage;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,7 +34,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.labkey.test.util.exp.SampleTypeAPIHelper.SAMPLE_TYPE_DOMAIN_KIND;
+import static org.labkey.test.util.DataRegionTable.DataRegion;
 
 @Category({Git.class})
 public class AllowedFileExtensionAdminTest extends BaseWebDriverTest
@@ -301,8 +303,22 @@ public class AllowedFileExtensionAdminTest extends BaseWebDriverTest
 
     }
 
+    /**
+     * <p>
+     *     Using a list validate that attachments work correctly with the allowed files list.
+     * </p>
+     * <p>
+     *     After creating a list that has an auto-index and a attachment field as the only field this test will:
+     *     <ul>
+     *         <li>Can insert an element into the list with the allowed file type.</li>
+     *         <li>Validate that a file of the type not allowed is not allowed.</li>
+     *         <li>Remove the bad file and resubmit with a valid file type.</li>
+     *     </ul>
+     * </p>
+     *
+     */
     @Test
-    public void testAllowedFileExtensionsInLists() throws IOException, CommandException
+    public void testAllowedFileExtensionsInLists()
     {
 
         List<String> allowedTypes = new ArrayList<>();
@@ -335,7 +351,7 @@ public class AllowedFileExtensionAdminTest extends BaseWebDriverTest
         {
             _listHelper.insertNewRow(Map.of(attachmentField, fileMap.get(allowedType).getAbsolutePath()), false);
             // Add a space before the name to allow for the icon.
-            expectedData [index++][0] = String.format(" %s", fileMap.get(allowedType).getName());
+            expectedData[index++][0] = String.format(" %s", fileMap.get(allowedType).getName());
         }
 
         goToManageLists();
@@ -347,6 +363,31 @@ public class AllowedFileExtensionAdminTest extends BaseWebDriverTest
 
         // Not sure why we record two exceptions.
         checkExpectedErrors(2);
+
+        log("Click 'Back' button and select a file type that is allowed.");
+        waitForElement(Locator.button("Back"));
+        clickButton("Back");
+
+        waitForElement(Locator.name("quf_" + attachmentField));
+
+        // Same as Issue 53026, the fields are cleared after hitting back button. Covewrage for that issue is in
+        // testAllowedFileExtensionsInSampleType test.
+        log("Clear the file field.");
+        FileInput el = FileInput.FileInput(Locator.name("quf_" + attachmentField), getDriver()).findWhenNeeded();
+        executeScript("arguments[0].value = '';", el.getComponentElement());
+
+        File fileAgain = fileMap.get(".txt");
+        log(String.format("Add the '%s' file to the list again (it is an allowed file).", fileAgain.getName()));
+        el.set(fileAgain.getAbsolutePath());
+
+        clickButton("Submit");
+
+        DataRegionTable dataRegion = DataRegion(getDriver()).withName("query").find();
+        List<String> actualData = dataRegion.getColumnDataAsText(attachmentField);
+
+        checker().withScreenshot()
+                .verifyEquals(String.format("The file '%s' should be in the list twice.", fileAgain.getName()),
+                        2, Collections.frequency(actualData, String.format(" %s", fileAgain.getName())));
 
     }
 
@@ -468,6 +509,128 @@ public class AllowedFileExtensionAdminTest extends BaseWebDriverTest
                 "", rowMap.get(stFileField));
 
         checker().screenShotIfNewError("Field_Values_Error");
+
+    }
+
+    /**
+     * <p>
+     *     Validate that message attachments work correctly with the allowed files list.
+     * </p>
+     * <p>
+     *     This test will:
+     *     <ul>
+     *         <li>Create a message with several allowed files as attachments.</li>
+     *         <li>Verify a message created with a disallowed file type is not allowed.</li>
+     *         <li>Remove the disallowed file from the list of attachments and resubmit.</li>
+     *     </ul>
+     * </p>
+     */
+    @Test
+    public void testAllowedFilesInMessages()
+    {
+
+        List<String> allowedTypes = new ArrayList<>();
+        String excludedType = ".tsv";
+
+        for (String extension : fileMap.keySet())
+        {
+            if (!extension.equals(excludedType))
+                allowedTypes.add(extension);
+        }
+
+        log(String.format("Add the following as allowed extensions: %s", allowedTypes));
+        setAllowedExtensions(allowedTypes, allowedTypes);
+
+        goToProjectHome();
+
+        String allowedTitle = "Allowed Files Attachment";
+
+        InsertPage page = InsertPage.beginAt(this)
+                .setTitle(allowedTitle)
+                .setBody("These attachments should be allowed.");
+
+        for (String allowedType : allowedTypes)
+        {
+            page.addAttachments(fileMap.get(allowedType));
+        }
+
+        log(String.format("Create a message with title of '%s' and several allowed files as attachments.", allowedTitle));
+
+        page.submit();
+
+        String notAllowedTitle = "Not Allowed Files Attachment";
+        String notAllowedBody = "At least one of these attachments should not be allowed.";
+
+        page = InsertPage.beginAt(this)
+                .setTitle(notAllowedTitle)
+                .setBody(notAllowedBody);
+
+        for (Map.Entry<String, File> entry : fileMap.entrySet())
+        {
+            page.addAttachments(entry.getValue());
+        }
+
+        List<String> notAllowedAttachments = Locator.tagWithAttributeContaining("span", "id","filename")
+                .findElements(getDriver())
+                .stream().map(WebElement::getText).toList();
+
+        log(String.format("Try to create a message with title of '%s' with several allowed files as attachments, and one disallowed file type.", allowedTitle));
+
+        page.submit();
+
+        // Not sure why we record two exceptions.
+        checkExpectedErrors(2);
+
+        // Issue 53026 Fields cleared after clicking 'Back' button.
+        log("Click 'Back' button and validate that the fields still have all the expected values.");
+        waitForElement(Locator.button("Back"));
+        clickButton("Back");
+
+        waitForElement(Locator.tagWithId("textarea", "body"));
+
+        page = new InsertPage(getDriver());
+
+        checker().verifyEquals("Message title was not persisted.",
+                notAllowedTitle, page.getTitle());
+
+        checker().verifyEquals("Message body was not persisted.",
+                notAllowedBody, page.getBody());
+
+        List<WebElement> attachmentElements = Locator.tagWithAttributeContaining("span", "id","filename")
+                .findElements(getDriver());
+
+        checker().verifyEqualsSorted("None of the previous attachments are still present.",
+                notAllowedAttachments, attachmentElements
+                        .stream().map(WebElement::getText).toList());
+
+        checker().screenShotIfNewError("Field_Values_After_Disallowed_Error");
+
+        log("Remove the offending file and resubmit the message.");
+
+        // This did not work for me. The index is correct but fails saying could not find link with text "remove".
+//        page.removeAttachment(attachmentElements
+//                .stream().map(WebElement::getText).toList()
+//                .indexOf(fileMap.get(excludedType).getName()));
+
+        List<WebElement> removeLinks = Locator.linkContainingText("remove").findElements(getDriver());
+
+        WebElement removeLink = removeLinks.get(attachmentElements
+                .stream().map(WebElement::getText).toList()
+                .indexOf(fileMap.get(excludedType).getName()));
+
+        removeLink.click();
+
+        shortWait().until(ExpectedConditions.stalenessOf(removeLink));
+
+        page.submit();
+
+        goToProjectHome();
+
+        DataRegionTable dataRegion = DataRegion(getDriver()).withName("Announcements").find();
+
+        checker().withScreenshot()
+                .verifyEqualsSorted("Not all messages are there.",
+                        List.of(allowedTitle, notAllowedTitle), dataRegion.getColumnDataAsText("Title"));
 
     }
 
