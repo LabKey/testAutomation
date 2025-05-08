@@ -1,5 +1,6 @@
 package org.labkey.test.components.ui.grids;
 
+import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
 import org.jetbrains.annotations.Nullable;
@@ -782,17 +783,16 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     public void waitForPasteContent(String pasteContent)
     {
         // split pasteContent into its parts
-        var contentParts = pasteContent.replace("\n", "\t").split("\t");
+        var contentParts = pasteContent.split("\\s*[\n\t]\\s*");
         // filter out empty and space-only values
         var filteredParts = Arrays.stream(contentParts)
-                .filter(a-> !a.isEmpty() && !a.equals(" "))
+                .filter(a-> !a.isBlank())
                 .map(str -> {
                     if (str.startsWith("\"") && str.endsWith("\""))
                     {
                         // reverse TsvQuoter.quote
                         str = str.replaceAll("\"\"", "\"");
-                        str = str.substring(1);
-                        str = str.substring(0, str.length() - 1);
+                        str = str.substring(1, str.length() - 1); // remove surrounding quotes
                     }
                     return str;
                 })

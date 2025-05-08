@@ -166,12 +166,6 @@ public class TestDataUtils
         return stringFromRowMaps(rowMaps, columns, includeHeaders, CSVFormat.TDF);
     }
 
-    public static String csvStringFromRowMaps(List<Map<String, Object>> rowMaps, List<String> columns,
-                                              boolean includeHeaders)
-    {
-        return stringFromRowMaps(rowMaps, columns, includeHeaders, CSVFormat.DEFAULT);
-    }
-
 
     public static List<List<String>> rowListsFromMaps(List<Map<String, Object>> rowMaps, List<String> columns)
     {
@@ -244,23 +238,23 @@ public class TestDataUtils
         return rowLists;
     }
 
-    public static File writeRowsToTsv(String fileName, List<List<String>> rows) throws IOException
+    public static <T> File writeRowsToTsv(String fileName, List<List<T>> rows) throws IOException
     {
         return writeRowsToFile(fileName, rows, CSVFormat.TDF);
     }
 
-    public static File writeRowsToFile(String fileName, List<List<String>> rows) throws IOException
+    public static <T> File writeRowsToCsv(String fileName, List<List<T>> rows) throws IOException
     {
         return writeRowsToFile(fileName, rows, CSVFormat.DEFAULT);
     }
 
-    public static @NotNull File writeRowsToFile(String fileName, List<List<String>> rows, CSVFormat format) throws IOException
+    public static @NotNull <T> File writeRowsToFile(String fileName, List<List<T>> rows, CSVFormat format) throws IOException
     {
         File file = new File(TestFileUtils.getTestTempDir(), fileName);
         FileUtils.forceMkdirParent(file);
 
         try (CSVPrinter printer = new CSVPrinter(new FileWriter(file, StandardCharsets.UTF_8), format)) {
-            for (List<String> row : rows)
+            for (List<T> row : rows)
             {
                 printer.printRecord(row);
             }

@@ -99,6 +99,7 @@ public class TestDataGenerator
     private final String _containerPath;
     private String _excludedChars;
     private boolean _alphaNumericStr;
+    private final TestDataUtils.TsvQuoter _tsvQuoter = new TestDataUtils.TsvQuoter(',');
     private final CSVFormat _format = CSVFormat.TDF;
 
     /**
@@ -125,7 +126,7 @@ public class TestDataGenerator
         List<List<String>> rows = TestDataUtils.rowListsFromMaps(entityData);
         TestDataUtils.replaceColumnHeaders(rows, ColumnNameMapper.labelToName(fields)); // Use field names
 
-        return TestDataUtils.writeRowsToFile(fileName, rows);
+        return TestDataUtils.writeRowsToCsv(fileName, rows);
     }
 
     public static List<Map<String, Object>> generateEntityData(List<FieldDefinition> fields, String nameField, String namePrefix, int startingCount, int size, boolean addLineage, boolean includeAliquots, String queryName, boolean forGridInsert)
@@ -640,32 +641,32 @@ public class TestDataGenerator
         for (Map<String, Object> row : _rows)
         {
             Object value = row.get(fieldName);
-            String strVal = _format.format(value);
+            String strVal = CSVFormat.DEFAULT.format(value); // Just quote commas
             values.add(strVal);
         }
         return values;
     }
 
     /**
-     * generates tabular text content (CSV or TSV) using the rows in the current instance;
-     * @return CSV formatted representation of generated rows
+     * generates tsv-formatted content using the rows in the current instance;
+     * @return TSV formatted representation of generated rows
      */
     public String writeTsvContents()
     {
         return TestDataUtils.stringFromRowMaps(_rows, getFieldsForFile(), true, _format);
     }
 
-    public File writeGeneratedDataToFile(int numberOfRowsToGenerate, String fileName) throws IOException
+    public File writeGeneratedDataToFile(String fileName) throws IOException
     {
-        List<Map<String, Object>> rows = new ArrayList<>();
-        for (int i = 0; i < numberOfRowsToGenerate; i++)
-        {
-            rows.add(generateRow());
-        }
-        return TestDataUtils.writeRowsToFile(fileName, TestDataUtils.rowListsFromMaps(rows, getFieldsForFile(), true, true), _format);
+        return writeGeneratedDataToFile(fileName, _format);
     }
 
-    public File writeGeneratedDataToExcel(int numberOfRowsToGenerate, String sheetName, String fileName) throws IOException
+    public File writeGeneratedDataToFile(String fileName, CSVFormat format) throws IOException
+    {
+        return TestDataUtils.writeRowsToFile(fileName, TestDataUtils.rowListsFromMaps(_rows, getFieldsForFile(), true, true), format);
+    }
+
+    public File writeGeneratedDataToExcel(String sheetName, String fileName) throws IOException
     {
         File file = new File(TestFileUtils.getTestTempDir(), fileName);
         FileUtils.forceMkdirParent(file);
@@ -684,10 +685,10 @@ public class TestDataGenerator
             }
 
             // write content
-            for (int i = 1; i < numberOfRowsToGenerate +1; i++)
+            for (int i = 0; i < _rows.size(); i++)
             {
-                Map<String, Object> row = generateRow();
-                SXSSFRow currentRow = sheet.createRow(i);
+                Map<String, Object> row = _rows.get(i);
+                SXSSFRow currentRow = sheet.createRow(i - 1);
                 for (int j = 0; j < columnNames.length; j++)
                 {
                     currentRow.createCell(j).setCellValue(row.get(columnNames[j]).toString());
@@ -700,16 +701,16 @@ public class TestDataGenerator
     }
 
     /**
-     * Creates a file containing the contents of the current rows, formatted in CSV.
+     * Creates a file containing the contents of the current rows, formatted in TSV.
      * The file is written to the test temp dir
-     * @param fileName  the name of the file, e.g. 'testDataFileForMyTest.csv'
-     * @return File object pointing at created file
+     * @param fileName  the name of the file, e.g. 'testDataFileForMyTest.tsv'
+     * @return File object pointing at created TSV
      */
     public File writeData(String fileName)
     {
         try
         {
-            return TestFileUtils.writeTempFile(fileName, writeTsvContents());
+            return writeGeneratedDataToFile(fileName);
         }
         catch (IOException e)
         {
