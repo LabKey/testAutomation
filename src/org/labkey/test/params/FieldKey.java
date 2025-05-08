@@ -5,11 +5,11 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 public class FieldKey
 {
+    public static final FieldKey ROOT = new FieldKey(null, null);
+
     private final FieldKey _parent;
     private final String _name;
     private final String _encodedName;
@@ -24,7 +24,7 @@ public class FieldKey
     public static FieldKey fromParts(List<String> parts)
     {
         if (parts.isEmpty())
-            return null;
+            return ROOT;
 
         if (parts.stream().anyMatch(StringUtils::isBlank))
             throw new IllegalArgumentException("parts contains blank: " + parts);
@@ -66,26 +66,37 @@ public class FieldKey
         return _parent;
     }
 
+    public FieldKey child(String fieldName)
+    {
+        return new FieldKey(_parent, fieldName);
+    }
+
     public List<String> getParts(boolean encode)
     {
-        List<String> parts = new ArrayList<>();
-        if (_parent != null)
+        if (this == ROOT)
         {
-            parts.addAll(_parent.getParts(encode));
+            return new ArrayList<>();
         }
-        parts.add(encode ? _encodedName : _name);
-        return parts;
+        else
+        {
+            List<String> parts = _parent.getParts(encode);
+            parts.add(encode ? _encodedName : _name);
+            return parts;
+        }
     }
 
     public List<FieldKey> getHierarchy()
     {
-        List<FieldKey> parts = new ArrayList<>();
-        if (_parent != null)
+        if (this == ROOT)
         {
-            parts.addAll(_parent.getHierarchy());
+            return new ArrayList<>();
         }
-        parts.add(this);
-        return parts;
+        else
+        {
+            List<FieldKey> parts = _parent.getHierarchy();
+            parts.add(this);
+            return parts;
+        }
     }
 
     @Override
