@@ -1812,6 +1812,66 @@ public class ListTest extends BaseWebDriverTest
 
     }
 
+    @Test // Issue 52098, Issue 49422
+    public void testNumberLikeLookup()
+    {
+        String lookupListName = TestDataGenerator.randomDomainName("lookupList");
+        String lookupKeyFieldName = TestDataGenerator.randomFieldName("lookupKeyField");
+        String lookupFieldName = TestDataGenerator.randomFieldName("lookupField");
+        log("Create a list to use as a lookup table with some number-like names.");
+        _listHelper.createList(PROJECT_VERIFY, lookupListName, lookupKeyFieldName,
+                new FieldDefinition(lookupFieldName, ColumnType.String));
+        String bulkData = lookupFieldName + "\n" +
+                "1E2\n" +
+                "102\n" +
+                "Lookup\n" +
+                ".123";
+        _listHelper.bulkImportData(bulkData);
+        DataRegionTable dataRegionTable = new DataRegionTable("query", getDriver());
+        CustomizeView customizer = dataRegionTable.openCustomizeGrid();
+        customizer.showHiddenItems();
+        customizer.addColumn(EscapeUtil.fieldKeyEncodePart(lookupKeyFieldName));
+        customizer.clickViewGrid();
+        List<Map<String, String>> actualValues = dataRegionTable.getTableData();
+        String keyNumber = actualValues.get(0).get(EscapeUtil.fieldKeyEncodePart(lookupKeyFieldName));
+        _listHelper.insertNewRow(Map.of(lookupFieldName, keyNumber));
+
+        log("Create a second list that looks up to the first list");
+        String baseListName = TestDataGenerator.randomDomainName("base");
+        String baseKeyFieldName = TestDataGenerator.randomFieldName("base Key Field");
+        String baseLookupFieldName = TestDataGenerator.randomFieldName("base Lookup Field");
+        _listHelper.createList(PROJECT_VERIFY, baseListName, baseKeyFieldName);
+        EditListDefinitionPage listDefinitionPage = _listHelper.goToEditDesign(baseListName);
+        listDefinitionPage.getFieldsPanel()
+                .addField(baseLookupFieldName)
+                .setType(ColumnType.Lookup)
+                .setLookup(new FieldDefinition.IntLookup("lists", lookupListName));
+        listDefinitionPage.clickSave();
+
+        log("Import data into the second list using number-like lookup values.");
+        bulkData = baseLookupFieldName + "\n" +
+                "1E2\n" +
+                keyNumber +"\n" +
+                ".123\n" +
+                "Lookup\n" +
+                keyNumber + "\n" +
+                "102";
+        _listHelper.clickImportData()
+                .setText(bulkData)
+                .setImportLookupByAlternateKey(true)
+                .submit();
+        log("Verify the import succeeds and resolves the lookups appropriately.");
+        List<Map<String, String>> expectedData = List.of(
+                Map.of(baseLookupFieldName, "1E2"),
+                Map.of(baseLookupFieldName, keyNumber),
+                Map.of(baseLookupFieldName, ".123"),
+                Map.of(baseLookupFieldName, "Lookup"),
+                Map.of(baseLookupFieldName, keyNumber),
+                Map.of(baseLookupFieldName, "102")
+        );
+        validateDataRegionTableForTricky(expectedData);
+    }
+
     private void validateDataRegionTableForTricky(List<Map<String, String>> expectedValue)
     {
         DataRegionTable dataRegionTable = new DataRegionTable("query", getDriver());
