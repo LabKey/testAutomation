@@ -263,11 +263,6 @@ public class TestDataUtils
         return file;
     }
 
-    public static <T> String stringFromRows(List<List<T>> rows)
-    {
-        return stringFromRows(rows, CSVFormat.DEFAULT);
-    }
-
     public static <T> String stringFromRows(List<List<T>> rows, CSVFormat format)
     {
         StringWriter stringWriter = new StringWriter();

@@ -688,7 +688,7 @@ public class TestDataGenerator
             for (int i = 0; i < _rows.size(); i++)
             {
                 Map<String, Object> row = _rows.get(i);
-                SXSSFRow currentRow = sheet.createRow(i - 1);
+                SXSSFRow currentRow = sheet.createRow(i + 1);
                 for (int j = 0; j < columnNames.length; j++)
                 {
                     currentRow.createCell(j).setCellValue(row.get(columnNames[j]).toString());

@@ -68,7 +68,7 @@ public class FieldKey
 
     public FieldKey child(String fieldName)
     {
-        return new FieldKey(_parent, fieldName);
+        return new FieldKey(this, fieldName);
     }
 
     public List<String> getParts(boolean encode)
