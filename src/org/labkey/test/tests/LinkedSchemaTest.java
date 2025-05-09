@@ -880,6 +880,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         // Issue 50516: NPE from LinkedSchema$XmlFilterWhereClauseSource.getWhereClauses() when linked schema XML references bogus column
         waitForText("Error creating linked schema table 'containers': Filter column 'no_such_column' not found.");
 
+        // update the linked schema to use a good filter
         _schemaHelper.updateLinkedSchema(sourceContainerPath, linkedSchemaName, sourceContainerPath, null, "core", null, goodFilter);
 
         // browse to containers in the linked schema and view data in the containers table
@@ -887,11 +888,13 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         goToSchemaBrowser();
         // finding the dataRegion here is already success
         DataRegionTable table = viewQueryData(linkedSchemaName, "containers");
+        // ensure that the current container appears here as expected
         checker().withScreenshot("current_container_not_present")
                 .wrapAssertion(()-> Assertions.assertThat(table.getRowIndex("Name", "StudyFolder"))
                 .as("container name not present in table")
                 .isGreaterThan(-1));
 
+        // clean up after ourselves
         _schemaHelper.deleteSchema(sourceContainerPath, A_PEOPLE_SCHEMA_NAME);
     }
 
