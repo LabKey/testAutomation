@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.assertj.core.api.Assertions;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -839,6 +840,59 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         DataRegionTable table = viewQueryData(linkedSchemaName, "Modules");
         List<String> colNames = table.getColumnNames();
         assertTrue("Columns should have included 'Name': " + colNames, colNames.contains("Name"));
+    }
+
+    // coverage for Issue 50516: NPE from LinkedSchema$XmlFilterWhereClauseSource.getWhereClauses() when linked schema XML references bogus column
+    @Test
+    public void testCoreLinkedSchemaFilters()
+    {
+        String linkedSchemaName = "linkedCoreFilter";
+        String sourceContainerPath = "/" + getProjectName() + "/" + STUDY_FOLDER;
+
+        String badFilter = """
+                <tables xmlns="http://labkey.org/data/xml" xmlns:cv="http://labkey.org/data/xml/queryCustomView">
+                  <filters name="bad-filter">
+                    <cv:filter column="no_such_column" operator="in" value="1;2"/>
+                  </filters>
+                  <table tableName="containers" tableDbType="NOT_IN_DB">
+                    <filters ref="bad-filter"/>
+                  </table>
+                </tables>
+                """;
+        String goodFilter = """
+                <tables xmlns="http://labkey.org/data/xml" xmlns:cv="http://labkey.org/data/xml/queryCustomView">
+                  <filters name="good-filter">
+                    <cv:filter column="searchable" operator="eq" value="true"/>
+                  </filters>
+                  <table tableName="containers" tableDbType="NOT_IN_DB">
+                    <filters ref="good-filter"/>
+                  </table>
+                </tables>
+                """;
+
+        log("Create the linked schema on core with a filter referencing a non-existent column");
+        _schemaHelper.createLinkedSchema(sourceContainerPath, linkedSchemaName, sourceContainerPath, null, "core", null, badFilter);
+
+        // browse to containers in the linked schema and verify the expected error
+        log("Verify the bogus filter gets an appropriate error");
+        goToSchemaBrowser();
+        selectQuery(linkedSchemaName, "containers");
+        // Issue 50516: NPE from LinkedSchema$XmlFilterWhereClauseSource.getWhereClauses() when linked schema XML references bogus column
+        waitForText("Error creating linked schema table 'containers': Filter column 'no_such_column' not found.");
+
+        _schemaHelper.updateLinkedSchema(sourceContainerPath, linkedSchemaName, sourceContainerPath, null, "core", null, goodFilter);
+
+        // browse to containers in the linked schema and view data in the containers table
+        log("Verify container is visible via linked schema via 'searchable=true' filter");
+        goToSchemaBrowser();
+        // finding the dataRegion here is already success
+        DataRegionTable table = viewQueryData(linkedSchemaName, "containers");
+        checker().withScreenshot("current_container_not_present")
+                .wrapAssertion(()-> Assertions.assertThat(table.getRowIndex("Name", "StudyFolder"))
+                .as("container name not present in table")
+                .isGreaterThan(-1));
+
+        _schemaHelper.deleteSchema(sourceContainerPath, A_PEOPLE_SCHEMA_NAME);
     }
 
     /*
