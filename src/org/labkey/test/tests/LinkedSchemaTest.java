@@ -890,7 +890,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         DataRegionTable table = viewQueryData(linkedSchemaName, "containers");
         // ensure that the current container appears here as expected
         checker().withScreenshot("current_container_not_present")
-                .wrapAssertion(()-> Assertions.assertThat(table.getRowIndex("Name", "StudyFolder"))
+                .wrapAssertion(()-> Assertions.assertThat(table.getRowIndex("Name", STUDY_FOLDER))
                 .as("container name not present in table")
                 .isGreaterThan(-1));
 
