@@ -60,7 +60,6 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import static org.labkey.test.BaseWebDriverTest.ALL_ILLEGAL_QUERY_KEY_CHARACTERS;
 import static org.labkey.test.util.data.TestDataUtils.REALISTIC_ASSAY_FIELDS;
@@ -99,8 +98,6 @@ public class TestDataGenerator
     private final String _containerPath;
     private String _excludedChars;
     private boolean _alphaNumericStr;
-    private final TestDataUtils.TsvQuoter _tsvQuoter = new TestDataUtils.TsvQuoter(',');
-    private final CSVFormat _format = CSVFormat.TDF;
 
     /**
      *  use TestDataGenerator to generate data to a specific fieldSet
@@ -635,6 +632,10 @@ public class TestDataGenerator
         return fieldNames;
     }
 
+    /**
+     * Get generated data for the specified column.
+     * Values will be quoted appropriately for pasting into editable grid lookups.
+     */
     public List<String> getPasteColumnValues(String fieldName)
     {
         List<String> values = new ArrayList<>();
@@ -649,21 +650,11 @@ public class TestDataGenerator
 
     /**
      * generates tsv-formatted content using the rows in the current instance;
-     * @return TSV formatted representation of generated rows
+     * @return TSV formatted representation of generated data
      */
-    public String writeTsvContents()
+    public String getDataAsTsv()
     {
-        return TestDataUtils.stringFromRowMaps(_rows, getFieldsForFile(), true, _format);
-    }
-
-    public File writeGeneratedDataToFile(String fileName) throws IOException
-    {
-        return writeGeneratedDataToFile(fileName, _format);
-    }
-
-    public File writeGeneratedDataToFile(String fileName, CSVFormat format) throws IOException
-    {
-        return TestDataUtils.writeRowsToFile(fileName, TestDataUtils.rowListsFromMaps(_rows, getFieldsForFile(), true, true), format);
+        return TestDataUtils.stringFromRowMaps(_rows, getFieldsForFile(), true, CSVFormat.TDF);
     }
 
     public File writeGeneratedDataToExcel(String sheetName, String fileName) throws IOException
@@ -677,11 +668,11 @@ public class TestDataGenerator
             var sheet = workbook.createSheet(sheetName);
 
             // write headers as row 0
-            String[] columnNames = _columns.keySet().toArray(new String[0]);
+            List<String> columnNames = getFieldsForFile();
             var headerRow = sheet.createRow(0);
-            for (int i = 0; i < columnNames.length; i++)
+            for (int i = 0; i < columnNames.size(); i++)
             {
-                headerRow.createCell(i).setCellValue(columnNames[i]);
+                headerRow.createCell(i).setCellValue(columnNames.get(i));
             }
 
             // write content
@@ -689,9 +680,9 @@ public class TestDataGenerator
             {
                 Map<String, Object> row = _rows.get(i);
                 SXSSFRow currentRow = sheet.createRow(i + 1);
-                for (int j = 0; j < columnNames.length; j++)
+                for (int j = 0; j < columnNames.size(); j++)
                 {
-                    currentRow.createCell(j).setCellValue(row.get(columnNames[j]).toString());
+                    currentRow.createCell(j).setCellValue(row.getOrDefault(columnNames.get(j), "").toString());
                 }
             }
             workbook.write(out);
@@ -701,16 +692,40 @@ public class TestDataGenerator
     }
 
     /**
-     * Creates a file containing the contents of the current rows, formatted in TSV.
+     * Creates a file containing the contents of the current rows, formatted in TSV, CSV, or xlsx.
      * The file is written to the test temp dir
      * @param fileName  the name of the file, e.g. 'testDataFileForMyTest.tsv'
-     * @return File object pointing at created TSV
+     * @return File object pointing at created file
      */
     public File writeData(String fileName)
     {
+        String fileExtension = fileName.substring(fileName.lastIndexOf('.') + 1);
+        switch (fileExtension)
+        {
+            case "xlsx":
+            case "xls":
+                try
+                {
+                    return writeGeneratedDataToExcel("sheet1", fileName);
+                }
+                catch (IOException e)
+                {
+                    throw new RuntimeException(e);
+                }
+            case "csv":
+                return writeData(fileName, CSVFormat.DEFAULT);
+            case "tsv":
+                return writeData(fileName, CSVFormat.TDF);
+            default:
+                throw new IllegalArgumentException("Unsupported file extension: " + fileExtension);
+        }
+    }
+
+    public File writeData(String fileName, CSVFormat format)
+    {
         try
         {
-            return writeGeneratedDataToFile(fileName);
+            return TestDataUtils.writeRowsToFile(fileName, TestDataUtils.rowListsFromMaps(_rows, getFieldsForFile()), format);
         }
         catch (IOException e)
         {

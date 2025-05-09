@@ -835,7 +835,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
                 for (int i = 0; i < headerCellElements.size(); i++)
                 {
                     headerCells.put(fieldLabels.get(i), headerCellElements.get(i)); // Fill out the headerCells Map since we have them all
-                    indexes.put(fieldLabels.get(i), new ColumnIndex(fieldLabels.get(i), i+offset, i));
+                    indexes.put(fieldLabels.get(i), new ColumnIndex(fieldLabels.get(i), i + offset, i));
                 }
             }
             return indexes;
@@ -889,7 +889,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
         protected GridRow getRow(String fieldLabel, String text)
         {
             // try to normalize column index to start at 0, excluding row selector column
-            Integer columnIndex = getColumnIndex(fieldLabel);
+            int columnIndex = getColumnIndex(fieldLabel);
             return new GridRow.GridRowFinder(ResponsiveGrid.this).withTextAtColumn(text, columnIndex)
                     .find(this);
         }
@@ -897,7 +897,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
         protected Optional<GridRow> getOptionalRow(String fieldLabel, String text)
         {
             // try to normalize column index to start at 0, excluding row selector column
-            Integer columnIndex = getColumnIndex(fieldLabel);
+            int columnIndex = getColumnIndex(fieldLabel);
             return new GridRow.GridRowFinder(ResponsiveGrid.this).withTextAtColumn(text, columnIndex)
                     .findOptional(this);
         }
@@ -988,9 +988,8 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
             return _locator;
         }
     }
-}
 
-    class ColumnIndex
+    static class ColumnIndex
     {
         private final Integer _rawIndex;
         private final Integer _normalizedIndex;
@@ -1022,3 +1021,4 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
             return _normalizedIndex;
         }
     }
+}

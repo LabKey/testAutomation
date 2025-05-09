@@ -28,7 +28,7 @@ public class UploadLargeExcelAssayTest extends BaseWebDriverTest
 {
     public static String LARGE_ASSAY = "chaos_assay";
     public static String LARGE_ASSAY_2 = "large_assay_2";
-    public static List<PropertyDescriptor> ASSAY_FIELDS = new ArrayList<PropertyDescriptor>();
+    public static List<PropertyDescriptor> ASSAY_FIELDS = new ArrayList<>();
 
     @Override
     protected void doCleanup(boolean afterTest)
@@ -87,7 +87,7 @@ public class UploadLargeExcelAssayTest extends BaseWebDriverTest
             .withColumns(ASSAY_FIELDS);
         dgen.generateRows(200_000);
         log("writing large .xlsx file");
-        var largeExcelFile = dgen.writeGeneratedDataToExcel("chaos", fileName);
+        var largeExcelFile = dgen.writeData(fileName);
         log("finished writing large .xlsx file");
 
         // import large generated excel to assay1

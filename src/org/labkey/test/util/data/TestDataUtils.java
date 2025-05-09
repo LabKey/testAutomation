@@ -6,12 +6,15 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
+import org.labkey.serverapi.reader.DataLoader;
 import org.labkey.serverapi.reader.TabLoader;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.TestDataGenerator;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,6 +22,8 @@ import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -42,10 +47,8 @@ public class TestDataUtils
             () -> new FieldDefinition("Consumption Rate, Glucose", FieldDefinition.ColumnType.Decimal),
             () -> new FieldDefinition("Measurement Date/Time", FieldDefinition.ColumnType.DateAndTime),
             () -> new FieldDefinition("A260/A280", FieldDefinition.ColumnType.Decimal),
-            () -> new FieldDefinition("Nucleic Acid (ng/uL)", FieldDefinition.ColumnType.Decimal)
-                    .setLabel("Nucleic Acid (ng/uL)"),
-            () -> new FieldDefinition("Concentration (by Qubit ng/uL)", FieldDefinition.ColumnType.Decimal)
-                    .setLabel("Concentration (by Qubit ng/uL)"),
+            () -> new FieldDefinition("Nucleic Acid (ng/uL)", FieldDefinition.ColumnType.Decimal),
+            () -> new FieldDefinition("Concentration (by Qubit ng/uL)", FieldDefinition.ColumnType.Decimal),
             () -> new FieldDefinition("Dead (cells/ml)", FieldDefinition.ColumnType.Decimal),
             () -> new FieldDefinition("PDGF-AA/BB", FieldDefinition.ColumnType.Decimal),
             () -> new FieldDefinition("Run End Data/Time", FieldDefinition.ColumnType.DateAndTime),
@@ -57,14 +60,10 @@ public class TestDataUtils
             () -> new FieldDefinition("FAM-Lambda..cp.Rxn."),
             () -> new FieldDefinition("VIC-Precision...1"),
             () -> new FieldDefinition("Product.Type"),
-            () -> new FieldDefinition("Weight.Balance_%", FieldDefinition.ColumnType.Decimal)
-                    .setLabel("Weight.Balance %"),
-            () -> new FieldDefinition("Cumulative.Yield.DCW/Glucose.Consumed_g/g", FieldDefinition.ColumnType.Decimal)
-                    .setLabel("Cumulative.Yield.DCW/Glucose.Consumed g/g"),
-            () -> new FieldDefinition("Average.Volume.Productivity_g/L/day", FieldDefinition.ColumnType.Decimal)
-                    .setLabel("Average.Volume.Productivity g/L/day"),
+            () -> new FieldDefinition("Weight.Balance_%", FieldDefinition.ColumnType.Decimal),
+            () -> new FieldDefinition("Cumulative.Yield.DCW/Glucose.Consumed_g/g", FieldDefinition.ColumnType.Decimal),
+            () -> new FieldDefinition("Average.Volume.Productivity_g/L/day", FieldDefinition.ColumnType.Decimal),
             () -> new FieldDefinition("Cmol.Biomass/Cmol.Glucose.Consumed_%", FieldDefinition.ColumnType.Decimal)
-                    .setLabel("Cmol.Biomass/Cmol.Glucose.Consumed %")
     );
     public static final List<Supplier<FieldDefinition>> REALISTIC_SAMPLE_FIELDS = List.of(
             () -> new FieldDefinition("MW (g/mol)", FieldDefinition.ColumnType.Decimal),
@@ -139,11 +138,27 @@ public class TestDataUtils
         return REALISTIC_PLATE_NAMES.get(TestDataGenerator.randomInt(0, REALISTIC_PLATE_NAMES.size() - 1));
     }
 
+    public static List<Map<String, Object>> rowMapsFromTsv(File tsvFile) throws IOException
+    {
+        try (DataLoader loader = new TabLoader.TsvFactory().createLoader(tsvFile, true))
+        {
+            return loader.load();
+        }
+    }
+
     public static List<Map<String, Object>> rowMapsFromTsv(String tsvString) throws IOException
     {
         try (InputStream dataStream = IOUtils.toInputStream(tsvString, StandardCharsets.UTF_8))
         {
             return new TabLoader.TsvFactory().createLoader(dataStream, true).load();
+        }
+    }
+
+    public static List<Map<String, Object>> rowMapsFromCsv(File csvFile) throws IOException
+    {
+        try (DataLoader loader = new TabLoader.CsvFactory().createLoader(csvFile, true))
+        {
+            return loader.load();
         }
     }
 
@@ -166,15 +181,33 @@ public class TestDataUtils
         return stringFromRowMaps(rowMaps, columns, includeHeaders, CSVFormat.TDF);
     }
 
-
-    public static List<List<String>> rowListsFromMaps(List<Map<String, Object>> rowMaps, List<String> columns)
+    public static <T> List<Map<String, T>> mapsFromRows(List<List<T>> allRows)
     {
-        return rowListsFromMaps(rowMaps, columns, false, true);
+        List<Map<String, T>> rowMaps = new ArrayList<>();
+
+        if (allRows != null && !allRows.isEmpty())
+        {
+            List<T> header = allRows.get(0);
+
+            for (int i = 1; i != allRows.size(); i++)
+            {
+                List<T> row = allRows.get(i);
+                Map<String, T> rowMap = new LinkedHashMap<>();
+                int end = Math.min(header.size(), row.size());
+                for (int col = 0; col < end; col++)
+                {
+                    rowMap.put(header.get(col).toString(), row.get(col));
+                }
+                rowMaps.add(rowMap);
+            }
+        }
+
+        return rowMaps;
     }
 
-    public static List<List<String>> rowListsFromMaps(List<Map<String, Object>> rowMaps, List<String> columns, boolean includeHeaders)
+    public static List<List<String>> dataRowsFromMaps(List<Map<String, Object>> rowMaps, List<String> columns)
     {
-        return rowListsFromMaps(rowMaps, columns, includeHeaders, true);
+        return rowListsFromMaps(rowMaps, columns, false, true);
     }
 
     public static List<List<String>> rowListsFromMaps(List<Map<String, Object>> rowMaps)
@@ -185,6 +218,11 @@ public class TestDataUtils
             columns.addAll(row.keySet());
         }
         return rowListsFromMaps(rowMaps, new ArrayList<>(columns), true, true);
+    }
+
+    public static List<List<String>> rowListsFromMaps(List<Map<String, Object>> rowMaps, List<String> columns)
+    {
+        return rowListsFromMaps(rowMaps, columns, true, true);
     }
 
     /**
