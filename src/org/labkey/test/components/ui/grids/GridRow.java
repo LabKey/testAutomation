@@ -7,8 +7,10 @@ import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.react.ReactCheckBox;
 import org.labkey.test.components.ui.files.AttachmentCard;
 import org.labkey.test.components.ui.files.ImageFileViewDialog;
+import org.labkey.test.params.FieldKey;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
+import org.labkey.test.util.TestLogger;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -126,9 +128,9 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
     /**
      * finds a AttachmentCard in the specified column, clicks it, and waits for the image to display in a modal
      */
-    public ImageFileViewDialog clickImgFile(String fieldLabel)
+    public ImageFileViewDialog clickImgFile(String columnIdentifier)
     {
-        return elementCache().waitForAttachment(fieldLabel).viewImgFile();
+        return elementCache().waitForAttachment(columnIdentifier).viewImgFile();
     }
 
     /**
@@ -166,6 +168,22 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
         return getRowMap(ResponsiveGrid.ColumnHeader::getColumnLabel);
     }
 
+    /**
+     * gets a map of the row's values, keyed by column name
+     */
+    public Map<String, String> getRowMapByName()
+    {
+        return getRowMap(columnHeader -> columnHeader.getFieldKey().getName());
+    }
+
+    /**
+     * gets a map of the row's values, keyed by column fieldKey
+     */
+    public Map<FieldKey, String> getRowMapByFieldKey()
+    {
+        return getRowMap(columnHeader -> columnHeader.getFieldKey());
+    }
+
     <T> Map<T, String> getRowMap(Function<ResponsiveGrid.ColumnHeader, T> keyMapper)
     {
         List<String> columnValues = elementCache().getCellTexts();
@@ -175,7 +193,17 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
 
         for (ResponsiveGrid.ColumnHeader header : headers)
         {
-            rowMap.put(keyMapper.apply(header), columnValues.get(header.getDomIndex()));
+            T key = keyMapper.apply(header);
+            String value = columnValues.get(header.getDomIndex());
+
+            if (rowMap.containsKey(key))
+            {
+                TestLogger.warn("Column identifier '%s' is ambiguous, omitting value '%s', consider getting data by name or fieldKey (e.g. %s)".formatted(key, value, header.getFieldKey()));
+            }
+            else
+            {
+                rowMap.put(key, value);
+            }
         }
 
         return rowMap;

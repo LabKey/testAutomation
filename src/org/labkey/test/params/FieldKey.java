@@ -95,6 +95,11 @@ public class FieldKey
         }
     }
 
+    public String getName()
+    {
+        return _name;
+    }
+
     @Override
     public String toString()
     {
