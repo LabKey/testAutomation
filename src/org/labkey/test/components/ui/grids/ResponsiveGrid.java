@@ -4,6 +4,9 @@
  */
 package org.labkey.test.components.ui.grids;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.mutable.Mutable;
+import org.apache.commons.lang3.mutable.MutableObject;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.remoteapi.query.Filter;
 import org.labkey.test.Locator;
@@ -15,6 +18,7 @@ import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.components.react.ReactCheckBox;
 import org.labkey.test.components.ui.search.FilterExpressionPanel;
+import org.labkey.test.params.FieldKey;
 import org.labkey.test.util.selenium.WebElementUtils;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
@@ -27,7 +31,8 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -38,7 +43,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.labkey.test.WebDriverWrapper.waitFor;
 
-public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent<ResponsiveGrid<T>.ElementCache> implements UpdatingComponent
+public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverComponent<ResponsiveGrid<T>.ElementCache> implements UpdatingComponent
 {
     final WebElement _gridElement;
     final WebDriver _driver;
@@ -99,7 +104,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
     {
         return Locator.tagWithClass("div", "grid-panel__grid")
                 .findElement(getComponentElement())
-                .getAttribute("class").contains("grid-panel__lock-left");
+                .getDomAttribute("class").contains("grid-panel__lock-left");
     }
 
     /**
@@ -656,11 +661,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
      */
     public List<Map<String, String>> getRowMapsByLabel()
     {
-        if(null == elementCache().mapList)
-        {
-            elementCache().mapList = elementCache()._initGridData();
-        }
-        return elementCache().mapList;
+        return elementCache().getRows().stream().map(GridRow::getRowMapByLabel).toList();
     }
 
     /**
@@ -714,18 +715,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
     {
         WebElement columnHeader = Locator.tagWithClass("th", "grid-header-cell")
                 .withDescendant(Locators.headerCellBody(fieldLabel)).findElement(this);
-        return columnHeader.getAttribute("class").contains("phi-protected");
-    }
-
-    /**
-     *  Gets the title attribute of the column header cell, if it has one
-     * @param fieldLabel The text with which to find the cell (uses startswith matching)
-     * @return  the contents of the 'title' attribute of the cell, or null if the attribute is
-     * not present.
-     */
-    public String getColumnTitleAttribute(String fieldLabel)
-    {
-        return elementCache().getColumnHeaderCell(fieldLabel).getAttribute("title");
+        return columnHeader.getDomAttribute("class").contains("phi-protected");
     }
 
     public Optional<String> getGridEmptyMessage()
@@ -749,6 +739,11 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
         return msg;
     }
 
+    List<ColumnHeader> getHeaders()
+    {
+        return Collections.unmodifiableList(elementCache().findHeaders());
+    }
+
     /**
      * supports chaining between base and derived instances
      * @return  magic
@@ -756,22 +751,6 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
     protected T getThis()
     {
         return (T) this;
-    }
-
-    /**
-     * Call this function to force a re-initialization of the internal data representation of the grid data.
-     * When trying to be more efficient the grid data is stored in an internal variable (so this is a stateful object).
-     * On creates the internal grid data is initialize by calling waitForLoaded. The waitForLoaded function  is also
-     * called when the page/grid is navigated, but it is not when a search, or ordering is done. As a temporary work
-     * around this function is made public so the calling function can update the data.
-     *
-     * The real fix would be to add an event listener to the grid and reinitialize the internal data when it detects a change.
-     *
-     */
-    public void initGridData()
-    {
-        waitForLoaded();
-        elementCache().mapList = elementCache()._initGridData();
     }
 
     @Override
@@ -806,69 +785,106 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
             }
         };
 
-        private final Map<String, WebElement> headerCells = new HashMap<>();
-        protected final WebElement getColumnHeaderCell(String headerText)
+        protected final WebElement getColumnHeaderCell(String fieldIdentifier)
         {
-            if (!headerCells.containsKey(headerText))
-            {
-                WebElement headerCell = Locators.headerCellBody(headerText).findElement(this);
-                headerCells.put(headerText, headerCell);
-            }
-            return headerCells.get(headerText);
+            return findColumnHeader(fieldIdentifier).getElement();
         }
 
-        protected List<String> fieldLabels;
-        protected Map<String, ColumnIndex> indexes;
-        protected Map<String, ColumnIndex> initColumnsAndIndices()
+        private final List<ColumnHeader> columnHeaders = new ArrayList<>();
+        private final Map<String, ColumnHeader> fieldKeys = new LinkedHashMap<>();
+        private final Map<String, ColumnHeader> fieldLabels = new LinkedHashMap<>();
+        protected List<ColumnHeader> findHeaders()
         {
-            if (fieldLabels == null || indexes == null)
+            if (columnHeaders.isEmpty())
             {
                 List<WebElement> headerCellElements = Locators.headerCells.findElements(this);
-                int offset = 0;
-                if (hasSelectColumn())
+                for (int domIndex = hasSelectColumn() ? 1 : 0; domIndex < headerCellElements.size(); domIndex++)
                 {
-                    headerCellElements.remove(0);
-                    offset = 1;
-                }
-                fieldLabels = headerCellElements.stream().map(el -> WebElementUtils.getTextContent(el).trim()).toList();
-                indexes = new HashMap<>();
-                for (int i = 0; i < headerCellElements.size(); i++)
-                {
-                    headerCells.put(fieldLabels.get(i), headerCellElements.get(i)); // Fill out the headerCells Map since we have them all
-                    indexes.put(fieldLabels.get(i), new ColumnIndex(fieldLabels.get(i), i + offset, i));
+                    columnHeaders.add(new ColumnHeader(headerCellElements.get(domIndex), domIndex));
                 }
             }
-            return indexes;
+            return columnHeaders;
         }
 
-        protected int getColumnIndex(String fieldLabel)
+        /**
+         * Find field by uncertain field identifier in order of precedence:
+         * <ol>
+         *     <li>Encoded fieldKey</li>
+         *     <li>Unencoded fieldKey</li>
+         *     <li>Field Label</li>
+         * </ol>
+         */
+        protected ColumnHeader findColumnHeader(String fieldIdentifier)
         {
-            final ColumnIndex columnIndex = initColumnsAndIndices().get(fieldLabel);
-            if (columnIndex == null)
+            FieldKey possibleFieldKey = FieldKey.fromParts(fieldIdentifier);
+
+            List<ColumnHeader> headers = findHeaders();
+            if (fieldKeys.containsKey(fieldIdentifier))
             {
-                throw new NoSuchElementException(String.format("Column not found: '%s'.\nKnown columns: %s",
-                        fieldLabel, String.join(", ", initColumnsAndIndices().keySet())));
+                return fieldKeys.get(fieldIdentifier);
             }
-            return columnIndex.getRawIndex();
+            else if (fieldKeys.containsKey(possibleFieldKey.toString()))
+            {
+                return fieldKeys.get(possibleFieldKey.toString());
+            }
+            else if (fieldLabels.containsKey(fieldIdentifier))
+            {
+                return fieldLabels.get(fieldIdentifier);
+            }
+            else
+            {
+                if (fieldKeys.size() < headers.size())
+                {
+                    // Check whether fieldIdentifier is an encoded fieldKey
+                    for (ColumnHeader header : headers)
+                    {
+                        if (!fieldKeys.containsValue(header))
+                        {
+                            String fieldKey = header.getFieldKey();
+                            fieldKeys.put(fieldKey, header);
+                            if (fieldKey.equals(fieldIdentifier))
+                            {
+                                return header;
+                            }
+                        }
+                    }
+
+                    // Check whether fieldIdentifier is an unencoded fieldKey
+                    if (fieldKeys.containsKey(possibleFieldKey.toString()))
+                    {
+                        return fieldKeys.get(possibleFieldKey.toString());
+                    }
+                }
+
+                if (fieldLabels.size() < headers.size())
+                {
+                    // Check whether fieldIdentifier is a field label
+                    for (ColumnHeader header : headers)
+                    {
+                        if (!fieldLabels.containsValue(header))
+                        {
+                            String columnLabel = header.getColumnLabel();
+                            fieldLabels.put(columnLabel, header);
+                            if (columnLabel.equals(fieldIdentifier))
+                            {
+                                return header;
+                            }
+                        }
+                    }
+                }
+
+                throw new NoSuchElementException("No such column with fieldKey or label: " + fieldIdentifier);
+            }
+        }
+
+        protected int getColumnIndex(String fieldIdentifier)
+        {
+            return findColumnHeader(fieldIdentifier).getDomIndex();
         }
 
         protected List<String> getColumnLabels()
         {
-            initColumnsAndIndices();
-            return fieldLabels;
-        }
-
-        protected List<Map<String, String>> mapList;
-        protected List<GridRow> gridRows;
-        private List<Map<String, String>> _initGridData()
-        {
-            List<Map<String, String>> rowMaps = new ArrayList<>();
-            gridRows = getRows();
-            for(GridRow row : gridRows)
-            {
-                rowMaps.add(row.getRowMapByLabel());
-            }
-            return rowMaps;
+            return findHeaders().stream().map(ColumnHeader::getColumnLabel).collect(Collectors.toList());
         }
 
         protected GridRow getRow(int index)
@@ -886,18 +902,16 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
             return new GridRow.GridRowFinder(ResponsiveGrid.this).withCellWithText(text).findOptional(this);
         }
 
-        protected GridRow getRow(String fieldLabel, String text)
+        protected GridRow getRow(String fieldIdentifier, String text)
         {
-            // try to normalize column index to start at 0, excluding row selector column
-            int columnIndex = getColumnIndex(fieldLabel);
+            int columnIndex = getColumnIndex(fieldIdentifier);
             return new GridRow.GridRowFinder(ResponsiveGrid.this).withTextAtColumn(text, columnIndex)
                     .find(this);
         }
 
-        protected Optional<GridRow> getOptionalRow(String fieldLabel, String text)
+        protected Optional<GridRow> getOptionalRow(String fieldIdentifier, String text)
         {
-            // try to normalize column index to start at 0, excluding row selector column
-            int columnIndex = getColumnIndex(fieldLabel);
+            int columnIndex = getColumnIndex(fieldIdentifier);
             return new GridRow.GridRowFinder(ResponsiveGrid.this).withTextAtColumn(text, columnIndex)
                     .findOptional(this);
         }
@@ -914,9 +928,14 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
             return new GridRow.GridRowFinder(ResponsiveGrid.this).withDescendant(containing).find();
         }
 
+        private List<GridRow> gridRows;
         protected List<GridRow> getRows()
         {
-            return new GridRow.GridRowFinder(ResponsiveGrid.this).findAll(getComponentElement());
+            if (gridRows == null)
+            {
+                gridRows = new GridRow.GridRowFinder(ResponsiveGrid.this).findAll(this);
+            }
+            return gridRows;
         }
     }
 
@@ -989,36 +1008,45 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
         }
     }
 
-    static class ColumnIndex
+    protected static class ColumnHeader
     {
-        private final Integer _rawIndex;
-        private final Integer _normalizedIndex;
-        private final String _fieldLabel;
+        private final WebElement _element;
+        private final Integer _domIndex;
+        private final Mutable<String> _fieldLabel = new MutableObject<>();
+        private final Mutable<String> _fieldKey = new MutableObject<>();
 
-        /**
-         * Helper to
-         * @param fieldLabel    text of the column header
-         * @param rawIndex      dom-oriented index of the column
-         * @param normalizedIndex   index of the list of columns
-         */
-        public ColumnIndex(String fieldLabel, int rawIndex, int normalizedIndex)
+        private ColumnHeader(WebElement element, int domIndex)
         {
-            _fieldLabel = fieldLabel;
-            _rawIndex = rawIndex;
-            _normalizedIndex = normalizedIndex;
+            _element = element;
+            _domIndex = domIndex;
+        }
+
+        public WebElement getElement()
+        {
+            return _element;
+        }
+
+        public String getFieldKey()
+        {
+            if (_fieldKey.getValue() == null)
+            {
+                _fieldKey.setValue(StringUtils.trimToEmpty(_element.getDomAttribute("data-fieldkey")));
+            }
+            return _fieldKey.getValue();
         }
 
         public String getColumnLabel()
         {
-            return _fieldLabel;
+            if (_fieldLabel.getValue() == null)
+            {
+                _fieldLabel.setValue(WebElementUtils.getTextContent(getElement()).trim());
+            }
+            return _fieldLabel.getValue();
         }
-        public Integer getRawIndex()
+
+        public Integer getDomIndex()
         {
-            return _rawIndex;
-        }
-        public Integer getNormalizedIndex()
-        {
-            return _normalizedIndex;
+            return _domIndex;
         }
     }
 }

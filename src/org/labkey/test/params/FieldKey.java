@@ -5,6 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 public class FieldKey
 {
@@ -36,11 +37,6 @@ public class FieldKey
     public static FieldKey fromParts(String... parts)
     {
         return fromParts(Arrays.asList(parts));
-    }
-
-    public static FieldKey fromPath(String path)
-    {
-        return fromParts(path.split("/"));
     }
 
     public static FieldKey fromFieldKey(String path)
@@ -103,5 +99,18 @@ public class FieldKey
     public String toString()
     {
         return String.join("/", getParts(true));
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (!(o instanceof FieldKey fieldKey)) return false;
+        return Objects.equals(_name, fieldKey._name) && Objects.equals(_parent, fieldKey._parent);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(_parent, _name);
     }
 }
