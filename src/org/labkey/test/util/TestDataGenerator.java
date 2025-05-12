@@ -699,7 +699,7 @@ public class TestDataGenerator
      */
     public File writeData(String fileName)
     {
-        String fileExtension = fileName.substring(fileName.lastIndexOf('.') + 1);
+        String fileExtension = fileName.toLowerCase().substring(fileName.lastIndexOf('.') + 1);
         switch (fileExtension)
         {
             case "xlsx":

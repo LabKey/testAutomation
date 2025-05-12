@@ -865,7 +865,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverCompon
 
         protected GridRow getRow(int index)
         {
-            return new GridRow.GridRowFinder(ResponsiveGrid.this).index(index).find(this);
+            return getRows().get(index);
         }
 
         protected GridRow getRow(String text)
@@ -1006,7 +1006,21 @@ public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverCompon
         {
             if (_fieldKey.getValue() == null)
             {
-                _fieldKey.setValue(FieldKey.fromFieldKey(StringUtils.trimToEmpty(_element.getDomAttribute("data-fieldkey"))));
+                String path = _element.getDomAttribute("data-fieldkey");
+                if (path != null)
+                {
+                    // Some grids don't have a field key, but have a similar value in the ID attribute
+                    _element.getDomAttribute("id");
+                }
+
+                if (path != null)
+                {
+                    _fieldKey.setValue(FieldKey.fromFieldKey(path));
+                }
+                else
+                {
+                    _fieldKey.setValue(FieldKey.ROOT);
+                }
             }
             return _fieldKey.getValue();
         }
