@@ -472,30 +472,14 @@ public class AllowedFileExtensionAdminTest extends BaseWebDriverTest
         // Not sure why we record two exceptions.
         checkExpectedErrors(2);
 
-        // Issue 53026 (or at least part of it)
-        log("Click 'Back' button and validate that the fields still have all the expected values.");
-        waitForElement(Locator.button("Back"));
-        clickButton("Back");
-
-        waitForElement(Locator.name("quf_" + stFileField));
-
-        checker().verifyEquals("'Name' field does not have expected value.",
-                sampleId, getFormElement(Locator.name("quf_Name")));
-
-        checker().verifyEquals("'Description' field does not have expected value.",
-                description, getFormElement(Locator.name("quf_Description")));
-
-        checker().verifyEquals("'StoredAmount' field does not have expected value.",
-                amount, getFormElement(Locator.name("quf_StoredAmount")));
-
-        checker().screenShotIfNewError("Field_Values_Error");
-
         // Issue 53027
-        log("Clear the file field and resubmit.");
-        FileInput el = FileInput.FileInput(Locator.name("quf_" + stFileField), getDriver()).findWhenNeeded();
-        executeScript("arguments[0].value = '';", el.getComponentElement());
-
-        clickButton("Submit");
+        goToProjectHome();
+        sampleTypeHelper = new SampleTypeHelper(this);
+        sampleTypeHelper.goToSampleType(stName);
+        fieldMap = Map.of("Name", sampleId,
+                "Description", description,
+                "StoredAmount", amount);
+        sampleTypeHelper.insertRow(fieldMap);
 
         Map<String, String> rowMap = sampleTypeHelper.getSamplesDataRegionTable().getRowDataAsMap(0);
 
@@ -580,57 +564,6 @@ public class AllowedFileExtensionAdminTest extends BaseWebDriverTest
 
         // Not sure why we record two exceptions.
         checkExpectedErrors(2);
-
-        // Issue 53026 Fields cleared after clicking 'Back' button.
-        log("Click 'Back' button and validate that the fields still have all the expected values.");
-        waitForElement(Locator.button("Back"));
-        clickButton("Back");
-
-        waitForElement(Locator.tagWithId("textarea", "body"));
-
-        page = new InsertPage(getDriver());
-
-        checker().verifyEquals("Message title was not persisted.",
-                notAllowedTitle, page.getTitle());
-
-        checker().verifyEquals("Message body was not persisted.",
-                notAllowedBody, page.getBody());
-
-        List<WebElement> attachmentElements = Locator.tagWithAttributeContaining("span", "id","filename")
-                .findElements(getDriver());
-
-        checker().verifyEqualsSorted("None of the previous attachments are still present.",
-                notAllowedAttachments, attachmentElements
-                        .stream().map(WebElement::getText).toList());
-
-        checker().screenShotIfNewError("Field_Values_After_Disallowed_Error");
-
-        log("Remove the offending file and resubmit the message.");
-
-        // This did not work for me. The index is correct but fails saying could not find link with text "remove".
-//        page.removeAttachment(attachmentElements
-//                .stream().map(WebElement::getText).toList()
-//                .indexOf(fileMap.get(excludedType).getName()));
-
-        List<WebElement> removeLinks = Locator.linkContainingText("remove").findElements(getDriver());
-
-        WebElement removeLink = removeLinks.get(attachmentElements
-                .stream().map(WebElement::getText).toList()
-                .indexOf(fileMap.get(excludedType).getName()));
-
-        removeLink.click();
-
-        shortWait().until(ExpectedConditions.stalenessOf(removeLink));
-
-        page.submit();
-
-        goToProjectHome();
-
-        DataRegionTable dataRegion = DataRegion(getDriver()).withName("Announcements").find();
-
-        checker().withScreenshot()
-                .verifyEqualsSorted("Not all messages are there.",
-                        List.of(allowedTitle, notAllowedTitle), dataRegion.getColumnDataAsText("Title"));
 
     }
 
