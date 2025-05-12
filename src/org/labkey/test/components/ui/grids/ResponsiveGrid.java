@@ -1007,10 +1007,10 @@ public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverCompon
             if (_fieldKey.getValue() == null)
             {
                 String path = _element.getDomAttribute("data-fieldkey");
-                if (path != null)
+                if (path == null)
                 {
                     // Some grids don't have a field key, but have a similar value in the ID attribute
-                    _element.getDomAttribute("id");
+                    path = _element.getDomAttribute("id");
                 }
 
                 if (path != null)

@@ -181,7 +181,7 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
      */
     public Map<FieldKey, String> getRowMapByFieldKey()
     {
-        return getRowMap(columnHeader -> columnHeader.getFieldKey());
+        return getRowMap(ResponsiveGrid.ColumnHeader::getFieldKey);
     }
 
     <T> Map<T, String> getRowMap(Function<ResponsiveGrid.ColumnHeader, T> keyMapper)

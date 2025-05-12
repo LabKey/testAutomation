@@ -110,10 +110,10 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
         return this;
     }
 
-    public EntityInsertPanel removeColumn(String columnName)
+    public EntityInsertPanel removeColumn(String columnIdentifier)
     {
         showGrid();
-        elementCache().grid.removeColumn(columnName);
+        elementCache().grid.removeColumn(columnIdentifier);
         return this;
     }
 

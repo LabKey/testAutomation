@@ -235,7 +235,7 @@ public class EntityBulkInsertDialog extends ModalDialog
             else if (field.getType() == FieldDefinition.ColumnType.Date || field.getType() == FieldDefinition.ColumnType.DateAndTime || field.getType() == FieldDefinition.ColumnType.Time)
                 setDateTimeField(fieldKey, value);
             else if (field.getType() == FieldDefinition.ColumnType.TextChoice)
-                setSelectionField(field.getLabel(), (List<String>) value);
+                setSelectionField(fieldKey, (List<String>) value);
             else
                 setTextField(fieldKey, (String) value);
         }
