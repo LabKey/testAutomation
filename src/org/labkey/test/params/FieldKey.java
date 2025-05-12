@@ -100,6 +100,11 @@ public class FieldKey
         return _name;
     }
 
+    public String[] toArray()
+    {
+        return getParts(false).toArray(new String[0]);
+    }
+
     @Override
     public String toString()
     {

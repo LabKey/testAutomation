@@ -443,6 +443,8 @@ public class FieldSelectionDialog extends ModalDialog
                 .sendKeys(Keys.TAB)
                 .perform();
 
+        getWrapper().mouseOver(elementCache().title); // Dismiss tooltip
+
         WebDriverWrapper.waitFor(()->!elementCache().fieldLabelEdit.isDisplayed() &&
                         elementCache().getListItemElement(elementCache().selectedFieldsPanel, newFieldLabel).isDisplayed(),
                 String.format("New field label '%s' is not in the list.", newFieldLabel), 500);
