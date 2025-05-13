@@ -39,9 +39,9 @@ public class FieldKey
         return fromParts(Arrays.asList(parts));
     }
 
-    public static FieldKey fromFieldKey(String path)
+    public static FieldKey fromFieldKey(String fieldKey)
     {
-        return fromParts(Arrays.stream(path.split("/")).map(FieldKey::decodePart).toList());
+        return fromParts(Arrays.stream(fieldKey.split("/")).map(FieldKey::decodePart).toList());
     }
 
     private static final String[] ILLEGAL = {"$", "/", "&", "}", "~", ",", "."};

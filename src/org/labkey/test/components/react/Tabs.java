@@ -95,6 +95,11 @@ public class Tabs extends WebDriverComponent<Tabs.ElementCache>
         return elementCache().findSelectedTab().getText();
     }
 
+    public String getSelectedTabKey()
+    {
+        return elementCache().findSelectedTab().getDomAttribute("data-event-key");
+    }
+
     @Override
     protected ElementCache newElementCache()
     {

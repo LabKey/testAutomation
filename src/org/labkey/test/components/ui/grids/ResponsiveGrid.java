@@ -4,7 +4,6 @@
  */
 package org.labkey.test.components.ui.grids;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.jetbrains.annotations.Nullable;
@@ -761,9 +760,9 @@ public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverCompon
             }
         };
 
-        protected final WebElement getColumnHeaderCell(String fieldIdentifier)
+        protected final WebElement getColumnHeaderCell(String columnIdentifier)
         {
-            return findColumnHeader(fieldIdentifier).getElement();
+            return findColumnHeader(columnIdentifier).getElement();
         }
 
         private final List<ColumnHeader> columnHeaders = new ArrayList<>();
@@ -790,42 +789,42 @@ public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverCompon
          *     <li>Field Label</li>
          * </ol>
          */
-        protected ColumnHeader findColumnHeader(String fieldIdentifier)
+        protected ColumnHeader findColumnHeader(String columnIdentifier)
         {
-            FieldKey possibleFieldKey = FieldKey.fromParts(fieldIdentifier);
+            FieldKey possibleFieldKey = FieldKey.fromParts(columnIdentifier);
 
             List<ColumnHeader> headers = findHeaders();
-            if (fieldKeys.containsKey(fieldIdentifier))
+            if (fieldKeys.containsKey(columnIdentifier))
             {
-                return fieldKeys.get(fieldIdentifier);
+                return fieldKeys.get(columnIdentifier);
             }
             else if (fieldKeys.containsKey(possibleFieldKey.toString()))
             {
                 return fieldKeys.get(possibleFieldKey.toString());
             }
-            else if (fieldLabels.containsKey(fieldIdentifier))
+            else if (fieldLabels.containsKey(columnIdentifier))
             {
-                return fieldLabels.get(fieldIdentifier);
+                return fieldLabels.get(columnIdentifier);
             }
             else
             {
                 if (fieldKeys.size() < headers.size())
                 {
-                    // Check whether fieldIdentifier is an encoded fieldKey
+                    // Check whether columnIdentifier is an encoded fieldKey
                     for (ColumnHeader header : headers)
                     {
                         if (!fieldKeys.containsValue(header))
                         {
                             String fieldKey = header.getFieldKey().toString();
                             fieldKeys.put(fieldKey, header);
-                            if (fieldKey.equals(fieldIdentifier))
+                            if (fieldKey.equals(columnIdentifier))
                             {
                                 return header;
                             }
                         }
                     }
 
-                    // Check whether fieldIdentifier is an unencoded fieldKey
+                    // Check whether columnIdentifier is an unencoded fieldKey
                     if (fieldKeys.containsKey(possibleFieldKey.toString()))
                     {
                         return fieldKeys.get(possibleFieldKey.toString());
@@ -834,14 +833,14 @@ public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverCompon
 
                 if (fieldLabels.size() < headers.size())
                 {
-                    // Check whether fieldIdentifier is a field label
+                    // Check whether columnIdentifier is a field label
                     for (ColumnHeader header : headers)
                     {
                         if (!fieldLabels.containsValue(header))
                         {
                             String columnLabel = header.getColumnLabel();
                             fieldLabels.put(columnLabel, header);
-                            if (columnLabel.equals(fieldIdentifier))
+                            if (columnLabel.equals(columnIdentifier))
                             {
                                 return header;
                             }
@@ -849,13 +848,13 @@ public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverCompon
                     }
                 }
 
-                throw new NoSuchElementException("No such column with fieldKey or label: " + fieldIdentifier);
+                throw new NoSuchElementException("No such column with fieldKey or label: " + columnIdentifier);
             }
         }
 
-        protected int getColumnIndex(String fieldIdentifier)
+        protected int getColumnIndex(String columnIdentifier)
         {
-            return findColumnHeader(fieldIdentifier).getDomIndex();
+            return findColumnHeader(columnIdentifier).getDomIndex();
         }
 
         protected List<String> getColumnLabels()
@@ -878,16 +877,16 @@ public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverCompon
             return new GridRow.GridRowFinder(ResponsiveGrid.this).withCellWithText(text).findOptional(this);
         }
 
-        protected GridRow getRow(String fieldIdentifier, String text)
+        protected GridRow getRow(String columnIdentifier, String text)
         {
-            int columnIndex = getColumnIndex(fieldIdentifier);
+            int columnIndex = getColumnIndex(columnIdentifier);
             return new GridRow.GridRowFinder(ResponsiveGrid.this).withTextAtColumn(text, columnIndex)
                     .find(this);
         }
 
-        protected Optional<GridRow> getOptionalRow(String fieldIdentifier, String text)
+        protected Optional<GridRow> getOptionalRow(String columnIdentifier, String text)
         {
-            int columnIndex = getColumnIndex(fieldIdentifier);
+            int columnIndex = getColumnIndex(columnIdentifier);
             return new GridRow.GridRowFinder(ResponsiveGrid.this).withTextAtColumn(text, columnIndex)
                     .findOptional(this);
         }

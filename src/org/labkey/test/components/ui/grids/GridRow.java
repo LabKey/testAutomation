@@ -84,9 +84,9 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
     /**
      * gets the cell corresponding to the specified column
      */
-    public WebElement getCell(String fieldIdentifier)
+    public WebElement getCell(String columnIdentifier)
     {
-        return getCell(_grid.getColumnIndex(fieldIdentifier));
+        return getCell(_grid.getColumnIndex(columnIdentifier));
     }
 
     /**
@@ -136,17 +136,17 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
     /**
      * finds a AttachmentCard specified filename, clicks it, and waits for the file to download
      */
-    public File clickNonImgFile(String fieldIdentifier)
+    public File clickNonImgFile(String columnIdentifier)
     {
-        return elementCache().waitForAttachment(fieldIdentifier).clickOnNonImgFile();
+        return elementCache().waitForAttachment(columnIdentifier).clickOnNonImgFile();
     }
 
     /**
      * Returns the text in the row for the specified column
      */
-    public String getText(String fieldIdentifier)
+    public String getText(String columnIdentifier)
     {
-        return getCell(fieldIdentifier).getText();
+        return getCell(columnIdentifier).getText();
     }
 
     /**
@@ -252,9 +252,9 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
             return cellTexts;
         }
 
-        public AttachmentCard waitForAttachment(String fieldIdentifier)
+        public AttachmentCard waitForAttachment(String columnIdentifier)
         {
-            return new AttachmentCard.FileAttachmentCardFinder(getDriver()).waitFor(getCell(fieldIdentifier));
+            return new AttachmentCard.FileAttachmentCardFinder(getDriver()).waitFor(getCell(columnIdentifier));
         }
     }
 
