@@ -19,13 +19,17 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Stream;
 
+import static java.lang.Integer.parseInt;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
@@ -243,15 +247,9 @@ public class AuditLogHelper
         return pass;
     }
 
-    public List<Map<String, Object>> getDomainPropertyEventsFromDomainEvents(String projectName, String domainName, @Nullable List<String> ignoreIds)
+    public List<Map<String, Object>> getDomainPropertyEventsFromDomainEvents(String projectName, String domainName, @Nullable Set<Integer> ignoreIds)
     {
-        List<String> domainEventIds = getDomainEventIds(projectName, domainName);
-
-        if(null != ignoreIds)
-        {
-            TestLogger.log("Removing the ignore ids from the list.");
-            domainEventIds.removeAll(ignoreIds);
-        }
+        List<Integer> domainEventIds = getDomainEventIds(projectName, domainName, ignoreIds);
 
         TestLogger.log("Get all of the Domain Property Events for '" + domainName + "' that are linked to the domain events.");
         List<Map<String, Object>> domainPropertyEventRows = getDomainPropertyEventLog(domainName, domainEventIds);
@@ -260,10 +258,61 @@ public class AuditLogHelper
         return domainPropertyEventRows;
     }
 
-    private List<String> getDomainEventIds(String projectName, String domainName)
+    public List<Integer> getDomainEventIds(String projectName, String domainName, @Nullable Collection<Integer> ignoreIds)
+    {
+        List<Map<String, Object>> domainAuditEventAllRows = getDomainEventLog(projectName, domainName, ignoreIds);
+
+        List<Integer> domainEventIds = new ArrayList<>();
+        domainAuditEventAllRows.forEach((event)->domainEventIds.add(getLogColumnIntValue(event, "rowid")));
+
+        TestLogger.log("Number of 'Domain Event' log entries for '" + domainName + "': " + domainEventIds.size());
+
+        return domainEventIds;
+    }
+
+    public List<String> getDomainEventComments(String projectName, String domainName, @Nullable Collection<Integer> ignoreIds)
+    {
+        List<Map<String, Object>> domainAuditEventAllRows = getDomainEventLog(projectName, domainName, ignoreIds);
+
+        List<String> domainEventComments = new ArrayList<>();
+        domainAuditEventAllRows.forEach((event)->domainEventComments.add(getLogColumnValue(event, "comment")));
+        return domainEventComments;
+    }
+
+    public Set<Integer> getDomainEventIdsFromPropertyEvents(List<Map<String, Object>> domainPropertyEventRows)
+    {
+        Set<Integer> domainEventIds = new HashSet<>();
+
+        for(Map<String, Object> row : domainPropertyEventRows)
+        {
+            domainEventIds.add(getLogColumnIntValue(row, "domaineventid"));
+        }
+
+        return domainEventIds;
+    }
+
+    private List<Map<String, Object>> getDomainEventLog(String projectName, String domainName, @Nullable Collection<Integer> ignoreIds)
     {
         TestLogger.log("Get a list of the Domain Events for project '" + projectName + "'. ");
-        List<Map<String, Object>> domainAuditEventAllRows = getDomainEventLog(projectName);
+
+        Connection cn = WebTestHelper.getRemoteApiConnection();
+        SelectRowsCommand cmd = new SelectRowsCommand("auditLog", "DomainAuditEvent");
+        cmd.setRequiredVersion(9.1);
+        cmd.setColumns(Arrays.asList("rowid", "created", "createdby", "impersonatedby", "projectid", "domainuri", "domainname", "comment"));
+        cmd.addFilter("projectid/DisplayName", projectName, Filter.Operator.EQUAL);
+        if(null != ignoreIds)
+        {
+            StringBuilder stringBuilder = new StringBuilder();
+            ignoreIds.forEach((id)->{
+                if(!stringBuilder.isEmpty())
+                    stringBuilder.append(";");
+                stringBuilder.append(id);
+            });
+            cmd.addFilter("rowId", stringBuilder, Filter.Operator.NOT_IN);
+        }
+        cmd.setContainerFilter(ContainerFilter.AllFolders);
+
+        List<Map<String, Object>> domainAuditEventAllRows = executeSelectCommand(cn, cmd);
         TestLogger.log("Number of 'Domain Event' log entries for '" + projectName + "': " + domainAuditEventAllRows.size());
 
         TestLogger.log("Filter the list to look only at '" + domainName + "'.");
@@ -275,39 +324,10 @@ public class AuditLogHelper
                 domainAuditEventRows.add(row);
         }
 
-        List<String> domainEventIds = new ArrayList<>();
-        domainAuditEventRows.forEach((event)->domainEventIds.add(getLogColumnValue(event, "rowid")));
-
-        TestLogger.log("Number of 'Domain Event' log entries for '" + domainName + "': " + domainEventIds.size());
-
-        return domainEventIds;
+        return domainAuditEventRows;
     }
 
-    public List<String> getDomainEventIdsFromPropertyEvents(List<Map<String, Object>> domainPropertyEventRows)
-    {
-        List<String> domainEventIds = new ArrayList<>();
-
-        for(Map<String, Object> row : domainPropertyEventRows)
-        {
-            domainEventIds.add(getLogColumnValue(row, "domaineventid"));
-        }
-
-        return domainEventIds;
-    }
-
-    private List<Map<String, Object>> getDomainEventLog(String projectName)
-    {
-        Connection cn = WebTestHelper.getRemoteApiConnection();
-        SelectRowsCommand cmd = new SelectRowsCommand("auditLog", "DomainAuditEvent");
-        cmd.setRequiredVersion(9.1);
-        cmd.setColumns(Arrays.asList("rowid", "created", "createdby", "impersonatedby", "projectid", "domainuri", "domainname", "comment"));
-        cmd.addFilter("projectid/DisplayName", projectName, Filter.Operator.EQUAL);
-        cmd.setContainerFilter(ContainerFilter.AllFolders);
-
-        return executeSelectCommand(cn, cmd);
-    }
-
-    private List<Map<String, Object>> getDomainPropertyEventLog(String domainName, @Nullable List<String> eventIds)
+    private List<Map<String, Object>> getDomainPropertyEventLog(String domainName, @Nullable List<Integer> eventIds)
     {
         Connection cn = WebTestHelper.getRemoteApiConnection();
         SelectRowsCommand cmd = new SelectRowsCommand("auditLog", "DomainPropertyAuditEvent");
@@ -388,6 +408,19 @@ public class AuditLogHelper
         try
         {
             return ((Map<String, Object>) rowEntry.get(columnName)).get("value").toString();
+        }
+        catch(JSONException je)
+        {
+            // Just fail here, don't toss the exception up the stack.
+            throw new IllegalArgumentException(je);
+        }
+    }
+
+    private Integer getLogColumnIntValue(Map<String, Object> rowEntry, String columnName)
+    {
+        try
+        {
+            return parseInt(getLogColumnValue(rowEntry, columnName));
         }
         catch(JSONException je)
         {

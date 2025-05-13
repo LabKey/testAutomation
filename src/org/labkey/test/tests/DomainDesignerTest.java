@@ -55,8 +55,10 @@ import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.containsString;
@@ -1352,7 +1354,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         List<Map<String, Object>> domainPropertyEventRows = _auditLogHelper.getDomainPropertyEventsFromDomainEvents(getProjectName(), listName, null);
         // Add the list of the event ids to an ignore list so future tests don't look at them again.
-        List<String> ignoreIds = new ArrayList<>(_auditLogHelper.getDomainEventIdsFromPropertyEvents(domainPropertyEventRows));
+        Set<Integer> ignoreIds = new HashSet<>(_auditLogHelper.getDomainEventIdsFromPropertyEvents(domainPropertyEventRows));
 
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();

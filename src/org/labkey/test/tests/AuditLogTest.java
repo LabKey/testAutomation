@@ -61,8 +61,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -605,7 +607,7 @@ public class AuditLogTest extends BaseWebDriverTest
         List<Map<String, Object>> domainPropertyEventRows = _auditLogHelper.getDomainPropertyEventsFromDomainEvents(AUDIT_PROPERTY_EVENTS_PROJECT, LIST_CHECK_LOG, null);
 
         // Add the list of the event ids to an ignore list so future tests don't look at them again.
-        List<String> ignoreIds = new ArrayList<>(_auditLogHelper.getDomainEventIdsFromPropertyEvents(domainPropertyEventRows));
+        Set<Integer> ignoreIds = new HashSet<>(_auditLogHelper.getDomainEventIdsFromPropertyEvents(domainPropertyEventRows));
 
         if(domainPropertyEventRows.size() != 3)
         {
