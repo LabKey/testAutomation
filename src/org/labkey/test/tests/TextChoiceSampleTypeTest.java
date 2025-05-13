@@ -1,5 +1,6 @@
 package org.labkey.test.tests;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -16,7 +17,9 @@ import org.labkey.test.pages.query.UpdateQueryRowPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldDefinition.ColumnType;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
+import org.labkey.test.util.AuditLogHelper;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.Maps;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
 import org.labkey.test.util.TestDataGenerator;
@@ -35,6 +38,8 @@ import java.util.stream.Collectors;
 @Category({Daily.class})
 public class TextChoiceSampleTypeTest extends BaseWebDriverTest
 {
+    private final AuditLogHelper _auditLogHelper = new AuditLogHelper(this);
+    final String DOMAIN_PROPERTY_LOG_NAME = "Domain property events";
 
     @Override
     public BrowserType bestBrowser()
@@ -326,6 +331,10 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
 
         TestDataGenerator dataGenerator = createSampleType(sampleTypeName, namePrefix, textChoiceFieldName, expectedUnLockedValues);
 
+        List<Map<String, Object>> domainPropertyEventRows = _auditLogHelper.getDomainPropertyEventsFromDomainEvents(getProjectName(), sampleTypeName, null);
+        // Add the list of the event ids to an ignore list so future tests don't look at them again.
+        List<String> ignoreIds = new ArrayList<>(_auditLogHelper.getDomainEventIdsFromPropertyEvents(domainPropertyEventRows));
+
         log("Create some samples that have TextChoice values set.");
 
         // Only assign a few of the values to samples (i.e. lock them).
@@ -447,6 +456,8 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
 
         updatePage.clickSave();
 
+        verifyDomainFieldAuditDetail(ignoreIds, "old: Text Choice Validator, \u00C5\\|\u00C5|BB|CC|DD|E E E|\u0083\u0083|GG|H, null, null, null, Text Choice Validator, new: Text Choice Validator, BB|CC and here is an update|E E E|GG|H|\u0083\u0083 updated|\u00C5\\|\u00C5, null, null, null, Text Choice Validator");
+
         // Construct a list of samples that have TextChoice set and what they are expected to be.
         List<Map<String, String>> expectedSamples = new ArrayList<>();
 
@@ -496,7 +507,7 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
         log("Click save, there should be no errors.");
         updatePage.clickSave();
 
-        log("Finally update a value and click the save button for the sample type without clicking 'Apply'.");
+        log("Next update a value and click the save button for the sample type without clicking 'Apply'.");
 
         waitAndClickAndWait(Locator.lkButton("Edit Type"));
         updatePage = new UpdateSampleTypePage(getDriver());
@@ -524,6 +535,34 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
 
         checker().verifyTrue(String.format("Expected value '%s' is not in the list of values.", valueToUpdate),
                 actualValues.contains(valueToUpdate));
+
+        log("Finally update a value and click the save button for the sample type and clicking 'Apply'.");
+        fieldRow.updateTextChoiceValue(valueToUpdate, updatedValue);
+        updatePage.clickSave();
+
+        verifyDomainFieldAuditDetail(ignoreIds, "old: Text Choice Validator, BB|CC and here is an update|E E E|GG|H|\u0083\u0083 updated|\u00C5\\|\u00C5, null, null, null, Text Choice Validator, new: Text Choice Validator, BB|CC and here is an update|E E E|GG|H no change|\u0083\u0083 updated|\u00C5\\|\u00C5, null, null, null, Text Choice Validator");
+
+    }
+
+    private void verifyDomainFieldAuditDetail(List<String> ignoreIds, String auditDetail)
+    {
+        final String sampleTypeName = "TC_Value_Updates";
+        final String textChoiceFieldName = "TextChoice_Field_1";
+
+        List<Map<String, Object>> domainPropertyEventRows = _auditLogHelper.getDomainPropertyEventsFromDomainEvents(getProjectName(), sampleTypeName, ignoreIds);
+        ignoreIds.addAll(_auditLogHelper.getDomainEventIdsFromPropertyEvents(domainPropertyEventRows));
+        if(domainPropertyEventRows.size() != 1)
+        {
+            _auditLogHelper.goToAuditEventView(DOMAIN_PROPERTY_LOG_NAME);
+            Assert.assertEquals("The number of entries in the domain audit log were not as expected.", 1, domainPropertyEventRows.size());
+        }
+        log("Validate that the expected rows after the update are in the log.");
+        Map<String, String> fieldExpectedColumns = Maps.of("action", "Modified");
+        Map<String, String> fieldExpectedComment = Maps.of("Validators", auditDetail);
+        boolean pass = _auditLogHelper.validateExpectedRowInDomainPropertyAuditLog(domainPropertyEventRows, textChoiceFieldName, fieldExpectedColumns, fieldExpectedComment);
+        if(!pass)
+            _auditLogHelper.goToAuditEventView(DOMAIN_PROPERTY_LOG_NAME);
+        Assert.assertTrue("The values logged for the updating domain field regex event were not as expected. See log for details.", pass);
 
     }
 

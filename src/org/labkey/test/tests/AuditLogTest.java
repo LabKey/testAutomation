@@ -97,6 +97,7 @@ public class AuditLogTest extends BaseWebDriverTest
     public static final String COMMENT_COLUMN = "Comment";
 
     private final ApiPermissionsHelper permissionsHelper = new ApiPermissionsHelper(this);
+    private final AuditLogHelper _auditLogHelper = new AuditLogHelper(this);
 
     @Override
     public List<String> getAssociatedModules()
@@ -601,10 +602,10 @@ public class AuditLogTest extends BaseWebDriverTest
 
         createList(AUDIT_PROPERTY_EVENTS_PROJECT, LIST_CHECK_LOG, null, listColumns);
 
-        List<Map<String, Object>> domainPropertyEventRows = getDomainPropertyEventsFromDomainEvents(AUDIT_PROPERTY_EVENTS_PROJECT, LIST_CHECK_LOG, null);
+        List<Map<String, Object>> domainPropertyEventRows = _auditLogHelper.getDomainPropertyEventsFromDomainEvents(AUDIT_PROPERTY_EVENTS_PROJECT, LIST_CHECK_LOG, null);
 
         // Add the list of the event ids to an ignore list so future tests don't look at them again.
-        List<String> ignoreIds = new ArrayList<>(getDomainEventIdsFromPropertyEvents(domainPropertyEventRows));
+        List<String> ignoreIds = new ArrayList<>(_auditLogHelper.getDomainEventIdsFromPropertyEvents(domainPropertyEventRows));
 
         if(domainPropertyEventRows.size() != 3)
         {
@@ -618,11 +619,11 @@ public class AuditLogTest extends BaseWebDriverTest
         log("Validate that the expected rows are there.");
         Map<String, String> field01ExpectedColumns = Maps.of("action", "Created");
         Map<String, String> field01ExpectedComment = Maps.of("Name", FIELD01_NAME,"Label", FIELD01_LABEL,"Type", "String","Description", FIELD01_DESCRIPTION);
-        boolean pass = validateExpectedRowInDomainPropertyAuditLog(domainPropertyEventRows, FIELD01_NAME, field01ExpectedColumns, field01ExpectedComment);
+        boolean pass = _auditLogHelper.validateExpectedRowInDomainPropertyAuditLog(domainPropertyEventRows, FIELD01_NAME, field01ExpectedColumns, field01ExpectedComment);
 
         Map<String, String> field02ExpectedColumns = Maps.of("action", "Created");
         Map<String, String> field02ExpectedComment = Maps.of("Name", FIELD02_NAME,"Label", FIELD02_LABEL,"Type", FIELD02_TYPE.getLabel(),"Description", FIELD02_DESCRIPTION);
-        pass = validateExpectedRowInDomainPropertyAuditLog(domainPropertyEventRows, FIELD02_NAME, field02ExpectedColumns, field02ExpectedComment) && pass;
+        pass = _auditLogHelper.validateExpectedRowInDomainPropertyAuditLog(domainPropertyEventRows, FIELD02_NAME, field02ExpectedColumns, field02ExpectedComment) && pass;
 
         // We are going to fail, so navigate to the Domain Property Events Audit Log.
         if(!pass)
@@ -654,10 +655,10 @@ public class AuditLogTest extends BaseWebDriverTest
         listDefinitionPage.clickSave();
 
         log("Get a list of ids from the Domain Events Audit Log again but this time remove from the list the ids from the created events.");
-        domainPropertyEventRows = getDomainPropertyEventsFromDomainEvents(AUDIT_PROPERTY_EVENTS_PROJECT, LIST_CHECK_LOG, ignoreIds);
+        domainPropertyEventRows = _auditLogHelper.getDomainPropertyEventsFromDomainEvents(AUDIT_PROPERTY_EVENTS_PROJECT, LIST_CHECK_LOG, ignoreIds);
 
         // Add the list of the event ids to an ignore list so future tests don't look at them again.
-        ignoreIds.addAll(getDomainEventIdsFromPropertyEvents(domainPropertyEventRows));
+        ignoreIds.addAll(_auditLogHelper.getDomainEventIdsFromPropertyEvents(domainPropertyEventRows));
 
         if(domainPropertyEventRows.size() != 2)
         {
@@ -672,12 +673,12 @@ public class AuditLogTest extends BaseWebDriverTest
                 "Description", FIELD01_DESCRIPTION + " -> " + FIELD01_UPDATED_DESCRIPTION,
                 "PHI", "Not PHI -> Restricted PHI",
                 "Required", "false -> true");
-        pass = validateExpectedRowInDomainPropertyAuditLog(domainPropertyEventRows, FIELD01_NAME, field01ExpectedColumns, field01ExpectedComment);
+        pass = _auditLogHelper.validateExpectedRowInDomainPropertyAuditLog(domainPropertyEventRows, FIELD01_NAME, field01ExpectedColumns, field01ExpectedComment);
 
         field02ExpectedColumns = Maps.of("action", "Modified");
-        field02ExpectedComment = Maps.of("ConditionalFormats", "old: <none>, new: 1",
+        field02ExpectedComment = Maps.of("ConditionalFormats", "old: <none>, new: format.column~eq=5: ",
                 "DefaultScale", "Linear -> Log");
-        pass = validateExpectedRowInDomainPropertyAuditLog(domainPropertyEventRows, FIELD02_NAME, field02ExpectedColumns, field02ExpectedComment) && pass;
+        pass = _auditLogHelper.validateExpectedRowInDomainPropertyAuditLog(domainPropertyEventRows, FIELD02_NAME, field02ExpectedColumns, field02ExpectedComment) && pass;
 
         // We are going to fail, so navigate to the Domain Property Events Audit Log.
         if(!pass)
@@ -696,10 +697,10 @@ public class AuditLogTest extends BaseWebDriverTest
         listDefinitionPage.clickSave();
 
         log("Validate that a 'Create' event was logged for the new filed.");
-        domainPropertyEventRows = getDomainPropertyEventsFromDomainEvents(AUDIT_PROPERTY_EVENTS_PROJECT, LIST_CHECK_LOG, ignoreIds);
+        domainPropertyEventRows = _auditLogHelper.getDomainPropertyEventsFromDomainEvents(AUDIT_PROPERTY_EVENTS_PROJECT, LIST_CHECK_LOG, ignoreIds);
 
         // Add the list of the event ids to an ignore list so future tests don't look at them again.
-        ignoreIds.addAll(getDomainEventIdsFromPropertyEvents(domainPropertyEventRows));
+        ignoreIds.addAll(_auditLogHelper.getDomainEventIdsFromPropertyEvents(domainPropertyEventRows));
 
         if(domainPropertyEventRows.size() != 1)
         {
@@ -714,7 +715,7 @@ public class AuditLogTest extends BaseWebDriverTest
                 "Label", FIELD03_LABEL,
                 "Type", FIELD03_TYPE.getLabel(),
                 "Lookup", "[Schema: lists, Query: " + LOOK_UP_LIST01 + "]");
-        pass = validateExpectedRowInDomainPropertyAuditLog(domainPropertyEventRows, FIELD03_NAME, field03ExpectedColumns, field03ExpectedComment);
+        pass = _auditLogHelper.validateExpectedRowInDomainPropertyAuditLog(domainPropertyEventRows, FIELD03_NAME, field03ExpectedColumns, field03ExpectedComment);
 
         // We are going to fail, so navigate to the Domain Property Events Audit Log.
         if(!pass)
@@ -738,12 +739,12 @@ public class AuditLogTest extends BaseWebDriverTest
         field03ExpectedComment = Maps.of("Lookup", "[Query: old: " + LOOK_UP_LIST01 + ", new: " + LOOK_UP_LIST02 + "]");
 
         log("Get a list of ids from the Domain Events Audit Log again but remove from the list the ids from all of the previous events.");
-        domainPropertyEventRows = getDomainPropertyEventsFromDomainEvents(AUDIT_PROPERTY_EVENTS_PROJECT, LIST_CHECK_LOG, ignoreIds);
+        domainPropertyEventRows = _auditLogHelper.getDomainPropertyEventsFromDomainEvents(AUDIT_PROPERTY_EVENTS_PROJECT, LIST_CHECK_LOG, ignoreIds);
 
         // Add the list of the event ids to an ignore list so future tests don't look at them again.
-        ignoreIds.addAll(getDomainEventIdsFromPropertyEvents(domainPropertyEventRows));
+        ignoreIds.addAll(_auditLogHelper.getDomainEventIdsFromPropertyEvents(domainPropertyEventRows));
 
-        pass = validateExpectedRowInDomainPropertyAuditLog(domainPropertyEventRows, FIELD03_NAME, field03ExpectedColumns, field03ExpectedComment);
+        pass = _auditLogHelper.validateExpectedRowInDomainPropertyAuditLog(domainPropertyEventRows, FIELD03_NAME, field03ExpectedColumns, field03ExpectedComment);
 
         // We are going to fail, so navigate to the Domain Property Events Audit Log.
         if(!pass)
@@ -762,9 +763,9 @@ public class AuditLogTest extends BaseWebDriverTest
         field03ExpectedColumns = Maps.of("action", "Deleted");
 
         log("Get a list of ids from the Domain Events Audit Log again but remove from the list the ids from all of the previous events.");
-        domainPropertyEventRows = getDomainPropertyEventsFromDomainEvents(AUDIT_PROPERTY_EVENTS_PROJECT, LIST_CHECK_LOG, ignoreIds);
+        domainPropertyEventRows = _auditLogHelper.getDomainPropertyEventsFromDomainEvents(AUDIT_PROPERTY_EVENTS_PROJECT, LIST_CHECK_LOG, ignoreIds);
 
-        pass = validateExpectedRowInDomainPropertyAuditLog(domainPropertyEventRows, FIELD03_NAME, field03ExpectedColumns, null);
+        pass = _auditLogHelper.validateExpectedRowInDomainPropertyAuditLog(domainPropertyEventRows, FIELD03_NAME, field03ExpectedColumns, null);
 
         // We are going to fail, so navigate to the Domain Property Events Audit Log.
         if(!pass)
@@ -775,204 +776,4 @@ public class AuditLogTest extends BaseWebDriverTest
         log("Ok, it looks like everything was logged as expected. Yipeee!");
     }
 
-    private boolean validateExpectedRowInDomainPropertyAuditLog(List<Map<String, Object>> domainPropertyEventRows, String propertyName, Map<String, String> expectedColumns, @Nullable Map<String, String> expectedComment)
-    {
-        boolean pass = true;
-
-        for(Map<String, Object> row : domainPropertyEventRows)
-        {
-
-            if(getLogColumnValue(row, "propertyname").equals(propertyName))
-            {
-                log("Validate the columns for property '" + propertyName + "'.");
-                for(String fieldName : expectedColumns.keySet())
-                {
-                    if(!getLogColumnValue(row, fieldName).equals(expectedColumns.get(fieldName)))
-                    {
-                        pass = false;
-                        log("************** For field '" + fieldName + "' expected value '" + expectedColumns.get(fieldName) + "' found '" + row.get(fieldName) + "' **************");
-                    }
-                }
-
-                if(null != expectedComment)
-                {
-                    log("Validate that the Comment field is as expected.");
-                    Map<String, String> commentFieldValues = getDomainPropertyEventComment(row);
-                    pass = validateCommentHasExpectedValues(commentFieldValues, expectedComment) && pass;
-                }
-            }
-
-        }
-
-        return pass;
-    }
-
-    private boolean validateCommentHasExpectedValues(Map<String, String> comment, Map<String, String> expected)
-    {
-        boolean pass = true;
-
-        for(String key : expected.keySet())
-        {
-            if(!expected.get(key).equals(comment.get(key)))
-            {
-                log("************** Comment value does not contain expected value for field '" + key + "'. Expected '" + expected.get(key) + "' found '" + comment.get(key) + "'.  **************");
-                pass = false;
-            }
-        }
-
-        return pass;
-    }
-
-    private List<Map<String, Object>> getDomainPropertyEventsFromDomainEvents(String projectName, String domainName, @Nullable List<String> ignoreIds)
-    {
-        List<String> domainEventIds = getDomainEventIds(projectName, domainName);
-
-        if(null != ignoreIds)
-        {
-            log("Removing the ignore ids from the list.");
-            domainEventIds.removeAll(ignoreIds);
-        }
-
-        log("Get all of the Domain Property Events for '" + domainName + "' that are linked to the domain events.");
-        List<Map<String, Object>> domainPropertyEventRows = getDomainPropertyEventLog(domainName, domainEventIds);
-        log("Number of 'Domain Property Event' log entries: " + domainPropertyEventRows.size());
-
-        return domainPropertyEventRows;
-    }
-
-    private List<String> getDomainEventIds(String projectName, String domainName)
-    {
-        log("Get a list of the Domain Events for project '" + projectName + "'. ");
-        List<Map<String, Object>> domainAuditEventAllRows = getDomainEventLog(projectName);
-        log("Number of 'Domain Event' log entries for '" + projectName + "': " + domainAuditEventAllRows.size());
-
-        log("Filter the list to look only at '" + domainName + "'.");
-        List<Map<String, Object>> domainAuditEventRows = new ArrayList<>();
-
-        for(Map<String, Object> row : domainAuditEventAllRows)
-        {
-            if(getLogColumnValue(row, "domainname").toLowerCase().trim().equals(domainName.toLowerCase().trim()))
-                domainAuditEventRows.add(row);
-        }
-
-        List<String> domainEventIds = new ArrayList<>();
-        domainAuditEventRows.forEach((event)->domainEventIds.add(getLogColumnValue(event, "rowid")));
-
-        log("Number of 'Domain Event' log entries for '" + domainName + "': " + domainEventIds.size());
-
-        return domainEventIds;
-    }
-
-    private List<String> getDomainEventIdsFromPropertyEvents(List<Map<String, Object>> domainPropertyEventRows)
-    {
-        List<String> domainEventIds = new ArrayList<>();
-
-        for(Map<String, Object> row : domainPropertyEventRows)
-        {
-            domainEventIds.add(getLogColumnValue(row, "domaineventid"));
-        }
-
-        return domainEventIds;
-    }
-
-    private List<Map<String, Object>> getDomainEventLog(String projectName)
-    {
-        Connection cn = WebTestHelper.getRemoteApiConnection();
-        SelectRowsCommand cmd = new SelectRowsCommand("auditLog", "DomainAuditEvent");
-        cmd.setRequiredVersion(9.1);
-        cmd.setColumns(Arrays.asList("rowid", "created", "createdby", "impersonatedby", "projectid", "domainuri", "domainname", "comment"));
-        cmd.addFilter("projectid/DisplayName", projectName, Filter.Operator.EQUAL);
-        cmd.setContainerFilter(ContainerFilter.AllFolders);
-
-        return executeSelectCommand(cn, cmd);
-    }
-
-    private List<Map<String, Object>> getDomainPropertyEventLog(String domainName, @Nullable List<String> eventIds)
-    {
-        Connection cn = WebTestHelper.getRemoteApiConnection();
-        SelectRowsCommand cmd = new SelectRowsCommand("auditLog", "DomainPropertyAuditEvent");
-        cmd.setRequiredVersion(9.1);
-        cmd.setColumns(Arrays.asList("Created", "CreatedBy", "ImpersonatedBy", "propertyname", "action", "domainname", "domaineventid", "Comment"));
-        cmd.addFilter("domainname", domainName, Filter.Operator.EQUAL);
-
-        if(null != eventIds)
-        {
-            StringBuilder stringBuilder = new StringBuilder();
-            eventIds.forEach((id)->{
-                if(!stringBuilder.isEmpty())
-                    stringBuilder.append(";");
-                stringBuilder.append(id);
-            });
-            cmd.addFilter("domaineventid/rowid", stringBuilder, Filter.Operator.IN);
-        }
-
-        cmd.setContainerFilter(ContainerFilter.AllFolders);
-
-        return executeSelectCommand(cn, cmd);
-    }
-
-    private List<Map<String, Object>> executeSelectCommand(Connection cn, SelectRowsCommand cmd)
-    {
-        List<Map<String, Object>> rowsReturned = new ArrayList<>();
-        try
-        {
-            SelectRowsResponse response = cmd.execute(cn, "/");
-            log("Number of rows: " + response.getRowCount());
-            rowsReturned.addAll(response.getRows());
-        }
-        catch(IOException | CommandException ex)
-        {
-            // Just fail here, don't toss the exception up the stack.
-            fail("There was a command exception when getting the log: " + ex);
-        }
-
-        return rowsReturned;
-    }
-
-    private Map<String, String> getDomainPropertyEventComment(Map<String, Object> row)
-    {
-        String comment = getLogColumnValue(row, "Comment");
-
-        String[] commentAsArray = comment.split(";");
-
-        Map<String, String> fieldComments = new HashMap<>();
-
-        for (String s : commentAsArray)
-        {
-            String[] fieldValue = s.split(":");
-
-            // If the split on the ':' produced more than two entries in the array it most likely means that the
-            // comment for that property had a : in it. So treat the first entry as the field name and then concat the
-            // other fields together.
-            // For example the ConditionalFormats field will log the following during an update:
-            // ConditionalFormats: old: <none>, new: 1;
-            // And a create of a Lookup will log as:
-            // Lookup: [Schema: lists, Query: LookUp01];
-            StringBuilder sb = new StringBuilder();
-            sb.append(fieldValue[1].trim());
-
-            for (int j = 2; j < fieldValue.length; j++)
-            {
-                sb.append(":");
-                sb.append(fieldValue[j]);
-            }
-
-            fieldComments.put(fieldValue[0].trim(), sb.toString());
-        }
-
-        return fieldComments;
-    }
-
-    private String getLogColumnValue(Map<String, Object> rowEntry, String columnName)
-    {
-        try
-        {
-            return ((Map<String, Object>) rowEntry.get(columnName)).get("value").toString();
-        }
-        catch(JSONException je)
-        {
-            // Just fail here, don't toss the exception up the stack.
-            throw new IllegalArgumentException(je);
-        }
-    }
 }

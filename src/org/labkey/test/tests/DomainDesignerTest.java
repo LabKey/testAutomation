@@ -40,7 +40,9 @@ import org.labkey.test.pages.core.admin.BaseSettingsPage.TIME_FORMAT;
 import org.labkey.test.pages.experiment.CreateSampleTypePage;
 import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.util.AuditLogHelper;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.Maps;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.TestDataGenerator;
 import org.openqa.selenium.WebElement;
@@ -71,6 +73,9 @@ import static org.labkey.test.util.exp.SampleTypeAPIHelper.SAMPLE_TYPE_DOMAIN_KI
 @Category({BVT.class})
 public class DomainDesignerTest extends BaseWebDriverTest
 {
+    private final AuditLogHelper _auditLogHelper = new AuditLogHelper(this);
+    final String DOMAIN_PROPERTY_LOG_NAME = "Domain property events";
+
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
@@ -1335,18 +1340,23 @@ public class DomainDesignerTest extends BaseWebDriverTest
     public void testRegexValidator() throws Exception
     {
         String listName = "regexValidatorList";
-
+        String fieldNameWithReg = "favoriteSnack";
         FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "lists", listName);
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
                 .withColumns(List.of(
                         new FieldDefinition("name", FieldDefinition.ColumnType.String),
                         new FieldDefinition("favoriteIceCream", FieldDefinition.ColumnType.String),
-                        new FieldDefinition("favoriteSnack", FieldDefinition.ColumnType.String),
+                        new FieldDefinition(fieldNameWithReg, FieldDefinition.ColumnType.String),
                         new FieldDefinition("size", FieldDefinition.ColumnType.Integer)));
         DomainResponse createResponse = dgen.createDomain(createDefaultConnection(), "IntList", Map.of("keyName", "Key"));
+
+        List<Map<String, Object>> domainPropertyEventRows = _auditLogHelper.getDomainPropertyEventsFromDomainEvents(getProjectName(), listName, null);
+        // Add the list of the event ids to an ignore list so future tests don't look at them again.
+        List<String> ignoreIds = new ArrayList<>(_auditLogHelper.getDomainEventIdsFromPropertyEvents(domainPropertyEventRows));
+
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
-        DomainFieldRow favoriteSnack = domainFormPanel.getField("favoriteSnack");
+        DomainFieldRow favoriteSnack = domainFormPanel.getField(fieldNameWithReg);
 
         RegexValidatorDialog validatorDialog = favoriteSnack.clickRegexButton();
         RegexValidatorPanel panel = validatorDialog.getValidationPanel();
@@ -1370,6 +1380,28 @@ public class DomainDesignerTest extends BaseWebDriverTest
                 "twizzler is not a snack", specialCharsValidator.get("description"));
         assertEquals("expected error message should be on the field",
                 "favorite snack cannot be twizzlers, yo", specialCharsValidator.get("errorMessage"));
+
+        // check audit log
+        log("Get a list of ids from the Domain Events Audit Log again but this time remove from the list the ids from the created events.");
+        domainPropertyEventRows = _auditLogHelper.getDomainPropertyEventsFromDomainEvents(getProjectName(), listName, ignoreIds);
+        ignoreIds.addAll(_auditLogHelper.getDomainEventIdsFromPropertyEvents(domainPropertyEventRows));
+
+        if(domainPropertyEventRows.size() != 1)
+        {
+            // We are going to fail, so navigate to the Domain Property Events Audit Log.
+            _auditLogHelper.goToAuditEventView(DOMAIN_PROPERTY_LOG_NAME);
+            Assert.assertEquals("The number of entries in the domain audit log were not as expected.", 1, domainPropertyEventRows.size());
+        }
+
+        log("Validate that the expected rows after the update are in the log.");
+        Map<String, String> fieldExpectedColumns = Maps.of("action", "Modified");
+        Map<String, String> fieldExpectedComment = Maps.of("Validators", "old: <none>, new: neverTwizzlers, twizzler, failOnMatch=true, favorite snack cannot be twizzlers, yo, twizzler is not a snack, Regular Expression");
+        boolean pass = _auditLogHelper.validateExpectedRowInDomainPropertyAuditLog(domainPropertyEventRows, fieldNameWithReg, fieldExpectedColumns, fieldExpectedComment);
+
+        if(!pass)
+            _auditLogHelper.goToAuditEventView(DOMAIN_PROPERTY_LOG_NAME);
+
+        Assert.assertTrue("The values logged for the updating domain field regex event were not as expected. See log for details.", pass);
 
         // this test does not verify that attempts to insert values that match will get an error
     }
