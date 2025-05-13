@@ -274,9 +274,14 @@ public class UserTest extends BaseWebDriverTest
         log("Adding the custom field to core.Users");
         DomainDesignerPage domainDesignerPage = new DomainDesignerPage(getDriver());
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
-        domainFormPanel.addField("UID")
-                .setType(FieldDefinition.ColumnType.String);
-        domainDesignerPage.clickSave();
+        if (!domainFormPanel.fieldNames().contains("UID"))
+        {
+            domainFormPanel.addField("UID")
+                    .setType(FieldDefinition.ColumnType.String);
+            domainDesignerPage.clickSave();
+        }
+        else
+            domainDesignerPage.clickCancel();
 
         log("Adding value to the custom field");
         navigateToUserDetails(NORMAL_USER);
