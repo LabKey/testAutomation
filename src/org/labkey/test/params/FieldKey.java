@@ -1,37 +1,52 @@
 package org.labkey.test.params;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
 
-public class FieldKey
+public class FieldKey implements CharSequence
 {
-    public static final FieldKey ROOT = new FieldKey(null, null);
+    public static final FieldKey EMPTY = new FieldKey("");
+    public static final FieldKey SOURCES_FK = new FieldKey("DataInputs");
+    public static final FieldKey PARENTS_FK = new FieldKey("MaterialInputs");
+
+    private static final String SEPARATOR = "/";
 
     private final FieldKey _parent;
     private final String _name;
-    private final String _encodedName;
+    private final String _fieldKey;
 
-    private FieldKey(FieldKey parent, String name)
+    private FieldKey(String name)
+    {
+        _parent = null;
+        _name = name;
+        _fieldKey = encodePart(name);
+    }
+
+    private FieldKey(FieldKey parent, String child)
     {
         _parent = parent;
-        _name = name;
-        _encodedName = encodePart(name);
+        _name = parent.getName() + SEPARATOR + child;
+        _fieldKey = parent + SEPARATOR + encodePart(child);
     }
 
     public static FieldKey fromParts(List<String> parts)
     {
-        if (parts.isEmpty())
-            return ROOT;
+        FieldKey fieldKey = EMPTY;
 
-        if (parts.stream().anyMatch(StringUtils::isBlank))
-            throw new IllegalArgumentException("parts contains blank: " + parts);
+        for (String part : parts)
+        {
+            if (StringUtils.isBlank(part))
+                throw new IllegalArgumentException("FieldKey contains a blank part: " + parts);
+            fieldKey = fieldKey.child(part);
+        }
 
-        FieldKey parent = FieldKey.fromParts(parts.subList(0, parts.size() - 1));
-        return new FieldKey(parent, parts.get(parts.size() - 1));
+        return fieldKey;
     }
 
     public static FieldKey fromParts(String... parts)
@@ -41,7 +56,15 @@ public class FieldKey
 
     public static FieldKey fromFieldKey(String fieldKey)
     {
-        return fromParts(Arrays.stream(fieldKey.split("/")).map(FieldKey::decodePart).toList());
+        return fromParts(Arrays.stream(fieldKey.split(SEPARATOR)).map(FieldKey::decodePart).toList());
+    }
+
+    public static FieldKey fromChars(CharSequence fieldKey)
+    {
+        if (fieldKey instanceof FieldKey fk)
+            return fk;
+        else
+            return fromParts(fieldKey.toString());
     }
 
     private static final String[] ILLEGAL = {"$", "/", "&", "}", "~", ",", "."};
@@ -62,37 +85,32 @@ public class FieldKey
         return _parent;
     }
 
-    public FieldKey child(String fieldName)
+    public FieldKey child(String name)
     {
-        return new FieldKey(this, fieldName);
-    }
-
-    public List<String> getParts(boolean encode)
-    {
-        if (this == ROOT)
+        if (StringUtils.isBlank(getName()))
         {
-            return new ArrayList<>();
+            return new FieldKey(name);
         }
         else
         {
-            List<String> parts = _parent.getParts(encode);
-            parts.add(encode ? _encodedName : _name);
-            return parts;
+            return new FieldKey(this, name);
         }
     }
 
-    public List<FieldKey> getHierarchy()
+    public Iterator<FieldKey> getIterator()
     {
-        if (this == ROOT)
+        List<FieldKey> ancestors = new ArrayList<>();
+        FieldKey temp = this;
+
+        while (temp.getParent() != null)
         {
-            return new ArrayList<>();
+            ancestors.add(temp);
+            temp = temp.getParent();
         }
-        else
-        {
-            List<FieldKey> parts = _parent.getHierarchy();
-            parts.add(this);
-            return parts;
-        }
+
+        Collections.reverse(ancestors);
+
+        return ancestors.iterator();
     }
 
     public String getName()
@@ -100,27 +118,46 @@ public class FieldKey
         return _name;
     }
 
-    public String[] toArray()
+    public String[] getNameArray()
     {
-        return getParts(false).toArray(new String[0]);
+        return _name.split(SEPARATOR);
     }
 
     @Override
-    public String toString()
+    public @NotNull String toString()
     {
-        return String.join("/", getParts(true));
+        return _fieldKey;
     }
 
     @Override
-    public boolean equals(Object o)
+    public int length()
+    {
+        return _fieldKey.length();
+    }
+
+    @Override
+    public char charAt(int index)
+    {
+        return _fieldKey.charAt(index);
+    }
+
+    @Override
+    public @NotNull CharSequence subSequence(int start, int end)
+    {
+        return _fieldKey.subSequence(start, end);
+    }
+
+    @Override
+    public final boolean equals(Object o)
     {
         if (!(o instanceof FieldKey fieldKey)) return false;
-        return Objects.equals(_name, fieldKey._name) && Objects.equals(_parent, fieldKey._parent);
+
+        return _fieldKey.equals(fieldKey._fieldKey);
     }
 
     @Override
     public int hashCode()
     {
-        return Objects.hash(_parent, _name);
+        return _fieldKey.hashCode();
     }
 }

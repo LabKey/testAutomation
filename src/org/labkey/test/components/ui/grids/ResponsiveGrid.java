@@ -641,6 +641,24 @@ public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverCompon
     }
 
     /**
+     *
+     * @return a list of Map&#60;String, String&#62; containing keys and values for each row
+     */
+    public List<Map<String, String>> getRowMapsByName()
+    {
+        return elementCache().getRows().stream().map(GridRow::getRowMapByName).toList();
+    }
+
+    /**
+     *
+     * @return a list of Map&#60;String, String&#62; containing keys and values for each row
+     */
+    public List<Map<FieldKey, String>> getRowMapsByFieldKey()
+    {
+        return elementCache().getRows().stream().map(GridRow::getRowMapByFieldKey).toList();
+    }
+
+    /**
      * locates the first link in the grid with matching text
      * @param text  the text to match
      */
@@ -1018,7 +1036,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverCompon
                 }
                 else
                 {
-                    _fieldKey.setValue(FieldKey.ROOT);
+                    _fieldKey.setValue(FieldKey.EMPTY);
                 }
             }
             return _fieldKey.getValue();

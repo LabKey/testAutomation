@@ -1377,7 +1377,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
                 }
                 else
                 {
-                    _fieldKey.setValue(FieldKey.ROOT);
+                    _fieldKey.setValue(FieldKey.EMPTY);
                 }
             }
             return _fieldKey.getValue();
