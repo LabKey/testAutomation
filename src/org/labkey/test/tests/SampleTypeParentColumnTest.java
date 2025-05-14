@@ -18,6 +18,7 @@ import org.labkey.test.pages.experiment.CreateSampleTypePage;
 import org.labkey.test.pages.experiment.UpdateSampleTypePage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
+import org.labkey.test.util.AuditLogHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExcelHelper;
 import org.labkey.test.util.PortalHelper;
@@ -64,6 +65,8 @@ public class SampleTypeParentColumnTest extends BaseWebDriverTest
     protected static Map<String, String> _mapCaptionToName = Map.of(
             COL_DESCRIPTION_CAPTION, COL_DESCRIPTION_NAME,
             COL_NAME_CAPTION, COL_NAME_NAME);
+
+    private final AuditLogHelper _auditLogHelper = new AuditLogHelper(this);
 
     @Override
     public List<String> getAssociatedModules()
@@ -605,6 +608,10 @@ public class SampleTypeParentColumnTest extends BaseWebDriverTest
         updatePage.removeParentAlias(PARENT_COLUMN);
         updatePage.clickSave();
 
+        checker().verifyEquals("The comment logged for the updating domain was not as expected.",
+                "AliquotNameExpression: <null> -> ${${AliquotedFrom}-:withCounter};ImportAlias: P7(materialInputs/" + SAMPLE_TYPE_NAME + ",required=false) ->  <null>; The descriptor of domain " + SAMPLE_TYPE_NAME + " was updated",
+                _auditLogHelper.getLastDomainEventComment(getProjectName(), SAMPLE_TYPE_NAME));
+
         log("Import some more samples using the alias column and make sure it doesn't work.");
         sampleText = "Name\t" + PARENT_COLUMN + "\n" +
                 "SG_03\tSG_01\n";
@@ -701,6 +708,9 @@ public class SampleTypeParentColumnTest extends BaseWebDriverTest
         log("Now add a valid parent column and check that you cannot now add a field in the sample type with the same name.");
         updatePage.addParentAlias(GOOD_PARENT_NAME, SampleTypeDesigner.CURRENT_SAMPLE_TYPE);
         updatePage.clickSave();
+
+        checker().verifyEquals("The comment logged for the updating domain was not as expected.", "ImportAlias: <null> -> P8(materialInputs/" + SAMPLE_TYPE_NAME + ",required=false); The descriptor of domain " + SAMPLE_TYPE_NAME + " was updated",
+                _auditLogHelper.getLastDomainEventComment(getProjectName(), SAMPLE_TYPE_NAME));
 
         clickFolder(SUB_FOLDER_NAME);
         updatePage = sampleHelper.goToEditSampleType(SAMPLE_TYPE_NAME);

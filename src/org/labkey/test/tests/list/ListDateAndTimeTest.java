@@ -27,6 +27,7 @@ import org.labkey.test.pages.core.admin.BaseSettingsPage.TIME_FORMAT;
 import org.labkey.test.pages.core.admin.LookAndFeelSettingsPage;
 import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.util.AuditLogHelper;
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExcelHelper;
@@ -49,6 +50,8 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
     private static SimpleDateFormat _defaultDateFormat = null;
     private static SimpleDateFormat _defaultTimeFormat = null;
     private static SimpleDateFormat _defaultDateTimeFormat = null;
+
+    private final AuditLogHelper _auditLogHelper = new AuditLogHelper(this);
 
     @Override
     public List<String> getAssociatedModules()
@@ -1222,6 +1225,9 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
 
         listDefinitionPage.clickSave();
 
+        checker().verifyEquals("Domain audit comment not as expected after changing datetime format", "The column(s) of domain " + listName + " were modified", _auditLogHelper.getLastDomainEventComment(getProjectName(), listName));
+        checker().verifyEqualsSorted("Domain field audit comment not as expected", List.of("Format: yyyy-MM-dd -> ddMMMyy;", "Format: hh:mm a -> HH:mm:ss;", "Format: yyyy-MM-dd hh:mm a -> dd-MMM-yyyy HH:mm:ss;"), _auditLogHelper.getLastDomainPropertyComment(getProjectName(), listName));
+
         expectedData = new ArrayList<>();
 
         for(Date date : dates)
@@ -1349,6 +1355,9 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
         confirmDialog.dismiss("Yes, Change Data Type");
 
         listDefinitionPage.clickSave();
+
+        checker().verifyEquals("Domain audit comment not as expected after changing data type", "The column(s) of domain Convert DateTime Field List were modified", _auditLogHelper.getLastDomainEventComment(getProjectName(), listName));
+        checker().verifyEqualsSorted("Domain field audit comment not as expected", List.of("Type: DateTime -> Date;", "Type: DateTime -> Time;"), _auditLogHelper.getLastDomainPropertyComment(getProjectName(), listName));
 
         // Update default format after changing the types.
         DATE_FORMAT dateFormat = DATE_FORMAT.Default;

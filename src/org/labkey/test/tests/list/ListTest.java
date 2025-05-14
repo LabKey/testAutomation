@@ -56,6 +56,7 @@ import org.labkey.test.params.FieldDefinition.LookupInfo;
 import org.labkey.test.params.FieldDefinition.StringLookup;
 import org.labkey.test.tests.AuditLogTest;
 import org.labkey.test.util.AbstractDataRegionExportOrSignHelper.ColumnHeaderType;
+import org.labkey.test.util.AuditLogHelper;
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
@@ -191,6 +192,8 @@ public class ListTest extends BaseWebDriverTest
     private final File EXCEL_APILIST_FILE = TestFileUtils.getSampleData("dataLoading/excel/ClientAPITestList.xls");
     private final File TSV_SAMPLE_FILE = TestFileUtils.getSampleData("fileTypes/tsv_sample.tsv");
     private final String TSV_LIST_NAME = "Fruits from TSV";
+
+    private final AuditLogHelper _auditLogHelper = new AuditLogHelper(this);
 
     @Override
     public List<String> getAssociatedModules()
@@ -1227,6 +1230,12 @@ public class ListTest extends BaseWebDriverTest
 
         listDefinitionPage.clickSave();
 
+        checker().verifyEquals("Domain audit comment not as expected after changing conditional format", "The column(s) of domain " + TSV_LIST_NAME + " were modified", _auditLogHelper.getLastDomainEventComment(getProjectName(), TSV_LIST_NAME));
+        checker().verifyEqualsSorted("Domain field audit comment not as expected",
+                List.of("ConditionalFormats: old: <none>, new: format.column~gt=7: text-decoration: line-through;, format.column~gt=5: font-weight: bold;;",
+                        "ConditionalFormats: old: <none>, new: format.column~eq=true: text-decoration: line-through;font-weight: bold;font-style: italic;color: #68ccca;background-color: #d33115 !important;;"),
+                _auditLogHelper.getLastDomainPropertyComment(getProjectName(), TSV_LIST_NAME));
+
         // Verify conditional format of boolean column
         // look for cells that do not match the
         assertTextPresent(TSV_LIST_NAME);
@@ -1294,6 +1303,11 @@ public class ListTest extends BaseWebDriverTest
                 .setLabel(newFieldName);
         listDefinitionPage.clickSave();
 
+        checker().verifyEquals("Domain audit comment not as expected after renaming a field", "The column(s) of domain " + listName + " were modified", _auditLogHelper.getLastDomainEventComment(getProjectName(), listName));
+        checker().verifyEqualsSorted("Domain field audit comment not as expected",
+                List.of("Name: "+ origFieldName + " -> " + newFieldName + "; Label: " + origFieldName + " -> " + newFieldName + ";"),
+                _auditLogHelper.getLastDomainPropertyComment(getProjectName(), listName));
+
         assertTextPresent(newFieldName);
         assertTextNotPresent(origFieldName);
 
@@ -1330,6 +1344,11 @@ public class ListTest extends BaseWebDriverTest
         listDefinitionPage.setColumnPhiLevel("PhiColumn", FieldDefinition.PhiSelectType.PHI);
         listDefinitionPage.setColumnPhiLevel("RestrictedPhiColumn", FieldDefinition.PhiSelectType.Restricted);
         listDefinitionPage.clickSave();
+
+        checker().verifyEquals("Domain audit comment not as expected after changing PHI setting for a field", "The column(s) of domain " + listName + " were modified", _auditLogHelper.getLastDomainEventComment(getProjectName(), listName));
+        checker().verifyEqualsSorted("Domain field audit comment not as expected",
+                List.of("PHI: Not PHI -> Limited PHI;", "PHI: Not PHI -> Full PHI;", "PHI: Not PHI -> Restricted PHI;"),
+                _auditLogHelper.getLastDomainPropertyComment(getProjectName(), listName));
 
         goToProjectHome();
         clickAndWait(Locator.linkWithText(listName));
@@ -1502,6 +1521,7 @@ public class ListTest extends BaseWebDriverTest
                 .getField(fieldName2).expand().clickAdvancedSettings().setUniqueConstraint(true)
                 .apply();
         listDefinitionPage.clickSave();
+        // TODO, domain audit not implemented for unique constraint changes
         viewRawTableMetadata(listName);
         verifyTableIndices("unique_constraint_list_", List.of("field_name1", "fieldname_2"));
         assertTextNotPresent("unique_constraint_list_fieldname_3");

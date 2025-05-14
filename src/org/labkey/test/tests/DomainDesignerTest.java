@@ -288,6 +288,12 @@ public class DomainDesignerTest extends BaseWebDriverTest
         EditListDefinitionPage editListDefinitionPage = new EditListDefinitionPage(getDriver());
         editListDefinitionPage.setName(editedListName)
                 .clickSave();
+        checker().verifyEquals("The comment logged for the list update was not as expected.",
+                "The name of the list domain 'InvalidLookUpNameList' was changed to 'InvalidLookUpNameList_edited'. " +
+                        "Name: InvalidLookUpNameList -> InvalidLookUpNameList_edited; " +
+                        "The descriptor of domain InvalidLookUpNameList_edited was updated",
+                _auditLogHelper.getLastDomainEventComment(getProjectName(), editedListName));
+
         domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleType);
         assertEquals("Look up should be updated after list renaming", "Current Folder > lists > " + editedListName, domainDesignerPage.fieldsPanel().getField("lookUpField").detailsMessage());
 

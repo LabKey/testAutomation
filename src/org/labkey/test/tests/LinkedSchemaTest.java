@@ -36,6 +36,7 @@ import org.labkey.test.params.list.IntListDefinition;
 import org.labkey.test.params.list.ListDefinition;
 import org.labkey.test.params.list.VarListDefinition;
 import org.labkey.test.util.ApiPermissionsHelper;
+import org.labkey.test.util.AuditLogHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.SchemaHelper;
@@ -109,6 +110,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     private static final String STUDY_FOLDER = "StudyFolder"; // Folder used to validate fix for issues 32454 & 32456
     private static final String MOTHER = "Mother";
     private static final String READER_USER = "reader@linkedschema.test";
+    private final AuditLogHelper _auditLogHelper = new AuditLogHelper(this);
 
     public static final String LIST_NAME = "LinkedSchemaTestPeople";
     public static final String LIST_DATA = "Name\tAge\tCrazy\tP\tQ\tR\tS\tT\tU\tV\tW\tX\tY\tZ\n" +
@@ -445,7 +447,8 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         //Change the Mother column lookup to point to the other folder, then ensure that the mother lookup is no longer propagating
         changelistLookup(SOURCE_FOLDER, "NIMHDemographics", MOTHER,
                 new FieldDefinition.LookupInfo("/" + PROJECT_NAME + "/" + OTHER_FOLDER, "lists", "NIMHDemographics")
-                        .setTableType(FieldDefinition.ColumnType.Integer));
+                        .setTableType(FieldDefinition.ColumnType.Integer),
+                "Lookup: [Container: old: null, new: OtherFolder, ];");
         assertLookupsWorking(TARGET_FOLDER, "BasicLinkedSchema", "NIMHDemographics", true, "Father");
         assertLookupsWorking(TARGET_FOLDER, "BasicLinkedSchema", "NIMHDemographics", false, "Mother");
 
@@ -460,7 +463,8 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         //Change the Mother column lookup to point to the query, and then make sure that the table has lookups appropriately.
         changelistLookup(SOURCE_FOLDER, "NIMHDemographics", MOTHER,
                 new FieldDefinition.LookupInfo("/" + PROJECT_NAME + "/" + SOURCE_FOLDER, "lists", "QueryOverLookup")
-                .setTableType(FieldDefinition.ColumnType.Integer));
+                .setTableType(FieldDefinition.ColumnType.Integer),
+                "Lookup: [Container: old: OtherFolder, new: SourceFolder, Query: old: NIMHDemographics, new: QueryOverLookup];");
         assertLookupsWorking(TARGET_FOLDER, "QueryLinkedSchema", "NIMHDemographics", true, "Mother", "Father");
     }
 
@@ -991,7 +995,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         }
     }
 
-    protected void changelistLookup(String sourceFolder, String tableName, String fieldName, FieldDefinition.LookupInfo info)
+    protected void changelistLookup(String sourceFolder, String tableName, String fieldName, FieldDefinition.LookupInfo info, String changeLog)
     {
         clickFolder(sourceFolder);
 
@@ -1001,6 +1005,9 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         listDefinitionPage.getFieldsPanel()
                 .getField(fieldName).setLookup(info);
         listDefinitionPage.clickSave();
+
+        checker().verifyEquals("Domain audit comment not as expected after changing lookup", "The column(s) of domain " + tableName + " were modified", _auditLogHelper.getLastDomainEventComment(getProjectName(), tableName));
+        checker().verifyEquals("Domain field audit comment not as expected", List.of(changeLog), _auditLogHelper.getLastDomainPropertyComment(getProjectName(), tableName));
     }
 
     protected void createLinkedSchemaQuery(String sourceFolder, String schemaName, String queryName, String tableName)

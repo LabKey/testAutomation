@@ -571,7 +571,7 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
         if(auditComments.size() != 1)
         {
             _auditLogHelper.goToAuditEventView(DOMAIN_LOG_NAME);
-            Assert.assertEquals("The number of entries in the domain audit log were not as expected.", 1, domainPropertyEventRows.size());
+            Assert.assertEquals("The number of entries in the domain audit log were not as expected.", 1, auditComments.size());
         }
 
         pass = auditComments.get(0).equals(auditComment);

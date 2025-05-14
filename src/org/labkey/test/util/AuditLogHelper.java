@@ -270,6 +270,35 @@ public class AuditLogHelper
         return domainEventIds;
     }
 
+    public Map<String, Object> getLastDomainEvent(String projectName, String domainName)
+    {
+        return getDomainEventLog(projectName, domainName, null).get(0);
+    }
+
+    public Integer getLastDomainEventId(String projectName, String domainName)
+    {
+        return getLogColumnIntValue(getLastDomainEvent(projectName, domainName), "rowid");
+    }
+
+    public String getLastDomainEventComment(String projectName, String domainName)
+    {
+        return getLogColumnValue(getLastDomainEvent(projectName, domainName), "comment");
+    }
+
+    public List<String> getLastDomainPropertyValues(String projectName, String domainName, String columnName)
+    {
+        Integer lastDomainEventId = getLastDomainEventId(projectName, domainName);
+        List<Map<String, Object>> allRows = getDomainPropertyEventLog(domainName, Collections.singletonList(lastDomainEventId));
+        List<String> domainPropEventComments = new ArrayList<>();
+        allRows.forEach((event)->domainPropEventComments.add(getLogColumnValue(event, columnName)));
+        return domainPropEventComments;
+    }
+
+    public List<String> getLastDomainPropertyComment(String projectName, String domainName)
+    {
+        return getLastDomainPropertyValues(projectName, domainName, "comment");
+    }
+
     public List<String> getDomainEventComments(String projectName, String domainName, @Nullable Collection<Integer> ignoreIds)
     {
         List<Map<String, Object>> domainAuditEventAllRows = getDomainEventLog(projectName, domainName, ignoreIds);
@@ -311,6 +340,7 @@ public class AuditLogHelper
             cmd.addFilter("rowId", stringBuilder, Filter.Operator.NOT_IN);
         }
         cmd.setContainerFilter(ContainerFilter.AllFolders);
+        cmd.setSorts(Arrays.asList(new Sort("RowId", Sort.Direction.DESCENDING)));
 
         List<Map<String, Object>> domainAuditEventAllRows = executeSelectCommand(cn, cmd);
         TestLogger.log("Number of 'Domain Event' log entries for '" + projectName + "': " + domainAuditEventAllRows.size());
