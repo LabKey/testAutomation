@@ -1,7 +1,9 @@
 package org.labkey.test.util.data;
 
 import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -13,16 +15,15 @@ import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.TestDataGenerator;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -299,6 +300,26 @@ public class TestDataUtils
         }
 
         return file;
+    }
+
+    public static List<List<String>> readRowsFromTsv(File file) throws IOException
+    {
+        return readRowsFromFile(file, CSVFormat.TDF);
+    }
+
+    public static List<List<String>> readRowsFromCsv(File file) throws IOException
+    {
+        return readRowsFromFile(file, CSVFormat.DEFAULT);
+    }
+
+    public static List<List<String>> readRowsFromFile(File file, CSVFormat format) throws IOException
+    {
+        try (Reader in = new FileReader(file, StandardCharsets.UTF_8))
+        {
+            CSVParser parser = CSVParser.builder().setFormat(format).setReader(in).get();
+            List<CSVRecord> records = parser.getRecords();
+            return records.stream().map(CSVRecord::toList).toList();
+        }
     }
 
     public static <T> String stringFromRows(List<List<T>> rows, CSVFormat format)
