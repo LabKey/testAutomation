@@ -1521,7 +1521,11 @@ public class ListTest extends BaseWebDriverTest
                 .getField(fieldName2).expand().clickAdvancedSettings().setUniqueConstraint(true)
                 .apply();
         listDefinitionPage.clickSave();
-        // TODO, domain audit not implemented for unique constraint changes
+
+        checker().verifyEquals("Domain audit comment not as expected after updating field unique constraint",
+                "Index: <null> -> [field Name1, unique: true, fieldName_2, unique: true]; The descriptor of domain " + listName + " was updated",
+                _auditLogHelper.getLastDomainEventComment(getProjectName(), listName));
+
         viewRawTableMetadata(listName);
         verifyTableIndices("unique_constraint_list_", List.of("field_name1", "fieldname_2"));
         assertTextNotPresent("unique_constraint_list_fieldname_3");
@@ -1535,6 +1539,11 @@ public class ListTest extends BaseWebDriverTest
                 .getField(fieldName3).expand().clickAdvancedSettings().setUniqueConstraint(true)
                 .apply();
         listDefinitionPage.clickSave();
+
+        checker().verifyEquals("Domain audit comment not as expected after updating field unique constraint",
+                "Index: field name1, unique: true, fieldname_2, unique: true -> FieldName@3, unique: true, field Name1, unique: true; The descriptor of domain " + listName + " was updated",
+                _auditLogHelper.getLastDomainEventComment(getProjectName(), listName));
+
         viewRawTableMetadata(listName);
         verifyTableIndices("unique_constraint_list_", List.of("field_name1", "fieldname_3"));
         assertTextNotPresent("unique_constraint_list_fieldname_2");
