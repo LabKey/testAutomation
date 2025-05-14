@@ -1,28 +1,30 @@
 package org.labkey.test.tests.query;
 
+import org.assertj.core.api.Assertions;
 import org.junit.BeforeClass;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.labkey.api.query.QueryHelper;
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.Locator;
+import org.labkey.test.categories.Daily;
+import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.list.IntListDefinition;
-import org.labkey.test.util.TestDataGenerator;
+
+import org.labkey.test.params.list.VarListDefinition;
+import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.EscapeUtil;
 
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.*;
 
-@Category({})
+@Category({Daily.class})
 public class QueryLookupTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "QueryLookupTest" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
-    private static final String USER = "template_user@querylookuptest.test";
-    private static final String LIST_NAME = TestDataGenerator.randomFieldName("list", "<>[]{};,`\"~!@#$%^*=|?\\");
-    private static final FieldDefinition.ColumnType LIST_KEY_TYPE = FieldDefinition.ColumnType.Integer;
-    private static final String LIST_KEY_NAME = TestDataGenerator.randomFieldName("listkey");
+    private static final String LIST_NAME = "l&ist q";
+
     private static final FieldDefinition NAME_COLUMN =
             new FieldDefinition("Name", FieldDefinition.ColumnType.String);
     private static final FieldDefinition TSHIRT_COLUMN =
@@ -32,7 +34,6 @@ public class QueryLookupTest extends BaseWebDriverTest
     protected void doCleanup(boolean afterTest)
     {
         _containerHelper.deleteProject(getProjectName(), afterTest);
-        _userHelper.deleteUsers(afterTest, USER);
     }
 
     @BeforeClass
@@ -46,32 +47,87 @@ public class QueryLookupTest extends BaseWebDriverTest
     private void doSetup() throws Exception
     {
         _containerHelper.createProject(PROJECT_NAME, null);
-        _userHelper.createUser(USER);
 
         // create a list
-        var dgen = new IntListDefinition(LIST_NAME)
-                .setFields(List.of(
-                        new FieldDefinition(LIST_KEY_NAME, LIST_KEY_TYPE),
-                        NAME_COLUMN,
-                        TSHIRT_COLUMN))
+        var dgen = new VarListDefinition(LIST_NAME)
+                .setFields(List.of(NAME_COLUMN, TSHIRT_COLUMN))
                 .create(createDefaultConnection(), PROJECT_NAME);
         dgen.withGeneratedRows(10)
                 .insertRows();
-
-        // create a query on the list
-        goToSchemaBrowser();
-        //var queryPage = navigateToQuery("lists", LIST_NAME);
-        var queryPage = createNewQuery("lists", LIST_NAME);
-
-        log("foo");
     }
-
 
     // Issue 49511 Setting lookup to custom query shows "Error: Lookup target table does not exist."
     @Test
-    public void testSomething()
+    public void testLookupToQueryColumn() throws Exception
     {
-        assertTrue("Failing stub test", false);
+        var insertedRows = executeSelectRowCommand("lists", LIST_NAME).getRows();
+        var itemNames = insertedRows.stream().map(a-> a.get("name").toString()).toList();
+        String secondList = "secondList";
+
+        // create a query from LIST_NAME list, with a key defined in the query xml
+        String queryName = "query from list";
+        String querySql = """
+                SELECT [list_name].Name,
+                [list_name].TShirt
+                FROM [list_name]
+                """.replace("[list_name]", EscapeUtil.getSqlQuotedValue(LIST_NAME));
+        String queryXml = """
+                <tables xmlns="http://labkey.org/data/xml">
+                  <table tableName="[query_name]" tableDbType="NOT_IN_DB">
+                    <columns>
+                      <column columnName="Name">
+                        <isKeyField>true</isKeyField>
+                      </column>
+                    </columns>
+                  </table>
+                </tables>
+                """.replace("[query_name]", EscapeUtil.getMarkupEscapedValue(queryName))
+                .replace("[list_key]", EscapeUtil.getMarkupEscapedValue(NAME_COLUMN.getName()));
+        // create a query on the list
+        goToSchemaBrowser();
+        createQuery(getProjectName(), queryName, "lists", querySql, queryXml, false);
+
+        // now create another list, with a lookup to the custom query
+        new IntListDefinition(secondList, "Key")
+                .setFields(List.of(NAME_COLUMN,
+                        new FieldDefinition("lookup", new FieldDefinition.StringLookup(getProjectName(), "lists", queryName))))
+                .create(createDefaultConnection(), PROJECT_NAME);
+
+        // insert data into the list
+        goToManageLists();
+        waitAndClickAndWait(Locator.linkWithText(secondList));
+        var importPage = DataRegionTable.DataRegion(getDriver()).withName("query").waitFor()
+                .clickImportBulkData();
+        StringBuilder builder = new StringBuilder("Name\tlookup\n");
+        int textIndex = 0;
+        for (String name : itemNames)
+        {
+            builder.append(String.format("text-%d\t%s\n", textIndex, name));
+            textIndex++;
+        }
+        importPage.setText(builder.toString());
+        importPage.submit();
+
+        // verify the query-list-items resolve here
+        var secondListDataRegion = DataRegionTable.DataRegion(getDriver()).withName("query").waitFor();
+        var resolvedLookupsInSecondList = secondListDataRegion.getColumnDataAsText("lookup");
+        checker().withScreenshot("query lookup values not resolved")
+                .wrapAssertion(()-> Assertions.assertThat(resolvedLookupsInSecondList)
+                        .as("the expected sample items were not resolved via query lookup")
+                        .containsAll(itemNames));
+
+        // navigate to the secondlist edit page and verify the details on the lookup field row are correct
+        secondListDataRegion.clickHeaderButtonAndWait("Design");
+        var listEditPage = new EditListDefinitionPage(getDriver());
+        var lookupFieldRow = listEditPage.getFieldsPanel().getField("Lookup");
+        checker().withScreenshot("unexpected lookup details")
+                .wrapAssertion(()-> Assertions.assertThat(lookupFieldRow.detailsMessage())
+                        .as("query lookup table not resolved")
+                        .isEqualTo(String.format("/%s > lists > %s", PROJECT_NAME, queryName)));
+        // click the link in the details message, expect to navigate to a view of the query
+        clickAndWait(Locator.linkWithText(queryName).findElement(lookupFieldRow));
+        assertTextPresent("lists Schema", queryName, PROJECT_NAME);
+
     }
 
     @Override
