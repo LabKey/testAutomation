@@ -14,9 +14,12 @@ import org.labkey.test.params.list.IntListDefinition;
 import org.labkey.test.params.list.VarListDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
+import org.labkey.test.util.TestDataUtils;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 
 @Category({Daily.class})
@@ -98,14 +101,15 @@ public class QueryLookupTest extends BaseWebDriverTest
         waitAndClickAndWait(Locator.linkWithText(secondList));
         var importPage = DataRegionTable.DataRegion(getDriver()).withName("query").waitFor()
                 .clickImportBulkData();
-        StringBuilder builder = new StringBuilder("Name\tlookup\n");
+        List<Map<String, Object>> importData = new ArrayList<>();
         int textIndex = 0;
-        for (String name : itemNames)
+        for (String lookupValue : itemNames)
         {
-            builder.append(String.format("text-%d\t%s\n", textIndex, name));
+            String nameVal = String.format("text-%d", textIndex);
+            importData.add(Map.of("Name", nameVal, "lookup", lookupValue));
             textIndex++;
         }
-        importPage.setText(builder.toString());
+        importPage.setText(TestDataUtils.tsvStringFromRowMaps(importData, List.of("Name", "lookup"), true));
         importPage.submit();
 
         // verify the query-list-items resolve here
