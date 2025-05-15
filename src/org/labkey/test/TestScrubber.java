@@ -134,6 +134,15 @@ public class TestScrubber extends ExtraSiteWrapper
 
         try
         {
+            clearListOfAllowedFileExtensions();
+        }
+        catch (Exception e)
+        {
+            TestLogger.error("Failed to remove list of allowed file extensions.", e);
+        }
+
+        try
+        {
             LimitActiveUserPage.resetUserLimits(connection);
         }
         catch (IOException | CommandException e)
@@ -212,5 +221,14 @@ public class TestScrubber extends ExtraSiteWrapper
                 fsaPage.save();
             }
         }
+    }
+
+    private void clearListOfAllowedFileExtensions() throws IOException, CommandException
+    {
+        SimplePostCommand command = new SimplePostCommand("admin", "deleteAllValues");
+        Map<String, Object> params = new HashMap<>();
+        params.put("type", "FileExtension");
+        command.setParameters(params);
+        command.execute(createDefaultConnection(), "/");
     }
 }

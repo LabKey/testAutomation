@@ -2507,6 +2507,15 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         waitForPipelineJobsToComplete(pipelineJobs, "Study Reload", expectError);
     }
 
+    protected void deleteAllAllowedFileExtension() throws IOException, CommandException
+    {
+        SimplePostCommand command = new SimplePostCommand("admin", "deleteAllValues");
+        Map<String, Object> params = new HashMap<>();
+        params.put("type", "FileExtension");
+        command.setParameters(params);
+        command.execute(createDefaultConnection(), "/");
+    }
+
     public AbstractContainerHelper getContainerHelper()
     {
         return _containerHelper;

@@ -5,7 +5,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
-import org.labkey.remoteapi.SimplePostCommand;
+
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
@@ -23,14 +23,12 @@ import org.labkey.test.util.SampleTypeHelper;
 import org.labkey.test.util.exp.SampleTypeAPIHelper;
 import org.labkey.test.pages.announcements.InsertPage;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -430,7 +428,7 @@ public class AllowedFileExtensionAdminTest extends BaseWebDriverTest
         SampleTypeDefinition stDefinition = new SampleTypeDefinition(stName);
 
         String stFileField = "File Upload Test";
-        stDefinition.addField(new FieldDefinition("File Upload Test", FieldDefinition.ColumnType.File));
+        stDefinition.addField(new FieldDefinition(stFileField, FieldDefinition.ColumnType.File));
         SampleTypeAPIHelper.createEmptySampleType(getProjectName(), stDefinition);
 
         refresh();
@@ -584,15 +582,6 @@ public class AllowedFileExtensionAdminTest extends BaseWebDriverTest
                         expectedTypes, extensions.stream().map(Input::getValue).toList());
 
         return allowedFileExtensionAdminPage;
-    }
-
-    private void deleteAllAllowedFileExtension() throws IOException, CommandException
-    {
-        SimplePostCommand command = new SimplePostCommand("admin", "deleteAllValues");
-        Map<String, Object> params = new HashMap<>();
-        params.put("type", "FileExtension");
-        command.setParameters(params);
-        command.execute(createDefaultConnection(), "/");
     }
 
     @Override
