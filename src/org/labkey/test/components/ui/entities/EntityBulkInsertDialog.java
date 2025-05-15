@@ -24,6 +24,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * `fieldIdentifier` arguments accept field names or {@link FieldKey}s
+ */
 public class EntityBulkInsertDialog extends ModalDialog
 {
     public EntityBulkInsertDialog(WebDriver driver)
@@ -408,7 +411,8 @@ public class EntityBulkInsertDialog extends ModalDialog
             String fieldKey = FieldKey.fromChars(fieldIdentifier).toString();
             return _rows.computeIfAbsent(fieldKey, fk ->
                 Locator.tagWithClass("div", "row")
-                    .withChild(Locator.tagWithAttribute("label", "for", fieldKey))
+                    // TODO: Shouldn't need to be case-insensitive. Parent/source lookups have weird casing
+                    .withChild(Locator.tagWithAttributeIgnoreCase("label", "for", fieldKey))
                     .findElement(this));
         }
 

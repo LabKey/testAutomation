@@ -14,20 +14,22 @@ import org.labkey.test.components.react.ReactDateTimePicker;
 import org.labkey.test.components.react.ToggleButton;
 import org.labkey.test.components.ui.files.FileAttachmentContainer;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.FieldKey;
 import org.labkey.test.util.AuditLogHelper;
-import org.labkey.test.util.EscapeUtil;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Automates product component src/components/forms/QueryInfoForms, with BulkUpdateForm.d.ts
+ * Automates product component src/components/forms/QueryInfoForms, with BulkUpdateForm.d.ts <br>
+ * <br>
+ * `fieldIdentifier` arguments accept field names or {@link FieldKey}s
  */
 public class EntityBulkUpdateDialog extends ModalDialog
 {
@@ -57,18 +59,20 @@ public class EntityBulkUpdateDialog extends ModalDialog
         return this;
     }
 
-    // enable/disable field editable state
-
-    public boolean isFieldEnabled(String fieldKey)
+    public boolean isFieldEnabled(CharSequence fieldIdentifier)
     {
-        return elementCache().getToggle(fieldKey).isOn();
+        return elementCache().getToggle(fieldIdentifier).isOn();
     }
 
-    public EntityBulkUpdateDialog setEditableState(String fieldKey, boolean enable)
+    public EntityBulkUpdateDialog setEditableState(CharSequence fieldIdentifier, boolean enable)
     {
-        elementCache().getToggle(fieldKey).set(enable);
-        if (enable) _changeCounter++;
-        else _changeCounter--;
+        ToggleButton toggle = elementCache().getToggle(fieldIdentifier);
+        if (toggle.isOn() != enable)
+        {
+            toggle.set(enable);
+            if (enable) _changeCounter++;
+            else _changeCounter--;
+        }
         return this;
     }
 
@@ -81,121 +85,132 @@ public class EntityBulkUpdateDialog extends ModalDialog
     public void setValue(FieldDefinition field, Object newValue)
     {
         if (field.getType() == FieldDefinition.ColumnType.TextChoice || field.getLookup() != null)
-            setSelectionField(EscapeUtil.fieldKeyEncodePart(field.getName()), newValue instanceof String ? List.of((String) newValue) : (List<String>) newValue);
+            setSelectionField(field.getName(), newValue instanceof String ? List.of((String) newValue) : (List<String>) newValue);
         else if (field.getType() == FieldDefinition.ColumnType.Integer || field.getType() == FieldDefinition.ColumnType.Decimal || field.getType() == FieldDefinition.ColumnType.Double)
-            setNumericField(EscapeUtil.fieldKeyEncodePart(field.getName()), String.valueOf(newValue));
+            setNumericField(field.getName(), String.valueOf(newValue));
         else if (field.getType() == FieldDefinition.ColumnType.Date || field.getType() == FieldDefinition.ColumnType.DateAndTime || field.getType() == FieldDefinition.ColumnType.Time)
-            setDateField(EscapeUtil.fieldKeyEncodePart(field.getName()), (String) newValue);
+            setDateField(field.getName(), (String) newValue);
         else if (field.getType() == FieldDefinition.ColumnType.Boolean)
-            setBooleanField(EscapeUtil.fieldKeyEncodePart(field.getName()), (Boolean) newValue);
+            setBooleanField(field.getName(), (Boolean) newValue);
         else if (field.getType() == FieldDefinition.ColumnType.MultiLine)
-            setTextArea(EscapeUtil.fieldKeyEncodePart(field.getName()), (String) newValue);
+            setTextArea(field.getName(), (String) newValue);
         else
-            setTextField(EscapeUtil.fieldKeyEncodePart(field.getName()), (String) newValue);
+            setTextField(field.getName(), (String) newValue);
     }
 
     // interact with selection fields
 
-    public EntityBulkUpdateDialog setSelectionField(String fieldKey, List<String> selectValues)
+    public EntityBulkUpdateDialog setSelectionField(CharSequence fieldIdentifier, List<String> selectValues)
     {
-        setEditableState(fieldKey, true);
-        FilteringReactSelect reactSelect = elementCache().getSelect(fieldKey);
+        setEditableState(fieldIdentifier, true);
+        FilteringReactSelect reactSelect = elementCache().getSelect(fieldIdentifier);
         WebDriverWrapper.waitFor(reactSelect::isEnabled,
-                "the ["+fieldKey+"] reactSelect did not become enabled in time", WAIT_TIMEOUT);
+                "the ["+fieldIdentifier+"] reactSelect did not become enabled in time", WAIT_TIMEOUT);
         selectValues.forEach(reactSelect::filterSelect);
         return this;
     }
 
-    public List<String> getSelectionOptions(String fieldKey)
+    public EntityBulkUpdateDialog setSelectionField(CharSequence fieldIdentifier, String selectValue)
     {
-        return enableAndWait(fieldKey, elementCache().getSelect(fieldKey)).getOptions();
+        return setSelectionField(fieldIdentifier, List.of(selectValue));
     }
 
-    public List<String> getSelectionFieldValues(String fieldKey)
+    public List<String> getSelectionOptions(CharSequence fieldIdentifier)
     {
-        return enableAndWait(fieldKey, elementCache().getSelect(fieldKey)).getSelections();
+        return enableAndWait(fieldIdentifier, elementCache().getSelect(fieldIdentifier)).getOptions();
     }
 
-    public EntityBulkUpdateDialog setTextArea(String fieldKey, String text)
+    public List<String> getSelectionFieldValues(CharSequence fieldIdentifier)
     {
-        enableAndWait(fieldKey, elementCache().textArea(fieldKey)).set(text);
+        return enableAndWait(fieldIdentifier, elementCache().getSelect(fieldIdentifier)).getSelections();
+    }
+
+    public EntityBulkUpdateDialog setTextArea(CharSequence fieldIdentifier, String text)
+    {
+        enableAndWait(fieldIdentifier, elementCache().textArea(fieldIdentifier)).set(text);
         return this;
     }
 
-    public String getTextArea(String fieldKey)
+    public String getTextArea(CharSequence fieldIdentifier)
     {
-        return elementCache().textArea(fieldKey).get();
+        return elementCache().textArea(fieldIdentifier).get();
     }
 
     // get/set text fields with ID
 
-    public EntityBulkUpdateDialog setTextField(String fieldKey, String value)
+    public EntityBulkUpdateDialog setTextField(CharSequence fieldIdentifier, String value)
     {
-        enableAndWait(fieldKey, elementCache().textInput(fieldKey)).set(value);
+        enableAndWait(fieldIdentifier, elementCache().textInput(fieldIdentifier)).set(value);
         return this;
     }
 
-    public String getTextField(String fieldKey)
+    public String getTextField(CharSequence fieldIdentifier)
     {
-        return enableAndWait(fieldKey, elementCache().textInput(fieldKey)).get();
+        return enableAndWait(fieldIdentifier, elementCache().textInput(fieldIdentifier)).get();
     }
 
-    public EntityBulkUpdateDialog setNumericField(String fieldKey, String value)
+    public EntityBulkUpdateDialog setNumericField(CharSequence fieldIdentifier, String value)
     {
-        enableAndWait(fieldKey, elementCache().numericInput(fieldKey)).set(value);
+        enableAndWait(fieldIdentifier, elementCache().numericInput(fieldIdentifier)).set(value);
         return this;
     }
 
-    public String getNumericField(String fieldKey)
+    public String getNumericField(CharSequence fieldIdentifier)
     {
-        return elementCache().numericInput(fieldKey).get();
+        return elementCache().numericInput(fieldIdentifier).get();
     }
 
-    public EntityBulkUpdateDialog setDateField(String fieldKey, String dateString)
+    public EntityBulkUpdateDialog setDateField(CharSequence fieldIdentifier, String dateString)
     {
-        enableAndWait(fieldKey, elementCache().dateInput(fieldKey)).set(dateString);
+        enableAndWait(fieldIdentifier, elementCache().dateInput(fieldIdentifier)).set(dateString);
         return this;
     }
 
-    public String getDateField(String fieldKey)
+    public String getDateField(CharSequence fieldIdentifier)
     {
-        return elementCache().dateInput(fieldKey).get();
+        return elementCache().dateInput(fieldIdentifier).get();
     }
 
-    public FileAttachmentContainer getFileField(String fieldKey)
+    public FileAttachmentContainer getFileField(CharSequence fieldIdentifier)
     {
-        return elementCache().fileUploadField(fieldKey);
+        fieldIdentifier = FieldKey.fromFieldKey(FieldKey.fromChars(fieldIdentifier) + "-fileUpload");
+        return enableAndWait(fieldIdentifier, elementCache().fileUploadField(fieldIdentifier));
     }
 
-    public EntityBulkUpdateDialog removeFile(String fieldKey)
+    public EntityBulkUpdateDialog attachFile(CharSequence fieldIdentifier, File file)
     {
-        getFileField(fieldKey).removeFile();
-        _changeCounter++;
+        getFileField(fieldIdentifier).attachFile(file);
         return this;
     }
 
-    public EntityBulkUpdateDialog setBooleanField(String fieldKey, boolean checked)
+    public EntityBulkUpdateDialog removeFile(CharSequence fieldIdentifier)
     {
-        enableAndWait(fieldKey, getCheckBox(fieldKey)).set(checked);
+        getFileField(fieldIdentifier).removeFile();
         return this;
     }
 
-    private <T extends Component<?>> T enableAndWait(String fieldKey, T formItem)
+    public EntityBulkUpdateDialog setBooleanField(CharSequence fieldIdentifier, boolean checked)
     {
-        setEditableState(fieldKey, true);
+        enableAndWait(fieldIdentifier, getCheckBox(fieldIdentifier)).set(checked);
+        return this;
+    }
+
+    private <T extends Component<?>> T enableAndWait(CharSequence fieldIdentifier, T formItem)
+    {
+        setEditableState(fieldIdentifier, true);
         // "Clickable" means visible and enabled
         waiter().until(ExpectedConditions.elementToBeClickable(formItem.getComponentElement()));
         return formItem;
     }
 
-    public boolean getBooleanField(String fieldKey)
+    public boolean getBooleanField(CharSequence fieldIdentifier)
     {
-        return getCheckBox(fieldKey).get();
+        return getCheckBox(fieldIdentifier).get();
     }
 
-    private Checkbox getCheckBox(String fieldKey)
+    private Checkbox getCheckBox(CharSequence fieldIdentifier)
     {
-        WebElement row = elementCache().formRow(fieldKey);
+        WebElement row = elementCache().formRow(fieldIdentifier);
         return new Checkbox(elementCache().checkBoxLoc.findElement(row));
     }
 
@@ -214,7 +229,7 @@ public class EntityBulkUpdateDialog extends ModalDialog
         List<WebElement> labels = Locator.tagWithClass("label", "control-label").withAttribute("for")
                 .waitForElements(elementCache(), 2_000);
 
-        return labels.stream().map(a -> EscapeUtil.fieldKeyDecodePart(a.getDomAttribute("for"))).toList();
+        return labels.stream().map(a -> FieldKey.fromFieldKey(a.getDomAttribute("for")).getName()).toList();
     }
 
     public EntityBulkUpdateDialog waitForFieldsToBe(List<String> expectedFieldNames, int waitMilliseconds)
@@ -325,50 +340,50 @@ public class EntityBulkUpdateDialog extends ModalDialog
 
     protected class ElementCache extends ModalDialog.ElementCache
     {
-        public WebElement formRow(String fieldKey)
+        public WebElement formRow(CharSequence fieldIdentifier)
         {
+            String fieldKey = FieldKey.fromChars(fieldIdentifier).toString();
             return Locator.tagWithClass("div", "row")
                     .withChild(Locator.tagWithAttribute("label", "for", fieldKey))
                     .waitForElement(this, WAIT_TIMEOUT);
         }
 
-        public ToggleButton getToggle(String fieldKey)
+        public ToggleButton getToggle(CharSequence fieldIdentifier)
         {
-            return new ToggleButton.ToggleButtonFinder(getDriver()).waitFor(formRow(fieldKey));
+            return new ToggleButton.ToggleButtonFinder(getDriver()).waitFor(formRow(fieldIdentifier));
         }
 
-        public FilteringReactSelect getSelect(String fieldKey)
+        public FilteringReactSelect getSelect(CharSequence fieldIdentifier)
         {
-            return FilteringReactSelect.finder(getDriver()).withNamedInput(fieldKey).refindWhenNeeded(this);
+            return FilteringReactSelect.finder(getDriver()).refindWhenNeeded(formRow(fieldIdentifier));
         }
 
-        public Input textInput(String fieldKey)
+        public Input textInput(CharSequence fieldIdentifier)
         {
-            WebElement inputEl = textInputLoc.waitForElement(formRow(fieldKey), WAIT_TIMEOUT);
+            WebElement inputEl = textInputLoc.waitForElement(formRow(fieldIdentifier), WAIT_TIMEOUT);
             return new Input(inputEl, getDriver());
         }
 
-        public Input textArea(String fieldKey)
+        public Input textArea(CharSequence fieldIdentifier)
         {
-            WebElement inputEl = Locator.textarea(fieldKey).waitForElement(formRow(fieldKey), WAIT_TIMEOUT);
+            WebElement inputEl = Locator.tag("textarea").waitForElement(formRow(fieldIdentifier), WAIT_TIMEOUT);
             return new Input(inputEl, getDriver());
         }
 
-        public Input numericInput(String fieldKey)
+        public Input numericInput(CharSequence fieldIdentifier)
         {
-            WebElement inputEl = numberInputLoc.waitForElement(formRow(fieldKey), WAIT_TIMEOUT);
+            WebElement inputEl = numberInputLoc.waitForElement(formRow(fieldIdentifier), WAIT_TIMEOUT);
             return new Input(inputEl, getDriver());
         }
 
-        public ReactDateTimePicker dateInput(String fieldKey)
+        public ReactDateTimePicker dateInput(CharSequence fieldIdentifier)
         {
-            return new ReactDateTimePicker.ReactDateTimeInputFinder(getDriver())
-                    .withInputId(fieldKey).waitFor(formRow(fieldKey));
+            return new ReactDateTimePicker.ReactDateTimeInputFinder(getDriver()).waitFor(formRow(fieldIdentifier));
         }
 
-        public FileAttachmentContainer fileUploadField(String fieldKey)
+        public FileAttachmentContainer fileUploadField(CharSequence fieldIdentifier)
         {
-            return new FileAttachmentContainer(formRow(fieldKey), getDriver());
+            return new FileAttachmentContainer(formRow(fieldIdentifier), getDriver());
         }
 
         final Locator textInputLoc = Locator.tagWithAttribute("input", "type", "text");
