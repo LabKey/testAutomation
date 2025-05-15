@@ -19,6 +19,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -400,12 +401,15 @@ public class EntityBulkInsertDialog extends ModalDialog
     {
         public final Locator validationMessage = Locator.tagWithClass("span", "validation-message");
 
+        private final Map<String, WebElement> _rows = new HashMap<>();
+
         public WebElement formRow(CharSequence fieldIdentifier)
         {
-            String fieldKey = fieldIdentifier instanceof FieldKey ? fieldIdentifier.toString() : FieldKey.encodePart(fieldIdentifier.toString());
-            return Locator.tagWithClass("div", "row")
+            String fieldKey = FieldKey.fromChars(fieldIdentifier).toString();
+            return _rows.computeIfAbsent(fieldKey, fk ->
+                Locator.tagWithClass("div", "row")
                     .withChild(Locator.tagWithAttribute("label", "for", fieldKey))
-                    .findElement(this);
+                    .findElement(this));
         }
 
         public FilteringReactSelect selectionField(CharSequence fieldIdentifier)
