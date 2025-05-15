@@ -1,5 +1,6 @@
 package org.labkey.test.components.ui.entities;
 
+import org.jetbrains.annotations.NotNull;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
@@ -102,10 +103,7 @@ public class EntityBulkUpdateDialog extends ModalDialog
 
     public EntityBulkUpdateDialog setSelectionField(CharSequence fieldIdentifier, List<String> selectValues)
     {
-        setEditableState(fieldIdentifier, true);
-        FilteringReactSelect reactSelect = elementCache().getSelect(fieldIdentifier);
-        WebDriverWrapper.waitFor(reactSelect::isEnabled,
-                "the ["+fieldIdentifier+"] reactSelect did not become enabled in time", WAIT_TIMEOUT);
+        FilteringReactSelect reactSelect = enableSelectionField(fieldIdentifier);
         selectValues.forEach(reactSelect::filterSelect);
         return this;
     }
@@ -117,12 +115,21 @@ public class EntityBulkUpdateDialog extends ModalDialog
 
     public List<String> getSelectionOptions(CharSequence fieldIdentifier)
     {
-        return enableAndWait(fieldIdentifier, elementCache().getSelect(fieldIdentifier)).getOptions();
+        return enableSelectionField(fieldIdentifier).getOptions();
     }
 
     public List<String> getSelectionFieldValues(CharSequence fieldIdentifier)
     {
-        return enableAndWait(fieldIdentifier, elementCache().getSelect(fieldIdentifier)).getSelections();
+        return enableSelectionField(fieldIdentifier).getSelections();
+    }
+
+    private @NotNull FilteringReactSelect enableSelectionField(CharSequence fieldIdentifier)
+    {
+        setEditableState(fieldIdentifier, true);
+        FilteringReactSelect reactSelect = elementCache().getSelect(fieldIdentifier);
+        WebDriverWrapper.waitFor(reactSelect::isEnabled,
+            "the ["+ fieldIdentifier +"] reactSelect did not become enabled in time", WAIT_TIMEOUT);
+        return reactSelect;
     }
 
     public EntityBulkUpdateDialog setTextArea(CharSequence fieldIdentifier, String text)
@@ -355,7 +362,7 @@ public class EntityBulkUpdateDialog extends ModalDialog
 
         public FilteringReactSelect getSelect(CharSequence fieldIdentifier)
         {
-            return FilteringReactSelect.finder(getDriver()).refindWhenNeeded(formRow(fieldIdentifier));
+            return new FilteringReactSelect(formRow(fieldIdentifier), getDriver());
         }
 
         public Input textInput(CharSequence fieldIdentifier)

@@ -96,11 +96,11 @@ public class EntityBulkInsertDialog extends ModalDialog
         {
             if(elementCache().derivativesOption.isChecked())
             {
-                option = elementCache().derivativesOption.getComponentElement().getAttribute("value");
+                option = elementCache().derivativesOption.getComponentElement().getDomAttribute("value");
             }
             else
             {
-                option = elementCache().poolOption.getComponentElement().getAttribute("value");
+                option = elementCache().poolOption.getComponentElement().getDomAttribute("value");
             }
         }
 
@@ -248,7 +248,6 @@ public class EntityBulkInsertDialog extends ModalDialog
     {
         for (FieldDefinition field : fields)
         {
-            String fieldName = field.getName();
             Object value = data.get(field.getEffectiveLabel());
             if (value == null)
                 continue;
