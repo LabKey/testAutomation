@@ -8,7 +8,6 @@ import org.labkey.test.components.UpdatingComponent;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.params.FieldKey;
-import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.selenium.WebElementUtils;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
@@ -19,7 +18,6 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -158,13 +156,12 @@ public class FieldSelectionDialog extends ModalDialog
      */
     private WebElement expandAvailableFields(String... fieldNameParts)
     {
-        StringBuilder fieldKey = new StringBuilder();
-
-        Iterator<String> iterator = Arrays.stream(fieldNameParts).iterator();
+        FieldKey fieldKey = FieldKey.fromParts(fieldNameParts);
+        Iterator<FieldKey> iterator = fieldKey.getIterator();
 
         while(iterator.hasNext())
         {
-            fieldKey.append(EscapeUtil.fieldKeyEncodePart(iterator.next().trim()));
+            fieldKey = iterator.next();
 
             // If this isn't the last item in the collection keep expanding and building the expected data-fieldkey value.
             if(iterator.hasNext())
@@ -172,8 +169,6 @@ public class FieldSelectionDialog extends ModalDialog
                 // If the field is already expanded don't try to expand it.
                 if(!isFieldKeyExpanded(elementCache().findAvailableField(fieldKey.toString())))
                     expandOrCollapseByFieldKey(fieldKey.toString(), true);
-
-                fieldKey.append("/");
             }
 
         }

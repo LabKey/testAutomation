@@ -102,7 +102,7 @@ public class FieldKey implements CharSequence
         List<FieldKey> ancestors = new ArrayList<>();
         FieldKey temp = this;
 
-        while (temp.getParent() != null)
+        while (temp != null)
         {
             ancestors.add(temp);
             temp = temp.getParent();
@@ -120,7 +120,7 @@ public class FieldKey implements CharSequence
 
     public String[] getNameArray()
     {
-        return _name.split(SEPARATOR);
+        return Arrays.stream(_fieldKey.split(SEPARATOR)).map(FieldKey::decodePart).toArray(String[]::new);
     }
 
     @Override
