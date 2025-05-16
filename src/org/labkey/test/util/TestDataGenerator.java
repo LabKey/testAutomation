@@ -120,8 +120,8 @@ public class TestDataGenerator
 
     public static File writeCsvFile(List<FieldDefinition> fields, List<Map<String, Object>> entityData, String fileName) throws IOException
     {
-        List<List<String>> rows = TestDataUtils.rowListsFromMaps(entityData);
-        TestDataUtils.replaceColumnHeaders(rows, ColumnNameMapper.labelToName(fields)); // Use field names
+        List<List<String>> rows = TestDataUtils.replaceColumnHeaders(
+            TestDataUtils.rowListsFromMaps(entityData), ColumnNameMapper.labelToName(fields)); // Use field names
 
         return TestDataUtils.writeRowsToCsv(fileName, rows);
     }

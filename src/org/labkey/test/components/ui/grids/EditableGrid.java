@@ -39,13 +39,13 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.awaitility.Awaitility.await;
@@ -58,7 +58,8 @@ import static org.labkey.test.util.selenium.WebDriverUtils.MODIFIER_KEY;
 public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 {
     public static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-    public static final String SELECT_COLUMN_HEADER = "<select>";
+    public static final String SELECT_COLUMN_LABEL_PLACEHOLDER = "<select>";
+    public static final FieldKey SELECT_COLUMN_ID = FieldKey.fromParts("__select__");
     public static final String ROW_NUMBER_COLUMN_HEADER = "<row number>";
 
     private final WebElement _gridElement;
@@ -230,43 +231,60 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         return Locators.rows.findElements(elementCache().table);
     }
 
-    public List<Map<String, String>> getGridDataByLabel(String... fieldLabels)
+    public List<Map<String, String>> getGridDataByLabel(String... columnIdentifiers)
     {
-        List<Map<String, String>> gridData = new ArrayList<>();
+        return getGridData(ColumnHeader::getColumnLabel, columnIdentifiers);
+    }
 
-        List<String> allFieldLabels = getColumnLabels();
-        Set<Integer> includedColIndices = new HashSet<>();
-        if (fieldLabels.length > 0)
+    public List<Map<FieldKey, String>> getGridDataByFieldKey(String... columnIdentifiers)
+    {
+        return getGridData(ColumnHeader::getFieldKey, columnIdentifiers);
+    }
+
+    public List<Map<String, String>> getGridDataByName(String... columnIdentifiers)
+    {
+        return getGridData(columnHeader -> columnHeader.getFieldKey().getName(), columnIdentifiers);
+    }
+
+    private <T> List<Map<T, String>> getGridData(Function<ColumnHeader, T> keyGenerator, String... columnIdentifiers)
+    {
+        List<Map<T, String>> gridData = new ArrayList<>();
+
+        Set<ColumnHeader> includedColHeaders = new LinkedHashSet<>();
+        if (columnIdentifiers.length == 0)
         {
-            Assertions.assertThat(allFieldLabels).as("Editable grid columns").contains(fieldLabels);
-            for (String col : fieldLabels)
+            includedColHeaders.addAll(elementCache().findHeaders());
+        }
+        else
+        {
+            for (String columnIdentifier : columnIdentifiers)
             {
-                int colIndex = allFieldLabels.indexOf(col);
-                includedColIndices.add(colIndex);
+                includedColHeaders.add(elementCache().findColumnHeader(columnIdentifier));
             }
         }
 
         for (WebElement row : getRows())
         {
             List<WebElement> cells = row.findElements(By.tagName("td"));
-            Map<String, String> rowMap = new HashMap<>();
+            Map<T, String> rowMap = new LinkedHashMap<>(includedColHeaders.size());
 
-            for (int i = 0; i < cells.size(); i++)
+            for (ColumnHeader columnHeader : includedColHeaders)
             {
-                if (includedColIndices.isEmpty() || includedColIndices.contains(i))
-                {
-                    WebElement cell = cells.get(i);
-                    String fieldLabel = allFieldLabels.get(i);
+                WebElement cell = cells.get(columnHeader.getDomIndex());
 
-                    if (fieldLabel.equals(SELECT_COLUMN_HEADER))
-                    {
-                        rowMap.put(fieldLabel, String.valueOf(cell.findElement(By.tagName("input")).isSelected()));
-                    }
-                    else
-                    {
-                        rowMap.put(fieldLabel, cell.getText());
-                    }
+                T key = keyGenerator.apply(columnHeader);
+                String value;
+
+                if (columnHeader.getDomIndex() == 0 && hasSelectColumn())
+                {
+                    value = String.valueOf(Locator.tag("input").findElement(cell).isSelected());
                 }
+                else
+                {
+                    value = cell.getText();
+                }
+
+                rowMap.put(key, value);
             }
 
             gridData.add(rowMap);
@@ -277,7 +295,12 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
     public List<String> getColumnDataByLabel(String fieldLabel)
     {
-        return getGridDataByLabel(fieldLabel).stream().map(a-> a.get(fieldLabel)).collect(Collectors.toList());
+        return getColumnData(fieldLabel);
+    }
+
+    public List<String> getColumnData(String fieldIdentifier)
+    {
+        return getGridData(ch -> 1, fieldIdentifier).stream().map(a-> a.get(1)).collect(Collectors.toList());
     }
 
     private WebElement getRow(int index)
@@ -1154,7 +1177,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
                 if (hasSelectColumn())
                 {
-                    columnHeaders.add(new ColumnHeader(headerCellElements.get(0), domIndex, SELECT_COLUMN_HEADER));
+                    columnHeaders.add(new ColumnHeader(headerCellElements.get(0), domIndex, SELECT_COLUMN_LABEL_PLACEHOLDER));
                     domIndex++;
                 }
 

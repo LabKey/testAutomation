@@ -4,6 +4,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
+import org.labkey.test.params.FieldKey;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
@@ -11,6 +12,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -115,7 +117,7 @@ public class DetailTable extends WebDriverComponent<DetailTable.ElementCache>
     }
 
     /**
-     * Gets the value of a cell identified by it's data-fieldKey attribute
+     * Gets the value of a cell identified by its data-fieldKey attribute
      * @param fieldKey  value of the data-fieldKey attribute on the intended element
      * @return  Text value of the specified element
      */
@@ -150,7 +152,7 @@ public class DetailTable extends WebDriverComponent<DetailTable.ElementCache>
      **/
     public Map<String, String> getTableDataByLabel()
     {
-        Map<String, String> tableData = new HashMap<>();
+        Map<String, String> tableData = new LinkedHashMap<>();
 
         for(WebElement tableRow : getComponentElement().findElements(By.cssSelector("tr")))
         {
@@ -160,6 +162,51 @@ public class DetailTable extends WebDriverComponent<DetailTable.ElementCache>
         }
 
         return tableData;
+    }
+
+    /**
+     * Returns a map of the values in the grid. Data is keyed by column FieldKeys.
+     *
+     * @return A map with string values.
+     **/
+    public Map<FieldKey, String> getTableDataByFieldKey()
+    {
+        Map<FieldKey, String> tableData = new LinkedHashMap<>();
+
+        for(WebElement tableRow : Locator.tag("tr").findElements(getComponentElement()))
+        {
+            WebElement dataCell = Locator.tag("td").withAttribute("data-fieldkey").findElement(tableRow);
+
+            tableData.put(FieldKey.fromFieldKey(dataCell.getDomAttribute("data-fieldkey")), dataCell.getText());
+        }
+
+        return tableData;
+    }
+
+    /**
+     * Returns a map of the values in the grid. Data is keyed by column names.
+     * Warning: Names are not guaranteed to be unique.
+     *
+     * @return A map with string values.
+     **/
+    public Map<String, String> getTableDataByName()
+    {
+        Map<FieldKey, String> tableDataByFieldKey = getTableDataByFieldKey();
+        Map<String, String> tableDataByName = new LinkedHashMap<>();
+        Map<String, FieldKey> collisionChecker = new HashMap<>();
+
+        for (Map.Entry<FieldKey, String> entry : tableDataByFieldKey.entrySet())
+        {
+            String name = entry.getKey().getName();
+            if (collisionChecker.containsKey(name))
+            {
+                throw new IllegalStateException("Ambiguous field name '%s' from FieldKeys '%s' and '%s'."
+                    .formatted(name, collisionChecker.get(name), entry.getKey()));
+            }
+            collisionChecker.put(name, entry.getKey());
+            tableDataByName.put(name, entry.getValue());
+        }
+        return tableDataByName;
     }
 
     protected static abstract class Locators

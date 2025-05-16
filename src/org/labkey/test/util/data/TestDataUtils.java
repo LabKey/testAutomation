@@ -270,11 +270,37 @@ public class TestDataUtils
     public static List<List<String>> replaceColumnHeaders(List<List<String>> rowLists, Function<String, String> columnMapper)
     {
         List<String> headerRow = rowLists.get(0);
-        for (int i = 1; i < rowLists.size(); i++)
+        List<String> updatedHeaderRow = new ArrayList<>();
+        for (String oldHeader : headerRow)
         {
-            headerRow.set(i, columnMapper.apply(headerRow.get(i)));
+            updatedHeaderRow.add(columnMapper.apply(oldHeader));
         }
-        return rowLists;
+
+        List<List<String>> updatedRows = new ArrayList<>();
+        updatedRows.add(updatedHeaderRow);
+        updatedRows.addAll(rowLists.subList(1, rowLists.size()));
+
+        return updatedRows;
+    }
+
+    public static List<Map<String, Object>> replaceMapKeys(List<Map<String, Object>> rowMaps, Function<String, String> columnMapper)
+    {
+        List<Map<String, Object>> updatedRows = new ArrayList<>();
+        for (Map<String, Object> original : rowMaps)
+        {
+            Map<String, Object> updatedRow = new LinkedHashMap<>();
+            for (Map.Entry<String, Object> entry : original.entrySet())
+            {
+                String updatedKey = columnMapper.apply(entry.getKey());
+                if (updatedRow.containsKey(updatedKey))
+                {
+                    throw new IllegalArgumentException("Duplicate key mapping for '" + updatedKey + "' in row: " +  original);
+                }
+                updatedRow.put(updatedKey, entry.getValue());
+            }
+            updatedRows.add(updatedRow);
+        }
+        return updatedRows;
     }
 
     public static <T> File writeRowsToTsv(String fileName, List<List<T>> rows) throws IOException
