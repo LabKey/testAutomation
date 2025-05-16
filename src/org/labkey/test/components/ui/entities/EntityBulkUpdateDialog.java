@@ -180,7 +180,7 @@ public class EntityBulkUpdateDialog extends ModalDialog
 
     public FileAttachmentContainer getFileField(CharSequence fieldIdentifier)
     {
-        fieldIdentifier = FieldKey.fromFieldKey(FieldKey.fromChars(fieldIdentifier) + "-fileUpload");
+        fieldIdentifier = EntityBulkInsertDialog.fileUploadFieldKey(fieldIdentifier);
         return enableAndWait(fieldIdentifier, elementCache().fileUploadField(fieldIdentifier));
     }
 

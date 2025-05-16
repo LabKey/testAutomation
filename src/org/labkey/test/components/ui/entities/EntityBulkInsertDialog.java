@@ -387,6 +387,11 @@ public class EntityBulkInsertDialog extends ModalDialog
         getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable( elementCache().addRowsButton ));
     }
 
+    public static FieldKey fileUploadFieldKey(CharSequence fieldIdentifier)
+    {
+        return FieldKey.fromFieldKey(fieldIdentifier + "-fileUpload");
+    }
+
     @Override
     protected ElementCache newElementCache()
     {
@@ -451,7 +456,7 @@ public class EntityBulkInsertDialog extends ModalDialog
 
         public FileAttachmentContainer fileUploadField(CharSequence fieldIdentifier)
         {
-            return new FileAttachmentContainer(formRow(FieldKey.fromFieldKey(fieldIdentifier + "-fileUpload")), getDriver());
+            return new FileAttachmentContainer(formRow(fileUploadFieldKey(fieldIdentifier)), getDriver());
         }
 
         public List<WebElement> fieldLabels()
