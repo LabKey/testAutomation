@@ -100,6 +100,25 @@ public class AuditLogHelper
         return cmd.execute(_connectionSupplier.get(), containerPath);
     }
 
+    public List<Map<String, Object>> getAuditLogsForTransactionId(String containerPath, String auditEventName, List<String> columnNames,
+                                                         Integer transactionId) throws IOException, CommandException
+    {
+        List<Filter> transactionFilter = List.of(new Filter("TransactionId", transactionId, Filter.Operator.EQUAL));
+        return getAuditLogsFromLKS(containerPath, auditEventName, columnNames, transactionFilter, null).getRows();
+    }
+
+    public void checkAuditEventValuesForTransactionId(String containerPath, String auditEventName, Integer transactionId, int rowCount, Map<String, Object> expectedValues) throws IOException, CommandException
+    {
+        List<String> columnNames = expectedValues.keySet().stream().map(Object::toString).toList();
+        List<Map<String, Object>> events = getAuditLogsForTransactionId(containerPath, auditEventName, columnNames, transactionId);
+        assertEquals("Unexpected number of events for transactionId " + transactionId, rowCount, events.size());
+        for (Map<String, Object> event : events)
+        {
+            for (String key : columnNames)
+                assertEquals("Event value for " + key + " not as expected", expectedValues.get(key), event.get(key));
+        }
+    }
+
     /**
      * Check the number of diffs in the audit event. This is a helper function to check the number of diffs in the
      * newRecordMap for an audit entry. If a transactionId is provided, it will check all rows for that
@@ -112,12 +131,13 @@ public class AuditLogHelper
     public void checkTimelineAuditEventDiffCount(String containerPath, String auditEventName, List<Integer> expectedDiffCounts) throws IOException, CommandException
     {
         Integer maxRows = expectedDiffCounts.size();
-        List<Map<String, Object>> events = getAuditLogsFromLKS(containerPath, auditEventName, List.of("NewRecordMap"), Collections.emptyList(), maxRows).getRows();
+        List<Map<String, Object>> events = getAuditLogsFromLKS(containerPath, auditEventName, List.of("InventoryUpdateType", "NewRecordMap"), Collections.emptyList(), maxRows).getRows();
         assertEquals("Unexpected number of events", expectedDiffCounts.size(), events.size());
         for (int i = 0; i < expectedDiffCounts.size(); i++)
         {
-            int expectedDiffCount = expectedDiffCounts.get(i);
             Map<String, Object> event = events.get(i);
+            boolean isInventoryUpdateType = event.get("InventoryUpdateType") != null;
+            int expectedDiffCount = isInventoryUpdateType ? 0 : expectedDiffCounts.get(i);
             String dataChangesStr = (String) event.get("NewRecordMap");
             String[] dataChanges = dataChangesStr != null ? dataChangesStr.split("&") : new String[0];
 
@@ -133,10 +153,11 @@ public class AuditLogHelper
     }
 
     /**
-     * Check for th expected number of diffs in the audit event for the last transactionId.
+     * Check for the expected number of diffs in the audit event for the last transactionId.
      * If an expectedEventCount is also provided, it will check that the number of events for that transactionId matches the expectedEventCount.
+     * @return transactionId
      */
-    public void checkTimelineAuditEventDiffCountForLastTransaction(String containerPath, String auditEventName, int expectedDiffCount, @Nullable Integer expectedEventCount) throws IOException, CommandException
+    public Integer checkTimelineAuditEventDiffCountForLastTransaction(String containerPath, String auditEventName, int expectedDiffCount, @Nullable Integer expectedEventCount) throws IOException, CommandException
     {
         Integer transactionId = (Integer) getAuditLogsFromLKS(containerPath, auditEventName, List.of("TransactionId"), Collections.emptyList(), 1)
                 .getRows().get(0).get("TransactionId");
@@ -146,6 +167,7 @@ public class AuditLogHelper
             assertEquals("Unexpected number of events for transactionId " + transactionId, expectedEventCount.intValue(), eventCount);
         List<Integer> expectedChangeCounts = Collections.nCopies(eventCount, expectedDiffCount);
         checkTimelineAuditEventDiffCount(containerPath, auditEventName, expectedChangeCounts);
+        return transactionId;
     }
 
     public String getAuditEventNameFromURL()
