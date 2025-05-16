@@ -1840,6 +1840,7 @@ public class ListTest extends BaseWebDriverTest
         String baseListName = TestDataGenerator.randomDomainName("base");
         String baseKeyFieldName = TestDataGenerator.randomFieldName("base Key Field");
         String baseLookupFieldName = TestDataGenerator.randomFieldName("base Lookup Field");
+        String baseLookupFieldKey = EscapeUtil.fieldKeyEncodePart(baseLookupFieldName);
         _listHelper.createList(PROJECT_VERIFY, baseListName, baseKeyFieldName);
         EditListDefinitionPage listDefinitionPage = _listHelper.goToEditDesign(baseListName);
         listDefinitionPage.getFieldsPanel()
@@ -1862,12 +1863,12 @@ public class ListTest extends BaseWebDriverTest
                 .submit();
         log("Verify the import succeeds and resolves the lookups appropriately.");
         List<Map<String, String>> expectedData = List.of(
-                Map.of(baseLookupFieldName, "1E2"),
-                Map.of(baseLookupFieldName, keyNumber),
-                Map.of(baseLookupFieldName, ".123"),
-                Map.of(baseLookupFieldName, "Lookup"),
-                Map.of(baseLookupFieldName, keyNumber),
-                Map.of(baseLookupFieldName, "102")
+                Map.of(baseLookupFieldKey, "1E2"),
+                Map.of(baseLookupFieldKey, keyNumber),
+                Map.of(baseLookupFieldKey, ".123"),
+                Map.of(baseLookupFieldKey, "Lookup"),
+                Map.of(baseLookupFieldKey, keyNumber),
+                Map.of(baseLookupFieldKey, "102")
         );
         validateDataRegionTableForTricky(expectedData);
     }
