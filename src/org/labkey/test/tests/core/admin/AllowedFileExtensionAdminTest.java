@@ -22,6 +22,7 @@ import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
 import org.labkey.test.util.exp.SampleTypeAPIHelper;
 import org.labkey.test.pages.announcements.InsertPage;
+import org.openqa.selenium.Alert;
 import org.openqa.selenium.WebElement;
 
 import java.io.File;
@@ -166,7 +167,15 @@ public class AllowedFileExtensionAdminTest extends BaseWebDriverTest
                 .verifyEqualsSorted("List of 'Allowed extensions' is not as expected after canceling 'Delete All'.",
                         allowedTypes, extensions.stream().map(Input::getValue).toList());
 
+        // Issue 53039.
+        log("Validate that canceling the 'Delete All' dialog does not set the dirty bit.");
+        // Using goToProjectHome will validate navigaiton happened.
+        goToProjectHome();
+
         log("Now, click 'Delete All' and accept the confirmation dialog.");
+
+        // Have to navigate back.
+        allowedFileExtensionAdminPage = goToAdminConsole().clickAllowedFileExtensions();
 
         allowedFileExtensionAdminPage.deleteAllExtensions(true);
 
@@ -202,8 +211,19 @@ public class AllowedFileExtensionAdminTest extends BaseWebDriverTest
 
         editExtension.setValue(newExtension);
 
-        // Issue 53039 If that issue is fixed code should be added here to validate dirty bit warning.
+        // Issue 53039 validate dirty bit warning.
+        log("Validate that an alert is shown is the change is not saved.");
+        Locator.tagWithClass("a", "brand-logo").findElement(getDriver()).click();
+        Alert alert = waitForAlert();
 
+        checker().withScreenshot()
+                .verifyTrue("Alert text doesn't have expected text.",
+                        alert.getText().contains("Changes you made may not be saved."));
+
+        log("Dismiss the alert.");
+        alert.dismiss();
+
+        log("Save the change.");
         allowedFileExtensionAdminPage.clickSaveUpdateExtension();
 
         allowedTypes.remove(oldExtension);
