@@ -1,7 +1,5 @@
 package org.labkey.test.tests;
 
-import org.apache.commons.lang3.StringUtils;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -20,7 +18,6 @@ import org.labkey.test.params.FieldDefinition.ColumnType;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.AuditLogHelper;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.Maps;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
 import org.labkey.test.util.TestDataGenerator;
@@ -42,8 +39,6 @@ import java.util.stream.Collectors;
 public class TextChoiceSampleTypeTest extends BaseWebDriverTest
 {
     private final AuditLogHelper _auditLogHelper = new AuditLogHelper(this);
-    final String DOMAIN_PROPERTY_LOG_NAME = "Domain property events";
-    final String DOMAIN_LOG_NAME = "Domain events";
 
     @Override
     public BrowserType bestBrowser()
@@ -460,7 +455,21 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
 
         updatePage.clickSave();
 
-        verifyDomainFieldAuditDetail(ignoreIds, "AliquotNameExpression: <null> -> ${${AliquotedFrom}-:withCounter}; The column(s) of domain TC_Value_Updates were modified", "old: Text Choice Validator, \u00C5\\|\u00C5|BB|CC|DD|E E E|\u0083\u0083|GG|H, null, null, null, Text Choice Validator, new: Text Choice Validator, BB|CC and here is an update|E E E|GG|H|\u0083\u0083 updated|\u00C5\\|\u00C5, null, null, null, Text Choice Validator");
+        log("Validate that the expected rows after the update are in the log.");
+        String fieldOldValues = "Name=TextChoice_Field_1&Type=String&Scale=4000&PHI=Not%20PHI&DefaultScale=Linear&Required=false&Hidden=false&MvEnabled=false&Measure=false&Dimension=false" +
+                "&ShownInInsert=true&ShownInDetails=true&ShownInUpdate=true&ShownInLookupView=false&RecommendedVariable=false&ExcludedFromShifting=false&Scannable=false" +
+                "&DefaultValueType=Editable%20default&Validator=Text%20Choice%20Validator%2C%20%C3%85%5C%7C%C3%85%7CBB%7CCC%7CDD%7CE%20E%20E%7C%C2%83%C2%83%7CGG%7CH%2C%20Text%20Choice%20Validator";
+        String fieldUpdateValues = "Name=TextChoice_Field_1&Type=String&Scale=4000&PHI=Not%20PHI&DefaultScale=Linear&Required=false&Hidden=false&MvEnabled=false&Measure=false&Dimension=false" +
+                "&ShownInInsert=true&ShownInDetails=true&ShownInUpdate=true&ShownInLookupView=false&RecommendedVariable=false&ExcludedFromShifting=false&Scannable=false" +
+                "&DefaultValueType=Editable%20default&Validator=Text%20Choice%20Validator%2C%20BB%7CCC%20and%20here%20is%20an%20update%7CE%20E%20E%7CGG%7CH%7C%C2%83%C2%83%20updated%7C%C3%85%5C%7C%C3%85%2C%20Text%20Choice%20Validator";
+        AuditLogHelper.DetailedAuditEventRow fieldEvent = new AuditLogHelper.DetailedAuditEventRow(null, textChoiceFieldName, "Modified",
+                "The following property was updated: Validator", "", fieldOldValues, fieldUpdateValues);
+        AuditLogHelper.DetailedAuditEventRow expectedDomainEvent = new AuditLogHelper.DetailedAuditEventRow(null, sampleTypeName, null,
+                "The column(s) of domain " + sampleTypeName + " were modified.",
+                "", null, null);
+        boolean pass = _auditLogHelper.validateLastDomainAuditEvents(sampleTypeName, getProjectName(), expectedDomainEvent, Map.of(textChoiceFieldName, fieldEvent));
+        checker().verifyTrue("Audit event is not as expected", pass);
+
 
         // Construct a list of samples that have TextChoice set and what they are expected to be.
         List<Map<String, String>> expectedSamples = new ArrayList<>();
@@ -544,43 +553,17 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
         fieldRow.updateTextChoiceValue(valueToUpdate, updatedValue);
         updatePage.clickSave();
 
-        verifyDomainFieldAuditDetail(ignoreIds, "The column(s) of domain TC_Value_Updates were modified", "old: Text Choice Validator, BB|CC and here is an update|E E E|GG|H|\u0083\u0083 updated|\u00C5\\|\u00C5, null, null, null, Text Choice Validator, new: Text Choice Validator, BB|CC and here is an update|E E E|GG|H no change|\u0083\u0083 updated|\u00C5\\|\u00C5, null, null, null, Text Choice Validator");
-
-    }
-
-    private void verifyDomainFieldAuditDetail(Set<Integer> ignoreIds, String auditComment, String auditDetail)
-    {
-        final String sampleTypeName = "TC_Value_Updates";
-        final String textChoiceFieldName = "TextChoice_Field_1";
-
-        List<Map<String, Object>> domainPropertyEventRows = _auditLogHelper.getDomainPropertyEventsFromDomainEvents(getProjectName(), sampleTypeName, ignoreIds);
-        if(domainPropertyEventRows.size() != 1)
-        {
-            _auditLogHelper.goToAuditEventView(DOMAIN_PROPERTY_LOG_NAME);
-            Assert.assertEquals("The number of entries in the domain property audit log were not as expected.", 1, domainPropertyEventRows.size());
-        }
         log("Validate that the expected rows after the update are in the log.");
-        Map<String, String> fieldExpectedColumns = Maps.of("action", "Modified");
-        Map<String, String> fieldExpectedComment = Maps.of("Validators", auditDetail);
-        boolean pass = _auditLogHelper.validateExpectedRowInDomainPropertyAuditLog(domainPropertyEventRows, textChoiceFieldName, fieldExpectedColumns, fieldExpectedComment);
-        if(!pass)
-            _auditLogHelper.goToAuditEventView(DOMAIN_PROPERTY_LOG_NAME);
-        Assert.assertTrue("The values logged for the updating domain field regex event were not as expected. See log for details.", pass);
+        String fieldUpdateValues2 = "Name=TextChoice_Field_1&Type=String&Scale=4000&PHI=Not%20PHI&DefaultScale=Linear&Required=false&Hidden=false&MvEnabled=false&Measure=false" +
+                "&Dimension=false&ShownInInsert=true&ShownInDetails=true&ShownInUpdate=true&ShownInLookupView=false&RecommendedVariable=false&ExcludedFromShifting=false" +
+                "&Scannable=false&DefaultValueType=Editable%20default&Validator=Text%20Choice%20Validator%2C%20BB%7CCC%20and%20here%20is%20an%20update%7CE%20E%20E%7CGG%7CH%20no%20change%7C%C2%83%C2%83%20updated%7C%C3%85%5C%7C%C3%85%2C%20Text%20Choice%20Validator";
+        fieldEvent = new AuditLogHelper.DetailedAuditEventRow(null, textChoiceFieldName, "Modified",
+                "The following property was updated: Validator", "", fieldUpdateValues, fieldUpdateValues2);
+        pass = _auditLogHelper.validateLastDomainAuditEvents(sampleTypeName, getProjectName(), expectedDomainEvent, Map.of(textChoiceFieldName, fieldEvent));
+        checker().verifyTrue("Audit event is not as expected", pass);
 
-        List<String> auditComments = _auditLogHelper.getDomainEventComments(getProjectName(), sampleTypeName, ignoreIds);
-        if(auditComments.size() != 1)
-        {
-            _auditLogHelper.goToAuditEventView(DOMAIN_LOG_NAME);
-            Assert.assertEquals("The number of entries in the domain audit log were not as expected.", 1, auditComments.size());
-        }
-
-        pass = auditComments.get(0).equals(auditComment);
-        if(!pass)
-            _auditLogHelper.goToAuditEventView(DOMAIN_LOG_NAME);
-        Assert.assertEquals("The comment logged for the updating domain was not as expected. See log for details.", auditComment, auditComments.get(0));
-
-        ignoreIds.addAll(_auditLogHelper.getDomainEventIdsFromPropertyEvents(domainPropertyEventRows));
     }
+
 
     /**
      * <p>

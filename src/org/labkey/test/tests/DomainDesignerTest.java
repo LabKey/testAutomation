@@ -42,7 +42,6 @@ import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.AuditLogHelper;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.Maps;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.TestDataGenerator;
 import org.openqa.selenium.WebElement;
@@ -55,10 +54,8 @@ import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.containsString;
@@ -289,9 +286,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         editListDefinitionPage.setName(editedListName)
                 .clickSave();
         checker().verifyEquals("The comment logged for the list update was not as expected.",
-                "The name of the list domain 'InvalidLookUpNameList' was changed to 'InvalidLookUpNameList_edited'. " +
-                        "Name: InvalidLookUpNameList -> InvalidLookUpNameList_edited; " +
-                        "The descriptor of domain InvalidLookUpNameList_edited was updated",
+                "The name of the list domain 'InvalidLookUpNameList' was changed to 'InvalidLookUpNameList_edited'. The descriptor of domain InvalidLookUpNameList_edited was updated",
                 _auditLogHelper.getLastDomainEventComment(getProjectName(), editedListName));
 
         domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleType);
@@ -1358,10 +1353,6 @@ public class DomainDesignerTest extends BaseWebDriverTest
                         new FieldDefinition("size", FieldDefinition.ColumnType.Integer)));
         DomainResponse createResponse = dgen.createDomain(createDefaultConnection(), "IntList", Map.of("keyName", "Key"));
 
-        List<Map<String, Object>> domainPropertyEventRows = _auditLogHelper.getDomainPropertyEventsFromDomainEvents(getProjectName(), listName, null);
-        // Add the list of the event ids to an ignore list so future tests don't look at them again.
-        Set<Integer> ignoreIds = new HashSet<>(_auditLogHelper.getDomainEventIdsFromPropertyEvents(domainPropertyEventRows));
-
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
         DomainFieldRow favoriteSnack = domainFormPanel.getField(fieldNameWithReg);
@@ -1389,22 +1380,17 @@ public class DomainDesignerTest extends BaseWebDriverTest
         assertEquals("expected error message should be on the field",
                 "favorite snack cannot be twizzlers, yo", specialCharsValidator.get("errorMessage"));
 
-        // check audit log
-        log("Get a list of ids from the Domain Events Audit Log again but this time remove from the list the ids from the created events.");
-        domainPropertyEventRows = _auditLogHelper.getDomainPropertyEventsFromDomainEvents(getProjectName(), listName, ignoreIds);
-        ignoreIds.addAll(_auditLogHelper.getDomainEventIdsFromPropertyEvents(domainPropertyEventRows));
-
-        if(domainPropertyEventRows.size() != 1)
-        {
-            // We are going to fail, so navigate to the Domain Property Events Audit Log.
-            _auditLogHelper.goToAuditEventView(DOMAIN_PROPERTY_LOG_NAME);
-            Assert.assertEquals("The number of entries in the domain audit log were not as expected.", 1, domainPropertyEventRows.size());
-        }
-
         log("Validate that the expected rows after the update are in the log.");
-        Map<String, String> fieldExpectedColumns = Maps.of("action", "Modified");
-        Map<String, String> fieldExpectedComment = Maps.of("Validators", "old: <none>, new: neverTwizzlers, twizzler, failOnMatch=true, favorite snack cannot be twizzlers, yo, twizzler is not a snack, Regular Expression");
-        boolean pass = _auditLogHelper.validateExpectedRowInDomainPropertyAuditLog(domainPropertyEventRows, fieldNameWithReg, fieldExpectedColumns, fieldExpectedComment);
+        String fieldOldValues = "Name=favoriteSnack&Type=String&Scale=4000&PHI=Not%20PHI&DefaultScale=Linear&Required=false&Hidden=false&MvEnabled=false&Measure=false" +
+                "&Dimension=false&ShownInInsert=true&ShownInDetails=true&ShownInUpdate=true&ShownInLookupView=false&RecommendedVariable=false&ExcludedFromShifting=false" +
+                "&Scannable=false&DefaultValueType=Editable%20default";
+        String fieldNewValues = fieldOldValues + "&Validator=neverTwizzlers%2C%20twizzler%20is%20not%20a%20snack%2C%20twizzler%2C%20failOnMatch%3Dtrue%2C%20favorite%20snack%20cannot%20be%20twizzlers%2C%20yo%2C%20Regular%20Expression";
+        AuditLogHelper.DetailedAuditEventRow fieldEvent = new AuditLogHelper.DetailedAuditEventRow(null, fieldNameWithReg, "Modified",
+                "The following property was updated: Validator", "", fieldOldValues, fieldNewValues);
+        AuditLogHelper.DetailedAuditEventRow expectedDomainEvent = new AuditLogHelper.DetailedAuditEventRow(null, listName, null,
+                "The column(s) of domain " + listName + " were modified.",
+                "", null, null);
+        boolean pass = _auditLogHelper.validateLastDomainAuditEvents(listName, getProjectName(), expectedDomainEvent, Map.of(fieldNameWithReg, fieldEvent));
 
         if(!pass)
             _auditLogHelper.goToAuditEventView(DOMAIN_PROPERTY_LOG_NAME);
