@@ -130,8 +130,12 @@ public class AuditLogHelper
     }
     public void checkTimelineAuditEventDiffCount(String containerPath, String auditEventName, List<Integer> expectedDiffCounts) throws IOException, CommandException
     {
+        checkTimelineAuditEventDiffCount(containerPath, auditEventName, Collections.emptyList(), expectedDiffCounts);
+    }
+    public void checkTimelineAuditEventDiffCount(String containerPath, String auditEventName, List<Filter> filters, List<Integer> expectedDiffCounts) throws IOException, CommandException
+    {
         Integer maxRows = expectedDiffCounts.size();
-        List<Map<String, Object>> events = getAuditLogsFromLKS(containerPath, auditEventName, List.of("InventoryUpdateType", "NewRecordMap"), Collections.emptyList(), maxRows).getRows();
+        List<Map<String, Object>> events = getAuditLogsFromLKS(containerPath, auditEventName, List.of("InventoryUpdateType", "NewRecordMap"), filters, maxRows).getRows();
         assertEquals("Unexpected number of events", expectedDiffCounts.size(), events.size());
         for (int i = 0; i < expectedDiffCounts.size(); i++)
         {
