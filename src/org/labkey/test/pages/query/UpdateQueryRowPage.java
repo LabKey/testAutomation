@@ -9,6 +9,7 @@ import org.labkey.test.Locators;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.html.Checkbox;
+import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.OptionSelect;
 import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.WebDriver;
@@ -116,6 +117,12 @@ public class UpdateQueryRowPage extends LabKeyPage<UpdateQueryRowPage.ElementCac
     {
         new OptionSelect<>(elementCache().findField(fieldName)).selectOption(option);
         return this;
+    }
+
+    public String getTextInputValue(String fieldName)
+    {
+        var input = new Input(elementCache().findField(fieldName), getDriver());
+        return input.getValue();
     }
 
     public void submit()
