@@ -895,7 +895,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
                 .isGreaterThan(-1));
 
         // clean up after ourselves
-        _schemaHelper.deleteSchema(sourceContainerPath, A_PEOPLE_SCHEMA_NAME);
+        _schemaHelper.deleteSchema(sourceContainerPath, linkedSchemaName);
     }
 
     /*
