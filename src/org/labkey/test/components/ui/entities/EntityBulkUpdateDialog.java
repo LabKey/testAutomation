@@ -279,7 +279,7 @@ public class EntityBulkUpdateDialog extends ModalDialog
         clickUpdate(false);
     }
 
-    public void clickUpdate(boolean skipChangeCounterCheck)
+    public void clickUpdate(boolean skipAuditEventCheck)
     {
         Integer rowCount = getCountFromTitle();
 
@@ -292,7 +292,7 @@ public class EntityBulkUpdateDialog extends ModalDialog
         // check for the expected number of Data Changes in the latest audit event records
         AuditLogHelper auditLogHelper = new AuditLogHelper(getWrapper());
         String auditEventName = auditLogHelper.getAuditEventNameFromURL();
-        if (!skipChangeCounterCheck && auditEventName != null)
+        if (!skipAuditEventCheck && auditEventName != null)
         {
             try
             {

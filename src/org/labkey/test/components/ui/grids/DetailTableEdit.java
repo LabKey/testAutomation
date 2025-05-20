@@ -503,7 +503,7 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
         return clickSave(false);
     }
 
-    public DetailDataPanel clickSave(boolean skipChangeCounterCheck)
+    public DetailDataPanel clickSave(boolean skipAuditEventCheck)
     {
         String title = getSourceTitle();
         var componentEl = getComponentElement();
@@ -517,7 +517,7 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
         // check for the expected number of Data Changes in the latest audit event records
         AuditLogHelper auditLogHelper = new AuditLogHelper(getWrapper());
         String auditEventName = auditLogHelper.getAuditEventNameFromURL();
-        if (!skipChangeCounterCheck && auditEventName != null)
+        if (!skipAuditEventCheck && auditEventName != null)
         {
             try
             {
