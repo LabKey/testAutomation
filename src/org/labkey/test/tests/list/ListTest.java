@@ -1836,7 +1836,7 @@ public class ListTest extends BaseWebDriverTest
         String keyNumber = actualValues.get(0).get(EscapeUtil.fieldKeyEncodePart(lookupKeyFieldName));
         _listHelper.insertNewRow(Map.of(lookupFieldName, keyNumber));
 
-        log("Create a second list that looks up to the first list");
+        log("Create a second list that looks up to the first list without the `Ensure value` checkbox selected.");
         String baseListName = TestDataGenerator.randomDomainName("base");
         String baseKeyFieldName = TestDataGenerator.randomFieldName("base Key Field");
         String baseLookupFieldName = TestDataGenerator.randomFieldName("base Lookup Field");
@@ -1849,28 +1849,171 @@ public class ListTest extends BaseWebDriverTest
                 .setLookup(new FieldDefinition.IntLookup("lists", lookupListName));
         listDefinitionPage.clickSave();
 
-        log("Import data into the second list using number-like lookup values.");
+        // without lookup validator
+        //   without alternate keys
+        log("Import data into the second list without alternate keys.");
+        bulkData = baseLookupFieldName + "\n" + keyNumber;
+        _listHelper.clickImportData()
+                .setText(bulkData)
+                .submit();
+        log("Verify the import succeeds and resolves by primary key when not expecting alternate keys.");
+        List<Map<String, String>> expectedData = List.of(
+                Map.of(baseLookupFieldKey, actualValues.get(0).get(EscapeUtil.fieldKeyEncodePart(lookupFieldName)))
+        );
+        validateDataRegionTableForTricky(expectedData);
+
+        log("Clean out list before next import.");
+        resetList();
+        log("Import data into second list without alternate keys supplying invalid primary key");
+        bulkData = baseLookupFieldName + "\n1000";
+        _listHelper.clickImportData()
+                .setText(bulkData)
+                .submit();
+        log("Verify the import succeeds but invalid primary key is left unresolved.");
+        expectedData = List.of(
+                Map.of(baseLookupFieldKey, "<1000>")
+        );
+        validateDataRegionTableForTricky(expectedData);
+
+        log("Check for error if not using alternate key and type does not match");
+        bulkData = baseLookupFieldName + "\nnoneSuch";
+        ImportDataPage importDataPage = _listHelper.clickImportData();
+        String error = importDataPage
+                .setText(bulkData)
+                        .submitExpectingError();
+        checker().withScreenshot().verifyEquals("Error message for invalid primary key not as expected", "Could not convert value 'noneSuch' (String) for Integer field '" + baseLookupFieldName + "'", error);
+
+        //    with alternate keys
+        log("Clean out list before next import.");
+        importDataPage.cancel();
+        resetList();
+        log("Import data into the second list using number-like lookup values expecting alternate keys but also accepting primary keys.");
         bulkData = baseLookupFieldName + "\n" +
-                "1E2\n" +
-                keyNumber +"\n" +
-                ".123\n" +
-                "Lookup\n" +
-                keyNumber + "\n" +
-                "102";
+                "1E2\n" + // valid alternate key looking like a number
+                keyNumber +"\n" + // valid alternate key same value as a primary key
+                ".123\n" + // valid alternate key looking like a float
+                "Lookup\n" + // valid alternate key that is a string
+                keyNumber + "\n" + // another copy
+                "102\n" + // valid number-like alternate key
+                actualValues.get(1).get(EscapeUtil.fieldKeyEncodePart(lookupKeyFieldName)) + "\n" + // primary key value not matching an alternate key
+                "1000" // primary key-type value that doesn't match
+                ;
         _listHelper.clickImportData()
                 .setText(bulkData)
                 .setImportLookupByAlternateKey(true)
                 .submit();
         log("Verify the import succeeds and resolves the lookups appropriately.");
-        List<Map<String, String>> expectedData = List.of(
+        expectedData = List.of(
                 Map.of(baseLookupFieldKey, "1E2"),
                 Map.of(baseLookupFieldKey, keyNumber),
                 Map.of(baseLookupFieldKey, ".123"),
                 Map.of(baseLookupFieldKey, "Lookup"),
                 Map.of(baseLookupFieldKey, keyNumber),
-                Map.of(baseLookupFieldKey, "102")
+                Map.of(baseLookupFieldKey, "102"),
+                Map.of(baseLookupFieldKey, actualValues.get(1).get(EscapeUtil.fieldKeyEncodePart(lookupFieldName))),
+                Map.of(baseLookupFieldKey, "<1000>")
         );
         validateDataRegionTableForTricky(expectedData);
+
+        log("Check for error if providing non-matching string value that is not a number");
+        bulkData =  baseLookupFieldName + "\nNotAValue";
+        importDataPage = _listHelper.clickImportData();
+        error = importDataPage
+                        .setText(bulkData)
+                                .setImportLookupByAlternateKey(true)
+                                        .submitExpectingError();
+        checker().withScreenshot().verifyEquals("Error message after supplying invalid alternate key not as expected", "Value 'NotAValue' not found for field " + baseLookupFieldName + " in the current context.", error);
+
+        log("Clean out list before next import.");
+        importDataPage.cancel();
+        resetList();
+
+        // without lookup validator
+        log("Add Lookup Validator to lookup field");
+        listDefinitionPage = _listHelper.goToEditDesign(baseListName);
+        listDefinitionPage.getFieldsPanel()
+                .getField(baseLookupFieldName)
+                .expand()
+                .setLookupValidatorEnabled(true);
+        listDefinitionPage.clickSave();
+
+        //   without alternate keys
+        log("With lookup validation on, import data into the second list without alternate keys.");
+        bulkData = baseLookupFieldName + "\n" + keyNumber;
+        _listHelper.clickImportData()
+                .setText(bulkData)
+                .submit();
+        log("Verify the import succeeds and resolves by primary key when not expecting alternate keys.");
+        expectedData = List.of(
+                Map.of(baseLookupFieldKey, actualValues.get(0).get(EscapeUtil.fieldKeyEncodePart(lookupFieldName)))
+        );
+        validateDataRegionTableForTricky(expectedData);
+
+        log("With lookup validation on, import data and provide an invalid primary key.");
+        importDataPage = _listHelper.clickImportData();
+        error = importDataPage
+                .setText(baseLookupFieldName + "\n1000")
+                .submitExpectingError();
+        checker().withScreenshot().verifyEquals("Error message for invalid primary key value not as expected", "Value '1000' was not present in lookup target 'lists." + lookupListName + "' for field '" + baseLookupFieldName + "'", error);
+
+        log("With lookup validation on, import data and provide an invalid primary key of type string.");
+        error = importDataPage
+                .setText(baseLookupFieldName + "\nLook")
+                .submitExpectingError();
+        checker().withScreenshot().verifyEquals("Error message for invalid primary key type not as expected", "Could not convert value 'Look' (String) for Integer field '" + baseLookupFieldName + "'", error);
+
+        //   with alternate keys
+        log("Clean out list before next import.");
+        importDataPage.cancel();
+        resetList();
+        log("With lookup validation on, import data into the second list using number-like lookup values expecting alternate keys but also accepting primary keys.");
+        bulkData = baseLookupFieldName + "\n" +
+                "1E2\n" + // valid alternate key looking like a number
+                keyNumber +"\n" + // valid alternate key same value as a primary key
+                ".123\n" + // valid alternate key looking like a float
+                "Lookup\n" + // valid alternate key that is a string
+                keyNumber + "\n" + // another copy
+                "102\n" + // valid number-like alternate key
+                actualValues.get(1).get(EscapeUtil.fieldKeyEncodePart(lookupKeyFieldName)) + "\n" // primary key value not matching an alternate key
+        ;
+        _listHelper.clickImportData()
+                .setText(bulkData)
+                .setImportLookupByAlternateKey(true)
+                .submit();
+        log("Verify the import succeeds and resolves the lookups appropriately.");
+        expectedData = List.of(
+                Map.of(baseLookupFieldKey, "1E2"),
+                Map.of(baseLookupFieldKey, keyNumber),
+                Map.of(baseLookupFieldKey, ".123"),
+                Map.of(baseLookupFieldKey, "Lookup"),
+                Map.of(baseLookupFieldKey, keyNumber),
+                Map.of(baseLookupFieldKey, "102"),
+                Map.of(baseLookupFieldKey, actualValues.get(1).get(EscapeUtil.fieldKeyEncodePart(lookupFieldName)))
+        );
+        validateDataRegionTableForTricky(expectedData);
+
+        bulkData = baseLookupFieldName + "\nInvalid";
+        importDataPage = _listHelper.clickImportData();
+        error = importDataPage
+                .setText(bulkData)
+                .setImportLookupByAlternateKey(true)
+                .submitExpectingError();
+        checker().withScreenshot().verifyEquals("Error message for invalid string alternate key not as expected", "Value 'Invalid' not found for field " + baseLookupFieldName + " in the current context.", error);
+
+        bulkData = baseLookupFieldName + "\n1234";
+        error = importDataPage
+                .setText(bulkData)
+                .setImportLookupByAlternateKey(true)
+                .submitExpectingError();
+        checker().withScreenshot().verifyEquals("Error message for invalid number-like alternate key not as expected", "Value '1234' was not present in lookup target 'lists." + lookupListName + "' for field '" + baseLookupFieldName + "'", error);
+
+    }
+
+    private void resetList()
+    {
+        DataRegionTable dataRegionTable = new DataRegionTable("query", getDriver());
+        dataRegionTable.checkAllOnPage();
+        dataRegionTable.deleteSelectedRows();
     }
 
     private void validateDataRegionTableForTricky(List<Map<String, String>> expectedValue)
