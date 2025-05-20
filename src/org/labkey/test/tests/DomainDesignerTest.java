@@ -54,6 +54,7 @@ import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -285,9 +286,12 @@ public class DomainDesignerTest extends BaseWebDriverTest
         EditListDefinitionPage editListDefinitionPage = new EditListDefinitionPage(getDriver());
         editListDefinitionPage.setName(editedListName)
                 .clickSave();
-        checker().verifyEquals("The comment logged for the list update was not as expected.",
-                "The name of the list domain 'InvalidLookUpNameList' was changed to 'InvalidLookUpNameList_edited'. The descriptor of domain InvalidLookUpNameList_edited was updated",
-                _auditLogHelper.getLastDomainEventComment(getProjectName(), editedListName));
+
+        AuditLogHelper.DetailedAuditEventRow expectedDomainEvent = new AuditLogHelper.DetailedAuditEventRow(null, listName, null,
+                "The name of the list domain 'InvalidLookUpNameList' was changed to 'InvalidLookUpNameList_edited'. The descriptor of domain InvalidLookUpNameList_edited was updated.",
+                "", null, null, "Name: " + listName + " > " + editedListName);
+        boolean pass = _auditLogHelper.validateLastDomainAuditEvents(listName, getProjectName(), expectedDomainEvent, Collections.emptyMap());
+        checker().verifyTrue("The comment logged for the list renaming was not as expected", pass);
 
         domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleType);
         assertEquals("Look up should be updated after list renaming", "Current Folder > lists > " + editedListName, domainDesignerPage.fieldsPanel().getField("lookUpField").detailsMessage());
@@ -1386,10 +1390,10 @@ public class DomainDesignerTest extends BaseWebDriverTest
                 "&Scannable=false&DefaultValueType=Editable%20default";
         String fieldNewValues = fieldOldValues + "&Validator=neverTwizzlers%2C%20twizzler%20is%20not%20a%20snack%2C%20twizzler%2C%20failOnMatch%3Dtrue%2C%20favorite%20snack%20cannot%20be%20twizzlers%2C%20yo%2C%20Regular%20Expression";
         AuditLogHelper.DetailedAuditEventRow fieldEvent = new AuditLogHelper.DetailedAuditEventRow(null, fieldNameWithReg, "Modified",
-                "The following property was updated: Validator", "", fieldOldValues, fieldNewValues);
+                "The following property was updated: Validator", "", fieldOldValues, fieldNewValues, null);
         AuditLogHelper.DetailedAuditEventRow expectedDomainEvent = new AuditLogHelper.DetailedAuditEventRow(null, listName, null,
                 "The column(s) of domain " + listName + " were modified.",
-                "", null, null);
+                "", null, null, null);
         boolean pass = _auditLogHelper.validateLastDomainAuditEvents(listName, getProjectName(), expectedDomainEvent, Map.of(fieldNameWithReg, fieldEvent));
 
         if(!pass)

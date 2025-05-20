@@ -205,15 +205,18 @@ public class AuditLogHelper
         boolean pass = true;
         for (String prop : propertyAuditColumns)
         {
-            if (expectedAuditDetail.getColumn(prop) != null)
+            String expectedValue = expectedAuditDetail.getColumn(prop);
+            if (expectedValue != null)
             {
-                if (StringUtils.isEmpty(expectedAuditDetail.getColumn(prop)) && actualAuditDetail.getColumn(prop) == null)
+                String actualValue = actualAuditDetail.getColumn(prop);
+
+                if (StringUtils.isEmpty(expectedValue) && actualValue == null)
                     continue;
 
-                if (!expectedAuditDetail.getColumn(prop).equals(actualAuditDetail.getColumn(prop)))
+                if (!expectedValue.equals(actualValue))
                 {
                     pass = false;
-                    TestLogger.log(prop + " is not as expected. Expected: " + expectedAuditDetail.getColumn(prop) + ", Actual: " + actualAuditDetail.getColumn(prop));
+                    TestLogger.log(prop + " is not as expected. Expected: " + expectedValue + ", Actual: " + actualValue);
                 }
             }
         }
@@ -222,6 +225,8 @@ public class AuditLogHelper
 
     public boolean validateDomainPropertiesAuditLog(String domainName, Integer domainEventId, Map<String, DetailedAuditEventRow> expectedAuditDetails)
     {
+        if (expectedAuditDetails == null)
+            return true;
         Map<String, DetailedAuditEventRow> actualAuditDetails = getDomainPropertyEvents(domainName, domainEventId);
         boolean pass = true;
         if (expectedAuditDetails.keySet().size() != actualAuditDetails.keySet().size())
@@ -274,13 +279,13 @@ public class AuditLogHelper
         return getLastDomainEvent(projectName, domainName).rowId;
     }
 
-    public String getLastDomainEventComment(String projectName, String domainName)
+    public String getLastDomainEventComment(String projectName, String domainName) // TODO delete
     {
         return getLastDomainEvent(projectName, domainName).comment;
     }
 
-    public static List<String> propertyAuditColumns = List.of("type", "comment", "usercomment", "oldvalues", "newvalues");
-    public record DetailedAuditEventRow(Integer rowId, String keyValue, String type, String comment, String userComment, String oldValues, String newValues)
+    public static List<String> propertyAuditColumns = List.of("type", "comment", "usercomment", "oldvalues", "newvalues", "datachanges");
+    public record DetailedAuditEventRow(Integer rowId, String keyValue, String type, String comment, String userComment, String oldValues, String newValues, String dataChanges)
     {
         public String getColumn(String columnName)
         {
@@ -294,6 +299,7 @@ public class AuditLogHelper
                 case "usercomment" -> userComment;
                 case "oldvalues" -> oldValues;
                 case "newvalues" -> newValues;
+                case "datachanges" -> dataChanges;
                 default -> null;
             };
         }
@@ -316,7 +322,8 @@ public class AuditLogHelper
             String userComment = getLogColumnValue(event, "UserComment");
             String oldValue = getLogColumnValue(event, "oldValues");
             String newValue = getLogColumnValue(event, "newValues");
-            domainPropEventComments.put(propertyName, new DetailedAuditEventRow(rowId, propertyName, action, comment, userComment, oldValue, newValue));
+            String dataChanges = getLogColumnDisplayValue(event, "dataChanges");
+            domainPropEventComments.put(propertyName, new DetailedAuditEventRow(rowId, propertyName, action, comment, userComment, oldValue, newValue, dataChanges));
         });
         return domainPropEventComments;
 
@@ -366,7 +373,7 @@ public class AuditLogHelper
         Connection cn = WebTestHelper.getRemoteApiConnection();
         SelectRowsCommand cmd = new SelectRowsCommand("auditLog", "DomainAuditEvent");
         cmd.setRequiredVersion(9.1);
-        cmd.setColumns(Arrays.asList("rowid", "domainuri", "domainname", "comment", "usercomment", "oldvalues", "newvalues"));
+        cmd.setColumns(Arrays.asList("rowid", "domainuri", "domainname", "comment", "usercomment", "oldvalues", "newvalues", "datachanges"));
         cmd.addFilter("projectid/DisplayName", projectName, Filter.Operator.EQUAL);
         if(null != ignoreIds)
         {
@@ -398,8 +405,8 @@ public class AuditLogHelper
                 String userComment = getLogColumnValue(row, "usercomment");
                 String oldValue = getLogColumnValue(row, "oldvalues");
                 String newValue = getLogColumnValue(row, "newvalues");
-
-                domainAuditEventRows.add(new DetailedAuditEventRow(rowId, domainName, null, comment, userComment, oldValue, newValue));
+                String dataChanges = getLogColumnDisplayValue(row, "dataChanges");
+                domainAuditEventRows.add(new DetailedAuditEventRow(rowId, domainName, null, comment, userComment, oldValue, newValue, dataChanges));
             }
         }
 
@@ -411,7 +418,7 @@ public class AuditLogHelper
         Connection cn = WebTestHelper.getRemoteApiConnection();
         SelectRowsCommand cmd = new SelectRowsCommand("auditLog", "DomainPropertyAuditEvent");
         cmd.setRequiredVersion(9.1);
-        cmd.setColumns(Arrays.asList("Created", "CreatedBy", "ImpersonatedBy", "propertyname", "action", "domainname", "domaineventid", "Comment", "UserComment", "oldvalues", "newvalues"));
+        cmd.setColumns(Arrays.asList("Created", "CreatedBy", "ImpersonatedBy", "propertyname", "action", "domainname", "domaineventid", "Comment", "UserComment", "oldvalues", "newvalues", "datachanges"));
         cmd.addFilter("domainname", domainName, Filter.Operator.EQUAL);
 
         if(null != eventIds)
@@ -484,14 +491,14 @@ public class AuditLogHelper
         return fieldComments;
     }
 
-    private String getLogColumnValue(Map<String, Object> rowEntry, String columnName)
+    private String getLogColumnValue(Map<String, Object> rowEntry, String columnName, String valueType)
     {
         try
         {
             Map<String, Object> val = ((Map<String, Object>) rowEntry.get(columnName));
             if (val == null)
                 return null;
-            Object value = val.get("value");
+            Object value = val.get(valueType);
             if (value == null)
                 return null;
             return value.toString();
@@ -501,6 +508,16 @@ public class AuditLogHelper
             // Just fail here, don't toss the exception up the stack.
             throw new IllegalArgumentException(je);
         }
+    }
+
+    private String getLogColumnValue(Map<String, Object> rowEntry, String columnName)
+    {
+        return getLogColumnValue(rowEntry, columnName, "value");
+    }
+
+    private String getLogColumnDisplayValue(Map<String, Object> rowEntry, String columnName)
+    {
+        return getLogColumnValue(rowEntry, columnName, "displayValue");
     }
 
     private Integer getLogColumnIntValue(Map<String, Object> rowEntry, String columnName)

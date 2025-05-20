@@ -1225,8 +1225,15 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
 
         listDefinitionPage.clickSave();
 
-        checker().verifyEquals("Domain audit comment not as expected after changing datetime format", "The column(s) of domain " + listName + " were modified", _auditLogHelper.getLastDomainEventComment(getProjectName(), listName));
-        checker().verifyEqualsSorted("Domain field audit comment not as expected", List.of("Format: yyyy-MM-dd -> ddMMMyy;", "Format: hh:mm a -> HH:mm:ss;", "Format: yyyy-MM-dd hh:mm a -> dd-MMM-yyyy HH:mm:ss;"), _auditLogHelper.getLastDomainPropertyComment(getProjectName(), listName));
+        AuditLogHelper.DetailedAuditEventRow expectedDomainEvent = new AuditLogHelper.DetailedAuditEventRow(null, listName, null,
+                "The column(s) of domain " + listName + " were modified.",
+                "", null, null, null);
+        boolean pass = _auditLogHelper.validateLastDomainAuditEvents(listName, PROJECT_NAME, expectedDomainEvent,
+                    Map.of(timeCol, new AuditLogHelper.DetailedAuditEventRow(null, timeCol, "Modified","The following property was updated: Format",null, null, null, "Format: hh:mm a > HH:mm:ss"),
+                            dateCol, new AuditLogHelper.DetailedAuditEventRow(null, dateCol, "Modified","The following property was updated: Format",null, null, null, "Format: yyyy-MM-dd > ddMMMyy"),
+                            dateTimeCol, new AuditLogHelper.DetailedAuditEventRow(null, dateTimeCol, "Modified","The following property was updated: Format",null, null, null, "Format: yyyy-MM-dd hh:mm a > dd-MMM-yyyy HH:mm:ss"))
+                );
+        checker().verifyTrue("Domain audit log not as expected after adding a parent alias column", pass);
 
         expectedData = new ArrayList<>();
 
@@ -1356,8 +1363,14 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
 
         listDefinitionPage.clickSave();
 
-        checker().verifyEquals("Domain audit comment not as expected after changing data type", "The column(s) of domain Convert DateTime Field List were modified", _auditLogHelper.getLastDomainEventComment(getProjectName(), listName));
-        checker().verifyEqualsSorted("Domain field audit comment not as expected", List.of("Type: DateTime -> Date;", "Type: DateTime -> Time;"), _auditLogHelper.getLastDomainPropertyComment(getProjectName(), listName));
+        AuditLogHelper.DetailedAuditEventRow expectedDomainEvent = new AuditLogHelper.DetailedAuditEventRow(null, listName, null,
+                "The column(s) of domain " + listName + " were modified.",
+                "", null, null, null);
+        boolean pass = _auditLogHelper.validateLastDomainAuditEvents(listName, PROJECT_NAME, expectedDomainEvent,
+                Map.of(dateTimeToDateCol, new AuditLogHelper.DetailedAuditEventRow(null, dateTimeToDateCol, "Modified","The following properties were updated: Type, Format",null, null, null, "Type: DateTime > Date\nFormat: MMMM dd yyyy HH:mm > "),
+                        dateTimeToTimeCol, new AuditLogHelper.DetailedAuditEventRow(null, dateTimeToTimeCol, "Modified","The following properties were updated: Type, Format",null, null, null, "Type: DateTime > Time\nFormat: yyyy-MMM-dd HH:mm:ss > "))
+        );
+        checker().verifyTrue("Domain audit log not as expected after changing data type", pass);
 
         // Update default format after changing the types.
         DATE_FORMAT dateFormat = DATE_FORMAT.Default;

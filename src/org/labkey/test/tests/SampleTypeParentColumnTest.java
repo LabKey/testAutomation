@@ -30,6 +30,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -608,9 +609,14 @@ public class SampleTypeParentColumnTest extends BaseWebDriverTest
         updatePage.removeParentAlias(PARENT_COLUMN);
         updatePage.clickSave();
 
-        checker().verifyEquals("The comment logged for the updating domain was not as expected.",
-                "AliquotNameExpression: <null> -> ${${AliquotedFrom}-:withCounter};ImportAlias: P7(materialInputs/" + SAMPLE_TYPE_NAME + ",required=false) ->  <null>; The descriptor of domain " + SAMPLE_TYPE_NAME + " was updated",
-                _auditLogHelper.getLastDomainEventComment(getProjectName(), SAMPLE_TYPE_NAME));
+        log("Validate domain audit log.");
+        String oldValues = "Name=SimpleSampleType07&ImportAlias=P7(materialInputs%2FSimpleSampleType07%2Crequired%3Dfalse)";
+        String newValues = "Name=SimpleSampleType07&AliquotNameExpression=%24%7B%24%7BAliquotedFrom%7D-%3AwithCounter%7D";
+        AuditLogHelper.DetailedAuditEventRow expectedDomainEvent = new AuditLogHelper.DetailedAuditEventRow(null, SAMPLE_TYPE_NAME, null,
+                "The descriptor of domain " + SAMPLE_TYPE_NAME + " was updated.",
+                "", oldValues, newValues, null);
+        boolean pass = _auditLogHelper.validateLastDomainAuditEvents(SAMPLE_TYPE_NAME, PROJECT_NAME, expectedDomainEvent, Collections.emptyMap());
+        checker().verifyTrue("Domain audit long not as expected after removing the parent alias column", pass);
 
         log("Import some more samples using the alias column and make sure it doesn't work.");
         sampleText = "Name\t" + PARENT_COLUMN + "\n" +
@@ -709,8 +715,14 @@ public class SampleTypeParentColumnTest extends BaseWebDriverTest
         updatePage.addParentAlias(GOOD_PARENT_NAME, SampleTypeDesigner.CURRENT_SAMPLE_TYPE);
         updatePage.clickSave();
 
-        checker().verifyEquals("The comment logged for the updating domain was not as expected.", "ImportAlias: <null> -> P8(materialInputs/" + SAMPLE_TYPE_NAME + ",required=false); The descriptor of domain " + SAMPLE_TYPE_NAME + " was updated",
-                _auditLogHelper.getLastDomainEventComment(getProjectName(), SAMPLE_TYPE_NAME));
+        log("Validate domain audit log.");
+        String oldValues = "Name=SimpleSampleType08&AliquotNameExpression=%24%7B%24%7BAliquotedFrom%7D-%3AwithCounter%7D";
+        String newValues = "Name=SimpleSampleType08&AliquotNameExpression=%24%7B%24%7BAliquotedFrom%7D-%3AwithCounter%7D&ImportAlias=P8(materialInputs%2FSimpleSampleType08%2Crequired%3Dfalse)";
+        AuditLogHelper.DetailedAuditEventRow expectedDomainEvent = new AuditLogHelper.DetailedAuditEventRow(null, SAMPLE_TYPE_NAME, null,
+                "The descriptor of domain " + SAMPLE_TYPE_NAME + " was updated.",
+                "", oldValues, newValues, null);
+        boolean pass = _auditLogHelper.validateLastDomainAuditEvents(SAMPLE_TYPE_NAME, PROJECT_NAME, expectedDomainEvent, Collections.emptyMap());
+        checker().verifyTrue("Domain audit long not as expected after adding a parent alias column", pass);
 
         clickFolder(SUB_FOLDER_NAME);
         updatePage = sampleHelper.goToEditSampleType(SAMPLE_TYPE_NAME);

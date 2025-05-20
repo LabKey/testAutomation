@@ -463,10 +463,10 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
                 "&ShownInInsert=true&ShownInDetails=true&ShownInUpdate=true&ShownInLookupView=false&RecommendedVariable=false&ExcludedFromShifting=false&Scannable=false" +
                 "&DefaultValueType=Editable%20default&Validator=Text%20Choice%20Validator%2C%20BB%7CCC%20and%20here%20is%20an%20update%7CE%20E%20E%7CGG%7CH%7C%C2%83%C2%83%20updated%7C%C3%85%5C%7C%C3%85%2C%20Text%20Choice%20Validator";
         AuditLogHelper.DetailedAuditEventRow fieldEvent = new AuditLogHelper.DetailedAuditEventRow(null, textChoiceFieldName, "Modified",
-                "The following property was updated: Validator", "", fieldOldValues, fieldUpdateValues);
+                "The following property was updated: Validator", "", fieldOldValues, fieldUpdateValues, null);
         AuditLogHelper.DetailedAuditEventRow expectedDomainEvent = new AuditLogHelper.DetailedAuditEventRow(null, sampleTypeName, null,
                 "The column(s) of domain " + sampleTypeName + " were modified.",
-                "", null, null);
+                "", null, null, null);
         boolean pass = _auditLogHelper.validateLastDomainAuditEvents(sampleTypeName, getProjectName(), expectedDomainEvent, Map.of(textChoiceFieldName, fieldEvent));
         checker().verifyTrue("Audit event is not as expected", pass);
 
@@ -558,7 +558,7 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
                 "&Dimension=false&ShownInInsert=true&ShownInDetails=true&ShownInUpdate=true&ShownInLookupView=false&RecommendedVariable=false&ExcludedFromShifting=false" +
                 "&Scannable=false&DefaultValueType=Editable%20default&Validator=Text%20Choice%20Validator%2C%20BB%7CCC%20and%20here%20is%20an%20update%7CE%20E%20E%7CGG%7CH%20no%20change%7C%C2%83%C2%83%20updated%7C%C3%85%5C%7C%C3%85%2C%20Text%20Choice%20Validator";
         fieldEvent = new AuditLogHelper.DetailedAuditEventRow(null, textChoiceFieldName, "Modified",
-                "The following property was updated: Validator", "", fieldUpdateValues, fieldUpdateValues2);
+                "The following property was updated: Validator", "", fieldUpdateValues, fieldUpdateValues2, null);
         pass = _auditLogHelper.validateLastDomainAuditEvents(sampleTypeName, getProjectName(), expectedDomainEvent, Map.of(textChoiceFieldName, fieldEvent));
         checker().verifyTrue("Audit event is not as expected", pass);
 

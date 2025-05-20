@@ -601,23 +601,23 @@ public class AuditLogTest extends BaseWebDriverTest
                 "&EntireListIndexSetting=0&EntireListBodySetting=0&EachItemBodySetting=0&EntireListIndex=false&EachItemIndex=false&FileAttachmentIndex=false";
         AuditLogHelper.DetailedAuditEventRow expectedDomainEvent = new AuditLogHelper.DetailedAuditEventRow(null, LIST_CHECK_LOG, null,
                 "The domain " + LIST_CHECK_LOG + " was created. The column(s) of domain " + LIST_CHECK_LOG + " were modified.",
-                null, null, eventInitValue);
+                null, null, eventInitValue, null);
         String field1InitValue = "Name=Field01&Label=This%20is%20Field%2001&Type=String&Scale=4000&Description=Simple%20String%20field." +
                 "&PHI=Not%20PHI&DefaultScale=Linear&Required=false&Hidden=false&MvEnabled=false&Measure=false&Dimension=false" +
                 "&ShownInInsert=true&ShownInDetails=true&ShownInUpdate=true&ShownInLookupView=false" +
                 "&RecommendedVariable=false&ExcludedFromShifting=false&Scannable=false&DefaultValueType=Editable%20default";
         AuditLogHelper.DetailedAuditEventRow field1ExpectedEvent = new AuditLogHelper.DetailedAuditEventRow(null, FIELD01_NAME, "Created",
-                null, null, null, field1InitValue);
+                null, null, null, field1InitValue, null);
 
         String field2InitValue = "Name=Field02&Label=This%20is%20Field%2002&Type=Integer&Description=Simple%20Integer%20field." +
                 "&PHI=Not%20PHI&DefaultScale=Linear&Required=false&Hidden=false&MvEnabled=false&Measure=true&Dimension=false" +
                 "&ShownInInsert=true&ShownInDetails=true&ShownInUpdate=true&ShownInLookupView=false&RecommendedVariable=false" +
                 "&ExcludedFromShifting=false&Scannable=false&DefaultValueType=Editable%20default";
         AuditLogHelper.DetailedAuditEventRow field2ExpectedEvent = new AuditLogHelper.DetailedAuditEventRow(null, FIELD02_NAME, "Created",
-                null, null, null, field2InitValue);
+                null, null, null, field2InitValue, null);
 
         AuditLogHelper.DetailedAuditEventRow keyFieldExpectedEvent = new AuditLogHelper.DetailedAuditEventRow(null, "Key", "Created",
-                null, null, null, null);
+                null, null, null, null, null);
         boolean pass = _auditLogHelper.validateLastDomainAuditEvents(LIST_CHECK_LOG, AUDIT_PROPERTY_EVENTS_PROJECT, expectedDomainEvent, Map.of("Key", keyFieldExpectedEvent, FIELD01_NAME, field1ExpectedEvent, FIELD02_NAME, field2ExpectedEvent));
 
         // We are going to fail, so navigate to the Domain Property Events Audit Log.
@@ -651,18 +651,18 @@ public class AuditLogTest extends BaseWebDriverTest
 
         expectedDomainEvent = new AuditLogHelper.DetailedAuditEventRow(null, LIST_CHECK_LOG, null,
                 "The column(s) of domain " + LIST_CHECK_LOG + " were modified.",
-                "", eventInitValue, eventInitValue);
+                "", eventInitValue, eventInitValue, null);
 
         String field1UpdateValue = "Name=Field01&Label=This%20is%20Update%20Label%20for%20Field%2001&Type=String&Scale=4000&Description=This%20should%20be%20a%20new%20description%20for%20the%20field." +
                 "&PHI=Restricted%20PHI&DefaultScale=Linear&Required=true&Hidden=false&MvEnabled=false&Measure=false&Dimension=false&ShownInInsert=true&ShownInDetails=true&ShownInUpdate=true" +
                 "&ShownInLookupView=false&RecommendedVariable=false&ExcludedFromShifting=false&Scannable=false&DefaultValueType=Editable%20default";
         field1ExpectedEvent = new AuditLogHelper.DetailedAuditEventRow(null, FIELD01_NAME, "Modified",
-                "The following properties were updated: Label, Description, PHI, Required", "", field1InitValue, field1UpdateValue);
+                "The following properties were updated: Label, Description, PHI, Required", "", field1InitValue, field1UpdateValue, null);
         String field2UpdateValue = "Name=Field02&Label=This%20is%20Field%2002&Type=Integer&Description=Simple%20Integer%20field.&Format=%23!&PHI=Not%20PHI" +
                 "&DefaultScale=Log&Required=false&Hidden=false&MvEnabled=false&Measure=true&Dimension=false&ShownInInsert=true&ShownInDetails=true&ShownInUpdate=true" +
                 "&ShownInLookupView=false&RecommendedVariable=false&ExcludedFromShifting=false&Scannable=false&DefaultValueType=Editable%20default&ConditionalFormat=format.column~eq%3D5%3A%20";
         field2ExpectedEvent = new AuditLogHelper.DetailedAuditEventRow(null, FIELD02_NAME, "Modified",
-                "The following properties were updated: DefaultScale, Format, ConditionalFormat", "", field2InitValue, field2UpdateValue);
+                "The following properties were updated: DefaultScale, Format, ConditionalFormat", "", field2InitValue, field2UpdateValue, null);
 
         log("Validate that the expected rows after the update are in the log.");
         pass = _auditLogHelper.validateLastDomainAuditEvents(LIST_CHECK_LOG, AUDIT_PROPERTY_EVENTS_PROJECT, expectedDomainEvent, Map.of(FIELD01_NAME, field1ExpectedEvent, FIELD02_NAME, field2ExpectedEvent));
@@ -687,7 +687,7 @@ public class AuditLogTest extends BaseWebDriverTest
                 "&Measure=false&Dimension=true&ShownInInsert=true&ShownInDetails=true&ShownInUpdate=true&ShownInLookupView=false&RecommendedVariable=false&ExcludedFromShifting=false&Scannable=false" +
                 "&DefaultValueType=Editable%20default&Lookup=%7B%22queryName%22%3A%22LookUp01%22%2C%22schemaName%22%3A%22lists%22%7D";
         AuditLogHelper.DetailedAuditEventRow field3ExpectedEvent = new AuditLogHelper.DetailedAuditEventRow(null, FIELD03_NAME, "Created",
-                null, "", null, field3CreateValue);
+                null, "", null, field3CreateValue, null);
 
         log("Validate that the expected rows after the update are in the log.");
         pass = _auditLogHelper.validateLastDomainAuditEvents(LIST_CHECK_LOG, AUDIT_PROPERTY_EVENTS_PROJECT, expectedDomainEvent, Map.of(FIELD03_NAME, field3ExpectedEvent));
@@ -715,7 +715,7 @@ public class AuditLogTest extends BaseWebDriverTest
                 "&Measure=false&Dimension=true&ShownInInsert=true&ShownInDetails=true&ShownInUpdate=true&ShownInLookupView=false&RecommendedVariable=false&ExcludedFromShifting=false" +
                 "&Scannable=false&DefaultValueType=Editable%20default&Lookup=%7B%22queryName%22%3A%22LookUp02%22%2C%22schemaName%22%3A%22lists%22%7D";
         field3ExpectedEvent = new AuditLogHelper.DetailedAuditEventRow(null, FIELD03_NAME, "Modified",
-                "The following property was updated: Lookup", "", field3CreateValue, field3UpdateValue);
+                "The following property was updated: Lookup", "", field3CreateValue, field3UpdateValue, null);
         pass = _auditLogHelper.validateLastDomainAuditEvents(LIST_CHECK_LOG, AUDIT_PROPERTY_EVENTS_PROJECT, expectedDomainEvent, Map.of(FIELD03_NAME, field3ExpectedEvent));
 
 
@@ -733,7 +733,7 @@ public class AuditLogTest extends BaseWebDriverTest
         listDefinitionPage.clickSave();
 
         field3ExpectedEvent = new AuditLogHelper.DetailedAuditEventRow(null, FIELD03_NAME, "Deleted",
-                "", "", null, null);
+                "", "", null, null, null);
         pass = _auditLogHelper.validateLastDomainAuditEvents(LIST_CHECK_LOG, AUDIT_PROPERTY_EVENTS_PROJECT, expectedDomainEvent, Map.of(FIELD03_NAME, field3ExpectedEvent));
         if(!pass)
             goToAuditEventView(this, DOMAIN_PROPERTY_LOG_NAME);

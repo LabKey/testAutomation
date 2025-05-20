@@ -35,6 +35,7 @@ import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.list.IntListDefinition;
 import org.labkey.test.params.list.ListDefinition;
 import org.labkey.test.params.list.VarListDefinition;
+import org.labkey.test.util.APIContainerHelper;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.AuditLogHelper;
 import org.labkey.test.util.DataRegionTable;
@@ -46,6 +47,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
@@ -428,7 +430,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     }
 
     @Test
-    public void lookupTest()
+    public void lookupTest() throws CommandException
     {
         String sourceContainerPath = "/" + getProjectName() + "/" + SOURCE_FOLDER;
         _schemaHelper.createLinkedSchema(getProjectName() + "/" + TARGET_FOLDER, "BasicLinkedSchema", sourceContainerPath, null, "lists", "NIMHDemographics,NIMHPortions", null);
@@ -443,12 +445,23 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         //Make sure that the lookup columns propagated properly into the linked schema
         assertLookupsWorking(TARGET_FOLDER, "BasicLinkedSchema", "NIMHDemographics", true, "Mother", "Father");
 
+        String sourceFolderId = ((APIContainerHelper) _containerHelper).getContainerId(getProjectName() + "/" + SOURCE_FOLDER);
+        String otherFolderId = ((APIContainerHelper) _containerHelper).getContainerId(getProjectName() + "/" + OTHER_FOLDER);
+
         // Linked schemas disallow lookups to other folders outside of the current folder.
         //Change the Mother column lookup to point to the other folder, then ensure that the mother lookup is no longer propagating
-        changelistLookup(SOURCE_FOLDER, "NIMHDemographics", MOTHER,
+        String fieldOldValues = "Name=Mother&Label=Mother&Type=Integer&PHI=Not%20PHI&DefaultScale=Linear&Required=false&Hidden=false&MvEnabled=false&Measure=false&Dimension=false" +
+                "&ShownInInsert=true&ShownInDetails=true&ShownInUpdate=true&ShownInLookupView=false&RecommendedVariable=false&ExcludedFromShifting=false&Scannable=false" +
+                "&Lookup=%7B%22queryName%22%3A%22NIMHDemographics%22%2C%22schemaName%22%3A%22lists%22%7D";
+        String fieldUpdateValues = "Name=Mother&Label=Mother&Type=Integer&PHI=Not%20PHI&DefaultScale=Linear&Required=false&Hidden=false&MvEnabled=false&Measure=false&Dimension=false" +
+                "&ShownInInsert=true&ShownInDetails=true&ShownInUpdate=true&ShownInLookupView=false&RecommendedVariable=false&ExcludedFromShifting=false&Scannable=false" +
+                "&Lookup=%7B%22queryName%22%3A%22NIMHDemographics%22%2C%22schemaName%22%3A%22lists%22%2C%22containerId%22%3A%22" +
+                otherFolderId + "%22%7D";
+
+        changelistLookup(
                 new FieldDefinition.LookupInfo("/" + PROJECT_NAME + "/" + OTHER_FOLDER, "lists", "NIMHDemographics")
                         .setTableType(FieldDefinition.ColumnType.Integer),
-                "Lookup: [Container: old: null, new: OtherFolder, ];");
+                fieldOldValues, fieldUpdateValues);
         assertLookupsWorking(TARGET_FOLDER, "BasicLinkedSchema", "NIMHDemographics", true, "Father");
         assertLookupsWorking(TARGET_FOLDER, "BasicLinkedSchema", "NIMHDemographics", false, "Mother");
 
@@ -460,11 +473,14 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         assertLookupsWorking(TARGET_FOLDER, "QueryLinkedSchema", "QueryOverLookup", true, "Father");
         assertLookupsWorking(TARGET_FOLDER, "QueryLinkedSchema", "QueryOverLookup", false, "Mother");
 
+        String fieldUpdateValues2 = "Name=Mother&Label=Mother&Type=Integer&PHI=Not%20PHI&DefaultScale=Linear&Required=false&Hidden=false&MvEnabled=false&Measure=false&Dimension=false&ShownInInsert=true" +
+                "&ShownInDetails=true&ShownInUpdate=true&ShownInLookupView=false&RecommendedVariable=false&ExcludedFromShifting=false&Scannable=false&Lookup=%7B%22queryName%22%3A%22QueryOverLookup%22%2C%22schemaName%22%3A%22lists%22%2C%22containerId%22%3A%22" +
+                sourceFolderId + "%22%7D";
         //Change the Mother column lookup to point to the query, and then make sure that the table has lookups appropriately.
-        changelistLookup(SOURCE_FOLDER, "NIMHDemographics", MOTHER,
+        changelistLookup(
                 new FieldDefinition.LookupInfo("/" + PROJECT_NAME + "/" + SOURCE_FOLDER, "lists", "QueryOverLookup")
                 .setTableType(FieldDefinition.ColumnType.Integer),
-                "Lookup: [Container: old: OtherFolder, new: SourceFolder, Query: old: NIMHDemographics, new: QueryOverLookup];");
+                fieldUpdateValues, fieldUpdateValues2);
         assertLookupsWorking(TARGET_FOLDER, "QueryLinkedSchema", "NIMHDemographics", true, "Mother", "Father");
     }
 
@@ -995,19 +1011,26 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         }
     }
 
-    protected void changelistLookup(String sourceFolder, String tableName, String fieldName, FieldDefinition.LookupInfo info, String changeLog)
+    protected void changelistLookup(FieldDefinition.LookupInfo info, String fieldOldValues, String fieldUpdateValues)
     {
-        clickFolder(sourceFolder);
+        clickFolder(LinkedSchemaTest.SOURCE_FOLDER);
 
         goToManageLists();
 
-        EditListDefinitionPage listDefinitionPage = _listHelper.goToEditDesign(tableName);
+        EditListDefinitionPage listDefinitionPage = _listHelper.goToEditDesign("NIMHDemographics");
         listDefinitionPage.getFieldsPanel()
-                .getField(fieldName).setLookup(info);
+                .getField(LinkedSchemaTest.MOTHER).setLookup(info);
         listDefinitionPage.clickSave();
 
-        checker().verifyEquals("Domain audit comment not as expected after changing lookup", "The column(s) of domain " + tableName + " were modified", _auditLogHelper.getLastDomainEventComment(getProjectName(), tableName));
-        checker().verifyEquals("Domain field audit comment not as expected", List.of(changeLog), _auditLogHelper.getLastDomainPropertyComment(getProjectName(), tableName));
+
+        log("Validate domain and domain property audit log.");
+        AuditLogHelper.DetailedAuditEventRow fieldEvent = new AuditLogHelper.DetailedAuditEventRow(null, LinkedSchemaTest.MOTHER, "Modified",
+                "The following property was updated: Lookup", "", fieldOldValues, fieldUpdateValues, null);
+        AuditLogHelper.DetailedAuditEventRow expectedDomainEvent = new AuditLogHelper.DetailedAuditEventRow(null, "NIMHDemographics", null,
+                "The column(s) of domain " + "NIMHDemographics" + " were modified.",
+                "", null, null, null);
+        boolean pass = _auditLogHelper.validateLastDomainAuditEvents("NIMHDemographics", getProjectName(), expectedDomainEvent, Map.of(LinkedSchemaTest.MOTHER, fieldEvent));
+        checker().verifyTrue("Domain audit long not as expected after changing lookup expected", pass);
     }
 
     protected void createLinkedSchemaQuery(String sourceFolder, String schemaName, String queryName, String tableName)
