@@ -84,6 +84,8 @@ public class AuditLogHelper
      * @param auditEventName Name of the audit event to filter on. Example 'SamplesWorkflowAuditEvent'.
      * @param columnNames The name of the columns to return.
      * @param filters The filters to be applied
+     * @param maxRows The maximum number of rows to return. If null, all rows for the provided filters will be returned.
+     * @param containerFilter The container filter to be applied. If null, default is ContainerFilter.Current.
      * @return A rowResponse with the query logs.
      * @throws IOException Can be thrown by the SelectRowsCommand.
      * @throws CommandException Can be thrown by the SelectRowsCommand.
@@ -158,6 +160,12 @@ public class AuditLogHelper
         }
     }
 
+    public Integer getLastTransactionId(String containerPath, String auditEventName) throws IOException, CommandException
+    {
+        List<Map<String, Object>> events = getAuditLogsFromLKS(containerPath, auditEventName, List.of("TransactionId"), Collections.emptyList(), 1, ContainerFilter.CurrentAndSubfolders).getRows();
+        return events.size() == 1 ? (Integer) events.get(0).get("TransactionId") : null;
+    }
+
     /**
      * Check for the expected number of diffs in the audit event for the last transactionId.
      * If an expectedEventCount is also provided, it will check that the number of events for that transactionId matches the expectedEventCount.
@@ -166,14 +174,13 @@ public class AuditLogHelper
     public Integer checkAuditEventDiffCountForLastTransaction(String containerPath, String auditEventName, int expectedDiffCount,
                                                                       @Nullable Integer expectedEventCount) throws IOException, CommandException
     {
-        Integer transactionId = (Integer) getAuditLogsFromLKS(containerPath, auditEventName, List.of("TransactionId"), Collections.emptyList(), 1, ContainerFilter.CurrentAndSubfolders)
-                .getRows().get(0).get("TransactionId");
+        Integer transactionId = getLastTransactionId(containerPath, auditEventName);
         List<Filter> transactionFilter = List.of(new Filter("TransactionId", transactionId, Filter.Operator.EQUAL));
         int eventCount = getAuditLogsFromLKS(containerPath, auditEventName, List.of("NewRecordMap"), transactionFilter, null, ContainerFilter.CurrentAndSubfolders).getRows().size();
         if (expectedEventCount != null)
             assertEquals("Unexpected number of events for transactionId " + transactionId, expectedEventCount.intValue(), eventCount);
         List<Integer> expectedChangeCounts = Collections.nCopies(eventCount, expectedDiffCount);
-        checkAuditEventDiffCount(containerPath, auditEventName, expectedChangeCounts);
+        checkAuditEventDiffCount(containerPath, auditEventName, transactionFilter, expectedChangeCounts);
         return transactionId;
     }
 
