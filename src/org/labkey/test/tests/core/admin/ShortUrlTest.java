@@ -186,10 +186,15 @@ public class ShortUrlTest extends BaseWebDriverTest
             log("As app admin, update shortUrl created by another user");
             adminPage.submitShortUrl(shortUrl_a, targetUrl2);
 
-            // Issue #52485 "App admins can create and edit shorturls but can't view them"
-            assertElementPresent(BootstrapLocators.errorBanner.withText("Table or query not found: ShortURL"));
+            // Issue #52485 "App admins can create and edit shorturls but can't view them" (but now they can!)
+            verifyShortUrlsInGrid(shortUrl_a, targetUrl2, shortUrl_b);
         });
 
+        verifyShortUrlsInGrid(shortUrl_a, targetUrl2, shortUrl_b);
+    }
+
+    private void verifyShortUrlsInGrid(String shortUrl_a, String targetUrl2, String shortUrl_b)
+    {
         Assertions.assertThat(ShortUrlAdminPage.beginAt(this).getUrlsFromGrid())
                 .as("short URLs")
                 .containsAllEntriesOf(Map.of(
