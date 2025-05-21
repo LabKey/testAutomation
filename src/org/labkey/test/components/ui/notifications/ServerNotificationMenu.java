@@ -274,11 +274,11 @@ public class ServerNotificationMenu extends WebDriverComponent<ServerNotificatio
         public final WebElement markAll()
         {
             return Locator.tagWithClass("h3", "navbar-menu-header")
-                    .child(Locator.tagWithClass("div", "server-notifications-link"))
+                    .child(Locator.byClass("clickable-text"))
                     .refindWhenNeeded(elementCache().menuContent);
         }
 
-        public final WebElement viewAllLink = Locator.tagWithText("div", "View all activity").refindWhenNeeded(this);
+        public final WebElement viewAllLink = Locator.linkContainingText("View all activity").refindWhenNeeded(this);
 
     }
 
