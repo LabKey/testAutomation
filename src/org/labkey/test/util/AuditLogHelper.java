@@ -279,11 +279,6 @@ public class AuditLogHelper
         return getLastDomainEvent(projectName, domainName).rowId;
     }
 
-    public String getLastDomainEventComment(String projectName, String domainName) // TODO delete
-    {
-        return getLastDomainEvent(projectName, domainName).comment;
-    }
-
     public static List<String> propertyAuditColumns = List.of("type", "comment", "usercomment", "oldvalues", "newvalues", "datachanges");
     public record DetailedAuditEventRow(Integer rowId, String keyValue, String type, String comment, String userComment, String oldValues, String newValues, String dataChanges)
     {
@@ -338,11 +333,6 @@ public class AuditLogHelper
     public List<String> getLastDomainPropertyValues(String projectName, String domainName, String columnName)
     {
         return getLastDomainPropertyEvents(projectName, domainName).values().stream().map(values -> values.getColumn(columnName)).toList();
-    }
-
-    public List<String> getLastDomainPropertyComment(String projectName, String domainName)
-    {
-        return getLastDomainPropertyValues(projectName, domainName, "comment");
     }
 
     public List<String> getDomainEventComments(String projectName, String domainName, @Nullable Collection<Integer> ignoreIds)

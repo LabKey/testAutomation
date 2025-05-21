@@ -1234,8 +1234,8 @@ public class ListTest extends BaseWebDriverTest
                 "The column(s) of domain " + TSV_LIST_NAME + " were modified.",
                 "", null, null, null);
         boolean pass = _auditLogHelper.validateLastDomainAuditEvents(TSV_LIST_NAME, getProjectName(), expectedDomainEvent,
-                Map.of("IntCol", new AuditLogHelper.DetailedAuditEventRow(null, "IntCol", "Modified","The following properties were updated: Type, ConditionalFormat",null, null, null, "ConditionalFormat:  » format.column~gt=7: text-decoration: line-through;, format.column~gt=5: font-weight: bold;"),
-                        "BoolCol", new AuditLogHelper.DetailedAuditEventRow(null, "BoolCol", "Modified","The following properties were updated: ConditionalFormat",null, null, null, "ConditionalFormat:  » format.column~eq=true: text-decoration: line-through;font-weight: bold;font-style: italic;color: #68ccca;background-color: #d33115 !important;"))
+                Map.of("IntCol", new AuditLogHelper.DetailedAuditEventRow(null, "IntCol", "Modified","The following property was updated: ConditionalFormat",null, null, null, "ConditionalFormat:  > format.column~gt=7: text-decoration: line-through;, format.column~gt=5: font-weight: bold;"),
+                        "BoolCol", new AuditLogHelper.DetailedAuditEventRow(null, "BoolCol", "Modified","The following property was updated: ConditionalFormat",null, null, null, "ConditionalFormat:  > format.column~eq=true: text-decoration: line-through;font-weight: bold;font-style: italic;color: #68ccca;background-color: #d33115 !important;"))
         );
         checker().verifyTrue("Domain audit comment not as expected after changing conditional format", pass);
 
@@ -1350,13 +1350,13 @@ public class ListTest extends BaseWebDriverTest
         listDefinitionPage.setColumnPhiLevel("RestrictedPhiColumn", FieldDefinition.PhiSelectType.Restricted);
         listDefinitionPage.clickSave();
 
-        AuditLogHelper.DetailedAuditEventRow expectedDomainEvent = new AuditLogHelper.DetailedAuditEventRow(null, TSV_LIST_NAME, null,
-                "The column(s) of domain " + TSV_LIST_NAME + " were modified.",
+        AuditLogHelper.DetailedAuditEventRow expectedDomainEvent = new AuditLogHelper.DetailedAuditEventRow(null, listName, null,
+                "The column(s) of domain " + listName + " were modified.",
                 "", null, null, null);
-        boolean pass = _auditLogHelper.validateLastDomainAuditEvents(TSV_LIST_NAME, getProjectName(), expectedDomainEvent,
-                Map.of("LimitedPhiColumn", new AuditLogHelper.DetailedAuditEventRow(null, "LimitedPhiColumn", "Modified","The following properties were updated: PHI",null, null, null, "PHI: Not PHI > Limited PHI"),
-                        "PhiColumn", new AuditLogHelper.DetailedAuditEventRow(null, "PhiColumn", "Modified","The following properties were updated: PHI",null, null, null, "PHI: Not PHI > Full PHI"),
-                        "RestrictedPhiColumn", new AuditLogHelper.DetailedAuditEventRow(null, "RestrictedPhiColumn", "Modified","The following properties were updated: PHI",null, null, null, "PHI: Not PHI > Restricted PHI"))
+        boolean pass = _auditLogHelper.validateLastDomainAuditEvents(listName, getProjectName(), expectedDomainEvent,
+                Map.of("LimitedPhiColumn", new AuditLogHelper.DetailedAuditEventRow(null, "LimitedPhiColumn", "Modified","The following property was updated: PHI",null, null, null, "PHI: Not PHI > Limited PHI"),
+                        "PhiColumn", new AuditLogHelper.DetailedAuditEventRow(null, "PhiColumn", "Modified","The following property was updated: PHI",null, null, null, "PHI: Not PHI > Full PHI"),
+                        "RestrictedPhiColumn", new AuditLogHelper.DetailedAuditEventRow(null, "RestrictedPhiColumn", "Modified","The following property was updated: PHI",null, null, null, "PHI: Not PHI > Restricted PHI"))
         );
         checker().verifyTrue("Domain audit comment not as expected after changing conditional format", pass);
 
@@ -1533,8 +1533,8 @@ public class ListTest extends BaseWebDriverTest
         listDefinitionPage.clickSave();
 
         AuditLogHelper.DetailedAuditEventRow expectedDomainEvent = new AuditLogHelper.DetailedAuditEventRow(null, listName, null,
-                "The descriptor of domain " + listName + " was updated",
-                "", null, null, "Index: > [field Name1, unique: true, fieldName_2, unique: true]");
+                "The descriptor of domain " + listName + " was updated.",
+                "", null, null, "Indices:  > [field Name1, unique: true, fieldName_2, unique: true]");
         boolean pass = _auditLogHelper.validateLastDomainAuditEvents(listName, getProjectName(), expectedDomainEvent, Collections.emptyMap());
         checker().verifyTrue("Domain audit comment not as expected after updating field unique constraint", pass);
 
@@ -1553,8 +1553,8 @@ public class ListTest extends BaseWebDriverTest
         listDefinitionPage.clickSave();
 
         expectedDomainEvent = new AuditLogHelper.DetailedAuditEventRow(null, listName, null,
-                "The descriptor of domain " + listName + " was updated",
-                "", null, null, "Index: field name1, unique: true, fieldname_2, unique: true > FieldName@3, unique: true, field Name1, unique");
+                "The descriptor of domain " + listName + " was updated.",
+                "", null, null, "Indices: [field name1, unique: true, fieldname_2, unique: true] > [FieldName@3, unique: true, field Name1, unique: true]");
         pass = _auditLogHelper.validateLastDomainAuditEvents(listName, getProjectName(), expectedDomainEvent, Collections.emptyMap());
         checker().verifyTrue("Domain audit comment not as expected after updating field unique constraint", pass);
 
