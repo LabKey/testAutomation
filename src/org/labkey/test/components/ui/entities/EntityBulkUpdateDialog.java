@@ -263,11 +263,6 @@ public class EntityBulkUpdateDialog extends ModalDialog
 
     // dismiss the dialog
 
-    public void clickEditWithGrid()
-    {
-        dismiss("Edit with Grid");
-    }
-
     public String clickUpdateExpectingError()
     {
         elementCache().updateButton.click();
