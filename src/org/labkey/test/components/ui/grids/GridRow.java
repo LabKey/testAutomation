@@ -7,6 +7,7 @@ import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.react.ReactCheckBox;
 import org.labkey.test.components.ui.files.AttachmentCard;
 import org.labkey.test.components.ui.files.ImageFileViewDialog;
+import org.labkey.test.components.ui.grids.FieldReferenceManager.FieldReference;
 import org.labkey.test.params.FieldKey;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
@@ -84,7 +85,7 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
     /**
      * gets the cell corresponding to the specified column
      */
-    public WebElement getCell(String columnIdentifier)
+    public WebElement getCell(CharSequence columnIdentifier)
     {
         return getCell(_grid.getColumnIndex(columnIdentifier));
     }
@@ -128,7 +129,7 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
     /**
      * finds a AttachmentCard in the specified column, clicks it, and waits for the image to display in a modal
      */
-    public ImageFileViewDialog clickImgFile(String columnIdentifier)
+    public ImageFileViewDialog clickImgFile(CharSequence columnIdentifier)
     {
         return elementCache().waitForAttachment(columnIdentifier).viewImgFile();
     }
@@ -136,7 +137,7 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
     /**
      * finds a AttachmentCard specified filename, clicks it, and waits for the file to download
      */
-    public File clickNonImgFile(String columnIdentifier)
+    public File clickNonImgFile(CharSequence columnIdentifier)
     {
         return elementCache().waitForAttachment(columnIdentifier).clickOnNonImgFile();
     }
@@ -144,7 +145,7 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
     /**
      * Returns the text in the row for the specified column
      */
-    public String getText(String columnIdentifier)
+    public String getText(CharSequence columnIdentifier)
     {
         return getCell(columnIdentifier).getText();
     }
@@ -165,7 +166,7 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
      */
     public Map<String, String> getRowMapByLabel()
     {
-        return getRowMap(FieldReferenceManager.FieldReference::getLabel);
+        return getRowMap(FieldReference::getLabel);
     }
 
     /**
@@ -173,7 +174,7 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
      */
     public Map<String, String> getRowMapByName()
     {
-        return getRowMap(columnHeader -> columnHeader.getFieldKey().getName());
+        return getRowMap(FieldReference::getName);
     }
 
     /**
@@ -181,17 +182,17 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
      */
     public Map<FieldKey, String> getRowMapByFieldKey()
     {
-        return getRowMap(FieldReferenceManager.FieldReference::getFieldKey);
+        return getRowMap(FieldReference::getFieldKey);
     }
 
-    <T> Map<T, String> getRowMap(Function<FieldReferenceManager.FieldReference, T> keyMapper)
+    <T> Map<T, String> getRowMap(Function<FieldReference, T> keyMapper)
     {
         List<String> columnValues = elementCache().getCellTexts();
-        List<FieldReferenceManager.FieldReference> headers = _grid.getHeaders();
+        List<FieldReference> headers = _grid.getHeaders();
 
         Map<T, String> rowMap = new LinkedHashMap<>();
 
-        for (FieldReferenceManager.FieldReference header : headers)
+        for (FieldReference header : headers)
         {
             T key = keyMapper.apply(header);
             String value = columnValues.get(header.getDomIndex());
@@ -252,7 +253,7 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
             return cellTexts;
         }
 
-        public AttachmentCard waitForAttachment(String columnIdentifier)
+        public AttachmentCard waitForAttachment(CharSequence columnIdentifier)
         {
             return new AttachmentCard.FileAttachmentCardFinder(getDriver()).waitFor(getCell(columnIdentifier));
         }

@@ -83,7 +83,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
      * @param text text in the data cell
      * @return row data
      */
-    public Map<String, String> getRowMapByLabel(String columnIdentifier, String text)
+    public Map<String, String> getRowMapByLabel(CharSequence columnIdentifier, String text)
     {
         return getRow(columnIdentifier, text).getRowMapByLabel();
     }
@@ -118,7 +118,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
      * @return this grid
      */
     @Override
-    public QueryGrid selectRow(String columnIdentifier, String text, boolean checked)
+    public QueryGrid selectRow(CharSequence columnIdentifier, String text, boolean checked)
     {
         getRow(columnIdentifier, text).select(checked);
         return this;
@@ -534,7 +534,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         for(WebElement menuItem : menuItems)
         {
             // Why does menuItem.getText() return an empty string here?
-            if(menuItem.getAttribute("text").contains("Manage Saved Views"))
+            if(menuItem.getDomProperty("text").contains("Manage Saved Views"))
                 return false;
         }
 

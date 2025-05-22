@@ -691,7 +691,7 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
         private final FieldKey _fieldKey;
         private final String _label;
 
-        public DetailTableEditFieldReference(WebElement element, Integer domIndex, String fieldKey, String label)
+        public DetailTableEditFieldReference(WebElement element, int domIndex, String fieldKey, String label)
         {
             super(element, domIndex);
             _fieldKey = FieldKey.fromFieldKey(fieldKey);
@@ -708,12 +708,6 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
         public String getLabel()
         {
             return _label;
-        }
-
-        @Override
-        public Integer getDomIndex()
-        {
-            return null;
         }
     }
 }

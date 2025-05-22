@@ -39,20 +39,20 @@ public class FieldReferenceManager
      *     <li>Field Label</li>
      * </ol>
      */
-    public final FieldReference findFieldReference(CharSequence columnIdentifier)
+    public final FieldReference findFieldReference(CharSequence fieldIdentifier)
     {
         List<Supplier<FieldReference>> options;
 
-        if (columnIdentifier instanceof FieldKey fk)
+        if (fieldIdentifier instanceof FieldKey fk)
         {
             options = List.of(() -> findColumnHeaderByFieldKey(fk)); // We know it is a FieldKey
         }
         else
         {
             options = List.of(
-                () -> findColumnHeaderByFieldKey(FieldKey.fromFieldKey(columnIdentifier)), // encoded fieldKey
-                () -> findColumnHeaderByFieldKey(FieldKey.fromName(columnIdentifier)), // unencoded fieldKey
-                () -> findColumnHeaderByLabel(columnIdentifier.toString()) // Field label
+                () -> findColumnHeaderByFieldKey(FieldKey.fromFieldKey(fieldIdentifier)), // encoded fieldKey
+                () -> findColumnHeaderByFieldKey(FieldKey.fromName(fieldIdentifier)), // unencoded fieldKey
+                () -> findColumnHeaderByLabel(fieldIdentifier.toString()) // Field label
             );
         }
 
@@ -60,25 +60,24 @@ public class FieldReferenceManager
             .map(Supplier::get)
             .filter(Objects::nonNull)
             .findFirst()
-            .orElseThrow(() -> new NoSuchElementException("Unable to locate field: " + columnIdentifier));
+            .orElseThrow(() -> new NoSuchElementException("Unable to locate field: " + fieldIdentifier));
     }
 
-    private FieldReference findColumnHeaderByFieldKey(FieldKey columnIdentifier)
+    private FieldReference findColumnHeaderByFieldKey(FieldKey fieldIdentifier)
     {
-        if (fieldKeys.containsKey(columnIdentifier))
+        if (fieldKeys.containsKey(fieldIdentifier))
         {
-            return fieldKeys.get(columnIdentifier);
+            return fieldKeys.get(fieldIdentifier);
         }
         else if (fieldKeys.size() < _fieldReferences.size())
         {
-            // Check whether columnIdentifier is an encoded fieldKey
             for (FieldReference header : _fieldReferences)
             {
                 if (!fieldKeys.containsValue(header))
                 {
                     FieldKey fieldKey = header.getFieldKey();
                     fieldKeys.put(fieldKey, header);
-                    if (fieldKey.equals(columnIdentifier))
+                    if (fieldKey.equals(fieldIdentifier))
                     {
                         return header;
                     }
@@ -97,7 +96,6 @@ public class FieldReferenceManager
         }
         else if (fieldLabels.size() < _fieldReferences.size())
         {
-            // Check whether columnIdentifier is a field label
             for (FieldReference header : _fieldReferences)
             {
                 if (!fieldLabels.containsValue(header))
@@ -118,11 +116,11 @@ public class FieldReferenceManager
     public static class FieldReference
     {
         private final WebElement _element;
-        private final Integer _domIndex;
+        private final int _domIndex;
         private final Mutable<String> _fieldLabel = new MutableObject<>();
         private final Mutable<FieldKey> _fieldKey = new MutableObject<>();
 
-        public FieldReference(WebElement element, Integer domIndex)
+        public FieldReference(WebElement element, int domIndex)
         {
             _element = element;
             _domIndex = domIndex;
@@ -170,7 +168,7 @@ public class FieldReferenceManager
             return getFieldKey().getName();
         }
 
-        public Integer getDomIndex()
+        public int getDomIndex()
         {
             return _domIndex;
         }
