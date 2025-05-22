@@ -452,7 +452,7 @@ public class EntityBulkInsertDialog extends ModalDialog
      */
     public static FieldKey fileUploadFieldKey(CharSequence fieldIdentifier)
     {
-        return FieldKey.fromFieldKey(fieldIdentifier + "-fileUpload");
+        return FieldKey.fromFieldKey(FieldKey.fromName(fieldIdentifier) + "-fileUpload");
     }
 
     @Override

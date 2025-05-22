@@ -114,7 +114,7 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
      * @param columnIdentifier fieldKey, name, or label
      * @return this component
      */
-    public EntityInsertPanel removeColumn(String columnIdentifier)
+    public EntityInsertPanel removeColumn(CharSequence columnIdentifier)
     {
         showGrid();
         elementCache().grid.removeColumn(columnIdentifier);

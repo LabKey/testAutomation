@@ -103,15 +103,25 @@ public class FieldSelectionDialog extends ModalDialog
      */
     public boolean isAvailableFieldSelected(String... fieldNameParts)
     {
-        WebElement listItem = expandAvailableFields(fieldNameParts);
+        return isAvailableFieldSelected(FieldKey.fromParts(fieldNameParts));
+    }
+
+    public boolean isAvailableFieldSelected(FieldKey fieldKey)
+    {
+        WebElement listItem = getAvailableFieldElement(fieldKey);
         return Locator.tagWithClass("i", "fa-check").findWhenNeeded(listItem).isDisplayed();
     }
 
     public boolean isFieldAvailable(String... fieldNameParts)
     {
+        return isFieldAvailable(FieldKey.fromParts(fieldNameParts));
+    }
+
+    public boolean isFieldAvailable(FieldKey fieldKey)
+    {
         try
         {
-            expandAvailableFields(fieldNameParts);
+            getAvailableFieldElement(fieldKey);
             return true;
         }
         catch (NoSuchElementException e)
@@ -128,9 +138,14 @@ public class FieldSelectionDialog extends ModalDialog
      */
     public FieldSelectionDialog selectAvailableField(String... fieldNameParts)
     {
-        WebElement listItem = expandAvailableFields(fieldNameParts);
+        return selectAvailableField(FieldKey.fromParts(fieldNameParts));
+    }
 
-        Assert.assertTrue(String.format(FIELD_NOT_AVAILABLE, FieldKey.fromParts(fieldNameParts)),
+    public FieldSelectionDialog selectAvailableField(FieldKey fieldKey)
+    {
+        WebElement listItem = getAvailableFieldElement(fieldKey);
+
+        Assert.assertTrue(String.format(FIELD_NOT_AVAILABLE, fieldKey),
             listItem.isDisplayed());
 
         WebElement addIcon = Locator.tagWithClass("div", "view-field__action")
@@ -144,19 +159,17 @@ public class FieldSelectionDialog extends ModalDialog
 
     public WebElement getAvailableFieldElement(String... fieldNameParts)
     {
-        return expandAvailableFields(fieldNameParts);
+        return getAvailableFieldElement(FieldKey.fromParts(fieldNameParts));
     }
 
     /**
-     * Expand a field or a hierarchy of fieldKeyParts. If a single field is passed in only it will be expanded. If multiple values
-     * are passed in it is assumed to be a path and all fieldKeyParts will be expanded to the last field.
+     * Expand available field tree to the specified field
      *
-     * @param fieldNameParts The list of fieldKeyParts to expand.
-     * @return key for the expanded field.
+     * @param fieldKey FieldKey for the target field
+     * @return row element for the specified field
      */
-    private WebElement expandAvailableFields(String... fieldNameParts)
+    public WebElement getAvailableFieldElement(FieldKey fieldKey)
     {
-        FieldKey fieldKey = FieldKey.fromParts(fieldNameParts);
         Iterator<FieldKey> iterator = fieldKey.getIterator();
 
         while(iterator.hasNext())

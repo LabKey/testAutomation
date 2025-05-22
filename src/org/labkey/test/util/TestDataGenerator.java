@@ -72,8 +72,10 @@ import static org.labkey.test.util.data.TestDataUtils.REALISTIC_SOURCE_FIELDS;
  */
 public class TestDataGenerator
 {
+    private static final String WIDE_CHAR = "👾";
+    private static final char WIDE_PLACEHOLDER = 'Π'; // Wide character can't be picked from the string with 'charAt'
     // chose a Character random from this String
-    public static final String CHARSET_STRING = "ABCDEFG01234abcdefvxyz~!@#$%^&*()-+=_{}[]|:;\"',.<>";
+    public static final String CHARSET_STRING = "ABCDEFG01234abcdefvxyz~!@#$%^&*()-+=_{}[]|:;\"',.<>и안は" + WIDE_PLACEHOLDER;
     public static final String ALPHANUMERIC_STRING = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvxyz";
     public static final String DOMAIN_SPECIAL_STRING =  "+- _.:&()/";
     public static final String ILLEGAL_DOMAIN_NAME_CHARSET = "<>[]{};,`\"~!@#$%^*=|?\\";
@@ -470,7 +472,11 @@ public class TestDataGenerator
         for (int i=0; i<size; i++)
         {
             int randIndex = (int)(charSetFrom.length() * Math.random());
-            val.append(charSetFrom.charAt(randIndex));
+            char c = charSetFrom.charAt(randIndex);
+            if (c == WIDE_PLACEHOLDER)
+                val.append(WIDE_CHAR);
+            else
+                val.append(c);
         }
         return val.toString();
     }
@@ -797,13 +803,12 @@ public class TestDataGenerator
         return shuffled.subList(0, selectCount);
     }
 
-    // Require suppliers to provide reassurance that mutable objects are only reused intentionally
-    public static <T> List<T> randomSelect(List<Supplier<T>> allFields, int selectCount)
+    public static <T> List<T> randomSelect(List<T> allOptions, int selectCount)
     {
         List<T> selected = new ArrayList<>();
         for (int i = 0; i < selectCount; i++)
         {
-            selected.add(allFields.get(randomInt(0, allFields.size())).get());
+            selected.add(allOptions.get(randomInt(0, allOptions.size())));
         }
         return selected;
     }

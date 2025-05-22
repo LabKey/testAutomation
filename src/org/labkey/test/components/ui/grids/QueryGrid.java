@@ -224,7 +224,10 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
 
         func.run();
 
-        optionalStatus.ifPresent(el -> getWrapper().shortWait().until(ExpectedConditions.stalenessOf(el)));
+        optionalStatus.ifPresent(el -> {
+            getWrapper().shortWait().until(ExpectedConditions.stalenessOf(el));
+            elementCache().selectionStatusContainerLoc.waitForElement(this, 5_000);
+        });
 
         waitForLoaded();
         clearElementCache();

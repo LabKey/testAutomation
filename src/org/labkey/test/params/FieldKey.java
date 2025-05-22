@@ -2,6 +2,7 @@ package org.labkey.test.params;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,7 +12,7 @@ import java.util.List;
 
 public class FieldKey implements CharSequence
 {
-    public static final FieldKey EMPTY = new FieldKey("");
+    public static final FieldKey EMPTY = new FieldKey(""); // Useful as a sort of FieldKey builder starting point
     public static final FieldKey SOURCES_FK = new FieldKey("DataInputs");
     public static final FieldKey PARENTS_FK = new FieldKey("MaterialInputs");
 
@@ -21,7 +22,7 @@ public class FieldKey implements CharSequence
     private final String _name;
     private final String _fieldKey;
 
-    private FieldKey(String name)
+    protected FieldKey(String name)
     {
         _parent = null;
         _name = name;
@@ -59,12 +60,23 @@ public class FieldKey implements CharSequence
      * @param fieldKey String or FieldKey
      * @return FieldKey representation of the String, or the identity if a FieldKey was provided
      */
-    public static FieldKey fromFieldKey(CharSequence fieldKey)
+    public static @Nullable FieldKey fromFieldKey(CharSequence fieldKey)
     {
         if (fieldKey instanceof FieldKey fk)
+        {
             return fk;
+        }
         else
-            return fromParts(Arrays.stream(fieldKey.toString().split(SEPARATOR)).map(FieldKey::decodePart).toList());
+        {
+            try
+            {
+                return fromParts(Arrays.stream(fieldKey.toString().split(SEPARATOR)).map(FieldKey::decodePart).toList());
+            }
+            catch (IllegalArgumentException iae)
+            {
+                return null;
+            }
+        }
     }
 
     /**
@@ -165,12 +177,12 @@ public class FieldKey implements CharSequence
     {
         if (!(o instanceof FieldKey fieldKey)) return false;
 
-        return _fieldKey.equals(fieldKey._fieldKey);
+        return _fieldKey.equalsIgnoreCase(fieldKey._fieldKey); // FieldKeys aren't case-sensitive?
     }
 
     @Override
     public int hashCode()
     {
-        return _fieldKey.hashCode();
+        return _fieldKey.toLowerCase().hashCode(); // FieldKeys aren't case-sensitive?
     }
 }
