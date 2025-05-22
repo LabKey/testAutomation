@@ -4,6 +4,7 @@ import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.UpdatingComponent;
 import org.labkey.test.components.bootstrap.ModalDialog;
@@ -290,7 +291,7 @@ public class EntityBulkUpdateDialog extends ModalDialog
         });
 
         // check for the expected number of Data Changes in the latest audit event records
-        AuditLogHelper auditLogHelper = new AuditLogHelper(getWrapper());
+        AuditLogHelper auditLogHelper = new AuditLogHelper(getWrapper(), () -> WebTestHelper.getRemoteApiConnection(false));
         String auditEventName = auditLogHelper.getAuditEventNameFromURL();
         if (!skipAuditEventCheck && auditEventName != null)
         {
