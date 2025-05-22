@@ -638,14 +638,17 @@ public class ListTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("view history"));
         checker().wrapAssertion(()->assertTextPresent(":History"));
         checker().wrapAssertion(()->assertTextPresent("record was modified", 2));    // An existing list record was modified
-        checker().wrapAssertion(()->assertTextPresent("were modified", 8));          // The column(s) of LIST_NAME_COLORS domain were modified
+
+        checker().wrapAssertion(()->assertTextPresent(" was created. The column(s) of domain ", 1));// Create domain and update columns combined into a single event
+        checker().wrapAssertion(()->assertTextPresent(" were modified.", 7));          // The column(s) of LIST_NAME_COLORS domain were modified
+        checker().wrapAssertion(()->assertTextPresent("The descriptor of domain.", 1));          // The description LIST_NAME_COLORS domain were modified
         checker().wrapAssertion(()->assertTextPresent("Bulk inserted", 2));
         checker().wrapAssertion(()->assertTextPresent("A new list record was inserted", 1));
         checker().wrapAssertion(()->assertTextPresent("was created", 2));                // Once for the list, once for the domain
         // List insert/update events should each have a link to the list item that was modified, but the other events won't have a link
-        checker().wrapAssertion(()->assertEquals("details Links", 6, DataRegionTable.detailsLinkLocator().findElements(getDriver()).size()));
-        checker().wrapAssertion(()->assertEquals("Project Links", 18, DataRegionTable.Locators.table().append(Locator.linkWithText(PROJECT_VERIFY)).findElements(getDriver()).size()));
-        checker().wrapAssertion(()->assertEquals("List Links", 18, DataRegionTable.Locators.table().append(Locator.linkWithText(LIST_NAME_COLORS)).findElements(getDriver()).size()));
+        checker().wrapAssertion(()->assertEquals("details Links", 6/*List Events*/ + 8/*Domain Audit*/, DataRegionTable.detailsLinkLocator().findElements(getDriver()).size()));
+        checker().wrapAssertion(()->assertEquals("Project Links", 17, DataRegionTable.Locators.table().append(Locator.linkWithText(PROJECT_VERIFY)).findElements(getDriver()).size()));
+        checker().wrapAssertion(()->assertEquals("List Links", 17, DataRegionTable.Locators.table().append(Locator.linkWithText(LIST_NAME_COLORS)).findElements(getDriver()).size()));
         DataRegionTable dataRegionTable = new DataRegionTable("query", getDriver());
         dataRegionTable.clickRowDetails(0);
         checker().wrapAssertion(()->assertTextPresent("List Item Details"));
