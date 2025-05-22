@@ -15,6 +15,7 @@ import org.labkey.test.components.react.ReactDateTimePicker;
 import org.labkey.test.components.react.ReactSelect;
 import org.labkey.test.components.ui.entities.EntityBulkInsertDialog;
 import org.labkey.test.components.ui.entities.EntityBulkUpdateDialog;
+import org.labkey.test.components.ui.grids.FieldReferenceManager.FieldReference;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldKey;
 import org.labkey.test.util.selenium.ScrollUtils;
@@ -137,6 +138,11 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         throw new NotFoundException("Column not found in grid: " + fieldLabel + ". Found: " + fieldLabels);
     }
 
+    /**
+     * Remove the specified column from the grid
+     * @param columnIdentifier fieldKey, name, or label
+     * @return this component
+     */
     public EditableGrid removeColumn(String columnIdentifier)
     {
         doAndWaitForColumnUpdate(() ->
@@ -231,26 +237,38 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         return Locators.rows.findElements(elementCache().table);
     }
 
+    /**
+     * @param columnIdentifiers fieldKeys, names, or labels of columns
+     * @return grid data for the specified columns, keyed by column label
+     */
     public List<Map<String, String>> getGridDataByLabel(String... columnIdentifiers)
     {
-        return getGridData(ColumnHeader::getColumnLabel, columnIdentifiers);
+        return getGridData(FieldReferenceManager.FieldReference::getLabel, columnIdentifiers);
     }
 
+    /**
+     * @param columnIdentifiers fieldKeys, names, or labels of columns
+     * @return grid data for the specified columns, keyed by column fieldKey
+     */
     public List<Map<FieldKey, String>> getGridDataByFieldKey(String... columnIdentifiers)
     {
-        return getGridData(ColumnHeader::getFieldKey, columnIdentifiers);
+        return getGridData(FieldReferenceManager.FieldReference::getFieldKey, columnIdentifiers);
     }
 
+    /**
+     * @param columnIdentifiers fieldKeys, names, or labels of columns
+     * @return grid data for the specified columns, keyed by column name
+     */
     public List<Map<String, String>> getGridDataByName(String... columnIdentifiers)
     {
-        return getGridData(columnHeader -> columnHeader.getFieldKey().getName(), columnIdentifiers);
+        return getGridData(FieldReference::getName, columnIdentifiers);
     }
 
-    private <T> List<Map<T, String>> getGridData(Function<ColumnHeader, T> keyGenerator, String... columnIdentifiers)
+    private <T> List<Map<T, String>> getGridData(Function<FieldReferenceManager.FieldReference, T> keyGenerator, String... columnIdentifiers)
     {
         List<Map<T, String>> gridData = new ArrayList<>();
 
-        Set<ColumnHeader> includedColHeaders = new LinkedHashSet<>();
+        Set<FieldReference> includedColHeaders = new LinkedHashSet<>();
         if (columnIdentifiers.length == 0)
         {
             includedColHeaders.addAll(elementCache().findHeaders());
@@ -268,14 +286,14 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
             List<WebElement> cells = row.findElements(By.tagName("td"));
             Map<T, String> rowMap = new LinkedHashMap<>(includedColHeaders.size());
 
-            for (ColumnHeader columnHeader : includedColHeaders)
+            for (FieldReference fieldReference : includedColHeaders)
             {
-                WebElement cell = cells.get(columnHeader.getDomIndex());
+                WebElement cell = cells.get(fieldReference.getDomIndex());
 
-                T key = keyGenerator.apply(columnHeader);
+                T key = keyGenerator.apply(fieldReference);
                 String value;
 
-                if (columnHeader.getDomIndex() == 0 && hasSelectColumn())
+                if (fieldReference.getDomIndex() == 0 && hasSelectColumn())
                 {
                     value = String.valueOf(Locator.tag("input").findElement(cell).isSelected());
                 }
@@ -293,11 +311,15 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         return gridData;
     }
 
+    @Deprecated
     public List<String> getColumnDataByLabel(String fieldLabel)
     {
         return getColumnData(fieldLabel);
     }
 
+    /**
+     * @param fieldIdentifier fieldKey, name, or label of column
+     */
     public List<String> getColumnData(String fieldIdentifier)
     {
         return getGridData(ch -> 1, fieldIdentifier).stream().map(a-> a.get(1)).collect(Collectors.toList());
@@ -312,15 +334,15 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
      * Find the first row index containing the text value in the given column.
      * If not found -1 is returned.
      *
-     * @param fieldLabel Column label to look at.
+     * @param fieldIdentifier fieldKey, name, or label of column
      * @param text Text to look for (must match exactly).
      * @return The first row index where found, -1 if not found.
      */
-    public Integer getRowIndex(String fieldLabel, String text)
+    public Integer getRowIndex(String fieldIdentifier, String text)
     {
         int index = -1;
 
-        List<String> columnData = getColumnDataByLabel(fieldLabel);
+        List<String> columnData = getColumnData(fieldIdentifier);
         for (int i = 0; i < columnData.size(); i++)
         {
             if (columnData.get(i).equals(text))
@@ -1165,99 +1187,39 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
             return findColumnHeader(fieldIdentifier).getElement();
         }
 
-        private final List<ColumnHeader> columnHeaders = new ArrayList<>();
-        private final Map<String, ColumnHeader> fieldKeys = new LinkedHashMap<>();
-        private final Map<String, ColumnHeader> fieldLabels = new LinkedHashMap<>();
-        protected List<ColumnHeader> findHeaders()
+        private FieldReferenceManager _fieldReferenceManager;
+        protected FieldReferenceManager getGridHeaderManager()
         {
-            if (columnHeaders.isEmpty())
+            if (_fieldReferenceManager == null)
             {
+                List<EditableGridColumnHeader> columnHeaders = new ArrayList<>();
                 List<WebElement> headerCellElements = Locators.headerCells.waitForElements(table, WAIT_FOR_JAVASCRIPT);
                 int domIndex = 0;
 
                 if (hasSelectColumn())
                 {
-                    columnHeaders.add(new ColumnHeader(headerCellElements.get(0), domIndex, SELECT_COLUMN_LABEL_PLACEHOLDER));
+                    columnHeaders.add(new EditableGridColumnHeader(headerCellElements.get(0), domIndex, SELECT_COLUMN_LABEL_PLACEHOLDER));
                     domIndex++;
                 }
 
                 for (; domIndex < headerCellElements.size(); domIndex++)
                 {
-                    columnHeaders.add(new ColumnHeader(headerCellElements.get(domIndex), domIndex));
+                    columnHeaders.add(new EditableGridColumnHeader(headerCellElements.get(domIndex), domIndex));
                 }
+
+                _fieldReferenceManager = new FieldReferenceManager(columnHeaders);
             }
-            return columnHeaders;
+            return _fieldReferenceManager;
         }
 
-        /**
-         * Find field by uncertain field identifier in order of precedence:
-         * <ol>
-         *     <li>Encoded fieldKey</li>
-         *     <li>Unencoded fieldKey</li>
-         *     <li>Field Label</li>
-         * </ol>
-         */
-        protected ColumnHeader findColumnHeader(String fieldIdentifier)
+        protected List<FieldReference> findHeaders()
         {
-            FieldKey possibleFieldKey = FieldKey.fromParts(fieldIdentifier);
+            return getGridHeaderManager().getColumnHeaders();
+        }
 
-            List<ColumnHeader> headers = findHeaders();
-            if (fieldKeys.containsKey(fieldIdentifier))
-            {
-                return fieldKeys.get(fieldIdentifier);
-            }
-            else if (fieldKeys.containsKey(possibleFieldKey.toString()))
-            {
-                return fieldKeys.get(possibleFieldKey.toString());
-            }
-            else if (fieldLabels.containsKey(fieldIdentifier))
-            {
-                return fieldLabels.get(fieldIdentifier);
-            }
-            else
-            {
-                if (fieldKeys.size() < headers.size())
-                {
-                    // Check whether fieldIdentifier is an encoded fieldKey
-                    for (ColumnHeader header : headers)
-                    {
-                        if (!fieldKeys.containsValue(header))
-                        {
-                            String fieldKey = header.getFieldKey().toString();
-                            fieldKeys.put(fieldKey, header);
-                            if (fieldKey.equals(fieldIdentifier))
-                            {
-                                return header;
-                            }
-                        }
-                    }
-
-                    // Check whether fieldIdentifier is an unencoded fieldKey
-                    if (fieldKeys.containsKey(possibleFieldKey.toString()))
-                    {
-                        return fieldKeys.get(possibleFieldKey.toString());
-                    }
-                }
-
-                if (fieldLabels.size() < headers.size())
-                {
-                    // Check whether fieldIdentifier is a field label
-                    for (ColumnHeader header : headers)
-                    {
-                        if (!fieldLabels.containsValue(header))
-                        {
-                            String columnLabel = header.getColumnLabel();
-                            fieldLabels.put(columnLabel, header);
-                            if (columnLabel.equals(fieldIdentifier))
-                            {
-                                return header;
-                            }
-                        }
-                    }
-                }
-
-                throw new NoSuchElementException("No such column with fieldKey or label: " + fieldIdentifier);
-            }
+        protected FieldReference findColumnHeader(String fieldIdentifier)
+        {
+            return getGridHeaderManager().findFieldReference(fieldIdentifier);
         }
 
         protected int getColumnIndex(String fieldIdentifier)
@@ -1267,36 +1229,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
         protected List<String> getColumnLabels()
         {
-            return findHeaders().stream().map(ColumnHeader::getColumnLabel).collect(Collectors.toList());
-        }
-
-        /**
-         * Extract label from header cell. Editable grid header cells have several different layouts. What they have in
-         * common is that the label is the first text node in the cell, possibly within a &lt;span&gt;
-         */
-        static String getLabelFromHeaderCell(WebElement el)
-        {
-            // Use text nodes to ignore browser whitespace formatting
-            List<String> textNodes = WebElementUtils.getTextNodesWithin(el);
-            if (textNodes.isEmpty())
-            {
-                List<WebElement> children = Locator.xpath("./*").findElements(el);
-                if (children.isEmpty())
-                {
-                    return ""; // probably the selection checkbox column
-                }
-                else
-                {
-                    // Depth-first search until we find some text
-                    return getLabelFromHeaderCell(children.get(0));
-                }
-            }
-            else
-            {
-                boolean required = Locator.byClass("required-symbol").existsIn(el);
-                String label = textNodes.get(0).trim(); // trim trailing NBSP
-                return label + (required ? " *" : ""); // re-add required asterisk for tests that expect it
-            }
+            return findHeaders().stream().map(FieldReference::getLabel).collect(Collectors.toList());
         }
 
         public WebElement inputCell()
@@ -1359,65 +1292,59 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         }
     }
 
-    protected static class ColumnHeader
+    protected static class EditableGridColumnHeader extends FieldReferenceManager.FieldReference
     {
-        private final WebElement _element;
-        private final Integer _domIndex;
         private final Mutable<String> _fieldLabel = new MutableObject<>();
-        private final Mutable<FieldKey> _fieldKey = new MutableObject<>();
 
-        private ColumnHeader(WebElement element, int domIndex)
+        public EditableGridColumnHeader(WebElement element, int domIndex)
         {
-            _element = element;
-            _domIndex = domIndex;
+            super(element, domIndex);
         }
 
-        private ColumnHeader(WebElement element, int domIndex, String label)
+        public EditableGridColumnHeader(WebElement element, int domIndex, String label)
         {
             this(element, domIndex);
             _fieldLabel.setValue(label);
         }
 
-        public WebElement getElement()
-        {
-            return _element;
-        }
-
-        public FieldKey getFieldKey()
-        {
-            if (_fieldKey.getValue() == null)
-            {
-                String path = _element.getDomAttribute("data-fieldkey");
-                if (path == null)
-                {
-                    // Some grids don't have a field key, but have a similar value in the ID attribute
-                    path = _element.getDomAttribute("id");
-                }
-
-                if (path != null)
-                {
-                    _fieldKey.setValue(FieldKey.fromFieldKey(path));
-                }
-                else
-                {
-                    _fieldKey.setValue(FieldKey.EMPTY);
-                }
-            }
-            return _fieldKey.getValue();
-        }
-
-        public String getColumnLabel()
+        @Override
+        public String getLabel()
         {
             if (_fieldLabel.getValue() == null)
             {
-                _fieldLabel.setValue(ElementCache.getLabelFromHeaderCell(getElement()).trim());
+                _fieldLabel.setValue(getLabelFromHeaderCell(getElement()).trim());
             }
             return _fieldLabel.getValue();
         }
 
-        public Integer getDomIndex()
+
+        /**
+         * Extract label from header cell. Editable grid header cells have several different layouts. What they have in
+         * common is that the label is the first text node in the cell, possibly within a &lt;span&gt;
+         */
+        private String getLabelFromHeaderCell(WebElement el)
         {
-            return _domIndex;
+            // Use text nodes to ignore browser whitespace formatting
+            List<String> textNodes = WebElementUtils.getTextNodesWithin(el);
+            if (textNodes.isEmpty())
+            {
+                List<WebElement> children = Locator.xpath("./*").findElements(el);
+                if (children.isEmpty())
+                {
+                    return ""; // probably the selection checkbox column
+                }
+                else
+                {
+                    // Depth-first search until we find some text
+                    return getLabelFromHeaderCell(children.get(0));
+                }
+            }
+            else
+            {
+                boolean required = Locator.byClass("required-symbol").existsIn(el);
+                String label = textNodes.get(0).trim(); // trim trailing NBSP
+                return label + (required ? " *" : ""); // re-add required asterisk for tests that expect it
+            }
         }
     }
 }

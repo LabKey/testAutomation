@@ -54,17 +54,30 @@ public class FieldKey implements CharSequence
         return fromParts(Arrays.asList(parts));
     }
 
-    public static FieldKey fromFieldKey(String fieldKey)
-    {
-        return fromParts(Arrays.stream(fieldKey.split(SEPARATOR)).map(FieldKey::decodePart).toList());
-    }
-
-    public static FieldKey fromChars(CharSequence fieldKey)
+    /**
+     * Construct a FieldKey from a CharSequence that might be an encoded fieldKey
+     * @param fieldKey String or FieldKey
+     * @return FieldKey representation of the String, or the identity if a FieldKey was provided
+     */
+    public static FieldKey fromFieldKey(CharSequence fieldKey)
     {
         if (fieldKey instanceof FieldKey fk)
             return fk;
         else
-            return fromParts(fieldKey.toString());
+            return fromParts(Arrays.stream(fieldKey.toString().split(SEPARATOR)).map(FieldKey::decodePart).toList());
+    }
+
+    /**
+     * Construct a FieldKey from a CharSequence that might be a field name
+     * @param nameOrFieldKey unencoded field name or an existing FieldKey object
+     * @return fieldKey encoded name, or the identity if one was provided
+     */
+    public static FieldKey fromName(CharSequence nameOrFieldKey)
+    {
+        if (nameOrFieldKey instanceof FieldKey fk)
+            return fk;
+        else
+            return fromParts(nameOrFieldKey.toString());
     }
 
     private static final String[] ILLEGAL = {"$", "/", "&", "}", "~", ",", "."};

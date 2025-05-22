@@ -165,7 +165,7 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
      */
     public Map<String, String> getRowMapByLabel()
     {
-        return getRowMap(ResponsiveGrid.ColumnHeader::getColumnLabel);
+        return getRowMap(FieldReferenceManager.FieldReference::getLabel);
     }
 
     /**
@@ -181,17 +181,17 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
      */
     public Map<FieldKey, String> getRowMapByFieldKey()
     {
-        return getRowMap(ResponsiveGrid.ColumnHeader::getFieldKey);
+        return getRowMap(FieldReferenceManager.FieldReference::getFieldKey);
     }
 
-    <T> Map<T, String> getRowMap(Function<ResponsiveGrid.ColumnHeader, T> keyMapper)
+    <T> Map<T, String> getRowMap(Function<FieldReferenceManager.FieldReference, T> keyMapper)
     {
         List<String> columnValues = elementCache().getCellTexts();
-        List<ResponsiveGrid.ColumnHeader> headers = _grid.getHeaders();
+        List<FieldReferenceManager.FieldReference> headers = _grid.getHeaders();
 
         Map<T, String> rowMap = new LinkedHashMap<>();
 
-        for (ResponsiveGrid.ColumnHeader header : headers)
+        for (FieldReferenceManager.FieldReference header : headers)
         {
             T key = keyMapper.apply(header);
             String value = columnValues.get(header.getDomIndex());

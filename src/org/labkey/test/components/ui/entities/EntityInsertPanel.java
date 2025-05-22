@@ -110,6 +110,10 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
         return this;
     }
 
+    /**
+     * @param columnIdentifier fieldKey, name, or label
+     * @return this component
+     */
     public EntityInsertPanel removeColumn(String columnIdentifier)
     {
         showGrid();
@@ -472,6 +476,10 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
     }
 }
 
+/**
+ * Provides read-only access to parent and source menus
+ * Prevents tests from using them to add parents or sources without proper grid synchronization
+ */
 class ReadOnlyMenu extends MultiMenu
 {
     private final String _entityType;

@@ -14,8 +14,9 @@ import org.labkey.test.components.react.ReactDateTimePicker;
 import org.labkey.test.components.react.ReactSelect;
 import org.labkey.test.components.ui.files.FileUploadField;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.FieldKey;
 import org.labkey.test.util.AuditLogHelper;
-import org.labkey.test.util.EscapeUtil;
+import org.labkey.test.util.LogMethod;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
@@ -27,12 +28,9 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
@@ -589,50 +587,24 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
 
         public WebElement findValueCell(String nameOrLabel)
         {
-            List<Supplier<WebElement>> options = List.of(
-                () -> valueCellWithFieldKey(nameOrLabel),
-                () -> valueCellWithName(nameOrLabel),
-                () -> valueCellWithLabel(nameOrLabel));
-
-            return options.stream()
-                .map(Supplier::get)
-                .filter(Objects::nonNull)
-                .findFirst()
-                .orElseThrow(() -> new NoSuchElementException("Unable to locate cell: " + nameOrLabel));
+            return getFieldManager().findFieldReference(nameOrLabel).getElement();
         }
 
-        public WebElement valueCellWithLabel(String label)
-        {
-            initFieldInfo();
-            return valueCellsByLabel.get(label);
-        }
-        public WebElement valueCellWithName(String fieldName)
-        {
-            return valueCellWithFieldKey(EscapeUtil.fieldKeyEncodePart(fieldName));
-        }
+        private FieldReferenceManager _fieldReferenceManager;
 
-        public WebElement valueCellWithFieldKey(String fieldKey)
+        @LogMethod
+        private FieldReferenceManager getFieldManager()
         {
-//            if (!valueCellsByFieldKey.containsKey(fieldKey))
-//            {
-//                valueCellsByFieldKey.put(fieldKey,
-//                    Locator.tagWithAttribute("td", "data-fieldkey", fieldKey)
-//                        .findElementOrNull(editPanel));
-//            }
-            initFieldInfo();
-            return valueCellsByFieldKey.get(fieldKey);
-        }
-
-        private final Map<String, WebElement> valueCellsByLabel = new HashMap<>();
-        private final Map<String, WebElement> valueCellsByFieldKey = new HashMap<>();
-        private void initFieldInfo()
-        {
-            if (valueCellsByFieldKey.isEmpty())
+            if (_fieldReferenceManager == null)
             {
+                List<DetailTableEditFieldReference> columnHeaders = new ArrayList<>();
+
                 List<WebElement> valueCells = Locator.tagWithAttribute("td", "data-fieldkey").findElements(this);
+                // Use JavaScript to get fieldKeys and captions in one operation, rather than making 2N calls to 'WebElement.getDomAttribute'
                 List<List<String>> captionsAndKeys = getWrapper().executeScript(
                     """
-                    var cells = arguments[0];
+                    
+                        var cells = arguments[0];
                     var captions = [];
                     var fieldkeys = [];
                     for (var i = 0; i < cells.length; i++)
@@ -641,16 +613,20 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
                         fieldkeys.push(cells[i].dataset.fieldkey);
                     }
                     return [captions, fieldkeys];
-                    """, List.class,
+                    """, List.
+                        class,
                 valueCells);
                 List<String> captions = captionsAndKeys.get(0);
                 List<String> fieldkeys = captionsAndKeys.get(1);
                 for (int i = 0; i < valueCells.size(); i++)
                 {
-                    valueCellsByFieldKey.put(fieldkeys.get(i), valueCells.get(i));
-                    valueCellsByLabel.put(captions.get(i), valueCells.get(i));
+                    columnHeaders.add(new DetailTableEditFieldReference(valueCells.get(i), i, fieldkeys.get(i), captions.get(i)));
                 }
+
+                _fieldReferenceManager = new FieldReferenceManager(columnHeaders);
             }
+
+            return _fieldReferenceManager;
         }
 
         public FileUploadField fileField(String nameOrLabel)
@@ -707,6 +683,37 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
         protected Locator locator()
         {
             return _locator;
+        }
+    }
+
+    private static class DetailTableEditFieldReference extends FieldReferenceManager.FieldReference
+    {
+        private final FieldKey _fieldKey;
+        private final String _label;
+
+        public DetailTableEditFieldReference(WebElement element, Integer domIndex, String fieldKey, String label)
+        {
+            super(element, domIndex);
+            _fieldKey = FieldKey.fromFieldKey(fieldKey);
+            _label = label;
+        }
+
+        @Override
+        public FieldKey getFieldKey()
+        {
+            return _fieldKey;
+        }
+
+        @Override
+        public String getLabel()
+        {
+            return _label;
+        }
+
+        @Override
+        public Integer getDomIndex()
+        {
+            return null;
         }
     }
 }

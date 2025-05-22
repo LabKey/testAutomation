@@ -349,7 +349,7 @@ public class EntityBulkUpdateDialog extends ModalDialog
     {
         public WebElement formRow(CharSequence fieldIdentifier)
         {
-            String fieldKey = FieldKey.fromChars(fieldIdentifier).toString();
+            String fieldKey = FieldKey.fromName(fieldIdentifier).toString();
             return Locator.tagWithClass("div", "row")
                     .withChild(Locator.tagWithAttribute("label", "for", fieldKey))
                     .waitForElement(this, WAIT_TIMEOUT);
