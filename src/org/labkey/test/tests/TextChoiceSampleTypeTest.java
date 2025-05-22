@@ -1,5 +1,6 @@
 package org.labkey.test.tests;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -597,6 +598,22 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
         tcValues.add("C||C");
 
         TestDataGenerator dataGenerator = createSampleType(sampleTypeName, namePrefix, textChoiceFieldName, tcValues);
+
+        // audit log for creating new sample type
+        String fieldValueMap = "Name=TextChoice_Field&Type=String&Scale=4000&PHI=Not%20PHI&DefaultScale=Linear&Required=false&Hidden=false&MvEnabled=false" +
+                "&Measure=false&Dimension=false&ShownInInsert=true&ShownInDetails=true&ShownInUpdate=true&ShownInLookupView=false&RecommendedVariable=false" +
+                "&ExcludedFromShifting=false&Scannable=false&DefaultValueType=Editable%20default" +
+                "&Validator=Text%20Choice%20Validator%2C%20%C3%86%5C%7C%5C%7C%C3%86%7CBB%7CC%5C%7C%5C%7CC%2C%20Text%20Choice%20Validator";
+        AuditLogHelper.DetailedAuditEventRow expectedDomainEvent = new AuditLogHelper.DetailedAuditEventRow(null, sampleTypeName, null,
+                "The domain " + sampleTypeName + " was created. The column(s) of domain " + sampleTypeName + " were modified.",
+                null, null, "NameExpression=TCSM_%24%7BgenId%7D", null);
+        AuditLogHelper.DetailedAuditEventRow field1ExpectedEvent = new AuditLogHelper.DetailedAuditEventRow(null, textChoiceFieldName, "Created",
+                null, null, null, fieldValueMap, null);
+        boolean pass = _auditLogHelper.validateLastDomainAuditEvents(sampleTypeName, getProjectName(), expectedDomainEvent,
+                Map.of(textChoiceFieldName, field1ExpectedEvent,
+                        "Str", new AuditLogHelper.DetailedAuditEventRow(null, "Str", "Created",
+                                null, null, null, null, null)));
+        checker().verifyTrue("Audit log not as expected for creating a new sample type with text choice field.", pass);
 
         log("Create some samples int the sample type. None of the samples will have a TextChoice value.");
 

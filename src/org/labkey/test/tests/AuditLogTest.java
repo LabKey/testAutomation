@@ -88,6 +88,8 @@ public class AuditLogTest extends BaseWebDriverTest
     private static final String AUDIT_TEST_SUBFOLDER = "AuditVerifyTest_Subfolder";
     private static final String AUDIT_PROPERTY_EVENTS_PROJECT = "AuditDomainPropertyEvents";
 
+    final String DOMAIN_PROPERTY_LOG_NAME = "Domain property events";
+
     public static final String COMMENT_COLUMN = "Comment";
 
     private final ApiPermissionsHelper permissionsHelper = new ApiPermissionsHelper(this);
@@ -572,8 +574,6 @@ public class AuditLogTest extends BaseWebDriverTest
         final String FIELD03_NAME = "Field03";
         final String FIELD03_LABEL = "Field 03 Lookup";
 
-        final String DOMAIN_PROPERTY_LOG_NAME = "Domain property events";
-
         _containerHelper.createProject(AUDIT_PROPERTY_EVENTS_PROJECT, null);
 
         PortalHelper portalHelper = new PortalHelper(getDriver());
@@ -618,13 +618,7 @@ public class AuditLogTest extends BaseWebDriverTest
 
         AuditLogHelper.DetailedAuditEventRow keyFieldExpectedEvent = new AuditLogHelper.DetailedAuditEventRow(null, "Key", "Created",
                 null, null, null, null, null);
-        boolean pass = _auditLogHelper.validateLastDomainAuditEvents(LIST_CHECK_LOG, AUDIT_PROPERTY_EVENTS_PROJECT, expectedDomainEvent, Map.of("Key", keyFieldExpectedEvent, FIELD01_NAME, field1ExpectedEvent, FIELD02_NAME, field2ExpectedEvent));
-
-        // We are going to fail, so navigate to the Domain Property Events Audit Log.
-        if(!pass)
-            goToAuditEventView(this, DOMAIN_PROPERTY_LOG_NAME);
-
-        Assert.assertTrue("The values logged for the 'Created' events were not as expected. See log for details.", pass);
+        validateLastDomainAuditEvents(LIST_CHECK_LOG, "The values logged for the 'Created' events were not as expected.", expectedDomainEvent, Map.of("Key", keyFieldExpectedEvent, FIELD01_NAME, field1ExpectedEvent, FIELD02_NAME, field2ExpectedEvent));
 
         log("Looks like the created events were as expected. Now modify some column/field attributes.");
         goToProjectHome(AUDIT_PROPERTY_EVENTS_PROJECT);
@@ -665,13 +659,7 @@ public class AuditLogTest extends BaseWebDriverTest
                 "The following properties were updated: DefaultScale, Format, ConditionalFormat", "", field2InitValue, field2UpdateValue, null);
 
         log("Validate that the expected rows after the update are in the log.");
-        pass = _auditLogHelper.validateLastDomainAuditEvents(LIST_CHECK_LOG, AUDIT_PROPERTY_EVENTS_PROJECT, expectedDomainEvent, Map.of(FIELD01_NAME, field1ExpectedEvent, FIELD02_NAME, field2ExpectedEvent));
-
-        // We are going to fail, so navigate to the Domain Property Events Audit Log.
-        if(!pass)
-            goToAuditEventView(this, DOMAIN_PROPERTY_LOG_NAME);
-
-        Assert.assertTrue("The values logged for the 'Modified' events were not as expected. See log for details.", pass);
+        validateLastDomainAuditEvents(LIST_CHECK_LOG, "The values logged for the 'Modified' events were not as expected.", expectedDomainEvent, Map.of(FIELD01_NAME, field1ExpectedEvent, FIELD02_NAME, field2ExpectedEvent));
 
         log("The modified events were logged as expected. Now add a lookup field.");
         goToProjectHome(AUDIT_PROPERTY_EVENTS_PROJECT);
@@ -690,14 +678,7 @@ public class AuditLogTest extends BaseWebDriverTest
                 null, "", null, field3CreateValue, null);
 
         log("Validate that the expected rows after the update are in the log.");
-        pass = _auditLogHelper.validateLastDomainAuditEvents(LIST_CHECK_LOG, AUDIT_PROPERTY_EVENTS_PROJECT, expectedDomainEvent, Map.of(FIELD03_NAME, field3ExpectedEvent));
-
-
-        // We are going to fail, so navigate to the Domain Property Events Audit Log.
-        if(!pass)
-            goToAuditEventView(this, DOMAIN_PROPERTY_LOG_NAME);
-
-        Assert.assertTrue("The values logged for the 'Created' event for the lookup field were not as expected. See log for details.", pass);
+        validateLastDomainAuditEvents(LIST_CHECK_LOG, "The values logged for the 'Created' event for the lookup field were not as expected.", expectedDomainEvent, Map.of(FIELD03_NAME, field3ExpectedEvent));
 
         log("The 'Created' event was logged as expected. Now modify the field to point to a new list in the lookup field.");
         goToProjectHome(AUDIT_PROPERTY_EVENTS_PROJECT);
@@ -716,8 +697,7 @@ public class AuditLogTest extends BaseWebDriverTest
                 "&Scannable=false&DefaultValueType=Editable%20default&Lookup=%7B%22queryName%22%3A%22LookUp02%22%2C%22schemaName%22%3A%22lists%22%7D";
         field3ExpectedEvent = new AuditLogHelper.DetailedAuditEventRow(null, FIELD03_NAME, "Modified",
                 "The following property was updated: Lookup", "", field3CreateValue, field3UpdateValue, null);
-        pass = _auditLogHelper.validateLastDomainAuditEvents(LIST_CHECK_LOG, AUDIT_PROPERTY_EVENTS_PROJECT, expectedDomainEvent, Map.of(FIELD03_NAME, field3ExpectedEvent));
-
+        boolean pass = _auditLogHelper.validateLastDomainAuditEvents(LIST_CHECK_LOG, AUDIT_PROPERTY_EVENTS_PROJECT, expectedDomainEvent, Map.of(FIELD03_NAME, field3ExpectedEvent));
 
         // We are going to fail, so navigate to the Domain Property Events Audit Log.
         if(!pass)
@@ -734,13 +714,18 @@ public class AuditLogTest extends BaseWebDriverTest
 
         field3ExpectedEvent = new AuditLogHelper.DetailedAuditEventRow(null, FIELD03_NAME, "Deleted",
                 "", "", null, null, null);
-        pass = _auditLogHelper.validateLastDomainAuditEvents(LIST_CHECK_LOG, AUDIT_PROPERTY_EVENTS_PROJECT, expectedDomainEvent, Map.of(FIELD03_NAME, field3ExpectedEvent));
+        validateLastDomainAuditEvents(LIST_CHECK_LOG, "The values logged for the 'Deleted' events for the lookup field were not as expected.", expectedDomainEvent, Map.of(FIELD03_NAME, field3ExpectedEvent));
+
+        log("Ok, it looks like everything was logged as expected. Yipeee!");
+    }
+
+    private void validateLastDomainAuditEvents(String domainName, String failComment, AuditLogHelper.DetailedAuditEventRow domainEvent, Map<String, AuditLogHelper.DetailedAuditEventRow> propertyEvents)
+    {
+        boolean pass = _auditLogHelper.validateLastDomainAuditEvents(domainName, AUDIT_PROPERTY_EVENTS_PROJECT, domainEvent, propertyEvents);
         if(!pass)
             goToAuditEventView(this, DOMAIN_PROPERTY_LOG_NAME);
 
-        Assert.assertTrue("The values logged for the 'Deleted' events for the lookup field were not as expected. See log for details.", pass);
-
-        log("Ok, it looks like everything was logged as expected. Yipeee!");
+        Assert.assertTrue(failComment + " See log for details.", pass);
     }
 
 }

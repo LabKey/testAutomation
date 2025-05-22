@@ -1233,7 +1233,7 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
                             dateCol, new AuditLogHelper.DetailedAuditEventRow(null, dateCol, "Modified","The following property was updated: Format",null, null, null, "Format: yyyy-MM-dd > ddMMMyy"),
                             dateTimeCol, new AuditLogHelper.DetailedAuditEventRow(null, dateTimeCol, "Modified","The following property was updated: Format",null, null, null, "Format: yyyy-MM-dd hh:mm a > dd-MMM-yyyy HH:mm:ss"))
                 );
-        checker().verifyTrue("Domain audit log not as expected after adding a parent alias column", pass);
+        checker().verifyTrue("Domain audit log not as expected after updating formats", pass);
 
         expectedData = new ArrayList<>();
 
