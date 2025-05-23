@@ -663,12 +663,17 @@ public class TestDataGenerator
         return TestDataUtils.stringFromRowMaps(_rows, getFieldsForFile(), true, CSVFormat.TDF);
     }
 
+    public String writeTsvContents(boolean includeHeaders)
+    {
+        return TestDataUtils.stringFromRowMaps(_rows, getFieldsForFile(), false, CSVFormat.TDF);
+    }
+
     public File writeGeneratedDataToExcel(String sheetName, String fileName) throws IOException
     {
         File file = new File(TestFileUtils.getTestTempDir(), fileName);
         FileUtils.forceMkdirParent(file);
 
-        try(SXSSFWorkbook workbook = new SXSSFWorkbook(1000); // only holds 1000 rows in memory
+        try (SXSSFWorkbook workbook = new SXSSFWorkbook(1000); // only holds 1000 rows in memory
             FileOutputStream out = new FileOutputStream(file))
         {
             var sheet = workbook.createSheet(sheetName);
