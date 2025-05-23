@@ -447,6 +447,12 @@ public class TestDataGenerator
             case "date":
             case "datetime":
                 return ()-> randomDateString(DateUtils.addWeeks(new Date(), -39), new Date());
+            case "time":
+                return ()->
+                    randomInt(0, 23) + ":" + // hour
+                        StringUtils.leftPad(String.valueOf(randomInt(0, 59)), 2, "0") + ":" + // minute
+                        StringUtils.leftPad(String.valueOf(randomInt(0, 59)), 2, "0") + "." + // second
+                        StringUtils.leftPad(String.valueOf(randomInt(0, 999)), 3, "0"); // millisecond
             default:
                 throw new IllegalArgumentException("ColumnType " + columnType + " isn't implemented yet");
         }
@@ -661,11 +667,6 @@ public class TestDataGenerator
     public String getDataAsTsv()
     {
         return TestDataUtils.stringFromRowMaps(_rows, getFieldsForFile(), true, CSVFormat.TDF);
-    }
-
-    public String writeTsvContents(boolean includeHeaders)
-    {
-        return TestDataUtils.stringFromRowMaps(_rows, getFieldsForFile(), false, CSVFormat.TDF);
     }
 
     public File writeGeneratedDataToExcel(String sheetName, String fileName) throws IOException

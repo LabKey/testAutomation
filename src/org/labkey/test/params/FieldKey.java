@@ -22,7 +22,7 @@ public class FieldKey implements CharSequence
     private final String _name;
     private final String _fieldKey;
 
-    protected FieldKey(String name)
+    private FieldKey(String name)
     {
         _parent = null;
         _name = name;
