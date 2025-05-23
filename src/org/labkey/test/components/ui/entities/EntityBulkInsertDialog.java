@@ -109,12 +109,7 @@ public class EntityBulkInsertDialog extends ModalDialog
 
     public EntityBulkInsertDialog setQuantity(int quantity)
     {
-        return setQuantity(Integer.toString(quantity));
-    }
-
-    public EntityBulkInsertDialog setQuantity(String quantity)
-    {
-        getWrapper().setFormElement(elementCache().quantity, quantity);
+        getWrapper().setFormElement(elementCache().quantity, Integer.toString(quantity));
         return this;
     }
 

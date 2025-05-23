@@ -60,11 +60,17 @@ public class EntityBulkUpdateDialog extends ModalDialog
         return this;
     }
 
+    /**
+     * @param fieldIdentifier Identifier for the field; name ({@link String}) or fieldKey ({@link FieldKey})
+     */
     public boolean isFieldEnabled(CharSequence fieldIdentifier)
     {
         return elementCache().getToggle(fieldIdentifier).isOn();
     }
 
+    /**
+     * @param fieldIdentifier Identifier for the field; name ({@link String}) or fieldKey ({@link FieldKey})
+     */
     public EntityBulkUpdateDialog setEditableState(CharSequence fieldIdentifier, boolean enable)
     {
         ToggleButton toggle = elementCache().getToggle(fieldIdentifier);
@@ -101,6 +107,11 @@ public class EntityBulkUpdateDialog extends ModalDialog
 
     // interact with selection fields
 
+    /**
+     * @param fieldIdentifier Identifier for the field; name ({@link String}) or fieldKey ({@link FieldKey})
+     * @param selectValues value to select
+     * @return this component
+     */
     public EntityBulkUpdateDialog setSelectionField(CharSequence fieldIdentifier, List<String> selectValues)
     {
         FilteringReactSelect reactSelect = enableSelectionField(fieldIdentifier);
@@ -108,16 +119,29 @@ public class EntityBulkUpdateDialog extends ModalDialog
         return this;
     }
 
+    /**
+     * @param fieldIdentifier Identifier for the field; name ({@link String}) or fieldKey ({@link FieldKey})
+     * @param selectValue value to select
+     * @return this component
+     */
     public EntityBulkUpdateDialog setSelectionField(CharSequence fieldIdentifier, String selectValue)
     {
         return setSelectionField(fieldIdentifier, List.of(selectValue));
     }
 
+    /**
+     * @param fieldIdentifier Identifier for the field; name ({@link String}) or fieldKey ({@link FieldKey})
+     * @return available options for the specified field
+     */
     public List<String> getSelectionOptions(CharSequence fieldIdentifier)
     {
         return enableSelectionField(fieldIdentifier).getOptions();
     }
 
+    /**
+     * @param fieldIdentifier Identifier for the field; name ({@link String}) or fieldKey ({@link FieldKey})
+     * @return selected options for the specified field
+     */
     public List<String> getSelectionFieldValues(CharSequence fieldIdentifier)
     {
         return enableSelectionField(fieldIdentifier).getSelections();
@@ -132,70 +156,122 @@ public class EntityBulkUpdateDialog extends ModalDialog
         return reactSelect;
     }
 
-    public EntityBulkUpdateDialog setTextArea(CharSequence fieldIdentifier, String text)
+    /**
+     * @param fieldIdentifier Identifier for the field; name ({@link String}) or fieldKey ({@link FieldKey})
+     * @param value value to set
+     * @return this component
+     */
+    public EntityBulkUpdateDialog setTextArea(CharSequence fieldIdentifier, String value)
     {
-        enableAndWait(fieldIdentifier, elementCache().textArea(fieldIdentifier)).set(text);
+        enableAndWait(fieldIdentifier, elementCache().textArea(fieldIdentifier)).set(value);
         return this;
     }
 
+    /**
+     * @param fieldIdentifier Identifier for the field; name ({@link String}) or fieldKey ({@link FieldKey})
+     * @return current value of the specified field
+     */
     public String getTextArea(CharSequence fieldIdentifier)
     {
         return elementCache().textArea(fieldIdentifier).get();
     }
 
-    // get/set text fields with ID
-
+    /**
+     * @param fieldIdentifier Identifier for the field; name ({@link String}) or fieldKey ({@link FieldKey})
+     * @param value value to set
+     * @return this component
+     */
     public EntityBulkUpdateDialog setTextField(CharSequence fieldIdentifier, String value)
     {
         enableAndWait(fieldIdentifier, elementCache().textInput(fieldIdentifier)).set(value);
         return this;
     }
 
+    /**
+     * @param fieldIdentifier Identifier for the field; name ({@link String}) or fieldKey ({@link FieldKey})
+     * @return current value of the specified field
+     */
     public String getTextField(CharSequence fieldIdentifier)
     {
         return enableAndWait(fieldIdentifier, elementCache().textInput(fieldIdentifier)).get();
     }
 
+    /**
+     * @param fieldIdentifier Identifier for the field; name ({@link String}) or fieldKey ({@link FieldKey})
+     * @param value value to set
+     * @return this component
+     */
     public EntityBulkUpdateDialog setNumericField(CharSequence fieldIdentifier, String value)
     {
         enableAndWait(fieldIdentifier, elementCache().numericInput(fieldIdentifier)).set(value);
         return this;
     }
 
+    /**
+     * @param fieldIdentifier Identifier for the field; name ({@link String}) or fieldKey ({@link FieldKey})
+     * @return current value of the specified field
+     */
     public String getNumericField(CharSequence fieldIdentifier)
     {
         return elementCache().numericInput(fieldIdentifier).get();
     }
 
+    /**
+     * @param fieldIdentifier Identifier for the field; name ({@link String}) or fieldKey ({@link FieldKey})
+     * @param dateString string representation of date to set
+     * @return this component
+     */
     public EntityBulkUpdateDialog setDateField(CharSequence fieldIdentifier, String dateString)
     {
         enableAndWait(fieldIdentifier, elementCache().dateInput(fieldIdentifier)).set(dateString);
         return this;
     }
 
+    /**
+     * @param fieldIdentifier Identifier for the field; name ({@link String}) or fieldKey ({@link FieldKey})
+     * @return current value of the specified field
+     */
     public String getDateField(CharSequence fieldIdentifier)
     {
         return elementCache().dateInput(fieldIdentifier).get();
     }
 
+    /**
+     * @param fieldIdentifier Identifier for the field; name ({@link String}) or fieldKey ({@link FieldKey})
+     * @return file attachment component
+     */
     public FileAttachmentContainer getFileField(CharSequence fieldIdentifier)
     {
         fieldIdentifier = EntityBulkInsertDialog.fileUploadFieldKey(fieldIdentifier);
         return enableAndWait(fieldIdentifier, elementCache().fileUploadField(fieldIdentifier));
     }
 
+    /**
+     * @param fieldIdentifier Identifier for the field; name ({@link String}) or fieldKey ({@link FieldKey})
+     * @param file file to attach
+     * @return this component
+     */
     public EntityBulkUpdateDialog attachFile(CharSequence fieldIdentifier, File file)
     {
         getFileField(fieldIdentifier).attachFile(file);
         return this;
     }
 
+    /**
+     * @param fieldIdentifier Identifier for the field; name ({@link String}) or fieldKey ({@link FieldKey})
+     * @return this component
+     */
     public EntityBulkUpdateDialog removeFile(CharSequence fieldIdentifier)
     {
         getFileField(fieldIdentifier).removeFile();
         return this;
     }
 
+    /**
+     * @param fieldIdentifier Identifier for the field; name ({@link String}) or fieldKey ({@link FieldKey})
+     * @param checked value to set
+     * @return this component
+     */
     public EntityBulkUpdateDialog setBooleanField(CharSequence fieldIdentifier, boolean checked)
     {
         enableAndWait(fieldIdentifier, getCheckBox(fieldIdentifier)).set(checked);
@@ -210,6 +286,10 @@ public class EntityBulkUpdateDialog extends ModalDialog
         return formItem;
     }
 
+    /**
+     * @param fieldIdentifier Identifier for the field; name ({@link String}) or fieldKey ({@link FieldKey})
+     * @return current value of the specified field
+     */
     public boolean getBooleanField(CharSequence fieldIdentifier)
     {
         return getCheckBox(fieldIdentifier).get();
