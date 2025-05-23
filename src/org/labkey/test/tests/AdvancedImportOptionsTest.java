@@ -71,7 +71,6 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest implements Post
     private static final boolean EXPECTED_IMPORT_ERRORS = false;
     private static final int EXPECTED_COMPLETED_IMPORT_JOBS = 1;
     private static final int EXPECTED_COMPLETED_MULTI_FOLDER_JOBS = 2;
-    private Boolean _studyDesignPreviouslyEnabled;
     private Boolean _advancedImportOptionsEnabled;
 
     @Override
@@ -96,7 +95,6 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest implements Post
     public static void doSetup()
     {
         AdvancedImportOptionsTest test = getCurrentTest();
-        test._studyDesignPreviouslyEnabled = OptionalFeatureHelper.enableOptionalFeature(test.createDefaultConnection(), "studyDesignFlag");
         test._advancedImportOptionsEnabled = OptionalFeatureHelper.enableOptionalFeature(test.createDefaultConnection(), "advancedImportFlag");
     }
 
@@ -108,8 +106,6 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest implements Post
         _containerHelper.deleteProject(IMPORT_PROJECT_FILE02, false);
         _containerHelper.deleteProject(IMPORT_PROJECT_FILE03, false);
         _containerHelper.deleteProject(IMPORT_PROJECT_MULTI, false);
-        if (_studyDesignPreviouslyEnabled != null)
-            OptionalFeatureHelper.setOptionalFeature(createDefaultConnection(), "studyDesignFlag", _studyDesignPreviouslyEnabled);
 
         if (_advancedImportOptionsEnabled != null)
             OptionalFeatureHelper.setOptionalFeature(createDefaultConnection(), "advancedImportFlag", _advancedImportOptionsEnabled);

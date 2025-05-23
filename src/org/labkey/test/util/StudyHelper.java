@@ -561,13 +561,16 @@ public class StudyHelper
     public boolean isSpecimenModulePresent()
     {
         if (null == _specimenModulePresent)
-        {
-            AbstractContainerHelper containerHelper = new APIContainerHelper(_test);
-            Set<String> allModules = containerHelper.getAllModules();
-            _specimenModulePresent = allModules.contains("specimen");
-        }
+            _specimenModulePresent = isModulePresent("specimen");
 
         return _specimenModulePresent;
+    }
+
+    public boolean isModulePresent(String moduleName)
+    {
+        AbstractContainerHelper containerHelper = new APIContainerHelper(_test);
+        Set<String> allModules = containerHelper.getAllModules();
+        return allModules.contains(moduleName);
     }
 
     public boolean isSpecimenModuleActive()
