@@ -74,7 +74,29 @@ public class FieldInfo
 
     public FieldDefinition getFieldDefinition()
     {
-        FieldDefinition fieldDefinition = new FieldDefinition(getName(), _columnType);
+        return getFieldDefinition(_columnType);
+    }
+
+    public FieldDefinition getFieldDefinition(String lookupContainerPath)
+    {
+        if (!_columnType.isLookup())
+        {
+            throw new IllegalArgumentException("Unable to set lookup container for %s column: %s".formatted(_columnType.getLabel(), getName()));
+        }
+        else
+        {
+            String schema = _columnType.getLookupInfo().getSchema();
+            String table = _columnType.getLookupInfo().getTable();
+            FieldDefinition.ColumnType columnType = _columnType.getRangeURI().equals(FieldDefinition.ColumnType.Integer.getRangeURI())
+                ? new FieldDefinition.IntLookup(lookupContainerPath, schema, table)
+                : new FieldDefinition.StringLookup(lookupContainerPath, schema, table);
+            return getFieldDefinition(columnType);
+        }
+    }
+
+    private FieldDefinition getFieldDefinition(FieldDefinition.ColumnType columnType)
+    {
+        FieldDefinition fieldDefinition = new FieldDefinition(getName(), columnType);
         if (getRawLabel() != null)
         {
             fieldDefinition.setLabel(getRawLabel());
