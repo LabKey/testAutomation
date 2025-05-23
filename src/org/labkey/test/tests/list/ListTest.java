@@ -641,7 +641,7 @@ public class ListTest extends BaseWebDriverTest
 
         checker().wrapAssertion(()->assertTextPresent(" was created. The column(s) of domain ", 1));// Create domain and update columns combined into a single event
         checker().wrapAssertion(()->assertTextPresent(" were modified.", 7));          // The column(s) of LIST_NAME_COLORS domain were modified
-        checker().wrapAssertion(()->assertTextPresent("The descriptor of domain.", 1));          // The description LIST_NAME_COLORS domain were modified
+        checker().wrapAssertion(()->assertTextPresent("The descriptor of domain", 1));          // The description LIST_NAME_COLORS domain were modified
         checker().wrapAssertion(()->assertTextPresent("Bulk inserted", 2));
         checker().wrapAssertion(()->assertTextPresent("A new list record was inserted", 1));
         checker().wrapAssertion(()->assertTextPresent("was created", 2));                // Once for the list, once for the domain
