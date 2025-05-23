@@ -1361,7 +1361,7 @@ public class ListTest extends BaseWebDriverTest
                         "PhiColumn", new AuditLogHelper.DetailedAuditEventRow(null, "PhiColumn", "Modified","The following property was updated: PHI",null, null, null, "PHI: Not PHI > Full PHI"),
                         "RestrictedPhiColumn", new AuditLogHelper.DetailedAuditEventRow(null, "RestrictedPhiColumn", "Modified","The following property was updated: PHI",null, null, null, "PHI: Not PHI > Restricted PHI"))
         );
-        checker().verifyTrue("Domain audit comment not as expected after changing conditional format", pass);
+        checker().verifyTrue("Domain audit comment not as expected after changing PHI setting", pass);
 
         goToProjectHome();
         clickAndWait(Locator.linkWithText(listName));

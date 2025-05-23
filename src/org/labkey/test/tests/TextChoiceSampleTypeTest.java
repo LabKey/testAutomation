@@ -469,7 +469,7 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
                 "The column(s) of domain " + sampleTypeName + " were modified.",
                 "", null, null, null);
         boolean pass = _auditLogHelper.validateLastDomainAuditEvents(sampleTypeName, getProjectName(), expectedDomainEvent, Map.of(textChoiceFieldName, fieldEvent));
-        checker().verifyTrue("Audit event is not as expected", pass);
+        checker().verifyTrue("Audit event is not as expected after text choice after", pass);
 
 
         // Construct a list of samples that have TextChoice set and what they are expected to be.
