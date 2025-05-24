@@ -87,11 +87,14 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
         return this;
     }
 
-    public boolean isFieldPresent(String nameOrLabel)
+    /**
+     * @param columnIdentifier fieldKey, name, or label
+     */
+    public boolean isFieldPresent(CharSequence columnIdentifier)
     {
         try
         {
-            elementCache().findValueCell(nameOrLabel);
+            elementCache().findValueCell(columnIdentifier);
             return true;
         }
         catch (NoSuchElementException e)
@@ -103,13 +106,13 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
      * Check to see if a field is editable. Could be state dependent, that is it returns false if the field is
      * loading but if checked later could return true.
      *
-     * @param nameOrLabel The name or label of the field to check.
+     * @param columnIdentifier fieldKey, name, or label
      * @return True if it is false otherwise.
      **/
-    public boolean isFieldEditable(String nameOrLabel)
+    public boolean isFieldEditable(CharSequence columnIdentifier)
     {
         // TODO Could put a check here to see if a field is loading then return false, or wait.
-        WebElement fieldValueElement = elementCache().findValueCell(nameOrLabel);
+        WebElement fieldValueElement = elementCache().findValueCell(columnIdentifier);
         return isEditableField(fieldValueElement);
     }
 
@@ -122,49 +125,43 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
     /**
      * Get the value of a read only field.
      *
-     * @param nameOrLabel The name or label of the field to get.
+     * @param columnIdentifier fieldKey, name, or label
      * @return The value in the field.
      **/
-    public String getReadOnlyField(String nameOrLabel)
+    public String getReadOnlyField(CharSequence columnIdentifier)
     {
-        WebElement fieldValueElement = elementCache().findValueCell(nameOrLabel);
+        WebElement fieldValueElement = elementCache().findValueCell(columnIdentifier);
         return Locator.xpath("./div/*").findElement(fieldValueElement).getText();
     }
 
     /**
      * Get the value of a text field.
      *
-     * @param nameOrLabel The name or label of the field to get.
+     * @param columnIdentifier fieldKey, name, or label
      * @return The value in the field.
      **/
-    public String getTextField(String nameOrLabel)
+    public String getTextField(CharSequence columnIdentifier)
     {
-        return elementCache().findInput(nameOrLabel).get();
+        return elementCache().findInput(columnIdentifier).get();
     }
 
     /**
      * Set a text field.
      *
-     * @param nameOrLabel The name or label of the field to set.
+     * @param columnIdentifier fieldKey, name, or label
      * @param value The value to set the field to.
      * @return A reference to this editable detail table.
      **/
-    public DetailTableEdit setTextField(String nameOrLabel, String value)
+    public DetailTableEdit setTextField(CharSequence columnIdentifier, String value)
     {
-        if (isFieldEditable(nameOrLabel))
+        if (isFieldEditable(columnIdentifier))
         {
-            elementCache().findInput(nameOrLabel);
-            WebElement fieldValueElement = elementCache().findValueCell(nameOrLabel);
-
-            WebElement editableElement = Locator.xpath("./div/div/*[self::input or self::textarea]").findElement(fieldValueElement);
-            getWrapper().setFormElement(editableElement, value);
-            editableElement.clear();
-            WebDriverWrapper.waitFor(()->editableElement.getText().isEmpty(), 500);
-            editableElement.sendKeys(value);
+            Input input = elementCache().findInput(columnIdentifier);
+            input.setValue(value);
         }
         else
         {
-            throw new IllegalArgumentException("Field with label '" + nameOrLabel + "' is read-only. This field can not be set.");
+            throw new IllegalArgumentException("Field '" + columnIdentifier + "' is read-only. This field can not be set.");
         }
 
         _changeCounter++;
@@ -196,16 +193,16 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
     /**
      * Get the value of a boolean field.
      *
-     * @param nameOrLabel The name or label of the field to get.
+     * @param columnIdentifier fieldKey, name, or label
      * @return The value of the field.
      **/
-    public boolean getBooleanField(String nameOrLabel)
+    public boolean getBooleanField(CharSequence columnIdentifier)
     {
         // The text used in the field label and the value of the name attribute in the checkbox don't always have the same case.
-        WebElement editableElement = Locator.tag("input").findElement(elementCache().findValueCell(nameOrLabel));
+        WebElement editableElement = Locator.tag("input").findElement(elementCache().findValueCell(columnIdentifier));
         String elementType = editableElement.getDomAttribute("type").toLowerCase().trim();
 
-        Assert.assertEquals(String.format("Field '%s' is not a checkbox. Cannot be get true/false value.", nameOrLabel), "checkbox", elementType);
+        Assert.assertEquals(String.format("Field '%s' is not a checkbox. Cannot be get true/false value.", columnIdentifier), "checkbox", elementType);
 
         return new Checkbox(editableElement).isChecked();
     }
@@ -213,21 +210,21 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
     /**
      * Set a boolean field (a checkbox).
      *
-     * @param nameOrLabel The label of the field to set.
+     * @param columnIdentifier fieldKey, name, or label
      * @param value True will check it, false will uncheck it.
      * @return A reference to this editable detail table.
      **/
-    public DetailTableEdit setBooleanField(String nameOrLabel, boolean value)
+    public DetailTableEdit setBooleanField(CharSequence columnIdentifier, boolean value)
     {
 
-        WebElement fieldValueElement = elementCache().findValueCell(nameOrLabel);
-        Assert.assertTrue(String.format("Field '%s' is not editable and cannot be set.", nameOrLabel), isEditableField(fieldValueElement));
+        WebElement fieldValueElement = elementCache().findValueCell(columnIdentifier);
+        Assert.assertTrue(String.format("Field '%s' is not editable and cannot be set.", columnIdentifier), isEditableField(fieldValueElement));
         getWrapper().scrollIntoView(fieldValueElement);
 
         WebElement editableElement = fieldValueElement.findElement(By.xpath("./div/div/input"));
         String elementType = editableElement.getDomAttribute("type").toLowerCase().trim();
 
-        Assert.assertEquals(String.format("Field '%s' is not a checkbox. Cannot be set to true/false.", nameOrLabel), "checkbox", elementType);
+        Assert.assertEquals(String.format("Field '%s' is not a checkbox. Cannot be set to true/false.", columnIdentifier), "checkbox", elementType);
 
         Checkbox checkbox = new Checkbox(editableElement);
 
@@ -240,97 +237,97 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
     /**
      * Get the value of an int field. You could also call getTextField
      *
-     * @param nameOrLabel The name or label of the field to get.
+     * @param columnIdentifier fieldKey, name, or label
      * @return The value of the field as an int.
      **/
-    public int getIntField(String nameOrLabel)
+    public int getIntField(CharSequence columnIdentifier)
     {
-        return Integer.getInteger(getTextField(nameOrLabel));
+        return Integer.getInteger(getTextField(columnIdentifier));
     }
 
     /**
      * Set an int field.
      *
-     * @param nameOrLabel The name or label of the field to set.
+     * @param columnIdentifier fieldKey, name, or label
      * @param value The int value to set the field to.
      * @return A reference to this editable detail table.
      **/
-    public DetailTableEdit setIntField(String nameOrLabel, int value)
+    public DetailTableEdit setIntField(CharSequence columnIdentifier, int value)
     {
-        return setTextField(nameOrLabel, Integer.toString(value));
+        return setTextField(columnIdentifier, Integer.toString(value));
     }
 
-    public FileUploadField getFileField(String fieldLabel)
+    public FileUploadField getFileField(CharSequence columnIdentifier)
     {
-        return elementCache().fileField(fieldLabel);
+        return elementCache().fileField(columnIdentifier);
     }
 
-    public DetailTableEdit setFileField(String nameOrLabel, File file)
+    public DetailTableEdit setFileField(CharSequence columnIdentifier, File file)
     {
-        getFileField(nameOrLabel)
+        getFileField(columnIdentifier)
                 .setFile(file);
 
         _changeCounter++;
         return this;
     }
 
-    public DetailTableEdit removeFileField(String nameOrLabel)
+    public DetailTableEdit removeFileField(CharSequence columnIdentifier)
     {
-        getFileField(nameOrLabel).removeFile();
+        getFileField(columnIdentifier).removeFile();
 
         _changeCounter++;
         return this;
     }
 
-    public boolean isFileFieldBlank(String fieldLabel)
+    public boolean isFileFieldBlank(CharSequence columnIdentifier)
     {
-        return !getFileField(fieldLabel)
+        return !getFileField(columnIdentifier)
                 .hasAttachedFile();
     }
 
-    public FilteringReactSelect getSelectField(String nameOrLabel)
+    public FilteringReactSelect getSelectField(CharSequence columnIdentifier)
     {
-        return elementCache().findSelect(nameOrLabel);
+        return elementCache().findSelect(columnIdentifier);
     }
 
     /**
      * Get the value of a select field.
      *
-     * @param nameOrLabel The name or label of the field to get.
+     * @param columnIdentifier fieldKey, name, or label
      * @return The selected value.
      **/
-    public String getSelectedValue(String nameOrLabel)
+    public String getSelectedValue(CharSequence columnIdentifier)
     {
-        return getSelectField(nameOrLabel).getValue();
+        return getSelectField(columnIdentifier).getValue();
     }
 
     /**
      * This allows you to query a given select in the edit panel to see what options it offers.
      *
-     * @param nameOrLabel The name or label of the field to get.
+     * @param columnIdentifier fieldKey, name, or label
      * @return List of strings for the values in the list.
      **/
-    public List<String> getSelectOptions(String nameOrLabel)
+    public List<String> getSelectOptions(CharSequence columnIdentifier)
     {
-        return getSelectField(nameOrLabel).getOptions();
+        return getSelectField(columnIdentifier).getOptions();
     }
 
     /**
      * Select a single value from a select list.
      *
-     * @param nameOrLabel The name or label of the field to set.
+     * @param columnIdentifier fieldKey, name, or label
      * @param selectValue The value to select from the list.
      * @return A reference to this editable detail table.
      **/
-    public DetailTableEdit setSelectValue(String nameOrLabel, String selectValue)
+    public DetailTableEdit setSelectValue(CharSequence columnIdentifier, String selectValue)
     {
         List<String> selection = Arrays.asList(selectValue);
-        return setSelectValue(nameOrLabel, selection);
+        return setSelectValue(columnIdentifier, selection);
     }
 
-    public DetailTableEdit createSelectValue(String nameOrLabel, String value)
+    public DetailTableEdit createSelectValue(CharSequence columnIdentifier, String value)
     {
-        var select = ReactSelect.finder(getDriver()).waitFor(elementCache().findValueCell(nameOrLabel));
+        var select = ReactSelect.finder(getDriver()).waitFor(elementCache().findValueCell(columnIdentifier));
         select.createValue(value);
         return this;
     }
@@ -338,13 +335,13 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
     /**
      * Select multiple values from a select list.
      *
-     * @param nameOrLabel The name or label of the field to set.
+     * @param columnIdentifier fieldKey, name, or label
      * @param selectValues The value to select from the list.
      * @return A reference to this editable detail table.
      **/
-    public DetailTableEdit setSelectValue(String nameOrLabel, List<String> selectValues)
+    public DetailTableEdit setSelectValue(CharSequence columnIdentifier, List<String> selectValues)
     {
-        FilteringReactSelect reactSelect = getSelectField(nameOrLabel);
+        FilteringReactSelect reactSelect = getSelectField(columnIdentifier);
         selectValues.forEach(reactSelect::typeAheadSelect);
         _changeCounter++;
         return this;
@@ -353,31 +350,31 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
     /**
      * Clear a given select field.
      *
-     * @param nameOrLabel The name or label of the field to clear.
+     * @param columnIdentifier fieldKey, name, or label
      * @return A reference to this editable detail table.
      **/
-    public DetailTableEdit clearSelectValue(String nameOrLabel)
+    public DetailTableEdit clearSelectValue(CharSequence columnIdentifier)
     {
-        return clearSelectValue(nameOrLabel, true, true);
+        return clearSelectValue(columnIdentifier, true, true);
     }
 
     /**
      * Clear a given select field.
      *
-     * @param nameOrLabel The name or label of the field to clear.
+     * @param columnIdentifier fieldKey, name, or label
      * @param waitForSelection If true, wait for the select to have a selection before clearing it
      * @param assertSelection  If true, assert if no selection appears (note: does nothing if waitForSelection is not true)
      * @return A reference to this editable detail table.
      */
-    public DetailTableEdit clearSelectValue(String nameOrLabel, boolean waitForSelection, boolean assertSelection)
+    public DetailTableEdit clearSelectValue(CharSequence columnIdentifier, boolean waitForSelection, boolean assertSelection)
     {
-        var select = getSelectField(nameOrLabel);
+        var select = getSelectField(columnIdentifier);
         if (waitForSelection)
         {
             if (assertSelection)
             {
                 WebDriverWrapper.waitFor(select::hasSelection,
-                        String.format("The %s select did not have any selection in time", nameOrLabel), _readyTimeout);
+                        String.format("The %s select did not have any selection in time", columnIdentifier), _readyTimeout);
             }
             else
                 WebDriverWrapper.waitFor(select::hasSelection, 1_000);
@@ -389,7 +386,7 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
 
     /**
      * Set a DateTime, Date or Time field.
-     * @param nameOrLabel The name or label of the field to set.
+     * @param columnIdentifier fieldKey, name, or label
      * @param dateTime Will be used to determine what kind of field is being set and how to set it. If the parameter
      *                 is a LocalDateTime object then it is assumed that field is a DateTime field. If the parameter is
      *                 a LocalDate object then it is assumed to be a date-only field. And I think you can guess what
@@ -397,9 +394,9 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
      *                 is typed into the field (no picker is used).
      * @return A reference to this DetailTableEdit object.
      */
-    public DetailTableEdit setDateTimeField(String nameOrLabel, Object dateTime)
+    public DetailTableEdit setDateTimeField(CharSequence columnIdentifier, Object dateTime)
     {
-        ReactDateTimePicker dateTimePicker = getDateTimePicker(nameOrLabel);
+        ReactDateTimePicker dateTimePicker = getDateTimePicker(columnIdentifier);
         if (dateTime instanceof LocalDateTime localDateTime)
         {
             dateTimePicker.select(localDateTime);
@@ -426,22 +423,22 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
         return this;
     }
 
-    public String getDateTimeField(String nameOrLabel)
+    public String getDateTimeField(CharSequence columnIdentifier)
     {
-        ReactDateTimePicker dateTimePicker = getDateTimePicker(nameOrLabel);
+        ReactDateTimePicker dateTimePicker = getDateTimePicker(columnIdentifier);
         return dateTimePicker.get();
     }
 
-    public void clearDateTimeField(String nameOrLabel)
+    public void clearDateTimeField(CharSequence columnIdentifier)
     {
-        ReactDateTimePicker dateTimePicker = getDateTimePicker(nameOrLabel);
+        ReactDateTimePicker dateTimePicker = getDateTimePicker(columnIdentifier);
         dateTimePicker.clear();
         _changeCounter++;
     }
 
-    private ReactDateTimePicker getDateTimePicker(String nameOrLabel)
+    private ReactDateTimePicker getDateTimePicker(CharSequence columnIdentifier)
     {
-        return new ReactDateTimePicker.ReactDateTimeInputFinder(getDriver()).find(elementCache().findValueCell(nameOrLabel));
+        return new ReactDateTimePicker.ReactDateTimeInputFinder(getDriver()).find(elementCache().findValueCell(columnIdentifier));
     }
 
     // For use when the field is of an unknown type, as can occur in fuzz tests
@@ -585,9 +582,9 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
         public final WebElement editPanel = Locator.tagWithClass("div", "detail__editing")
                 .findWhenNeeded(this);
 
-        public WebElement findValueCell(String nameOrLabel)
+        public WebElement findValueCell(CharSequence columnIdentifier)
         {
-            return getFieldManager().findFieldReference(nameOrLabel).getElement();
+            return getFieldManager().findFieldReference(columnIdentifier).getElement();
         }
 
         private FieldReferenceManager _fieldReferenceManager;
@@ -603,8 +600,7 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
                 // Use JavaScript to get fieldKeys and captions in one operation, rather than making 2N calls to 'WebElement.getDomAttribute'
                 List<List<String>> captionsAndKeys = getWrapper().executeScript(
                     """
-                    
-                        var cells = arguments[0];
+                    var cells = arguments[0];
                     var captions = [];
                     var fieldkeys = [];
                     for (var i = 0; i < cells.length; i++)
@@ -613,8 +609,7 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
                         fieldkeys.push(cells[i].dataset.fieldkey);
                     }
                     return [captions, fieldkeys];
-                    """, List.
-                        class,
+                    """, List.class,
                 valueCells);
                 List<String> captions = captionsAndKeys.get(0);
                 List<String> fieldkeys = captionsAndKeys.get(1);
@@ -629,9 +624,9 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
             return _fieldReferenceManager;
         }
 
-        public FileUploadField fileField(String nameOrLabel)
+        public FileUploadField fileField(CharSequence columnIdentifier)
         {
-            return new FileUploadField(findValueCell(nameOrLabel), getDriver());
+            return new FileUploadField(findValueCell(columnIdentifier), getDriver());
         }
 
         public Locator validationMsg = Locator.tagWithClass("span", "validation-message");
@@ -643,14 +638,14 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
 
         public WebElement commentInput = Locator.tagWithId("textarea", "actionComments").refindWhenNeeded(getDriver());
 
-        public FilteringReactSelect findSelect(String nameOrLabel)
+        public FilteringReactSelect findSelect(CharSequence columnIdentifier)
         {
-            return FilteringReactSelect.finder(_driver).timeout(_readyTimeout).waitFor(findValueCell(nameOrLabel));
+            return FilteringReactSelect.finder(_driver).timeout(_readyTimeout).waitFor(findValueCell(columnIdentifier));
         }
 
-        public Input findInput(String nameOrLabel)
+        public Input findInput(CharSequence columnIdentifier)
         {
-            return Input.Input(Locator.xpath("./div/div/*[self::input or self::textarea]"), getDriver()).find(findValueCell(nameOrLabel));
+            return Input.Input(Locator.xpath("./div/div/*[self::input or self::textarea]"), getDriver()).find(findValueCell(columnIdentifier));
         }
     }
 
