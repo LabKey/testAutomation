@@ -74,8 +74,9 @@ public class TestDataGenerator
 {
     private static final String WIDE_CHAR = "👾";
     private static final char WIDE_PLACEHOLDER = 'Π'; // Wide character can't be picked from the string with 'charAt'
+    private static final String NON_LATIN_STRING = "и안は";
     // chose a Character random from this String
-    public static final String CHARSET_STRING = "ABCDEFG01234abcdefvxyz~!@#$%^&*()-+=_{}[]|:;\"',.<>и안は" + WIDE_PLACEHOLDER;
+    public static final String CHARSET_STRING = "ABCDEFG01234abcdefvxyz~!@#$%^&*()-+=_{}[]|:;\"',.<>" + NON_LATIN_STRING + WIDE_PLACEHOLDER;
     public static final String ALPHANUMERIC_STRING = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvxyz";
     public static final String DOMAIN_SPECIAL_STRING =  "+- _.:&()/";
     public static final String ILLEGAL_DOMAIN_NAME_CHARSET = "<>[]{};,`\"~!@#$%^*=|?\\";
@@ -581,7 +582,7 @@ public class TestDataGenerator
     public static String randomFieldName(@NotNull String part, int numStartChars, int numEndChars, @Nullable String exclusion)
     {
         // use the characters that we know are encoded in fieldKeys plus characters that we know clients are using
-        String chars = ALL_ILLEGAL_QUERY_KEY_CHARACTERS + " %()=+-[]_|*`'\":;<>?!@#^";
+        String chars = ALL_ILLEGAL_QUERY_KEY_CHARACTERS + " %()=+-[]_|*`'\":;<>?!@#^" + NON_LATIN_STRING + WIDE_PLACEHOLDER ;
 
         String randomFieldName = randomName(part, numStartChars, numEndChars, chars, exclusion);
         TestLogger.log("Generated random field name: " + randomFieldName);
