@@ -825,7 +825,7 @@ public class DataRegionTable extends DataRegion
     public WebElement getFlag(int row, String columnName)
     {
         var cell = findCell(row, columnName);
-        return tagWithAttribute("i", "flagid").findElement(cell);
+        return tagWithAttribute("i", "data-flagId").findElement(cell);
     }
 
     public boolean isFlagEnabled(int row, String columnName)
@@ -913,7 +913,7 @@ public class DataRegionTable extends DataRegion
      */
     public void clearFlagValues()
     {
-        List<WebElement> allFlags = Locator.tagWithAttribute("i", "flagid").findElements(elementCache());
+        List<WebElement> allFlags = Locator.tagWithAttribute("i", "data-flagId").findElements(elementCache());
         for (WebElement flag : allFlags)
         {
             if (isFlagEnabled(flag))
