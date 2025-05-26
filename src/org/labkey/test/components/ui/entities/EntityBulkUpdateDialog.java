@@ -4,6 +4,7 @@ import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.UpdatingComponent;
 import org.labkey.test.components.bootstrap.ModalDialog;
@@ -262,11 +263,6 @@ public class EntityBulkUpdateDialog extends ModalDialog
 
     // dismiss the dialog
 
-    public void clickEditWithGrid()
-    {
-        dismiss("Edit with Grid");
-    }
-
     public String clickUpdateExpectingError()
     {
         elementCache().updateButton.click();
@@ -279,7 +275,7 @@ public class EntityBulkUpdateDialog extends ModalDialog
         clickUpdate(false);
     }
 
-    public void clickUpdate(boolean skipChangeCounterCheck)
+    public void clickUpdate(boolean skipAuditEventCheck)
     {
         Integer rowCount = getCountFromTitle();
 
@@ -290,14 +286,14 @@ public class EntityBulkUpdateDialog extends ModalDialog
         });
 
         // check for the expected number of Data Changes in the latest audit event records
-        AuditLogHelper auditLogHelper = new AuditLogHelper(getWrapper());
+        AuditLogHelper auditLogHelper = new AuditLogHelper(getWrapper(), () -> WebTestHelper.getRemoteApiConnection(false));
         String auditEventName = auditLogHelper.getAuditEventNameFromURL();
-        if (!skipChangeCounterCheck && auditEventName != null)
+        if (!skipAuditEventCheck && auditEventName != null)
         {
             try
             {
                 int changeCounter = auditLogHelper.isSourcesRoute() ? _changeCounter + 1 : _changeCounter; // Source updates include the name value in the diff (even when not changed)
-                auditLogHelper.checkTimelineAuditEventDiffCountForLastTransaction(getWrapper().getCurrentContainerPath(), auditEventName, changeCounter, rowCount);
+                auditLogHelper.checkAuditEventDiffCountForLastTransaction(getWrapper().getCurrentContainerPath(), auditEventName, changeCounter, rowCount);
             }
             catch (CommandException | IOException e)
             {
