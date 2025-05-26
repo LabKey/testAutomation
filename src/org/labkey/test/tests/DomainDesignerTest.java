@@ -40,6 +40,7 @@ import org.labkey.test.pages.core.admin.BaseSettingsPage.TIME_FORMAT;
 import org.labkey.test.pages.experiment.CreateSampleTypePage;
 import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.util.AuditLogHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.TestDataGenerator;
@@ -53,6 +54,7 @@ import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -71,6 +73,9 @@ import static org.labkey.test.util.exp.SampleTypeAPIHelper.SAMPLE_TYPE_DOMAIN_KI
 @Category({BVT.class})
 public class DomainDesignerTest extends BaseWebDriverTest
 {
+    private final AuditLogHelper _auditLogHelper = new AuditLogHelper(this);
+    final String DOMAIN_PROPERTY_LOG_NAME = "Domain property events";
+
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
@@ -281,6 +286,13 @@ public class DomainDesignerTest extends BaseWebDriverTest
         EditListDefinitionPage editListDefinitionPage = new EditListDefinitionPage(getDriver());
         editListDefinitionPage.setName(editedListName)
                 .clickSave();
+
+        AuditLogHelper.DetailedAuditEventRow expectedDomainEvent = new AuditLogHelper.DetailedAuditEventRow(null, listName, null,
+                "The name of the list domain 'InvalidLookUpNameList' was changed to 'InvalidLookUpNameList_edited'. The descriptor of domain InvalidLookUpNameList_edited was updated.",
+                "", null, null, "Name: " + listName + " > " + editedListName);
+        boolean pass = _auditLogHelper.validateLastDomainAuditEvents(editedListName, getProjectName(), expectedDomainEvent, Collections.emptyMap());
+        checker().verifyTrue("The comment logged for the list renaming was not as expected", pass);
+
         domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleType);
         assertEquals("Look up should be updated after list renaming", "Current Folder > lists > " + editedListName, domainDesignerPage.fieldsPanel().getField("lookUpField").detailsMessage());
 
@@ -1335,18 +1347,19 @@ public class DomainDesignerTest extends BaseWebDriverTest
     public void testRegexValidator() throws Exception
     {
         String listName = "regexValidatorList";
-
+        String fieldNameWithReg = "favoriteSnack";
         FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "lists", listName);
         TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
                 .withColumns(List.of(
                         new FieldDefinition("name", FieldDefinition.ColumnType.String),
                         new FieldDefinition("favoriteIceCream", FieldDefinition.ColumnType.String),
-                        new FieldDefinition("favoriteSnack", FieldDefinition.ColumnType.String),
+                        new FieldDefinition(fieldNameWithReg, FieldDefinition.ColumnType.String),
                         new FieldDefinition("size", FieldDefinition.ColumnType.Integer)));
         DomainResponse createResponse = dgen.createDomain(createDefaultConnection(), "IntList", Map.of("keyName", "Key"));
+
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
-        DomainFieldRow favoriteSnack = domainFormPanel.getField("favoriteSnack");
+        DomainFieldRow favoriteSnack = domainFormPanel.getField(fieldNameWithReg);
 
         RegexValidatorDialog validatorDialog = favoriteSnack.clickRegexButton();
         RegexValidatorPanel panel = validatorDialog.getValidationPanel();
@@ -1370,6 +1383,23 @@ public class DomainDesignerTest extends BaseWebDriverTest
                 "twizzler is not a snack", specialCharsValidator.get("description"));
         assertEquals("expected error message should be on the field",
                 "favorite snack cannot be twizzlers, yo", specialCharsValidator.get("errorMessage"));
+
+        log("Validate that the expected rows after the update are in the log.");
+        String fieldOldValues = "Name=favoriteSnack&Type=String&Scale=4000&PHI=Not%20PHI&DefaultScale=Linear&Required=false&Hidden=false&MvEnabled=false&Measure=false" +
+                "&Dimension=false&ShownInInsert=true&ShownInDetails=true&ShownInUpdate=true&ShownInLookupView=false&RecommendedVariable=false&ExcludedFromShifting=false" +
+                "&Scannable=false&DefaultValueType=Editable%20default";
+        String fieldNewValues = fieldOldValues + "&Validator=neverTwizzlers%2C%20twizzler%20is%20not%20a%20snack%2C%20twizzler%2C%20failOnMatch%3Dtrue%2C%20favorite%20snack%20cannot%20be%20twizzlers%2C%20yo%2C%20Regular%20Expression";
+        AuditLogHelper.DetailedAuditEventRow fieldEvent = new AuditLogHelper.DetailedAuditEventRow(null, fieldNameWithReg, "Modified",
+                "The following property was updated: Validator", "", fieldOldValues, fieldNewValues, null);
+        AuditLogHelper.DetailedAuditEventRow expectedDomainEvent = new AuditLogHelper.DetailedAuditEventRow(null, listName, null,
+                "The column(s) of domain " + listName + " were modified.",
+                "", null, null, null);
+        boolean pass = _auditLogHelper.validateLastDomainAuditEvents(listName, getProjectName(), expectedDomainEvent, Map.of(fieldNameWithReg, fieldEvent));
+
+        if(!pass)
+            _auditLogHelper.goToAuditEventView(DOMAIN_PROPERTY_LOG_NAME);
+
+        Assert.assertTrue("The values logged for the updating domain field regex event were not as expected. See log for details.", pass);
 
         // this test does not verify that attempts to insert values that match will get an error
     }
