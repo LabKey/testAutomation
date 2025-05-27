@@ -37,7 +37,6 @@ import org.bouncycastle.openpgp.PGPLiteralData;
 import org.bouncycastle.openpgp.PGPPBEEncryptedData;
 import org.bouncycastle.openpgp.PGPUtil;
 import org.bouncycastle.openpgp.jcajce.JcaPGPObjectFactory;
-import org.bouncycastle.openpgp.operator.jcajce.JcaPGPDigestCalculatorProviderBuilder;
 import org.bouncycastle.openpgp.operator.jcajce.JcePBEDataDecryptorFactoryBuilder;
 import org.bouncycastle.util.io.Streams;
 import org.jetbrains.annotations.NotNull;
@@ -653,7 +652,7 @@ public abstract class TestFileUtils
         }
 
         PGPPBEEncryptedData pbe = (PGPPBEEncryptedData) enc.get(0);
-        InputStream clear = pbe.getDataStream(new JcePBEDataDecryptorFactoryBuilder(new JcaPGPDigestCalculatorProviderBuilder().setProvider(BouncyCastleProvider.PROVIDER_NAME).build())
+        InputStream clear = pbe.getDataStream(new JcePBEDataDecryptorFactoryBuilder()
                 .setProvider(BouncyCastleProvider.PROVIDER_NAME).build(passPhrase));
 
         JcaPGPObjectFactory pgpFact = new JcaPGPObjectFactory(clear);
