@@ -27,6 +27,7 @@ import org.labkey.test.pages.core.admin.BaseSettingsPage.TIME_FORMAT;
 import org.labkey.test.pages.core.admin.LookAndFeelSettingsPage;
 import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.util.AuditLogHelper;
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExcelHelper;
@@ -49,6 +50,8 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
     private static SimpleDateFormat _defaultDateFormat = null;
     private static SimpleDateFormat _defaultTimeFormat = null;
     private static SimpleDateFormat _defaultDateTimeFormat = null;
+
+    private final AuditLogHelper _auditLogHelper = new AuditLogHelper(this);
 
     @Override
     public List<String> getAssociatedModules()
@@ -1222,6 +1225,16 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
 
         listDefinitionPage.clickSave();
 
+        AuditLogHelper.DetailedAuditEventRow expectedDomainEvent = new AuditLogHelper.DetailedAuditEventRow(null, listName, null,
+                "The column(s) of domain " + listName + " were modified.",
+                "", null, null, null);
+        boolean pass = _auditLogHelper.validateLastDomainAuditEvents(listName, PROJECT_NAME, expectedDomainEvent,
+                    Map.of(timeCol, new AuditLogHelper.DetailedAuditEventRow(null, timeCol, "Modified","The following property was updated: Format",null, null, null, "Format: hh:mm a > HH:mm:ss"),
+                            dateCol, new AuditLogHelper.DetailedAuditEventRow(null, dateCol, "Modified","The following property was updated: Format",null, null, null, "Format: yyyy-MM-dd > ddMMMyy"),
+                            dateTimeCol, new AuditLogHelper.DetailedAuditEventRow(null, dateTimeCol, "Modified","The following property was updated: Format",null, null, null, "Format: yyyy-MM-dd hh:mm a > dd-MMM-yyyy HH:mm:ss"))
+                );
+        checker().verifyTrue("Domain audit log not as expected after updating formats", pass);
+
         expectedData = new ArrayList<>();
 
         for(Date date : dates)
@@ -1349,6 +1362,15 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
         confirmDialog.dismiss("Yes, Change Data Type");
 
         listDefinitionPage.clickSave();
+
+        AuditLogHelper.DetailedAuditEventRow expectedDomainEvent = new AuditLogHelper.DetailedAuditEventRow(null, listName, null,
+                "The column(s) of domain " + listName + " were modified.",
+                "", null, null, null);
+        boolean pass = _auditLogHelper.validateLastDomainAuditEvents(listName, PROJECT_NAME, expectedDomainEvent,
+                Map.of(dateTimeToDateCol, new AuditLogHelper.DetailedAuditEventRow(null, dateTimeToDateCol, "Modified","The following properties were updated: Type, Format",null, null, null, "Type: DateTime > Date\nFormat: MMMM dd yyyy HH:mm > "),
+                        dateTimeToTimeCol, new AuditLogHelper.DetailedAuditEventRow(null, dateTimeToTimeCol, "Modified","The following properties were updated: Type, Format",null, null, null, "Type: DateTime > Time\nFormat: yyyy-MMM-dd HH:mm:ss > "))
+        );
+        checker().verifyTrue("Domain audit log not as expected after changing data type", pass);
 
         // Update default format after changing the types.
         DATE_FORMAT dateFormat = DATE_FORMAT.Default;

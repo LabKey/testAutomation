@@ -5,6 +5,7 @@ import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.html.Checkbox;
@@ -503,7 +504,7 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
         return clickSave(false);
     }
 
-    public DetailDataPanel clickSave(boolean skipChangeCounterCheck)
+    public DetailDataPanel clickSave(boolean skipAuditEventCheck)
     {
         String title = getSourceTitle();
         var componentEl = getComponentElement();
@@ -515,14 +516,14 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
                 .until(ExpectedConditions.stalenessOf(elementCache().saveButton));
 
         // check for the expected number of Data Changes in the latest audit event records
-        AuditLogHelper auditLogHelper = new AuditLogHelper(getWrapper());
+        AuditLogHelper auditLogHelper = new AuditLogHelper(getWrapper(), () -> WebTestHelper.getRemoteApiConnection(false));
         String auditEventName = auditLogHelper.getAuditEventNameFromURL();
-        if (!skipChangeCounterCheck && auditEventName != null)
+        if (!skipAuditEventCheck && auditEventName != null)
         {
             try
             {
                 int changeCounter = auditLogHelper.isSourcesRoute() ? _changeCounter + 1 : _changeCounter; // Source updates include the name value in the diff (even when not changed)
-                auditLogHelper.checkTimelineAuditEventDiffCountForLastTransaction(getWrapper().getCurrentContainerPath(), auditEventName, changeCounter, 1);
+                auditLogHelper.checkAuditEventDiffCountForLastTransaction(getWrapper().getCurrentContainerPath(), auditEventName, changeCounter, 1);
             }
             catch (CommandException | IOException e)
             {
