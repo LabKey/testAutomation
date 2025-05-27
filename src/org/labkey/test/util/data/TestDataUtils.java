@@ -88,7 +88,7 @@ public class TestDataUtils
             () -> new FieldDefinition("PSS Tracking No."),
             () -> new FieldDefinition("Product/bottle size", FieldDefinition.ColumnType.Decimal),
             () -> new FieldDefinition("Time point / Pull Date", FieldDefinition.ColumnType.DateAndTime),
-            () -> new FieldDefinition("Cell Type (Epz, Spz, PS)"),
+            () -> new FieldDefinition("Cell Type (Epz, Spz, PS)",  FieldDefinition.ColumnType.TextChoice).setTextChoiceValues(List.of("Epz", "Spz", "PS")),
             () -> new FieldDefinition("Concentration (ng/uL)", FieldDefinition.ColumnType.Decimal),
             () -> new FieldDefinition("Lot no. (Replacement tube) 1"),
             () -> new FieldDefinition("Date of Collection (DD/MMM/YYY)", FieldDefinition.ColumnType.Date),

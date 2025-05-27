@@ -56,6 +56,7 @@ import org.labkey.test.params.FieldDefinition.LookupInfo;
 import org.labkey.test.params.FieldDefinition.StringLookup;
 import org.labkey.test.tests.AuditLogTest;
 import org.labkey.test.util.AbstractDataRegionExportOrSignHelper.ColumnHeaderType;
+import org.labkey.test.util.AuditLogHelper;
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
@@ -191,6 +192,8 @@ public class ListTest extends BaseWebDriverTest
     private final File EXCEL_APILIST_FILE = TestFileUtils.getSampleData("dataLoading/excel/ClientAPITestList.xls");
     private final File TSV_SAMPLE_FILE = TestFileUtils.getSampleData("fileTypes/tsv_sample.tsv");
     private final String TSV_LIST_NAME = "Fruits from TSV";
+
+    private final AuditLogHelper _auditLogHelper = new AuditLogHelper(this);
 
     @Override
     public List<String> getAssociatedModules()
@@ -635,14 +638,17 @@ public class ListTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("view history"));
         checker().wrapAssertion(()->assertTextPresent(":History"));
         checker().wrapAssertion(()->assertTextPresent("record was modified", 2));    // An existing list record was modified
-        checker().wrapAssertion(()->assertTextPresent("were modified", 8));          // The column(s) of LIST_NAME_COLORS domain were modified
+
+        checker().wrapAssertion(()->assertTextPresent(" was created. The column(s) of domain ", 1));// Create domain and update columns combined into a single event
+        checker().wrapAssertion(()->assertTextPresent(" were modified.", 7));          // The column(s) of LIST_NAME_COLORS domain were modified
+        checker().wrapAssertion(()->assertTextPresent("The descriptor of domain", 1));          // The description LIST_NAME_COLORS domain were modified
         checker().wrapAssertion(()->assertTextPresent("Bulk inserted", 2));
         checker().wrapAssertion(()->assertTextPresent("A new list record was inserted", 1));
         checker().wrapAssertion(()->assertTextPresent("was created", 2));                // Once for the list, once for the domain
         // List insert/update events should each have a link to the list item that was modified, but the other events won't have a link
-        checker().wrapAssertion(()->assertEquals("details Links", 6, DataRegionTable.detailsLinkLocator().findElements(getDriver()).size()));
-        checker().wrapAssertion(()->assertEquals("Project Links", 18, DataRegionTable.Locators.table().append(Locator.linkWithText(PROJECT_VERIFY)).findElements(getDriver()).size()));
-        checker().wrapAssertion(()->assertEquals("List Links", 18, DataRegionTable.Locators.table().append(Locator.linkWithText(LIST_NAME_COLORS)).findElements(getDriver()).size()));
+        checker().wrapAssertion(()->assertEquals("details Links", 6/*List Events*/ + 8/*Domain Audit*/, DataRegionTable.detailsLinkLocator().findElements(getDriver()).size()));
+        checker().wrapAssertion(()->assertEquals("Project Links", 17, DataRegionTable.Locators.table().append(Locator.linkWithText(PROJECT_VERIFY)).findElements(getDriver()).size()));
+        checker().wrapAssertion(()->assertEquals("List Links", 17, DataRegionTable.Locators.table().append(Locator.linkWithText(LIST_NAME_COLORS)).findElements(getDriver()).size()));
         DataRegionTable dataRegionTable = new DataRegionTable("query", getDriver());
         dataRegionTable.clickRowDetails(0);
         checker().wrapAssertion(()->assertTextPresent("List Item Details"));
@@ -1227,6 +1233,15 @@ public class ListTest extends BaseWebDriverTest
 
         listDefinitionPage.clickSave();
 
+        AuditLogHelper.DetailedAuditEventRow expectedDomainEvent = new AuditLogHelper.DetailedAuditEventRow(null, TSV_LIST_NAME, null,
+                "The column(s) of domain " + TSV_LIST_NAME + " were modified.",
+                "", null, null, null);
+        boolean pass = _auditLogHelper.validateLastDomainAuditEvents(TSV_LIST_NAME, getProjectName(), expectedDomainEvent,
+                Map.of("IntCol", new AuditLogHelper.DetailedAuditEventRow(null, "IntCol", "Modified","The following property was updated: ConditionalFormat",null, null, null, "ConditionalFormat:  > format.column~gt=7: text-decoration: line-through;, format.column~gt=5: font-weight: bold;"),
+                        "BoolCol", new AuditLogHelper.DetailedAuditEventRow(null, "BoolCol", "Modified","The following property was updated: ConditionalFormat",null, null, null, "ConditionalFormat:  > format.column~eq=true: text-decoration: line-through;font-weight: bold;font-style: italic;color: #68ccca;background-color: #d33115 !important;"))
+        );
+        checker().verifyTrue("Domain audit comment not as expected after changing conditional format", pass);
+
         // Verify conditional format of boolean column
         // look for cells that do not match the
         assertTextPresent(TSV_LIST_NAME);
@@ -1294,6 +1309,13 @@ public class ListTest extends BaseWebDriverTest
                 .setLabel(newFieldName);
         listDefinitionPage.clickSave();
 
+        AuditLogHelper.DetailedAuditEventRow expectedDomainEvent = new AuditLogHelper.DetailedAuditEventRow(null, listName, null,
+                "The column(s) of domain " + listName + " were modified.",
+                "", null, null, null);
+        boolean pass = _auditLogHelper.validateLastDomainAuditEvents(listName, getProjectName(), expectedDomainEvent,
+                Map.of(newFieldName, new AuditLogHelper.DetailedAuditEventRow(null, newFieldName, "Modified","The following properties were updated: Name, Label",null, null, null, "Name: "+ origFieldName + " > " + newFieldName + "\nLabel: " + origFieldName + " > " + newFieldName)));
+        checker().verifyTrue("Domain audit comment not as expected after renaming a field", pass);
+
         assertTextPresent(newFieldName);
         assertTextNotPresent(origFieldName);
 
@@ -1330,6 +1352,16 @@ public class ListTest extends BaseWebDriverTest
         listDefinitionPage.setColumnPhiLevel("PhiColumn", FieldDefinition.PhiSelectType.PHI);
         listDefinitionPage.setColumnPhiLevel("RestrictedPhiColumn", FieldDefinition.PhiSelectType.Restricted);
         listDefinitionPage.clickSave();
+
+        AuditLogHelper.DetailedAuditEventRow expectedDomainEvent = new AuditLogHelper.DetailedAuditEventRow(null, listName, null,
+                "The column(s) of domain " + listName + " were modified.",
+                "", null, null, null);
+        boolean pass = _auditLogHelper.validateLastDomainAuditEvents(listName, getProjectName(), expectedDomainEvent,
+                Map.of("LimitedPhiColumn", new AuditLogHelper.DetailedAuditEventRow(null, "LimitedPhiColumn", "Modified","The following property was updated: PHI",null, null, null, "PHI: Not PHI > Limited PHI"),
+                        "PhiColumn", new AuditLogHelper.DetailedAuditEventRow(null, "PhiColumn", "Modified","The following property was updated: PHI",null, null, null, "PHI: Not PHI > Full PHI"),
+                        "RestrictedPhiColumn", new AuditLogHelper.DetailedAuditEventRow(null, "RestrictedPhiColumn", "Modified","The following property was updated: PHI",null, null, null, "PHI: Not PHI > Restricted PHI"))
+        );
+        checker().verifyTrue("Domain audit comment not as expected after changing PHI setting", pass);
 
         goToProjectHome();
         clickAndWait(Locator.linkWithText(listName));
@@ -1502,6 +1534,13 @@ public class ListTest extends BaseWebDriverTest
                 .getField(fieldName2).expand().clickAdvancedSettings().setUniqueConstraint(true)
                 .apply();
         listDefinitionPage.clickSave();
+
+        AuditLogHelper.DetailedAuditEventRow expectedDomainEvent = new AuditLogHelper.DetailedAuditEventRow(null, listName, null,
+                "The descriptor of domain " + listName + " was updated.",
+                "", null, null, "Indices:  > [field Name1, unique: true, fieldName_2, unique: true]");
+        boolean pass = _auditLogHelper.validateLastDomainAuditEvents(listName, getProjectName(), expectedDomainEvent, Collections.emptyMap());
+        checker().verifyTrue("Domain audit comment not as expected after updating field unique constraint", pass);
+
         viewRawTableMetadata(listName);
         verifyTableIndices("unique_constraint_list_", List.of("field_name1", "fieldname_2"));
         assertTextNotPresent("unique_constraint_list_fieldname_3");
@@ -1515,6 +1554,13 @@ public class ListTest extends BaseWebDriverTest
                 .getField(fieldName3).expand().clickAdvancedSettings().setUniqueConstraint(true)
                 .apply();
         listDefinitionPage.clickSave();
+
+        expectedDomainEvent = new AuditLogHelper.DetailedAuditEventRow(null, listName, null,
+                "The descriptor of domain " + listName + " was updated.",
+                "", null, null, "Indices: [field name1, unique: true, fieldname_2, unique: true] > [FieldName@3, unique: true, field Name1, unique: true]");
+        pass = _auditLogHelper.validateLastDomainAuditEvents(listName, getProjectName(), expectedDomainEvent, Collections.emptyMap());
+        checker().verifyTrue("Domain audit comment not as expected after updating field unique constraint", pass);
+
         viewRawTableMetadata(listName);
         verifyTableIndices("unique_constraint_list_", List.of("field_name1", "fieldname_3"));
         assertTextNotPresent("unique_constraint_list_fieldname_2");

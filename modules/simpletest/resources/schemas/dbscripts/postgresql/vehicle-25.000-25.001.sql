@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX AK_Name ON vehicle.Manufacturers (Name);
