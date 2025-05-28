@@ -158,7 +158,7 @@ public class ManageSampleStatusesPanel extends WebDriverComponent<ManageSampleSt
     public List<String> getStatusNames()
     {
         return elementCache().statusItems
-                .findElements(this)
+                .waitForElements(this, 2_000)
                 .stream()
                 .map(WebElement::getText)
                 .collect(Collectors.toList());

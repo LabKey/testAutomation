@@ -3434,7 +3434,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
      */
     public void setFormElement(WebElement el, String text)
     {
-        String inputType = el.getAttribute("type");
+        String inputType = el.getDomAttribute("type");
 
         if ("file".equals(inputType))
         {

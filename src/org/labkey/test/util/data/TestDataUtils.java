@@ -1,24 +1,37 @@
-package org.labkey.test.util;
+package org.labkey.test.util.data;
 
 import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
+import org.labkey.serverapi.reader.DataLoader;
 import org.labkey.serverapi.reader.TabLoader;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.util.TestDataGenerator;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public class TestDataUtils
 {
@@ -35,10 +48,8 @@ public class TestDataUtils
             () -> new FieldDefinition("Consumption Rate, Glucose", FieldDefinition.ColumnType.Decimal),
             () -> new FieldDefinition("Measurement Date/Time", FieldDefinition.ColumnType.DateAndTime),
             () -> new FieldDefinition("A260/A280", FieldDefinition.ColumnType.Decimal),
-            () -> new FieldDefinition("Nucleic Acid (ng/uL)", FieldDefinition.ColumnType.Decimal)
-                    .setLabel("Nucleic Acid (ng/uL)"),
-            () -> new FieldDefinition("Concentration (by Qubit ng/uL)", FieldDefinition.ColumnType.Decimal)
-                    .setLabel("Concentration (by Qubit ng/uL)"),
+            () -> new FieldDefinition("Nucleic Acid (ng/uL)", FieldDefinition.ColumnType.Decimal),
+            () -> new FieldDefinition("Concentration (by Qubit ng/uL)", FieldDefinition.ColumnType.Decimal),
             () -> new FieldDefinition("Dead (cells/ml)", FieldDefinition.ColumnType.Decimal),
             () -> new FieldDefinition("PDGF-AA/BB", FieldDefinition.ColumnType.Decimal),
             () -> new FieldDefinition("Run End Data/Time", FieldDefinition.ColumnType.DateAndTime),
@@ -50,14 +61,10 @@ public class TestDataUtils
             () -> new FieldDefinition("FAM-Lambda..cp.Rxn."),
             () -> new FieldDefinition("VIC-Precision...1"),
             () -> new FieldDefinition("Product.Type"),
-            () -> new FieldDefinition("Weight.Balance_%", FieldDefinition.ColumnType.Decimal)
-                    .setLabel("Weight.Balance %"),
-            () -> new FieldDefinition("Cumulative.Yield.DCW/Glucose.Consumed_g/g", FieldDefinition.ColumnType.Decimal)
-                    .setLabel("Cumulative.Yield.DCW/Glucose.Consumed g/g"),
-            () -> new FieldDefinition("Average.Volume.Productivity_g/L/day", FieldDefinition.ColumnType.Decimal)
-                    .setLabel("Average.Volume.Productivity g/L/day"),
+            () -> new FieldDefinition("Weight.Balance_%", FieldDefinition.ColumnType.Decimal),
+            () -> new FieldDefinition("Cumulative.Yield.DCW/Glucose.Consumed_g/g", FieldDefinition.ColumnType.Decimal),
+            () -> new FieldDefinition("Average.Volume.Productivity_g/L/day", FieldDefinition.ColumnType.Decimal),
             () -> new FieldDefinition("Cmol.Biomass/Cmol.Glucose.Consumed_%", FieldDefinition.ColumnType.Decimal)
-                    .setLabel("Cmol.Biomass/Cmol.Glucose.Consumed %")
     );
     public static final List<Supplier<FieldDefinition>> REALISTIC_SAMPLE_FIELDS = List.of(
             () -> new FieldDefinition("MW (g/mol)", FieldDefinition.ColumnType.Decimal),
@@ -132,11 +139,27 @@ public class TestDataUtils
         return REALISTIC_PLATE_NAMES.get(TestDataGenerator.randomInt(0, REALISTIC_PLATE_NAMES.size() - 1));
     }
 
+    public static List<Map<String, Object>> rowMapsFromTsv(File tsvFile) throws IOException
+    {
+        try (DataLoader loader = new TabLoader.TsvFactory().createLoader(tsvFile, true))
+        {
+            return loader.load();
+        }
+    }
+
     public static List<Map<String, Object>> rowMapsFromTsv(String tsvString) throws IOException
     {
         try (InputStream dataStream = IOUtils.toInputStream(tsvString, StandardCharsets.UTF_8))
         {
             return new TabLoader.TsvFactory().createLoader(dataStream, true).load();
+        }
+    }
+
+    public static List<Map<String, Object>> rowMapsFromCsv(File csvFile) throws IOException
+    {
+        try (DataLoader loader = new TabLoader.CsvFactory().createLoader(csvFile, true))
+        {
+            return loader.load();
         }
     }
 
@@ -148,22 +171,59 @@ public class TestDataUtils
         }
     }
 
+    public static String stringFromRowMaps(List<Map<String, Object>> rowMaps, List<String> columns, boolean includeHeaders, CSVFormat format)
+    {
+        return stringFromRows(rowListsFromMaps(rowMaps, columns, includeHeaders, true), format);
+    }
+
     public static String tsvStringFromRowMaps(List<Map<String, Object>> rowMaps, List<String> columns,
                                               boolean includeHeaders)
     {
-        return writeRowsToString(rowListsFromMaps(rowMaps, columns, includeHeaders, true), CSVFormat.TDF);
+        return stringFromRowMaps(rowMaps, columns, includeHeaders, CSVFormat.TDF);
     }
 
-    public static String csvStringFromRowMaps(List<Map<String, Object>> rowMaps, List<String> columns,
-                                              boolean includeHeaders)
+    public static <T> List<Map<String, T>> mapsFromRows(List<List<T>> allRows)
     {
-        return writeRowsToString(rowListsFromMaps(rowMaps, columns, includeHeaders, true), CSVFormat.DEFAULT);
+        List<Map<String, T>> rowMaps = new ArrayList<>();
+
+        if (allRows != null && !allRows.isEmpty())
+        {
+            List<T> header = allRows.get(0);
+
+            for (int i = 1; i != allRows.size(); i++)
+            {
+                List<T> row = allRows.get(i);
+                Map<String, T> rowMap = new LinkedHashMap<>();
+                int end = Math.min(header.size(), row.size());
+                for (int col = 0; col < end; col++)
+                {
+                    rowMap.put(header.get(col).toString(), row.get(col));
+                }
+                rowMaps.add(rowMap);
+            }
+        }
+
+        return rowMaps;
     }
 
+    public static List<List<String>> dataRowsFromMaps(List<Map<String, Object>> rowMaps, List<String> columns)
+    {
+        return rowListsFromMaps(rowMaps, columns, false, true);
+    }
+
+    public static List<List<String>> rowListsFromMaps(List<Map<String, Object>> rowMaps)
+    {
+        Set<String> columns = new LinkedHashSet<>();
+        for (Map<String, Object> row : rowMaps)
+        {
+            columns.addAll(row.keySet());
+        }
+        return rowListsFromMaps(rowMaps, new ArrayList<>(columns), true, true);
+    }
 
     public static List<List<String>> rowListsFromMaps(List<Map<String, Object>> rowMaps, List<String> columns)
     {
-        return rowListsFromMaps(rowMaps, columns, false, true);
+        return rowListsFromMaps(rowMaps, columns, true, true);
     }
 
     /**
@@ -172,7 +232,7 @@ public class TestDataUtils
      * @param columns   keys contained in each map, will copy values associated with them to the resulting list
      * @return A List<List<String>> containing values
      */
-    public static List<List<String>> rowListsFromMaps(List<Map<String, Object>> rowMaps, List<String> columns, boolean includeHeaders, boolean preserveEmptyValues)
+    public static List<List<String>> rowListsFromMaps(List<Map<String, Object>> rowMaps, List<String> columns, boolean includeHeaders, boolean allowMissingValues)
     {
         List<List<String>> lists = new ArrayList<>();
 
@@ -191,10 +251,14 @@ public class TestDataUtils
                 var value = rowMap.get(column);
                 if (value == null)
                 {
-                    if (preserveEmptyValues)
+                    if (allowMissingValues)
                         value = "";
                     else
                         throw new IllegalArgumentException("Missing value for column '" + column + "' in row: " +  rowMap);
+                }
+                if (value instanceof Collection<?> c)
+                {
+                    value = c.stream().map(Object::toString).collect(Collectors.joining(","));
                 }
                 rowList.add(value.toString());
             }
@@ -203,13 +267,59 @@ public class TestDataUtils
         return lists;
     }
 
-    public static File writeRowsToTsv(String fileName, List<List<String>> rows) throws IOException
+    public static List<List<String>> replaceColumnHeaders(List<List<String>> rowLists, Function<String, String> columnMapper)
+    {
+        List<String> headerRow = rowLists.get(0);
+        List<String> updatedHeaderRow = new ArrayList<>();
+        for (String oldHeader : headerRow)
+        {
+            updatedHeaderRow.add(columnMapper.apply(oldHeader));
+        }
+
+        List<List<String>> updatedRows = new ArrayList<>();
+        updatedRows.add(updatedHeaderRow);
+        updatedRows.addAll(rowLists.subList(1, rowLists.size()));
+
+        return updatedRows;
+    }
+
+    public static List<Map<String, Object>> replaceMapKeys(List<Map<String, Object>> rowMaps, Function<String, String> columnMapper)
+    {
+        List<Map<String, Object>> updatedRows = new ArrayList<>();
+        for (Map<String, Object> original : rowMaps)
+        {
+            Map<String, Object> updatedRow = new LinkedHashMap<>();
+            for (Map.Entry<String, Object> entry : original.entrySet())
+            {
+                String updatedKey = columnMapper.apply(entry.getKey());
+                if (updatedRow.containsKey(updatedKey))
+                {
+                    throw new IllegalArgumentException("Duplicate key mapping for '" + updatedKey + "' in row: " +  original);
+                }
+                updatedRow.put(updatedKey, entry.getValue());
+            }
+            updatedRows.add(updatedRow);
+        }
+        return updatedRows;
+    }
+
+    public static <T> File writeRowsToTsv(String fileName, List<List<T>> rows) throws IOException
+    {
+        return writeRowsToFile(fileName, rows, CSVFormat.TDF);
+    }
+
+    public static <T> File writeRowsToCsv(String fileName, List<List<T>> rows) throws IOException
+    {
+        return writeRowsToFile(fileName, rows, CSVFormat.DEFAULT);
+    }
+
+    public static @NotNull <T> File writeRowsToFile(String fileName, List<List<T>> rows, CSVFormat format) throws IOException
     {
         File file = new File(TestFileUtils.getTestTempDir(), fileName);
         FileUtils.forceMkdirParent(file);
 
-        try (CSVPrinter printer = new CSVPrinter(new FileWriter(file, StandardCharsets.UTF_8), CSVFormat.TDF)) {
-            for (List<String> row : rows)
+        try (CSVPrinter printer = new CSVPrinter(new FileWriter(file, StandardCharsets.UTF_8), format)) {
+            for (List<T> row : rows)
             {
                 printer.printRecord(row);
             }
@@ -218,17 +328,32 @@ public class TestDataUtils
         return file;
     }
 
-    public static String writeRowsToTsvString(List<List<String>> rows) throws IOException
+    public static List<List<String>> readRowsFromTsv(File file) throws IOException
     {
-        return writeRowsToString(rows, CSVFormat.TDF);
+        return readRowsFromFile(file, CSVFormat.TDF);
     }
 
-    public static String writeRowsToString(List<List<String>> rows, CSVFormat format)
+    public static List<List<String>> readRowsFromCsv(File file) throws IOException
+    {
+        return readRowsFromFile(file, CSVFormat.DEFAULT);
+    }
+
+    public static List<List<String>> readRowsFromFile(File file, CSVFormat format) throws IOException
+    {
+        try (Reader in = new FileReader(file, StandardCharsets.UTF_8))
+        {
+            CSVParser parser = CSVParser.builder().setFormat(format).setReader(in).get();
+            List<CSVRecord> records = parser.getRecords();
+            return records.stream().map(CSVRecord::toList).toList();
+        }
+    }
+
+    public static <T> String stringFromRows(List<List<T>> rows, CSVFormat format)
     {
         StringWriter stringWriter = new StringWriter();
 
         try (CSVPrinter printer = new CSVPrinter(stringWriter, format)) {
-            for (List<String> row : rows)
+            for (List<?> row : rows)
             {
                 printer.printRecord(row);
             }

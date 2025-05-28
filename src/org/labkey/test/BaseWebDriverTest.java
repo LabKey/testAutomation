@@ -40,7 +40,7 @@ import org.junit.runner.Description;
 import org.junit.runners.model.MultipleFailureException;
 import org.junit.runners.model.Statement;
 import org.junit.runners.model.TestTimedOutException;
-import org.labkey.api.query.QueryKey;
+import org.labkey.api.query.FieldKey;
 import org.labkey.junit.rules.TestWatcher;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
@@ -218,7 +218,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     public static final double DELTA = 10E-10;
 
-    public static final String[] ILLEGAL_QUERY_KEY_CHARACTERS = QueryKey.ILLEGAL;
+    public static final String[] ILLEGAL_QUERY_KEY_CHARACTERS = FieldKey.ILLEGAL;
     public static final String ALL_ILLEGAL_QUERY_KEY_CHARACTERS = StringUtils.join(ILLEGAL_QUERY_KEY_CHARACTERS, "");
     // See TSVWriter.shouldQuote. Generally we are not able to use the tab and new line characters when creating field names in the UI, but including here for completeness
     public static final String[] TRICKY_IMPORT_FIELD_CHARACTERS = {"\\", "\"", "\\t", ",", "\\n", "\\r"};
