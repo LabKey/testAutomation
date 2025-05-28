@@ -117,7 +117,7 @@ public class FilterExpressionPanel extends WebDriverComponent<FilterExpressionPa
         }
     }
 
-    private void setFilterType(int index, Object op)
+    public void setFilterType(int index, Object op)
     {
         if (op instanceof Operator operator)
         {

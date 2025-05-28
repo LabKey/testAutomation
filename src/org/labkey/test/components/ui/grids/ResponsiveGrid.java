@@ -12,6 +12,7 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.UpdatingComponent;
 import org.labkey.test.components.WebDriverComponent;
+import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.components.react.ReactCheckBox;
 import org.labkey.test.components.ui.search.FilterExpressionPanel;
@@ -188,6 +189,30 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
             clickColumnMenuItem(fieldLabel, "Filter...", false);
             GridFilterModal filterModal = new GridFilterModal(getDriver(), this);
             new RadioButton.RadioButtonFinder().withNameAndValue("field-value-bool-0", value?"true":"false").find(filterModal).set(true);
+            filterModal.confirm();
+        });
+        return _this;
+    }
+
+    /**
+     *
+     * @param index
+     * @param fieldLabel
+     * @param operator
+     * @param dateString1
+     * @param dateString2
+     * @return
+     */
+    public T filterDateColumn(int index, String fieldLabel, Filter.Operator operator, String dateString1, String dateString2)
+    {
+        T _this = getThis();
+        doAndWaitForUpdate(() -> {
+            clickColumnMenuItem(fieldLabel, "Filter...", false);
+            GridFilterModal filterModal = new GridFilterModal(getDriver(), this);
+            filterModal.selectExpressionTab().setFilterType(index, operator);
+            Input.Input(Locator.input("field-value-date-0"), getDriver()).waitFor().set(dateString1);
+            if (dateString2 != null)
+                Input.Input(Locator.input("field-value-date-1"), getDriver()).waitFor().set(dateString2);
             filterModal.confirm();
         });
         return _this;

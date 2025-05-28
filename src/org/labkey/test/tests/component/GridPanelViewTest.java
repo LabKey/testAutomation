@@ -1,5 +1,7 @@
 package org.labkey.test.tests.component;
 
+import org.aspectj.org.eclipse.jdt.core.dom.InfixExpression;
+import org.assertj.core.api.Assertions;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -33,6 +35,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -1258,6 +1261,48 @@ public class GridPanelViewTest extends GridPanelBaseTest
         checker().verifyEquals("Grid columns not as expected after removing all, and adding back a field.",
                 List.of(COL_STRING1), grid.getColumnLabels());
 
+    }
+
+    @Test
+    public void testWarningOnInvalidDateFilter()
+    {
+        String viewName = "broken view";
+        goToProjectHome();
+
+        resetDefaultView(VIEW_DIALOG_ST, DEFAULT_COLUMNS);
+
+        QueryGrid grid = beginAtQueryGrid(VIEW_DIALOG_ST);
+
+        log("Save a view, call it 'broken view'");
+        grid.saveView()
+                .setViewName(viewName)
+                .saveView();
+
+        log("add created column so we can filter on it");
+        grid.customizeView()
+                .selectAvailableField("Created")
+                .clickUpdateGrid();
+
+        log("filter on a valid date");
+        grid.filterDateColumn(0, "Created", Filter.Operator.GT, "May 27, 2024", null);
+        var filterStatusValueTexts = grid.getFilterStatusValuesText();
+        checker().withScreenshot("Filter_Texts_Error")
+                .wrapAssertion(()-> Assertions.assertThat(filterStatusValueTexts)
+                        .hasSize(1)
+                        .containsExactly("Created > 2024-05-27"));
+        grid.clearFilters();
+
+        log("try to filter on an invalid date");
+        grid.filterDateColumn(0, "Created", Filter.Operator.GT, "05/37/2024", null);
+        // don't expect the parser to get the invalid date right; current behavior won't do that
+
+        log("ensure the view can be edited after");
+        grid.filterColumn("Created", Filter.Operator.LTE, new Date());  // filter on right now
+
+        grid.clickUndoButton(); // undo will clear the view from its edited state, make it deletable
+        grid.manageViews()      // ensure the view can be deleted now
+                .deleteViewAndConfirm(viewName + " (shared)")
+                .dismiss("Done");
     }
 
     /**
