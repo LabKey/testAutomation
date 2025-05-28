@@ -1,6 +1,5 @@
 package org.labkey.test.tests.component;
 
-import org.aspectj.org.eclipse.jdt.core.dom.InfixExpression;
 import org.assertj.core.api.Assertions;
 import org.junit.BeforeClass;
 import org.junit.Test;
