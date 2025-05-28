@@ -242,9 +242,9 @@ public class MenuBarTest extends BaseWebDriverTest
         goToProjectHome();
         clickUserMenuItem(true,"Support");
         checker().withScreenshot("unexpected_destination")
-                .wrapAssertion(()-> Assertions.assertThat(getURL().toString())
-                        .as("expect navigation to localhost/home/support")
-                        .contains("localhost", "/home/support"));
+                .verifyEquals("Support menu destination",
+                        WebTestHelper.buildUrl("project", "home/support", "begin"),
+                        getDriver().getCurrentUrl());
 
         goToProjectHome();
         clickAdminMenuItem("Developer Links", "JavaScript API Reference");
