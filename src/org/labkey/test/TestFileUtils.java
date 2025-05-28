@@ -48,6 +48,7 @@ import org.openqa.selenium.NotFoundException;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -55,6 +56,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -470,7 +472,12 @@ public abstract class TestFileUtils
      */
     public static File writeFile(File file, String contents) throws IOException
     {
-        try (Writer writer = PrintWriters.getPrintWriter(file))
+        return writeFile(file, contents, false);
+    }
+
+    public static File writeFile(File file, String contents, boolean append) throws IOException
+    {
+        try (Writer writer = new OutputStreamWriter(new FileOutputStream(file, append), StandardCharsets.UTF_8))
         {
             writer.write(contents);
             return file;
@@ -578,10 +585,10 @@ public abstract class TestFileUtils
     {
         final List<File> untaredFiles = new ArrayList<>();
         try (InputStream is = new FileInputStream(inputFile);
-             TarArchiveInputStream inputStream = (TarArchiveInputStream) new ArchiveStreamFactory().createArchiveInputStream("tar", is))
+             TarArchiveInputStream inputStream = new ArchiveStreamFactory().createArchiveInputStream("tar", is))
         {
             TarArchiveEntry entry;
-            while ((entry = (TarArchiveEntry) inputStream.getNextEntry()) != null)
+            while ((entry = inputStream.getNextEntry()) != null)
             {
                 final File outputFile = new File(outputDir, entry.getName());
                 if (entry.isDirectory())
@@ -598,7 +605,7 @@ public abstract class TestFileUtils
                 {
                     try (OutputStream outputFileStream = new FileOutputStream(outputFile))
                     {
-                        org.apache.commons.compress.utils.IOUtils.copy(inputStream, outputFileStream);
+                        IOUtils.copy(inputStream, outputFileStream);
                     }
                 }
                 untaredFiles.add(outputFile);

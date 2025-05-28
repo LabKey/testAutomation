@@ -1,6 +1,5 @@
 package org.labkey.test.components.ui.grids;
 
-import org.labkey.api.collections.CaseInsensitiveHashMap;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
@@ -8,24 +7,28 @@ import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.react.ReactCheckBox;
 import org.labkey.test.components.ui.files.AttachmentCard;
 import org.labkey.test.components.ui.files.ImageFileViewDialog;
+import org.labkey.test.components.ui.grids.FieldReferenceManager.FieldReference;
+import org.labkey.test.params.FieldKey;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
+import org.labkey.test.util.TestLogger;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 
 public class GridRow extends WebDriverComponent<GridRow.ElementCache>
 {
-    final WebElement _el;
-    final ResponsiveGrid<?> _grid;
-    private Map<String, String> _rowMapByLabel = null;
+    private final WebElement _el;
+    protected final ResponsiveGrid<?> _grid;
 
     protected GridRow(ResponsiveGrid<?> grid, WebElement element)
     {
@@ -73,20 +76,18 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
 
     /**
      * gets the cell at the specified index
-     * use fieldLabel, which computes the appropriate index
-     * This method is intended for short-term use, until we can offload usages in the heatmap to its own component
      */
     public WebElement getCell(int colIndex)
     {
-        return Locator.tag("td").index(colIndex).findElement(this);
+        return elementCache().findCells().get(colIndex);
     }
 
     /**
      * gets the cell corresponding to the specified column
      */
-    public WebElement getCell(String fieldLabel)
+    public WebElement getCell(CharSequence columnIdentifier)
     {
-        return getCell(_grid.getColumnIndex(fieldLabel));
+        return getCell(_grid.getColumnIndex(columnIdentifier));
     }
 
     /**
@@ -128,25 +129,25 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
     /**
      * finds a AttachmentCard in the specified column, clicks it, and waits for the image to display in a modal
      */
-    public ImageFileViewDialog clickImgFile(String fieldLabel)
+    public ImageFileViewDialog clickImgFile(CharSequence columnIdentifier)
     {
-        return elementCache().waitForAttachment(fieldLabel).viewImgFile();
+        return elementCache().waitForAttachment(columnIdentifier).viewImgFile();
     }
 
     /**
      * finds a AttachmentCard specified filename, clicks it, and waits for the file to download
      */
-    public File clickNonImgFile(String fieldLabel)
+    public File clickNonImgFile(CharSequence columnIdentifier)
     {
-        return elementCache().waitForAttachment(fieldLabel).clickOnNonImgFile();
+        return elementCache().waitForAttachment(columnIdentifier).clickOnNonImgFile();
     }
 
     /**
      * Returns the text in the row for the specified column
      */
-    public String getText(String fieldLabel)
+    public String getText(CharSequence columnIdentifier)
     {
-        return getCell(fieldLabel).getText();
+        return getCell(columnIdentifier).getText();
     }
 
     /**
@@ -154,8 +155,7 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
      */
     public List<String> getTexts()
     {
-        List<String> columnValues = getWrapper().getTexts(Locator.css("td")
-                .findElements(this));
+        List<String> columnValues = elementCache().getCellTexts();
         if (hasSelectColumn())
             columnValues.remove(0);
         return columnValues;
@@ -166,17 +166,48 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
      */
     public Map<String, String> getRowMapByLabel()
     {
-        if (_rowMapByLabel == null)
+        return getRowMap(FieldReference::getLabel);
+    }
+
+    /**
+     * gets a map of the row's values, keyed by column name
+     */
+    public Map<String, String> getRowMapByName()
+    {
+        return getRowMap(FieldReference::getName);
+    }
+
+    /**
+     * gets a map of the row's values, keyed by column fieldKey
+     */
+    public Map<FieldKey, String> getRowMapByFieldKey()
+    {
+        return getRowMap(FieldReference::getFieldKey);
+    }
+
+    <T> Map<T, String> getRowMap(Function<FieldReference, T> keyMapper)
+    {
+        List<String> columnValues = elementCache().getCellTexts();
+        List<FieldReference> headers = _grid.getHeaders();
+
+        Map<T, String> rowMap = new LinkedHashMap<>();
+
+        for (FieldReference header : headers)
         {
-            _rowMapByLabel = new CaseInsensitiveHashMap<>();
-            List<String> columns = _grid.getColumnLabels();
-            List<String> rowCellTexts = getTexts();
-            for (int i = 0; i < columns.size(); i++)
+            T key = keyMapper.apply(header);
+            String value = columnValues.get(header.getDomIndex());
+
+            if (rowMap.containsKey(key))
             {
-                _rowMapByLabel.put(columns.get(i), rowCellTexts.get(i));
+                TestLogger.warn("Column identifier '%s' is ambiguous, omitting value '%s', consider getting data by name or fieldKey (e.g. %s)".formatted(key, value, header.getFieldKey()));
+            }
+            else
+            {
+                rowMap.put(key, value);
             }
         }
-        return _rowMapByLabel;
+
+        return rowMap;
     }
 
     @Override
@@ -202,9 +233,29 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
         public ReactCheckBox selectCheckbox = new ReactCheckBox(Locator.tagWithAttribute("input", "type", "checkbox")
             .findWhenNeeded(this));
 
-        public AttachmentCard waitForAttachment(String fieldLabel)
+        private List<WebElement> _cells = null;
+        protected List<WebElement> findCells()
         {
-            return new AttachmentCard.FileAttachmentCardFinder(getDriver()).waitFor(getCell(fieldLabel));
+            if (_cells == null)
+            {
+                _cells = Locator.xpath("./td").findElements(this);
+            }
+            return _cells;
+        }
+
+        private List<String> cellTexts = null;
+        protected List<String> getCellTexts()
+        {
+            if (cellTexts == null)
+            {
+                cellTexts = getWrapper().getTexts(findCells());
+            }
+            return cellTexts;
+        }
+
+        public AttachmentCard waitForAttachment(CharSequence columnIdentifier)
+        {
+            return new AttachmentCard.FileAttachmentCardFinder(getDriver()).waitFor(getCell(columnIdentifier));
         }
     }
 
