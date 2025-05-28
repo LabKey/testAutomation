@@ -586,7 +586,7 @@ public class FilterTest extends BaseWebDriverTest
         DataRegionTable region = new DataRegionTable(TABLE_NAME, this);
         region.setFilter(fieldKey, filter1Type, filter1, filter2Type, filter2);
 
-        checkFilterWasApplied(textPresentAfterFilter, textNotPresentAfterFilter, columnDef.getLabel(), filter1Type, filter1, filter2Type, filter2);
+        checkFilterWasApplied(textPresentAfterFilter, textNotPresentAfterFilter, columnDef.getEffectiveLabel(), filter1Type, filter1, filter2Type, filter2);
 
         log("** Checking filter present in R view");
         region.goToReport(R_VIEW);

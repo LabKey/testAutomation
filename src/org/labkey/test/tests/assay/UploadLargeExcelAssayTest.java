@@ -7,39 +7,28 @@ import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.domain.PropertyDescriptor;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.Daily;
-import org.labkey.test.pages.ImportDataPage;
 import org.labkey.test.pages.ReactAssayDesignerPage;
-import org.labkey.test.pages.assay.AssayImportPage;
-import org.labkey.test.pages.assay.AssayRunsPage;
 import org.labkey.test.pages.assay.AssayUploadJobsPage;
 import org.labkey.test.pages.query.SourceQueryPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.assay.GeneralAssayDesign;
-import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.AbstractDataRegionExportOrSignHelper;
-import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.SampleTypeHelper;
 import org.labkey.test.util.TestDataGenerator;
-import org.labkey.test.util.TestLogger;
-import org.labkey.test.util.exp.SampleTypeAPIHelper;
 
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.*;
-
 @Category({Assays.class, Daily.class})
 public class UploadLargeExcelAssayTest extends BaseWebDriverTest
 {
     public static String LARGE_ASSAY = "chaos_assay";
     public static String LARGE_ASSAY_2 = "large_assay_2";
-    public static List<PropertyDescriptor> ASSAY_FIELDS = new ArrayList<PropertyDescriptor>();
+    public static List<PropertyDescriptor> ASSAY_FIELDS = new ArrayList<>();
 
     @Override
     protected void doCleanup(boolean afterTest)
@@ -96,8 +85,9 @@ public class UploadLargeExcelAssayTest extends BaseWebDriverTest
         String fileName = "200kXlsxFile.xlsx";
         var dgen = new TestDataGenerator("samples", "chaos_sample", getProjectName())
             .withColumns(ASSAY_FIELDS);
+        dgen.generateRows(200_000);
         log("writing large .xlsx file");
-        var largeExcelFile = dgen.writeGeneratedDataToExcel(200000, "chaos", fileName);
+        var largeExcelFile = dgen.writeData(fileName);
         log("finished writing large .xlsx file");
 
         // import large generated excel to assay1

@@ -61,7 +61,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.params.FieldDefinition.DOMAIN_TRICKY_CHARACTERS;
-import static org.labkey.test.util.TestDataUtils.getEscapedNameExpression;
+import static org.labkey.test.util.data.TestDataUtils.getEscapedNameExpression;
 
 @Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 5)

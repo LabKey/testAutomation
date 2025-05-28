@@ -22,6 +22,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.labkey.api.exp.query.ExpSchema;
+import org.labkey.remoteapi.domain.ConditionalFormat;
 import org.labkey.remoteapi.domain.PropertyDescriptor;
 import org.labkey.remoteapi.query.Filter;
 import org.labkey.test.components.html.OptionSelect;
@@ -213,6 +214,13 @@ public class FieldDefinition extends PropertyDescriptor
     public FieldDefinition setHidden(Boolean hidden)
     {
         super.setHidden(hidden);
+        return this;
+    }
+
+    @Override
+    public FieldDefinition setConditionalFormats(List<ConditionalFormat> conditionalFormats)
+    {
+        super.setConditionalFormats(conditionalFormats);
         return this;
     }
 

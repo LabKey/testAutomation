@@ -173,7 +173,7 @@ public class SampleTypeRemoteAPITest extends BaseWebDriverTest
         dgen.addCustomRow(Map.of("name", "Eighth","mvStringData", "ActualData", "volume", 17.5));
 
         // write the domain data into TSV format, for import via the UI
-        String importTsv = dgen.writeTsvContents();
+        String importTsv = dgen.getDataAsTsv();
 
         refresh();
         DataRegionTable sampleTypeList =  DataRegionTable.DataRegion(getDriver()).withName(SAMPLE_TYPE_DATA_REGION_NAME).waitFor();
@@ -365,7 +365,7 @@ public class SampleTypeRemoteAPITest extends BaseWebDriverTest
         dgen.insertRows(createDefaultConnection(), dgen.getRows());     // insert data via API rather than UI
 
         // prepare expected values-
-        String expectedTSVData = dgen.writeTsvContents();
+        String expectedTSVData = dgen.getDataAsTsv();
         String[] tsvRows = expectedTSVData.split("\n");
         List<String> dataRows = new ArrayList();
         for (int i=1; i < tsvRows.length; i++) // don't validate columns; we expect labels instead of column names
@@ -775,7 +775,7 @@ public class SampleTypeRemoteAPITest extends BaseWebDriverTest
         {
             AssayImportPage page = new AssayImportPage(getDriver())
                     .setNamedTextAreaValue("TextAreaDataCollector.textArea",
-                    dataGen.writeTsvContents());
+                    dataGen.getDataAsTsv());
             imported++;
 
             if(imported < limit)
