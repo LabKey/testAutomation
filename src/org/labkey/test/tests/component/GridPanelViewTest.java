@@ -1263,6 +1263,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
 
     }
 
+    // Issue 52661 Saved grid view with an invalid date filter can't be edited or deleted
     @Test
     public void testWarningOnInvalidDateFilter()
     {
