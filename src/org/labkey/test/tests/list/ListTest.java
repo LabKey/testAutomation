@@ -801,7 +801,7 @@ public class ListTest extends BaseWebDriverTest
     /* Issue 23487: add regression coverage for batch insert into list with multiple errors
     */
     @Test
-    public void testBatchInsertErrors() throws IOException, CommandException
+    public void testBatchInsertErrors()
     {
         // create the list for this case
         String multiErrorListName = "multiErrorBatchList";
