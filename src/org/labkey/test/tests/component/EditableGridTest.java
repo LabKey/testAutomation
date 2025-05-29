@@ -1294,7 +1294,7 @@ public class EditableGridTest extends BaseWebDriverTest
 
     private String getActualPaste(EditableGrid testGrid)
     {
-        List<Map<String, String>> gridData = testGrid.getGridData(PASTE_1, PASTE_2, PASTE_3, PASTE_4, PASTE_5);
+        List<Map<String, String>> gridData = testGrid.getGridDataByLabel(PASTE_1, PASTE_2, PASTE_3, PASTE_4, PASTE_5);
         List<List<String>> rows = gridData.stream().map(r -> List.of(r.get(PASTE_1), r.get(PASTE_2), r.get(PASTE_3), r.get(PASTE_4), r.get(PASTE_5))).toList();
         return rowsToString(rows);
     }

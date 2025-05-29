@@ -15,9 +15,9 @@
  */
 package org.labkey.test.util;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
 import org.eclipse.jetty.util.URIUtil;
+import org.labkey.test.params.FieldKey;
 
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -119,17 +119,14 @@ public class EscapeUtil
         return URIUtil.decodePath(path);
     }
 
-    private static final String[] ILLEGAL = {"$", "/", "&", "}", "~", ",", "."};
-    private static final String[] REPLACEMENT = {"$D", "$S", "$A", "$B", "$T", "$C", "$P"};
-
-    static public String fieldKeyEncodePart(String str)
+    public static String fieldKeyEncodePart(String str)
     {
-        return StringUtils.replaceEach(str, ILLEGAL, REPLACEMENT);
+        return FieldKey.encodePart(str);
     }
 
-    static public String fieldKeyDecodePart(String str)
+    public static String fieldKeyDecodePart(String str)
     {
-        return StringUtils.replaceEach(str, REPLACEMENT, ILLEGAL);
+        return FieldKey.decodePart(str);
     }
 
     public static String getTextChoiceValidatorExpression(List<String> options)
