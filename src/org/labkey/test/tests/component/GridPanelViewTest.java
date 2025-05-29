@@ -1286,11 +1286,12 @@ public class GridPanelViewTest extends GridPanelBaseTest
 
         log("filter on a valid date");
         grid.filterDateColumn(0, "Created", Filter.Operator.GT, "May 27, 2024", null);
-        var filterStatusValueTexts = grid.getFilterStatusValuesText();
+        var filterStatuses = grid.getFilterStatusValues();
         checker().withScreenshot("Filter_Texts_Error")
-                .wrapAssertion(()-> Assertions.assertThat(filterStatusValueTexts)
+                .wrapAssertion(()-> Assertions.assertThat(filterStatuses)
                         .hasSize(1)
-                        .containsExactly("Created > 2024-05-27"));
+                        .filteredOn(a-> a.getText().equals("Created > 2024-05-27"))
+                                .isNotEmpty());
         grid.clearFilters();
 
         log("try to filter on an invalid date");
