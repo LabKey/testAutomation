@@ -1285,7 +1285,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
                 .clickUpdateGrid();
 
         log("filter on a valid date");
-        grid.filterDateColumn(0, "Created", Filter.Operator.GT, "May 27, 2024", null);
+        grid.filterColumn("Created", Filter.Operator.GT, new FilterExpressionPanel.DateString("May 27, 2024"));
         var filterStatuses = grid.getFilterStatusValues();
         checker().withScreenshot("Filter_Texts_Error")
                 .wrapAssertion(()-> Assertions.assertThat(filterStatuses)
@@ -1295,7 +1295,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
         grid.clearFilters();
 
         log("try to filter on an invalid date");
-        grid.filterDateColumn(0, "Created", Filter.Operator.GT, "05/37/2024", null);
+        grid.filterColumn("Created", Filter.Operator.GT, new FilterExpressionPanel.DateString("05/37/2024"));
         // don't expect the parser to get the invalid date right; current behavior won't do that
 
         log("ensure the view can be edited after");

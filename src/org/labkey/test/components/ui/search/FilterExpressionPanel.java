@@ -92,11 +92,19 @@ public class FilterExpressionPanel extends WebDriverComponent<FilterExpressionPa
             }
             else if (value1 instanceof Date dateVal1)
             {
-                final String dateStr1 = DATE_FORMAT.format(dateVal1);
+                String dateStr1;
+                if (value1 instanceof DateString)
+                    dateStr1 = ((DateString)value1).getDateStr();   // use the test-supplied date string
+                else
+                    dateStr1 = DATE_FORMAT.format(dateVal1);        // format the supplied date value to string
                 elementCache().dateValues.get(index).set(dateStr1);
                 if (value2 instanceof Date dateVal2)
                 {
-                    final String dateStr2 = DATE_FORMAT.format(dateVal2);
+                    String dateStr2;
+                    if (value2 instanceof DateString)
+                        dateStr2 = ((DateString)value2).getDateStr();
+                    else
+                        dateStr2 = DATE_FORMAT.format(dateVal2);
                     elementCache().dateValuesSecond.get(index).set(dateStr2);
                 }
                 else if (value2 != null)
@@ -117,7 +125,7 @@ public class FilterExpressionPanel extends WebDriverComponent<FilterExpressionPa
         }
     }
 
-    public void setFilterType(int index, Object op)
+    private void setFilterType(int index, Object op)
     {
         if (op instanceof Operator operator)
         {
@@ -174,6 +182,20 @@ public class FilterExpressionPanel extends WebDriverComponent<FilterExpressionPa
         protected final List<RadioButton> boolFalseRadios = List.of(
                 RadioButton.RadioButton(Locator.radioButtonByNameAndValue("field-value-bool-0", "false")).refindWhenNeeded(this),
                 RadioButton.RadioButton(Locator.radioButtonByNameAndValue("field-value-bool-1", "false")).refindWhenNeeded(this));
+    }
+
+    public static class DateString extends Date
+    {
+        private final String _dateStr;
+        public DateString(String dateStr)
+        {
+            _dateStr = dateStr;
+        }
+
+        public String getDateStr()
+        {
+            return _dateStr;
+        }
     }
 
     public static class FilterExpressionPanelFinder extends WebDriverComponentFinder<FilterExpressionPanel, FilterExpressionPanelFinder>

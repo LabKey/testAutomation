@@ -218,30 +218,6 @@ public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverCompon
     }
 
     /**
-     *
-     * @param index
-     * @param fieldLabel
-     * @param operator
-     * @param dateString1
-     * @param dateString2
-     * @return
-     */
-    public T filterDateColumn(int index, String fieldLabel, Filter.Operator operator, String dateString1, String dateString2)
-    {
-        T _this = getThis();
-        doAndWaitForUpdate(() -> {
-            clickColumnMenuItem(fieldLabel, "Filter...", false);
-            GridFilterModal filterModal = new GridFilterModal(getDriver(), this);
-            filterModal.selectExpressionTab().setFilterType(index, operator);
-            Input.Input(Locator.input("field-value-date-0"), getDriver()).waitFor().set(dateString1);
-            if (dateString2 != null)
-                Input.Input(Locator.input("field-value-date-1"), getDriver()).waitFor().set(dateString2);
-            filterModal.confirm();
-        });
-        return _this;
-    }
-
-    /**
      * @param columnIdentifier fieldKey, name, or label of column
      */
     public String filterColumnExpectingError(CharSequence columnIdentifier, Filter.Operator operator, Object value)
