@@ -273,12 +273,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleType);
         domainDesignerPage.fieldsPanel().addField("lookUpField")
-                .setType(FieldDefinition.ColumnType.Lookup)
-                .expand()
-                .setFromFolder("Current Folder")
-                .setFromSchema("lists")
-                .setFromTargetTable(listName + " (Integer)")
-                .collapse();
+            .setLookup(new FieldDefinition.IntLookup("lists", listName));
         domainDesignerPage.clickFinish();
 
         log("Issue 52124: Editing the list name should update domain lookup");
@@ -955,11 +950,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
 
         DomainFieldRow lookUpRow = domainFormPanel.addField("lookUpField")
-                .setType(FieldDefinition.ColumnType.Lookup)
-                .expand()
-                .setFromFolder("Current Folder")
-                .setFromSchema("lists")
-                .setFromTargetTable("lookUpList1 (Integer)")
+                .setLookup(new FieldDefinition.IntLookup("lists", listName))
                 .setDescription("LookUp in same container")
                 .collapse();
 
@@ -1000,11 +991,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
 
         DomainFieldRow lookUpRow = domainFormPanel.addField("lookUpField")
-                .setType(FieldDefinition.ColumnType.Lookup)
-                .expand()
-                .setFromFolder("Current Folder")
-                .setFromSchema("lists")
-                .setFromTargetTable("lookUpList (Integer)")
+                .setLookup(new FieldDefinition.IntLookup("lists", lookUplistName))
                 .setDescription("LookUp in same container")
                 .collapse();
 
@@ -1048,10 +1035,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         // add a lookup field to the test list
         DomainFieldRow row = domainFormPanel.addField("looky")
-                .setType(FieldDefinition.ColumnType.Lookup)
-                .setFromFolder("Current Folder")
-                .setFromSchema("lists")
-                .setFromTargetTable(lookupList1Item)
+                .setLookup(new FieldDefinition.IntLookup("lists", lookupList1Item))
                 .setLookupValidatorEnabled(true)
                 .setDescription("should validate lookup value contents");
         domainDesignerPage.clickFinish();

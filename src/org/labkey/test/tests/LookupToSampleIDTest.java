@@ -188,6 +188,7 @@ public class LookupToSampleIDTest extends BaseWebDriverTest
         assayDesigner.goToResultsFields()
                 .addField(SAMPLE_ID_FIELD_NAME)
                 .setLabel(SAMPLE_ID_FIELD_LABEL)
+                .setLookup(new FieldDefinition.IntLookup(sampleTypeFolder, "samples", lookupTableValue))
                 .setType(FieldDefinition.ColumnType.Lookup)
                 .setFromFolder(sampleTypeFolder)
                 .setFromSchema("samples")
