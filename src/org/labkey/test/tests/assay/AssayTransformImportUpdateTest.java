@@ -238,7 +238,7 @@ public class AssayTransformImportUpdateTest extends BaseWebDriverTest
                 # sleep a bit before writing the table, give the test time to cancel the job before it is complete
                 labkey.setDebugMode(TRUE);
                 print("before");
-                Sys.sleep(4);
+                Sys.sleep(30);
                 print("after");
                 labkey.setDebugMode(FALSE);
 
