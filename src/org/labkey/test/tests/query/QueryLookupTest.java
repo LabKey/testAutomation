@@ -14,7 +14,7 @@ import org.labkey.test.params.list.IntListDefinition;
 import org.labkey.test.params.list.VarListDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
-import org.labkey.test.util.TestDataUtils;
+import org.labkey.test.util.data.TestDataUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
