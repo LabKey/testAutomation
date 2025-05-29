@@ -448,7 +448,21 @@ public class TriggerScriptTest extends BaseWebDriverTest
         GoToDataUI goToDataClass = () -> goTo("Data Classes", DATA_CLASSES_NAME);
 
         setupDataClass();
+
+        // Check to see that the logging shows up in the Server JavaScript Console
+        // It's normally accessed via the developer menu, but we can hit the URL directly to avoid dealing with the
+        // popup window in the test
+
+        // Go to the log view to start capturing messages
+        beginAt("/admin-sessionLogging.view");
+        goBack();
+
         doIndividualTriggerTest("query", goToDataClass, "Name", false, "Yes, Delete", false);
+
+        beginAt("/admin-sessionLogging.view");
+        waitForText("init got triggered with event: delete",
+                "exp.data: this is from the shared function",
+                "complete got triggered with event: delete");
     }
 
 
