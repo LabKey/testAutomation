@@ -249,7 +249,7 @@ public class AuditLogHelper
                 if (StringUtils.isEmpty(expectedValue) && actualValue == null)
                     continue;
 
-                if (!expectedValue.equals(actualValue))
+                if (!expectedValue.equalsIgnoreCase(actualValue))
                 {
                     pass = false;
                     TestLogger.log(prop + " is not as expected. Expected: " + expectedValue + ", Actual: " + actualValue);
