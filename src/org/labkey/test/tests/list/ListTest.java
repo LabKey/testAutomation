@@ -807,7 +807,7 @@ public class ListTest extends BaseWebDriverTest
         String multiErrorListName = "multiErrorBatchList";
         String[] expectedErrors = new String[]{
             getConversionErrorMessage("green", "ShouldInsertCorrectly", Boolean.class),
-            getConversionErrorMessage("five", "Id", Integer.class) + "; Missing value for required property: Id"
+            getConversionErrorMessage("five", "Id", Integer.class)
         };
 
         createList(multiErrorListName, BatchListColumns, BatchListData);
