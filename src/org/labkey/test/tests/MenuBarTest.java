@@ -23,6 +23,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.UIContainerHelper;
@@ -243,7 +244,7 @@ public class MenuBarTest extends BaseWebDriverTest
         clickUserMenuItem(true,"Support");
         checker().withScreenshot("unexpected_destination")
                 .verifyEquals("Support menu destination",
-                        WebTestHelper.buildUrl("project", "home/support", "begin"),
+                        WebTestHelper.buildURL("project", "home/support", "begin"),
                         getDriver().getCurrentUrl());
 
         goToProjectHome();

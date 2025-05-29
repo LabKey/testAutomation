@@ -160,7 +160,7 @@ public class AdminConsoleTest extends AbstractAdminConsoleTest
     {
         goToAdminConsole();
 
-        String bannerMessage = "test banner message" + TRICKY_CHARACTERS;
+        String bannerMessage = "test banner message" + TRICKY_CHARACTERS + INJECT_CHARS_1;
         Locator bannerLoc = Locator.tagWithClass("div", "lk-dismissable-warn").containing(bannerMessage);
 
         //As site admin

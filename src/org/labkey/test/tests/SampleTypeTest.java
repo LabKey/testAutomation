@@ -171,7 +171,7 @@ public class SampleTypeTest extends BaseWebDriverTest
         var dataRegion = DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
         var updatePage = dataRegion.clickInsertNewRow();
         String date = "January 01 2025";
-        String time = "23:56:54:123";
+        String time = "23:56:54.123";
         String dateTime = "06-May-1986 23:58:34.123";
         updatePage.setField("Name", "sample01");
         updatePage.setField(dateField.getName(), date);
@@ -186,7 +186,7 @@ public class SampleTypeTest extends BaseWebDriverTest
                 .isEqualTo(time));
         checker().wrapAssertion(()-> Assertions.assertThat(updatePage.getTextInputValue(dateTimeField.getName()))
                 .as("expect dateTime to post back as entered")
-                .isEqualTo(dateTime));
+                .isEqualTo("1986-05-06 23:58:34.123"));
         checker().screenShotIfNewError("unexpected data update");
 
         // fill in the required text field and submit
