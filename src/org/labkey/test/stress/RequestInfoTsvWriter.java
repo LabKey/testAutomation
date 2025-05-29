@@ -2,7 +2,7 @@ package org.labkey.test.stress;
 
 import org.labkey.remoteapi.miniprofiler.RequestInfo;
 import org.labkey.serverapi.writer.PrintWriters;
-import org.labkey.test.util.TestDataUtils;
+import org.labkey.test.util.data.TestDataUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;

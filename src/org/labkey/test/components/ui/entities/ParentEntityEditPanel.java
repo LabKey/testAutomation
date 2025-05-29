@@ -317,7 +317,7 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
      */
     public FilteringReactSelect getParent(String typeName)
     {
-        return getParentFinder(typeName).find(elementCache());
+        return getParentFinder(typeName).waitFor(elementCache());
     }
 
     /**

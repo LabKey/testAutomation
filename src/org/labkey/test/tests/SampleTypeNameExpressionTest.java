@@ -33,6 +33,7 @@ import org.labkey.test.pages.experiment.CreateSampleTypePage;
 import org.labkey.test.pages.experiment.UpdateSampleTypePage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
+import org.labkey.test.util.AuditLogHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.PortalHelper;
@@ -60,7 +61,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.params.FieldDefinition.DOMAIN_TRICKY_CHARACTERS;
-import static org.labkey.test.util.TestDataUtils.getEscapedNameExpression;
+import static org.labkey.test.util.data.TestDataUtils.getEscapedNameExpression;
 
 @Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 5)
@@ -81,6 +82,8 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
     private static final String PARENT_SAMPLE_07 = "\"parent07";
 
     private static final File PARENT_EXCEL = TestFileUtils.getSampleData("samples/ParentSamples.xlsx");
+
+    protected final AuditLogHelper _auditLogHelper = new AuditLogHelper(this);
 
     @Override
     public List<String> getAssociatedModules()
@@ -1283,6 +1286,13 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         idDialog.setGenId(Integer.toString(nextGenId));
         idDialog.dismiss("Update");
 
+        // check audit log
+        AuditLogHelper.DetailedAuditEventRow expectedDomainEvent = new AuditLogHelper.DetailedAuditEventRow(null, sampleType, null,
+                "The genId for domain Test_Set_GenId has been updated to " + (nextGenId - 1) + ".", null, null,
+                null, null);
+        boolean pass = _auditLogHelper.validateLastDomainAuditEvents(sampleType, getProjectName(), expectedDomainEvent, null);
+        checker().verifyTrue("Result Domain event not as expected after updating genId", pass);
+
         log("Validate that the banner has been updated.");
 
         checker()
@@ -1335,17 +1345,17 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         waitFor(updatePage::isResetGenIdVisible,
                 "The 'Reset GenId' button should now be visible if the sample type is empty. Fatal error.", 500);
 
-        ModalDialog deleteDialog = updatePage.clickResetGenId();
+        ModalDialog genIdDialog = updatePage.clickResetGenId();
 
         String expectedMsg = String.format("The current genId is at %d. Resetting will reset genId back to 1 and cannot be undone.", nextGenId);
 
         checker()
                 .withScreenshot("Reset_GenId_Dialog_Error")
                 .verifyEquals("Message in the reset confirm dialog is not as expected.",
-                        expectedMsg, deleteDialog.getBodyText());
+                        expectedMsg, genIdDialog.getBodyText());
 
         log("Click 'Cancel' and verify banner/genId does not change.");
-        deleteDialog.dismiss("Cancel");
+        genIdDialog.dismiss("Cancel");
 
         checker()
                 .withScreenshot("Reset_GenId_Cancel_Error")
@@ -1354,8 +1364,15 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
 
         log("Click 'Rest GenId' again and this time reset the genId.");
 
-        deleteDialog = updatePage.clickResetGenId();
-        deleteDialog.dismiss("Reset");
+        genIdDialog = updatePage.clickResetGenId();
+        genIdDialog.dismiss("Reset");
+
+        expectedDomainEvent = new AuditLogHelper.DetailedAuditEventRow(null, sampleType, null,
+                "The genId for domain " + sampleType + " has been updated to 0.", null, null,
+                null, null);
+        pass = _auditLogHelper.validateLastDomainAuditEvents(sampleType, getProjectName(), expectedDomainEvent, null);
+        checker().verifyTrue("Result Domain event not as expected after resetting genId", pass);
+
 
         nextGenId = 1;
         checker()

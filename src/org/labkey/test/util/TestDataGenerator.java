@@ -15,6 +15,7 @@
  */
 package org.labkey.test.util;
 
+import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
@@ -36,16 +37,16 @@ import org.labkey.remoteapi.query.SaveRowsResponse;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.remoteapi.query.Sort;
 import org.labkey.serverapi.reader.TabLoader;
-import org.labkey.serverapi.writer.PrintWriters;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.util.data.ColumnNameMapper;
+import org.labkey.test.util.data.TestDataUtils;
 import org.labkey.test.util.query.QueryApiHelper;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -59,12 +60,11 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import static org.labkey.test.BaseWebDriverTest.ALL_ILLEGAL_QUERY_KEY_CHARACTERS;
-import static org.labkey.test.util.TestDataUtils.REALISTIC_ASSAY_FIELDS;
-import static org.labkey.test.util.TestDataUtils.REALISTIC_SAMPLE_FIELDS;
-import static org.labkey.test.util.TestDataUtils.REALISTIC_SOURCE_FIELDS;
+import static org.labkey.test.util.data.TestDataUtils.REALISTIC_ASSAY_FIELDS;
+import static org.labkey.test.util.data.TestDataUtils.REALISTIC_SAMPLE_FIELDS;
+import static org.labkey.test.util.data.TestDataUtils.REALISTIC_SOURCE_FIELDS;
 
 
 /**
@@ -72,8 +72,11 @@ import static org.labkey.test.util.TestDataUtils.REALISTIC_SOURCE_FIELDS;
  */
 public class TestDataGenerator
 {
+    private static final String WIDE_CHAR = "\uD83D\uDC7E"; // 👾
+    private static final char WIDE_PLACEHOLDER = '\u03A0'; // 'Π' - Wide character can't be picked from the string with 'charAt'
+    private static final String NON_LATIN_STRING = "\u0438\uC548\u306F"; // "и안は"
     // chose a Character random from this String
-    public static final String CHARSET_STRING = "ABCDEFG01234abcdefvxyz~!@#$%^&*()-+=_{}[]|:;\"',.<>";
+    public static final String CHARSET_STRING = "ABCDEFG01234abcdefvxyz~!@#$%^&*()-+=_{}[]|:;\"',.<>" + NON_LATIN_STRING + WIDE_PLACEHOLDER;
     public static final String ALPHANUMERIC_STRING = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvxyz";
     public static final String DOMAIN_SPECIAL_STRING =  "+- _.:&()/";
     public static final String ILLEGAL_DOMAIN_NAME_CHARSET = "<>[]{};,`\"~!@#$%^*=|?\\";
@@ -98,7 +101,6 @@ public class TestDataGenerator
     private final String _containerPath;
     private String _excludedChars;
     private boolean _alphaNumericStr;
-    private final TestDataUtils.TsvQuoter _tsvQuoter = new TestDataUtils.TsvQuoter(',');
 
     /**
      *  use TestDataGenerator to generate data to a specific fieldSet
@@ -121,24 +123,10 @@ public class TestDataGenerator
 
     public static File writeCsvFile(List<FieldDefinition> fields, List<Map<String, Object>> entityData, String fileName) throws IOException
     {
-        List<Map<String, Object>> fileData = new ArrayList<>();
-        List<String> fieldNamesForFile = fields.stream().map(FieldDefinition::getName).collect(Collectors.toList());
-        for (Map<String, Object> row : entityData)
-        {
-            Map<String, Object> fileRow = new HashMap<>();
-            for (FieldDefinition field : fields)
-            {
-                String key = field.getLabel() == null ? field.getName() : field.getLabel();
-                Object value = row.get(key);
-                Object valueToWrite = value;
-                if (value instanceof List<?>)
-                    valueToWrite = StringUtils.join((List<?>)value, ",");
-                fileRow.put(field.getName(), valueToWrite);
-            }
-            fileData.add(fileRow);
-        }
-        var fileContents = TestDataUtils.csvStringFromRowMaps(fileData, fieldNamesForFile, true);
-        return TestFileUtils.writeTempFile(fileName, fileContents);
+        List<List<String>> rows = TestDataUtils.replaceColumnHeaders(
+            TestDataUtils.rowListsFromMaps(entityData), ColumnNameMapper.labelToName(fields)); // Use field names
+
+        return TestDataUtils.writeRowsToCsv(fileName, rows);
     }
 
     public static List<Map<String, Object>> generateEntityData(List<FieldDefinition> fields, String nameField, String namePrefix, int startingCount, int size, boolean addLineage, boolean includeAliquots, String queryName, boolean forGridInsert)
@@ -162,7 +150,7 @@ public class TestDataGenerator
             {
                 if (!fieldDefinition.getName().equalsIgnoreCase(nameField)) // Name already set
                 {
-                    String key = fieldDefinition.getLabel() != null ? fieldDefinition.getLabel() : FieldDefinition.labelFromName(fieldDefinition.getName());
+                    String key = fieldDefinition.getEffectiveLabel();
                     if (fieldDefinition.getType().equals(FieldDefinition.ColumnType.Date))
                         entityData.put(key, UI_DATE_FORMAT.get().format(TestDateUtils.diffFromTodaysDate(Calendar.HOUR, i * 24)));
                     else if (fieldDefinition.getType().equals(FieldDefinition.ColumnType.DateAndTime))
@@ -263,14 +251,6 @@ public class TestDataGenerator
             TestLogger.log(obj.getName() + " : " + obj.getType().getLabel());
         });
         return fields;
-    }
-
-    public static void setFieldCaptionsFromNames(List<FieldDefinition> fields)
-    {
-        fields.forEach(f -> {
-            if (f.getLabel() == null)
-                f.setLabel(FieldDefinition.labelFromName(f.getName()));
-        });
     }
 
     public String getSchema()
@@ -468,6 +448,12 @@ public class TestDataGenerator
             case "date":
             case "datetime":
                 return ()-> randomDateString(DateUtils.addWeeks(new Date(), -39), new Date());
+            case "time":
+                return ()->
+                    randomInt(0, 23) + ":" + // hour
+                        StringUtils.leftPad(String.valueOf(randomInt(0, 59)), 2, "0") + ":" + // minute
+                        StringUtils.leftPad(String.valueOf(randomInt(0, 59)), 2, "0") + "." + // second
+                        StringUtils.leftPad(String.valueOf(randomInt(0, 999)), 3, "0"); // millisecond
             default:
                 throw new IllegalArgumentException("ColumnType " + columnType + " isn't implemented yet");
         }
@@ -493,7 +479,11 @@ public class TestDataGenerator
         for (int i=0; i<size; i++)
         {
             int randIndex = (int)(charSetFrom.length() * Math.random());
-            val.append(charSetFrom.charAt(randIndex));
+            char c = charSetFrom.charAt(randIndex);
+            if (c == WIDE_PLACEHOLDER)
+                val.append(WIDE_CHAR);
+            else
+                val.append(c);
         }
         return val.toString();
     }
@@ -592,7 +582,7 @@ public class TestDataGenerator
     public static String randomFieldName(@NotNull String part, int numStartChars, int numEndChars, @Nullable String exclusion)
     {
         // use the characters that we know are encoded in fieldKeys plus characters that we know clients are using
-        String chars = ALL_ILLEGAL_QUERY_KEY_CHARACTERS + " %()=+-[]_|*`'\":;<>?!@#^";
+        String chars = ALL_ILLEGAL_QUERY_KEY_CHARACTERS + " %()=+-[]_|*`'\":;<>?!@#^" + NON_LATIN_STRING + WIDE_PLACEHOLDER ;
 
         String randomFieldName = randomName(part, numStartChars, numEndChars, chars, exclusion);
         TestLogger.log("Generated random field name: " + randomFieldName);
@@ -648,131 +638,64 @@ public class TestDataGenerator
         return ThreadLocalRandom.current().nextBoolean();
     }
 
-    public StringBuilder writeTsvHeaders()
+    private @NotNull List<String> getFieldsForFile()
     {
-        StringBuilder builder = new StringBuilder();
         List<String> fieldNames = new ArrayList<>(_columns.keySet());
         fieldNames.removeAll(_autoGeneratedFields);
-
-        List<String> headers = new ArrayList<>();
-        for (String fieldName : fieldNames)
-            headers.add(getTsvQuotedValue(fieldName, _tsvQuoter));
-
-        builder.append(String.join("\t", headers));
-        builder.append("\n");
-
-        return builder;
+        return fieldNames;
     }
 
-    public static String getTsvQuotedValue(Object value, TestDataUtils.TsvQuoter tsvQuoter)
-    {
-        String strVal;
-        if (value instanceof String s)
-            strVal = tsvQuoter.quoteValue(s);
-        else
-            strVal = value != null ? String.valueOf(value) : "";
-
-        return strVal;
-    }
-
+    /**
+     * Get generated data for the specified column.
+     * Values will be quoted appropriately for pasting into editable grid lookups.
+     */
     public List<String> getPasteColumnValues(String fieldName)
     {
         List<String> values = new ArrayList<>();
         for (Map<String, Object> row : _rows)
         {
             Object value = row.get(fieldName);
-            String strVal = getTsvQuotedValue(value, _tsvQuoter);
+            String strVal = CSVFormat.DEFAULT.format(value); // Just quote commas
             values.add(strVal);
         }
         return values;
     }
 
-    public String rowToString(List<String> fieldNames, Map<String, Object> row)
-    {
-        StringBuilder builder = new StringBuilder();
-        List<String> values = new ArrayList<>();
-        String firstField = fieldNames.get(0);
-        for (String fieldName : fieldNames)
-        {
-            Object value = row.get(fieldName);
-            String strVal = getTsvQuotedValue(value, _tsvQuoter);
-
-            if (strVal.startsWith("#") && fieldName.equals(firstField)) // don't generate comment lines
-                strVal = "\"" + strVal + "\"";
-
-            values.add(strVal);
-        }
-        builder.append(String.join("\t", values));
-        builder.append("\n");
-
-        return builder.toString();
-    }
-
     /**
      * generates tsv-formatted content using the rows in the current instance;
-     * @return TSV formatted representation of generated rows
+     * @return TSV formatted representation of generated data
      */
-    public String writeTsvContents()
+    public String getDataAsTsv()
     {
-        List<String> fieldNames = new ArrayList<>(_columns.keySet());
-        fieldNames.removeAll(_autoGeneratedFields);
-        StringBuilder builder = writeTsvHeaders();
-
-        for (Map<String, Object> row : _rows)
-        {
-            builder.append(rowToString(fieldNames, row));
-        }
-        return builder.toString();
+        return TestDataUtils.stringFromRowMaps(_rows, getFieldsForFile(), true, CSVFormat.TDF);
     }
 
-    public File writeGeneratedDataToFile(int numberOfRowsToGenerate, String fileName) throws IOException
-    {
-        String headers = writeTsvHeaders().toString();
-        File file = new File(TestFileUtils.getTestTempDir(), fileName);
-        FileUtils.forceMkdirParent(file);
-
-        try(PrintWriter stream = PrintWriters.getPrintWriter(file))
-        {
-            List<String> fieldNames = new ArrayList<>(_columns.keySet());
-            fieldNames.removeAll(_autoGeneratedFields);
-            stream.write(headers);
-
-            for (int i = 0; i < numberOfRowsToGenerate; i++)
-            {
-                Map<String, Object> newRow = generateRow();
-                var rowMapString = rowToString(fieldNames, newRow);
-                stream.write(rowMapString);
-            }
-        }
-        return file;
-    }
-
-    public File writeGeneratedDataToExcel(int numberOfRowsToGenerate, String sheetName, String fileName) throws IOException
+    public File writeGeneratedDataToExcel(String sheetName, String fileName) throws IOException
     {
         File file = new File(TestFileUtils.getTestTempDir(), fileName);
         FileUtils.forceMkdirParent(file);
 
-        try(SXSSFWorkbook workbook = new SXSSFWorkbook(1000); // only holds 1000 rows in memory
+        try (SXSSFWorkbook workbook = new SXSSFWorkbook(1000); // only holds 1000 rows in memory
             FileOutputStream out = new FileOutputStream(file))
         {
             var sheet = workbook.createSheet(sheetName);
 
             // write headers as row 0
-            String[] columnNames = _columns.keySet().toArray(new String[0]);
+            List<String> columnNames = getFieldsForFile();
             var headerRow = sheet.createRow(0);
-            for (int i = 0; i < columnNames.length; i++)
+            for (int i = 0; i < columnNames.size(); i++)
             {
-                headerRow.createCell(i).setCellValue(columnNames[i]);
+                headerRow.createCell(i).setCellValue(columnNames.get(i));
             }
 
             // write content
-            for (int i = 1; i < numberOfRowsToGenerate +1; i++)
+            for (int i = 0; i < _rows.size(); i++)
             {
-                Map<String, Object> row = generateRow();
-                SXSSFRow currentRow = sheet.createRow(i);
-                for (int j = 0; j < columnNames.length; j++)
+                Map<String, Object> row = _rows.get(i);
+                SXSSFRow currentRow = sheet.createRow(i + 1);
+                for (int j = 0; j < columnNames.size(); j++)
                 {
-                    currentRow.createCell(j).setCellValue(row.get(columnNames[j]).toString());
+                    currentRow.createCell(j).setCellValue(row.getOrDefault(columnNames.get(j), "").toString());
                 }
             }
             workbook.write(out);
@@ -782,21 +705,44 @@ public class TestDataGenerator
     }
 
     /**
-     * Creates a file containing the contents of the current rows, formatted in TSV.
+     * Creates a file containing the contents of the current rows, formatted in TSV, CSV, or xlsx.
      * The file is written to the test temp dir
      * @param fileName  the name of the file, e.g. 'testDataFileForMyTest.tsv'
-     * @return File object pointing at created TSV
+     * @return File object pointing at created file
      */
     public File writeData(String fileName)
     {
+        String fileExtension = fileName.toLowerCase().substring(fileName.lastIndexOf('.') + 1);
+        switch (fileExtension)
+        {
+            case "xlsx":
+            case "xls":
+                try
+                {
+                    return writeGeneratedDataToExcel("sheet1", fileName);
+                }
+                catch (IOException e)
+                {
+                    throw new RuntimeException(e);
+                }
+            case "csv":
+                return writeData(fileName, CSVFormat.DEFAULT);
+            case "tsv":
+                return writeData(fileName, CSVFormat.TDF);
+            default:
+                throw new IllegalArgumentException("Unsupported file extension: " + fileExtension);
+        }
+    }
+
+    public File writeData(String fileName, CSVFormat format)
+    {
         try
         {
-            return TestFileUtils.writeTempFile(fileName, writeTsvContents());
+            return TestDataUtils.writeRowsToFile(fileName, TestDataUtils.rowListsFromMaps(_rows, getFieldsForFile()), format);
         }
         catch (IOException e)
         {
-            e.printStackTrace();
-            return null;
+            throw new RuntimeException(e);
         }
     }
 
@@ -864,13 +810,12 @@ public class TestDataGenerator
         return shuffled.subList(0, selectCount);
     }
 
-    // Require suppliers to provide reassurance that mutable objects are only reused intentionally
-    public static <T> List<T> randomSelect(List<Supplier<T>> allFields, int selectCount)
+    public static <T> List<T> randomSelect(List<T> allOptions, int selectCount)
     {
         List<T> selected = new ArrayList<>();
         for (int i = 0; i < selectCount; i++)
         {
-            selected.add(allFields.get(randomInt(0, allFields.size())).get());
+            selected.add(allOptions.get(randomInt(0, allOptions.size())));
         }
         return selected;
     }

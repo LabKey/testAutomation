@@ -19,6 +19,7 @@ import org.labkey.test.components.ui.grids.SaveViewDialog;
 import org.labkey.test.components.ui.search.FilterExpressionPanel;
 import org.labkey.test.components.ui.search.FilterFacetedPanel;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.FieldKey;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.APIUserHelper;
 import org.labkey.test.util.ApiPermissionsHelper;
@@ -1022,7 +1023,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
         log(String.format("Change the label of the field '%s' to '%s'.", materialNameField, newFieldLabel));
 
         // Adding the 'Material Source Id / Name' field creates two fields with the label 'Name' in the 'Shown in Grid' panel, make sure the expected one is updated.
-        customizeModal.setFieldLabel(materialNameField, 1, newFieldLabel);
+        customizeModal.setFieldLabel(FieldKey.fromParts(materialIDField, materialNameField), newFieldLabel);
 
         checker().fatal().verifyTrue("'Update' button is not enabled, cannot save changes. Fatal error.",
                 customizeModal.isUpdateGridEnabled());

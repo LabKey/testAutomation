@@ -57,7 +57,7 @@ import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PermissionsHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.StudyHelper;
-import org.labkey.test.util.TestDataUtils;
+import org.labkey.test.util.data.TestDataUtils;
 import org.labkey.test.util.UIUserHelper;
 import org.labkey.test.util.WikiHelper;
 import org.labkey.test.util.query.QueryUtils;
@@ -964,7 +964,7 @@ public class ClientAPITest extends BaseWebDriverTest
 
         assertTextPresent("Webpart Title");
         for (FieldDefinition column : LIST_COLUMNS)
-            assertTextPresent(column.getLabel());
+            assertTextPresent(column.getEffectiveLabel());
     }
 
     @Test

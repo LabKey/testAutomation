@@ -16,7 +16,6 @@ import org.labkey.test.util.TestDataGenerator;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -49,7 +48,7 @@ public class SampleTypeAPIHelper
         }
         catch (CommandException | IOException e)
         {
-            throw new RuntimeException("Failed to create sample type.", e);
+            throw new RuntimeException(String.format("Failed to create sample type. %s", e.getMessage()), e);
         }
     }
 

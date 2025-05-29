@@ -1,6 +1,8 @@
 package org.labkey.test.components.ui.grids;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.mutable.Mutable;
+import org.apache.commons.lang3.mutable.MutableObject;
 import org.assertj.core.api.Assertions;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.Locator;
@@ -13,7 +15,9 @@ import org.labkey.test.components.react.ReactDateTimePicker;
 import org.labkey.test.components.react.ReactSelect;
 import org.labkey.test.components.ui.entities.EntityBulkInsertDialog;
 import org.labkey.test.components.ui.entities.EntityBulkUpdateDialog;
+import org.labkey.test.components.ui.grids.FieldReferenceManager.FieldReference;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.FieldKey;
 import org.labkey.test.util.selenium.ScrollUtils;
 import org.labkey.test.util.selenium.WebElementUtils;
 import org.openqa.selenium.By;
@@ -36,12 +40,13 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.awaitility.Awaitility.await;
@@ -54,7 +59,8 @@ import static org.labkey.test.util.selenium.WebDriverUtils.MODIFIER_KEY;
 public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 {
     public static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-    public static final String SELECT_COLUMN_HEADER = "<select>";
+    public static final String SELECT_COLUMN_LABEL_PLACEHOLDER = "<select>";
+    public static final FieldKey SELECT_COLUMN_ID = FieldKey.fromParts("__select__");
     public static final String ROW_NUMBER_COLUMN_HEADER = "<row number>";
 
     private final WebElement _gridElement;
@@ -83,7 +89,8 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         return _gridElement;
     }
 
-    public void waitForLoaded()
+    @Override
+    public void waitForReady()
     {
         Locators.loadingGrid.waitForElementToDisappear(this, 30000);
         Locators.spinner.waitForElementToDisappear(this, 30000);
@@ -91,7 +98,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
     public void clickDelete()
     {
-        doAndWaitForUpdate(() -> elementCache().deleteRowsBtn.click());
+        doAndWaitForRowCountUpdate(() -> elementCache().deleteRowsBtn.click());
     }
 
     public EntityBulkInsertDialog clickBulkAdd()
@@ -120,22 +127,24 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         return elementCache().getColumnLabels();
     }
 
-    protected Integer getColumnIndex(String fieldLabel)
+    protected Integer getColumnIndex(CharSequence columnIdentifier)
     {
-        List<String> fieldLabels = getColumnLabels();
-        for (int i=0; i< fieldLabels.size(); i++ )
-        {
-            if (fieldLabels.get(i).equalsIgnoreCase(fieldLabel))
-                return i;
-        }
-        throw new NotFoundException("Column not found in grid: " + fieldLabel + ". Found: " + fieldLabels);
+        return elementCache().getColumnIndex(columnIdentifier);
     }
 
-    public EditableGrid removeColumn(String fieldLabel)
+    /**
+     * Remove the specified column from the grid
+     * @param columnIdentifier fieldKey, name, or label
+     * @return this component
+     */
+    public EditableGrid removeColumn(CharSequence columnIdentifier)
     {
-        WebElement headerCell = elementCache().getGridCellHeader(fieldLabel);
-        Locator.byClass("fa-chevron-circle-down").findElement(headerCell).click();
-        Locator.tagWithText("a", "Remove Column").findElement(headerCell).click();
+        doAndWaitForColumnUpdate(() ->
+        {
+            WebElement headerCell = elementCache().getColumnHeaderCell(columnIdentifier);
+            Locator.byClass("fa-chevron-circle-down").findElement(headerCell).click();
+            Locator.tagWithText("a", "Remove Column").findElement(headerCell).click();
+        });
         return this;
     }
 
@@ -219,47 +228,75 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
     private List<WebElement> getRows()
     {
-        waitForLoaded();
         return Locators.rows.findElements(elementCache().table);
     }
 
-    public List<Map<String, String>> getGridData(String... fieldLabels)
+    /**
+     * @param columnIdentifiers fieldKeys, names, or labels of columns
+     * @return grid data for the specified columns, keyed by column label
+     */
+    public List<Map<String, String>> getGridDataByLabel(CharSequence... columnIdentifiers)
     {
-        List<Map<String, String>> gridData = new ArrayList<>();
+        return getGridData(FieldReferenceManager.FieldReference::getLabel, columnIdentifiers);
+    }
 
-        List<String> allFieldLabels = getColumnLabels();
-        Set<Integer> includedColIndices = new HashSet<>();
-        if (fieldLabels.length > 0)
+    /**
+     * @param columnIdentifiers fieldKeys, names, or labels of columns
+     * @return grid data for the specified columns, keyed by column fieldKey
+     */
+    public List<Map<FieldKey, String>> getGridDataByFieldKey(CharSequence... columnIdentifiers)
+    {
+        return getGridData(FieldReferenceManager.FieldReference::getFieldKey, columnIdentifiers);
+    }
+
+    /**
+     * @param columnIdentifiers fieldKeys, names, or labels of columns
+     * @return grid data for the specified columns, keyed by column name
+     */
+    public List<Map<String, String>> getGridDataByName(CharSequence... columnIdentifiers)
+    {
+        return getGridData(FieldReference::getName, columnIdentifiers);
+    }
+
+    private <T> List<Map<T, String>> getGridData(Function<FieldReferenceManager.FieldReference, T> keyGenerator, CharSequence... columnIdentifiers)
+    {
+        List<Map<T, String>> gridData = new ArrayList<>();
+
+        Set<FieldReference> includedColHeaders = new LinkedHashSet<>();
+        if (columnIdentifiers.length == 0)
         {
-            Assertions.assertThat(allFieldLabels).as("Editable grid columns").contains(fieldLabels);
-            for (String col : fieldLabels)
+            includedColHeaders.addAll(elementCache().findHeaders());
+        }
+        else
+        {
+            for (CharSequence columnIdentifier : columnIdentifiers)
             {
-                int colIndex = allFieldLabels.indexOf(col);
-                includedColIndices.add(colIndex);
+                includedColHeaders.add(elementCache().findColumnHeader(columnIdentifier));
             }
         }
 
         for (WebElement row : getRows())
         {
             List<WebElement> cells = row.findElements(By.tagName("td"));
-            Map<String, String> rowMap = new HashMap<>();
+            Map<T, String> rowMap = new LinkedHashMap<>(includedColHeaders.size());
 
-            for (int i = 0; i < cells.size(); i++)
+            for (FieldReference fieldReference : includedColHeaders)
             {
-                if (includedColIndices.isEmpty() || includedColIndices.contains(i))
-                {
-                    WebElement cell = cells.get(i);
-                    String fieldLabel = allFieldLabels.get(i);
+                WebElement cell = cells.get(fieldReference.getDomIndex());
 
-                    if (fieldLabel.equals(SELECT_COLUMN_HEADER))
-                    {
-                        rowMap.put(fieldLabel, String.valueOf(cell.findElement(By.tagName("input")).isSelected()));
-                    }
-                    else
-                    {
-                        rowMap.put(fieldLabel, cell.getText());
-                    }
+                T key = keyGenerator.apply(fieldReference);
+                String value;
+
+                if (fieldReference.getDomIndex() == 0 && hasSelectColumn())
+                {
+                    value = String.valueOf(Locator.tag("input").findElement(cell).isSelected());
                 }
+                else
+                {
+                    value = cell.getText();
+                }
+
+                rowMap.put(key, value);
             }
 
             gridData.add(rowMap);
@@ -268,9 +305,18 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         return gridData;
     }
 
-    public List<String> getColumnDataByLabel(String fieldLabel)
+    @Deprecated
+    public List<String> getColumnDataByLabel(CharSequence columnIdentifier)
     {
-        return getGridData(fieldLabel).stream().map(a-> a.get(fieldLabel)).collect(Collectors.toList());
+        return getColumnData(columnIdentifier);
+    }
+
+    /**
+     * @param columnIdentifier fieldKey, name, or label of column
+     */
+    public List<String> getColumnData(CharSequence columnIdentifier)
+    {
+        return getGridData(ch -> 1, columnIdentifier).stream().map(a-> a.get(1)).collect(Collectors.toList());
     }
 
     private WebElement getRow(int index)
@@ -282,15 +328,15 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
      * Find the first row index containing the text value in the given column.
      * If not found -1 is returned.
      *
-     * @param fieldLabel Column label to look at.
+     * @param columnIdentifier fieldKey, name, or label of column
      * @param text Text to look for (must match exactly).
      * @return The first row index where found, -1 if not found.
      */
-    public Integer getRowIndex(String fieldLabel, String text)
+    public Integer getRowIndex(CharSequence columnIdentifier, String text)
     {
         int index = -1;
 
-        List<String> columnData = getColumnDataByLabel(fieldLabel);
+        List<String> columnData = getColumnData(columnIdentifier);
         for (int i = 0; i < columnData.size(); i++)
         {
             if (columnData.get(i).equals(text))
@@ -307,18 +353,18 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
      * Get the td element for a cell.
      *
      * @param row The 0 based row index.
-     * @param fieldLabel The label of the column to get the cell.
+     * @param columnIdentifier fieldKey, name, or label of column
      * @return A {@link WebElement} that is the td for the cell.
      */
-    public WebElement getCell(int row, String fieldLabel)
+    public WebElement getCell(int row, CharSequence columnIdentifier)
     {
-        int columNumber = getColumnIndex(fieldLabel) + 1;
+        int columNumber = getColumnIndex(columnIdentifier) + 1;
         return Locator.css("td:nth-of-type(" + columNumber + ")").findElement(getRow(row));
     }
 
-    public boolean isCellReadOnly(int row, String fieldLabel)
+    public boolean isCellReadOnly(int row, CharSequence columnIdentifier)
     {
-        WebElement div = Locator.tag("div").findElement(getCell(row, fieldLabel));
+        WebElement div = Locator.tag("div").findElement(getCell(row, columnIdentifier));
         String cellClass = div.getDomAttribute("class");
         return cellClass != null && cellClass.contains("cell-read-only");
     }
@@ -330,44 +376,44 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
     /**
      * <p>
-     *     For a given column, 'fieldLabelToSet', set the lookup cell in the first row where the value in column 'fieldLabelToSearch'
+     *     For a given column, 'columnToSet', set the lookup cell in the first row where the value in column 'columnToSearch'
      *     equals 'valueToSearch'. The value chosen will be at the specified index in the lookup options. Supply a 'value' in order to
      *     filter the set of options shown.
      * </p>
      *
-     * @param fieldLabelToSearch The label of the column to check if a row should be updated or not.
-     * @param valueToSearch The value to check for in 'fieldLabelToSearch' to see if the row should be updated.
-     * @param fieldLabelToSet The column to update in a row.
+     * @param columnToSearch fieldKey, name, or label of column to check if a row should be updated or not.
+     * @param valueToSearch The value to check for in 'columnToSearch' to see if the row should be updated.
+     * @param columnToSet The column to update in a row.
      * @param value Optional value to supply for filtering lookup options before selection
      * @param index The 0-based index of the option to choose from the possibly filtered list of options.
      */
-    public void setCellValueForLookup(String fieldLabelToSearch, String valueToSearch, String fieldLabelToSet, @Nullable String value, int index)
+    public void setCellValueForLookup(CharSequence columnToSearch, String valueToSearch, CharSequence columnToSet, @Nullable String value, int index)
     {
-        setCellValueForLookup(getRowIndex(fieldLabelToSearch, valueToSearch), fieldLabelToSet, value, index);
+        setCellValueForLookup(getRowIndex(columnToSearch, valueToSearch), columnToSet, value, index);
     }
 
     /**
      * <p>
-     *     For a given column, 'fieldLabelToSet', set the cell in the row if value in column 'fieldLabelToSearch'
+     *     For a given column, 'columnToSet', set the cell in the row if value in column 'columnToSearch'
      *     equals 'valueToSearch'.
      * </p>
      * <p>
      *     Rather than set one cell in a specific row, this function will loop through all the rows in the grid and
-     *     will update the value in column 'fieldLabelToSet' only if the value in the column 'fieldLabelToSearch' equal
+     *     will update the value in column 'columnToSet' only if the value in the column 'columnToSearch' equal
      *     'valueToSearch' in that row.
      * </p>
      * <p>
      *     The check for equality for 'valueToSearch' is case sensitive.
      * </p>
      *
-     * @param fieldLabelToSearch The label of the column to check if a row should be updated or not.
-     * @param valueToSearch The value to check for in 'fieldLabelToSearch' to see if the row should be updated.
-     * @param fieldLabelToSet The column to update in a row.
-     * @param valueToSet The new value to put into column 'fieldLabelToSet'.
+     * @param columnToSearch fieldKey, name, or label of column to check if a row should be updated or not.
+     * @param valueToSearch The value to check for in 'columnToSearch' to see if the row should be updated.
+     * @param columnToSet The column to update in a row.
+     * @param valueToSet The new value to put into column 'columnToSet'.
      */
-    public void setCellValue(String fieldLabelToSearch, String valueToSearch, String fieldLabelToSet, Object valueToSet)
+    public void setCellValue(CharSequence columnToSearch, String valueToSearch, CharSequence columnToSet, Object valueToSet)
     {
-        setCellValue(getRowIndex(fieldLabelToSearch, valueToSearch), fieldLabelToSet, valueToSet);
+        setCellValue(getRowIndex(columnToSearch, valueToSearch), columnToSet, valueToSet);
     }
 
     /**
@@ -380,13 +426,13 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
      * </p>
      *
      * @param row        Index of the row (0 based).
-     * @param fieldLabel Label of the column to update.
+     * @param columnIdentifier fieldKey, name, or label of column
      * @param value      If the cell is a lookup, value should be List.of(value(s)). To use the date picker pass a 'Date', 'LocalDate', or 'LocalDateTime'
      * @return cell WebElement
      */
-    public WebElement setCellValue(int row, String fieldLabel, Object value)
+    public WebElement setCellValue(int row, CharSequence columnIdentifier, Object value)
     {
-        return setCellValue(row, fieldLabel, value, true, false);
+        return setCellValue(row, columnIdentifier, value, true, false);
     }
 
     /**
@@ -395,14 +441,14 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
      * </p>
      *
      * @param row        Index of the row (0 based).
-     * @param fieldLabel Label of the column to update.
+     * @param columnIdentifier fieldKey, name, or label of column
      * @param value      Optional value to type in to filter the options shown
      * @param index      The index of the option to select for the lookup
      * @return cell WebElement
      */
-    public WebElement setCellValueForLookup(int row, String fieldLabel, @Nullable String value, int index)
+    public WebElement setCellValueForLookup(int row, CharSequence columnIdentifier, @Nullable String value, int index)
     {
-        WebElement gridCell = selectCell(row, fieldLabel);
+        WebElement gridCell = selectCell(row, columnIdentifier);
 
         ReactSelect lookupSelect = elementCache().lookupSelect(gridCell);
 
@@ -412,7 +458,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
         List<WebElement> elements = lookupSelect.getOptionElements();
         if (elements.size() < index)
-            throw new NotFoundException("Could not select option at index " + index + " in lookup for " + fieldLabel + ". Only " + elements.size() + " options found.");
+            throw new NotFoundException("Could not select option at index " + index + " in lookup for " + columnIdentifier + ". Only " + elements.size() + " options found.");
         elements.get(index).click();
         return gridCell;
     }
@@ -427,13 +473,13 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
      * </p>
      *
      * @param row        Index of the row (0 based).
-     * @param fieldLabel Label of the column to update.
+     * @param columnIdentifier fieldKey, name, or label of column
      * @param value      If the cell is a lookup, value should be List.of(value(s)). To use the date picker pass a 'Date', 'LocalDate', or 'LocalDateTime'
      * @param checkContains Check to see if the value passed in is contained in the value shown in the grid after the edit.
      *                   Will be true most of the time but can be false if the field has formatting that may alter the value passed in like date values.
      * @return cell WebElement
      */
-    public WebElement setCellValue(int row, String fieldLabel, Object value, boolean checkContains, boolean centerSelectedCell)
+    public WebElement setCellValue(int row, CharSequence columnIdentifier, Object value, boolean checkContains, boolean centerSelectedCell)
     {
         // Normalize date values
         if (value instanceof Date date)
@@ -442,9 +488,9 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         }
 
         if (centerSelectedCell)
-            ScrollUtils.scrollIntoView(getCell(row, fieldLabel), center, center);
+            ScrollUtils.scrollIntoView(getCell(row, columnIdentifier), center, center);
 
-        WebElement gridCell = selectCell(row, fieldLabel);
+        WebElement gridCell = selectCell(row, columnIdentifier);
 
         if (value instanceof List)
         {
@@ -535,10 +581,9 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         {
             Map<String, Object> rowData = data.get(i);
             for (FieldDefinition field : fields) {
-                String key = field.getLabel() != null ? field.getLabel() : field.getName();
-                Object value = rowData.get(key);
+                Object value = rowData.get(field.getEffectiveLabel());
                 if (value != null)
-                    setCellValue(i, key, value);
+                    setCellValue(i, field.getName(), value);
             }
         }
     }
@@ -548,8 +593,8 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         for (int i = 0; i < rowValues.size(); i++)
         {
             Map<String, Object> columnValues = rowValues.get(i);
-            for(String fieldLabel : columnValues.keySet())
-                setCellValue(i, fieldLabel, columnValues.get(fieldLabel), true, true);
+            for(String fieldIdentifier : columnValues.keySet())
+                setCellValue(i, fieldIdentifier, columnValues.get(fieldIdentifier), true, true);
         }
         return this;
     }
@@ -559,16 +604,16 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
      * Use '\n' for a new line.
      *
      * @param row Row to update.
-     * @param fieldLabel Column label of the multi-line field.
+     * @param columnIdentifier fieldKey, name, or label of column
      * @param value The value to set.
      */
-    public void setMultiLineCellValue(int row, String fieldLabel, String value)
+    public void setMultiLineCellValue(int row, CharSequence columnIdentifier, String value)
     {
 
-        WebElement gridCell = getCell(row, fieldLabel);
+        WebElement gridCell = getCell(row, columnIdentifier);
         String beforeText = gridCell.getText();
 
-        WebElement textArea = activateCellUsingDoubleClick(row, fieldLabel);
+        WebElement textArea = activateCellUsingDoubleClick(row, columnIdentifier);
 
         textArea.sendKeys(value, Keys.RETURN); // Add the RETURN to close the inputCell.
 
@@ -585,12 +630,12 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
      * Double-clicking a cell that is "text" value field will activate it and present a textArea for editing the value.
      * This will return the textArea WebElement that can be used to set the field.
      * @param row Row to be edited.
-     * @param fieldLabel Column label of the field.
+     * @param columnIdentifier fieldKey, name, or label of column
      * @return The TextArea component that can be used to edit the field.
      */
-    public WebElement activateCellUsingDoubleClick(int row, String fieldLabel)
+    public WebElement activateCellUsingDoubleClick(int row, CharSequence columnIdentifier)
     {
-        WebElement gridCell = getCell(row, fieldLabel);
+        WebElement gridCell = getCell(row, columnIdentifier);
         WebElement textArea = Locator.tag("textarea").refindWhenNeeded(gridCell);
 
         // Account for the cell already being active.
@@ -598,7 +643,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         {
             getWrapper().doubleClick(gridCell);
             waitFor(textArea::isDisplayed,
-                    String.format("Table cell for row %d and column '%s' was not activated.", row, fieldLabel), 1_000);
+                    String.format("Table cell for row %d and column '%s' was not activated.", row, columnIdentifier), 1_000);
         }
         return textArea;
     }
@@ -606,12 +651,12 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     /**
      * Creates a value in a select that allows the user to insert/create a value, vs. selecting from an existing/populated set
      * @param row   the row
-     * @param fieldLabel    label of the column
+     * @param columnIdentifier fieldKey, name, or label of column
      * @param value     value to insert
      */
-    public void setNewSelectValue(int row, String fieldLabel, String value)
+    public void setNewSelectValue(int row, CharSequence columnIdentifier, String value)
     {
-        WebElement gridCell = selectCell(row, fieldLabel);
+        WebElement gridCell = selectCell(row, columnIdentifier);
 
         ReactSelect createSelect = elementCache().lookupSelect(gridCell);
 
@@ -619,26 +664,26 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     }
 
     /**
-     * Search for a row and then clear the given cell (fieldLabelToClear) on the row.
+     * Search for a row and then clear the given cell (columnToClear) on the row.
      *
-     * @param fieldLabelToSearch Column to search.
+     * @param columnToSearch Column to search.
      * @param valueToSearch Value in the column to search for.
-     * @param fieldLabelToClear Column to clear.
+     * @param columnToClear Column to clear.
      */
-    public void clearCellValue(String fieldLabelToSearch, String valueToSearch, String fieldLabelToClear)
+    public void clearCellValue(CharSequence columnToSearch, String valueToSearch, CharSequence columnToClear)
     {
-        clearCellValue(getRowIndex(fieldLabelToSearch, valueToSearch), fieldLabelToClear);
+        clearCellValue(getRowIndex(columnToSearch, valueToSearch), columnToClear);
     }
 
     /**
-     * Clear the cell (fieldLabel) in the row.
+     * Clear the cell (columnIdentifier) in the row.
      *
      * @param row Row of the cell to clear.
-     * @param fieldLabel Column of the cell to clear.
+     * @param columnIdentifier fieldKey, name, or label of column
      */
-    public void clearCellValue(int row, String fieldLabel)
+    public void clearCellValue(int row, CharSequence columnIdentifier)
     {
-        selectCell(row, fieldLabel);
+        selectCell(row, columnIdentifier);
         new Actions(getDriver()).sendKeys(Keys.DELETE).perform();
     }
 
@@ -646,12 +691,12 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
      * For a given row get the value in the given column.
      *
      * @param row The row index (0 based).
-     * @param fieldLabel The label of the column to get the value for.
+     * @param columnIdentifier fieldKey, name, or label of column
      * @return The string value of the {@link WebElement} that is the cell.
      */
-    public String getCellValue(int row, String fieldLabel)
+    public String getCellValue(int row, CharSequence columnIdentifier)
     {
-        return getCellValue(getCell(row, fieldLabel));
+        return getCellValue(getCell(row, columnIdentifier));
     }
 
     private String getCellValue(WebElement cell)
@@ -675,12 +720,12 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
      * For the given row get the values displayed in the dropdown list for the given column.
      *
      * @param row The 0 based row index.
-     * @param fieldLabel The label of the column.
+     * @param columnIdentifier fieldKey, name, or label of column
      * @return A list of strings from the dropdown list. If the cell does not have a dropdown then an empty list is returned.
      */
-    public List<String> getDropdownListForCell(int row, String fieldLabel)
+    public List<String> getDropdownListForCell(int row, CharSequence columnIdentifier)
     {
-        return getFilteredDropdownListForCell(row, fieldLabel, null);
+        return getFilteredDropdownListForCell(row, columnIdentifier, null);
     }
 
     /**
@@ -688,14 +733,14 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
      * If this cell is not a lookup cell, does not have a dropdown, the text will not be entered and an empty list will be returned.
      *
      * @param row A 0 based index containing the cell.
-     * @param fieldLabel The column of the cell.
+     * @param columnIdentifier fieldKey, name, or label of column
      * @param filterText The text to type into the cell. If the value is null it will not filter the list.
      * @return A list values shown in the dropdown list after the text has been entered.
      */
-    public List<String> getFilteredDropdownListForCell(int row, String fieldLabel, @Nullable String filterText)
+    public List<String> getFilteredDropdownListForCell(int row, CharSequence columnIdentifier, @Nullable String filterText)
     {
 
-        WebElement gridCell = selectCell(row, fieldLabel);
+        WebElement gridCell = selectCell(row, columnIdentifier);
 
         ReactSelect lookupSelect = elementCache().lookupSelect(gridCell);
 
@@ -715,28 +760,28 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
      * Pastes delimited text to the grid, via a single target.  The component is clever enough to target
      * text into cells based on text delimiters; thus we can paste a square of data into the grid.
      * @param row           index of the target cell
-     * @param fieldLabel    column of the target cell
+     * @param columnIdentifier fieldKey, name, or label of column
      * @param pasteText     tab-delimited or csv or excel data
      * @return A Reference to this editableGrid object.
      */
-    public EditableGrid pasteFromCell(int row, String fieldLabel, String pasteText)
+    public EditableGrid pasteFromCell(int row, CharSequence columnIdentifier, String pasteText)
     {
-        return pasteFromCell(row, fieldLabel, pasteText, false);
+        return pasteFromCell(row, columnIdentifier, pasteText, false);
     }
 
     /**
      * Pastes delimited text to the grid, via a single target.  The component is clever enough to target
      * text into cells based on text delimiters; thus we can paste a square of data into the grid.
      * @param row           index of the target cell
-     * @param fieldLabel    column of the target cell
+     * @param columnIdentifier fieldKey, name, or label of column
      * @param pasteText     tab-delimited or csv or excel data
      * @param validate      whether to await/confirm the presence of pasted text before resuming
      * @return A Reference to this editableGrid object.
      */
-    public EditableGrid pasteFromCell(int row, String fieldLabel, String pasteText, boolean validate)
+    public EditableGrid pasteFromCell(int row, CharSequence columnIdentifier, String pasteText, boolean validate)
     {
         int initialRowCount = getRowCount();
-        WebElement gridCell = getCell(row, fieldLabel);
+        WebElement gridCell = getCell(row, columnIdentifier);
         String indexValue = gridCell.getText();
         selectCell(gridCell);
 
@@ -775,17 +820,16 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     public void waitForPasteContent(String pasteContent)
     {
         // split pasteContent into its parts
-        var contentParts = pasteContent.replace("\n", "\t").split("\t");
+        var contentParts = pasteContent.split("\\s*[\n\t]\\s*");
         // filter out empty and space-only values
         var filteredParts = Arrays.stream(contentParts)
-                .filter(a-> !a.isEmpty() && !a.equals(" "))
+                .filter(a-> !a.isBlank())
                 .map(str -> {
                     if (str.startsWith("\"") && str.endsWith("\""))
                     {
                         // reverse TsvQuoter.quote
                         str = str.replaceAll("\"\"", "\"");
-                        str = str.substring(1);
-                        str = str.substring(0, str.length() - 1);
+                        str = str.substring(1, str.length() - 1); // remove surrounding quotes
                     }
                     return str;
                 })
@@ -815,12 +859,12 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
      * the grid should produce an error/alert.
      * @param pasteText     The text to paste
      * @param startRowIndex index of the starting row
-     * @param startColumn   text of the starting cell
+     * @param startColumn   fieldKey, name, or label of the starting cell
      * @param endRowIndex   index of the ending row
-     * @param endColumn     text of the ending cell
+     * @param endColumn     fieldKey, name, or label of the ending cell
      * @return  the current grid instance
      */
-    public EditableGrid pasteMultipleCells(String pasteText, int startRowIndex, String startColumn, int endRowIndex, String endColumn)
+    public EditableGrid pasteMultipleCells(String pasteText, int startRowIndex, CharSequence startColumn, int endRowIndex, CharSequence endColumn)
     {
         WebElement startCell = getCell(startRowIndex, startColumn);
         WebElement endCell = getCell(endRowIndex, endColumn);
@@ -832,12 +876,12 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     /**
      * Copies text from the grid, b
      * @param startRowIndex Index of the top-left cell's row
-     * @param startColumn   Column label of the top-left cell
+     * @param startColumn   fieldKey, name, or label of the top-left cell
      * @param endRowIndex   Index of the bottom-right cell's row
-     * @param endColumn     Column label of the bottom-right cell
+     * @param endColumn     fieldKey, name, or label of the bottom-right cell
      * @return  the text contained in the prescribed selection
      */
-    public String copyCellRange(int startRowIndex, String startColumn, int endRowIndex, String endColumn) throws IOException, UnsupportedFlavorException
+    public String copyCellRange(int startRowIndex, CharSequence startColumn, int endRowIndex, CharSequence endColumn) throws IOException, UnsupportedFlavorException
     {
         WebElement startCell = getCell(startRowIndex, startColumn);
         WebElement endCell = getCell(endRowIndex, endColumn);
@@ -935,10 +979,10 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
                 "the expected cells did not become selected", 3000);
     }
 
-    public WebElement selectCell(int row, String fieldLabel)
+    public WebElement selectCell(int row, CharSequence columnIdentifier)
     {
         // Get a reference to the cell.
-        WebElement gridCell = getCell(row, fieldLabel);
+        WebElement gridCell = getCell(row, columnIdentifier);
 
         // Select the cell.
         selectCell(gridCell);
@@ -992,14 +1036,14 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
             // div will not have the cell-selected in the class attribute.
             return Locator.tagWithClass("div", "cellular-display")
                     .findElement(cell)
-                    .getAttribute("class").contains("cell-selected");
+                    .getDomAttribute("class").contains("cell-selected");
         }
         catch (NoSuchElementException nse)
         {
             // If the cell is an open/active reactSelect the class attribute is different.
             return Locator.tagWithClass("div", "select-input__control")
                     .findElement(cell)
-                    .getAttribute("class").contains("select-input__control--is-focused");
+                    .getDomAttribute("class").contains("select-input__control--is-focused");
         }
     }
 
@@ -1013,7 +1057,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         // Should not need to add code for a reactSelect here. A selection involves clicking/dragging, which closes the reactSelect.
         return Locator.tagWithClass("div", "cellular-display")
                 .findElement(cell)
-                .getAttribute("class").contains("cell-selection");
+                .getDomAttribute("class").contains("cell-selection");
     }
 
     /**
@@ -1030,9 +1074,9 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         return (isInSelection(indexCell) && isInSelection(endCell));
     }
 
-    public boolean hasCellError(int row, String fieldLabel)
+    public boolean hasCellError(int row, CharSequence columnIdentifier)
     {
-        WebElement gridCell = getCell(row, fieldLabel);
+        WebElement gridCell = getCell(row, columnIdentifier);
         return cellHasError(gridCell);
     }
 
@@ -1041,18 +1085,28 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         return Locator.tagWithClass("div", "cell-error").existsIn(cell);
     }
 
-    public String getCellError(int row, String fieldLabel)
+    /**
+     * @param row row index
+     * @param columnIdentifier fieldKey, name, or label of column
+     * @return error text in the specified cell or 'null' if there is no error
+     */
+    public String getCellError(int row, CharSequence columnIdentifier)
     {
-        WebElement gridCell = getCell(row, fieldLabel);
+        WebElement gridCell = getCell(row, columnIdentifier);
 
         if (cellHasError(gridCell))
             return Locator.tagWithClass("div", "cell-error").findElement(gridCell).getText();
         return null;
     }
 
-    public String getCellPopoverText(int row, String fieldLabel)
+    /**
+     * @param row row index
+     * @param columnIdentifier fieldKey, name, or label of column
+     * @return popover text when mousing over the specified cell or 'null' if there is none
+     */
+    public String getCellPopoverText(int row, CharSequence columnIdentifier)
     {
-        WebElement cellDiv = Locator.tagWithClass("div", "cellular-display").findElement(getCell(row, fieldLabel));
+        WebElement cellDiv = Locator.tagWithClass("div", "cellular-display").findElement(getCell(row, columnIdentifier));
         getWrapper().mouseOver(cellDiv);   // cause the tooltip to be present
         if (WebDriverWrapper.waitFor(()-> null != Locator.byClass("popover").findElementOrNull(getDriver()), 1000))
         {
@@ -1086,18 +1140,33 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     public void addRows(int count)
     {
         setAddRows(count);
-        doAndWaitForUpdate(() -> {
+        doAndWaitForRowCountUpdate(() -> {
             elementCache().addRowsButton.click();
         });
     }
 
-    private void doAndWaitForUpdate(Runnable func)
+    private void doAndWaitForRowCountUpdate(Runnable func)
     {
         int initialCount = getRowCount();
 
         func.run();
 
         waitFor(() -> getRowCount() != initialCount, "Failed to add/remove rows", 5_000);
+    }
+
+    /**
+     * Wait for column count to change after the provided action
+     */
+    public void doAndWaitForColumnUpdate(Runnable func)
+    {
+        int initialCount = elementCache().findHeaders().size();
+
+        func.run();
+
+        waitFor(() -> {
+            clearElementCache();
+            return elementCache().findHeaders().size() != initialCount;
+        }, "Failed to add/remove column", 5_000);
     }
 
     @Override
@@ -1116,73 +1185,54 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         final WebElement table = Locator.byClass("table-cellular").findWhenNeeded(this);
         private final WebElement selectColumn = Locator.xpath("//th/input[@type='checkbox']").findWhenNeeded(table);
 
-        public WebElement getGridCellHeader(String label)
+        protected WebElement getColumnHeaderCell(CharSequence columnIdentifier)
         {
-            return Locator.byClass("grid-header-cell").withDescendant(Locator.tagContainingText("span", label)).findWhenNeeded(table);
+            return findColumnHeader(columnIdentifier).getElement();
         }
 
-        private List<String> fieldLabels = new ArrayList<>();
-
-        public List<String> getColumnLabels()
+        private FieldReferenceManager _fieldReferenceManager;
+        protected FieldReferenceManager getGridHeaderManager()
         {
-            // If the number of header cells is not equal to the list of fieldLabels the columns have been modified since
-            // the last call to getColumnLabels so get the column labels again.
-            List<WebElement> headerCells = Locators.headerCells.waitForElements(table, WAIT_FOR_JAVASCRIPT);
-            if (fieldLabels.size() != headerCells.size())
+            if (_fieldReferenceManager == null)
             {
-                fieldLabels = new ArrayList<>();
-            }
+                List<EditableGridColumnHeader> columnHeaders = new ArrayList<>();
+                List<WebElement> headerCellElements = Locators.headerCells.waitForElements(table, WAIT_FOR_JAVASCRIPT);
+                int domIndex = 0;
 
-            if (fieldLabels.isEmpty())
-            {
-                for (WebElement el : headerCells)
-                {
-                    fieldLabels.add(getLabelFromHeaderCell(el));
-                }
-
-                int rowNumberColumn = 0;
                 if (hasSelectColumn())
                 {
-                    fieldLabels.set(0, SELECT_COLUMN_HEADER);
-                    rowNumberColumn = 1;
+                    columnHeaders.add(new EditableGridColumnHeader(headerCellElements.get(0), domIndex, SELECT_COLUMN_LABEL_PLACEHOLDER));
+                    domIndex++;
                 }
 
-                if (fieldLabels.get(rowNumberColumn).trim().isEmpty())
+                for (; domIndex < headerCellElements.size(); domIndex++)
                 {
-                    fieldLabels.set(rowNumberColumn, ROW_NUMBER_COLUMN_HEADER);
+                    columnHeaders.add(new EditableGridColumnHeader(headerCellElements.get(domIndex), domIndex));
                 }
-            }
 
-            return fieldLabels;
+                _fieldReferenceManager = new FieldReferenceManager(columnHeaders);
+            }
+            return _fieldReferenceManager;
         }
 
-        /**
-         * Extract label from header cell. Editable grid header cells have several different layouts. What they have in
-         * common is that the label is the first text node in the cell, possibly within a &lt;span&gt;
-         */
-        private String getLabelFromHeaderCell(WebElement el)
+        protected List<FieldReference> findHeaders()
         {
-            // Use text nodes to ignore browser whitespace formatting
-            List<String> textNodes = WebElementUtils.getTextNodesWithin(el);
-            if (textNodes.isEmpty())
-            {
-                List<WebElement> children = Locator.xpath("./*").findElements(el);
-                if (children.isEmpty())
-                {
-                    return ""; // probably the selection checkbox column
-                }
-                else
-                {
-                    // Depth-first search until we find some text
-                    return getLabelFromHeaderCell(children.get(0));
-                }
-            }
-            else
-            {
-                boolean required = Locator.byClass("required-symbol").existsIn(el);
-                String label = textNodes.get(0).trim(); // trim trailing NBSP
-                return label + (required ? " *" : ""); // re-add required asterisk for tests that expect it
-            }
+            return getGridHeaderManager().getColumnHeaders();
+        }
+
+        protected FieldReference findColumnHeader(CharSequence columnIdentifier)
+        {
+            return getGridHeaderManager().findFieldReference(columnIdentifier);
+        }
+
+        protected int getColumnIndex(CharSequence columnIdentifier)
+        {
+            return findColumnHeader(columnIdentifier).getDomIndex();
+        }
+
+        protected List<String> getColumnLabels()
+        {
+            return findHeaders().stream().map(FieldReference::getLabel).collect(Collectors.toList());
         }
 
         public WebElement inputCell()
@@ -1242,6 +1292,62 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         protected Locator locator()
         {
             return _locator;
+        }
+    }
+
+    protected static class EditableGridColumnHeader extends FieldReferenceManager.FieldReference
+    {
+        private final Mutable<String> _fieldLabel = new MutableObject<>();
+
+        public EditableGridColumnHeader(WebElement element, int domIndex)
+        {
+            super(element, domIndex);
+        }
+
+        public EditableGridColumnHeader(WebElement element, int domIndex, String label)
+        {
+            this(element, domIndex);
+            _fieldLabel.setValue(label);
+        }
+
+        @Override
+        public String getLabel()
+        {
+            if (_fieldLabel.getValue() == null)
+            {
+                _fieldLabel.setValue(getLabelFromHeaderCell(getElement()).trim());
+            }
+            return _fieldLabel.getValue();
+        }
+
+
+        /**
+         * Extract label from header cell. Editable grid header cells have several different layouts. What they have in
+         * common is that the label is the first text node in the cell, possibly within a &lt;span&gt;
+         */
+        private String getLabelFromHeaderCell(WebElement el)
+        {
+            // Use text nodes to ignore browser whitespace formatting
+            List<String> textNodes = WebElementUtils.getTextNodesWithin(el);
+            if (textNodes.isEmpty())
+            {
+                List<WebElement> children = Locator.xpath("./*").findElements(el);
+                if (children.isEmpty())
+                {
+                    return ""; // probably the selection checkbox column
+                }
+                else
+                {
+                    // Depth-first search until we find some text
+                    return getLabelFromHeaderCell(children.get(0));
+                }
+            }
+            else
+            {
+                boolean required = Locator.byClass("required-symbol").existsIn(el);
+                String label = textNodes.get(0).trim(); // trim trailing NBSP
+                return label + (required ? " *" : ""); // re-add required asterisk for tests that expect it
+            }
         }
     }
 }
