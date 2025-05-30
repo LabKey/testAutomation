@@ -494,22 +494,19 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
         for (WebElement el : elements)
         {
             _driver.fireEvent(el, WebDriverWrapper.SeleniumEvent.blur);
-            try
+            for (int i = 0; i < 10; i++)
             {
-                for (int i = 0; i < 10; i++)
+                try
                 {
-                    try
-                    {
-                        ScrollUtils.scrollIntoView(el);
-                        builder.moveToElement(el).click().build().perform();
-                    }
-                    catch (WebDriverException ignore)
-                    {
-                        ScrollUtils.scrollUnderFloatingHeader(el);
-                    }
+                    ScrollUtils.scrollIntoView(el);
+                    builder.moveToElement(el).click().build().perform();
+                }
+                catch (StaleElementReferenceException ignore) {}
+                catch (WebDriverException ignore)
+                {
+                    ScrollUtils.scrollUnderFloatingHeader(el);
                 }
             }
-            catch (StaleElementReferenceException ignore) {}
             _driver.shortWait().until(ExpectedConditions.stalenessOf(el));
         }
     }
