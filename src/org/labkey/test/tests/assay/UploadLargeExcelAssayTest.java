@@ -39,7 +39,7 @@ public class UploadLargeExcelAssayTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject() throws Exception
     {
-        UploadLargeExcelAssayTest init = (UploadLargeExcelAssayTest) getCurrentTest();
+        UploadLargeExcelAssayTest init = getCurrentTest();
 
         init.doSetup();
     }
@@ -85,9 +85,8 @@ public class UploadLargeExcelAssayTest extends BaseWebDriverTest
         String fileName = "200kXlsxFile.xlsx";
         var dgen = new TestDataGenerator("samples", "chaos_sample", getProjectName())
             .withColumns(ASSAY_FIELDS);
-        dgen.generateRows(200_000);
         log("writing large .xlsx file");
-        var largeExcelFile = dgen.writeData(fileName);
+        var largeExcelFile = dgen.writeData(fileName, 200_000);
         log("finished writing large .xlsx file");
 
         // import large generated excel to assay1
