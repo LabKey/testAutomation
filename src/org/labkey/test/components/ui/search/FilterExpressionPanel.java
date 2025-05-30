@@ -93,16 +93,16 @@ public class FilterExpressionPanel extends WebDriverComponent<FilterExpressionPa
             else if (value1 instanceof Date dateVal1)
             {
                 String dateStr1;
-                if (value1 instanceof DateString)
-                    dateStr1 = ((DateString)value1).getDateStr();   // use the test-supplied date string
+                if (value1 instanceof DateString ds1)
+                    dateStr1 = ds1.getDateStr();   // use the test-supplied date string
                 else
                     dateStr1 = DATE_FORMAT.format(dateVal1);        // format the supplied date value to string
                 elementCache().dateValues.get(index).set(dateStr1);
                 if (value2 instanceof Date dateVal2)
                 {
                     String dateStr2;
-                    if (value2 instanceof DateString)
-                        dateStr2 = ((DateString)value2).getDateStr();
+                    if (value2 instanceof DateString ds2)
+                        dateStr2 = ds2.getDateStr();
                     else
                         dateStr2 = DATE_FORMAT.format(dateVal2);
                     elementCache().dateValuesSecond.get(index).set(dateStr2);
