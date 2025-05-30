@@ -246,7 +246,7 @@ public class DataRegionTable extends DataRegion
 
     public boolean hasSummaryStatisticRow()
     {
-        return Locator.css("tr.labkey-col-total").findElements(elementCache()).size() > 0;
+        return !Locator.css("tr.labkey-col-total").findElements(elementCache()).isEmpty();
     }
 
     /**
@@ -457,7 +457,7 @@ public class DataRegionTable extends DataRegion
         if (i < 0)
         {
             List<String> columnLabelsWithoutSpaces = new ArrayList<>(getColumnLabels().size());
-            getColumnLabels().stream().forEach(s -> columnLabelsWithoutSpaces.add(s.replace(" ", "")));
+            getColumnLabels().forEach(s -> columnLabelsWithoutSpaces.add(s.replace(" ", "")));
             i = columnLabelsWithoutSpaces.indexOf(name.replace(" ", ""));
             if (i >= 0)
             {
@@ -825,7 +825,7 @@ public class DataRegionTable extends DataRegion
     public WebElement getFlag(int row, String columnName)
     {
         var cell = findCell(row, columnName);
-        return tagWithAttribute("i", "data-flagId").findElement(cell);
+        return tagWithAttribute("i", "data-flagid").findElement(cell);
     }
 
     public boolean isFlagEnabled(int row, String columnName)
@@ -913,7 +913,7 @@ public class DataRegionTable extends DataRegion
      */
     public void clearFlagValues()
     {
-        List<WebElement> allFlags = Locator.tagWithAttribute("i", "data-flagId").findElements(elementCache());
+        List<WebElement> allFlags = Locator.tagWithAttribute("i", "data-flagid").findElements(elementCache());
         for (WebElement flag : allFlags)
         {
             if (isFlagEnabled(flag))
