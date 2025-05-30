@@ -29,6 +29,7 @@ import org.labkey.test.util.PermissionsHelper;
 import org.labkey.test.util.SampleTypeHelper;
 import org.labkey.test.util.TestDataGenerator;
 import org.labkey.test.util.exp.SampleTypeAPIHelper;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriverException;
 
 import java.io.IOException;
@@ -39,6 +40,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static org.junit.Assert.fail;
 
 @Category({Daily.class})
 public class GridPanelViewTest extends GridPanelBaseTest
@@ -1292,18 +1295,23 @@ public class GridPanelViewTest extends GridPanelBaseTest
                         .hasSize(1)
                         .filteredOn(a-> a.getText().equals("Created > 2024-05-27"))
                                 .isNotEmpty());
+        grid.saveView().saveView();
         grid.clearFilters();
 
         log("try to filter on an invalid date");
         grid.filterColumn("Created", Filter.Operator.GT, new FilterExpressionPanel.DateString("05/37/2024"));
         // don't expect the parser to get the invalid date right; current behavior won't do that
+        // also add a bogus filter on int column, verify it refuses to do it
+        var err = grid.filterColumnExpectingError("Int", Filter.Operator.GT, "XYZ");
+        checker().verifyEquals("expect error when trying to configure invalid filter",
+                "Missing filter values for: Int.", err);
+        grid.saveView().saveView();
 
         log("ensure the view can be edited after");
         grid.filterColumn("Created", Filter.Operator.LTE, new Date());  // filter on right now
 
-        grid.clickUndoButton(); // undo will clear the view from its edited state, make it deletable
         grid.manageViews()      // ensure the view can be deleted now
-                .deleteViewAndConfirm(viewName + " (shared)")
+                .deleteViewAndConfirm(viewName)
                 .dismiss("Done");
     }
 
