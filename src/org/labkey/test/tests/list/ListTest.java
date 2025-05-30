@@ -801,13 +801,13 @@ public class ListTest extends BaseWebDriverTest
     /* Issue 23487: add regression coverage for batch insert into list with multiple errors
     */
     @Test
-    public void testBatchInsertErrors() throws IOException, CommandException
+    public void testBatchInsertErrors()
     {
         // create the list for this case
         String multiErrorListName = "multiErrorBatchList";
         String[] expectedErrors = new String[]{
             getConversionErrorMessage("green", "ShouldInsertCorrectly", Boolean.class),
-            getConversionErrorMessage("five", "Id", Integer.class) + "; Missing value for required property: Id"
+            getConversionErrorMessage("five", "Id", Integer.class)
         };
 
         createList(multiErrorListName, BatchListColumns, BatchListData);
