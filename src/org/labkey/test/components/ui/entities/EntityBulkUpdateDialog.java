@@ -269,9 +269,9 @@ public class EntityBulkUpdateDialog extends ModalDialog
         return this;
     }
 
-    public FileUploadField getExistingFileField(String fieldKey)
+    public FileUploadField getExistingFileField(String fieldIdentifier)
     {
-        return elementCache().fileField(fieldKey);
+        return elementCache().fileField(fieldIdentifier);
     }
 
     /**
@@ -475,9 +475,9 @@ public class EntityBulkUpdateDialog extends ModalDialog
             return new FileAttachmentContainer(formRow(fieldIdentifier), getDriver());
         }
 
-        public FileUploadField fileField(String fieldKey)
+        public FileUploadField fileField(CharSequence fieldIdentifier)
         {
-            return new FileUploadField(Locator.tagWithClass("div", "col-xs-12").findElementOrNull(formRow(fieldKey)), getDriver());
+            return new FileUploadField(Locator.tagWithClass("div", "col-xs-12").findElementOrNull(formRow(fieldIdentifier)), getDriver());
         }
 
         final Locator textInputLoc = Locator.tagWithAttribute("input", "type", "text");
