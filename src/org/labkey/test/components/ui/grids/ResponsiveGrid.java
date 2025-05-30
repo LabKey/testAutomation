@@ -12,7 +12,6 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.UpdatingComponent;
 import org.labkey.test.components.WebDriverComponent;
-import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.components.react.ReactCheckBox;
 import org.labkey.test.components.ui.grids.FieldReferenceManager.FieldReference;
