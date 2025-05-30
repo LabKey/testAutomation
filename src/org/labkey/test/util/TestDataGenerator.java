@@ -582,7 +582,8 @@ public class TestDataGenerator
     public static String randomFieldName(@NotNull String part, int numStartChars, int numEndChars, @Nullable String exclusion)
     {
         // use the characters that we know are encoded in fieldKeys plus characters that we know clients are using
-        String chars = ALL_ILLEGAL_QUERY_KEY_CHARACTERS + " %()=+-[]_|*`'\":;<>?!@#^" + NON_LATIN_STRING + WIDE_PLACEHOLDER ;
+        // Issue 53197: Field name with double byte character can cause client side exception in Firefox when trying to customize grid view.
+        String chars = ALL_ILLEGAL_QUERY_KEY_CHARACTERS + " %()=+-[]_|*`'\":;<>?!@#^" + NON_LATIN_STRING;// + WIDE_PLACEHOLDER ;
 
         String randomFieldName = randomName(part, numStartChars, numEndChars, chars, exclusion);
         TestLogger.log("Generated random field name: " + randomFieldName);
