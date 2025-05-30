@@ -9,6 +9,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.FieldInfo;
 import org.labkey.test.params.list.IntListDefinition;
 
 import org.labkey.test.params.list.VarListDefinition;
@@ -28,10 +29,10 @@ public class QueryLookupTest extends BaseWebDriverTest
     private static final String PROJECT_NAME = "QueryLookupTest" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
     private static final String LIST_NAME = "l&ist q";
 
-    private static final FieldDefinition NAME_COLUMN =
-            new FieldDefinition("Name", FieldDefinition.ColumnType.String);
-    private static final FieldDefinition TSHIRT_COLUMN =
-            new FieldDefinition("TShirt", FieldDefinition.ColumnType.String);
+    private static final FieldInfo NAME_COLUMN =
+            new FieldInfo("Name", FieldDefinition.ColumnType.String);
+    private static final FieldInfo TSHIRT_COLUMN =
+            new FieldInfo("TShirt", FieldDefinition.ColumnType.String);
 
     @Override
     protected void doCleanup(boolean afterTest)
@@ -53,7 +54,7 @@ public class QueryLookupTest extends BaseWebDriverTest
 
         // create a list
         var dgen = new VarListDefinition(LIST_NAME)
-                .setFields(List.of(NAME_COLUMN, TSHIRT_COLUMN))
+                .setFields(List.of(NAME_COLUMN.getFieldDefinition(), TSHIRT_COLUMN.getFieldDefinition()))
                 .create(createDefaultConnection(), PROJECT_NAME);
         dgen.withGeneratedRows(10)
                 .insertRows();
@@ -92,7 +93,7 @@ public class QueryLookupTest extends BaseWebDriverTest
 
         // now create another list, with a lookup to the custom query
         new IntListDefinition(secondList, "Key")
-                .setFields(List.of(NAME_COLUMN,
+                .setFields(List.of(NAME_COLUMN.getFieldDefinition(),
                         new FieldDefinition("lookup", new FieldDefinition.StringLookup(getProjectName(), "lists", queryName))))
                 .create(createDefaultConnection(), PROJECT_NAME);
 
