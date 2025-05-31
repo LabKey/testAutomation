@@ -305,11 +305,11 @@ public class CustomizeViewTest extends BaseWebDriverTest
         String value = "J";
         String[] viewNames = {TRICKY_CHARACTERS + "view", "AAC", "aaa", "aad", "zzz"};
 
-        setColumns(fieldKey);
+        setColumns(LAST_NAME_COLUMN);
         for(String name : viewNames)
         {
             _customizeViewsHelper.openCustomizeViewPanel();
-            _customizeViewsHelper.addFilter(fieldKey, fieldKey, op, value);
+            _customizeViewsHelper.addFilter(new String[]{fieldKey}, fieldKey, op, value);
             _customizeViewsHelper.saveCustomView(name);
         }
 

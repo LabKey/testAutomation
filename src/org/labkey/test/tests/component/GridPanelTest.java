@@ -23,6 +23,7 @@ import org.labkey.test.components.ui.grids.QueryGrid;
 import org.labkey.test.components.ui.search.FilterExpressionPanel;
 import org.labkey.test.components.ui.search.FilterFacetedPanel;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.FieldKey;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.SampleTypeHelper;
@@ -63,11 +64,11 @@ public class GridPanelTest extends GridPanelBaseTest
     // Column names.
     private static final String FILTER_NAME_COL = "Name";
     private static final String FILTER_EXPDATE_COL = "Expiration Date";
-    private static final String FILTER_STRING_COL = TestDataGenerator.randomFieldName("Str", 0, 5);
-    private static final String FILTER_INT_COL = TestDataGenerator.randomFieldName("Int", 0, 5);
-    private static final String FILTER_EXTEND_CHAR_COL = TestDataGenerator.randomFieldName("\u0106\u00D8\u0139", 0, 5);
-    private static final String FILTER_BOOL_COL = TestDataGenerator.randomFieldName("Bool", 0, 5);
-    private static final String FILTER_DATE_COL = TestDataGenerator.randomFieldName("Date", 0, 5);
+    private static final String FILTER_STRING_COL = "Str";
+    private static final String FILTER_INT_COL = "Int";
+    private static final String FILTER_EXTEND_CHAR_COL = "\u0106\u00D8\u0139";
+    private static final String FILTER_BOOL_COL = "Bool";
+    private static final String FILTER_DATE_COL = "Date";
     private static final String FILTER_STORED_AMOUNT_COL = "Amount";
 
     // Views and columns used in the views. The views are only applied to the small sample type (Small_SampleType).
@@ -117,7 +118,7 @@ public class GridPanelTest extends GridPanelBaseTest
     @BeforeClass
     public static void setupProject() throws IOException, CommandException
     {
-        GridPanelTest init = (GridPanelTest) getCurrentTest();
+        GridPanelTest init = getCurrentTest();
 
         init.doSetup();
     }
@@ -196,7 +197,7 @@ public class GridPanelTest extends GridPanelBaseTest
         cv.saveCustomView(VIEW_FEWER_COLUMNS);
 
         log(String.format("Finally create a view named '%s' for '%s' that only has a filter.", VIEW_FILTERED_COLUMN, SMALL_SAMPLE_TYPE));
-        drtSamples.setFilter(FILTER_STRING_COL, "Contains One Of", String.format("%1$s\n%1$s%2$s", stringSetMembers.get(0), stringSetMembers.get(1)));
+        drtSamples.setFilter(FieldKey.encodePart(FILTER_STRING_COL), "Contains One Of", String.format("%1$s\n%1$s%2$s", stringSetMembers.get(0), stringSetMembers.get(1)));
         cv = drtSamples.openCustomizeGrid();
         cv.saveCustomView(VIEW_FILTERED_COLUMN);
 
