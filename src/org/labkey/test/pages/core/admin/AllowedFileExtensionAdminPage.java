@@ -1,5 +1,8 @@
 package org.labkey.test.pages.core.admin;
 
+import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
@@ -15,8 +18,14 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class AllowedFileExtensionAdminPage extends LabKeyPage<AllowedFileExtensionAdminPage.ElementCache>
 {
@@ -27,7 +36,8 @@ public class AllowedFileExtensionAdminPage extends LabKeyPage<AllowedFileExtensi
 
     public static AllowedFileExtensionAdminPage beginAt(WebDriverWrapper webDriverWrapper)
     {
-        webDriverWrapper.beginAt(WebTestHelper.buildURL("admin", "allowList"));
+        webDriverWrapper.beginAt(WebTestHelper.buildURL("admin", "allowList",
+                Map.of("type", "FileExtension")));
         return new AllowedFileExtensionAdminPage(webDriverWrapper.getDriver());
     }
 
@@ -48,6 +58,21 @@ public class AllowedFileExtensionAdminPage extends LabKeyPage<AllowedFileExtensi
 
     }
 
+    /**
+     * Clears any file extensions that are set as the only allowable names, letting users upload any filename they like.
+     *
+     * @param connection A connection object to use in the command.execute call.
+     */
+    public static void deleteAllAllowedFileExtension(Connection connection) throws IOException, CommandException
+    {
+        SimplePostCommand command = new SimplePostCommand("admin", "deleteAllValues");
+        Map<String, Object> params = new HashMap<>();
+        params.put("type", "FileExtension");
+        command.setParameters(params);
+        command.execute(connection, "/");
+    }
+
+
     public AllowedFileExtensionAdminPage setExtension(String extension)
     {
         elementCache().extension.set(extension);
@@ -56,18 +81,12 @@ public class AllowedFileExtensionAdminPage extends LabKeyPage<AllowedFileExtensi
 
     public String clickSaveExpectingError()
     {
-        String errorText;
-        elementCache().saveExtension.click();
-        errorText = waitForElement(Locators.labkeyError).getText();
-        clearCache();
-        return errorText;
+        return clickButtonExpectingError(elementCache().saveExtension);
     }
 
     public AllowedFileExtensionAdminPage clickSaveExtension()
     {
-        elementCache().saveExtension.click();
-        clearCache();
-        return this;
+        return clickButtonNoError(elementCache().saveExtension);
     }
 
     public AllowedFileExtensionAdminPage updateExtension(String oldExtension, String newExtension)
@@ -79,15 +98,25 @@ public class AllowedFileExtensionAdminPage extends LabKeyPage<AllowedFileExtensi
 
     public AllowedFileExtensionAdminPage clickSaveUpdateExtension()
     {
-        elementCache().saveUpdateExtension.click();
-        sleep(750);
-        clearCache();
-        return this;
+        return clickButtonNoError(elementCache().saveUpdateExtension);
     }
 
     public String clickUpdateExtensionExpectingError()
     {
-        elementCache().saveUpdateExtension.click();
+        return clickButtonExpectingError(elementCache().saveUpdateExtension);
+    }
+
+    private AllowedFileExtensionAdminPage clickButtonNoError(WebElement button)
+    {
+        clickAndWait(button);
+        clearCache();
+        assertNoLabKeyErrors();
+        return this;
+    }
+
+    private String clickButtonExpectingError(WebElement button)
+    {
+        clickAndWait(button);
         clearCache();
         return waitForElement(Locators.labkeyError).getText();
     }
@@ -111,20 +140,21 @@ public class AllowedFileExtensionAdminPage extends LabKeyPage<AllowedFileExtensi
 
     public AllowedFileExtensionAdminPage deleteAllExtensions(boolean acceptAlert)
     {
-        elementCache().deleteAll.click();
-
         if (acceptAlert)
         {
-            acceptAlert();
-            shortWait().withMessage("'Delete All' button should have gone away.")
-                    .until(ExpectedConditions.stalenessOf(elementCache().deleteAll));
+            doAndWaitForPageToLoad(() -> {
+                elementCache().deleteAll.click();
+                acceptAlert();
+            });
+            clearCache();
+            assertFalse("Delete All button should not be present after deleting all extensions", elementCache().deleteAll.isDisplayed());
         }
         else
         {
+            elementCache().deleteAll.click();
             cancelAlert();
+            assertTrue("Delete All button should be present", elementCache().deleteAll.isDisplayed());
         }
-
-        clearCache();
         return this;
     }
 

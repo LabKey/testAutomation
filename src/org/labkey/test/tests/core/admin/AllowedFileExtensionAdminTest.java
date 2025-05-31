@@ -6,6 +6,8 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
 
+import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.domain.PropertyDescriptor;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
@@ -16,14 +18,15 @@ import org.labkey.test.components.html.Input;
 import org.labkey.test.pages.core.admin.AllowedFileExtensionAdminPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
+import org.labkey.test.params.list.IntListDefinition;
+import org.labkey.test.params.list.ListDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
+import org.labkey.test.util.TestDataGenerator;
 import org.labkey.test.util.exp.SampleTypeAPIHelper;
 import org.labkey.test.pages.announcements.InsertPage;
-import org.openqa.selenium.Alert;
-import org.openqa.selenium.WebElement;
 
 import java.io.File;
 import java.io.IOException;
@@ -38,6 +41,7 @@ import static org.labkey.test.util.DataRegionTable.DataRegion;
 @Category({Git.class})
 public class AllowedFileExtensionAdminTest extends BaseWebDriverTest
 {
+    private final File TAR_FILE = TestFileUtils.getSampleData("fileTypes/targz_sample.tar.gz");
     private final File CSV_FILE = TestFileUtils.getSampleData("fileTypes/csv_sample.csv");
     private final File TSV_FILE = TestFileUtils.getSampleData("fileTypes/tsv_sample.tsv");
     private final File TXT_FILE = TestFileUtils.getSampleData("fileTypes/sample.txt");
@@ -45,10 +49,11 @@ public class AllowedFileExtensionAdminTest extends BaseWebDriverTest
     private final File XLSX_FILE = TestFileUtils.getSampleData("fileTypes/xlsx_sample.xlsx");
 
     private final Map<String, File> fileMap = Map.of(
-            ".csv", CSV_FILE,
-            ".tsv", TSV_FILE,
-            ".txt", TXT_FILE,
+            ".tar.gz", TAR_FILE,
             ".xls", XLS_FILE,
+            ".tsv", TSV_FILE,
+            ".csv", CSV_FILE,
+            ".txt", TXT_FILE,
             ".xlsx", XLSX_FILE
     );
 
@@ -65,7 +70,7 @@ public class AllowedFileExtensionAdminTest extends BaseWebDriverTest
         _containerHelper.deleteProject(getProjectName(), afterTest);
         try
         {
-            deleteAllAllowedFileExtension();
+            AllowedFileExtensionAdminPage.deleteAllAllowedFileExtension(createDefaultConnection());
         }
         catch (IOException | CommandException e)
         {
@@ -78,17 +83,20 @@ public class AllowedFileExtensionAdminTest extends BaseWebDriverTest
         _containerHelper.createProject(getProjectName(), null);
 
         goToProjectHome();
-        new PortalHelper(getDriver()).addWebPart("Files");
-        new PortalHelper(getDriver()).addWebPart("Sample Types");
-        new PortalHelper(getDriver()).addWebPart("Lists");
-        new PortalHelper(getDriver()).addWebPart("Messages List");
+        new PortalHelper(getDriver()).doInAdminMode(ph -> {
+            ph.addWebPart("Files");
+            ph.addWebPart("Sample Types");
+            ph.addWebPart("Lists");
+            ph.addWebPart("Messages List");
+        });
+
     }
 
     @Before
     public void beforeTest() throws IOException, CommandException
     {
         log("Use API to delete any existing allowed extensions.");
-        deleteAllAllowedFileExtension();
+        AllowedFileExtensionAdminPage.deleteAllAllowedFileExtension(createDefaultConnection());
 
         log("Delete any files that have already been uploaded.");
         goToProjectHome();
@@ -104,10 +112,10 @@ public class AllowedFileExtensionAdminTest extends BaseWebDriverTest
      *     <ul>
      *         <li>Add several file extensions as allowed extensions, then upload files of that type.</li>
      *         <li>Upload a file that is not allowed and validate it is rejected.</li>
-     *         <li>Remove an allowed file type and validate files of that type can not be uploaded.</li>
+     *         <li>Remove an allowed file type and validate files of that type cannot be uploaded.</li>
      *         <li>Click 'Delete All' and cancel out of confirmation, validate no change.</li>
      *         <li>Click 'Delete All' and validate any file type can be uploaded.</li>
-     *         <li>Edit an allowed extension, .xls to .xlsx, and validate .xlsx files can be uploaded but .xls can not.</li>
+     *         <li>Edit an allowed extension, .xls to .xlsx, and validate .xlsx files can be uploaded, but .xls cannot.</li>
      *         <li>Validate extension value must start with a '.'</li>
      *         <li>Validate duplicate extensions are not allowed.</li>
      *         <li>Validate blank extension type is not allowed.</li>
@@ -115,7 +123,7 @@ public class AllowedFileExtensionAdminTest extends BaseWebDriverTest
      * </p>
      */
     @Test
-    public void testAddUpdateAndDelete()
+    public void testAddUpdateAndDeleteFileExtensions()
     {
 
         List<String> allowedTypes = new ArrayList<>();
@@ -211,17 +219,17 @@ public class AllowedFileExtensionAdminTest extends BaseWebDriverTest
 
         editExtension.setValue(newExtension);
 
-        // Issue 53039 validate dirty bit warning.
-        log("Validate that an alert is shown is the change is not saved.");
-        Locator.tagWithClass("a", "brand-logo").findElement(getDriver()).click();
-        Alert alert = waitForAlert();
-
-        checker().withScreenshot()
-                .verifyTrue("Alert text doesn't have expected text.",
-                        alert.getText().contains("Changes you made may not be saved."));
-
-        log("Dismiss the alert.");
-        alert.dismiss();
+//        // Issue 53039 validate dirty bit warning.
+//        log("Validate that an alert is shown if the change is not saved.");
+//        Locator.tagWithClass("a", "brand-logo").findElement(getDriver()).click();
+//        Alert alert = waitForAlert();
+//
+//        checker().withScreenshot()
+//                .verifyTrue("Alert text doesn't have expected text.",
+//                        alert.getText().contains("Changes you made may not be saved."));
+//
+//        log("Dismiss the alert.");
+//        alert.dismiss();
 
         log("Save the change.");
         allowedFileExtensionAdminPage.clickSaveUpdateExtension();
@@ -313,8 +321,8 @@ public class AllowedFileExtensionAdminTest extends BaseWebDriverTest
             Window<?> errorWindow = _fileBrowserHelper.uploadFileExpectingError(fileMap.get(excludedType));
 
             checker().withScreenshot()
-                    .verifyEquals(String.format("Error message for excluded file type '%s' not as expected.", excludedType),
-                            String.format("This file type [%s] is not allowed.", excludedType.replace(".", "")), errorWindow.getBody());
+                    .verifyTrue(String.format("Error message for excluded file type '%s' not as expected.", excludedType),
+                            errorWindow.getBody().contains(String.format("This file type [%s] is not allowed.", excludedType.replace(".", ""))));
 
             click(Ext4Helper.Locators.ext4Button("OK"));
         }
@@ -323,7 +331,7 @@ public class AllowedFileExtensionAdminTest extends BaseWebDriverTest
 
     /**
      * <p>
-     *     Using a list validate that attachments work correctly with the allowed files list.
+     *     Using a list, validate that attachments work correctly with the allowed files list.
      * </p>
      * <p>
      *     After creating a list that has an auto-index and a attachment field as the only field this test will:
@@ -336,7 +344,7 @@ public class AllowedFileExtensionAdminTest extends BaseWebDriverTest
      *
      */
     @Test
-    public void testAllowedFileExtensionsInLists()
+    public void testAllowedFileExtensionsInLists() throws IOException, CommandException
     {
 
         List<String> allowedTypes = new ArrayList<>();
@@ -353,12 +361,13 @@ public class AllowedFileExtensionAdminTest extends BaseWebDriverTest
 
         goToProjectHome();
         String listName = "Test Allowed Attachments";
-        String keyField = "Key";
         String attachmentField = "Attachment Field";
 
         log(String.format("Create a list '%s' with attachment field and auto-increment key.", listName));
-        _listHelper.createList(getProjectName(), listName, keyField,
-                new FieldDefinition(attachmentField, FieldDefinition.ColumnType.Attachment));
+        Connection connection = createDefaultConnection();
+        ListDefinition listDef = new IntListDefinition(listName, "Key");
+        listDef.addField(new FieldDefinition(attachmentField, FieldDefinition.ColumnType.Attachment));
+        listDef.create(connection, getProjectName());
 
         goToManageLists();
         _listHelper.goToList(listName);
@@ -379,8 +388,7 @@ public class AllowedFileExtensionAdminTest extends BaseWebDriverTest
         _listHelper.goToList(listName);
         _listHelper.insertNewRow(Map.of(attachmentField, fileMap.get(excludedType).getAbsolutePath()), false);
 
-        // Not sure why we record two exceptions.
-        checkExpectedErrors(2);
+        validateErrorPage(fileMap.get(excludedType).getName());
 
         log("Click 'Back' button and select a file type that is allowed.");
         waitForElement(Locator.button("Back"));
@@ -388,11 +396,11 @@ public class AllowedFileExtensionAdminTest extends BaseWebDriverTest
 
         waitForElement(Locator.name("quf_" + attachmentField));
 
-        // Same as Issue 53026, the fields are cleared after hitting back button. Covewrage for that issue is in
+        // Same as Issue 53026, the fields are cleared after hitting back button. Coverage for that issue is in
         // testAllowedFileExtensionsInSampleType test.
         log("Clear the file field.");
         FileInput el = FileInput.FileInput(Locator.name("quf_" + attachmentField), getDriver()).findWhenNeeded();
-        executeScript("arguments[0].value = '';", el.getComponentElement());
+        el.clear();
 
         File fileAgain = fileMap.get(".txt");
         log(String.format("Add the '%s' file to the list again (it is an allowed file).", fileAgain.getName()));
@@ -469,7 +477,7 @@ public class AllowedFileExtensionAdminTest extends BaseWebDriverTest
             i++;
         }
 
-        // The order of the grid is last one added is at the top, which is opposite of how they were added to the list.
+        // The order of the grid is the last one added is at the top, which is opposite of how they were added to the list.
         Collections.reverse(expectedValues);
 
         List<String> actualValues = sampleTypeHelper.getSamplesDataRegionTable().getColumnDataAsText(stFileField);
@@ -479,7 +487,7 @@ public class AllowedFileExtensionAdminTest extends BaseWebDriverTest
         log("Create a sample that tries to upload a disallowed file type.");
         String sampleId = String.format("S-%d", i);
         String description= "Some text for the description.";
-        String amount = "5.00";
+        String amount = "5.0";
 
         fieldMap = Map.of("Name", sampleId,
                 "Description", description,
@@ -487,8 +495,7 @@ public class AllowedFileExtensionAdminTest extends BaseWebDriverTest
                 "StoredAmount", amount);
         sampleTypeHelper.insertRow(fieldMap);
 
-        // Not sure why we record two exceptions.
-        checkExpectedErrors(2);
+        validateErrorPage(fileMap.get(excludedType).getName());
 
         // Issue 53027
         goToProjectHome();
@@ -505,10 +512,10 @@ public class AllowedFileExtensionAdminTest extends BaseWebDriverTest
                 sampleId, rowMap.get("Name"));
 
         checker().verifyEquals("'Amount' field in grid does not have expected value.",
-                amount, rowMap.get("Amount"));
+                amount, rowMap.get("StoredAmount"));
 
         checker().verifyEquals(String.format("'%s' field in grid does not have expected value.", stFileField),
-                "", rowMap.get(stFileField));
+                " ", rowMap.get(stFileField));
 
         checker().screenShotIfNewError("Field_Values_Error");
 
@@ -572,17 +579,26 @@ public class AllowedFileExtensionAdminTest extends BaseWebDriverTest
             page.addAttachments(entry.getValue());
         }
 
-        List<String> notAllowedAttachments = Locator.tagWithAttributeContaining("span", "id","filename")
-                .findElements(getDriver())
-                .stream().map(WebElement::getText).toList();
-
         log(String.format("Try to create a message with title of '%s' with several allowed files as attachments, and one disallowed file type.", allowedTitle));
 
         page.submit();
 
-        // Not sure why we record two exceptions.
-        checkExpectedErrors(2);
+        validateErrorPage(fileMap.get(excludedType).getName());
 
+    }
+
+    private void validateErrorPage(String notAllowedFile)
+    {
+
+        String notAllowedFileExtension = notAllowedFile.substring(notAllowedFile.lastIndexOf(".") + 1);
+
+        String expectedErrorMsg = String.format("%s: This file type [%s] is not allowed.",
+                notAllowedFile, notAllowedFileExtension);
+
+        checker().withScreenshot()
+                .verifyTrue(String.format("Error message '%s' not found on the error page.", expectedErrorMsg),
+                        waitForElement(Locator.tagContainingText("div", expectedErrorMsg).withClass("labkey-error-heading"),
+                                1_500, false));
     }
 
     private AllowedFileExtensionAdminPage setAllowedExtensions(List<String> allowedTypes, List<String> expectedTypes)

@@ -20,6 +20,7 @@ import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.test.components.html.Checkbox;
+import org.labkey.test.pages.core.admin.AllowedFileExtensionAdminPage;
 import org.labkey.test.pages.core.admin.BaseSettingsPage;
 import org.labkey.test.pages.core.admin.ConfigureFileSystemAccessPage;
 import org.labkey.test.pages.core.admin.LimitActiveUserPage;
@@ -134,7 +135,7 @@ public class TestScrubber extends ExtraSiteWrapper
 
         try
         {
-            clearListOfAllowedFileExtensions();
+            AllowedFileExtensionAdminPage.deleteAllAllowedFileExtension(createDefaultConnection());
         }
         catch (Exception e)
         {
@@ -223,12 +224,4 @@ public class TestScrubber extends ExtraSiteWrapper
         }
     }
 
-    private void clearListOfAllowedFileExtensions() throws IOException, CommandException
-    {
-        SimplePostCommand command = new SimplePostCommand("admin", "deleteAllValues");
-        Map<String, Object> params = new HashMap<>();
-        params.put("type", "FileExtension");
-        command.setParameters(params);
-        command.execute(createDefaultConnection(), "/");
-    }
 }
