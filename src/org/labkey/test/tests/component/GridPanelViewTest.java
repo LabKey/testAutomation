@@ -1280,6 +1280,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
         log("Save a view, call it 'broken view'");
         grid.saveView()
                 .setViewName(viewName)
+                .setMakeShared(false)
                 .saveView();
 
         log("add created column so we can filter on it");
@@ -1296,7 +1297,6 @@ public class GridPanelViewTest extends GridPanelBaseTest
                         .filteredOn(a-> a.getText().equals("Created > 2024-05-27"))
                                 .isNotEmpty());
         grid.saveView().saveView();
-        grid.clearFilters();
 
         log("try to filter on an invalid date");
         grid.filterColumn("Created", Filter.Operator.GT, new FilterExpressionPanel.DateString("05/37/2024"));
@@ -1309,9 +1309,12 @@ public class GridPanelViewTest extends GridPanelBaseTest
 
         log("ensure the view can be edited after");
         grid.filterColumn("Created", Filter.Operator.LTE, new Date());  // filter on right now
+        grid.saveView().saveView();
 
         grid.manageViews()      // ensure the view can be deleted now
-                .deleteViewAndConfirm(viewName)
+                .revertDefaultView()
+                .deleteView(viewName)
+                .confirmDelete()
                 .dismiss("Done");
     }
 
