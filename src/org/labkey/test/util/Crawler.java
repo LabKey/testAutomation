@@ -199,6 +199,8 @@ public class Crawler
             // Tested directly in XTandemTest
             new ControllerActionId("protein", "doProteinSearch"),
             new ControllerActionId("protein", "pepSearch"), // TODO: Issue 36995: Check for SQL injection in StatementWrapper is not precise enough
+            new ControllerActionId("publish", "sampleTypePublishConfirm"), // POST-only
+            new ControllerActionId("publish", "assayPublishConfirm"), // POST-only
             new ControllerActionId("query", "printRows"), // Data region print button. 404s on "TargetedMS Runs" grid
             new ControllerActionId("reports", "streamFile"),
             new ControllerActionId("study", "manageStudyProperties"), // Intermittently triggers form dirty alert
