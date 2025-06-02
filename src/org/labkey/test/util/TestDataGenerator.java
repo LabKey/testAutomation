@@ -16,11 +16,8 @@
 package org.labkey.test.util;
 
 import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
-import org.apache.poi.xssf.streaming.SXSSFRow;
-import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
@@ -37,7 +34,6 @@ import org.labkey.remoteapi.query.SaveRowsResponse;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.remoteapi.query.Sort;
 import org.labkey.serverapi.reader.TabLoader;
-import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.data.ColumnNameMapper;
@@ -45,7 +41,6 @@ import org.labkey.test.util.data.TestDataUtils;
 import org.labkey.test.util.query.QueryApiHelper;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -54,8 +49,11 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Supplier;
@@ -313,7 +311,7 @@ public class TestDataGenerator
 
     public TestDataGenerator addDataSupplier(String columnName, Supplier<Object> supplier)
     {
-        _dataSuppliers.put(columnName, ()-> supplier.get());
+        _dataSuppliers.put(columnName, supplier);
         return this;
     }
 
@@ -400,7 +398,7 @@ public class TestDataGenerator
 
     public void generateRows(int numberOfRowsToGenerate)
     {
-        if (_columns.keySet().size() == 0)
+        if (_columns.isEmpty())
             throw new IllegalStateException("can't generate row data without column definitions");
 
         for (int i= 0; i < numberOfRowsToGenerate; i++)
@@ -444,7 +442,7 @@ public class TestDataGenerator
             case "double":
                 return ()-> randomDouble(0, 20);
             case "boolean":
-                return ()-> randomBoolean();
+                return this::randomBoolean;
             case "date":
             case "datetime":
                 return ()-> randomDateString(DateUtils.addWeeks(new Date(), -39), new Date());
@@ -582,7 +580,8 @@ public class TestDataGenerator
     public static String randomFieldName(@NotNull String part, int numStartChars, int numEndChars, @Nullable String exclusion)
     {
         // use the characters that we know are encoded in fieldKeys plus characters that we know clients are using
-        String chars = ALL_ILLEGAL_QUERY_KEY_CHARACTERS + " %()=+-[]_|*`'\":;<>?!@#^" + NON_LATIN_STRING + WIDE_PLACEHOLDER ;
+        // Issue 53197: Field name with double byte character can cause client side exception in Firefox when trying to customize grid view.
+        String chars = ALL_ILLEGAL_QUERY_KEY_CHARACTERS + " %()=+-[]_|*`'\":;<>?!@#^" + NON_LATIN_STRING;// + WIDE_PLACEHOLDER ;
 
         String randomFieldName = randomName(part, numStartChars, numEndChars, chars, exclusion);
         TestLogger.log("Generated random field name: " + randomFieldName);
@@ -670,40 +669,6 @@ public class TestDataGenerator
         return TestDataUtils.stringFromRowMaps(_rows, getFieldsForFile(), true, CSVFormat.TDF);
     }
 
-    public File writeGeneratedDataToExcel(String sheetName, String fileName) throws IOException
-    {
-        File file = new File(TestFileUtils.getTestTempDir(), fileName);
-        FileUtils.forceMkdirParent(file);
-
-        try (SXSSFWorkbook workbook = new SXSSFWorkbook(1000); // only holds 1000 rows in memory
-            FileOutputStream out = new FileOutputStream(file))
-        {
-            var sheet = workbook.createSheet(sheetName);
-
-            // write headers as row 0
-            List<String> columnNames = getFieldsForFile();
-            var headerRow = sheet.createRow(0);
-            for (int i = 0; i < columnNames.size(); i++)
-            {
-                headerRow.createCell(i).setCellValue(columnNames.get(i));
-            }
-
-            // write content
-            for (int i = 0; i < _rows.size(); i++)
-            {
-                Map<String, Object> row = _rows.get(i);
-                SXSSFRow currentRow = sheet.createRow(i + 1);
-                for (int j = 0; j < columnNames.size(); j++)
-                {
-                    currentRow.createCell(j).setCellValue(row.getOrDefault(columnNames.get(j), "").toString());
-                }
-            }
-            workbook.write(out);
-        }
-
-        return file;
-    }
-
     /**
      * Creates a file containing the contents of the current rows, formatted in TSV, CSV, or xlsx.
      * The file is written to the test temp dir
@@ -712,33 +677,43 @@ public class TestDataGenerator
      */
     public File writeData(String fileName)
     {
-        String fileExtension = fileName.toLowerCase().substring(fileName.lastIndexOf('.') + 1);
-        switch (fileExtension)
-        {
-            case "xlsx":
-            case "xls":
-                try
-                {
-                    return writeGeneratedDataToExcel("sheet1", fileName);
-                }
-                catch (IOException e)
-                {
-                    throw new RuntimeException(e);
-                }
-            case "csv":
-                return writeData(fileName, CSVFormat.DEFAULT);
-            case "tsv":
-                return writeData(fileName, CSVFormat.TDF);
-            default:
-                throw new IllegalArgumentException("Unsupported file extension: " + fileExtension);
-        }
+        return writeData(fileName, new FileRowIterator(getFieldsForFile(), _rows));
     }
 
-    public File writeData(String fileName, CSVFormat format)
+    /**
+     * Generate rows and write to file without saving in data generator
+     * @param fileName the name of the file, e.g. 'testDataFileForMyTest.tsv'
+     * @param numRows the number of rows to generate
+     * @return object pointing at created file
+     */
+    public File writeData(String fileName, int numRows)
+    {
+        return writeData(fileName, new FileRowIterator(getFieldsForFile(), this::generateRow, numRows));
+    }
+
+    /**
+     * Creates a file containing the contents of the current rows, formatted in TSV, CSV, or xlsx.
+     * The file is written to the test temp dir
+     * @param fileName  the name of the file, e.g. 'testDataFileForMyTest.tsv'
+     * @return File object pointing at created file
+     */
+    public File writeData(String fileName, Iterator<List<Object>> rowIterator)
     {
         try
         {
-            return TestDataUtils.writeRowsToFile(fileName, TestDataUtils.rowListsFromMaps(_rows, getFieldsForFile()), format);
+            String fileExtension = fileName.toLowerCase().substring(fileName.lastIndexOf('.') + 1);
+            switch (fileExtension)
+            {
+                case "xlsx":
+                case "xls":
+                    return TestDataUtils.writeRowsToExcel(fileName, rowIterator);
+                case "csv":
+                    return TestDataUtils.writeRowsToFile(fileName, rowIterator, CSVFormat.DEFAULT);
+                case "tsv":
+                    return TestDataUtils.writeRowsToFile(fileName, rowIterator, CSVFormat.TDF);
+                default:
+                    throw new IllegalArgumentException("Unsupported file extension: " + fileExtension);
+            }
         }
         catch (IOException e)
         {
@@ -914,4 +889,72 @@ public class TestDataGenerator
         return DomainUtils.doesDomainExist(containerPath, schema, queryName);
     }
 
+}
+
+class FileRowIterator implements Iterator<List<Object>>
+{
+    private final List<String> headers;
+    private final Iterator<Map<String, Object>> rows;
+
+    private boolean firstRow = true;
+
+    public FileRowIterator(@NotNull List<String> headers, @NotNull Iterator<Map<String, Object>> rows)
+    {
+        this.headers = Objects.requireNonNull(headers);
+        this.rows = Objects.requireNonNull(rows);
+    }
+
+    public FileRowIterator(@NotNull List<String> headers, @NotNull Supplier<Map<String, Object>> rowSupplier, final int rowCount)
+    {
+        this(headers, new Iterator<>()
+        {
+            int count = 0;
+
+            @Override
+            public boolean hasNext()
+            {
+                return count < rowCount;
+            }
+
+            @Override
+            public Map<String, Object> next()
+            {
+                count++;
+                return rowSupplier.get();
+            }
+        });
+    }
+
+    public FileRowIterator(@NotNull List<String> headers, @NotNull List<Map<String, Object>> rows)
+    {
+        this(headers, rows.iterator());
+    }
+
+    @Override
+    public boolean hasNext()
+    {
+        return firstRow || rows.hasNext();
+    }
+
+    @Override
+    public List<Object> next()
+    {
+        if (!hasNext())
+            throw new NoSuchElementException();
+
+        if (firstRow)
+        {
+            firstRow = false;
+            return Collections.unmodifiableList(headers);
+        }
+        else
+        {
+            return rowMapToList(rows.next());
+        }
+    }
+
+    private List<Object> rowMapToList(Map<String, Object> row)
+    {
+        return headers.stream().map(h -> row.getOrDefault(h, "")).toList();
+    }
 }
