@@ -7,14 +7,18 @@ import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.xssf.streaming.SXSSFRow;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.jetbrains.annotations.NotNull;
 import org.labkey.serverapi.reader.DataLoader;
 import org.labkey.serverapi.reader.TabLoader;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.TestDataGenerator;
+import org.labkey.test.util.TestLogger;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -24,6 +28,7 @@ import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -315,14 +320,69 @@ public class TestDataUtils
 
     public static @NotNull <T> File writeRowsToFile(String fileName, List<List<T>> rows, CSVFormat format) throws IOException
     {
+        return writeRowsToFile(fileName, rows.iterator(), format);
+    }
+
+    public static @NotNull <T> File writeRowsToFile(String fileName, Iterator<List<T>> rowIterator, CSVFormat format) throws IOException
+    {
         File file = new File(TestFileUtils.getTestTempDir(), fileName);
         FileUtils.forceMkdirParent(file);
 
+        TestLogger.log("Writing data file " + file.getAbsolutePath());
+
         try (CSVPrinter printer = new CSVPrinter(new FileWriter(file, StandardCharsets.UTF_8), format)) {
-            for (List<T> row : rows)
+            while (rowIterator.hasNext())
             {
-                printer.printRecord(row);
+                printer.printRecord(rowIterator.next());
             }
+        }
+
+        return file;
+    }
+
+    public static @NotNull <T> File writeRowsToExcel(String fileName, List<List<T>> rows) throws IOException
+    {
+        return writeRowsToExcel(fileName, rows.iterator());
+    }
+
+    public static @NotNull <T> File writeRowsToExcel(String fileName, Iterator<List<T>> rowIterator) throws IOException
+    {
+        File file = new File(TestFileUtils.getTestTempDir(), fileName);
+        FileUtils.forceMkdirParent(file);
+
+        TestLogger.log("Writing data file " + file.getAbsolutePath());
+
+        try (SXSSFWorkbook workbook = new SXSSFWorkbook(1000); // only holds 1000 rows in memory
+             FileOutputStream out = new FileOutputStream(file))
+        {
+            var sheet = workbook.createSheet("sheet1");
+
+            // write headers as row 0
+            List<T> columnNames = rowIterator.next();
+            var headerRow = sheet.createRow(0);
+            for (int col = 0; col < columnNames.size(); col++)
+            {
+                if (columnNames.get(col) instanceof String s)
+                {
+                    headerRow.createCell(col).setCellValue(s);
+                }
+                else
+                {
+                    throw new IllegalArgumentException("Expected column headers to be Strings but got " + columnNames.get(col).getClass().getSimpleName());
+                }
+            }
+
+            // write content
+            for (int rowNum = 1; rowIterator.hasNext(); rowNum++)
+            {
+                List<T> row = rowIterator.next();
+                SXSSFRow currentRow = sheet.createRow(rowNum + 1);
+                for (int col = 0; col < columnNames.size(); col++)
+                {
+                    currentRow.createCell(col).setCellValue(row.get(col).toString());
+                }
+            }
+            workbook.write(out);
         }
 
         return file;
