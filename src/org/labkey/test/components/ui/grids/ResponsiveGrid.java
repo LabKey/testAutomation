@@ -232,7 +232,16 @@ public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverCompon
         clickColumnMenuItem(columnIdentifier, "Filter...", false);
         GridFilterModal filterModal = new GridFilterModal(getDriver(), this);
         if (operator != null)
-            filterModal.selectExpressionTab().setFilter(new FilterExpressionPanel.Expression(operator, value));
+        {
+            if (operator.equals(Filter.Operator.IN) && value instanceof List<?>)
+            {
+                List<String> values = (List<String>) value;
+                filterModal.selectFacetTab().selectValue(values.get(0));
+                filterModal.selectFacetTab().checkValues(values.toArray(String[]::new));
+            }
+            else
+                filterModal.selectExpressionTab().setFilter(new FilterExpressionPanel.Expression(operator, value));
+        }
         return filterModal;
     }
 
