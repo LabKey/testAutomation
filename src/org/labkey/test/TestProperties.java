@@ -129,7 +129,7 @@ public abstract class TestProperties
 
     public static boolean isCspCheckSkipped()
     {
-        return !getBooleanProperty("webtest.cspCheck", false);
+        return !getBooleanProperty("webtest.cspCheck", true);
     }
 
     public static boolean isNewWebDriverForEachTest()

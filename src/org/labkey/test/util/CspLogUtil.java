@@ -4,9 +4,12 @@ import org.apache.commons.collections4.MultiValuedMap;
 import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
+import org.labkey.remoteapi.Connection;
 import org.labkey.serverapi.writer.PrintWriters;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestProperties;
+import org.labkey.test.pages.core.admin.logger.ManagerPage;
+import org.labkey.test.pages.core.admin.logger.ManagerPage.LoggingLevel;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -18,9 +21,12 @@ import java.nio.file.Files;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 public class CspLogUtil
 {
+    private static final String DISABLE_ENFORCE_CSP_OPTIONAL_FEATURE = "disableEnforceCsp";
+
     private static final List<String> ignoredViolations = List.of(
             "/_rstudio/",
             "/_rstudioReport/",
@@ -157,6 +163,21 @@ public class CspLogUtil
 
         lastSize = logFile.length();
         lastModified = logFile.lastModified();
+    }
+
+    public static void setEnforceCsp(Connection connection, boolean enforce)
+    {
+        Objects.requireNonNull(OptionalFeatureHelper.setOptionalFeature(connection, DISABLE_ENFORCE_CSP_OPTIONAL_FEATURE, !enforce), () -> "Unable to configure enforce CSP.");
+    }
+
+    public static void resetEnforceCsp(Connection connection)
+    {
+        OptionalFeatureHelper.resetOptionalFeature(connection, DISABLE_ENFORCE_CSP_OPTIONAL_FEATURE);
+    }
+
+    public static void debugCspWarnings()
+    {
+        Log4jUtils.setLogLevel("org.labkey.core.admin.AdminController.ContentSecurityPolicyReportAction", LoggingLevel.DEBUG);
     }
 
     public static class CspWarningDetectedException extends AssertionError
