@@ -24,6 +24,7 @@ import org.labkey.test.TestProperties;
 import org.labkey.test.pages.reports.ManageViewsPage;
 import org.labkey.test.util.CodeMirrorHelper;
 import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelper;
 import org.openqa.selenium.WebElement;
@@ -62,7 +63,7 @@ public abstract class AbstractKnitrReportTest extends BaseWebDriverTest
     @BeforeClass
     public static void initProject()
     {
-        AbstractKnitrReportTest init = (AbstractKnitrReportTest)getCurrentTest();
+        AbstractKnitrReportTest init = getCurrentTest();
         init.setupProject();
     }
 
@@ -88,7 +89,8 @@ public abstract class AbstractKnitrReportTest extends BaseWebDriverTest
         return false;
     }
 
-    protected String createKnitrReport(Path reportSourcePath, RReportHelper.ReportOption knitrOption)
+    @LogMethod
+    protected String createKnitrReport(@LoggedParam Path reportSourcePath, @LoggedParam RReportHelper.ReportOption knitrOption)
     {
         String reportSource = readReport(reportSourcePath);
 

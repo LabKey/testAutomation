@@ -1,5 +1,9 @@
 package org.labkey.test.pages.admin;
 
+import org.json.JSONObject;
+import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
@@ -9,9 +13,11 @@ import org.labkey.test.components.html.Table;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
+import org.labkey.test.util.TestLogger;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -33,6 +39,22 @@ public class ExternalSourcesPage extends LabKeyPage<ExternalSourcesPage.ElementC
     {
         webDriverWrapper.beginAt(WebTestHelper.buildURL("admin", "externalSources"));
         return new ExternalSourcesPage(webDriverWrapper.getDriver());
+    }
+
+    public void deleteAllApi()
+    {
+        SimplePostCommand postCommand = new SimplePostCommand("admin", "externalSources");
+        postCommand.setParameters(Map.of(
+            "saveAll", true,
+            "existingValues", ""));
+        try
+        {
+            postCommand.execute(createDefaultConnection(), null);
+        }
+        catch (IOException | CommandException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
     @LogMethod
