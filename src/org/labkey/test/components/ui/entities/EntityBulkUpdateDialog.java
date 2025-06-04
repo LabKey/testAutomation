@@ -16,6 +16,7 @@ import org.labkey.test.components.react.FilteringReactSelect;
 import org.labkey.test.components.react.ReactDateTimePicker;
 import org.labkey.test.components.react.ToggleButton;
 import org.labkey.test.components.ui.files.FileAttachmentContainer;
+import org.labkey.test.components.ui.files.FileUploadField;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldKey;
 import org.labkey.test.util.AuditLogHelper;
@@ -268,6 +269,11 @@ public class EntityBulkUpdateDialog extends ModalDialog
         return this;
     }
 
+    public FileUploadField getExistingFileField(String fieldIdentifier)
+    {
+        return elementCache().fileField(fieldIdentifier);
+    }
+
     /**
      * @param fieldIdentifier Identifier for the field; name ({@link String}) or fieldKey ({@link FieldKey})
      * @param checked value to set
@@ -467,6 +473,11 @@ public class EntityBulkUpdateDialog extends ModalDialog
         public FileAttachmentContainer fileUploadField(CharSequence fieldIdentifier)
         {
             return new FileAttachmentContainer(formRow(fieldIdentifier), getDriver());
+        }
+
+        public FileUploadField fileField(CharSequence fieldIdentifier)
+        {
+            return new FileUploadField(Locator.tagWithClass("div", "col-xs-12").findElementOrNull(formRow(fieldIdentifier)), getDriver());
         }
 
         final Locator textInputLoc = Locator.tagWithAttribute("input", "type", "text");
