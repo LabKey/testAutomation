@@ -21,18 +21,21 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestProperties;
+import org.labkey.test.pages.admin.ExternalSourcesPage;
 import org.labkey.test.pages.reports.ManageViewsPage;
 import org.labkey.test.util.CodeMirrorHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelper;
+import org.labkey.test.util.core.admin.CspConfigHelper;
 import org.openqa.selenium.WebElement;
 
 import java.io.File;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -70,6 +73,10 @@ public abstract class AbstractKnitrReportTest extends BaseWebDriverTest
     @LogMethod
     protected void setupProject()
     {
+        new CspConfigHelper(this).setAllowedHosts(Map.of(
+            ExternalSourcesPage.Directive.Style, List.of("https://cdn.datatables.net"),
+            ExternalSourcesPage.Directive.Font, List.of("https://mathjax.rstudio.com")));
+
         _rReportHelper.ensureRConfig(isDocker());
 
         _containerHelper.createProject(getProjectName(), "Collaboration");
