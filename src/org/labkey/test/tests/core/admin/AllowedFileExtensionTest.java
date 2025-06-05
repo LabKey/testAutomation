@@ -87,7 +87,7 @@ public class AllowedFileExtensionTest extends AllowedFileExtensionBaseTest
      * </p>
      */
     @Test
-    public void testAddUpdateAndDeleteFileExtensions()
+    public void testAllowedFileExtensionsInFileWebPart()
     {
 
         List<String> allowedTypes = new ArrayList<>();

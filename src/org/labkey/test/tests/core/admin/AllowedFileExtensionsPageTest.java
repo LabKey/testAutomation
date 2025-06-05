@@ -58,7 +58,7 @@ public class AllowedFileExtensionsPageTest extends AllowedFileExtensionBaseTest
      * </p>
      */
     @Test
-    public void testAddUpdateAndDeleteFileExtensions()
+    public void testAllowFileExtensionsAdminPage()
     {
 
         List<String> allowedTypes = new ArrayList<>(fileMap.keySet());
