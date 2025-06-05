@@ -22,8 +22,10 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestProperties;
 import org.labkey.test.pages.admin.ExternalSourcesPage;
+import org.labkey.test.pages.core.admin.logger.ManagerPage;
 import org.labkey.test.pages.reports.ManageViewsPage;
 import org.labkey.test.util.CodeMirrorHelper;
+import org.labkey.test.util.Log4jUtils;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.PortalHelper;
@@ -73,6 +75,8 @@ public abstract class AbstractKnitrReportTest extends BaseWebDriverTest
     @LogMethod
     protected void setupProject()
     {
+        CspConfigHelper.debugCspWarnings(); // TODO: temp debug on Teamcity
+        Log4jUtils.setLogLevel("org.labkey.query.reports.ReportsController", ManagerPage.LoggingLevel.DEBUG);
         new CspConfigHelper(this).setAllowedHosts(Map.of(
             ExternalSourcesPage.Directive.Style, List.of("https://cdn.datatables.net"),
             ExternalSourcesPage.Directive.Font, List.of("https://mathjax.rstudio.com")));

@@ -18,6 +18,7 @@ package org.labkey.test;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.labkey.serverapi.reader.Readers;
+import org.labkey.test.util.CspLogUtil;
 import org.labkey.test.util.TestLogger;
 import org.openqa.selenium.Dimension;
 
@@ -79,6 +80,7 @@ public abstract class TestProperties
     public static void load()
     {
         /* Force static block to run */
+        CspLogUtil.init();
     }
 
     public static boolean isTestCleanupSkipped()
