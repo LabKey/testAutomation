@@ -23,9 +23,11 @@ public class CspLogUtil
 {
     private static final List<String> ignoredViolations = List.of(
             "/_rstudio/",
-            "/_rstudioReport/",
-            "/reports-createScriptReport.view?" // Issue 53226: reports-streamFile is blocked by object-src CSP directive
+            "/_rstudioReport/"
     );
+    // Issue 53226: reports-streamFile is blocked by object-src CSP directive
+    private static final List<String> ignoredDirectives = List.of("object-src");
+
     private static final String logName = "csp-report.log";
     private static final File logFile = new File(TestFileUtils.getServerLogDir(), logName);
 
