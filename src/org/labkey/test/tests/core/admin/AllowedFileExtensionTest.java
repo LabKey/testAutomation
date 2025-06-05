@@ -7,10 +7,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
 
 import org.labkey.remoteapi.Connection;
-import org.labkey.remoteapi.domain.PropertyDescriptor;
-import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Git;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.components.html.FileInput;
@@ -24,7 +21,6 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
-import org.labkey.test.util.TestDataGenerator;
 import org.labkey.test.util.exp.SampleTypeAPIHelper;
 import org.labkey.test.pages.announcements.InsertPage;
 
@@ -39,43 +35,14 @@ import java.util.Map;
 import static org.labkey.test.util.DataRegionTable.DataRegion;
 
 @Category({Git.class})
-public class AllowedFileExtensionAdminTest extends BaseWebDriverTest
+public class AllowedFileExtensionTest extends AllowedFileExtensionBaseTest
 {
-    private final File TAR_FILE = TestFileUtils.getSampleData("fileTypes/targz_sample.tar.gz");
-    private final File CSV_FILE = TestFileUtils.getSampleData("fileTypes/csv_sample.csv");
-    private final File TSV_FILE = TestFileUtils.getSampleData("fileTypes/tsv_sample.tsv");
-    private final File TXT_FILE = TestFileUtils.getSampleData("fileTypes/sample.txt");
-    private final File XLS_FILE = TestFileUtils.getSampleData("fileTypes/xls_sample.xls");
-    private final File XLSX_FILE = TestFileUtils.getSampleData("fileTypes/xlsx_sample.xlsx");
-
-    private final Map<String, File> fileMap = Map.of(
-            ".tar.gz", TAR_FILE,
-            ".xls", XLS_FILE,
-            ".tsv", TSV_FILE,
-            ".csv", CSV_FILE,
-            ".txt", TXT_FILE,
-            ".xlsx", XLSX_FILE
-    );
 
     @BeforeClass
     public static void setupProject()
     {
-        AllowedFileExtensionAdminTest init = getCurrentTest();
+        AllowedFileExtensionTest init = getCurrentTest();
         init.doSetup();
-    }
-
-    @Override
-    protected void doCleanup(boolean afterTest)
-    {
-        _containerHelper.deleteProject(getProjectName(), afterTest);
-        try
-        {
-            AllowedFileExtensionAdminPage.deleteAllAllowedFileExtension(createDefaultConnection());
-        }
-        catch (IOException | CommandException e)
-        {
-            throw new RuntimeException(e);
-        }
     }
 
     private void doSetup()
@@ -105,7 +72,8 @@ public class AllowedFileExtensionAdminTest extends BaseWebDriverTest
 
     /**
      * <p>
-     *     Test the 'Allowed File Extension Admin' page and use the files web part as part of the validation process.
+     *     Test the 'Allowed File Extension' using the files web part as part of the validation process. This also
+     *     validates some changes made on the admin page behave as expected.
      * </p>
      * <p>
      *     This test will:
@@ -113,12 +81,8 @@ public class AllowedFileExtensionAdminTest extends BaseWebDriverTest
      *         <li>Add several file extensions as allowed extensions, then upload files of that type.</li>
      *         <li>Upload a file that is not allowed and validate it is rejected.</li>
      *         <li>Remove an allowed file type and validate files of that type cannot be uploaded.</li>
-     *         <li>Click 'Delete All' and cancel out of confirmation, validate no change.</li>
      *         <li>Click 'Delete All' and validate any file type can be uploaded.</li>
      *         <li>Edit an allowed extension, .xls to .xlsx, and validate .xlsx files can be uploaded, but .xls cannot.</li>
-     *         <li>Validate extension value must start with a '.'</li>
-     *         <li>Validate duplicate extensions are not allowed.</li>
-     *         <li>Validate blank extension type is not allowed.</li>
      *     </ul>
      * </p>
      */
@@ -163,26 +127,8 @@ public class AllowedFileExtensionAdminTest extends BaseWebDriverTest
         log(String.format("Verify upload of '%s' fails.", excludedType));
         uploadToFileWebPartExcluded(excludedTypes);
 
-        allowedFileExtensionAdminPage = goToAdminConsole().clickAllowedFileExtensions();
+        log("Click 'Delete All' and accept the confirmation dialog.");
 
-        log("Click 'Delete All' but cancel out of the confirmation dialog.");
-
-        allowedFileExtensionAdminPage.deleteAllExtensions(false);
-
-        extensions = allowedFileExtensionAdminPage.getAllowedExtensions();
-
-        checker().withScreenshot()
-                .verifyEqualsSorted("List of 'Allowed extensions' is not as expected after canceling 'Delete All'.",
-                        allowedTypes, extensions.stream().map(Input::getValue).toList());
-
-        // Issue 53039.
-        log("Validate that canceling the 'Delete All' dialog does not set the dirty bit.");
-        // Using goToProjectHome will validate navigaiton happened.
-        goToProjectHome();
-
-        log("Now, click 'Delete All' and accept the confirmation dialog.");
-
-        // Have to navigate back.
         allowedFileExtensionAdminPage = goToAdminConsole().clickAllowedFileExtensions();
 
         allowedFileExtensionAdminPage.deleteAllExtensions(true);
@@ -219,18 +165,6 @@ public class AllowedFileExtensionAdminTest extends BaseWebDriverTest
 
         editExtension.setValue(newExtension);
 
-//        // Issue 53039 validate dirty bit warning.
-//        log("Validate that an alert is shown if the change is not saved.");
-//        Locator.tagWithClass("a", "brand-logo").findElement(getDriver()).click();
-//        Alert alert = waitForAlert();
-//
-//        checker().withScreenshot()
-//                .verifyTrue("Alert text doesn't have expected text.",
-//                        alert.getText().contains("Changes you made may not be saved."));
-//
-//        log("Dismiss the alert.");
-//        alert.dismiss();
-
         log("Save the change.");
         allowedFileExtensionAdminPage.clickSaveUpdateExtension();
 
@@ -248,35 +182,6 @@ public class AllowedFileExtensionAdminTest extends BaseWebDriverTest
 
         log(String.format("Verify file with the old extension '%s' is excluded.", oldExtension));
         uploadToFileWebPartExcluded(excludedTypes);
-
-        allowedFileExtensionAdminPage = goToAdminConsole().clickAllowedFileExtensions();
-        allowedFileExtensionAdminPage.setExtension("not .an extension");
-        String expectedValue = "File extension must start with a '.'";
-        String actualValue = allowedFileExtensionAdminPage.clickSaveExpectingError();
-        checker().withScreenshot()
-                .verifyEquals("Incorrect error message for invalid extension.",
-                        expectedValue, actualValue);
-
-        allowedFileExtensionAdminPage.setExtension(allowedTypes.get(0));
-        expectedValue = String.format("'%s' already exists. Duplicate values not allowed.", allowedTypes.get(0));
-        actualValue = allowedFileExtensionAdminPage.clickSaveExpectingError();
-        checker().withScreenshot()
-                .verifyEquals("Incorrect error message for duplicate extension.",
-                        expectedValue, actualValue);
-
-        allowedFileExtensionAdminPage.setExtension(allowedTypes.get(1).toUpperCase());
-        expectedValue = String.format("'%s' already exists. Duplicate values not allowed.", allowedTypes.get(1).toUpperCase());
-        actualValue = allowedFileExtensionAdminPage.clickSaveExpectingError();
-        checker().withScreenshot()
-                .verifyEquals("Incorrect error message for duplicate extension but different case.",
-                        expectedValue, actualValue);
-
-        allowedFileExtensionAdminPage.setExtension("");
-        expectedValue = "File extension must not be blank.";
-        actualValue = allowedFileExtensionAdminPage.clickSaveExpectingError();
-        checker().withScreenshot()
-                .verifyEquals("Incorrect error message for blank extension value.",
-                        expectedValue, actualValue);
 
     }
 
@@ -601,29 +506,10 @@ public class AllowedFileExtensionAdminTest extends BaseWebDriverTest
                                 1_500, false));
     }
 
-    private AllowedFileExtensionAdminPage setAllowedExtensions(List<String> allowedTypes, List<String> expectedTypes)
-    {
-        AllowedFileExtensionAdminPage allowedFileExtensionAdminPage = goToAdminConsole().clickAllowedFileExtensions();
-
-        for (String extension : allowedTypes)
-        {
-            allowedFileExtensionAdminPage.setExtension(extension);
-            allowedFileExtensionAdminPage.clickSaveExtension();
-        }
-
-        List<Input> extensions = allowedFileExtensionAdminPage.getAllowedExtensions();
-
-        checker().withScreenshot()
-                .verifyEqualsSorted("List of 'Allowed extensions' is not as expected.",
-                        expectedTypes, extensions.stream().map(Input::getValue).toList());
-
-        return allowedFileExtensionAdminPage;
-    }
-
     @Override
     protected String getProjectName()
     {
-        return "Allowed File Extension Admin Test Project " + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
+        return "Allowed File Extension Test Project " + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
     }
 
     @Override
@@ -631,4 +517,5 @@ public class AllowedFileExtensionAdminTest extends BaseWebDriverTest
     {
         return Arrays.asList();
     }
+
 }
