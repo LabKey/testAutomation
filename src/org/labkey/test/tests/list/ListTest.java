@@ -1086,7 +1086,15 @@ public class ListTest extends BaseWebDriverTest
         region.setFilter(_listColGood.getName(), "Is Less Than", "10");
         assertTextPresent(TEST_DATA[TD_DESC][0], 1);
 
-        clickAndWait(Locator.linkContainingText(LIST_NAME_COLORS));
+        checker().verifyEquals("Incorrect filter on list", Arrays.asList(_listColGood.getLabel() + " < 10"),
+                getTexts(DataRegionTable.Locators.filterContextAction().findElements(getDriver())));
+        region = new DataRegionTable("qwp3", getDriver());
+        region.openFilterDialog(_listColGood.getName());
+
+        // Issue 52547: LKS filter dialog treats many filter types as if they are Equals
+        assertEquals("Faceted filter tab should not be selected.", "Choose Filters", getText(Locator.css(".x-tab-strip-active")));
+
+        clickButton("Cancel", 0);
     }
 
     /*  Issue 11825: Create test for "Clear Sort"
