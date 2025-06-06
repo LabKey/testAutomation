@@ -34,6 +34,7 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Data;
+import org.labkey.test.components.html.SiteNavBar;
 import org.labkey.test.pages.ImportDataPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldDefinition.ColumnType;
@@ -449,20 +450,21 @@ public class TriggerScriptTest extends BaseWebDriverTest
 
         setupDataClass();
 
-        // Check to see that the logging shows up in the Server JavaScript Console
-        // It's normally accessed via the developer menu, but we can hit the URL directly to avoid dealing with the
-        // popup window in the test
-
         // Go to the log view to start capturing messages
-        beginAt("/admin-sessionLogging.view");
-        goBack();
+        new SiteNavBar(getDriver()).clickAdminMenuItem(false, "Developer Links", "Server JavaScript Console");
+        switchToWindow(1);
+        waitForText("Message");
 
+        switchToMainWindow();
         doIndividualTriggerTest("query", goToDataClass, "Name", false, "Yes, Delete", false);
 
-        beginAt("/admin-sessionLogging.view");
+        // Go back to the console window
+        switchToWindow(1);
         waitForText("init got triggered with event: delete",
                 "exp.data: this is from the shared function",
                 "complete got triggered with event: delete");
+        getDriver().close();
+        switchToMainWindow();
     }
 
 
