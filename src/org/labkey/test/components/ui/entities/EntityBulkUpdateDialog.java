@@ -271,7 +271,7 @@ public class EntityBulkUpdateDialog extends ModalDialog
 
     public FileUploadField getExistingFileField(String fieldIdentifier)
     {
-        return elementCache().fileField(fieldIdentifier);
+        return enableAndWait(fieldIdentifier, elementCache().fileField(fieldIdentifier));
     }
 
     /**
