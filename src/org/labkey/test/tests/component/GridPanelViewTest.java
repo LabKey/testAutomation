@@ -1,5 +1,6 @@
 package org.labkey.test.tests.component;
 
+import org.assertj.core.api.Assertions;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -28,15 +29,19 @@ import org.labkey.test.util.PermissionsHelper;
 import org.labkey.test.util.SampleTypeHelper;
 import org.labkey.test.util.TestDataGenerator;
 import org.labkey.test.util.exp.SampleTypeAPIHelper;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriverException;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static org.junit.Assert.fail;
 
 @Category({Daily.class})
 public class GridPanelViewTest extends GridPanelBaseTest
@@ -1259,6 +1264,58 @@ public class GridPanelViewTest extends GridPanelBaseTest
         checker().verifyEquals("Grid columns not as expected after removing all, and adding back a field.",
                 List.of(COL_STRING1), grid.getColumnLabels());
 
+    }
+
+    // Issue 52661 Saved grid view with an invalid date filter can't be edited or deleted
+    @Test
+    public void testWarningOnInvalidDateFilter()
+    {
+        String viewName = "broken view";
+        goToProjectHome();
+
+        resetDefaultView(VIEW_DIALOG_ST, DEFAULT_COLUMNS);
+
+        QueryGrid grid = beginAtQueryGrid(VIEW_DIALOG_ST);
+
+        log("Save a view, call it 'broken view'");
+        grid.saveView()
+                .setViewName(viewName)
+                .setMakeShared(false)
+                .saveView();
+
+        log("add created column so we can filter on it");
+        grid.customizeView()
+                .selectAvailableField("Created")
+                .clickUpdateGrid();
+
+        log("filter on a valid date");
+        grid.filterColumn("Created", Filter.Operator.GT, new FilterExpressionPanel.DateString("May 27, 2024"));
+        var filterStatuses = grid.getFilterStatusValues();
+        checker().withScreenshot("Filter_Texts_Error")
+                .wrapAssertion(()-> Assertions.assertThat(filterStatuses)
+                        .hasSize(1)
+                        .filteredOn(a-> a.getText().equals("Created > 2024-05-27"))
+                                .isNotEmpty());
+        grid.saveView().saveView();
+
+        log("try to filter on an invalid date");
+        grid.filterColumn("Created", Filter.Operator.GT, new FilterExpressionPanel.DateString("05/37/2024"));
+        // don't expect the parser to get the invalid date right; current behavior won't do that
+        // also add a bogus filter on int column, verify it refuses to do it
+        var err = grid.filterColumnExpectingError("Int", Filter.Operator.GT, "XYZ");
+        checker().verifyEquals("expect error when trying to configure invalid filter",
+                "Missing filter values for: Int.", err);
+        grid.saveView().saveView();
+
+        log("ensure the view can be edited after");
+        grid.filterColumn("Created", Filter.Operator.LTE, new Date());  // filter on right now
+        grid.saveView().saveView();
+
+        grid.manageViews()      // ensure the view can be deleted now
+                .revertDefaultView()
+                .deleteView(viewName)
+                .confirmDelete()
+                .dismiss("Done");
     }
 
     /**

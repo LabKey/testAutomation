@@ -28,6 +28,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Wiki;
+import org.labkey.test.components.WebPartPanel;
 import org.labkey.test.pages.admin.ExternalSourcesPage;
 import org.labkey.test.pages.admin.ExternalSourcesPage.Directive;
 import org.labkey.test.pages.search.SearchResultsPage;
@@ -38,6 +39,7 @@ import org.labkey.test.util.WikiHelper;
 import org.labkey.test.util.search.SearchAdminAPIHelper;
 
 import java.io.File;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 
@@ -46,6 +48,8 @@ import java.util.List;
 public class WikiTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = TRICKY_CHARACTERS_FOR_PROJECT_NAMES + "WikiVerifyProject";
+    private static final String SUBFOLDER_NAME = TRICKY_CHARACTERS_FOR_PROJECT_NAMES + "WikiVerifySubfolder";
+    private static final String SUBFOLDER_PATH = String.format("%s/%s", PROJECT_NAME, SUBFOLDER_NAME);
     private static final String WIKI_PAGE_ALTTITLE = "PageBBB has HTML";
     private static final String WIKI_PAGE_WEBPART_ID = "qwp999";
     private static final String WIKI_PAGE_TITLE = "_Test Wiki " + BaseWebDriverTest.INJECT_CHARS_1;
@@ -67,6 +71,8 @@ public class WikiTest extends BaseWebDriverTest
     private void doSetup()
     {
         _containerHelper.createProject(PROJECT_NAME, null);
+        _containerHelper.enableModules(Arrays.asList("Wiki"));
+        _containerHelper.createSubfolder(PROJECT_NAME, SUBFOLDER_NAME);
         _containerHelper.enableModules(Arrays.asList("Wiki"));
 
         SearchAdminAPIHelper.pauseCrawler(getDriver());
@@ -344,7 +350,65 @@ public class WikiTest extends BaseWebDriverTest
                     .as("expect title field to be the source of the error")
                     .isEqualTo("title"));
         }
-}
+    }
+
+    // Issue 52729 Wiki webpart doesn't resolve after wiki rename with alias
+    @Test
+    public void testRenameWebPartWiki() throws Exception
+    {
+        var newLine = '\u0081';
+        var stringTerminator = '\u009c';
+        String wikiContent = "<p>This is my content " + stringTerminator + TRICKY_CHARACTERS + newLine + "</p>";
+        String wikiName = "webPartWiki";
+        String wikiTitle = "wikiRenameWebPart";
+        var cn = createDefaultConnection();
+
+        // first, create a straightforward wiki
+        var createCmd = new SimplePostCommand("wiki", "saveWiki");
+        JSONObject createJson = new JSONObject();
+        createJson.put("name", wikiName);
+        createJson.put("title", wikiTitle);
+        createJson.put("rendererType", "HTML");
+        createJson.put("body", "<p>content for wiki webpart rename</p>");
+        createJson.put("pageVersionId", -1);
+        createCmd.setJsonObject(createJson);
+        createCmd.execute(cn, SUBFOLDER_PATH);
+        SearchAdminAPIHelper.waitForIndexer();
+
+        // give the folder a wikiWebPart
+        goToProjectFolder(PROJECT_NAME, SUBFOLDER_NAME);
+        var wikiHelper = new WikiHelper(this);
+        new PortalHelper(this).addWebPart("Wiki");
+        Locator wikiWebPartLoc  = Locator.tagWithClass("div", "panel-portal")
+                .withDescendant(Locator.tagWithAttribute("h3", "title", wikiTitle))
+                .descendant(Locator.tagWithText("p", "content for wiki webpart rename"));
+
+        // configure the webPart to use the wiki created above
+        waitAndClickAndWait(Locator.linkWithText("Choose an existing page to display"));
+        var selectedPageOption = getSelectedOptionText(Locator.name("name"));
+        checker().withScreenshot("unexpected_selected_page")
+                        .wrapAssertion(()-> Assertions.assertThat(selectedPageOption)
+                                .as("expect our wiki to be selected")
+                                .startsWith(wikiName));
+        waitAndClickAndWait(Locator.id("btnSubmit"));
+
+        // verify the webpart's content is our expected content
+        checker().withScreenshot("unexpected_wiki_content")
+                .awaiting(Duration.ofSeconds(1), ()-> Assertions.assertThat(wikiWebPartLoc.existsIn(getDriver()))
+                        .as("expect our wiki content to be present")
+                        .isTrue());
+
+        // Now edit the wiki, give it a new name, with an alias
+        var wikiConfigPage = wikiHelper.manageWikiConfiguration();
+        wikiConfigPage.rename("webPartNewWikiName", true)
+                        .save();
+
+        // verify the expected content is still present
+        checker().withScreenshot("unexpected_wiki_content_after_rename")
+                .awaiting(Duration.ofSeconds(1), ()-> Assertions.assertThat(wikiWebPartLoc.existsIn(getDriver()))
+                        .as("expect our wiki content to be present")
+                        .isTrue());
+    }
 
     protected void verifyWikiPagePresent()
     {
