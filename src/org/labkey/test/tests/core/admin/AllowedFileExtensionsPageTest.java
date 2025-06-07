@@ -48,9 +48,7 @@ public class AllowedFileExtensionsPageTest extends AllowedFileExtensionBaseTest
      *     This test will:
      *     <ul>
      *         <li>Add several file extensions as allowed extensions, and validate they are listed in alphabetical order.</li>
-     *         <li>Click 'Delete All' and cancel out of confirmation, validate no change.</li>
-     *         <li>Validate no dirty bit after canceling out of 'Delete All'.</li>
-     *         <li>Edit an allowed extension, .txt to .pdf, don't save and validate the dirty bit.</li>
+     *         <li>Click 'Delete All' and cancel out of confirmation.</li>
      *         <li>Validate extension value must start with a '.'</li>
      *         <li>Validate duplicate extensions are not allowed.</li>
      *         <li>Validate blank extension type is not allowed.</li>
@@ -84,37 +82,43 @@ public class AllowedFileExtensionsPageTest extends AllowedFileExtensionBaseTest
                 .verifyEqualsSorted("List of 'Allowed extensions' is not as expected after canceling 'Delete All'.",
                         allowedTypes, extensions.stream().map(Input::getValue).toList());
 
+        // Issue 38785
+        // Selenium launches the firefox browser with a prefernce set that (basically) disabled the dirty bit.
+        // As a result, checking for the dirty bit dialog prompt, or a missing dialog, is doable until 38785 is addressed.
         // Issue 53039.
-        log("Validate that canceling the 'Delete All' dialog does not set the dirty bit.");
+//        log("Validate that canceling the 'Delete All' dialog does not set the dirty bit.");
+//
+//        // Using goToProjectHome will validate no dirty bit is set and navigation can happen.
+//        goToProjectHome();
+//
+//        allowedFileExtensionAdminPage = goToAdminConsole().clickAllowedFileExtensions();
 
-        // Using goToProjectHome will validate no dirty bit is set and navigation can happen.
-        goToProjectHome();
-
-        allowedFileExtensionAdminPage = goToAdminConsole().clickAllowedFileExtensions();
-
-        String oldExtension = ".txt";
-        String newExtension = ".pdf";
-
-        log(String.format("Edit the extension '%s' and change it to '%s'.", oldExtension, newExtension));
-
-        Input editExtension = allowedFileExtensionAdminPage.getAllowedExtension(allowedFileExtensionAdminPage.getAllowedExtensionIndex(oldExtension));
-
-        editExtension.setValue(newExtension);
-
-        // Issue 53039 validate dirty bit warning.
-        log("Validate that an alert is shown if the change is not saved.");
-        Locator.tagWithClass("a", "brand-logo").findElement(getDriver()).click();
-        Alert alert = waitForAlert();
-
-        checker().withScreenshot()
-                .verifyTrue("Alert text doesn't have expected text.",
-                        alert.getText().contains("Changes you made may not be saved."));
-
-        log("Dismiss the alert.");
-        alert.dismiss();
-
-        log("Save the change.");
-        allowedFileExtensionAdminPage.clickSaveUpdateExtension();
+        // Issue 38785
+        // Selenium launches the firefox browser with a prefernce set that (basically) disabled the dirty bit.
+        // As a result, checking for the dirty bit dialog prompt, or a missing dialog, is doable until 38785 is addressed.
+//        String oldExtension = ".txt";
+//        String newExtension = ".pdf";
+//
+//        log(String.format("Edit the extension '%s' and change it to '%s'.", oldExtension, newExtension));
+//
+//        Input editExtension = allowedFileExtensionAdminPage.getAllowedExtension(allowedFileExtensionAdminPage.getAllowedExtensionIndex(oldExtension));
+//
+//        editExtension.setValue(newExtension);
+//
+//        // Issue 53039 validate dirty bit warning.
+//        log("Validate that an alert is shown if the change is not saved.");
+//        Locator.tagWithClass("a", "brand-logo").findElement(getDriver()).click();
+//        Alert alert = waitForAlert();
+//
+//        checker().withScreenshot()
+//                .verifyTrue("Alert text doesn't have expected text.",
+//                        alert.getText().contains("Changes you made may not be saved."));
+//
+//        log("Dismiss the alert.");
+//        alert.dismiss();
+//
+//        log("Save the change.");
+//        allowedFileExtensionAdminPage.clickSaveUpdateExtension();
 
         allowedFileExtensionAdminPage.setExtension("not .an extension");
         String expectedValue = "File extension must start with a '.'";
