@@ -77,8 +77,7 @@ public class SampleTypeLimitsTest extends BaseWebDriverTest
         log("Creating the sample type of 10000 samples");
         try
         {
-            FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", SAMPLE_TYPE_NAME);
-            TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
+            TestDataGenerator dgen = new TestDataGenerator("exp.materials", SAMPLE_TYPE_NAME, getProjectName())
                     .withColumns(List.of(
                             TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                             TestDataGenerator.simpleFieldDef("label", FieldDefinition.ColumnType.String)));

@@ -110,15 +110,6 @@ public class TestDataGenerator
         _containerPath = containerPath;
     }
 
-    /**
-     * @deprecated This isn't actually a lookup
-     */
-    @Deprecated (since = "22.4")
-    public TestDataGenerator(FieldDefinition.LookupInfo lookupInfo)
-    {
-        this(lookupInfo.getSchema(), lookupInfo.getTable(), lookupInfo.getFolder());
-    }
-
     public static File writeCsvFile(List<FieldDefinition> fields, List<Map<String, Object>> entityData, String fileName) throws IOException
     {
         List<List<String>> rows = TestDataUtils.replaceColumnHeaders(
@@ -259,6 +250,11 @@ public class TestDataGenerator
     public String getQueryName()
     {
         return _queryName;
+    }
+
+    public String getContainerPath()
+    {
+        return _containerPath;
     }
 
     public void setExcludedChars(String excludedChars)
