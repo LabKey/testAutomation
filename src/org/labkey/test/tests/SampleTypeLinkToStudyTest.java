@@ -60,7 +60,7 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject() throws IOException, CommandException
     {
-        SampleTypeLinkToStudyTest init = (SampleTypeLinkToStudyTest) getCurrentTest();
+        SampleTypeLinkToStudyTest init = getCurrentTest();
         init.doSetup();
     }
 

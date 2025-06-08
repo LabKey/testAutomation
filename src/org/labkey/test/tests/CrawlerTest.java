@@ -42,7 +42,7 @@ public class CrawlerTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        CrawlerTest init = (CrawlerTest) getCurrentTest();
+        CrawlerTest init = getCurrentTest();
 
         init.doSetup();
     }

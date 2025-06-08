@@ -71,7 +71,7 @@ public class FileBrowserIconsTest extends BaseWebDriverTest
     @BeforeClass
     public static void initTest()
     {
-        FileBrowserIconsTest init = (FileBrowserIconsTest)getCurrentTest();
+        FileBrowserIconsTest init = getCurrentTest();
         init.doInit();
     }
 

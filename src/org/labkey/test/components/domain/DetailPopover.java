@@ -72,7 +72,7 @@ public class DetailPopover extends WebDriverComponent<DetailPopover.ElementCache
     @Override
     protected ElementCache elementCache()
     {
-        return (ElementCache) super.elementCache();
+        return super.elementCache();
     }
 
     protected class ElementCache extends Component<?>.ElementCache

@@ -32,7 +32,7 @@ public class AttachmentFieldTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        AttachmentFieldTest init = (AttachmentFieldTest) getCurrentTest();
+        AttachmentFieldTest init = getCurrentTest();
         init.doSetup();
     }
 

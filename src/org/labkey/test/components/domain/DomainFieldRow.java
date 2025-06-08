@@ -1760,7 +1760,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
             Locator.XPathLocator loadingOption = Locator.tagWithText("option", "Loading...");
             if (!WebDriverWrapper.waitFor(() -> !loadingOption.existsIn(select.getWrappedElement()), WAIT_FOR_JAVASCRIPT))
             {
-                throw new NoSuchElementException("Select got stuck loading: " + select.getWrappedElement().toString());
+                throw new NoSuchElementException("Select got stuck loading: " + select.getWrappedElement());
             }
             return select;
         }

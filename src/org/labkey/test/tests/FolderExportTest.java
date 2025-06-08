@@ -135,7 +135,7 @@ public class FolderExportTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject() throws IOException
     {
-        FolderExportTest init = (FolderExportTest) getCurrentTest();
+        FolderExportTest init = getCurrentTest();
 
         init.doSetup();
     }

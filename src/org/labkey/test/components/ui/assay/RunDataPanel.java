@@ -4,13 +4,9 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
-import org.labkey.test.components.html.Checkbox;
-import org.labkey.test.components.html.Input;
 import org.labkey.test.components.ui.entities.EntityBulkInsertDialog;
-import org.labkey.test.components.ui.entities.EntityInsertPanel;
 import org.labkey.test.components.ui.files.FileUploadPanel;
 import org.labkey.test.components.ui.grids.EditableGrid;
-import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -19,7 +15,6 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import java.util.Optional;
 
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
-import static org.labkey.test.components.html.Input.Input;
 
 /**
  * Exercises behavior for /internal/components/assay/RunDataPanel.tsx
@@ -154,8 +149,6 @@ public class RunDataPanel extends WebDriverComponent<RunDataPanel.ElementCache>
 
     /**
      * finds the mode select tabs, to switch between grid input and file upload
-     * @param text
-     * @return
      */
     private Locator.XPathLocator modeSelectListItem(String text)
     {

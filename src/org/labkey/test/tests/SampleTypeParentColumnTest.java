@@ -90,7 +90,7 @@ public class SampleTypeParentColumnTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        SampleTypeParentColumnTest init = (SampleTypeParentColumnTest) getCurrentTest();
+        SampleTypeParentColumnTest init = getCurrentTest();
 
         // Comment out this line (after you run once) it will make iterating on  tests much easier.
         init.doSetup();
@@ -236,7 +236,7 @@ public class SampleTypeParentColumnTest extends BaseWebDriverTest
 
         List<String> dataInTable = dataRegionTable.getColumnDataAsText(columnName);
 
-        Assert.assertTrue("There were no rows in the data region '" + dataRegionName + "'.", dataInTable.size() > 0);
+        Assert.assertTrue("There were no rows in the data region '" + dataRegionName + "'.", !dataInTable.isEmpty());
         Assert.assertTrue("The index given for the row (" + rowIndex + ") is beyond the number of rows in the data region '" + dataRegionName + "' (" + dataInTable.size() + ").", rowIndex < dataInTable.size());
 
         String cellValue = dataInTable.get(rowIndex);

@@ -65,7 +65,7 @@ public class SubfolderWebPartTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        SubfolderWebPartTest init = (SubfolderWebPartTest) getCurrentTest();
+        SubfolderWebPartTest init = getCurrentTest();
 
         init.doSetup();
     }

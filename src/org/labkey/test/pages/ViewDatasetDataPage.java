@@ -15,7 +15,6 @@
  */
 package org.labkey.test.pages;
 
-import org.labkey.test.Locators;
 import org.labkey.test.util.DataRegionTable;
 import org.openqa.selenium.WebDriver;
 

@@ -45,7 +45,7 @@ public class SampleTypeExportTest extends AbstractExportTest
     @BeforeClass
     public static void doSetup() throws Exception
     {
-        SampleTypeExportTest initTest = (SampleTypeExportTest) getCurrentTest();
+        SampleTypeExportTest initTest = getCurrentTest();
 
         initTest._containerHelper.createProject(initTest.getProjectName(), null);
 

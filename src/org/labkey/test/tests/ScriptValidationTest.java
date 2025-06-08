@@ -93,7 +93,7 @@ public class ScriptValidationTest extends BaseWebDriverTest
     @BeforeClass
     public static void initTest() throws Exception
     {
-        ScriptValidationTest init = (ScriptValidationTest) getCurrentTest();
+        ScriptValidationTest init = getCurrentTest();
         init.doSetup();
     }
 

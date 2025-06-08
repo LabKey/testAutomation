@@ -200,7 +200,7 @@ public class ClientAPITest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject() throws Exception
     {
-        ClientAPITest init = (ClientAPITest)getCurrentTest();
+        ClientAPITest init = getCurrentTest();
         init._containerHelper.createProject(OTHER_PROJECT, null);
         init._containerHelper.createProject(PROJECT_NAME, null);
 
@@ -1264,8 +1264,8 @@ public class ClientAPITest extends BaseWebDriverTest
             contentStr.append("'),");
         }
 
-        String emailScript = String.format(emailScriptTemplate, from, StringUtils.trimToEmpty(subject), recipientStr.toString(),
-                contentStr.toString());
+        String emailScript = String.format(emailScriptTemplate, from, StringUtils.trimToEmpty(subject), recipientStr,
+                contentStr);
 
         return (String)((JavascriptExecutor) getDriver()).executeAsyncScript(emailScript);
     }
@@ -1295,7 +1295,7 @@ public class ClientAPITest extends BaseWebDriverTest
     public void webDavAPITestJS()
     {
         String script = TestFileUtils.getFileContents(TestFileUtils.getSampleData("api/webdavTest.js"));
-        String scriptResult = "";
+        String scriptResult;
         try
         {
             scriptResult = (String)((JavascriptExecutor) getDriver()).executeAsyncScript(script);

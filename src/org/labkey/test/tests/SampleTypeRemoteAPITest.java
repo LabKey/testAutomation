@@ -83,7 +83,7 @@ public class SampleTypeRemoteAPITest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        SampleTypeRemoteAPITest init = (SampleTypeRemoteAPITest) getCurrentTest();
+        SampleTypeRemoteAPITest init = getCurrentTest();
 
         init.doSetup();
     }
@@ -113,8 +113,6 @@ public class SampleTypeRemoteAPITest extends BaseWebDriverTest
 
     /**
      * regression coverage for Issue 37514 - sample type lookup to exp.Files crashes when viewing the sample type
-     * @throws IOException
-     * @throws CommandException
      */
     @Test
     public void samplesWithLookupsToExpFilesTest() throws IOException, CommandException
@@ -146,8 +144,6 @@ public class SampleTypeRemoteAPITest extends BaseWebDriverTest
 
     /**
      * generates a small sample type, pastes data into it via the UI, including "Q" and "N" missing value indicators
-     * @throws IOException
-     * @throws CommandException
      */
     @Test
     public void importMissingValueSampleType() throws IOException, CommandException
@@ -339,8 +335,6 @@ public class SampleTypeRemoteAPITest extends BaseWebDriverTest
 
     /**
      * regression for https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=38436
-     * @throws CommandException
-     * @throws IOException
      */
     @Test
     @Ignore("ignoring result until issue 38436 can be resolved.")
@@ -688,7 +682,7 @@ public class SampleTypeRemoteAPITest extends BaseWebDriverTest
         SaveAssayBatchCommand saveAssayBatchCommand = new SaveAssayBatchCommand(SaveAssayBatchCommand.SAMPLE_DERIVATION_PROTOCOL, batch);
         //saveAssayBatchCommand.setAssayId(Integer.parseInt(assayIdStringValue));
         SaveAssayBatchResponse saveAssayBatchResponse;
-        saveAssayBatchResponse = saveAssayBatchCommand.execute(createDefaultConnection(), getProjectName() + "/" + samplesFolder);
+        saveAssayBatchCommand.execute(createDefaultConnection(), getProjectName() + "/" + samplesFolder);
 
         refresh();
         // add a bodyWebPart here to make viewing the sampleset easier while debugging
@@ -726,7 +720,6 @@ public class SampleTypeRemoteAPITest extends BaseWebDriverTest
     /**
      * generates data (runs) for the gpat assay used by tests in this class.
      * @param assayLookup : specifies the container, schema, name of the assay's run table
-     * @return
      */
     private List<TestDataGenerator> generateAssayData(FieldDefinition.LookupInfo assayLookup)
     {

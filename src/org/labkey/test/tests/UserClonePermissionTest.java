@@ -44,7 +44,7 @@ public class UserClonePermissionTest extends BaseWebDriverTest
     @BeforeClass
     public static void setup()
     {
-        UserClonePermissionTest initTest = (UserClonePermissionTest) getCurrentTest();
+        UserClonePermissionTest initTest = getCurrentTest();
         initTest.doSetup();
     }
 

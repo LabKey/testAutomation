@@ -25,7 +25,7 @@ import org.openqa.selenium.WebElement;
 
 public class Checkbox extends Component implements FormItem<Boolean>
 {
-    private WebElement _el;
+    private final WebElement _el;
 
     public Checkbox(WebElement element)
     {

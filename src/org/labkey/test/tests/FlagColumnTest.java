@@ -68,7 +68,7 @@ public class FlagColumnTest extends BaseWebDriverTest
     @BeforeClass
     public static void initTest()
     {
-        FlagColumnTest init = (FlagColumnTest)getCurrentTest();
+        FlagColumnTest init = getCurrentTest();
         init.doInit();
     }
 

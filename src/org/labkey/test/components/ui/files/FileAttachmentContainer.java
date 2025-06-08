@@ -49,7 +49,7 @@ public class FileAttachmentContainer extends WebDriverComponent<FileAttachmentCo
     @Override
     protected ElementCache elementCache()
     {
-        return (ElementCache) super.elementCache();
+        return super.elementCache();
     }
 
     public boolean isMulti()

@@ -161,7 +161,7 @@ public class RangeValidatorPanel extends WebDriverComponent<RangeValidatorPanel.
 
     static class RangeValidatorPanelFinder extends WebDriverComponentFinder<RangeValidatorPanel, RangeValidatorPanelFinder>
     {
-        private RangeValidatorDialog _dialog;
+        private final RangeValidatorDialog _dialog;
         private Locator.XPathLocator _baseLocator = Locator.tagWithClass("div", "domain-validator-panel");
         private String _name = null;
         private String _id = null;

@@ -8,7 +8,7 @@ import java.util.List;
 
 public class ConditionalFormatDialog extends ModalDialog
 {
-    private DomainFieldRow _row;
+    private final DomainFieldRow _row;
 
     private ConditionalFormatDialog(DomainFieldRow row, ModalDialogFinder finder)
     {

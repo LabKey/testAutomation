@@ -354,7 +354,7 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
     public String getParentAlias(int index)
     {
         expandPropertiesPanel();
-        WebDriverWrapper.waitFor(()->elementCache().parentAliases().size() > 0,
+        WebDriverWrapper.waitFor(()-> !elementCache().parentAliases().isEmpty(),
                 "There are no parent aliases visible.", 2_500);
         return elementCache().parentAlias(index).get();
     }

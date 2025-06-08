@@ -33,7 +33,6 @@ import org.labkey.test.pages.core.login.LoginConfigurePage;
 import org.labkey.test.params.login.DatabaseAuthenticationProvider;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
-import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.core.login.DbLoginUtils;
 import org.labkey.test.util.core.login.DbLoginUtils.DbLoginProperties;
 import org.labkey.test.util.core.login.DbLoginUtils.PasswordExpiration;

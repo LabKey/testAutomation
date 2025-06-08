@@ -385,7 +385,6 @@ public class PipelineStatusDetailsPage extends LabKeyPage<PipelineStatusDetailsP
 
     /**
      * Click the run link with the given name.
-     * @param runName
      */
     @LogMethod
     public void clickRunLink(@Nullable String runName)

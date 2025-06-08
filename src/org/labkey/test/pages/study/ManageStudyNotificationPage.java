@@ -1,13 +1,10 @@
 package org.labkey.test.pages.study;
 
-import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.ext4.RadioButton;
 import org.labkey.test.pages.LabKeyPage;
-import org.labkey.test.util.Ext4Helper;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 
 public class ManageStudyNotificationPage extends LabKeyPage<ManageStudyNotificationPage.ElementCache>
 {
@@ -71,6 +68,7 @@ public class ManageStudyNotificationPage extends LabKeyPage<ManageStudyNotificat
         waitForText("Manage Study Notifications");
     }
 
+    @Override
     protected ManageStudyNotificationPage.ElementCache newElementCache()
     {
         return new ManageStudyNotificationPage.ElementCache();

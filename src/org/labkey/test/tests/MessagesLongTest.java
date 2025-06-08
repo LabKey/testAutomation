@@ -155,7 +155,7 @@ public class MessagesLongTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        MessagesLongTest init = (MessagesLongTest) getCurrentTest();
+        MessagesLongTest init = getCurrentTest();
         init.doSetup();
     }
 
@@ -225,7 +225,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         log("Create message using markdown");
         clickButton( "New");
         InsertPage markdownPage = new InsertPage(getDriver());
-        assertEquals("default selection should be 'Markdown'",markdownPage.getRenderAs(), WikiHelper.WikiRendererType.MARKDOWN);
+        assertEquals("default selection should be 'Markdown'", WikiHelper.WikiRendererType.MARKDOWN, markdownPage.getRenderAs());
         markdownPage.setTitle("Markdown is a thing now")
                 .setBody("""
                         # Holy Header, Batman!
@@ -534,7 +534,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         clickButton("Yes");
 
         DataRegionTable dr = new DataRegionTable(usersDataRegion, getDriver());
-        assertEquals(dr.getDataAsText(_messageUserId, messageColumn), userSettingNew);
+        assertEquals(userSettingNew, dr.getDataAsText(_messageUserId, messageColumn));
      }
 
     private void testMemberLists()
@@ -786,7 +786,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         selectCmd.setMaxRows(-1);
         selectCmd.setContainerFilter(ContainerFilter.CurrentAndSubfolders);
         selectCmd.setColumns(Arrays.asList("*"));
-        SelectRowsResponse selectResp = null;
+        SelectRowsResponse selectResp;
 
         String[] queries = {"Announcement", "AnnouncementSubscription", "EmailOption", "ForumSubscription"};
         int[] counts = {2, 0, 5, 1};

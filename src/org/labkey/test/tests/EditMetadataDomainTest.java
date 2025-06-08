@@ -27,7 +27,7 @@ public class EditMetadataDomainTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject() throws IOException, CommandException
     {
-        EditMetadataDomainTest init = (EditMetadataDomainTest) getCurrentTest();
+        EditMetadataDomainTest init = getCurrentTest();
         init.doSetup();
     }
 

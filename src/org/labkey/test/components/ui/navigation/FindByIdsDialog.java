@@ -4,7 +4,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.Locator;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.html.RadioButton;
-import org.labkey.test.components.react.BaseReactSelect;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import java.util.List;

@@ -48,7 +48,7 @@ public class FileContentActionButtonsTest extends BaseWebDriverTest
     @BeforeClass
     public static void doSetup() throws Exception
     {
-        FileContentActionButtonsTest initTest = (FileContentActionButtonsTest)getCurrentTest();
+        FileContentActionButtonsTest initTest = getCurrentTest();
 
         initTest.doSetupSteps();
     }
@@ -250,7 +250,7 @@ public class FileContentActionButtonsTest extends BaseWebDriverTest
 
         log("Drag and Drop file '" + uploadFileName + "'");
         _fileBrowserHelper.dragDropUpload(TestFileUtils.getSampleData(uploadFolderName + "/" + uploadFileName));
-        assertEquals("File not uploaded via drag and drop", _fileBrowserHelper.getFileList().get(0), uploadFileName);
+        assertEquals("File not uploaded via drag and drop", uploadFileName, _fileBrowserHelper.getFileList().get(0));
 
     }
 

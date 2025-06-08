@@ -33,7 +33,7 @@ public class DomainFieldTypeChangeTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        DomainFieldTypeChangeTest init = (DomainFieldTypeChangeTest) getCurrentTest();
+        DomainFieldTypeChangeTest init = getCurrentTest();
         init.doSetup();
     }
 

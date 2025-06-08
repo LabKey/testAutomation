@@ -54,7 +54,7 @@ public class GetModulesResponse extends CommandResponse
         return _modules;
     }
 
-    public class Module extends ResponseObject implements Comparable<Module>
+    public static class Module extends ResponseObject implements Comparable<Module>
     {
         String _tabName;
         String _name;

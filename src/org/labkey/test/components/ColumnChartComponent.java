@@ -29,8 +29,9 @@ public class ColumnChartComponent
     public final static String TYPE_BOX = "box";
     public final static String TYPE_UNKNOWN = "unknown";
 
-    private WebDriverWrapper _driver;
-    private WebElement _divReference, _svgReference;
+    private final WebDriverWrapper _driver;
+    private final WebElement _divReference;
+    private final WebElement _svgReference;
     private String _title, _footer, _type, _plotId;
     private int _numberOfDataPoints;
 
@@ -64,7 +65,7 @@ public class ColumnChartComponent
                 }
             }
 
-            if(classValue.length() != 0)
+            if(!classValue.isEmpty())
             {
                 // Id for pie charts is different form bar and box plots.
                 _plotId = classValue.substring(0, classValue.indexOf("_"));

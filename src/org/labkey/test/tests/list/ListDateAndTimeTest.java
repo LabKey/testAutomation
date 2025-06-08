@@ -68,7 +68,7 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject() throws IOException, CommandException
     {
-        ListDateAndTimeTest init = (ListDateAndTimeTest)getCurrentTest();
+        ListDateAndTimeTest init = getCurrentTest();
         init.doSetup();
     }
 

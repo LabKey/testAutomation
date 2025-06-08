@@ -31,25 +31,25 @@ public class AssayImportOptions
         LookupList
     }
 
-    private String assayId;
-    private String cutoff1;
-    private String cutoff2;
-    private String cutoff3;
-    private String virusName;
-    private String virusId;
-    private String curveFitMethod;
-    private File metadataFile;
-    private File runFile;
-    private String[] ptids;
-    private String[] visits;
-    private String[] initialDilutions;
-    private String[] dilutionFactors;
-    private String[] methods;
-    private String[] sampleIds;
-    private String[] dates;
-    private VisitResolverType visitResolver;
-    private boolean useDefaultResolver = false;
-    private boolean resetDefaults = false;
+    private final String assayId;
+    private final String cutoff1;
+    private final String cutoff2;
+    private final String cutoff3;
+    private final String virusName;
+    private final String virusId;
+    private final String curveFitMethod;
+    private final File metadataFile;
+    private final File runFile;
+    private final String[] ptids;
+    private final String[] visits;
+    private final String[] initialDilutions;
+    private final String[] dilutionFactors;
+    private final String[] methods;
+    private final String[] sampleIds;
+    private final String[] dates;
+    private final VisitResolverType visitResolver;
+    private boolean useDefaultResolver;
+    private boolean resetDefaults;
 
     private AssayImportOptions(ImportOptionsBuilder builder)
     {

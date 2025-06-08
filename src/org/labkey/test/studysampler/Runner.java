@@ -106,7 +106,7 @@ public class Runner
 
     static class AliasFactory
     {
-        private Map<String, String> _aliases = new HashMap<>();
+        private final Map<String, String> _aliases = new HashMap<>();
 
         String get(String key)
         {
@@ -382,7 +382,7 @@ public class Runner
         {
             random = new Random(Long.parseLong(reader.readLine())); // First line is seed.
 
-            while (!(line = reader.readLine()).equals(""))
+            while (!(line = reader.readLine()).isEmpty())
             {
                 subjectIds.add(line);
                 aliaser.get(line, ANIMAL_PREFIX); // Pre-generate aliases to ensure consistency.

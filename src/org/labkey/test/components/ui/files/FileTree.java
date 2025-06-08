@@ -139,7 +139,7 @@ public class FileTree extends WebDriverComponent<FileTree.ElementCache>
      * &lt;/li>
      * </pre>
      */
-    public class SubTree extends Component<Component<?>.ElementCache>
+    public static class SubTree extends Component<Component<?>.ElementCache>
     {
         // <li> that wraps subtree
         private final WebElement _el;
@@ -327,7 +327,7 @@ public class FileTree extends WebDriverComponent<FileTree.ElementCache>
             }
 
             throw new IllegalStateException(String.format(
-                "Unable to determine row expansion state for '%s'. Possibly not a directory?: %s", getName(), _icon.toString()));
+                "Unable to determine row expansion state for '%s'. Possibly not a directory?: %s", getName(), _icon));
         }
     }
 

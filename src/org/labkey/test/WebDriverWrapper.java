@@ -1096,11 +1096,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
         //IE and Firefox have different notions of empty.
         //IE returns html for all pages even empty text...
         String text = getHtmlSource();
-        if (null == text || text.trim().length() == 0)
+        if (null == text || text.trim().isEmpty())
             return true;
 
         text = getBodyText();
-        return null == text || text.trim().length() == 0;
+        return null == text || text.trim().isEmpty();
     }
 
     /**
@@ -1209,7 +1209,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
         try
         {
-            if (relativeURL.length() == 0)
+            if (relativeURL.isEmpty())
                 logMessage = "Navigating to root";
             else
             {
@@ -2655,7 +2655,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public boolean isElementPresent(Locator loc)
     {
-        return loc.findElements(getDriver()).size() > 0;
+        return !loc.findElements(getDriver()).isEmpty();
     }
 
     public boolean isElementVisible(Locator loc)
@@ -3475,7 +3475,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         else if (text.length() < 1000 && !text.contains("\n") && !text.contains("\t"))
         {
             input.clear();
-            if (!waitFor(()-> getFormElement(input).length() == 0, 500))
+            if (!waitFor(()-> getFormElement(input).isEmpty(), 500))
             {
                 TestLogger.warn("Failed to clear input: " + input);
             }
@@ -3523,8 +3523,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
     /**
      *  puts the specified text into the clipboard, then pastes it into the specified element,
      *  or whatever has focus at the moment.
-     * @param input
-     * @param text
      */
     public void actionPaste(WebElement input, String text)
     {

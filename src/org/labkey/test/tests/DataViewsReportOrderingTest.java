@@ -52,7 +52,7 @@ public class DataViewsReportOrderingTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        DataViewsReportOrderingTest init = (DataViewsReportOrderingTest) getCurrentTest();
+        DataViewsReportOrderingTest init = getCurrentTest();
         init.doSetup();
     }
 

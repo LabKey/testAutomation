@@ -167,7 +167,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
     @BeforeClass
     public static void projectSetup()
     {
-        TriggerScriptTest init = (TriggerScriptTest) getCurrentTest();
+        TriggerScriptTest init = getCurrentTest();
         init.doSetup();
     }
 

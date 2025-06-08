@@ -2606,7 +2606,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             if (isElementPresent(Locator.id(testDivId)))
             {
                 String divHtml = (String)executeScript("return document.getElementById('" + testDivId + "').innerHTML;");
-                if (divHtml.length() > 0)
+                if (!divHtml.isEmpty())
                     return divHtml;
             }
             sleep(1000);

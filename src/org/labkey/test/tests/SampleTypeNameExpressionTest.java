@@ -101,7 +101,7 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject() throws IOException, CommandException
     {
-        SampleTypeNameExpressionTest test = (SampleTypeNameExpressionTest)getCurrentTest();
+        SampleTypeNameExpressionTest test = getCurrentTest();
         test.doSetup();
     }
 

@@ -61,8 +61,8 @@ public class SummaryStatisticsHelper
         ));
     }
 
-    private WebDriverWrapper _wrapper;
-    private boolean _hasPremiumModule;
+    private final WebDriverWrapper _wrapper;
+    private final boolean _hasPremiumModule;
 
     public SummaryStatisticsHelper(BaseWebDriverTest test)
     {

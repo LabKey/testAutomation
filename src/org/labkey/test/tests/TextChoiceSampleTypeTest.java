@@ -1,6 +1,5 @@
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -62,7 +61,7 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        TextChoiceSampleTypeTest init = (TextChoiceSampleTypeTest) getCurrentTest();
+        TextChoiceSampleTypeTest init = getCurrentTest();
         init.doSetup();
     }
 

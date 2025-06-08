@@ -85,7 +85,7 @@ public class QueryChartPanel extends WebDriverComponent<QueryChartPanel.ElementC
     @Override
     protected ElementCache elementCache()
     {
-        return (ElementCache) super.elementCache();
+        return super.elementCache();
     }
 
     protected class ElementCache extends Component<?>.ElementCache

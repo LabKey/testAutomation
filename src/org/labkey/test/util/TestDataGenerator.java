@@ -545,7 +545,7 @@ public class TestDataGenerator
      */
     public static String randomDomainName(@Nullable String namePart, int numEndChars)
     {
-        String domainName = "";
+        String domainName;
         do
         {
             String firstChar = namePart != null ? namePart.charAt(0) + "" : randomString(1, null, ALPHANUMERIC_STRING); // domain needs to start with alphanumeric char;

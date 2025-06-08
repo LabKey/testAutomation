@@ -35,7 +35,6 @@ import org.labkey.test.categories.Issues;
 import org.labkey.test.components.dumbster.EmailRecordTable;
 import org.labkey.test.components.dumbster.EmailRecordTable.EmailMessage;
 import org.labkey.test.components.html.BootstrapMenu;
-import org.labkey.test.pages.issues.BaseIssuePage;
 import org.labkey.test.pages.issues.ClosePage;
 import org.labkey.test.pages.issues.DetailsPage;
 import org.labkey.test.pages.issues.EmailPrefsPage;
@@ -112,7 +111,7 @@ public class IssuesTest extends BaseWebDriverTest
     @BeforeClass
     public static void doSetup()
     {
-        IssuesTest initTest = (IssuesTest) getCurrentTest();
+        IssuesTest initTest = getCurrentTest();
         initTest.doInit();
     }
 
@@ -840,7 +839,7 @@ public class IssuesTest extends BaseWebDriverTest
 
         // check for no default
         clickButton("New Issue");
-        assertEquals(getSelectedOptionText(Locator.name("assignedTo")), "");
+        assertEquals("", getSelectedOptionText(Locator.name("assignedTo")));
         clickButton("Cancel");
 
         /// check reader cannot be set as default user (issue 20598)
@@ -876,7 +875,7 @@ public class IssuesTest extends BaseWebDriverTest
 
         // check for no default
         clickButton("New Issue");
-        assertEquals(getSelectedOptionText(Locator.name("assignedTo")), "");
+        assertEquals("", getSelectedOptionText(Locator.name("assignedTo")));
         clickButton("Cancel");
 
         // issue 20699 - NPE b/c default assign to user deleted!

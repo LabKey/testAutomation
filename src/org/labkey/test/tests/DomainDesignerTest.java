@@ -85,7 +85,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        DomainDesignerTest init = (DomainDesignerTest) getCurrentTest();
+        DomainDesignerTest init = getCurrentTest();
 
         init.doSetup();
     }
@@ -555,7 +555,6 @@ public class DomainDesignerTest extends BaseWebDriverTest
     /**
      * confirms that the key field (called 'name') in a sampleset is not shown in the domain editor
      *
-     * @throws Exception
      */
     @Test
     public void testConfirmNameFieldFromSampleTypeNotShown() throws Exception
@@ -625,7 +624,6 @@ public class DomainDesignerTest extends BaseWebDriverTest
     /**
      * provides regression coverage for https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=38314
      *
-     * @throws Exception
      */
     @Test
     public void verifySavedFieldCannotBeRenamedReservedName() throws Exception
@@ -667,7 +665,6 @@ public class DomainDesignerTest extends BaseWebDriverTest
     /**
      * regresses issue https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=38341
      *
-     * @throws Exception
      */
     @Test
     public void showHideFieldOnDefaultGridView() throws Exception
@@ -949,7 +946,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                         new FieldDefinition("name", FieldDefinition.ColumnType.String),
                         new FieldDefinition("extraField", FieldDefinition.ColumnType.String),
                         new FieldDefinition("testCol", FieldDefinition.ColumnType.String)));
-        createResponse = dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
+        dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
 
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleType);
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
@@ -1164,7 +1161,6 @@ public class DomainDesignerTest extends BaseWebDriverTest
     /**
      * verifies that when a user marks a field 'required' (and that field already has empty values in it) they are warned
      *
-     * @throws Exception
      */
     @Test
     public void testUserWarningOnRequiredFieldWithEmptyValues() throws Exception
@@ -1203,7 +1199,6 @@ public class DomainDesignerTest extends BaseWebDriverTest
     /**
      * verifies that a field with data (and no blank values) can be marked as 'required'
      *
-     * @throws Exception
      */
     @Test
     public void testMarkFieldRequired() throws Exception
@@ -1243,7 +1238,6 @@ public class DomainDesignerTest extends BaseWebDriverTest
     /**
      * confirms that clicking the name field does not expand the field row
      *
-     * @throws Exception
      */
     @Test
     public void verifyNameFieldClickExpandsRow() throws Exception

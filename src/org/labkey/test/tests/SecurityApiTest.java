@@ -62,7 +62,7 @@ public class SecurityApiTest extends BaseWebDriverTest
     @BeforeClass
     public static void initTest() throws Exception
     {
-        SecurityApiTest init = (SecurityApiTest)getCurrentTest();
+        SecurityApiTest init = getCurrentTest();
         init.createUsers();
     }
 
