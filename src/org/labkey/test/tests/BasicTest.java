@@ -70,10 +70,10 @@ public class BasicTest extends BaseWebDriverTest
 
         // Issue 52684: Ensure Log4J is capturing startup logging from:
         assertTextPresent(
-                "Starting LabKeyServer using",  // Our "embedded" code (the primary entry point)
+                "Starting LabKeyServer ",       // Our "embedded" code (the primary entry point)
                 "Starting Servlet engine",             // Spring Boot and Tomcat
                 "Exploding module archives",           // Our "bootstrap" code (extracts modules and sets up webapp classloading)
-                "LabKey-managed modules to ensure they're recent enough to upgrade"  // Our code inside the webapp
+                "Deploying to context path"            // Our code inside the webapp
         );
     }
 
