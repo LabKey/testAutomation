@@ -247,6 +247,12 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
         clickAndWait(elementCache().creditsLink);
     }
 
+    public void clickViewPrimarySiteLogFile()
+    {
+        goToSettingsSection();
+        clickAndWait(elementCache().viewPrimarySiteLogFileLink);
+    }
+
     public void clickPostgresActivity()
     {
         goToSettingsSection();
@@ -304,6 +310,7 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
         protected WebElement systemPropertiesLink = Locator.linkContainingText("system properties").findWhenNeeded(this);
         protected WebElement viewsAndScriptingLink = Locator.linkWithText("views and scripting").findWhenNeeded(this);
         protected WebElement creditsLink = Locator.linkWithText("credits").findWhenNeeded(this);
+        protected WebElement viewPrimarySiteLogFileLink = Locator.linkWithText("view primary site log file").findWhenNeeded(this);
 
         protected WebElement postgresActivityLink = Locator.linkWithText("postgres activity").findWhenNeeded(this);
         protected WebElement postgresLocksLink = Locator.linkWithText("postgres locks").findWhenNeeded(this);

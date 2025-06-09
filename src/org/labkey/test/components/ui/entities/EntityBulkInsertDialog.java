@@ -440,16 +440,6 @@ public class EntityBulkInsertDialog extends ModalDialog
         getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable( elementCache().addRowsButton ));
     }
 
-    /**
-     * File upload fields append "-fileUpload" to the field's fieldKey
-     * @param fieldIdentifier Identifier for the field; name ({@link String}) or fieldKey ({@link FieldKey})
-     * @return FieldKey with expected suffix
-     */
-    public static FieldKey fileUploadFieldKey(CharSequence fieldIdentifier)
-    {
-        return FieldKey.fromFieldKey(FieldKey.fromName(fieldIdentifier) + "-fileUpload");
-    }
-
     @Override
     protected ElementCache newElementCache()
     {
@@ -514,7 +504,7 @@ public class EntityBulkInsertDialog extends ModalDialog
 
         public FileAttachmentContainer fileUploadField(CharSequence fieldIdentifier)
         {
-            return new FileAttachmentContainer(formRow(fileUploadFieldKey(fieldIdentifier)), getDriver());
+            return new FileAttachmentContainer(formRow(fieldIdentifier), getDriver());
         }
 
         public List<WebElement> fieldLabels()
