@@ -72,28 +72,6 @@ public class DeleteConfirmationDialog<ConfirmPage extends WebDriverWrapper> exte
                 "The delete confirmation dialog did not become ready.", 1_000);
     }
 
-    public Integer getCountFromTitle()
-    {
-        // expecting title to be like "Permanently Delete N Samples/Sources"
-        String prefix = "Permanently Delete";
-        String title = getTitle();
-        if (title != null && title.startsWith(prefix))
-        {
-            try
-            {
-                title = title.replaceFirst(prefix, "").trim();
-                String countString = title.substring(0, title.indexOf(' '));
-                return Integer.parseInt(countString);
-            }
-            catch (NumberFormatException e)
-            {
-                // If we can't parse the number, return null
-                return null;
-            }
-        }
-        return null;
-    }
-
     public void cancelDelete()
     {
         this.dismiss("Cancel");
@@ -111,13 +89,13 @@ public class DeleteConfirmationDialog<ConfirmPage extends WebDriverWrapper> exte
 
     public ConfirmPage confirmDelete(boolean skipAuditEventCheck, Integer waitSeconds)
     {
-        Integer count = getCountFromTitle();
+        Integer count = getCountFromTitle("Permanently Delete");
         String auditEventName = new AuditLogHelper(getWrapper()).getAuditEventNameFromURL();
 
         var confirmPage = _confirmationSynchronizationFunction.apply(() -> this.dismiss("Yes, Delete", waitSeconds));
 
         if (!skipAuditEventCheck && count != null && auditEventName != null)
-            verifyAuditEvents(getWrapper(), getWrapper().getCurrentContainerPath(), auditEventName, count);
+            verifyAuditEvents(getWrapper(), getWrapper().getCurrentProject(), auditEventName, count);
 
         return confirmPage;
     }

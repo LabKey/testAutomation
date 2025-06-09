@@ -84,6 +84,26 @@ public class ModalDialog extends WebDriverComponent<ModalDialog.ElementCache>
         return elementCache().body.getText();
     }
 
+    public Integer getCountFromTitle(String prefix)
+    {
+        String title = getTitle();
+        if (title != null && title.startsWith(prefix))
+        {
+            try
+            {
+                title = title.replaceFirst(prefix, "").trim();
+                String countString = title.substring(0, title.indexOf(' '));
+                return Integer.parseInt(countString);
+            }
+            catch (NumberFormatException e)
+            {
+                // If we can't parse the number, return null
+                return null;
+            }
+        }
+        return null;
+    }
+
     public void close()
     {
         elementCache().closeButton.click();
