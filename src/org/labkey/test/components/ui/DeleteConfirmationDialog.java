@@ -1,15 +1,19 @@
 package org.labkey.test.components.ui;
 
 import org.jetbrains.annotations.NotNull;
+import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.UpdatingComponent;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.html.Input;
+import org.labkey.test.util.AuditLogHelper;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
+import java.io.IOException;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -68,6 +72,28 @@ public class DeleteConfirmationDialog<ConfirmPage extends WebDriverWrapper> exte
                 "The delete confirmation dialog did not become ready.", 1_000);
     }
 
+    public Integer getCountFromTitle()
+    {
+        // expecting title to be like "Permanently Delete N Samples/Sources"
+        String prefix = "Permanently Delete";
+        String title = getTitle();
+        if (title != null && title.startsWith(prefix))
+        {
+            try
+            {
+                title = title.replaceFirst(prefix, "").trim();
+                String countString = title.substring(0, title.indexOf(' '));
+                return Integer.parseInt(countString);
+            }
+            catch (NumberFormatException e)
+            {
+                // If we can't parse the number, return null
+                return null;
+            }
+        }
+        return null;
+    }
+
     public void cancelDelete()
     {
         this.dismiss("Cancel");
@@ -75,12 +101,38 @@ public class DeleteConfirmationDialog<ConfirmPage extends WebDriverWrapper> exte
 
     public ConfirmPage confirmDelete()
     {
-        return confirmDelete(10);
+        return confirmDelete(false, 10);
     }
 
     public ConfirmPage confirmDelete(Integer waitSeconds)
     {
-        return _confirmationSynchronizationFunction.apply(() -> this.dismiss("Yes, Delete", waitSeconds));
+        return confirmDelete(false, waitSeconds);
+    }
+
+    public ConfirmPage confirmDelete(boolean skipAuditEventCheck, Integer waitSeconds)
+    {
+        Integer count = getCountFromTitle();
+        String auditEventName = new AuditLogHelper(getWrapper()).getAuditEventNameFromURL();
+
+        var confirmPage = _confirmationSynchronizationFunction.apply(() -> this.dismiss("Yes, Delete", waitSeconds));
+
+        if (!skipAuditEventCheck && count != null && auditEventName != null)
+            verifyAuditEvents(getWrapper(), getWrapper().getCurrentContainerPath(), auditEventName, count);
+
+        return confirmPage;
+    }
+
+    public static void verifyAuditEvents(WebDriverWrapper wrapper, String containerPath, String auditEventName, int entityCount)
+    {
+        try
+        {
+            AuditLogHelper auditLogHelper = new AuditLogHelper(wrapper, () -> WebTestHelper.getRemoteApiConnection(false));
+            auditLogHelper.checkAuditEventDiffCountForLastTransaction(containerPath, auditEventName, 0, entityCount);
+        }
+        catch (CommandException | IOException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
     public Boolean isDeleteEnabled()
