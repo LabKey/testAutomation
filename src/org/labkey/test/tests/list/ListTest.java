@@ -168,7 +168,7 @@ public class ListTest extends BaseWebDriverTest
     private final static ColumnType LIST3_KEY_TYPE = ColumnType.String;
     private final static String LIST3_KEY_NAME = "Owner";
     private final FieldDefinition _list3Col2 = new FieldDefinition("Wealth", ColumnType.String);
-    protected final FieldDefinition _list3Col1 = new FieldDefinition(LIST3_KEY_NAME, new StringLookup("lists", LIST3_NAME_OWNERS, "/" + PROJECT_OTHER)).setDescription("Who owns the car");
+    protected final FieldDefinition _list3Col1 = new FieldDefinition(LIST3_KEY_NAME, new StringLookup(PROJECT_OTHER, "lists", LIST3_NAME_OWNERS)).setDescription("Who owns the car");
     private final static String LIST3_COL2 = "Rich";
     private final String LIST2_DATA =
             LIST2_KEY_NAME + "\t" + LIST_KEY_NAME2_BULK  + "\t" + LIST3_KEY_NAME + "\n" +
@@ -998,7 +998,7 @@ public class ListTest extends BaseWebDriverTest
                 new FieldDefinition(dummyCol, ColumnType.String)
         };
         FieldDefinition lookupCol = new FieldDefinition(lookupField,
-                new FieldDefinition.IntLookup(lookupSchema, listName, null));
+                new FieldDefinition.IntLookup(lookupSchema, listName));
         // create the list
         _listHelper.createList(PROJECT_VERIFY, listName, keyCol, columns);
         // now add the lookup column (which references the new table)
@@ -1882,7 +1882,7 @@ public class ListTest extends BaseWebDriverTest
 
     FieldDefinition col(String folder, String name, String table)
     {
-        return new FieldDefinition(name, new FieldDefinition.IntLookup("lists", table, folder));
+        return new FieldDefinition(name, new FieldDefinition.IntLookup(folder, "lists", table));
     }
 
     FieldDefinition colURL(String name, ColumnType type, String url)

@@ -61,13 +61,6 @@ public class SelectInputOption extends WebDriverComponent<SelectInputOption.Elem
         return new ElementCache();
     }
 
-    @Override
-    protected ElementCache elementCache()
-    {
-        return super.elementCache();
-    }
-
-
     protected class ElementCache extends Component<?>.ElementCache
     {
         public Locator.XPathLocator fieldLabelLoc = Locator.tagWithClass("span", "identifying_field_label");
