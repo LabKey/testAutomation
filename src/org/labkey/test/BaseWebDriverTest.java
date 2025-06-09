@@ -237,15 +237,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     static final Set<String> urlsSeen = new HashSet<>();
 
-    public enum ProductKey
-    {
-        sampleManagerStarter,
-        sampleManagerProfessional,
-        labkeyLims,
-        limsStarter,
-        limsEnterprise,
-    }
-
     static
     {
         TestProperties.load();
@@ -2762,53 +2753,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     {
         int DEFAULT = 25;
         int minutes() default DEFAULT;
-    }
-
-    private ProductKey getProductConfiguration() throws IOException, CommandException
-    {
-        SimpleGetCommand command = new SimpleGetCommand("admin", "productFeature");
-        var resp = command.execute(createDefaultConnection(), "/");
-        String keyString = resp.getProperty("productKey");
-        if (keyString == null)
-            return null;
-
-        return ProductKey.valueOf(keyString);
-    }
-
-    protected ProductKey setProductConfigurationViaApi(@Nullable ProductKey productKey) throws IOException, CommandException
-    {
-        ProductKey existing = getProductConfiguration();
-        log("Setting product key to " + (productKey == null ? "null" : productKey));
-        Map<String, Object> parameters = new HashMap<>();
-        parameters.put("productKey", productKey == null ? null : productKey.toString());
-
-        SimplePostCommand command = new SimplePostCommand("admin", "productfeature");
-        command.setParameters(parameters);
-        var resp = command.execute(createDefaultConnection(), "/");
-        if (resp.getStatusCode() == 200)
-            log("Successfully updated product key.");
-        else
-            throw new CommandException("Failed to set product key.");
-        return existing;
-    }
-
-    /**
-     * Goes to the Admin / Product Configuration page and selects the designated product. Will navigate back to current URL.
-     *
-     */
-    protected void setProductConfiguration(ProductKey productKey)
-    {
-        if (productKey == null)
-            return;
-
-        String currentUrl = getCurrentRelativeURL();
-
-        goToAdminConsole();
-        clickAndWait(Locator.linkWithText("product configuration"));
-        RadioButton radioButton = new RadioButton.RadioButtonFinder().withValue(productKey.name()).find(getDriver());
-        radioButton.check();
-
-        beginAt(currentUrl);
     }
 
     private static final class SingletonWebDriver
