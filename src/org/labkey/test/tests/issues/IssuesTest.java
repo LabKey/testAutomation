@@ -249,18 +249,18 @@ public class IssuesTest extends BaseWebDriverTest
 
         fields.add(new FieldDefinition("MyInteger", FieldDefinition.ColumnType.Integer));
         fields.add(new FieldDefinition("MySecondInteger", FieldDefinition.ColumnType.Integer));
-        fields.add(new FieldDefinition("MyFirstString", new FieldDefinition.StringLookup("lists", getLookupTableName("issues", "MyFirstString"), null)));
+        fields.add(new FieldDefinition("MyFirstString", new FieldDefinition.StringLookup(null, "lists", getLookupTableName("issues", "MyFirstString"))));
         fields.add(new FieldDefinition("MyThirdString", FieldDefinition.ColumnType.String));
         fields.add(new FieldDefinition("MyFourthString", FieldDefinition.ColumnType.String));
-        fields.add(new FieldDefinition("MyFifthString", new FieldDefinition.StringLookup("lists", getLookupTableName("issues", "MyFifthString"), null)));
+        fields.add(new FieldDefinition("MyFifthString", new FieldDefinition.StringLookup(null, getLookupTableName("issues", "MyFifthString"))));
 
-        fields.add(new FieldDefinition("Client", new FieldDefinition.StringLookup("lists", getLookupTableName("issues", "Client"), null)));
-        fields.add(new FieldDefinition("UserStory", new FieldDefinition.StringLookup("lists", getLookupTableName("issues", "UserStory"), null)));
+        fields.add(new FieldDefinition("Client", new FieldDefinition.StringLookup(null, "lists", getLookupTableName("issues", "Client"))));
+        fields.add(new FieldDefinition("UserStory", new FieldDefinition.StringLookup(null, "lists", getLookupTableName("issues", "UserStory"))));
         fields.add(new FieldDefinition("SupportTicket", FieldDefinition.ColumnType.Integer));
         fields.add(new FieldDefinition("TeamCity", FieldDefinition.ColumnType.String).setLabel("TeamCity Note"));
-        fields.add(new FieldDefinition("Triage", new FieldDefinition.StringLookup("lists", getLookupTableName("issues", "Triage"), null)));
-        fields.add(new FieldDefinition("Note", new FieldDefinition.StringLookup("lists", getLookupTableName("issues", "Note"), null)));
-        fields.add(new FieldDefinition("Module", new FieldDefinition.StringLookup("lists", getLookupTableName("issues", "Module"), null)));
+        fields.add(new FieldDefinition("Triage", new FieldDefinition.StringLookup(null, "lists", getLookupTableName("issues", "Triage"))));
+        fields.add(new FieldDefinition("Note", new FieldDefinition.StringLookup(null, "lists", getLookupTableName("issues", "Note"))));
+        fields.add(new FieldDefinition("Module", new FieldDefinition.StringLookup(null, "lists", getLookupTableName("issues", "Module"))));
 
         clickProject(getProjectName());
         waitAndClickAndWait(Locator.linkContainingText(ISSUE_SUMMARY_WEBPART_NAME));
