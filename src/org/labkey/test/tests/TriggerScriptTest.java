@@ -34,6 +34,7 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Data;
+import org.labkey.test.components.html.SiteNavBar;
 import org.labkey.test.pages.ImportDataPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldDefinition.ColumnType;
@@ -448,7 +449,22 @@ public class TriggerScriptTest extends BaseWebDriverTest
         GoToDataUI goToDataClass = () -> goTo("Data Classes", DATA_CLASSES_NAME);
 
         setupDataClass();
+
+        // Go to the log view to start capturing messages
+        new SiteNavBar(getDriver()).clickAdminMenuItem(false, "Developer Links", "Server JavaScript Console");
+        switchToWindow(1);
+        waitForText("Message");
+
+        switchToMainWindow();
         doIndividualTriggerTest("query", goToDataClass, "Name", false, "Yes, Delete", false);
+
+        // Go back to the console window
+        switchToWindow(1);
+        waitForText("init got triggered with event: delete",
+                "exp.data: this is from the shared function",
+                "complete got triggered with event: delete");
+        getDriver().close();
+        switchToMainWindow();
     }
 
 
