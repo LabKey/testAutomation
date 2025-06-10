@@ -92,7 +92,7 @@ public class ModalDialog extends WebDriverComponent<ModalDialog.ElementCache>
             try
             {
                 title = title.replaceFirst(prefix, "").trim();
-                String countString = title.substring(0, title.indexOf(' '));
+                String countString = title.contains(" ") ? title.substring(0, title.indexOf(' ')) : title;
                 return Integer.parseInt(countString);
             }
             catch (NumberFormatException e)
