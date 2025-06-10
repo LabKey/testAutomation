@@ -108,7 +108,7 @@ public class AllowedFileExtensionTest extends AllowedFileExtensionBaseTest
         uploadToFileWebPartAllowed(excludedTypes);
 
         log(String.format("Verify upload of '%s' fails", excludedType));
-        uploadToFileWebPartExcluded(excludedTypes);
+        uploadToFileWebPartExcluded(excludedTypes, allowedTypes);
 
         AllowedFileExtensionAdminPage allowedFileExtensionAdminPage = goToAdminConsole().clickAllowedFileExtensions();
 
@@ -125,7 +125,7 @@ public class AllowedFileExtensionTest extends AllowedFileExtensionBaseTest
                         allowedTypes, extensions.stream().map(Input::getValue).toList());
 
         log(String.format("Verify upload of '%s' fails.", excludedType));
-        uploadToFileWebPartExcluded(excludedTypes);
+        uploadToFileWebPartExcluded(excludedTypes, allowedTypes);
 
         log("Click 'Delete All' and accept the confirmation dialog.");
 
@@ -181,7 +181,7 @@ public class AllowedFileExtensionTest extends AllowedFileExtensionBaseTest
         uploadToFileWebPartAllowed(excludedTypes);
 
         log(String.format("Verify file with the old extension '%s' is excluded.", oldExtension));
-        uploadToFileWebPartExcluded(excludedTypes);
+        uploadToFileWebPartExcluded(excludedTypes, allowedTypes);
 
     }
 
@@ -208,10 +208,12 @@ public class AllowedFileExtensionTest extends AllowedFileExtensionBaseTest
 
     }
 
-    private void uploadToFileWebPartExcluded(List<String> excludedTypes)
+    private void uploadToFileWebPartExcluded(List<String> excludedTypes, List<String> allowedTypes)
     {
 
         goToProjectHome();
+
+        Collections.sort(allowedTypes);
 
         for (String excludedType : excludedTypes)
         {
@@ -226,8 +228,10 @@ public class AllowedFileExtensionTest extends AllowedFileExtensionBaseTest
             Window<?> errorWindow = _fileBrowserHelper.uploadFileExpectingError(fileMap.get(excludedType));
 
             checker().withScreenshot()
-                    .verifyTrue(String.format("Error message for excluded file type '%s' not as expected.", excludedType),
-                            errorWindow.getBody().contains(String.format("This file type [%s] is not allowed.", excludedType.replace(".", ""))));
+                    .verifyEquals(String.format("Error message for excluded file type '%s' not as expected.", excludedType),
+                            String.format("This file type [%s] is not allowed. Accepted file extensions: %s",
+                                    excludedType.replace(".", ""), allowedTypes),
+                            errorWindow.getBody());
 
             click(Ext4Helper.Locators.ext4Button("OK"));
         }
@@ -293,7 +297,7 @@ public class AllowedFileExtensionTest extends AllowedFileExtensionBaseTest
         _listHelper.goToList(listName);
         _listHelper.insertNewRow(Map.of(attachmentField, fileMap.get(excludedType).getAbsolutePath()), false);
 
-        validateErrorPage(fileMap.get(excludedType).getName());
+        validateErrorPage(fileMap.get(excludedType).getName(), allowedTypes);
 
         log("Click 'Back' button and select a file type that is allowed.");
         waitForElement(Locator.button("Back"));
@@ -301,8 +305,7 @@ public class AllowedFileExtensionTest extends AllowedFileExtensionBaseTest
 
         waitForElement(Locator.name("quf_" + attachmentField));
 
-        // Same as Issue 53026, the fields are cleared after hitting back button. Coverage for that issue is in
-        // testAllowedFileExtensionsInSampleType test.
+        // Issue 53026, the fields are cleared after hitting the back button. Unlikely the issue will be fixed.
         log("Clear the file field.");
         FileInput el = FileInput.FileInput(Locator.name("quf_" + attachmentField), getDriver()).findWhenNeeded();
         el.clear();
@@ -400,7 +403,7 @@ public class AllowedFileExtensionTest extends AllowedFileExtensionBaseTest
                 "StoredAmount", amount);
         sampleTypeHelper.insertRow(fieldMap);
 
-        validateErrorPage(fileMap.get(excludedType).getName());
+        validateErrorPage(fileMap.get(excludedType).getName(), allowedTypes);
 
         // Issue 53027
         goToProjectHome();
@@ -488,17 +491,18 @@ public class AllowedFileExtensionTest extends AllowedFileExtensionBaseTest
 
         page.submit();
 
-        validateErrorPage(fileMap.get(excludedType).getName());
+        validateErrorPage(fileMap.get(excludedType).getName(), allowedTypes);
 
     }
 
-    private void validateErrorPage(String notAllowedFile)
+    private void validateErrorPage(String notAllowedFile, List<String> allowedTypes)
     {
 
+        Collections.sort(allowedTypes);
         String notAllowedFileExtension = notAllowedFile.substring(notAllowedFile.lastIndexOf(".") + 1);
 
-        String expectedErrorMsg = String.format("%s: This file type [%s] is not allowed.",
-                notAllowedFile, notAllowedFileExtension);
+        String expectedErrorMsg = String.format("%s: This file type [%s] is not allowed. Accepted file extensions: %s",
+                notAllowedFile, notAllowedFileExtension, allowedTypes);
 
         checker().withScreenshot()
                 .verifyTrue(String.format("Error message '%s' not found on the error page.", expectedErrorMsg),

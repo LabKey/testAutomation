@@ -83,8 +83,9 @@ public class AllowedFileExtensionsPageTest extends AllowedFileExtensionBaseTest
                         allowedTypes, extensions.stream().map(Input::getValue).toList());
 
         // Issue 38785
-        // Selenium launches the firefox browser with a prefernce set that (basically) disabled the dirty bit.
-        // As a result, checking for the dirty bit dialog prompt, or a missing dialog, is doable until 38785 is addressed.
+        // Selenium launches the firefox browser with a preference set that (basically) disabled the dirty bit.
+        // As a result, checking for the dirty bit dialog prompt, or a missing dialog, is not doable until issue 38785
+        // is addressed.
         // Issue 53039.
 //        log("Validate that canceling the 'Delete All' dialog does not set the dirty bit.");
 //
