@@ -1,6 +1,7 @@
 package org.labkey.test.pages.admin;
 
 import org.labkey.test.Locator;
+import org.labkey.test.Locators;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.html.Input;
@@ -57,7 +58,46 @@ public class ExternalSourcesPage extends LabKeyPage<ExternalSourcesPage.ElementC
 
         clickAndWait(elementCache().addButton);
         clearCache();
+        assertNoLabKeyErrors();
         return this;
+    }
+
+    @LogMethod (quiet = true)
+    public List<String> addHostExpectingError(@LoggedParam Directive directive, @LoggedParam String host)
+    {
+        elementCache().directiveSelect.selectOption(directive);
+        elementCache().hostInput.set(host);
+
+        clickAndWait(elementCache().addButton);
+        clearCache();
+
+        return getTexts(Locators.labkeyError.findElements(elementCache()));
+    }
+
+    public ExternalSourcesPage editHost(int rowIndex, String newHost)
+    {
+        elementCache().getExistingSourceRows().get(rowIndex).hostInput.set(newHost);
+
+        return this;
+    }
+
+    @LogMethod (quiet = true)
+    public ExternalSourcesPage saveChanges()
+    {
+        clickAndWait(elementCache().saveButton);
+        clearCache();
+
+        assertNoLabKeyErrors();
+        return this;
+    }
+
+    @LogMethod (quiet = true)
+    public List<String> saveChangesExpectingError()
+    {
+        clickAndWait(elementCache().saveButton);
+        clearCache();
+
+        return getTexts(Locators.labkeyError.findElements(elementCache()));
     }
 
     public Map<Directive, List<String>> getExistingHosts()
@@ -74,16 +114,12 @@ public class ExternalSourcesPage extends LabKeyPage<ExternalSourcesPage.ElementC
 
     public Map<Directive, List<Input>> getExistingHostInputs()
     {
-        List<WebElement> directiveColumn = elementCache().existingValuesTable.getColumnAsElement(1);
-        List<WebElement> hostsColumn = elementCache().existingValuesTable.getColumnAsElement(2);
-
         Map<Directive, List<Input>> existingHosts = new HashMap<>();
 
-        for (int i = 0; i < hostsColumn.size(); i++)
+        for (ExistingSourceRow row : elementCache().getExistingSourceRows())
         {
-            WebElement directiveInput = Locator.tag("input").findElement(directiveColumn.get(i));
-            Directive directive = Directive.valueOf(directiveInput.getDomAttribute("data-directive"));
-            Input hostInput = Input.Input(Locator.tag("input"), getDriver()).find(hostsColumn.get(i));
+            Directive directive = row.getDirective();
+            Input hostInput = row.getHostInput();
             existingHosts.computeIfAbsent(directive, d -> new ArrayList<>()).add(hostInput);
         }
 
@@ -105,6 +141,59 @@ public class ExternalSourcesPage extends LabKeyPage<ExternalSourcesPage.ElementC
 
         final WebElement existingValuesForm = Locator.name("existingValues").findWhenNeeded(this);
         final Table existingValuesTable = new Table(getDriver(), Locator.byClass("labkey-data-region-legacy").findWhenNeeded(existingValuesForm), 0);
+        private List<ExistingSourceRow> existingSourceRows;
+
+        protected List<ExistingSourceRow> getExistingSourceRows()
+        {
+            if (existingSourceRows == null)
+            {
+                existingSourceRows = existingValuesTable.getRows().stream().map(ExistingSourceRow::new).toList();
+            }
+            return existingSourceRows;
+        }
+
+        final WebElement saveButton = Locator.lkButton("Save").findWhenNeeded(existingValuesForm);
+    }
+
+    protected class ExistingSourceRow
+    {
+        private final WebElement directiveInput;
+        private final Input hostInput;
+        private final WebElement deleteButton;
+
+        private Directive directive;
+
+        ExistingSourceRow(WebElement row)
+        {
+            directiveInput = Locator.tag("input").withAttributeContaining("name", "directive").findWhenNeeded(row);
+            hostInput = Input.Input(Locator.tag("input").withAttributeContaining("name", "host"), getDriver()).findWhenNeeded(row);
+            deleteButton = Locator.lkButton().findWhenNeeded(row);
+        }
+
+        Directive getDirective()
+        {
+            if (directive == null)
+            {
+                directive = Directive.valueOf(directiveInput.getDomAttribute("data-directive"));
+            }
+            return directive;
+        }
+
+        public Input getHostInput()
+        {
+            return hostInput;
+        }
+
+        public String getHost()
+        {
+            return hostInput.get();
+        }
+
+        public void clickDelete()
+        {
+            clickAndWait(deleteButton);
+            clearCache();
+        }
     }
 
     public enum Directive implements OptionSelect.SelectOption

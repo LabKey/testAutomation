@@ -20,6 +20,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 public class CspLogUtil
 {
@@ -28,7 +29,7 @@ public class CspLogUtil
             "/_rstudioReport/"
     );
     // Issue 53226: reports-streamFile is blocked by object-src CSP directive
-    private static final List<String> ignoredDirectives = List.of("object-src");
+    private static final Set<String> ignoredDirectives = Set.of("object-src");
 
     private static final String logName = "csp-report.log";
     private static final File logFile = new File(TestFileUtils.getServerLogDir(), logName);
@@ -132,9 +133,9 @@ public class CspLogUtil
 
                 for (CspReport cspReport : cspReports)
                 {
-                    String url = cspReport.getDocument();
+                    String url = cspReport.getDocumentUri();
                     String violatedDirective = cspReport.getViolatedDirective();
-                    if (ignoredViolations.stream().anyMatch(url::contains) || ignoredDirectives.stream().anyMatch(violatedDirective::contains))
+                    if (ignoredViolations.stream().anyMatch(url::contains) || ignoredDirectives.contains(violatedDirective))
                     {
                         TestLogger.warn("Ignoring %s CSP warning on page: %s".formatted(violatedDirective, url));
                     }
@@ -205,13 +206,13 @@ public class CspLogUtil
 class CspReport
 {
     private final String _violatedDirective;
-    private final String _document;
+    private final String _documentUri;
 
     CspReport(String reportStr)
     {
         JSONObject report = new JSONObject(reportStr).getJSONObject("csp-report");
         _violatedDirective = report.getString("violated-directive");
-        _document = report.getString("document-uri");
+        _documentUri = report.getString("document-uri");
     }
 
     public String getViolatedDirective()
@@ -219,14 +220,14 @@ class CspReport
         return _violatedDirective;
     }
 
-    public String getDocument()
+    public String getDocumentUri()
     {
-        return _document;
+        return _documentUri;
     }
 
     @Override
     public String toString()
     {
-        return getViolatedDirective() + ": " + getDocument();
+        return getViolatedDirective() + ": " + getDocumentUri();
     }
 }
