@@ -1,12 +1,14 @@
 package org.labkey.test.tests.assay;
 
 import org.assertj.core.api.Assertions;
+import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.pages.ReactAssayDesignerPage;
@@ -227,6 +229,9 @@ public class AssayTransformImportUpdateTest extends BaseWebDriverTest
     @Test
     public void testCancelAsyncAssayTransformJob() throws Exception
     {
+        Assume.assumeTrue("Issue 53240: User cannot cancel pipeline job on SQL",
+                WebTestHelper.getDatabaseType() != WebTestHelper.DatabaseType.MicrosoftSQLServer);
+
         String transformCancelFile = "importCancelTransform.R";
         String importCancelTransformAssay = "importCancelTransformAssay";
         String transformContent = """
