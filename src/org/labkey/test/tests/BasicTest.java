@@ -28,6 +28,7 @@ import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Git;
 import org.labkey.test.categories.Hosting;
 import org.labkey.test.categories.Smoke;
+import org.labkey.test.pages.core.admin.ShowAdminPage;
 import org.labkey.test.util.Order;
 
 import java.util.List;
@@ -59,6 +60,21 @@ public class BasicTest extends BaseWebDriverTest
         // Check for unrecognized scripts on the orphaned scripts page (only available in dev mode)
         beginAt(WebTestHelper.buildURL("admin-sql", "orphanedScripts"));
         assertTextNotPresent("WARNING:");
+    }
+
+    @Test
+    public void testStartupLogging()
+    {
+        ShowAdminPage adminPage = goToAdminConsole();
+        adminPage.clickViewPrimarySiteLogFile();
+
+        // Issue 52684: Ensure Log4J is capturing startup logging from:
+        assertTextPresent(
+                "Starting LabKeyServer ",       // Our "embedded" code (the primary entry point)
+                "Starting Servlet engine",             // Spring Boot and Tomcat
+                "Exploding module archives",           // Our "bootstrap" code (extracts modules and sets up webapp classloading)
+                "Deploying to context path"            // Our code inside the webapp
+        );
     }
 
     @Override
