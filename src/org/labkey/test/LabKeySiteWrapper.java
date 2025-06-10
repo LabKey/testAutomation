@@ -49,6 +49,7 @@ import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.components.core.ProjectMenu;
 import org.labkey.test.components.core.login.SetPasswordForm;
 import org.labkey.test.components.dumbster.EmailRecordTable;
+import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.components.html.SiteNavBar;
 import org.labkey.test.components.ui.navigation.UserMenu;
 import org.labkey.test.pages.core.admin.CustomizeSitePage;
@@ -111,6 +112,15 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     private static final int MAX_SERVER_STARTUP_WAIT_SECONDS = TestProperties.getServerStartupTimeout();
     private static final String CLIENT_SIDE_ERROR = "Client exception detected";
     public final APIUserHelper _userHelper = new APIUserHelper(this);
+
+    public enum ProductKey
+    {
+        sampleManagerStarter,
+        sampleManagerProfessional,
+        labkeyLims,
+        limsStarter,
+        limsEnterprise,
+    }
 
     public boolean isGuestModeTest()
     {
@@ -1692,5 +1702,52 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         }
 
         return "Could not convert value '" + value + "' (" + value.getClass().getSimpleName() + ") for " + fieldType + " field '" + fieldName + "'" ;
+    }
+
+    private ProductKey getProductConfiguration() throws IOException, CommandException
+    {
+        SimpleGetCommand command = new SimpleGetCommand("admin", "productFeature");
+        var resp = command.execute(createDefaultConnection(), "/");
+        String keyString = resp.getProperty("productKey");
+        if (keyString == null)
+            return null;
+
+        return ProductKey.valueOf(keyString);
+    }
+
+    protected ProductKey setProductConfigurationViaApi(@Nullable ProductKey productKey) throws IOException, CommandException
+    {
+        ProductKey existing = getProductConfiguration();
+        log("Setting product key to " + (productKey == null ? "null" : productKey));
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("productKey", productKey == null ? null : productKey.toString());
+
+        SimplePostCommand command = new SimplePostCommand("admin", "productfeature");
+        command.setParameters(parameters);
+        var resp = command.execute(createDefaultConnection(), "/");
+        if (resp.getStatusCode() == 200)
+            log("Successfully updated product key.");
+        else
+            throw new CommandException("Failed to set product key.");
+        return existing;
+    }
+
+    /**
+     * Goes to the Admin / Product Configuration page and selects the designated product. Will navigate back to current URL.
+     *
+     */
+    protected void setProductConfiguration(ProductKey productKey)
+    {
+        if (productKey == null)
+            return;
+
+        String currentUrl = getCurrentRelativeURL();
+
+        goToAdminConsole();
+        clickAndWait(Locator.linkWithText("product configuration"));
+        RadioButton radioButton = new RadioButton.RadioButtonFinder().withValue(productKey.name()).find(getDriver());
+        radioButton.check();
+
+        beginAt(currentUrl);
     }
 }
