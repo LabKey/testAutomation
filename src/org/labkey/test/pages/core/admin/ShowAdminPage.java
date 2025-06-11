@@ -99,6 +99,13 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
         return new ShowAuditLogPage(getDriver());
     }
 
+    public AllowedFileExtensionAdminPage clickAllowedFileExtensions()
+    {
+        goToSettingsSection();
+        clickAndWait(elementCache().allowedFileExtensionLink);
+        return new AllowedFileExtensionAdminPage(getDriver());
+    }
+
     public void clickAuditLogMaintenance()
     {
         goToSettingsSection();
@@ -280,6 +287,7 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
 
         protected WebElement analyticsSettingsLink = Locator.linkWithText("analytics settings").findWhenNeeded(this);
         protected WebElement externalRedirectHostLink = Locator.linkWithText("allowed external redirect hosts").findElement(this);
+        protected WebElement allowedFileExtensionLink = Locator.linkWithText("allowed file extensions").findElement(this);
         protected WebElement auditLogLink = Locator.linkWithText("audit log").findWhenNeeded(this);
         protected WebElement auditLogMaintenanceLink = Locator.linkWithText("Audit Log Maintenance").findWhenNeeded(this);
         protected WebElement authenticationLink = Locator.linkWithText("authentication").findWhenNeeded(this);
