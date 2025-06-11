@@ -86,6 +86,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
 
     private static final String COMMENTS_FIELD = "Comments";
     private static final String COUNTRY_FIELD = "Country";
+    public static final String PEOPLE_LIST_NAME = "People";
 
     protected final PortalHelper _portalHelper = new PortalHelper(this);
 
@@ -171,6 +172,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
         init.doSetup();
     }
 
+
     protected void doSetup()
     {
         _containerHelper.createProject(getProjectName(), null);
@@ -188,10 +190,11 @@ public class TriggerScriptTest extends BaseWebDriverTest
 
         _listHelper.createList(getProjectName(), LIST_NAME, "Key", columns);
 
-        log("Create list in subfolder to prevent query validation failure");
-        _listHelper.createList(getProjectName(), "People", "Key",
+        log("Create the People list");
+        _listHelper.createList(getProjectName(), PEOPLE_LIST_NAME, "Key",
                 new FieldDefinition("Name", ColumnType.String).setDescription("Name"),
                 new FieldDefinition("Age", ColumnType.Integer).setDescription("Age"),
+                new FieldDefinition("FavoriteDateTime", ColumnType.DateAndTime).setDescription("Favorite date time. Who doesn't have one?"),
                 new FieldDefinition("Crazy", ColumnType.Boolean).setDescription("Crazy?"));
 
         importFolderFromZip(TestFileUtils.getSampleData("studies/LabkeyDemoStudy.zip"));
@@ -301,7 +304,38 @@ public class TriggerScriptTest extends BaseWebDriverTest
         cleanUpListRows();
     }
 
+    /** Issue 52098 - ensure trigger scripts have a chance to do custom type conversion with the incoming row */
     @Test
+    public void testListAPITriggerTypeConversion() throws Exception
+    {
+        Connection cn = WebTestHelper.getRemoteApiConnection();
+
+        // Insert a row with a value that can only be handled by the trigger script to make sure it gets a chance
+        // to do the conversion. People.js should strip the "RemoveMe" prefix from Age and FavoriteDateTime
+        InsertRowsCommand insCmd = new InsertRowsCommand(LIST_SCHEMA, PEOPLE_LIST_NAME);
+        insCmd.addRow(Map.of("Name", "Jimbo", "Age", "RemoveMe25", "FavoriteDateTime", "RemoveMe2025-06-11 11:42", "Crazy", "true"));
+        SaveRowsResponse insResp = insCmd.execute(cn, getProjectName());
+        List<Map<String, Object>> insertedRows = insResp.getRows();
+        Assert.assertEquals(1, insertedRows.size());
+
+        Map<String, Object> insertedRow = insertedRows.get(0);
+        Assert.assertEquals("Jimbo", insertedRow.get("Name"));
+        Assert.assertEquals(25, insertedRow.get("Age"));
+        Assert.assertEquals("2025-06-11 11:42:00.000", insertedRow.get("FavoriteDateTime"));
+
+        // Validate update too
+        UpdateRowsCommand upCmd = new UpdateRowsCommand(LIST_SCHEMA, PEOPLE_LIST_NAME);
+        insertedRow.put("Age", "RemoveMe26");
+        upCmd.addRow(insertedRow);
+        SaveRowsResponse upResp = upCmd.execute(cn, getProjectName());
+        List<Map<String, Object>> updatedRows = upResp.getRows();
+        Assert.assertEquals(1, updatedRows.size());
+
+        Map<String, Object> updatedRow = updatedRows.get(0);
+        Assert.assertEquals(26, updatedRow.get("Age"));
+    }
+
+        @Test
     public void testListAPITriggers() throws Exception
     {
         String ssn1 = "111111112";
