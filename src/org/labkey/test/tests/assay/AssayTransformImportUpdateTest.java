@@ -15,6 +15,7 @@ import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.pages.admin.UsageStatisticsPage;
 import org.labkey.test.pages.assay.AssayImportPage;
 import org.labkey.test.pages.assay.AssayRunsPage;
+import org.labkey.test.pages.core.admin.ShowAdminPage;
 import org.labkey.test.pages.pipeline.PipelineStatusDetailsPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.assay.GeneralAssayDesign;
@@ -301,6 +302,13 @@ public class AssayTransformImportUpdateTest extends BaseWebDriverTest
                     .wrapAssertion(()-> Assertions.assertThat(duration.getSeconds())
                             .as("expect cancel to interrupt the sleep in the transform script")
                             .isLessThan(20));
+
+        // verify in the server log the process termination logging
+        ShowAdminPage adminPage = goToAdminConsole();
+        adminPage.clickViewPrimarySiteLogFile();
+        assertTextPresent("Attempting to kill forked process gracefully",
+                "Finished dealing with forked process");
+
         resetErrors();
     }
 
