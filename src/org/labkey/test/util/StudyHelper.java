@@ -201,7 +201,7 @@ public class StudyHelper
             else
             {
                 String currentIds = _test.getFormElement(Locator.xpath("//textarea[@name='participantIdentifiers']"));
-                if (currentIds != null && currentIds.length() > 0)
+                if (currentIds != null && !currentIds.isEmpty())
                     _test.setFormElement(Locator.xpath("//textarea[@name='participantIdentifiers']"), currentIds + "," + csp);
             }
         }
@@ -636,11 +636,13 @@ public class StudyHelper
             this.labelColumn = labelColumn;
         }
 
+        @Override
         public String getPanelTitle()
         {
             return panelTitle;
         }
 
+        @Override
         public String getLabelColumn()
         {
             return labelColumn;

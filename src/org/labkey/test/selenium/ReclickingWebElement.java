@@ -153,9 +153,9 @@ public class ReclickingWebElement extends WebElementDecorator
     private Point getAreaCenter()
     {
         List<Integer> coords = Arrays.stream(getWrappedElement().getAttribute("coords").split(",")).map(Integer::parseInt).collect(Collectors.toList());
-        Integer minX = Integer.MAX_VALUE;
+        int minX = Integer.MAX_VALUE;
         Integer maxX = 0;
-        Integer minY = Integer.MAX_VALUE;
+        int minY = Integer.MAX_VALUE;
         Integer maxY = 0;
         for (int i = 0; i + 1 < coords.size(); i = i + 2)
         {
@@ -178,7 +178,7 @@ public class ReclickingWebElement extends WebElementDecorator
      */
     private boolean clickRowInFirefox()
     {
-        TestLogger.warn("Don't click 'tr' elements directly, use a specific child 'td': " + toString());
+        TestLogger.warn("Don't click 'tr' elements directly, use a specific child 'td': " + this);
         List<WebElement> cells = getWrappedElement().findElements(By.xpath("./td"));
         for (WebElement cell : cells)
         {

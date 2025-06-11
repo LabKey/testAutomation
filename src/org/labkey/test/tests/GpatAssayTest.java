@@ -76,7 +76,7 @@ public class GpatAssayTest extends BaseWebDriverTest
     @BeforeClass
     public static void doSetup()
     {
-        GpatAssayTest init = (GpatAssayTest) getCurrentTest();
+        GpatAssayTest init = getCurrentTest();
         init._containerHelper.createProject(init.getProjectName(), "Assay");
         init.goToProjectHome();
     }

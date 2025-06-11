@@ -134,7 +134,7 @@ public class VagrantUtil
         }
         else if (!_outputPassthrough)
         {
-            if(output.size() > 0)
+            if(!output.isEmpty())
                 TestLogger.log(output.get(output.size() -1));
         }
     }

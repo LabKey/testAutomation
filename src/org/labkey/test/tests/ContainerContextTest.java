@@ -112,7 +112,7 @@ public class ContainerContextTest extends BaseWebDriverTest
     @BeforeClass
     public static void setup() throws Exception
     {
-        ContainerContextTest init = (ContainerContextTest)getCurrentTest();
+        ContainerContextTest init = getCurrentTest();
         init.doSetup();
     }
 
@@ -556,7 +556,7 @@ public class ContainerContextTest extends BaseWebDriverTest
                     href != null && (href.contains(expectedHref)));
 
             // parent sample ID link (table has a container so URL should go to lookup's container)
-            if (parentRowIds[i] != null && !parentRowIds[i].equals("") && parentDetailsAction != null)
+            if (parentRowIds[i] != null && !parentRowIds[i].isEmpty() && parentDetailsAction != null)
             {
                 String parentTestWorkbookId = rowIdToWorkbookId.get(parentRowIds[i]);
                 String parentTestContainer = getProjectName() + "/" + parentTestWorkbookId;

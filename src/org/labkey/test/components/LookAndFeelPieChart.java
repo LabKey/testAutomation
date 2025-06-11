@@ -179,7 +179,7 @@ public class LookAndFeelPieChart extends ChartLayoutDialog<LookAndFeelPieChart.E
         Dark("Dark"),
         Alternate("Alternate");
 
-        private String _dropDownText;
+        private final String _dropDownText;
         ColorPalette(String value)
         {
             _dropDownText = value;

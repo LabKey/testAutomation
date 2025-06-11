@@ -9,7 +9,7 @@ import java.util.List;
 
 public class RegexValidatorDialog extends ModalDialog
 {
-    private DomainFieldRow _row;
+    private final DomainFieldRow _row;
 
     public RegexValidatorDialog(DomainFieldRow row, ModalDialogFinder finder)
     {

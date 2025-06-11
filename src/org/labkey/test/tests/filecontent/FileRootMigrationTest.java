@@ -47,8 +47,8 @@ public class FileRootMigrationTest extends BaseWebDriverTest
 {
     private static final String FOLDER = "subfolder";
     private final File targetFileRoot = new File(TestFileUtils.getTestTempDir(), "target");
-    private File defaultProjectFileRoot = TestFileUtils.getDefaultFileRoot(getProjectName());
-    private File defaultFolderFileRoot = TestFileUtils.getDefaultFileRoot(getProjectName() + "/" + FOLDER);
+    private final File defaultProjectFileRoot = TestFileUtils.getDefaultFileRoot(getProjectName());
+    private final File defaultFolderFileRoot = TestFileUtils.getDefaultFileRoot(getProjectName() + "/" + FOLDER);
 
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
@@ -59,7 +59,7 @@ public class FileRootMigrationTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        FileRootMigrationTest init = (FileRootMigrationTest) getCurrentTest();
+        FileRootMigrationTest init = getCurrentTest();
 
         init.doSetup();
     }

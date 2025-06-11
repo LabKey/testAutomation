@@ -227,7 +227,7 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
         return new SimpleWebDriverComponentFinder<>(getDriver(), Locators.userMenu, UserMenu::new);
     }
 
-    public class AdminMenu extends BootstrapMenu
+    public static class AdminMenu extends BootstrapMenu
     {
         protected AdminMenu(WebElement componentElement, WebDriver driver)
         {
@@ -271,7 +271,7 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
         }
     }
 
-    public class UserMenu extends BootstrapMenu
+    public static class UserMenu extends BootstrapMenu
     {
         protected UserMenu(WebElement componentElement, WebDriver driver)
         {

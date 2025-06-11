@@ -51,15 +51,18 @@ public class LabKeyExpectedConditions
      */
     public static ExpectedCondition<WebElement> presenceOfNestedElementLocatedBy(final SearchContext context, final By childLocator)
     {
-        return new ExpectedCondition<WebElement>() {
+        return new ExpectedCondition<>()
+        {
 
             @Override
-            public WebElement apply(WebDriver webDriver) {
+            public WebElement apply(WebDriver webDriver)
+            {
                 return context.findElement(childLocator);
             }
 
             @Override
-            public String toString() {
+            public String toString()
+            {
                 return String.format("visibility of element located by %s", childLocator);
             }
         };
@@ -180,7 +183,7 @@ public class LabKeyExpectedConditions
     {
         return new ExpectedCondition<>()
         {
-            ExpectedCondition<Boolean> staleCheck = ExpectedConditions.stalenessOf(element);
+            final ExpectedCondition<Boolean> staleCheck = ExpectedConditions.stalenessOf(element);
 
             @Override
             public Boolean apply(WebDriver ignored)

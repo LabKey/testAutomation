@@ -122,7 +122,7 @@ public class InlineImagesListTest extends BaseWebDriverTest
     @BeforeClass
     public static void initTest()
     {
-        InlineImagesListTest init = (InlineImagesListTest)getCurrentTest();
+        InlineImagesListTest init = getCurrentTest();
         init.doInit();
     }
 

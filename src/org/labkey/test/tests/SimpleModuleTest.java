@@ -202,7 +202,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
     @LogMethod
     public static void initTest()
     {
-        SimpleModuleTest init = (SimpleModuleTest) getCurrentTest();
+        SimpleModuleTest init = getCurrentTest();
         init.doSetup();
     }
     
@@ -1793,7 +1793,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         Map result = (Map)executeAsyncScript(vehicleMetadataJsQuery);
         Map colorColumnFields = ((List<Map>)(((Map)result.get("metaData")).get("fields"))).get(0);
 
-        assertEquals("Column fields for column 'Color' in vehicle.Vehicles query not found!", colorColumnFields.get("name"), "Color");
+        assertEquals("Column fields for column 'Color' in vehicle.Vehicles query not found!", "Color", colorColumnFields.get("name"));
 
         return (Map)((List)((Map)colorColumnFields.get("lookup")).get("filterGroups")).get(0);
     }

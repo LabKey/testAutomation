@@ -80,7 +80,7 @@ public class ParentDetailPanel extends WebDriverComponent<ParentDetailPanel.Elem
 
     public boolean hasParentTypes()
     {
-        return getParentTypes().size() > 0;
+        return !getParentTypes().isEmpty();
     }
 
     public List<String> getParentTypes()
@@ -128,7 +128,7 @@ public class ParentDetailPanel extends WebDriverComponent<ParentDetailPanel.Elem
                     else
                     {
                         List<DetailTable> detailTables = new DetailTable.DetailTableFinder(getDriver()).findAll(this);
-                        if (detailTables.size() == 0)
+                        if (detailTables.isEmpty())
                             return false;
 
                         // at least one detailtable exists, each with some value in it

@@ -25,7 +25,7 @@ public class PageFactory<P extends LabKeyPage>
 {
     private final RelativeUrl url;
     private final Function<WebDriver, P> pageConstructor;
-    private String containerPath = null;
+    private final String containerPath = null;
 
     PageFactory(RelativeUrl url, Function<WebDriver, P> pageConstructor)
     {

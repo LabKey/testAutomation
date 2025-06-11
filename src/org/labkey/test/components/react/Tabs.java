@@ -116,7 +116,7 @@ public class Tabs extends WebDriverComponent<Tabs.ElementCache>
 
         public ElementCache()
         {
-            if (!WebDriverWrapper.waitFor(() -> findAllTabs().size() > 0, 10_000))
+            if (!WebDriverWrapper.waitFor(() -> !findAllTabs().isEmpty(), 10_000))
             {
                 tabLoc.findElement(this); // Should trigger a 'NoSuchElementException'
             }

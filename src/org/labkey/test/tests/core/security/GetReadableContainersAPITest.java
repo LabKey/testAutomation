@@ -47,7 +47,7 @@ public class GetReadableContainersAPITest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        GetReadableContainersAPITest init = (GetReadableContainersAPITest) getCurrentTest();
+        GetReadableContainersAPITest init = getCurrentTest();
 
         init.doSetup();
     }
@@ -202,7 +202,7 @@ public class GetReadableContainersAPITest extends BaseWebDriverTest
         }
         else
         {
-            throw new RuntimeException("Did not find errors in response: \n" + response.toString());
+            throw new RuntimeException("Did not find errors in response: \n" + response);
         }
     }
 

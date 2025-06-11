@@ -23,7 +23,6 @@ import org.labkey.test.Locators;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.util.Maps;
-import org.labkey.test.util.PasswordUtil;
 
 import static org.junit.Assert.assertEquals;
 

@@ -54,7 +54,6 @@ public class SampleTypeAPIHelper
 
     /**
      * A set of FieldDefinition provided for convenience
-     * @return
      */
     public static List<FieldDefinition> sampleTypeTestFields(boolean withFileField)
     {
@@ -126,7 +125,6 @@ public class SampleTypeAPIHelper
      * @param sampleTypeName The name of the sample type.
      * @param sampleNames A list of sample name you want to get the id's for.
      * @return A map of containing sample names and their corresponding row ids.
-     * @throws Exception Because this uses the Select Rows Command it can throw a few different type of exceptions.
      */
     public static Map<String, Integer> getRowIdsForSamples(String containerPath, String sampleTypeName, List<String> sampleNames) throws IOException, CommandException
     {

@@ -151,7 +151,7 @@ public class RegexValidatorPanel extends WebDriverComponent<RegexValidatorPanel.
 
     static class RegexValidatorPanelFinder extends WebDriverComponentFinder<RegexValidatorPanel, RegexValidatorPanelFinder>
     {
-        private RegexValidatorDialog _dialog;
+        private final RegexValidatorDialog _dialog;
         private Locator.XPathLocator _baseLocator = Locator.tagWithClass("div", "domain-validator-panel");
         private String _id = null;
 

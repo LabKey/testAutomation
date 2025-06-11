@@ -12,7 +12,7 @@ import java.util.List;
  */
 public class TextChoiceValueDialog extends ModalDialog
 {
-    private DomainFieldRow _row;
+    private final DomainFieldRow _row;
 
     /**
      * Constructor with a field row and a finder.

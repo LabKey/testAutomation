@@ -58,7 +58,7 @@ public class BaseTermsOfUseTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        BaseTermsOfUseTest init = (BaseTermsOfUseTest) getCurrentTest();
+        BaseTermsOfUseTest init = getCurrentTest();
 
         init.doSetup();
     }
@@ -109,7 +109,7 @@ public class BaseTermsOfUseTest extends BaseWebDriverTest
 
     protected void createTermsOfUsePage(String projectName, String body)
     {
-        String message = null;
+        String message;
         if (null != projectName)
         {
             message = "Create terms of use page for project " + projectName;

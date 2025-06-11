@@ -19,13 +19,10 @@ package org.labkey.test.tests.list;
 import org.apache.commons.lang3.StringUtils;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.MatcherAssert;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.domain.Domain;
 import org.labkey.remoteapi.domain.DomainResponse;
 import org.labkey.remoteapi.domain.PropertyDescriptor;
@@ -52,7 +49,6 @@ import org.labkey.test.pages.ImportDataPage;
 import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.pages.list.GridPage;
 import org.labkey.test.params.FieldDefinition;
-import org.labkey.test.params.FieldDefinition.LookupInfo;
 import org.labkey.test.params.FieldDefinition.StringLookup;
 import org.labkey.test.tests.AuditLogTest;
 import org.labkey.test.util.AbstractDataRegionExportOrSignHelper.ColumnHeaderType;
@@ -73,7 +69,6 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -173,7 +168,7 @@ public class ListTest extends BaseWebDriverTest
     private final static ColumnType LIST3_KEY_TYPE = ColumnType.String;
     private final static String LIST3_KEY_NAME = "Owner";
     private final FieldDefinition _list3Col2 = new FieldDefinition("Wealth", ColumnType.String);
-    protected final FieldDefinition _list3Col1 = new FieldDefinition(LIST3_KEY_NAME, new LookupInfo("/" + PROJECT_OTHER, "lists", LIST3_NAME_OWNERS).setTableType(ColumnType.String)).setDescription("Who owns the car");
+    protected final FieldDefinition _list3Col1 = new FieldDefinition(LIST3_KEY_NAME, new StringLookup(PROJECT_OTHER, "lists", LIST3_NAME_OWNERS)).setDescription("Who owns the car");
     private final static String LIST3_COL2 = "Rich";
     private final String LIST2_DATA =
             LIST2_KEY_NAME + "\t" + LIST_KEY_NAME2_BULK  + "\t" + LIST3_KEY_NAME + "\n" +
@@ -513,7 +508,7 @@ public class ListTest extends BaseWebDriverTest
     /* Issue 51572: Bug with creating a new list by uploading a csv file in "UTF-8 with BOM" format
      */
     @Test
-    public void testCreateListWithBOMFile() throws IOException
+    public void testCreateListWithBOMFile()
     {
         String listName = TestDataGenerator.randomDomainName("From BOM File", 4);
         File bomFile = TestFileUtils.getSampleData("lists/TestUTF8_BOM.csv");
@@ -874,8 +869,7 @@ public class ListTest extends BaseWebDriverTest
                 new FieldDefinition("dewey", ColumnType.Decimal)
         );
         String listName = "remoteApiListTestAddColumn";
-        LookupInfo info = new LookupInfo(getProjectName(), "lists", listName);
-        TestDataGenerator dgen = new TestDataGenerator(info)
+        TestDataGenerator dgen = new TestDataGenerator("lists", listName, getProjectName())
                 .withColumns(cols);
         DomainResponse createResponse = dgen.createList(createDefaultConnection(), "key");
         Domain listDomain = createResponse.getDomain();
@@ -884,9 +878,9 @@ public class ListTest extends BaseWebDriverTest
         listDomain.setFields(listFields);
 
         // now save with an extra field
-        SaveDomainCommand saveCmd = new SaveDomainCommand(info.getSchema(), info.getTable());
+        SaveDomainCommand saveCmd = new SaveDomainCommand(dgen.getSchema(), dgen.getQueryName());
         saveCmd.setDomainDesign(listDomain);
-        DomainResponse saveResponse = saveCmd.execute(createDefaultConnection(), info.getFolder());
+        DomainResponse saveResponse = saveCmd.execute(createDefaultConnection(), dgen.getContainerPath());
 
         // now verify
         assertEquals(listFields.size(), saveResponse.getDomain().getFields().size());
@@ -909,8 +903,7 @@ public class ListTest extends BaseWebDriverTest
                 new FieldDefinition("removeMe", ColumnType.Decimal)
         );
         String listName = "remoteApiListTestRemoveColumn";
-        LookupInfo info = new LookupInfo(getProjectName(), "lists", listName);
-        TestDataGenerator dgen = new TestDataGenerator(info)
+        TestDataGenerator dgen = new TestDataGenerator("lists", listName, getProjectName())
                 .withColumns(cols);
         DomainResponse createResponse = dgen.createList(createDefaultConnection(), "key");
         Domain listDomain = createResponse.getDomain();
@@ -918,9 +911,9 @@ public class ListTest extends BaseWebDriverTest
         listFields.removeIf(a-> a.getName().equals("removeMe"));
         listDomain.setFields(listFields);
 
-        SaveDomainCommand saveCmd = new SaveDomainCommand(info.getSchema(), info.getTable());
+        SaveDomainCommand saveCmd = new SaveDomainCommand(dgen.getSchema(), dgen.getQueryName());
         saveCmd.setDomainDesign(listDomain);
-        DomainResponse saveResponse = saveCmd.execute(createDefaultConnection(), info.getFolder());
+        DomainResponse saveResponse = saveCmd.execute(createDefaultConnection(), dgen.getContainerPath());
 
         checker().verifyFalse("'removeMe' field was not deleted.",
                 saveResponse.getDomain().getFields().stream()
@@ -936,8 +929,7 @@ public class ListTest extends BaseWebDriverTest
                 new FieldDefinition("dewey", ColumnType.Decimal)
         );
         String listName = "remoteAPIBeforeRename";
-        LookupInfo info = new LookupInfo(getProjectName(), "lists", listName);
-        TestDataGenerator dgen = new TestDataGenerator(info)
+        TestDataGenerator dgen = new TestDataGenerator("lists", listName, getProjectName())
                 .withColumns(cols);
         DomainResponse createResponse = dgen.createList(createDefaultConnection(), "key");
         Domain listDomain = createResponse.getDomain();
@@ -945,7 +937,7 @@ public class ListTest extends BaseWebDriverTest
 
         SaveDomainCommand saveCmd = new SaveDomainCommand(listDomain.getDomainId());
         saveCmd.setDomainDesign(listDomain);
-        DomainResponse saveResponse = saveCmd.execute(createDefaultConnection(), info.getFolder());
+        DomainResponse saveResponse = saveCmd.execute(createDefaultConnection(), dgen.getContainerPath());
 
         assertEquals("remoteAPIAfterRename", saveResponse.getDomain().getName());
     }
@@ -998,7 +990,6 @@ public class ListTest extends BaseWebDriverTest
         final String dummyCol = dummyBase + TRICKY_CHARACTERS;
         final String lookupField = "lookupField" + TRICKY_CHARACTERS;
         final String lookupSchema = "lists";
-        final String lookupTable = listName;
         final String keyCol = "Key &%<+";
 
         log("Issue 6883: test list self join");
@@ -1007,7 +998,7 @@ public class ListTest extends BaseWebDriverTest
                 new FieldDefinition(dummyCol, ColumnType.String)
         };
         FieldDefinition lookupCol = new FieldDefinition(lookupField,
-                new LookupInfo(null, lookupSchema, lookupTable).setTableType(ColumnType.Integer));
+                new FieldDefinition.IntLookup(lookupSchema, listName));
         // create the list
         _listHelper.createList(PROJECT_VERIFY, listName, keyCol, columns);
         // now add the lookup column (which references the new table)
@@ -1040,7 +1031,7 @@ public class ListTest extends BaseWebDriverTest
         goToProjectHome(PROJECT_OTHER);
         //create list with look up A
         String lookupColumn = "lookup";
-        FieldDefinition[] cols = new FieldDefinition[]{col(PROJECT_VERIFY, lookupColumn, ColumnType.Integer, "A" )};
+        FieldDefinition[] cols = new FieldDefinition[]{col(PROJECT_VERIFY, lookupColumn, "A" )};
         _listHelper.createList(PROJECT_OTHER, crossContainerLookupList, "Key", cols);
         _listHelper.goToList(crossContainerLookupList);
         _listHelper.clickImportData();
@@ -1884,14 +1875,14 @@ public class ListTest extends BaseWebDriverTest
         return new FieldDefinition(name, type);
     }
 
-    FieldDefinition col(String name, ColumnType type, String table)
+    FieldDefinition col(String name, String table)
     {
-        return col(null, name, type, table);
+        return col(null, name, table);
     }
 
-    FieldDefinition col(String folder, String name, ColumnType type, String table)
+    FieldDefinition col(String folder, String name, String table)
     {
-        return new FieldDefinition(name, new LookupInfo(folder, "lists", table).setTableType(type));
+        return new FieldDefinition(name, new FieldDefinition.IntLookup(folder, "lists", table));
     }
 
     FieldDefinition colURL(String name, ColumnType type, String url)
@@ -1902,7 +1893,7 @@ public class ListTest extends BaseWebDriverTest
     List<FieldDefinition> Acolumns = Arrays.asList(
             col("A", ColumnType.Integer),
             colURL("title", ColumnType.String, "/junit/echoForm.view?key=${A}&title=${title}&table=A"),
-            col("Bfk", ColumnType.Integer, "B")
+            col("Bfk", "B")
     );
     String[][] Adata = new String[][]
     {
@@ -1912,7 +1903,7 @@ public class ListTest extends BaseWebDriverTest
     List<FieldDefinition> Bcolumns = Arrays.asList(
             col("B", ColumnType.Integer),
             colURL("title", ColumnType.String, "org.labkey.core.junit.JunitController$EchoFormAction.class?key=${B}&title=${title}&table=B"),
-            col("Cfk", ColumnType.Integer, "C")
+            col("Cfk", "C")
     );
     String[][] Bdata = new String[][]
     {

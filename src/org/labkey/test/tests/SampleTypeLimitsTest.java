@@ -62,7 +62,7 @@ public class SampleTypeLimitsTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        SampleTypeLimitsTest init = (SampleTypeLimitsTest) getCurrentTest();
+        SampleTypeLimitsTest init = getCurrentTest();
         init.doSetup();
     }
 
@@ -77,8 +77,7 @@ public class SampleTypeLimitsTest extends BaseWebDriverTest
         log("Creating the sample type of 10000 samples");
         try
         {
-            FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", SAMPLE_TYPE_NAME);
-            TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
+            TestDataGenerator dgen = new TestDataGenerator("exp.materials", SAMPLE_TYPE_NAME, getProjectName())
                     .withColumns(List.of(
                             TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                             TestDataGenerator.simpleFieldDef("label", FieldDefinition.ColumnType.String)));
@@ -272,7 +271,7 @@ public class SampleTypeLimitsTest extends BaseWebDriverTest
         LineageResponse linResponse = linCmd.execute(createDefaultConnection(), getCurrentContainerPath());
         LineageNode node = linResponse.getSeed();
         int generationDepth = 0;
-        while(node.getChildren().size()>0)  // walk the node depth until the end
+        while(!node.getChildren().isEmpty())  // walk the node depth until the end
         {
             node = node.getChildren().get(0).getNode();
             generationDepth++;

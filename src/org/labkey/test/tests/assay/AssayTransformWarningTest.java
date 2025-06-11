@@ -32,7 +32,6 @@ import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.QCAssayScriptHelper;
 import org.labkey.test.util.RReportHelper;
-import org.labkey.test.util.core.webdav.WebDavUtils;
 
 import java.io.File;
 import java.util.Arrays;
@@ -85,7 +84,7 @@ public class AssayTransformWarningTest extends BaseWebDriverTest
     @BeforeClass
     public static void initTest()
     {
-        AssayTransformWarningTest init = (AssayTransformWarningTest)getCurrentTest();
+        AssayTransformWarningTest init = getCurrentTest();
         init.doInit();
     }
 

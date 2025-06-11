@@ -38,7 +38,7 @@ public class SampleTypeLookupDisplayColumnTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject() throws Exception
     {
-        SampleTypeLookupDisplayColumnTest init = (SampleTypeLookupDisplayColumnTest) getCurrentTest();
+        SampleTypeLookupDisplayColumnTest init = getCurrentTest();
 
         init.doSetup();
 

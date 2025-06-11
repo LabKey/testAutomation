@@ -29,7 +29,6 @@ import org.labkey.test.util.PermissionsHelper;
 import org.labkey.test.util.SampleTypeHelper;
 import org.labkey.test.util.TestDataGenerator;
 import org.labkey.test.util.exp.SampleTypeAPIHelper;
-import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriverException;
 
 import java.io.IOException;
@@ -40,8 +39,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static org.junit.Assert.fail;
 
 @Category({Daily.class})
 public class GridPanelViewTest extends GridPanelBaseTest
@@ -81,7 +78,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
     private static final String UPDATED_ALERT = "UPDATED";
 
     // Keep track of any custom views that may have been created.
-    private static List<String> savedViewsForDefaultSampleType = new ArrayList<>();
+    private static final List<String> savedViewsForDefaultSampleType = new ArrayList<>();
 
     // Using the core-components.view adds 'GridPanel - ' to the panel header. Need to take that into account .
     private static final String PANEL_VIEW_NAME_PREFIX = "GridPanel - %s";
@@ -107,7 +104,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
     @BeforeClass
     public static void setupProject() throws IOException, CommandException
     {
-        GridPanelViewTest init = (GridPanelViewTest) getCurrentTest();
+        GridPanelViewTest init = getCurrentTest();
 
         init.doSetup();
     }
