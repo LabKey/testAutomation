@@ -173,44 +173,38 @@ public class TriggerScriptTest extends BaseWebDriverTest
     }
 
 
-    @Override
-    protected void doCleanup(boolean afterTest)
-    {
-        // Hack to speed up repro
-    }
-
     protected void doSetup()
     {
-//        _containerHelper.createProject(getProjectName(), null);
-//        _containerHelper.enableModule(getProjectName(), "Query");
-//        _containerHelper.enableModule(getProjectName(), SIMPLE_MODULE);
-//        _containerHelper.enableModule(getProjectName(), TRIGGER_MODULE);
-//
-//        //create List
-//        FieldDefinition[] columns = new FieldDefinition[] {
-//                new FieldDefinition("name", ColumnType.String).setLabel("Name"),
-//                new FieldDefinition("ssn", ColumnType.String).setLabel("SSN"),
-//                new FieldDefinition("company", ColumnType.String).setLabel("Company")
-//
-//        };
-//
-//        _listHelper.createList(getProjectName(), LIST_NAME, "Key", columns);
-//
-//        log("Create the People list");
-//        _listHelper.createList(getProjectName(), PEOPLE_LIST_NAME, "Key",
-//                new FieldDefinition("Name", ColumnType.String).setDescription("Name"),
-//                new FieldDefinition("Age", ColumnType.Integer).setDescription("Age"),
-//                new FieldDefinition("FavoriteDateTime", ColumnType.DateAndTime).setDescription("Favorite date time. Who doesn't have one?"),
-//                new FieldDefinition("Crazy", ColumnType.Boolean).setDescription("Crazy?"));
-//
-//        importFolderFromZip(TestFileUtils.getSampleData("studies/LabkeyDemoStudy.zip"));
-//
-//        //Add webparts for dataset, data class, sample type setup
-//        goToProjectHome();
-//
-//        _portalHelper.addWebPart("Datasets");
-//        _portalHelper.addWebPart("Data Classes");
-//        _portalHelper.addWebPart("Sample Types");
+        _containerHelper.createProject(getProjectName(), null);
+        _containerHelper.enableModule(getProjectName(), "Query");
+        _containerHelper.enableModule(getProjectName(), SIMPLE_MODULE);
+        _containerHelper.enableModule(getProjectName(), TRIGGER_MODULE);
+
+        //create List
+        FieldDefinition[] columns = new FieldDefinition[] {
+                new FieldDefinition("name", ColumnType.String).setLabel("Name"),
+                new FieldDefinition("ssn", ColumnType.String).setLabel("SSN"),
+                new FieldDefinition("company", ColumnType.String).setLabel("Company")
+
+        };
+
+        _listHelper.createList(getProjectName(), LIST_NAME, "Key", columns);
+
+        log("Create the People list");
+        _listHelper.createList(getProjectName(), PEOPLE_LIST_NAME, "Key",
+                new FieldDefinition("Name", ColumnType.String).setDescription("Name"),
+                new FieldDefinition("Age", ColumnType.Integer).setDescription("Age"),
+                new FieldDefinition("FavoriteDateTime", ColumnType.DateAndTime).setDescription("Favorite date time. Who doesn't have one?"),
+                new FieldDefinition("Crazy", ColumnType.Boolean).setDescription("Crazy?"));
+
+        importFolderFromZip(TestFileUtils.getSampleData("studies/LabkeyDemoStudy.zip"));
+
+        //Add webparts for dataset, data class, sample type setup
+        goToProjectHome();
+
+        _portalHelper.addWebPart("Datasets");
+        _portalHelper.addWebPart("Data Classes");
+        _portalHelper.addWebPart("Sample Types");
     }
 
     @Before
