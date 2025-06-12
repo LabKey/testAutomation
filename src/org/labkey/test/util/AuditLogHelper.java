@@ -50,6 +50,28 @@ public class AuditLogHelper
         this(wrapper, wrapper::createDefaultConnection);
     }
 
+    public enum AuditEvent
+    {
+        SAMPLE_TIMELINE_EVENT("SampleTimelineEvent"),
+        SOURCES_AUDIT_EVENT("SourcesAuditEvent"),
+        INVENTORY_AUDIT_EVENT("InventoryAuditEvent"),
+        LIST_AUDIT_EVENT("ListAuditEvent"),
+        EXPERIMENT_AUDIT_EVENT("ExperimentAuditEvent"),
+        SAMPLE_WORKFLOW_AUDIT_EVENT("SamplesWorkflowAuditEvent");
+
+        private final String _name;
+
+        AuditEvent(String name)
+        {
+            _name = name;
+        }
+
+        public String getName()
+        {
+            return _name;
+        }
+    }
+
     public Integer getLatestAuditRowId(String auditTable) throws IOException, CommandException
     {
         String rowId = "rowId";
@@ -101,10 +123,10 @@ public class AuditLogHelper
      * @throws IOException Can be thrown by the SelectRowsCommand.
      * @throws CommandException Can be thrown by the SelectRowsCommand.
      */
-    public SelectRowsResponse getAuditLogsFromLKS(String containerPath, String auditEventName, List<String> columnNames,
+    public SelectRowsResponse getAuditLogsFromLKS(String containerPath, AuditEvent auditEventName, List<String> columnNames,
                                                          List<Filter> filters, @Nullable Integer maxRows, @Nullable ContainerFilter containerFilter) throws IOException, CommandException
     {
-        SelectRowsCommand cmd = new SelectRowsCommand("auditLog", auditEventName);
+        SelectRowsCommand cmd = new SelectRowsCommand("auditLog", auditEventName.getName());
         cmd.setColumns(columnNames);
         cmd.addFilter("ProjectId/Name", _wrapper.getCurrentProject(), Filter.Operator.EQUAL);
         filters.forEach(cmd::addFilter);
@@ -115,14 +137,14 @@ public class AuditLogHelper
         return cmd.execute(_connectionSupplier.get(), containerPath);
     }
 
-    public List<Map<String, Object>> getAuditLogsForTransactionId(String containerPath, String auditEventName, List<String> columnNames,
+    public List<Map<String, Object>> getAuditLogsForTransactionId(String containerPath, AuditEvent auditEventName, List<String> columnNames,
                                                          Integer transactionId, @Nullable ContainerFilter containerFilter) throws IOException, CommandException
     {
         List<Filter> transactionFilter = List.of(new Filter("TransactionId", transactionId, Filter.Operator.EQUAL));
         return getAuditLogsFromLKS(containerPath, auditEventName, columnNames, transactionFilter, null, containerFilter).getRows();
     }
 
-    public void checkAuditEventValuesForTransactionId(String containerPath, String auditEventName, Integer transactionId, int rowCount, Map<String, Object> expectedValues) throws IOException, CommandException
+    public void checkAuditEventValuesForTransactionId(String containerPath, AuditEvent auditEventName, Integer transactionId, int rowCount, Map<String, Object> expectedValues) throws IOException, CommandException
     {
         List<String> columnNames = expectedValues.keySet().stream().map(Object::toString).toList();
         List<Map<String, Object>> events = getAuditLogsForTransactionId(containerPath, auditEventName, columnNames, transactionId, ContainerFilter.CurrentAndSubfolders);
@@ -143,11 +165,11 @@ public class AuditLogHelper
     {
         checkAuditEventDiffCount(containerPath, getAuditEventNameFromURL(), expectedDiffCounts);
     }
-    public void checkAuditEventDiffCount(String containerPath, String auditEventName, List<Integer> expectedDiffCounts) throws IOException, CommandException
+    public void checkAuditEventDiffCount(String containerPath, AuditEvent auditEventName, List<Integer> expectedDiffCounts) throws IOException, CommandException
     {
         checkAuditEventDiffCount(containerPath, auditEventName, Collections.emptyList(), expectedDiffCounts);
     }
-    public void checkAuditEventDiffCount(String containerPath, String auditEventName, List<Filter> filters, List<Integer> expectedDiffCounts) throws IOException, CommandException
+    public void checkAuditEventDiffCount(String containerPath, AuditEvent auditEventName, List<Filter> filters, List<Integer> expectedDiffCounts) throws IOException, CommandException
     {
         Integer maxRows = expectedDiffCounts.size();
         List<Map<String, Object>> events = getAuditLogsFromLKS(containerPath, auditEventName, List.of("InventoryUpdateType", "NewRecordMap"), filters, maxRows, ContainerFilter.CurrentAndSubfolders).getRows();
@@ -171,7 +193,7 @@ public class AuditLogHelper
         }
     }
 
-    public Integer getLastTransactionId(String containerPath, String auditEventName) throws IOException, CommandException
+    public Integer getLastTransactionId(String containerPath, AuditEvent auditEventName) throws IOException, CommandException
     {
         List<Map<String, Object>> events = getAuditLogsFromLKS(containerPath, auditEventName, List.of("TransactionId"), Collections.emptyList(), 1, ContainerFilter.CurrentAndSubfolders).getRows();
         return events.size() == 1 ? (Integer) events.get(0).get("TransactionId") : null;
@@ -182,7 +204,7 @@ public class AuditLogHelper
      * If an expectedEventCount is also provided, it will check that the number of events for that transactionId matches the expectedEventCount.
      * @return transactionId
      */
-    public Integer checkAuditEventDiffCountForLastTransaction(String containerPath, String auditEventName, int expectedDiffCount,
+    public Integer checkAuditEventDiffCountForLastTransaction(String containerPath, AuditEvent auditEventName, int expectedDiffCount,
                                                                       @Nullable Integer expectedEventCount) throws IOException, CommandException
     {
         Integer transactionId = getLastTransactionId(containerPath, auditEventName);
@@ -195,12 +217,12 @@ public class AuditLogHelper
         return transactionId;
     }
 
-    public String getAuditEventNameFromURL()
+    public AuditEvent getAuditEventNameFromURL()
     {
         if (isSamplesRoute())
-            return "SampleTimelineEvent";
+            return AuditEvent.SAMPLE_TIMELINE_EVENT;
         else if (isDataClassRoute())
-            return "SourcesAuditEvent";
+            return AuditEvent.SOURCES_AUDIT_EVENT;
         return null;
     }
 

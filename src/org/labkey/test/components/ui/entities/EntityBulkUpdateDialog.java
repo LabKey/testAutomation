@@ -395,7 +395,7 @@ public class EntityBulkUpdateDialog extends ModalDialog
 
         // check for the expected number of Data Changes in the latest audit event records
         AuditLogHelper auditLogHelper = new AuditLogHelper(getWrapper(), () -> WebTestHelper.getRemoteApiConnection(false));
-        String auditEventName = auditLogHelper.getAuditEventNameFromURL();
+        AuditLogHelper.AuditEvent auditEventName = auditLogHelper.getAuditEventNameFromURL();
         if (!skipAuditEventCheck && auditEventName != null && !TestProperties.isTrialServer())
         {
             try
