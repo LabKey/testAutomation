@@ -230,7 +230,7 @@ public class SimpleHttpRequest
             if (cookie.getKey().equals(Connection.JSESSIONID))
                 con.setRequestProperty((String)cookie.getKey(), (String)cookie.getValue());
 
-            if (cookieString.length() > 0)
+            if (!cookieString.isEmpty())
                 cookieString.append("; ");
 
             cookieString.append(cookie.getKey());

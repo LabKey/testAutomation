@@ -44,7 +44,7 @@ public class MultiplePKUploadAssayTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        MultiplePKUploadAssayTest init = (MultiplePKUploadAssayTest) getCurrentTest();
+        MultiplePKUploadAssayTest init = getCurrentTest();
         init.doSetup();
     }
 

@@ -399,7 +399,7 @@ public class UIPermissionsHelper extends PermissionsHelper
             namesList.append(member).append("\n");
         }
 
-        _driver.log("Adding [" + namesList.toString() + "] to group " + groupName + "...");
+        _driver.log("Adding [" + namesList + "] to group " + groupName + "...");
         addUserToGroupFromGroupScreen(namesList.toString());
 
         enterPermissionsUI();

@@ -137,7 +137,7 @@ public abstract class AbstractDataRegionExportOrSignHelper extends WebDriverComp
         XLS(1),
         IQY(2);
 
-        private int _radioIndex;
+        private final int _radioIndex;
 
         ExcelFileType(int radioIndex)
         {
@@ -162,7 +162,7 @@ public abstract class AbstractDataRegionExportOrSignHelper extends WebDriverComp
         COLON("csv"),
         SEMICOLON("csv");
 
-        private String fileExtension;
+        private final String fileExtension;
 
         TextSeparator(String ext)
         {

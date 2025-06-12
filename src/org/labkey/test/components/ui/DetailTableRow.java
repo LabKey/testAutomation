@@ -10,7 +10,7 @@ import org.openqa.selenium.WebElement;
 public class DetailTableRow extends WebDriverComponent
 {
     final WebElement _rowElement;
-    private WebDriver _driver;
+    private final WebDriver _driver;
 
     protected DetailTableRow(WebElement element, WebDriver driver)
     {

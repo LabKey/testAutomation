@@ -73,7 +73,7 @@ public class WebDavTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        WebDavTest init = (WebDavTest)getCurrentTest();
+        WebDavTest init = getCurrentTest();
         init.doSetup();
     }
 

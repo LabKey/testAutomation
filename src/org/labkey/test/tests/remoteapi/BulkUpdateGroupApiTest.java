@@ -89,7 +89,7 @@ public class BulkUpdateGroupApiTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        BulkUpdateGroupApiTest init = (BulkUpdateGroupApiTest) getCurrentTest();
+        BulkUpdateGroupApiTest init = getCurrentTest();
 
         init.doSetup();
     }

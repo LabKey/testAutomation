@@ -260,7 +260,7 @@ public abstract class AbstractScenario<T>
         RUNNING,
         FINISHING,
         SHUTDOWN,
-        COMPLETE;
+        COMPLETE
     }
 
     public interface TsvResultsWriter<T>

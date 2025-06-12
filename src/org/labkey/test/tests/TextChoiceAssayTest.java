@@ -33,14 +33,14 @@ public class TextChoiceAssayTest extends TextChoiceTest
     @BeforeClass
     public static void setupProject() throws IOException, CommandException
     {
-        TextChoiceAssayTest init = (TextChoiceAssayTest) getCurrentTest();
+        TextChoiceAssayTest init = getCurrentTest();
         init.doSetup();
     }
 
-    private static List<String> unusedRunFieldValues = new ArrayList<>(RUN_FIELD_VALUES);
+    private static final List<String> unusedRunFieldValues = new ArrayList<>(RUN_FIELD_VALUES);
     private static String currentRunValue;
 
-    private static List<String> unusedResultFiledValues = new ArrayList<>(RESULT_FIELD_VALUES);
+    private static final List<String> unusedResultFiledValues = new ArrayList<>(RESULT_FIELD_VALUES);
 
     private static Map<String, String> currentResultRowData = new HashMap<>();
 

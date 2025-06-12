@@ -115,7 +115,7 @@ public class ApiPermissionsHelper extends PermissionsHelper
             roles.addAll(getGroupRoles(container, userOrGroupName));
 
         Assert.assertTrue(String.format("%s did not have role: %s\nFound: %s", userOrGroupName, expectedRole, StringUtils.join("\n", roles)),
-                roles.contains(expectedRole) || "No Permissions".equals(permissionSetting) && roles.size() == 0);
+                roles.contains(expectedRole) || "No Permissions".equals(permissionSetting) && roles.isEmpty());
     }
 
     public List<String> getGroupRoles(String container, String groupName)

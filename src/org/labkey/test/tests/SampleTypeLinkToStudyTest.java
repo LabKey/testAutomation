@@ -53,6 +53,7 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
     final static String SAMPLE_TYPE2 = "Sample type 2";
     private final static String visitLabel1 = "Screening";
     private final static String visitLabel2 = "Baseline";
+    private static final String READER_USER = "reader_user@user.test";
 
     protected DateTimeFormatter _dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     protected String now = LocalDateTime.now().format(_dateTimeFormatter);
@@ -60,7 +61,7 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject() throws IOException, CommandException
     {
-        SampleTypeLinkToStudyTest init = (SampleTypeLinkToStudyTest) getCurrentTest();
+        SampleTypeLinkToStudyTest init = getCurrentTest();
         init.doSetup();
     }
 
@@ -71,6 +72,7 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         _studyHelper.startCreateStudy()
                 .setTimepointType(StudyHelper.TimepointType.VISIT)
                 .createStudy();
+        createUserWithPermissions(READER_USER, VISIT_BASED_STUDY, "Reader");
 
         _containerHelper.createProject(DATE_BASED_STUDY, "Study");
         _studyHelper.startCreateStudy()
@@ -137,6 +139,13 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         checker().verifyEquals("Incorrect number of rows linked", numOfRowsLinked, table.getDataRowCount());
         checker().verifyEquals("Incorrect Participant ID's", Arrays.asList("P3", "P4"), table.getColumnDataAsText("ParticipantId"));
         checker().verifyEquals("Incorrect category for the dataset(Uncategorized case)", " ", getCategory(VISIT_BASED_STUDY, SAMPLE_TYPE1));
+
+        // issue 53194
+        impersonate(READER_USER);
+        log("Verifying the linked sample type in study");
+        goToProjectHome(VISIT_BASED_STUDY);
+        clickAndWait(Locator.linkWithText(SAMPLE_TYPE1));
+        stopImpersonating();
 
         log("Verifying log entries");
         goToProjectHome(SAMPLE_TYPE_PROJECT);
@@ -852,6 +861,7 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
+        _userHelper.deleteUsers(false, READER_USER);
         _containerHelper.deleteProject(SAMPLE_TYPE_PROJECT, afterTest);
         _containerHelper.deleteProject(VISIT_BASED_STUDY, afterTest);
         _containerHelper.deleteProject(DATE_BASED_STUDY, afterTest);

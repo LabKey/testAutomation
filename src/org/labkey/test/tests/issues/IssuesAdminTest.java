@@ -43,7 +43,6 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
-import static org.labkey.test.util.PasswordUtil.getUsername;
 
 @Category({Issues.class, Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 5)
@@ -58,13 +57,13 @@ public class IssuesAdminTest extends BaseWebDriverTest
     private static final String PROJECT2 = "IssuesAdminWithoutModule";
     private static final String PROJECT3 = "CustomIssueName Project";
 
-    private IssuesHelper _issuesHelper = new IssuesHelper(this);
-    private ApiPermissionsHelper _permissionsHelper = new ApiPermissionsHelper(this);
+    private final IssuesHelper _issuesHelper = new IssuesHelper(this);
+    private final ApiPermissionsHelper _permissionsHelper = new ApiPermissionsHelper(this);
 
     @BeforeClass
     public static void setupProject()
     {
-        IssuesAdminTest init = (IssuesAdminTest) getCurrentTest();
+        IssuesAdminTest init = getCurrentTest();
         init.doSetup();
     }
 

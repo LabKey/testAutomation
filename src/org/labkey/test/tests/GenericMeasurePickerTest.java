@@ -66,7 +66,7 @@ public class GenericMeasurePickerTest extends BaseWebDriverTest
     @BeforeClass
     public static void beforeTestClass()
     {
-        GenericMeasurePickerTest init = (GenericMeasurePickerTest)getCurrentTest();
+        GenericMeasurePickerTest init = getCurrentTest();
 
         init.initProject();
     }

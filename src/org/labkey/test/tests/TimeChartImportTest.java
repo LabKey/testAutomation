@@ -62,7 +62,7 @@ public class TimeChartImportTest extends StudyBaseTest
     @BeforeClass
     public static void doSetup() throws Exception
     {
-        TimeChartImportTest initTest = (TimeChartImportTest)getCurrentTest();
+        TimeChartImportTest initTest = getCurrentTest();
         initTest._containerHelper.createProject(initTest.getProjectName(), null);
         initTest.importFolderFromZip(MULTI_FOLDER_ZIP);
         initTest._containerHelper.createSubfolder(initTest.getProjectName(), EXPORT_TEST_FOLDER, "Collaboration");
@@ -332,11 +332,11 @@ public class TimeChartImportTest extends StudyBaseTest
 
     public static class TimeChartInfo
     {
-        private String _name;
-        private int _countSVGs;
-        private int _gridCount;
-        private boolean _hasPointClickFn;
-        private String[] _svg;
+        private final String _name;
+        private final int _countSVGs;
+        private final int _gridCount;
+        private final boolean _hasPointClickFn;
+        private final String[] _svg;
 
         public TimeChartInfo(String name, int countSVGs, int gridCount, boolean hasPointClickFn, String[] svg)
         {

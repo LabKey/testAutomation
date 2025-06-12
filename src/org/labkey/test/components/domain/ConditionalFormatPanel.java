@@ -178,7 +178,7 @@ public class ConditionalFormatPanel extends WebDriverComponent<ConditionalFormat
 
     static class ConditionalFormatPanelFinder extends WebDriverComponentFinder<ConditionalFormatPanel, ConditionalFormatPanelFinder>
     {
-        private ConditionalFormatDialog _dialog;
+        private final ConditionalFormatDialog _dialog;
         private final Locator.XPathLocator _baseLocator = Locator.tagWithClass("div", "domain-validator-panel");
         private String _id = null;
 

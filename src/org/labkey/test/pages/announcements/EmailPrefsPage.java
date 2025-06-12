@@ -108,12 +108,12 @@ public class EmailPrefsPage extends LabKeyPage<EmailPrefsPage.ElementCache>
 
     protected class ElementCache extends LabKeyPage.ElementCache
     {
-        private Locator.XPathLocator notify = Locator.radioButtonByName("emailPreference");
+        private final Locator.XPathLocator notify = Locator.radioButtonByName("emailPreference");
         protected WebElement notifyNone = notify.withAttribute("value", "0").findWhenNeeded(this);
         protected WebElement notifyMine = notify.withAttribute("value", "2").findWhenNeeded(this);
         protected WebElement notifyAll = notify.withAttribute("value", "1").findWhenNeeded(this);
 
-        private Locator.XPathLocator type = Locator.radioButtonByName("notificationType");
+        private final Locator.XPathLocator type = Locator.radioButtonByName("notificationType");
         protected WebElement typeIndividual = notify.withAttribute("value", "3").findWhenNeeded(this);
         protected WebElement typeDigest = notify.withAttribute("value", "4").findWhenNeeded(this);
 

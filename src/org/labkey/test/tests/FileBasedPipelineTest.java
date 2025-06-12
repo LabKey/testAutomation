@@ -61,7 +61,7 @@ public class FileBasedPipelineTest extends BaseWebDriverTest
     @BeforeClass
     public static void doSetup() throws Exception
     {
-        FileBasedPipelineTest initTest = (FileBasedPipelineTest)getCurrentTest();
+        FileBasedPipelineTest initTest = getCurrentTest();
 
         initTest._containerHelper.createProject(initTest.getProjectName(), null);
         initTest._containerHelper.enableModules(Arrays.asList(PIPELINETEST_MODULE, "Pipeline"));

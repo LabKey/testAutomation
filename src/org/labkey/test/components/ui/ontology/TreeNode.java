@@ -66,7 +66,6 @@ public class TreeNode extends WebDriverComponent<TreeNode.ElementCache>
      * a Tree node that is selected shows up in blue bold text.  The root always remains selected, while only
      * the lowest-traversed node (which can be a branch or a leaf node) will be selected.  The selected node's
      * information will appear in the detail tabs when they are shown
-     * @return
      */
     public TreeNode select()
     {
@@ -204,7 +203,6 @@ public class TreeNode extends WebDriverComponent<TreeNode.ElementCache>
          * which are 'active'.
          * For example, search for children of a treeNode will return only direct descendants; use this one to get the
          * active/focused node(s) in the tree
-         * @return
          */
         public TreeNodeFinder activeOnly()
         {
@@ -214,7 +212,6 @@ public class TreeNode extends WebDriverComponent<TreeNode.ElementCache>
 
         /**
          * use this to search for nodes that have a filter icon
-         * @return
          */
         public TreeNodeFinder withSelectedFilter()
         {

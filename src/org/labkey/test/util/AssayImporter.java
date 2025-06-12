@@ -20,8 +20,8 @@ import org.labkey.test.Locator;
 
 public class AssayImporter
 {
-    private BaseWebDriverTest test;
-    private AssayImportOptions options;
+    private final BaseWebDriverTest test;
+    private final AssayImportOptions options;
 
     public AssayImporter(BaseWebDriverTest test, AssayImportOptions options)
     {

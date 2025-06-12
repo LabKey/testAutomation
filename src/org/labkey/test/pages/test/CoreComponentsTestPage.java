@@ -42,8 +42,6 @@ public class CoreComponentsTestPage extends LabKeyPage<CoreComponentsTestPage.El
 
     /**
      * Configures the current page to show a GridPanel containing the contents of the specified query
-     * @param schema
-     * @param query
      * @return  a QueryGrid to wrap the GridPanel, once it is found
      */
     public QueryGrid getGridPanel(String schema, String query)
@@ -63,7 +61,6 @@ public class CoreComponentsTestPage extends LabKeyPage<CoreComponentsTestPage.El
     /**
      * clears the selected component, if there is one, so that the current page can be re-used
      * to test a different component
-     * @return
      */
     public CoreComponentsTestPage clearSelectedComponent()
     {

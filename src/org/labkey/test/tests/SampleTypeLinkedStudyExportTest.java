@@ -44,7 +44,7 @@ public class SampleTypeLinkedStudyExportTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject() throws IOException, CommandException
     {
-        SampleTypeLinkedStudyExportTest init = (SampleTypeLinkedStudyExportTest) getCurrentTest();
+        SampleTypeLinkedStudyExportTest init = getCurrentTest();
         init.doSetup();
     }
 

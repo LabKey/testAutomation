@@ -35,7 +35,6 @@ import org.labkey.test.categories.Issues;
 import org.labkey.test.components.dumbster.EmailRecordTable;
 import org.labkey.test.components.dumbster.EmailRecordTable.EmailMessage;
 import org.labkey.test.components.html.BootstrapMenu;
-import org.labkey.test.pages.issues.BaseIssuePage;
 import org.labkey.test.pages.issues.ClosePage;
 import org.labkey.test.pages.issues.DetailsPage;
 import org.labkey.test.pages.issues.EmailPrefsPage;
@@ -112,7 +111,7 @@ public class IssuesTest extends BaseWebDriverTest
     @BeforeClass
     public static void doSetup()
     {
-        IssuesTest initTest = (IssuesTest) getCurrentTest();
+        IssuesTest initTest = getCurrentTest();
         initTest.doInit();
     }
 
@@ -250,18 +249,18 @@ public class IssuesTest extends BaseWebDriverTest
 
         fields.add(new FieldDefinition("MyInteger", FieldDefinition.ColumnType.Integer));
         fields.add(new FieldDefinition("MySecondInteger", FieldDefinition.ColumnType.Integer));
-        fields.add(new FieldDefinition("MyFirstString", new FieldDefinition.LookupInfo(null, "lists", getLookupTableName("issues", "MyFirstString"))));
+        fields.add(new FieldDefinition("MyFirstString", new FieldDefinition.StringLookup("lists", getLookupTableName("issues", "MyFirstString"))));
         fields.add(new FieldDefinition("MyThirdString", FieldDefinition.ColumnType.String));
         fields.add(new FieldDefinition("MyFourthString", FieldDefinition.ColumnType.String));
-        fields.add(new FieldDefinition("MyFifthString", new FieldDefinition.LookupInfo(null, "lists", getLookupTableName("issues", "MyFifthString"))));
+        fields.add(new FieldDefinition("MyFifthString", new FieldDefinition.StringLookup("lists", getLookupTableName("issues", "MyFifthString"))));
 
-        fields.add(new FieldDefinition("Client", new FieldDefinition.LookupInfo(null, "lists", getLookupTableName("issues", "Client"))));
-        fields.add(new FieldDefinition("UserStory", new FieldDefinition.LookupInfo(null, "lists", getLookupTableName("issues", "UserStory"))));
+        fields.add(new FieldDefinition("Client", new FieldDefinition.StringLookup("lists", getLookupTableName("issues", "Client"))));
+        fields.add(new FieldDefinition("UserStory", new FieldDefinition.StringLookup("lists", getLookupTableName("issues", "UserStory"))));
         fields.add(new FieldDefinition("SupportTicket", FieldDefinition.ColumnType.Integer));
         fields.add(new FieldDefinition("TeamCity", FieldDefinition.ColumnType.String).setLabel("TeamCity Note"));
-        fields.add(new FieldDefinition("Triage", new FieldDefinition.LookupInfo(null, "lists", getLookupTableName("issues", "Triage"))));
-        fields.add(new FieldDefinition("Note", new FieldDefinition.LookupInfo(null, "lists", getLookupTableName("issues", "Note"))));
-        fields.add(new FieldDefinition("Module", new FieldDefinition.LookupInfo(null, "lists", getLookupTableName("issues", "Module"))));
+        fields.add(new FieldDefinition("Triage", new FieldDefinition.StringLookup("lists", getLookupTableName("issues", "Triage"))));
+        fields.add(new FieldDefinition("Note", new FieldDefinition.StringLookup("lists", getLookupTableName("issues", "Note"))));
+        fields.add(new FieldDefinition("Module", new FieldDefinition.StringLookup("lists", getLookupTableName("issues", "Module"))));
 
         clickProject(getProjectName());
         waitAndClickAndWait(Locator.linkContainingText(ISSUE_SUMMARY_WEBPART_NAME));
@@ -840,7 +839,7 @@ public class IssuesTest extends BaseWebDriverTest
 
         // check for no default
         clickButton("New Issue");
-        assertEquals(getSelectedOptionText(Locator.name("assignedTo")), "");
+        assertEquals("", getSelectedOptionText(Locator.name("assignedTo")));
         clickButton("Cancel");
 
         /// check reader cannot be set as default user (issue 20598)
@@ -876,7 +875,7 @@ public class IssuesTest extends BaseWebDriverTest
 
         // check for no default
         clickButton("New Issue");
-        assertEquals(getSelectedOptionText(Locator.name("assignedTo")), "");
+        assertEquals("", getSelectedOptionText(Locator.name("assignedTo")));
         clickButton("Cancel");
 
         // issue 20699 - NPE b/c default assign to user deleted!

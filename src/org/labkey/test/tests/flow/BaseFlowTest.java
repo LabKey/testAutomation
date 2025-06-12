@@ -81,7 +81,7 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        BaseFlowTest initTest = (BaseFlowTest)getCurrentTest();
+        BaseFlowTest initTest = getCurrentTest();
         initTest.init();
     }
 
@@ -444,12 +444,12 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
             assertTextPresent("Matched");
         }
 
-        if (selectedGroupNames != null && selectedGroupNames.size() > 0)
+        if (selectedGroupNames != null && !selectedGroupNames.isEmpty())
         {
             selectOptionByValue(Locator.id("importGroupNames"), StringUtils.join(selectedGroupNames, ","));
             fireEvent(Locator.id("importGroupNames"), SeleniumEvent.change); // TODO: Workaround for reselection not changing checkboxes
         }
-        else if (selectedSampleIds != null && selectedSampleIds.size() > 0)
+        else if (selectedSampleIds != null && !selectedSampleIds.isEmpty())
         {
             // UNDONE: Select individual rows for import
         }
@@ -522,7 +522,7 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
     {
         private final String _containerPath;
         private final String _workspacePath;
-        private SelectFCSFileOption _selectFCSFilesOption;
+        private final SelectFCSFileOption _selectFCSFilesOption;
         private final List<String> _keywordDirs;
         private final List<String> _selectedGroupNames;
         private final List<String> _selectedSampleIds;

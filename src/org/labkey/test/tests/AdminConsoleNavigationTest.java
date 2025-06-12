@@ -18,7 +18,6 @@ import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.Crawler;
 import org.labkey.test.util.PermissionsHelper;
 import org.labkey.test.util.TestLogger;
-import org.openqa.selenium.JavascriptException;
 import org.openqa.selenium.WebElement;
 
 import java.io.IOException;
@@ -46,7 +45,7 @@ public class AdminConsoleNavigationTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        AdminConsoleNavigationTest init = (AdminConsoleNavigationTest) getCurrentTest();
+        AdminConsoleNavigationTest init = getCurrentTest();
         init.doSetup();
     }
 

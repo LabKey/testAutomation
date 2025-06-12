@@ -62,13 +62,13 @@ public class ImmunizationScheduleWebpart extends BodyWebPart<ImmunizationSchedul
 
     public class ElementCache extends BodyWebPart.ElementCache
     {
-        private int wait = BaseWebDriverTest.WAIT_FOR_JAVASCRIPT;
-        private Locator.XPathLocator tableOuterLoc = Locator.tagWithClass("table", "outer");
-        private Locator.XPathLocator tableRowLoc = Locator.tagWithClass("tr", "row-outer");
-        private Locator.XPathLocator cellDisplayLoc = Locator.tagWithClass("td", "cell-display");
-        private Locator.XPathLocator emptyLoc = Locator.tagWithClassContaining("td", "empty").withText("No data to show.");
-        private Locator.XPathLocator manageLoc = Locator.linkWithText("Manage Treatments");
-        private Locator.XPathLocator cohortsLoc = Locator.tagWithClass("div", "immunization-schedule-cohorts");
+        private final int wait = BaseWebDriverTest.WAIT_FOR_JAVASCRIPT;
+        private final Locator.XPathLocator tableOuterLoc = Locator.tagWithClass("table", "outer");
+        private final Locator.XPathLocator tableRowLoc = Locator.tagWithClass("tr", "row-outer");
+        private final Locator.XPathLocator cellDisplayLoc = Locator.tagWithClass("td", "cell-display");
+        private final Locator.XPathLocator emptyLoc = Locator.tagWithClassContaining("td", "empty").withText("No data to show.");
+        private final Locator.XPathLocator manageLoc = Locator.linkWithText("Manage Treatments");
+        private final Locator.XPathLocator cohortsLoc = Locator.tagWithClass("div", "immunization-schedule-cohorts");
 
         WebElement cohortsTable = cohortsLoc.append(tableOuterLoc).findWhenNeeded(this).withTimeout(wait);
         WebElement manageLink = manageLoc.findWhenNeeded(this).withTimeout(wait);

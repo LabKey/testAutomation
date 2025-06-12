@@ -159,7 +159,7 @@ public abstract class AbstractAssayHelper
         RUN_FIELDS("Run Fields"),
         EXCEL_FILE_RUN_PROPERTIES("Excel File Run Properties");
 
-        private String menuSuffix;
+        private final String menuSuffix;
 
         AssayDefaultAreas(String menuSuffix)
         {

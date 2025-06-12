@@ -99,7 +99,7 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        SampleTypeFolderExportImportTest init = (SampleTypeFolderExportImportTest) getCurrentTest();
+        SampleTypeFolderExportImportTest init = getCurrentTest();
         init.doSetup();
     }
 
@@ -150,13 +150,12 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
             {
                 if(logMismatch)
                 {
-                    StringBuilder errorMsg = new StringBuilder();
-                    errorMsg.append("\n*************** ERROR ***************");
-                    errorMsg.append("\nFound a mismatch in the lists.");
-                    errorMsg.append("\nlist01(" + i + "): " + list01.get(i));
-                    errorMsg.append("\nlist02(" + i + "): " + list02.get(i));
-                    errorMsg.append("\n*************** ERROR ***************");
-                    log(errorMsg.toString());
+                    String errorMsg = "\n*************** ERROR ***************" +
+                            "\nFound a mismatch in the lists." +
+                            "\nlist01(" + i + "): " + list01.get(i) +
+                            "\nlist02(" + i + "): " + list02.get(i) +
+                            "\n*************** ERROR ***************";
+                    log(errorMsg);
                 }
                 areEqual = false;
             }
@@ -413,7 +412,7 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
         Assert.assertTrue("Imported Sample Type data not as expected.", areDataListEqual(resultsFromDB, expectedValuesInDB));
         */
 
-        if(errorLog.length() > 0)
+        if(!errorLog.isEmpty())
             Assert.fail(errorLog.toString());
 
         log("All done.");

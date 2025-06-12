@@ -51,8 +51,8 @@ public class AssayValidator extends AbstractAssayValidator
         if (getRunProperties().containsKey(Props.runDataFile.name()))
         {
             List<Map<String, String>> dataMap = parseRunData(new File(getRunProperties().get(Props.runDataFile.name())));
-            Map<String, String> ptidMap = new HashMap<String, String>();
-            Map<String, String> animalMap = new HashMap<String, String>();
+            Map<String, String> ptidMap = new HashMap<>();
+            Map<String, String> animalMap = new HashMap<>();
 
             for (Map<String, String> row : dataMap)
             {

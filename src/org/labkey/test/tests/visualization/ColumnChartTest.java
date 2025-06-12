@@ -69,7 +69,7 @@ public class ColumnChartTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        ColumnChartTest init = (ColumnChartTest)getCurrentTest();
+        ColumnChartTest init = getCurrentTest();
 
         init.doSetup();
     }

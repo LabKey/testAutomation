@@ -154,9 +154,10 @@ public class ManagerPage extends LabKeyPage<ManagerPage.ElementCache>
         }
     }
 
-    public class LoggerInfo
+    public static class LoggerInfo
     {
-        private String _name, _parent;
+        private final String _name;
+        private final String _parent;
         LoggingLevel _level;
 
         public LoggerInfo(String name, String parent, LoggingLevel level)
@@ -191,6 +192,6 @@ public class ManagerPage extends LabKeyPage<ManagerPage.ElementCache>
         INFO,
         OFF,
         TRACE,
-        WARN;
+        WARN
     }
 }

@@ -28,7 +28,7 @@ public class RenameFolderJavaClientApiTest extends BaseWebDriverTest
     @BeforeClass
     public static void doSetup()
     {
-        RenameFolderJavaClientApiTest initTest = (RenameFolderJavaClientApiTest) getCurrentTest();
+        RenameFolderJavaClientApiTest initTest = getCurrentTest();
         initTest.setupProject();
     }
 

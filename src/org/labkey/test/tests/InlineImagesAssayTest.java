@@ -81,7 +81,7 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
     @BeforeClass
     public static void initTest()
     {
-        InlineImagesAssayTest init = (InlineImagesAssayTest)getCurrentTest();
+        InlineImagesAssayTest init = getCurrentTest();
         init.doInit();
     }
 

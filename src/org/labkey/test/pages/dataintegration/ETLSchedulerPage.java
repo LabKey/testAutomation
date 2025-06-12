@@ -54,8 +54,6 @@ public class ETLSchedulerPage extends LabKeyPage<ETLSchedulerPage.Elements>
 
     /**
      * gets the ETL given its name.
-     * @param transformName
-     * @return
      */
     public TransformRow getTransform(String transformName)
     {

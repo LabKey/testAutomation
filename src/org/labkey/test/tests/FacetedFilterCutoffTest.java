@@ -47,7 +47,7 @@ public class FacetedFilterCutoffTest extends BaseWebDriverTest
     @BeforeClass
     public static void doSetup() throws Exception
     {
-        FacetedFilterCutoffTest initTest = (FacetedFilterCutoffTest)getCurrentTest();
+        FacetedFilterCutoffTest initTest = getCurrentTest();
         initTest.doSetupSteps();
     }
 

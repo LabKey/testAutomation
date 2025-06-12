@@ -45,9 +45,9 @@ public class RConfigTest extends BaseWebDriverTest
     private static final String SECONDARY_ENGINE_NAME = "R Scripting Engine 2";
     private static final String DISABLED_ENGINE_NAME = "Disabled Engine";
 
-    private String FOLDER_NAME = "subfolder";
+    private final String FOLDER_NAME = "subfolder";
 
-    private RReportHelper _RReportHelper = new RReportHelper(this);
+    private final RReportHelper _RReportHelper = new RReportHelper(this);
 
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
@@ -64,7 +64,7 @@ public class RConfigTest extends BaseWebDriverTest
     @BeforeClass
     public static void setup() throws Exception
     {
-        RConfigTest init = (RConfigTest) getCurrentTest();
+        RConfigTest init = getCurrentTest();
         init.doSetup();
     }
 

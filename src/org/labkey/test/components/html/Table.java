@@ -222,7 +222,7 @@ public class Table extends WebDriverComponent<Table.Elements>
         List<WebElement> columnElements = getColumnAsElement(col);
         List<String> columnText = new ArrayList<>();
 
-        if (columnElements.size() > 0)
+        if (!columnElements.isEmpty())
         {
             for (WebElement columnElement : columnElements)
             {

@@ -87,7 +87,6 @@ public class OntologyTreeSearch extends WebDriverComponent<OntologyTreeSearch.El
      * and for the placeholder to become visible.
      * Clearing the search results in this manner (and ensuring that they are not present) is helpful to ensure
      * that subsequent calls to waitForResults won't find the last set as they go stale
-     * @return
      */
     public OntologyTreeSearch clearInput()
     {
@@ -103,7 +102,7 @@ public class OntologyTreeSearch extends WebDriverComponent<OntologyTreeSearch.El
 
     public List<TreeSearchResult> waitForResults()
     {
-        getWrapper().waitFor(()-> isResultContainerExpanded() && getSearchResults().size() > 0 || showsNoSearchResultsFound()
+        getWrapper().waitFor(()-> isResultContainerExpanded() && !getSearchResults().isEmpty() || showsNoSearchResultsFound()
                 , WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
         return getSearchResults();
     }
@@ -116,7 +115,6 @@ public class OntologyTreeSearch extends WebDriverComponent<OntologyTreeSearch.El
     /**
      * when more search hits exist than are shown (max of 20 can be shown), an added search result footer element
      * will appear with text advising the user to refine their search
-     * @return
      */
     Optional<WebElement> searchResultFooterElement()
     {

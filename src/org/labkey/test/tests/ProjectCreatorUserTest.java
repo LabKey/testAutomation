@@ -46,7 +46,7 @@ public class ProjectCreatorUserTest extends BaseWebDriverTest
     @BeforeClass
     public static void setup()
     {
-        ProjectCreatorUserTest initTest = (ProjectCreatorUserTest) getCurrentTest();
+        ProjectCreatorUserTest initTest = getCurrentTest();
         initTest.doSetup();
     }
 

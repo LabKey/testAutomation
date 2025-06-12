@@ -36,11 +36,12 @@ public class EditableModuleController extends SpringActionController
     }
 
     @RequiresPermission(ReadPermission.class)
-    public class HelloAction extends SimpleViewAction
+    public static class HelloAction extends SimpleViewAction<Object>
     {
+        @Override
         public ModelAndView getView(Object o, BindException errors)
         {
-            return new JspView("/org/labkey/editablemodule/view/hello.jsp");
+            return new JspView<>("/org/labkey/editablemodule/view/hello.jsp");
         }
 
         @Override

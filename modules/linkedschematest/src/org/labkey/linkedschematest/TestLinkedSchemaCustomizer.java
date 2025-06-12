@@ -42,7 +42,7 @@ import java.util.Map;
  */
 public class TestLinkedSchemaCustomizer implements LinkedSchemaCustomizer
 {
-    private static Logger LOG = LogManager.getLogger(TestLinkedSchemaCustomizer.class);
+    private static final Logger LOG = LogManager.getLogger(TestLinkedSchemaCustomizer.class);
 
     // Name of the parameter declaration
     private static final String PARAM_FAMILY = "PARAM_FAMILY";

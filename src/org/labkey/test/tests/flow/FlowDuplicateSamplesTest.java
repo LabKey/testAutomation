@@ -21,6 +21,7 @@ import java.util.Arrays;
 public class FlowDuplicateSamplesTest extends BaseFlowTest
 {
 
+    @Override
     protected void importFCSFiles()
     {
         waitAndClickAndWait(Locator.linkWithText("Browse for FCS files to be imported"));

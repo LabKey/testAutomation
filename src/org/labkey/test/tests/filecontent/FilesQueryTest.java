@@ -62,7 +62,7 @@ public class FilesQueryTest extends BaseWebDriverTest
     @BeforeClass
     public static void doSetup()
     {
-        FilesQueryTest initTest = (FilesQueryTest)getCurrentTest();
+        FilesQueryTest initTest = getCurrentTest();
 
         initTest.doSetupSteps();
     }

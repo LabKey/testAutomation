@@ -29,7 +29,7 @@ public class FiltersOnMultipleGridsTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        FiltersOnMultipleGridsTest init = (FiltersOnMultipleGridsTest) getCurrentTest();
+        FiltersOnMultipleGridsTest init = getCurrentTest();
         init.doSetup();
     }
 

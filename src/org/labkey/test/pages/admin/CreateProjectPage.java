@@ -95,8 +95,8 @@ public class CreateProjectPage extends LabKeyPage<CreateProjectPage.ElementCache
 
     protected class ElementCache extends LabKeyPage.ElementCache
     {
-        WebElement nameInput = Locator.input("name").findWhenNeeded(this).withTimeout(4000);;
-        WebElement titleInput = Locator.input("title").findWhenNeeded(this).withTimeout(4000);;
+        WebElement nameInput = Locator.input("name").findWhenNeeded(this).withTimeout(4000);
+        WebElement titleInput = Locator.input("title").findWhenNeeded(this).withTimeout(4000);
         WebElement useNameAsDisplayTitleCheckBox = Locator.checkboxByLabel("Use name as display title", false)
                 .findWhenNeeded(this).withTimeout(4000);
         Locator activePane = Locator.tagWithClass("li", "active")

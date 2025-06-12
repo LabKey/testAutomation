@@ -138,13 +138,13 @@ public class SelectWrapper extends org.openqa.selenium.support.ui.Select
     {
         WebDriverWrapper.waitFor(() ->
                         select.getOptions().stream().anyMatch(option -> Objects.equals(text, option.getText())),
-                "Option [text = " + text + "] not found: " + select.getWrappedElement().toString(), 10000);
+                "Option [text = " + text + "] not found: " + select.getWrappedElement(), 10000);
     }
 
     public static void waitForOptionWithValue(Select select, String value)
     {
         WebDriverWrapper.waitFor(() ->
                 select.getOptions().stream().anyMatch(option -> Objects.equals(value, option.getAttribute("value"))),
-                "Option [value = " + value + "] not found: " + select.getWrappedElement().toString(), 10000);
+                "Option [value = " + value + "] not found: " + select.getWrappedElement(), 10000);
     }
 }

@@ -26,7 +26,7 @@ import static org.junit.Assert.assertEquals;
  */
 public class OlapTestJson
 {
-    private BaseWebDriverTest _test;
+    private final BaseWebDriverTest _test;
 
     public OlapTestJson(BaseWebDriverTest test)
     {

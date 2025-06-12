@@ -50,7 +50,6 @@ public class DetailDataPanel extends WebDriverComponent<DetailDataPanel.ElementC
 
     /**
      * When the logged-in user does not have edit permissions, the edit button will not be present
-     * @return
      */
     public boolean isEditable()
     {
