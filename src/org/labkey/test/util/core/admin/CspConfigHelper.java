@@ -74,4 +74,42 @@ public class CspConfigHelper
     {
         Log4jUtils.setLogLevel("org.labkey.core.admin.AdminController.ContentSecurityPolicyReportAction", ManagerPage.LoggingLevel.DEBUG);
     }
+
+    public static class AllowedHost
+    {
+        private final Directive _directive;
+        private final String _host;
+
+        public AllowedHost(Directive directive, String host)
+        {
+            _directive = Objects.requireNonNull(directive);
+            _host = Objects.requireNonNull(host);
+        }
+
+        public Directive getDirective()
+        {
+            return _directive;
+        }
+
+        public String getHost()
+        {
+            return _host;
+        }
+
+        @Override
+        public final boolean equals(Object o)
+        {
+            if (!(o instanceof AllowedHost that)) return false;
+
+            return _directive == that._directive && _host.equals(that._host);
+        }
+
+        @Override
+        public int hashCode()
+        {
+            int result = _directive.hashCode();
+            result = 31 * result + _host.hashCode();
+            return result;
+        }
+    }
 }

@@ -1,9 +1,6 @@
 package org.labkey.test.tests.core.admin;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.hc.core5.http.HttpStatus;
-import org.assertj.core.api.Assertions;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -16,21 +13,19 @@ import org.labkey.test.categories.Daily;
 import org.labkey.test.components.html.SelectWrapper;
 import org.labkey.test.pages.admin.ExternalSourcesPage;
 import org.labkey.test.pages.admin.ExternalSourcesPage.Directive;
+import org.labkey.test.util.core.admin.CspConfigHelper.AllowedHost;
 import org.labkey.test.pages.core.admin.ShowAdminPage;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.core.admin.CspConfigHelper;
 
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.labkey.test.util.PermissionsHelper.MemberType.user;
 
 @Category({Daily.class})
@@ -38,7 +33,6 @@ public class CspResourceHostsTest extends BaseWebDriverTest
 {
     private static final String APP_ADMIN = "csp_app_admin@cspresourcehoststest.test";
     private static final String TROUBLESHOOTER = "csp_troubleshooter@cspresourcehoststest.test";
-    private static final Log log = LogFactory.getLog(CspResourceHostsTest.class);
 
     private final CspConfigHelper _cspConfigHelper = new CspConfigHelper(this);
 
@@ -83,11 +77,13 @@ public class CspResourceHostsTest extends BaseWebDriverTest
 
         ExternalSourcesPage externalSourcesPage = ExternalSourcesPage.beginAt(this);
         externalSourcesPage.addHost(directive, host);
+
         assertElementPresent(addButton);
         assertElementPresent(saveButton);
         assertElementPresent(deleteButton);
         assertElementNotPresent(doneButton);
-        assertEquals("Defined directives", Map.of(directive, Set.of(host)), externalSourcesPage.getExistingHosts());
+        List<AllowedHost> expected = List.of(new AllowedHost(directive, host));
+        assertEquals("Defined directives", expected, externalSourcesPage.getExistingHosts());
 
         impersonate(TROUBLESHOOTER);
         externalSourcesPage = ShowAdminPage.beginAt(this).clickAllowedExternalResourceHosts();
@@ -95,7 +91,7 @@ public class CspResourceHostsTest extends BaseWebDriverTest
         assertElementNotPresent(saveButton);
         assertElementNotPresent(deleteButton);
         assertElementPresent(doneButton);
-        assertEquals("Defined directives", Map.of(directive, Set.of(host)), externalSourcesPage.getExistingHosts());
+        assertEquals("Defined directives", expected, externalSourcesPage.getExistingHosts());
 
         clickAndWait(doneButton);
         assertEquals("Done button destination", "/admin-showAdmin.view", getCurrentRelativeURL());
@@ -116,7 +112,7 @@ public class CspResourceHostsTest extends BaseWebDriverTest
     public void testAddDuplicateHostsErrors()
     {
         String host1 = "https://labkey.org";
-        Map<Directive, Set<String>> expectedDirectives = new HashMap<>();
+        List<AllowedHost> expectedDirectives = new ArrayList<>();
 
         impersonate(APP_ADMIN);
         ExternalSourcesPage externalSourcesPage = ExternalSourcesPage.beginAt(this);
@@ -124,7 +120,7 @@ public class CspResourceHostsTest extends BaseWebDriverTest
         log("Verify that multiple directives can have the same host");
         for (Directive directive : Directive.values())
         {
-            expectedDirectives.put(directive, Set.of(host1));
+            expectedDirectives.add(new AllowedHost(directive, host1));
             externalSourcesPage.addHost(directive, "  " + host1 + "  ");
         }
 
@@ -133,19 +129,20 @@ public class CspResourceHostsTest extends BaseWebDriverTest
         {
             String host1UpperCase = host1.toUpperCase();
             List<String> errors = externalSourcesPage.addHostExpectingError(directive, "  " + host1UpperCase + "  ");
-            Assertions.assertThat(errors).as("error count").hasSize(1);
-            Assertions.assertThat(errors.get(0)).contains("Duplicate values are not allowed.", directive.name(), host1UpperCase);
+            assertThat(errors).as("error count").hasSize(1);
+            assertThat(errors.get(0)).contains("Duplicate values are not allowed.", directive.name(), host1UpperCase);
         }
 
-        assertEquals("Defined directives", expectedDirectives, externalSourcesPage.getExistingHosts());
+        assertThat(externalSourcesPage.getExistingHosts()).as("Defined directives")
+            .containsExactlyInAnyOrderElementsOf(expectedDirectives);
     }
 
     @Test
-    public void testEditDuplicateHostsErrors() throws Exception
+    public void testEditDuplicateHostsErrors()
     {
         String host1 = "https://labkey.org";
         String host2 = "https://labkey.com";
-        Map<Directive, Set<String>> expectedDirectives = new HashMap<>();
+        List<AllowedHost> expectedDirectives = new ArrayList<>();
 
         impersonate(APP_ADMIN);
         ExternalSourcesPage externalSourcesPage = ExternalSourcesPage.beginAt(this);
@@ -153,7 +150,8 @@ public class CspResourceHostsTest extends BaseWebDriverTest
         log("Setup directives with multiple hosts");
         for (Directive directive : Directive.values())
         {
-            expectedDirectives.put(directive, Set.of(host1, host2));
+            expectedDirectives.add(new AllowedHost(directive, host1));
+            expectedDirectives.add(new AllowedHost(directive, host2));
             externalSourcesPage.addHost(directive, "  " + host1 + "  ");
             externalSourcesPage.addHost(directive, "  " + host2 + "  ");
         }
@@ -162,17 +160,18 @@ public class CspResourceHostsTest extends BaseWebDriverTest
         for (Directive directive : Directive.values())
         {
             String host1UpperCase = host1.toUpperCase();
-            externalSourcesPage.editExistingSource(directive, host2, "  " + host1UpperCase + "  ");
+            externalSourcesPage.editHost(directive, host2, "  " + host1UpperCase + "  ");
             List<String> errors = externalSourcesPage.saveChangesExpectingError();
-            Assertions.assertThat(errors).as("error count").hasSize(1);
-            Assertions.assertThat(errors.get(0)).contains("Duplicate values are not allowed.", directive.name(), host1);
+            assertThat(errors).as("error count").hasSize(1);
+            assertThat(errors.get(0)).contains("Duplicate values are not allowed.", directive.name(), host1);
         }
 
-        assertEquals("Defined directives", expectedDirectives, externalSourcesPage.getExistingHosts());
+        assertThat(externalSourcesPage.getExistingHosts()).as("Defined directives")
+            .containsExactlyInAnyOrderElementsOf(expectedDirectives);
     }
 
     @Test
-    public void testAddInvalidHostsErrors() throws Exception
+    public void testAddInvalidHostsErrors()
     {
         String host1 = "https://labkey.org";
 
@@ -184,24 +183,24 @@ public class CspResourceHostsTest extends BaseWebDriverTest
         {
             String badHost1 = host1 + ";";
             List<String> errors = externalSourcesPage.addHostExpectingError(directive, badHost1);
-            Assertions.assertThat(errors).as("error").containsExactly("Semicolons are not allowed in host names");
+            assertThat(errors).as("error").containsExactly("Semicolons are not allowed in host names");
         }
 
         log("Verify that each directive can't add blank hosts");
         for (Directive directive : Directive.values())
         {
             List<String> errors = externalSourcesPage.addHostExpectingError(directive, "");
-            Assertions.assertThat(errors).as("error").containsExactly("Host must not be blank");
+            assertThat(errors).as("error").containsExactly("Host must not be blank");
         }
 
-        assertEquals("Defined directives", Collections.emptyMap(), externalSourcesPage.getExistingHosts());
+        assertEquals("Defined directives", Collections.emptyList(), externalSourcesPage.getExistingHosts());
     }
 
     @Test
-    public void testEditInvalidHostsErrors() throws Exception
+    public void testEditInvalidHostsErrors()
     {
-        String host1 = "https://labkey.org";
-        Map<Directive, Set<String>> expectedDirectives = new HashMap<>();
+        String host = "https://labkey.org";
+        List<AllowedHost> expectedDirectives = new ArrayList<>();
 
         impersonate(APP_ADMIN);
         ExternalSourcesPage externalSourcesPage = ExternalSourcesPage.beginAt(this);
@@ -209,28 +208,72 @@ public class CspResourceHostsTest extends BaseWebDriverTest
         log("Setup directives with multiple hosts");
         for (Directive directive : Directive.values())
         {
-            expectedDirectives.put(directive, Set.of(host1));
-            externalSourcesPage.addHost(directive, "  " + host1 + "  ");
+            expectedDirectives.add(new AllowedHost(directive, host));
+            externalSourcesPage.addHost(directive, "  " + host + "  ");
         }
 
         log("Verify that directive can't be edited to have semicolon");
         for (Directive directive : Directive.values())
         {
-            String host1UpperCase = host1.toUpperCase();
-            externalSourcesPage.editExistingSource(directive, host1, host1UpperCase + " ;");
+            String host1UpperCase = host.toUpperCase();
+            externalSourcesPage.editHost(directive, host, host1UpperCase + " ;");
             List<String> errors = externalSourcesPage.saveChangesExpectingError();
-            Assertions.assertThat(errors).as("error").containsExactly("Semicolons are not allowed in host names");
+            assertThat(errors).as("error").containsExactly("Semicolons are not allowed in host names");
         }
 
         log("Verify that directive can't be edited to be blank");
         for (Directive directive : Directive.values())
         {
-            externalSourcesPage.editExistingSource(directive, host1, "");
+            externalSourcesPage.editHost(directive, host, "");
             List<String> errors = externalSourcesPage.saveChangesExpectingError();
-            Assertions.assertThat(errors).as("error").containsExactly("Host must not be blank");
+            assertThat(errors).as("error").containsExactly("Host must not be blank");
         }
 
-        assertEquals("Defined directives", expectedDirectives, externalSourcesPage.getExistingHosts());
+        assertThat(externalSourcesPage.getExistingHosts()).as("Defined directives")
+            .containsExactlyInAnyOrderElementsOf(expectedDirectives);
+    }
+
+    @Test
+    public void testDeleteAvailableHosts()
+    {
+        String host1 = "https://labkey.org";
+        String host2 = "https://labkey.com";
+        List<AllowedHost> expectedDirectives = new ArrayList<>();
+
+        impersonate(APP_ADMIN);
+        ExternalSourcesPage externalSourcesPage = ExternalSourcesPage.beginAt(this);
+
+        log("Setup directives with multiple hosts in a random order");
+        for (Directive directive : Directive.values())
+        {
+            expectedDirectives.add(new AllowedHost(directive, host1));
+            expectedDirectives.add(new AllowedHost(directive, host2));
+        }
+        Collections.shuffle(expectedDirectives);
+        for (AllowedHost allowedHost : expectedDirectives)
+        {
+            externalSourcesPage.addHost(allowedHost.getDirective(), allowedHost.getHost());
+        }
+
+        assertThat(externalSourcesPage.getExistingHosts()).as("Defined directives")
+            .containsExactlyInAnyOrderElementsOf(expectedDirectives);
+
+        log("Delete directives in a random order");
+        Collections.shuffle(expectedDirectives);
+        Iterator<AllowedHost> iterator = expectedDirectives.iterator();
+        while (iterator.hasNext())
+        {
+            AllowedHost allowedHost = iterator.next();
+            iterator.remove();
+            externalSourcesPage.deleteHost(allowedHost.getDirective(), allowedHost.getHost());
+
+            assertThat(externalSourcesPage.getExistingHosts()).as("Defined directives")
+                .containsExactlyInAnyOrderElementsOf(expectedDirectives);
+        }
+
+        assertThat(externalSourcesPage.getExistingHosts())
+            .as("Defined directives after deleting all")
+            .isEmpty();
     }
 
     @Test
@@ -242,7 +285,7 @@ public class CspResourceHostsTest extends BaseWebDriverTest
         List<String> availableDirectives = SelectWrapper.Select(Locator.id("newDirective")).find(getDriver())
             .getOptions().stream().map(el -> el.getDomProperty("value")).toList();
 
-        Assertions.assertThat(availableDirectives).as("Available directives")
+        assertThat(availableDirectives).as("Available directives")
             .containsExactlyInAnyOrderElementsOf(expectedDirectives);
     }
 

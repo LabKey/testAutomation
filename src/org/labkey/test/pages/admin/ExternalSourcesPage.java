@@ -1,5 +1,6 @@
 package org.labkey.test.pages.admin;
 
+import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
 import org.labkey.test.WebDriverWrapper;
@@ -10,18 +11,13 @@ import org.labkey.test.components.html.Table;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
+import org.labkey.test.util.core.admin.CspConfigHelper;
 import org.openqa.selenium.NotFoundException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -43,7 +39,7 @@ public class ExternalSourcesPage extends LabKeyPage<ExternalSourcesPage.ElementC
     @LogMethod
     public ExternalSourcesPage ensureHost(Directive directive, String host)
     {
-        if (!getExistingHosts().getOrDefault(directive, Collections.emptySet()).contains(host))
+        if (!getExistingHosts().contains(new CspConfigHelper.AllowedHost(directive, host)))
         {
             return addHost(directive, host);
         }
@@ -75,16 +71,18 @@ public class ExternalSourcesPage extends LabKeyPage<ExternalSourcesPage.ElementC
         clickAndWait(elementCache().addButton);
         clearCache();
 
-        return getTexts(Locators.labkeyError.findElements(elementCache()));
+        List<WebElement> errorEls = Locators.labkeyError.findElements(elementCache());
+        Assert.assertFalse("No errors found", errorEls.isEmpty());
+        return getTexts(errorEls);
     }
 
-    public ExternalSourcesPage editExistingSource(Directive directive, String host, String newHost)
+    public ExternalSourcesPage editHost(Directive directive, String host, String newHost)
     {
         getExistingSourceRow(directive, host).getHostInput().set(newHost);
         return this;
     }
 
-    public ExternalSourcesPage deleteExistingSource(Directive directive, String host, String newHost)
+    public ExternalSourcesPage deleteHost(Directive directive, String host)
     {
         getExistingSourceRow(directive, host).clickDelete();
         return this;
@@ -113,18 +111,20 @@ public class ExternalSourcesPage extends LabKeyPage<ExternalSourcesPage.ElementC
         clickAndWait(elementCache().saveButton);
         clearCache();
 
-        return getTexts(Locators.labkeyError.findElements(elementCache()));
+        List<WebElement> errorEls = Locators.labkeyError.findElements(elementCache());
+        Assert.assertFalse("No errors found", errorEls.isEmpty());
+        return getTexts(errorEls);
     }
 
-    public Map<Directive, Set<String>> getExistingHosts()
+    public List<CspConfigHelper.AllowedHost> getExistingHosts()
     {
-        Map<Directive, Set<String>> existingHosts = new HashMap<>();
+        List<CspConfigHelper.AllowedHost> existingHosts = new ArrayList<>();
 
         for (ExistingSourceRow row : elementCache().getExistingSourceRows())
         {
             Directive directive = row.getDirective();
-            String hostInput = row.getHost();
-            existingHosts.computeIfAbsent(directive, d -> new HashSet<>()).add(hostInput);
+            String host = row.getHost();
+            existingHosts.add(new CspConfigHelper.AllowedHost(directive, host));
         }
 
         return existingHosts;
@@ -151,14 +151,7 @@ public class ExternalSourcesPage extends LabKeyPage<ExternalSourcesPage.ElementC
         {
             if (existingSourceRows == null)
             {
-                List<WebElement> rows = existingValuesTable.getRows();
-                List<ExistingSourceRow> temp = new ArrayList<>();
-                for (int i = 0; i < rows.size(); i++)
-                {
-                    WebElement row = rows.get(i);
-                    temp.add(new ExistingSourceRow(row, i));
-                }
-                existingSourceRows = Collections.unmodifiableList(temp);
+                existingSourceRows = existingValuesTable.getRows().stream().map(ExistingSourceRow::new).toList();
             }
             return existingSourceRows;
         }
@@ -171,16 +164,14 @@ public class ExternalSourcesPage extends LabKeyPage<ExternalSourcesPage.ElementC
         private final WebElement directiveInput;
         private final Input hostInput;
         private final WebElement deleteButton;
-        private final int rowIndex;
 
         private Directive directive;
 
-        ExistingSourceRow(WebElement row, int rowIndex)
+        ExistingSourceRow(WebElement row)
         {
             directiveInput = Locator.tag("input").withAttributeContaining("name", "directive").findWhenNeeded(row);
             hostInput = Input.Input(Locator.tag("input").withAttributeContaining("name", "host"), getDriver()).findWhenNeeded(row);
             deleteButton = Locator.lkButton("Delete").findWhenNeeded(row);
-            this.rowIndex = rowIndex;
         }
 
         Directive getDirective()
