@@ -63,7 +63,7 @@ public class CustomizeGridPermissionsTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        CustomizeGridPermissionsTest init = (CustomizeGridPermissionsTest) getCurrentTest();
+        CustomizeGridPermissionsTest init = getCurrentTest();
 
         init.doSetup();
     }

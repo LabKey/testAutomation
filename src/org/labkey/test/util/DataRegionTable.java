@@ -868,7 +868,7 @@ public class DataRegionTable extends DataRegion
         }
         else if (isFlagDisabled(flag))
         {
-            assertEquals("Expect unset flag title to be 'Flag for review'", title, "Flag for review");
+            assertEquals("Expect unset flag title to be 'Flag for review'", "Flag for review", title);
             return null;
         }
         throw new AssertionError("Expected flag class to be either 'lk-flag-enabled' or 'lk-flag-disabled'");

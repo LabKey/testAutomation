@@ -576,7 +576,7 @@ public abstract class Locator extends By
             @Override
             public Boolean apply(SearchContext context)
             {
-                return findElements(context).size() == 0;
+                return findElements(context).isEmpty();
             }
 
             @Override
@@ -1672,7 +1672,7 @@ public abstract class Locator extends By
         @Override
         public Locator containing(String contains)
         {
-            if (_text != null && _text.length() > 0 || _contains != null && _contains.length() > 0)
+            if (_text != null && !_text.isEmpty() || _contains != null && !_contains.isEmpty())
                 throw new IllegalStateException("Text content already been specified for this Locator");
 
             return new CssLocator(getLoc(), _index, contains, _text);
@@ -1681,7 +1681,7 @@ public abstract class Locator extends By
         @Override
         public Locator withText(String text)
         {
-            if (_text != null && _text.length() > 0 || _contains != null && _contains.length() > 0)
+            if (_text != null && !_text.isEmpty() || _contains != null && !_contains.isEmpty())
                 throw new IllegalStateException("Text content already been specified for this Locator");
 
             return new CssLocator(getLoc(), _index, _contains, text);
@@ -1820,7 +1820,7 @@ public abstract class Locator extends By
 
     public static class LinkLocator extends XPathLocator
     {
-        private String _linkText;
+        private final String _linkText;
 
         public LinkLocator(@NotNull String linkText)
         {
@@ -1845,7 +1845,7 @@ public abstract class Locator extends By
                 // By.linkText doesn't allow all possible link texts. e.g. "[All]"
                 return new XPathLocator(getLoc()).findElements(context);
             }
-            if (elements.size() == 0 && !_linkText.equals(_linkText.toUpperCase()))
+            if (elements.isEmpty() && !_linkText.equals(_linkText.toUpperCase()))
                 return (new LinkLocator(_linkText.toUpperCase())).findElements(context);
             else
                 return elements;

@@ -476,7 +476,7 @@ public class QueryChartDialog extends ModalDialog
             Locator loc = Locator.tag("div").withChild(Locator.tagContainingText("label", label));
             return Locator.tagWithClass("div", "field-option-icon").descendant("span").findElementOrNull(loc.findElement(this));
         }
-        private Locator.XPathLocator previewContainerLoc = Locator.tag("div").withChild(Locator.tagWithText("label", "Preview"));
+        private final Locator.XPathLocator previewContainerLoc = Locator.tag("div").withChild(Locator.tagWithText("label", "Preview"));
         public WebElement previewContainer()
         {
             return previewContainerLoc.waitForElement(this, 1500);
@@ -486,8 +486,8 @@ public class QueryChartDialog extends ModalDialog
             return Locator.tagWithClass("div", "gray-text").waitForElement(previewContainer(), 1500).getText();
         }
 
-        private Locator previewBodyLoc = Locator.tagWithClass("div", "chart-builder-preview-body");
-        private Locator svgLoc = Locator.tagWithClass("div", "svg-chart__chart");
+        private final Locator previewBodyLoc = Locator.tagWithClass("div", "chart-builder-preview-body");
+        private final Locator svgLoc = Locator.tagWithClass("div", "svg-chart__chart");
 
         public WebElement svg()
         {
@@ -515,7 +515,7 @@ public class QueryChartDialog extends ModalDialog
         }
 
         static {
-            Map<String,CHART_TYPE> map = new HashMap<String,CHART_TYPE>();
+            Map<String,CHART_TYPE> map = new HashMap<>();
             for(CHART_TYPE instance : CHART_TYPE.values())
             {
                 map.put(instance.getChartType(), instance);

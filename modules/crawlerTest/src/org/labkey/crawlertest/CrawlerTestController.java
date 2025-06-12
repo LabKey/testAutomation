@@ -38,7 +38,7 @@ public class CrawlerTestController extends SpringActionController
     }
 
     @RequiresPermission(ReadPermission.class)
-    public class InjectJspAction extends SimpleViewAction<InjectForm>
+    public static class InjectJspAction extends SimpleViewAction<InjectForm>
     {
         @Override
         public void validate(InjectForm form, BindException errors)

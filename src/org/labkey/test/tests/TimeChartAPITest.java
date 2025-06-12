@@ -71,7 +71,8 @@ public class TimeChartAPITest extends TimeChartTest
         33
     };
 
-    private static final List<Pair<String, List<Object>>> GETDATA_API_TEST_MEASURES = new ArrayList<Pair<String, List<Object>>>(){{
+    private static final List<Pair<String, List<Object>>> GETDATA_API_TEST_MEASURES = new ArrayList<>()
+    {{
         add(Pair.of("study_Lab Results_CD4", Arrays.asList(543.0, 520.0, 420.0, 185.0, 261.0, 308.0, 177.0, 144.0, 167.0, 154.0)));
         add(Pair.of("study_Lab Results_Hemoglobin", Arrays.asList(14.5, 16.0, 12.2, 15.5, 13.9, 13.7, 12.9, 11.1, 13.2, 16.1)));
         add(Pair.of("study_Physical Exam_Weight_kg", Arrays.asList(86.0, 84.0, 83.0, 80.0, 79.0, 79.0, 79.0, 78.0, 77.0, 75.0)));
@@ -115,7 +116,8 @@ public class TimeChartAPITest extends TimeChartTest
                 {"study_Lab Results_date", "study_Lab Results_CD4", "study_Lab Results_ParticipantVisit_VisitDate", "IL-10 (23)::study_LuminexAssay_ObsConc_MAX", "IL-2 (3)::study_LuminexAssay_ObsConc_MAX", "TNF-alpha (40)::study_LuminexAssay_ObsConc_MAX", "IL-10 (23)::study_LuminexAssay_FI_MAX", "IL-2 (3)::study_LuminexAssay_FI_MAX", "TNF-alpha (40)::study_LuminexAssay_FI_MAX", "Days"}
         };
 
-        final List<Pair<String, List<Object>>> GETDATA_API_TEST_DAYS = new ArrayList<Pair<String, List<Object>>>() {{
+        final List<Pair<String, List<Object>>> GETDATA_API_TEST_DAYS = new ArrayList<>()
+        {{
             add(Pair.of("Days", Arrays.asList(44.0, 79.0, 108.0, 190.0, 246.0, 276.0, 303.0, 335.0, 364.0, 394.0)));
             add(Pair.of("Days", Arrays.asList(44.0, 79.0, 108.0, 190.0, 246.0, 276.0, 303.0, 335.0, 364.0, 394.0)));
             add(Pair.of("Days", Arrays.asList(44.0, 79.0, 108.0, 190.0, 246.0, 276.0, 303.0, 335.0, 364.0, 394.0)));
@@ -147,7 +149,8 @@ public class TimeChartAPITest extends TimeChartTest
                 {"study_Lab Results_ParticipantVisit_sequencenum", "study_Lab Results_CD4", "study_Lab Results_ParticipantVisit_Visit_Label", "study_Lab Results_ParticipantVisit_Visit_DisplayOrder", "study_Lab Results_ParticipantVisit_VisitDate", "IL-10 (23)::study_LuminexAssay_ObsConc_MAX", "IL-2 (3)::study_LuminexAssay_ObsConc_MAX", "TNF-alpha (40)::study_LuminexAssay_ObsConc_MAX", "IL-10 (23)::study_LuminexAssay_FI_MAX", "IL-2 (3)::study_LuminexAssay_FI_MAX", "TNF-alpha (40)::study_LuminexAssay_FI_MAX"}
         };
 
-        final List<Pair<String, List<Object>>> GETDATA_API_TEST_VISITLABEL = new ArrayList<Pair<String, List<Object>>>() {{
+        final List<Pair<String, List<Object>>> GETDATA_API_TEST_VISITLABEL = new ArrayList<>()
+        {{
             add(Pair.of("VisitLabel", Arrays.asList("Month 2", "Month 3", "Month 4", "Month 7", "Month 9", "Month 10", "Month 10", "Month 11", "Month 12", "Month 13")));
             add(Pair.of("VisitLabel", Arrays.asList("Month 2", "Month 3", "Month 4", "Month 7", "Month 9", "Month 10", "Month 10", "Month 11", "Month 12", "Month 13")));
             add(Pair.of("study_Lab Results_ParticipantVisit_Visit_Label", Arrays.asList("Month 2", "Month 3", "Month 4", "Month 7", "Month 9", "Month 10", "Month 10", "Month 11", "Month 12", "Month 13")));

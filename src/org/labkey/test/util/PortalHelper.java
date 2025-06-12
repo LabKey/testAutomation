@@ -252,7 +252,6 @@ public class PortalHelper extends WebDriverWrapper
     /**
      * Allows test code to navigate to a Webpart Ext-based navigation menu.
      * @param webPartTitle title (not name) of webpart to be clicked.  Multiple web parts with the same title not supported.
-     * @param items
      */
     public void clickWebpartMenuItem(String webPartTitle, String... items)
     {
@@ -436,9 +435,6 @@ public class PortalHelper extends WebDriverWrapper
     }
 
     /**
-     * @param webpart
-     * @param permission
-     * @param folder null=current folder
      */
     public void setWebpartPermission(String webpart, String permission, String folder)
     {
@@ -460,8 +456,6 @@ public class PortalHelper extends WebDriverWrapper
     }
 
     /**
-     * @param webpart
-     * @param expectedPermission The permission that is expected to be set.
      * @param expectedFolder The folder that is expected to be selected, null=current folder
      */
     public void checkWebpartPermission(String webpart, String expectedPermission, String expectedFolder)
@@ -492,8 +486,8 @@ public class PortalHelper extends WebDriverWrapper
         LEFT("Left", Axis.HORIZONTAL),
         RIGHT("Right", Axis.HORIZONTAL);
 
-        private String _dir;
-        private Axis _axis;
+        private final String _dir;
+        private final Axis _axis;
 
         Direction (String dir, Axis axis)
         {

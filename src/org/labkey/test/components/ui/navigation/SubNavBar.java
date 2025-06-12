@@ -124,7 +124,7 @@ public class SubNavBar extends WebDriverComponent<SubNavBar.ElementCache>
     // Extend simpleComponentFinder
     public static class SubNavBarFinder extends WebDriverComponentFinder<SubNavBar, SubNavBarFinder>
     {
-        private Locator.XPathLocator _locator;
+        private final Locator.XPathLocator _locator;
 
         private SubNavBarFinder(WebDriver driver)
         {

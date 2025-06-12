@@ -33,7 +33,7 @@ public class LinkedReportTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        LinkedReportTest init = (LinkedReportTest) getCurrentTest();
+        LinkedReportTest init = getCurrentTest();
         init._containerHelper.createProject(init.getProjectName());
     }
 

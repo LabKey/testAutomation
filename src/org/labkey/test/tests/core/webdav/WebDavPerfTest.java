@@ -51,7 +51,7 @@ public class WebDavPerfTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        WebDavPerfTest init = (WebDavPerfTest) getCurrentTest();
+        WebDavPerfTest init = getCurrentTest();
 
         init.doSetup();
     }

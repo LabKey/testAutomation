@@ -214,7 +214,7 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
 
         if (name != null)
         {
-            if ("".equals(name))
+            if (name.isEmpty())
             {
                 _driver.log("Saving default custom view");
                 saveWindow.defaultViewRadio.check();
@@ -345,7 +345,6 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
 
     /**
      * expand customize view menu to all but the last of fieldKeyParts
-     * @param fieldKeyParts
      * @return The data-recordid property of the &lt;tr&gt; element for the specified field in the "Available Fields" column tree.
      */
     private WebElement expandPivots(String[] fieldKeyParts)
@@ -364,7 +363,7 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
                 Locator.css(".x4-tree-expander").findElement(fieldRow).click();
             }
             Locator.tag("tr").withClass("x4-grid-tree-node-expanded").withAttribute("data-recordid", nodePath).waitForElement(getComponentElement(), 10000);
-            WebDriverWrapper.waitFor(() -> Locator.css("tr[data-recordid] + tr:not(.x4-grid-row)").findElements(getComponentElement()).size() == 0, 2000); // Spacer row appears during expansion animation
+            WebDriverWrapper.waitFor(() -> Locator.css("tr[data-recordid] + tr:not(.x4-grid-row)").findElements(getComponentElement()).isEmpty(), 2000); // Spacer row appears during expansion animation
             nodePath += "/";
         }
 
@@ -414,7 +413,7 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
 
     public void addFilter(String[] fieldKeyParts, String column_name, String filter_type, String filter)
     {
-        if (filter.equals(""))
+        if (filter.isEmpty())
             _driver.log("Adding " + column_name + " filter of " + filter_type);
         else
             _driver.log("Adding " + column_name + " filter of " + filter_type + " " + filter);
@@ -758,7 +757,7 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
     public boolean isLookupColumn(String fieldKey)
     {
         WebElement fieldRow = expandPivots(fieldKey.split("/"));
-        return Locator.css("img.x4-tree-expander").findElements(fieldRow).size() > 0;
+        return !Locator.css("img.x4-tree-expander").findElements(fieldRow).isEmpty();
     }
 
     @Override
@@ -777,8 +776,8 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
 
     private class SelectedItemRow extends Component
     {
-        private WebElement _element;
-        private String _fieldKey;
+        private final WebElement _element;
+        private final String _fieldKey;
 
         protected SelectedItemRow(ViewItemType itemType, String fieldkey)
         {

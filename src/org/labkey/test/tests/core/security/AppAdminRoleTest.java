@@ -63,7 +63,7 @@ public class AppAdminRoleTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        AppAdminRoleTest init = (AppAdminRoleTest) getCurrentTest();
+        AppAdminRoleTest init = getCurrentTest();
 
         init.doSetup();
     }

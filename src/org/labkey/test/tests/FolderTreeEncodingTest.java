@@ -48,7 +48,7 @@ public class FolderTreeEncodingTest extends BaseWebDriverTest
     @BeforeClass
     public static void initTest()
     {
-        FolderTreeEncodingTest init = (FolderTreeEncodingTest)getCurrentTest();
+        FolderTreeEncodingTest init = getCurrentTest();
         init.doInit();
     }
 

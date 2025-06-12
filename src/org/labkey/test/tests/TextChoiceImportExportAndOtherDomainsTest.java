@@ -40,7 +40,7 @@ public class TextChoiceImportExportAndOtherDomainsTest extends TextChoiceTest
     private static final String LIST_TC_FIELD = "LTC_Field";
     private static final String LIST_TEXT_FIELD = "Str";
     private static final List<String> LIST_VALUES = Arrays.asList("L1", "L2|withPipes|", "L3", "L4");
-    private static List<Map<String, String>> listData = new ArrayList<>();
+    private static final List<Map<String, String>> listData = new ArrayList<>();
 
     // Issue names, etc...
     private static final String ISSUE_DESIGN_NAME = "Simple_TC_Issue";
@@ -65,7 +65,7 @@ public class TextChoiceImportExportAndOtherDomainsTest extends TextChoiceTest
     @BeforeClass
     public static void setupProject()
     {
-        TextChoiceImportExportAndOtherDomainsTest init = (TextChoiceImportExportAndOtherDomainsTest) getCurrentTest();
+        TextChoiceImportExportAndOtherDomainsTest init = getCurrentTest();
         init.doSetup();
     }
 
@@ -168,7 +168,7 @@ public class TextChoiceImportExportAndOtherDomainsTest extends TextChoiceTest
         log("Validate that a new issue can be inserted that uses the TextChoice field.");
         IssuesHelper issuesHelper = new IssuesHelper(getDriver());
 
-        String tcFieldName = getSelectControlName(ISSUE_TC_FIELD);;
+        String tcFieldName = getSelectControlName(ISSUE_TC_FIELD);
 
         Map<String, String> issueDetails = Map.of("title", ISSUE_TITLE, "assignedTo", getDisplayName(), tcFieldName, ISSUE_VALUE);
 

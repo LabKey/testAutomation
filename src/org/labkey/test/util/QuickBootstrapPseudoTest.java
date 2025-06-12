@@ -2,11 +2,7 @@ package org.labkey.test.util;
 
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.LabKeySiteWrapper;
-
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * Bootstrap a server without the initial user validation done by {@link LabKeySiteWrapper#signIn()}

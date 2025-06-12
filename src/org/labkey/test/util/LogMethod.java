@@ -33,7 +33,7 @@ public @interface LogMethod
     MethodType category() default MethodType.UNSPECIFIED;
 
     @Deprecated
-    public static enum MethodType
+    enum MethodType
     {
         BEFORE,
         SETUP,

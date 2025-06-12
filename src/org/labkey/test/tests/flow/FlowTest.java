@@ -72,7 +72,7 @@ public class FlowTest extends BaseFlowTest
     @BeforeClass
     public static void initR()
     {
-        FlowTest init = (FlowTest)getCurrentTest();
+        FlowTest init = getCurrentTest();
         init.doInit();
     }
 

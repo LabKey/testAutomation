@@ -164,7 +164,7 @@ public class ProjectSettingsTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject() throws IOException, CommandException
     {
-        ProjectSettingsTest init = (ProjectSettingsTest)getCurrentTest();
+        ProjectSettingsTest init = getCurrentTest();
         init.setUpTest();
     }
 

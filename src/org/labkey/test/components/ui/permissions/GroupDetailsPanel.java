@@ -1,6 +1,5 @@
 package org.labkey.test.components.ui.permissions;
 
-import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;

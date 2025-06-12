@@ -69,12 +69,6 @@ public class DetailPopover extends WebDriverComponent<DetailPopover.ElementCache
         return new ElementCache();
     }
 
-    @Override
-    protected ElementCache elementCache()
-    {
-        return (ElementCache) super.elementCache();
-    }
-
     protected class ElementCache extends Component<?>.ElementCache
     {
         public WebElement popover = Locator.tagWithClass("div", "header-details-hover")

@@ -82,7 +82,7 @@ public class ChartingAPITest extends BaseWebDriverTest
     @BeforeClass
     public static void doSetup() throws Exception
     {
-        ChartingAPITest initTest = (ChartingAPITest)getCurrentTest();
+        ChartingAPITest initTest = getCurrentTest();
         initTest.initProject();
     }
 

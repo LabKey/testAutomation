@@ -65,7 +65,7 @@ public class MessagesAttachmentTest extends BaseWebDriverTest implements NonWind
     {
         assertFalse("Do not run this test on Windows. It uses files with illegal characters", SystemUtils.IS_OS_WINDOWS);
 
-        MessagesAttachmentTest init = (MessagesAttachmentTest) getCurrentTest();
+        MessagesAttachmentTest init = getCurrentTest();
         init.doSetup();
     }
 

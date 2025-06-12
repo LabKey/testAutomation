@@ -24,11 +24,6 @@ import org.labkey.test.util.PermissionsHelper;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
 public abstract class AbstractAdminConsoleTest extends BaseWebDriverTest
 {
     protected static final String APP_ADMIN_USER = "app_admin_test_user@adminconsole.test";

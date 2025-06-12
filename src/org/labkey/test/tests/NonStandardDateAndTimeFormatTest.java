@@ -85,7 +85,7 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject() throws IOException, CommandException
     {
-        NonStandardDateAndTimeFormatTest init = (NonStandardDateAndTimeFormatTest)getCurrentTest();
+        NonStandardDateAndTimeFormatTest init = getCurrentTest();
         init.doSetup();
     }
 

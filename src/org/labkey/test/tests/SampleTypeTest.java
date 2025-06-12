@@ -107,7 +107,7 @@ public class SampleTypeTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        SampleTypeTest init = (SampleTypeTest) getCurrentTest();
+        SampleTypeTest init = getCurrentTest();
 
         // Comment out this line (after you run once) it will make iterating on tests much easier.
         init.doSetup();
@@ -327,7 +327,7 @@ public class SampleTypeTest extends BaseWebDriverTest
         mouseOver(meCell);
         WebElement helpDivBody = shortWait().until(ExpectedConditions.visibilityOfElementLocated(Locator.id("helpDivBody")));
         assertEquals("expect custom format popup for me filter",
-                helpDivBody.getText(), "Formatting applied because column = ~me~.");
+                "Formatting applied because column = ~me~.", helpDivBody.getText());
         assertNotEquals("expect cell for other user not to get custom format",
                 "rgb(244, 78, 59)", notMeCell.getCssValue("background-color"));
     }
@@ -1729,7 +1729,7 @@ public class SampleTypeTest extends BaseWebDriverTest
         row = 1;
         for (String filePath : expectedFilePaths)
         {
-            if (filePath.length() == 0)
+            if (filePath.isEmpty())
             {
                 assertEquals("Value of attachment column for row " + row + " not exported as expected.", "", exportedColumn.get(row).trim());
             }

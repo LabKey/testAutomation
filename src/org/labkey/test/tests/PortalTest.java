@@ -33,7 +33,6 @@ import org.labkey.test.util.PortalHelper;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.assertTrue;
@@ -57,7 +56,7 @@ public class PortalTest extends BaseWebDriverTest
     @BeforeClass
     public static void doSetup() throws Exception
     {
-        PortalTest initTest = (PortalTest)getCurrentTest();
+        PortalTest initTest = getCurrentTest();
 
         initTest._containerHelper.createProject(initTest.getProjectName(), null);
     }
@@ -107,7 +106,7 @@ public class PortalTest extends BaseWebDriverTest
     @LogMethod
     public void assertWebparts(List<String> requiredWebparts, List<String> preferredWebparts)
     {
-        log(requiredWebparts.size() > 0 ? "Assert that required webparts can't be removed" : "No required webparts");
+        log(!requiredWebparts.isEmpty() ? "Assert that required webparts can't be removed" : "No required webparts");
         SiteNavBar navBar = new SiteNavBar(getDriver());
         navBar.enterPageAdminMode();
         for (String webpartTitle : requiredWebparts)
@@ -122,7 +121,7 @@ public class PortalTest extends BaseWebDriverTest
             titleMenu.collapse();
         }
 
-        log(preferredWebparts.size() > 0 ? "Assert that preferred webparts can be removed" : "No preferred webparts");
+        log(!preferredWebparts.isEmpty() ? "Assert that preferred webparts can be removed" : "No preferred webparts");
         for (String webpartTitle : preferredWebparts)
         {
             log("Check preferred webpart: " + webpartTitle);

@@ -20,7 +20,6 @@ import org.labkey.test.Locator;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.util.DataRegionTable;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.util.List;
@@ -50,7 +49,7 @@ public class SummaryStatisticsDialog extends Window<SummaryStatisticsDialog.Elem
 
     public boolean isPresent(String statLabel)
     {
-        return elementCache().statCellLoc.startsWith(statLabel).findElements(this).size() >= 1;
+        return !elementCache().statCellLoc.startsWith(statLabel).findElements(this).isEmpty();
     }
 
     public boolean isSelected(String statLabel)

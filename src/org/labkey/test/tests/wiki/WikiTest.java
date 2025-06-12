@@ -28,7 +28,6 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Wiki;
-import org.labkey.test.components.WebPartPanel;
 import org.labkey.test.pages.admin.ExternalSourcesPage;
 import org.labkey.test.pages.admin.ExternalSourcesPage.Directive;
 import org.labkey.test.pages.search.SearchResultsPage;

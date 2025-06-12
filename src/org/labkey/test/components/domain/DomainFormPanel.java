@@ -280,7 +280,7 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
 
     public boolean isManuallyDefineFieldsPresent()
     {
-        return getThis().findElements(elementCache().manuallyDefineFieldsLoc).size() > 0;
+        return !getThis().findElements(elementCache().manuallyDefineFieldsLoc).isEmpty();
     }
 
     /**
@@ -525,7 +525,7 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
     public DomainFormPanel setInferFieldFile(File file)
     {
         getWrapper().setFormElement(elementCache().fileUploadInput, file);
-        getWrapper().waitFor(()-> elementCache().findFieldRows().size() > 0,
+        getWrapper().waitFor(()-> !elementCache().findFieldRows().isEmpty(),
                 "fields were not inferred from file in time", WAIT_FOR_JAVASCRIPT);
         return this;
     }

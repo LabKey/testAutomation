@@ -124,7 +124,7 @@ public class NabAssayTest extends AbstractAssayTest
     @BeforeClass
     public static void setupProject() throws Exception
     {
-        NabAssayTest init = (NabAssayTest)getCurrentTest();
+        NabAssayTest init = getCurrentTest();
         init.doSetup();
     }
 

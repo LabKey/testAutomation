@@ -24,7 +24,6 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.util.PortalHelper;
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 

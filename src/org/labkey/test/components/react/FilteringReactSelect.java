@@ -170,7 +170,7 @@ public class FilteringReactSelect extends BaseReactSelect<FilteringReactSelect>
         long filterStart = System.currentTimeMillis();
         WebDriverWrapper.waitFor(()-> {
             List<WebElement> options = elementCache().getOptions();
-            return options.size() > 0 &&
+            return !options.isEmpty() &&
                     !isLoading() || options.stream().anyMatch((a)-> a.getText().contains(value));
         }, WAIT_FOR_JAVASCRIPT);
         long elapsed = System.currentTimeMillis() - filterStart;

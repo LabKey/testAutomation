@@ -70,10 +70,10 @@ public class AssayAPITest extends BaseWebDriverTest
     @BeforeClass
     public static void doSetup() throws Exception
     {
-        AssayAPITest initTest = (AssayAPITest) getCurrentTest();
+        AssayAPITest initTest = getCurrentTest();
         initTest._containerHelper.createProject(initTest.getProjectName(), "Assay");
         initTest._containerHelper.createSubfolder(initTest.getProjectName(), SUBFOLDER_1, "Assay");
-        initTest.goToProjectHome();;
+        initTest.goToProjectHome();
 
         initTest.log("upload inline files to the pipeline root");
         initTest.goToModule("FileContent");

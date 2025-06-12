@@ -44,7 +44,7 @@ public class FieldEditorRowSelectionActionTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        FieldEditorRowSelectionActionTest init = (FieldEditorRowSelectionActionTest) getCurrentTest();
+        FieldEditorRowSelectionActionTest init = getCurrentTest();
         init.doSetup();
     }
 

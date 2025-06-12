@@ -33,7 +33,7 @@ public class NAbResultCalcTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        NAbResultCalcTest init = (NAbResultCalcTest) getCurrentTest();
+        NAbResultCalcTest init = getCurrentTest();
         init.doSetup();
     }
 

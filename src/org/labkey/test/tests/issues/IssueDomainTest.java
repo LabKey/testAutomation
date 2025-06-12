@@ -28,7 +28,7 @@ import static org.junit.Assert.fail;
 @BaseWebDriverTest.ClassTimeout(minutes = 2)
 public class IssueDomainTest extends BaseWebDriverTest
 {
-    private IssuesHelper _issuesHelper = new IssuesHelper(this);
+    private final IssuesHelper _issuesHelper = new IssuesHelper(this);
     private final String DOMAIN_NAME = "issues";//schemaName
     private final String ISSUES_NAME = "testdomainissue";
 
@@ -53,7 +53,7 @@ public class IssueDomainTest extends BaseWebDriverTest
     @BeforeClass
     public static void doSetup()
     {
-        IssueDomainTest initTest = (IssueDomainTest) getCurrentTest();
+        IssueDomainTest initTest = getCurrentTest();
         initTest.setup();
     }
 

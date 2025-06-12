@@ -176,7 +176,7 @@ public class PythonHelper
         }
         catch(IOException ex)
         {
-            if (versionOutput.length() > 0) _test.log("python --version > " + versionOutput);
+            if (!versionOutput.isEmpty()) _test.log("python --version > " + versionOutput);
             throw new RuntimeException("Unable to determine python version: " + python.getAbsolutePath(), ex);
         }
     }

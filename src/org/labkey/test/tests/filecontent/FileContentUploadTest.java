@@ -101,7 +101,7 @@ public class FileContentUploadTest extends BaseWebDriverTest
     @BeforeClass
     public static void doSetup()
     {
-        FileContentUploadTest initTest = (FileContentUploadTest)getCurrentTest();
+        FileContentUploadTest initTest = getCurrentTest();
 
         initTest.doSetupSteps();
     }

@@ -7,7 +7,6 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.Connection;
 import org.labkey.test.BaseWebDriverTest;
-import org.labkey.test.BootstrapLocators;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.pages.admin.ShortUrlAdminPage;

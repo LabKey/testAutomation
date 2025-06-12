@@ -16,7 +16,6 @@
 
 package org.labkey.test.pages;
 
-import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
 import org.openqa.selenium.WebDriver;
@@ -50,7 +49,7 @@ public class InsertPage extends LabKeyPage
         return new Elements();
     }
 
-    protected class Elements
+    protected static class Elements
     {
         public Locator.XPathLocator title = Locators.bodyTitle();
         public Locator.XPathLocator body = Locators.bodyPanel();

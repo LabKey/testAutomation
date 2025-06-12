@@ -94,7 +94,6 @@ public class IssueResponseModel
 
     /**
      * for ad-hoc querying of _serverProps
-     * @param key
      * @return  the object at that key
      */
     public Object getProperties(String key)

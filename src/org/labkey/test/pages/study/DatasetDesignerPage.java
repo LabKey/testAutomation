@@ -279,12 +279,12 @@ public class DatasetDesignerPage extends DomainDesigner<DatasetDesignerPage.Elem
         protected Input descriptionInput = new Input(Locator.id("description").findWhenNeeded(propertiesPanel),
                 getDriver());
 
-        private WebElement categoryRow = Locator.tagWithClass("div", "margin-top")
+        private final WebElement categoryRow = Locator.tagWithClass("div", "margin-top")
                 .containingIgnoreCase("Category").findWhenNeeded(propertiesPanel);
         protected FilteringReactSelect categorySelect = FilteringReactSelect.finder(getDriver()).findWhenNeeded(categoryRow);
         protected Input labelInput = new Input(Locator.inputById("label").findWhenNeeded(propertiesPanel), getDriver());
 
-        private WebElement rowUniquenessContainer = Locator.tagWithClass("div", "dataset_data_row_uniqueness_container")
+        private final WebElement rowUniquenessContainer = Locator.tagWithClass("div", "dataset_data_row_uniqueness_container")
                 .findWhenNeeded(propertiesPanel);
         final ReactSelect keyPropertyName = ReactSelect.finder(getDriver()).withName("keyPropertyName").findWhenNeeded(this);
         protected Locator dataRowRadioBtn(Integer index)

@@ -123,7 +123,7 @@ public class QueryExportTest extends AbstractExportTest
     @BeforeClass
     public static void doSetup() throws Exception
     {
-        QueryExportTest initTest = (QueryExportTest)getCurrentTest();
+        QueryExportTest initTest = getCurrentTest();
 
         initTest._containerHelper.createProject(initTest.getProjectName(), null);
         initTest._listHelper.importListArchive(initTest.getProjectName(), LIST_ARCHIVE);

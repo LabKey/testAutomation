@@ -68,7 +68,7 @@ public class NabHighThroughputAssayTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        NabHighThroughputAssayTest init = (NabHighThroughputAssayTest)getCurrentTest();
+        NabHighThroughputAssayTest init = getCurrentTest();
         init.doInit();
     }
 
