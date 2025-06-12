@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
+import org.labkey.test.TestProperties;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.UpdatingComponent;
@@ -20,6 +21,7 @@ import java.util.function.Supplier;
 public class DeleteConfirmationDialog<ConfirmPage extends WebDriverWrapper> extends ModalDialog
 {
     private final Function<Runnable, ConfirmPage> _confirmationSynchronizationFunction;
+    private boolean skipAuditEventCheck = false;
 
     public DeleteConfirmationDialog(@NotNull WebDriverWrapper sourcePage, Supplier<ConfirmPage> confirmPageSupplier)
     {
@@ -72,6 +74,12 @@ public class DeleteConfirmationDialog<ConfirmPage extends WebDriverWrapper> exte
                 "The delete confirmation dialog did not become ready.", 1_000);
     }
 
+    public DeleteConfirmationDialog<ConfirmPage> setSkipAuditEventCheck(boolean skipAuditEventCheck)
+    {
+        this.skipAuditEventCheck = skipAuditEventCheck;
+        return this;
+    }
+
     public void cancelDelete()
     {
         this.dismiss("Cancel");
@@ -79,28 +87,28 @@ public class DeleteConfirmationDialog<ConfirmPage extends WebDriverWrapper> exte
 
     public ConfirmPage confirmDelete()
     {
-        return confirmDelete(false, 10);
+        return confirmDelete(10);
     }
 
     public ConfirmPage confirmDelete(Integer waitSeconds)
     {
-        return confirmDelete(false, waitSeconds);
-    }
-
-    public ConfirmPage confirmDelete(boolean skipAuditEventCheck, Integer waitSeconds)
-    {
-        Integer count = getCountFromTitle("Permanently Delete");
-        String auditEventName = new AuditLogHelper(getWrapper()).getAuditEventNameFromURL();
+        Integer count = getCountFromTitle();
+        AuditLogHelper.AuditEvent auditEventName = getAuditEvent();
 
         var confirmPage = _confirmationSynchronizationFunction.apply(() -> this.dismiss("Yes, Delete", waitSeconds));
 
-        if (!skipAuditEventCheck && count != null && auditEventName != null)
+        if (!skipAuditEventCheck && count != null && auditEventName != null && !TestProperties.isTrialServer())
             verifyAuditEvents(getWrapper(), getWrapper().getCurrentProject(), auditEventName, count);
 
         return confirmPage;
     }
 
-    public static void verifyAuditEvents(WebDriverWrapper wrapper, String containerPath, String auditEventName, int entityCount)
+    public AuditLogHelper.AuditEvent getAuditEvent()
+    {
+        return new AuditLogHelper(getWrapper()).getAuditEventNameFromURL();
+    }
+
+    public static void verifyAuditEvents(WebDriverWrapper wrapper, String containerPath, AuditLogHelper.AuditEvent auditEventName, int entityCount)
     {
         try
         {
