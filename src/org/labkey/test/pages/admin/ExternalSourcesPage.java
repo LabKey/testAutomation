@@ -11,7 +11,7 @@ import org.labkey.test.components.html.Table;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
-import org.labkey.test.util.core.admin.CspConfigHelper;
+import org.labkey.test.util.core.admin.CspConfigHelper.AllowedHost;
 import org.openqa.selenium.NotFoundException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -39,7 +39,7 @@ public class ExternalSourcesPage extends LabKeyPage<ExternalSourcesPage.ElementC
     @LogMethod
     public ExternalSourcesPage ensureHost(Directive directive, String host)
     {
-        if (!getExistingHosts().contains(new CspConfigHelper.AllowedHost(directive, host)))
+        if (!getExistingHosts().contains(new AllowedHost(directive, host)))
         {
             return addHost(directive, host);
         }
@@ -116,15 +116,15 @@ public class ExternalSourcesPage extends LabKeyPage<ExternalSourcesPage.ElementC
         return getTexts(errorEls);
     }
 
-    public List<CspConfigHelper.AllowedHost> getExistingHosts()
+    public List<AllowedHost> getExistingHosts()
     {
-        List<CspConfigHelper.AllowedHost> existingHosts = new ArrayList<>();
+        List<AllowedHost> existingHosts = new ArrayList<>();
 
         for (ExistingSourceRow row : elementCache().getExistingSourceRows())
         {
             Directive directive = row.getDirective();
             String host = row.getHost();
-            existingHosts.add(new CspConfigHelper.AllowedHost(directive, host));
+            existingHosts.add(new AllowedHost(directive, host));
         }
 
         return existingHosts;
