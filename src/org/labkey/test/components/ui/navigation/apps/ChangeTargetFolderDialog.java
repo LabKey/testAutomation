@@ -29,7 +29,7 @@ public class ChangeTargetFolderDialog extends ModalDialog
 
 
 
-    static public interface UpdatesTargetFolder
+    public interface UpdatesTargetFolder
     {
         void doAndWaitForFolderUpdate(Runnable func);
     }

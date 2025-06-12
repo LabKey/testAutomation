@@ -101,7 +101,7 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject() throws Exception
     {
-        FileAttachmentColumnTest init = (FileAttachmentColumnTest)getCurrentTest();
+        FileAttachmentColumnTest init = getCurrentTest();
         init.doSetup();
     }
 

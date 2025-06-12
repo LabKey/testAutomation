@@ -61,7 +61,7 @@ public class SampleTypeRenameTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject() throws IOException, CommandException
     {
-        SampleTypeRenameTest init = (SampleTypeRenameTest) getCurrentTest();
+        SampleTypeRenameTest init = getCurrentTest();
         init.doSetup();
     }
 

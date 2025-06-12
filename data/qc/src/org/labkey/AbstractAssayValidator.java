@@ -31,9 +31,9 @@ public abstract class AbstractAssayValidator
     private String _email;
     private String _password;
     private File _errorFile;
-    private Map<String, String> _runProperties = new HashMap<>();
-    private Map<String, String> _transformFile = new HashMap<>();
-    private List<String> _errors = new ArrayList<>();
+    private final Map<String, String> _runProperties = new HashMap<>();
+    private final Map<String, String> _transformFile = new HashMap<>();
+    private final List<String> _errors = new ArrayList<>();
     private String _host;
 
     public enum Props {

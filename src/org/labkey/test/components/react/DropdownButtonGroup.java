@@ -97,7 +97,7 @@ public class DropdownButtonGroup extends WebDriverComponent<DropdownButtonGroup.
             return null;
 
         WebElement context = getRootMenu();
-        WebElement item = null;
+        WebElement item;
         for (int i = 0; i < subMenuLabels.length -1; i++)
         {
             context = openSubmenu(subMenuLabels[i], context);
@@ -134,7 +134,7 @@ public class DropdownButtonGroup extends WebDriverComponent<DropdownButtonGroup.
     {
         WebElement rootMenu = Locator.tagWithClass("ul", "dropdown-menu")
                 .withAttribute("aria-labelledby", componentId()).findElement(getComponentElement());
-        WebDriverWrapper.waitFor(()-> Locators.menuItem().findElements(rootMenu).size() > 0,
+        WebDriverWrapper.waitFor(()-> !Locators.menuItem().findElements(rootMenu).isEmpty(),
                 "the root menu did not have items in time", WAIT_FOR_JAVASCRIPT);
         return rootMenu;
     }

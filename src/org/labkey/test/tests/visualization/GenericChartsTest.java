@@ -44,8 +44,8 @@ public abstract class GenericChartsTest extends ReportTest
     protected static final String MOUSE_GROUP_CATEGORY = "Cat Mice Let";
     protected static final String CHART_TITLE = "Test Title";
 
-    private List<String> _plots = new ArrayList<>();
-    private List<String> _plotDescriptions = new ArrayList<>();
+    private final List<String> _plots = new ArrayList<>();
+    private final List<String> _plotDescriptions = new ArrayList<>();
 
     @Override
     @LogMethod

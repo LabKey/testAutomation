@@ -110,15 +110,6 @@ public class TestDataGenerator
         _containerPath = containerPath;
     }
 
-    /**
-     * @deprecated This isn't actually a lookup
-     */
-    @Deprecated (since = "22.4")
-    public TestDataGenerator(FieldDefinition.LookupInfo lookupInfo)
-    {
-        this(lookupInfo.getSchema(), lookupInfo.getTable(), lookupInfo.getFolder());
-    }
-
     public static File writeCsvFile(List<FieldDefinition> fields, List<Map<String, Object>> entityData, String fileName) throws IOException
     {
         List<List<String>> rows = TestDataUtils.replaceColumnHeaders(
@@ -259,6 +250,11 @@ public class TestDataGenerator
     public String getQueryName()
     {
         return _queryName;
+    }
+
+    public String getContainerPath()
+    {
+        return _containerPath;
     }
 
     public void setExcludedChars(String excludedChars)
@@ -545,7 +541,7 @@ public class TestDataGenerator
      */
     public static String randomDomainName(@Nullable String namePart, int numEndChars)
     {
-        String domainName = "";
+        String domainName;
         do
         {
             String firstChar = namePart != null ? namePart.charAt(0) + "" : randomString(1, null, ALPHANUMERIC_STRING); // domain needs to start with alphanumeric char;

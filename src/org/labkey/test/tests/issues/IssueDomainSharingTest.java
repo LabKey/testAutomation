@@ -53,8 +53,8 @@ public class IssueDomainSharingTest extends BaseWebDriverTest
     private static final String SHARED_LIST_DEF = "SharedTestDef";
     private final String FOLDER_PATH = "/" + getProjectName() + "/" + FOLDER;
 
-    private IssuesHelper _issuesHelper = new IssuesHelper(this);
-    private ApiPermissionsHelper _permissionsHelper = new ApiPermissionsHelper(this);
+    private final IssuesHelper _issuesHelper = new IssuesHelper(this);
+    private final ApiPermissionsHelper _permissionsHelper = new ApiPermissionsHelper(this);
 
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
@@ -72,7 +72,7 @@ public class IssueDomainSharingTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        IssueDomainSharingTest init = (IssueDomainSharingTest) getCurrentTest();
+        IssueDomainSharingTest init = getCurrentTest();
 
         init.doSetup();
     }

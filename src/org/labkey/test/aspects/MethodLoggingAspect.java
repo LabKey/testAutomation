@@ -38,10 +38,10 @@ import java.util.Stack;
 @Aspect
 public class MethodLoggingAspect
 {
-    private static Stack<Long> startTimes = new Stack<>();
-    private static Stack<String> methodStack = new Stack<>();
-    private static Stack<String> quietMethods = new Stack<>();
-    private static Stack<String> quietMethodsArgStrings = new Stack<>();
+    private static final Stack<Long> startTimes = new Stack<>();
+    private static final Stack<String> methodStack = new Stack<>();
+    private static final Stack<String> quietMethods = new Stack<>();
+    private static final Stack<String> quietMethodsArgStrings = new Stack<>();
 
     @Pointcut(value = "execution(@org.labkey.test.util.LogMethod * *(..))")
     void loggedMethod(){}
@@ -103,7 +103,7 @@ public class MethodLoggingAspect
     {
         methodStack.pop(); // Discard current method, duplicated in joinPoint
         String caller = methodStack.isEmpty() ? "" : methodStack.peek();
-        Long elapsed = System.currentTimeMillis()-startTimes.pop();
+        long elapsed = System.currentTimeMillis()-startTimes.pop();
         String method = joinPoint.getStaticPart().getSignature().getName();
 
         String argString = " done";
@@ -144,7 +144,7 @@ public class MethodLoggingAspect
             StringBuilder argBuilder = new StringBuilder();
             for (Object arg : args)
             {
-                if (argBuilder.length() > 0)
+                if (!argBuilder.isEmpty())
                     argBuilder.append(", ");
                 argBuilder.append(getArgString(arg, maxArgLength));
             }
@@ -163,7 +163,7 @@ public class MethodLoggingAspect
             }
         }while (!done);
 
-        argsString = (argsString.length() > 0 ? "(" + argsString + ")" : "");
+        argsString = (!argsString.isEmpty() ? "(" + argsString + ")" : "");
         return argsString;
     }
 
@@ -174,7 +174,7 @@ public class MethodLoggingAspect
         {
             for (Object nestedArg : (Object[])arg)
             {
-                argString += (argString.length() > 0 ? ", " : "") + getArgString(nestedArg, maxArgLength);
+                argString += (!argString.isEmpty() ? ", " : "") + getArgString(nestedArg, maxArgLength);
             }
             argString = "[" + argString + "]";
         }
@@ -182,7 +182,7 @@ public class MethodLoggingAspect
         {
             for (Object nestedArg : (Collection)arg)
             {
-                argString += (argString.length() > 0 ? ", " : "") + getArgString(nestedArg, maxArgLength);
+                argString += (!argString.isEmpty() ? ", " : "") + getArgString(nestedArg, maxArgLength);
             }
             argString = "[" + argString + "]";
         }

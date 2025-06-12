@@ -57,7 +57,7 @@ public class FilesWebpartFileRootTest extends BaseWebDriverTest
     @BeforeClass
     public static void initTest()
     {
-        FilesWebpartFileRootTest init = (FilesWebpartFileRootTest)getCurrentTest();
+        FilesWebpartFileRootTest init = getCurrentTest();
         init.doInit();
     }
 

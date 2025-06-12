@@ -23,8 +23,8 @@ import org.openqa.selenium.WebElement;
 
 public class WebPartPanel<EC extends WebPartPanel.ElementCache> extends WebDriverComponent<EC>
 {
-    private WebElement _componentElement;
-    private WebDriver _driver;
+    private final WebElement _componentElement;
+    private final WebDriver _driver;
     protected String _title;
 
     protected WebPartPanel(WebElement componentElement, WebDriver driver)

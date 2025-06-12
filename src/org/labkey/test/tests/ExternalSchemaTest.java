@@ -173,7 +173,7 @@ public class ExternalSchemaTest extends BaseWebDriverTest
     @BeforeClass
     public static void doSetup() throws Exception
     {
-        ExternalSchemaTest initTest = (ExternalSchemaTest)getCurrentTest();
+        ExternalSchemaTest initTest = getCurrentTest();
         initTest.createProject();
     }
 
@@ -440,7 +440,7 @@ public class ExternalSchemaTest extends BaseWebDriverTest
             Row r = new Row(rowid, text, intNotNull, datetimeNotNull);
             rows.add(r);
         }
-        return rows.toArray(new Row[rows.size()]);
+        return rows.toArray(new Row[0]);
     }
     
     Row[] updateViaJavaApi(String containerPath, Connection cn, Row... rows) throws ParseException, IOException, CommandException
@@ -545,7 +545,7 @@ public class ExternalSchemaTest extends BaseWebDriverTest
         // get newly inserted pk
         String rowidStr = table.getDataAsText(0, table.getColumnIndex("RowId"));
         assertTrue("Expected to find the RowId for the new row instead of '" + rowidStr + "'",
-                rowidStr != null && !rowidStr.equals(""));
+                rowidStr != null && !rowidStr.isEmpty());
         return Integer.parseInt(rowidStr);
     }
 

@@ -222,7 +222,6 @@ public class BootstrapMenu extends BaseBootstrapMenu
         /**
          * Some menu controls have IDs prepended with dynamic numbers, like 123-special-menu
          * @param substring the part of the ID that isn't dynamic
-         * @return
          */
         public BootstrapMenuFinder withToggleIdContaining(String substring)
         {

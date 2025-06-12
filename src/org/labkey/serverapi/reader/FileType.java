@@ -49,23 +49,23 @@ public class FileType implements Serializable
     /**
      * A list of possible suffixes in priority order. Later suffixes may also match earlier suffixes
      */
-    private List<String> _suffixes;
+    private final List<String> _suffixes;
     /**
      * a list of filetypes to reject - handles the scenario where old pepxml files are "foo.xml" and
      * we have to avoid grabbing "foo.pep-prot.xml"
      */
-    private List<FileType> _antiTypes;
+    private final List<FileType> _antiTypes;
     /**
      * The canonical suffix, will be used when creating new files from scratch
      */
-    private String _defaultSuffix;
+    private final String _defaultSuffix;
 
     /**
      * Mime content type.
      */
-    private List<String> _contentTypes;
+    private final List<String> _contentTypes;
 
-    private Boolean _dir;
+    private final Boolean _dir;
     /**
      * If _preferGZ is true, assume suffix.gz for new files to support TPP's transparent .xml.gz useage.
      * When dealing with existing files, non-gz version is still assumed to be the target if found
@@ -75,7 +75,7 @@ public class FileType implements Serializable
      * If _supportGZ is true, accept .suffix.gz as the equivalent of .suffix
      **/
     private Boolean _supportGZ;
-    private boolean _caseSensitiveOnCaseSensitiveFileSystems = false;
+    private final boolean _caseSensitiveOnCaseSensitiveFileSystems = false;
 
     /**
      * @param suffixes      list of what are usually the file extensions (but may be some other suffix to

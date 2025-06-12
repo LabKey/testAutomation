@@ -59,7 +59,7 @@ public class SimpleSmtpServer implements Runnable {
   /**
    * Port the server listens on - set to the default SMTP port initially.
    */
-  private int port = DEFAULT_SMTP_PORT;
+  private final int port;
 
   /**
    * Timeout listening on server socket.
@@ -166,7 +166,6 @@ public class SimpleSmtpServer implements Runnable {
    * @param out   output stream
    * @param input input stream
    * @return List of SmtpMessage
-   * @throws IOException
    */
   private List<SmtpMessage> handleTransaction(PrintWriter out, BufferedReader input) throws IOException {
     // Initialize the state machine

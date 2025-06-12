@@ -30,7 +30,7 @@ public class SampleTypeDefinition extends DomainProps
     private List<FieldDefinition> _fields = new ArrayList<>();
     private Map<String, String> _parentAliases = new HashMap<>();
     // Indicates which parent aliases reference 'exp.dataInputs' instead of 'exp.materialInputs'
-    private Set<String> _dataParentAliases = new HashSet<>();
+    private final Set<String> _dataParentAliases = new HashSet<>();
 
     // Currently, these values are only used by the SampleManager module.
     private MetricUnit _inventoryMetricUnit;

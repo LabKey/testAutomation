@@ -62,7 +62,7 @@ public class TourTest extends BaseWebDriverTest
     @LogMethod
     public static void setup() throws Exception
     {
-        TourTest initTest = (TourTest)getCurrentTest();
+        TourTest initTest = getCurrentTest();
         initTest._containerHelper.createProject(initTest.getProjectName(), "Collaboration");
         initTest._containerHelper.createSubfolder(initTest.getProjectName(), SUBFOLDER1);
         initTest._containerHelper.createSubfolder(initTest.getProjectName(), SUBFOLDER2);

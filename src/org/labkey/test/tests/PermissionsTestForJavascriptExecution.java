@@ -56,7 +56,7 @@ public class PermissionsTestForJavascriptExecution extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        PermissionsTestForJavascriptExecution init = (PermissionsTestForJavascriptExecution) getCurrentTest();
+        PermissionsTestForJavascriptExecution init = getCurrentTest();
         init.doSetup();
     }
 

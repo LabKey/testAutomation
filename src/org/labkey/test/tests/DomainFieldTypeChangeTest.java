@@ -33,7 +33,7 @@ public class DomainFieldTypeChangeTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        DomainFieldTypeChangeTest init = (DomainFieldTypeChangeTest) getCurrentTest();
+        DomainFieldTypeChangeTest init = getCurrentTest();
         init.doSetup();
     }
 
@@ -61,8 +61,7 @@ public class DomainFieldTypeChangeTest extends BaseWebDriverTest
         String listName = "SampleListWithAllDataTypes";
 
         log("Creating list with variety of data fields");
-        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "lists", listName);
-        TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
+        TestDataGenerator dgen = new TestDataGenerator("lists", listName, getProjectName())
                 .withColumns(List.of(
                         new FieldDefinition("name", FieldDefinition.ColumnType.String),
                         new FieldDefinition("testInteger", FieldDefinition.ColumnType.Integer),

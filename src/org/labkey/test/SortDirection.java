@@ -20,7 +20,7 @@ public enum SortDirection
     ASC("Ascending"),
     DESC("Descending");
 
-    private String _string;
+    private final String _string;
 
     SortDirection(String string)
     {

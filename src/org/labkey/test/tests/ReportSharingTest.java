@@ -52,7 +52,7 @@ public class ReportSharingTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        ReportSharingTest init = (ReportSharingTest) getCurrentTest();
+        ReportSharingTest init = getCurrentTest();
         init.doSetup();
     }
 

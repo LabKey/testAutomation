@@ -132,7 +132,7 @@ public class AssayExportImportTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        AssayExportImportTest init = (AssayExportImportTest)getCurrentTest();
+        AssayExportImportTest init = getCurrentTest();
         init.doSetup();
     }
 

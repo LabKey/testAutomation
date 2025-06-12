@@ -39,7 +39,7 @@ public class AssayMissingValuesTest extends MissingValueIndicatorsTest
     @BeforeClass
     public static void beforeTestClass()
     {
-        AssayMissingValuesTest init = (AssayMissingValuesTest)getCurrentTest();
+        AssayMissingValuesTest init = getCurrentTest();
 
         init.setupProject();
     }

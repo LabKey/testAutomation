@@ -42,7 +42,7 @@ public class DiscussionLinkTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        DiscussionLinkTest init = (DiscussionLinkTest) getCurrentTest();
+        DiscussionLinkTest init = getCurrentTest();
 
         init.doSetup();
     }

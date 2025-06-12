@@ -51,7 +51,7 @@ public class ElisaMultiPlateAssayTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        ElisaMultiPlateAssayTest init = (ElisaMultiPlateAssayTest) getCurrentTest();
+        ElisaMultiPlateAssayTest init = getCurrentTest();
 
         init.doSetup();
     }

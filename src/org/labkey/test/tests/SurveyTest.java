@@ -84,7 +84,7 @@ public class SurveyTest extends BaseWebDriverTest
     @LogMethod
     public static void doSetup()
     {
-        SurveyTest initTest = (SurveyTest)getCurrentTest();
+        SurveyTest initTest = getCurrentTest();
         initTest.setupProject();
     }
 

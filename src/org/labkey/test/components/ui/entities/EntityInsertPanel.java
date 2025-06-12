@@ -398,8 +398,6 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
 
     /**
      * finds the mode select tabs, to switch between grid input and file upload
-     * @param containsText
-     * @return
      */
     private Locator.XPathLocator modeSelectListItem(String containsText)
     {

@@ -33,7 +33,7 @@ public class AnnouncementAPITest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        AnnouncementAPITest init = (AnnouncementAPITest) getCurrentTest();
+        AnnouncementAPITest init = getCurrentTest();
 
         init.doSetup();
     }

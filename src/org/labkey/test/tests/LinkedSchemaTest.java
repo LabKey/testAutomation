@@ -104,7 +104,7 @@ import static org.junit.Assert.assertTrue;
 @BaseWebDriverTest.ClassTimeout(minutes = 11)
 public class LinkedSchemaTest extends BaseWebDriverTest
 {
-    private SchemaHelper _schemaHelper = new SchemaHelper(this);
+    private final SchemaHelper _schemaHelper = new SchemaHelper(this);
     private static final String PROJECT_NAME = LinkedSchemaTest.class.getSimpleName() + "Project";
     private static final String SOURCE_FOLDER = "SourceFolder";
     private static final String TARGET_FOLDER = "TargetFolder";
@@ -406,7 +406,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     @BeforeClass
     public static void doSetup() throws Exception
     {
-        LinkedSchemaTest initTest = (LinkedSchemaTest)getCurrentTest();
+        LinkedSchemaTest initTest = getCurrentTest();
 
         initTest.setupProject();
         initTest.createList();

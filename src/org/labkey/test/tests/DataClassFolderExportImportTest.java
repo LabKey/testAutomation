@@ -45,7 +45,7 @@ public class DataClassFolderExportImportTest extends BaseWebDriverTest
     private final File SAMPLE_JPG = new File(DATAFILE_DIRECTORY, "jpg_sample.jpg");
     private final File SAMPLE_PDF = new File(DATAFILE_DIRECTORY, "pdf_sample.pdf");
     private final File SAMPLE_TIF = new File(DATAFILE_DIRECTORY, "tif_sample.tif");
-    private List<File> _attachments = List.of(SAMPLE_CSV, SAMPLE_JPG, SAMPLE_PDF, SAMPLE_TIF);
+    private final List<File> _attachments = List.of(SAMPLE_CSV, SAMPLE_JPG, SAMPLE_PDF, SAMPLE_TIF);
 
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
@@ -57,7 +57,7 @@ public class DataClassFolderExportImportTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        DataClassFolderExportImportTest init = (DataClassFolderExportImportTest) getCurrentTest();
+        DataClassFolderExportImportTest init = getCurrentTest();
         init.doSetup();
     }
 
@@ -147,7 +147,7 @@ public class DataClassFolderExportImportTest extends BaseWebDriverTest
         }
 
         clickAndWait(Locator.linkWithText(testDataClass));
-        DataRegionTable destTable = DataRegionTable.DataRegion(getDriver()).withName("query").waitFor();;
+        DataRegionTable destTable = DataRegionTable.DataRegion(getDriver()).withName("query").waitFor();
 
         // capture the data in the exported sampleType
         List<Map<String, String>> destRowData = destTable.getTableData();

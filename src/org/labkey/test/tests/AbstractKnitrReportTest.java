@@ -62,7 +62,7 @@ public abstract class AbstractKnitrReportTest extends BaseWebDriverTest
     @BeforeClass
     public static void initProject()
     {
-        AbstractKnitrReportTest init = (AbstractKnitrReportTest)getCurrentTest();
+        AbstractKnitrReportTest init = getCurrentTest();
         init.setupProject();
     }
 

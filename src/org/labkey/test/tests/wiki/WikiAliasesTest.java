@@ -23,12 +23,12 @@ import java.util.Map;
 @BaseWebDriverTest.ClassTimeout(minutes = 4)
 public class WikiAliasesTest extends BaseWebDriverTest
 {
-    private static String wikiName = "Sample Wiki for testing aliases";
-    private static String wikiName2 = "Sample Wiki for testing aliases - Wiki 2";
-    private static String wikiTitle = "Title for " + wikiName;
-    private static String wikiBody = "Wiki body for " + wikiName;
+    private static final String wikiName = "Sample Wiki for testing aliases";
+    private static final String wikiName2 = "Sample Wiki for testing aliases - Wiki 2";
+    private static final String wikiTitle = "Title for " + wikiName;
+    private static final String wikiBody = "Wiki body for " + wikiName;
 
-    private static String SUBFOLDER = "Subfolder for wiki";
+    private static final String SUBFOLDER = "Subfolder for wiki";
 
     @BeforeClass
     public static void setupProject()

@@ -49,7 +49,7 @@ public class ListIndexingTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        ListIndexingTest init = (ListIndexingTest) getCurrentTest();
+        ListIndexingTest init = getCurrentTest();
         init.doSetup();
     }
 

@@ -82,7 +82,7 @@ public class UserDetailsPermissionTest extends BaseWebDriverTest
     @BeforeClass
     public static void setup()
     {
-        UserDetailsPermissionTest initTest = (UserDetailsPermissionTest) getCurrentTest();
+        UserDetailsPermissionTest initTest = getCurrentTest();
         initTest.doSetup();
     }
 

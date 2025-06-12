@@ -39,8 +39,8 @@ import static org.labkey.test.util.Ext4Helper.getCssPrefix;
 
 public class ComboBox extends WebDriverComponent<ComboBox.ElementCache>
 {
-    private WebElement _formItem;
-    private WebDriver _driver;
+    private final WebElement _formItem;
+    private final WebDriver _driver;
     private ComboListMatcher _matcher;
     private Boolean _isMultiSelect;
 

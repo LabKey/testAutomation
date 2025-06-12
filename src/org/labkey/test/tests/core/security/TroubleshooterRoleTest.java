@@ -32,7 +32,7 @@ public class TroubleshooterRoleTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        TroubleshooterRoleTest init = (TroubleshooterRoleTest) getCurrentTest();
+        TroubleshooterRoleTest init = getCurrentTest();
         init.doSetup();
     }
 

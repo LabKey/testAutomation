@@ -50,7 +50,7 @@ public class FlowSpecimenTest extends BaseFlowTest
     @BeforeClass
     public static void initFlowFolders()
     {
-        FlowSpecimenTest initTest = (FlowSpecimenTest)getCurrentTest();
+        FlowSpecimenTest initTest = getCurrentTest();
         initTest.initializeStudyFolder();
     }
 

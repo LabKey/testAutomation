@@ -58,7 +58,7 @@ public class PipelineTestsBase
 
     public boolean hasParams()
     {
-        return _listParams.size() > 0;
+        return !_listParams.isEmpty();
     }
 
     public void addParams(PipelineTestParams params)
@@ -73,7 +73,7 @@ public class PipelineTestsBase
 
     public PipelineTestParams[] getParams()
     {
-        return _listParams.toArray(new PipelineTestParams[_listParams.size()]);
+        return _listParams.toArray(new PipelineTestParams[0]);
     }
 
     public PipelineTestParams[] getCompleteParams()
@@ -85,7 +85,7 @@ public class PipelineTestsBase
             if (pc.isComplete(tp))
                 listCompleteParams.add(tp);
         }
-        return listCompleteParams.toArray(new PipelineTestParams[listCompleteParams.size()]);
+        return listCompleteParams.toArray(new PipelineTestParams[0]);
     }
 
     public void setup()
@@ -147,7 +147,7 @@ public class PipelineTestsBase
     public class PageCache
     {
         private PipelineStatusTable _tableStatus;
-        private Map<String, ExperimentRunTable> _mapTableExp = new HashMap<>();
+        private final Map<String, ExperimentRunTable> _mapTableExp = new HashMap<>();
 
         /**
          * Determines whether a test has completed its pipeline processing.  Note

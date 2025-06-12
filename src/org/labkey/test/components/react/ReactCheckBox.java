@@ -121,7 +121,7 @@ public class ReactCheckBox extends Checkbox
     {
         Checked,
         Indeterminate,
-        Unchecked;
+        Unchecked
     }
 }
 

@@ -85,7 +85,7 @@ public class CustomizeViewTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject() throws Exception
     {
-        CustomizeViewTest init = (CustomizeViewTest) getCurrentTest();
+        CustomizeViewTest init = getCurrentTest();
         init.doSetup();
     }
 

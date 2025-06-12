@@ -71,7 +71,7 @@ public class FileBrowserIconsTest extends BaseWebDriverTest
     @BeforeClass
     public static void initTest()
     {
-        FileBrowserIconsTest init = (FileBrowserIconsTest)getCurrentTest();
+        FileBrowserIconsTest init = getCurrentTest();
         init.doInit();
     }
 
@@ -90,67 +90,29 @@ public class FileBrowserIconsTest extends BaseWebDriverTest
     @Test
     public final void testSteps()
     {
-        boolean pass = true;
+        _fileBrowserHelper.waitForFileGridReady();
 
-        try
-        {
-            log("Validate the pipeline job has completed.");
-            waitForElementToDisappear(Locator.css("div.x4-grid-empty"), 5000);
-        }
-        catch(org.openqa.selenium.TimeoutException te)
-        {
-            assertTrue("Grid was never populated, check for pipeline error.", false);
-        }
+        validateCount("text", "span.fa-file-text-o", 8);
+        validateCount("code", "span.fa-file-code-o", 4);
+        validateCount("rtf/word", "span.fa-file-word-o", 5);
+        validateCount("image", "span.fa-file-image-o", 6);
+        validateCount("archive", "span.fa-file-archive-o", 5);
+        validateCount("video", "span.fa-file-video-o", 1);
+        validateCount("pdf", "span.fa-file-pdf-o", 2);
+        validateCount("excel", "span.fa-file-excel-o", 4);
+        validateCount("list", "span.fa-list-alt", 2);
+        validateCount("powerpoint", "span.fa-file-powerpoint-o", 2);
+        validateCount("file", "span.fa-file-o", 1);
 
-        log("Validate number of text icons is correct.");
-        pass = validateCount("span.fa-file-text-o", 8) & pass;
-
-        log("Validate number of code icons is correct.");
-        pass = validateCount("span.fa-file-code-o", 4) & pass;
-
-        log("Validate number of rtf\\word icons is correct.");
-        pass = validateCount("span.fa-file-word-o", 5) & pass;
-
-        log("Validate number of image icons is correct.");
-        pass = validateCount("span.fa-file-image-o", 6) & pass;
-
-        log("Validate number of archive icons is correct.");
-        pass = validateCount("span.fa-file-archive-o", 4) & pass;
-
-        log("Validate number of video icons is correct.");
-        pass = validateCount("span.fa-file-video-o", 1) & pass;
-
-        log("Validate number of pdf icons is correct.");
-        pass = validateCount("span.fa-file-pdf-o", 2) & pass;
-
-        log("Validate number of excel icons is correct.");
-        pass = validateCount("span.fa-file-excel-o", 4) & pass;
-
-        log("Validate number of list icons is correct.");
-        pass = validateCount("span.fa-list-alt", 2) & pass;
-
-        log("Validate number of powerpoint icons is correct.");
-        pass = validateCount("span.fa-file-powerpoint-o", 2) & pass;
-
-        log("Validate number of file icons is correct.");
-        pass = validateCount("span.fa-file-o", 1) & pass;
-
-        assertTrue("Count(s) for icons were not as expected. Review log to find the counts that were wrong.", pass);
+        checker().screenShotIfNewError("icon_counts");
     }
 
-    private boolean validateCount(String cssIcon, int expCount)
+    private void validateCount(String description, String cssIcon, int expCount)
     {
-        int count = getElementCount(Locator.css(cssIcon));
+        log("Validate number of %s icons is correct.".formatted(description));
+        int count = Locator.css(cssIcon).findElements(getDriver()).size();
 
-        if (getElementCount(Locator.css(cssIcon)) != expCount)
-        {
-            log("!!!!!Number of " + cssIcon + " is not as expected. Expected: " + expCount + " Actual: " + count);
-            return false;
-        }
-        else
-        {
-            return true;
-        }
+        checker().verifyEquals(description + " icons", expCount, count);
     }
 
 }

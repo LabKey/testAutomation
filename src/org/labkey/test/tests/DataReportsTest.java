@@ -136,7 +136,7 @@ public class DataReportsTest extends ReportTest
     @BeforeClass
     public static void doSetup()
     {
-        DataReportsTest initTest = (DataReportsTest)getCurrentTest();
+        DataReportsTest initTest = getCurrentTest();
 
         // fail fast if R is not configured
         initTest._rReportHelper.ensureRConfig();

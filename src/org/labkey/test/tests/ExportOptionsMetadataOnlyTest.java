@@ -43,7 +43,7 @@ public class ExportOptionsMetadataOnlyTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        ExportOptionsMetadataOnlyTest init = (ExportOptionsMetadataOnlyTest) getCurrentTest();
+        ExportOptionsMetadataOnlyTest init = getCurrentTest();
         init.doSetup();
     }
 

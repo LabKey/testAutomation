@@ -55,7 +55,7 @@ public class BaseExpressionMatrixTest extends BaseWebDriverTest implements Postg
     @BeforeClass
     public static void doSetup()
     {
-        BaseExpressionMatrixTest initTest = (BaseExpressionMatrixTest)getCurrentTest();
+        BaseExpressionMatrixTest initTest = getCurrentTest();
 
         initTest.doSetupSteps();
     }

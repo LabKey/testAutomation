@@ -626,7 +626,7 @@ public class Ext4Helper
         List<String> ids = new ArrayList<>();
         for (String id : unfilteredIds)
         {
-            if (Locator.id(id).findElements(_test.getDriver()).size() > 0)
+            if (!Locator.id(id).findElements(_test.getDriver()).isEmpty())
                 ids.add(id); // ignore uninitialized ext components
         }
         return componentsFromIds(ids, clazz);
@@ -635,7 +635,7 @@ public class Ext4Helper
     public <Type extends Ext4CmpRef> Type queryOne(String componentSelector, Class<Type> clazz)
     {
         List<Type> cmpRefs = componentQuery(componentSelector, clazz);
-        if (null == cmpRefs || cmpRefs.size() == 0)
+        if (null == cmpRefs || cmpRefs.isEmpty())
             return null;
 
         return cmpRefs.get(0);

@@ -98,7 +98,7 @@ public class UserTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        UserTest init = (UserTest)getCurrentTest();
+        UserTest init = getCurrentTest();
         init.doSetup();
     }
 

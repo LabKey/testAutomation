@@ -101,7 +101,7 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject() throws IOException, CommandException
     {
-        SampleTypeNameExpressionTest test = (SampleTypeNameExpressionTest)getCurrentTest();
+        SampleTypeNameExpressionTest test = getCurrentTest();
         test.doSetup();
     }
 
@@ -452,12 +452,11 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
     public void testLookupNameExpression() throws Exception
     {
         String lookupList = "Colors";
-        FieldDefinition.LookupInfo colorsLookup = new FieldDefinition.LookupInfo(getProjectName(), "lists", lookupList)
-                .setTableType(FieldDefinition.ColumnType.Integer);
+        FieldDefinition.LookupInfo colorsLookup = new FieldDefinition.IntLookup(getProjectName(), "lists", lookupList);
         String nameExpSamples = "NameExpressionSamples";
 
         // begin by creating a lookupList of colors, the sampleType will reference it
-        TestDataGenerator colorsGen = new TestDataGenerator(colorsLookup)
+        TestDataGenerator colorsGen = new TestDataGenerator("lists", lookupList, getProjectName())
                 .withColumns(List.of(new FieldDefinition("ColorName", FieldDefinition.ColumnType.String),
                         new FieldDefinition("ColorCode", FieldDefinition.ColumnType.String)));
         colorsGen.addCustomRow(Map.of("ColorName", "green", "ColorCode", "gr"));
