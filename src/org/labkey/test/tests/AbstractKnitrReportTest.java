@@ -17,6 +17,7 @@ package org.labkey.test.tests;
 
 import org.junit.Assume;
 import org.junit.BeforeClass;
+import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
@@ -34,6 +35,7 @@ import org.labkey.test.util.core.admin.CspConfigHelper;
 import org.openqa.selenium.WebElement;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
@@ -73,13 +75,19 @@ public abstract class AbstractKnitrReportTest extends BaseWebDriverTest
     }
 
     @LogMethod
-    protected void setupProject() throws Exception
+    protected void setupProject()
     {
-        CspConfigHelper.debugCspWarnings(); // TODO: temp debug on Teamcity
         Log4jUtils.setLogLevel("org.labkey.query.reports.ReportsController", ManagerPage.LoggingLevel.DEBUG);
-        new CspConfigHelper(this).setAllowedHosts(Map.of(
-            ExternalSourcesPage.Directive.Style, List.of("https://cdn.datatables.net"),
-            ExternalSourcesPage.Directive.Font, List.of("https://mathjax.rstudio.com")));
+        try
+        {
+            new CspConfigHelper(this).setAllowedHosts(Map.of(
+                ExternalSourcesPage.Directive.Style, List.of("https://cdn.datatables.net"),
+                ExternalSourcesPage.Directive.Font, List.of("https://mathjax.rstudio.com")));
+        }
+        catch (IOException | CommandException e)
+        {
+            throw new RuntimeException(e);
+        }
 
         _rReportHelper.ensureRConfig(isDocker());
 
