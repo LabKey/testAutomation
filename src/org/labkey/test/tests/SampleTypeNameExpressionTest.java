@@ -452,7 +452,7 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
     public void testLookupNameExpression() throws Exception
     {
         String lookupList = "Colors";
-        FieldDefinition.LookupInfo colorsLookup = new FieldDefinition.IntLookup("lists", lookupList, getProjectName());
+        FieldDefinition.LookupInfo colorsLookup = new FieldDefinition.IntLookup(getProjectName(), "lists", lookupList);
         String nameExpSamples = "NameExpressionSamples";
 
         // begin by creating a lookupList of colors, the sampleType will reference it
