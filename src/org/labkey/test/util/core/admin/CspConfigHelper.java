@@ -41,7 +41,7 @@ public class CspConfigHelper
         return _connectionSupplier.get();
     }
 
-    public void setAllowedHosts(Map<Directive, List<String>> allowedHosts)
+    public void setAllowedHosts(Map<Directive, List<String>> allowedHosts) throws IOException, CommandException
     {
         StringBuilder existingValues = new StringBuilder();
         for (Map.Entry<Directive, List<String>> entry : allowedHosts.entrySet())
@@ -57,17 +57,10 @@ public class CspConfigHelper
         postCommand.setParameters(Map.of(
             "saveAll", true,
             "existingValues", existingValues));
-        try
-        {
-            postCommand.execute(getConnection(), null);
-        }
-        catch (IOException | CommandException e)
-        {
-            throw new RuntimeException(e);
-        }
+        postCommand.execute(getConnection(), null);
     }
 
-    public void clearAllowedHosts()
+    public void clearAllowedHosts() throws IOException, CommandException
     {
         setAllowedHosts(Collections.emptyMap());
     }

@@ -66,14 +66,14 @@ public abstract class AbstractKnitrReportTest extends BaseWebDriverTest
     }
 
     @BeforeClass
-    public static void initProject()
+    public static void initProject() throws Exception
     {
         AbstractKnitrReportTest init = getCurrentTest();
         init.setupProject();
     }
 
     @LogMethod
-    protected void setupProject()
+    protected void setupProject() throws Exception
     {
         CspConfigHelper.debugCspWarnings(); // TODO: temp debug on Teamcity
         Log4jUtils.setLogLevel("org.labkey.query.reports.ReportsController", ManagerPage.LoggingLevel.DEBUG);
