@@ -258,6 +258,21 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         return getGridData(FieldReference::getName, columnIdentifiers);
     }
 
+    /**
+     * @param columnIdentifiers fieldKeys, names, or labels of columns
+     * @return grid data for the specified columns, ordered as the provided columnIdentifiers
+     */
+    public List<List<String>> getGridData(CharSequence... columnIdentifiers)
+    {
+        List<Map<Integer, String>> rowMaps = getGridData(FieldReference::getDomIndex, columnIdentifiers);
+        List<List<String>> gridData = new ArrayList<>();
+        for (Map<Integer, String> gridMap : rowMaps)
+        {
+            gridData.add(new ArrayList<>(gridMap.values())); // row maps remember insertion order
+        }
+        return gridData;
+    }
+
     private <T> List<Map<T, String>> getGridData(Function<FieldReferenceManager.FieldReference, T> keyGenerator, CharSequence... columnIdentifiers)
     {
         List<Map<T, String>> gridData = new ArrayList<>();
