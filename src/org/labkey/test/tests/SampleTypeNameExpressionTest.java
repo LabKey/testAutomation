@@ -580,16 +580,13 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
     public void testDeriveSampleFromSampleDetailsPage() throws Exception
     {
 
-        // This test exposes Issue 44760. The issue is not caused by using the UI but rather by the latest lineage lookup
-        // name expression feature.
         goToProjectHome();
 
         SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
 
         final String sampleType = "DerivedUI_SampleType";
+        // Covers Issue 44760
         final String nameExpression = String.format("DUI_${genId}_${materialInputs/%s/Str}", PARENT_SAMPLE_TYPE_INPUT);
-
-        // TODO: When Issue 44760 this test can be updated to use a parent alias in the name expression.
 
         log(String.format("Create a sample type named '%s' with a name expression of '%s'.", sampleType, nameExpression));
 
@@ -614,6 +611,7 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         checker().verifyTrue(String.format("Doesn't look like there is a link to the parent sample '%s'.", PARENT_SAMPLE_01),
                 isElementPresent(Locator.linkWithText(PARENT_SAMPLE_01)));
 
+        // Covers Issue 44760
         final String ancestorNameExpression = String.format("GrandChild_${MaterialInputs/%s/..[MaterialInputs/%s]/Str}_${genId}", sampleType, PARENT_SAMPLE_TYPE_INPUT);
         log("Change the sample type name expression to support grandparent property lookup: " + ancestorNameExpression);
         goToProjectHome();
@@ -659,7 +657,7 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
     private String deriveSample(String parentSampleName, String parentSampleType, String targetSampleType, String strVal, String intVal) throws IOException, CommandException
     {
         log(String.format("Go to the 'overview' page for sample '%s' in sample type '%s'", parentSampleName, parentSampleType));
-        Integer sampleRowNum = SampleTypeAPIHelper.getSampleIdFromName(getProjectName(), parentSampleType, Arrays.asList(parentSampleName)).get(parentSampleName);
+        Integer sampleRowNum = SampleTypeAPIHelper.getRowIdsForSamples(getProjectName(), parentSampleType, Arrays.asList(parentSampleName)).get(parentSampleName);
 
         String url = WebTestHelper.buildRelativeUrl("experiment", getCurrentContainerPath(), "showMaterial", Map.of("rowId", sampleRowNum));
         beginAt(url);
