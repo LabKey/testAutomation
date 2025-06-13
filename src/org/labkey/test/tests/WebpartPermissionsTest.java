@@ -130,9 +130,9 @@ public class WebpartPermissionsTest extends BaseWebDriverTest
     {
         // Target permissions operations at non-default project
         PermissionsHelper helper = new ApiPermissionsHelper(DUMMY_PROJECT_NAME);
-        helper.setPermissions(users[0], "Reader");
-        helper.setPermissions(users[1], "Editor");
-        helper.setPermissions(users[2], "Project Administrator");
+        helper.setUserPermissions(users[0], "Reader");
+        helper.setUserPermissions(users[1], "Editor");
+        helper.setUserPermissions(users[2], "Project Administrator");
     }
 
     private void verifyNoWebpartsVisible()
