@@ -982,7 +982,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                 else if (currentError.size() == 1)
                 {
                     // Line after the ERROR usually has the exception type and error message
-                    TestLogger.error("    " + iterator.next());
+                    TestLogger.error("    " + line);
                 }
                 else if (line.startsWith("Caused by:"))
                 {
