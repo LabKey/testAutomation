@@ -22,6 +22,8 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Daily;
+import org.labkey.test.util.ApiPermissionsHelper;
+import org.labkey.test.util.PermissionsHelper;
 import org.labkey.test.util.PortalHelper;
 
 import java.util.Arrays;
@@ -126,10 +128,11 @@ public class WebpartPermissionsTest extends BaseWebDriverTest
 
     private void setPermissionsOnDummyFolder()
     {
-        clickProject(DUMMY_PROJECT_NAME);
-        _securityHelper.setProjectPerm(users[0], DUMMY_PROJECT_NAME, "Reader");
-        _securityHelper.setProjectPerm(users[1], "Editor");
-        _securityHelper.setProjectPerm(users[2], "Project Administrator");
+        // Target permissions operations at non-default project
+        PermissionsHelper helper = new ApiPermissionsHelper(DUMMY_PROJECT_NAME);
+        helper.setPermissions(users[0], "Reader");
+        helper.setPermissions(users[1], "Editor");
+        helper.setPermissions(users[2], "Project Administrator");
     }
 
     private void verifyNoWebpartsVisible()
@@ -146,16 +149,16 @@ public class WebpartPermissionsTest extends BaseWebDriverTest
 
     private void setUpFocusFolder()
     {
-        /**
-         * this folder has three parts, with permissions set (dependent on DUMMY_PROJECT
-         * Flow Experiment managagement = Administrate
-         * Flow Analyses = Edit
-         * Flow Script = Read
+        /*
+          this folder has three parts, with permissions set (dependent on DUMMY_PROJECT
+          Flow Experiment management = Administrate
+          Flow Analyses = Edit
+          Flow Script = Read
          */
         _containerHelper.createProject(getProjectName(), "Collaboration");
         importFolderFromZip(TestFileUtils.getSampleData("webpartPerm/webPerms.folder.zip"));
         //set all users to Reader so they have access to the folder
-        _securityHelper.setSiteGroupPermissions("All Site Users", "Reader");
+        _permissionsHelper.setSiteGroupPermissions("All Site Users", "Reader");
     }
 
     //This folder contains no data, but will create users and set them with specific permissions
