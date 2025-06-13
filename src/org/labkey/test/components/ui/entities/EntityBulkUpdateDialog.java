@@ -350,25 +350,6 @@ public class EntityBulkUpdateDialog extends ModalDialog
         return this;
     }
 
-    public Integer getCountFromTitle()
-    {
-        // expecting title to be like "Update N items"
-        String title = getTitle();
-        String[] parts = title.split(" ");
-        if (parts.length > 1)
-        {
-            try
-            {
-                return Integer.parseInt(parts[1]);
-            }
-            catch (NumberFormatException nfe)
-            {
-                return null;
-            }
-        }
-        return null;
-    }
-
     // dismiss the dialog
 
     public String clickUpdateExpectingError()
@@ -395,7 +376,7 @@ public class EntityBulkUpdateDialog extends ModalDialog
 
         // check for the expected number of Data Changes in the latest audit event records
         AuditLogHelper auditLogHelper = new AuditLogHelper(getWrapper(), () -> WebTestHelper.getRemoteApiConnection(false));
-        String auditEventName = auditLogHelper.getAuditEventNameFromURL();
+        AuditLogHelper.AuditEvent auditEventName = auditLogHelper.getAuditEventNameFromURL();
         if (!skipAuditEventCheck && auditEventName != null && !TestProperties.isTrialServer())
         {
             try
