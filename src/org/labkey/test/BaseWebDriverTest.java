@@ -87,7 +87,6 @@ import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.PermissionsHelper;
 import org.labkey.test.util.PipelineToolsHelper;
 import org.labkey.test.util.ReadOnlyTest;
-import org.labkey.test.util.SecurityHelper;
 import org.labkey.test.util.SimpleHttpResponse;
 import org.labkey.test.util.StudyHelper;
 import org.labkey.test.util.TestLogger;
@@ -208,8 +207,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     public StudyHelper _studyHelper = new StudyHelper(this);
     public final ListHelper _listHelper;
     public AbstractAssayHelper _assayHelper = new APIAssayHelper(this);
-    @Deprecated // Redundant class. Use ApiPermissionsHelper or UiPermissionsHelper
-    public SecurityHelper _securityHelper = new SecurityHelper(this);
     public FileBrowserHelper _fileBrowserHelper = new FileBrowserHelper(this);
     @Deprecated // Use ApiPermissionsHelper unless UI testing is necessary
     public UIPermissionsHelper _permissionsHelper = new UIPermissionsHelper(this);
