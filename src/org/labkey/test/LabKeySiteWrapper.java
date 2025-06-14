@@ -56,6 +56,7 @@ import org.labkey.test.pages.core.admin.CustomizeSitePage;
 import org.labkey.test.pages.core.admin.ShowAdminPage;
 import org.labkey.test.pages.user.UserDetailsPage;
 import org.labkey.test.util.APIUserHelper;
+import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LabKeyExpectedConditions;
 import org.labkey.test.util.LogMethod;
@@ -772,6 +773,9 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                     // Note: leave the self-report setting unchanged
                     customizeSitePage.save();
                 }
+
+                verifySiteGroups();
+
                 /*
                     Waiting for search service to boot up
                     Issue 50601: PDF indexing is slow on first file after server startup on Windows
@@ -786,10 +790,12 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                     waitForElement(Locator.id("status-progress-bar").withText("Module startup complete"), WAIT_FOR_PAGE);
                     clickAndWait(Locator.lkButton("Next"));
                     Locator.lkButton("Next")
-                            .findOptionalElement(getDriver())
-                            .ifPresent(button ->
-                                    doAndWaitForPageToLoad(() ->
-                                            shortWait().until(LabKeyExpectedConditions.clickUntilStale(button))));
+                        .findOptionalElement(getDriver())
+                        .ifPresent(button ->
+                            doAndWaitForPageToLoad(() ->
+                                shortWait().until(LabKeyExpectedConditions.clickUntilStale(button))
+                            )
+                        );
                 }
                 else
                 {
@@ -950,6 +956,23 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             if (null != response)
                 EntityUtils.consumeQuietly(response.getEntity());
         }
+    }
+
+    @LogMethod
+    private void verifySiteGroups()
+    {
+        // Simple verification of the site groups created at bootstrap time, Issue #52166
+        ApiPermissionsHelper helper = new ApiPermissionsHelper(this);
+        // Site groups are returned in known order: alphabetical by name, except that "Users" is replaced with
+        // "All Site Users" after sorting takes place
+        List<Map<String, Object>> siteGroups = helper.getSiteGroups();
+        assertEquals(2, siteGroups.size());
+        Map<String, Object> guests = siteGroups.get(0);
+        assertEquals("Guests", guests.get("name"));
+        assertEquals(-3, guests.get("id"));
+        Map<String, Object> users = siteGroups.get(1);
+        assertEquals("All Site Users", users.get("name"));
+        assertEquals(-2, users.get("id"));
     }
 
     public static final Pattern ERROR_PATTERN = Pattern.compile("^(ERROR|FATAL)", Pattern.MULTILINE);
