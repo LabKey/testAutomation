@@ -74,8 +74,6 @@ public class WebpartPermissionsTest extends BaseWebDriverTest
             fail("Unable to delete dummy project");
         }
         assertTextNotPresent("Flow Script");
-
-
     }
 
     private void changeWebpartPermAndVerify()
@@ -104,7 +102,6 @@ public class WebpartPermissionsTest extends BaseWebDriverTest
         goToProjectHome();
         assertTextPresent(changedWebPart);
         stopImpersonating();
-
     }
 
     private void verifyCorrectWebpartsVisible()

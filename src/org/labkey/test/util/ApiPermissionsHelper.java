@@ -211,7 +211,7 @@ public class ApiPermissionsHelper extends PermissionsHelper
         return groups;
     }
 
-    private List<Map<String, Object>> getSiteGroups()
+    public List<Map<String, Object>> getSiteGroups()
     {
         return getGroups("/");
     }
@@ -230,9 +230,6 @@ public class ApiPermissionsHelper extends PermissionsHelper
 
     private Integer getSiteGroupId(String groupName)
     {
-        if ("Developers".equals(groupName))
-            return -4; // Actually a role, exposed as a group -- org.labkey.api.security.Group.groupDevelopers
-
         for (Map<String, Object> group : getSiteGroups())
         {
             if (groupName.equals(group.get("name")))
