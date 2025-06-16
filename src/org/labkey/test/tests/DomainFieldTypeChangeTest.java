@@ -15,6 +15,7 @@ import org.labkey.test.components.DomainDesignerPage;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.FieldInfo;
 import org.labkey.test.util.APIAssayHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
@@ -58,76 +59,89 @@ public class DomainFieldTypeChangeTest extends BaseWebDriverTest
     @Test
     public void testProvisionedDomainFieldChanges() throws IOException, CommandException
     {
-        String listName = "SampleListWithAllDataTypes";
-
         log("Creating list with variety of data fields");
+        String listName = TestDataGenerator.randomDomainName("SampleListWithAllDataTypes");
+        FieldInfo stringField = new FieldInfo(TestDataGenerator.randomFieldName("name"), FieldDefinition.ColumnType.String);
+        FieldInfo integerField = new FieldInfo(TestDataGenerator.randomFieldName("Test/Integer"), FieldDefinition.ColumnType.Integer);
+        FieldInfo decimalField = new FieldInfo(TestDataGenerator.randomFieldName("Test/Decimal"), FieldDefinition.ColumnType.Decimal);
+        FieldInfo dateField = new FieldInfo(TestDataGenerator.randomFieldName("Test/Date"), FieldDefinition.ColumnType.DateAndTime);
+        FieldInfo booleanField = new FieldInfo(TestDataGenerator.randomFieldName("Test'/\"Boolean"), FieldDefinition.ColumnType.Boolean); // GH Issue #755
         TestDataGenerator dgen = new TestDataGenerator("lists", listName, getProjectName())
                 .withColumns(List.of(
-                        new FieldDefinition("name", FieldDefinition.ColumnType.String),
-                        new FieldDefinition("testInteger", FieldDefinition.ColumnType.Integer),
-                        new FieldDefinition("testDecimal", FieldDefinition.ColumnType.Decimal),
-                        new FieldDefinition("testDate", FieldDefinition.ColumnType.DateAndTime),
-                        new FieldDefinition("testBoolean", FieldDefinition.ColumnType.Boolean)));
+                        stringField.getFieldDefinition(),
+                        integerField.getFieldDefinition(),
+                        decimalField.getFieldDefinition(),
+                        dateField.getFieldDefinition(),
+                        booleanField.getFieldDefinition()));
         dgen.createDomain(createDefaultConnection(), "IntList", Map.of("keyName", "id"));
 
         log("Inserting sample rows in the list");
-        dgen.addCustomRow(Map.of("name", "first", "testInteger", "1",
-                "testDecimal", "1.10", "testDate", "01-01-2022",
-                "testBoolean", "true"));
-        dgen.addCustomRow(Map.of("name", "Second", "testInteger", "2",
-                "testDecimal", "2.20", "testDate", "01-02-2022",
-                "testBoolean", "false"));
-        dgen.addCustomRow(Map.of("name", "Third", "testInteger", "3",
-                "testDecimal", "3.30", "testDate", "01-03-2022",
-                "testBoolean", "true"));
+        dgen.addCustomRow(Map.of(
+                stringField.getLabel(), "first",
+                integerField.getLabel(), "1",
+                decimalField.getLabel(), "1.10",
+                dateField.getLabel(), "01-01-2022",
+                booleanField.getLabel(), "true"));
+        dgen.addCustomRow(Map.of(
+                stringField.getLabel(), "Second",
+                integerField.getLabel(), "2",
+                decimalField.getLabel(), "2.20",
+                dateField.getLabel(), "01-02-2022",
+                booleanField.getLabel(), "false"));
+        dgen.addCustomRow(Map.of(
+                stringField.getLabel(), "Third",
+                integerField.getLabel(), "3",
+                decimalField.getLabel(), "3.30",
+                dateField.getLabel(), "01-03-2022",
+                booleanField.getLabel(), "true"));
         dgen.insertRows(createDefaultConnection(), dgen.getRows());
 
         log("Verifying Integer to Decimal change");
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
-        domainFormPanel.getField("testInteger").setType(FieldDefinition.ColumnType.Decimal, true);
-        domainFormPanel.getField("testBoolean").setNumberFormat("yes;no");
+        domainFormPanel.getField(integerField.getName()).setType(FieldDefinition.ColumnType.Decimal, true);
+        domainFormPanel.getField(booleanField.getName()).setNumberFormat("yes;no");
         domainDesignerPage.clickFinish();
 
         clickAndWait(Locator.linkWithText(listName));
         DataRegionTable table = new DataRegionTable("query", getDriver());
         checker().verifyEquals("Incorrect values after changing integer to decimal", Arrays.asList("1.0", "2.0", "3.0"),
-                table.getColumnDataAsText("testInteger"));
+                table.getColumnDataAsText(integerField.getLabel()));
 
         log("Verifying changing data fields to string");
         domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
         domainFormPanel = domainDesignerPage.fieldsPanel();
-        domainFormPanel.getField("testInteger").setType(FieldDefinition.ColumnType.String, true);
-        domainFormPanel.getField("testDecimal").setType(FieldDefinition.ColumnType.String, true);
-        domainFormPanel.getField("testDate").setType(FieldDefinition.ColumnType.String, true);
-        domainFormPanel.getField("testBoolean").setType(FieldDefinition.ColumnType.String, true);
+        domainFormPanel.getField(integerField.getName()).setType(FieldDefinition.ColumnType.String, true);
+        domainFormPanel.getField(decimalField.getName()).setType(FieldDefinition.ColumnType.String, true);
+        domainFormPanel.getField(dateField.getName()).setType(FieldDefinition.ColumnType.String, true);
+        domainFormPanel.getField(booleanField.getName()).setType(FieldDefinition.ColumnType.String, true); // GH Issue #755
         domainDesignerPage.clickFinish();
 
         clickAndWait(Locator.linkWithText(listName));
         table = new DataRegionTable("query", getDriver());
         log("Verifying inserting string values");
         table.clickInsertNewRow();
-        setFormElement(Locator.name("quf_name"), "Fourth");
-        setFormElement(Locator.name("quf_testInteger"), "New1");
-        setFormElement(Locator.name("quf_testDecimal"), "New1.1");
-        setFormElement(Locator.name("quf_testDate"), "New01-02-2022");
-        setFormElement(Locator.name("quf_testBoolean"), "NewTrue");
+        setFormElement(Locator.name("quf_" + stringField.getName()), "Fourth");
+        setFormElement(Locator.name("quf_" + integerField.getName()), "New1");
+        setFormElement(Locator.name("quf_" + decimalField.getName()), "New1.1");
+        setFormElement(Locator.name("quf_" + dateField.getName()), "New01-02-2022");
+        setFormElement(Locator.name("quf_" + booleanField.getName()), "NewTrue");
         clickButton("Submit");
         table.clickEditRow(0);
-        setFormElement(Locator.name("quf_testInteger"), "Edited1");
+        setFormElement(Locator.name("quf_" + integerField.getName()), "Edited1");
         clickButton("Submit");
         checker().verifyEquals("Incorrect values after changing integer to string", Arrays.asList("Edited1", "2", "3", "New1"),
-                table.getColumnDataAsText("testInteger"));
+                table.getColumnDataAsText(integerField.getLabel()));
         checker().verifyEquals("Incorrect values after changing decimal to string", Arrays.asList("1.1", "2.2", "3.3", "New1.1"),
-                table.getColumnDataAsText("testDecimal"));
+                table.getColumnDataAsText(decimalField.getLabel()));
         checker().verifyEquals("Incorrect values after changing boolean to string", Arrays.asList("yes", "no", "yes", "NewTrue"),
-                table.getColumnDataAsText("testBoolean"));
+                table.getColumnDataAsText(booleanField.getLabel()));
         if (WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.MicrosoftSQLServer)
             checker().verifyEquals("Incorrect values after changing date to string", Arrays.asList("Jan 1 2022 12:00AM", "Jan 2 2022 12:00AM", "Jan 3 2022 12:00AM", "New01-02-2022"),
-                    table.getColumnDataAsText("testDate"));
+                    table.getColumnDataAsText(dateField.getLabel()));
         else
             checker().verifyEquals("Incorrect values after changing date to string", Arrays.asList("2022-01-01 00:00:00", "2022-01-02 00:00:00", "2022-01-03 00:00:00", "New01-02-2022"),
-                    table.getColumnDataAsText("testDate"));
+                    table.getColumnDataAsText(dateField.getLabel()));
     }
 
     @Test
