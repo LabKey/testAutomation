@@ -584,13 +584,7 @@ public class WebTestHelper
 
     public static Connection getRemoteApiConnection(boolean includeCookiesFromPrimaryUser)
     {
-        String username = PasswordUtil.getUsername();
-        Connection connection = new Connection(getBaseURL(), username, PasswordUtil.getPassword());
-
-        if (includeCookiesFromPrimaryUser)
-            addCachedCookies(connection, username);
-
-        return connection;
+        return getRemoteApiConnection(PasswordUtil.getUsername(), includeCookiesFromPrimaryUser);
     }
 
     public static Connection getRemoteApiConnection(String username, boolean includeCookies)
