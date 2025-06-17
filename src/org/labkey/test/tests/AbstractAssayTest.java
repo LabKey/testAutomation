@@ -291,7 +291,7 @@ public abstract class AbstractAssayTest extends BaseWebDriverTest
             _permissionsHelper.removePermission(group, "Reader");
         }
         else
-            _securityHelper.setProjectPerm(group, perms);
+            _permissionsHelper.setPermissions(group, perms);
     }
 
     /**
