@@ -359,6 +359,7 @@ public class FolderExportTest extends BaseWebDriverTest
         verifyExpectedWebPartsPresent();
         verifySubfolderImport(folderFromTemplate, true);
         verifyFolderExportAsExpected(folderFromTemplate);
+        stopImpersonating();
     }
 
     @Test
