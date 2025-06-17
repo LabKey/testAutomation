@@ -129,9 +129,9 @@ public class GroupTest extends BaseWebDriverTest
         _permissionsHelper.enterPermissionsUI();
         waitForText("Author");
 
-        _securityHelper.setSiteGroupPermissions(COMPOUND_GROUP, "Author");
-        _securityHelper.setSiteGroupPermissions(COMPOUND_GROUP, "Reader");
-        _securityHelper.setSiteGroupPermissions(SIMPLE_GROUP, "Editor");
+        _permissionsHelper.setSiteGroupPermissions(COMPOUND_GROUP, "Author");
+        _permissionsHelper.setSiteGroupPermissions(COMPOUND_GROUP, "Reader");
+        _permissionsHelper.setSiteGroupPermissions(SIMPLE_GROUP, "Editor");
         clickButton("Save and Finish");
         assertUserCanSeeProject(TEST_USERS_FOR_GROUP[0], getProjectName());
         //can't add built in group to regular group
@@ -141,7 +141,7 @@ public class GroupTest extends BaseWebDriverTest
         clickProject(getProjectName());
         _permissionsHelper.enterPermissionsUI();
         waitForText("Author");
-        _securityHelper.setSiteGroupPermissions("All Site Users", "Author");
+        _permissionsHelper.setSiteGroupPermissions("All Site Users", "Author");
         permissionsReportTest();
 
         // Ensure that deleting from the group's page works too. Issue 52614
@@ -205,7 +205,7 @@ public class GroupTest extends BaseWebDriverTest
         WikiHelper wikiHelper = new WikiHelper(this);
 
         //set simple group as editor
-        _securityHelper.setSiteGroupPermissions(SIMPLE_GROUP, "Editor");
+        _permissionsHelper.setSiteGroupPermissions(SIMPLE_GROUP, "Editor");
 
         //impersonate user 1, make several wiki edits
         impersonate(TEST_USERS_FOR_GROUP[0]);
