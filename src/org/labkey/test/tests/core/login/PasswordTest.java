@@ -295,8 +295,8 @@ public class PasswordTest extends BaseWebDriverTest
                 PasswordStrength.Strong,
                 PasswordExpiration.FiveSeconds
             );
-            // Wait five seconds for expiration
-            sleep(5000);
+            // Wait six seconds for expiration
+            sleep(6000);
             signInShouldFail(strongPassword, "Your password has expired; please choose a new password.");
             changeInvalidPassword(strongPassword, VERY_STRONG_PASSWORD + "@");
         }
