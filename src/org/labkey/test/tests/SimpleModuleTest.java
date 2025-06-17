@@ -20,6 +20,7 @@ import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.apache.hc.core5.http.HttpStatus;
 import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.Nullable;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -79,6 +80,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -1192,13 +1195,15 @@ public class SimpleModuleTest extends BaseWebDriverTest
         File expectedIconFile = TestFileUtils.getSampleData(THUMBNAIL_FOLDER + KNITR_PEOPLE + ICON_FILENAME);
         String expectedIcon = TestFileUtils.getFileContents(expectedIconFile);
 
-        String iconStyle = waitForElement(Locator.tag("img").withClass("dataview-icon").withoutClass("x4-tree-icon-parent").notHidden()).getDomAttribute("style");
-        assertTrue("Module report icon style is not as expected", iconStyle.indexOf("background-image") == 0);
-        String iconSrc = iconStyle.replace("background-image:url(\"", "").replace("background-image: url(\"", "").replace("\");", "");
-
-        String portPortion = 80 == WebTestHelper.getWebPort() ? "" : ":" + WebTestHelper.getWebPort();
-        String protocol = WebTestHelper.getTargetServer() + portPortion;
-        String iconData = WebTestHelper.getHttpResponse(protocol + iconSrc).getResponseBody();
+        WebElement img = waitForElement(Locator.tag("img").withClass("dataview-icon").withoutClass("x4-tree-icon-parent").notHidden());
+        String backgroundImage = StringUtils.trimToEmpty(img.getCssValue("background-image"));
+        Matcher matcher = Pattern.compile("^url\\(\"(.+)\"\\)$").matcher(backgroundImage);
+        if (!matcher.find())
+        {
+            Assert.fail("Module report icon style is not as expected: " + img.getDomAttribute("style"));
+        }
+        String iconUrl = matcher.group(1);
+        String iconData = WebTestHelper.getHttpResponse(iconUrl).getResponseBody();
 
         int lengthToCompare = 3000;
         int diff = LevenshteinDistance.getDefaultInstance().apply(expectedIcon.substring(0, lengthToCompare), iconData.substring(0, lengthToCompare));
