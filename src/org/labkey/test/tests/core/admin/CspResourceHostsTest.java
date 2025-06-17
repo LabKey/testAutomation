@@ -13,10 +13,10 @@ import org.labkey.test.categories.Daily;
 import org.labkey.test.components.html.SelectWrapper;
 import org.labkey.test.pages.admin.ExternalSourcesPage;
 import org.labkey.test.pages.admin.ExternalSourcesPage.Directive;
-import org.labkey.test.util.core.admin.CspConfigHelper.AllowedHost;
 import org.labkey.test.pages.core.admin.ShowAdminPage;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.core.admin.CspConfigHelper;
+import org.labkey.test.util.core.admin.CspConfigHelper.AllowedHost;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -70,30 +70,29 @@ public class CspResourceHostsTest extends BaseWebDriverTest
     {
         Directive directive = Directive.Connection;
         String host = "https://labkey.org";
-        Locator addButton = Locator.lkButton("Add");
-        Locator saveButton = Locator.lkButton("Save");
-        Locator deleteButton = Locator.lkButton("Delete");
-        Locator doneButton = Locator.lkButton("Done");
+        String add = "Add";
+        String save = "Save";
+        String delete = "Delete";
+        String done = "Done";
 
         ExternalSourcesPage externalSourcesPage = ExternalSourcesPage.beginAt(this);
         externalSourcesPage.addHost(directive, host);
+        List<AllowedHost> expectedHosts = List.of(new AllowedHost(directive, host));
 
-        assertElementPresent(addButton);
-        assertElementPresent(saveButton);
-        assertElementPresent(deleteButton);
-        assertElementNotPresent(doneButton);
-        List<AllowedHost> expected = List.of(new AllowedHost(directive, host));
-        assertEquals("Defined directives", expected, externalSourcesPage.getExistingHosts());
+        List<String> buttons = getTexts(Locator.lkButton().findElements(getDriver()));
+        checker().verifyEqualsSorted("Form buttons", List.of(add, save, delete), buttons);
+        checker().verifyEquals("Defined directives", expectedHosts, externalSourcesPage.getExistingHosts());
+        checker().screenShotIfNewError("site_admin_csp");
 
         impersonate(TROUBLESHOOTER);
         externalSourcesPage = ShowAdminPage.beginAt(this).clickAllowedExternalResourceHosts();
-        assertElementNotPresent(addButton);
-        assertElementNotPresent(saveButton);
-        assertElementNotPresent(deleteButton);
-        assertElementPresent(doneButton);
-        assertEquals("Defined directives", expected, externalSourcesPage.getExistingHosts());
 
-        clickAndWait(doneButton);
+        buttons = getTexts(Locator.lkButton().findElements(getDriver()));
+        checker().verifyEqualsSorted("Form buttons", List.of(done), buttons);
+        checker().verifyEquals("Defined directives", expectedHosts, externalSourcesPage.getExistingHosts());
+        checker().screenShotIfNewError("troubleshooter_csp");
+
+        clickAndWait(Locator.lkButton(done));
         assertEquals("Done button destination", "/admin-showAdmin.view", getCurrentRelativeURL());
 
         try
