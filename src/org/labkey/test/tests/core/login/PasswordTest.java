@@ -23,9 +23,11 @@ import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.SimplePostCommand;
+import org.labkey.remoteapi.security.EnsureLoginCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.components.core.login.SetPasswordForm;
 import org.labkey.test.pages.core.login.DatabaseAuthConfigureDialog;
@@ -46,6 +48,7 @@ import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.labkey.test.components.core.login.SetPasswordForm.SHORT_PASSWORD;
 import static org.labkey.test.components.core.login.SetPasswordForm.VERY_STRONG_PASSWORD;
 import static org.labkey.test.components.core.login.SetPasswordForm.VERY_WEAK_PASSWORD;
@@ -206,9 +209,6 @@ public class PasswordTest extends BaseWebDriverTest
         password = adminPasswordResetTest(username, password+"adminReset");
 
         String resetUrl = userForgotPasswordWorkflowTest(username, password);
-
-        ensureSignedOut();
-
         beginAt(resetUrl);
 
         attemptSetInvalidPassword("fooba", "fooba", "Your password must be at least eight characters and cannot contain spaces.");
@@ -253,13 +253,105 @@ public class PasswordTest extends BaseWebDriverTest
         assertTrue("Expected email/password in URL to be rejected.", rejectedProperly);
     }
 
+    @Test
+    public void testChooseNewPasswordMessages() throws IOException
+    {
+        // Hold an admin connection open, allowing us to reset the config regardless of what happens during the test
+        Connection adminConnection = WebTestHelper.getRemoteApiConnection();
+        DbLoginProperties savedProperties = DbLoginUtils.getDbLoginConfig(adminConnection);
+
+        try
+        {
+            DbLoginUtils.setDbLoginConfig(adminConnection,
+                PasswordStrength.Good,
+                PasswordExpiration.Never
+            );
+
+            // Set a weak password
+            signOut();
+            String resetUrl = userInitiatePasswordReset(USER);
+            beginAt(resetUrl);
+            new SetPasswordForm(getDriver())
+                .setNewPassword(WEAK_PASSWORD)
+                .clickSubmit();
+
+            // Test bogus password first
+            signOut();
+            signInShouldFail("bogus", "The email address and password you entered did not match any accounts on file.");
+            signIn(USER, WEAK_PASSWORD);
+            signOut();
+
+            // Change the configuration and test password that no longer meets complexity requirements
+            DbLoginUtils.setDbLoginConfig(adminConnection,
+                PasswordStrength.Strong,
+                PasswordExpiration.Never
+            );
+            signInShouldFail(WEAK_PASSWORD, "Your password does not meet the complexity requirements; please choose a new password.");
+            String strongPassword = VERY_STRONG_PASSWORD + "!";
+            changeInvalidPassword(WEAK_PASSWORD, strongPassword);
+
+            // Change the configuration and test expired password
+            DbLoginUtils.setDbLoginConfig(adminConnection,
+                PasswordStrength.Strong,
+                PasswordExpiration.FiveSeconds
+            );
+            // Wait five seconds for expiration
+            sleep(5000);
+            signInShouldFail(strongPassword, "Your password has expired; please choose a new password.");
+            changeInvalidPassword(strongPassword, VERY_STRONG_PASSWORD + "@");
+        }
+        finally
+        {
+            DbLoginUtils.setDbLoginConfig(adminConnection, savedProperties);
+        }
+    }
+
+    // Attempt to sign in via UI and API, expecting both to fail with the specified message
+    private void signInShouldFail(String password, String expectedMessage) throws IOException
+    {
+        signInShouldFail(USER, password, expectedMessage);
+        Connection userConnection = new Connection(WebTestHelper.getBaseURL(), USER, password);
+        EnsureLoginCommand ensureLoginCommand = new EnsureLoginCommand();
+        try
+        {
+            ensureLoginCommand.execute(userConnection, "/");
+            fail("Expected execute() to throw an exception.");
+        }
+        catch (CommandException e)
+        {
+            assertEquals(HttpStatus.SC_UNAUTHORIZED, e.getStatusCode());
+            assertEquals(expectedMessage, e.getMessage());
+        }
+    }
+
+    @LogMethod
+    private void resetPassword(String password)
+    {
+        signOut();
+        String resetUrl = userInitiatePasswordReset(USER);
+        beginAt(resetUrl);
+        new SetPasswordForm(getDriver())
+            .setNewPassword(password)
+            .clickSubmit();
+    }
+
+    @LogMethod
+    private void changeInvalidPassword(String oldPassword, String newPassword)
+    {
+        new SetPasswordForm(getDriver())
+            .setOldPassword(oldPassword)
+            .setNewPassword(newPassword)
+            .clickSubmit();
+        signOut();
+    }
+
     @LogMethod
     protected void attemptSetInvalidPassword(String password1, String password2, String error)
     {
         new SetPasswordForm(getDriver())
-                .setPassword1(password1)
-                .setPassword2(password2)
-                .clickSubmitExpectingError(error);
+            .setPassword1(password1)
+            .setPassword2(password2)
+            .clickSubmitExpectingError(error);
     }
 
     /**
@@ -274,13 +366,10 @@ public class PasswordTest extends BaseWebDriverTest
     @LogMethod
     private String userForgotPasswordWorkflowTest(String username, String password)
     {
-        ensureSignedOut();
-
         String resetUrl = userInitiatePasswordReset(username);
-
         signOut();
 
-        //attempt sign in with old password- should succeed
+        //attempt sign in with old password - should succeed
         signIn(username, password);
         signOut();
 
@@ -290,14 +379,14 @@ public class PasswordTest extends BaseWebDriverTest
     @LogMethod
     public String userInitiatePasswordReset(String username)
     {
+        signOut();
         goToHome();
-        ensureSignedOut();
-
         clickAndWait(Locator.linkWithText("Sign In"));
         clickAndWait(Locator.linkContainingText("Forgot password"));
         setFormElement(Locator.id("email"), username);
         clickButtonContainingText("Reset", 0);
 
+        // Need to sign in as admin to see the email
         signIn();
         return getPasswordResetUrl(_userId);
     }

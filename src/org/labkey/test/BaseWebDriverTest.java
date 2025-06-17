@@ -2477,12 +2477,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         }
     }
 
-    public void ensureSignedOut()
-    {
-        if(isElementPresent(Locator.id("userMenuPopupLink")))
-            signOut();
-    }
-
     protected void reloadStudyFromZip(File folderArchive)
     {
         reloadStudyFromZip(folderArchive, true, 2);
