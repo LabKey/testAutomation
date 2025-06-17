@@ -1341,49 +1341,49 @@ public class EditableGridTest extends BaseWebDriverTest
         checker().verifyEquals("Cell error should be absent when a row is added on page load", 0, testGrid.getCellErrors().size());
 
         log("Input empty string for required field should trigger cell warning.");
-        testGrid.setCellValue(1, REQ_STR_FIELD.getFieldKey(), " ");
-        checker().verifyEquals("Cell warning status not as expected at row " + 1 + " for col " + REQ_STR_FIELD.getLabel(), true, testGrid.hasCellError(1, REQ_STR_FIELD.getFieldKey()));
-        checker().verifyEquals("Cell warning msg not as expected at row " + 1 + " for col " + REQ_STR_FIELD.getLabel(), REQ_STR_FIELD.getLabel() + " is required.", testGrid.getCellPopoverText(1, REQ_STR_FIELD.getFieldKey()));
+        testGrid.setCellValue(1, REQ_STR_FIELD, " ");
+        checker().verifyEquals("Cell warning status not as expected at row " + 1 + " for col " + REQ_STR_FIELD.getLabel(), true, testGrid.hasCellError(1, REQ_STR_FIELD));
+        checker().verifyEquals("Cell warning msg not as expected at row " + 1 + " for col " + REQ_STR_FIELD.getLabel(), REQ_STR_FIELD.getLabel() + " is required.", testGrid.getCellPopoverText(1, REQ_STR_FIELD));
         mouseOver(testGrid.getCell(0, "Row")); // dismiss warning popup
-        testGrid.setCellValue(1, REQ_INT_FIELD.getFieldKey(), " ");
-        checker().verifyEquals("Cell warning status not as expected at row " + 1 + " for col " + REQ_INT_FIELD.getLabel(), true, testGrid.hasCellError(1, REQ_INT_FIELD.getFieldKey()));
-        checker().verifyEquals("Cell warning msg not as expected at row " + 1 + " for col " + REQ_INT_FIELD.getLabel(), REQ_INT_FIELD.getLabel() + " is required.", testGrid.getCellPopoverText(1, REQ_INT_FIELD.getFieldKey()));
+        testGrid.setCellValue(1, REQ_INT_FIELD, " ");
+        checker().verifyEquals("Cell warning status not as expected at row " + 1 + " for col " + REQ_INT_FIELD.getLabel(), true, testGrid.hasCellError(1, REQ_INT_FIELD));
+        checker().verifyEquals("Cell warning msg not as expected at row " + 1 + " for col " + REQ_INT_FIELD.getLabel(), REQ_INT_FIELD.getLabel() + " is required.", testGrid.getCellPopoverText(1, REQ_INT_FIELD));
 
         log("Correct values should remove cell warning, keep entering wrong values should update warning");
         mouseOver(testGrid.getCell(0, "Row")); // dismiss warning popup
-        testGrid.setCellValue(0, STR_FIELD.getFieldKey(), "");
+        testGrid.setCellValue(0, STR_FIELD, "");
         mouseOver(testGrid.getCell(0, "Row"));
-        testGrid.setCellValue(1, STR_FIELD.getFieldKey(), "This value is too long");
+        testGrid.setCellValue(1, STR_FIELD, "This value is too long");
         mouseOver(testGrid.getCell(0, "Row"));
-        testGrid.setCellValue(0, REQ_STR_FIELD.getFieldKey(), "good");
+        testGrid.setCellValue(0, REQ_STR_FIELD, "good");
         mouseOver(testGrid.getCell(0, "Row"));
-        testGrid.setCellValue(1, REQ_STR_FIELD.getFieldKey(), "This value is too long");
-        checker().verifyEquals("Cell warning status not as expected at row " + 0 + " for col " + STR_FIELD.getLabel(), false, testGrid.hasCellError(0, STR_FIELD.getFieldKey()));
-        checker().verifyEquals("Cell warning msg not as expected at row " + 1 + " for col " + STR_FIELD.getLabel(), "22/10 characters", testGrid.getCellPopoverText(1, STR_FIELD.getFieldKey()));
-        checker().verifyEquals("Cell warning status not as expected at row " + 0 + " for col " + REQ_STR_FIELD.getLabel(), false, testGrid.hasCellError(0, REQ_STR_FIELD.getFieldKey()));
-        checker().verifyEquals("Cell warning msg not as expected at row " + 1 + " for col " + REQ_STR_FIELD.getLabel(), "22/10 characters", testGrid.getCellPopoverText(1, REQ_STR_FIELD.getFieldKey()));
+        testGrid.setCellValue(1, REQ_STR_FIELD, "This value is too long");
+        checker().verifyEquals("Cell warning status not as expected at row " + 0 + " for col " + STR_FIELD.getLabel(), false, testGrid.hasCellError(0, STR_FIELD));
+        checker().verifyEquals("Cell warning msg not as expected at row " + 1 + " for col " + STR_FIELD.getLabel(), "22/10 characters", testGrid.getCellPopoverText(1, STR_FIELD));
+        checker().verifyEquals("Cell warning status not as expected at row " + 0 + " for col " + REQ_STR_FIELD.getLabel(), false, testGrid.hasCellError(0, REQ_STR_FIELD));
+        checker().verifyEquals("Cell warning msg not as expected at row " + 1 + " for col " + REQ_STR_FIELD.getLabel(), "22/10 characters", testGrid.getCellPopoverText(1, REQ_STR_FIELD));
 
         log("Input invalid data type value should trigger cell warnings.");
         mouseOver(testGrid.getCell(0, "Row")); // dismiss warning popup
-        testGrid.setCellValue(0, INT_FIELD.getFieldKey(), "1.23");
+        testGrid.setCellValue(0, INT_FIELD, "1.23");
         mouseOver(testGrid.getCell(0, "Row")); // dismiss warning popup
-        testGrid.setCellValue(0, FLOAT_FIELD.getFieldKey(), "not float");
+        testGrid.setCellValue(0, FLOAT_FIELD, "not float");
         mouseOver(testGrid.getCell(0, "Row")); // dismiss warning popup
-        testGrid.setCellValue(0, BOOL_FIELD.getFieldKey(), "not bool");
-        checker().verifyEquals("Cell warning msg not as expected at row " + 0 + " for col " + INT_FIELD.getLabel(), "Invalid integer", testGrid.getCellPopoverText(0, INT_FIELD.getFieldKey()));
-        checker().verifyEquals("Cell warning msg not as expected at row " + 0 + " for col " + FLOAT_FIELD.getLabel(), "Invalid decimal", testGrid.getCellPopoverText(0, FLOAT_FIELD.getFieldKey()));
-        checker().verifyEquals("Cell warning msg not as expected at row " + 0 + " for col " + BOOL_FIELD.getLabel(), "Invalid boolean", testGrid.getCellPopoverText(0, BOOL_FIELD.getFieldKey()));
+        testGrid.setCellValue(0, BOOL_FIELD, "not bool");
+        checker().verifyEquals("Cell warning msg not as expected at row " + 0 + " for col " + INT_FIELD.getLabel(), "Invalid integer", testGrid.getCellPopoverText(0, INT_FIELD));
+        checker().verifyEquals("Cell warning msg not as expected at row " + 0 + " for col " + FLOAT_FIELD.getLabel(), "Invalid decimal", testGrid.getCellPopoverText(0, FLOAT_FIELD));
+        checker().verifyEquals("Cell warning msg not as expected at row " + 0 + " for col " + BOOL_FIELD.getLabel(), "Invalid boolean", testGrid.getCellPopoverText(0, BOOL_FIELD));
 
         log("Correct values should remove data type warning.");
         mouseOver(testGrid.getCell(0, "Row")); // dismiss warning popup
-        testGrid.setCellValue(0, INT_FIELD.getFieldKey(), "123");
-        checker().verifyFalse("Cell warning should disappear after correcting value", testGrid.hasCellError(0, INT_FIELD.getFieldKey()));
+        testGrid.setCellValue(0, INT_FIELD, "123");
+        checker().verifyFalse("Cell warning should disappear after correcting value", testGrid.hasCellError(0, INT_FIELD));
 
         log("Required value warning should be absent before the cell is acted on");
-        checker().verifyFalse("Required value warning should not be present on page init", testGrid.hasCellError(0, REQ_STR_FIELD.getFieldKey()));
+        checker().verifyFalse("Required value warning should not be present on page init", testGrid.hasCellError(0, REQ_STR_FIELD));
         mouseOver(testGrid.getCell(0, "Row")); // dismiss warning popup
-        testGrid.clearCellValue(1, REQ_STR_FIELD.getFieldKey());
-        checker().verifyTrue("Required value warning should show up after removing a value from cell", testGrid.hasCellError(1, REQ_STR_FIELD.getFieldKey()));
+        testGrid.clearCellValue(1, REQ_STR_FIELD);
+        checker().verifyTrue("Required value warning should show up after removing a value from cell", testGrid.hasCellError(1, REQ_STR_FIELD));
     }
 
     @Test
@@ -1400,7 +1400,7 @@ public class EditableGridTest extends BaseWebDriverTest
         testGrid.addRows(3);
 
         log("Pasting invalid values");
-        testGrid.selectCell(0, STR_FIELD.getFieldKey());
+        testGrid.selectCell(0, STR_FIELD);
 
         actionPaste(null, rowsToString(clipRows));
         List<List<String>> expectedCellWarnings = List.of(
@@ -1423,50 +1423,50 @@ public class EditableGridTest extends BaseWebDriverTest
                 "Bad value popup did not go away.", 500);
 
         log("Correct missing required fields should remove corresponding cell warnings");
-        testGrid.setCellValue(1, REQ_STR_FIELD.getFieldKey(), " ");
-        checker().verifyTrue("Cell warning should be present after setting another invalid value", testGrid.hasCellError(1, REQ_STR_FIELD.getFieldKey()));
-        mouseOver(testGrid.getCell(0, STR_FIELD.getFieldKey())); // dismiss warning popup
-        testGrid.setCellValue(1, REQ_INT_FIELD.getFieldKey(), "2");
-        mouseOver(testGrid.getCell(0, STR_FIELD.getFieldKey())); // dismiss warning popup
-        testGrid.setCellValue(1, REQ_TEXTCHOICE_FIELD.getFieldKey(), List.of("Orange"));
-        mouseOver(testGrid.getCell(0, STR_FIELD.getFieldKey())); // dismiss warning popup
-        testGrid.setCellValue(1, REQ_LOOKUP_FIELD.getFieldKey(), List.of("Orange"));
-        mouseOver(testGrid.getCell(0, STR_FIELD.getFieldKey())); // dismiss warning popup
-        testGrid.setCellValue(1, REQ_STR_FIELD.getFieldKey(), "not empty");
-        mouseOver(testGrid.getCell(0, STR_FIELD.getFieldKey())); // dismiss warning popup
-        testGrid.setCellValue(1, REQ_DATETIME_FIELD.getFieldKey(), LocalDateTime.of(2024, 7, 7, 10, 30));
-        mouseOver(testGrid.getCell(0, STR_FIELD.getFieldKey())); // dismiss warning popup
-        testGrid.setCellValue(1, REQ_TIME_FIELD.getFieldKey(), LocalTime.of(2, 30));
+        testGrid.setCellValue(1, REQ_STR_FIELD, " ");
+        checker().verifyTrue("Cell warning should be present after setting another invalid value", testGrid.hasCellError(1, REQ_STR_FIELD));
+        mouseOver(testGrid.getCell(0, STR_FIELD)); // dismiss warning popup
+        testGrid.setCellValue(1, REQ_INT_FIELD, "2");
+        mouseOver(testGrid.getCell(0, STR_FIELD)); // dismiss warning popup
+        testGrid.setCellValue(1, REQ_TEXTCHOICE_FIELD, List.of("Orange"));
+        mouseOver(testGrid.getCell(0, STR_FIELD)); // dismiss warning popup
+        testGrid.setCellValue(1, REQ_LOOKUP_FIELD, List.of("Orange"));
+        mouseOver(testGrid.getCell(0, STR_FIELD)); // dismiss warning popup
+        testGrid.setCellValue(1, REQ_STR_FIELD, "not empty");
+        mouseOver(testGrid.getCell(0, STR_FIELD)); // dismiss warning popup
+        testGrid.setCellValue(1, REQ_DATETIME_FIELD, LocalDateTime.of(2024, 7, 7, 10, 30));
+        mouseOver(testGrid.getCell(0, STR_FIELD)); // dismiss warning popup
+        testGrid.setCellValue(1, REQ_TIME_FIELD, LocalTime.of(2, 30));
 
         for (FieldInfo field : ALL_FIELDS)
         {
-            checker().verifyFalse("Cell warning be absent after required values are provided: " + field.getLabel(), testGrid.hasCellError(1, field.getFieldKey()));
+            checker().verifyFalse("Cell warning be absent after required values are provided: " + field.getLabel(), testGrid.hasCellError(1, field));
         }
 
         log("Enter another bad value should retain cell warning");
-        testGrid.setCellValue(2, INT_FIELD.getFieldKey(), "bad");
-        checker().verifyTrue("Cell warning should be present after setting another invalid value", testGrid.hasCellError(2, INT_FIELD.getFieldKey()));
+        testGrid.setCellValue(2, INT_FIELD, "bad");
+        checker().verifyTrue("Cell warning should be present after setting another invalid value", testGrid.hasCellError(2, INT_FIELD));
         checker().screenShotIfNewError("after required value correction error");
 
         log("Correct bad data type values should remove paste data warnings");
-        testGrid.setCellValue(2, STR_FIELD.getFieldKey(), "good");
-        testGrid.setCellValue(2, REQ_STR_FIELD.getFieldKey(), "good");
-        testGrid.setCellValue(2, INT_FIELD.getFieldKey(), "1");
-        testGrid.setCellValue(2, REQ_INT_FIELD.getFieldKey(), "134");
-        testGrid.setCellValue(2, BOOL_FIELD.getFieldKey(), "on");
-        testGrid.setCellValue(2, FLOAT_FIELD.getFieldKey(), "1.23");
-        testGrid.setCellValue(2, TEXTCHOICE_FIELD.getFieldKey(), List.of("red"));
-        testGrid.setCellValue(2, REQ_TEXTCHOICE_FIELD.getFieldKey(), List.of("red"));
-        testGrid.setCellValue(2, LOOKUP_FIELD.getFieldKey(), List.of("kiwi"));
-        testGrid.setCellValue(2, REQ_LOOKUP_FIELD.getFieldKey(), List.of("kiwi"));
-        testGrid.setCellValue(2, DATE_FIELD.getFieldKey(), LocalDate.of(2024, 7, 7));
-        testGrid.setCellValue(2, TIME_FIELD.getFieldKey(), LocalTime.of(2, 30));
-        testGrid.setCellValue(2, REQ_DATETIME_FIELD.getFieldKey(), LocalDateTime.of(2024, 7, 7, 10, 30));
-        testGrid.setCellValue(2, REQ_TIME_FIELD.getFieldKey(), LocalTime.of(2, 30));
+        testGrid.setCellValue(2, STR_FIELD, "good");
+        testGrid.setCellValue(2, REQ_STR_FIELD, "good");
+        testGrid.setCellValue(2, INT_FIELD, "1");
+        testGrid.setCellValue(2, REQ_INT_FIELD, "134");
+        testGrid.setCellValue(2, BOOL_FIELD, "on");
+        testGrid.setCellValue(2, FLOAT_FIELD, "1.23");
+        testGrid.setCellValue(2, TEXTCHOICE_FIELD, List.of("red"));
+        testGrid.setCellValue(2, REQ_TEXTCHOICE_FIELD, List.of("red"));
+        testGrid.setCellValue(2, LOOKUP_FIELD, List.of("kiwi"));
+        testGrid.setCellValue(2, REQ_LOOKUP_FIELD, List.of("kiwi"));
+        testGrid.setCellValue(2, DATE_FIELD, LocalDate.of(2024, 7, 7));
+        testGrid.setCellValue(2, TIME_FIELD, LocalTime.of(2, 30));
+        testGrid.setCellValue(2, REQ_DATETIME_FIELD, LocalDateTime.of(2024, 7, 7, 10, 30));
+        testGrid.setCellValue(2, REQ_TIME_FIELD, LocalTime.of(2, 30));
 
         for (FieldInfo field : ALL_FIELDS)
         {
-            checker().verifyFalse("Cell warning should be absent after correct values are provided: " + field.getLabel(), testGrid.hasCellError(2, field.getFieldKey()));
+            checker().verifyFalse("Cell warning should be absent after correct values are provided: " + field.getLabel(), testGrid.hasCellError(2, field));
         }
         checker().screenShotIfNewError("after data correction error");
 
@@ -1474,14 +1474,14 @@ public class EditableGridTest extends BaseWebDriverTest
         for (FieldInfo field : ALL_FIELDS)
         {
             // start date before year 1000 shouldn't trigger warning
-            checker().verifyFalse("Cell warning should not be present for: " + field.getLabel(), testGrid.hasCellError(0, field.getFieldKey()));
+            checker().verifyFalse("Cell warning should not be present for: " + field.getLabel(), testGrid.hasCellError(0, field));
         }
 
         log("Verify UI is interactable with values before 1000-01-01");
-        testGrid.setCellValue(3, DATE_FIELD.getFieldKey(), LocalDate.of(2024, 7, 7));
-        testGrid.setCellValue(3, TIME_FIELD.getFieldKey(), LocalTime.of(2, 30));
-        testGrid.setCellValue(3, REQ_DATETIME_FIELD.getFieldKey(), LocalDate.of(2024, 7, 7));
-        testGrid.setCellValue(3, REQ_TIME_FIELD.getFieldKey(), LocalTime.of(2, 30));
+        testGrid.setCellValue(3, DATE_FIELD, LocalDate.of(2024, 7, 7));
+        testGrid.setCellValue(3, TIME_FIELD, LocalTime.of(2, 30));
+        testGrid.setCellValue(3, REQ_DATETIME_FIELD, LocalDate.of(2024, 7, 7));
+        testGrid.setCellValue(3, REQ_TIME_FIELD, LocalTime.of(2, 30));
 
         checker().screenShotIfNewError("Issue 46767");
 
@@ -1496,9 +1496,9 @@ public class EditableGridTest extends BaseWebDriverTest
             String expectedWarning = expectedWarnings.get(col);
             FieldInfo field = ALL_FIELDS.get(col);
 
-            checker().verifyEquals("Cell warning status not as expected at row " + rowId + " for col " + field.getLabel(), !StringUtils.isEmpty(expectedWarning), testGrid.hasCellError(rowId, field.getFieldKey()));
+            checker().verifyEquals("Cell warning status not as expected at row " + rowId + " for col " + field.getLabel(), !StringUtils.isEmpty(expectedWarning), testGrid.hasCellError(rowId, field));
             if (!StringUtils.isEmpty(expectedWarning))
-                checker().verifyEquals("Cell warning msg not as expected at row " + rowId + " for col " + field.getLabel(), expectedWarning, testGrid.getCellPopoverText(rowId, field.getFieldKey()));
+                checker().verifyEquals("Cell warning msg not as expected at row " + rowId + " for col " + field.getLabel(), expectedWarning, testGrid.getCellPopoverText(rowId, field));
         }
     }
 
@@ -1513,15 +1513,15 @@ public class EditableGridTest extends BaseWebDriverTest
         testGrid.addRows(3);
 
         log("Start with pasting invalid values, so we can fill down invalid values for dropdowns and data/time inputs");
-        testGrid.selectCell(0, STR_FIELD.getFieldKey());
+        testGrid.selectCell(0, STR_FIELD);
         actionPaste(null, rowsToString(clipRows));
 
         // Scroll one column to the right into view, this will help ensure the REQ_LOOKUP_FIELD is within the viewport.
         var index = testGrid.getColumnLabels().indexOf(REQ_LOOKUP_FIELD.getLabel() + " *") + 1;
         scrollIntoView(testGrid.getCell(0, testGrid.getColumnLabels().get(index)));
 
-        WebElement fillFrom = testGrid.getCell(0, REQ_LOOKUP_FIELD.getFieldKey());
-        WebElement fillTo = testGrid.getCell(2, REQ_LOOKUP_FIELD.getFieldKey());
+        WebElement fillFrom = testGrid.getCell(0, REQ_LOOKUP_FIELD);
+        WebElement fillTo = testGrid.getCell(2, REQ_LOOKUP_FIELD);
         testGrid.dragFill(fillFrom, fillTo);
 
         List<String> expectedWarnings = Arrays.asList("22/10 characters", REQ_STR_FIELD.getLabel() + " is required.", "Invalid integer", "Invalid integer",

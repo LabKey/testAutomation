@@ -308,6 +308,23 @@ public class TestDataUtils
         return updatedRows;
     }
 
+    public static <T> File writeRowsToFile(String fileName, List<List<T>> rows) throws IOException
+    {
+        return writeRowsToFile(fileName, rows.iterator());
+    }
+
+    public static <T> File writeRowsToFile(String fileName, Iterator<List<T>> rowIterator) throws IOException
+    {
+        String fileExtension = fileName.toLowerCase().substring(fileName.lastIndexOf('.') + 1);
+        return switch (fileExtension)
+        {
+            case "xlsx", "xls" -> TestDataUtils.writeRowsToExcel(fileName, rowIterator);
+            case "csv" -> TestDataUtils.writeRowsToFile(fileName, rowIterator, CSVFormat.DEFAULT);
+            case "tsv" -> TestDataUtils.writeRowsToFile(fileName, rowIterator, CSVFormat.TDF);
+            default -> throw new IllegalArgumentException("Unsupported file extension: " + fileExtension);
+        };
+    }
+
     public static <T> File writeRowsToTsv(String fileName, List<List<T>> rows) throws IOException
     {
         return writeRowsToFile(fileName, rows, CSVFormat.TDF);
@@ -491,8 +508,8 @@ public class TestDataUtils
         }
     }
 
-    public static final String[] DECODED = {"\\", "$", "/", "&", "}", "~", ",", "."};
-    public static final String[] ENCODED = {"\\\\", "\\$", "\\/", "\\&", "\\}", "\\~", "\\,", "\\."};
+    private static final String[] DECODED = {"\\", "$", "/", "&", "}", "~", ",", "."};
+    private static final String[] ENCODED = {"\\\\", "\\$", "\\/", "\\&", "\\}", "\\~", "\\,", "\\."};
     public static String getEscapedNameExpression(String encoded)
     {
         return StringUtils.replaceEach(encoded, DECODED, ENCODED);

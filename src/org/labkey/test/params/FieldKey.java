@@ -10,8 +10,11 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-public class FieldKey implements CharSequence
+public final class FieldKey implements CharSequence, WrapsFieldKey
 {
+    private static final String[] ILLEGAL = {"$", "/", "&", "}", "~", ",", "."};
+    private static final String[] REPLACEMENT = {"$D", "$S", "$A", "$B", "$T", "$C", "$P"};
+
     public static final FieldKey EMPTY = new FieldKey(""); // Useful as a sort of FieldKey builder starting point
     public static final FieldKey SOURCES_FK = new FieldKey("DataInputs");
     public static final FieldKey PARENTS_FK = new FieldKey("MaterialInputs");
@@ -34,6 +37,11 @@ public class FieldKey implements CharSequence
         _parent = parent;
         _name = parent.getName() + SEPARATOR + child;
         _fieldKey = parent + SEPARATOR + encodePart(child);
+    }
+
+    public static List<String> getIllegalChars()
+    {
+        return List.of(ILLEGAL);
     }
 
     public static FieldKey fromParts(List<String> parts)
@@ -62,9 +70,9 @@ public class FieldKey implements CharSequence
      */
     public static @Nullable FieldKey fromFieldKey(CharSequence fieldKey)
     {
-        if (fieldKey instanceof FieldKey fk)
+        if (fieldKey instanceof WrapsFieldKey fk)
         {
-            return fk;
+            return fk.getFieldKey();
         }
         else
         {
@@ -86,14 +94,11 @@ public class FieldKey implements CharSequence
      */
     public static FieldKey fromName(CharSequence nameOrFieldKey)
     {
-        if (nameOrFieldKey instanceof FieldKey fk)
-            return fk;
+        if (nameOrFieldKey instanceof WrapsFieldKey fk)
+            return fk.getFieldKey();
         else
             return fromParts(nameOrFieldKey.toString());
     }
-
-    private static final String[] ILLEGAL = {"$", "/", "&", "}", "~", ",", "."};
-    private static final String[] REPLACEMENT = {"$D", "$S", "$A", "$B", "$T", "$C", "$P"};
 
     public static String encodePart(String str)
     {
@@ -149,6 +154,12 @@ public class FieldKey implements CharSequence
     }
 
     @Override
+    public FieldKey getFieldKey()
+    {
+        return this;
+    }
+
+    @Override
     public @NotNull String toString()
     {
         return _fieldKey;
@@ -173,7 +184,7 @@ public class FieldKey implements CharSequence
     }
 
     @Override
-    public final boolean equals(Object o)
+    public boolean equals(Object o)
     {
         if (!(o instanceof FieldKey fieldKey)) return false;
 
