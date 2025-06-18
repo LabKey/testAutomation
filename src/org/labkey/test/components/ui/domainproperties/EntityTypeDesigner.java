@@ -378,7 +378,14 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
         {
             elementCache().parentAliasSelect(index).select(optionDisplayText);
         }
-        getWrapper().setCheckbox(elementCache().parentAliasRequiredCheckbox(index), isRequired);
+
+        // The "Required" checkbox is not presented outside of the apps. Only a test running in the app could set
+        // this parent field to being required.
+        if (isRequired)
+        {
+            getWrapper().setCheckbox(elementCache().parentAliasRequiredCheckbox(index), isRequired);
+        }
+
         return getThis();
     }
 
