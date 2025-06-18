@@ -416,8 +416,20 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     public void signInShouldFail(String email, String password, String... expectedMessages)
     {
         attemptSignIn(email, password);
-        String errorText = waitForElement(Locator.id("errors").withText()).getText();
-        assertElementPresent(Locator.tagWithName("form", "login"));
+
+        WebElement element = waitForElement(Locator.tagWithClass("div", "auth-header"));
+        final String errorText;
+
+        // Could be on the "Sign In" page or the "Change Password" page
+        if (element.getText().equals("Sign In"))
+        {
+            errorText = getText(Locator.id("errors"));
+        }
+        else
+        {
+            assertEquals("Change Password", element.getText());
+            errorText = getText(Locator.tagWithClass("div", "auth-form-body").childTag("p"));
+        }
 
         List<String> missingErrors = getMissingTexts(new TextSearcher(errorText), expectedMessages);
         assertTrue(String.format("Wrong errors.\nExpected: ['%s']\nActual: '%s'", String.join("',\n'", expectedMessages), errorText), missingErrors.isEmpty());
