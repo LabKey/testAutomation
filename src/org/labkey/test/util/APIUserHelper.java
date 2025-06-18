@@ -15,6 +15,7 @@
  */
 package org.labkey.test.util;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
 import org.apache.hc.core5.http.message.BasicNameValuePair;
@@ -239,15 +240,17 @@ public class APIUserHelper extends AbstractUserHelper
     protected void _deleteUsers(boolean failIfNotFound, String... userEmails)
     {
         Map<String, Integer> userIds = getUserIds(Arrays.asList(userEmails), true);
-        // TODO: instead of calling deleteUser() one-by-one, should build an array of userIds and call deleteUsers(int...)
+        List<Integer> validUserIds = new ArrayList<>();
         for (String userEmail : new HashSet<>(Arrays.asList(userEmails)))
         {
             Integer userId = userIds.get(userEmail);
             if (failIfNotFound)
                 assertNotNull(userEmail + " was not present", userId);
             if (userId != null)
-                deleteUser(userId);
+                validUserIds.add(userId);
         }
+        if (!validUserIds.isEmpty())
+            deleteUsers(ArrayUtils.toPrimitive(validUserIds.toArray(new Integer[0])));
     }
 
     private static final Pattern regEmailVerification = Pattern.compile("verification=([A-Za-z0-9]+)");
