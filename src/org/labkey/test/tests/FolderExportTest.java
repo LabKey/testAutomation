@@ -355,7 +355,7 @@ public class FolderExportTest extends BaseWebDriverTest
     private void verifyCreateFolderFromTemplate()
     {
         impersonateRole("Folder Administrator"); // Issue 52254
-        _containerHelper.createSubFolderFromTemplate(getProjectName(), folderFromTemplate, "/" + getProjectName() + "/" + folderFromZip, new String[]{"Grid Views"});
+        new UIContainerHelper(this).createSubFolderFromTemplate(getProjectName(), folderFromTemplate, "/" + getProjectName() + "/" + folderFromZip, new String[]{"Grid Views"});
         verifyExpectedWebPartsPresent();
         verifySubfolderImport(folderFromTemplate, true);
         verifyFolderExportAsExpected(folderFromTemplate);
