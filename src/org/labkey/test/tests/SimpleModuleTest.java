@@ -1807,7 +1807,6 @@ public class SimpleModuleTest extends BaseWebDriverTest
         lookAndFeelSettingsPage.setAltLoginPage("simpletest-testCustomLogin");
         lookAndFeelSettingsPage.save();
         signOut();
-        ensureSignedOut();
 
         beginAt(WebTestHelper.buildURL("login", "login"));
         waitForAnyElement("Should be on login or Home portal", Locator.id("email"), SiteNavBar.Locators.userMenu);
@@ -1821,7 +1820,6 @@ public class SimpleModuleTest extends BaseWebDriverTest
         lookAndFeelSettingsPage.setAltLoginPage("simpletest-testCustomLoginWithReturnUrl");
         lookAndFeelSettingsPage.save();
         signOut();
-        ensureSignedOut();
 
         beginAt(WebTestHelper.buildURL("login", "login"));
         waitForAnyElement("Should be on login or Home portal", Locator.id("email"), SiteNavBar.Locators.userMenu);
@@ -1835,7 +1833,6 @@ public class SimpleModuleTest extends BaseWebDriverTest
         lookAndFeelSettingsPage.setAltLoginPage("");
         lookAndFeelSettingsPage.save();
         signOut();
-        ensureSignedOut();
         signIn();
 
         log("restore original login page");
