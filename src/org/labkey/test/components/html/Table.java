@@ -88,6 +88,11 @@ public class Table extends WebDriverComponent<Table.Elements>
         return elementCache().getRows().size();
     }
 
+    public List<WebElement> getRows()
+    {
+        return elementCache().getRows();
+    }
+
     /**
      * For a well formed html table get the text from the th elements in the thead.
      *
