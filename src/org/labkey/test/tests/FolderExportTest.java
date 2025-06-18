@@ -41,6 +41,7 @@ import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PermissionsHelper.PrincipalType;
 import org.labkey.test.util.RReportHelper;
+import org.labkey.test.util.UIContainerHelper;
 import org.labkey.test.util.ZipUtil;
 import org.openqa.selenium.WebElement;
 
