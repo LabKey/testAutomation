@@ -29,9 +29,8 @@ public class ColumnNameMapper implements Function<String, String>
 
     public static ColumnNameMapper labelToName(Collection<FieldDefinition> fields)
     {
-        return new ColumnNameMapper(label -> fields.stream()
-            .collect(Collectors.toMap(FieldDefinition::getEffectiveLabel, FieldDefinition::getName))
-            .getOrDefault(label, label));
+        Map<String, String> labelToNameMap = fields.stream().collect(Collectors.toMap(FieldDefinition::getEffectiveLabel, FieldDefinition::getName));
+        return new ColumnNameMapper(label -> labelToNameMap.getOrDefault(label, label));
     }
 
     public static ColumnNameMapper nameToLabel(Collection<FieldDefinition> fields)
