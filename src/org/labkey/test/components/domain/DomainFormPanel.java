@@ -256,8 +256,8 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
      */
     public DomainFormPanel clickManuallyDefineFields()
     {
-        getWrapper().scrollIntoView(elementCache().manuallyDefineButton, true);
         getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().manuallyDefineButton)); // give modal dialogs time to disappear
+        getWrapper().scrollIntoView(elementCache().manuallyDefineButton, true);
         elementCache().manuallyDefineButton.click();
 
         return this;
