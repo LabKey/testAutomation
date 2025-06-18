@@ -33,6 +33,7 @@ import org.labkey.test.components.core.login.SetPasswordForm;
 import org.labkey.test.pages.core.login.DatabaseAuthConfigureDialog;
 import org.labkey.test.pages.core.login.LoginConfigurePage;
 import org.labkey.test.params.login.DatabaseAuthenticationProvider;
+import org.labkey.test.util.APIUserHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.core.login.DbLoginUtils;
@@ -256,7 +257,11 @@ public class PasswordTest extends BaseWebDriverTest
     @Test
     public void testChooseNewPasswordMessages() throws IOException
     {
-        // Hold an admin connection open, allowing us to reset the config regardless of what happens during the test
+        // Test bad API key
+        signOut();
+        signInShouldFailUiAndApi("apikey", "abc123", "The API key you provided is invalid.");
+
+        // Hold an admin API connection open, allowing us to reset the config without the browser session interfering
         Connection adminConnection = WebTestHelper.getRemoteApiConnection();
         DbLoginProperties savedProperties = DbLoginUtils.getDbLoginConfig(adminConnection);
 
@@ -268,25 +273,28 @@ public class PasswordTest extends BaseWebDriverTest
             );
 
             // Set a weak password
-            signOut();
             String resetUrl = userInitiatePasswordReset(USER);
             beginAt(resetUrl);
             new SetPasswordForm(getDriver())
                 .setNewPassword(WEAK_PASSWORD)
                 .clickSubmit();
 
-            // Test bogus password first
+            // Test bogus password
             signOut();
-            signInShouldFail("bogus", "The email address and password you entered did not match any accounts on file.");
-            signIn(USER, WEAK_PASSWORD);
-            signOut();
+            signInShouldFailUiAndApi(USER, "bogus", "The email address and password you entered did not match any accounts on file.");
+
+            // Test deactivated user
+            APIUserHelper helper = new APIUserHelper(() -> adminConnection);
+            helper.deactivateUsers(_userId);
+            signInShouldFailUiAndApi(USER, WEAK_PASSWORD, "Your account has been deactivated.");
+            helper.activateUsers(_userId);
 
             // Change the configuration and test password that no longer meets complexity requirements
             DbLoginUtils.setDbLoginConfig(adminConnection,
                 PasswordStrength.Strong,
                 PasswordExpiration.Never
             );
-            signInShouldFail(WEAK_PASSWORD, "Your password does not meet the complexity requirements; please choose a new password.");
+            signInShouldFailUiAndApi(USER, WEAK_PASSWORD, "Your password does not meet the complexity requirements; please choose a new password.");
             String strongPassword = VERY_STRONG_PASSWORD + "!";
             changeInvalidPassword(WEAK_PASSWORD, strongPassword);
 
@@ -297,7 +305,7 @@ public class PasswordTest extends BaseWebDriverTest
             );
             // Wait six seconds for expiration
             sleep(6000);
-            signInShouldFail(strongPassword, "Your password has expired; please choose a new password.");
+            signInShouldFailUiAndApi(USER, strongPassword, "Your password has expired; please choose a new password.");
             changeInvalidPassword(strongPassword, VERY_STRONG_PASSWORD + "@");
         }
         finally
@@ -307,10 +315,10 @@ public class PasswordTest extends BaseWebDriverTest
     }
 
     // Attempt to sign in via UI and API, expecting both to fail with the specified message
-    private void signInShouldFail(String password, String expectedMessage) throws IOException
+    private void signInShouldFailUiAndApi(String email, String password, String expectedMessage) throws IOException
     {
-        signInShouldFail(USER, password, expectedMessage);
-        Connection userConnection = new Connection(WebTestHelper.getBaseURL(), USER, password);
+        signInShouldFail(email, password, expectedMessage);
+        Connection userConnection = new Connection(WebTestHelper.getBaseURL(), email, password);
         EnsureLoginCommand ensureLoginCommand = new EnsureLoginCommand();
         try
         {
