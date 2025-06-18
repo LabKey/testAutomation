@@ -15,7 +15,6 @@
  */
 package org.labkey.test.util;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
 import org.apache.hc.core5.http.message.BasicNameValuePair;
@@ -31,6 +30,7 @@ import org.labkey.remoteapi.SimpleGetCommand;
 import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.remoteapi.security.CreateUserCommand;
 import org.labkey.remoteapi.security.CreateUserResponse;
+import org.labkey.remoteapi.security.DeleteUserCommand;
 import org.labkey.remoteapi.security.GetUsersCommand;
 import org.labkey.remoteapi.security.GetUsersResponse;
 import org.labkey.remoteapi.security.GetUsersResponse.UserInfo;
@@ -222,21 +222,32 @@ public class APIUserHelper extends AbstractUserHelper
         deleteUsers(false, userEmail);
     }
 
+    private void deleteUser(@NotNull Integer userId)
+    {
+        DeleteUserCommand command = new DeleteUserCommand(userId);
+        try
+        {
+            command.execute(connectionSupplier.get(), "/");
+        }
+        catch (IOException|CommandException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
     @Override
     protected void _deleteUsers(boolean failIfNotFound, String... userEmails)
     {
         Map<String, Integer> userIds = getUserIds(Arrays.asList(userEmails), true);
-        ArrayList<Integer> idsToDelete = new ArrayList<>();
+        // TODO: instead of calling deleteUser() one-by-one, should build an array of userIds and call deleteUsers(int...)
         for (String userEmail : new HashSet<>(Arrays.asList(userEmails)))
         {
             Integer userId = userIds.get(userEmail);
             if (failIfNotFound)
                 assertNotNull(userEmail + " was not present", userId);
             if (userId != null)
-                idsToDelete.add(userId);
+                deleteUser(userId);
         }
-        int[] idsArray = ArrayUtils.toPrimitive(idsToDelete.toArray(new Integer[0]));
-        deleteUsers(idsArray);
     }
 
     private static final Pattern regEmailVerification = Pattern.compile("verification=([A-Za-z0-9]+)");
@@ -298,7 +309,7 @@ public class APIUserHelper extends AbstractUserHelper
     private void updateUsersState(boolean activate, boolean delete, int... userIds)
     {
         SimplePostCommand updateUsers = new SimplePostCommand("user", "updateUsersStateApi");
-        updateUsers.setJsonObject(new JSONObject(Map.of("userId",userIds, "activate", activate, "delete", delete)));
+        updateUsers.setJsonObject(new JSONObject(Map.of("userId", userIds, "activate", activate, "delete", delete)));
         try
         {
             updateUsers.execute(connectionSupplier.get(), null);
