@@ -41,6 +41,7 @@ import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PermissionsHelper.PrincipalType;
 import org.labkey.test.util.RReportHelper;
+import org.labkey.test.util.UIContainerHelper;
 import org.labkey.test.util.ZipUtil;
 import org.openqa.selenium.WebElement;
 
@@ -354,10 +355,12 @@ public class FolderExportTest extends BaseWebDriverTest
     @LogMethod
     private void verifyCreateFolderFromTemplate()
     {
-        _containerHelper.createSubFolderFromTemplate(getProjectName(), folderFromTemplate, "/" + getProjectName() + "/" + folderFromZip, new String[]{"Grid Views"});
+        impersonateRole("Folder Administrator"); // Issue 52254
+        new UIContainerHelper(this).createSubFolderFromTemplate(getProjectName(), folderFromTemplate, "/" + getProjectName() + "/" + folderFromZip, new String[]{"Grid Views"});
         verifyExpectedWebPartsPresent();
         verifySubfolderImport(folderFromTemplate, true);
         verifyFolderExportAsExpected(folderFromTemplate);
+        stopImpersonating();
     }
 
     @Test
