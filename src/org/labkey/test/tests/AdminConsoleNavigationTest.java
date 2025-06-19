@@ -55,7 +55,6 @@ public class AdminConsoleNavigationTest extends BaseWebDriverTest
         _apiPermissionsHelper.addMemberToRole(TROUBLESHOOTER, "Troubleshooter", PermissionsHelper.MemberType.user, "/");
 
         _userHelper.createUser(NON_ADMIN);
-        _apiPermissionsHelper.setUserPermissions(NON_ADMIN, "Reader");
     }
 
     @Override
