@@ -1215,7 +1215,8 @@ public class SimpleModuleTest extends BaseWebDriverTest
     private void doTestReportCreatedDate()
     {
         log("Verify module report \"created\" date");
-        clickAndWait(mouseOver(Locator.tag("span").withClass("fa-list-ul").notHidden())); // Report details link
+        click(Locator.byClass("dataset-search"));
+        clickAndWait(Locator.tag("span").withClass("fa-list-ul").notHidden()); // Report details link
         waitForText("August 01 2015");
     }
 
