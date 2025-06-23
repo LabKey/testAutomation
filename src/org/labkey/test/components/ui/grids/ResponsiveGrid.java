@@ -773,7 +773,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverCompon
         return msg;
     }
 
-    List<FieldReference> getHeaders()
+    public List<FieldReference> getHeaders()
     {
         return Collections.unmodifiableList(elementCache().findHeaders());
     }
