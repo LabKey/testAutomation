@@ -14,6 +14,7 @@ import org.labkey.test.categories.Daily;
 import org.labkey.test.components.DomainDesignerPage;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.pages.ReactAssayDesignerPage;
+import org.labkey.test.pages.query.UpdateQueryRowPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldInfo;
 import org.labkey.test.util.APIAssayHelper;
@@ -77,23 +78,23 @@ public class DomainFieldTypeChangeTest extends BaseWebDriverTest
 
         log("Inserting sample rows in the list");
         dgen.addCustomRow(Map.of(
-                stringField.getLabel(), "first",
-                integerField.getLabel(), "1",
-                decimalField.getLabel(), "1.10",
-                dateField.getLabel(), "01-01-2022",
-                booleanField.getLabel(), "true"));
+                stringField.getName(), "first",
+                integerField.getName(), "1",
+                decimalField.getName(), "1.10",
+                dateField.getName(), "01-01-2022",
+                booleanField.getName(), "true"));
         dgen.addCustomRow(Map.of(
-                stringField.getLabel(), "Second",
-                integerField.getLabel(), "2",
-                decimalField.getLabel(), "2.20",
-                dateField.getLabel(), "01-02-2022",
-                booleanField.getLabel(), "false"));
+                stringField.getName(), "Second",
+                integerField.getName(), "2",
+                decimalField.getName(), "2.20",
+                dateField.getName(), "01-02-2022",
+                booleanField.getName(), "false"));
         dgen.addCustomRow(Map.of(
-                stringField.getLabel(), "Third",
-                integerField.getLabel(), "3",
-                decimalField.getLabel(), "3.30",
-                dateField.getLabel(), "01-03-2022",
-                booleanField.getLabel(), "true"));
+                stringField.getName(), "Third",
+                integerField.getName(), "3",
+                decimalField.getName(), "3.30",
+                dateField.getName(), "01-03-2022",
+                booleanField.getName(), "true"));
         dgen.insertRows(createDefaultConnection(), dgen.getRows());
 
         log("Verifying Integer to Decimal change");
@@ -120,28 +121,28 @@ public class DomainFieldTypeChangeTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(listName));
         table = new DataRegionTable("query", getDriver());
         log("Verifying inserting string values");
-        table.clickInsertNewRow();
-        setFormElement(Locator.name("quf_" + stringField.getName()), "Fourth");
-        setFormElement(Locator.name("quf_" + integerField.getName()), "New1");
-        setFormElement(Locator.name("quf_" + decimalField.getName()), "New1.1");
-        setFormElement(Locator.name("quf_" + dateField.getName()), "New01-02-2022");
-        setFormElement(Locator.name("quf_" + booleanField.getName()), "NewTrue");
+        UpdateQueryRowPage updateQueryRowPage = table.clickInsertNewRow();
+        updateQueryRowPage.setField(stringField.getName(), "Fourth");
+        updateQueryRowPage.setField(integerField.getName(), "New1");
+        updateQueryRowPage.setField(decimalField.getName(), "New1.1");
+        updateQueryRowPage.setField(dateField.getName(), "New01-02-2022");
+        updateQueryRowPage.setField(booleanField.getName(), "NewTrue");
         clickButton("Submit");
-        table.clickEditRow(0);
-        setFormElement(Locator.name("quf_" + integerField.getName()), "Edited1");
+        updateQueryRowPage = table.clickEditRow(0);
+        updateQueryRowPage.setField(integerField.getName(), "Edited1");
         clickButton("Submit");
         checker().verifyEquals("Incorrect values after changing integer to string", Arrays.asList("Edited1", "2", "3", "New1"),
-                table.getColumnDataAsText(integerField.getLabel()));
+                table.getColumnDataAsText(integerField.getName()));
         checker().verifyEquals("Incorrect values after changing decimal to string", Arrays.asList("1.1", "2.2", "3.3", "New1.1"),
-                table.getColumnDataAsText(decimalField.getLabel()));
+                table.getColumnDataAsText(decimalField.getName()));
         checker().verifyEquals("Incorrect values after changing boolean to string", Arrays.asList("yes", "no", "yes", "NewTrue"),
-                table.getColumnDataAsText(booleanField.getLabel()));
+                table.getColumnDataAsText(booleanField.getName()));
         if (WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.MicrosoftSQLServer)
             checker().verifyEquals("Incorrect values after changing date to string", Arrays.asList("Jan 1 2022 12:00AM", "Jan 2 2022 12:00AM", "Jan 3 2022 12:00AM", "New01-02-2022"),
-                    table.getColumnDataAsText(dateField.getLabel()));
+                    table.getColumnDataAsText(dateField.getName()));
         else
             checker().verifyEquals("Incorrect values after changing date to string", Arrays.asList("2022-01-01 00:00:00", "2022-01-02 00:00:00", "2022-01-03 00:00:00", "New01-02-2022"),
-                    table.getColumnDataAsText(dateField.getLabel()));
+                    table.getColumnDataAsText(dateField.getName()));
     }
 
     @Test
