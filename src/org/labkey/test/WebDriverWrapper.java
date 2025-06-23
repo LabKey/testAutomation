@@ -2738,6 +2738,12 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return select.getFirstSelectedOption().getText();
     }
 
+    public List<String> getSelectedOptionTexts(Locator loc)
+    {
+        Select select = new Select(loc.findElement(getDriver()));
+        return select.getAllSelectedOptions().stream().map(WebElement::getText).collect(Collectors.toList());
+    }
+
     public String getSelectedOptionValue(Locator loc)
     {
         return getSelectedOptionValue(loc.findElement(getDriver()));

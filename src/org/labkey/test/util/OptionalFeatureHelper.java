@@ -28,6 +28,8 @@ import java.util.Map;
 
 public class OptionalFeatureHelper
 {
+    private static final Map<String, Boolean> initialValues = new HashMap<>();
+
     public static Boolean enableOptionalFeature(Connection cn, String feature)
     {
         return setOptionalFeature(cn, feature, true);
@@ -56,7 +58,9 @@ public class OptionalFeatureHelper
             CommandResponse r = command.execute(cn, null);
             Map<String, Object> response = r.getParsedData();
 
-            return (Boolean)response.get("previouslyEnabled");
+            Boolean previouslyEnabled = (Boolean) response.get("previouslyEnabled");
+            initialValues.putIfAbsent(feature, previouslyEnabled);
+            return previouslyEnabled;
         }
         catch (IOException e)
         {
@@ -65,6 +69,16 @@ public class OptionalFeatureHelper
         catch (CommandException e)
         {
             throw new RuntimeException("Error setting optional feature '" + feature + "': " + e.getStatusCode(), e);
+        }
+    }
+
+    @LogMethod
+    public static void resetOptionalFeature(Connection cn, @LoggedParam String feature)
+    {
+        if (initialValues.containsKey(feature))
+        {
+            setOptionalFeature(cn, feature, initialValues.get(feature));
+            initialValues.remove(feature);
         }
     }
 
