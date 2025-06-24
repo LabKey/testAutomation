@@ -56,6 +56,7 @@ import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.list.IntListDefinition;
 import org.labkey.test.params.list.ListDefinition;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.LabKeyExpectedConditions;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.Maps;
@@ -1215,8 +1216,8 @@ public class SimpleModuleTest extends BaseWebDriverTest
     private void doTestReportCreatedDate()
     {
         log("Verify module report \"created\" date");
-        click(Locator.byClass("dataset-search"));
-        clickAndWait(Locator.tag("span").withClass("fa-list-ul").notHidden()); // Report details link
+        WebElement detailsLink = Locator.tag("span").withClass("fa-list-ul").notHidden().findElement(getDriver());
+        doAndWaitForPageToLoad(() -> shortWait().until(LabKeyExpectedConditions.clickUntilStale(detailsLink)));
         waitForText("August 01 2015");
     }
 
