@@ -31,7 +31,7 @@ import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.pages.query.ExecuteQueryPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.ApiPermissionsHelper;
-import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.DataRegionTable.DataRegionFinder;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
@@ -145,7 +145,7 @@ public class UserDetailsPermissionTest extends BaseWebDriverTest
 
         log("Verify that emails cannot be seen in list via lookup");
         clickAndWait(Locator.linkWithText(EMAIL_TEST_LIST));
-        DataRegionTable.findDataRegion(this).goToView(HIDDEN_COL_VIEW);
+        new DataRegionFinder(getDriver()).find().goToView(HIDDEN_COL_VIEW);
         assertTextPresent(displayName);
         // This user does not have permission to see user details, so no link
         assertElementNotPresent(Locator.linkWithText(displayName));
@@ -157,7 +157,7 @@ public class UserDetailsPermissionTest extends BaseWebDriverTest
 
         log("Verify that user table info can be seen with permission");
         clickAndWait(Locator.linkWithText(EMAIL_TEST_LIST));
-        DataRegionTable.findDataRegion(this).goToView(HIDDEN_COL_VIEW);
+        new DataRegionFinder(getDriver()).find().goToView(HIDDEN_COL_VIEW);
         assertTextPresent(CHECKED_USER, ADMIN_USER, HIDDEN_STRING);
     }
 
@@ -171,7 +171,7 @@ public class UserDetailsPermissionTest extends BaseWebDriverTest
         ExecuteQueryPage.beginAt(this, "core", "Users");
 
         log("Verify that emails cannot be seen in query webpart");
-        DataRegionTable.findDataRegion(this).goToView(HIDDEN_COL_VIEW);
+        new DataRegionFinder(getDriver()).find().goToView(HIDDEN_COL_VIEW);
         assertElementPresent(Locator.linkWithText(displayName));
         assertTextNotPresent(CHECKED_USER, ADMIN_USER, HIDDEN_STRING);
 
@@ -180,7 +180,7 @@ public class UserDetailsPermissionTest extends BaseWebDriverTest
         ExecuteQueryPage.beginAt(this, "core", "Users");
 
         log("Verify that user table info can be seen with permission");
-        DataRegionTable.findDataRegion(this).goToView(HIDDEN_COL_VIEW);
+        new DataRegionFinder(getDriver()).find().goToView(HIDDEN_COL_VIEW);
         assertTextPresent(CHECKED_USER, ADMIN_USER, HIDDEN_STRING);
     }
 
@@ -249,10 +249,10 @@ public class UserDetailsPermissionTest extends BaseWebDriverTest
         _listHelper.createList(getProjectName(), EMAIL_TEST_LIST, "Key", userColumn);
         goToManageLists();
         clickAndWait(Locator.linkWithText(EMAIL_TEST_LIST));
-        DataRegionTable.findDataRegion(this).clickInsertNewRow();
+        new DataRegionFinder(getDriver()).find().clickInsertNewRow();
         selectOptionByText(Locator.name("quf_user"), _userHelper.getDisplayNameForEmail(CHECKED_USER));
         clickButton("Submit");
-        DataRegionTable.findDataRegion(this).clickInsertNewRow();
+        new DataRegionFinder(getDriver()).find().clickInsertNewRow();
         selectOptionByText(Locator.name("quf_user"), _userHelper.getDisplayNameForEmail(ADMIN_USER));
         clickButton("Submit");
         _customizeViewsHelper.openCustomizeViewPanel();

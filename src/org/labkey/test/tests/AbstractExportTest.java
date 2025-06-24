@@ -103,7 +103,7 @@ public abstract class AbstractExportTest extends BaseWebDriverTest
         exportHelper = new DataRegionExportHelper(dataRegion);
 
         if (hasSelectors())
-            dataRegion.uncheckAll();
+            dataRegion.uncheckAllOnPage();
     }
 
     @Test
