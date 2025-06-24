@@ -2,7 +2,6 @@ package org.labkey.test.params;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,7 +9,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-public class FieldKey implements CharSequence
+public class FieldKey implements CharSequence, WrapsFieldKey
 {
     public static final FieldKey EMPTY = new FieldKey(""); // Useful as a sort of FieldKey builder starting point
     public static final FieldKey SOURCES_FK = new FieldKey("DataInputs");
@@ -60,22 +59,15 @@ public class FieldKey implements CharSequence
      * @param fieldKey String or FieldKey
      * @return FieldKey representation of the String, or the identity if a FieldKey was provided
      */
-    public static @Nullable FieldKey fromFieldKey(CharSequence fieldKey)
+    public static FieldKey fromFieldKey(CharSequence fieldKey)
     {
-        if (fieldKey instanceof FieldKey fk)
+        if (fieldKey instanceof WrapsFieldKey fk)
         {
-            return fk;
+            return fk.getFieldKey();
         }
         else
         {
-            try
-            {
-                return fromParts(Arrays.stream(fieldKey.toString().split(SEPARATOR)).map(FieldKey::decodePart).toList());
-            }
-            catch (IllegalArgumentException iae)
-            {
-                return null;
-            }
+            return fromParts(Arrays.stream(fieldKey.toString().split(SEPARATOR)).map(FieldKey::decodePart).toList());
         }
     }
 
@@ -86,8 +78,8 @@ public class FieldKey implements CharSequence
      */
     public static FieldKey fromName(CharSequence nameOrFieldKey)
     {
-        if (nameOrFieldKey instanceof FieldKey fk)
-            return fk;
+        if (nameOrFieldKey instanceof WrapsFieldKey fk)
+            return fk.getFieldKey();
         else
             return fromParts(nameOrFieldKey.toString());
     }
@@ -143,9 +135,19 @@ public class FieldKey implements CharSequence
         return _name;
     }
 
+    /**
+     * Inverse of {@link #fromParts(String...)}
+     * @return decoded parts of the field key
+     */
     public String[] getNameArray()
     {
         return Arrays.stream(_fieldKey.split(SEPARATOR)).map(FieldKey::decodePart).toArray(String[]::new);
+    }
+
+    @Override
+    public FieldKey getFieldKey()
+    {
+        return this;
     }
 
     @Override

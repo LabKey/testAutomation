@@ -1,33 +1,43 @@
 package org.labkey.test.components.ui.grids;
 
-import org.apache.commons.lang3.mutable.Mutable;
-import org.apache.commons.lang3.mutable.MutableObject;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.labkey.test.params.FieldKey;
+import org.labkey.test.params.WrapsFieldKey;
+import org.labkey.test.util.CachingSupplier;
 import org.labkey.test.util.selenium.WebElementUtils;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public class FieldReferenceManager
 {
-    private final List<FieldReference> _fieldReferences;
+    private final List<FieldReference> fieldReferences;
+    private final Map<Integer, FieldReference> fieldsByIndex;
     private final Map<FieldKey, FieldReference> fieldKeys = new LinkedHashMap<>();
     private final Map<String, FieldReference> fieldLabels = new LinkedHashMap<>();
 
     public <T extends FieldReference> FieldReferenceManager(List<T> columnHeaders)
     {
-        this._fieldReferences = Collections.unmodifiableList(columnHeaders);
+        fieldReferences = List.copyOf(columnHeaders);
+        fieldsByIndex = columnHeaders.stream().collect(Collectors.toMap(FieldReference::getDomIndex, Function.identity()));
     }
 
     public List<FieldReference> getColumnHeaders()
     {
-        return _fieldReferences;
+        return fieldReferences;
+    }
+
+    public FieldReference getColumnHeader(int index)
+    {
+        return fieldsByIndex.get(index);
     }
 
     /**
@@ -39,13 +49,13 @@ public class FieldReferenceManager
      *     <li>Field Label</li>
      * </ol>
      */
-    public final FieldReference findFieldReference(CharSequence fieldIdentifier)
+    public final @NotNull FieldReference findFieldReference(CharSequence fieldIdentifier)
     {
         List<Supplier<FieldReference>> options;
 
-        if (fieldIdentifier instanceof FieldKey fk)
+        if (fieldIdentifier instanceof WrapsFieldKey fk)
         {
-            options = List.of(() -> findColumnHeaderByFieldKey(fk)); // We know it is a FieldKey
+            options = List.of(() -> findColumnHeaderByFieldKey(fk.getFieldKey())); // We know it is a FieldKey
         }
         else
         {
@@ -63,15 +73,27 @@ public class FieldReferenceManager
             .orElseThrow(() -> new NoSuchElementException("Unable to locate field: " + fieldIdentifier));
     }
 
+    public final @Nullable FieldReference findFieldReferenceOrNull(CharSequence fieldIdentifier)
+    {
+        try
+        {
+            return findFieldReference(fieldIdentifier);
+        }
+        catch (NoSuchElementException e)
+        {
+            return null;
+        }
+    }
+
     private FieldReference findColumnHeaderByFieldKey(FieldKey fieldIdentifier)
     {
         if (fieldKeys.containsKey(fieldIdentifier))
         {
             return fieldKeys.get(fieldIdentifier);
         }
-        else if (fieldKeys.size() < _fieldReferences.size())
+        else if (fieldKeys.size() < fieldReferences.size())
         {
-            for (FieldReference header : _fieldReferences)
+            for (FieldReference header : fieldReferences)
             {
                 if (!fieldKeys.containsValue(header))
                 {
@@ -94,9 +116,9 @@ public class FieldReferenceManager
         {
             return fieldLabels.get(label);
         }
-        else if (fieldLabels.size() < _fieldReferences.size())
+        else if (fieldLabels.size() < fieldReferences.size())
         {
-            for (FieldReference header : _fieldReferences)
+            for (FieldReference header : fieldReferences)
             {
                 if (!fieldLabels.containsValue(header))
                 {
@@ -117,8 +139,8 @@ public class FieldReferenceManager
     {
         private final WebElement _element;
         private final int _domIndex;
-        private final Mutable<String> _fieldLabel = new MutableObject<>();
-        private final Mutable<FieldKey> _fieldKey = new MutableObject<>();
+        private final CachingSupplier<String> _fieldLabel = new CachingSupplier<>(this::labelSupplier);
+        private final CachingSupplier<FieldKey> _fieldKey = new CachingSupplier<>(this::fieldKeySupplier);
 
         public FieldReference(WebElement element, int domIndex)
         {
@@ -133,34 +155,12 @@ public class FieldReferenceManager
 
         public FieldKey getFieldKey()
         {
-            if (_fieldKey.getValue() == null)
-            {
-                String path = _element.getDomAttribute("data-fieldkey");
-                if (path == null)
-                {
-                    // Some grids don't have a field key, but have a similar value in the ID attribute
-                    path = _element.getDomAttribute("id");
-                }
-
-                if (path != null)
-                {
-                    _fieldKey.setValue(FieldKey.fromFieldKey(path));
-                }
-                else
-                {
-                    _fieldKey.setValue(FieldKey.EMPTY);
-                }
-            }
-            return _fieldKey.getValue();
+            return _fieldKey.get();
         }
 
         public String getLabel()
         {
-            if (_fieldLabel.getValue() == null)
-            {
-                _fieldLabel.setValue(WebElementUtils.getTextContent(getElement()).trim());
-            }
-            return _fieldLabel.getValue();
+            return _fieldLabel.get();
         }
 
         public String getName()
@@ -171,6 +171,30 @@ public class FieldReferenceManager
         public int getDomIndex()
         {
             return _domIndex;
+        }
+
+        protected String labelSupplier()
+        {
+            return WebElementUtils.getTextContent(getElement()).trim();
+        }
+
+        protected FieldKey fieldKeySupplier()
+        {
+            String path = getElement().getDomAttribute("data-fieldkey");
+            if (path == null)
+            {
+                // Some grids don't have a field key, but have a similar value in the ID attribute
+                path = getElement().getDomAttribute("id");
+            }
+
+            if (path != null)
+            {
+                return FieldKey.fromFieldKey(path);
+            }
+            else
+            {
+                return FieldKey.EMPTY;
+            }
         }
     }
 }

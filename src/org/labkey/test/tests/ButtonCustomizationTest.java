@@ -188,7 +188,7 @@ public class ButtonCustomizationTest extends BaseWebDriverTest
                 Locator.lkButton(METADATA_LINK_BUTTON).waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT)
                         .getAttribute("class").contains("labkey-disabled-button"));
 
-        buttonRegion.checkCheckbox(buttonRegion.getIndexWhereDataAppears("Portland", "Name"));
+        buttonRegion.checkCheckbox(buttonRegion.getRowIndex("Portland", "Name"));
         // wait for the button to enable:
         waitForElement(Locator.lkButton(METADATA_LINK_BUTTON), 10000);
 
