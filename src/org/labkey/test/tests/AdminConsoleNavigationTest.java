@@ -55,7 +55,6 @@ public class AdminConsoleNavigationTest extends BaseWebDriverTest
         _apiPermissionsHelper.addMemberToRole(TROUBLESHOOTER, "Troubleshooter", PermissionsHelper.MemberType.user, "/");
 
         _userHelper.createUser(NON_ADMIN);
-        _apiPermissionsHelper.setUserPermissions(NON_ADMIN, "Reader");
     }
 
     @Override
@@ -76,6 +75,7 @@ public class AdminConsoleNavigationTest extends BaseWebDriverTest
                 "Memory Usage",                     // Slow to load
                 "View All Site Errors",             // No nav trail
                 "View All Site Errors Since Reset", // No nav trail
+                "View CSP Report Log File",         // No nav trail
                 "View Primary Site Log File"        // No nav trail
         ));
         List<WebElement> adminLinks = ShowAdminPage.beginAt(this).getAllAdminConsoleLinks();

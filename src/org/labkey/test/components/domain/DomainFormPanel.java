@@ -27,6 +27,7 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
+import static org.labkey.test.WebDriverWrapper.waitFor;
 
 /**
  * Automates the LabKey ui component defined in: packages/components/src/components/domainproperties/DomainForm.tsx
@@ -41,6 +42,12 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
     private DomainFormPanel(WebElement element, WebDriver driver)
     {
         super(element, driver);
+    }
+
+    @Override
+    protected void waitForReady()
+    {
+        waitFor(() -> !BootstrapLocators.loadingSpinner.existsIn(this), "Loading spinner still present", 2_000);
     }
 
     public static List<AdvancedFieldSetting> advancedSettingsFromFieldDefinition(FieldDefinition def)
@@ -256,8 +263,8 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
      */
     public DomainFormPanel clickManuallyDefineFields()
     {
-        getWrapper().scrollIntoView(elementCache().manuallyDefineButton, true);
         getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().manuallyDefineButton)); // give modal dialogs time to disappear
+        getWrapper().scrollIntoView(elementCache().manuallyDefineButton, true);
         elementCache().manuallyDefineButton.click();
 
         return this;

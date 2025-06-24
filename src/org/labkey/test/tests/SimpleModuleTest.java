@@ -15,9 +15,12 @@
  */
 package org.labkey.test.tests;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.apache.hc.core5.http.HttpStatus;
+import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.Nullable;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -58,6 +61,7 @@ import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelper;
+import org.labkey.test.util.TestLogger;
 import org.labkey.test.util.WikiHelper;
 import org.labkey.test.util.ext4cmp.Ext4FieldRef;
 import org.openqa.selenium.By;
@@ -76,6 +80,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -228,8 +234,6 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
         goToProjectHome();
         portalHelper.addWebPart("Data Views");
-        for (int i = 0; i < 5; i ++)
-            portalHelper.moveWebPart("Data Views", PortalHelper.Direction.UP);
 
         ProjectSettingsPage projectSettingsPage = goToProjectSettings();
         projectSettingsPage.setDefaultDateTimeDisplayInherited(false);
@@ -436,7 +440,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         deleteCmd.execute(createDefaultConnection(), getProjectName());
     }
 
-    private void submitAndTestExpectedFailure(Command cmd, String expectedError) throws Exception
+    private void submitAndTestExpectedFailure(Command<?, ?> cmd, String expectedError) throws Exception
     {
         try
         {
@@ -725,7 +729,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         ));
         try
         {
-            SaveRowsResponse updateRows = updateCmd.execute(cn, getProjectName() + "/" + FOLDER_NAME);
+            updateCmd.execute(cn, getProjectName() + "/" + FOLDER_NAME);
             fail("Expected to throw CommandException");
         }
         catch (CommandException ex)
@@ -737,7 +741,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         // Make sure that the schema isn't resolved if the module is not enabled in the container
         try
         {
-            SaveRowsResponse updateRows = updateCmd.execute(cn, "Shared");
+            updateCmd.execute(cn, "Shared");
             fail("Expected to throw CommandException");
         }
         catch (CommandException ex)
@@ -809,7 +813,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         try
         {
             log("** Trying to delete Vehicles from a different container");
-            SaveRowsResponse deleteResp = deleteCmd.execute(cn, getProjectName() + "/" + FOLDER_NAME);
+            deleteCmd.execute(cn, getProjectName() + "/" + FOLDER_NAME);
             fail("Expected to throw CommandException");
         }
         catch (CommandException ex)
@@ -845,7 +849,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
             Locator popup = Locator.tag("div").withAttribute("id", "helpDiv").descendant("img").withAttributeContaining("src", popupImage).
                     withAttributeContaining("style", popupWidth != null ? "width:" + popupWidth : "max-width:300px");
             shortWait().until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("#helpDiv")));
-            String src = popup.findElement(getDriver()).getAttribute("src");
+            String src = StringUtils.trimToEmpty(popup.findElement(getDriver()).getDomAttribute("src"));
 
             fireEvent(thumbnail, SeleniumEvent.mouseout);
             Locator.tagWithClass("th", "labkey-selectors").findElement(getDriver()).click(); // safe out-click in the first header cell
@@ -857,7 +861,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         else
         {
             Locator popup = Locator.tag("div").withAttribute("id", "helpDiv").descendant("img").withAttributeContaining("src", popupImage);
-            assertTrue("Popup should not be present", !popup.existsIn(getDriver()));
+            assertFalse("Popup should not be present", popup.existsIn(getDriver()));
         }
     }
 
@@ -884,7 +888,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
         assertTrue("should be able to select default view", saveWindow.defaultViewRadio.isEnabled());
         saveWindow.defaultViewRadio.check();
-        Window saveError = saveWindow.saveError();
+        Window<?> saveError = saveWindow.saveError();
         saveError.clickButton("OK", 0);
         saveError.waitForClose();
 
@@ -1004,10 +1008,8 @@ public class SimpleModuleTest extends BaseWebDriverTest
                     Object value = convertedRow.getValue(keyField);
                     newRow.put(keyField, value);
 
-                    List<Map<String, Object>> rows = rowsByContainer.get(container);
-                    if (rows == null)
-                        rowsByContainer.put(container, rows = new ArrayList<>());
-                    rows.add(newRow);
+                    rowsByContainer.computeIfAbsent(container, k -> new ArrayList<>())
+                            .add(newRow);
                 }
 
                 for (String container : rowsByContainer.keySet())
@@ -1028,8 +1030,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
             // Don't log project not found error
             if (e.getStatusCode() != 404)
             {
-                log("** Error during cleanupTable:");
-                e.printStackTrace(System.out);
+                TestLogger.info("** Error during cleanupTable:", e);
             }
         }
     }
@@ -1076,14 +1077,10 @@ public class SimpleModuleTest extends BaseWebDriverTest
                 new FieldDefinition("Age", FieldDefinition.ColumnType.Integer).setDescription("Age"),
                 new FieldDefinition("Crazy", FieldDefinition.ColumnType.Boolean).setDescription("Crazy?")
         ));
-        listDef.create(createDefaultConnection(), getProjectName());
-
-        log("Importing some data...");
-        goToManageLists();
-        _listHelper.goToList(LIST_NAME);
-        _listHelper.clickImportData()
-                .setText(LIST_DATA)
-                .submit();
+        Connection connection = createDefaultConnection();
+        listDef.create(connection, getProjectName())
+                .getQueryHelper(connection)
+                .importData(LIST_DATA);
     }
 
     @LogMethod
@@ -1198,16 +1195,18 @@ public class SimpleModuleTest extends BaseWebDriverTest
         File expectedIconFile = TestFileUtils.getSampleData(THUMBNAIL_FOLDER + KNITR_PEOPLE + ICON_FILENAME);
         String expectedIcon = TestFileUtils.getFileContents(expectedIconFile);
 
-        String iconStyle = waitForElement(Locator.tag("img").withClass("dataview-icon").withoutClass("x4-tree-icon-parent").notHidden()).getAttribute("style");
-        assertTrue("Module report icon style is not as expected", iconStyle.indexOf("background-image") == 0);
-        String iconSrc = iconStyle.replace("background-image:url(\"", "").replace("background-image: url(\"", "").replace("\");", "");
-
-        String portPortion = 80 == WebTestHelper.getWebPort() ? "" : ":" + WebTestHelper.getWebPort();
-        String protocol = WebTestHelper.getTargetServer() + portPortion;
-        String iconData = WebTestHelper.getHttpResponse(protocol + iconSrc).getResponseBody();
+        WebElement img = waitForElement(Locator.tag("img").withClass("dataview-icon").withoutClass("x4-tree-icon-parent").notHidden());
+        String backgroundImage = StringUtils.trimToEmpty(img.getCssValue("background-image"));
+        Matcher matcher = Pattern.compile("^url\\(\"(.+)\"\\)$").matcher(backgroundImage);
+        if (!matcher.find())
+        {
+            Assert.fail("Module report icon style is not as expected: " + img.getDomAttribute("style"));
+        }
+        String iconUrl = matcher.group(1);
+        String iconData = WebTestHelper.getHttpResponse(iconUrl).getResponseBody();
 
         int lengthToCompare = 3000;
-        int diff = new LevenshteinDistance().apply(expectedIcon.substring(0, lengthToCompare), iconData.substring(0, lengthToCompare));
+        int diff = LevenshteinDistance.getDefaultInstance().apply(expectedIcon.substring(0, lengthToCompare), iconData.substring(0, lengthToCompare));
         assertTrue("Module report icon is not as expected, diff is " + diff, expectedIcon.equals(iconData) ||
                 diff  <= lengthToCompare * 0.03); // Might be slightly different due to indentations, etc
     }
@@ -1229,16 +1228,16 @@ public class SimpleModuleTest extends BaseWebDriverTest
         WebElement reportLink = waitForElement(Locator.xpath("//a[text()='" + reportTitle + "']"));
         mouseOver(reportLink);
         WebElement thumbnail = waitForElement(Locator.xpath("//div[@class='thumbnail']/img").notHidden());
-        String thumbnailData = WebTestHelper.getHttpResponse(thumbnail.getAttribute("src")).getResponseBody();
+        String thumbnailData = WebTestHelper.getHttpResponse(thumbnail.getDomAttribute("src")).getResponseBody();
 
         int lengthToCompare = 5000;
-        int diff = new LevenshteinDistance().apply(expectedThumbnail.substring(0, lengthToCompare), thumbnailData.substring(0, lengthToCompare));
+        int diff = LevenshteinDistance.getDefaultInstance().apply(expectedThumbnail.substring(0, lengthToCompare), thumbnailData.substring(0, lengthToCompare));
         assertTrue("Module report thumbnail is not as expected, diff is " + diff, expectedThumbnail.equals(thumbnailData) ||
                 diff  <= lengthToCompare * 0.03); // Might be slightly different due to indentations, etc
     }
 
     @LogMethod
-    private void doTestImportTemplates() throws Exception
+    private void doTestImportTemplates()
     {
         log("Testing import templates...");
 
@@ -1251,7 +1250,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         assertTrue("Import message not present", isTextPresent("Please read this before you import data"));
 
         Locator l = Locator.xpath("//select[@id='importTemplate']//option");
-        assertTrue("Wrong number of templates found", getElementCount(l) == 2);
+        assertEquals("Wrong number of templates found", 2, l.findElements(getDriver()).size());
     }
 
     @LogMethod
@@ -1401,7 +1400,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         selectResp = selectCmd.execute(cn, getProjectName());
         assertEquals("Expected first row to be 2001.", 2001, selectResp.getRows().get(0).get("ModelYear"));
         assertEquals("Expected first row to be 2000.", 2000, selectResp.getRows().get(1).get("ModelYear"));
-        assertTrue("Expected the column 'ModelId/ManufacturerId/Name' to be included based on the default view", selectResp.getColumnModel("ModelId/ManufacturerId/Name") != null);
+        assertNotNull("Expected the column 'ModelId/ManufacturerId/Name' to be included based on the default view", selectResp.getColumnModel("ModelId/ManufacturerId/Name"));
         assertEquals("Expected to return 6 columns, based on the default view", 6, selectResp.getColumnModel().size());
     }
 
@@ -1449,37 +1448,37 @@ public class SimpleModuleTest extends BaseWebDriverTest
             labkey.ensureRLibPath <- function(append=FALSE)
             {
               propValue <- labkey.getModuleProperty(baseUrl, folderPath, moduleName, propName)
-             \s
+
               splits <- strsplit(propValue, '\\r\\n|\\n|\\r')
               paths <- splits[[1]]
-             \s
+
               if (append == TRUE)
-              \t.libPaths(c(paths, .libPaths()))
+                .libPaths(c(paths, .libPaths()))
               else
-              \t.libPaths(c(paths[1], paths[2]))
-             \s
+                .libPaths(c(paths[1], paths[2]))
+
               .libPaths()
             }
-                \s
+
             folderPath = "SimpleModuleTest Project/subfolder"
             print("BEGIN-FIRST-CALL")
-            labkey.ensureRLibPath() \s
+            labkey.ensureRLibPath()
             print("END-FIRST-CALL")
-                \s
-            folderPath = "SimpleModuleTest Project/subfolder2" \s
+
+            folderPath = "SimpleModuleTest Project/subfolder2"
             print("BEGIN-SECOND-CALL")
             labkey.ensureRLibPath()
-            print("END-SECOND-CALL")    \s
+            print("END-SECOND-CALL")
 
-            folderPath = "SimpleModuleTest Project/subfolder" \s
+            folderPath = "SimpleModuleTest Project/subfolder"
             print("BEGIN-THIRD-CALL")
             labkey.ensureRLibPath(append=TRUE)
             print("END-THIRD-CALL")
-             \s""";
+            """;
 
     @LogMethod
     @Test
-    public void testModuleProperties() throws Exception
+    public void testModuleProperties()
     {
         RReportHelper rReportHelper = new RReportHelper(this);
         rReportHelper.ensureRConfig(false);
@@ -1705,6 +1704,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         clickButton("Save & Finish");
     }
 
+    @Language("JavaScript")
     private static final String vehicleMetadataJsQuery = """
             function onFailure(errorInfo, options, responseObj)
             {
