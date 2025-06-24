@@ -642,11 +642,19 @@ public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverCompon
         return elementCache().getColumnLabels();
     }
 
+    /**
+     *
+     * @return a List&#60;String&#62; containing the names of the fields for each column header
+     */
     public List<String> getColumnNames()
     {
         return elementCache().getColumnNames();
     }
 
+    /**
+     *
+     * @return a List&#60;FieldKey&#62; containing the fieldKeys for each column header
+     */
     public List<FieldKey> getColumnFieldKeys()
     {
         return elementCache().getColumnFieldKeys();
