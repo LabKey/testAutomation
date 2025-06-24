@@ -286,7 +286,7 @@ public class AssayTransformImportUpdateTest extends BaseWebDriverTest
         Instant before = Instant.now();
         importPage.clickSaveAndFinish();
 
-        waitAndClickAndWait(Locator.linkWithText("Assay upload RUNNING"));
+        waitAndClick(WAIT_FOR_JAVASCRIPT, Locator.linkWithText("Assay upload RUNNING"), WAIT_FOR_JAVASCRIPT);
         PipelineStatusDetailsPage pipelineStatusDetailsPage = new PipelineStatusDetailsPage(getDriver());
         pipelineStatusDetailsPage.clickCancel();
 
