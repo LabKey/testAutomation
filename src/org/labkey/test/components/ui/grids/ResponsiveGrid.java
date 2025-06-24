@@ -642,6 +642,16 @@ public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverCompon
         return elementCache().getColumnLabels();
     }
 
+    public List<String> getColumnNames()
+    {
+        return elementCache().getColumnNames();
+    }
+
+    public List<FieldKey> getColumnFieldKeys()
+    {
+        return elementCache().getColumnFieldKeys();
+    }
+
     /**
      * Get data from a row
      * @param rowIndex  the index of the desired row
@@ -859,6 +869,16 @@ public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverCompon
         protected List<String> getColumnLabels()
         {
             return findHeaders().stream().map(FieldReferenceManager.FieldReference::getLabel).collect(Collectors.toList());
+        }
+
+        protected List<String> getColumnNames()
+        {
+            return findHeaders().stream().map(FieldReferenceManager.FieldReference::getName).collect(Collectors.toList());
+        }
+
+        protected List<FieldKey> getColumnFieldKeys()
+        {
+            return findHeaders().stream().map(FieldReferenceManager.FieldReference::getFieldKey).collect(Collectors.toList());
         }
 
         protected GridRow getRow(int index)
