@@ -7,7 +7,7 @@ import java.util.function.Consumer;
  * Immutable alternative to 'FieldDefinition'
  * Use this for shared global field information
  */
-public class FieldInfo implements WrapsFieldKey
+public class FieldInfo
 {
     private final FieldKey _fieldKey;
     private final String _label;
@@ -57,7 +57,6 @@ public class FieldInfo implements WrapsFieldKey
         return Objects.requireNonNullElseGet(getRawLabel(), () -> FieldDefinition.labelFromName(_fieldKey.getName()));
     }
 
-    @Override
     public FieldKey getFieldKey()
     {
         return _fieldKey;

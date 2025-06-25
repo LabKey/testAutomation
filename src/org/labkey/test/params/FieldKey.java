@@ -9,7 +9,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-public class FieldKey implements CharSequence, WrapsFieldKey
+public class FieldKey implements CharSequence
 {
     public static final FieldKey EMPTY = new FieldKey(""); // Useful as a sort of FieldKey builder starting point
     public static final FieldKey SOURCES_FK = new FieldKey("DataInputs");
@@ -61,9 +61,9 @@ public class FieldKey implements CharSequence, WrapsFieldKey
      */
     public static FieldKey fromFieldKey(CharSequence fieldKey)
     {
-        if (fieldKey instanceof WrapsFieldKey fk)
+        if (fieldKey instanceof FieldKey fk)
         {
-            return fk.getFieldKey();
+            return fk;
         }
         else
         {
@@ -78,8 +78,8 @@ public class FieldKey implements CharSequence, WrapsFieldKey
      */
     public static FieldKey fromName(CharSequence nameOrFieldKey)
     {
-        if (nameOrFieldKey instanceof WrapsFieldKey fk)
-            return fk.getFieldKey();
+        if (nameOrFieldKey instanceof FieldKey fk)
+            return fk;
         else
             return fromParts(nameOrFieldKey.toString());
     }
@@ -142,12 +142,6 @@ public class FieldKey implements CharSequence, WrapsFieldKey
     public String[] getNameArray()
     {
         return Arrays.stream(_fieldKey.split(SEPARATOR)).map(FieldKey::decodePart).toArray(String[]::new);
-    }
-
-    @Override
-    public FieldKey getFieldKey()
-    {
-        return this;
     }
 
     @Override
