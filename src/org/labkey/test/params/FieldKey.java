@@ -50,8 +50,6 @@ public final class FieldKey implements CharSequence, WrapsFieldKey
 
         for (String part : parts)
         {
-            if (StringUtils.isBlank(part))
-                throw new IllegalArgumentException("FieldKey contains a blank part: " + parts);
             fieldKey = fieldKey.child(part);
         }
 
@@ -115,15 +113,18 @@ public final class FieldKey implements CharSequence, WrapsFieldKey
         return _parent;
     }
 
-    public FieldKey child(String name)
+    public FieldKey child(String part)
     {
+        if (StringUtils.isBlank(part))
+            throw new IllegalArgumentException("FieldKey can't have blank part(s): " + this);
+
         if (StringUtils.isBlank(getName()))
         {
-            return new FieldKey(name);
+            return new FieldKey(part);
         }
         else
         {
-            return new FieldKey(this, name);
+            return new FieldKey(this, part);
         }
     }
 
