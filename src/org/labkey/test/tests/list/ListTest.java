@@ -19,14 +19,10 @@ package org.labkey.test.tests.list;
 import org.apache.commons.lang3.StringUtils;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.MatcherAssert;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.labkey.api.query.QueryKey;
-import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.domain.Domain;
 import org.labkey.remoteapi.domain.DomainResponse;
 import org.labkey.remoteapi.domain.PropertyDescriptor;
@@ -53,10 +49,10 @@ import org.labkey.test.pages.ImportDataPage;
 import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.pages.list.GridPage;
 import org.labkey.test.params.FieldDefinition;
-import org.labkey.test.params.FieldDefinition.LookupInfo;
 import org.labkey.test.params.FieldDefinition.StringLookup;
 import org.labkey.test.tests.AuditLogTest;
 import org.labkey.test.util.AbstractDataRegionExportOrSignHelper.ColumnHeaderType;
+import org.labkey.test.util.AuditLogHelper;
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
@@ -67,6 +63,7 @@ import org.labkey.test.util.TestDataGenerator;
 import org.labkey.test.util.TextSearcher;
 import org.labkey.test.util.search.SearchAdminAPIHelper;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
@@ -171,7 +168,7 @@ public class ListTest extends BaseWebDriverTest
     private final static ColumnType LIST3_KEY_TYPE = ColumnType.String;
     private final static String LIST3_KEY_NAME = "Owner";
     private final FieldDefinition _list3Col2 = new FieldDefinition("Wealth", ColumnType.String);
-    protected final FieldDefinition _list3Col1 = new FieldDefinition(LIST3_KEY_NAME, new LookupInfo("/" + PROJECT_OTHER, "lists", LIST3_NAME_OWNERS).setTableType(ColumnType.String)).setDescription("Who owns the car");
+    protected final FieldDefinition _list3Col1 = new FieldDefinition(LIST3_KEY_NAME, new StringLookup(PROJECT_OTHER, "lists", LIST3_NAME_OWNERS)).setDescription("Who owns the car");
     private final static String LIST3_COL2 = "Rich";
     private final String LIST2_DATA =
             LIST2_KEY_NAME + "\t" + LIST_KEY_NAME2_BULK  + "\t" + LIST3_KEY_NAME + "\n" +
@@ -191,6 +188,8 @@ public class ListTest extends BaseWebDriverTest
     private final File TSV_SAMPLE_FILE = TestFileUtils.getSampleData("fileTypes/tsv_sample.tsv");
     private final String TSV_LIST_NAME = "Fruits from TSV";
 
+    private final AuditLogHelper _auditLogHelper = new AuditLogHelper(this);
+
     @Override
     public List<String> getAssociatedModules()
     {
@@ -206,7 +205,7 @@ public class ListTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        ListTest init = (ListTest)getCurrentTest();
+        ListTest init = getCurrentTest();
         init.doSetup();
     }
 
@@ -506,6 +505,44 @@ public class ListTest extends BaseWebDriverTest
         checker().withScreenshot().verifyEquals("Name not trimmed as expected", trimmedName, editList.getName());
     }
 
+    /* Issue 51572: Bug with creating a new list by uploading a csv file in "UTF-8 with BOM" format
+     */
+    @Test
+    public void testCreateListWithBOMFile()
+    {
+        String listName = TestDataGenerator.randomDomainName("From BOM File", 4);
+        File bomFile = TestFileUtils.getSampleData("lists/TestUTF8_BOM.csv");
+
+        EditListDefinitionPage listEditPage = _listHelper.beginCreateList(getProjectName(), listName);
+        listEditPage.getFieldsPanel()
+                .setInferFieldFile(bomFile);
+
+        String keyName = "KeyValue";
+        listEditPage.selectKeyField(keyName);
+        listEditPage.clickSave();
+
+        List<FieldDefinition> fields = List.of(
+                new FieldDefinition(keyName, ColumnType.Integer),
+                new FieldDefinition("A", ColumnType.String),
+                new FieldDefinition("B", ColumnType.String),
+                new FieldDefinition("C", ColumnType.String)
+        );
+
+        String [][] data = { {"101","A2","B2","C2"},
+                {"102","A3","B3","C3"},
+                {"103","A4","B4","C4"},
+                {"104","A5","B5","C5"},
+                {"105","A6","B6","C6"},
+                {"106","A7","B7","C7"},
+                {"107","A8","B8","C8"},
+                {"108","A9","B9","C9"},
+                {"109","A10","B10","C10"},
+                {"110","A11","B11","C11"} };
+
+        _listHelper.verifyListData(fields, data, checker());
+
+    }
+
     @Test
     public void testCustomViews()
     {
@@ -581,8 +618,8 @@ public class ListTest extends BaseWebDriverTest
         clickProject(getProjectName());
 
         log("Test that sort only affects one web part");
-        DataRegionTable firstList = DataRegionTable.DataRegion(getDriver()).find();
-        DataRegionTable secondList = DataRegionTable.DataRegion(getDriver()).index(1).find();
+        DataRegionTable firstList = DataRegion(getDriver()).find();
+        DataRegionTable secondList = DataRegion(getDriver()).index(1).find();
         firstList.setSort(_listColGood.getName(), SortDirection.ASC);
         List<String> expectedColumn = new ArrayList<>(Arrays.asList(TEST_DATA[TD_GOOD]));
         List<String> firstListColumn = secondList.getColumnDataAsText(_listColGood.getName());
@@ -596,14 +633,17 @@ public class ListTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("view history"));
         checker().wrapAssertion(()->assertTextPresent(":History"));
         checker().wrapAssertion(()->assertTextPresent("record was modified", 2));    // An existing list record was modified
-        checker().wrapAssertion(()->assertTextPresent("were modified", 8));          // The column(s) of LIST_NAME_COLORS domain were modified
+
+        checker().wrapAssertion(()->assertTextPresent(" was created. The column(s) of domain ", 1));// Create domain and update columns combined into a single event
+        checker().wrapAssertion(()->assertTextPresent(" were modified.", 7));          // The column(s) of LIST_NAME_COLORS domain were modified
+        checker().wrapAssertion(()->assertTextPresent("The descriptor of domain", 1));          // The description LIST_NAME_COLORS domain were modified
         checker().wrapAssertion(()->assertTextPresent("Bulk inserted", 2));
         checker().wrapAssertion(()->assertTextPresent("A new list record was inserted", 1));
         checker().wrapAssertion(()->assertTextPresent("was created", 2));                // Once for the list, once for the domain
         // List insert/update events should each have a link to the list item that was modified, but the other events won't have a link
-        checker().wrapAssertion(()->assertEquals("details Links", 6, DataRegionTable.detailsLinkLocator().findElements(getDriver()).size()));
-        checker().wrapAssertion(()->assertEquals("Project Links", 18, DataRegionTable.Locators.table().append(Locator.linkWithText(PROJECT_VERIFY)).findElements(getDriver()).size()));
-        checker().wrapAssertion(()->assertEquals("List Links", 18, DataRegionTable.Locators.table().append(Locator.linkWithText(LIST_NAME_COLORS)).findElements(getDriver()).size()));
+        checker().wrapAssertion(()->assertEquals("details Links", 6/*List Events*/ + 8/*Domain Audit*/, DataRegionTable.detailsLinkLocator().findElements(getDriver()).size()));
+        checker().wrapAssertion(()->assertEquals("Project Links", 17, DataRegionTable.Locators.table().append(Locator.linkWithText(PROJECT_VERIFY)).findElements(getDriver()).size()));
+        checker().wrapAssertion(()->assertEquals("List Links", 17, DataRegionTable.Locators.table().append(Locator.linkWithText(LIST_NAME_COLORS)).findElements(getDriver()).size()));
         DataRegionTable dataRegionTable = new DataRegionTable("query", getDriver());
         dataRegionTable.clickRowDetails(0);
         checker().wrapAssertion(()->assertTextPresent("List Item Details"));
@@ -756,13 +796,13 @@ public class ListTest extends BaseWebDriverTest
     /* Issue 23487: add regression coverage for batch insert into list with multiple errors
     */
     @Test
-    public void testBatchInsertErrors() throws IOException, CommandException
+    public void testBatchInsertErrors()
     {
         // create the list for this case
         String multiErrorListName = "multiErrorBatchList";
         String[] expectedErrors = new String[]{
             getConversionErrorMessage("green", "ShouldInsertCorrectly", Boolean.class),
-            getConversionErrorMessage("five", "Id", Integer.class) + "; Missing value for required property: Id"
+            getConversionErrorMessage("five", "Id", Integer.class)
         };
 
         createList(multiErrorListName, BatchListColumns, BatchListData);
@@ -829,8 +869,7 @@ public class ListTest extends BaseWebDriverTest
                 new FieldDefinition("dewey", ColumnType.Decimal)
         );
         String listName = "remoteApiListTestAddColumn";
-        FieldDefinition.LookupInfo info = new FieldDefinition.LookupInfo(getProjectName(), "lists", listName);
-        TestDataGenerator dgen = new TestDataGenerator(info)
+        TestDataGenerator dgen = new TestDataGenerator("lists", listName, getProjectName())
                 .withColumns(cols);
         DomainResponse createResponse = dgen.createList(createDefaultConnection(), "key");
         Domain listDomain = createResponse.getDomain();
@@ -839,9 +878,9 @@ public class ListTest extends BaseWebDriverTest
         listDomain.setFields(listFields);
 
         // now save with an extra field
-        SaveDomainCommand saveCmd = new SaveDomainCommand(info.getSchema(), info.getTable());
+        SaveDomainCommand saveCmd = new SaveDomainCommand(dgen.getSchema(), dgen.getQueryName());
         saveCmd.setDomainDesign(listDomain);
-        DomainResponse saveResponse = saveCmd.execute(createDefaultConnection(), info.getFolder());
+        DomainResponse saveResponse = saveCmd.execute(createDefaultConnection(), dgen.getContainerPath());
 
         // now verify
         assertEquals(listFields.size(), saveResponse.getDomain().getFields().size());
@@ -864,8 +903,7 @@ public class ListTest extends BaseWebDriverTest
                 new FieldDefinition("removeMe", ColumnType.Decimal)
         );
         String listName = "remoteApiListTestRemoveColumn";
-        FieldDefinition.LookupInfo info = new FieldDefinition.LookupInfo(getProjectName(), "lists", listName);
-        TestDataGenerator dgen = new TestDataGenerator(info)
+        TestDataGenerator dgen = new TestDataGenerator("lists", listName, getProjectName())
                 .withColumns(cols);
         DomainResponse createResponse = dgen.createList(createDefaultConnection(), "key");
         Domain listDomain = createResponse.getDomain();
@@ -873,9 +911,9 @@ public class ListTest extends BaseWebDriverTest
         listFields.removeIf(a-> a.getName().equals("removeMe"));
         listDomain.setFields(listFields);
 
-        SaveDomainCommand saveCmd = new SaveDomainCommand(info.getSchema(), info.getTable());
+        SaveDomainCommand saveCmd = new SaveDomainCommand(dgen.getSchema(), dgen.getQueryName());
         saveCmd.setDomainDesign(listDomain);
-        DomainResponse saveResponse = saveCmd.execute(createDefaultConnection(), info.getFolder());
+        DomainResponse saveResponse = saveCmd.execute(createDefaultConnection(), dgen.getContainerPath());
 
         checker().verifyFalse("'removeMe' field was not deleted.",
                 saveResponse.getDomain().getFields().stream()
@@ -883,8 +921,7 @@ public class ListTest extends BaseWebDriverTest
     }
 
     @Test
-    @Ignore // ignore until remoteAPI supports rename
-    public void testChangeListName() throws Exception
+    public void testChangeListNameOverAPI() throws Exception
     {
         List<FieldDefinition> cols = Arrays.asList(
                 new FieldDefinition("name", ColumnType.String),
@@ -892,8 +929,7 @@ public class ListTest extends BaseWebDriverTest
                 new FieldDefinition("dewey", ColumnType.Decimal)
         );
         String listName = "remoteAPIBeforeRename";
-        FieldDefinition.LookupInfo info = new FieldDefinition.LookupInfo(getProjectName(), "lists", listName);
-        TestDataGenerator dgen = new TestDataGenerator(info)
+        TestDataGenerator dgen = new TestDataGenerator("lists", listName, getProjectName())
                 .withColumns(cols);
         DomainResponse createResponse = dgen.createList(createDefaultConnection(), "key");
         Domain listDomain = createResponse.getDomain();
@@ -901,9 +937,40 @@ public class ListTest extends BaseWebDriverTest
 
         SaveDomainCommand saveCmd = new SaveDomainCommand(listDomain.getDomainId());
         saveCmd.setDomainDesign(listDomain);
-        DomainResponse saveResponse = saveCmd.execute(createDefaultConnection(), info.getFolder());
+        DomainResponse saveResponse = saveCmd.execute(createDefaultConnection(), dgen.getContainerPath());
 
         assertEquals("remoteAPIAfterRename", saveResponse.getDomain().getName());
+    }
+
+    // Issue 52694 Links broken to list, data classes from the (list)-begin.view page if their names end with a /
+    @Test
+    public void testChangeListName()
+    {
+
+        String listNameBefore = TestDataGenerator.randomDomainName("Before Rename", 7);
+
+        _listHelper.createList(PROJECT_VERIFY, listNameBefore,
+                new FieldDefinition("name", ColumnType.String),
+                new FieldDefinition("title", ColumnType.String),
+                new FieldDefinition("dewey", ColumnType.Decimal));
+
+        String listNameAfter = "After Rename (Issue 52694) /";
+        _listHelper.goToEditDesign(listNameBefore)
+                .setName(listNameAfter)
+                .clickSave();
+
+        List<String> actualLists = goToManageLists().getGrid().getListNames();
+
+        assertTrue(String.format("Updated list name '%s' is not there.", listNameAfter),
+                actualLists.contains(listNameAfter));
+
+        assertFalse(String.format("Previous list name '%s' is there, it should not be.", listNameBefore),
+                actualLists.contains(listNameBefore));
+
+        clickAndWait(Locator.linkWithText(listNameAfter));
+
+        assertElementVisible(Locator.tagContainingText("h3", listNameAfter));
+
     }
 
     /*  Issue 6883: Create test for list self join
@@ -923,7 +990,6 @@ public class ListTest extends BaseWebDriverTest
         final String dummyCol = dummyBase + TRICKY_CHARACTERS;
         final String lookupField = "lookupField" + TRICKY_CHARACTERS;
         final String lookupSchema = "lists";
-        final String lookupTable = listName;
         final String keyCol = "Key &%<+";
 
         log("Issue 6883: test list self join");
@@ -932,7 +998,7 @@ public class ListTest extends BaseWebDriverTest
                 new FieldDefinition(dummyCol, ColumnType.String)
         };
         FieldDefinition lookupCol = new FieldDefinition(lookupField,
-                new FieldDefinition.LookupInfo(null, lookupSchema, lookupTable).setTableType(ColumnType.Integer));
+                new FieldDefinition.IntLookup(lookupSchema, listName));
         // create the list
         _listHelper.createList(PROJECT_VERIFY, listName, keyCol, columns);
         // now add the lookup column (which references the new table)
@@ -965,7 +1031,7 @@ public class ListTest extends BaseWebDriverTest
         goToProjectHome(PROJECT_OTHER);
         //create list with look up A
         String lookupColumn = "lookup";
-        FieldDefinition[] cols = new FieldDefinition[]{col(PROJECT_VERIFY, lookupColumn, ColumnType.Integer, "A" )};
+        FieldDefinition[] cols = new FieldDefinition[]{col(PROJECT_VERIFY, lookupColumn, "A" )};
         _listHelper.createList(PROJECT_OTHER, crossContainerLookupList, "Key", cols);
         _listHelper.goToList(crossContainerLookupList);
         _listHelper.clickImportData();
@@ -1011,7 +1077,15 @@ public class ListTest extends BaseWebDriverTest
         region.setFilter(_listColGood.getName(), "Is Less Than", "10");
         assertTextPresent(TEST_DATA[TD_DESC][0], 1);
 
-        clickAndWait(Locator.linkContainingText(LIST_NAME_COLORS));
+        checker().verifyEquals("Incorrect filter on list", Arrays.asList(_listColGood.getLabel() + " < 10"),
+                getTexts(DataRegionTable.Locators.filterContextAction().findElements(getDriver())));
+        region = new DataRegionTable("qwp3", getDriver());
+        region.openFilterDialog(_listColGood.getName());
+
+        // Issue 52547: LKS filter dialog treats many filter types as if they are Equals
+        assertEquals("Faceted filter tab should not be selected.", "Choose Filters", getText(Locator.css(".x-tab-strip-active")));
+
+        clickButton("Cancel", 0);
     }
 
     /*  Issue 11825: Create test for "Clear Sort"
@@ -1158,6 +1232,15 @@ public class ListTest extends BaseWebDriverTest
 
         listDefinitionPage.clickSave();
 
+        AuditLogHelper.DetailedAuditEventRow expectedDomainEvent = new AuditLogHelper.DetailedAuditEventRow(null, TSV_LIST_NAME, null,
+                "The column(s) of domain " + TSV_LIST_NAME + " were modified.",
+                "", null, null, null);
+        boolean pass = _auditLogHelper.validateLastDomainAuditEvents(TSV_LIST_NAME, getProjectName(), expectedDomainEvent,
+                Map.of("IntCol", new AuditLogHelper.DetailedAuditEventRow(null, "IntCol", "Modified","The following property was updated: ConditionalFormat",null, null, null, "ConditionalFormat:  > format.column~gt=7: text-decoration: line-through;, format.column~gt=5: font-weight: bold;"),
+                        "BoolCol", new AuditLogHelper.DetailedAuditEventRow(null, "BoolCol", "Modified","The following property was updated: ConditionalFormat",null, null, null, "ConditionalFormat:  > format.column~eq=true: text-decoration: line-through;font-weight: bold;font-style: italic;color: #68ccca;background-color: #d33115 !important;"))
+        );
+        checker().verifyTrue("Domain audit comment not as expected after changing conditional format", pass);
+
         // Verify conditional format of boolean column
         // look for cells that do not match the
         assertTextPresent(TSV_LIST_NAME);
@@ -1197,15 +1280,19 @@ public class ListTest extends BaseWebDriverTest
     @Test
     public void doRenameFieldsTest()
     {
+        // Issue 8329
         log("8329: Test that renaming a field then creating a new field with the old name doesn't result in awful things");
         String listName = "new";
-        String origFieldName = "BarBar";
-        String newFieldName = "FooFoo";
-        String invalidListName = TestDataGenerator.randomInvalidDomainName(5);
+
+        // Issue 52480
+        String origFieldName = ": Some Field Name 1 /@\".";
+        String newFieldName = "Some Field Name 1";
+
+        String invalidListName = TestDataGenerator.randomInvalidDomainName(null, 0, 5);
         EditListDefinitionPage listDefinitionPage = _listHelper.beginCreateList(PROJECT_VERIFY, invalidListName);
         listDefinitionPage.manuallyDefineFieldsWithAutoIncrementingKey("key");
         List<String> errors = listDefinitionPage.clickSaveExpectingErrors();
-        Assert.assertTrue("Error msg not as expected during list creation", errors.contains("Invalid IntList name '" + invalidListName + "'. IntList name must start with a letter or a number."));
+        assertTrue("Error msg not as expected during list creation", errors.contains("Invalid IntList name '" + invalidListName + "'. IntList name must start with a letter or a number."));
 
         _listHelper.createList(PROJECT_VERIFY, listName, "key",
                 new FieldDefinition(origFieldName, ColumnType.String).setLabel(origFieldName).setDescription("first column"));
@@ -1213,13 +1300,20 @@ public class ListTest extends BaseWebDriverTest
         listDefinitionPage = _listHelper.goToEditDesign(listName);
         listDefinitionPage.setName(invalidListName);
         errors = listDefinitionPage.clickSaveExpectingErrors();
-        Assert.assertTrue("Error msg not as expected during list renaming", errors.contains("Invalid IntList name '" + invalidListName + "'. IntList name must start with a letter or a number."));
+        assertTrue("Error msg not as expected during list renaming", errors.contains("Invalid IntList name '" + invalidListName + "'. IntList name must start with a letter or a number."));
         listDefinitionPage.setName(listName);
         listDefinitionPage.getFieldsPanel()
                 .getField(origFieldName)
                 .setName(newFieldName)
                 .setLabel(newFieldName);
         listDefinitionPage.clickSave();
+
+        AuditLogHelper.DetailedAuditEventRow expectedDomainEvent = new AuditLogHelper.DetailedAuditEventRow(null, listName, null,
+                "The column(s) of domain " + listName + " were modified.",
+                "", null, null, null);
+        boolean pass = _auditLogHelper.validateLastDomainAuditEvents(listName, getProjectName(), expectedDomainEvent,
+                Map.of(newFieldName, new AuditLogHelper.DetailedAuditEventRow(null, newFieldName, "Modified","The following properties were updated: Name, Label",null, null, null, "Name: "+ origFieldName + " > " + newFieldName + "\nLabel: " + origFieldName + " > " + newFieldName)));
+        checker().verifyTrue("Domain audit comment not as expected after renaming a field", pass);
 
         assertTextPresent(newFieldName);
         assertTextNotPresent(origFieldName);
@@ -1257,6 +1351,16 @@ public class ListTest extends BaseWebDriverTest
         listDefinitionPage.setColumnPhiLevel("PhiColumn", FieldDefinition.PhiSelectType.PHI);
         listDefinitionPage.setColumnPhiLevel("RestrictedPhiColumn", FieldDefinition.PhiSelectType.Restricted);
         listDefinitionPage.clickSave();
+
+        AuditLogHelper.DetailedAuditEventRow expectedDomainEvent = new AuditLogHelper.DetailedAuditEventRow(null, listName, null,
+                "The column(s) of domain " + listName + " were modified.",
+                "", null, null, null);
+        boolean pass = _auditLogHelper.validateLastDomainAuditEvents(listName, getProjectName(), expectedDomainEvent,
+                Map.of("LimitedPhiColumn", new AuditLogHelper.DetailedAuditEventRow(null, "LimitedPhiColumn", "Modified","The following property was updated: PHI",null, null, null, "PHI: Not PHI > Limited PHI"),
+                        "PhiColumn", new AuditLogHelper.DetailedAuditEventRow(null, "PhiColumn", "Modified","The following property was updated: PHI",null, null, null, "PHI: Not PHI > Full PHI"),
+                        "RestrictedPhiColumn", new AuditLogHelper.DetailedAuditEventRow(null, "RestrictedPhiColumn", "Modified","The following property was updated: PHI",null, null, null, "PHI: Not PHI > Restricted PHI"))
+        );
+        checker().verifyTrue("Domain audit comment not as expected after changing PHI setting", pass);
 
         goToProjectHome();
         clickAndWait(Locator.linkWithText(listName));
@@ -1429,6 +1533,13 @@ public class ListTest extends BaseWebDriverTest
                 .getField(fieldName2).expand().clickAdvancedSettings().setUniqueConstraint(true)
                 .apply();
         listDefinitionPage.clickSave();
+
+        AuditLogHelper.DetailedAuditEventRow expectedDomainEvent = new AuditLogHelper.DetailedAuditEventRow(null, listName, null,
+                "The descriptor of domain " + listName + " was updated.",
+                "", null, null, "Indices:  > [field Name1, unique: true, fieldName_2, unique: true]");
+        boolean pass = _auditLogHelper.validateLastDomainAuditEvents(listName, getProjectName(), expectedDomainEvent, Collections.emptyMap());
+        checker().verifyTrue("Domain audit comment not as expected after updating field unique constraint", pass);
+
         viewRawTableMetadata(listName);
         verifyTableIndices("unique_constraint_list_", List.of("field_name1", "fieldname_2"));
         assertTextNotPresent("unique_constraint_list_fieldname_3");
@@ -1442,6 +1553,13 @@ public class ListTest extends BaseWebDriverTest
                 .getField(fieldName3).expand().clickAdvancedSettings().setUniqueConstraint(true)
                 .apply();
         listDefinitionPage.clickSave();
+
+        expectedDomainEvent = new AuditLogHelper.DetailedAuditEventRow(null, listName, null,
+                "The descriptor of domain " + listName + " was updated.",
+                "", null, null, "Indices: [field name1, unique: true, fieldname_2, unique: true] > [FieldName@3, unique: true, field Name1, unique: true]");
+        pass = _auditLogHelper.validateLastDomainAuditEvents(listName, getProjectName(), expectedDomainEvent, Collections.emptyMap());
+        checker().verifyTrue("Domain audit comment not as expected after updating field unique constraint", pass);
+
         viewRawTableMetadata(listName);
         verifyTableIndices("unique_constraint_list_", List.of("field_name1", "fieldname_3"));
         assertTextNotPresent("unique_constraint_list_fieldname_2");
@@ -1460,7 +1578,7 @@ public class ListTest extends BaseWebDriverTest
         DataRegionTable table = new DataRegionTable("query", getDriver());
         CustomizeView customizeView = table.openCustomizeGrid();
         customizeView.showHiddenItems();
-        customizeView.addColumn(QueryKey.encodePart(keyName));
+        customizeView.addColumn(EscapeUtil.fieldKeyEncodePart(keyName));
         customizeView.applyCustomView();
 
         // insert a new row and verify the key is encoded in the form input
@@ -1518,7 +1636,7 @@ public class ListTest extends BaseWebDriverTest
     @Test
     public void testTrickyCharacterFields() throws IOException
     {
-        // These validate Issue 52070
+        // These validate Issue 52069 Issue 52070 Issue 52071
         testTricky("Tricky Field Character", false);
         testTricky("TrickyField Character Auto Key", true);
 
@@ -1531,22 +1649,26 @@ public class ListTest extends BaseWebDriverTest
         String keyField_Bulk = "\"" + keyField.replace("\"", "\"\"") + "\"" ;
         String intField = "Int Field \"`~!@#$%^&*()_-+={}[]|\\:;<>,.?/\u00a5\u00e6";
         String intField_Bulk = "\"" + intField.replace("\"", "\"\"") + "\"";
+        String trickyField = "\u5668\u9aa8\u00a5\u00e6\"`~!@#$%^&*()_-+={}[]|\\:;<>,.?/";
+        String trickyField_Bulk = "\"" + trickyField.replace("\"", "\"\"") + "\"";
 
-        log(String.format("Create list '%s' with key field '%s' and field '%s'.",
-                listName, keyField, intField));
+        log(String.format("Create list '%s' with key field '%s' and fields '%s', '%s'.",
+                listName, keyField, intField, trickyField));
 
         if (!autoKey)
         {
             log("Key is not auto-increment.");
             _listHelper.createList(PROJECT_VERIFY, listName,
                     new FieldDefinition(keyField, ColumnType.Integer),
-                    new FieldDefinition(intField, ColumnType.Integer));
+                    new FieldDefinition(intField, ColumnType.Integer),
+                    new FieldDefinition(trickyField, ColumnType.Integer));
         }
         else
         {
             log("Key is auto-increment.");
             _listHelper.createList(PROJECT_VERIFY, listName, keyField,
-                    new FieldDefinition(intField, ColumnType.Integer));
+                    new FieldDefinition(intField, ColumnType.Integer),
+                    new FieldDefinition(trickyField, ColumnType.Integer));
         }
 
         assertNoLabKeyErrors();
@@ -1562,14 +1684,17 @@ public class ListTest extends BaseWebDriverTest
             row.put(keyField, "1");
 
             expectedValues.add(Map.of(EscapeUtil.fieldKeyEncodePart(keyField), "1",
-                    EscapeUtil.fieldKeyEncodePart(intField), "123"));
+                    EscapeUtil.fieldKeyEncodePart(intField), "100",
+                    EscapeUtil.fieldKeyEncodePart(trickyField), "101"));
         }
         else
         {
-            expectedValues.add(Map.of(EscapeUtil.fieldKeyEncodePart(intField), "123"));
+            expectedValues.add(Map.of(EscapeUtil.fieldKeyEncodePart(intField), "100",
+                    EscapeUtil.fieldKeyEncodePart(trickyField), "101"));
         }
 
-        row.put(intField, "123");
+        row.put(intField, "100");
+        row.put(trickyField, "101");
 
         _listHelper.insertNewRow(row);
 
@@ -1588,6 +1713,8 @@ public class ListTest extends BaseWebDriverTest
         }
 
         sbBulkData.append(intField_Bulk);
+        sbBulkData.append("\t");
+        sbBulkData.append(trickyField_Bulk);
         sbBulkData.append("\n");
 
         if (!autoKey)
@@ -1595,14 +1722,16 @@ public class ListTest extends BaseWebDriverTest
             sbBulkData.append("2\t");
 
             expectedValues.add(Map.of(EscapeUtil.fieldKeyEncodePart(keyField), "2",
-                    EscapeUtil.fieldKeyEncodePart(intField), "456"));
+                    EscapeUtil.fieldKeyEncodePart(intField), "200",
+                    EscapeUtil.fieldKeyEncodePart(trickyField), "202"));
         }
         else
         {
-            expectedValues.add(Map.of(EscapeUtil.fieldKeyEncodePart(intField), "456"));
+            expectedValues.add(Map.of(EscapeUtil.fieldKeyEncodePart(intField), "200",
+                    EscapeUtil.fieldKeyEncodePart(trickyField), "202"));
         }
 
-        sbBulkData.append("456");
+        sbBulkData.append("200\t202");
 
         _listHelper.bulkImportData(sbBulkData.toString());
 
@@ -1621,6 +1750,8 @@ public class ListTest extends BaseWebDriverTest
         }
 
         sbBulkData.append(intField_Bulk);
+        sbBulkData.append("\t");
+        sbBulkData.append(trickyField_Bulk);
         fileData.add(sbBulkData.toString());
 
         sbBulkData = new StringBuilder();
@@ -1630,15 +1761,17 @@ public class ListTest extends BaseWebDriverTest
             sbBulkData.append("3\t");
 
             expectedValues.add(Map.of(EscapeUtil.fieldKeyEncodePart(keyField), "3",
-                    EscapeUtil.fieldKeyEncodePart(intField), "789"));
+                    EscapeUtil.fieldKeyEncodePart(intField), "300",
+                    EscapeUtil.fieldKeyEncodePart(trickyField), "303"));
 
         }
         else
         {
-            expectedValues.add(Map.of(EscapeUtil.fieldKeyEncodePart(intField), "789"));
+            expectedValues.add(Map.of(EscapeUtil.fieldKeyEncodePart(intField), "300",
+                    EscapeUtil.fieldKeyEncodePart(trickyField), "303"));
         }
 
-        sbBulkData.append("789");
+        sbBulkData.append("300\t303");
         fileData.add(sbBulkData.toString());
 
         File importFile = TestFileUtils.writeTempFile("ListTest_Tricky.tsv", String.join(System.lineSeparator(), fileData));
@@ -1649,21 +1782,24 @@ public class ListTest extends BaseWebDriverTest
 
         validateDataRegionTableForTricky(expectedValues);
 
-        log(String.format("For row 0 update the value in field '%s' in the UI.", intField));
+        log(String.format("For row 0 update the value in fields '%s' and '%s' in the UI.", intField, trickyField));
 
         DataRegionTable dataRegionTable = new DataRegionTable("query", getDriver());
-        dataRegionTable.updateRow(0, Map.of(intField, "321"));
+        dataRegionTable.updateRow(0, Map.of(intField, "123",
+                trickyField, "456"));
 
         assertNoLabKeyErrors();
 
         if (!autoKey)
         {
             expectedValues.set(0, Map.of(EscapeUtil.fieldKeyEncodePart(keyField), "1",
-                    EscapeUtil.fieldKeyEncodePart(intField), "321"));
+                    EscapeUtil.fieldKeyEncodePart(intField), "123",
+                    EscapeUtil.fieldKeyEncodePart(trickyField), "456"));
         }
         else
         {
-            expectedValues.set(0, Map.of(EscapeUtil.fieldKeyEncodePart(intField), "321"));
+            expectedValues.set(0, Map.of(EscapeUtil.fieldKeyEncodePart(intField), "123",
+                    EscapeUtil.fieldKeyEncodePart(trickyField), "456"));
         }
 
         validateDataRegionTableForTricky(expectedValues);
@@ -1679,6 +1815,9 @@ public class ListTest extends BaseWebDriverTest
         assertEquals(String.format("Tooltip for column '%s' not as expected.", intField),
                 intField, dataRegionTable.getColumnTitle(EscapeUtil.fieldKeyEncodePart(intField)));
 
+        assertEquals(String.format("Tooltip for column '%s' not as expected.", trickyField),
+                trickyField, dataRegionTable.getColumnTitle(EscapeUtil.fieldKeyEncodePart(trickyField)));
+
         log("Delete row 0.");
 
         dataRegionTable = new DataRegionTable("query", getDriver());
@@ -1690,6 +1829,31 @@ public class ListTest extends BaseWebDriverTest
         expectedValues.remove(0);
 
         validateDataRegionTableForTricky(expectedValues);
+
+        // Validates Issue 52071
+        dataRegionTable.clickRowDetails(0);
+
+        List<String> actualFields = Locator.tagWithClass("td", "lk-form-label").findElements(getDriver()).stream().map(WebElement::getText).toList();
+
+        List<String> expectedFields = new ArrayList<>();
+
+        // Add the expected files in the expected display order.
+        if (!autoKey)
+        {
+            expectedFields.add(keyField);
+        }
+
+        expectedFields.add(intField);
+        expectedFields.add(trickyField);
+
+        // Replace the _ with a space and add a : at the end.
+        expectedFields.replaceAll(f -> f.replace("_", " ") + ":");
+
+        for (int i = 0; i < expectedFields.size(); i++)
+        {
+            assertEquals(String.format("Row detail for column '%s' not as expected.", expectedFields.get(i)),
+                    expectedFields.get(i), actualFields.get(i));
+        }
 
     }
 
@@ -1711,14 +1875,14 @@ public class ListTest extends BaseWebDriverTest
         return new FieldDefinition(name, type);
     }
 
-    FieldDefinition col(String name, ColumnType type, String table)
+    FieldDefinition col(String name, String table)
     {
-        return col(null, name, type, table);
+        return col(null, name, table);
     }
 
-    FieldDefinition col(String folder, String name, ColumnType type, String table)
+    FieldDefinition col(String folder, String name, String table)
     {
-        return new FieldDefinition(name, new FieldDefinition.LookupInfo(folder, "lists", table).setTableType(type));
+        return new FieldDefinition(name, new FieldDefinition.IntLookup(folder, "lists", table));
     }
 
     FieldDefinition colURL(String name, ColumnType type, String url)
@@ -1729,7 +1893,7 @@ public class ListTest extends BaseWebDriverTest
     List<FieldDefinition> Acolumns = Arrays.asList(
             col("A", ColumnType.Integer),
             colURL("title", ColumnType.String, "/junit/echoForm.view?key=${A}&title=${title}&table=A"),
-            col("Bfk", ColumnType.Integer, "B")
+            col("Bfk", "B")
     );
     String[][] Adata = new String[][]
     {
@@ -1739,7 +1903,7 @@ public class ListTest extends BaseWebDriverTest
     List<FieldDefinition> Bcolumns = Arrays.asList(
             col("B", ColumnType.Integer),
             colURL("title", ColumnType.String, "org.labkey.core.junit.JunitController$EchoFormAction.class?key=${B}&title=${title}&table=B"),
-            col("Cfk", ColumnType.Integer, "C")
+            col("Cfk", "C")
     );
     String[][] Bdata = new String[][]
     {
@@ -1896,7 +2060,7 @@ public class ListTest extends BaseWebDriverTest
             assertElementPresent(inputWithValue("key","1"));
             assertElementPresent(inputWithValue("table","C"));
             assertElementPresent(inputWithValue("title","one C"));
-            assertTrue(getCurrentRelativeURL(false).contains(WebTestHelper.buildRelativeUrl("junit", PROJECT_VERIFY, "echoForm")));
+            assertTrue(getCurrentRelativeURL().contains(WebTestHelper.buildRelativeUrl("junit", PROJECT_VERIFY, "echoForm")));
         }
         popLocation();
     }

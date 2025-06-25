@@ -23,7 +23,6 @@ import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.DeleteRowsCommand;
 import org.labkey.remoteapi.query.InsertRowsCommand;
-import org.labkey.remoteapi.query.SaveRowsResponse;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
@@ -62,7 +61,7 @@ import static org.junit.Assert.assertTrue;
 @BaseWebDriverTest.ClassTimeout(minutes = 25 )
 public class FolderTest extends BaseWebDriverTest
 {
-    private static String secondProject = "FolderTestProject2";
+    private static final String secondProject = "FolderTestProject2";
 
     @Override
     public List<String> getAssociatedModules()
@@ -92,7 +91,7 @@ public class FolderTest extends BaseWebDriverTest
     @BeforeClass
     public static void testSetup()
     {
-        FolderTest init = (FolderTest)getCurrentTest();
+        FolderTest init = getCurrentTest();
         init._containerHelper.createProject(init.getProjectName(), null);
         init._containerHelper.createProject(secondProject, null);
         init.goToProjectHome();

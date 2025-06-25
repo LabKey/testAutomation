@@ -46,12 +46,6 @@ public class FileAttachmentContainer extends WebDriverComponent<FileAttachmentCo
         return new ElementCache();
     }
 
-    @Override
-    protected ElementCache elementCache()
-    {
-        return (ElementCache) super.elementCache();
-    }
-
     public boolean isMulti()
     {
         return elementCache().fileInput.getComponentElement().getAttribute("multiple") != null;
@@ -111,7 +105,7 @@ public class FileAttachmentContainer extends WebDriverComponent<FileAttachmentCo
     /**
      * Returns true if there is a file with that name in the current instance
      */
-    private boolean hasFile(String fileName)
+    public boolean hasFile(String fileName)
     {
         return new FileAttachmentEntry.FileAttachmentEntryFinder(getDriver())
                 .withTitle(fileName).findOptional(this).isPresent();

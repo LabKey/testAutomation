@@ -12,7 +12,7 @@ public class CreatePlateSetParams
     // This will match PlateController.CreatePlateSetForm
     private String _name;
     private String _description;
-    private List<CreatePlateSetPlate> _plates = new ArrayList<CreatePlateSetPlate>();
+    private List<CreatePlateSetPlate> _plates = new ArrayList<>();
     private PlateSetType _type;
     private String _plateSetId; // optional
     private Integer _rowId;
@@ -33,7 +33,7 @@ public class CreatePlateSetParams
         json.put("parentPlateSetId", _parentPlateSetId);
         if (_plateSetId != null)
             json.put("plateSetId", _plateSetId);
-        if (_plates.size() > 0)
+        if (!_plates.isEmpty())
         {
             JSONArray plates = new JSONArray();
             for (CreatePlateSetPlate plate : _plates)

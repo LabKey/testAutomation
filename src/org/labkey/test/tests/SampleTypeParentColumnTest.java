@@ -18,6 +18,7 @@ import org.labkey.test.pages.experiment.CreateSampleTypePage;
 import org.labkey.test.pages.experiment.UpdateSampleTypePage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
+import org.labkey.test.util.AuditLogHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExcelHelper;
 import org.labkey.test.util.PortalHelper;
@@ -29,6 +30,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -65,6 +67,8 @@ public class SampleTypeParentColumnTest extends BaseWebDriverTest
             COL_DESCRIPTION_CAPTION, COL_DESCRIPTION_NAME,
             COL_NAME_CAPTION, COL_NAME_NAME);
 
+    private final AuditLogHelper _auditLogHelper = new AuditLogHelper(this);
+
     @Override
     public List<String> getAssociatedModules()
     {
@@ -86,7 +90,7 @@ public class SampleTypeParentColumnTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        SampleTypeParentColumnTest init = (SampleTypeParentColumnTest) getCurrentTest();
+        SampleTypeParentColumnTest init = getCurrentTest();
 
         // Comment out this line (after you run once) it will make iterating on  tests much easier.
         init.doSetup();
@@ -232,7 +236,7 @@ public class SampleTypeParentColumnTest extends BaseWebDriverTest
 
         List<String> dataInTable = dataRegionTable.getColumnDataAsText(columnName);
 
-        Assert.assertTrue("There were no rows in the data region '" + dataRegionName + "'.", dataInTable.size() > 0);
+        Assert.assertTrue("There were no rows in the data region '" + dataRegionName + "'.", !dataInTable.isEmpty());
         Assert.assertTrue("The index given for the row (" + rowIndex + ") is beyond the number of rows in the data region '" + dataRegionName + "' (" + dataInTable.size() + ").", rowIndex < dataInTable.size());
 
         String cellValue = dataInTable.get(rowIndex);
@@ -605,6 +609,15 @@ public class SampleTypeParentColumnTest extends BaseWebDriverTest
         updatePage.removeParentAlias(PARENT_COLUMN);
         updatePage.clickSave();
 
+        log("Validate domain audit log.");
+        String oldValues = "Name=SimpleSampleType07&ImportAlias=P7(materialInputs%2FSimpleSampleType07%2Crequired%3Dfalse)";
+        String newValues = "Name=SimpleSampleType07&AliquotNameExpression=%24%7B%24%7BAliquotedFrom%7D-%3AwithCounter%7D";
+        AuditLogHelper.DetailedAuditEventRow expectedDomainEvent = new AuditLogHelper.DetailedAuditEventRow(null, SAMPLE_TYPE_NAME, null,
+                "The descriptor of domain " + SAMPLE_TYPE_NAME + " was updated.",
+                "", oldValues, newValues, null);
+        boolean pass = _auditLogHelper.validateLastDomainAuditEvents(SAMPLE_TYPE_NAME, PROJECT_NAME, expectedDomainEvent, Collections.emptyMap());
+        checker().verifyTrue("Domain audit long not as expected after removing the parent alias column", pass);
+
         log("Import some more samples using the alias column and make sure it doesn't work.");
         sampleText = "Name\t" + PARENT_COLUMN + "\n" +
                 "SG_03\tSG_01\n";
@@ -701,6 +714,15 @@ public class SampleTypeParentColumnTest extends BaseWebDriverTest
         log("Now add a valid parent column and check that you cannot now add a field in the sample type with the same name.");
         updatePage.addParentAlias(GOOD_PARENT_NAME, SampleTypeDesigner.CURRENT_SAMPLE_TYPE);
         updatePage.clickSave();
+
+        log("Validate domain audit log.");
+        String oldValues = "Name=SimpleSampleType08&AliquotNameExpression=%24%7B%24%7BAliquotedFrom%7D-%3AwithCounter%7D";
+        String newValues = "Name=SimpleSampleType08&AliquotNameExpression=%24%7B%24%7BAliquotedFrom%7D-%3AwithCounter%7D&ImportAlias=P8(materialInputs%2FSimpleSampleType08%2Crequired%3Dfalse)";
+        AuditLogHelper.DetailedAuditEventRow expectedDomainEvent = new AuditLogHelper.DetailedAuditEventRow(null, SAMPLE_TYPE_NAME, null,
+                "The descriptor of domain " + SAMPLE_TYPE_NAME + " was updated.",
+                "", oldValues, newValues, null);
+        boolean pass = _auditLogHelper.validateLastDomainAuditEvents(SAMPLE_TYPE_NAME, PROJECT_NAME, expectedDomainEvent, Collections.emptyMap());
+        checker().verifyTrue("Domain audit long not as expected after adding a parent alias column", pass);
 
         clickFolder(SUB_FOLDER_NAME);
         updatePage = sampleHelper.goToEditSampleType(SAMPLE_TYPE_NAME);

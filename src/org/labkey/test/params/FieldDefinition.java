@@ -16,20 +16,24 @@
 package org.labkey.test.params;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.labkey.api.exp.query.ExpSchema;
+import org.labkey.remoteapi.domain.ConditionalFormat;
 import org.labkey.remoteapi.domain.PropertyDescriptor;
 import org.labkey.remoteapi.query.Filter;
 import org.labkey.test.components.html.OptionSelect;
+import org.labkey.test.util.EscapeUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static org.labkey.test.util.TestDataGenerator.DOMAIN_SPECIAL_STRING;
 
@@ -59,7 +63,7 @@ public class FieldDefinition extends PropertyDescriptor
      * @param name field name
      * @param type field type
      */
-    public FieldDefinition(String name, ColumnType type)
+    public FieldDefinition(@NotNull String name, @NotNull ColumnType type)
     {
         setName(name);
         setType(type);
@@ -67,6 +71,12 @@ public class FieldDefinition extends PropertyDescriptor
         setMeasure(null);
         setDimension(null);
         setMvEnabled(null);
+    }
+
+    public FieldDefinition withNewName(String newName)
+    {
+        setName(newName);
+        return this;
     }
 
     /**
@@ -84,7 +94,7 @@ public class FieldDefinition extends PropertyDescriptor
         if (name == null)
             return null;
 
-        if (name.length() == 0)
+        if (name.isEmpty())
             return name;
 
         StringBuilder buf = new StringBuilder(name.length() + 10);
@@ -112,6 +122,11 @@ public class FieldDefinition extends PropertyDescriptor
         }
 
         return buf.toString();
+    }
+
+    public String getEffectiveLabel()
+    {
+        return Objects.requireNonNullElseGet(getLabel(), () -> labelFromName(getName()));
     }
 
     @Override
@@ -199,6 +214,13 @@ public class FieldDefinition extends PropertyDescriptor
     public FieldDefinition setHidden(Boolean hidden)
     {
         super.setHidden(hidden);
+        return this;
+    }
+
+    @Override
+    public FieldDefinition setConditionalFormats(List<ConditionalFormat> conditionalFormats)
+    {
+        super.setConditionalFormats(conditionalFormats);
         return this;
     }
 
@@ -606,7 +628,7 @@ public class FieldDefinition extends PropertyDescriptor
 
         static List<ColumnType> values()
         {
-            return ColumnTypeImpl.COLUMN_TYPES;
+            return Collections.unmodifiableList(ColumnTypeImpl.COLUMN_TYPES);
         }
     }
 
@@ -1084,7 +1106,7 @@ public class FieldDefinition extends PropertyDescriptor
         @Override
         protected String getExpression()
         {
-            return String.join("|", _values);
+            return EscapeUtil.getTextChoiceValidatorExpression(_values);
         }
 
         public List<String> getValues()

@@ -92,7 +92,6 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
     /**
      * uses the pager to select a page from the pager dropdown list
      * @param page the text of the list item to be clicked
-     * @return
      */
     public GridBar jumpToPage(String page) // e.g. "First Page"|"Last Page"
     {
@@ -102,7 +101,6 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
 
     /**
      * gets the current page number
-     * @return
      */
     public int getCurrentPage()
     {
@@ -111,8 +109,6 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
 
     /**
      * selects the number of rows to be shown per page
-     * @param pageSize
-     * @return
      */
     public GridBar selectPageSize(String pageSize)
     {
@@ -150,7 +146,6 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
 
     /**
      * clicks the 'next' button on the pager associated with this grid and waits for the grid to update
-     * @return
      */
     public QueryGrid clickNext()
     {
@@ -160,7 +155,6 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
 
     /**
      * clicks the 'previous' button on the pager and waits for the grid to update
-     * @return
      */
     public QueryGrid clickPrevious()
     {
@@ -170,11 +164,11 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
 
     /**
      * Click a button on the grid bar with the given text.
-     * @param buttonCaption Button caption.
+     * @param buttonText Button text.
      */
-    public void clickButton(String buttonCaption)
+    public void clickButton(String buttonText)
     {
-        var btn = BootstrapLocators.button(buttonCaption).waitForElement(this, 5_000);
+        var btn = BootstrapLocators.button(buttonText).waitForElement(this, 5_000);
         getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(btn));   // for cases when a disabled button
         btn.click();                                                                    // awaits being enabled, for example by selecting grid items
     }
@@ -252,7 +246,7 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
             }
             catch (NoSuchElementException nse)
             {
-                getWrapper().log("Couldn't find menu button with caption '" + buttonText + "', trying again.");
+                getWrapper().log("Couldn't find menu button with text '" + buttonText + "', trying again.");
                 tries++;
                 sleep(500);
             }
@@ -261,7 +255,7 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
         if(found)
             return multiMenu.getMenuText();
 
-        throw new NoSuchElementException("Couldn't find menu button with caption '" + buttonText + "'.");
+        throw new NoSuchElementException("Couldn't find menu button with text '" + buttonText + "'.");
     }
 
     /**

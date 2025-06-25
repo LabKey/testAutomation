@@ -78,8 +78,9 @@ public class WikiLongTest extends BaseWebDriverTest
     private static final String WIKI_INDEX_EDIT_CHECKBOX = "wiki-input-shouldIndex";
     private static final String WIKI_INDEX_MANAGE_CHECKBOX = "shouldIndex";
     private static final String WIKI_DELETE_SUBTREE_CHECKBOX = "isDeletingSubtree";
+
     private final PortalHelper _portalHelper = new PortalHelper(this);
-    private WikiHelper _wikiHelper = new WikiHelper(this);
+    private final WikiHelper _wikiHelper = new WikiHelper(this);
 
     private static final String WIKI_PAGE1_CONTENT =
             "1 Title\n" +
@@ -145,8 +146,18 @@ public class WikiLongTest extends BaseWebDriverTest
                     {labkey:tree|name=core.siteAdmin}
                     """;
 
-    private static final String HEADER_CONTENT =
-            "Yo! This is the header!";
+    private static final String HEADER_CONTENT = "Yo! This is the header!";
+
+    private static final String RADEOX_LINK_NAME = "radeox";
+    private static final String RADEOX_LINK_TITLE = "Test Radeox links";
+    private static final String RADEOX_LINK_CONTENT = """
+        You want to click on {link:Menu > Storage|/home/project-begin.view}
+        
+        Isn't this (font)awesome? {link:{span:class=fa fa-sitemap}{span} Sample Finder|/home/project-begin.view}
+        
+        Consider {link:using <isHidden>true</isHidden> in the XML metadata|/home/project-begin.view}
+        """;
+    private static final String RADEOX_HTML_CONTENT = "<div class=\"labkey-wiki\">You want to click on <span class=\"nobr\"><a href=\"/home/project-begin.view\">Menu &gt; Storage</a></span><p class=\"paragraph\">Isn't this (font)awesome? <span class=\"nobr\"><a href=\"/home/project-begin.view\"><span class=\"fa fa-sitemap\"></span> Sample Finder</a></span></p><p class=\"paragraph\">Consider <span class=\"nobr\"><a href=\"/home/project-begin.view\">using &lt;isHidden&gt;true&lt;/isHidden&gt; in the XML metadata</a></span></p></div>";
 
     @Override
     public List<String> getAssociatedModules()
@@ -169,13 +180,13 @@ public class WikiLongTest extends BaseWebDriverTest
         enableEmailRecorder();
         _containerHelper.createProject(PROJECT2_NAME, null);
         _containerHelper.enableModule(PROJECT2_NAME, "MS2");
-        _securityHelper.setProjectPerm(USERS_GROUP, "Editor");
+        _permissionsHelper.setPermissions(USERS_GROUP, "Editor");
         clickButton("Save and Finish");
         _containerHelper.createProject(PROJECT_NAME, null);
         _containerHelper.enableModule(PROJECT_NAME, "MS2");
         _permissionsHelper.createPermissionsGroup("testers");
-        _securityHelper.setProjectPerm("testers", "Editor");
-        _securityHelper.setProjectPerm(USERS_GROUP, "Editor");
+        _permissionsHelper.setPermissions("testers", "Editor");
+        _permissionsHelper.setPermissions(USERS_GROUP, "Editor");
         clickButton("Save and Finish");
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Folder Type"));
@@ -410,9 +421,7 @@ public class WikiLongTest extends BaseWebDriverTest
         assertTextPresent("6");
         clickAndWait(Locator.linkWithText(WIKI_PAGE1_TITLE));
         clickAndWait(Locator.linkWithText("next"));
-        assertTextPresent("More HTML content",
-                WIKI_PAGE3_ALTTITLE);
-
+        assertTextPresent("More HTML content", WIKI_PAGE3_ALTTITLE);
 
         log("test copy wiki");
         portalHelper.clickWebpartMenuItem("Pages", true, "Copy");
@@ -611,6 +620,8 @@ public class WikiLongTest extends BaseWebDriverTest
         assertElementNotPresent(Locator.linkWithText(WIKI_PAGE3_ALTTITLE));
         assertElementNotPresent(Locator.linkWithText(WIKI_PAGE8_TITLE));
 
+        testRadeoxLinkEncoding();
+
         //extended wiki test -- generate 2000 pages
 //        clickProject(PROJECT_NAME);
 //        clickTab("Wiki");
@@ -630,6 +641,20 @@ public class WikiLongTest extends BaseWebDriverTest
 //            setFormElement("body", "Page" + Integer.toString(i));
 //            submit();
 //        }
+    }
+
+    // Regression test for Issue 51488
+    private void testRadeoxLinkEncoding()
+    {
+        log("Test Radeox link encoding");
+        _wikiHelper.createNewWikiPage("RADEOX");
+
+        _wikiHelper.setWikiName(RADEOX_LINK_NAME);
+        _wikiHelper.setWikiTitle(RADEOX_LINK_TITLE);
+        _wikiHelper.setWikiBody(RADEOX_LINK_CONTENT);
+        _wikiHelper.saveWikiPage();
+        // Ensure link content is properly encoded (but not double encoded)
+        assertTrue(getHtmlSource().contains(RADEOX_HTML_CONTENT));
     }
 
     private void deleteWikiPage(boolean isDeletingSubtree)

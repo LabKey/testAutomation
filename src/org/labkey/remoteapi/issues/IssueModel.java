@@ -81,8 +81,6 @@ public class IssueModel
 
     /**
      * when notify is just 1 user, you can provide their email
-     * @param notify
-     * @return
      */
     public IssueModel setNotify(String notify)
     {

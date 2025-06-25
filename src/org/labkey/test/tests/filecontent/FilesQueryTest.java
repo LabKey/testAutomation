@@ -62,7 +62,7 @@ public class FilesQueryTest extends BaseWebDriverTest
     @BeforeClass
     public static void doSetup()
     {
-        FilesQueryTest initTest = (FilesQueryTest)getCurrentTest();
+        FilesQueryTest initTest = getCurrentTest();
 
         initTest.doSetupSteps();
     }
@@ -89,12 +89,13 @@ public class FilesQueryTest extends BaseWebDriverTest
         ApiPermissionsHelper permissionsHelper = new ApiPermissionsHelper(this);
         permissionsHelper.createPermissionsGroup(TEST_GROUP, TEST_USER, TEST_USER_NO_PATHS);
         permissionsHelper.setPermissions(TEST_GROUP, "Project Administrator");
-        permissionsHelper.setSiteAdminRoleUserPermissions(TEST_USER, "See Absolute File Paths");
+        permissionsHelper.setSiteRoleUserPermissions(TEST_USER, "See Absolute File Paths");
     }
 
     @Test
     public void testFileRecordsWithCustomProp()
     {
+        goToProjectHome();
         log("Upload a file to file root from file browser");
         final File testFile1 = TestFileUtils.getSampleData("security/InlineFile.html");
         final String customPropValue1 = "CustomPropValue1";

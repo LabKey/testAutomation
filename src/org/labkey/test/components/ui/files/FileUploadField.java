@@ -53,6 +53,16 @@ public class FileUploadField extends WebDriverComponent<FileUploadField.ElementC
         return !elementCache().fileInputLabel.isDisplayed();
     }
 
+    public String getExistingFileName()
+    {
+        if (hasAttachedFile())
+        {
+            AttachmentCard card = elementCache().getExistingAttachment().get();
+            return card.getFileName();
+        }
+        return null;
+    }
+
     @Override
     public WebElement getComponentElement()
     {

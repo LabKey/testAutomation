@@ -28,7 +28,7 @@ import java.io.File;
 
 public class WikiHelper
 {
-    private BaseWebDriverTest _test;
+    private final BaseWebDriverTest _test;
     
     public WikiHelper(BaseWebDriverTest test)
     {
@@ -133,7 +133,7 @@ public class WikiHelper
     public void saveWikiPage(boolean expectSuccess)
     {
         String title = Locator.id("wiki-input-title").findElement(_test.getDriver()).getText();
-        if (title.equals("")) title = Locator.id("wiki-input-name").findElement(_test.getDriver()).getText();
+        if (title.isEmpty()) title = Locator.id("wiki-input-name").findElement(_test.getDriver()).getText();
         if (expectSuccess)
         {
             _test.clickButton("Save & Close");

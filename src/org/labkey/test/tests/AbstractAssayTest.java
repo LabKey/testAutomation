@@ -210,7 +210,7 @@ public abstract class AbstractAssayTest extends BaseWebDriverTest
         //add a PI user to that group
         permissionsHelper.addUserToProjGroup(TEST_ASSAY_USR_PI1, getProjectName(), TEST_ASSAY_GRP_PIS);
         // give the PI user "CanSeeAuditLog" permission
-        permissionsHelper.setSiteAdminRoleUserPermissions(TEST_ASSAY_USR_PI1, "See Audit Log Events");
+        permissionsHelper.setSiteRoleUserPermissions(TEST_ASSAY_USR_PI1, "See Audit Log Events");
 
         //add a lab tech user to the Users group
         permissionsHelper.addUserToProjGroup(TEST_ASSAY_USR_TECH1, getProjectName(), TEST_ASSAY_GRP_USERS);
@@ -291,7 +291,7 @@ public abstract class AbstractAssayTest extends BaseWebDriverTest
             _permissionsHelper.removePermission(group, "Reader");
         }
         else
-            _securityHelper.setProjectPerm(group, perms);
+            _permissionsHelper.setPermissions(group, perms);
     }
 
     /**

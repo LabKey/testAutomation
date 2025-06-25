@@ -43,7 +43,7 @@ public class ExportOptionsMetadataOnlyTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        ExportOptionsMetadataOnlyTest init = (ExportOptionsMetadataOnlyTest) getCurrentTest();
+        ExportOptionsMetadataOnlyTest init = getCurrentTest();
         init.doSetup();
     }
 
@@ -170,6 +170,7 @@ public class ExportOptionsMetadataOnlyTest extends BaseWebDriverTest
     {
         String assayName = "Export Assay";
         File runFile = TestFileUtils.getSampleData("AssayImportExport/GenericAssay_Run1.xlsx");
+        goToProjectHome();
 
         goToManageAssays();
         _assayHelper.createAssayDesign("General", assayName).clickSave();

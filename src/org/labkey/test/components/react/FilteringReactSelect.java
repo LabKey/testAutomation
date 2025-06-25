@@ -163,14 +163,14 @@ public class FilteringReactSelect extends BaseReactSelect<FilteringReactSelect>
         return this;
     }
 
-    private List<WebElement> setFilter(String value)
+    public List<WebElement> setFilter(String value)
     {
         open();
         elementCache().input.sendKeys(value);
         long filterStart = System.currentTimeMillis();
         WebDriverWrapper.waitFor(()-> {
             List<WebElement> options = elementCache().getOptions();
-            return options.size() > 0 &&
+            return !options.isEmpty() &&
                     !isLoading() || options.stream().anyMatch((a)-> a.getText().contains(value));
         }, WAIT_FOR_JAVASCRIPT);
         long elapsed = System.currentTimeMillis() - filterStart;

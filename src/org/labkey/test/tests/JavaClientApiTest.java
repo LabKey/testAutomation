@@ -106,7 +106,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
     @LogMethod
     public static void doSetup() throws Exception
     {
-        JavaClientApiTest initTest = (JavaClientApiTest)getCurrentTest();
+        JavaClientApiTest initTest = getCurrentTest();
         initTest.setupProject();
     }
 

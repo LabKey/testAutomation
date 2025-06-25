@@ -30,7 +30,7 @@ public class ActiveUserLimitationTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        ActiveUserLimitationTest init = (ActiveUserLimitationTest) getCurrentTest();
+        ActiveUserLimitationTest init = getCurrentTest();
         init.doSetup();
     }
 

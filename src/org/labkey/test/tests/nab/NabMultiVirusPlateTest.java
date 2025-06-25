@@ -91,7 +91,7 @@ public class NabMultiVirusPlateTest extends BaseWebDriverTest
     @BeforeClass
     public static void initProject()
     {
-        NabMultiVirusPlateTest init = (NabMultiVirusPlateTest)getCurrentTest();
+        NabMultiVirusPlateTest init = getCurrentTest();
 
         init.doCreateSteps();
     }

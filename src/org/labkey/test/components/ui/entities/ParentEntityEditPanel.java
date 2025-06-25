@@ -6,6 +6,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
+import org.labkey.test.components.react.BaseReactSelect;
 import org.labkey.test.components.react.FilteringReactSelect;
 import org.labkey.test.components.react.ReactSelect;
 import org.openqa.selenium.NoSuchElementException;
@@ -276,10 +277,8 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
             String inputName = input.findElement(this).getAttribute("name");
             return new ReactSelect.ReactSelectFinder(getDriver()).withNamedInput(inputName).find(this);
         }
-        else
-        {
-            return null;
-        }
+
+        return null;
     }
 
     /**
@@ -305,6 +304,11 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
                 .findAll(elementCache());
     }
 
+    private BaseReactSelect.BaseReactSelectFinder<FilteringReactSelect> getParentFinder(String typeName)
+    {
+        return FilteringReactSelect.finder(getDriver()).withNamedInput(String.format("parentEntityValue_%s", typeName));
+    }
+
     /**
      * Get a select for a given parent entity type.
      *
@@ -313,8 +317,7 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
      */
     public FilteringReactSelect getParent(String typeName)
     {
-        return FilteringReactSelect.finder(getDriver()).withNamedInput(String.format("parentEntityValue_%s", typeName))
-                .find(elementCache());
+        return getParentFinder(typeName).waitFor(elementCache());
     }
 
     /**
@@ -352,12 +355,10 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
      */
     public ParentEntityEditPanel addParents(String typeName, List<String> parentIds)
     {
-        if(getEntityType(typeName) == null)
+        if (getEntityType(typeName) == null)
             getAddNewEntityTypeSelect().select(typeName);
 
-        var selectParent = FilteringReactSelect.finder(getDriver())
-                .withNamedInput(String.format("parentEntityValue_%s", typeName))
-                .waitFor(elementCache());
+        var selectParent = getParentFinder(typeName).waitFor(elementCache());
 
         // Adding for debugging (trying to understand why save button is not enabled after setting).
         getWrapper().log(String.format("Selections before adding: %s", selectParent.getSelections()));
@@ -500,7 +501,7 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
     protected class ElementCache extends Component<?>.ElementCache
     {
         final WebElement saveButton = Locator.byClass("btn-success").withText("Save").findWhenNeeded(this);
-        final WebElement cancelButton = Locator.byClass("btn-default").withText("Cancel").findWhenNeeded(this);
+        final WebElement cancelButton = Locator.byClass("btn-default").withText("Cancel").refindWhenNeeded(this);
 
         // This is the 'Add' button that is contained inside the panel.
         final WebElement addButton = Locator

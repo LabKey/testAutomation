@@ -255,6 +255,21 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
         return elementCache().optionalWarningAlert();
     }
 
+    public void setActionComment(String comment)
+    {
+        elementCache().commentInput.sendKeys(comment);
+    }
+
+    public void clearActionComment()
+    {
+        elementCache().commentInput.clear();
+    }
+
+    public boolean isCommentInputPresent()
+    {
+        return elementCache().commentInputLocator.findOptionalElement(getDriver()).isPresent();
+    }
+
 
     /**
      * Dialog that allows the user to set the genId value.
@@ -339,7 +354,7 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
     public String getParentAlias(int index)
     {
         expandPropertiesPanel();
-        WebDriverWrapper.waitFor(()->elementCache().parentAliases().size() > 0,
+        WebDriverWrapper.waitFor(()-> !elementCache().parentAliases().isEmpty(),
                 "There are no parent aliases visible.", 2_500);
         return elementCache().parentAlias(index).get();
     }
@@ -418,6 +433,9 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
                 .withContainerClass("sampleset-metric-unit-select-container").timeout(WAIT_FOR_JAVASCRIPT).findWhenNeeded(this);
 
         final Locator uniqueIdMsgLoc = Locator.tagWithClass("div", "uniqueid-msg");
+
+        public Locator.XPathLocator commentInputLocator = Locator.tagWithId("textarea", "actionComments");
+        public WebElement commentInput = commentInputLocator.refindWhenNeeded(getDriver());
 
         public List<Input> parentAliases()
         {

@@ -200,7 +200,7 @@ public class APIAssayHelper extends AbstractAssayHelper
     {
         AssayListCommand alc = new AssayListCommand();
         alc.setName(assayName);
-        AssayListResponse alr = null;
+        AssayListResponse alr;
         try
         {
             alr = alc.execute(_test.createDefaultConnection(), projectPath);

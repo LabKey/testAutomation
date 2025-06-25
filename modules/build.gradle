@@ -30,8 +30,8 @@ tasks.register('deploy') {
 }
 
 tasks.register('clean') {
-    group 'Clean'
-    description 'Clean all build directories for subprojects'
+    group = 'Clean'
+    description = 'Clean all build directories for subprojects'
     subprojects.each { Project p ->
         if (p.projectDir.exists())
             dependsOn(p.tasks.clean)

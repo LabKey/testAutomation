@@ -51,7 +51,7 @@ public class IssueAPITest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        IssueAPITest init = (IssueAPITest) getCurrentTest();
+        IssueAPITest init = getCurrentTest();
         init.doSetup();
     }
 

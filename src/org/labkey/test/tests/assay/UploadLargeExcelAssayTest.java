@@ -7,39 +7,28 @@ import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.domain.PropertyDescriptor;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.Daily;
-import org.labkey.test.pages.ImportDataPage;
 import org.labkey.test.pages.ReactAssayDesignerPage;
-import org.labkey.test.pages.assay.AssayImportPage;
-import org.labkey.test.pages.assay.AssayRunsPage;
 import org.labkey.test.pages.assay.AssayUploadJobsPage;
 import org.labkey.test.pages.query.SourceQueryPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.assay.GeneralAssayDesign;
-import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.AbstractDataRegionExportOrSignHelper;
-import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.SampleTypeHelper;
 import org.labkey.test.util.TestDataGenerator;
-import org.labkey.test.util.TestLogger;
-import org.labkey.test.util.exp.SampleTypeAPIHelper;
 
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.*;
-
 @Category({Assays.class, Daily.class})
 public class UploadLargeExcelAssayTest extends BaseWebDriverTest
 {
     public static String LARGE_ASSAY = "chaos_assay";
     public static String LARGE_ASSAY_2 = "large_assay_2";
-    public static List<PropertyDescriptor> ASSAY_FIELDS = new ArrayList<PropertyDescriptor>();
+    public static List<PropertyDescriptor> ASSAY_FIELDS = new ArrayList<>();
 
     @Override
     protected void doCleanup(boolean afterTest)
@@ -50,7 +39,7 @@ public class UploadLargeExcelAssayTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject() throws Exception
     {
-        UploadLargeExcelAssayTest init = (UploadLargeExcelAssayTest) getCurrentTest();
+        UploadLargeExcelAssayTest init = getCurrentTest();
 
         init.doSetup();
     }
@@ -97,7 +86,7 @@ public class UploadLargeExcelAssayTest extends BaseWebDriverTest
         var dgen = new TestDataGenerator("samples", "chaos_sample", getProjectName())
             .withColumns(ASSAY_FIELDS);
         log("writing large .xlsx file");
-        var largeExcelFile = dgen.writeGeneratedDataToExcel(200000, "chaos", fileName);
+        var largeExcelFile = dgen.writeData(fileName, 200_000);
         log("finished writing large .xlsx file");
 
         // import large generated excel to assay1
@@ -112,7 +101,9 @@ public class UploadLargeExcelAssayTest extends BaseWebDriverTest
         clickButton("Save and Finish");
 
         // wait for import complete
-        waitForPipelineJobsToComplete(1, "200k", false, 12 * 60000);
+        var assayJobsPage1 = new AssayUploadJobsPage(getDriver());
+        var pipelineDetailsPage1 = assayJobsPage1.clickJobStatus("200k", 3 * WebDriverWrapper.WAIT_FOR_PAGE);
+        pipelineDetailsPage1.waitForComplete(12 * WebDriverWrapper.WAIT_FOR_PAGE);
 
         // export assay1 data to excel
         log("exporting samples fields to excel");
@@ -133,7 +124,9 @@ public class UploadLargeExcelAssayTest extends BaseWebDriverTest
         setFormElement(Locator.input("__primaryFile__"), largeExportExcelFile);
         clickButton("Save and Finish");
 
-        waitForPipelineJobsToComplete(2, "200k take 2", false, 12 * 60000);
+        var assayJobsPage2 = new AssayUploadJobsPage(getDriver());
+        var pipelineDetailsPage2 = assayJobsPage2.clickJobStatus("200k take 2", 3 * getDefaultWaitForPage());
+        pipelineDetailsPage2.waitForComplete(12 * WebDriverWrapper.WAIT_FOR_PAGE);
 
         var qPage = SourceQueryPage.beginAt(this, getProjectName(), "assay.General.large_assay_2", "Data");
         var dataregion  = qPage.viewData(Duration.ofSeconds(60));

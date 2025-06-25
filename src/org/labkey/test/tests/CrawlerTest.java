@@ -16,6 +16,7 @@ import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.Crawler;
 import org.labkey.test.util.CspLogUtil;
 import org.labkey.test.util.PermissionsHelper.MemberType;
+import org.labkey.test.util.core.admin.CspConfigHelper;
 import org.labkey.test.util.selenium.WebDriverUtils;
 import org.openqa.selenium.UnhandledAlertException;
 
@@ -30,7 +31,9 @@ public class CrawlerTest extends BaseWebDriverTest
 {
 
     private static final String MODULE_NAME = "CrawlerTest";
-    private static final String USER = "injectiontester@labkey.injection.test";
+    private static final String USER = "injectiontester@labkey.injection.test"; // required by 'injectJsp' page
+
+    private final CspConfigHelper _cspConfigHelper = new CspConfigHelper(this);
 
     @Override
     protected void doCleanup(boolean afterTest)
@@ -42,13 +45,14 @@ public class CrawlerTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        CrawlerTest init = (CrawlerTest) getCurrentTest();
+        CrawlerTest init = getCurrentTest();
 
         init.doSetup();
     }
 
     private void doSetup()
     {
+        CspConfigHelper.debugCspWarnings();
         _containerHelper.createProject(getProjectName(), null);
         _userHelper.createUser(USER);
         new ApiPermissionsHelper(this).addMemberToRole(USER, "Reader", MemberType.user, getProjectName());
@@ -60,6 +64,8 @@ public class CrawlerTest extends BaseWebDriverTest
     @Test
     public void testCrawlerTest() throws Exception
     {
+        _cspConfigHelper.setEnforceCsp(false);
+
         String safeParam = "OK!";
 
         log("Verify vulnerable page requires specific user");
@@ -101,9 +107,25 @@ public class CrawlerTest extends BaseWebDriverTest
     }
 
     @Test (expected = CspLogUtil.CspWarningDetectedException.class)
+    public void testEnforceCsp() throws Exception
+    {
+        _cspConfigHelper.setEnforceCsp(true);
+
+        createDefaultConnection().impersonate(USER);
+
+        log("Verify that page is not vulnerable when CSP is enforced");
+        beginAt(getInjectUrl(Crawler.injectScriptBlock), 10_000);
+
+        log("Verify that enforced CSP is also reported");
+        CspLogUtil.checkNewCspWarnings(getArtifactCollector());
+    }
+
+    @Test (expected = CspLogUtil.CspWarningDetectedException.class)
     public void testCspWarning()
     {
         Assume.assumeFalse("Can't test for CSP report", TestProperties.isCspCheckSkipped());
+
+        _cspConfigHelper.setEnforceCsp(false);
 
         beginAt(WebTestHelper.buildRelativeUrl(MODULE_NAME, getProjectName(), "cspWarning"));
         CspLogUtil.checkNewCspWarnings(getArtifactCollector());
@@ -134,6 +156,8 @@ public class CrawlerTest extends BaseWebDriverTest
     @Test
     public void testCrawler() throws Exception
     {
+        _cspConfigHelper.setEnforceCsp(false);
+
         String safeParam = "OK!";
 
         createDefaultConnection().impersonate(USER);

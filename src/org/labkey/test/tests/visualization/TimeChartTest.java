@@ -70,7 +70,7 @@ public abstract class TimeChartTest extends ReportTest
     @BeforeClass
     public static void doInit()
     {
-        TimeChartTest init = (TimeChartTest) getCurrentTest();
+        TimeChartTest init = getCurrentTest();
         init._containerHelper.createProject(init.getProjectName());
     }
 

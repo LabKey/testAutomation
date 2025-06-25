@@ -62,7 +62,7 @@ public class SecurityApiTest extends BaseWebDriverTest
     @BeforeClass
     public static void initTest() throws Exception
     {
-        SecurityApiTest init = (SecurityApiTest)getCurrentTest();
+        SecurityApiTest init = getCurrentTest();
         init.createUsers();
     }
 
@@ -82,7 +82,7 @@ public class SecurityApiTest extends BaseWebDriverTest
         // Create the admin user that will be used to call the APIs.
         int userId = _userHelper.createUserAndNotify(ADMIN_USER).getUserId();
         setInitialPassword(userId);
-        apiPermissionsHelper.addUserToSiteGroup(ADMIN_USER, "Site Administrators");
+        apiPermissionsHelper.setSiteRoleUserPermissions(ADMIN_USER, "Site Administrator");
 
     }
 

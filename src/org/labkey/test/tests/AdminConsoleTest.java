@@ -20,8 +20,10 @@ import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.SimpleGetCommand;
+import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.pages.core.admin.CustomizeSitePage;
@@ -33,11 +35,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 @Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 3)
@@ -149,6 +153,77 @@ public class AdminConsoleTest extends AbstractAdminConsoleTest
         customizeSitePage.setShowRibbonMessage(false).save();
         assertElementNotPresent(ribbon);
         assertElementNotPresent(ribbonLink);
+    }
+
+    // Issue 51843  allow site banner configuration via api
+    @Test
+    public void testSiteBannerAPIConfiguration() throws Exception
+    {
+        goToAdminConsole();
+
+        String bannerMessage = "test banner message" + TRICKY_CHARACTERS;
+        Locator bannerLoc = Locator.tagWithClass("div", "lk-dismissable-warn")
+                .containing("test banner message" + TRICKY_CHARACTERS);
+
+        //As site admin
+        // set the message and show it
+        var showBannerCmd = new SimplePostCommand("admin", "setRibbonMessage.api");
+        showBannerCmd.setParameters(Map.of("message", bannerMessage,
+                "show", true));
+        showBannerCmd.execute(createDefaultConnection(), "/");
+        refresh();
+        // verify it is shown
+        WebDriverWrapper.waitFor(()-> bannerLoc.isDisplayed(getDriver()), 1000);
+        if (checker().withScreenshot("banner not shown or not as expected")
+                .verifyTrue("expect banner to be shown", bannerLoc.isDisplayed(getDriver())))
+        {
+            // hide the banner
+            var hideBannerCmd = new SimplePostCommand("admin", "setRibbonMessage.api");
+            hideBannerCmd.setParameters(Map.of("show", false));
+            hideBannerCmd.execute(createDefaultConnection(), "/");
+            refresh();
+            WebDriverWrapper.waitFor(()-> !bannerLoc.isDisplayed(getDriver()), 1000);
+            // verify it is hidden
+            checker().withScreenshot("banner is shown when not expected")
+                    .verifyFalse("expect banner not to be shown", bannerLoc.isDisplayed(getDriver()));
+        }
+
+        // restore it with the previous banner value
+        var restoreBannerCmd = new SimplePostCommand("admin", "setRibbonMessage.api");
+        restoreBannerCmd.setParameters(Map.of("show", true));
+        restoreBannerCmd.execute(createDefaultConnection(), "/");
+        refresh();
+        // verify it is restored with the previous value
+        checker().withScreenshot("banner not shown or not as expected")
+                .verifyTrue("expect banner to be shown", bannerLoc.isDisplayed(getDriver()));
+
+        // as app admin
+        impersonateRole("Application Admin");
+        var reHideBannerCmd = new SimplePostCommand("admin", "setRibbonMessage.api");
+        reHideBannerCmd.setParameters(Map.of("show", false));
+        try
+        {
+            reHideBannerCmd.execute(createDefaultConnection(), "/");
+            fail("expect exception trying to call this API as app admin");
+        }
+        catch (CommandException e)
+        {
+            // success, caller with app admin failed to hit this api
+        }
+        refresh();
+        // verify it remains shown
+        checker().withScreenshot("banner is hidden when not expected")
+                .verifyTrue("expect banner to be shown", bannerLoc.isDisplayed(getDriver()));
+
+        stopImpersonating();
+
+        // clean up after ourselves as site admin
+        var clearAndHideBannerCmd = new SimplePostCommand("admin", "setRibbonMessage.api");
+        clearAndHideBannerCmd.setParameters(Map.of("show", false, "message", ""));
+        clearAndHideBannerCmd.execute(createDefaultConnection(), "/");
+        refresh();
+        checker().withScreenshot("banner is shown when not expected")
+                .verifyFalse("expect banner not to be shown", bannerLoc.isDisplayed(getDriver()));
     }
 
     @Test

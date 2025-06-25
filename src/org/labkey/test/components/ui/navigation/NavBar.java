@@ -39,7 +39,7 @@ public abstract class NavBar extends WebDriverComponent<NavBar.ElementCache>
 
     public String getHeaderLogoImgSrc()
     {
-        return elementCache().headerLogo.getAttribute("src");
+        return elementCache().headerLogoImage.getAttribute("src");
     }
 
     public HasSearchResults searchFor(String searchString)

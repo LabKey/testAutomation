@@ -32,7 +32,7 @@ public class AttachmentFieldTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        AttachmentFieldTest init = (AttachmentFieldTest) getCurrentTest();
+        AttachmentFieldTest init = getCurrentTest();
         init.doSetup();
     }
 
@@ -59,9 +59,11 @@ public class AttachmentFieldTest extends BaseWebDriverTest
     @Test
     public void testFileFieldInSampleType()
     {
+        goToProjectHome();
         String sampleTypeName = "Sample type with attachment";
         String fieldName = "testFile";
         SampleTypeHelper sampleTypeHelper = new SampleTypeHelper(this);
+        goToProjectHome();
 
         log("Create a sample type with attachment field");
         sampleTypeHelper.createSampleType(new SampleTypeDefinition(sampleTypeName)

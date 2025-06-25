@@ -64,7 +64,7 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        SampleTypeLineageTest init = (SampleTypeLineageTest) getCurrentTest();
+        SampleTypeLineageTest init = getCurrentTest();
 
         // Comment out this line (after you run once) it will make iterating on  tests much easier.
         init.doSetup();
@@ -309,7 +309,7 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
 
         log("Again check that data validation works as expected.");
         checker().verifyTrue("Expected error message 'is not a valid Date' is not present.",
-                isTextPresent("'BadDate’ is not a valid Date for DateCol "));
+                isTextPresent("'BadDate' is not a valid Date for DateCol "));
         setFormElement(Locator.name("outputSample1_DateCol"), "1/1/2007");
         clickButton("Submit");
 
@@ -852,7 +852,7 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
         sampleGenerator.addCustomRow(Map.of("name", "J", "MaterialInputs/Family", "A", "DataInputs/Sources", "S-1"));
         sampleGenerator.addCustomRow(Map.of("name", "K", "MaterialInputs/Family", "D", "DataInputs/Sources", "S-1"));
         sampleGenerator.addCustomRow(Map.of("name", "L", "MaterialInputs/Family", "A,B", "DataInputs/Sources", "S-1,S-2"));
-        List<Map<String, Object>> savedSampleRows = sampleGenerator.insertRows(createDefaultConnection(), sampleGenerator.getRows()).getRows();;
+        List<Map<String, Object>> savedSampleRows = sampleGenerator.insertRows(createDefaultConnection(), sampleGenerator.getRows()).getRows();
 
         // add data objects with samples as parents
         dataGenerator = dataClass.getTestDataGenerator(getProjectName());

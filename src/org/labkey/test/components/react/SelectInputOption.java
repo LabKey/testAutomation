@@ -2,21 +2,14 @@ package org.labkey.test.components.react;
 
 import org.apache.commons.lang3.StringUtils;
 import org.labkey.api.collections.CaseInsensitiveHashMap;
-import org.labkey.api.collections.CaseInsensitiveMapWrapper;
-import org.labkey.api.util.Pair;
 import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
-import org.labkey.test.components.html.Input;
-import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static org.labkey.test.components.html.Input.Input;
 
 /*
     This component is meant to wrap the verbose options in filteringReactSelect, ReactSelect
@@ -67,13 +60,6 @@ public class SelectInputOption extends WebDriverComponent<SelectInputOption.Elem
     {
         return new ElementCache();
     }
-
-    @Override
-    protected ElementCache elementCache()
-    {
-        return (ElementCache) super.elementCache();
-    }
-
 
     protected class ElementCache extends Component<?>.ElementCache
     {

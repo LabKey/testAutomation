@@ -15,12 +15,15 @@
  */
 package org.labkey.test.util;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.eclipse.jetty.util.URIUtil;
+import org.labkey.test.params.FieldKey;
 
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * UNDONE: Refactor useful methods from PageFlowUtil into util.jar that can be used by the test harness then delete this class.
@@ -118,25 +121,29 @@ public class EscapeUtil
 
     public static String fieldKeyEncodePart(String str)
     {
-        str = StringUtils.replace(str, "$", "$D");
-        str = StringUtils.replace(str, "/", "$S");
-        str = StringUtils.replace(str, "&", "$A");
-        str = StringUtils.replace(str, "}", "$B");
-        str = StringUtils.replace(str, "~", "$T");
-        str = StringUtils.replace(str, ",", "$C");
-        str = StringUtils.replace(str, ".", "$P");
-        return str;
+        return FieldKey.encodePart(str);
     }
 
     public static String fieldKeyDecodePart(String str)
     {
-        str = StringUtils.replace(str, "$C", ",");
-        str = StringUtils.replace(str, "$T", "~");
-        str = StringUtils.replace(str, "$B", "}");
-        str = StringUtils.replace(str, "$A", "&");
-        str = StringUtils.replace(str, "$S", "/");
-        str = StringUtils.replace(str, "$D", "$");
-        str = StringUtils.replace(str, "$P", ".");
-        return str;
+        return FieldKey.decodePart(str);
+    }
+
+    public static String getTextChoiceValidatorExpression(List<String> options)
+    {
+        return options.stream()
+                .map(String::trim)
+                .map(value -> value.replaceAll("([\\\\|])", "\\\\$1"))
+                .collect(Collectors.joining("|"));
+    }
+
+    public static String getSqlQuotedValue(String value)
+    {
+        return String.format("\"%s\"", value.replaceAll("\"", "\"\""));
+    }
+
+    public static String getMarkupEscapedValue(String value)
+    {
+        return StringEscapeUtils.escapeXml11(value);
     }
 }

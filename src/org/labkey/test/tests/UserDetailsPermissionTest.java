@@ -82,7 +82,7 @@ public class UserDetailsPermissionTest extends BaseWebDriverTest
     @BeforeClass
     public static void setup()
     {
-        UserDetailsPermissionTest initTest = (UserDetailsPermissionTest) getCurrentTest();
+        UserDetailsPermissionTest initTest = getCurrentTest();
         initTest.doSetup();
     }
 
@@ -104,14 +104,14 @@ public class UserDetailsPermissionTest extends BaseWebDriverTest
 
         _containerHelper.createProject(getProjectName(), null);
 
-        new ApiPermissionsHelper(this).addUserToSiteGroup(ADMIN_USER, "Site Administrators");
+        new ApiPermissionsHelper(this).setSiteRoleUserPermissions(ADMIN_USER, "Site Administrator");
         // Use created user to ensure we have a known 'Modified by' column for created users
         ApiPermissionsHelper apiPermissionsHelper = new ApiPermissionsHelper(this,
                 () -> new Connection(WebTestHelper.getBaseURL(), ADMIN_USER, PasswordUtil.getPassword()));
 
         apiPermissionsHelper.createPermissionsGroup(TEST_GROUP, USER_INFO_VIEWER, IMPERSONATED_USER, CHECKED_USER);
         apiPermissionsHelper.setPermissions(TEST_GROUP, "Reader");
-        apiPermissionsHelper.setSiteAdminRoleUserPermissions(USER_INFO_VIEWER, "See User and Group Details");
+        apiPermissionsHelper.setSiteRoleUserPermissions(USER_INFO_VIEWER, "See User and Group Details");
 
         impersonate(ADMIN_USER);
         {

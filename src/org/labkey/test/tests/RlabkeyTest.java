@@ -84,7 +84,7 @@ public class RlabkeyTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        RlabkeyTest init = (RlabkeyTest)getCurrentTest();
+        RlabkeyTest init = getCurrentTest();
         init.doInit();
     }
 
@@ -306,7 +306,7 @@ public class RlabkeyTest extends BaseWebDriverTest
                 if (!success)
                 {
                     TestLogger.error("Expected results for test case: " + test.getName() + ":\n" + expectedOutput);
-                    TestLogger.error("Script for failed test case: " + test.getName() + ":\n" + sb.toString());
+                    TestLogger.error("Script for failed test case: " + test.getName() + ":\n" + sb);
                     checker().withScreenshot(testData.getName()).error(test.getName());
                 }
                 else if ("DEBUG".equalsIgnoreCase(test.getType()))

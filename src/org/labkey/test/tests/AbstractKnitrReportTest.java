@@ -17,21 +17,29 @@ package org.labkey.test.tests;
 
 import org.junit.Assume;
 import org.junit.BeforeClass;
+import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestProperties;
+import org.labkey.test.pages.admin.ExternalSourcesPage;
+import org.labkey.test.pages.core.admin.logger.ManagerPage;
 import org.labkey.test.pages.reports.ManageViewsPage;
 import org.labkey.test.util.CodeMirrorHelper;
+import org.labkey.test.util.Log4jUtils;
 import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelper;
+import org.labkey.test.util.core.admin.CspConfigHelper;
 import org.openqa.selenium.WebElement;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -60,15 +68,27 @@ public abstract class AbstractKnitrReportTest extends BaseWebDriverTest
     }
 
     @BeforeClass
-    public static void initProject()
+    public static void initProject() throws Exception
     {
-        AbstractKnitrReportTest init = (AbstractKnitrReportTest)getCurrentTest();
+        AbstractKnitrReportTest init = getCurrentTest();
         init.setupProject();
     }
 
     @LogMethod
     protected void setupProject()
     {
+        Log4jUtils.setLogLevel("org.labkey.query.reports.ReportsController", ManagerPage.LoggingLevel.DEBUG);
+        try
+        {
+            new CspConfigHelper(this).setAllowedHosts(Map.of(
+                ExternalSourcesPage.Directive.Style, List.of("https://cdn.datatables.net"),
+                ExternalSourcesPage.Directive.Font, List.of("https://mathjax.rstudio.com")));
+        }
+        catch (IOException | CommandException e)
+        {
+            throw new RuntimeException(e);
+        }
+
         _rReportHelper.ensureRConfig(isDocker());
 
         _containerHelper.createProject(getProjectName(), "Collaboration");
@@ -88,7 +108,8 @@ public abstract class AbstractKnitrReportTest extends BaseWebDriverTest
         return false;
     }
 
-    protected String createKnitrReport(Path reportSourcePath, RReportHelper.ReportOption knitrOption)
+    @LogMethod
+    protected String createKnitrReport(@LoggedParam Path reportSourcePath, @LoggedParam RReportHelper.ReportOption knitrOption)
     {
         String reportSource = readReport(reportSourcePath);
 
@@ -201,6 +222,6 @@ public abstract class AbstractKnitrReportTest extends BaseWebDriverTest
         _ext4Helper.waitForMaskToDisappear();
         waitAndClickAndWait(Locator.linkWithText("kable"));
         _ext4Helper.waitForMaskToDisappear(3 * BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        waitForElement(Locator.id("mtcars_table_wrapper"));
+        waitForElement(Locator.id("mtcars_table"));
     }
 }

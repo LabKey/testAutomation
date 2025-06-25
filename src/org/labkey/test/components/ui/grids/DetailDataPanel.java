@@ -50,7 +50,6 @@ public class DetailDataPanel extends WebDriverComponent<DetailDataPanel.ElementC
 
     /**
      * When the logged-in user does not have edit permissions, the edit button will not be present
-     * @return
      */
     public boolean isEditable()
     {
@@ -123,34 +122,34 @@ public class DetailDataPanel extends WebDriverComponent<DetailDataPanel.ElementC
         return tables.get(0);
     }
 
-    public AttachmentCard getFileField(String fieldCaption)
+    public AttachmentCard getFileField(String fieldLabel)
     {
-        return elementCache().fileField(fieldCaption);
+        return elementCache().fileField(fieldLabel);
     }
 
-    public String getFileName(String fieldCaption)
+    public String getFileName(String fieldLabel)
     {
-        return getFileField(fieldCaption).getFileName();
+        return getFileField(fieldLabel).getFileName();
     }
 
-    public boolean isFileFieldBlank(String fieldCaption)
+    public boolean isFileFieldBlank(String fieldLabel)
     {
-        return getFileField(fieldCaption) == null;
+        return getFileField(fieldLabel) == null;
     }
 
-    public File downloadFileField(String fieldCaption)
+    public File downloadFileField(String fieldLabel)
     {
-        return getFileField(fieldCaption).clickDownload();
+        return getFileField(fieldLabel).clickDownload();
     }
 
-    public ImageFileViewDialog viewImgFile(String fieldCaption)
+    public ImageFileViewDialog viewImgFile(String fieldLabel)
     {
-        return getFileField(fieldCaption).viewImgFile();
+        return getFileField(fieldLabel).viewImgFile();
     }
 
-    public File clickNonImgFile(String fieldCaption)
+    public File clickNonImgFile(String fieldLabel)
     {
-        return getFileField(fieldCaption).clickOnNonImgFile();
+        return getFileField(fieldLabel).clickOnNonImgFile();
     }
 
     @Override
@@ -175,14 +174,14 @@ public class DetailDataPanel extends WebDriverComponent<DetailDataPanel.ElementC
             return new DetailTable.DetailTableFinder(getDriver()).findAll(this);
         }
 
-        public WebElement findValueEl(String caption)
+        public WebElement findValueEl(String fieldLabel)
         {
-            return Locator.tagWithAttribute("td", "data-caption", caption).waitForElement(this, 4_000);
+            return Locator.tagWithAttribute("td", "data-caption", fieldLabel).waitForElement(this, 4_000);
         }
 
-        public AttachmentCard fileField(String caption)
+        public AttachmentCard fileField(String fieldLabel)
         {
-            return new AttachmentCard.FileAttachmentCardFinder(getDriver()).findOrNull(findValueEl(caption));
+            return new AttachmentCard.FileAttachmentCardFinder(getDriver()).findOrNull(findValueEl(fieldLabel));
         }
     }
 

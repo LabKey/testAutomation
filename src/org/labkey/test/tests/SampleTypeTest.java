@@ -42,6 +42,7 @@ import org.labkey.test.components.ext4.Window;
 import org.labkey.test.components.html.OptionSelect;
 import org.labkey.test.pages.ImportDataPage;
 import org.labkey.test.pages.ReactAssayDesignerPage;
+import org.labkey.test.pages.core.admin.BaseSettingsPage;
 import org.labkey.test.pages.experiment.CreateSampleTypePage;
 import org.labkey.test.pages.experiment.UpdateSampleTypePage;
 import org.labkey.test.params.FieldDefinition;
@@ -106,7 +107,7 @@ public class SampleTypeTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        SampleTypeTest init = (SampleTypeTest) getCurrentTest();
+        SampleTypeTest init = getCurrentTest();
 
         // Comment out this line (after you run once) it will make iterating on tests much easier.
         init.doSetup();
@@ -135,6 +136,75 @@ public class SampleTypeTest extends BaseWebDriverTest
         // It can make re-running faster but you need to valid the integrity of the test data on your own.
 //        log("Do nothing.");
         _userHelper.deleteUsers(false, USER_FOR_FILTERTEST.getEmail());
+    }
+
+    // Issue 52390: milliseconds are truncated from time fields on update or reshow
+    @Test
+    public void testDateAndTimeValueUpdates() throws Exception
+    {
+        var projectSettingsPage = goToProjectSettings();
+        projectSettingsPage.setDefaultDateDisplayInherited(false);
+        projectSettingsPage.setDefaultDateDisplay(BaseSettingsPage.DATE_FORMAT.MMMM_dd_yyyy);
+        projectSettingsPage.setDefaultDateTimeDisplayInherited(false);
+        projectSettingsPage.setDefaultDateTimeDisplay(BaseSettingsPage.DATE_FORMAT.dd_MMM_yyyy,
+                BaseSettingsPage.TIME_FORMAT.HH_mm_ss_SSS);
+        projectSettingsPage.setDefaultTimeDisplayInherited(false);
+        projectSettingsPage.setDefaultTimeDisplay(BaseSettingsPage.TIME_FORMAT.HH_mm_ss_SSS);
+        projectSettingsPage.save();
+
+        final String sampleTypeName = "dateTimeEditSamples";
+        final FieldDefinition txtField = new FieldDefinition(
+                TestDataGenerator.randomFieldName("text"), ColumnType.String).setRequired(true);
+        final FieldDefinition dateField = new FieldDefinition(
+                TestDataGenerator.randomFieldName("date", ":"), ColumnType.Date);
+        final FieldDefinition timeField = new FieldDefinition(
+                TestDataGenerator.randomFieldName("time", ":"), ColumnType.Time);
+        final FieldDefinition dateTimeField = new FieldDefinition(
+                TestDataGenerator.randomFieldName("dateTime", ":"),  ColumnType.DateAndTime);
+        final List<FieldDefinition> fields = List.of(txtField, dateField, timeField, dateTimeField);
+
+        SampleTypeDefinition sampleTypeDefinition = new SampleTypeDefinition(sampleTypeName).setFields(fields);
+        sampleTypeDefinition.create(createDefaultConnection(), getProjectName());
+
+        goToProjectHome();
+        waitAndClickAndWait(Locator.linkWithText(sampleTypeName));
+        var dataRegion = DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
+        var updatePage = dataRegion.clickInsertNewRow();
+        String date = "January 01 2025";
+        String time = "23:56:54.123";
+        String dateTime = "06-May-1986 23:58:34.123";
+        updatePage.setField("Name", "sample01");
+        updatePage.setField(dateField.getName(), date);
+        updatePage.setField(timeField.getName(), time);
+        updatePage.setField(dateTimeField.getName(), dateTime);
+        updatePage.submitExpectingError();
+
+        checker().wrapAssertion(()-> Assertions.assertThat(updatePage.getTextInputValue(dateField.getName()))
+                .isEqualTo("2025-01-01")); // expect reformat of date
+        checker().wrapAssertion(()-> Assertions.assertThat(updatePage.getTextInputValue(timeField.getName()))
+                .as("expect time to retain milliseconds")
+                .isEqualTo(time));
+        checker().wrapAssertion(()-> Assertions.assertThat(updatePage.getTextInputValue(dateTimeField.getName()))
+                .as("expect dateTime to post back as entered")
+                .isEqualTo("1986-05-06 23:58:34.123"));
+        checker().screenShotIfNewError("unexpected data update");
+
+        // fill in the required text field and submit
+        updatePage.setField(txtField.getName(), "sample01");
+        updatePage.submit();
+
+        var afterSubmit = DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
+        var rowData = afterSubmit.getRowDataAsText(0);
+        checker().withScreenshot("unexpected data persisted")
+                .wrapAssertion(()-> Assertions.assertThat(rowData)
+                .as("Issue 52390 expect date, time, dateTime to be shown as entered")
+                .contains(date, time, dateTime));
+
+        var cleanupDateFormatsPage = goToProjectSettings();
+        cleanupDateFormatsPage.setDefaultDateDisplayInherited(true);
+        cleanupDateFormatsPage.setDefaultDateTimeDisplayInherited(true);
+        cleanupDateFormatsPage.setDefaultTimeDisplayInherited(true);
+        cleanupDateFormatsPage.save();
     }
 
     @Test
@@ -257,7 +327,7 @@ public class SampleTypeTest extends BaseWebDriverTest
         mouseOver(meCell);
         WebElement helpDivBody = shortWait().until(ExpectedConditions.visibilityOfElementLocated(Locator.id("helpDivBody")));
         assertEquals("expect custom format popup for me filter",
-                helpDivBody.getText(), "Formatting applied because column = ~me~.");
+                "Formatting applied because column = ~me~.", helpDivBody.getText());
         assertNotEquals("expect cell for other user not to get custom format",
                 "rgb(244, 78, 59)", notMeCell.getCssValue("background-color"));
     }
@@ -1659,7 +1729,7 @@ public class SampleTypeTest extends BaseWebDriverTest
         row = 1;
         for (String filePath : expectedFilePaths)
         {
-            if (filePath.length() == 0)
+            if (filePath.isEmpty())
             {
                 assertEquals("Value of attachment column for row " + row + " not exported as expected.", "", exportedColumn.get(row).trim());
             }

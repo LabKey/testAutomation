@@ -1,7 +1,6 @@
 package org.labkey.test.tests.wiki;
 
 import org.jetbrains.annotations.Nullable;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -24,7 +23,10 @@ public class WikiCspTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = TRICKY_CHARACTERS_FOR_PROJECT_NAMES + "WikiCspTest";
     private static final String WIKI_PAGE_TITLE = "TOC_with_inline";
-    private static final String WIKI_PAGE_BODY = "${labkey.webPart(partName='Wiki TOC', showFrame='false')}\n" +
+    private static final String WIKI_PAGE_BODY =
+        // Issue 52483: HTML substitution patterns can throw errors during wiki validation
+        "${labkey.webPart(partName='Query', schemaName='core', queryName='Users')}\n" +
+        // Trigger wiki validation warning
             "<div onclick=\"alert('bad page')\">Click me</div>";
 
     @BeforeClass
@@ -54,7 +56,7 @@ public class WikiCspTest extends BaseWebDriverTest
     }
 
     @Override
-    protected void checkLeaks()
+    protected void checkLinks()
     {
         // No-op to avoid triggering the CSP violation during the crawl
     }

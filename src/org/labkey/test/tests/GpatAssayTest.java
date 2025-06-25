@@ -76,7 +76,7 @@ public class GpatAssayTest extends BaseWebDriverTest
     @BeforeClass
     public static void doSetup()
     {
-        GpatAssayTest init = (GpatAssayTest) getCurrentTest();
+        GpatAssayTest init = getCurrentTest();
         init._containerHelper.createProject(init.getProjectName(), "Assay");
         init.goToProjectHome();
     }
@@ -150,7 +150,7 @@ public class GpatAssayTest extends BaseWebDriverTest
             clickButton("OK", defaultWaitForPage);
         clickButton("Next", defaultWaitForPage);
 
-        WebElement runPropertiesPanel = Locator.tagWithAttributeContaining("form", "lk-region-form", "Runs")
+        WebElement runPropertiesPanel = Locator.tagWithAttributeContaining("form", "data-region-form", "Runs")
                 .findElement(getDriver());
 
         setFormElement(Locator.name("date").findElement(runPropertiesPanel),
@@ -339,7 +339,7 @@ public class GpatAssayTest extends BaseWebDriverTest
     {
         File trialData = TestFileUtils.getSampleData("GPAT/renameAssayTrial.xls");
 
-        String invalidAssayName = TestDataGenerator.randomInvalidDomainName(10);
+        String invalidAssayName = TestDataGenerator.randomInvalidDomainName(null, 0, 10);
         ReactAssayDesignerPage assayDesignerPage = startCreateGpatAssay(trialData, invalidAssayName);
         List<String> errors = assayDesignerPage.clickSaveExpectingErrors();
         assayDesignerPage.clickCancel();

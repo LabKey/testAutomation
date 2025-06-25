@@ -27,7 +27,7 @@ public class EditMetadataDomainTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject() throws IOException, CommandException
     {
-        EditMetadataDomainTest init = (EditMetadataDomainTest) getCurrentTest();
+        EditMetadataDomainTest init = getCurrentTest();
         init.doSetup();
     }
 
@@ -44,8 +44,7 @@ public class EditMetadataDomainTest extends BaseWebDriverTest
         new PortalHelper(getDriver()).addBodyWebPart("Lists");
 
         log("Creating a sample list");
-        FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "lists", listName);
-        TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
+        TestDataGenerator dgen = new TestDataGenerator("lists", listName, getProjectName())
                 .withColumns(List.of(
                         new FieldDefinition("name", FieldDefinition.ColumnType.String),
                         new FieldDefinition("firstCol", FieldDefinition.ColumnType.String)));

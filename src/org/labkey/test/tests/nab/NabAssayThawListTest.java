@@ -84,7 +84,7 @@ public class NabAssayThawListTest extends AbstractAssayTest
     @BeforeClass
     public static void setupProject() throws Exception
     {
-        NabAssayThawListTest init = (NabAssayThawListTest)getCurrentTest();
+        NabAssayThawListTest init = getCurrentTest();
         init.doSetup();
     }
 

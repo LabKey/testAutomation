@@ -91,7 +91,7 @@ public class DatasetExportTest extends AssayResultsExportTest
     @BeforeClass
     public static void doSetup() throws Exception
     {
-        DatasetExportTest initTest = (DatasetExportTest)getCurrentTest();
+        DatasetExportTest initTest = getCurrentTest();
         initTest.setupDataset();
     }
 

@@ -67,7 +67,7 @@ public class PipelineProtocolArchiveTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        PipelineProtocolArchiveTest init = (PipelineProtocolArchiveTest) getCurrentTest();
+        PipelineProtocolArchiveTest init = getCurrentTest();
         init.doSetup();
     }
 

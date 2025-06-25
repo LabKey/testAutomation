@@ -20,8 +20,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.labkey.api.util.FileUtil;
-import org.labkey.api.util.Path;
 import org.labkey.remoteapi.assay.ImportRunCommand;
 import org.labkey.remoteapi.assay.Protocol;
 import org.labkey.remoteapi.domain.CreateDomainCommand;
@@ -44,7 +42,6 @@ import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
 import org.labkey.test.util.StudyHelper;
-import org.labkey.test.util.TestDataUtils;
 import org.labkey.test.util.core.webdav.WebDavUploadHelper;
 import org.labkey.test.util.exp.SampleTypeAPIHelper;
 import org.openqa.selenium.By;
@@ -104,7 +101,7 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject() throws Exception
     {
-        FileAttachmentColumnTest init = (FileAttachmentColumnTest)getCurrentTest();
+        FileAttachmentColumnTest init = getCurrentTest();
         init.doSetup();
     }
 
@@ -459,15 +456,12 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
     private Protocol makeGeneralAssay(String assayName, List<PropertyDescriptor> runFields, List<PropertyDescriptor> dataFields,
                                       String folderPath) throws Exception
     {
-        var assayDesign =  new GeneralAssayDesign(assayName)
+        return new GeneralAssayDesign(assayName)
                 .setBatchFields(List.of(new FieldDefinition("batchData", FieldDefinition.ColumnType.String)), false)
                 .setRunFields(runFields, false)
-                .setDataFields(dataFields, false);
-
-
-        var protocol = assayDesign.createAssay(folderPath, createDefaultConnection());
-        var updateProtocol = protocol.setEditableRuns(true).setEditableResults(true);
-        return assayDesign.updateProtocol(folderPath, createDefaultConnection(), updateProtocol);
+                .setDataFields(dataFields, false)
+                .addProtocolTransformer(protocol -> protocol.setEditableRuns(true).setEditableResults(true))
+                .createAssay(folderPath, createDefaultConnection());
     }
 
     private void addRunData(Integer protocolId, String folderPath) throws Exception

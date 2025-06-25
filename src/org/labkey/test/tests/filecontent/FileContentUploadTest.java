@@ -60,7 +60,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -102,7 +101,7 @@ public class FileContentUploadTest extends BaseWebDriverTest
     @BeforeClass
     public static void doSetup()
     {
-        FileContentUploadTest initTest = (FileContentUploadTest)getCurrentTest();
+        FileContentUploadTest initTest = getCurrentTest();
 
         initTest.doSetupSteps();
     }
@@ -231,7 +230,7 @@ public class FileContentUploadTest extends BaseWebDriverTest
         final String s = File.separator;
 
         new ApiPermissionsHelper(this)
-                .setSiteAdminRoleUserPermissions(PasswordUtil.getUsername(), "See Absolute File Paths");
+                .setSiteRoleUserPermissions(PasswordUtil.getUsername(), "See Absolute File Paths");
 
         navigateToFolder(getProjectName(), subfolderName);
         final File testFile = TestFileUtils.getSampleData("security/InlineFile2.html");

@@ -104,7 +104,7 @@ public class ElispotAssayTest extends AbstractAssayTest
     @BeforeClass
     public static void initProject() throws Exception
     {
-        ElispotAssayTest init = (ElispotAssayTest)getCurrentTest();
+        ElispotAssayTest init = getCurrentTest();
         init.setupFolder();
     }
 
@@ -359,14 +359,14 @@ public class ElispotAssayTest extends AbstractAssayTest
         for (int i = 0; i < cellWell.size(); i++)
         {
             int cpw = NumberUtils.toInt(cellWell.get(i), 0);
-            Float sc = NumberUtils.toFloat(spotCount.get(i));
-            Float nsc = NumberUtils.toFloat(normalizedSpotCount.get(i));
-            Float computed = sc;
+            float sc = NumberUtils.toFloat(spotCount.get(i));
+            float nsc = NumberUtils.toFloat(normalizedSpotCount.get(i));
+            float computed = sc;
 
             if (cpw != 0)
                 computed = sc / cpw * 1000000;
 
-            assertEquals(computed.intValue(), nsc.intValue());
+            assertEquals((int) computed, (int) nsc);
         }
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.revertUnsavedView();
@@ -656,14 +656,14 @@ public class ElispotAssayTest extends AbstractAssayTest
             if (!"TNTC".equals(spotCount.get(i)))
             {
                 int cpw = NumberUtils.toInt(cellWell.get(i), 0);
-                Float sc = NumberUtils.toFloat(spotCount.get(i));
-                Float nsc = NumberUtils.toFloat(normalizedSpotCount.get(i));
-                Float computed = sc;
+                float sc = NumberUtils.toFloat(spotCount.get(i));
+                float nsc = NumberUtils.toFloat(normalizedSpotCount.get(i));
+                float computed = sc;
 
                 if (cpw != 0)
                     computed = sc / cpw * 1000000;
 
-                assertEquals(computed.intValue(), nsc.intValue());
+                assertEquals((int) computed, (int) nsc);
             }
             else
             {

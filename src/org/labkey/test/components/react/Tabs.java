@@ -53,9 +53,14 @@ public class Tabs extends WebDriverComponent<Tabs.ElementCache>
         return _driver;
     }
 
+    public WebElement findTab(String tabText)
+    {
+        return elementCache().findTab(tabText);
+    }
+
     public WebElement findPanelForTab(String tabText)
     {
-        return elementCache().findTabPanel(tabText);
+        return elementCache().findTabPanel(elementCache().findTab(tabText));
     }
 
     public WebElement selectTab(String tabText)
@@ -63,14 +68,19 @@ public class Tabs extends WebDriverComponent<Tabs.ElementCache>
         WebElement tab = elementCache().findTab(tabText);
         getWrapper().scrollIntoView(tab);
         tab.click();
-        WebElement panel = findPanelForTab(tabText);
+        WebElement panel = elementCache().findTabPanel(tab);
         getWrapper().shortWait().until(ExpectedConditions.visibilityOf(panel));
         return panel;
     }
 
+    public WebElement findPanelForActiveTab()
+    {
+        return elementCache().findTabPanel(elementCache().findSelectedTab());
+    }
+
     public boolean isTabSelected(String tabText)
     {
-        return Boolean.valueOf(elementCache().findTab(tabText).getAttribute("aria-selected"));
+        return Boolean.valueOf(elementCache().findTab(tabText).getDomAttribute("aria-selected"));
     }
 
     public List<String> getTabText()
@@ -78,6 +88,16 @@ public class Tabs extends WebDriverComponent<Tabs.ElementCache>
         List<WebElement> tabs = elementCache().findAllTabs();
         return tabs
                 .stream().map(WebElement::getText).toList();
+    }
+
+    public String getSelectedTabText()
+    {
+        return elementCache().findSelectedTab().getText();
+    }
+
+    public String getSelectedTabKey()
+    {
+        return elementCache().findSelectedTab().getDomAttribute("data-event-key");
     }
 
     @Override
@@ -96,10 +116,15 @@ public class Tabs extends WebDriverComponent<Tabs.ElementCache>
 
         public ElementCache()
         {
-            if (!WebDriverWrapper.waitFor(() -> findAllTabs().size() > 0, 10_000))
+            if (!WebDriverWrapper.waitFor(() -> !findAllTabs().isEmpty(), 10_000))
             {
                 tabLoc.findElement(this); // Should trigger a 'NoSuchElementException'
             }
+        }
+
+        protected WebElement findSelectedTab()
+        {
+            return tabLoc.withAttribute("aria-selected", "true").findElement(this);
         }
 
         List<WebElement> findAllTabs()
@@ -118,12 +143,14 @@ public class Tabs extends WebDriverComponent<Tabs.ElementCache>
                 WebElement tabEl;
                 try
                 {
-                    tabEl = tabLoc.withText(tabText).findElement(tabList);
+                    // Use 'containing' here because it may happen that the counts get loaded into the tabs after the call to this method,
+                    // which causes the name to change from, say 'Included Samples' to 'Included Samples (7)'.
+                    tabEl = tabLoc.containing(tabText).findElement(tabList);
                 }
                 catch (NoSuchElementException ex)
                 {
                     throw new NoSuchElementException(String.format("'%s' not among available tabs: %s",
-                            tabText, getWrapper().getTexts(findAllTabs())), ex);
+                        tabText, getWrapper().getTexts(findAllTabs())), ex);
                 }
                 tabMap.put(tabText, tabEl);
             }
@@ -131,9 +158,9 @@ public class Tabs extends WebDriverComponent<Tabs.ElementCache>
         }
 
         // Tab panels can be updated and changed when flipping between tabs. Don't persist the panel element find it each time.
-        WebElement findTabPanel(String tabText)
+        WebElement findTabPanel(WebElement tabElement)
         {
-            String panelId = findTab(tabText).getAttribute("aria-controls");
+            String panelId = tabElement.getDomAttribute("aria-controls");
             WebElement panelEl;
             try
             {
@@ -141,7 +168,7 @@ public class Tabs extends WebDriverComponent<Tabs.ElementCache>
             }
             catch (NoSuchElementException ex)
             {
-                throw new NoSuchElementException("Panel not found for tab : " + tabText, ex);
+                throw new NoSuchElementException("Panel not found for tab : " + tabElement.getText(), ex);
             }
 
             return panelEl;

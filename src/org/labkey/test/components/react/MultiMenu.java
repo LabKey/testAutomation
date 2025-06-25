@@ -57,7 +57,6 @@ public class MultiMenu extends BootstrapMenu
      * If there are duplicate items in the menu by text and the one you want isn't the first in the menu,
      * consider using getMenuItemUnderToggle or getMenuItemUnderHeading
      * @param menuItem Text of the intended menuItem
-     * @return
      */
     public WebElement getMenuItem(String menuItem)
     {
@@ -252,7 +251,6 @@ public class MultiMenu extends BootstrapMenu
      *
      * @param heading Text of the lk-dropdown-header under which to find menu items
      * @param collapse  whether to collapse the menu after
-     * @return
      */
     public List<String> getMenuItemsUnderHeading(String heading, boolean collapse)
     {
@@ -266,7 +264,6 @@ public class MultiMenu extends BootstrapMenu
      * gets the dropdown-section__menu-items between a heading and the next separator
      *
      * @param heading Text of the lk-dropdown-header under which to find menu items
-     * @return
      */
     protected List<WebElement> getMenuItemsUnderHeading(String heading)
     {

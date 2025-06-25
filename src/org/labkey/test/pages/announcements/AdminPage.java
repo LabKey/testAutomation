@@ -192,7 +192,7 @@ public class AdminPage extends LabKeyPage<AdminPage.ElementCache>
         protected WebElement securityOff = Locator.radioButtonByName("secure").withAttribute("value", "0").findWhenNeeded(this);
         protected WebElement securityOn = Locator.radioButtonByName("secure").withAttribute("value", "1").findWhenNeeded(this);
 
-        private Locator.XPathLocator moderatorReview = Locator.radioButtonByName("moderatorReview");
+        private final Locator.XPathLocator moderatorReview = Locator.radioButtonByName("moderatorReview");
         protected WebElement moderatorReviewAll = moderatorReview.withAttribute("value", "All").findWhenNeeded(this);
         protected WebElement moderatorReviewInitial = moderatorReview.withAttribute("value", "InitialPost").findWhenNeeded(this);
         protected WebElement moderatorReviewNewThread = moderatorReview.withAttribute("value", "NewThread").findWhenNeeded(this);

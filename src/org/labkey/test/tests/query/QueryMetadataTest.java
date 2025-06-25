@@ -35,7 +35,7 @@ public class QueryMetadataTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject() throws Exception
     {
-        QueryMetadataTest init = (QueryMetadataTest) getCurrentTest();
+        QueryMetadataTest init = getCurrentTest();
 
         init.doSetup();
     }

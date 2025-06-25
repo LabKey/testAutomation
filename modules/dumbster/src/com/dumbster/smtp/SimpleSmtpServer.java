@@ -16,26 +16,30 @@
  */
 package com.dumbster.smtp;
 
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Iterator;
+import org.apache.logging.log4j.Logger;
+import org.labkey.api.util.logging.LogHelper;
+
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Dummy SMTP server for testing purposes.
- *
- * @todo constructor allowing user to pass preinitialized ServerSocket
  */
 public class SimpleSmtpServer implements Runnable {
+  private static final Logger LOG = LogHelper.getLogger(SimpleSmtpServer.class, "Dumbster module SMTP Server");
+
   /**
    * Stores all of the email received since this instance started up.
    */
-  private List<String> receivedMail;
+  private final List<SmtpMessage> receivedMail;
 
   /**
    * Default SMTP port is 25.
@@ -55,7 +59,7 @@ public class SimpleSmtpServer implements Runnable {
   /**
    * Port the server listens on - set to the default SMTP port initially.
    */
-  private int port = DEFAULT_SMTP_PORT;
+  private final int port;
 
   /**
    * Timeout listening on server socket.
@@ -91,19 +95,16 @@ public class SimpleSmtpServer implements Runnable {
       // Server: loop until stopped
       while (!isStopped()) {
         // Start server socket and listen for client connections
-        Socket socket = null;
+        Socket socket;
         try {
           socket = serverSocket.accept();
         } catch (Exception e) {
-          if (socket != null) {
-            socket.close();
-          }
           continue; // Non-blocking socket timeout occurred: try accept() again
         }
 
         // Get the input and output streams
-        BufferedReader input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        PrintWriter out = new PrintWriter(socket.getOutputStream());
+        BufferedReader input = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
+        PrintWriter out = new PrintWriter(socket.getOutputStream(), false, StandardCharsets.UTF_8);
 
         synchronized (this) {
           /*
@@ -112,20 +113,22 @@ public class SimpleSmtpServer implements Runnable {
            * For higher concurrency, we could just change handle to return void and update the list inside the method
            * to limit the duration that we hold the lock.
            */
-          List msgs = handleTransaction(out, input);
+          List<SmtpMessage> msgs = handleTransaction(out, input);
           receivedMail.addAll(msgs);
         }
         socket.close();
       }
     } catch (Exception e) {
-      /** @todo Should throw an appropriate exception here. */
-      e.printStackTrace();
+      if (!isStopped())
+      {
+        LOG.warn(e);
+      }
     } finally {
       if (serverSocket != null) {
         try {
           serverSocket.close();
         } catch (IOException e) {
-          e.printStackTrace();
+          LOG.warn("Error shutting down Dumbster SMTP server", e);
         }
       }
     }
@@ -163,9 +166,8 @@ public class SimpleSmtpServer implements Runnable {
    * @param out   output stream
    * @param input input stream
    * @return List of SmtpMessage
-   * @throws IOException
    */
-  private List handleTransaction(PrintWriter out, BufferedReader input) throws IOException {
+  private List<SmtpMessage> handleTransaction(PrintWriter out, BufferedReader input) throws IOException {
     // Initialize the state machine
     SmtpState smtpState = SmtpState.CONNECT;
     SmtpRequest smtpRequest = new SmtpRequest(SmtpActionType.CONNECT, "", smtpState);
@@ -207,6 +209,7 @@ public class SimpleSmtpServer implements Runnable {
       }
     }
 
+    LOG.debug("Dumbster received {} message{}", msgList::size, () -> msgList.size() != 1 ? "s" : "");
     return msgList;
   }
 
@@ -228,7 +231,7 @@ public class SimpleSmtpServer implements Runnable {
    * Get email received by this instance since start up.
    * @return List of String
    */
-  public synchronized Iterator getReceivedEmail() {
+  public synchronized Iterator<SmtpMessage> getReceivedEmail() {
     return receivedMail.iterator();
   }
 

@@ -57,7 +57,7 @@ import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PermissionsHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.StudyHelper;
-import org.labkey.test.util.TestDataUtils;
+import org.labkey.test.util.data.TestDataUtils;
 import org.labkey.test.util.UIUserHelper;
 import org.labkey.test.util.WikiHelper;
 import org.labkey.test.util.query.QueryUtils;
@@ -200,7 +200,7 @@ public class ClientAPITest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject() throws Exception
     {
-        ClientAPITest init = (ClientAPITest)getCurrentTest();
+        ClientAPITest init = getCurrentTest();
         init._containerHelper.createProject(OTHER_PROJECT, null);
         init._containerHelper.createProject(PROJECT_NAME, null);
 
@@ -300,7 +300,7 @@ public class ClientAPITest extends BaseWebDriverTest
     private void createStudies()
     {
         // create time-based study
-        projectMenu().navigateToFolder(getProjectName(), TIME_STUDY_FOLDER);
+        goToProjectFolder(getProjectName(), TIME_STUDY_FOLDER);
         navBar().goToModule("Study");
         CreateStudyPage createStudyPage = _studyHelper.startCreateStudy();
         createStudyPage.setLabel(TIME_STUDY_NAME)
@@ -308,7 +308,7 @@ public class ClientAPITest extends BaseWebDriverTest
                 .createStudy();
 
         // create a visit-based study in a different container
-        projectMenu().navigateToFolder(getProjectName(), VISIT_STUDY_FOLDER);
+        goToProjectFolder(getProjectName(), VISIT_STUDY_FOLDER);
         navBar().goToModule("Study");
         CreateStudyPage createVisitStudyPage = _studyHelper.startCreateStudy();
         createVisitStudyPage.setLabel(VISIT_STUDY_NAME)
@@ -964,7 +964,7 @@ public class ClientAPITest extends BaseWebDriverTest
 
         assertTextPresent("Webpart Title");
         for (FieldDefinition column : LIST_COLUMNS)
-            assertTextPresent(column.getLabel());
+            assertTextPresent(column.getEffectiveLabel());
     }
 
     @Test
@@ -1264,8 +1264,8 @@ public class ClientAPITest extends BaseWebDriverTest
             contentStr.append("'),");
         }
 
-        String emailScript = String.format(emailScriptTemplate, from, StringUtils.trimToEmpty(subject), recipientStr.toString(),
-                contentStr.toString());
+        String emailScript = String.format(emailScriptTemplate, from, StringUtils.trimToEmpty(subject), recipientStr,
+                contentStr);
 
         return (String)((JavascriptExecutor) getDriver()).executeAsyncScript(emailScript);
     }
@@ -1295,7 +1295,7 @@ public class ClientAPITest extends BaseWebDriverTest
     public void webDavAPITestJS()
     {
         String script = TestFileUtils.getFileContents(TestFileUtils.getSampleData("api/webdavTest.js"));
-        String scriptResult = "";
+        String scriptResult;
         try
         {
             scriptResult = (String)((JavascriptExecutor) getDriver()).executeAsyncScript(script);

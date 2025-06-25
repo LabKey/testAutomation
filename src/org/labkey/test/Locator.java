@@ -25,6 +25,7 @@ import org.labkey.test.selenium.LazyWebElement;
 import org.labkey.test.selenium.ReclickingWebElement;
 import org.labkey.test.selenium.RefindingWebElement;
 import org.labkey.test.util.TestLogger;
+import org.labkey.test.util.TextUtils;
 import org.labkey.test.util.selenium.WebDriverUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.InvalidSelectorException;
@@ -46,8 +47,10 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
@@ -183,23 +186,30 @@ public abstract class Locator extends By
      */
     public static WebElement waitForAnyElement(FluentWait<? extends SearchContext> wait, final Locator... locators)
     {
-        return wait.until(new Function<SearchContext, WebElement>()
+        try
         {
-            @Override
-            public WebElement apply(SearchContext context)
+            return wait.until(new Function<SearchContext, WebElement>()
             {
-                return findAnyElementOrNull(context, locators);
-            }
+                @Override
+                public WebElement apply(SearchContext context)
+                {
+                    return findAnyElementOrNull(context, locators);
+                }
 
-            @Override
-            public String toString()
-            {
-                List<String> locDescriptions = new ArrayList<>();
-                Arrays.stream(locators).forEach(loc -> locDescriptions.add(loc.getLoggableDescription()));
-                SearchContext searchContext = extractInputFromFluentWait(wait);
-                return String.join("\n--OR--\n", locDescriptions) + (searchContext instanceof WebDriver ? "" : "\nIN: " + searchContext.toString());
-            }
-        });
+                @Override
+                public String toString()
+                {
+                    List<String> locDescriptions = new ArrayList<>();
+                    Arrays.stream(locators).forEach(loc -> locDescriptions.add(loc.getLoggableDescription()));
+                    SearchContext searchContext = extractInputFromFluentWait(wait);
+                    return String.join("\n--OR--\n", locDescriptions) + (searchContext instanceof WebDriver ? "" : "\nIN: " + searchContext.toString());
+                }
+            });
+        }
+        catch (TimeoutException e)
+        {
+            throw new NoSuchElementException(e.getMessage(), e);
+        }
     }
 
     /**
@@ -208,28 +218,34 @@ public abstract class Locator extends By
      */
     public static List<WebElement> waitForElements(FluentWait<? extends SearchContext> wait, final Locator... locators)
     {
-        return wait.until(new Function<SearchContext, List<WebElement>>()
+        try
         {
-            @Override
-            public List<WebElement> apply(SearchContext context)
+            return wait.until(new Function<SearchContext, List<WebElement>>()
             {
-                List<WebElement> els = findElements(context, locators);
-                if (els.size() > 0)
-                    return els;
-                else
-                    return null;
-            }
+                @Override
+                public List<WebElement> apply(SearchContext context)
+                {
+                    List<WebElement> els = findElements(context, locators);
+                    if (!els.isEmpty())
+                        return els;
+                    else
+                        return null;
+                }
 
-            @Override
-            public String toString()
-            {
-                List<String> locDescriptions = new ArrayList<>();
-                Arrays.stream(locators).forEach(loc -> locDescriptions.add(loc.getLoggableDescription()));
-                SearchContext searchContext = extractInputFromFluentWait(wait);
-                return String.join("\n--OR--\n", locDescriptions) + (searchContext instanceof WebDriver ? "" : "\nIN: " + searchContext.toString());
-            }
-        });
-
+                @Override
+                public String toString()
+                {
+                    List<String> locDescriptions = new ArrayList<>();
+                    Arrays.stream(locators).forEach(loc -> locDescriptions.add(loc.getLoggableDescription()));
+                    SearchContext searchContext = extractInputFromFluentWait(wait);
+                    return String.join("\n--OR--\n", locDescriptions) + (searchContext instanceof WebDriver ? "" : "\nIN: " + searchContext.toString());
+                }
+            });
+        }
+        catch (TimeoutException e)
+        {
+            throw new NoSuchElementException(e.getMessage(), e);
+        }
     }
 
     public static List<WebElement> findElements(SearchContext context, final Locator... locators)
@@ -560,7 +576,7 @@ public abstract class Locator extends By
             @Override
             public Boolean apply(SearchContext context)
             {
-                return findElements(context).size() == 0;
+                return findElements(context).isEmpty();
             }
 
             @Override
@@ -975,6 +991,16 @@ public abstract class Locator extends By
         return Quotes.escape(value);
     }
 
+    /**
+     * Equivalent to XPath {@code normalize-space()}:<br>
+     * "The normalize-space function strips leading and trailing white-space from a string, replaces sequences of
+     * whitespace characters by a single space, and returns the resulting string."
+     */
+    private static String ns(String value)
+    {
+        return TextUtils.normalizeSpace(value);
+    }
+
     public static String cq(String value)
     {
         return "\"" + value.replace("\\", "\\\\").replace("\"", "\\\"") + "\"";
@@ -1189,7 +1215,7 @@ public abstract class Locator extends By
         public XPathLocator containing(String contains)
         {
             if (contains != null && !contains.isEmpty())
-                return this.withPredicate("contains(normalize-space(), "+xq(contains)+")");
+                return this.withPredicate("contains(normalize-space(), "+xq(ns(contains))+")");
             else
                 return this;
         }
@@ -1197,20 +1223,20 @@ public abstract class Locator extends By
         public XPathLocator containingIgnoreCase(String contains)
         {
             if (contains != null && !contains.isEmpty())
-                return this.withPredicate("contains(translate(normalize-space(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), "+xq(contains.toLowerCase())+")");
+                return this.withPredicate("contains(" + toLowerCase("normalize-space()", contains) + ", "+xq(ns(contains.toLowerCase()))+")");
             else
                 return this;
         }
 
         public XPathLocator notContaining(String contains)
         {
-            return this.withPredicate("not(contains(normalize-space(), "+xq(contains)+"))");
+            return this.withPredicate("not(contains(normalize-space(), "+xq(ns(contains))+"))");
         }
 
         public XPathLocator notContainingIgnoreCase(String contains)
         {
             if (contains != null && !contains.isEmpty())
-                return this.withPredicate("not(contains(translate(normalize-space(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), "+xq(contains.toLowerCase())+"))");
+                return this.withPredicate("not(contains(" + toLowerCase("normalize-space()", contains) + ", "+xq(ns(contains.toLowerCase()))+"))");
             else
                 return this;
         }
@@ -1218,7 +1244,7 @@ public abstract class Locator extends By
         @Override
         public XPathLocator withText(String text)
         {
-            return this.withPredicate("normalize-space()="+xq(text));
+            return this.withPredicate("normalize-space()="+xq(ns(text)));
         }
 
         public XPathLocator withText()
@@ -1228,7 +1254,7 @@ public abstract class Locator extends By
 
         public XPathLocator withoutText(String text)
         {
-            return this.withPredicate("not(normalize-space()=" + xq(text) + ")");
+            return this.withPredicate("not(normalize-space()=" + xq(ns(text)) + ")");
         }
 
         public XPathLocator withoutText()
@@ -1238,17 +1264,17 @@ public abstract class Locator extends By
 
         public XPathLocator withTextMatching(String regex)
         {
-            return this.withPredicate("matches(normalize-space(), " + xq(regex) + ")");
+            return this.withPredicate("matches(normalize-space(), " + xq(ns(regex)) + ")");
         }
 
         public XPathLocator startsWith(String text)
         {
-            return this.withPredicate("starts-with(normalize-space(), "+xq(text)+")");
+            return this.withPredicate("starts-with(normalize-space(), "+xq(ns(text))+")");
         }
 
         public XPathLocator startsWithIgnoreCase(String text)
         {
-            return this.withPredicate("starts-with(translate(normalize-space(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), "+xq(text.toLowerCase())+")");
+            return this.withPredicate("starts-with(" + toLowerCase("normalize-space()", text) + ", "+xq(ns(text.toLowerCase()))+")");
         }
 
         @Override
@@ -1404,7 +1430,7 @@ public abstract class Locator extends By
 
         public XPathLocator endsWith(String substring)
         {
-            return this.endsWith("normalize-space()", substring);
+            return this.endsWith("normalize-space()", ns(substring));
         }
 
         private XPathLocator endsWith(String expression, String substring)
@@ -1451,9 +1477,48 @@ public abstract class Locator extends By
 
         public XPathLocator withAttributeIgnoreCase(String attrName, String attrVal)
         {
-            return this.withPredicate(
-                    String.format("translate(@%s, 'ABCDEFGHIJKLMNOPQRSTUVWXYZÅ', 'abcdefghijklmnopqrstuvwxyzå')=%s",
-                            attrName, xq(attrVal.toLowerCase())));
+            return this.withPredicate(toLowerCase("@" + attrName, attrVal) + "=" + xq(attrVal.toLowerCase()));
+        }
+
+        /**
+         * Generate an XPath 'translate' statement that will convert the provided statement to lowerCase so that it can
+         * be compared to the target value. Allow case-insensitive comparison with values containing tricky characters.
+         * The Locator "{@code Locator.tag("span").containingIgnoreCase("test")}", produces an XPath like:
+         * "{@code //span[contains(translate(normalize-space(), 'TES', 'tes'), 'test')]}"<br>
+         * This would find "{@code <span>test</span}" or "{@code <span>TESTING</span}"
+         *
+         * @param sourceStatement XPath statement to apply the translation to
+         * @param targetValue String that 'sourceStatement' will be compared to
+         * @return translate statement to be used in XPath predicate
+         */
+        private String toLowerCase(String sourceStatement, String targetValue)
+        {
+            Map<Character, Character> caseMap = new HashMap<>(); // upperCase -> lowerCase
+            char[] upperCase = targetValue.toUpperCase().toCharArray();
+            char[] lowerCase = targetValue.toLowerCase().toCharArray();
+            for (int i = 0; i < targetValue.length(); i++)
+            {
+                if (upperCase[i] != lowerCase[i])
+                {
+                    caseMap.put(Character.valueOf(upperCase[i]), Character.valueOf(lowerCase[i]));
+                }
+            }
+            if (caseMap.isEmpty())
+            {
+                return sourceStatement;
+            }
+            else
+            {
+                StringBuilder upperCaseBuilder = new StringBuilder();
+                StringBuilder lowerCaseBuilder = new StringBuilder();
+                caseMap.forEach((u, l) -> {
+                    upperCaseBuilder.append(u);
+                    lowerCaseBuilder.append(l);
+                });
+                return "translate(" + sourceStatement + ", " +
+                        "'" + upperCaseBuilder + "' ," +
+                        "'" + lowerCaseBuilder + "')";
+            }
         }
 
         public XPathLocator withoutAttribute(String attrName, String attrVal)
@@ -1607,7 +1672,7 @@ public abstract class Locator extends By
         @Override
         public Locator containing(String contains)
         {
-            if (_text != null && _text.length() > 0 || _contains != null && _contains.length() > 0)
+            if (_text != null && !_text.isEmpty() || _contains != null && !_contains.isEmpty())
                 throw new IllegalStateException("Text content already been specified for this Locator");
 
             return new CssLocator(getLoc(), _index, contains, _text);
@@ -1616,7 +1681,7 @@ public abstract class Locator extends By
         @Override
         public Locator withText(String text)
         {
-            if (_text != null && _text.length() > 0 || _contains != null && _contains.length() > 0)
+            if (_text != null && !_text.isEmpty() || _contains != null && !_contains.isEmpty())
                 throw new IllegalStateException("Text content already been specified for this Locator");
 
             return new CssLocator(getLoc(), _index, _contains, text);
@@ -1755,7 +1820,7 @@ public abstract class Locator extends By
 
     public static class LinkLocator extends XPathLocator
     {
-        private String _linkText;
+        private final String _linkText;
 
         public LinkLocator(@NotNull String linkText)
         {
@@ -1780,7 +1845,7 @@ public abstract class Locator extends By
                 // By.linkText doesn't allow all possible link texts. e.g. "[All]"
                 return new XPathLocator(getLoc()).findElements(context);
             }
-            if (elements.size() == 0 && !_linkText.equals(_linkText.toUpperCase()))
+            if (elements.isEmpty() && !_linkText.equals(_linkText.toUpperCase()))
                 return (new LinkLocator(_linkText.toUpperCase())).findElements(context);
             else
                 return elements;

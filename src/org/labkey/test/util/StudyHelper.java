@@ -201,7 +201,7 @@ public class StudyHelper
             else
             {
                 String currentIds = _test.getFormElement(Locator.xpath("//textarea[@name='participantIdentifiers']"));
-                if (currentIds != null && currentIds.length() > 0)
+                if (currentIds != null && !currentIds.isEmpty())
                     _test.setFormElement(Locator.xpath("//textarea[@name='participantIdentifiers']"), currentIds + "," + csp);
             }
         }
@@ -561,13 +561,16 @@ public class StudyHelper
     public boolean isSpecimenModulePresent()
     {
         if (null == _specimenModulePresent)
-        {
-            AbstractContainerHelper containerHelper = new APIContainerHelper(_test);
-            Set<String> allModules = containerHelper.getAllModules();
-            _specimenModulePresent = allModules.contains("specimen");
-        }
+            _specimenModulePresent = isModulePresent("specimen");
 
         return _specimenModulePresent;
+    }
+
+    public boolean isModulePresent(String moduleName)
+    {
+        AbstractContainerHelper containerHelper = new APIContainerHelper(_test);
+        Set<String> allModules = containerHelper.getAllModules();
+        return allModules.contains(moduleName);
     }
 
     public boolean isSpecimenModuleActive()
@@ -582,7 +585,8 @@ public class StudyHelper
     public enum TimepointType
     {
         DATE,
-        VISIT
+        VISIT,
+        CONTINUOUS
     }
 
     public enum SecurityMode
@@ -632,11 +636,13 @@ public class StudyHelper
             this.labelColumn = labelColumn;
         }
 
+        @Override
         public String getPanelTitle()
         {
             return panelTitle;
         }
 
+        @Override
         public String getLabelColumn()
         {
             return labelColumn;

@@ -61,14 +61,14 @@ public class AssayRenameExportImportTest extends BaseWebDriverTest
             .setTimeOfDay(10, 45, 0)
             .build().getTime();
 
-    private SimpleDateFormat _defaultDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-    private SimpleDateFormat _defaultTimeFormat = new SimpleDateFormat("HH:mm:ss");
-    private SimpleDateFormat _defaultDateTimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+    private final SimpleDateFormat _defaultDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    private final SimpleDateFormat _defaultTimeFormat = new SimpleDateFormat("HH:mm:ss");
+    private final SimpleDateFormat _defaultDateTimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
     @BeforeClass
     public static void doSetup()
     {
-        AssayRenameExportImportTest init = (AssayRenameExportImportTest) getCurrentTest();
+        AssayRenameExportImportTest init = getCurrentTest();
 
         init._containerHelper.createProject(ORIGINAL_PROJECT, "Assay");
         init._containerHelper.createProject(SECOND_PROJECT, "Assay");
@@ -297,7 +297,7 @@ public class AssayRenameExportImportTest extends BaseWebDriverTest
 
         waitAndClick(Locator.lkButton("Next"));
 
-        WebElement runPropertiesPanel = Locator.tagWithAttributeContaining("form", "lk-region-form", "Runs")
+        WebElement runPropertiesPanel = Locator.tagWithAttributeContaining("form", "data-region-form", "Runs")
                 .findElement(getDriver());
 
         setFormElement(Locator.name("runDate").findElement(runPropertiesPanel),

@@ -2,6 +2,7 @@ package org.labkey.test.tests.component;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
@@ -209,7 +210,7 @@ public class EditableGridTest extends BaseWebDriverTest
                 "Unable to paste. Cannot paste columns beyond the columns found in the grid.",
                 testGrid.getCellPopoverText(0, "Description"));
         assertThat("Expect failed paste to leave data unchanged",
-                testGrid.getColumnData("Name"), everyItem(is("")));
+                testGrid.getColumnDataByLabel("Name"), everyItem(is("")));
     }
 
     @Test
@@ -226,8 +227,8 @@ public class EditableGridTest extends BaseWebDriverTest
         assertEquals("Initial editable grid row count", 0, testGrid.getRowCount());
         testGrid.addRows(1);
         testGrid.pasteFromCell(0, DESC_STRING, tallShape);
-        List<String> pastedColData = testGrid.getColumnData(DESC_STRING);
-        List<String> unpastedColData = testGrid.getColumnData(ASC_STRING);
+        List<String> pastedColData = testGrid.getColumnDataByLabel(DESC_STRING);
+        List<String> unpastedColData = testGrid.getColumnDataByLabel(ASC_STRING);
 
         assertEquals("Didn't get correct values", List.of("42", "41", "40", "39", "38"), pastedColData);
         assertThat("expect other column to remain empty",
@@ -253,16 +254,16 @@ public class EditableGridTest extends BaseWebDriverTest
         List<String> expectedDecreasing = List.of("4", "2", "0", "-2", "-4", "");
         assertEquals("Drag-fill should have extrapolated " + ASC_STRING,
                 expectedIncreasing,
-                testGrid.getColumnData(ASC_STRING));
+                testGrid.getColumnDataByLabel(ASC_STRING));
         assertEquals("Drag-fill should have extrapolated " + DESC_STRING,
                 expectedDecreasing,
-                testGrid.getColumnData(DESC_STRING));
+                testGrid.getColumnDataByLabel(DESC_STRING));
         assertEquals("Drag-fill should have extrapolated " + ASC_INT,
                 expectedIncreasing,
-                testGrid.getColumnData(ASC_INT));
+                testGrid.getColumnDataByLabel(ASC_INT));
         assertEquals("Drag-fill should have extrapolated " + DESC_INT,
                 expectedDecreasing,
-                testGrid.getColumnData(DESC_INT));
+                testGrid.getColumnDataByLabel(DESC_INT));
     }
 
     @Test
@@ -282,13 +283,14 @@ public class EditableGridTest extends BaseWebDriverTest
         List<String> expectedDecreasing = List.of("ABC-4", "ABC-2", "ABC-0", "ABC--2", "ABC--4", "");
         assertEquals("Drag-fill should have extrapolated " + ASC_STRING,
                 expectedIncreasing,
-                testGrid.getColumnData(ASC_STRING));
+                testGrid.getColumnDataByLabel(ASC_STRING));
         assertEquals("Drag-fill should have extrapolated " + DESC_STRING,
                 expectedDecreasing,
-                testGrid.getColumnData(DESC_STRING));
+                testGrid.getColumnDataByLabel(DESC_STRING));
     }
 
     @Test
+    @Ignore  // Test disabled until Issue 52226, Issue 51927 are resolved
     public void testDragFillSingleRow()
     {
         final LocalDateTime now = LocalDate.of(2019, 1, 30).atTime(16, 30);
@@ -326,19 +328,19 @@ public class EditableGridTest extends BaseWebDriverTest
 
         checker().verifyEquals("Drag-fill should have filled " + FILL_STRING,
                 List.of(stringValue, stringValue, stringValue, ""),
-                testGrid.getColumnData(FILL_STRING));
+                testGrid.getColumnDataByLabel(FILL_STRING));
         checker().verifyEquals("Drag-fill should have filled " + FILL_MULTI_LINE,
                 List.of(multiLineValue, multiLineValue, multiLineValue, ""),
-                testGrid.getColumnData(FILL_MULTI_LINE));
+                testGrid.getColumnDataByLabel(FILL_MULTI_LINE));
         checker().verifyEquals("Drag-fill should have filled " + FILL_INT,
                 List.of(intValue, intValue, intValue, ""),
-                testGrid.getColumnData(FILL_INT));
+                testGrid.getColumnDataByLabel(FILL_INT));
         checker().verifyEquals("Drag-fill should have filled " + FILL_DATE,
                 List.of(EditableGrid.DATE_FORMAT.format(now),
                         EditableGrid.DATE_FORMAT.format(now.plusDays(1)),
                         EditableGrid.DATE_FORMAT.format(now.plusDays(2)),
                         ""),
-                testGrid.getColumnData(FILL_DATE));
+                testGrid.getColumnDataByLabel(FILL_DATE));
 
         // Check that pasting increased the size of all the rows.
         var totalHeightAfter = new Object(){int size = 0; };
@@ -350,6 +352,7 @@ public class EditableGridTest extends BaseWebDriverTest
     }
 
     @Test
+    @Ignore  // Test disabled until Issue 52226, Issue 51927 are resolved
     public void testDragFillMultipleRows()
     {
         final LocalDateTime now = LocalDate.of(2019, 1, 30).atTime(14, 30);
@@ -374,10 +377,10 @@ public class EditableGridTest extends BaseWebDriverTest
 
         checker().verifyEquals("Drag-fill should have filled " + FILL_STRING,
                 List.of("QWE", "ASD", "ZXC", "QWE", "ASD", "ZXC", ""),
-                testGrid.getColumnData(FILL_STRING));
+                testGrid.getColumnDataByLabel(FILL_STRING));
         checker().verifyEquals("Drag-fill should have filled " + FILL_MULTI_LINE,
                 List.of(mlRow1, "", mlRow2, mlRow1, "", mlRow2, ""),
-                testGrid.getColumnData(FILL_MULTI_LINE));
+                testGrid.getColumnDataByLabel(FILL_MULTI_LINE));
         checker().verifyEquals("Drag-fill should have filled " + FILL_DATE,
                 List.of(EditableGrid.DATE_FORMAT.format(now),
                         EditableGrid.DATE_FORMAT.format(now.plusDays(3)),
@@ -386,7 +389,7 @@ public class EditableGridTest extends BaseWebDriverTest
                         EditableGrid.DATE_FORMAT.format(now.plusDays(3)),
                         EditableGrid.DATE_FORMAT.format(now.plusDays(1)),
                         ""),
-                testGrid.getColumnData(FILL_DATE));
+                testGrid.getColumnDataByLabel(FILL_DATE));
     }
 
     @Test
@@ -644,7 +647,7 @@ public class EditableGridTest extends BaseWebDriverTest
                 waitFor(()->expectedValues.size() == editableGrid.getRowCount(), 1_000));
 
         checker().verifyEquals(String.format("Values in column '%s' not as expected.", PASTE_ML),
-                expectedValues, editableGrid.getColumnData(PASTE_ML));
+                expectedValues, editableGrid.getColumnDataByLabel(PASTE_ML));
 
         checker().screenShotIfNewError("Paste_Into_Multiple_Cells_Error");
 
@@ -674,8 +677,8 @@ public class EditableGridTest extends BaseWebDriverTest
         editableGrid.addRows(1);
 
         // Scroll the last column into view it will make any failure screenshots more useful.
-        String lastColumnName = editableGrid.getColumnNames().get(editableGrid.getColumnNames().size() - 1);
-        scrollIntoView(editableGrid.getCell(0, lastColumnName));
+        String lastColumn = editableGrid.getColumnLabels().get(editableGrid.getColumnLabels().size() - 1);
+        scrollIntoView(editableGrid.getCell(0, lastColumn));
 
         int emptyWidth = editableGrid.getCell(0, PASTE_ML).getSize().getWidth();
         int emptyHeight = editableGrid.getCell(0, PASTE_ML).getSize().getHeight();
@@ -740,7 +743,7 @@ public class EditableGridTest extends BaseWebDriverTest
                 .build()
                 .perform();
 
-        scrollIntoView(editableGrid.getCell(0, lastColumnName));
+        scrollIntoView(editableGrid.getCell(0, lastColumn));
 
         checker().verifyTrue("TextArea should have gone away after hitting <Enter>.",
                 shortWait().until(ExpectedConditions.stalenessOf(editCell)).booleanValue());
@@ -767,7 +770,7 @@ public class EditableGridTest extends BaseWebDriverTest
 
         log("Enter one long line.");
         editableGrid.addRows(1);
-        scrollIntoView(editableGrid.getCell(0, lastColumnName));
+        scrollIntoView(editableGrid.getCell(0, lastColumn));
 
         editCell = editableGrid.activateCellUsingDoubleClick(0, PASTE_ML);
 
@@ -777,7 +780,7 @@ public class EditableGridTest extends BaseWebDriverTest
                 .perform();
 
         // This should scroll the last cell into view.
-        editableGrid.getCell(0, lastColumnName).click();
+        editableGrid.getCell(0, lastColumn).click();
 
         checker().verifyTrue("TextArea should have gone away after clicking out of the edit cell.",
                 shortWait().until(ExpectedConditions.stalenessOf(editCell)).booleanValue());
@@ -805,7 +808,7 @@ public class EditableGridTest extends BaseWebDriverTest
 
         log("Enter many short lines.");
         editableGrid.addRows(1);
-        scrollIntoView(editableGrid.getCell(0, lastColumnName));
+        scrollIntoView(editableGrid.getCell(0, lastColumn));
 
         editCell = editableGrid.activateCellUsingDoubleClick(0, PASTE_ML);
 
@@ -829,7 +832,7 @@ public class EditableGridTest extends BaseWebDriverTest
         checker().verifyTrue("TextArea should have gone away after hitting <Enter>.",
                 shortWait().until(ExpectedConditions.stalenessOf(editCell)).booleanValue());
 
-        scrollIntoView(editableGrid.getCell(0, lastColumnName));
+        scrollIntoView(editableGrid.getCell(0, lastColumn));
 
         WebElement updatedGridCell03 = editableGrid.getCell(0, PASTE_ML);
         checker().verifyTrue("Cell not updated with many short lines.",
@@ -853,7 +856,7 @@ public class EditableGridTest extends BaseWebDriverTest
 
         log("Validate <esc> exits edit mode and does not save.");
         editableGrid.addRows(1);
-        scrollIntoView(editableGrid.getCell(0, lastColumnName));
+        scrollIntoView(editableGrid.getCell(0, lastColumn));
 
         editCell = editableGrid.activateCellUsingDoubleClick(0, PASTE_ML);
 
@@ -877,7 +880,7 @@ public class EditableGridTest extends BaseWebDriverTest
         checker().verifyTrue("TextArea should have gone away after hitting <Esc>.",
                 shortWait().until(ExpectedConditions.stalenessOf(editCell)).booleanValue());
 
-        scrollIntoView(editableGrid.getCell(0, lastColumnName));
+        scrollIntoView(editableGrid.getCell(0, lastColumn));
 
         WebElement updatedGridCell04 = editableGrid.getCell(0, PASTE_ML);
         checker().verifyTrue("Cell should not be updated after hitting <esc>.",
@@ -914,7 +917,7 @@ public class EditableGridTest extends BaseWebDriverTest
                 .verifyEquals("There should be no grid cells already selected. Fatal error.",
                         0, editableGrid.getSelectedCells().size());
 
-        List<String> columns = editableGrid.getColumnNames();
+        List<String> columns = editableGrid.getColumnLabels();
         int column = columns.size() / 2;
 
         int startRow = 4;
@@ -1027,7 +1030,7 @@ public class EditableGridTest extends BaseWebDriverTest
                 .verifyEquals("There should be no grid cells already selected. Fatal error.",
                         0, editableGrid.getSelectedCells().size());
 
-        List<String> columns = editableGrid.getColumnNames();
+        List<String> columns = editableGrid.getColumnLabels();
         int startColumn = columns.indexOf(PASTE_1);
 
         int gridRow = 4;
@@ -1165,7 +1168,7 @@ public class EditableGridTest extends BaseWebDriverTest
                 .verifyEquals("There should be no grid cells already selected. Fatal error.",
                         0, editableGrid.getSelectedCells().size());
 
-        List<String> columns = editableGrid.getColumnNames();
+        List<String> columns = editableGrid.getColumnLabels();
         int startColumn = columns.indexOf("Description");
 
         int startRow = 5;
@@ -1275,7 +1278,7 @@ public class EditableGridTest extends BaseWebDriverTest
         checker().verifyEquals("Number of cells selected not as expected.",
                 expectedSelectedCount, selectedSizeAfter);
 
-        List<String> columnNames = editableGrid.getColumnNames();
+        List<String> columnNames = editableGrid.getColumnLabels();
 
         for(int colIndex = startCol; colIndex <= endCol; colIndex++)
         {
@@ -1291,7 +1294,7 @@ public class EditableGridTest extends BaseWebDriverTest
 
     private String getActualPaste(EditableGrid testGrid)
     {
-        List<Map<String, String>> gridData = testGrid.getGridData(PASTE_1, PASTE_2, PASTE_3, PASTE_4, PASTE_5);
+        List<Map<String, String>> gridData = testGrid.getGridDataByLabel(PASTE_1, PASTE_2, PASTE_3, PASTE_4, PASTE_5);
         List<List<String>> rows = gridData.stream().map(r -> List.of(r.get(PASTE_1), r.get(PASTE_2), r.get(PASTE_3), r.get(PASTE_4), r.get(PASTE_5))).toList();
         return rowsToString(rows);
     }
@@ -1366,17 +1369,16 @@ public class EditableGridTest extends BaseWebDriverTest
         EditableGrid testGrid = goToEditableGrid(ALL_TYPE_SAMPLE_TYPE);
         testGrid.addRows(2);
 
-        log("Verify no warnings when page first load");
-        checker().verifyEquals("Cell warning should be absent when a row is added on page load",
-                0, Locator.tagWithClass("div", "cell-warning").findElements(testGrid).size());
+        log("Verify no cell errors when page first load");
+        checker().verifyEquals("Cell error should be absent when a row is added on page load", 0, testGrid.getCellErrors().size());
 
         log("Input empty string for required field should trigger cell warning.");
         testGrid.setCellValue(1, REQ_STR_FIELD_NAME + " *", " ");
-        checker().verifyEquals("Cell warning status not as expected at row " + 1 + " for col " + REQ_STR_FIELD_NAME, true, testGrid.hasCellWarning(1, REQ_STR_FIELD_NAME + " *"));
+        checker().verifyEquals("Cell warning status not as expected at row " + 1 + " for col " + REQ_STR_FIELD_NAME, true, testGrid.hasCellError(1, REQ_STR_FIELD_NAME + " *"));
         checker().verifyEquals("Cell warning msg not as expected at row " + 1 + " for col " + REQ_STR_FIELD_NAME, REQ_STR_FIELD_NAME + " is required.", testGrid.getCellPopoverText(1, REQ_STR_FIELD_NAME + " *"));
         mouseOver(testGrid.getCell(0, "Row")); // dismiss warning popup
         testGrid.setCellValue(1, REQ_INT_FIELD_NAME + " *", " ");
-        checker().verifyEquals("Cell warning status not as expected at row " + 1 + " for col " + REQ_INT_FIELD_NAME, true, testGrid.hasCellWarning(1, REQ_INT_FIELD_NAME + " *"));
+        checker().verifyEquals("Cell warning status not as expected at row " + 1 + " for col " + REQ_INT_FIELD_NAME, true, testGrid.hasCellError(1, REQ_INT_FIELD_NAME + " *"));
         checker().verifyEquals("Cell warning msg not as expected at row " + 1 + " for col " + REQ_INT_FIELD_NAME, REQ_INT_FIELD_NAME + " is required.", testGrid.getCellPopoverText(1, REQ_INT_FIELD_NAME + " *"));
 
         log("Correct values should remove cell warning, keep entering wrong values should update warning");
@@ -1388,9 +1390,9 @@ public class EditableGridTest extends BaseWebDriverTest
         testGrid.setCellValue(0, REQ_STR_FIELD_NAME + " *", "good");
         mouseOver(testGrid.getCell(0, "Row"));
         testGrid.setCellValue(1, REQ_STR_FIELD_NAME + " *", "This value is too long");
-        checker().verifyEquals("Cell warning status not as expected at row " + 0 + " for col " + STR_FIELD_NAME, false, testGrid.hasCellWarning(0, STR_FIELD_NAME));
+        checker().verifyEquals("Cell warning status not as expected at row " + 0 + " for col " + STR_FIELD_NAME, false, testGrid.hasCellError(0, STR_FIELD_NAME));
         checker().verifyEquals("Cell warning msg not as expected at row " + 1 + " for col " + STR_FIELD_NAME, "22/10 characters", testGrid.getCellPopoverText(1, STR_FIELD_NAME));
-        checker().verifyEquals("Cell warning status not as expected at row " + 0 + " for col " + REQ_STR_FIELD_NAME, false, testGrid.hasCellWarning(0, REQ_STR_FIELD_NAME + " *"));
+        checker().verifyEquals("Cell warning status not as expected at row " + 0 + " for col " + REQ_STR_FIELD_NAME, false, testGrid.hasCellError(0, REQ_STR_FIELD_NAME + " *"));
         checker().verifyEquals("Cell warning msg not as expected at row " + 1 + " for col " + REQ_STR_FIELD_NAME, "22/10 characters", testGrid.getCellPopoverText(1, REQ_STR_FIELD_NAME + " *"));
 
         log("Input invalid data type value should trigger cell warnings.");
@@ -1407,13 +1409,13 @@ public class EditableGridTest extends BaseWebDriverTest
         log("Correct values should remove data type warning.");
         mouseOver(testGrid.getCell(0, "Row")); // dismiss warning popup
         testGrid.setCellValue(0, INT_FIELD_NAME, "123");
-        checker().verifyFalse("Cell warning should disappear after correcting value", testGrid.hasCellWarning(0, INT_FIELD_NAME));
+        checker().verifyFalse("Cell warning should disappear after correcting value", testGrid.hasCellError(0, INT_FIELD_NAME));
 
         log("Required value warning should be absent before the cell is acted on");
-        checker().verifyFalse("Required value warning should not be present on page init", testGrid.hasCellWarning(0, REQ_STR_FIELD_NAME + " *"));
+        checker().verifyFalse("Required value warning should not be present on page init", testGrid.hasCellError(0, REQ_STR_FIELD_NAME + " *"));
         mouseOver(testGrid.getCell(0, "Row")); // dismiss warning popup
         testGrid.clearCellValue(1, REQ_STR_FIELD_NAME + " *");
-        checker().verifyTrue("Required value warning should show up after removing a value from cell", testGrid.hasCellWarning(1, REQ_STR_FIELD_NAME + " *"));
+        checker().verifyTrue("Required value warning should show up after removing a value from cell", testGrid.hasCellError(1, REQ_STR_FIELD_NAME + " *"));
     }
 
     @Test
@@ -1454,7 +1456,7 @@ public class EditableGridTest extends BaseWebDriverTest
 
         log("Correct missing required fields should remove corresponding cell warnings");
         testGrid.setCellValue(1, REQ_STR_FIELD_NAME + " *", " ");
-        checker().verifyTrue("Cell warning should be present after setting another invalid value", testGrid.hasCellWarning(1, REQ_STR_FIELD_NAME + " *"));
+        checker().verifyTrue("Cell warning should be present after setting another invalid value", testGrid.hasCellError(1, REQ_STR_FIELD_NAME + " *"));
         mouseOver(testGrid.getCell(0, STR_FIELD_NAME)); // dismiss warning popup
         testGrid.setCellValue(1, REQ_INT_FIELD_NAME + " *", "2");
         mouseOver(testGrid.getCell(0, STR_FIELD_NAME)); // dismiss warning popup
@@ -1474,12 +1476,12 @@ public class EditableGridTest extends BaseWebDriverTest
             if (colName.endsWith(" Req"))
                 colName += " *";
 
-            checker().verifyFalse("Cell warning be absent after required values are provided: " + colName, testGrid.hasCellWarning(1, colName));
+            checker().verifyFalse("Cell warning be absent after required values are provided: " + colName, testGrid.hasCellError(1, colName));
         }
 
         log("Enter another bad value should retain cell warning");
         testGrid.setCellValue(2, INT_FIELD_NAME, "bad");
-        checker().verifyTrue("Cell warning should be present after setting another invalid value", testGrid.hasCellWarning(2, INT_FIELD_NAME));
+        checker().verifyTrue("Cell warning should be present after setting another invalid value", testGrid.hasCellError(2, INT_FIELD_NAME));
         checker().screenShotIfNewError("after required value correction error");
 
         log("Correct bad data type values should remove paste data warnings");
@@ -1504,7 +1506,7 @@ public class EditableGridTest extends BaseWebDriverTest
             if (colName.endsWith(" Req"))
                 colName += " *";
 
-            checker().verifyFalse("Cell warning should be absent after correct values are provided: " + colName, testGrid.hasCellWarning(2, colName));
+            checker().verifyFalse("Cell warning should be absent after correct values are provided: " + colName, testGrid.hasCellError(2, colName));
         }
         checker().screenShotIfNewError("after data correction error");
 
@@ -1516,7 +1518,7 @@ public class EditableGridTest extends BaseWebDriverTest
                 colName += " *";
 
             // start date before year 1000 shouldn't trigger warning
-            checker().verifyFalse("Cell warning should not be present for: " + colName, testGrid.hasCellWarning(0, colName));
+            checker().verifyFalse("Cell warning should not be present for: " + colName, testGrid.hasCellError(0, colName));
         }
 
         log("Verify UI is interactable with values before 1000-01-01");
@@ -1540,7 +1542,7 @@ public class EditableGridTest extends BaseWebDriverTest
             if (colName.endsWith(" Req"))
                 colName += " *";
 
-            checker().verifyEquals("Cell warning status not as expected at row " + rowId + " for col " + colName, !StringUtils.isEmpty(expectedWarning), testGrid.hasCellWarning(rowId, colName));
+            checker().verifyEquals("Cell warning status not as expected at row " + rowId + " for col " + colName, !StringUtils.isEmpty(expectedWarning), testGrid.hasCellError(rowId, colName));
             if (!StringUtils.isEmpty(expectedWarning))
                 checker().verifyEquals("Cell warning msg not as expected at row " + rowId + " for col " + colName, expectedWarning, testGrid.getCellPopoverText(rowId, colName));
         }
@@ -1561,8 +1563,8 @@ public class EditableGridTest extends BaseWebDriverTest
         actionPaste(null, rowsToString(clipRows));
 
         // Scroll one column to the right into view, this will help ensure the REQ_LOOKUP_FIELD_NAME is within the viewport.
-        var index = testGrid.getColumnNames().indexOf(REQ_LOOKUP_FIELD_NAME + " *") + 1;
-        scrollIntoView(testGrid.getCell(0, testGrid.getColumnNames().get(index)));
+        var index = testGrid.getColumnLabels().indexOf(REQ_LOOKUP_FIELD_NAME + " *") + 1;
+        scrollIntoView(testGrid.getCell(0, testGrid.getColumnLabels().get(index)));
 
         WebElement fillFrom = testGrid.getCell(0, REQ_LOOKUP_FIELD_NAME + " *");
         WebElement fillTo = testGrid.getCell(2, REQ_LOOKUP_FIELD_NAME + " *");

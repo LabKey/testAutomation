@@ -43,7 +43,6 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.core.ProjectMenu;
 import org.labkey.test.util.selenium.WebDriverUtils;
-import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
@@ -55,7 +54,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.AbstractMap;
@@ -190,11 +188,9 @@ public class Crawler
             new ControllerActionId("dumbster", "begin"),
             new ControllerActionId("filetransfer", "auth"), // redirects to external site
             new ControllerActionId("genotyping", "analyze"),    // Crawler doesn't like NotFoundException that the test generates
-            new ControllerActionId("login", "createToken"),
             new ControllerActionId("login", "logout"),
             new ControllerActionId("login", "setAuthenticationParameter"),
             new ControllerActionId("login", "setPassword"),
-            new ControllerActionId("login", "verifyToken"), // returns XML, which WDW.waitForPageToLoad can't handle
             new ControllerActionId("ms2", "showList"),
             new ControllerActionId("ms2", "showParamsFile"),
             new ControllerActionId("nlp", "runPipeline"),
@@ -203,6 +199,8 @@ public class Crawler
             // Tested directly in XTandemTest
             new ControllerActionId("protein", "doProteinSearch"),
             new ControllerActionId("protein", "pepSearch"), // TODO: Issue 36995: Check for SQL injection in StatementWrapper is not precise enough
+            new ControllerActionId("publish", "sampleTypePublishConfirm"), // POST-only
+            new ControllerActionId("publish", "assayPublishConfirm"), // POST-only
             new ControllerActionId("query", "printRows"), // Data region print button. 404s on "TargetedMS Runs" grid
             new ControllerActionId("reports", "streamFile"),
             new ControllerActionId("study", "manageStudyProperties"), // Intermittently triggers form dirty alert
@@ -327,7 +325,6 @@ public class Crawler
     protected Map<ControllerActionId, List<String>> getExcludedParametersFromInjection()
     {
         Map<ControllerActionId, List<String>> map = new HashMap<>();
-        map.put(new ControllerActionId("study-designer", "designer"), Collections.singletonList("panel")); // TODO: 16768: study-designer.DesignerAction: IllegalArgumentException on bad 'panel'
 
         // Permanent exclusions
         map.put(new ControllerActionId("plate", "designer"), Arrays.asList("colCount", "rowCount")); // 37208: Plate designer dumps stack trace from bad URL parameters
@@ -459,7 +456,7 @@ public class Crawler
         private final int _depth;
         private boolean _isFromForm = false;
 
-        public UrlToCheck(URL origin, String urlText, int depth)
+        public UrlToCheck(final URL origin, final String urlText, final int depth)
         {
             if (depth < 0)
             {
@@ -469,53 +466,54 @@ public class Crawler
             _urlText = urlText;
             _depth = depth;
 
-            // Make sure it is a link to inside the page
-            if (urlText.startsWith("http://") ||
-                    urlText.startsWith("https://") ||
-                    urlText.startsWith("javascript:") ||
-                    urlText.startsWith("ftp://"))
+            if (isLabKeyShortUrl(urlText)) // Don't crawl short URLs
             {
-                if (!urlText.contains(WebTestHelper.getBaseURL()) || urlText.equals(WebTestHelper.getBaseURL()) || isLabKeyShortUrl(urlText))
+                _relativeURL = null;
+            }
+            else if (isAbsoluteUrl(urlText)) // Make sure it is a link to the site under test
+            {
+                String relativeURL;
+                try
                 {
-                    _relativeURL = null;
-                    _actionId = null;
+                    relativeURL = WebTestHelper.makeRelativeUrl(urlText);
                 }
-                else
+                catch (IllegalArgumentException iae)
                 {
-                    int relativeURLStart = urlText.lastIndexOf(WebTestHelper.getBaseURL()) + WebTestHelper.getBaseURL().length();
-                    final String relativeURL = urlText.substring(relativeURLStart);
-                    if (!relativeURL.isBlank() && "/".equals(relativeURL))
-                    {
-                        _relativeURL = relativeURL;
-
-                        ControllerActionId tempActionId = null;
-                        try
-                        {
-                            tempActionId = new ControllerActionId(_relativeURL);
-                        }
-                        catch (IllegalArgumentException ignore) { } // Probably a resource, not an action.
-                        _actionId = tempActionId;
-                    }
-                    else
-                    {
-                        _relativeURL = null;
-                        _actionId = null;
-                    }
+                    relativeURL = null;
                 }
+                _relativeURL = StringUtils.trimToNull(relativeURL);
             }
             else
             {
                 // Make sure it is correctly formatted
                 if (urlText.startsWith("/"))
-                    _relativeURL = urlText;
+                    _relativeURL = urlText.substring(1);
                 else if (urlText.startsWith("#"))
-                    _relativeURL = stripHash(origin.toString()) + urlText;
+                    _relativeURL = makeRelativeUrl(stripHash(origin.toString())) + urlText;
                 else if (urlText.startsWith("?"))
-                    _relativeURL = stripQueryParams(origin.toString()) + urlText;
+                    _relativeURL = makeRelativeUrl(stripQueryParams(origin.toString())) + urlText;
                 else
-                    _relativeURL = getURLBase(origin) + urlText;
+                    _relativeURL = makeRelativeUrl(getURLBase(origin)) + urlText;
+            }
 
-                _actionId = new ControllerActionId(_relativeURL);
+            if (_relativeURL != null)
+            {
+                ControllerActionId tempActionId = null;
+                try
+                {
+                    tempActionId = new ControllerActionId(_relativeURL);
+                }
+                catch (IllegalArgumentException badUrl) {
+                    if (!isAbsoluteUrl(urlText))
+                    {
+                        throw badUrl; // We should know how to handle all relative URLs
+                    }
+                }
+                _actionId = tempActionId;
+            }
+            else
+            {
+                _actionId = null;
             }
 
             int p = _depth;
@@ -536,13 +534,21 @@ public class Crawler
             catch (RuntimeException ex)
             {
                 // Get a more useful exception if we hit a URL that we REALLY don't understand
-                throw new IllegalArgumentException("Failed to parse action from URL [%s] found on page [%s]".formatted(getUrlText(), getOrigin()));
+                throw new IllegalArgumentException("Failed to parse action from URL [%s] found on page [%s]".formatted(getUrlText(), getOrigin()), ex);
             }
+        }
+
+        private static boolean isAbsoluteUrl(String urlText)
+        {
+            return urlText.startsWith("http://") ||
+                    urlText.startsWith("https://") ||
+                    urlText.startsWith("javascript:") ||
+                    urlText.startsWith("ftp://");
         }
 
         private boolean isLabKeyShortUrl(String urlText)
         {
-            return urlText.startsWith(WebTestHelper.getBaseURL()) && urlText.endsWith(".url");
+            return urlText.endsWith(".url") && (urlText.startsWith(WebTestHelper.getBaseURL()) || !isAbsoluteUrl(urlText));
         }
 
         public boolean isFromForm()
@@ -601,7 +607,7 @@ public class Crawler
 
         public boolean isVisitableURL()
         {
-            if (getRelativeURL() == null)
+            if (StringUtils.isBlank(getRelativeURL()))
                 return false;
 
             String strippedRelativeURL = stripQueryParams(getRelativeURL());
@@ -1063,9 +1069,15 @@ public class Crawler
 
                         int nextDepth = depth + 1;
 
-                        for (Pair<String, ?> p : linksWithAttributes)
+                        for (Pair<String, Map<String, String>> p : linksWithAttributes)
                         {
                             String url = p.getLeft();
+                            // Handle popup menus
+                            String dataQuery = p.getRight().getOrDefault("data-query", "");
+                            if (dataQuery.startsWith("?"))
+                            {
+                                url = url + dataQuery;
+                            }
                             try
                             {
                                 newUrlsToCheck.add(new UrlToCheck(actualUrl, url, nextDepth));
@@ -1093,7 +1105,7 @@ public class Crawler
             else
             {
                 // Did not navigate. Test download URL for injection
-                actualUrl = new URL(WebTestHelper.getBaseURL() + relativeURL);
+                actualUrl = new URL(WebTestHelper.getBaseURL() + "/" + relativeURL);
             }
         }
         catch (RuntimeException | AssertionError rethrow)
@@ -1115,9 +1127,6 @@ public class Crawler
 
             if (rethrow instanceof AssertionError)
                 throw rethrow; // AssertionErrors already contain page and origin information.
-            else if (rethrow instanceof TimeoutException)
-                throw new RuntimeException(relativeURL + " failed to render. " + originMessage +
-                        " It may be a file download which is unsupported by the crawler", rethrow); // Improve error reporting for downloads, see issue 42661
             else
                 throw new RuntimeException("Crawler threw " + rethrow.getClass().getSimpleName() + ".\n" +
                     "Target page: " + relativeURL + "\n" +
@@ -1180,7 +1189,7 @@ public class Crawler
 
     private boolean doesUrlExist(UrlToCheck urlToCheck)
     {
-        final String url = stripQueryParams(urlToCheck.getRelativeURL());
+        final String url = WebTestHelper.makeAbsoluteUrl(stripQueryParams(urlToCheck.getRelativeURL()));
 
         // Check whether 404 was due to a missing action
         HttpContext context = WebTestHelper.getBasicHttpContext();
@@ -1355,9 +1364,8 @@ public class Crawler
             List<Map.Entry<String,String>> injectParams = new ArrayList<>(params);
             //noinspection SuspiciousListRemoveInLoop
             injectParams.remove(i);
-            String xss = (random.nextInt()%2)==0 ? injectScriptBlock : injectAttributeScript;
-            xss = URLEncoder.encode(xss, StandardCharsets.UTF_8);
-            String paramMalicious = key + "=" + xss;
+            String xssValue = (random.nextInt()%2)==0 ? injectScriptBlock : injectAttributeScript;
+            String paramMalicious = EscapeUtil.encode(key) + "=" + EscapeUtil.encode(xssValue);
             String queryMalicious = paramMalicious + "&" + queryStringFromEntries(injectParams);
             String urlMalicious = base + "?" + queryMalicious;
             try

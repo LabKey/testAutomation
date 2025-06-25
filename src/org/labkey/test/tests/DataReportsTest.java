@@ -136,7 +136,7 @@ public class DataReportsTest extends ReportTest
     @BeforeClass
     public static void doSetup()
     {
-        DataReportsTest initTest = (DataReportsTest)getCurrentTest();
+        DataReportsTest initTest = getCurrentTest();
 
         // fail fast if R is not configured
         initTest._rReportHelper.ensureRConfig();
@@ -148,18 +148,6 @@ public class DataReportsTest extends ReportTest
         // need this to turn off the demographic bit in the DEM-1 dataset
         initTest.clickFolder(initTest.getFolderName());
         initTest.setDemographicsBit("DEM-1: Demographics", false);
-
-        // Make sure the Developers group has the Platform Developer role.
-        initTest.addDeveloperGroupToPlatformDeveloperRole();
-    }
-
-    private void addDeveloperGroupToPlatformDeveloperRole()
-    {
-        goToHome();
-
-        ApiPermissionsHelper apiPermissionsHelper = new ApiPermissionsHelper(this);
-
-        apiPermissionsHelper.addMemberToRole("Developers", "Platform Developer", ApiPermissionsHelper.MemberType.siteGroup, "/");
     }
 
     @Before

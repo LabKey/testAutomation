@@ -72,7 +72,7 @@ public class FlowTest extends BaseFlowTest
     @BeforeClass
     public static void initR()
     {
-        FlowTest init = (FlowTest)getCurrentTest();
+        FlowTest init = getCurrentTest();
         init.doInit();
     }
 
@@ -419,7 +419,7 @@ public class FlowTest extends BaseFlowTest
         assertEquals(1, countEnabledInputs(SELECT_CHECKBOX_NAME));
         doAndWaitForPageToLoad(() -> selectOptionByText(Locator.name("ff_compensationMatrixOption"), "Matrix: " + FCS_FILE_1 + " comp matrix"));
 
-        // Non-standard data-region, can't use `DataRegionTable` component. No enclosing 'lk-region-form'
+        // Non-standard data-region, can't use `DataRegionTable` component. No enclosing 'data-region-form'
         doAndWaitForPageSignal(() -> click(Locator.checkboxByName(".toggle")), DataRegion.UPDATE_SIGNAL);
         clickButton("Analyze selected runs");
 

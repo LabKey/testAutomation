@@ -16,7 +16,6 @@ import org.labkey.test.util.TestDataGenerator;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -49,13 +48,12 @@ public class SampleTypeAPIHelper
         }
         catch (CommandException | IOException e)
         {
-            throw new RuntimeException("Failed to create sample type.", e);
+            throw new RuntimeException(String.format("Failed to create sample type. %s", e.getMessage()), e);
         }
     }
 
     /**
      * A set of FieldDefinition provided for convenience
-     * @return
      */
     public static List<FieldDefinition> sampleTypeTestFields(boolean withFileField)
     {
@@ -127,7 +125,6 @@ public class SampleTypeAPIHelper
      * @param sampleTypeName The name of the sample type.
      * @param sampleNames A list of sample name you want to get the id's for.
      * @return A map of containing sample names and their corresponding row ids.
-     * @throws Exception Because this uses the Select Rows Command it can throw a few different type of exceptions.
      */
     public static Map<String, Integer> getRowIdsForSamples(String containerPath, String sampleTypeName, List<String> sampleNames) throws IOException, CommandException
     {

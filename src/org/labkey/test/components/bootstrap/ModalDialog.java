@@ -26,6 +26,8 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 
@@ -82,6 +84,25 @@ public class ModalDialog extends WebDriverComponent<ModalDialog.ElementCache>
     public String getBodyText()
     {
         return elementCache().body.getText();
+    }
+
+    public Integer getCountFromTitle()
+    {
+        Pattern pattern = Pattern.compile("(\\d+)");
+        Matcher matcher = pattern.matcher(getTitle());
+        if (matcher.find())
+        {
+            try
+            {
+                return Integer.parseInt(matcher.group(1).trim());
+            }
+            catch (NumberFormatException e)
+            {
+                // If we can't parse the number, return null
+                return null;
+            }
+        }
+        return null;
     }
 
     public void close()

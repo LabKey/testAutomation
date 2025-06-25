@@ -14,7 +14,7 @@ import org.labkey.test.components.react.QueryChartDialog;
 import org.labkey.test.components.react.QueryChartPanel;
 import org.labkey.test.components.react.ReactCheckBox;
 import org.labkey.test.components.ui.FilterStatusValue;
-import org.labkey.test.util.selenium.WebDriverUtils;
+import org.labkey.test.util.selenium.WebElementUtils;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -72,21 +72,20 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
      * @param text column text to search for
      * @return row data
      */
-    public Map<String, String> getRowMap(String text)
+    public Map<String, String> getRowMapByLabel(String text)
     {
-        return getRow(text).getRowMap();
+        return getRow(text).getRowMapByLabel();
     }
 
     /**
      * Returns the first row with the supplied text in the specified column
-     * @param columnLabel    The text in the column header cell
+     * @param columnIdentifier    The text in the column header cell
      * @param text text in the data cell
      * @return row data
      */
-    public Map<String, String> getRowMap(String columnLabel, String text)
+    public Map<String, String> getRowMapByLabel(CharSequence columnIdentifier, String text)
     {
-        GridRow row = getRow(columnLabel, text);
-        return row.getRowMap();
+        return getRow(columnIdentifier, text).getRowMapByLabel();
     }
 
     /**
@@ -94,9 +93,9 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
      * @param partialMap Map where keys are columnText, values are full text
      * @return row data
      */
-    public Map<String, String> getRowMap(Map<String, String> partialMap)
+    public Map<String, String> getRowMapByLabel(Map<String, String> partialMap)
     {
-        return getRow(partialMap).getRowMap();
+        return getRow(partialMap).getRowMapByLabel();
     }
 
     /**
@@ -104,24 +103,24 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
      * @param containing Locator for an element in the row
      * @return row data
      */
-    public Map<String, String> getRowMap(Locator.XPathLocator containing)
+    public Map<String, String> getRowMapByLabel(Locator.XPathLocator containing)
     {
-        return getRow(containing).getRowMap();
+        return getRow(containing).getRowMapByLabel();
     }
 
     // row selection
 
     /**
      * Selects or un-selects the first row with the specified text in the specified column
-     * @param columnLabel The exact text of the column header
+     * @param columnIdentifier The exact text of the column header
      * @param text The full text of the cell to match
      * @param checked   whether or not to check the box
      * @return this grid
      */
     @Override
-    public QueryGrid selectRow(String columnLabel, String text, boolean checked)
+    public QueryGrid selectRow(CharSequence columnIdentifier, String text, boolean checked)
     {
-        getRow(columnLabel, text).select(checked);
+        getRow(columnIdentifier, text).select(checked);
         return this;
     }
 
@@ -225,7 +224,10 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
 
         func.run();
 
-        optionalStatus.ifPresent(el -> getWrapper().shortWait().until(ExpectedConditions.stalenessOf(el)));
+        optionalStatus.ifPresent(el -> {
+            getWrapper().shortWait().until(ExpectedConditions.stalenessOf(el));
+            elementCache().selectionStatusContainerLoc.waitForElement(this, 5_000);
+        });
 
         waitForLoaded();
         clearElementCache();
@@ -535,7 +537,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         for(WebElement menuItem : menuItems)
         {
             // Why does menuItem.getText() return an empty string here?
-            if(menuItem.getAttribute("text").contains("Manage Saved Views"))
+            if(menuItem.getDomProperty("text").contains("Manage Saved Views"))
                 return false;
         }
 
@@ -587,7 +589,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         if(panelHeader.isDisplayed())
         {
             // The view name in the header is not in a separate element.
-            viewName = WebDriverUtils.getTextNodeWithin(panelHeader);
+            viewName = WebElementUtils.getTextNodeWithin(panelHeader);
         }
         else
         {

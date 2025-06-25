@@ -103,16 +103,16 @@ public class VaccineDesignWebpart extends BodyWebPart<VaccineDesignWebpart.Eleme
 
     public class ElementCache extends BodyWebPart.ElementCache
     {
-        private int wait = BaseWebDriverTest.WAIT_FOR_JAVASCRIPT;
-        private Locator.XPathLocator tableOuterLoc = Locator.tagWithClass("table", "outer");
-        private Locator.XPathLocator tableRowLoc = Locator.tagWithClass("tr", "row-outer");
-        private Locator.XPathLocator subgridRowLoc = Locator.tagWithClass("tr", "subrow");
-        private Locator.XPathLocator cellDisplayLoc = Locator.tagWithClass("td", "cell-display");
-        private Locator.XPathLocator emptyLoc = Locator.tagWithClassContaining("td", "empty").withText("No data to show.");
-        private Locator.XPathLocator manageLoc = Locator.linkWithText("Manage Study Products");
-        private Locator.XPathLocator immunogensLoc = Locator.tagWithClass("div", "vaccine-design-immunogens");
-        private Locator.XPathLocator adjuvantsLoc = Locator.tagWithClass("div", "vaccine-design-adjuvants");
-        private Locator.XPathLocator challengesLoc = Locator.tagWithClass("div", "vaccine-design-challenges");
+        private final int wait = BaseWebDriverTest.WAIT_FOR_JAVASCRIPT;
+        private final Locator.XPathLocator tableOuterLoc = Locator.tagWithClass("table", "outer");
+        private final Locator.XPathLocator tableRowLoc = Locator.tagWithClass("tr", "row-outer");
+        private final Locator.XPathLocator subgridRowLoc = Locator.tagWithClass("tr", "subrow");
+        private final Locator.XPathLocator cellDisplayLoc = Locator.tagWithClass("td", "cell-display");
+        private final Locator.XPathLocator emptyLoc = Locator.tagWithClassContaining("td", "empty").withText("No data to show.");
+        private final Locator.XPathLocator manageLoc = Locator.linkWithText("Manage Study Products");
+        private final Locator.XPathLocator immunogensLoc = Locator.tagWithClass("div", "vaccine-design-immunogens");
+        private final Locator.XPathLocator adjuvantsLoc = Locator.tagWithClass("div", "vaccine-design-adjuvants");
+        private final Locator.XPathLocator challengesLoc = Locator.tagWithClass("div", "vaccine-design-challenges");
 
         WebElement immunogensTable = immunogensLoc.append(tableOuterLoc).findWhenNeeded(this).withTimeout(wait);
         WebElement adjuvantsTable = adjuvantsLoc.append(tableOuterLoc).findWhenNeeded(this).withTimeout(wait);

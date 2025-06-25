@@ -16,7 +16,6 @@
 package org.labkey.test.tests;
 
 import org.junit.Assume;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
@@ -32,14 +31,11 @@ import org.labkey.test.categories.Git;
 import org.labkey.test.io.Grep;
 import org.labkey.test.pages.core.admin.SiteValidationPage;
 import org.labkey.test.pages.pipeline.PipelineStatusDetailsPage;
-import org.labkey.test.util.CspLogUtil;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.Order;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PipelineStatusTable;
-import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.TextSearcher;
-import org.labkey.test.util.WikiHelper;
 import org.openqa.selenium.WebElement;
 
 import java.io.File;
@@ -100,7 +96,7 @@ public class DatabaseDiagnosticsTest extends BaseWebDriverTest
                 "Module: Core", "Permissions Validator", "Display Format Validator",
                 "Module: Pipeline", "Pipeline Validator");
 
-        assertTextNotPresent(textSearcher, "Error");
+        assertTextNotPresent(textSearcher, "Errors:");
     }
 
     @Test

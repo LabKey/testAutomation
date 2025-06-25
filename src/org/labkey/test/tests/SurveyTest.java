@@ -84,7 +84,7 @@ public class SurveyTest extends BaseWebDriverTest
     @LogMethod
     public static void doSetup()
     {
-        SurveyTest initTest = (SurveyTest)getCurrentTest();
+        SurveyTest initTest = getCurrentTest();
         initTest.setupProject();
     }
 
@@ -121,6 +121,7 @@ public class SurveyTest extends BaseWebDriverTest
         final String dateSurveyDesign = "My extDate Survey Design";
 
         File metadata = TestFileUtils.getSampleData("survey/DateAndDateTimeSurvey.json");
+        navigateToFolder(getProjectName(), FOLDER_NAME);
         createSurveyDesign(getProjectName(), null, null, dateSurveyDesign, null, LIST_SCHEMA, LIST_NAME, metadata);
 
         clickProject(getProjectName());

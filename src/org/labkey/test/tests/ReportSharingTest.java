@@ -52,7 +52,7 @@ public class ReportSharingTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        ReportSharingTest init = (ReportSharingTest) getCurrentTest();
+        ReportSharingTest init = getCurrentTest();
         init.doSetup();
     }
 
@@ -71,7 +71,7 @@ public class ReportSharingTest extends BaseWebDriverTest
         apiPermissionsHelper.setPermissions("Users", "Editor");
         apiPermissionsHelper.setUserPermissions(USER_EDITOR,"Reader");
         apiPermissionsHelper.setUserPermissions(USER_NON_EDITOR,"Submitter");
-        apiPermissionsHelper.addUserToSiteGroup(USER_DEV, "Site Administrators");
+        apiPermissionsHelper.setSiteRoleUserPermissions(USER_DEV, "Site Administrator");
     }
 
     @Before

@@ -161,7 +161,7 @@ public class ApiKeyTest extends BaseWebDriverTest
 
         QueryGrid grid = new QueryGrid.QueryGridFinder(getDriver()).waitFor();
         int beforeDeleteCount = grid.getRecordCount();
-        assertFalse("Row with description not found", grid.getRowMap("Description", keyDescription).isEmpty());
+        assertFalse("Row with description not found", grid.getRowMapByLabel("Description", keyDescription).isEmpty());
         grid = deleteAPIKeyViaUI();
         assertEquals("Number of keys after UI deletion not as expected", beforeDeleteCount - 1, grid.getRecordCount());
         verifyInvalidAPIKey(createApiKeyConnection(apiKey), false);
@@ -279,9 +279,8 @@ public class ApiKeyTest extends BaseWebDriverTest
         impersonate(EDITOR_USER.getEmail());
         goToExternalToolPage();
         List<WebElement> banners = Locator.byClass(BootstrapLocators.BannerType.WARNING.getCss()).findElements(this.getDriver());
-        assertEquals("Number of warning banners not as expected", 2, banners.size());
-        assertEquals("API key generation warning not as expected", "API key generation is not available while impersonating.", banners.get(0).getText());
-        assertEquals("Session key generation warning not as expected", "Session key generation is not available while impersonating.", banners.get(1).getText());
+        assertEquals("Number of warning banners not as expected", 1, banners.size());
+        assertEquals("API and session key generation warning not as expected", "API and session key generation is not available while impersonating.", banners.get(0).getText());
     }
 
     @Test

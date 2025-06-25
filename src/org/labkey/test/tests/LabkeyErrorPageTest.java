@@ -18,7 +18,6 @@ import java.util.List;
 public class LabkeyErrorPageTest extends BaseWebDriverTest
 {
     private static final String READER_USER = "reader_user@user.test";
-    private static final String PROJECT_NAME = "Labkey Error Page Test";
 
     @BeforeClass
     public static void setupProject()
@@ -101,18 +100,18 @@ public class LabkeyErrorPageTest extends BaseWebDriverTest
 
         checker().verifyEquals("Incorrect error heading message", "Oops! An error has occurred.",
                 errorPage.getErrorHeading());
-        checker().verifyEquals("Incorrect error instructions", "Please report this bug to LabKey Support by copying " +
-                        "and pasting both your unique reference code and the full stack trace in the View Details section below.",
+        checker().verifyEquals("Incorrect error instructions", "You can find help resources here and may " +
+                "find troubleshooting hints by reading the full stack trace in the View Details section below.",
                 errorPage.getErrorInstruction());
         checker().verifyThat("Incorrect error image", errorPage.getErrorImage(), CoreMatchers.containsString(imageTitle));
 
-        checkExpectedErrors(3);
+        checkExpectedErrors(2);
     }
 
     @Override
     protected @Nullable String getProjectName()
     {
-        return PROJECT_NAME;
+        return  "LabkeyErrPageTest Project";
     }
 
     @Override

@@ -17,7 +17,6 @@ package org.labkey.remoteapi.puppeteer;
 
 import org.json.JSONObject;
 import org.labkey.remoteapi.CommandResponse;
-import org.labkey.test.util.TestLogger;
 
 import java.util.Map;
 

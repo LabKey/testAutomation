@@ -45,7 +45,7 @@ public class UserTableCustomFieldUpdateTest extends BaseWebDriverTest
     @BeforeClass
     public static void initProject()
     {
-        UserTableCustomFieldUpdateTest initTest = (UserTableCustomFieldUpdateTest) getCurrentTest();
+        UserTableCustomFieldUpdateTest initTest = getCurrentTest();
         initTest.doSetup();
     }
 

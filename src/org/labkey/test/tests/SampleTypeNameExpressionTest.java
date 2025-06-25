@@ -33,11 +33,13 @@ import org.labkey.test.pages.experiment.CreateSampleTypePage;
 import org.labkey.test.pages.experiment.UpdateSampleTypePage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
+import org.labkey.test.util.AuditLogHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
 import org.labkey.test.util.TestDataGenerator;
+import org.labkey.test.util.TextUtils;
 import org.labkey.test.util.exp.SampleTypeAPIHelper;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
@@ -59,16 +61,17 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.params.FieldDefinition.DOMAIN_TRICKY_CHARACTERS;
+import static org.labkey.test.util.data.TestDataUtils.getEscapedNameExpression;
 
 @Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 5)
 public class SampleTypeNameExpressionTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "SampleType_Name_Expression_Test";
-    private static final String DEFAULT_SAMPLE_PARENT_VALUE = "SS";
+    private static final String DEFAULT_SAMPLE_PARENT_VALUE = "SS" + TestDataGenerator.randomString(3).replaceAll("[_)]", "."); // '_' is used as delimiter to get batchRandomId and ) is used to close the defaultValue()
 
     private static final String PARENT_SAMPLE_TYPE = "PS" + DOMAIN_TRICKY_CHARACTERS;
-    private static final String PARENT_SAMPLE_TYPE_INPUT = "PS" + DOMAIN_TRICKY_CHARACTERS.replace("/", "$S");
+    private static final String PARENT_SAMPLE_TYPE_INPUT = "PS" + getEscapedNameExpression(DOMAIN_TRICKY_CHARACTERS);
 
     private static final String PARENT_SAMPLE_01 = "parent01";
     private static final String PARENT_SAMPLE_02 = "parent02";
@@ -79,6 +82,8 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
     private static final String PARENT_SAMPLE_07 = "\"parent07";
 
     private static final File PARENT_EXCEL = TestFileUtils.getSampleData("samples/ParentSamples.xlsx");
+
+    protected final AuditLogHelper _auditLogHelper = new AuditLogHelper(this);
 
     @Override
     public List<String> getAssociatedModules()
@@ -96,7 +101,7 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject() throws IOException, CommandException
     {
-        SampleTypeNameExpressionTest test = (SampleTypeNameExpressionTest)getCurrentTest();
+        SampleTypeNameExpressionTest test = getCurrentTest();
         test.doSetup();
     }
 
@@ -294,7 +299,7 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
 
         SampleTypeHelper sampleTypeHelper = new SampleTypeHelper(this);
 
-        final String sampleTypeName = "Tricky_" + TestDataGenerator.randomDomainName();
+        final String sampleTypeName = TestDataGenerator.randomDomainName("Tricky_");
 
         CreateSampleTypePage createPage = sampleTypeHelper.goToCreateNewSampleType();
 
@@ -388,37 +393,45 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
     {
         verifyNames(
                 "InputsExpressionTest",
-                "Name\tB\tMaterialInputs/InputsExpressionTest",
+                "Name\tFieldB\tMaterialInputs/InputsExpressionTest",
                 "${Inputs:first:defaultValue('" + DEFAULT_SAMPLE_PARENT_VALUE + "')}_${batchRandomId}",
                 null, "Pat");
 
+
+        final String urlLikeDefaultVal = "a+b%c#d";
+        verifyNames(
+                "InputsExpressionTest2",
+                "Name\tFieldB\tMaterialInputs/InputsExpressionTest2",
+                "${Inputs:first:defaultValue('" + urlLikeDefaultVal + "')}_${batchRandomId}",
+                null, "Fed", true, urlLikeDefaultVal);
+
         verifyNames(
                 "Inputs/ExpressionTest2",
-                "Name\tB\tMaterialInputs/Inputs$SExpressionTest2",
+                "Name\tFieldB\tMaterialInputs/Inputs$SExpressionTest2",
                 "${Inputs:defaultValue('" + DEFAULT_SAMPLE_PARENT_VALUE + "')}_${batchRandomId}",
                 null, "Bat", false);
 
         verifyNames(
                 "Inputs/WithDataTypeExpression",
-                "Name\tB\tMaterialInputs/Inputs/WithDataTypeExpression",
+                "Name\tFieldB\tMaterialInputs/Inputs/WithDataTypeExpression",
                 "${Inputs/Inputs$SWithDataTypeExpression:first:defaultValue('" + DEFAULT_SAMPLE_PARENT_VALUE + "')}_${batchRandomId}",
                 null, "Red");
 
         verifyNames(
                 "Inputs/WithDataTypeExpression2",
-                "Name\tB\tMaterialInputs/Inputs$SWithDataTypeExpression2",
+                "Name\tFieldB\tMaterialInputs/Inputs$SWithDataTypeExpression2",
                 "${Inputs/Inputs$SWithDataTypeExpression2:defaultValue('" + DEFAULT_SAMPLE_PARENT_VALUE + "')}_${batchRandomId}",
                 null, "Ted", false);
 
         verifyNames(
                 "Material/WithDataTypeExpression",
-                "Name\tB\tMaterialInputs/Material/WithDataTypeExpression",
+                "Name\tFieldB\tMaterialInputs/Material/WithDataTypeExpression",
                 "${MaterialInputs/Material$SWithDataTypeExpression:first:defaultValue('" + DEFAULT_SAMPLE_PARENT_VALUE + "')}_${batchRandomId}",
                 null, "Ned");
 
         verifyNames(
                 "Material/WithDataTypeExpression2",
-                "Name\tB\tMaterialInputs/Material$SWithDataTypeExpression2",
+                "Name\tFieldB\tMaterialInputs/Material$SWithDataTypeExpression2",
                 "${MaterialInputs/Material$SWithDataTypeExpression2:defaultValue('" + DEFAULT_SAMPLE_PARENT_VALUE + "')}_${batchRandomId}",
                 null, "Med", false);
 
@@ -429,7 +442,7 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
     {
         verifyNames(
                 "ParentAliasInputsExpressionTest",
-                "Name\tB\tParent",
+                "Name\tFieldB\tParent",
                 "${Parent:first:defaultValue('" + DEFAULT_SAMPLE_PARENT_VALUE + "')}_${batchRandomId}",
                 "Parent", "Jessi");
     }
@@ -439,12 +452,11 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
     public void testLookupNameExpression() throws Exception
     {
         String lookupList = "Colors";
-        FieldDefinition.LookupInfo colorsLookup = new FieldDefinition.LookupInfo(getProjectName(), "lists", lookupList)
-                .setTableType(FieldDefinition.ColumnType.Integer);
+        FieldDefinition.LookupInfo colorsLookup = new FieldDefinition.IntLookup(getProjectName(), "lists", lookupList);
         String nameExpSamples = "NameExpressionSamples";
 
         // begin by creating a lookupList of colors, the sampleType will reference it
-        TestDataGenerator colorsGen = new TestDataGenerator(colorsLookup)
+        TestDataGenerator colorsGen = new TestDataGenerator("lists", lookupList, getProjectName())
                 .withColumns(List.of(new FieldDefinition("ColorName", FieldDefinition.ColumnType.String),
                         new FieldDefinition("ColorCode", FieldDefinition.ColumnType.String)));
         colorsGen.addCustomRow(Map.of("ColorName", "green", "ColorCode", "gr"));
@@ -489,7 +501,7 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
     {
         verifyNames(
                 "MaterialInputsExpressionWithParentAliasData",
-                "Name\tB\tParent",
+                "Name\tFieldB\tParent",
                 "${MaterialInputs:first:defaultValue('" + DEFAULT_SAMPLE_PARENT_VALUE + "')}_${batchRandomId}",
                 "Parent", "Sam");
     }
@@ -500,6 +512,11 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
     }
 
     private void verifyNames(String sampleTypeName, String header, String nameExpression, @Nullable String currentTypeAlias, String namePrefix, boolean useFirst)
+    {
+        verifyNames(sampleTypeName, header, nameExpression, currentTypeAlias, namePrefix, useFirst, DEFAULT_SAMPLE_PARENT_VALUE);
+    }
+
+    private void verifyNames(String sampleTypeName, String header, String nameExpression, @Nullable String currentTypeAlias, String namePrefix, boolean useFirst, String defaultValue)
     {
         goToProjectHome();
 
@@ -525,7 +542,7 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
                 .setNameExpression(nameExpression);
         if (currentTypeAlias != null)
             definition = definition.setParentAliases(Map.of(currentTypeAlias, "(Current Sample Type)"));
-        definition = definition.setFields(List.of(new FieldDefinition("B", FieldDefinition.ColumnType.String)));
+        definition = definition.setFields(List.of(new FieldDefinition("FieldB", FieldDefinition.ColumnType.String)));
         sampleHelper.createSampleType(definition, data);
 
         assertTextPresent(nameExpression);
@@ -533,7 +550,7 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         DataRegionTable materialTable = new DataRegionTable("Material", this);
         List<String> names = materialTable.getColumnDataAsText("Name");
 
-        assertTrue("First name (" + names.get(0) + ") not as expected", names.get(0).startsWith(DEFAULT_SAMPLE_PARENT_VALUE + "_"));
+        assertTrue("First name (" + names.get(0) + ") expected to start with " + defaultValue + "_ but it did not", names.get(0).startsWith(defaultValue + "_"));
         String batchRandomId = names.get(0).split("_")[1];
 
         assertEquals("Second name not as expected", name2 + "_" + batchRandomId, names.get(1));
@@ -682,7 +699,7 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         if(expectedPreview != null)
         {
             expectedToolTip.append("Example of name that will be generated from the current pattern: ");
-            expectedToolTip.append(expectedPreview);
+            expectedToolTip.append(TextUtils.normalizeSpace(expectedPreview));
             expectedToolTip.append("\n");
         }
 
@@ -1268,6 +1285,13 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         idDialog.setGenId(Integer.toString(nextGenId));
         idDialog.dismiss("Update");
 
+        // check audit log
+        AuditLogHelper.DetailedAuditEventRow expectedDomainEvent = new AuditLogHelper.DetailedAuditEventRow(null, sampleType, null,
+                "The genId for domain Test_Set_GenId has been updated to " + (nextGenId - 1) + ".", null, null,
+                null, null);
+        boolean pass = _auditLogHelper.validateLastDomainAuditEvents(sampleType, getProjectName(), expectedDomainEvent, null);
+        checker().verifyTrue("Result Domain event not as expected after updating genId", pass);
+
         log("Validate that the banner has been updated.");
 
         checker()
@@ -1320,17 +1344,17 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         waitFor(updatePage::isResetGenIdVisible,
                 "The 'Reset GenId' button should now be visible if the sample type is empty. Fatal error.", 500);
 
-        ModalDialog deleteDialog = updatePage.clickResetGenId();
+        ModalDialog genIdDialog = updatePage.clickResetGenId();
 
         String expectedMsg = String.format("The current genId is at %d. Resetting will reset genId back to 1 and cannot be undone.", nextGenId);
 
         checker()
                 .withScreenshot("Reset_GenId_Dialog_Error")
                 .verifyEquals("Message in the reset confirm dialog is not as expected.",
-                        expectedMsg, deleteDialog.getBodyText());
+                        expectedMsg, genIdDialog.getBodyText());
 
         log("Click 'Cancel' and verify banner/genId does not change.");
-        deleteDialog.dismiss("Cancel");
+        genIdDialog.dismiss("Cancel");
 
         checker()
                 .withScreenshot("Reset_GenId_Cancel_Error")
@@ -1339,8 +1363,15 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
 
         log("Click 'Rest GenId' again and this time reset the genId.");
 
-        deleteDialog = updatePage.clickResetGenId();
-        deleteDialog.dismiss("Reset");
+        genIdDialog = updatePage.clickResetGenId();
+        genIdDialog.dismiss("Reset");
+
+        expectedDomainEvent = new AuditLogHelper.DetailedAuditEventRow(null, sampleType, null,
+                "The genId for domain " + sampleType + " has been updated to 0.", null, null,
+                null, null);
+        pass = _auditLogHelper.validateLastDomainAuditEvents(sampleType, getProjectName(), expectedDomainEvent, null);
+        checker().verifyTrue("Result Domain event not as expected after resetting genId", pass);
+
 
         nextGenId = 1;
         checker()

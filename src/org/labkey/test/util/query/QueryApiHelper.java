@@ -12,6 +12,7 @@ import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.ImportDataCommand;
 import org.labkey.remoteapi.query.ImportDataResponse;
 import org.labkey.remoteapi.query.InsertRowsCommand;
+import org.labkey.remoteapi.query.SaveRowsCommand;
 import org.labkey.remoteapi.query.SaveRowsResponse;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
@@ -89,6 +90,7 @@ public class QueryApiHelper
         InsertRowsCommand insertRowsCommand = new InsertRowsCommand(_schema, _query);
         insertRowsCommand.setRows(rows);
         insertRowsCommand.setTimeout(_insertTimout);
+        insertRowsCommand.setAuditBehavior(SaveRowsCommand.AuditBehavior.DETAILED);
         return insertRowsCommand.execute(_connection, _containerPath);
     }
 
@@ -97,6 +99,7 @@ public class QueryApiHelper
         UpdateRowsCommand updateRowsCommand = new UpdateRowsCommand(_schema, _query);
         updateRowsCommand.setRows(rows);
         updateRowsCommand.setTimeout(_insertTimout);
+        updateRowsCommand.setAuditBehavior(SaveRowsCommand.AuditBehavior.DETAILED);
         return  updateRowsCommand.execute(_connection, _containerPath);
     }
 
@@ -124,6 +127,7 @@ public class QueryApiHelper
     {
         DeleteRowsCommand cmd = new DeleteRowsCommand(_schema, _query);
         cmd.setRows(rowsToDelete);
+        cmd.setAuditBehavior(SaveRowsCommand.AuditBehavior.DETAILED);
         return cmd.execute(_connection, _containerPath);
     }
 
