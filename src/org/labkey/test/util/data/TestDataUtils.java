@@ -443,6 +443,11 @@ public class TestDataUtils
         return stringWriter.toString();
     }
 
+    public static <T> String stringFromRows(List<List<T>> rows)
+    {
+        return stringFromRows(rows, CSVFormat.TDF);
+    }
+
     /**
      * Used to quote values to be written to a TSV file
      * @see org.labkey.api.data.TSVWriter
@@ -507,12 +512,4 @@ public class TestDataUtils
             return StringUtils.containsAny(value, _escapedChars);
         }
     }
-
-    private static final String[] DECODED = {"\\", "$", "/", "&", "}", "~", ",", "."};
-    private static final String[] ENCODED = {"\\\\", "\\$", "\\/", "\\&", "\\}", "\\~", "\\,", "\\."};
-    public static String getEscapedNameExpression(String encoded)
-    {
-        return StringUtils.replaceEach(encoded, DECODED, ENCODED);
-    }
-
 }

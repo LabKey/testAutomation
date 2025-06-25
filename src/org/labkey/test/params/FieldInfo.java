@@ -3,6 +3,7 @@ package org.labkey.test.params;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.labkey.test.params.FieldDefinition.ColumnType;
+import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.TestDataGenerator;
 
 import java.util.Objects;
@@ -104,6 +105,15 @@ public class FieldInfo implements CharSequence, WrapsFieldKey
     public String getName()
     {
         return _fieldKey.getName();
+    }
+
+    /**
+     * Get name escaped for use in sample or source name expressions
+     */
+    @Contract(pure = true)
+    public String getExpName()
+    {
+        return EscapeUtil.escapeForNameExpression(getName());
     }
 
     @Contract(pure = true)
