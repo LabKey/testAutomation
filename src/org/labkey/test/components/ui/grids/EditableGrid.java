@@ -127,7 +127,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         return elementCache().getColumnLabels();
     }
 
-    protected Integer getColumnIndex(CharSequence columnIdentifier)
+    public Integer getColumnIndex(CharSequence columnIdentifier)
     {
         return elementCache().getColumnIndex(columnIdentifier);
     }

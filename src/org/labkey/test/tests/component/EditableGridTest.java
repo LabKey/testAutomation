@@ -43,32 +43,31 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.labkey.test.util.TestDataGenerator.randomDomainName;
-import static org.labkey.test.util.TestDataGenerator.randomFieldName;
 
 @Category({Daily.class})
 public class EditableGridTest extends BaseWebDriverTest
 {
     private static final String EXTRAPOLATING_SAMPLE_TYPE = randomDomainName("ExtrapolatingSampleType");
-    private static final String ASC_STRING = randomFieldName("Ascending String");
-    private static final String DESC_STRING = randomFieldName("Descending String");
-    private static final String ASC_INT = randomFieldName("Ascending Int");
-    private static final String DESC_INT = randomFieldName("Descending Int");
-    private static final String ASC_DATE = randomFieldName("Ascending Date");
-    private static final String DESC_DATE = randomFieldName("Descending Date");
+    private static final FieldInfo ASC_STRING = FieldInfo.random("Ascending String");
+    private static final FieldInfo DESC_STRING = FieldInfo.random("Descending String");
+    private static final FieldInfo ASC_INT = FieldInfo.random("Ascending Int", ColumnType.Integer);
+    private static final FieldInfo DESC_INT = FieldInfo.random("Descending Int", ColumnType.Integer);
+    private static final FieldInfo ASC_DATE = FieldInfo.random("Ascending Date", ColumnType.DateAndTime);
+    private static final FieldInfo DESC_DATE = FieldInfo.random("Descending Date", ColumnType.DateAndTime);
 
     private static final String FILLING_SAMPLE_TYPE = randomDomainName("FillingSampleType");
-    private static final String FILL_STRING = randomFieldName("Filling String");
-    private static final String FILL_MULTI_LINE = randomFieldName("Filling Multi Line");
-    private static final String FILL_INT = randomFieldName("Filling Int");
-    private static final String FILL_DATE = randomFieldName("Filling Date");
+    private static final FieldInfo FILL_STRING = FieldInfo.random("Filling String");
+    private static final FieldInfo FILL_MULTI_LINE = FieldInfo.random("Filling Multi Line", ColumnType.MultiLine);
+    private static final FieldInfo FILL_INT = FieldInfo.random("Filling Int", ColumnType.Integer);
+    private static final FieldInfo FILL_DATE = FieldInfo.random("Filling Date", ColumnType.DateAndTime);
 
     private static final String PASTING_SAMPLE_TYPE = randomDomainName("PastingSampleType");
-    private static final String PASTE_1 = randomFieldName("Paste Column 1");
-    private static final String PASTE_2 = randomFieldName("Paste Column 2");
-    private static final String PASTE_3 = randomFieldName("Paste Column 3");
-    private static final String PASTE_4 = randomFieldName("Paste Column 4");
-    private static final String PASTE_5 = randomFieldName("Paste Column 5");
-    private static final String PASTE_ML = randomFieldName("Paste Multi Line");
+    private static final FieldInfo PASTE_1 = FieldInfo.random("Paste Column 1");
+    private static final FieldInfo PASTE_2 = FieldInfo.random("Paste Column 2");
+    private static final FieldInfo PASTE_3 = FieldInfo.random("Paste Column 3");
+    private static final FieldInfo PASTE_4 = FieldInfo.random("Paste Column 4");
+    private static final FieldInfo PASTE_5 = FieldInfo.random("Paste Column 5");
+    private static final FieldInfo PASTE_ML = FieldInfo.random("Paste Multi Line", ColumnType.MultiLine);
 
     private static final List<String> TEXT_CHOICES = Arrays.asList("red", "Orange", "YELLOW");
     private static final String LOOKUP_LIST = randomDomainName("Fruits");
@@ -76,27 +75,27 @@ public class EditableGridTest extends BaseWebDriverTest
 
     private static final String ALL_TYPE_SAMPLE_TYPE = randomDomainName("AllFieldsSampleType");
 
-    private static final FieldInfo STR_FIELD = new FieldInfo(randomFieldName("strCol"))
+    private static final FieldInfo STR_FIELD = FieldInfo.random("strCol")
         .customizeFieldDefinition(fd -> fd.setScale(10));
-    private static final FieldInfo REQ_STR_FIELD = new FieldInfo(randomFieldName("strColReq"))
+    private static final FieldInfo REQ_STR_FIELD = FieldInfo.random("strColReq")
         .customizeFieldDefinition(fd -> fd.setScale(10).setRequired(true));
-    private static final FieldInfo INT_FIELD = new FieldInfo(randomFieldName("intCol"), ColumnType.Integer);
-    private static final FieldInfo REQ_INT_FIELD = new FieldInfo(randomFieldName("intColReq"), ColumnType.Integer)
+    private static final FieldInfo INT_FIELD = FieldInfo.random("intCol", ColumnType.Integer);
+    private static final FieldInfo REQ_INT_FIELD = FieldInfo.random("intColReq", ColumnType.Integer)
         .customizeFieldDefinition(fd -> fd.setRequired(true));
-    private static final FieldInfo DATE_FIELD = new FieldInfo(randomFieldName("dateCol"), ColumnType.Date);
-    private static final FieldInfo REQ_DATETIME_FIELD = new FieldInfo(randomFieldName("datetimeColReq"), ColumnType.DateAndTime)
+    private static final FieldInfo DATE_FIELD = FieldInfo.random("dateCol", ColumnType.Date);
+    private static final FieldInfo REQ_DATETIME_FIELD = FieldInfo.random("datetimeColReq", ColumnType.DateAndTime)
         .customizeFieldDefinition(fd -> fd.setRequired(true));
-    private static final FieldInfo TIME_FIELD = new FieldInfo(randomFieldName("timeCol"), ColumnType.Time);
-    private static final FieldInfo REQ_TIME_FIELD = new FieldInfo(randomFieldName("timeColReq"), ColumnType.Time)
+    private static final FieldInfo TIME_FIELD = FieldInfo.random("timeCol", ColumnType.Time);
+    private static final FieldInfo REQ_TIME_FIELD = FieldInfo.random("timeColReq", ColumnType.Time)
         .customizeFieldDefinition(fd -> fd.setRequired(true));
-    private static final FieldInfo BOOL_FIELD = new FieldInfo(randomFieldName("boolCol"), ColumnType.Boolean);
-    private static final FieldInfo FLOAT_FIELD = new FieldInfo(randomFieldName("floatCol"), ColumnType.Decimal);
-    private static final FieldInfo TEXTCHOICE_FIELD = new FieldInfo(randomFieldName("textchoiceCol"), ColumnType.TextChoice)
+    private static final FieldInfo BOOL_FIELD = FieldInfo.random("boolCol", ColumnType.Boolean);
+    private static final FieldInfo FLOAT_FIELD = FieldInfo.random("floatCol", ColumnType.Decimal);
+    private static final FieldInfo TEXTCHOICE_FIELD = FieldInfo.random("textchoiceCol", ColumnType.TextChoice)
         .customizeFieldDefinition(fd -> fd.setTextChoiceValues(TEXT_CHOICES));
-    private static final FieldInfo REQ_TEXTCHOICE_FIELD = new FieldInfo(randomFieldName("textchoiceColReq"), ColumnType.TextChoice)
+    private static final FieldInfo REQ_TEXTCHOICE_FIELD = FieldInfo.random("textchoiceColReq", ColumnType.TextChoice)
         .customizeFieldDefinition(fd -> fd.setRequired(true).setTextChoiceValues(TEXT_CHOICES));
-    private static final FieldInfo LOOKUP_FIELD = new FieldInfo(randomFieldName("lookupCol"), new IntLookup(null, "lists", LOOKUP_LIST));
-    private static final FieldInfo REQ_LOOKUP_FIELD = new FieldInfo(randomFieldName("lookupColReq"), new IntLookup(null, "lists", LOOKUP_LIST))
+    private static final FieldInfo LOOKUP_FIELD = FieldInfo.random("lookupCol", new IntLookup(null, "lists", LOOKUP_LIST));
+    private static final FieldInfo REQ_LOOKUP_FIELD = FieldInfo.random("lookupColReq", new IntLookup(null, "lists", LOOKUP_LIST))
         .customizeFieldDefinition(fd -> fd.setRequired(true));
 
     final List<FieldInfo> ALL_FIELDS = Arrays.asList(STR_FIELD, REQ_STR_FIELD, INT_FIELD, REQ_INT_FIELD,
@@ -131,32 +130,32 @@ public class EditableGridTest extends BaseWebDriverTest
         new SampleTypeDefinition(EXTRAPOLATING_SAMPLE_TYPE)
                 .setFields(
                         List.of(
-                                new FieldDefinition(ASC_STRING, ColumnType.String),
-                                new FieldDefinition(DESC_STRING, ColumnType.String),
-                                new FieldDefinition(ASC_INT, ColumnType.Integer),
-                                new FieldDefinition(DESC_INT, ColumnType.Integer),
-                                new FieldDefinition(ASC_DATE, ColumnType.DateAndTime),
-                                new FieldDefinition(DESC_DATE, ColumnType.DateAndTime)
+                                ASC_STRING.getFieldDefinition(),
+                                DESC_STRING.getFieldDefinition(),
+                                ASC_INT.getFieldDefinition(),
+                                DESC_INT.getFieldDefinition(),
+                                ASC_DATE.getFieldDefinition(),
+                                DESC_DATE.getFieldDefinition()
                         ))
                 .create(connection, getProjectName());
         new SampleTypeDefinition(FILLING_SAMPLE_TYPE)
                 .setFields(
                         List.of(
-                                new FieldDefinition(FILL_STRING, ColumnType.String),
-                                new FieldDefinition(FILL_MULTI_LINE, ColumnType.MultiLine),
-                                new FieldDefinition(FILL_INT, ColumnType.Integer),
-                                new FieldDefinition(FILL_DATE, ColumnType.DateAndTime)
+                                FILL_STRING.getFieldDefinition(),
+                                FILL_MULTI_LINE.getFieldDefinition(),
+                                FILL_INT.getFieldDefinition(),
+                                FILL_DATE.getFieldDefinition()
                         ))
                 .create(connection, getProjectName());
         new SampleTypeDefinition(PASTING_SAMPLE_TYPE)
                 .setFields(
                         List.of(
-                                new FieldDefinition(PASTE_1, ColumnType.String),
-                                new FieldDefinition(PASTE_2, ColumnType.String),
-                                new FieldDefinition(PASTE_3, ColumnType.String),
-                                new FieldDefinition(PASTE_4, ColumnType.String),
-                                new FieldDefinition(PASTE_5, ColumnType.String),
-                                new FieldDefinition(PASTE_ML, ColumnType.MultiLine)
+                                PASTE_1.getFieldDefinition(),
+                                PASTE_2.getFieldDefinition(),
+                                PASTE_3.getFieldDefinition(),
+                                PASTE_4.getFieldDefinition(),
+                                PASTE_5.getFieldDefinition(),
+                                PASTE_ML.getFieldDefinition()
                         ))
                 .create(connection, getProjectName());
 
@@ -999,8 +998,7 @@ public class EditableGridTest extends BaseWebDriverTest
                 .verifyEquals("There should be no grid cells already selected. Fatal error.",
                         0, editableGrid.getSelectedCells().size());
 
-        List<String> columns = editableGrid.getColumnLabels();
-        int startColumn = columns.indexOf(PASTE_1);
+        int startColumn = editableGrid.getColumnIndex(PASTE_1);
 
         int gridRow = 4;
         WebElement startCell = editableGrid.getCell(gridRow, PASTE_1);
@@ -1318,10 +1316,10 @@ public class EditableGridTest extends BaseWebDriverTest
                 .collect(Collectors.joining("\n"));
     }
 
-    private static List<WebElement> setCellValues(EditableGrid testGrid, String ascString, Object... values)
+    private static List<WebElement> setCellValues(EditableGrid testGrid, CharSequence columnIdentifier, Object... values)
     {
         List<WebElement> cells = new ArrayList<>();
-        List.of(values).forEach(value -> cells.add(testGrid.setCellValue(cells.size(), ascString, value)));
+        List.of(values).forEach(value -> cells.add(testGrid.setCellValue(cells.size(), columnIdentifier, value)));
         return cells;
     }
 
