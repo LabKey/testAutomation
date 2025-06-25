@@ -542,7 +542,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
      * Wrapper for synchronous execution of asynchronous JavaScript. This wrapper extracts the 'callback' from the argument list
      * See {@link JavascriptExecutor#executeAsyncScript(java.lang.String, java.lang.Object...)} for details
      */
-    public Object executeAsyncScript(@Language("XPath") String script, Object... arguments)
+    public Object executeAsyncScript(@Language("JavaScript") String script, Object... arguments)
     {
         script = "var callback = arguments[arguments.length - 1];\n" + // See WebDriver documentation for details on injected callback
                 "try {" +
@@ -551,7 +551,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return ((JavascriptExecutor) getDriver()).executeAsyncScript(script, arguments);
     }
 
-    public <T> T executeAsyncScript(String script, Class<T> expectedResultType, Object... arguments)
+    public <T> T executeAsyncScript(@Language("JavaScript") String script, Class<T> expectedResultType, Object... arguments)
     {
         Object o = executeAsyncScript(script, arguments);
         if (o != null && !expectedResultType.isAssignableFrom(o.getClass()))

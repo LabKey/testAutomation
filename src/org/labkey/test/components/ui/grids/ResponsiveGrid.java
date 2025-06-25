@@ -643,6 +643,24 @@ public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverCompon
     }
 
     /**
+     *
+     * @return a List&#60;String&#62; containing the names of the fields for each column header
+     */
+    public List<String> getColumnNames()
+    {
+        return elementCache().getColumnNames();
+    }
+
+    /**
+     *
+     * @return a List&#60;FieldKey&#62; containing the fieldKeys for each column header
+     */
+    public List<FieldKey> getColumnFieldKeys()
+    {
+        return elementCache().getColumnFieldKeys();
+    }
+
+    /**
      * Get data from a row
      * @param rowIndex  the index of the desired row
      * @return  a list of the text values in the row
@@ -773,7 +791,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverCompon
         return msg;
     }
 
-    List<FieldReference> getHeaders()
+    public List<FieldReference> getHeaders()
     {
         return Collections.unmodifiableList(elementCache().findHeaders());
     }
@@ -859,6 +877,16 @@ public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverCompon
         protected List<String> getColumnLabels()
         {
             return findHeaders().stream().map(FieldReferenceManager.FieldReference::getLabel).collect(Collectors.toList());
+        }
+
+        protected List<String> getColumnNames()
+        {
+            return findHeaders().stream().map(FieldReferenceManager.FieldReference::getName).collect(Collectors.toList());
+        }
+
+        protected List<FieldKey> getColumnFieldKeys()
+        {
+            return findHeaders().stream().map(FieldReferenceManager.FieldReference::getFieldKey).collect(Collectors.toList());
         }
 
         protected GridRow getRow(int index)
