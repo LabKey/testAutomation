@@ -91,6 +91,11 @@ public class Input extends WebDriverComponent<Component<?>.ElementCache> impleme
         getWrapper().setFormElement(getComponentElement(), value);
     }
 
+    public void clear()
+    {
+        getComponentElement().clear();
+    }
+
     public void setWithPaste(String value)
     {
         getWrapper().actionClear(getComponentElement());
