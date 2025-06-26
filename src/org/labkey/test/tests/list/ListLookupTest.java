@@ -1,6 +1,5 @@
 package org.labkey.test.tests.list;
 
-import org.apache.commons.csv.CSVFormat;
 import org.jetbrains.annotations.Nullable;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -286,7 +285,7 @@ public class ListLookupTest extends BaseWebDriverTest
     private String tsvFromColumn(List<String> column)
     {
         List<List<String>> rows = column.stream().map(Collections::singletonList).toList();
-        return TestDataUtils.stringFromRows(rows, CSVFormat.TDF);
+        return TestDataUtils.stringFromRows(rows);
     }
 
     @Override
