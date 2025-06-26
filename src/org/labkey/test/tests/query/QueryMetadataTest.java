@@ -319,7 +319,7 @@ public class QueryMetadataTest extends BaseWebDriverTest
         sourcePage.setMetadataXml(xml);
         checker().withScreenshot("validation-error")
                 .verifyEquals("expecting a validation error for the unsupported multi value type",
-                        "Failed to Save: Non-junction multi value column type : \"unsupported\" is not supported.", sourcePage.clickSaveExpectingError());
+                        "Failed to Save: Column : \"fakeMVFK\" has an invalid fkMultiValued value : \"unsupported\" is not supported.", sourcePage.clickSaveExpectingError());
     }
 
     @Override
