@@ -33,11 +33,6 @@ public class FileInput extends Input
         getWrapper().setFormElement(getComponentElement(), file);
     }
 
-    public void clear()
-    {
-        getComponentElement().clear();
-    }
-
     @Override
     protected void assertElementType(WebElement el)
     {
