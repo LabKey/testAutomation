@@ -48,6 +48,7 @@ import org.labkey.test.components.list.AdvancedListSettingsDialog;
 import org.labkey.test.pages.ImportDataPage;
 import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.pages.list.GridPage;
+import org.labkey.test.pages.query.UpdateQueryRowPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldDefinition.StringLookup;
 import org.labkey.test.tests.AuditLogTest;
@@ -505,6 +506,32 @@ public class ListTest extends BaseWebDriverTest
         checker().withScreenshot().verifyEquals("Name not trimmed as expected", trimmedName, editList.getName());
     }
 
+    @Test // Issue 52339
+    public void testLongName()
+    {
+        String listName = "A_+-:''.¡™£¢∞§¶•ªº–≠œ∑´®†¥¨ˆøπ“‘«æ…¬˚∆˙©√ƒ∂ßΩ≈ç√∫µ≤≥÷‹›ﬁﬂ‡°·‚—±⁄€‹›‡‰Æ«»¢∫√∑∏∂";
+        String fieldWithDefault = TestDataGenerator.randomFieldName("With Default");
+        EditListDefinitionPage listEditPage = _listHelper.beginCreateList(getProjectName(), listName);
+        listEditPage.manuallyDefineFieldsWithAutoIncrementingKey("Key");
+        listEditPage.addField(new FieldDefinition(fieldWithDefault, ColumnType.String));
+        listEditPage.clickSave();
+
+        listEditPage = _listHelper.goToEditDesign(listName);
+        var page = listEditPage.getFieldsPanel()
+                .expand()
+                .getField(fieldWithDefault)
+                .clickAdvancedSettings()
+                .clickDefaultValuesLink();
+        var input = Locator.tagContainingText("td", "With Default").followingSibling("td").descendant("input").findElement(page.getDriver());
+        setFormElement(input, "42");
+        clickButton("Save Defaults");
+        _listHelper.beginAtList(getProjectName(), listName);
+
+        DataRegionTable list = new DataRegionTable("query", getDriver());
+        UpdateQueryRowPage updatePage = list.clickInsertNewRow();
+        checker().verifyEquals("Default value not as expected ", "42", updatePage.getTextInputValue(fieldWithDefault));
+        updatePage.submit();
+    }
     /* Issue 51572: Bug with creating a new list by uploading a csv file in "UTF-8 with BOM" format
      */
     @Test
