@@ -266,8 +266,7 @@ public class ParticipantReportTest extends ReportTest
         Window<?> saveAsDialog = new Window.WindowFinder(getDriver()).withTitle("Save As").waitFor();
         _extHelper.setExtFormElementByLabel("Save As", "Report Name", PARTICIPANT_REPORT2_NAME);
         _extHelper.setExtFormElementByLabel("Save As", "Report Description", PARTICIPANT_REPORT2_DESCRIPTION);
-        Ext4Helper.Locators.ext4Button("Save").withoutAttributeContaining("class", "disabled")
-            .waitForElement(saveAsDialog, 2_000).click();
+        Ext4Helper.Locators.ext4ButtonEnabled("Save").waitForElement(saveAsDialog, 2_000).click();
         saveAsDialog.waitForClose();
         _ext4Helper.waitForComponentNotDirty("participant-report-panel-1");
         waitForTextToDisappear("Severity Grade");
@@ -279,8 +278,7 @@ public class ParticipantReportTest extends ReportTest
         saveAsDialog = new Window.WindowFinder(getDriver()).withTitle("Save As").waitFor();
         _extHelper.setExtFormElementByLabel("Save As", "Report Name", PARTICIPANT_REPORT_NAME);
         _extHelper.setExtFormElementByLabel("Save As", "Report Description", PARTICIPANT_REPORT2_DESCRIPTION);
-        Ext4Helper.Locators.ext4Button("Save").withoutAttributeContaining("class", "disabled")
-            .waitForElement(saveAsDialog, 2_000).click();
+        Ext4Helper.Locators.ext4ButtonEnabled("Save").waitForElement(saveAsDialog, 2_000).click();
         Window<?> failureDialog = new Window.WindowFinder(getDriver()).withTitle("Failure").waitFor();
         assertTextPresent("Another report with the same name already exists.");
         clickButton("OK", 0);
