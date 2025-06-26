@@ -312,13 +312,13 @@ public class TimeChartAPITest extends TimeChartTest
                 waitForElement(Locator.paginationText(testRowCounts[testIndex]), WAIT_FOR_JAVASCRIPT);
             }
 
-            CachingSupplier<DataRegionTable> table = new CachingSupplier<>(
-                () -> new DataRegionTable("apiTestDataRegion", this));
+            DataRegionTable table = new DataRegionTable.DataRegionFinder(getDriver())
+                .withName("apiTestDataRegion").findWhenNeeded();
 
             if (testColumnNames != null)
             {
                 List<String> expectedColumnNames = Arrays.asList(testColumnNames[testIndex]);
-                List<String> columnNames = new ArrayList<>(table.get().getColumnNames());
+                List<String> columnNames = new ArrayList<>(table.getColumnNames());
 
                 if (!columnNames.containsAll(expectedColumnNames))
                 {
@@ -333,14 +333,14 @@ public class TimeChartAPITest extends TimeChartTest
             {
                 Pair<String, List<Object>> expectedColumn = expectedColForAllTests.get(testIndex);
                 String columnName = expectedColumn.getKey();
-                int columnIndex = table.get().getColumnIndex(columnName);
+                int columnIndex = table.getColumnIndex(columnName);
                 List<Object> expectedValues = expectedColumn.getValue();
                 List<Object> actualValues = new ArrayList<>();
                 boolean isNumberCol = expectedValues.get(0) instanceof Number;
 
-                for (int i = 0; i < table.get().getDataRowCount() && actualValues.size() < expectedValues.size() && columnIndex >= 0; i++)
+                for (int i = 0; i < table.getDataRowCount() && actualValues.size() < expectedValues.size() && columnIndex >= 0; i++)
                 {
-                    String value = table.get().getDataAsText(i, columnIndex).trim();
+                    String value = table.getDataAsText(i, columnIndex).trim();
                     if (!value.isEmpty())
                         actualValues.add(isNumberCol ? Double.parseDouble(value) : value);
                 }

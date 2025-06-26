@@ -18,25 +18,25 @@ import java.util.stream.Collectors;
 
 public class FieldReferenceManager
 {
-    private final List<FieldReference> fieldReferences;
-    private final Map<Integer, FieldReference> fieldsByIndex;
-    private final Map<FieldKey, FieldReference> fieldKeys = new LinkedHashMap<>();
-    private final Map<String, FieldReference> fieldLabels = new LinkedHashMap<>();
+    private final List<FieldReference> _fieldReferences;
+    private final Map<Integer, FieldReference> _fieldsByIndex;
+    private final Map<FieldKey, FieldReference> _fieldKeys = new LinkedHashMap<>();
+    private final Map<String, FieldReference> _fieldLabels = new LinkedHashMap<>();
 
     public <T extends FieldReference> FieldReferenceManager(List<T> columnHeaders)
     {
-        fieldReferences = List.copyOf(columnHeaders);
-        fieldsByIndex = columnHeaders.stream().collect(Collectors.toMap(FieldReference::getDomIndex, Function.identity()));
+        _fieldReferences = List.copyOf(columnHeaders);
+        _fieldsByIndex = columnHeaders.stream().collect(Collectors.toMap(FieldReference::getDomIndex, Function.identity()));
     }
 
     public List<FieldReference> getColumnHeaders()
     {
-        return fieldReferences;
+        return _fieldReferences;
     }
 
     public FieldReference getColumnHeader(int index)
     {
-        return fieldsByIndex.get(index);
+        return _fieldsByIndex.get(index);
     }
 
     /**
@@ -86,18 +86,18 @@ public class FieldReferenceManager
 
     private FieldReference findColumnHeaderByFieldKey(FieldKey fieldIdentifier)
     {
-        if (fieldKeys.containsKey(fieldIdentifier))
+        if (_fieldKeys.containsKey(fieldIdentifier))
         {
-            return fieldKeys.get(fieldIdentifier);
+            return _fieldKeys.get(fieldIdentifier);
         }
-        else if (fieldKeys.size() < fieldReferences.size())
+        else if (_fieldKeys.size() < _fieldReferences.size())
         {
-            for (FieldReference header : fieldReferences)
+            for (FieldReference header : _fieldReferences)
             {
-                if (!fieldKeys.containsValue(header))
+                if (!_fieldKeys.containsValue(header))
                 {
                     FieldKey fieldKey = header.getFieldKey();
-                    fieldKeys.put(fieldKey, header);
+                    _fieldKeys.put(fieldKey, header);
                     if (fieldKey.equals(fieldIdentifier))
                     {
                         return header;
@@ -111,18 +111,18 @@ public class FieldReferenceManager
 
     private FieldReference findColumnHeaderByLabel(String label)
     {
-        if (fieldLabels.containsKey(label))
+        if (_fieldLabels.containsKey(label))
         {
-            return fieldLabels.get(label);
+            return _fieldLabels.get(label);
         }
-        else if (fieldLabels.size() < fieldReferences.size())
+        else if (_fieldLabels.size() < _fieldReferences.size())
         {
-            for (FieldReference header : fieldReferences)
+            for (FieldReference header : _fieldReferences)
             {
-                if (!fieldLabels.containsValue(header))
+                if (!_fieldLabels.containsValue(header))
                 {
                     String columnLabel = header.getLabel();
-                    fieldLabels.put(columnLabel, header);
+                    _fieldLabels.put(columnLabel, header);
                     if (columnLabel.equals(label))
                     {
                         return header;
