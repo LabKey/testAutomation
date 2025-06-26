@@ -244,7 +244,8 @@ public class DataReportsTest extends ReportTest
     @Test
     public void doCrosstabViewTest()
     {
-        String reportName = "TestReport";
+        String reportName = "TestReport" + TRICKY_CHARACTERS;
+        String reportName2 = "ATotallyDifferentReport" + TRICKY_CHARACTERS;
 
         clickAndWait(Locator.linkWithText("DEM-1: Demographics"));
 
@@ -254,19 +255,40 @@ public class DataReportsTest extends ReportTest
         selectOptionByText(Locator.name("statField"), "Visit");
         clickButton("Submit");
 
-        String[] row3 = new String[] {"Male", "2", "9", "3", "14"};
-        assertTableRowsEqual("report", 3, new String[][] {row3});
+        assertTableRowsEqual("report", 3, new String[][] {new String[] {"Male", "2", "9", "3", "14"}});
 
         setFormElement(Locator.name("label"), reportName);
         clickButton("Save");
 
+        // Now visit the report and check that it renders correctly
         clickFolder("My Study");
-        assertTextPresent(reportName);
         clickAndWait(Locator.linkWithText(reportName));
-
         assertTableCellTextEquals("report", 2, 0, "Female");
 
+        clickFolder("My Study");
+        clickAndWait(Locator.linkWithText("DEM-1: Demographics"));
+        DataRegionTable.DataRegion(getDriver()).find().goToReport("Create Crosstab Report");
+        // Test rendering of date values, both in headers and in cells
+        selectOptionByValue(Locator.name("rowField"), "DEMdt");
+        selectOptionByValue(Locator.name("colField"), "DEMhisp");
+        selectOptionByText(Locator.name("statField"), "1.Date of Birth");
+        clickButton("Submit");
+
+        // Try saving with a duplicate name
+        setFormElement(Locator.name("label"), reportName);
+        clickButton("Save");
+        assertTextPresent("There is already a report with the name of");
+        setFormElement(Locator.name("label"), reportName2);
+        clickButton("Save");
+
+        // Now visit the second report and check that it renders correctly
+        clickFolder("My Study");
+        clickAndWait(Locator.linkWithText(reportName2));
+        assertTableRowsEqual("report", 3, new String[][] {new String[] {"2006-01-01 00:00:00.0", "1", "0", "1"}});
+        assertTableRowsEqual("report", 14, new String[][] {new String[] {"2006-02-01 00:00:00.0", "3", "1", "4"}});
+
         deleteReport(reportName);
+        deleteReport(reportName2);
     }
 
     @Test
