@@ -79,6 +79,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.labkey.test.params.FieldDefinition.DOMAIN_TRICKY_CHARACTERS;
 import static org.labkey.test.util.DataRegionTable.DataRegion;
 
 @Category({Daily.class})
@@ -241,7 +242,36 @@ public class SampleTypeTest extends BaseWebDriverTest
         sampleTypeHelper.verifyDataValues(data);
     }
 
-    // Issue 47280: LKSM: Trailing/Leading whitespace in Source name won't resolve when deriving samples
+    // Issue 53313: LKS doesn't show Sample Type fields with special characters in Custom Properties
+    @Test
+    public void testCustomProperties()
+    {
+        final String sampleTypeName = "SampleTypeCustomProps" + DOMAIN_TRICKY_CHARACTERS;
+        final List<FieldDefinition> fields = List.of(
+                new FieldDefinition("StringColPlain", FieldDefinition.ColumnType.String),
+                new FieldDefinition("StringCol%", FieldDefinition.ColumnType.String),
+                new FieldDefinition("CalcCol", ColumnType.Calculation).setValueExpression("StringColPlain || 'Concat'"));
+
+        SampleTypeDefinition sampleTypeDefinition = new SampleTypeDefinition(sampleTypeName).setFields(fields);
+
+        SampleTypeAPIHelper.createEmptySampleType(getProjectName(), sampleTypeDefinition);
+
+        log("Create a new sample type");
+        projectMenu().navigateToFolder(PROJECT_NAME, FOLDER_NAME);
+        SampleTypeHelper sampleTypeHelper = new SampleTypeHelper(this);
+        sampleTypeHelper.goToSampleType(sampleTypeName);
+
+        log("Add a single row to the sample type, with trailing spaces");
+        Map<String, String> fieldMap = Map.of("Name", "CustomPropsSample", "StringColPlain", "PlainValue", "StringCol%", "PercentValue");
+        sampleTypeHelper.insertRow(fieldMap);
+
+        log("Verify custom properties, both name and values, are shown in both the grid and detail pages");
+        assertTextPresent("String Col Plain", "String Col%", "Calc Col", "PlainValue", "PercentValue", "PlainValueConcat");
+        clickAndWait(Locator.linkWithText("CustomPropsSample"));
+        assertTextPresent("String Col Plain", "String Col%", "Calc Col", "PlainValue", "PercentValue", "PlainValueConcat");
+    }
+
+        // Issue 47280: LKSM: Trailing/Leading whitespace in Source name won't resolve when deriving samples
     @Test
     public void testImportSamplesWithTrailingSpace()
     {
