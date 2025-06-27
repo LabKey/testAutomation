@@ -52,6 +52,7 @@ import org.labkey.test.params.FieldInfo;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.ExcelHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
@@ -248,7 +249,7 @@ public class SampleTypeTest extends BaseWebDriverTest
     public void testCustomProperties()
     {
         final String sampleTypeName = "SampleTypeCustomProps" + DOMAIN_TRICKY_CHARACTERS;
-        FieldInfo stringCol1 = new FieldInfo(TestDataGenerator.randomFieldName("StringColPlain", "\""), ColumnType.String);
+        FieldInfo stringCol1 = new FieldInfo(TestDataGenerator.randomFieldName("StringColPlain"), ColumnType.String);
         FieldInfo stringCol2 = new FieldInfo(TestDataGenerator.randomFieldName("StringCol%"), ColumnType.String);
         // Used to make sure the details page shows properties with null values
         FieldInfo stringCol3 = new FieldInfo(TestDataGenerator.randomFieldName("StringColNull"), ColumnType.String);
@@ -257,7 +258,7 @@ public class SampleTypeTest extends BaseWebDriverTest
                 stringCol1.getFieldDefinition(),
                 stringCol2.getFieldDefinition(),
                 stringCol3.getFieldDefinition(),
-                calcCol.getFieldDefinition().setValueExpression("\"" + stringCol1.getName() + "\" || 'Concat'")
+                calcCol.getFieldDefinition().setValueExpression(EscapeUtil.getSqlQuotedValue(stringCol1.getName()) + " || 'Concat'")
         );
 
         SampleTypeDefinition sampleTypeDefinition = new SampleTypeDefinition(sampleTypeName).setFields(fields);
