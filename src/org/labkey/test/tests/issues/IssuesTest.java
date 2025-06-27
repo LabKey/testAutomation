@@ -199,7 +199,7 @@ public class IssuesTest extends BaseWebDriverTest
         DataRegionTable issuesTable = new DataRegionTable(ISSUE_LIST_REGION_NAME, getDriver());
 
         // clear region selection and filters
-        issuesTable.uncheckAll();
+        issuesTable.uncheckAllOnPage();
         issuesTable.clearAllFilters();
 
         // reset folder filter
@@ -599,7 +599,7 @@ public class IssuesTest extends BaseWebDriverTest
         DataRegionTable issuesTable = new DataRegionTable(ISSUE_LIST_REGION_NAME, getDriver());
 
         issuesTable.setFilter("Status", "Has Any Value", null);
-        issuesTable.checkAll();
+        issuesTable.checkAllOnPage();
         clickButton("View Details");
         assertTextPresent(
                 ISSUE_0.get("comment"),

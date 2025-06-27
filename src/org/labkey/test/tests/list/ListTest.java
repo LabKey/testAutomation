@@ -753,7 +753,7 @@ public class ListTest extends BaseWebDriverTest
         assertTextPresent(TEST_DATA[TD_DESC][1], 2);
 
         log("Test deleting rows");
-        dataRegionTable.checkAll();
+        dataRegionTable.checkAllOnPage();
         doAndWaitForPageToLoad(() ->
         {
             dt.clickHeaderButton("Delete");

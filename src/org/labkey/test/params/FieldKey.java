@@ -2,7 +2,6 @@ package org.labkey.test.params;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -66,7 +65,7 @@ public final class FieldKey implements CharSequence, WrapsFieldKey
      * @param fieldKey String or FieldKey
      * @return FieldKey representation of the String, or the identity if a FieldKey was provided
      */
-    public static @Nullable FieldKey fromFieldKey(CharSequence fieldKey)
+    public static FieldKey fromFieldKey(CharSequence fieldKey)
     {
         if (fieldKey instanceof WrapsFieldKey fk)
         {
@@ -74,14 +73,7 @@ public final class FieldKey implements CharSequence, WrapsFieldKey
         }
         else
         {
-            try
-            {
-                return fromParts(Arrays.stream(fieldKey.toString().split(SEPARATOR)).map(FieldKey::decodePart).toList());
-            }
-            catch (IllegalArgumentException iae)
-            {
-                return null;
-            }
+            return fromParts(Arrays.stream(fieldKey.toString().split(SEPARATOR)).map(FieldKey::decodePart).toList());
         }
     }
 
@@ -149,6 +141,10 @@ public final class FieldKey implements CharSequence, WrapsFieldKey
         return _name;
     }
 
+    /**
+     * Inverse of {@link #fromParts(String...)}
+     * @return decoded parts of the field key
+     */
     public String[] getNameArray()
     {
         return Arrays.stream(_fieldKey.split(SEPARATOR)).map(FieldKey::decodePart).toArray(String[]::new);

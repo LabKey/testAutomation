@@ -581,7 +581,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
 
         if((expectedUsersCount > 0) && (null != studyName))
         {
-            if (!table.getColumnNames().contains("ParticipantId/Study"))
+            if (!table.getFieldKeyStrings().contains("ParticipantId/Study"))
             {
                 CustomizeView cv = table.openCustomizeGrid();
                 cv.addColumn("ParticipantId/Study");
