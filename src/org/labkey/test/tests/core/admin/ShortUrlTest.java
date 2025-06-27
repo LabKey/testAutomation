@@ -7,6 +7,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.Connection;
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.pages.admin.ShortUrlAdminPage;
@@ -186,20 +187,36 @@ public class ShortUrlTest extends BaseWebDriverTest
             adminPage.submitShortUrl(shortUrl_a, targetUrl2);
 
             // Issue #52485 "App admins can create and edit shorturls but can't view them" (but now they can!)
-            verifyShortUrlsInGrid(shortUrl_a, targetUrl2, shortUrl_b);
+            verifyShortUrlsInGrid(Map.of(shortUrl_a, targetUrl2, shortUrl_b, targetUrl2));
+
+            // Edit an existing row, setting it back to the original target
+            DataRegionTable table = new DataRegionTable("ShortURL", getDriver());
+            table.setFilter("ShortURL", "Equals", shortUrl_a);
+            table.clickEditRow(0);
+            setFormElement(Locator.name("fullURL"), targetUrl1);
+            clickButton("Update");
+
+            // Issue #52485 "App admins can create and edit shorturls but can't view them" (but now they can!)
+            verifyShortUrlsInGrid(Map.of(shortUrl_a, targetUrl1, shortUrl_b, targetUrl2));
+
+            // Delete an existing row
+            table = new DataRegionTable("ShortURL", getDriver());
+            table.setFilter("ShortURL", "Equals", shortUrl_a);
+            table.checkCheckbox(0);
+            table.deleteSelectedRows();
+            assertTextNotPresent(targetUrl1);
         });
 
-        verifyShortUrlsInGrid(shortUrl_a, targetUrl2, shortUrl_b);
+        // Double-verify the single entry to reuse the same validation method
+        verifyShortUrlsInGrid(Map.of(shortUrl_b, targetUrl2));
     }
 
-    private void verifyShortUrlsInGrid(String shortUrl_a, String targetUrl2, String shortUrl_b)
+    /** Map of short URL to target URLs to expect */
+    private void verifyShortUrlsInGrid(Map<String, String> urlMap)
     {
         Assertions.assertThat(ShortUrlAdminPage.beginAt(this).getUrlsFromGrid())
                 .as("short URLs")
-                .containsAllEntriesOf(Map.of(
-                        shortUrl_a, targetUrl2,
-                        shortUrl_b, targetUrl2
-                ));
+                .containsAllEntriesOf(urlMap);
     }
 
     private String nextUrlKey()

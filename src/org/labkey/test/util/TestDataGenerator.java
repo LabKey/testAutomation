@@ -697,19 +697,7 @@ public class TestDataGenerator
     {
         try
         {
-            String fileExtension = fileName.toLowerCase().substring(fileName.lastIndexOf('.') + 1);
-            switch (fileExtension)
-            {
-                case "xlsx":
-                case "xls":
-                    return TestDataUtils.writeRowsToExcel(fileName, rowIterator);
-                case "csv":
-                    return TestDataUtils.writeRowsToFile(fileName, rowIterator, CSVFormat.DEFAULT);
-                case "tsv":
-                    return TestDataUtils.writeRowsToFile(fileName, rowIterator, CSVFormat.TDF);
-                default:
-                    throw new IllegalArgumentException("Unsupported file extension: " + fileExtension);
-            }
+            return TestDataUtils.writeRowsToFile(fileName, rowIterator);
         }
         catch (IOException e)
         {

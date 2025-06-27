@@ -68,10 +68,10 @@ public class UniprotAnnotationTest extends BaseWebDriverTest
         if (alreadyLoaded)
         {
             annotInsertions.setFilter("FileName", "Contains", UNIPROT_FILENAME);
-            annotInsertions.checkAll();
+            annotInsertions.checkAllOnPage();
             doAndWaitForPageToLoad(() ->
             {
-                annotInsertions.clickHeaderButtonByText("Delete");
+                annotInsertions.clickHeaderButton("Delete");
                 acceptAlert();
             });
         }
