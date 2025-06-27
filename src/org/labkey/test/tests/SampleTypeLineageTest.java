@@ -40,6 +40,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.labkey.test.params.FieldDefinition.DOMAIN_TRICKY_CHARACTERS;
 import static org.labkey.test.util.exp.SampleTypeAPIHelper.SAMPLE_TYPE_DOMAIN_KIND;
 
 @Category({Daily.class})
@@ -1116,31 +1117,37 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
     @Test
     public void testDeleteSamplesSomeWithDerivedSamples()
     {
-        final String SAMPLE_TYPE_NAME = "DeleteSamplesWithParents";
+        final String SAMPLE_TYPE_NAME = "DeleteSamplesWithParents" + DOMAIN_TRICKY_CHARACTERS;
         List<String> parentSampleNames = Arrays.asList("P-1", "P-2", "P-3");
         List<Map<String, String>> sampleData = new ArrayList<>();
-        parentSampleNames.forEach(name -> {
-            sampleData.add(Map.of("Name", name));
-        });
+        parentSampleNames.forEach(name -> sampleData.add(Map.of("Name", name)));
 
         clickProject(PROJECT_NAME);
         SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
         log("Create a sample type with some potential parents");
-        sampleHelper.createSampleType(new SampleTypeDefinition(SAMPLE_TYPE_NAME), sampleData);
+        sampleHelper.createSampleType(new SampleTypeDefinition(SAMPLE_TYPE_NAME).
+                addField(new FieldDefinition("Blood+")).
+                addField(new FieldDefinition("Blood-")),
+            sampleData);
         DataRegionTable drtSamples = sampleHelper.getSamplesDataRegionTable();
         log("Derive one sample from another");
         drtSamples.checkCheckbox(drtSamples.getIndexWhereDataAppears(parentSampleNames.get(0), "Name"));
         clickButton("Derive Samples");
         waitAndClickAndWait(Locator.lkButton("Next"));
         String childName = parentSampleNames.get(0) + ".1";
-        setFormElement(Locator.name("outputSample1_Name"), childName);
+        String nameFieldInputFieldName = "Output Sample 1_Name";
+        String bloodPlusFieldInputFieldName = "Output Sample 1_Blood+";
+        String bloodMinusFieldInputFieldName = "Output Sample 1_Blood-";
+        setFormElement(Locator.name(nameFieldInputFieldName), childName);
+        setFormElement(Locator.name(bloodPlusFieldInputFieldName), "blood plus");
+        setFormElement(Locator.name(bloodMinusFieldInputFieldName), "blood minus");
         clickButton("Submit");
 
         log("Derive a sample from the one just created");
         clickAndWait(Locator.linkContainingText("derive samples from this sample"));
         clickButton("Next");
         String grandchildName = childName + ".1";
-        setFormElement(Locator.name("outputSample1_Name"), grandchildName);
+        setFormElement(Locator.name(nameFieldInputFieldName), grandchildName);
         clickButton("Submit");
 
         log("Derive a sample with two parents");
@@ -1150,10 +1157,15 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
         clickButton("Derive Samples");
         waitAndClickAndWait(Locator.lkButton("Next"));
         String twoParentChildName = parentSampleNames.get(1) + "+" + childName + ".1";
-        setFormElement(Locator.name("outputSample1_Name"), twoParentChildName);
+        setFormElement(Locator.name(nameFieldInputFieldName), twoParentChildName);
         clickButton("Submit");
 
         clickAndWait(Locator.linkContainingText(SAMPLE_TYPE_NAME));
+
+        // Issue 53306 - ensure that names differing only by special characters were captured correctly and are being
+        // shown in the grid
+        assertTextPresent("blood plus", "blood minus");
+
 
         log("Try to delete parent sample");
         drtSamples.checkCheckbox(drtSamples.getIndexWhereDataAppears(parentSampleNames.get(0), "Name"));

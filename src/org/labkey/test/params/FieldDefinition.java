@@ -83,7 +83,7 @@ public class FieldDefinition extends PropertyDescriptor
      * Define a String field
      * @param name field name
      */
-    public FieldDefinition(String name)
+    public FieldDefinition(@NotNull String name)
     {
         this(name, ColumnType.String);
     }
