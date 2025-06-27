@@ -59,21 +59,21 @@ public class UpdateQueryRowPage extends LabKeyPage<UpdateQueryRowPage.ElementCac
         for (Map.Entry<String, ?> entry : fields.entrySet())
         {
             Object value = entry.getValue();
-            if (value instanceof String)
+            if (value instanceof String s)
             {
-                setField(entry.getKey(), (String) value);
+                setField(entry.getKey(), s);
             }
-            else if (value instanceof Boolean)
+            else if (value instanceof Boolean b)
             {
-                setField(entry.getKey(), (Boolean) value);
+                setField(entry.getKey(), b);
             }
-            else if (value instanceof Integer)
+            else if (value instanceof Integer i)
             {
-                setField(entry.getKey(), (Integer) value);
+                setField(entry.getKey(), i);
             }
-            else if (value instanceof File)
+            else if (value instanceof File f)
             {
-                setField(entry.getKey(), (File) value);
+                setField(entry.getKey(), f);
             }
             else
             {

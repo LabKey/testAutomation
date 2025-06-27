@@ -25,6 +25,7 @@ import org.labkey.test.categories.Charting;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Reports;
 import org.labkey.test.tests.visualization.TimeChartTest;
+import org.labkey.test.util.CachingSupplier;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
@@ -311,11 +312,11 @@ public class TimeChartAPITest extends TimeChartTest
                 waitForElement(Locator.paginationText(testRowCounts[testIndex]), WAIT_FOR_JAVASCRIPT);
             }
 
-            DataRegionTable table = null;
+            DataRegionTable table = new DataRegionTable.DataRegionFinder(getDriver())
+                .withName("apiTestDataRegion").findWhenNeeded();
 
             if (testColumnNames != null)
             {
-                if (null == table) table = new DataRegionTable("apiTestDataRegion", this);
                 List<String> expectedColumnNames = Arrays.asList(testColumnNames[testIndex]);
                 List<String> columnNames = new ArrayList<>(table.getColumnNames());
 
@@ -328,33 +329,28 @@ public class TimeChartAPITest extends TimeChartTest
                 }
             }
 
-            if (colsForAllTests.length > 0)
+            for (List<Pair<String, List<Object>>> expectedColForAllTests : colsForAllTests)
             {
-                if (null == table) table = new DataRegionTable("apiTestDataRegion", this);
+                Pair<String, List<Object>> expectedColumn = expectedColForAllTests.get(testIndex);
+                String columnName = expectedColumn.getKey();
+                int columnIndex = table.getColumnIndex(columnName);
+                List<Object> expectedValues = expectedColumn.getValue();
+                List<Object> actualValues = new ArrayList<>();
+                boolean isNumberCol = expectedValues.get(0) instanceof Number;
 
-                for (List<Pair<String, List<Object>>> expectedColForAllTests : colsForAllTests)
+                for (int i = 0; i < table.getDataRowCount() && actualValues.size() < expectedValues.size() && columnIndex >= 0; i++)
                 {
-                    Pair<String, List<Object>> expectedColumn = expectedColForAllTests.get(testIndex);
-                    String columnName = expectedColumn.getKey();
-                    int columnIndex = table.getColumnIndex(columnName);
-                    List<Object> expectedValues = expectedColumn.getValue();
-                    List<Object> actualValues = new ArrayList<>();
-                    boolean isNumberCol = expectedValues.get(0) instanceof Number;
-
-                    for (int i = 0; i < table.getDataRowCount() && actualValues.size() < expectedValues.size() && columnIndex >= 0; i++)
-                    {
-                        String value = table.getDataAsText(i, columnIndex).trim();
-                        if (!value.isEmpty())
-                            actualValues.add(isNumberCol ? Double.parseDouble(value) : value);
-                    }
-
-                    if (!expectedValues.equals(actualValues))
-                    {
-                        TestLogger.log("expected values for " + columnName + " -- " + String.join(", ", expectedValues.toString()));
-                        TestLogger.log("actual values for " + columnName + " -- " + String.join(", ", actualValues.toString()));
-                    }
-                    assertEquals("Wrong values for column " + columnName, expectedValues, actualValues);
+                    String value = table.getDataAsText(i, columnIndex).trim();
+                    if (!value.isEmpty())
+                        actualValues.add(isNumberCol ? Double.parseDouble(value) : value);
                 }
+
+                if (!expectedValues.equals(actualValues))
+                {
+                    TestLogger.log("expected values for " + columnName + " -- " + String.join(", ", expectedValues.toString()));
+                    TestLogger.log("actual values for " + columnName + " -- " + String.join(", ", actualValues.toString()));
+                }
+                assertEquals("Wrong values for column " + columnName, expectedValues, actualValues);
             }
 
             if (testOutputTexts != null)
