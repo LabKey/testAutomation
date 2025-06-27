@@ -80,7 +80,7 @@ public final class FieldKey implements CharSequence, WrapsFieldKey
             }
             catch (IllegalArgumentException iae)
             {
-                return null; // FieldRefernceManager depends on this returning null.
+                return null; // FieldReferenceManager depends on this returning null.
             }
         }
     }
