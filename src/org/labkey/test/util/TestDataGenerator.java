@@ -74,7 +74,7 @@ public class TestDataGenerator
     private static final char WIDE_PLACEHOLDER = '\u03A0'; // 'Π' - Wide character can't be picked from the string with 'charAt'
     private static final String NON_LATIN_STRING = "\u0438\uC548\u306F"; // "и안は"
     // chose a Character random from this String
-    public static final String CHARSET_STRING = "ABCDEFG01234abcdefvxyz~!@#$%^&*()-+=_{}[]|:;\"',.<>" + NON_LATIN_STRING + WIDE_PLACEHOLDER;
+    public static final String CHARSET_STRING = "ABCDEFG01234abcdefvxyz~!@#$%^&*()-+=_{}[]|:;\"\\',.<>" + NON_LATIN_STRING + WIDE_PLACEHOLDER;
     public static final String ALPHANUMERIC_STRING = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvxyz";
     public static final String DOMAIN_SPECIAL_STRING =  "+- _.:&()/";
     public static final String ILLEGAL_DOMAIN_NAME_CHARSET = "<>[]{};,`\"~!@#$%^*=|?\\";
@@ -697,19 +697,7 @@ public class TestDataGenerator
     {
         try
         {
-            String fileExtension = fileName.toLowerCase().substring(fileName.lastIndexOf('.') + 1);
-            switch (fileExtension)
-            {
-                case "xlsx":
-                case "xls":
-                    return TestDataUtils.writeRowsToExcel(fileName, rowIterator);
-                case "csv":
-                    return TestDataUtils.writeRowsToFile(fileName, rowIterator, CSVFormat.DEFAULT);
-                case "tsv":
-                    return TestDataUtils.writeRowsToFile(fileName, rowIterator, CSVFormat.TDF);
-                default:
-                    throw new IllegalArgumentException("Unsupported file extension: " + fileExtension);
-            }
+            return TestDataUtils.writeRowsToFile(fileName, rowIterator);
         }
         catch (IOException e)
         {

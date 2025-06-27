@@ -3,6 +3,7 @@ package org.labkey.test.components.ui.grids;
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.labkey.test.params.FieldKey;
+import org.labkey.test.params.WrapsFieldKey;
 import org.labkey.test.util.selenium.WebElementUtils;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
@@ -43,9 +44,9 @@ public class FieldReferenceManager
     {
         List<Supplier<FieldReference>> options;
 
-        if (fieldIdentifier instanceof FieldKey fk)
+        if (fieldIdentifier instanceof WrapsFieldKey fk)
         {
-            options = List.of(() -> findColumnHeaderByFieldKey(fk)); // We know it is a FieldKey
+            options = List.of(() -> findColumnHeaderByFieldKey(fk.getFieldKey())); // We know it is a FieldKey
         }
         else
         {
