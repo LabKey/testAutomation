@@ -20,8 +20,8 @@ import java.util.List;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 @Category({Assays.class, Daily.class})
@@ -124,7 +124,7 @@ public class FlagColumnTest extends BaseWebDriverTest
 
         // verify expected rows and columns are present
         DataRegionTable grid = new DataRegionTable("Data", getDriver());
-        assertThat(grid.getColumnNames(), hasItems(RESULT_SOME_DATA, RESULT_FLAG_A, RESULT_FLAG_B, "Run/AnotherRunFlag", RESULT_RUN_FLAG));
+        assertThat(grid.getFieldKeyStrings(), hasItems(RESULT_SOME_DATA, RESULT_FLAG_A, RESULT_FLAG_B, "Run/AnotherRunFlag", RESULT_RUN_FLAG));
         assertEquals("run1-data1", grid.getDataAsText(0, RESULT_SOME_DATA));
         assertEquals("run1-data2", grid.getDataAsText(1, RESULT_SOME_DATA));
         assertEquals("run2-data1", grid.getDataAsText(2, RESULT_SOME_DATA));

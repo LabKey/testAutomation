@@ -35,8 +35,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -103,7 +103,7 @@ public abstract class AbstractExportTest extends BaseWebDriverTest
         exportHelper = new DataRegionExportHelper(dataRegion);
 
         if (hasSelectors())
-            dataRegion.uncheckAll();
+            dataRegion.uncheckAllOnPage();
     }
 
     @Test
