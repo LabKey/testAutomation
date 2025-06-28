@@ -83,7 +83,7 @@ public class ElispotAssayTest extends AbstractAssayTest
     private static final String FLUOROSPOT_DETECTION_METHOD = "fluorescent";
 
     public static final String FLUOROSPOT_FOLDER = "Fluorospot";
-    public static final Locator.XPathLocator PLATE_READER_LOCATOR = Locator.name("plateReader");
+    public static final Locator.XPathLocator PLATE_READER_LOCATOR = Locator.name("PlateReader");
 
     @Override
     public List<String> getAssociatedModules()

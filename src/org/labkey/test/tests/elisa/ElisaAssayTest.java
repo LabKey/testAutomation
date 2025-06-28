@@ -142,8 +142,8 @@ public class ElisaAssayTest extends AbstractAssayTest
     {
         for (int i = startSpecimen; i <= lastSpecimen; i++)
         {
-            Locator specimenLocator = Locator.name("specimen" + (i) + "_SpecimenID");
-            Locator participantLocator = Locator.name("specimen" + (i) + "_ParticipantID");
+            Locator specimenLocator = Locator.name("Specimen " + (i) + "_SpecimenID");
+            Locator participantLocator = Locator.name("Specimen " + (i) + "_ParticipantID");
 
             // test for prepopulation of specimen form element values
 //            if (testPrepopulation)

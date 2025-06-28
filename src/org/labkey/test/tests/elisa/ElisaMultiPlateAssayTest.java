@@ -255,8 +255,8 @@ public class ElisaMultiPlateAssayTest extends BaseWebDriverTest
 
         for (int i = startSpecimen; i <= lastSpecimen; i++)
         {
-            Locator specimenLocator = Locator.name("specimen" + (i) + "_SpecimenID");
-            Locator participantLocator = Locator.name("specimen" + (i) + "_ParticipantID");
+            Locator specimenLocator = Locator.name("Specimen " + (i) + "_SpecimenID");
+            Locator participantLocator = Locator.name("Specimen " + (i) + "_ParticipantID");
 
             setFormElement(specimenLocator, "specimen " + (i) + " " + uniqueifier);
             setFormElement(participantLocator, "ptid " + (i) + " " + uniqueifier);
