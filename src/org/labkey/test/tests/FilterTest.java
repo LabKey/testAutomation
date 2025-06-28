@@ -48,7 +48,6 @@ import java.util.Map;
 import static org.junit.Assert.assertEquals;
 import static org.labkey.test.params.FieldDefinition.ColumnType;
 import static org.labkey.test.params.FieldDefinition.DOMAIN_TRICKY_CHARACTERS;
-import static org.labkey.test.params.FieldDefinition.LookupInfo;
 import static org.labkey.test.util.PermissionsHelper.MemberType;
 
 @Category({Daily.class, Data.class})
@@ -80,7 +79,7 @@ public class FilterTest extends BaseWebDriverTest
     protected final static String[] CONVERTED_MONTHS = { "2000-01-01", "2000-04-04", "2000-03-03", "2000-02-02" };
 
     protected final FieldDefinition _list2ColKey = new FieldDefinition("Car", ColumnType.String);
-    protected final FieldDefinition _list2Col1 = new FieldDefinition(LIST_KEY_NAME2, new LookupInfo(null, "lists", LIST_NAME_COLORS).setTableType(ColumnType.String)).setDescription("The color of the car");
+    protected final FieldDefinition _list2Col1 = new FieldDefinition(LIST_KEY_NAME2, new FieldDefinition.StringLookup(null, "lists", LIST_NAME_COLORS)).setDescription("The color of the car");
     protected final FieldDefinition _list2ColYear = new FieldDefinition("year", ColumnType.Integer).setLabel("year");
 
     @Override
@@ -284,15 +283,15 @@ public class FilterTest extends BaseWebDriverTest
 
         HashMap<String, String> projectIssue = new HashMap<>();
         projectIssue.put("title", "project issue1");
-        projectIssue.put("assignedTo", getDisplayName());
-        projectIssue.put("type", "typea");
-        projectIssue.put("priority", "1");
+        projectIssue.put("AssignedTo", getDisplayName());
+        projectIssue.put("Type", "typea");
+        projectIssue.put("Priority", "1");
         issuesHelper.addIssue(projectIssue);
         HashMap<String, String> projectIssue2 = new HashMap<>();
         projectIssue2.put("title", "project issue2");
-        projectIssue2.put("assignedTo", getDisplayName());
-        projectIssue2.put("type", "typeb");
-        projectIssue2.put("priority", "2");
+        projectIssue2.put("AssignedTo", getDisplayName());
+        projectIssue2.put("Type", "typeb");
+        projectIssue2.put("Priority", "2");
         issuesHelper.addIssue(projectIssue2);
 
         _containerHelper.createSubfolder(getProjectName(), "subfolder");
@@ -310,15 +309,15 @@ public class FilterTest extends BaseWebDriverTest
 
         HashMap<String, String> subfolderIssue = new HashMap<>();
         subfolderIssue.put("title", "subfolder issue1");
-        subfolderIssue.put("assignedTo", getDisplayName());
-        subfolderIssue.put("type", "typed");
-        subfolderIssue.put("priority", "3");
+        subfolderIssue.put("AssignedTo", getDisplayName());
+        subfolderIssue.put("Type", "typed");
+        subfolderIssue.put("Priority", "3");
         issuesHelper.addIssue(subfolderIssue);
         HashMap<String, String> subfolderIssue2 = new HashMap<>();
         subfolderIssue2.put("title", "subfolder issue2");
-        subfolderIssue2.put("assignedTo", getDisplayName());
-        subfolderIssue2.put("type", "typee");
-        subfolderIssue2.put("priority", "4");
+        subfolderIssue2.put("AssignedTo", getDisplayName());
+        subfolderIssue2.put("Type", "typee");
+        subfolderIssue2.put("Priority", "4");
         issuesHelper.addIssue(subfolderIssue2);
 
         goToProjectHome();
@@ -337,16 +336,16 @@ public class FilterTest extends BaseWebDriverTest
         assertElementPresent(Locator.linkWithText(subfolderIssue2.get("title")));
 
         verifyFacetOptions(region, "Type",
-                projectIssue.get("type"),
-                projectIssue2.get("type"),
-                subfolderIssue.get("type"),
-                subfolderIssue2.get("type"));
+                projectIssue.get("Type"),
+                projectIssue2.get("Type"),
+                subfolderIssue.get("Type"),
+                subfolderIssue2.get("Type"));
 
         verifyFacetOptions(region, "Priority",
-                projectIssue.get("priority"),
-                projectIssue2.get("priority"),
-                subfolderIssue.get("priority"),
-                subfolderIssue2.get("priority"));
+                projectIssue.get("Priority"),
+                projectIssue2.get("Priority"),
+                subfolderIssue.get("Priority"),
+                subfolderIssue2.get("Priority"));
 
         region.setFacetedFilter("Priority", projectIssue2.get("priority"), subfolderIssue.get("priority"));
         assertElementNotPresent(Locator.linkWithText(projectIssue.get("title")));
@@ -355,8 +354,8 @@ public class FilterTest extends BaseWebDriverTest
         assertElementNotPresent(Locator.linkWithText(subfolderIssue2.get("title")));
 
         verifyFacetOptions(region, "Type",
-                projectIssue2.get("type"),
-                subfolderIssue.get("type"));
+                projectIssue2.get("Type"),
+                subfolderIssue.get("Type"));
     }
 
     private void verifyFacetOptions(DataRegionTable dataRegion, String column, String... options)

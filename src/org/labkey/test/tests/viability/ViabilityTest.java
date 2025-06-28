@@ -89,7 +89,7 @@ public class ViabilityTest extends AbstractViabilityTest
         assertEquals("5.0", getFormElement(Locator.name("_pool_160450533-5_0_VisitID")));
         assertEquals("3.700E7", getFormElement(Locator.name("_pool_160450533-5_0_TotalCells")));
         assertEquals("3.127E7", getFormElement(Locator.name("_pool_160450533-5_0_ViableCells")));
-        assertEquals("84.5%", getFormElement(Locator.name("_pool_1604505335_0_Viability")));
+        assertEquals("84.5%", getFormElement(Locator.name("_pool_160450533-5_0_Viability")));
         assertNotChecked(Locator.checkboxByName("_pool_160450533-5_0_Unreliable"));
         assertEquals("", getFormElement(Locator.name("_pool_160450533-5_0_IntValue")));
 
