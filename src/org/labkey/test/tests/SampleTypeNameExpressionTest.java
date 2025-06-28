@@ -704,8 +704,8 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         selectOptionByText(Locator.name("targetSampleTypeId"),  String.format("%s in /%s", targetSampleType, getProjectName()));
         clickButton("Next");
 
-        setFormElement(Locator.name("outputSample1_%s".formatted(COL_DINT.getName())), intVal);
-        setFormElement(Locator.name("outputSample1_%s".formatted(COL_DSTR.getName())), strVal);
+        setFormElement(Locator.name("Output Sample 1_%s".formatted(COL_DINT.getName())), intVal);
+        setFormElement(Locator.name("Output Sample 1_%s".formatted(COL_DSTR.getName())), strVal);
         clickButton("Submit");
 
         waitForElement(Locator.tagWithText("td", strVal));

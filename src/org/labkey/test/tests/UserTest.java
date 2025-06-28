@@ -406,7 +406,7 @@ public class UserTest extends BaseWebDriverTest
 
     private Locator createAssignedToOptionLocator(String username)
     {
-        return Locator.xpath("//select[@name='assignedTo']/option[@value='" + username +  "']");
+        return Locator.xpath("//select[@name='AssignedTo']/option[@value='" + username +  "']");
     }
 
     /**

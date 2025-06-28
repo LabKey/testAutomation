@@ -10,6 +10,7 @@ import org.labkey.test.components.html.OptionSelect;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
+import org.labkey.test.tests.study.AssayTest;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.TestDataGenerator;
 import org.labkey.test.util.exp.SampleTypeAPIHelper;
@@ -177,7 +178,7 @@ public abstract class TextChoiceTest extends BaseWebDriverTest
         DataRegionTable runTable = new DataRegionTable("Runs", getDriver());
         runTable.clickHeaderButtonAndWait("Import Data");
 
-        Locator batchLocator = Locator.name(getSelectControlName(BATCH_TC_FIELD));
+        Locator batchLocator = Locator.name(BATCH_TC_FIELD);
         assertSelectOptions(batchLocator, BATCH_FIELD_VALUES,
                 String.format("Options for the batch field '%s' are not as expected. Fatal error.", BATCH_TC_FIELD));
 
@@ -191,7 +192,7 @@ public abstract class TextChoiceTest extends BaseWebDriverTest
 
         setFormElement(Locator.tagWithName("input", "name"), ASSAY_RUN_ID);
 
-        Locator runLocator = Locator.name(getSelectControlName(RUN_TC_FIELD));
+        Locator runLocator = Locator.name(RUN_TC_FIELD);
         assertSelectOptions(runLocator, RUN_FIELD_VALUES,
                 String.format("Options for the '%s' field not as expected. Fatal error.", RUN_TC_FIELD));
 
@@ -221,7 +222,7 @@ public abstract class TextChoiceTest extends BaseWebDriverTest
 
         log("Paste in the results and save.");
 
-        setFormElement(Locator.id("TextAreaDataCollector.textArea"), resultsPasteText.toString());
+        setFormElement(AssayTest.TEXT_AREA_DATA_COLLECTOR_LOCATOR, resultsPasteText.toString());
 
         clickButton("Save and Finish");
 
@@ -276,17 +277,4 @@ public abstract class TextChoiceTest extends BaseWebDriverTest
         LabKeyAssert.assertEqualsSorted(failureMsg, expectedOptions, selectOptions);
 
     }
-
-    /**
-     * Simple helper to identify the name of the control on a page based on the field name. The name of the
-     * control is the field but the first letter is lower case. This lets the test not worry about that.
-     *
-     * @param tcFieldName The TextChoice field name.
-     * @return The field name with the first letter lower case.
-     */
-    protected String getSelectControlName(String tcFieldName)
-    {
-        return Character.toLowerCase(tcFieldName.charAt(0)) + tcFieldName.substring(1);
-    }
-
 }

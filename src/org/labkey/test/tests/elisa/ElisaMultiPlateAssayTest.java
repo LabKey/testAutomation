@@ -20,6 +20,7 @@ import org.labkey.test.pages.assay.AssayRunsPage;
 import org.labkey.test.pages.assay.elisa.ElisaRunDetailsPage;
 import org.labkey.test.pages.assay.plate.PlateDesignerPage;
 import org.labkey.test.pages.assay.plate.PlateTemplateListPage;
+import org.labkey.test.tests.study.AssayTest;
 import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
@@ -239,8 +240,8 @@ public class ElisaMultiPlateAssayTest extends BaseWebDriverTest
         clickButton("Import Data");
         clickButton("Next");
 
-        setFormElement(Locator.name("name"), runName);
-        setFormElement(Locator.name("curveFitMethod"), curveFitMethod);
+        setFormElement(AssayTest.ASSAY_NAME_FIELD_LOCATOR, runName);
+        setFormElement(Locator.name("CurveFitMethod"), curveFitMethod);
         setFormElement(Locator.name("__primaryFile__"), file);
         clickButton("Save and Finish", 180000); // 3 minutes wait if need
         return new AssayRunsPage(getDriver());
@@ -263,15 +264,15 @@ public class ElisaMultiPlateAssayTest extends BaseWebDriverTest
             setFormElement(Locator.name("specimen" + (i) + "_VisitID"), "" + (i));
         }
 
-        setFormElement(Locator.name("name"), runName);
-        setFormElement(Locator.name("curveFitMethod"), curveFitMethod);
+        setFormElement(AssayTest.ASSAY_NAME_FIELD_LOCATOR, runName);
+        setFormElement(Locator.name("CurveFitMethod"), curveFitMethod);
         setFormElement(Locator.name("__primaryFile__"), file);
         clickButton("Next");
 
         String[] letters = {"A","B","C","D","E","F","G","H"};
         for (int i = 0; i <= 5; i++)
         {
-            setFormElement(Locator.name(letters[i].toLowerCase()+"1"+letters[i]+"2_Concentration"), "" + (i + 1));
+            setFormElement(Locator.name(letters[i]+"1"+letters[i]+"2_Concentration"), "" + (i + 1));
         }
 
         clickButton("Save and Finish");

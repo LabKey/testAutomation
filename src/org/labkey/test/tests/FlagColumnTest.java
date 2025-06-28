@@ -12,6 +12,7 @@ import org.labkey.test.SortDirection;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.tests.study.AssayTest;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.RelativeUrl;
 
@@ -100,15 +101,15 @@ public class FlagColumnTest extends BaseWebDriverTest
         clickButton("Import Data");
 
         log("Import run1...");
-        setFormElement(Locator.name("name"), "Run01");
-        setFormElement(Locator.id("TextAreaDataCollector.textArea"),
+        setFormElement(AssayTest.ASSAY_NAME_FIELD_LOCATOR, "Run01");
+        setFormElement(AssayTest.TEXT_AREA_DATA_COLLECTOR_LOCATOR,
             "SomeData\nrun1-data1\nrun1-data2");
         clickButton("Save and Import Another Run");
 
         log("Import run2...");
-        setFormElement(Locator.name("name"), "Run02");
-        setFormElement(Locator.name("anotherRunFlag"), "run has flag");
-        setFormElement(Locator.id("TextAreaDataCollector.textArea"),
+        setFormElement(AssayTest.ASSAY_NAME_FIELD_LOCATOR, "Run02");
+        setFormElement(Locator.name("AnotherRunFlag"), "run has flag");
+        setFormElement(AssayTest.TEXT_AREA_DATA_COLLECTOR_LOCATOR,
                 "SomeData\nrun2-data1\nrun2-data2");
         clickButton("Save and Finish");
 

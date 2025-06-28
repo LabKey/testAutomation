@@ -33,6 +33,7 @@ import org.labkey.test.components.PlateSummary;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.pages.assay.plate.PlateDesignerPage;
 import org.labkey.test.tests.AbstractAssayTest;
+import org.labkey.test.tests.study.AssayTest;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PipelineStatusTable;
@@ -82,6 +83,7 @@ public class ElispotAssayTest extends AbstractAssayTest
     private static final String FLUOROSPOT_DETECTION_METHOD = "fluorescent";
 
     public static final String FLUOROSPOT_FOLDER = "Fluorospot";
+    public static final Locator.XPathLocator PLATE_READER_LOCATOR = Locator.name("plateReader");
 
     @Override
     public List<String> getAssociatedModules()
@@ -136,15 +138,15 @@ public class ElispotAssayTest extends AbstractAssayTest
         clickButton("Import Data");
         clickButton("Next");
 
-        selectOptionByText(Locator.name("plateReader"), "Cellular Technology Ltd. (CTL)");
+        selectOptionByText(PLATE_READER_LOCATOR, "Cellular Technology Ltd. (CTL)");
         uploadFile(TEST_ASSAY_ELISPOT_FILE1, "A", "Save and Import Another Run", false);
         assertTextPresent("Upload successful.");
 
-        selectOptionByText(Locator.name("plateReader"), "AID");
+        selectOptionByText(PLATE_READER_LOCATOR, "AID");
         uploadFile(TEST_ASSAY_ELISPOT_FILE2, "B", "Save and Import Another Run", false);
         assertTextPresent("Upload successful.");
 
-        selectOptionByText(Locator.name("plateReader"), "Zeiss");
+        selectOptionByText(PLATE_READER_LOCATOR, "Zeiss");
         uploadFile(TEST_ASSAY_ELISPOT_FILE3, "C", "Save and Finish", false);
 
         assertElispotData();
@@ -176,11 +178,11 @@ public class ElispotAssayTest extends AbstractAssayTest
         log("Uploading Fluorospot Runs");
         clickButton("Import Data");
         clickButton("Next");
-        selectOptionByText(Locator.name("plateReader"), "AID");
+        selectOptionByText(PLATE_READER_LOCATOR, "AID");
         uploadFluorospotFile(TEST_ASSAY_FLUOROSPOT_FILE1, "F1", "Save and Import Another Run");
         assertTextPresent("Upload successful.");
 
-        selectOptionByText(Locator.name("plateReader"), "AID");
+        selectOptionByText(PLATE_READER_LOCATOR, "AID");
         uploadFluorospotFile(TEST_ASSAY_FLUOROSPOT_FILE2, "F2", "Save and Finish");
 
         clickAndWait(Locator.linkContainingText("AID_fluoro2"));
@@ -300,7 +302,7 @@ public class ElispotAssayTest extends AbstractAssayTest
 
             // test for prepopulation of specimen form element values
             if (testPrepopulation)
-                assertFormElementEquals(specimenLocator, "Specimen " + (i+1));
+                assertEquals("Specimen " + (i+1), getFormElement(specimenLocator));
             setFormElement(specimenLocator, "ptid " + (i + 1) + " " + uniqueifier);
 
             setFormElement(Locator.name("specimen" + (i + 1) + "_VisitID"), "" + (i + 1));
@@ -318,7 +320,7 @@ public class ElispotAssayTest extends AbstractAssayTest
 
             // test for prepopulation of antigen element values
             if (testPrepopulation)
-                assertFormElementEquals(antigenLocator, "Antigen " + (i+1));
+                assertEquals("Antigen " + (i+1), getFormElement(antigenLocator));
 
             setFormElement(antigenLocator, "atg_" + (i + 1) + uniqueifier);
             setFormElement(Locator.name("antigen" + (i + 1) + "_CellWell"), "150");
@@ -506,8 +508,8 @@ public class ElispotAssayTest extends AbstractAssayTest
         clickButton("Import Data");
         clickButton("Next");
 
-        setFormElement(Locator.name("name"), "transformed assayId");
-        selectOptionByText(Locator.name("plateReader"), "AID");
+        setFormElement(AssayTest.ASSAY_NAME_FIELD_LOCATOR, "transformed assayId");
+        selectOptionByText(PLATE_READER_LOCATOR, "AID");
         uploadFile(TEST_ASSAY_ELISPOT_FILE4, "D", "Save and Finish", false);
 
         // verify there is a spot count value of 747.747 and a custom column added by the transform
@@ -592,7 +594,7 @@ public class ElispotAssayTest extends AbstractAssayTest
         clickButton("Import Data");
         clickButton("Next");
 
-        selectOptionByText(Locator.name("plateReader"), "AID");
+        selectOptionByText(PLATE_READER_LOCATOR, "AID");
         uploadFile(TEST_ASSAY_ELISPOT_FILE5, "E", "Save and Finish", false, true);
         DataRegionTable runTable = new DataRegionTable("Runs", this);
         assertTextPresent("AID_0161456 W8");
@@ -632,7 +634,7 @@ public class ElispotAssayTest extends AbstractAssayTest
         clickButton("Import Data");
         clickButton("Next");
 
-        selectOptionByText(Locator.name("plateReader"), "AID");
+        selectOptionByText(PLATE_READER_LOCATOR, "AID");
         uploadFile(TEST_ASSAY_ELISPOT_FILE6, "F", "Save and Finish", false);
 
         testMeanAndMedian();

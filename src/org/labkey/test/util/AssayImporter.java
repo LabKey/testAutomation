@@ -17,6 +17,7 @@ package org.labkey.test.util;
 
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.tests.study.AssayTest;
 
 public class AssayImporter
 {
@@ -41,13 +42,13 @@ public class AssayImporter
         {
             if (options.getVisitResolver() == AssayImportOptions.VisitResolverType.SpecimenIDParticipantVisit)
             {
-                test.checkRadioButton(Locator.radioButtonByNameAndValue("participantVisitResolver", AssayImportOptions.VisitResolverType.SpecimenID.name()));
+                test.checkRadioButton(Locator.radioButtonByNameAndValue("ParticipantVisitResolver", AssayImportOptions.VisitResolverType.SpecimenID.name()));
                 Locator checkBox = Locator.checkboxByName("includeParticipantAndVisit");
                 test.waitForElement(checkBox);
                 test.checkCheckbox(checkBox);
             }
             else
-                test.checkRadioButton(Locator.radioButtonByNameAndValue("participantVisitResolver", options.getVisitResolver().name()));
+                test.checkRadioButton(Locator.radioButtonByNameAndValue("ParticipantVisitResolver", options.getVisitResolver().name()));
         }
         else
         {
@@ -61,10 +62,10 @@ public class AssayImporter
                     test.assertChecked(Locator.radioButtonByNameAndValue("ThawListType", "Text"));
                     break;
                 case SpecimenIDParticipantVisit:
-                    test.assertChecked(Locator.radioButtonByNameAndValue("participantVisitResolver", AssayImportOptions.VisitResolverType.SpecimenID.name()));
+                    test.assertChecked(Locator.radioButtonByNameAndValue("ParticipantVisitResolver", AssayImportOptions.VisitResolverType.SpecimenID.name()));
                     break;
                 default:
-                    test.assertChecked(Locator.radioButtonByNameAndValue("participantVisitResolver", options.getVisitResolver().name()));
+                    test.assertChecked(Locator.radioButtonByNameAndValue("ParticipantVisitResolver", options.getVisitResolver().name()));
             }
         }
 
@@ -77,20 +78,20 @@ public class AssayImporter
         test.clickButton("Next");
 
         if (options.getAssayId() != null)
-            test.setFormElement(Locator.name("name"), options.getAssayId());
+            test.setFormElement(AssayTest.ASSAY_NAME_FIELD_LOCATOR, options.getAssayId());
 
-        test.setFormElement(Locator.name("cutoff1"), options.getCutoff1());
+        test.setFormElement(Locator.name("Cutoff1"), options.getCutoff1());
         if (options.getCutoff2() != null)
-            test.setFormElement(Locator.name("cutoff2"), options.getCutoff2());
+            test.setFormElement(Locator.name("Cutoff2"), options.getCutoff2());
         if (options.getCutoff3() != null)
-            test.setFormElement(Locator.name("cutoff3"), options.getCutoff3());
+            test.setFormElement(Locator.name("Cutoff3"), options.getCutoff3());
 
         if (options.getVirusName() != null)
-            test.setFormElement(Locator.name("virusName"), options.getVirusName());
+            test.setFormElement(Locator.name("VirusName"), options.getVirusName());
         if (options.getVirusId() != null)
-            test.setFormElement(Locator.name("virusID"), options.getVirusId());
+            test.setFormElement(Locator.name("VirusID"), options.getVirusId());
 
-        test.selectOptionByText(Locator.name("curveFitMethod"), options.getCurveFitMethod());
+        test.selectOptionByText(Locator.name("CurveFitMethod"), options.getCurveFitMethod());
 
         if (options.getMetadataFile() == null)
         {

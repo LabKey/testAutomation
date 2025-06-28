@@ -85,13 +85,13 @@ public class ViabilityTest extends AbstractViabilityTest
         uploadViabilityRun(TestFileUtils.getSampleData("viability/small.VIA.csv"), true);
 
         log("** Check form field values");
-        assertEquals("160450533", getFormElement(Locator.name("_pool_1604505335_0_ParticipantID")));
-        assertEquals("5.0", getFormElement(Locator.name("_pool_1604505335_0_VisitID")));
-        assertEquals("3.700E7", getFormElement(Locator.name("_pool_1604505335_0_TotalCells")));
-        assertEquals("3.127E7", getFormElement(Locator.name("_pool_1604505335_0_ViableCells")));
+        assertEquals("160450533", getFormElement(Locator.name("_pool_160450533-5_0_ParticipantID")));
+        assertEquals("5.0", getFormElement(Locator.name("_pool_160450533-5_0_VisitID")));
+        assertEquals("3.700E7", getFormElement(Locator.name("_pool_160450533-5_0_TotalCells")));
+        assertEquals("3.127E7", getFormElement(Locator.name("_pool_160450533-5_0_ViableCells")));
         assertEquals("84.5%", getFormElement(Locator.name("_pool_1604505335_0_Viability")));
-        assertNotChecked(Locator.checkboxByName("_pool_1604505335_0_Unreliable"));
-        assertEquals("", getFormElement(Locator.name("_pool_1604505335_0_IntValue")));
+        assertNotChecked(Locator.checkboxByName("_pool_160450533-5_0_Unreliable"));
+        assertEquals("", getFormElement(Locator.name("_pool_160450533-5_0_IntValue")));
 
         sleep(500);
         clickButton(SAVE_AND_FINISH, 0);
@@ -105,15 +105,15 @@ public class ViabilityTest extends AbstractViabilityTest
         assertElementNotPresent(Locator.lkButtonDisabled(SAVE_AND_IMPORT));
 
         log("** Insert specimen IDs");
-        addSpecimenIds("_pool_1604505335_0_SpecimenIDs", "vial2", "vial3", "vial1", "foobar");
-        addSpecimenIds("_pool_1594020325_1_SpecimenIDs", "vial1");
-        addSpecimenIds("_pool_161400006105_2_SpecimenIDs", "vial2");
-        addSpecimenIds("_pool_161400006115_3_SpecimenIDs", "vial3");
-        addSpecimenIds("_pool_1614016435_4_SpecimenIDs", "xyzzy");
+        addSpecimenIds("_pool_160450533-5_0_SpecimenIDs", "vial2", "vial3", "vial1", "foobar");
+        addSpecimenIds("_pool_159402032-5_1_SpecimenIDs", "vial1");
+        addSpecimenIds("_pool_16140000610-5_2_SpecimenIDs", "vial2");
+        addSpecimenIds("_pool_16140000611-5_3_SpecimenIDs", "vial3");
+        addSpecimenIds("_pool_161401643-5_4_SpecimenIDs", "xyzzy");
 
         log("** Set Unreliable flag and IntValue");
-        checkCheckbox(Locator.checkboxByName("_pool_1604505335_0_Unreliable"));
-        setFormElement(Locator.xpath("//input[@name='_pool_1604505335_0_IntValue'][1]"), "300");
+        checkCheckbox(Locator.checkboxByName("_pool_160450533-5_0_Unreliable"));
+        setFormElement(Locator.xpath("//input[@name='_pool_160450533-5_0_IntValue'][1]"), "300");
 
         doAndWaitForPageToLoad(() ->
         {
@@ -184,11 +184,11 @@ public class ViabilityTest extends AbstractViabilityTest
 
         // Check the 'SpecimenIDs' and 'IntValue' field is copied on re-run
         assertEquals("Specimen IDs for 160450533-5", List.of("foobar", "vial1", "vial2", "vial3"),
-                getValues("_pool_1604505335_0_SpecimenIDs"));
+                getValues("_pool_160450533-5_0_SpecimenIDs"));
         assertEquals("Specimen IDs for 161401643-5", List.of("xyzzy"),
-                getValues("_pool_1614016435_4_SpecimenIDs"));
+                getValues("_pool_161401643-5_4_SpecimenIDs"));
         assertEquals("IntValue for 160450533-5", List.of("300"),
-                getValues("_pool_1604505335_0_IntValue"));
+                getValues("_pool_160450533-5_0_IntValue"));
 
         // Check the 'Unreliable' field isn't copied on re-run
         assertNotChecked(Locator.checkboxByName("_pool_1604505335_0_Unreliable"));
@@ -253,18 +253,18 @@ public class ViabilityTest extends AbstractViabilityTest
         uploadViabilityRun(TestFileUtils.getSampleData("viability/small.VIA.csv"), runName, false);
 
         log("** Check form field values");
-        assertEquals("160450533", getFormElement(Locator.name("_pool_1604505335_0_ParticipantID")));
-        assertEquals("5.0", getFormElement(Locator.name("_pool_1604505335_0_VisitID")));
-        assertEquals("3.700E7", getFormElement(Locator.name("_pool_1604505335_0_TotalCells")));
-        assertEquals("3.127E7", getFormElement(Locator.name("_pool_1604505335_0_ViableCells")));
-        assertEquals("84.5%", getFormElement(Locator.name("_pool_1604505335_0_Viability")));
+        assertEquals("160450533", getFormElement(Locator.name("_pool_160450533-5_0_ParticipantID")));
+        assertEquals("5.0", getFormElement(Locator.name("_pool_160450533-5_0_VisitID")));
+        assertEquals("3.700E7", getFormElement(Locator.name("_pool_160450533-5_0_TotalCells")));
+        assertEquals("3.127E7", getFormElement(Locator.name("_pool_160450533-5_0_ViableCells")));
+        assertEquals("84.5%", getFormElement(Locator.name("_pool_160450533-5_0_Viability")));
 
         log("** Insert specimen IDs");
-        addSpecimenIds("_pool_1604505335_0_SpecimenIDs", "vial2", "vial3", "vial1", "foobar");
-        addSpecimenIds("_pool_1594020325_1_SpecimenIDs", "vial1");
-        addSpecimenIds("_pool_161400006105_2_SpecimenIDs", "vial2");
-        addSpecimenIds("_pool_161400006115_3_SpecimenIDs", "vial3");
-        addSpecimenIds("_pool_1614016435_4_SpecimenIDs", "xyzzy");
+        addSpecimenIds("_pool_160450533-5_0_SpecimenIDs", "vial2", "vial3", "vial1", "foobar");
+        addSpecimenIds("_pool_159402032-5_1_SpecimenIDs", "vial1");
+        addSpecimenIds("_pool_16140000610-5_2_SpecimenIDs", "vial2");
+        addSpecimenIds("_pool_16140000611-5_3_SpecimenIDs", "vial3");
+        addSpecimenIds("_pool_161401643-5_4_SpecimenIDs", "xyzzy");
 
         doAndWaitForPageToLoad(() ->
         {
@@ -315,28 +315,28 @@ public class ViabilityTest extends AbstractViabilityTest
 
         log("** Test 'same' checkbox for TargetStudy");
         String targetStudyOptionText = "/" + getProjectName() + "/" + getFolderName() + " (" + getFolderName() + " Study)";
-        selectOptionByText(Locator.name("_pool_1604505335_0_TargetStudy"), targetStudyOptionText);
-        assertEquals("[None]", getSelectedOptionText(Locator.name("_pool_1594020325_1_TargetStudy")));
-        checkCheckbox(Locator.checkboxById("_pool_1604505335_0_TargetStudyCheckBox"));
+        selectOptionByText(Locator.name("_pool_160450533-5_0_TargetStudy"), targetStudyOptionText);
+        assertEquals("[None]", getSelectedOptionText(Locator.name("_pool_159402032-5_1_TargetStudy")));
+        checkCheckbox(Locator.checkboxById("_pool_160450533-5_0_TargetStudyCheckBox"));
         assertEquals("Target study didn't propagate with 'Same' checkbox.",
-                getSelectedOptionValue(Locator.name("_pool_1604505335_0_TargetStudy")),
-                getSelectedOptionValue(Locator.name("_pool_1594020325_1_TargetStudy")));
+                getSelectedOptionValue(Locator.name("_pool_160450533-5_0_TargetStudy")),
+                getSelectedOptionValue(Locator.name("_pool_159402032-5_1_TargetStudy")));
         assertEquals("Target study didn't propagate with 'Same' checkbox.",
-                getSelectedOptionValue(Locator.name("_pool_1604505335_0_TargetStudy")),
-                getSelectedOptionValue(Locator.name("_pool_161400006115_3_TargetStudy")));
-        uncheckCheckbox(Locator.checkboxById("_pool_1604505335_0_TargetStudyCheckBox"));
+                getSelectedOptionValue(Locator.name("_pool_160450533-5_0_TargetStudy")),
+                getSelectedOptionValue(Locator.name("_pool_16140000611-5_3_TargetStudy")));
+        uncheckCheckbox(Locator.checkboxById("_pool_160450533-5_0_TargetStudyCheckBox"));
 
         // clear TargetStudy for 'vial2' and set the TargetStudy for 'vial3' and 'xyzzy'
-        selectOptionByText(Locator.name("_pool_161400006105_2_TargetStudy"), "[None]");
-        selectOptionByText(Locator.name("_pool_161400006115_3_TargetStudy"), "/" + getProjectName() + "/" + STUDY2_NAME + " (" + STUDY2_NAME + " Study)");
-        selectOptionByText(Locator.name("_pool_1614016435_4_TargetStudy"), "/" + getProjectName() + "/" + STUDY2_NAME + " (" + STUDY2_NAME + " Study)");
+        selectOptionByText(Locator.name("_pool_16140000610-5_2_TargetStudy"), "[None]");
+        selectOptionByText(Locator.name("_pool_16140000611-5_3_TargetStudy"), "/" + getProjectName() + "/" + STUDY2_NAME + " (" + STUDY2_NAME + " Study)");
+        selectOptionByText(Locator.name("_pool_161401643-5_4_TargetStudy"), "/" + getProjectName() + "/" + STUDY2_NAME + " (" + STUDY2_NAME + " Study)");
 
         log("** Insert specimen IDs");
-        addSpecimenIds("_pool_1604505335_0_SpecimenIDs", "vial2", "vial3", "vial1", "foobar");
-        addSpecimenIds("_pool_1594020325_1_SpecimenIDs", "vial1");
-        addSpecimenIds("_pool_161400006105_2_SpecimenIDs", "vial2");
-        addSpecimenIds("_pool_161400006115_3_SpecimenIDs", "vial3");
-        addSpecimenIds("_pool_1614016435_4_SpecimenIDs", "xyzzy");
+        addSpecimenIds("_pool_160450533-5_0_SpecimenIDs", "vial2", "vial3", "vial1", "foobar");
+        addSpecimenIds("_pool_159402032-5_1_SpecimenIDs", "vial1");
+        addSpecimenIds("_pool_16140000610-5_2_SpecimenIDs", "vial2");
+        addSpecimenIds("_pool_16140000611-5_3_SpecimenIDs", "vial3");
+        addSpecimenIds("_pool_161401643-5_4_SpecimenIDs", "xyzzy");
 
         doAndWaitForPageToLoad(() ->
         {

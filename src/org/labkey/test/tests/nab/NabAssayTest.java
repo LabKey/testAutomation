@@ -541,7 +541,7 @@ public class NabAssayTest extends AbstractAssayTest
         clickFolder(TEST_ASSAY_FLDR_NAB);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
         clickButton("Import Data");
-        checkRadioButton(Locator.radioButtonByNameAndValue("participantVisitResolver", "ParticipantVisitDate"));
+        checkRadioButton(Locator.radioButtonByNameAndValue("ParticipantVisitResolver", "ParticipantVisitDate"));
         clickButton("Next");
 
         // verify that 'Participant ID', 'Visit ID', and 'Date' fields are included

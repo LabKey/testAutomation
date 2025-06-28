@@ -23,6 +23,7 @@ import org.labkey.test.pages.study.ManageStudyPage;
 import org.labkey.test.pages.study.ManageVisitPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
+import org.labkey.test.tests.study.AssayTest;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.PortalHelper;
@@ -312,8 +313,8 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         samplesTable.clickHeaderButtonAndWait("Derive Samples");
         selectOptionByText(Locator.name("targetSampleTypeId"), "Plasma in /" + SAMPLE_TYPE_PROJECT);
         clickButton("Next");
-        setFormElement(Locator.name("outputSample1_Name"), derivedSampleName);
-        setFormElement(Locator.name("outputSample1_Volume"), "1");
+        setFormElement(Locator.name("Output Sample 1_Name"), derivedSampleName);
+        setFormElement(Locator.name("Output Sample 1_Volume"), "1");
         clickButton("Submit");
 
         goToProjectHome(SAMPLE_TYPE_PROJECT);
@@ -361,8 +362,8 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         DataRegionTable table = new DataRegionTable("Runs", getDriver());
         table.clickHeaderButton("Import Data");
         clickButton("Next");
-        setFormElement(Locator.name("name"), runName);
-        setFormElement(Locator.name("TextAreaDataCollector.textArea"), importData);
+        setFormElement(AssayTest.ASSAY_NAME_FIELD_LOCATOR, runName);
+        setFormElement(AssayTest.TEXT_AREA_DATA_COLLECTOR_LOCATOR, importData);
         clickButton("Save and Finish");
 
         clickAndWait(Locator.linkWithText(runName));
@@ -663,7 +664,7 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         samplesTable.clickHeaderButtonAndWait("Derive Samples");
         selectOptionByText(Locator.name("targetSampleTypeId"), childSampleType + " in /" + getProjectName());
         clickButton("Next");
-        setFormElement(Locator.name("outputSample1_Name"), "derivedChildSample");
+        setFormElement(Locator.name("Output Sample 1_Name"), "derivedChildSample");
         clickButton("Submit");
 
         log("Verifying the auto link to study by deriving single samples from parent sample");

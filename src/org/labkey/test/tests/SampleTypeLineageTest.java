@@ -272,19 +272,19 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
         selectOptionByText(Locator.name("targetSampleTypeId"), subFolderSampleType + " in /" + getProjectName() + "/" + SUB_FOLDER_NAME);
         clickButton("Next");
 
-        setFormElement(Locator.name("outputSample1_Name"), "SampleSetBVT15");
-        setFormElement(Locator.name("outputSample2_Name"), "SampleSetBVT16");
-        checkCheckbox(Locator.name("outputSample1_IntColFolderCheckBox"));
-        setFormElement(Locator.name("outputSample1_IntColFolder"), "500a");
-        setFormElement(Locator.name("outputSample1_StringColFolder"), "firstOutput");
-        setFormElement(Locator.name("outputSample2_StringColFolder"), "secondOutput");
+        setFormElement(Locator.name("Output Sample 1_Name"), "SampleSetBVT15");
+        setFormElement(Locator.name("Output Sample 2_Name"), "SampleSetBVT16");
+        checkCheckbox(Locator.name("Output Sample 1_IntColFolderCheckBox"));
+        setFormElement(Locator.name("Output Sample 1_IntColFolder"), "500a");
+        setFormElement(Locator.name("Output Sample 1_StringColFolder"), "firstOutput");
+        setFormElement(Locator.name("Output Sample 2_StringColFolder"), "secondOutput");
         clickButton("Submit");
 
         log("Do a simple check that data validation works.");
         checker().verifyTrue("Expected error message '(String) for Integer field' is not present.",
                 isTextPresent("(String) for Integer field"));
-        checkCheckbox(Locator.name("outputSample1_IntColFolderCheckBox"));
-        setFormElement(Locator.name("outputSample1_IntColFolder"), "500");
+        checkCheckbox(Locator.name("Output Sample 1_IntColFolderCheckBox"));
+        setFormElement(Locator.name("Output Sample 1_IntColFolder"), "500");
         clickButton("Submit");
 
         clickAndWait(Locator.linkContainingText("Derive 2 samples"));
@@ -301,17 +301,17 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
         clickButton("Next");
 
         String derivedSampleName = "Only_In_Sub_Folder";
-        setFormElement(Locator.name("outputSample1_Name"), derivedSampleName);
-        setFormElement(Locator.name("outputSample1_IntCol"), "600");
-        setFormElement(Locator.name("outputSample1_StringCol"), "String");
-        setFormElement(Locator.name("outputSample1_DateCol"), "BadDate");
-        uncheckCheckbox(Locator.name("outputSample1_BoolCol"));
+        setFormElement(Locator.name("Output Sample 1_Name"), derivedSampleName);
+        setFormElement(Locator.name("Output Sample 1_IntCol"), "600");
+        setFormElement(Locator.name("Output Sample 1_StringCol"), "String");
+        setFormElement(Locator.name("Output Sample 1_DateCol"), "BadDate");
+        uncheckCheckbox(Locator.name("Output Sample 1_BoolCol"));
         clickButton("Submit");
 
         log("Again check that data validation works as expected.");
         checker().verifyTrue("Expected error message 'is not a valid Date' is not present.",
                 isTextPresent("'BadDate' is not a valid Date for DateCol "));
-        setFormElement(Locator.name("outputSample1_DateCol"), "1/1/2007");
+        setFormElement(Locator.name("Output Sample 1_DateCol"), "1/1/2007");
         clickButton("Submit");
 
         log("Check that the correct sample id is shown as the parent.");

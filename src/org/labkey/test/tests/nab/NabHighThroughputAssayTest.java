@@ -199,7 +199,7 @@ public class NabHighThroughputAssayTest extends BaseWebDriverTest
 
         setFormElement(Locator.name("cutoff1"), "50");
         setFormElement(Locator.name("cutoff2"), "70");
-        selectOptionByText(Locator.name("curveFitMethod"), "Polynomial");
+        selectOptionByText(Locator.name("CurveFitMethod"), "Polynomial");
 
         if (metadataFile != null)
         {
@@ -322,7 +322,7 @@ public class NabHighThroughputAssayTest extends BaseWebDriverTest
     {
         // high throughput Nab assays should not contain the Participant, Visit, Date resolver type
         clickAndWait(Locator.linkWithText("Import Data"));
-        assertElementNotPresent(Locator.radioButtonByNameAndValue("participantVisitResolver", "ParticipantVisitDate"));
+        assertElementNotPresent(Locator.radioButtonByNameAndValue("ParticipantVisitResolver", "ParticipantVisitDate"));
         clickButton("Cancel");
     }
 

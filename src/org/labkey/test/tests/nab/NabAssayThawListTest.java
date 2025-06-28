@@ -123,7 +123,7 @@ public class NabAssayThawListTest extends AbstractAssayTest
         // We'll override it later at the folder level.
         clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
         _assayHelper.setDefaultValues(TEST_ASSAY_NAB, AbstractAssayHelper.AssayDefaultAreas.BATCH_FIELDS);
-        click(Locator.radioButtonByNameAndValue("participantVisitResolver", AssayImportOptions.VisitResolverType.ParticipantVisitDate.name()));
+        click(Locator.radioButtonByNameAndValue("ParticipantVisitResolver", AssayImportOptions.VisitResolverType.ParticipantVisitDate.name()));
         clickButton("Save Defaults");
 
         // Add the list we'll use for the thaw list lookup
@@ -141,10 +141,10 @@ public class NabAssayThawListTest extends AbstractAssayTest
         // Are we seeing the default set in the parent project?
         Assert.assertEquals("Default participant visit resolver not inherited from project",
                 AssayImportOptions.VisitResolverType.ParticipantVisitDate.name(),
-                Locator.checkedRadioInGroup("participantVisitResolver").findElement(getDriver()).getAttribute("value"));
+                Locator.checkedRadioInGroup("ParticipantVisitResolver").findElement(getDriver()).getAttribute("value"));
 
         // Now override
-        click(Locator.radioButtonByNameAndValue("participantVisitResolver", "Lookup"));
+        click(Locator.radioButtonByNameAndValue("ParticipantVisitResolver", "Lookup"));
 
         // 20583 We now hide the option to paste in a tsv for the default value
         assertElementNotPresent(Locator.radioButtonByNameAndValue("ThawListType", "Text"));
@@ -190,21 +190,21 @@ public class NabAssayThawListTest extends AbstractAssayTest
         // As long as we're here, make sure inheritance is still being acknowledged.
         Assert.assertEquals("Default participant visit resolver not inherited from project",
                             AssayImportOptions.VisitResolverType.ParticipantVisitDate.name(),
-                            Locator.checkedRadioInGroup("participantVisitResolver").findElement(getDriver()).getAttribute("value"));
+                            Locator.checkedRadioInGroup("ParticipantVisitResolver").findElement(getDriver()).getAttribute("value"));
         assertTextPresent("These values are overridden by defaults");
 
         log("Verify Delete and Re-import doesn't autofill SpecimenId");
         navToRunDetails();
         clickAndWait(Locator.linkWithText("Delete and Re-import"));
         Assert.assertEquals("Wrong participant visit resolver selected",
-                "Lookup", Locator.checkedRadioInGroup("participantVisitResolver").findElement(getDriver()).getAttribute("value"));
+                "Lookup", Locator.checkedRadioInGroup("ParticipantVisitResolver").findElement(getDriver()).getAttribute("value"));
         Assert.assertEquals("Wrong participant visit resolver selected",
                 "List", Locator.checkedRadioInGroup("ThawListType").findElement(getDriver()).getAttribute("value"));
         waitForFormElementToEqual(Locator.tagWithName("input", "ThawListList-QueryName"), "NabThawList");
         clickButton("Next");
-        assertElementPresent(Locator.input("specimen1_SpecimenID").withoutAttribute("value", ""));
+        assertElementPresent(Locator.input("Specimen 1_SpecimenID").withoutAttribute("value", ""));
         // Let's make sure *some* of the last entered values did get auto-filled.
-        assertElementPresent(Locator.input("specimen1_InitialDilution").withAttribute("value", "20.0"));
+        assertElementPresent(Locator.input("Specimen 1_InitialDilution").withAttribute("value", "20.0"));
 
         verifyValidation(iob);
     }

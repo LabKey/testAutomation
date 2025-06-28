@@ -155,7 +155,7 @@ public class ElisaAssayTest extends AbstractAssayTest
         }
 
         setFormElement(Locator.name("__primaryFile__"), file);
-        setFormElement(Locator.name("curveFitMethod"), "Linear");
+        setFormElement(Locator.name("CurveFitMethod"), "Linear");
 
         clickButton("Next");
 

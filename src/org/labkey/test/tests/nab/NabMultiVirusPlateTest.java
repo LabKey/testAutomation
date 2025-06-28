@@ -235,7 +235,7 @@ public class NabMultiVirusPlateTest extends BaseWebDriverTest
 
         setFormElement(Locator.name("cutoff1"), "50");
         setFormElement(Locator.name("cutoff2"), "70");
-        selectOptionByText(Locator.name("curveFitMethod"), curveFitMethod);
+        selectOptionByText(Locator.name("CurveFitMethod"), curveFitMethod);
         setFormElement(Locator.name("specimen01_InitialDilution"), "5");
         setFormElement(Locator.name("specimen01_Factor"), "42");
         selectOptionByText(Locator.name("specimen01_Method"), "Dilution");

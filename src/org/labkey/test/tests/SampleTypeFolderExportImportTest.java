@@ -320,9 +320,9 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
         clickButtonContainingText("Next");
 
         // TODO: Should validate that the Derive Samples action shows the various fields as expected. That is the required and missing value fields should have the correct input type. Will be fixed in 19.2.
-        setFormElement(Locator.tagWithName("input", "outputSample1_Name"), sampleNames[8]);
-        setFormElement(Locator.tagWithName("input", "outputSample1_" + REQUIRED_FIELD_NAME), "Required text for this field.");
-        setFormElement(Locator.tagWithName("input", "outputSample1_" + MISSING_FIELD_NAME), "Q");
+        setFormElement(Locator.tagWithName("input", "Output Sample 1_Name"), sampleNames[8]);
+        setFormElement(Locator.tagWithName("input", "Output Sample 1_" + REQUIRED_FIELD_NAME), "Required text for this field.");
+        setFormElement(Locator.tagWithName("input", "Output Sample 1_" + MISSING_FIELD_NAME), "Q");
         clickButtonContainingText("Submit");
 
         // TODO: There is a bug where derived values do not honor missing value fields (treat them as a text field). So the indicator field for this sample will be empty. Will be fixed in 19.2.

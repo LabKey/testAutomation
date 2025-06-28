@@ -204,8 +204,8 @@ public class StudyMissingValuesTest extends MissingValueIndicatorsTest
         selectOptionByText(Locator.xpath("//select[@name='targetStudy']"), targetStudyValue);
 
         clickButton("Next");
-        setFormElement(Locator.name("name"), ASSAY_RUN_SINGLE_COLUMN);
-        click(Locator.xpath("//input[@value='textAreaDataProvider']"));
+        setFormElement(AssayTest.ASSAY_NAME_FIELD_LOCATOR, ASSAY_RUN_SINGLE_COLUMN);
+        click(AssayTest.TEXT_AREA_DATA_PROVIDER_LOCATOR);
         setFormElement(Locator.name("TextAreaDataCollector.textArea"), TEST_DATA_SINGLE_COLUMN_ASSAY);
         clickButton("Save and Finish");
         assertNoLabKeyErrors();

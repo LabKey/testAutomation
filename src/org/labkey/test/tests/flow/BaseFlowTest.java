@@ -279,12 +279,14 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
         if (setBackground)
         {
             // specify forground-background match columns
-            assertFormElementEquals(Locator.name("ff_matchColumn").index(0), "Run");
+            Locator loc1 = Locator.name("ff_matchColumn").index(0);
+            assertEquals("Run", getFormElement(loc1));
             selectOptionByText(Locator.name("ff_matchColumn").index(1), "Sample Sample Order");
 
             // specify background values
             selectOptionByText(Locator.name("ff_backgroundFilterField").index(0), "Sample Stim");
-            assertFormElementEquals(Locator.name("ff_backgroundFilterOp").index(0), "eq");
+            Locator loc = Locator.name("ff_backgroundFilterOp").index(0);
+            assertEquals("eq", getFormElement(loc));
             setFormElement(Locator.name("ff_backgroundFilterValue").index(0), "Neg Cont");
         }
 
@@ -339,7 +341,8 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
         if (!options.canAccelerateWizard())
         {
             importAnalysis_selectFCSFiles(options.getContainerPath(), options.getSelectFCSFilesOption(), options.getKeywordDirs());
-            assertFormElementEquals(Locator.name("selectFCSFilesOption"), options.getSelectFCSFilesOption().name());
+            Locator loc = Locator.name("selectFCSFilesOption");
+            assertEquals(options.getSelectFCSFilesOption().name(), getFormElement(loc));
 
             boolean resolving = options.getSelectFCSFilesOption() == SelectFCSFileOption.Previous;
             importAnalysis_reviewSamples(options.getContainerPath(), resolving, options.getSelectedGroupNames(), options.getSelectedSampleIds());
