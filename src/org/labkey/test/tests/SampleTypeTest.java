@@ -36,6 +36,7 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.CustomizeView;
+import org.labkey.test.components.assay.AssayConstants;
 import org.labkey.test.components.domain.BaseDomainDesigner;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.ext4.Window;
@@ -50,7 +51,6 @@ import org.labkey.test.params.FieldDefinition.ColumnType;
 import org.labkey.test.params.FieldDefinition.LookupInfo;
 import org.labkey.test.params.FieldInfo;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
-import org.labkey.test.tests.study.AssayTest;
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
@@ -662,7 +662,7 @@ public class SampleTypeTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(DATA_ID_ASSAY));
         clickButton("Import Data");
         clickButton("Next");
-        setFormElement(AssayTest.TEXT_AREA_DATA_COLLECTOR_LOCATOR, SAMPLE_ID_TEST_RUN_DATA);
+        setFormElement(AssayConstants.TEXT_AREA_DATA_COLLECTOR_LOCATOR, SAMPLE_ID_TEST_RUN_DATA);
         clickButton("Save and Finish");
 
         log("Try to delete all samples");
@@ -696,7 +696,7 @@ public class SampleTypeTest extends BaseWebDriverTest
         clickButton("Import Data");
         clickButton("Next");
         setFormElement(Locator.name(SAMPLE_ID_FIELD_NAME), RUN_SAMPLE_NAME);
-        setFormElement(AssayTest.TEXT_AREA_DATA_COLLECTOR_LOCATOR, TEST_RUN_DATA);
+        setFormElement(AssayConstants.TEXT_AREA_DATA_COLLECTOR_LOCATOR, TEST_RUN_DATA);
         clickButton("Save and Finish");
 
         log("Try to delete the sampleId referenced in the run field");

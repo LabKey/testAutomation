@@ -29,6 +29,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Daily;
+import org.labkey.test.components.assay.AssayConstants;
 import org.labkey.test.pages.admin.FolderManagementPage;
 import org.labkey.test.pages.assay.AssayRunsPage;
 import org.labkey.test.pages.files.FileContentPage;
@@ -37,7 +38,6 @@ import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldDefinition.ColumnType;
 import org.labkey.test.params.assay.GeneralAssayDesign;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
-import org.labkey.test.tests.study.AssayTest;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
@@ -283,7 +283,7 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
         clickButton("Next");    // batch properties
 
         // run properties
-        setFormElement(AssayTest.ASSAY_NAME_FIELD_LOCATOR, runName);
+        setFormElement(AssayConstants.ASSAY_NAME_FIELD_LOCATOR, runName);
         setFormElement(Locator.input(RUN_TXT_COL), "run text");
         setFormElement(Locator.input(RUN_FILE_COL), runFileFieldFile);
         checkRadioButton(Locator.inputById("Fileupload"));

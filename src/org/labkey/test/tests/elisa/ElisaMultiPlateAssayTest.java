@@ -15,12 +15,12 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.Daily;
+import org.labkey.test.components.assay.AssayConstants;
 import org.labkey.test.pages.assay.AssayDataPage;
 import org.labkey.test.pages.assay.AssayRunsPage;
 import org.labkey.test.pages.assay.elisa.ElisaRunDetailsPage;
 import org.labkey.test.pages.assay.plate.PlateDesignerPage;
 import org.labkey.test.pages.assay.plate.PlateTemplateListPage;
-import org.labkey.test.tests.study.AssayTest;
 import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
@@ -240,7 +240,7 @@ public class ElisaMultiPlateAssayTest extends BaseWebDriverTest
         clickButton("Import Data");
         clickButton("Next");
 
-        setFormElement(AssayTest.ASSAY_NAME_FIELD_LOCATOR, runName);
+        setFormElement(AssayConstants.ASSAY_NAME_FIELD_LOCATOR, runName);
         setFormElement(Locator.name("CurveFitMethod"), curveFitMethod);
         setFormElement(Locator.name("__primaryFile__"), file);
         clickButton("Save and Finish", 180000); // 3 minutes wait if need
@@ -264,7 +264,7 @@ public class ElisaMultiPlateAssayTest extends BaseWebDriverTest
             setFormElement(Locator.name("specimen" + (i) + "_VisitID"), "" + (i));
         }
 
-        setFormElement(AssayTest.ASSAY_NAME_FIELD_LOCATOR, runName);
+        setFormElement(AssayConstants.ASSAY_NAME_FIELD_LOCATOR, runName);
         setFormElement(Locator.name("CurveFitMethod"), curveFitMethod);
         setFormElement(Locator.name("__primaryFile__"), file);
         clickButton("Next");

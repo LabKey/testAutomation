@@ -19,11 +19,11 @@ package org.labkey.test.tests.viability;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.components.assay.AssayConstants;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.tests.AbstractAssayTest;
-import org.labkey.test.tests.study.AssayTest;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.PostgresOnlyTest;
 import org.labkey.test.util.QCAssayScriptHelper;
@@ -136,7 +136,7 @@ public abstract class AbstractViabilityTest extends AbstractAssayTest implements
         clickButton("Next");
 
         if (runName != null)
-            setFormElement(AssayTest.ASSAY_NAME_FIELD_LOCATOR, runName);
+            setFormElement(AssayConstants.ASSAY_NAME_FIELD_LOCATOR, runName);
 
         uploadAssayFile(file);
     }
@@ -151,7 +151,7 @@ public abstract class AbstractViabilityTest extends AbstractAssayTest implements
         clickButton("Next");
 
         if (runName != null)
-            setFormElement(AssayTest.ASSAY_NAME_FIELD_LOCATOR, runName);
+            setFormElement(AssayConstants.ASSAY_NAME_FIELD_LOCATOR, runName);
 
         uploadAssayFile(file);
     }

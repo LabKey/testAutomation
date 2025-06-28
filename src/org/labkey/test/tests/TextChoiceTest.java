@@ -4,13 +4,13 @@ import org.labkey.junit.LabKeyAssert;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.components.assay.AssayConstants;
 import org.labkey.test.components.domain.DomainFieldRow;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.html.OptionSelect;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
-import org.labkey.test.tests.study.AssayTest;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.TestDataGenerator;
 import org.labkey.test.util.exp.SampleTypeAPIHelper;
@@ -222,7 +222,7 @@ public abstract class TextChoiceTest extends BaseWebDriverTest
 
         log("Paste in the results and save.");
 
-        setFormElement(AssayTest.TEXT_AREA_DATA_COLLECTOR_LOCATOR, resultsPasteText.toString());
+        setFormElement(AssayConstants.TEXT_AREA_DATA_COLLECTOR_LOCATOR, resultsPasteText.toString());
 
         clickButton("Save and Finish");
 

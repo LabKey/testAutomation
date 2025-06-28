@@ -12,6 +12,7 @@ import org.labkey.test.SortDirection;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.CustomizeView;
+import org.labkey.test.components.assay.AssayConstants;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.pages.ImportDataPage;
@@ -23,7 +24,6 @@ import org.labkey.test.pages.study.ManageStudyPage;
 import org.labkey.test.pages.study.ManageVisitPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
-import org.labkey.test.tests.study.AssayTest;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.PortalHelper;
@@ -362,8 +362,8 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         DataRegionTable table = new DataRegionTable("Runs", getDriver());
         table.clickHeaderButton("Import Data");
         clickButton("Next");
-        setFormElement(AssayTest.ASSAY_NAME_FIELD_LOCATOR, runName);
-        setFormElement(AssayTest.TEXT_AREA_DATA_COLLECTOR_LOCATOR, importData);
+        setFormElement(AssayConstants.ASSAY_NAME_FIELD_LOCATOR, runName);
+        setFormElement(AssayConstants.TEXT_AREA_DATA_COLLECTOR_LOCATOR, importData);
         clickButton("Save and Finish");
 
         clickAndWait(Locator.linkWithText(runName));

@@ -30,10 +30,10 @@ import org.labkey.test.categories.Daily;
 import org.labkey.test.components.CrosstabDataRegion;
 import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.PlateSummary;
+import org.labkey.test.components.assay.AssayConstants;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.pages.assay.plate.PlateDesignerPage;
 import org.labkey.test.tests.AbstractAssayTest;
-import org.labkey.test.tests.study.AssayTest;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PipelineStatusTable;
@@ -508,7 +508,7 @@ public class ElispotAssayTest extends AbstractAssayTest
         clickButton("Import Data");
         clickButton("Next");
 
-        setFormElement(AssayTest.ASSAY_NAME_FIELD_LOCATOR, "transformed assayId");
+        setFormElement(AssayConstants.ASSAY_NAME_FIELD_LOCATOR, "transformed assayId");
         selectOptionByText(PLATE_READER_LOCATOR, "AID");
         uploadFile(TEST_ASSAY_ELISPOT_FILE4, "D", "Save and Finish", false);
 

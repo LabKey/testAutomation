@@ -17,7 +17,7 @@ package org.labkey.test.util;
 
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.tests.study.AssayTest;
+import org.labkey.test.components.assay.AssayConstants;
 
 public class AssayImporter
 {
@@ -78,7 +78,7 @@ public class AssayImporter
         test.clickButton("Next");
 
         if (options.getAssayId() != null)
-            test.setFormElement(AssayTest.ASSAY_NAME_FIELD_LOCATOR, options.getAssayId());
+            test.setFormElement(AssayConstants.ASSAY_NAME_FIELD_LOCATOR, options.getAssayId());
 
         test.setFormElement(Locator.name("Cutoff1"), options.getCutoff1());
         if (options.getCutoff2() != null)

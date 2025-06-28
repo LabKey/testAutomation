@@ -9,11 +9,11 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Daily;
+import org.labkey.test.components.assay.AssayConstants;
 import org.labkey.test.pages.admin.ExportFolderPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.assay.GeneralAssayDesign;
 import org.labkey.test.tests.MissingValueIndicatorsTest;
-import org.labkey.test.tests.study.AssayTest;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 
@@ -94,14 +94,14 @@ public class AssayMissingValuesTest extends MissingValueIndicatorsTest
         waitAndClickAndWait(Locator.linkWithText(ASSAY_NAME));
         clickButton("Import Data");
         clickButton("Next");
-        setFormElement(AssayTest.ASSAY_NAME_FIELD_LOCATOR, ASSAY_RUN_SINGLE_COLUMN);
-        click(AssayTest.TEXT_AREA_DATA_PROVIDER_LOCATOR);
+        setFormElement(AssayConstants.ASSAY_NAME_FIELD_LOCATOR, ASSAY_RUN_SINGLE_COLUMN);
+        click(AssayConstants.TEXT_AREA_DATA_PROVIDER_LOCATOR);
 
         setFormElement(Locator.name("TextAreaDataCollector.textArea"), TEST_DATA_SINGLE_COLUMN_ASSAY_BAD);
         clickButton("Save and Finish");
         assertLabKeyErrorPresent();
 
-        click(AssayTest.TEXT_AREA_DATA_PROVIDER_LOCATOR);
+        click(AssayConstants.TEXT_AREA_DATA_PROVIDER_LOCATOR);
         setFormElement(Locator.name("TextAreaDataCollector.textArea"), TEST_DATA_SINGLE_COLUMN_ASSAY);
         clickButton("Save and Finish");
         assertNoLabKeyErrors();
@@ -127,15 +127,15 @@ public class AssayMissingValuesTest extends MissingValueIndicatorsTest
         clickAndWait(Locator.linkWithText(ASSAY_NAME));
         clickButton("Import Data");
         clickButton("Next");
-        setFormElement(AssayTest.ASSAY_NAME_FIELD_LOCATOR, ASSAY_RUN_TWO_COLUMN);
+        setFormElement(AssayConstants.ASSAY_NAME_FIELD_LOCATOR, ASSAY_RUN_TWO_COLUMN);
 
-        click(AssayTest.TEXT_AREA_DATA_PROVIDER_LOCATOR);
-        setFormElement(AssayTest.TEXT_AREA_DATA_COLLECTOR_LOCATOR, TEST_DATA_TWO_COLUMN_ASSAY_BAD);
+        click(AssayConstants.TEXT_AREA_DATA_PROVIDER_LOCATOR);
+        setFormElement(AssayConstants.TEXT_AREA_DATA_COLLECTOR_LOCATOR, TEST_DATA_TWO_COLUMN_ASSAY_BAD);
         clickButton("Save and Finish");
         assertLabKeyErrorPresent();
 
-        click(AssayTest.TEXT_AREA_DATA_PROVIDER_LOCATOR);
-        setFormElement(AssayTest.TEXT_AREA_DATA_COLLECTOR_LOCATOR, TEST_DATA_TWO_COLUMN_ASSAY);
+        click(AssayConstants.TEXT_AREA_DATA_PROVIDER_LOCATOR);
+        setFormElement(AssayConstants.TEXT_AREA_DATA_COLLECTOR_LOCATOR, TEST_DATA_TWO_COLUMN_ASSAY);
         clickButton("Save and Finish");
         assertNoLabKeyErrors();
         clickAndWait(Locator.linkWithText(ASSAY_RUN_TWO_COLUMN));
@@ -163,7 +163,7 @@ public class AssayMissingValuesTest extends MissingValueIndicatorsTest
         clickAndWait(Locator.linkWithText(ASSAY_NAME));
         clickButton("Import Data");
         clickButton("Next");
-        setFormElement(AssayTest.ASSAY_NAME_FIELD_LOCATOR, ASSAY_EXCEL_RUN_SINGLE_COLUMN);
+        setFormElement(AssayConstants.ASSAY_NAME_FIELD_LOCATOR, ASSAY_EXCEL_RUN_SINGLE_COLUMN);
         checkCheckbox(Locator.radioButtonByNameAndValue("dataCollectorName", "File upload"));
 
         setFormElement(Locator.name("__primaryFile__"), ASSAY_SINGLE_COLUMN_EXCEL_FILE_BAD);
@@ -188,7 +188,7 @@ public class AssayMissingValuesTest extends MissingValueIndicatorsTest
         clickAndWait(Locator.linkWithText(ASSAY_NAME));
         clickButton("Import Data");
         clickButton("Next");
-        setFormElement(AssayTest.ASSAY_NAME_FIELD_LOCATOR, ASSAY_EXCEL_RUN_TWO_COLUMN);
+        setFormElement(AssayConstants.ASSAY_NAME_FIELD_LOCATOR, ASSAY_EXCEL_RUN_TWO_COLUMN);
         checkCheckbox(Locator.radioButtonByNameAndValue("dataCollectorName", "File upload"));
         setFormElement(Locator.name("__primaryFile__"), ASSAY_TWO_COLUMN_EXCEL_FILE_BAD);
         clickButton("Save and Finish");

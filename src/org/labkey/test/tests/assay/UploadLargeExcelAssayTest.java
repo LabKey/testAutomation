@@ -10,12 +10,12 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.Daily;
+import org.labkey.test.components.assay.AssayConstants;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.pages.assay.AssayUploadJobsPage;
 import org.labkey.test.pages.query.SourceQueryPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.assay.GeneralAssayDesign;
-import org.labkey.test.tests.study.AssayTest;
 import org.labkey.test.util.AbstractDataRegionExportOrSignHelper;
 import org.labkey.test.util.TestDataGenerator;
 
@@ -96,7 +96,7 @@ public class UploadLargeExcelAssayTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(LARGE_ASSAY));
         clickButton("Import Data");
         clickButton("Next");
-        setFormElement(AssayTest.ASSAY_NAME_FIELD_LOCATOR, "200k");
+        setFormElement(AssayConstants.ASSAY_NAME_FIELD_LOCATOR, "200k");
         checkRadioButton(Locator.inputById("Fileupload"));
         setFormElement(Locator.input("__primaryFile__"), largeExcelFile);
         clickButton("Save and Finish");

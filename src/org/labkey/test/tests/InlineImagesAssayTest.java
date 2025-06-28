@@ -28,9 +28,9 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.CustomizeView;
+import org.labkey.test.components.assay.AssayConstants;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.params.FieldDefinition;
-import org.labkey.test.tests.study.AssayTest;
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExcelHelper;
@@ -129,8 +129,8 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
         clickButton("Import Data");
         setFormElement(Locator.name("batchFileField"), XLS_FILE);
         clickButton("Next");
-        setFormElement(AssayTest.ASSAY_NAME_FIELD_LOCATOR, runName);
-        setFormElement(AssayTest.TEXT_AREA_DATA_COLLECTOR_LOCATOR, importData);
+        setFormElement(AssayConstants.ASSAY_NAME_FIELD_LOCATOR, runName);
+        setFormElement(AssayConstants.TEXT_AREA_DATA_COLLECTOR_LOCATOR, importData);
 
         clickButton("Save and Finish");
 

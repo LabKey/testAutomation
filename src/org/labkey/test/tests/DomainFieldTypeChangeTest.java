@@ -12,12 +12,12 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.DomainDesignerPage;
+import org.labkey.test.components.assay.AssayConstants;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.pages.query.UpdateQueryRowPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldInfo;
-import org.labkey.test.tests.study.AssayTest;
 import org.labkey.test.util.APIAssayHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
@@ -179,7 +179,7 @@ public class DomainFieldTypeChangeTest extends BaseWebDriverTest
         checkCheckbox(Locator.name("batchTestBoolean"));
         clickButton("Next");
 
-        setFormElement(AssayTest.ASSAY_NAME_FIELD_LOCATOR, runName);
+        setFormElement(AssayConstants.ASSAY_NAME_FIELD_LOCATOR, runName);
         setFormElement(Locator.name("runTestInteger"), "12");
         setFormElement(Locator.name("runTestDecimal"), "1.12");
         setFormElement(Locator.name("runTestDate"), "01-03-2022");
