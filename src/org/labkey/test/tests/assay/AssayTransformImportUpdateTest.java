@@ -281,7 +281,7 @@ public class AssayTransformImportUpdateTest extends BaseWebDriverTest
         new AssayRunsPage(getDriver()).getTable().clickHeaderButton("Import Data");
         clickButton("Next");
         var importPage = new AssayImportPage(getDriver());
-        importPage.setNamedInputText("name", "cancelTransformTestImport");
+        importPage.setNamedInputText("Name", "cancelTransformTestImport");
         importPage.setNamedTextAreaValue("TextAreaDataCollector.textArea", importDataBuilder.toString());
         Instant before = Instant.now();
         importPage.clickSaveAndFinish();

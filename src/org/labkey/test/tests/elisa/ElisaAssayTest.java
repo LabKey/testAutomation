@@ -151,7 +151,7 @@ public class ElisaAssayTest extends AbstractAssayTest
             setFormElement(specimenLocator, "specimen " + (i) + " " + uniqueifier);
             setFormElement(participantLocator, "ptid " + (i) + " " + uniqueifier);
 
-            setFormElement(Locator.name("specimen" + (i) + "_VisitID"), "" + (i));
+            setFormElement(Locator.name("Specimen " + (i) + "_VisitID"), "" + (i));
         }
 
         setFormElement(Locator.name("__primaryFile__"), file);

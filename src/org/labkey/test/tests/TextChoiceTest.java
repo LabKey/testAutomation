@@ -190,7 +190,7 @@ public abstract class TextChoiceTest extends BaseWebDriverTest
 
         log(String.format("Set the Assay ID to '%s'.", ASSAY_RUN_ID));
 
-        setFormElement(Locator.tagWithName("input", "name"), ASSAY_RUN_ID);
+        setFormElement(AssayConstants.ASSAY_NAME_FIELD_LOCATOR, ASSAY_RUN_ID);
 
         Locator runLocator = Locator.name(RUN_TC_FIELD);
         assertSelectOptions(runLocator, RUN_FIELD_VALUES,

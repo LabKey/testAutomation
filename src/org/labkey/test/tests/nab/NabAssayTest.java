@@ -549,8 +549,8 @@ public class NabAssayTest extends AbstractAssayTest
         assertTextPresent("Participant id, visit id, and date.");
         // assert that both the visit id and date are present.  In other resolver types only one
         // or the other is present
-        assertElementPresent(Locator.checkboxById("specimen1_VisitIDCheckBox"));
-        assertElementPresent(Locator.checkboxById("specimen1_DateCheckBox"));
+        assertElementPresent(Locator.checkboxById("Specimen 1_VisitIDCheckBox"));
+        assertElementPresent(Locator.checkboxById("Specimen 1_DateCheckBox"));
         clickButton("Cancel");
     }
 

@@ -162,8 +162,8 @@ public class IssuesTest extends BaseWebDriverTest
     public void doInit()
     {
         NAME = getDisplayName();
-        ISSUE_0.put("assignedTo", NAME);
-        ISSUE_1.put("assignedTo", NAME);
+        ISSUE_0.put("AssignedTo", NAME);
+        ISSUE_1.put("AssignedTo", NAME);
         _containerHelper.createProject(getProjectName(), null);
         _permissionsHelper.createPermissionsGroup(TEST_GROUP);
         _permissionsHelper.assertPermissionSetting(TEST_GROUP, "No Permissions");
@@ -278,12 +278,12 @@ public class IssuesTest extends BaseWebDriverTest
         // InsertAction
         clickButton("New Issue");
         setFormElement(Locator.name("title"), issueTitle);
-        selectOptionByText(Locator.name("type"), "UFO");
-        selectOptionByText(Locator.name("area"), "Area51");
+        selectOptionByText(Locator.name("Type"), "UFO");
+        selectOptionByText(Locator.name("Area"), "Area51");
         selectOptionByText(Locator.name("module"), "Zvezda");
-        selectOptionByText(Locator.name("priority"), "2");
+        selectOptionByText(Locator.name("Priority"), "2");
         setFormElement(Locator.name("comment"), ISSUE_0.get("comment"));
-        selectOptionByText(Locator.name("assignedTo"), NAME);
+        selectOptionByText(Locator.name("AssignedTo"), NAME);
         selectOptionByText(Locator.name("milestone"), "2012");
 
         Locator fouthStringLocator = Locator.name("myFourthString");
@@ -477,7 +477,7 @@ public class IssuesTest extends BaseWebDriverTest
     @Test
     public void emailTest()
     {
-        Map<String, String> ISSUE = Maps.of("assignedTo", _userHelper.getDisplayNameForEmail(USER1), "title", "A not so serious issue", "priority", "4", "comment", "No big whup", "notifyList", USER2);
+        Map<String, String> ISSUE = Maps.of("AssignedTo", _userHelper.getDisplayNameForEmail(USER1), "title", "A not so serious issue", "Priority", "4", "comment", "No big whup", "notifyList", USER2);
 
         _issuesHelper.goToAdmin();
         _issuesHelper.setIssueAssignmentList(null);
@@ -669,7 +669,7 @@ public class IssuesTest extends BaseWebDriverTest
     {
         final Map<String, String> issue0 = new HashMap<>(ISSUE_0);
         issue0.put("title", "This is for the subfolder test");
-        final Map<String, String> issue1 = Maps.of("assignedTo", NAME, "title", "A sub-folder issue", "priority", "2", "comment", "We are in a sub-folder");
+        final Map<String, String> issue1 = Maps.of("AssignedTo", NAME, "title", "A sub-folder issue", "Priority", "2", "comment", "We are in a sub-folder");
         final String subFolder = "SubFolder";
 
         // NOTE: be afraid -- very afraid. this data is used other places and could lead to false+ or false-
@@ -700,14 +700,14 @@ public class IssuesTest extends BaseWebDriverTest
     @Test
     public void duplicatesTest()
     {
-        _issuesHelper.addIssue(Maps.of("assignedTo", NAME, "title", "This Is some Issue -- let's say A"));
+        _issuesHelper.addIssue(Maps.of("AssignedTo", NAME, "title", "This Is some Issue -- let's say A"));
         String issueIdA = getIssueId();
 
-        _issuesHelper.addIssue(Maps.of("assignedTo", NAME, "title", "This is another issue -- let's say B"));
+        _issuesHelper.addIssue(Maps.of("AssignedTo", NAME, "title", "This is another issue -- let's say B"));
         String issueIdB = getIssueId();
 
         clickButton("Resolve");
-        selectOptionByText(Locator.name("resolution"), "Duplicate");
+        selectOptionByText(Locator.name("Resolution"), "Duplicate");
         setFormElement(Locator.name("duplicate"), issueIdA);
         clickButton("Save");
 
@@ -735,7 +735,7 @@ public class IssuesTest extends BaseWebDriverTest
         goToModule("Issues");
 
         // create a new issue to be moved
-        _issuesHelper.addIssue(Maps.of("assignedTo", displayName, "title", issueTitle));
+        _issuesHelper.addIssue(Maps.of("AssignedTo", displayName, "title", issueTitle));
 
         // move the created issue
         goToModule("Issues");
@@ -756,11 +756,11 @@ public class IssuesTest extends BaseWebDriverTest
         goToModule("Issues");
 
         String issueTitleA = "Multi-Issue Move A";
-        _issuesHelper.addIssue(Maps.of("assignedTo", displayName, "title", issueTitleA));
+        _issuesHelper.addIssue(Maps.of("AssignedTo", displayName, "title", issueTitleA));
         String issueIdA = getIssueId();
 
         String issueTitleB = "Multi-Issue Move B";
-        _issuesHelper.addIssue(Maps.of("assignedTo", displayName, "title", issueTitleB));
+        _issuesHelper.addIssue(Maps.of("AssignedTo", displayName, "title", issueTitleB));
         String issueIdB = getIssueId();
 
         goToModule("Issues");
@@ -783,10 +783,10 @@ public class IssuesTest extends BaseWebDriverTest
     {
         Locator relatedLocator = Locator.name("related");
 
-        String issueIdA = _issuesHelper.addIssue(Maps.of("assignedTo", NAME, "title", "A is for Apple", "priority", "0")).getIssueId();
-        String issueIdB = _issuesHelper.addIssue(Maps.of("assignedTo", NAME, "title", "B is for Baking", "priority", "0")).getIssueId();
+        String issueIdA = _issuesHelper.addIssue(Maps.of("AssignedTo", NAME, "title", "A is for Apple", "priority", "0")).getIssueId();
+        String issueIdB = _issuesHelper.addIssue(Maps.of("AssignedTo", NAME, "title", "B is for Baking", "priority", "0")).getIssueId();
         // related C to A
-        String issueIdC = _issuesHelper.addIssue(Maps.of("assignedTo", NAME, "title", "C is for Cat", "priority", "0", "related", issueIdA)).getIssueId();
+        String issueIdC = _issuesHelper.addIssue(Maps.of("AssignedTo", NAME, "title", "C is for Cat", "priority", "0", "related", issueIdA)).getIssueId();
 
         clickAndWait(Locator.linkWithText(issueIdA));
         assertElementPresent(Locator.linkWithText(issueIdC)); // Should link back to related issue
@@ -839,7 +839,7 @@ public class IssuesTest extends BaseWebDriverTest
 
         // check for no default
         clickButton("New Issue");
-        assertEquals("", getSelectedOptionText(Locator.name("assignedTo")));
+        assertEquals("", getSelectedOptionText(Locator.name("AssignedTo")));
         clickButton("Cancel");
 
         /// check reader cannot be set as default user (issue 20598)
@@ -853,7 +853,7 @@ public class IssuesTest extends BaseWebDriverTest
 
         // verify
         clickButton("New Issue");
-        assertEquals(getSelectedOptionText(Locator.name("assignedTo")), user1DisplayName);
+        assertEquals(getSelectedOptionText(Locator.name("AssignedTo")), user1DisplayName);
         clickButton("Cancel");
 
         // set default group and user
@@ -864,7 +864,7 @@ public class IssuesTest extends BaseWebDriverTest
 
         // verify
         clickButton("New Issue");
-        assertEquals(getSelectedOptionText(Locator.name("assignedTo")), NAME);
+        assertEquals(getSelectedOptionText(Locator.name("AssignedTo")), NAME);
         clickButton("Cancel");
 
         // set no default user and return to project users assign list
@@ -875,7 +875,7 @@ public class IssuesTest extends BaseWebDriverTest
 
         // check for no default
         clickButton("New Issue");
-        assertEquals("", getSelectedOptionText(Locator.name("assignedTo")));
+        assertEquals("", getSelectedOptionText(Locator.name("AssignedTo")));
         clickButton("Cancel");
 
         // issue 20699 - NPE b/c default assign to user deleted!
@@ -901,7 +901,7 @@ public class IssuesTest extends BaseWebDriverTest
         goToProjectHome();
         waitAndClickAndWait(Locator.linkContainingText(ISSUE_SUMMARY_WEBPART_NAME));
         clickButton("New Issue");
-        List<WebElement> assignedToUserOptionWebElement = new Select(Locator.name("assignedTo").findElement(getDriver())).getOptions();
+        List<WebElement> assignedToUserOptionWebElement = new Select(Locator.name("AssignedTo").findElement(getDriver())).getOptions();
         List<String> assignedToUserOptions = new ArrayList<>();
         for (WebElement e : assignedToUserOptionWebElement)
             if (!e.getText().isBlank())

@@ -274,17 +274,17 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
 
         setFormElement(Locator.name("Output Sample 1_Name"), "SampleSetBVT15");
         setFormElement(Locator.name("Output Sample 2_Name"), "SampleSetBVT16");
-        checkCheckbox(Locator.name("Output Sample 1_IntColFolderCheckBox"));
-        setFormElement(Locator.name("Output Sample 1_IntColFolder"), "500a");
-        setFormElement(Locator.name("Output Sample 1_StringColFolder"), "firstOutput");
-        setFormElement(Locator.name("Output Sample 2_StringColFolder"), "secondOutput");
+        checkCheckbox(Locator.name("Output Sample 1_IntCol-FolderCheckBox"));
+        setFormElement(Locator.name("Output Sample 1_IntCol-Folder"), "500a");
+        setFormElement(Locator.name("Output Sample 1_StringCol-Folder"), "firstOutput");
+        setFormElement(Locator.name("Output Sample 2_StringCol-Folder"), "secondOutput");
         clickButton("Submit");
 
         log("Do a simple check that data validation works.");
         checker().verifyTrue("Expected error message '(String) for Integer field' is not present.",
                 isTextPresent("(String) for Integer field"));
-        checkCheckbox(Locator.name("Output Sample 1_IntColFolderCheckBox"));
-        setFormElement(Locator.name("Output Sample 1_IntColFolder"), "500");
+        checkCheckbox(Locator.name("Output Sample 1_IntCol-FolderCheckBox"));
+        setFormElement(Locator.name("Output Sample 1_IntCol-Folder"), "500");
         clickButton("Submit");
 
         clickAndWait(Locator.linkContainingText("Derive 2 samples"));

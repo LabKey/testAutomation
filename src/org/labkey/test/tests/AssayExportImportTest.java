@@ -486,10 +486,10 @@ public class AssayExportImportTest extends BaseWebDriverTest
         batchProperties.put(INSTRUMENT_FIELD_NAME, INSTRUMENT_NAME_02);
 
         List<Map<String, String>> runProperties = new ArrayList<>();
-        runProperties.add(Maps.of("name", RUN01_NAME, "comments", COMMENT_BASIC_02 + RUN01_NAME, INSTRUMENT_SETTING_FIELD_NAME, INSTRUMENT_SETTING_02));
-        runProperties.add(Maps.of("name", RUN02_NAME, "comments", COMMENT_BASIC_02 + RUN02_NAME, INSTRUMENT_SETTING_FIELD_NAME, INSTRUMENT_SETTING_02));
-        runProperties.add(Maps.of("name", RUN03_NAME, "comments", COMMENT_BASIC_02 + RUN03_NAME, INSTRUMENT_SETTING_FIELD_NAME, INSTRUMENT_SETTING_02));
-        runProperties.add(Maps.of("name", RUN04_NAME, "comments", COMMENT_BASIC_02 + RUN04_NAME, INSTRUMENT_SETTING_FIELD_NAME, INSTRUMENT_SETTING_02));
+        runProperties.add(Maps.of("Name", RUN01_NAME, "Comments", COMMENT_BASIC_02 + RUN01_NAME, INSTRUMENT_SETTING_FIELD_NAME, INSTRUMENT_SETTING_02));
+        runProperties.add(Maps.of("Name", RUN02_NAME, "Comments", COMMENT_BASIC_02 + RUN02_NAME, INSTRUMENT_SETTING_FIELD_NAME, INSTRUMENT_SETTING_02));
+        runProperties.add(Maps.of("Name", RUN03_NAME, "Comments", COMMENT_BASIC_02 + RUN03_NAME, INSTRUMENT_SETTING_FIELD_NAME, INSTRUMENT_SETTING_02));
+        runProperties.add(Maps.of("Name", RUN04_NAME, "Comments", COMMENT_BASIC_02 + RUN04_NAME, INSTRUMENT_SETTING_FIELD_NAME, INSTRUMENT_SETTING_02));
 
         log("Populate the assay '" + SIMPLE_ASSAY_FOR_EXPORT + "' by importing the file through the 'Run Properties'.");
         populateAssay(ASSAY_PROJECT_FOR_EXPORT_02, SIMPLE_ASSAY_FOR_EXPORT, false, runFiles, batchProperties, runProperties, null);

@@ -298,15 +298,15 @@ public class ElispotAssayTest extends AbstractAssayTest
             checkCheckbox(Locator.checkboxByName("subtractBackground"));
         for (int i = 0; i < 4; i++)
         {
-            Locator specimenLocator = Locator.name("specimen" + (i + 1) + "_ParticipantID");
+            Locator specimenLocator = Locator.name("Specimen " + (i + 1) + "_ParticipantID");
 
             // test for prepopulation of specimen form element values
             if (testPrepopulation)
                 assertEquals("Specimen " + (i+1), getFormElement(specimenLocator));
             setFormElement(specimenLocator, "ptid " + (i + 1) + " " + uniqueifier);
 
-            setFormElement(Locator.name("specimen" + (i + 1) + "_VisitID"), "" + (i + 1));
-            setFormElement(Locator.name("specimen" + (i + 1) + "_SampleDescription"), "blood");
+            setFormElement(Locator.name("Specimen " + (i + 1) + "_VisitID"), "" + (i + 1));
+            setFormElement(Locator.name("Specimen " + (i + 1) + "_SampleDescription"), "blood");
         }
 
         setFormElement(Locator.name("__primaryFile__"), file);
