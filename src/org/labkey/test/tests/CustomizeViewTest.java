@@ -309,7 +309,7 @@ public class CustomizeViewTest extends BaseWebDriverTest
         for(String name : viewNames)
         {
             _customizeViewsHelper.openCustomizeViewPanel();
-            _customizeViewsHelper.addFilter(new String[]{fieldKey}, fieldKey, op, value);
+            _customizeViewsHelper.addFilter(new String[]{fieldKey}, op, value);
             _customizeViewsHelper.saveCustomView(name);
         }
 
@@ -350,7 +350,7 @@ public class CustomizeViewTest extends BaseWebDriverTest
     private void addFilter(String columnName, String op, String value)
     {
         _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.addFilter(FieldKey.fromParts(columnName).toString(), columnName, op, value);
+        _customizeViewsHelper.addFilter(FieldKey.fromParts(columnName).toString(), op, value);
         _customizeViewsHelper.applyCustomView();
     }
 

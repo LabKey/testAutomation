@@ -210,7 +210,7 @@ public class ElispotAssayTest extends AbstractAssayTest
         clickAndWait(Locator.linkWithText("view runs"));
         waitAndClick(Locator.linkWithText("view results"));
         DataRegionTable results = new DataRegionTable("Data", this);
-        results.ensureColumnsPresent("Wellgroup Name", "Antigen Wellgroup Name", "Antigen Name", "Cells per Well", "Wellgroup Location", "Spot Count", "Normalized Spot Count", "Spot Size", "Analyte", "Cytokine", "Activity", "Intensity", "Specimen ID", "Participant ID", "Visit ID", "Date", "Sample Description", "ProtocolName", "Plate Reader");
+        assertEquals("Wrong columns", List.of("Wellgroup Name", "Antigen Wellgroup Name", "Antigen Name", "Cells per Well", "Wellgroup Location", "Spot Count", "Normalized Spot Count", "Spot Size", "Analyte", "Cytokine", "Activity", "Intensity", "Specimen ID", "Participant ID", "Visit ID", "Date", "Sample Description", "ProtocolName", "Plate Reader"), results.getColumnLabels());
         assertEquals(Arrays.asList("Specimen 4", "Antigen 6", "atg_6F2", "150", "(7, 8)", "0.0", "0.0", " ", "FITC+Cy5", " ", " ", " ", " ", "ptid 4 F2", "4.0", " ", "blood", " ", "AID", " "), results.getRowDataAsText(0));
     }
 
@@ -226,9 +226,9 @@ public class ElispotAssayTest extends AbstractAssayTest
         cvHelper.removeSort("Analyte");
         cvHelper.removeSort("WellgroupLocation");
 
-        cvHelper.addSort("AntigenLsid/AntigenName", "AntigenName", sortDir);
-        cvHelper.addSort("Analyte", "Analyte", sortDir);
-        cvHelper.addSort("WellgroupLocation", "WellgroupLocation", sortDir);
+        cvHelper.addSort("AntigenLsid/AntigenName", sortDir);
+        cvHelper.addSort("Analyte", sortDir);
+        cvHelper.addSort("WellgroupLocation", sortDir);
         cvHelper.applyCustomView();
 
         pushLocation();

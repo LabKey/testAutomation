@@ -793,7 +793,7 @@ public class FlowTest extends BaseFlowTest
         _customizeViewsHelper.addColumn(new String[] { reportNameEscaped, "Raw P" });
         _customizeViewsHelper.addColumn(new String[] { reportNameEscaped, "Adjusted P"});
         _customizeViewsHelper.addColumn(new String[] { reportNameEscaped, "Response"});
-        _customizeViewsHelper.addFilter(new String[] { reportNameEscaped, "Response"}, "Response", "Equals", "1");
+        _customizeViewsHelper.addFilter(new String[] { reportNameEscaped, "Response"}, "Equals", "1");
         _customizeViewsHelper.addSort("Name", SortDirection.ASC);
         _customizeViewsHelper.saveCustomView();
 

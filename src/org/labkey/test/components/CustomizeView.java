@@ -28,6 +28,7 @@ import org.labkey.test.components.ext4.Checkbox;
 import org.labkey.test.components.ext4.ComboBox;
 import org.labkey.test.components.ext4.RadioButton;
 import org.labkey.test.components.ext4.Window;
+import org.labkey.test.params.FieldKey;
 import org.labkey.test.selenium.LazyWebElement;
 import org.labkey.test.selenium.RefindingWebElement;
 import org.labkey.test.util.DataRegionTable;
@@ -46,6 +47,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import static org.labkey.test.components.ext4.Checkbox.Ext4Checkbox;
@@ -258,10 +260,10 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
             getWrapper().setFormElement(targetContainerInput, container);
         }
 
-        public Window saveError()
+        public Window<?> saveError()
         {
             clickButton("Save", 0);
-            return new Window("Error saving grid view", getWrapper().getDriver());
+            return new Window<>("Error saving grid view", getWrapper().getDriver());
         }
 
         public void save()
@@ -279,7 +281,7 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
     public void deleteView()
     {
         elements().deleteButton.click();
-        Window confirm = Window(getDriver()).withTitleContaining("Delete").find();
+        Window<?> confirm = Window(getDriver()).withTitleContaining("Delete").find();
         confirm.clickButton("Yes");
     }
 
@@ -308,19 +310,19 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
     /**
      * add a column to an already open customize view grid
      *
-     * @param column_name Name of the column.  If your column is nested, should be of the form
+     * @param fieldKey Name of the column.  If your column is nested, should be of the form
      *          "nodename/nodename/lastnodename", where nodename is not the displayed text of a node
      *          but the name included in the span containing the checkbox.  It will often be the same name,
      *          but with less whitespace
      */
-    public void addColumn(String column_name)
+    public void addColumn(CharSequence fieldKey)
     {
-        addColumn(column_name, column_name);
+        addItem(fieldKey, ViewItemType.Columns);
     }
 
     public void addColumn(String[] fieldKeyParts)
     {
-        addColumn(fieldKeyParts, StringUtils.join(fieldKeyParts, "/"));
+        addColumn(StringUtils.join(fieldKeyParts, "/"));
     }
 
     public void changeTab(ViewItemType tab)
@@ -347,84 +349,71 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
      * expand customize view menu to all but the last of fieldKeyParts
      * @return The data-recordid property of the &lt;tr&gt; element for the specified field in the "Available Fields" column tree.
      */
-    private WebElement expandPivots(String[] fieldKeyParts)
+    private WebElement expandPivots(CharSequence fieldIdentifier)
     {
-        String nodePath = "";
-        String fieldKey = StringUtils.join(fieldKeyParts, "/").toUpperCase();
+        Iterator<FieldKey> fieldKeyIterator = FieldKey.fromFieldKey(fieldIdentifier).getIterator();
+        FieldKey fieldKey = fieldKeyIterator.next();
+        String dataRecordId = fieldKey.toString().toUpperCase();
 
-        for (int i = 0; i < fieldKeyParts.length - 1; i ++ )
+        while (fieldKeyIterator.hasNext())
         {
-            nodePath += fieldKeyParts[i].toUpperCase();
-            WebElement fieldRow = Locator.tag("tr").withClass("x4-grid-data-row").withAttribute("data-recordid", nodePath).waitForElement(getComponentElement(), 10000);
+            WebElement fieldRow = Locator.tag("tr").withClass("x4-grid-data-row").withAttribute("data-recordid", dataRecordId).waitForElement(getComponentElement(), 10000);
 
             _driver.scrollIntoView(fieldRow, false);
             if (!fieldRow.getAttribute("class").contains("expanded"))
             {
                 Locator.css(".x4-tree-expander").findElement(fieldRow).click();
             }
-            Locator.tag("tr").withClass("x4-grid-tree-node-expanded").withAttribute("data-recordid", nodePath).waitForElement(getComponentElement(), 10000);
+            Locator.tag("tr").withClass("x4-grid-tree-node-expanded").withAttribute("data-recordid", dataRecordId).waitForElement(getComponentElement(), 10000);
             WebDriverWrapper.waitFor(() -> Locator.css("tr[data-recordid] + tr:not(.x4-grid-row)").findElements(getComponentElement()).isEmpty(), 2000); // Spacer row appears during expansion animation
-            nodePath += "/";
+
+            fieldKey = fieldKeyIterator.next();
+            dataRecordId = fieldKey.toString().toUpperCase();
         }
 
-        return Locator.tag("tr").withClass("x4-grid-data-row").withAttribute("data-recordid", fieldKey).findElement(getComponentElement());
+        return Locator.tag("tr").withClass("x4-grid-data-row").withAttribute("data-recordid", dataRecordId).findElement(getComponentElement());
     }
 
-    private void addItem(String[] fieldKeyParts, String columnName, ViewItemType type)
+    private void addItem(CharSequence fieldKey, ViewItemType type)
     {
         // fieldKey is the value contained in @fieldkey
-        _driver.log("Adding " + columnName + " " + type.toString());
+        _driver.log("Adding " + fieldKey + " " + type);
 
         changeTab(type);
 
         // Expand all nodes necessary to reveal the desired node.
-        WebElement fieldRow = expandPivots(fieldKeyParts);
+        WebElement fieldRow = expandPivots(fieldKey);
         WebElement checkbox = Locator.css("input[type=button]").findElement(fieldRow);
         WebElement rowLabel = Locator.byClass("x4-tree-node-text").findElement(fieldRow);
         rowLabel.click();
         new Checkbox(checkbox).check();
-        itemXPath(type, fieldKeyParts).waitForElement(this, 2_000);
+        itemXPath(type, fieldKey).waitForElement(this, 2_000);
     }
 
-    public void addColumn(String[] fieldKeyParts, String label)
+    public void addFilter(CharSequence fieldKey, String filter_type)
     {
-        addItem(fieldKeyParts, label, ViewItemType.Columns);
+        addFilter(fieldKey, filter_type, "");
     }
 
-    public void addColumn(String fieldKey, String column_name)
+    public void addFilter(String[] fieldKeyParts, String filter_type, String filter)
     {
-        addItem(fieldKey.split("/"), column_name, ViewItemType.Columns);
+        addFilter(String.join("/", fieldKeyParts), filter_type, filter);
     }
 
-    public void addFilter(String fieldKey, String filter_type)
-    {
-        addFilter(fieldKey, fieldKey, filter_type, "");
-    }
-
-    public void addFilter(String fieldKey, String filter_type, String filter)
-    {
-        addFilter(fieldKey, fieldKey, filter_type, filter);
-    }
-
-    public void addFilter(String fieldKey, String column_name, String filter_type, String filter)
-    {
-        addFilter(fieldKey.split("/"), column_name, filter_type, filter);
-    }
-
-    public void addFilter(String[] fieldKeyParts, String column_name, String filter_type, String filter)
+    public void addFilter(CharSequence fieldKey, String filter_type, String filter)
     {
         if (filter.isEmpty())
-            _driver.log("Adding " + column_name + " filter of " + filter_type);
+            _driver.log("Adding " + fieldKey + " filter of " + filter_type);
         else
-            _driver.log("Adding " + column_name + " filter of " + filter_type + " " + filter);
+            _driver.log("Adding " + fieldKey + " filter of " + filter_type + " " + filter);
 
         changeTab(ViewItemType.Filter);
-        Locator.XPathLocator itemXPath = itemXPath(ViewItemType.Filter, fieldKeyParts);
+        Locator.XPathLocator itemXPath = itemXPath(ViewItemType.Filter, fieldKey);
 
         if (!_driver.isElementPresent(itemXPath))
         {
             // Add filter if it doesn't exist
-            addItem(fieldKeyParts, column_name, ViewItemType.Filter);
+            addItem(fieldKey, ViewItemType.Filter);
             _driver.assertElementPresent(itemXPath);
         }
         else
@@ -459,15 +448,9 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
         return Locator.tagWithClass("div", "test-" + type.toString().toLowerCase() + "-tab");
     }
 
-    private Locator.XPathLocator itemXPath(ViewItemType type, String[] fieldKeyParts)
+    private Locator.XPathLocator itemXPath(ViewItemType type, CharSequence fieldKey)
     {
-        return itemXPath(type, StringUtils.join(fieldKeyParts, "/"));
-    }
-
-    private Locator.XPathLocator itemXPath(ViewItemType type, String fieldKey)
-    {
-        FieldKey parsedFieldKey = new FieldKey(fieldKey);
-        return itemXPath(type).withPredicate("@fieldkey=" + Locator.xq(fieldKey) + " or @fieldkey=" + Locator.xq(parsedFieldKey.toString()));
+        return itemXPath(type).withAttribute("fieldkey", fieldKey.toString());
     }
 
     private Locator.XPathLocator itemXPath(ViewItemType type, int item_index)
@@ -510,43 +493,6 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
         }
     }
 
-    public static class FieldKey
-    {
-        public static final String SEPARATOR = "/";
-        private final String fieldName;
-        private final String fieldKey;
-        private final List<String> lookupParts;
-
-        public FieldKey(String fieldKey)
-        {
-            List<String> allParts = Arrays.asList(fieldKey.split(SEPARATOR));
-            lookupParts = allParts.subList(0, allParts.size() - 1);
-            for (int i = 0; i < lookupParts.size(); i++)
-            {
-                lookupParts.set(i, lookupParts.get(i));//.toUpperCase());
-            }
-            fieldName = allParts.get(allParts.size() - 1);
-            allParts = new ArrayList<>(lookupParts);
-            allParts.add(fieldName);
-            this.fieldKey = String.join(SEPARATOR, allParts);
-        }
-
-        public String getFieldName()
-        {
-            return fieldName;
-        }
-
-        public List<String> getLookupParts()
-        {
-            return lookupParts;
-        }
-
-        public String toString()
-        {
-            return fieldKey;
-        }
-    }
-
     //enable customize view grid to show hidden fields
     public void showHiddenItems()
     {
@@ -558,25 +504,20 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
         BaseWebDriverTest.sleep(250); // wait for columns to display
     }
 
-    public void addSort(String column_name, SortDirection order)
+    public void addSort(CharSequence fieldKey, SortDirection order)
     {
-        addSort(column_name, column_name, order);
-    }
-
-    public void addSort(String fieldKey, String column_name, SortDirection order)
-    {
-        addSort(fieldKey.split("/"), column_name, order);
-    }
-
-    public void addSort(String[] fieldKeyParts, String column_name, SortDirection order)
-    {
-        Locator.XPathLocator itemXPath = itemXPath(ViewItemType.Sort, fieldKeyParts);
+        Locator.XPathLocator itemXPath = itemXPath(ViewItemType.Sort, fieldKey);
 
         _driver.assertElementNotPresent(itemXPath);
-        addItem(fieldKeyParts, column_name, ViewItemType.Sort);
+        addItem(fieldKey, ViewItemType.Sort);
 
         _driver._ext4Helper.selectComboBoxItem(itemXPath, order.toString());
         itemXPath.append("//tr").findElement(this).click(); // Sort direction doesn't stick without this
+    }
+
+    public void addSort(String[] fieldKeyParts, SortDirection order)
+    {
+        addSort(String.join("/", fieldKeyParts), order);
     }
 
     public void removeColumn(String fieldKey)
@@ -714,11 +655,11 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
     }
 
     /** Check that a column is present. */
-    public boolean isColumnPresent(String fieldKey)
+    public boolean isColumnPresent(CharSequence fieldKey)
     {
         try
         {
-            expandPivots(fieldKey.split("/"));
+            expandPivots(fieldKey);
             return true;
         }
         catch (NoSuchElementException no)
@@ -728,23 +669,23 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
     }
 
     /** Check that a column is present and is not selectable. */
-    public boolean isColumnUnselectable(String fieldKey)
+    public boolean isColumnUnselectable(CharSequence fieldKey)
     {
-        WebElement fieldRow = expandPivots(fieldKey.split("/"));
+        WebElement fieldRow = expandPivots(fieldKey);
         return "on".equals(fieldRow.getAttribute("unselectable"));
     }
 
-    public WebElement getColumn(String fieldKey)
+    public WebElement getColumn(CharSequence fieldKey)
     {
-        return expandPivots(fieldKey.split("/"));
+        return expandPivots(fieldKey);
     }
 
     /** Check that a column is present and not hidden. Assumes that the 'show hidden columns' is unchecked. */
-    public boolean isColumnVisible(String fieldKey)
+    public boolean isColumnVisible(CharSequence fieldKey)
     {
         try
         {
-            WebElement fieldRow = expandPivots(fieldKey.split("/"));
+            WebElement fieldRow = expandPivots(fieldKey);
             return fieldRow.isDisplayed();
         }
         catch (NoSuchElementException no)
@@ -754,9 +695,9 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
     }
 
     /** Check that a column is present and is a lookup column. */
-    public boolean isLookupColumn(String fieldKey)
+    public boolean isLookupColumn(CharSequence fieldKey)
     {
-        WebElement fieldRow = expandPivots(fieldKey.split("/"));
+        WebElement fieldRow = expandPivots(fieldKey);
         return !Locator.css("img.x4-tree-expander").findElements(fieldRow).isEmpty();
     }
 
@@ -766,7 +707,7 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
         return new Elements();
     }
 
-    protected class Elements extends Component.ElementCache
+    protected class Elements extends Component<?>.ElementCache
     {
         protected final WebElement deleteButton = new RefindingWebElement(Ext4Helper.Locators.ext4Button("Delete"), this);
         protected final WebElement revertButton = new RefindingWebElement(Ext4Helper.Locators.ext4Button("Revert"), this);
@@ -774,7 +715,7 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
         protected final WebElement saveButton = new RefindingWebElement(Ext4Helper.Locators.ext4Button("Save"), this);
     }
 
-    private class SelectedItemRow extends Component
+    private class SelectedItemRow extends Component<Component<?>.ElementCache>
     {
         private final WebElement _element;
         private final String _fieldKey;

@@ -256,12 +256,12 @@ public class UserDetailsPermissionTest extends BaseWebDriverTest
         selectOptionByText(Locator.name("quf_user"), _userHelper.getDisplayNameForEmail(ADMIN_USER));
         clickButton("Submit");
         _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.addColumn("user/Phone", "Phone");
-        _customizeViewsHelper.addColumn("user/" + CUSTOM_USER_COLUMN, CUSTOM_USER_COLUMN);
-        _customizeViewsHelper.addColumn("user/Email", "Email");
-        _customizeViewsHelper.addColumn("user/ModifiedBy/Email", "Email");
-        _customizeViewsHelper.addColumn("user/ModifiedBy/ModifiedBy/Email", "Email");
-        _customizeViewsHelper.addColumn("ModifiedBy/Email", "Email");
+        _customizeViewsHelper.addColumn("user/Phone");
+        _customizeViewsHelper.addColumn("user/" + CUSTOM_USER_COLUMN);
+        _customizeViewsHelper.addColumn("user/Email");
+        _customizeViewsHelper.addColumn("user/ModifiedBy/Email");
+        _customizeViewsHelper.addColumn("user/ModifiedBy/ModifiedBy/Email");
+        _customizeViewsHelper.addColumn("ModifiedBy/Email");
         _customizeViewsHelper.saveCustomView(HIDDEN_COL_VIEW, true);
 
         assertTextPresent(CHECKED_USER, ADMIN_USER, HIDDEN_STRING); // Ensure subsequent check is valid
@@ -273,7 +273,7 @@ public class UserDetailsPermissionTest extends BaseWebDriverTest
     {
         ExecuteQueryPage.beginAt(this, "core", "Users");
         _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.addColumn("ModifiedBy/Email", "Email");
+        _customizeViewsHelper.addColumn("ModifiedBy/Email");
         _customizeViewsHelper.saveCustomView(HIDDEN_COL_VIEW, true);
 
         assertTextPresent(CHECKED_USER, ADMIN_USER, HIDDEN_STRING); // Ensure subsequent check is valid
