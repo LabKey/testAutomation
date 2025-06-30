@@ -14,6 +14,7 @@ import org.labkey.serverapi.reader.DataLoader;
 import org.labkey.serverapi.reader.TabLoader;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.TestDataGenerator;
 import org.labkey.test.util.TestLogger;
 
@@ -308,6 +309,23 @@ public class TestDataUtils
         return updatedRows;
     }
 
+    public static <T> File writeRowsToFile(String fileName, List<List<T>> rows) throws IOException
+    {
+        return writeRowsToFile(fileName, rows.iterator());
+    }
+
+    public static <T> File writeRowsToFile(String fileName, Iterator<List<T>> rowIterator) throws IOException
+    {
+        String fileExtension = fileName.toLowerCase().substring(fileName.lastIndexOf('.') + 1);
+        return switch (fileExtension)
+        {
+            case "xlsx", "xls" -> TestDataUtils.writeRowsToExcel(fileName, rowIterator);
+            case "csv" -> TestDataUtils.writeRowsToFile(fileName, rowIterator, CSVFormat.DEFAULT);
+            case "tsv" -> TestDataUtils.writeRowsToFile(fileName, rowIterator, CSVFormat.TDF);
+            default -> throw new IllegalArgumentException("Unsupported file extension: " + fileExtension);
+        };
+    }
+
     public static <T> File writeRowsToTsv(String fileName, List<List<T>> rows) throws IOException
     {
         return writeRowsToFile(fileName, rows, CSVFormat.TDF);
@@ -426,6 +444,11 @@ public class TestDataUtils
         return stringWriter.toString();
     }
 
+    public static <T> String stringFromRows(List<List<T>> rows)
+    {
+        return stringFromRows(rows, CSVFormat.TDF);
+    }
+
     /**
      * Used to quote values to be written to a TSV file
      * @see org.labkey.api.data.TSVWriter
@@ -491,11 +514,9 @@ public class TestDataUtils
         }
     }
 
-    public static final String[] DECODED = {"\\", "$", "/", "&", "}", "~", ",", "."};
-    public static final String[] ENCODED = {"\\\\", "\\$", "\\/", "\\&", "\\}", "\\~", "\\,", "\\."};
-    public static String getEscapedNameExpression(String encoded)
+    @Deprecated // Going away soon
+    public static String getEscapedNameExpression(String name)
     {
-        return StringUtils.replaceEach(encoded, DECODED, ENCODED);
+        return EscapeUtil.escapeForNameExpression(name);
     }
-
 }

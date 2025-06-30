@@ -277,7 +277,7 @@ public class DataRegionTest extends AbstractQWPTest
         clickAndWait(selectionPart.append(Locator.tagWithClass("span", "show-selected")));
         assertEquals(5, table.getDataRowCount());
 
-        table.showAll();
+        table.rowSelector().showAll();
         assertEquals(15, table.getDataRowCount());
     }
 
