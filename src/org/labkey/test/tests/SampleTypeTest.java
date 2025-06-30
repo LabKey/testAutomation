@@ -48,9 +48,11 @@ import org.labkey.test.pages.experiment.UpdateSampleTypePage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldDefinition.ColumnType;
 import org.labkey.test.params.FieldDefinition.LookupInfo;
+import org.labkey.test.params.FieldInfo;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.ExcelHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
@@ -79,6 +81,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.labkey.test.params.FieldDefinition.DOMAIN_TRICKY_CHARACTERS;
 import static org.labkey.test.util.DataRegionTable.DataRegion;
 
 @Category({Daily.class})
@@ -241,7 +244,47 @@ public class SampleTypeTest extends BaseWebDriverTest
         sampleTypeHelper.verifyDataValues(data);
     }
 
-    // Issue 47280: LKSM: Trailing/Leading whitespace in Source name won't resolve when deriving samples
+    // Issue 53313: LKS doesn't show Sample Type fields with special characters in Custom Properties
+    @Test
+    public void testCustomProperties()
+    {
+        final String sampleTypeName = "SampleTypeCustomProps" + DOMAIN_TRICKY_CHARACTERS;
+        FieldInfo stringCol1 = new FieldInfo(TestDataGenerator.randomFieldName("StringColPlain"), ColumnType.String);
+        FieldInfo stringCol2 = new FieldInfo(TestDataGenerator.randomFieldName("StringCol%"), ColumnType.String);
+        // Used to make sure the details page shows properties with null values
+        FieldInfo stringCol3 = new FieldInfo(TestDataGenerator.randomFieldName("StringColNull"), ColumnType.String);
+        FieldInfo calcCol = new FieldInfo(TestDataGenerator.randomFieldName("CalcCol"), ColumnType.Calculation);
+        final List<FieldDefinition> fields = List.of(
+                stringCol1.getFieldDefinition(),
+                stringCol2.getFieldDefinition(),
+                stringCol3.getFieldDefinition(),
+                calcCol.getFieldDefinition().setValueExpression(EscapeUtil.getSqlQuotedValue(stringCol1.getName()) + " || 'Concat'")
+        );
+
+        SampleTypeDefinition sampleTypeDefinition = new SampleTypeDefinition(sampleTypeName).setFields(fields);
+
+        SampleTypeAPIHelper.createEmptySampleType(getProjectName(), sampleTypeDefinition);
+
+        log("Create a new sample type");
+        projectMenu().navigateToFolder(PROJECT_NAME, FOLDER_NAME);
+        SampleTypeHelper sampleTypeHelper = new SampleTypeHelper(this);
+        sampleTypeHelper.goToSampleType(sampleTypeName);
+
+        log("Add a single row to the sample type, with trailing spaces");
+        Map<String, String> fieldMap = Map.of("Name", "CustomPropsSample", stringCol1.getName(), "PlainValue", stringCol2.getName(), "PercentValue");
+        sampleTypeHelper.insertRow(fieldMap);
+
+        log("Verify custom properties, both name and values, are shown in both the grid and detail pages");
+        var dataRegion = DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
+        checker().verifyEquals("Row data does not contain expected custom properties", "PlainValue", dataRegion.getDataAsText(0, stringCol1.getLabel()));
+        checker().verifyEquals("Row data does not contain expected custom properties", "PercentValue", dataRegion.getDataAsText(0, stringCol2.getLabel()));
+        checker().verifyEquals("Row data does not contain expected custom properties", " ", dataRegion.getDataAsText(0, stringCol3.getLabel()));
+        checker().verifyEquals("Row data does not contain expected custom properties", "PlainValueConcat", dataRegion.getDataAsText(0, calcCol.getLabel()));
+        clickAndWait(Locator.linkWithText("CustomPropsSample"));
+        assertTextPresent(stringCol1.getLabel(), stringCol2.getLabel(), stringCol3.getLabel(), calcCol.getLabel(), "PlainValue", "PercentValue", "PlainValueConcat");
+    }
+
+        // Issue 47280: LKSM: Trailing/Leading whitespace in Source name won't resolve when deriving samples
     @Test
     public void testImportSamplesWithTrailingSpace()
     {

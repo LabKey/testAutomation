@@ -16,12 +16,11 @@
 package org.labkey.test.pages.study;
 
 import org.jetbrains.annotations.Nullable;
-import org.labkey.test.CachingLocator;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.pages.LabKeyPage;
-import org.labkey.test.selenium.LazyWebElement;
+import org.labkey.test.util.CachingSupplier;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -133,7 +132,7 @@ public class OverviewPage extends LabKeyPage<OverviewPage.Elements>
     public Map<String, List<CountPair>> getDatasetRowData(@Nullable Integer leftVisitIndex, @Nullable Integer endVisitIndex)
     {
         Map<String, List<CountPair>> datasetRowData = new HashMap<>();
-        List<WebElement> overviewRows = elementCache().getStudyOverviewRows();
+        List<WebElement> overviewRows = elementCache().studyOverviewRows.get();
         overviewRows = overviewRows.subList(1, overviewRows.size());
 
         for (WebElement row : overviewRows)
@@ -178,7 +177,7 @@ public class OverviewPage extends LabKeyPage<OverviewPage.Elements>
 
     public List<String> getVisits()
     {
-        WebElement headerRow = elementCache().getStudyOverviewRows().get(0);
+        WebElement headerRow = elementCache().studyOverviewRows.get().get(0);
         List<WebElement> visitCells = Locator.css("td").findElements(headerRow);
         visitCells = visitCells.subList(1, visitCells.size() - 1);
 
@@ -193,16 +192,13 @@ public class OverviewPage extends LabKeyPage<OverviewPage.Elements>
 
     protected class Elements extends LabKeyPage<?>.ElementCache
     {
-        public final WebElement participantCountCheckbox = new LazyWebElement(Locator.checkboxByNameAndValue("visitStatistic", "ParticipantCount"), this);
-        public final WebElement rowCountCheckbox = new LazyWebElement(Locator.checkboxByNameAndValue("visitStatistic", "RowCount"), this);
-        public final WebElement studyOverview = new LazyWebElement(Locator.tagWithId("table", "studyOverview"), this);
+        public final WebElement participantCountCheckbox = Locator.checkboxByNameAndValue("visitStatistic", "ParticipantCount").findWhenNeeded(this);
+        public final WebElement rowCountCheckbox = Locator.checkboxByNameAndValue("visitStatistic", "RowCount").findWhenNeeded(this);
+        public final WebElement studyOverview = Locator.tagWithId("table", "studyOverview").findWhenNeeded(this);
 
-        private final Locator studyOverviewRow = new CachingLocator(Locator.CssLocator.union(Locator.css(".labkey-row"), Locator.css(".labkey-alternate-row")));
+        private final Locator studyOverviewRow = Locator.CssLocator.union(Locator.css(".labkey-row"), Locator.css(".labkey-alternate-row"));
 
-        public List<WebElement> getStudyOverviewRows()
-        {
-            return studyOverviewRow.findElements(studyOverview);
-        }
+        public CachingSupplier<List<WebElement>> studyOverviewRows = new CachingSupplier<>(() -> studyOverviewRow.findElements(studyOverview));
     }
 
     public static class CountPair

@@ -80,7 +80,7 @@ public class BulkUpdateGroupApiTest extends BaseWebDriverTest
 
         if (usersTable.getDataRowCount() > 0)
         {
-            usersTable.checkAll();
+            usersTable.checkAllOnPage();
             clickButton("Delete");
             clickButton("Permanently Delete");
         }

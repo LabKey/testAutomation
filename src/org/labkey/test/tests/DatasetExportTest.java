@@ -108,7 +108,7 @@ public class DatasetExportTest extends AssayResultsExportTest
         clickAndWait(Locator.linkWithText(ASSAY_RUN_FILE.getName()));
 
         DataRegionTable assayResults = new DataRegionTable(super.getDataRegionId(), this);
-        assayResults.checkAll();
+        assayResults.checkAllOnPage();
         clickButton("Link to Study");
         selectOptionByText(Locator.name("targetStudy"), "/" + getProjectName() + "/" + getFolderName() + " (" + getFolderName() + " Study)");
         clickButton("Next");
