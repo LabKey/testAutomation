@@ -152,16 +152,16 @@ public class TimeChartAPITest extends TimeChartTest
 
         final List<Pair<String, List<Object>>> GETDATA_API_TEST_VISITLABEL = new ArrayList<>()
         {{
-            add(Pair.of("VisitLabel", Arrays.asList("Month 2", "Month 3", "Month 4", "Month 7", "Month 9", "Month 10", "Month 10", "Month 11", "Month 12", "Month 13")));
-            add(Pair.of("VisitLabel", Arrays.asList("Month 2", "Month 3", "Month 4", "Month 7", "Month 9", "Month 10", "Month 10", "Month 11", "Month 12", "Month 13")));
             add(Pair.of("study_Lab Results_ParticipantVisit_Visit_Label", Arrays.asList("Month 2", "Month 3", "Month 4", "Month 7", "Month 9", "Month 10", "Month 10", "Month 11", "Month 12", "Month 13")));
             add(Pair.of("study_Lab Results_ParticipantVisit_Visit_Label", Arrays.asList("Month 2", "Month 3", "Month 4", "Month 7", "Month 9", "Month 10", "Month 10", "Month 11", "Month 12", "Month 13")));
-            add(Pair.of("VisitLabel", Arrays.asList("Month 2", "Month 2", "Month 2", "Month 3", "Month 3", "Month 3", "Month 4", "Month 4", "Month 4", "Month 7", "Month 7", "Month 7", "Month 9", "Month 9", "Month 9")));
+            add(Pair.of("study_Lab Results_ParticipantVisit_Visit_Label", Arrays.asList("Month 2", "Month 3", "Month 4", "Month 7", "Month 9", "Month 10", "Month 10", "Month 11", "Month 12", "Month 13")));
+            add(Pair.of("study_Lab Results_ParticipantVisit_Visit_Label", Arrays.asList("Month 2", "Month 3", "Month 4", "Month 7", "Month 9", "Month 10", "Month 10", "Month 11", "Month 12", "Month 13")));
+            add(Pair.of("study_Lab Results_ParticipantVisit_Visit_Label", Arrays.asList("Month 2", "Month 2", "Month 2", "Month 3", "Month 3", "Month 3", "Month 4", "Month 4", "Month 4", "Month 7", "Month 7", "Month 7", "Month 9", "Month 9", "Month 9")));
             add(Pair.of("study_Lab Results_ParticipantVisit_Visit_Label", Arrays.asList("Month 2", "Month 2", "Month 2", "Month 3", "Month 3", "Month 3", "Month 4", "Month 4", "Month 4", "Month 7", "Month 7", "Month 7", "Month 9", "Month 9", "Month 9", "Month 10", "Month 10", "Month 11", "Month 12", "Month 13")));
-            add(Pair.of("VisitLabel", Arrays.asList("Month 2", "Month 3", "Month 4", "Month 7", "Month 9")));
+            add(Pair.of("study_Lab Results_ParticipantVisit_Visit_Label", Arrays.asList("Month 2", "Month 3", "Month 4", "Month 7", "Month 9")));
             add(Pair.of("study_Lab Results_ParticipantVisit_Visit_Label", Arrays.asList("Month 2", "Month 3", "Month 4", "Month 7", "Month 9", "Month 10", "Month 10", "Month 11", "Month 12", "Month 13")));
-            add(Pair.of("VisitLabel", Arrays.asList("Month 2", "Month 2", "Month 2", "Month 3", "Month 4", "Month 7", "Month 9", "Month 10", "Month 10", "Month 11", "Month 12", "Month 13")));
-            add(Pair.of("VisitLabel", Arrays.asList("Month 2", "Month 3", "Month 4", "Month 7", "Month 9", "Month 10", "Month 10", "Month 11", "Month 12", "Month 13")));
+            add(Pair.of("study_Lab Results_ParticipantVisit_Visit_Label", Arrays.asList("Month 2", "Month 2", "Month 2", "Month 3", "Month 4", "Month 7", "Month 9", "Month 10", "Month 10", "Month 11", "Month 12", "Month 13")));
+            add(Pair.of("study_Lab Results_ParticipantVisit_Visit_Label", Arrays.asList("Month 2", "Month 3", "Month 4", "Month 7", "Month 9", "Month 10", "Month 10", "Month 11", "Month 12", "Month 13")));
         }};
 
         testVisApi(TestFileUtils.getSampleData("api/getDataVisitTest.html"), GETDATA_API_TEST_TITLES, GETDATA_API_TEST_NUMROWS, GETDATA_API_VISITTEST_COLNAMES, null, GETDATA_API_TEST_VISITLABEL,

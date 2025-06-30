@@ -51,6 +51,7 @@ import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.pages.list.GridPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldDefinition.StringLookup;
+import org.labkey.test.params.FieldKey;
 import org.labkey.test.params.list.VarListDefinition;
 import org.labkey.test.tests.AuditLogTest;
 import org.labkey.test.util.AbstractDataRegionExportOrSignHelper.ColumnHeaderType;
@@ -570,10 +571,8 @@ public class ListTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(LIST_NAME_COLORS));
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.removeColumn(_listColGood.getName());
-        String fieldKey6 = _listColGood.getName();
-        _customizeViewsHelper.addFilter(fieldKey6, "Is Less Than", "10");
-        String fieldKey8 = _listColMonth.getName();
-        _customizeViewsHelper.addSort(fieldKey8, SortDirection.ASC);
+        _customizeViewsHelper.addFilter(_listColGood.getName(), "Is Less Than", "10");
+        _customizeViewsHelper.addSort(_listColMonth.getName(), SortDirection.ASC);
         _customizeViewsHelper.saveCustomView(TEST_VIEW);
 
         log("Check Customize View worked");
@@ -692,20 +691,13 @@ public class ListTest extends BaseWebDriverTest
 
         log("Check that reference worked");
         _customizeViewsHelper.openCustomizeViewPanel();
-        String fieldKey4 = EscapeUtil.fieldKeyEncodePart(_list2Col1.getName()) + "/" + _listColDesc.getName();
-        _customizeViewsHelper.addColumn(fieldKey4);
-        String fieldKey3 = EscapeUtil.fieldKeyEncodePart(_list2Col1.getName()) + "/" + _listColMonth.getName();
-        _customizeViewsHelper.addColumn(fieldKey3);
-        String fieldKey2 = EscapeUtil.fieldKeyEncodePart(_list2Col1.getName()) + "/" + _listColGood.getName();
-        _customizeViewsHelper.addColumn(fieldKey2);
-        String fieldKey5 = EscapeUtil.fieldKeyEncodePart(_list2Col1.getName()) + "/" + _listColGood.getName();
-        _customizeViewsHelper.addFilter(fieldKey5, "Is Less Than", "10");
-        String fieldKey7 = EscapeUtil.fieldKeyEncodePart(_list2Col1.getName()) + "/" + _listColGood.getName();
-        _customizeViewsHelper.addSort(fieldKey7, SortDirection.ASC);
-        String fieldKey1 = _list3Col1.getName() + "/" + _list3Col1.getName();
-        _customizeViewsHelper.addColumn(fieldKey1);
-        String fieldKey = _list3Col1.getName() + "/" + _list3Col2.getName();
-        _customizeViewsHelper.addColumn(fieldKey);
+        _customizeViewsHelper.addColumn(FieldKey.fromParts(_list2Col1.getName(), _listColDesc.getName()));
+        _customizeViewsHelper.addColumn(FieldKey.fromParts(_list2Col1.getName(), _listColMonth.getName()));
+        _customizeViewsHelper.addColumn(FieldKey.fromParts(_list2Col1.getName(), _listColGood.getName()));
+        _customizeViewsHelper.addFilter(FieldKey.fromParts(_list2Col1.getName(), _listColGood.getName()), "Is Less Than", "10");
+        _customizeViewsHelper.addSort(FieldKey.fromParts(_list2Col1.getName(), _listColGood.getName()), SortDirection.ASC);
+        _customizeViewsHelper.addColumn(_list3Col1.getName() + "/" + _list3Col1.getName());
+        _customizeViewsHelper.addColumn(_list3Col1.getName() + "/" + _list3Col2.getName());
         _customizeViewsHelper.saveCustomView(TEST_VIEW);
 
         log("Check adding referenced fields worked");

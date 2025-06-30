@@ -463,7 +463,7 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
         return Locator.tagWithClass("table", "labkey-customview-" + type.toString().toLowerCase() + "-item");
     }
 
-    private void removeItem(String fieldKey, ViewItemType type)
+    private void removeItem(CharSequence fieldKey, ViewItemType type)
     {
         changeTab(type);
 
@@ -520,19 +520,19 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
         addSort(String.join("/", fieldKeyParts), order);
     }
 
-    public void removeColumn(String fieldKey)
+    public void removeColumn(CharSequence fieldKey)
     {
         _driver.log("Removing " + fieldKey + " column");
         removeItem(fieldKey, ViewItemType.Columns);
     }
 
-    public void removeFilter(String fieldKey)
+    public void removeFilter(CharSequence fieldKey)
     {
         _driver.log("Removing " + fieldKey + " filter");
         removeItem(fieldKey, ViewItemType.Filter);
     }
 
-    public void removeSort(String fieldKey)
+    public void removeSort(CharSequence fieldKey)
     {
         _driver.log("Removing " + fieldKey + " sort");
         removeItem(fieldKey, ViewItemType.Sort);
@@ -584,25 +584,25 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
         _driver._ext4Helper.selectComboBoxItem("Folder Filter:", folderFilter);
     }
 
-    public void moveColumn(String fieldKey, boolean moveUp)
+    public void moveColumn(CharSequence fieldKey, boolean moveUp)
     {
         _driver.log("Moving filter, " + fieldKey + " " + (moveUp ? "up." : "down."));
         moveItem(fieldKey, moveUp, ViewItemType.Columns);
     }
 
-    public void moveFilter(String fieldKey, boolean moveUp)
+    public void moveFilter(CharSequence fieldKey, boolean moveUp)
     {
         _driver.log("Moving filter, " + fieldKey + " " + (moveUp ? "up." : "down."));
         moveItem(fieldKey, moveUp, ViewItemType.Filter);
     }
 
-    public void moveSort(String fieldKey, boolean moveUp)
+    public void moveSort(CharSequence fieldKey, boolean moveUp)
     {
         _driver.log("Moving sort, " + fieldKey + " " + (moveUp ? "up." : "down."));
         moveItem(fieldKey, moveUp, ViewItemType.Sort);
     }
 
-    private void moveItem(String fieldKey, boolean moveUp, ViewItemType type)
+    private void moveItem(CharSequence fieldKey, boolean moveUp, ViewItemType type)
     {
         changeTab(type);
         final int itemIndex = _driver.getElementIndex(itemXPath(type, fieldKey).findElement(this));
@@ -624,7 +624,7 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
         builder.dragAndDrop(fromItem, toItem).build().perform();
     }
 
-    public void removeColumnTitle(String fieldKey)
+    public void removeColumnTitle(CharSequence fieldKey)
     {
         setColumnTitle(fieldKey, null);
     }
@@ -634,7 +634,7 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
      * @param fieldKey The field key of the column to change.  Note that the column should already be in the selected column list.
      * @param caption The caption value or null to unset the column caption.
      */
-    public void setColumnTitle(String fieldKey, String caption)
+    public void setColumnTitle(CharSequence fieldKey, String caption)
     {
         String msg = "Setting column " + fieldKey;
         if (caption != null)
@@ -643,15 +643,14 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
 
         changeTab(ViewItemType.Columns);
 
-        Window window = new SelectedColumnRow(fieldKey).clickEdit();
+        Window<?> window = new SelectedColumnRow(fieldKey).clickEdit();
 
         if (caption == null)
             caption = "";
         _driver.setFormElement(Locator.name("title").findElement(window), caption);
         Locator.xpath("//label").findElement(window).click();
 
-        window.clickButton("OK", 0);
-        window.waitForClose();
+        window.clickButton("OK", true);
     }
 
     /** Check that a column is present. */
@@ -718,11 +717,11 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
     private class SelectedItemRow extends Component<Component<?>.ElementCache>
     {
         private final WebElement _element;
-        private final String _fieldKey;
+        private final FieldKey _fieldKey;
 
-        protected SelectedItemRow(ViewItemType itemType, String fieldkey)
+        protected SelectedItemRow(ViewItemType itemType, CharSequence fieldkey)
         {
-            _fieldKey = fieldkey;
+            _fieldKey = FieldKey.fromFieldKey(fieldkey);
             _element = itemXPath(itemType, fieldkey).findElement(CustomizeView.this);
         }
 
@@ -732,7 +731,7 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
             return _element;
         }
 
-        protected String getFieldKey()
+        protected FieldKey getFieldKey()
         {
             return _fieldKey;
         }
@@ -746,7 +745,7 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
 
     private class SelectedColumnRow extends SelectedItemRow
     {
-        public SelectedColumnRow(String fieldkey)
+        public SelectedColumnRow(CharSequence fieldkey)
         {
             super(ViewItemType.Columns, fieldkey);
         }
@@ -762,7 +761,7 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
 
     private class SelectedFilterRow extends SelectedItemRow
     {
-        public SelectedFilterRow(String fieldkey)
+        public SelectedFilterRow(CharSequence fieldkey)
         {
             super(ViewItemType.Filter, fieldkey);
         }
@@ -775,7 +774,7 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
 
     private class SelectedSortRow extends SelectedItemRow
     {
-        public SelectedSortRow(String fieldkey)
+        public SelectedSortRow(CharSequence fieldkey)
         {
             super(ViewItemType.Sort, fieldkey);
         }
