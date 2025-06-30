@@ -80,7 +80,7 @@ public final class FieldKey implements CharSequence, WrapsFieldKey
             }
             catch (IllegalArgumentException iae)
             {
-                return null;
+                return null; // FieldReferenceManager depends on this returning null.
             }
         }
     }
@@ -149,6 +149,10 @@ public final class FieldKey implements CharSequence, WrapsFieldKey
         return _name;
     }
 
+    /**
+     * Inverse of {@link #fromParts(String...)}
+     * @return decoded parts of the field key
+     */
     public String[] getNameArray()
     {
         return Arrays.stream(_fieldKey.split(SEPARATOR)).map(FieldKey::decodePart).toArray(String[]::new);
