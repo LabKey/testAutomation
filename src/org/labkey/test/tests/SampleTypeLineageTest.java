@@ -17,6 +17,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.FieldKey;
 import org.labkey.test.params.experiment.DataClassDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.DataRegionTable;
@@ -459,7 +460,7 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
         DataRegionTable table = sampleHelper.getSamplesDataRegionTable();
         table.openCustomizeGrid();
         _customizeViewsHelper.showHiddenItems();
-        _customizeViewsHelper.addColumn(new String[]{"Inputs", "Materials", parentSampleType});
+        _customizeViewsHelper.addColumn(FieldKey.fromParts("Inputs", "Materials", parentSampleType));
         _customizeViewsHelper.applyCustomView();
         waitAndClickAndWait(Locator.linkWithText("SampleSetBVT4"));
 

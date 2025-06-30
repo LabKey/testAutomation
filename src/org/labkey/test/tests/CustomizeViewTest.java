@@ -300,7 +300,7 @@ public class CustomizeViewTest extends BaseWebDriverTest
     @Test
     public void saveFilterTest()
     {
-        String fieldKey = FieldKey.fromParts(LAST_NAME_COLUMN).toString();
+        FieldKey fieldKey = FieldKey.fromParts(LAST_NAME_COLUMN);
         String op = "Starts With";
         String value = "J";
         String[] viewNames = {TRICKY_CHARACTERS + "view", "AAC", "aaa", "aad", "zzz"};
@@ -309,7 +309,7 @@ public class CustomizeViewTest extends BaseWebDriverTest
         for(String name : viewNames)
         {
             _customizeViewsHelper.openCustomizeViewPanel();
-            _customizeViewsHelper.addFilter(new String[]{fieldKey}, op, value);
+            _customizeViewsHelper.addFilter(fieldKey, op, value);
             _customizeViewsHelper.saveCustomView(name);
         }
 

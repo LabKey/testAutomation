@@ -45,8 +45,6 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -320,11 +318,6 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
         addItem(fieldKey, ViewItemType.Columns);
     }
 
-    public void addColumn(String[] fieldKeyParts)
-    {
-        addColumn(StringUtils.join(fieldKeyParts, "/"));
-    }
-
     public void changeTab(ViewItemType tab)
     {
         Locator.tag("ul").child(Locator.tag("li").withClass("labkey-customview-tab").containing(tab.toString())).findElement(this).click();
@@ -393,11 +386,6 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
     public void addFilter(CharSequence fieldKey, String filter_type)
     {
         addFilter(fieldKey, filter_type, "");
-    }
-
-    public void addFilter(String[] fieldKeyParts, String filter_type, String filter)
-    {
-        addFilter(String.join("/", fieldKeyParts), filter_type, filter);
     }
 
     public void addFilter(CharSequence fieldKey, String filter_type, String filter)
@@ -513,11 +501,6 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
 
         _driver._ext4Helper.selectComboBoxItem(itemXPath, order.toString());
         itemXPath.append("//tr").findElement(this).click(); // Sort direction doesn't stick without this
-    }
-
-    public void addSort(String[] fieldKeyParts, SortDirection order)
-    {
-        addSort(String.join("/", fieldKeyParts), order);
     }
 
     public void removeColumn(CharSequence fieldKey)

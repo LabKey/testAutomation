@@ -34,6 +34,7 @@ import org.labkey.test.pages.flow.reports.QCReportEditorPage;
 import org.labkey.test.pages.flow.reports.ReportEditorPage;
 import org.labkey.test.pages.pipeline.PipelineStatusDetailsPage;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.FieldKey;
 import org.labkey.test.tests.AuditLogTest;
 import org.labkey.test.util.DataRegion;
 import org.labkey.test.util.DataRegionTable;
@@ -787,13 +788,13 @@ public class FlowTest extends BaseFlowTest
     {
         beginAt("/flow" + getContainerPath() + "/query.view?schemaName=flow&query.queryName=FCSAnalyses");
 
-        String reportNameEscaped = EscapeUtil.fieldKeyEncodePart(reportName);
+        FieldKey reportNameFk = FieldKey.fromParts(reportName);
 
         _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.addColumn(new String[] { reportNameEscaped, "Raw P" });
-        _customizeViewsHelper.addColumn(new String[] { reportNameEscaped, "Adjusted P"});
-        _customizeViewsHelper.addColumn(new String[] { reportNameEscaped, "Response"});
-        _customizeViewsHelper.addFilter(new String[] { reportNameEscaped, "Response"}, "Equals", "1");
+        _customizeViewsHelper.addColumn(reportNameFk.child("Raw P"));
+        _customizeViewsHelper.addColumn(reportNameFk.child("Adjusted P"));
+        _customizeViewsHelper.addColumn(reportNameFk.child("Response"));
+        _customizeViewsHelper.addFilter(reportNameFk.child("Response"), "Equals", "1");
         _customizeViewsHelper.addSort("Name", SortDirection.ASC);
         _customizeViewsHelper.saveCustomView();
 

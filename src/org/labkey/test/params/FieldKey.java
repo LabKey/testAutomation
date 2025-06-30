@@ -27,9 +27,18 @@ public final class FieldKey implements CharSequence, WrapsFieldKey
 
     private FieldKey(FieldKey parent, String child)
     {
-        _parent = parent;
-        _name = (parent != null && !parent.getName().isBlank() ? parent.getName() + SEPARATOR : "") + child;
-        _fieldKey = (parent != null && !parent.getName().isBlank() ? parent + SEPARATOR : "") + encodePart(child);
+        if (parent != null && !parent.isEmpty())
+        {
+            _parent = parent;
+            _name = parent.getName() + SEPARATOR + child;
+            _fieldKey = parent + SEPARATOR + encodePart(child);
+        }
+        else
+        {
+            _parent = null;
+            _name = child;
+            _fieldKey = encodePart(child);
+        }
     }
 
     public static List<String> getIllegalChars()
