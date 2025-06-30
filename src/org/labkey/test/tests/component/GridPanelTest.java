@@ -64,11 +64,11 @@ public class GridPanelTest extends GridPanelBaseTest
     // Column names.
     private static final String FILTER_NAME_COL = "Name";
     private static final String FILTER_EXPDATE_COL = "Expiration Date";
-    private static final String FILTER_STRING_COL = "Str";
-    private static final String FILTER_INT_COL = "Int";
-    private static final String FILTER_EXTEND_CHAR_COL = "\u0106\u00D8\u0139";
-    private static final String FILTER_BOOL_COL = "Bool";
-    private static final String FILTER_DATE_COL = "Date";
+    private static final String FILTER_STRING_COL = TestDataGenerator.randomFieldName("Str", 0, 5);
+    private static final String FILTER_INT_COL = TestDataGenerator.randomFieldName("Int", 0, 5);
+    private static final String FILTER_EXTEND_CHAR_COL = TestDataGenerator.randomFieldName("\u0106\u00D8\u0139", 0, 5);
+    private static final String FILTER_BOOL_COL = TestDataGenerator.randomFieldName("Bool", 0, 5);
+    private static final String FILTER_DATE_COL = TestDataGenerator.randomFieldName("Date", 0, 5);
     private static final String FILTER_STORED_AMOUNT_COL = "Amount";
 
     // Views and columns used in the views. The views are only applied to the small sample type (Small_SampleType).
