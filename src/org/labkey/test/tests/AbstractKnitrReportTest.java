@@ -81,6 +81,7 @@ public abstract class AbstractKnitrReportTest extends BaseWebDriverTest
         try
         {
             new CspConfigHelper(this).setAllowedHosts(Map.of(
+                ExternalSourcesPage.Directive.Object, List.of("'self'"), // Issue 53226: reports-streamFile is blocked by object-src CSP directive
                 ExternalSourcesPage.Directive.Style, List.of("https://cdn.datatables.net"),
                 ExternalSourcesPage.Directive.Font, List.of("https://mathjax.rstudio.com")));
         }
