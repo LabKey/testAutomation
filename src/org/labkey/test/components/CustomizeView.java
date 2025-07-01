@@ -29,7 +29,6 @@ import org.labkey.test.components.ext4.ComboBox;
 import org.labkey.test.components.ext4.RadioButton;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.params.FieldKey;
-import org.labkey.test.selenium.LazyWebElement;
 import org.labkey.test.selenium.RefindingWebElement;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
@@ -233,14 +232,14 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
         saveWindow.save();
     }
 
-    public static class SaveWindow extends Window
+    public static class SaveWindow extends Window<Window<?>.ElementCache>
     {
         public final Checkbox shareCheckbox = Ext4Checkbox().withLabel("Make this grid view available to all users").findWhenNeeded(this);
         public final Checkbox inheritCheckbox = Ext4Checkbox().withLabel("Make this grid view available in child folders").findWhenNeeded(this);
         public final RadioButton defaultViewRadio = RadioButton().withLabelContaining("Default").findWhenNeeded(this);
         public final RadioButton namedViewRadio = RadioButton().withLabelContaining("Named").findWhenNeeded(this);
-        private final WebElement viewNameInput = new LazyWebElement(Locator.xpath("//input[@name='saveCustomView_name']"), this);
-        private final WebElement targetContainerInput = new LazyWebElement(Locator.xpath("//input[@name='saveCustomView_targetContainer']"), this);
+        private final WebElement viewNameInput = Locator.input("saveCustomView_name").findWhenNeeded(this);
+        private final WebElement targetContainerInput = Locator.input("saveCustomView_targetContainer").findWhenNeeded(this);
 
         protected SaveWindow(WebDriver driver)
         {
@@ -353,7 +352,7 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
             WebElement fieldRow = Locator.tag("tr").withClass("x4-grid-data-row").withAttribute("data-recordid", dataRecordId).waitForElement(getComponentElement(), 10000);
 
             _driver.scrollIntoView(fieldRow, false);
-            if (!fieldRow.getAttribute("class").contains("expanded"))
+            if (!StringUtils.trimToEmpty(fieldRow.getAttribute("class")).contains("expanded"))
             {
                 Locator.css(".x4-tree-expander").findElement(fieldRow).click();
             }
@@ -733,7 +732,7 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
             super(ViewItemType.Columns, fieldkey);
         }
 
-        public Window clickEdit()
+        public Window<?> clickEdit()
         {
             WebElement gear = Locator.css("div.labkey-tool-gear").findElement(getComponentElement());
             _driver.scrollIntoView(gear, true);
