@@ -72,7 +72,9 @@ import static org.labkey.test.util.EscapeUtil.escapeForNameExpression;
 public class SampleTypeNameExpressionTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "SampleType_Name_Expression_Test";
-    private static final String DEFAULT_SAMPLE_PARENT_VALUE = "SS" + TestDataGenerator.randomString(3).replaceAll("[_)]", "."); // '_' is used as delimiter to get batchRandomId and ) is used to close the defaultValue()
+
+    private static final String DEFAULT_SAMPLE_PARENT_VALUE = "SS" +
+            EscapeUtil.escapeForNameExpression(TestDataGenerator.randomString(3).replaceAll("[_)]", ".")); // '_' is used as delimiter to get batchRandomId and ) is used to close the defaultValue()
 
     private static final String PARENT_SAMPLE_TYPE = "PS" + DOMAIN_TRICKY_CHARACTERS;
     private static final String PARENT_SAMPLE_TYPE_INPUT = escapeForNameExpression(PARENT_SAMPLE_TYPE);
@@ -90,15 +92,17 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
     private static final String PARENT_SAMPLE_06 = "parent,06";
     private static final String PARENT_SAMPLE_07 = "\"parent07";
 
-    private static final FieldInfo PARENT_FIELD_BACKSLASH = new FieldInfo("Str \\", ColumnType.String);
-    private static final FieldInfo PARENT_FIELD_DOLLAR_DATE = new FieldInfo("Date $", ColumnType.DateAndTime);
-    private static final FieldInfo PARENT_FIELD_FORWARDSLASH = new FieldInfo("Str /", ColumnType.String);
-    private static final FieldInfo PARENT_FIELD_PERIOD = new FieldInfo("Str .", ColumnType.String);
-    private static final FieldInfo PARENT_FIELD_AMPERSAND = new FieldInfo("Str &", ColumnType.String);
-    private static final FieldInfo PARENT_FIELD_CURLY_LEFT = new FieldInfo("Str {", ColumnType.String);
-    private static final FieldInfo PARENT_FIELD_CURLY_RIGHT_INT = new FieldInfo("Int }", ColumnType.Integer);
-    private static final FieldInfo PARENT_FIELD_TILDE = new FieldInfo("Str ~", ColumnType.String);
-    private static final FieldInfo PARENT_FIELD_COMMA = new FieldInfo("Str ,", ColumnType.String);
+    // Create fields that have each of the tricky characters for name expressions.
+    // Having field names that differ only by special characters causes problems (Issue 53315)
+    private static final FieldInfo PARENT_FIELD_BACKSLASH = new FieldInfo("Str A \\", ColumnType.String);
+    private static final FieldInfo PARENT_FIELD_DOLLAR_DATE = new FieldInfo("Date B $", ColumnType.DateAndTime);
+    private static final FieldInfo PARENT_FIELD_FORWARDSLASH = new FieldInfo("Str C /", ColumnType.String);
+    private static final FieldInfo PARENT_FIELD_PERIOD = new FieldInfo("Str D .", ColumnType.String);
+    private static final FieldInfo PARENT_FIELD_AMPERSAND = new FieldInfo("Str E &", ColumnType.String);
+    private static final FieldInfo PARENT_FIELD_CURLY_LEFT = new FieldInfo("Str F {", ColumnType.String);
+    private static final FieldInfo PARENT_FIELD_CURLY_RIGHT_INT = new FieldInfo("Int G }", ColumnType.Integer);
+    private static final FieldInfo PARENT_FIELD_TILDE = new FieldInfo("Str H ~", ColumnType.String);
+    private static final FieldInfo PARENT_FIELD_COMMA = new FieldInfo("Str I ,", ColumnType.String);
 
     private static final File PARENT_EXCEL = TestFileUtils.getSampleData("samples/ParentSamples.xlsx");
 
