@@ -17,6 +17,7 @@ package org.labkey.test.tests;
 
 import org.junit.Assume;
 import org.junit.BeforeClass;
+import org.junit.Test;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -54,6 +55,8 @@ public abstract class AbstractKnitrReportTest extends BaseWebDriverTest
     protected static final Path rmdReport_no_scriptpad = TestFileUtils.getSampleData("reports/knitr_no_scriptpad.rmd").toPath();
     private static final Path rhtmlReport = scriptpadReports.resolve("script_rhtml.rhtml");
     private static final Path rhtmlReport_no_scriptpad = TestFileUtils.getSampleData("reports/knitr_no_scriptpad.rhtml").toPath();
+    protected static final Path rmdReport_embedded_script = TestFileUtils.getSampleData("reports/plotly.rmd").toPath();
+
     protected final RReportHelper _rReportHelper = new RReportHelper(this);
 
     private static String readReport(final Path reportFile)
@@ -224,5 +227,19 @@ public abstract class AbstractKnitrReportTest extends BaseWebDriverTest
         waitAndClickAndWait(Locator.linkWithText("kable"));
         _ext4Helper.waitForMaskToDisappear(3 * BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         waitForElement(Locator.id("mtcars_table"));
+    }
+
+    /**
+     * Issue 53211: CSP reports when an R/Plotly graph is displayed in Reports web part, same thing wrapped in a wiki works fine with strict csp
+     */
+    @Test
+    public void reportEmbeddedScript()
+    {
+        Locator[] reportContains = {};
+
+        String[] reportNotContains = {};
+
+        createAndVerifyKnitrReport(rmdReport_embedded_script, RReportHelper.ReportOption.knitrMarkdown, reportContains,
+            reportNotContains, true);
     }
 }

@@ -1,0 +1,12 @@
+---
+title: "Plotly Example"
+output: html_document
+---
+
+```{r testing, echo=FALSE, message=FALSE}
+library(plotly, warn.conflicts = FALSE)
+
+fig <- plot_ly(x = ~rnorm(50), type = "box")
+fig <- fig %>% add_trace(x = ~rnorm(50, 1))
+fig
+```
