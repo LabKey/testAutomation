@@ -17,6 +17,7 @@
 package org.labkey.test.tests.elispotassay;
 
 import org.apache.commons.lang3.math.NumberUtils;
+import org.assertj.core.api.Assertions;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -210,8 +211,8 @@ public class ElispotAssayTest extends AbstractAssayTest
         clickAndWait(Locator.linkWithText("view runs"));
         waitAndClick(Locator.linkWithText("view results"));
         DataRegionTable results = new DataRegionTable("Data", this);
-        assertEquals("Wrong columns", List.of("Wellgroup Name", "Antigen Wellgroup Name", "Antigen Name", "Cells per Well", "Wellgroup Location", "Spot Count", "Normalized Spot Count", "Spot Size", "Analyte", "Cytokine", "Activity", "Intensity", "Specimen ID", "Participant ID", "Visit ID", "Date", "Sample Description", "ProtocolName", "Plate Reader"), results.getColumnLabels());
-        assertEquals(Arrays.asList("Specimen 4", "Antigen 6", "atg_6F2", "150", "(7, 8)", "0.0", "0.0", " ", "FITC+Cy5", " ", " ", " ", " ", "ptid 4 F2", "4.0", " ", "blood", " ", "AID", " "), results.getRowDataAsText(0));
+        Assertions.assertThat(results.getColumnLabels()).as("Wrong columns").containsExactly("Wellgroup Name", "Antigen Wellgroup Name", "Antigen Name", "Cells per Well", "Wellgroup Location", "Spot Count", "Normalized Spot Count", "Spot Size", "Analyte", "Cytokine", "Activity", "Intensity", "Specimen ID", "Participant ID", "Visit ID", "Date", "Sample Description", "ProtocolName", "Plate Reader", "Target Study");
+        Assertions.assertThat(results.getRowDataAsText(0)).as("row data").containsExactly("Specimen 4", "Antigen 6", "atg_6F2", "150", "(7, 8)", "0.0", "0.0", " ", "FITC+Cy5", " ", " ", " ", " ", "ptid 4 F2", "4.0", " ", "blood", " ", "AID", " ");
     }
 
     private void verifyDataRegion(DataRegionTable table, SortDirection sortDir, List<String> expectedSpotCount, List<String> expectedActivity, List<String> expectedIntensity, List<String> expectedCytokine)
