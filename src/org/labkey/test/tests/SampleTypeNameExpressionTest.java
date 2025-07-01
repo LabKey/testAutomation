@@ -726,8 +726,8 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
                 Map.of(COL_DSTR.getName(), flagString,
                         COL_DINT.getName(), intVal));
 
-        checker().verifyTrue("Name of derived sample doesn't look correct. Should contain 'Parent Sample'.",
-                derivedSampleName.contains("Parent Sample"));
+        checker().verifyTrue("Name of derived sample doesn't look correct. Should contain 'tricky06'.",
+                derivedSampleName.contains("tricky06"));
         checker().verifyTrue(String.format("Doesn't look like there is a link to the parent sample '%s'.", PARENT_SAMPLE_01),
                 isElementPresent(Locator.linkWithText(PARENT_SAMPLE_01)));
 
@@ -747,8 +747,8 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         String grandChildSampleName = deriveSample(derivedSampleName, sampleType, sampleType,
                 Map.of(COL_DSTR.getName(), flagStringGD,
                         COL_DINT.getName(), intValGD));
-        checker().verifyTrue(String.format("Name of derived sample doesn't look correct. Should contain 'Parent Sample' and not contain '%s'.", flagString),
-                grandChildSampleName.contains("Parent Sample") && !grandChildSampleName.contains(flagString));
+        checker().verifyTrue(String.format("Name of derived sample doesn't look correct. Should contain 'tricky06' and not contain '%s'.", flagString),
+                grandChildSampleName.contains("tricky06") && !grandChildSampleName.contains(flagString));
         checker().verifyTrue(String.format("Doesn't look like there is a link to the parent sample '%s'.", derivedSampleName),
                 isElementPresent(Locator.linkWithText(derivedSampleName)));
 
@@ -771,8 +771,8 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         click(Locator.tagWithText("td", grandImportChildSampleName));
         waitForElement(Locator.tagWithText("td", flagStringBulkImport));
 
-        checker().verifyTrue(String.format("Name of derived sample doesn't look correct. Should contain 'Parent Sample' and not contain '%s'.", flagString),
-                grandChildSampleName.contains("Parent Sample") && !grandChildSampleName.contains(flagString));
+        checker().verifyTrue(String.format("Name of derived sample doesn't look correct. Should contain 'tricky06' and not contain '%s'.", flagString),
+                grandChildSampleName.contains("tricky06") && !grandChildSampleName.contains(flagString));
         checker().verifyTrue(String.format("Doesn't look like there is a link to the parent sample '%s'.", derivedSampleName),
                 isElementPresent(Locator.linkWithText(derivedSampleName)));
     }
