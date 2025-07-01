@@ -171,15 +171,20 @@ public class AuditLogHelper
     }
     public void checkAuditEventDiffCount(String containerPath, AuditEvent auditEventName, List<Filter> filters, List<Integer> expectedDiffCounts) throws IOException, CommandException
     {
+        checkAuditEventDiffCount(containerPath, auditEventName, "NewRecordMap", filters, expectedDiffCounts);
+    }
+
+    public void checkAuditEventDiffCount(String containerPath, AuditEvent auditEventName, String eventDiffFieldName, List<Filter> filters, List<Integer> expectedDiffCounts) throws IOException, CommandException
+    {
         Integer maxRows = expectedDiffCounts.size();
-        List<Map<String, Object>> events = getAuditLogsFromLKS(containerPath, auditEventName, List.of("InventoryUpdateType", "NewRecordMap"), filters, maxRows, ContainerFilter.CurrentAndSubfolders).getRows();
+        List<Map<String, Object>> events = getAuditLogsFromLKS(containerPath, auditEventName, List.of("InventoryUpdateType", eventDiffFieldName), filters, maxRows, ContainerFilter.CurrentAndSubfolders).getRows();
         assertEquals("Unexpected number of events", expectedDiffCounts.size(), events.size());
         for (int i = 0; i < expectedDiffCounts.size(); i++)
         {
             Map<String, Object> event = events.get(i);
             boolean isInventoryUpdateType = event.get("InventoryUpdateType") != null;
             int expectedDiffCount = isInventoryUpdateType ? 0 : expectedDiffCounts.get(i);
-            String dataChangesStr = (String) event.get("NewRecordMap");
+            String dataChangesStr = (String) event.get(eventDiffFieldName);
             String[] dataChanges = dataChangesStr != null ? dataChangesStr.split("&") : new String[0];
 
             // filter out SampleStateLabel as that is not a change, it is added for display purposes
@@ -187,8 +192,8 @@ public class AuditLogHelper
             // filter out RowId as that is not a change, it is added for display purposes
             dataChanges = Stream.of(dataChanges).filter(s -> !s.toLowerCase().startsWith("rowid=")).toArray(String[]::new);
 
-            TestLogger.log("Audit record data changes diff count check: " + dataChangesStr);
-            assertEquals("Audit record data changes did not include the expected number of diffs, expected " + expectedDiffCount + " but was " + dataChanges.length + ": " + dataChangesStr,
+            TestLogger.log("Audit record data changes diff count check (" + eventDiffFieldName + "): " + dataChangesStr);
+            assertEquals("Audit record data changes did not include the expected number of diffs in " + eventDiffFieldName + ", expected " + expectedDiffCount + " but was " + dataChanges.length + ": " + dataChangesStr,
                     expectedDiffCount, dataChanges.length);
         }
     }
