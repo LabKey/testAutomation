@@ -46,6 +46,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 import static org.labkey.test.components.ext4.Checkbox.Ext4Checkbox;
 import static org.labkey.test.components.ext4.RadioButton.RadioButton;
@@ -307,10 +308,7 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
     /**
      * add a column to an already open customize view grid
      *
-     * @param fieldKey Name of the column.  If your column is nested, should be of the form
-     *          "nodename/nodename/lastnodename", where nodename is not the displayed text of a node
-     *          but the name included in the span containing the checkbox.  It will often be the same name,
-     *          but with less whitespace
+     * @param fieldKey fieldKey of the column
      */
     public void addColumn(CharSequence fieldKey)
     {
@@ -338,14 +336,14 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
     }
 
     /**
-     * expand customize view menu to all but the last of fieldKeyParts
-     * @return The data-recordid property of the &lt;tr&gt; element for the specified field in the "Available Fields" column tree.
+     * expand customize view fields tree to expose the specified column
+     * @return The row element for the specified column
      */
-    private WebElement expandPivots(CharSequence fieldIdentifier)
+    private WebElement expandPivots(CharSequence fieldKey)
     {
-        Iterator<FieldKey> fieldKeyIterator = FieldKey.fromFieldKey(fieldIdentifier).getIterator();
-        FieldKey fieldKey = fieldKeyIterator.next();
-        String dataRecordId = fieldKey.toString().toUpperCase();
+        Iterator<FieldKey> fieldKeyIterator = Objects.requireNonNull(FieldKey.fromFieldKey(fieldKey), "Invalid fieldKey: " + fieldKey).getIterator();
+        FieldKey currentFieldKey = fieldKeyIterator.next();
+        String dataRecordId = currentFieldKey.toString().toUpperCase();
 
         while (fieldKeyIterator.hasNext())
         {
@@ -359,8 +357,8 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
             Locator.tag("tr").withClass("x4-grid-tree-node-expanded").withAttribute("data-recordid", dataRecordId).waitForElement(getComponentElement(), 10000);
             WebDriverWrapper.waitFor(() -> Locator.css("tr[data-recordid] + tr:not(.x4-grid-row)").findElements(getComponentElement()).isEmpty(), 2000); // Spacer row appears during expansion animation
 
-            fieldKey = fieldKeyIterator.next();
-            dataRecordId = fieldKey.toString().toUpperCase();
+            currentFieldKey = fieldKeyIterator.next();
+            dataRecordId = currentFieldKey.toString().toUpperCase();
         }
 
         return Locator.tag("tr").withClass("x4-grid-data-row").withAttribute("data-recordid", dataRecordId).findElement(getComponentElement());
