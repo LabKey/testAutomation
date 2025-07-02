@@ -26,6 +26,8 @@ import org.labkey.test.TestProperties;
 import org.labkey.test.pages.admin.ExternalSourcesPage;
 import org.labkey.test.pages.core.admin.logger.ManagerPage;
 import org.labkey.test.pages.reports.ManageViewsPage;
+import org.labkey.test.pages.reports.ScriptReportPage;
+import org.labkey.test.pages.reports.ScriptReportPage.StandardReportOption;
 import org.labkey.test.util.CodeMirrorHelper;
 import org.labkey.test.util.CspLogUtil;
 import org.labkey.test.util.Log4jUtils;
@@ -242,13 +244,15 @@ public abstract class AbstractKnitrReportTest extends BaseWebDriverTest
     @Test
     public void testEmbeddedReportNonce()
     {
+        CspConfigHelper.debugCspWarnings();
+        new CspConfigHelper(this).setEnforceCsp(false);
+
         String name = "rhtml nonce check";
-        String success = "SUCCESS";
         Locator[] reportContains = {nonceCheckSuccessLoc};
 
         createAndVerifyKnitrReport(rhtmlNonceCheck, RReportHelper.ReportOption.knitrHtml, reportContains,
             null, true, name);
-        CspLogUtil.checkNewCspWarnings(getArtifactCollector());
+        assertNonceSuccess();
 
         log("Create wiki with embedded report");
         new WikiHelper(this).createNewWikiPage()
@@ -261,15 +265,38 @@ public abstract class AbstractKnitrReportTest extends BaseWebDriverTest
             """.formatted(name))
             .saveAndClose();
         clickAndWait(Locator.linkWithText(name));
-        assertEquals("Nonce check result", success, getText(nonceCheckLoc));
-        CspLogUtil.checkNewCspWarnings(getArtifactCollector());
+        assertNonceSuccess();
 
         log("Add report webpart");
         new PortalHelper(this).doInAdminMode(ph -> {
-            ph.addTab(name); // Use a separate tab to ensure report isn't run accidentally
+            ph.addTab(name + " tab"); // Use a separate tab to ensure report isn't run accidentally
             ph.addReportWebPart(name);
-            assertEquals("Nonce check result", success, getText(nonceCheckLoc));
-            CspLogUtil.checkNewCspWarnings(getArtifactCollector());
+            assertNonceSuccess();
         });
+
+        log("Re-verify with report run as pipeline job");
+        goToManageViews();
+        waitAndClickAndWait(Locator.linkWithText(name));
+        ScriptReportPage reportPage = _rReportHelper.getReportPage();
+        reportPage.selectOption(StandardReportOption.runInPipeline);
+        String reportId = reportPage.saveReport(null, false, WAIT_FOR_PAGE);
+        goBack();
+        reportPage.startPipelineJobAndWait();
+
+        ScriptReportPage.beginAtReport(this, getCurrentContainerPath(), reportId);
+        assertNonceSuccess();
+
+        clickTab(name + " tab");
+        assertNonceSuccess();
+
+        goToModule("Wiki");
+        clickAndWait(Locator.linkWithText(name));
+        assertNonceSuccess();
+    }
+
+    private void assertNonceSuccess()
+    {
+        assertEquals("Nonce check result", "SUCCESS", getText(nonceCheckLoc));
+        CspLogUtil.checkNewCspWarnings(getArtifactCollector());
     }
 }
