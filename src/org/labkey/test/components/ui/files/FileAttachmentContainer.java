@@ -195,6 +195,10 @@ public class FileAttachmentContainer extends WebDriverComponent<FileAttachmentCo
         public Locator fileUploadScrollFooterLoc = Locator.tagWithClass("div", "file-upload__scroll-footer");
     }
 
+    public static String fileUploadIdentifier(String fieldIdentifier)
+    {
+        return fieldIdentifier + "-fileUpload"; // Issue 53394
+    }
 
     public static class FileAttachmentContainerFinder extends WebDriverComponentFinder<FileAttachmentContainer, FileAttachmentContainerFinder>
     {
