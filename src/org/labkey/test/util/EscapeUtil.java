@@ -23,11 +23,9 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-/**
- * UNDONE: Refactor useful methods from PageFlowUtil into util.jar that can be used by the test harness then delete this class.
- */
 public class EscapeUtil
 {
     static public String jsString(String s)
@@ -145,5 +143,11 @@ public class EscapeUtil
     public static String getMarkupEscapedValue(String value)
     {
         return StringEscapeUtils.escapeXml11(value);
+    }
+
+    private static final Pattern nameExpressionNeedsEscaping = Pattern.compile("([\\\\$/&}~,.])");
+    public static String escapeForNameExpression(String name)
+    {
+        return nameExpressionNeedsEscaping.matcher(name).replaceAll("\\\\$1");
     }
 }

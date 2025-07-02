@@ -23,6 +23,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.domain.Domain;
 import org.labkey.remoteapi.domain.DomainResponse;
 import org.labkey.remoteapi.domain.PropertyDescriptor;
@@ -48,8 +49,11 @@ import org.labkey.test.components.list.AdvancedListSettingsDialog;
 import org.labkey.test.pages.ImportDataPage;
 import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.pages.list.GridPage;
+import org.labkey.test.pages.query.UpdateQueryRowPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldDefinition.StringLookup;
+import org.labkey.test.params.FieldInfo;
+import org.labkey.test.params.list.VarListDefinition;
 import org.labkey.test.tests.AuditLogTest;
 import org.labkey.test.util.AbstractDataRegionExportOrSignHelper.ColumnHeaderType;
 import org.labkey.test.util.AuditLogHelper;
@@ -505,6 +509,32 @@ public class ListTest extends BaseWebDriverTest
         checker().withScreenshot().verifyEquals("Name not trimmed as expected", trimmedName, editList.getName());
     }
 
+    @Test // Issue 52339
+    public void testLongName()
+    {
+        String listName = "A_+-:''.¡™£¢∞§¶•ªº–≠œ∑´®†¥¨ˆøπ“‘«æ…¬˚∆˙©√ƒ∂ßΩ≈ç√∫µ≤≥÷‹›ﬁﬂ‡°·‚—±⁄€‹›‡‰Æ«»¢∫√∑∏∂";
+        String fieldWithDefault = TestDataGenerator.randomFieldName("With Default");
+        EditListDefinitionPage listEditPage = _listHelper.beginCreateList(getProjectName(), listName);
+        listEditPage.manuallyDefineFieldsWithAutoIncrementingKey("Key");
+        listEditPage.addField(new FieldDefinition(fieldWithDefault, ColumnType.String));
+        listEditPage.clickSave();
+
+        listEditPage = _listHelper.goToEditDesign(listName);
+        var page = listEditPage.getFieldsPanel()
+                .expand()
+                .getField(fieldWithDefault)
+                .clickAdvancedSettings()
+                .clickDefaultValuesLink();
+        var input = Locator.tagContainingText("td", "With Default").followingSibling("td").descendant("input").findElement(page.getDriver());
+        setFormElement(input, "42");
+        clickButton("Save Defaults");
+        _listHelper.beginAtList(getProjectName(), listName);
+
+        DataRegionTable list = new DataRegionTable("query", getDriver());
+        UpdateQueryRowPage updatePage = list.clickInsertNewRow();
+        checker().verifyEquals("Default value not as expected ", "42", updatePage.getTextInputValue(fieldWithDefault));
+        updatePage.submit();
+    }
     /* Issue 51572: Bug with creating a new list by uploading a csv file in "UTF-8 with BOM" format
      */
     @Test
@@ -753,7 +783,7 @@ public class ListTest extends BaseWebDriverTest
         assertTextPresent(TEST_DATA[TD_DESC][1], 2);
 
         log("Test deleting rows");
-        dataRegionTable.checkAll();
+        dataRegionTable.checkAllOnPage();
         doAndWaitForPageToLoad(() ->
         {
             dt.clickHeaderButton("Delete");
@@ -2063,6 +2093,32 @@ public class ListTest extends BaseWebDriverTest
             assertTrue(getCurrentRelativeURL().contains(WebTestHelper.buildRelativeUrl("junit", PROJECT_VERIFY, "echoForm")));
         }
         popLocation();
+    }
+
+    /**
+     * Issue 53361: 'list-details.view' doesn't work when list pk is named "name"
+     * Expect bad product behavior. Convert this to a regression test once the issue is fixed.
+     */
+    @Test
+    public void testPkNameParameterCollision() throws IOException, CommandException
+    {
+        String listName = TestDataGenerator.randomDomainName("list_key_check");
+        String pkCol = "Name";
+
+        var dgen = new VarListDefinition(listName)
+            .setFields(List.of(new FieldDefinition(pkCol)))
+            .create(createDefaultConnection(), getProjectName())
+            .withGeneratedRows(10);
+        List<String> pks = dgen.getRows().stream().map(row -> (String) row.get(pkCol)).toList();
+        dgen.insertRows();
+
+        goToProjectHome();
+
+        goToManageLists().getGrid().viewListData(listName);
+
+        clickAndWait(Locator.linkWithText(pks.get(0)));
+        assertElementPresent(Locator.byClass("labkey-error-heading")
+            .withText("List item '%s' does not exist".formatted(listName)));
     }
 
     @Override
