@@ -176,7 +176,7 @@ public class AuditLogHelper
 
     public void checkAuditEventDiffCount(String containerPath, AuditEvent auditEventName, String eventDiffFieldName, List<Filter> filters, List<Integer> expectedDiffCounts) throws IOException, CommandException
     {
-        Integer maxRows = expectedDiffCounts.size();
+        Integer maxRows = null;//expectedDiffCounts.size(); TODO decide on this up before merge
         List<Map<String, Object>> events = getAuditLogsFromLKS(containerPath, auditEventName, List.of("InventoryUpdateType", eventDiffFieldName), filters, maxRows, ContainerFilter.CurrentAndSubfolders).getRows();
         assertEquals("Unexpected number of events", expectedDiffCounts.size(), events.size());
         for (int i = 0; i < expectedDiffCounts.size(); i++)
