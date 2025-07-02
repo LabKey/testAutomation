@@ -168,7 +168,7 @@ public class TextChoiceImportExportAndOtherDomainsTest extends TextChoiceTest
         log("Validate that a new issue can be inserted that uses the TextChoice field.");
         IssuesHelper issuesHelper = new IssuesHelper(getDriver());
 
-        Map<String, String> issueDetails = Map.of("title", ISSUE_TITLE, "assignedTo", getDisplayName(), ISSUE_TC_FIELD, ISSUE_VALUE);
+        Map<String, String> issueDetails = Map.of("title", ISSUE_TITLE, "AssignedTo", getDisplayName(), ISSUE_TC_FIELD, ISSUE_VALUE);
 
         issuesHelper.addIssue(issueDetails);
 

@@ -127,7 +127,7 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
         log("Populate the assay with data.");
         clickAndWait(Locator.linkWithText(assayName));
         clickButton("Import Data");
-        setFormElement(Locator.name("batchFileField"), XLS_FILE);
+        setFormElement(Locator.name("BatchFileField"), XLS_FILE);
         clickButton("Next");
         setFormElement(AssayConstants.ASSAY_NAME_FIELD_LOCATOR, runName);
         setFormElement(AssayConstants.TEXT_AREA_DATA_COLLECTOR_LOCATOR, importData);

@@ -197,8 +197,8 @@ public class NabHighThroughputAssayTest extends BaseWebDriverTest
         clickButton("Import Data");
         clickButton("Next");
 
-        setFormElement(Locator.name("cutoff1"), "50");
-        setFormElement(Locator.name("cutoff2"), "70");
+        setFormElement(Locator.name("Cutoff1"), "50");
+        setFormElement(Locator.name("Cutoff2"), "70");
         selectOptionByText(Locator.name("CurveFitMethod"), "Polynomial");
 
         if (metadataFile != null)
