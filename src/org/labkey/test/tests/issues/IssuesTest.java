@@ -262,6 +262,8 @@ public class IssuesTest extends BaseWebDriverTest
         fields.add(new FieldDefinition("Note", new FieldDefinition.StringLookup("lists", getLookupTableName("issues", "Note"))));
         fields.add(new FieldDefinition("Module", new FieldDefinition.StringLookup("lists", getLookupTableName("issues", "Module"))));
 
+        fields.add(new FieldDefinition("StringWithDefault", FieldDefinition.ColumnType.String));
+
         clickProject(getProjectName());
         waitAndClickAndWait(Locator.linkContainingText(ISSUE_SUMMARY_WEBPART_NAME));
         IssuesAdminPage adminPage = _issuesHelper.goToAdmin();
@@ -271,6 +273,14 @@ public class IssuesTest extends BaseWebDriverTest
             adminPage.getFieldsPanel().addField(col);
         }
         clickButton("Save");
+
+        // configure a string field with a default value
+        adminPage = _issuesHelper.goToAdmin();
+        adminPage.getFieldsPanel().getField("StringWithDefault")
+                .clickAdvancedSettings()
+                .clickDefaultValuesLink();  // should land us in
+        setFormElement(Locator.input("stringWithDefault"), "StringWithDefault (default value)");
+        clickButton("Save Defaults");
 
         clickProject(getProjectName());
         waitAndClickAndWait(Locator.linkContainingText(ISSUE_SUMMARY_WEBPART_NAME));
@@ -295,6 +305,9 @@ public class IssuesTest extends BaseWebDriverTest
         if (!isElementPresent(fifthStringLocator))
             fifthStringLocator = Locator.name("myfifthstring");
         selectOptionByText(fifthStringLocator, "Polonium");
+        // clear out the default value on insert
+        setFormElement(Locator.name("stringWithDefault"), "");
+
         clickButton("Save");
 
         // find issueId - parse the text from first space to :
@@ -305,6 +318,7 @@ public class IssuesTest extends BaseWebDriverTest
                 "Milestone", "My Integer", "My Second Integer", "My First String", "My Third String", "My Fourth String", "My Fifth String");
         assertTextNotPresent("MySecondString", "My Second String");
         assertElementPresent(Locator.linkWithText("http://www.issues.test"));
+        assertTextNotPresent("StringWithDefault", "StringWithDefault (default value)");
 
         // ListAction
         clickAndWait(Locator.linkWithText("Issues List"));
@@ -596,6 +610,8 @@ public class IssuesTest extends BaseWebDriverTest
     @Test
     public void viewSelectedDetailsTest()
     {
+
+
         DataRegionTable issuesTable = new DataRegionTable(ISSUE_LIST_REGION_NAME, getDriver());
 
         issuesTable.setFilter("Status", "Has Any Value", null);

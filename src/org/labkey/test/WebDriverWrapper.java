@@ -2953,10 +2953,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
         catch (WebDriverException ignore) { }
     }
 
-    public void mouseOver(Locator l)
+    public WebElement mouseOver(Locator l)
     {
         WebElement el = l.findElement(getDriver());
         mouseOver(el);
+        return el;
     }
 
     public void mouseOver(WebElement el)
