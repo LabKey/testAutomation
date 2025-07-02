@@ -91,6 +91,7 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
     private static final String PARENT_SAMPLE_05 = "\"parent05";
     private static final String PARENT_SAMPLE_06 = "parent,06";
     private static final String PARENT_SAMPLE_07 = "\"parent07";
+    private static final String PARENT_FIELD_VALUE_PREFIX = "Tricky Parent";
 
     // Create fields that have each of the tricky characters for name expressions.
     // Having field names that differ only by special characters causes problems (Issue 53315)
@@ -134,15 +135,22 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
 
         // Cannot use Map.of there are too many fields.
         sampleData.put("name", name);
-        sampleData.put(PARENT_FIELD_BACKSLASH.getName(), intVal + " tricky01");
+        sampleData.put(PARENT_FIELD_BACKSLASH.getName(),
+                String.format("%d %s 01", intVal, PARENT_FIELD_VALUE_PREFIX));
         sampleData.put(PARENT_FIELD_DOLLAR_DATE.getName(), intVal + "/14/2020");
-        sampleData.put(PARENT_FIELD_FORWARDSLASH.getName(), intVal + " tricky03");
-        sampleData.put(PARENT_FIELD_PERIOD.getName(), intVal + " tricky04");
-        sampleData.put(PARENT_FIELD_AMPERSAND.getName(), intVal + " tricky05");
-        sampleData.put(PARENT_FIELD_CURLY_LEFT.getName(), intVal + " tricky06");
+        sampleData.put(PARENT_FIELD_FORWARDSLASH.getName(),
+                String.format("%d %s 03", intVal, PARENT_FIELD_VALUE_PREFIX));
+        sampleData.put(PARENT_FIELD_PERIOD.getName(),
+                String.format("%d %s 04", intVal, PARENT_FIELD_VALUE_PREFIX));
+        sampleData.put(PARENT_FIELD_AMPERSAND.getName(),
+                String.format("%d %s 05", intVal, PARENT_FIELD_VALUE_PREFIX));
+        sampleData.put(PARENT_FIELD_CURLY_LEFT.getName(),
+                String.format("%d %s 06", intVal, PARENT_FIELD_VALUE_PREFIX));
         sampleData.put(PARENT_FIELD_CURLY_RIGHT_INT.getName(), intVal);
-        sampleData.put(PARENT_FIELD_TILDE.getName(), intVal + " tricky08");
-        sampleData.put(PARENT_FIELD_COMMA.getName(), intVal + " tricky09");
+        sampleData.put(PARENT_FIELD_TILDE.getName(),
+                String.format("%d %s 08", intVal, PARENT_FIELD_VALUE_PREFIX));
+        sampleData.put(PARENT_FIELD_COMMA.getName(),
+                String.format("%d %s 09", intVal, PARENT_FIELD_VALUE_PREFIX));
 
         dataGenerator.addCustomRow(sampleData);
     }
@@ -462,17 +470,16 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         StringBuilder sbNameExpression = new StringBuilder();
 
         // Covers Issue 52180
-        String parentsampleTypeEncoded = PARENT_SAMPLE_TYPE.replace("/", "\\/");
         sbNameExpression.append("Trick-Field ${genId} ");
-        sbNameExpression.append(String.format("${materialInputs/%s/%s} ", parentsampleTypeEncoded, PARENT_FIELD_BACKSLASH.getExpName()));
-        sbNameExpression.append(String.format("${materialInputs/%s/%s} ", parentsampleTypeEncoded, PARENT_FIELD_DOLLAR_DATE.getExpName()));
-        sbNameExpression.append(String.format("${materialInputs/%s/%s} ", parentsampleTypeEncoded, PARENT_FIELD_FORWARDSLASH.getExpName()));
-        sbNameExpression.append(String.format("${materialInputs/%s/%s} ", parentsampleTypeEncoded, PARENT_FIELD_PERIOD.getExpName()));
-        sbNameExpression.append(String.format("${materialInputs/%s/%s} ", parentsampleTypeEncoded, PARENT_FIELD_AMPERSAND.getExpName()));
-        sbNameExpression.append(String.format("${materialInputs/%s/%s} ", parentsampleTypeEncoded, PARENT_FIELD_CURLY_LEFT.getExpName()));
-        sbNameExpression.append(String.format("${materialInputs/%s/%s} ", parentsampleTypeEncoded, PARENT_FIELD_CURLY_RIGHT_INT.getExpName()));
-        sbNameExpression.append(String.format("${materialInputs/%s/%s} ", parentsampleTypeEncoded, PARENT_FIELD_TILDE.getExpName()));
-        sbNameExpression.append(String.format("${materialInputs/%s/%s}", parentsampleTypeEncoded, PARENT_FIELD_COMMA.getExpName()));
+        sbNameExpression.append(String.format("${materialInputs/%s/%s} ", PARENT_SAMPLE_TYPE_INPUT, PARENT_FIELD_BACKSLASH.getExpName()));
+        sbNameExpression.append(String.format("${materialInputs/%s/%s} ", PARENT_SAMPLE_TYPE_INPUT, PARENT_FIELD_DOLLAR_DATE.getExpName()));
+        sbNameExpression.append(String.format("${materialInputs/%s/%s} ", PARENT_SAMPLE_TYPE_INPUT, PARENT_FIELD_FORWARDSLASH.getExpName()));
+        sbNameExpression.append(String.format("${materialInputs/%s/%s} ", PARENT_SAMPLE_TYPE_INPUT, PARENT_FIELD_PERIOD.getExpName()));
+        sbNameExpression.append(String.format("${materialInputs/%s/%s} ", PARENT_SAMPLE_TYPE_INPUT, PARENT_FIELD_AMPERSAND.getExpName()));
+        sbNameExpression.append(String.format("${materialInputs/%s/%s} ", PARENT_SAMPLE_TYPE_INPUT, PARENT_FIELD_CURLY_LEFT.getExpName()));
+        sbNameExpression.append(String.format("${materialInputs/%s/%s} ", PARENT_SAMPLE_TYPE_INPUT, PARENT_FIELD_CURLY_RIGHT_INT.getExpName()));
+        sbNameExpression.append(String.format("${materialInputs/%s/%s} ", PARENT_SAMPLE_TYPE_INPUT, PARENT_FIELD_TILDE.getExpName()));
+        sbNameExpression.append(String.format("${materialInputs/%s/%s}", PARENT_SAMPLE_TYPE_INPUT, PARENT_FIELD_COMMA.getExpName()));
 
         log(String.format("Create a sample type named '%s' with a name expression of '%s'.", sampleType, sbNameExpression));
 
@@ -726,8 +733,8 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
                 Map.of(COL_DSTR.getName(), flagString,
                         COL_DINT.getName(), intVal));
 
-        checker().verifyTrue("Name of derived sample doesn't look correct. Should contain 'tricky06'.",
-                derivedSampleName.contains("tricky06"));
+        checker().verifyTrue(String.format("Name of derived sample doesn't look correct. Should contain %s.", PARENT_FIELD_VALUE_PREFIX),
+                derivedSampleName.contains(PARENT_FIELD_VALUE_PREFIX));
         checker().verifyTrue(String.format("Doesn't look like there is a link to the parent sample '%s'.", PARENT_SAMPLE_01),
                 isElementPresent(Locator.linkWithText(PARENT_SAMPLE_01)));
 
@@ -747,8 +754,8 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         String grandChildSampleName = deriveSample(derivedSampleName, sampleType, sampleType,
                 Map.of(COL_DSTR.getName(), flagStringGD,
                         COL_DINT.getName(), intValGD));
-        checker().verifyTrue(String.format("Name of derived sample doesn't look correct. Should contain 'tricky06' and not contain '%s'.", flagString),
-                grandChildSampleName.contains("tricky06") && !grandChildSampleName.contains(flagString));
+        checker().verifyTrue(String.format("Name of derived sample doesn't look correct. Should contain %s and not contain '%s'.", PARENT_FIELD_VALUE_PREFIX, flagString),
+                grandChildSampleName.contains(PARENT_FIELD_VALUE_PREFIX) && !grandChildSampleName.contains(flagString));
         checker().verifyTrue(String.format("Doesn't look like there is a link to the parent sample '%s'.", derivedSampleName),
                 isElementPresent(Locator.linkWithText(derivedSampleName)));
 
@@ -771,8 +778,8 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         click(Locator.tagWithText("td", grandImportChildSampleName));
         waitForElement(Locator.tagWithText("td", flagStringBulkImport));
 
-        checker().verifyTrue(String.format("Name of derived sample doesn't look correct. Should contain 'tricky06' and not contain '%s'.", flagString),
-                grandChildSampleName.contains("tricky06") && !grandChildSampleName.contains(flagString));
+        checker().verifyTrue(String.format("Name of derived sample doesn't look correct. Should contain %s and not contain '%s'.", PARENT_FIELD_VALUE_PREFIX, flagString),
+                grandChildSampleName.contains(PARENT_FIELD_VALUE_PREFIX) && !grandChildSampleName.contains(flagString));
         checker().verifyTrue(String.format("Doesn't look like there is a link to the parent sample '%s'.", derivedSampleName),
                 isElementPresent(Locator.linkWithText(derivedSampleName)));
     }
