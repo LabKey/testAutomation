@@ -1,6 +1,7 @@
 package org.labkey.test.components.ui.entities;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
@@ -130,6 +131,15 @@ public class EntityBulkUpdateDialog extends ModalDialog
     public EntityBulkUpdateDialog setSelectionField(CharSequence fieldIdentifier, String selectValue)
     {
         return setSelectionField(fieldIdentifier, List.of(selectValue));
+    }
+
+    /**
+     * @param fieldIdentifier Identifier for the field; name ({@link String}) or fieldKey ({@link FieldKey})
+     * @return text displayed in the help block, if any, for the selection field
+     */
+    public @Nullable String getSelectionFieldHelpBlockText(CharSequence fieldIdentifier)
+    {
+        return elementCache().getSelect(fieldIdentifier).getHelpBlockText();
     }
 
     /**
