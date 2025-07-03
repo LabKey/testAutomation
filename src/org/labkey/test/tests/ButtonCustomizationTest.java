@@ -25,11 +25,13 @@ import org.labkey.test.categories.Daily;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldDefinition.ColumnType;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.DataRegionTable.DataRegionFinder;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.WikiHelper;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertTrue;
 
@@ -101,12 +103,10 @@ public class ButtonCustomizationTest extends BaseWebDriverTest
         goToManageLists();
         clickAndWait(Locator.linkWithText(LIST_NAME));
         assertButtonNotPresent(METADATA_OVERRIDE_BUTTON);
-        DataRegionTable.findDataRegion(this).clickInsertNewRow();
-        setFormElement(Locator.name("quf_name"), "Seattle");
-        clickButton("Submit");
-        DataRegionTable.findDataRegion(this).clickInsertNewRow();
-        setFormElement(Locator.name("quf_name"), "Portland");
-        clickButton("Submit");
+        new DataRegionFinder(getDriver()).find().clickInsertNewRow()
+            .update(Map.of("name", "Seattle"));
+        new DataRegionFinder(getDriver()).find().clickInsertNewRow()
+            .update(Map.of("name", "Portland"));
         
         // assert custom buttons can be added to the standard set:
         beginAt("/query/" + PROJECT_NAME + "/schema.view?schemaName=lists");
@@ -188,7 +188,7 @@ public class ButtonCustomizationTest extends BaseWebDriverTest
                 Locator.lkButton(METADATA_LINK_BUTTON).waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT)
                         .getAttribute("class").contains("labkey-disabled-button"));
 
-        buttonRegion.checkCheckbox(buttonRegion.getIndexWhereDataAppears("Portland", "Name"));
+        buttonRegion.checkCheckbox(buttonRegion.getRowIndex("Portland", "Name"));
         // wait for the button to enable:
         waitForElement(Locator.lkButton(METADATA_LINK_BUTTON), 10000);
 

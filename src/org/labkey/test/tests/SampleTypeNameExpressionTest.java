@@ -245,10 +245,26 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         expectedNames.add("[" + PARENT_SAMPLE_01 + ", " + PARENT_SAMPLE_02 + ", " + PARENT_SAMPLE_03 + "]-child");
         assertEquals("Sample names are not as expected", expectedNames, names);
 
-        log("Verify import tsv should successfully create derivatives from parent starting with #, as long as values are quoted");
+        log("Verify import tsv should successfully create derivatives from line starting with #, as long as values are quoted");
         data = "MaterialInputs/" + EscapeUtil.fieldKeyEncodePart(PARENT_SAMPLE_TYPE) + "\n"; // fully encoded
         data += "\"" + PARENT_SAMPLE_03 + "\"\n";
-        data += "\"" + PARENT_SAMPLE_03 + "," + PARENT_SAMPLE_02 + "\"\n";
+
+        sampleHelper.bulkImport(data);
+
+        names = materialTable.getColumnDataAsText("Name");
+        Collections.reverse(names);
+
+        log("generated sample names:");
+        names.forEach(this::log);
+
+        assertEquals(3, names.size());
+
+        expectedNames.add(PARENT_SAMPLE_03 + "-child");
+        assertEquals("Sample names are not as expected", expectedNames, names);
+
+        log("Verify import tsv should successfully create derivatives from parent starting with #, as long as this is not the 1st field in the row");
+        data = "Description\tMaterialInputs/" + EscapeUtil.fieldKeyEncodePart(PARENT_SAMPLE_TYPE) + "\n"; // fully encoded
+        data += "Parents with leading # should work\t" + PARENT_SAMPLE_03 + "," + PARENT_SAMPLE_02 + "\n";
 
         sampleHelper.bulkImport(data);
 
@@ -260,7 +276,6 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
 
         assertEquals(4, names.size());
 
-        expectedNames.add(PARENT_SAMPLE_03 + "-child");
         expectedNames.add("[" + PARENT_SAMPLE_03 + ", " + PARENT_SAMPLE_02 + "]-child");
         assertEquals("Sample names are not as expected", expectedNames, names);
 
@@ -776,6 +791,15 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         actualMsg = createPage.getNameExpressionPreview();
         checker().withScreenshot("Parent_Fields_Preview_Error")
                 .verifyTrue("Tool-tip message does not contain expected example.", actualMsg.contains("Unable to generate example name from the current pattern. Check for syntax errors."));
+        // Make the tooltip go away.
+        mouseOver(createPage.getComponentElement());
+
+        log("Use a name expression using a field from the named parent, with parent type not encoded.");
+        nameExpressionBad = String.format("SNP_${genId}_${%s/$s}_${materialInputs/%s/%s}", parentAlias, COL_INT.getExpName(), PARENT_SAMPLE_TYPE, COL_STR.getName());
+        createPage.setNameExpression(nameExpressionBad);
+        actualMsg = createPage.getNameExpressionPreview();
+        checker().withScreenshot("Parent_Fields_Preview_Error")
+            .verifyTrue("Tool-tip message does not contain expected example.", actualMsg.contains("Unable to generate example name from the current pattern. Check for syntax errors."));
         // Make the tooltip go away.
         mouseOver(createPage.getComponentElement());
 

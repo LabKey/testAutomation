@@ -14,6 +14,7 @@ import org.labkey.serverapi.reader.DataLoader;
 import org.labkey.serverapi.reader.TabLoader;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.TestDataGenerator;
 import org.labkey.test.util.TestLogger;
 

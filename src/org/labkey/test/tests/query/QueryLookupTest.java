@@ -11,7 +11,6 @@ import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldInfo;
 import org.labkey.test.params.list.IntListDefinition;
-
 import org.labkey.test.params.list.VarListDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;

@@ -775,7 +775,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         log("test filtering of messages grid");
         clickAndWait(Locator.linkWithText("view list"));
         DataRegionTable region = new DataRegionTable("Announcements", getDriver());
-        region.setFilter("Title", "Equals", "foo", WAIT_FOR_PAGE);
+        region.setFilter("Title", "Equals", "foo");
 
         assertTextNotPresent(RESP1_TITLE);
     }
