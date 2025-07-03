@@ -253,9 +253,9 @@ public class EntityBulkUpdateDialog extends ModalDialog
      * @param fieldIdentifier Identifier for the field; name ({@link String}) or fieldKey ({@link FieldKey})
      * @return file attachment component
      */
-    public FileAttachmentContainer getFileField(CharSequence fieldIdentifier)
+    private FileAttachmentContainer getFileField(CharSequence fieldIdentifier)
     {
-        String identifier = FileAttachmentContainer.fileUploadIdentifier(fieldIdentifier.toString());
+        FieldKey identifier = FileAttachmentContainer.fileUploadFieldKey(fieldIdentifier);
         return enableAndWait(identifier, elementCache().fileUploadField(identifier));
     }
 
@@ -280,9 +280,9 @@ public class EntityBulkUpdateDialog extends ModalDialog
         return this;
     }
 
-    public FileUploadField getExistingFileField(String fieldIdentifier)
+    public FileUploadField getExistingFileCard(CharSequence fieldIdentifier)
     {
-        String identifier = FileAttachmentContainer.fileUploadIdentifier(fieldIdentifier.toString());
+        FieldKey identifier = FileAttachmentContainer.fileUploadFieldKey(fieldIdentifier);
         return enableAndWait(identifier, elementCache().fileField(identifier));
     }
 

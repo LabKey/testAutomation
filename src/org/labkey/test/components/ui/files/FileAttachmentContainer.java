@@ -6,6 +6,7 @@ import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.html.FileInput;
 import org.labkey.test.components.html.Input;
+import org.labkey.test.params.FieldKey;
 import org.openqa.selenium.ElementNotInteractableException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -195,9 +196,14 @@ public class FileAttachmentContainer extends WebDriverComponent<FileAttachmentCo
         public Locator fileUploadScrollFooterLoc = Locator.tagWithClass("div", "file-upload__scroll-footer");
     }
 
-    public static String fileUploadIdentifier(String fieldIdentifier)
+    /**
+     * File upload fields append "-fileUpload" to the field's fieldKey
+     * @param fieldIdentifier Identifier for the field; name ({@link String}) or fieldKey ({@link FieldKey})
+     * @return FieldKey with expected suffix
+     */
+    public static FieldKey fileUploadFieldKey(CharSequence fieldIdentifier)
     {
-        return fieldIdentifier + "-fileUpload"; // Issue 53394
+        return FieldKey.fromFieldKey(FieldKey.fromName(fieldIdentifier) + "-fileUpload"); // Issue 53394
     }
 
     public static class FileAttachmentContainerFinder extends WebDriverComponentFinder<FileAttachmentContainer, FileAttachmentContainerFinder>
