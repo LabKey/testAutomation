@@ -43,10 +43,26 @@ public class EmailPrefsPage extends LabKeyPage<EmailPrefsPage.ElementCache>
         return new EmailPrefsPage(driver.getDriver());
     }
 
+    @Deprecated // Inconsistent name, but leave for backward compatibility
     public EmailPrefsPage setNoNotify()
+    {
+        return setNotifyNone();
+    }
+
+    public EmailPrefsPage setNotifyNone()
     {
         elementCache().notifyNone.click();
         return new EmailPrefsPage(getDriver());
+    }
+
+    public boolean isNotifyNoneSelected()
+    {
+        return elementCache().notifyNone.isSelected();
+    }
+
+    public boolean isNotifyNoneDisabled()
+    {
+        return !elementCache().notifyNone.isEnabled();
     }
 
     public EmailPrefsPage setNotifyOnMine()
@@ -55,22 +71,62 @@ public class EmailPrefsPage extends LabKeyPage<EmailPrefsPage.ElementCache>
         return new EmailPrefsPage(getDriver());
     }
 
+    public boolean isNotifyOnMineSelected()
+    {
+        return elementCache().notifyMine.isSelected();
+    }
+
+    public boolean isNotifyOnMineDisabled()
+    {
+        return !elementCache().notifyMine.isEnabled();
+    }
+
     public EmailPrefsPage setNotifyOnAll()
     {
         elementCache().notifyAll.click();
         return new EmailPrefsPage(getDriver());
     }
 
+    public boolean isNotifyOnAllSelected()
+    {
+        return elementCache().notifyAll.isSelected();
+    }
+
+    public boolean isNotifyOnAllDisabled()
+    {
+        return !elementCache().notifyAll.isEnabled();
+    }
+
     public EmailPrefsPage setTypeIndividual()
     {
-        elementCache().notifyAll.click();
+        elementCache().typeIndividual.click();
         return new EmailPrefsPage(getDriver());
+    }
+
+    public boolean isTypeIndividualSelected()
+    {
+        return elementCache().typeIndividual.isSelected();
+    }
+
+    public boolean isTypeIndividualDisabled()
+    {
+        return !elementCache().typeIndividual.isEnabled();
     }
 
     public EmailPrefsPage setTypeDigest()
     {
-        elementCache().notifyAll.click();
+        elementCache().typeDigest.click();
         return new EmailPrefsPage(getDriver());
+    }
+
+    public boolean isTypeDigestSelected()
+    {
+        return elementCache().typeDigest.isSelected();
+    }
+
+    public boolean isTypeDigestDisabled()
+    {
+        return !elementCache().typeDigest.isEnabled();
     }
 
     public EmailPrefsPage reset(boolean reset)
@@ -108,16 +164,16 @@ public class EmailPrefsPage extends LabKeyPage<EmailPrefsPage.ElementCache>
 
     protected class ElementCache extends LabKeyPage.ElementCache
     {
-        private Locator.XPathLocator notify = Locator.radioButtonByName("emailPreference");
+        private final Locator.XPathLocator notify = Locator.radioButtonByName("emailPreference");
         protected WebElement notifyNone = notify.withAttribute("value", "0").findWhenNeeded(this);
         protected WebElement notifyMine = notify.withAttribute("value", "2").findWhenNeeded(this);
         protected WebElement notifyAll = notify.withAttribute("value", "1").findWhenNeeded(this);
 
-        private Locator.XPathLocator type = Locator.radioButtonByName("notificationType");
-        protected WebElement typeIndividual = notify.withAttribute("value", "3").findWhenNeeded(this);
-        protected WebElement typeDigest = notify.withAttribute("value", "4").findWhenNeeded(this);
+        private final Locator.XPathLocator type = Locator.radioButtonByName("notificationType");
+        protected WebElement typeIndividual = type.withAttribute("value", "3").findWhenNeeded(this);
+        protected WebElement typeDigest = type.withAttribute("value", "4").findWhenNeeded(this);
 
-        Checkbox resetCheckbox = Checkbox(Locator.tagWithName("input", "emailPreference").withAttribute("value", "1")).findWhenNeeded(this);
+        Checkbox resetCheckbox = Checkbox(Locator.tagWithId("input", "resetFolderDefault")).findWhenNeeded(this);
 
         WebElement updateButton = Locator.lkButton("Update").findWhenNeeded(this);
         WebElement cancelButton = Locator.lkButton("Cancel").findWhenNeeded(this);
