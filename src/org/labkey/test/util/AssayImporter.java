@@ -98,37 +98,37 @@ public class AssayImporter
             // populate the sample well group information
             for (int i = 0; i < options.getPtids().length; i++)
             {
-                test.setFormElement(Locator.name("specimen" + (i + 1) + "_ParticipantID"), options.getPtids()[i]);
+                test.setFormElement(Locator.name("Specimen " + (i + 1) + "_ParticipantID"), options.getPtids()[i]);
             }
 
             for (int i = 0; i < options.getVisits().length; i++)
             {
-                test.setFormElement(Locator.name("specimen" + (i + 1) + "_VisitID"), options.getVisits()[i]);
+                test.setFormElement(Locator.name("Specimen " + (i + 1) + "_VisitID"), options.getVisits()[i]);
             }
 
             for (int i = 0; i < options.getInitialDilutions().length; i++)
             {
-                test.setFormElement(Locator.name("specimen" + (i + 1) + "_InitialDilution"), options.getInitialDilutions()[i]);
+                test.setFormElement(Locator.name("Specimen " + (i + 1) + "_InitialDilution"), options.getInitialDilutions()[i]);
             }
 
             for (int i = 0; i < options.getDilutionFactors().length; i++)
             {
-                test.setFormElement(Locator.name("specimen" + (i + 1) + "_Factor"), options.getDilutionFactors()[i]);
+                test.setFormElement(Locator.name("Specimen " + (i + 1) + "_Factor"), options.getDilutionFactors()[i]);
             }
 
             for (int i = 0; i < options.getMethods().length; i++)
             {
-                test.selectOptionByText(Locator.name("specimen" + (i + 1) + "_Method"), options.getMethods()[i]);
+                test.selectOptionByText(Locator.name("Specimen " + (i + 1) + "_Method"), options.getMethods()[i]);
             }
 
             for (int i = 0; i < options.getDates().length; i++)
             {
-                test.setFormElement(Locator.name("specimen" + (i + 1) + "_Date"), options.getDates()[i]);
+                test.setFormElement(Locator.name("Specimen " + (i + 1) + "_Date"), options.getDates()[i]);
             }
 
             for (int i = 0; i < options.getSampleIds().length; i++)
             {
-                test.setFormElement(Locator.name("specimen" + (i + 1) + "_SpecimenID"), options.getSampleIds()[i]);
+                test.setFormElement(Locator.name("Specimen " + (i + 1) + "_SpecimenID"), options.getSampleIds()[i]);
             }
         }
         else

@@ -347,7 +347,7 @@ public class FilterTest extends BaseWebDriverTest
                 subfolderIssue.get("Priority"),
                 subfolderIssue2.get("Priority"));
 
-        region.setFacetedFilter("Priority", projectIssue2.get("priority"), subfolderIssue.get("priority"));
+        region.setFacetedFilter("Priority", projectIssue2.get("Priority"), subfolderIssue.get("Priority"));
         assertElementNotPresent(Locator.linkWithText(projectIssue.get("title")));
         assertElementPresent(Locator.linkWithText(projectIssue2.get("title")));
         assertElementPresent(Locator.linkWithText(subfolderIssue.get("title")));

@@ -169,7 +169,7 @@ public class AssayTransformImportUpdateTest extends BaseWebDriverTest
         new AssayRunsPage(getDriver()).getTable().clickHeaderButton("Import Data");
         clickButton("Next");
         importPage = new AssayImportPage(getDriver());
-        importPage.setNamedInputText("name", "non_transform_import");
+        importPage.setNamedInputText("Name", "non_transform_import");
         importPage.setNamedTextAreaValue("TextAreaDataCollector.textArea", importData);
         importPage.clickSaveAndFinish();
 

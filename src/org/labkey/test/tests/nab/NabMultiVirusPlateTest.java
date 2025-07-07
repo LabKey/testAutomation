@@ -236,12 +236,12 @@ public class NabMultiVirusPlateTest extends BaseWebDriverTest
         setFormElement(Locator.name("Cutoff1"), "50");
         setFormElement(Locator.name("Cutoff2"), "70");
         selectOptionByText(Locator.name("CurveFitMethod"), curveFitMethod);
-        setFormElement(Locator.name("specimen01_InitialDilution"), "5");
-        setFormElement(Locator.name("specimen01_Factor"), "42");
-        selectOptionByText(Locator.name("specimen01_Method"), "Dilution");
-        checkCheckbox(Locator.name("specimen01_InitialDilutionCheckBox"));
-        checkCheckbox(Locator.name("specimen01_FactorCheckBox"));
-        checkCheckbox(Locator.name("specimen01_MethodCheckBox"));
+        setFormElement(Locator.name("Specimen 01_InitialDilution"), "5");
+        setFormElement(Locator.name("Specimen 01_Factor"), "42");
+        selectOptionByText(Locator.name("Specimen 01_Method"), "Dilution");
+        checkCheckbox(Locator.name("Specimen 01_InitialDilutionCheckBox"));
+        checkCheckbox(Locator.name("Specimen 01_FactorCheckBox"));
+        checkCheckbox(Locator.name("Specimen 01_MethodCheckBox"));
 
         setFormElement(Locator.xpath("//input[@type='file' and @name='__primaryFile__']"), dataFile);
 
