@@ -1002,7 +1002,7 @@ public class GridPanelTest extends GridPanelBaseTest
                         Filter.Operator.getOperator("IN")));
         int expectedCount = getExpectedResults(FILTER_SAMPLE_TYPE, null, null, filters).size();
 
-        checker().verifyEquals("Filter did not return the expected number of rows.", // TODO here
+        checker().verifyEquals("Filter did not return the expected number of rows.",
                 expectedCount, grid.getRecordCount());
 
     }
@@ -1746,7 +1746,6 @@ public class GridPanelTest extends GridPanelBaseTest
         expectedList.add(FILTER_STRING_COL.getLabel());
         expectedList.add(FILTER_DATE_COL.getLabel());
         expectedList.add(FILTER_STORED_AMOUNT_COL);
-        expectedList.add("Status"); // TODo remove me before commit
 
         actualList = filterDialog.getAvailableFieldLabels();
 
@@ -1806,7 +1805,6 @@ public class GridPanelTest extends GridPanelBaseTest
         expectedList.add(FILTER_BOOL_COL.getLabel());
         expectedList.add(FILTER_DATE_COL.getLabel());
         expectedList.add(FILTER_STORED_AMOUNT_COL);
-        expectedList.add("Status"); // TODO remove me before commit
 
         filterDialog = grid.getGridBar().openFilterDialog();
 
