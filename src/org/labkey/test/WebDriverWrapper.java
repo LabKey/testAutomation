@@ -1358,9 +1358,9 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return whoAmI().getDisplayName();
     }
 
-    public Number getUserId()
+    public int getCurrentUserId()
     {
-        return whoAmI().getUserId();
+        return whoAmI().getUserId().intValue();
     }
 
     public String getCurrentDateTimeFormatString()
