@@ -314,16 +314,16 @@ public class ElispotAssayTest extends AbstractAssayTest
 
         for (int i = 0; i < 6; i++)
         {
-            setFormElement(Locator.name("antigen" + (i + 1) + "_AntigenID"), "" + (i + 1));
+            setFormElement(Locator.name("Antigen " + (i + 1) + "_AntigenID"), "" + (i + 1));
 
-            Locator antigenLocator = Locator.name("antigen" + (i + 1) + "_AntigenName");
+            Locator antigenLocator = Locator.name("Antigen " + (i + 1) + "_AntigenName");
 
             // test for prepopulation of antigen element values
             if (testPrepopulation)
                 assertEquals("Antigen " + (i+1), getFormElement(antigenLocator));
 
             setFormElement(antigenLocator, "atg_" + (i + 1) + uniqueifier);
-            setFormElement(Locator.name("antigen" + (i + 1) + "_CellWell"), "150");
+            setFormElement(Locator.name("Antigen " + (i + 1) + "_CellWell"), "150");
         }
 
         if (fluorospot)

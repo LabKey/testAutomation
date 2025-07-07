@@ -29,6 +29,7 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.PlateGrid;
+import org.labkey.test.components.assay.AssayConstants;
 import org.labkey.test.components.labkey.LabKeyAlert;
 import org.labkey.test.pages.admin.PermissionsPage;
 import org.labkey.test.pages.assay.RunQCPage;
@@ -419,7 +420,7 @@ public class NabAssayTest extends AbstractAssayTest
             region.checkAllOnPage();
             region.clickHeaderButtonAndWait("Link to Study");
 
-            selectOptionByText(Locator.name("targetStudy"), "/" + TEST_ASSAY_PRJ_NAB + "/" + TEST_ASSAY_FLDR_STUDY1 + " (" + TEST_ASSAY_FLDR_STUDY1 + " Study)");
+            selectOptionByText(AssayConstants.TARGET_STUDY_FIELD_LOCATOR, "/" + TEST_ASSAY_PRJ_NAB + "/" + TEST_ASSAY_FLDR_STUDY1 + " (" + TEST_ASSAY_FLDR_STUDY1 + " Study)");
             clickButton("Next", 300_000); // Triggers a query that is, sometimes, very slow on SQL Server
 
             region = new DataRegionTable("Data", this);
@@ -549,8 +550,8 @@ public class NabAssayTest extends AbstractAssayTest
         assertTextPresent("Participant id, visit id, and date.");
         // assert that both the visit id and date are present.  In other resolver types only one
         // or the other is present
-        assertElementPresent(Locator.checkboxById("Specimen 1_VisitIDCheckBox"));
-        assertElementPresent(Locator.checkboxById("Specimen 1_DateCheckBox"));
+        assertElementPresent(Locator.checkboxById("specimen1_VisitIDCheckBox"));
+        assertElementPresent(Locator.checkboxById("specimen1_DateCheckBox"));
         clickButton("Cancel");
     }
 

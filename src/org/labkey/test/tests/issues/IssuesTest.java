@@ -279,7 +279,7 @@ public class IssuesTest extends BaseWebDriverTest
         adminPage.getFieldsPanel().getField("StringWithDefault")
                 .clickAdvancedSettings()
                 .clickDefaultValuesLink();  // should land us in
-        setFormElement(Locator.input("stringWithDefault"), "StringWithDefault (default value)");
+        setFormElement(Locator.input("StringWithDefault"), "StringWithDefault (default value)");
         clickButton("Save Defaults");
 
         clickProject(getProjectName());
@@ -290,23 +290,19 @@ public class IssuesTest extends BaseWebDriverTest
         setFormElement(Locator.name("title"), issueTitle);
         selectOptionByText(Locator.name("Type"), "UFO");
         selectOptionByText(Locator.name("Area"), "Area51");
-        selectOptionByText(Locator.name("module"), "Zvezda");
+        selectOptionByText(Locator.name("Module"), "Zvezda");
         selectOptionByText(Locator.name("Priority"), "2");
         setFormElement(Locator.name("comment"), ISSUE_0.get("comment"));
         selectOptionByText(Locator.name("AssignedTo"), NAME);
-        selectOptionByText(Locator.name("milestone"), "2012");
+        selectOptionByText(Locator.name("Milestone"), "2012");
 
-        Locator fouthStringLocator = Locator.name("myFourthString");
-        if (!isElementPresent(fouthStringLocator))
-            fouthStringLocator = Locator.name("myfourthstring");
-        setFormElement(fouthStringLocator, "http://www.issues.test");
+        Locator fourthStringLocator = Locator.name("MyFourthString");
+        setFormElement(fourthStringLocator, "http://www.issues.test");
 
-        Locator fifthStringLocator = Locator.name("myFifthString");
-        if (!isElementPresent(fifthStringLocator))
-            fifthStringLocator = Locator.name("myfifthstring");
+        Locator fifthStringLocator = Locator.name("MyFifthString");
         selectOptionByText(fifthStringLocator, "Polonium");
         // clear out the default value on insert
-        setFormElement(Locator.name("stringWithDefault"), "");
+        setFormElement(Locator.name("StringWithDefault"), "");
 
         clickButton("Save");
 
@@ -324,7 +320,7 @@ public class IssuesTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("Issues List"));
 
         // Click the issue id based on the text issue title
-        clickAndWait(Locator.linkWithText("" + issueId));
+        clickAndWait(Locator.linkWithText(issueId));
 
         // UpdateAction
         updateIssue();
@@ -350,7 +346,7 @@ public class IssuesTest extends BaseWebDriverTest
         assertTextPresent("Issues List"); //we should be back at the issues list now
 
         // JumpToIssueAction
-        setFormElement(Locator.name("issueId"), "" + issueId);
+        setFormElement(Locator.name("issueId"), issueId);
         clickAndWait(Locator.tagWithAttribute("a", "data-original-title", "Search"));
         assertTextPresent(issueTitle);
         assertElementNotPresent(Locators.labkeyError);
@@ -443,7 +439,7 @@ public class IssuesTest extends BaseWebDriverTest
     {
         page.title().set(title);
         page.assignedTo().set(assignedTo);
-        page.selectWithName("type").set(type);
+        page.selectWithName("Type").set(type);
         page.priority().set(priority);
         page.related().set(related);
         page.notifyList().set(notify);
@@ -453,7 +449,7 @@ public class IssuesTest extends BaseWebDriverTest
     {
         assertEquals("title", title, page.title().get());
         assertEquals("assignedTo", assignedTo, page.assignedTo().get());
-        assertEquals("type", type, page.selectWithName("type").get());
+        assertEquals("type", type, page.selectWithName("Type").get());
         assertEquals("priority", priority, page.priority().get());
         assertEquals("related", related, page.related().get());
         Assertions.assertThat(page.notifyList().get()).as("notify").contains(_userHelper.getDisplayNameForEmail(notify));
@@ -799,10 +795,10 @@ public class IssuesTest extends BaseWebDriverTest
     {
         Locator relatedLocator = Locator.name("related");
 
-        String issueIdA = _issuesHelper.addIssue(Maps.of("AssignedTo", NAME, "title", "A is for Apple", "priority", "0")).getIssueId();
-        String issueIdB = _issuesHelper.addIssue(Maps.of("AssignedTo", NAME, "title", "B is for Baking", "priority", "0")).getIssueId();
+        String issueIdA = _issuesHelper.addIssue(Maps.of("AssignedTo", NAME, "title", "A is for Apple", "Priority", "0")).getIssueId();
+        String issueIdB = _issuesHelper.addIssue(Maps.of("AssignedTo", NAME, "title", "B is for Baking", "Priority", "0")).getIssueId();
         // related C to A
-        String issueIdC = _issuesHelper.addIssue(Maps.of("AssignedTo", NAME, "title", "C is for Cat", "priority", "0", "related", issueIdA)).getIssueId();
+        String issueIdC = _issuesHelper.addIssue(Maps.of("AssignedTo", NAME, "title", "C is for Cat", "Priority", "0", "related", issueIdA)).getIssueId();
 
         clickAndWait(Locator.linkWithText(issueIdA));
         assertElementPresent(Locator.linkWithText(issueIdC)); // Should link back to related issue

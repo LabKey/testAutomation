@@ -173,7 +173,7 @@ public class ElisaAssayTest extends AbstractAssayTest
         String[] letters = {"A","B","C","D","E","F","G","H"};
         for (int i = 0; i <= 5; i++)
         {
-            setFormElement(Locator.name(letters[i].toLowerCase()+"1"+letters[i]+"2_Concentration"), "" + (i + 1));
+            setFormElement(Locator.name(letters[i]+"1-"+letters[i]+"2_Concentration"), "" + (i + 1));
 
             if (!testPrepopulation)
             {

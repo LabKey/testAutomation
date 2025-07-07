@@ -132,7 +132,7 @@ public abstract class AbstractViabilityTest extends AbstractAssayTest implements
         clickAndWait(Locator.linkWithText(getAssayName()));
         clickButton("Import Data");
         if (setBatchTargetStudy)
-            selectOptionByText(Locator.name("targetStudy"), "/" + getProjectName() + "/" + getFolderName() + " (" + getFolderName() + " Study)");
+            selectOptionByText(AssayConstants.TARGET_STUDY_FIELD_LOCATOR, "/" + getProjectName() + "/" + getFolderName() + " (" + getFolderName() + " Study)");
         clickButton("Next");
 
         if (runName != null)

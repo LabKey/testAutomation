@@ -38,6 +38,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Daily;
+import org.labkey.test.components.assay.AssayConstants;
 import org.labkey.test.components.ext4.Checkbox;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.pages.admin.ExportFolderPage;
@@ -240,7 +241,7 @@ public class AssayExportImportTest extends BaseWebDriverTest
             clickAndWait(Locator.lkButton("Import Data"));
         }
 
-        waitForElement(Locator.tagWithName("select", "targetStudy"));
+        waitForElement(AssayConstants.TARGET_STUDY_FIELD_LOCATOR);
 
         if(null != batchProperties)
         {

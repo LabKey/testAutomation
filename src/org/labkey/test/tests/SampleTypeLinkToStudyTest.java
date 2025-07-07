@@ -331,7 +331,7 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         samplesTable.clickHeaderButtonAndWait("Link to Study");
 
         log("Link to study: Choose target");
-        selectOptionByText(Locator.id("targetStudy"), "/" + DATE_BASED_STUDY + " (" + DATE_BASED_STUDY + " Study)");
+        selectOptionByText(AssayConstants.TARGET_STUDY_FIELD_LOCATOR, "/" + DATE_BASED_STUDY + " (" + DATE_BASED_STUDY + " Study)");
         clickButton("Next");
         new DataRegionTable("query", getDriver()).clickHeaderButtonAndWait("Link to Study");
 
@@ -377,7 +377,7 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
 
         table.checkCheckbox(0);
         table.clickHeaderButtonAndWait("Link to Study");
-        selectOptionByText(Locator.id("targetStudy"), "/" + DATE_BASED_STUDY + " (" + DATE_BASED_STUDY + " Study)");
+        selectOptionByText(AssayConstants.TARGET_STUDY_FIELD_LOCATOR, "/" + DATE_BASED_STUDY + " (" + DATE_BASED_STUDY + " Study)");
         clickButton("Next");
 
         checker().verifyEquals("Incorrect Participant ID deduced", "P4", Locator.name("participantId").findElement(getDriver()).getAttribute("value"));

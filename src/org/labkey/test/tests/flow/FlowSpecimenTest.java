@@ -23,6 +23,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Flow;
 import org.labkey.test.categories.Specimen;
+import org.labkey.test.components.assay.AssayConstants;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PipelineStatusTable;
@@ -161,7 +162,7 @@ public class FlowSpecimenTest extends BaseFlowTest
         clickAndWait(Locator.linkWithText("Browse for more FCS files to be imported"));
         _fileBrowserHelper.selectFileBrowserItem("flowjoquery/microFCS");
         _fileBrowserHelper.selectImportDataAction("Import Directory of FCS Files");
-        selectOptionByText(Locator.id("targetStudy"), "/" + getProjectName() + "/" + STUDY_FOLDER + " (" + STUDY_FOLDER + " Study)");
+        selectOptionByText(AssayConstants.TARGET_STUDY_FIELD_LOCATOR, "/" + getProjectName() + "/" + STUDY_FOLDER + " (" + STUDY_FOLDER + " Study)");
         clickButton("Import Selected Runs");
         waitForPipelineComplete();
 
@@ -223,7 +224,7 @@ public class FlowSpecimenTest extends BaseFlowTest
         beginAt("/flow" + getContainerPath() + "/query.view?schemaName=flow&query.queryName=FCSAnalyses");
         click(Locator.checkboxByName(".toggle"));
         clickButton("Link to Study");
-        selectOptionByText(Locator.name("targetStudy"), "/" + getProjectName() + "/" + STUDY_FOLDER + " (" + STUDY_FOLDER + " Study)");
+        selectOptionByText(AssayConstants.TARGET_STUDY_FIELD_LOCATOR, "/" + getProjectName() + "/" + STUDY_FOLDER + " (" + STUDY_FOLDER + " Study)");
         clickButton("Next");
         assertTitleContains("Link to " + STUDY_FOLDER + " Study: Verify Results");
         // verify specimen information is filled in for '118795.fcs' FCS file
