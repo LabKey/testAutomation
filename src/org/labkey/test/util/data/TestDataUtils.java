@@ -134,7 +134,6 @@ public class TestDataUtils
             "Miniprep Quant BL 18JAN2023",
             "CIS43LS ABCD PK Pre-Qual Run 3"
     );
-
     public static final List<String> REALISTIC_DOMAIN_NAMES = List.of(
             "10 minute placenta",
             "30 minute placenta",
