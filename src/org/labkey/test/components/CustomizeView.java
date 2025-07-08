@@ -31,6 +31,7 @@ import org.labkey.test.components.ext4.Window;
 import org.labkey.test.selenium.LazyWebElement;
 import org.labkey.test.selenium.RefindingWebElement;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
@@ -378,12 +379,26 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
         changeTab(type);
 
         // Expand all nodes necessary to reveal the desired node.
-        WebElement fieldRow = expandPivots(fieldKeyParts);
+        String[] encodedParts = Arrays.stream(fieldKeyParts).map(this::encodeFieldKeyPart).toArray(String[]::new); // Issue 53197
+        WebElement fieldRow = expandPivots(encodedParts);
         WebElement checkbox = Locator.css("input[type=button]").findElement(fieldRow);
         WebElement rowLabel = Locator.byClass("x4-tree-node-text").findElement(fieldRow);
         rowLabel.click();
         new Checkbox(checkbox).check();
         itemXPath(type, fieldKeyParts).waitForElement(this, 2_000);
+    }
+
+    private String encodeFieldKeyPart(String fieldKeyPart)
+    {
+        String _fieldKeyPart = EscapeUtil.encodeUriPath(fieldKeyPart);
+        if (_fieldKeyPart != null)
+        {
+            // Jetty encodes # ? ; but we want to preserve these characters in paths
+            _fieldKeyPart = _fieldKeyPart.replaceAll("%23", "#");
+            _fieldKeyPart = _fieldKeyPart.replaceAll("%3F", "?");
+            _fieldKeyPart = _fieldKeyPart.replaceAll("%3B", ";");
+        }
+        return _fieldKeyPart;
     }
 
     public void addColumn(String[] fieldKeyParts, String label)
