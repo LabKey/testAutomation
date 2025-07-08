@@ -296,7 +296,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         return SingletonWebDriver.getInstance().getWebDriver();
     }
 
-    protected abstract @Nullable String getProjectName();
+    protected abstract String getProjectName();
 
     public final @Nullable String getPrimaryTestProject()
     {
