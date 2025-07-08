@@ -393,10 +393,11 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
         String _fieldKeyPart = EscapeUtil.encodeUriPath(fieldKeyPart);
         if (_fieldKeyPart != null)
         {
-            // Jetty encodes # ? ; but we want to preserve these characters in paths
+            // Jetty encodes # ? ; ' but we want to preserve these characters in paths
             _fieldKeyPart = _fieldKeyPart.replaceAll("%23", "#");
             _fieldKeyPart = _fieldKeyPart.replaceAll("%3F", "?");
             _fieldKeyPart = _fieldKeyPart.replaceAll("%3B", ";");
+            _fieldKeyPart = _fieldKeyPart.replaceAll("%27", "'");
         }
         return _fieldKeyPart;
     }
