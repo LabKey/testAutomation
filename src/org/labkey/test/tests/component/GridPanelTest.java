@@ -192,14 +192,14 @@ public class GridPanelTest extends GridPanelBaseTest
         log(String.format("Create the '%s' view for the '%s' sample type.", VIEW_FEWER_COLUMNS, SMALL_SAMPLE_TYPE));
         cv = drtSamples.openCustomizeGrid();
 
-        for(String columnName : List.of(FILTER_BOOL_COL.getFieldKey().toString()))
+        for(String columnName : List.of(FILTER_BOOL_COL.toString()))
         {
             cv.removeColumn(columnName);
         }
         cv.saveCustomView(VIEW_FEWER_COLUMNS);
 
         log(String.format("Finally create a view named '%s' for '%s' that only has a filter.", VIEW_FILTERED_COLUMN, SMALL_SAMPLE_TYPE));
-        drtSamples.setFilter(FILTER_STRING_COL.getFieldKey().toString(), "Contains One Of", String.format("%1$s\n%1$s%2$s", stringSetMembers.get(0), stringSetMembers.get(1)));
+        drtSamples.setFilter(FILTER_STRING_COL.toString(), "Contains One Of", String.format("%1$s\n%1$s%2$s", stringSetMembers.get(0), stringSetMembers.get(1)));
         cv = drtSamples.openCustomizeGrid();
         cv.saveCustomView(VIEW_FILTERED_COLUMN);
 
@@ -559,7 +559,7 @@ public class GridPanelTest extends GridPanelBaseTest
         QueryGrid grid = beginAtQueryGrid(FILTER_SAMPLE_TYPE);
 
         log("Validate that the 'Select All' button works as expected.");
-        grid.filterColumn(FILTER_STRING_COL.getName(), Filter.Operator.EQUAL, MULTI_PAGE_STRING);
+        grid.filterColumn(FILTER_STRING_COL, Filter.Operator.EQUAL, MULTI_PAGE_STRING);
 
         checker().fatal()
                 .verifyTrue("The 'Select All' button is not present.", grid.hasSelectAllButton());
@@ -593,7 +593,7 @@ public class GridPanelTest extends GridPanelBaseTest
         QueryGrid grid = beginAtQueryGrid(FILTER_SAMPLE_TYPE);
 
         log("Validate the select all check box at the top of the gird works as expected.");
-        grid.filterColumn(FILTER_STRING_COL.getName(), Filter.Operator.EQUAL, MULTI_PAGE_STRING);
+        grid.filterColumn(FILTER_STRING_COL, Filter.Operator.EQUAL, MULTI_PAGE_STRING);
         grid.selectAllOnPage(true);
         grid.removeColumnFilter(FILTER_STRING_COL.getName());
         checker().withScreenshot("Select_All_On_Page_Error")
@@ -720,14 +720,14 @@ public class GridPanelTest extends GridPanelBaseTest
         int low = INT_MAX - 3;
         int high = INT_MAX;
 
-        log(String.format("Filter the '%s' for values greater than %d and less than or equal to %d.", FILTER_INT_COL.getName(), low, high));
+        log(String.format("Filter the '%s' for values greater than %d and less than or equal to %d.", FILTER_INT_COL, low, high));
 
-        grid.filterColumn(FILTER_INT_COL.getName(), Filter.Operator.GT, low, Filter.Operator.LTE, high);
+        grid.filterColumn(FILTER_INT_COL, Filter.Operator.GT, low, Filter.Operator.LTE, high);
 
         // Query the table to get the expected number of rows.
         List<Filter> filters = List.of(
-                new Filter(FILTER_INT_COL.getFieldKey().toString(), low, Filter.Operator.getOperator("GREATER_THAN")),
-                new Filter(FILTER_INT_COL.getFieldKey().toString(), high, Filter.Operator.getOperator("LESS_THAN_OR_EQUAL")));
+                new Filter(FILTER_INT_COL.toString(), low, Filter.Operator.getOperator("GREATER_THAN")),
+                new Filter(FILTER_INT_COL.toString(), high, Filter.Operator.getOperator("LESS_THAN_OR_EQUAL")));
         int expectedCount = getExpectedResults(FILTER_SAMPLE_TYPE, null, null, filters).size();
 
         checker().withScreenshot("Multiple_Filters_One_Column_Error")
@@ -998,7 +998,7 @@ public class GridPanelTest extends GridPanelBaseTest
 
         // Query the table to get the expected number of rows to be returned.
         List<Filter> filters = List.of(
-                new Filter(FILTER_STRING_COL.getFieldKey().toString(), String.format("%s;%s", firstFilterValue, secondFilterValue),
+                new Filter(FILTER_STRING_COL.toString(), String.format("%s;%s", firstFilterValue, secondFilterValue),
                         Filter.Operator.getOperator("IN")));
         int expectedCount = getExpectedResults(FILTER_SAMPLE_TYPE, null, null, filters).size();
 
@@ -1057,9 +1057,9 @@ public class GridPanelTest extends GridPanelBaseTest
 
         // Query the table to get the expected number of rows to be returned. Will modify this list later so make it mutable.
         List<Filter> filters = new ArrayList<>();
-        filters.add(new Filter(FILTER_STRING_COL.getFieldKey().toString(), oneOfFilter, Filter.Operator.getOperator("CONTAINS_ONE_OF")));
-        filters.add(new Filter(FILTER_INT_COL.getFieldKey().toString(), low, Filter.Operator.getOperator("GREATER_THAN")));
-        filters.add(new Filter(FILTER_INT_COL.getFieldKey().toString(), high, Filter.Operator.getOperator("LESS_THAN")));
+        filters.add(new Filter(FILTER_STRING_COL.toString(), oneOfFilter, Filter.Operator.getOperator("CONTAINS_ONE_OF")));
+        filters.add(new Filter(FILTER_INT_COL.toString(), low, Filter.Operator.getOperator("GREATER_THAN")));
+        filters.add(new Filter(FILTER_INT_COL.toString(), high, Filter.Operator.getOperator("LESS_THAN")));
         int expectedCount = getExpectedResults(FILTER_SAMPLE_TYPE, null, null, filters).size();
 
         checker().verifyEquals("Number of rows after filter applied not as expected.",
@@ -1074,7 +1074,7 @@ public class GridPanelTest extends GridPanelBaseTest
         grid.getGridBar().searchFor(searchString);
 
         // Because the search string is specific to the Str column a query can be used to get the expected count.
-        filters.add(new Filter(FILTER_STRING_COL.getFieldKey().toString(), searchString, Filter.Operator.getOperator("CONTAINS")));
+        filters.add(new Filter(FILTER_STRING_COL.toString(), searchString, Filter.Operator.getOperator("CONTAINS")));
         expectedCount = getExpectedResults(FILTER_SAMPLE_TYPE, null, null, filters).size();
 
         checker().withScreenshot("Filter_With_Search_Error")
@@ -1090,7 +1090,7 @@ public class GridPanelTest extends GridPanelBaseTest
 
         // Again can use a query to get the expected number of rows from the search.
         filters = new ArrayList<>();
-        filters.add(new Filter(FILTER_STRING_COL.getFieldKey().toString(), searchString, Filter.Operator.getOperator("CONTAINS")));
+        filters.add(new Filter(FILTER_STRING_COL.toString(), searchString, Filter.Operator.getOperator("CONTAINS")));
         expectedCount = getExpectedResults(FILTER_SAMPLE_TYPE, null, null, filters).size();
 
         checker().verifyEquals("Number of rows after filter were cleared not as expected.",
@@ -1174,9 +1174,9 @@ public class GridPanelTest extends GridPanelBaseTest
                 expectedValues, actualValues);
 
         List<Filter> filters = List.of(
-                new Filter(FILTER_INT_COL.getFieldKey().toString(), low, Filter.Operator.getOperator("GREATER_THAN")),
-                new Filter(FILTER_INT_COL.getFieldKey().toString(), high, Filter.Operator.getOperator("LESS_THAN")),
-                new Filter(FILTER_STRING_COL.getFieldKey().toString(), oneOfFilter, Filter.Operator.getOperator("CONTAINS_ONE_OF")));
+                new Filter(FILTER_INT_COL.toString(), low, Filter.Operator.getOperator("GREATER_THAN")),
+                new Filter(FILTER_INT_COL.toString(), high, Filter.Operator.getOperator("LESS_THAN")),
+                new Filter(FILTER_STRING_COL.toString(), oneOfFilter, Filter.Operator.getOperator("CONTAINS_ONE_OF")));
         int expectedCount = getExpectedResults(FILTER_SAMPLE_TYPE, null, null, filters).size();
 
         checker().verifyEquals("Rows returned after filters applied not as expected.",
@@ -1195,8 +1195,8 @@ public class GridPanelTest extends GridPanelBaseTest
         }
 
         filters = List.of(
-                new Filter(FILTER_INT_COL.getFieldKey().toString(), low, Filter.Operator.getOperator("GREATER_THAN")),
-                new Filter(FILTER_STRING_COL.getFieldKey().toString(), oneOfFilter, Filter.Operator.getOperator("CONTAINS_ONE_OF")));
+                new Filter(FILTER_INT_COL.toString(), low, Filter.Operator.getOperator("GREATER_THAN")),
+                new Filter(FILTER_STRING_COL.toString(), oneOfFilter, Filter.Operator.getOperator("CONTAINS_ONE_OF")));
         expectedCount = getExpectedResults(FILTER_SAMPLE_TYPE, null, null, filters).size();
 
         checker().verifyEquals("Rows returned after filter pill removed not as expected.",
@@ -1392,7 +1392,7 @@ public class GridPanelTest extends GridPanelBaseTest
 
         // Identify how many rows should be returned.
         List<Filter> filters = List.of(
-                new Filter(FILTER_STRING_COL.getFieldKey().toString(), searchString, Filter.Operator.getOperator("CONTAINS")));
+                new Filter(FILTER_STRING_COL.toString(), searchString, Filter.Operator.getOperator("CONTAINS")));
         int expectedCount = getExpectedResults(FILTER_SAMPLE_TYPE, null, null, filters).size();
 
         int actualCount = grid.getRecordCount();
@@ -1453,15 +1453,15 @@ public class GridPanelTest extends GridPanelBaseTest
         checker().verifyEquals("Number of records returned from search not as expected.",
                 expectedCount, actualCount);
 
-        log(String.format("Validate that the result set did not return a row where the search value was in the %s field.", FILTER_INT_COL.getLabel()));
+        log(String.format("Validate that the result set did not return a row where the search value was in the %s field.", FILTER_INT_COL));
 
         List<String> actualIds = grid.getColumnDataAsText(FILTER_NAME_COL);
 
         // Query the table to get a list of samples/rows that should not be in the result from the search.
         List<Filter> filters = List.of(new Filter(FILTER_NAME_COL, searchString, Filter.Operator.getOperator("DOES_NOT_CONTAIN")),
-                new Filter(FILTER_STRING_COL.getFieldKey().toString(), searchString, Filter.Operator.getOperator("DOES_NOT_CONTAIN")),
-                new Filter(FILTER_EXTEND_CHAR_COL.getFieldKey().toString(), searchString, Filter.Operator.getOperator("DOES_NOT_CONTAIN")),
-                new Filter(FILTER_INT_COL.getFieldKey().toString(), searchString, Filter.Operator.getOperator("EQUAL")));
+                new Filter(FILTER_STRING_COL.toString(), searchString, Filter.Operator.getOperator("DOES_NOT_CONTAIN")),
+                new Filter(FILTER_EXTEND_CHAR_COL.toString(), searchString, Filter.Operator.getOperator("DOES_NOT_CONTAIN")),
+                new Filter(FILTER_INT_COL.toString(), searchString, Filter.Operator.getOperator("EQUAL")));
         List<Map<String, Object>> rows = getExpectedResults(FILTER_SAMPLE_TYPE, null, Arrays.asList(FILTER_NAME_COL), filters);
 
         boolean error = false;
@@ -1512,7 +1512,7 @@ public class GridPanelTest extends GridPanelBaseTest
         filterDialog.confirm();
 
         List<Filter> filters = List.of(
-                new Filter(FILTER_EXTEND_CHAR_COL.getFieldKey().toString(), EXTEND_RECORD_STRING, Filter.Operator.getOperator("EQUAL")));
+                new Filter(FILTER_EXTEND_CHAR_COL.toString(), EXTEND_RECORD_STRING, Filter.Operator.getOperator("EQUAL")));
         int expectedCount = getExpectedResults(FILTER_SAMPLE_TYPE, null, null, filters).size();
 
         checker().withScreenshot("Filter_Extended_Error")
@@ -1536,16 +1536,15 @@ public class GridPanelTest extends GridPanelBaseTest
         log("Filter the grid and validate only the filtered results are exported.");
         grid.filterColumn(FILTER_STRING_COL, Filter.Operator.EQUAL, MULTI_PAGE_STRING);
 
-        List<String> columnsFKs = Arrays.asList(FILTER_NAME_COL, FILTER_STRING_COL.getFieldKey().toString(), FILTER_INT_COL.getFieldKey().toString(), FILTER_EXTEND_CHAR_COL.getFieldKey().toString());
-        List<String> columnNames = Arrays.asList(FILTER_NAME_COL, FILTER_STRING_COL.getName(), FILTER_INT_COL.getName(), FILTER_EXTEND_CHAR_COL.getName());
-        List<String> columnLabels = Arrays.asList(FILTER_NAME_COL, FILTER_STRING_COL.getLabel(), FILTER_INT_COL.getLabel(), FILTER_EXTEND_CHAR_COL.getLabel());
+        List<FieldInfo> columns = Arrays.asList(new FieldInfo(FILTER_NAME_COL), FILTER_STRING_COL, FILTER_INT_COL, FILTER_EXTEND_CHAR_COL);
+        List<String> columnsFKs = Arrays.asList(FILTER_NAME_COL, FILTER_STRING_COL.toString(), FILTER_INT_COL.toString(), FILTER_EXTEND_CHAR_COL.toString());
         List<Filter> filters = List.of(
-                new Filter(FILTER_STRING_COL.getFieldKey().toString(), MULTI_PAGE_STRING, Filter.Operator.getOperator("EQUAL")));
+                new Filter(FILTER_STRING_COL.toString(), MULTI_PAGE_STRING, Filter.Operator.getOperator("EQUAL")));
         List<Map<String, Object>> expectedValues = getExpectedResults(FILTER_SAMPLE_TYPE, null, columnsFKs, filters);
 
         File exportedFile = grid.getGridBar().exportData(GridBar.ExportType.CSV);
 
-        validateExportedData(exportedFile, expectedValues, columnNames, columnLabels);
+        validateExportedData(exportedFile, expectedValues, columns);
 
         log("Validate that if there are selected rows only they are exported.");
         grid.clearFilters();
@@ -1557,12 +1556,12 @@ public class GridPanelTest extends GridPanelBaseTest
         grid.clearFilters();
 
         filters = List.of(
-                new Filter(FILTER_STRING_COL.getFieldKey().toString(), ONE_PAGE_STRING, Filter.Operator.getOperator("EQUAL")));
+                new Filter(FILTER_STRING_COL.toString(), ONE_PAGE_STRING, Filter.Operator.getOperator("EQUAL")));
         expectedValues = getExpectedResults(FILTER_SAMPLE_TYPE, null, columnsFKs, filters);
 
         exportedFile = grid.getGridBar().exportData(GridBar.ExportType.CSV);
 
-        validateExportedData(exportedFile, expectedValues, columnNames, columnLabels);
+        validateExportedData(exportedFile, expectedValues, columns);
 
         log(String.format("Using sample type '%s' validate that if a view is selected the expected columns are exported.", SMALL_SAMPLE_TYPE));
 
@@ -1574,25 +1573,25 @@ public class GridPanelTest extends GridPanelBaseTest
         exportedFile = grid.getGridBar().exportData(GridBar.ExportType.CSV);
 
         // The extra column added have spaces in the name so the column header in the exported file, so use the header values.
-        List<String> columns = new ArrayList<>(extraColumnsHeaders);
-        columns.add(FILTER_DATE_COL.getLabel());
-        columns.add(FILTER_NAME_COL);
-        columns.add(FILTER_BOOL_COL.getLabel());
-        columns.add(FILTER_STRING_COL.getLabel());
-        columns.add(FILTER_INT_COL.getLabel());
-        validateExportedColumnHeader(exportedFile, columns, new ArrayList<>());
+        List<String> columnLabels = new ArrayList<>(extraColumnsHeaders);
+        columnLabels.add(FILTER_DATE_COL.getLabel());
+        columnLabels.add(FILTER_NAME_COL);
+        columnLabels.add(FILTER_BOOL_COL.getLabel());
+        columnLabels.add(FILTER_STRING_COL.getLabel());
+        columnLabels.add(FILTER_INT_COL.getLabel());
+        validateExportedColumnHeader(exportedFile, columnLabels, new ArrayList<>());
 
         log(String.format("Now select the '%s' view.", VIEW_FEWER_COLUMNS));
         grid.selectView(VIEW_FEWER_COLUMNS);
 
         exportedFile = grid.getGridBar().exportData(GridBar.ExportType.CSV);
 
-        columns = new ArrayList<>();
-        columns.add(FILTER_DATE_COL.getLabel());
-        columns.add(FILTER_NAME_COL);
-        columns.add(FILTER_STRING_COL.getLabel());
-        columns.add(FILTER_INT_COL.getLabel());
-        validateExportedColumnHeader(exportedFile, columns, List.of(FILTER_BOOL_COL.getLabel()));
+        columnLabels = new ArrayList<>();
+        columnLabels.add(FILTER_DATE_COL.getLabel());
+        columnLabels.add(FILTER_NAME_COL);
+        columnLabels.add(FILTER_STRING_COL.getLabel());
+        columnLabels.add(FILTER_INT_COL.getLabel());
+        validateExportedColumnHeader(exportedFile, columnLabels, List.of(FILTER_BOOL_COL.getLabel()));
 
         // Test for Issue 46465 (Sample export do not respect filter when samples have been selected)
         grid = beginAtQueryGrid(FILTER_SAMPLE_TYPE);
@@ -1605,7 +1604,7 @@ public class GridPanelTest extends GridPanelBaseTest
 
         int rowsCountBefore = grid.getRecordCount();
 
-        grid.filterColumn(FILTER_INT_COL.getName(), Filter.Operator.GT, 10);
+        grid.filterColumn(FILTER_INT_COL, Filter.Operator.GT, 10);
 
         int rowCountAfter = grid.getRecordCount();
 
@@ -1616,7 +1615,7 @@ public class GridPanelTest extends GridPanelBaseTest
 
             List<Map<String, Object>> expectedData = new ArrayList<>();
 
-            List<String> intColData = grid.getColumnDataAsText(FILTER_INT_COL.getLabel());
+            List<String> intColData = grid.getColumnDataAsText(FILTER_INT_COL);
 
             for(String colValue : intColData)
             {
@@ -1627,10 +1626,7 @@ public class GridPanelTest extends GridPanelBaseTest
 
             exportedFile = grid.getGridBar().exportData(GridBar.ExportType.CSV);
 
-            validateExportedData(exportedFile, expectedData,
-                    Arrays.asList(FILTER_STRING_COL.getName(), FILTER_INT_COL.getName()),
-                    Arrays.asList(FILTER_STRING_COL.getLabel(), FILTER_INT_COL.getLabel())
-            );
+            validateExportedData(exportedFile, expectedData, List.of(FILTER_STRING_COL, FILTER_INT_COL));
         }
 
     }
@@ -1716,14 +1712,14 @@ public class GridPanelTest extends GridPanelBaseTest
         log("Go back to default view. Filter on a column to be removed, then change view that does not include the column.");
         grid.selectView(VIEW_DEFAULT);
 
-        log(String.format("Filter column '%s' to true.", FILTER_BOOL_COL.getName()));
-        grid.filterColumn(FILTER_BOOL_COL.getName(), Filter.Operator.EQUAL, true);
+        log(String.format("Filter column '%s' to true.", FILTER_BOOL_COL));
+        grid.filterColumn(FILTER_BOOL_COL, Filter.Operator.EQUAL, true);
 
-        log(String.format("Change view to '%s' which should remove column '%s' from the grid.", VIEW_FEWER_COLUMNS, FILTER_BOOL_COL.getName()));
+        log(String.format("Change view to '%s' which should remove column '%s' from the grid.", VIEW_FEWER_COLUMNS, FILTER_BOOL_COL));
         grid.selectView(VIEW_FEWER_COLUMNS);
 
         // Get the expected sample id.
-        List<Filter> filters = List.of(new Filter(FILTER_BOOL_COL.getFieldKey().toString(), true, Filter.Operator.getOperator("EQUAL")));
+        List<Filter> filters = List.of(new Filter(FILTER_BOOL_COL.toString(), true, Filter.Operator.getOperator("EQUAL")));
         int expectedCount = getExpectedResults(SMALL_SAMPLE_TYPE, VIEW_FEWER_COLUMNS, null, filters).size();
 
         checker().withScreenshot("View_Filtered_Removed_Column_Error")
@@ -1757,8 +1753,8 @@ public class GridPanelTest extends GridPanelBaseTest
 
         // Build the list of expected values.
         // Get the expected sample id.
-        filters = List.of(new Filter(FILTER_BOOL_COL.getFieldKey().toString(), true, Filter.Operator.getOperator("EQUAL")));
-        List<Map<String, Object>> strValues = getExpectedResults(SMALL_SAMPLE_TYPE, VIEW_FEWER_COLUMNS, List.of(FILTER_STRING_COL.getFieldKey().toString()), filters);
+        filters = List.of(new Filter(FILTER_BOOL_COL.toString(), true, Filter.Operator.getOperator("EQUAL")));
+        List<Map<String, Object>> strValues = getExpectedResults(SMALL_SAMPLE_TYPE, VIEW_FEWER_COLUMNS, List.of(FILTER_STRING_COL.toString()), filters);
 
         expectedList = new ArrayList<>();
         for(Map<String, Object> row : strValues)
@@ -1863,16 +1859,16 @@ public class GridPanelTest extends GridPanelBaseTest
      *
      * @param exportedFile The exported csv/tsv file.
      * @param expectedValues A list of the expected values in the rows.
-     * @param columnNames The columns to validate against.
-     * @param columnLabels The columns to validate against.
+     * @param columns The columns to validate against.
      * @throws IOException Can be thrown by the file reader.
      */
-    private void validateExportedData(File exportedFile, List<Map<String, Object>> expectedValues, List<String> columnNames, List<String> columnLabels) throws IOException
+    private void validateExportedData(File exportedFile, List<Map<String, Object>> expectedValues, List<FieldInfo> columns) throws IOException
     {
 
         try (CSVReader reader = new CSVReader(Readers.getReader(exportedFile), GridBar.ExportType.CSV.getSeparator()))
         {
-
+            List<String> columnNames = columns.stream().map(FieldInfo::getName).toList();
+            List<String> columnLabels = columns.stream().map(FieldInfo::getLabel).toList();
             List<String[]> allRows = reader.readAll();
 
             // Use headerRow, the column names, as keys for the map of actual data.
