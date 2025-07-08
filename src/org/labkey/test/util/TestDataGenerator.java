@@ -580,7 +580,7 @@ public class TestDataGenerator
 
         String randomFieldName = randomName(part, numStartChars, numEndChars, chars, exclusion);
         TestLogger.log("Generated random field name: " + randomFieldName);
-        return randomFieldName + WIDE_PLACEHOLDER; // TODO remove this hardcoded WIDE_PLACEHOLDER after a few TC runs
+        return randomFieldName;
     }
 
     public static String randomChoice(List<String> choices)
