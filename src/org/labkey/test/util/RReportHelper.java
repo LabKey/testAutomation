@@ -47,8 +47,6 @@ public class RReportHelper
 
     public enum ReportOption implements ScriptReportPage.ReportOption
     {
-        @Deprecated (since = "22.7")
-        shareReport(ScriptReportPage.StandardReportOption.shareReport),
         knitrNone("None" + Locator.NBSP, "Knitr Options", false),
         knitrHtml("Html" + Locator.NBSP, "Knitr Options", false),
         knitrMarkdown("Markdown" + Locator.NBSP, "Knitr Options", false);
