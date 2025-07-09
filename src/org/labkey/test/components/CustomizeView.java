@@ -31,7 +31,6 @@ import org.labkey.test.components.ext4.Window;
 import org.labkey.test.params.FieldKey;
 import org.labkey.test.selenium.RefindingWebElement;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
