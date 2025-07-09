@@ -17,8 +17,9 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 
 import static org.labkey.test.components.ext4.Checkbox.Ext4Checkbox;
@@ -89,12 +90,25 @@ public class ScriptReportPage extends LabKeyPage<ScriptReportPage.ElementCache>
         {
             saveReportWithName(name, isSaveAs);
         }
-        return Objects.requireNonNullElse(getReportId(), reportIdBeforeSave);
+        String reportIdAfterSave = getReportId();
+        return reportIdAfterSave == null ? reportIdBeforeSave : reportIdAfterSave;
     }
 
     public String getReportId()
     {
-        return getUrlParam("reportId", true);
+        String paramName = "reportId";
+
+        Map<String, String> params = WebTestHelper.parseUrlQuery(getURL());
+        String paramValue = params.get(paramName);
+
+        if (paramValue == null)
+        {
+            paramValue = params.entrySet().stream()
+                    .filter(entry -> entry.getKey().endsWith("." + paramName))
+                    .map(Map.Entry::getValue).findFirst().orElse(null);
+        }
+
+        return paramValue == null ? null : URLDecoder.decode(paramValue, StandardCharsets.UTF_8);
     }
 
     /**
