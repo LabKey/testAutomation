@@ -416,7 +416,7 @@ public class DataRegionTable extends DataRegion
         return link(row, getColumnIndexStrict(columnIdentifier));
     }
 
-    protected int getColumnIndexStrict(CharSequence columnIdentifier)
+    public int getColumnIndexStrict(CharSequence columnIdentifier)
     {
         return elementCache().getColumnIndex(columnIdentifier).getDomIndex();
     }
@@ -1536,7 +1536,7 @@ public class DataRegionTable extends DataRegion
                 String noSpaces = columnIdentifier.toString().replace(" ", "");
                 if (!noSpaces.equals(columnIdentifier.toString()))
                 {
-                    fieldReference = elementCache().getColumnHeaderManager().findFieldReferenceOrNull(columnIdentifier);
+                    fieldReference = elementCache().getColumnHeaderManager().findFieldReferenceOrNull(noSpaces);
                     if (fieldReference != null)
                     {
                         TestLogger.warn("Unnecessary space in requested column name. " +

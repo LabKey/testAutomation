@@ -262,36 +262,12 @@ public class WikiHelper
      */
     public void switchWikiToSourceView()
     {
-        String curFormat = (String) _test.executeScript("return LABKEY._wiki.getProps().rendererType;");
-        if (curFormat.equalsIgnoreCase("HTML"))
-        {
-            if (_test.isElementPresent(Locator.css("#wiki-tab-source.labkey-tab-inactive")))
-            {
-                Locator tab = Locator.css("#wiki-tab-source > a");
-                _test.waitForElementToBeVisible(tab);
-                _test.click(tab);
-                _test.waitForElement(Locator.css("#wiki-tab-source.labkey-tab-active"));
-            }
-        }
+        new EditPage(_test.getDriver()).switchWikiToSourceView();
     }
 
     public void switchWikiToVisualView()
     {
-        String curFormat = (String) _test.executeScript("return LABKEY._wiki.getProps().rendererType;");
-        if (curFormat.equalsIgnoreCase("HTML"))
-        {
-            if (_test.isElementPresent(Locator.css("#wiki-tab-visual.labkey-tab-inactive")))
-            {
-                Locator tab = Locator.css("#wiki-tab-visual > a");
-                _test.waitForElementToBeVisible(tab);
-                _test.click(tab);
-
-                Locator yesButton = Locator.tagWithText("span","Yes");
-                _test.waitForElementToBeVisible(yesButton);
-                _test.waitAndClick(yesButton);
-                _test.waitForElement(Locator.css("#wiki-tab-visual.labkey-tab-active"));
-            }
-        }
+        new EditPage(_test.getDriver()).switchWikiToVisualView();
     }
 
     // need to be on a wiki page in the source container, and destinationFolder needs to be a unique link on the page

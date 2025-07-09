@@ -31,7 +31,6 @@ import org.labkey.remoteapi.SimpleGetCommand;
 import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.remoteapi.security.CreateUserCommand;
 import org.labkey.remoteapi.security.CreateUserResponse;
-import org.labkey.remoteapi.security.DeleteUserCommand;
 import org.labkey.remoteapi.security.GetUsersCommand;
 import org.labkey.remoteapi.security.GetUsersResponse;
 import org.labkey.remoteapi.security.GetUsersResponse.UserInfo;
@@ -58,6 +57,7 @@ import static org.junit.Assert.assertNotNull;
 public class APIUserHelper extends AbstractUserHelper
 {
     private final Supplier<Connection> connectionSupplier;
+
     public APIUserHelper(Supplier<Connection> connectionSupplier)
     {
         super(null);
@@ -221,19 +221,6 @@ public class APIUserHelper extends AbstractUserHelper
     protected void _deleteUser(String userEmail)
     {
         deleteUsers(false, userEmail);
-    }
-
-    private void deleteUser(@NotNull Integer userId)
-    {
-        DeleteUserCommand command = new DeleteUserCommand(userId);
-        try
-        {
-            command.execute(connectionSupplier.get(), "/");
-        }
-        catch (IOException|CommandException e)
-        {
-            throw new RuntimeException(e);
-        }
     }
 
     @Override
