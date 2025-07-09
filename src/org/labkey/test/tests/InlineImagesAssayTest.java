@@ -31,6 +31,7 @@ import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.assay.AssayConstants;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.FieldKey;
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExcelHelper;
@@ -178,8 +179,8 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
         DataRegionTable list = new DataRegionTable("Data", getDriver());
         CustomizeView customizeView = list.openCustomizeGrid();
         customizeView.showHiddenItems();
-        customizeView.addColumn(new String[]{"Run", "RowId"});
-        customizeView.addColumn(new String[]{"Run", "Protocol", "RowId"});
+        customizeView.addColumn(FieldKey.fromParts("Run", "RowId"));
+        customizeView.addColumn(FieldKey.fromParts("Run", "Protocol", "RowId"));
         customizeView.applyCustomView();
         var protocolId = list.getDataAsText(0, "Run/Protocol/RowId");
         var runId = list.getDataAsText(0, "Run/RowId");

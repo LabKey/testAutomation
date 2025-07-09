@@ -64,16 +64,6 @@ public class PortalHelper extends WebDriverWrapper
         return _driverWrapper.getWrappedDriver();
     }
 
-    public void enableTabEditMode()
-    {
-        new SiteNavBar(getDriver()).enterPageAdminMode();
-    }
-
-    public void disableTabEditMode()
-    {
-        new SiteNavBar(getDriver()).exitPageAdminMode();
-    }
-
     public PortalTab activateTab(String tabText)
     {
         tabText = tabText.trim();
@@ -126,18 +116,18 @@ public class PortalHelper extends WebDriverWrapper
     {
         PortalTab.find(tabText, getDriver()).hide();
 
-        disableTabEditMode();
+        exitAdminMode();
         assertElementNotPresent(Locator.xpath("//div[@class='lk-nav-tabs-ct']//ul//li//a[text()='" + tabText +"']"));
-        enableTabEditMode();
+        enterAdminMode();
     }
 
     @LogMethod(quiet = true)
     public void showTab(@LoggedParam String tabText)
     {
         PortalTab.find(tabText, getDriver()).show();
-        disableTabEditMode();
+        exitAdminMode();
         assertElementVisible(Locator.xpath("//div[@class='lk-nav-tabs-ct']//ul//li//a[contains(text(),'" + tabText +"')]"));
-        enableTabEditMode();
+        enterAdminMode();
     }
 
     @LogMethod(quiet = true)

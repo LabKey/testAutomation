@@ -113,6 +113,12 @@ library(knitr)
 knit('knitr-minimal.Rmd')
 ```
 
+<span>Nonce check: <span id="nonce-check-result">FAIL</span></span>
+
+<script>
+    document.getElementById('nonce-check-result').innerText = "SUCCESS";
+</script>
+
 ## Conclusion
 
 Markdown is super easy to write. Go to **knitr** [homepage](http://yihui.name/knitr) for details.

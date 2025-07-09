@@ -58,13 +58,13 @@ public class SampleTypeAPIHelper
     public static List<FieldDefinition> sampleTypeTestFields(boolean withFileField)
     {
         List<FieldDefinition> fields = new ArrayList<>(Arrays.asList(
-                new FieldDefinition("intColumn", FieldDefinition.ColumnType.Integer),
-                new FieldDefinition("decimalColumn", FieldDefinition.ColumnType.Decimal),
-                new FieldDefinition("stringColumn", FieldDefinition.ColumnType.String),
-                new FieldDefinition("sampleDate", FieldDefinition.ColumnType.DateAndTime),
-                new FieldDefinition("boolColumn", FieldDefinition.ColumnType.Boolean)));
+                new FieldDefinition(TestDataGenerator.randomFieldName("intColumn"), FieldDefinition.ColumnType.Integer),
+                new FieldDefinition(TestDataGenerator.randomFieldName("decimalColumn"), FieldDefinition.ColumnType.Decimal),
+                new FieldDefinition(TestDataGenerator.randomFieldName("stringColumn"), FieldDefinition.ColumnType.String),
+                new FieldDefinition(TestDataGenerator.randomFieldName("sampleDate"), FieldDefinition.ColumnType.DateAndTime),
+                new FieldDefinition(TestDataGenerator.randomFieldName("boolColumn"), FieldDefinition.ColumnType.Boolean)));
         if (withFileField)
-            fields.add(new FieldDefinition("fileColumn", FieldDefinition.ColumnType.File));
+            fields.add(new FieldDefinition(TestDataGenerator.randomFieldName("fileColumn"), FieldDefinition.ColumnType.File));
         return fields;
     }
 
@@ -176,14 +176,4 @@ public class SampleTypeAPIHelper
         return rowIds;
     }
 
-    /**
-     * This method has a misleading name. "Name" and "Sample ID" refer to the same column. This is actually fetching
-     * row IDs of the specified samples.
-     * @deprecated Use {@link #getRowIdsForSamples(String, String, List)}
-     */
-    @Deprecated(since = "22.4")
-    public static Map<String, Integer> getSampleIdFromName(String folder, String sampleTypeName, List<String> sampleNames) throws IOException, CommandException
-    {
-        return getRowIdsForSamples(folder, sampleTypeName, sampleNames);
-    }
 }

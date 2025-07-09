@@ -100,8 +100,46 @@ public class EditPage extends LabKeyPage<EditPage.ElementCache>
 
     public EditPage setBody(String body)
     {
+        switchWikiToSourceView();
         elementCache().bodyTextArea.set(body);
         return this;
+    }
+
+    /**
+     * Switches the wiki edit page to source view when the format type is HTML.
+     */
+    public void switchWikiToSourceView()
+    {
+        String curFormat = executeScript("return LABKEY._wiki.getProps().rendererType;", String.class);
+        if (curFormat.equalsIgnoreCase("HTML"))
+        {
+            if (isElementPresent(Locator.css("#wiki-tab-source.labkey-tab-inactive")))
+            {
+                Locator tab = Locator.css("#wiki-tab-source > a");
+                waitForElementToBeVisible(tab);
+                click(tab);
+                waitForElement(Locator.css("#wiki-tab-source.labkey-tab-active"));
+            }
+        }
+    }
+
+    public void switchWikiToVisualView()
+    {
+        String curFormat = (String) executeScript("return LABKEY._wiki.getProps().rendererType;");
+        if (curFormat.equalsIgnoreCase("HTML"))
+        {
+            if (isElementPresent(Locator.css("#wiki-tab-visual.labkey-tab-inactive")))
+            {
+                Locator tab = Locator.css("#wiki-tab-visual > a");
+                waitForElementToBeVisible(tab);
+                click(tab);
+
+                Locator yesButton = Locator.tagWithText("span","Yes");
+                waitForElementToBeVisible(yesButton);
+                waitAndClick(yesButton);
+                waitForElement(Locator.css("#wiki-tab-visual.labkey-tab-active"));
+            }
+        }
     }
 
     public EditPage setShouldIndex(boolean shouldIndex)
