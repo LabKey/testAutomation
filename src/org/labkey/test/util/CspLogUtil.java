@@ -19,6 +19,7 @@ import java.nio.file.Files;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -28,8 +29,7 @@ public class CspLogUtil
             "/_rstudio/",
             "/_rstudioReport/"
     );
-    // Issue 53226: reports-streamFile is blocked by object-src CSP directive
-    private static final Set<String> ignoredDirectives = Set.of("object-src");
+    private static final Set<String> ignoredDirectives = Collections.emptySet();
 
     private static final String logName = "csp-report.log";
     private static final File logFile = new File(TestFileUtils.getServerLogDir(), logName);

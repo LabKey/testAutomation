@@ -82,7 +82,7 @@ public class TimeChartAPITest extends TimeChartTest
         add(Pair.of("study_LuminexAssay_ObsConc", Arrays.asList(35.87, 40.07, 52.74, 13.68, 28.35, 42.38, 2.82, 5.19, 7.99, 5.12, 6.69, 32.33, 3.09, 5.76, 12.49)));
         add(Pair.of("IL-10 (23)::study_LuminexAssay_ObsConc_MAX", Arrays.asList(40.07, 42.38, 7.99, 32.33, 12.49)));
         add(Pair.of("IL-10 (23)::study_LuminexAssay_ObsConc_MAX", Arrays.asList(40.07, 42.38, 7.99, 32.33, 12.49)));
-        add(Pair.of("M1", Arrays.asList(520.0, 543.0)));
+        add(Pair.of("study_GenericAssay_M1", Arrays.asList(520.0, 543.0)));
         add(Pair.of("IL-10 (23)::study_LuminexAssay_ObsConc_MAX", Arrays.asList(40.07, 42.38, 7.99, 32.33, 12.49)));
     }};
 
@@ -152,16 +152,16 @@ public class TimeChartAPITest extends TimeChartTest
 
         final List<Pair<String, List<Object>>> GETDATA_API_TEST_VISITLABEL = new ArrayList<>()
         {{
-            add(Pair.of("VisitLabel", Arrays.asList("Month 2", "Month 3", "Month 4", "Month 7", "Month 9", "Month 10", "Month 10", "Month 11", "Month 12", "Month 13")));
-            add(Pair.of("VisitLabel", Arrays.asList("Month 2", "Month 3", "Month 4", "Month 7", "Month 9", "Month 10", "Month 10", "Month 11", "Month 12", "Month 13")));
             add(Pair.of("study_Lab Results_ParticipantVisit_Visit_Label", Arrays.asList("Month 2", "Month 3", "Month 4", "Month 7", "Month 9", "Month 10", "Month 10", "Month 11", "Month 12", "Month 13")));
             add(Pair.of("study_Lab Results_ParticipantVisit_Visit_Label", Arrays.asList("Month 2", "Month 3", "Month 4", "Month 7", "Month 9", "Month 10", "Month 10", "Month 11", "Month 12", "Month 13")));
-            add(Pair.of("VisitLabel", Arrays.asList("Month 2", "Month 2", "Month 2", "Month 3", "Month 3", "Month 3", "Month 4", "Month 4", "Month 4", "Month 7", "Month 7", "Month 7", "Month 9", "Month 9", "Month 9")));
+            add(Pair.of("study_Lab Results_ParticipantVisit_Visit_Label", Arrays.asList("Month 2", "Month 3", "Month 4", "Month 7", "Month 9", "Month 10", "Month 10", "Month 11", "Month 12", "Month 13")));
+            add(Pair.of("study_Lab Results_ParticipantVisit_Visit_Label", Arrays.asList("Month 2", "Month 3", "Month 4", "Month 7", "Month 9", "Month 10", "Month 10", "Month 11", "Month 12", "Month 13")));
+            add(Pair.of("study_Lab Results_ParticipantVisit_Visit_Label", Arrays.asList("Month 2", "Month 2", "Month 2", "Month 3", "Month 3", "Month 3", "Month 4", "Month 4", "Month 4", "Month 7", "Month 7", "Month 7", "Month 9", "Month 9", "Month 9")));
             add(Pair.of("study_Lab Results_ParticipantVisit_Visit_Label", Arrays.asList("Month 2", "Month 2", "Month 2", "Month 3", "Month 3", "Month 3", "Month 4", "Month 4", "Month 4", "Month 7", "Month 7", "Month 7", "Month 9", "Month 9", "Month 9", "Month 10", "Month 10", "Month 11", "Month 12", "Month 13")));
-            add(Pair.of("VisitLabel", Arrays.asList("Month 2", "Month 3", "Month 4", "Month 7", "Month 9")));
+            add(Pair.of("study_Lab Results_ParticipantVisit_Visit_Label", Arrays.asList("Month 2", "Month 3", "Month 4", "Month 7", "Month 9")));
             add(Pair.of("study_Lab Results_ParticipantVisit_Visit_Label", Arrays.asList("Month 2", "Month 3", "Month 4", "Month 7", "Month 9", "Month 10", "Month 10", "Month 11", "Month 12", "Month 13")));
-            add(Pair.of("VisitLabel", Arrays.asList("Month 2", "Month 2", "Month 2", "Month 3", "Month 4", "Month 7", "Month 9", "Month 10", "Month 10", "Month 11", "Month 12", "Month 13")));
-            add(Pair.of("VisitLabel", Arrays.asList("Month 2", "Month 3", "Month 4", "Month 7", "Month 9", "Month 10", "Month 10", "Month 11", "Month 12", "Month 13")));
+            add(Pair.of("study_Lab Results_ParticipantVisit_Visit_Label", Arrays.asList("Month 2", "Month 2", "Month 2", "Month 3", "Month 4", "Month 7", "Month 9", "Month 10", "Month 10", "Month 11", "Month 12", "Month 13")));
+            add(Pair.of("study_Lab Results_ParticipantVisit_Visit_Label", Arrays.asList("Month 2", "Month 3", "Month 4", "Month 7", "Month 9", "Month 10", "Month 10", "Month 11", "Month 12", "Month 13")));
         }};
 
         testVisApi(TestFileUtils.getSampleData("api/getDataVisitTest.html"), GETDATA_API_TEST_TITLES, GETDATA_API_TEST_NUMROWS, GETDATA_API_VISITTEST_COLNAMES, null, GETDATA_API_TEST_VISITLABEL,
@@ -333,7 +333,7 @@ public class TimeChartAPITest extends TimeChartTest
             {
                 Pair<String, List<Object>> expectedColumn = expectedColForAllTests.get(testIndex);
                 String columnName = expectedColumn.getKey();
-                int columnIndex = table.getColumnIndex(columnName);
+                int columnIndex = table.getColumnIndexStrict(columnName);
                 List<Object> expectedValues = expectedColumn.getValue();
                 List<Object> actualValues = new ArrayList<>();
                 boolean isNumberCol = expectedValues.get(0) instanceof Number;

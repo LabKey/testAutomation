@@ -33,6 +33,7 @@ import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.components.html.SiteNavBar;
 import org.labkey.test.pages.admin.PermissionsPage;
 import org.labkey.test.pages.announcements.AdminPage;
+import org.labkey.test.pages.announcements.EmailPrefsPage;
 import org.labkey.test.pages.announcements.InsertPage;
 import org.labkey.test.pages.announcements.RespondPage;
 import org.labkey.test.util.ApiPermissionsHelper;
@@ -170,8 +171,6 @@ public class MessagesLongTest extends BaseWebDriverTest
                 .assertPermissionSetting("testers1", "No Permissions")
                 .clickSaveAndFinish();
         _containerHelper.enableModule(PROJECT_NAME, "Dumbster");
-
-
     }
 
     @Test
@@ -190,10 +189,37 @@ public class MessagesLongTest extends BaseWebDriverTest
 
         clickProject(PROJECT_NAME);
         log("Check email preferences");
+        // Unlike EmailPrefsPage.beginAt(), this ensures returnUrl is passed to the action
         _portalHelper.clickWebpartMenuItem("Messages", true, "Email Preferences");
-        checkCheckbox(Locator.radioButtonByName("emailPreference").index(2));
-        clickButton("Update");
-        clickButton("Done");
+        EmailPrefsPage prefsPage = new EmailPrefsPage(getDriver());
+        // Verify prefs are "Mine" (doTestEmailPrefsMine() sets this) and "Individual" (folder default)
+        assertTrue(prefsPage.isNotifyOnMineSelected());
+        assertTrue(prefsPage.isTypeIndividualSelected());
+
+        // Update to settings that differ from the folder default values to test "Reset to folder default setting", Issue 53387
+        prefsPage = prefsPage
+            .setNotifyOnAll()
+            .setTypeDigest()
+            .update();
+        assertTrue(prefsPage.isNotifyOnAllSelected());
+        assertTrue(prefsPage.isTypeDigestSelected());
+
+        // After clicking "Reset", all options should be disabled
+        prefsPage = prefsPage.reset(true);
+        assertTrue(prefsPage.isNotifyNoneDisabled());
+        assertTrue(prefsPage.isNotifyOnMineDisabled());
+        assertTrue(prefsPage.isNotifyOnAllDisabled());
+        assertTrue(prefsPage.isTypeIndividualDisabled());
+        assertTrue(prefsPage.isTypeDigestDisabled());
+
+        // Submit reset to folder default and verify
+        prefsPage = prefsPage.update();
+        assertTrue(prefsPage.isNotifyOnMineSelected());
+        assertTrue(prefsPage.isTypeIndividualSelected());
+
+        prefsPage = prefsPage.setNotifyOnAll().update();
+        assertTrue(prefsPage.isNotifyOnAllSelected());
+        prefsPage.done();
 
         SiteNavBar siteNavBar = new SiteNavBar(getDriver());
         siteNavBar.enterPageAdminMode();
@@ -644,10 +670,13 @@ public class MessagesLongTest extends BaseWebDriverTest
         createUserWithPermissions(RESPONDER, PROJECT_NAME, "Editor");
         goToProjectHome(PROJECT_NAME);
 
+        // Unlike EmailPrefsPage.beginAt(), this ensures returnUrl is passed to the action
         _portalHelper.clickWebpartMenuItem("Messages", true, "Email Preferences");
-        checkCheckbox(Locator.radioButtonByName("emailPreference").index(1));
-        clickButton("Update");
-        clickButton("Done");
+        EmailPrefsPage prefsPage = new EmailPrefsPage(getDriver())
+            .setNotifyOnMine()
+            .update();
+        assertTrue(prefsPage.isNotifyOnMineSelected());
+        prefsPage.done();
 
         createNewMessage(_messageTitle, _messageBody);
 

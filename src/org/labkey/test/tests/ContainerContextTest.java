@@ -35,6 +35,7 @@ import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Data;
 import org.labkey.test.pages.reports.ScriptReportPage;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.FieldKey;
 import org.labkey.test.params.list.IntListDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
@@ -177,7 +178,7 @@ public class ContainerContextTest extends BaseWebDriverTest
 
         log("** Adding in lookup list columns to grid");
         _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.addColumn(new String[] { "ListLookup", "LookupAge" });
+        _customizeViewsHelper.addColumn(FieldKey.fromParts("ListLookup", "LookupAge"));
         _customizeViewsHelper.saveCustomView();
 
         log("** Checking URLs go to correct container...");

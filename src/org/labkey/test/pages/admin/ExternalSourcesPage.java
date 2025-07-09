@@ -207,6 +207,7 @@ public class ExternalSourcesPage extends LabKeyPage<ExternalSourcesPage.ElementC
         Frame("frame-src"),
         Image("image-src"),
         Style("style-src"),
+        Object("object-src"),
         ;
 
         private final String directiveId;
