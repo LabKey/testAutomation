@@ -373,27 +373,12 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
         changeTab(type);
 
         // Expand all nodes necessary to reveal the desired node.
-        //String[] encodedParts = Arrays.stream(fieldKeyParts).map(this::encodeFieldKeyPart).toArray(String[]::new); // Issue 53197
         WebElement fieldRow = expandPivots(fieldKey);
         WebElement checkbox = Locator.css("input[type=button]").findElement(fieldRow);
         WebElement rowLabel = Locator.byClass("x4-tree-node-text").findElement(fieldRow);
         rowLabel.click();
         new Checkbox(checkbox).check();
         itemXPath(type, fieldKey).waitForElement(this, 2_000);
-    }
-
-    private String encodeFieldKeyPart(String fieldKeyPart)
-    {
-        String _fieldKeyPart = EscapeUtil.encodeUriPath(fieldKeyPart);
-        if (_fieldKeyPart != null)
-        {
-            // Jetty encodes # ? ; ' but we want to preserve these characters in paths
-            _fieldKeyPart = _fieldKeyPart.replaceAll("%23", "#");
-            _fieldKeyPart = _fieldKeyPart.replaceAll("%3F", "?");
-            _fieldKeyPart = _fieldKeyPart.replaceAll("%3B", ";");
-            _fieldKeyPart = _fieldKeyPart.replaceAll("%27", "'");
-        }
-        return _fieldKeyPart;
     }
 
     public void addFilter(CharSequence fieldKey, String filter_type)

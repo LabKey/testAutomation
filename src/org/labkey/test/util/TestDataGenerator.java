@@ -592,7 +592,7 @@ public class TestDataGenerator
         }
 
         TestLogger.log("Generated random field name: " + randomFieldName);
-        return randomFieldName;
+        return randomFieldName + WIDE_CHAR; // TODO remove this before merge (added for extra TC testing)
     }
 
     public static String randomChoice(List<String> choices)
