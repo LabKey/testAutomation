@@ -54,6 +54,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -71,14 +72,12 @@ import static org.labkey.test.util.EscapeUtil.escapeForNameExpression;
 public class SampleTypeNameExpressionTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "SampleType_Name_Expression_Test";
-    private static final String DEFAULT_SAMPLE_PARENT_VALUE = "SS" + TestDataGenerator.randomString(3).replaceAll("[_)]", "."); // '_' is used as delimiter to get batchRandomId and ) is used to close the defaultValue()
+
+    private static final String DEFAULT_SAMPLE_PARENT_VALUE = "SS" +
+            EscapeUtil.escapeForNameExpression(TestDataGenerator.randomString(3));
 
     private static final String PARENT_SAMPLE_TYPE = "PS" + DOMAIN_TRICKY_CHARACTERS;
     private static final String PARENT_SAMPLE_TYPE_INPUT = escapeForNameExpression(PARENT_SAMPLE_TYPE);
-
-    private static final FieldInfo COL_STR = FieldInfo.random("{Str", ColumnType.String);
-    private static final FieldInfo COL_INT = FieldInfo.random("}Int", ColumnType.Integer);
-    private static final FieldInfo COL_DATE = FieldInfo.random("$Date", ColumnType.DateAndTime);
 
     // No random names for deriving sample type
     // Issue 53306: LabKey Server: Derive samples form does not distinguish between fields that differ by 'special characters'
@@ -92,6 +91,19 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
     private static final String PARENT_SAMPLE_05 = "\"parent05";
     private static final String PARENT_SAMPLE_06 = "parent,06";
     private static final String PARENT_SAMPLE_07 = "\"parent07";
+    private static final String PARENT_FIELD_VALUE_PREFIX = "Tricky Parent";
+
+    // Create fields that have each of the tricky characters for name expressions.
+    // Having field names that differ only by special characters causes problems (Issue 53315)
+    private static final FieldInfo PARENT_FIELD_BACKSLASH = new FieldInfo("Str A \\", ColumnType.String);
+    private static final FieldInfo PARENT_FIELD_DOLLAR_DATE = new FieldInfo("Date B $", ColumnType.DateAndTime);
+    private static final FieldInfo PARENT_FIELD_FORWARDSLASH = new FieldInfo("Str C /", ColumnType.String);
+    private static final FieldInfo PARENT_FIELD_PERIOD = new FieldInfo("Str D .", ColumnType.String);
+    private static final FieldInfo PARENT_FIELD_AMPERSAND = new FieldInfo("Str E &", ColumnType.String);
+    private static final FieldInfo PARENT_FIELD_CURLY_LEFT = new FieldInfo("Str F {", ColumnType.String);
+    private static final FieldInfo PARENT_FIELD_CURLY_RIGHT_INT = new FieldInfo("Int G }", ColumnType.Integer);
+    private static final FieldInfo PARENT_FIELD_TILDE = new FieldInfo("Str H ~", ColumnType.String);
+    private static final FieldInfo PARENT_FIELD_COMMA = new FieldInfo("Str I ,", ColumnType.String);
 
     private static final File PARENT_EXCEL = TestFileUtils.getSampleData("samples/ParentSamples.xlsx");
 
@@ -119,11 +131,27 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
 
     private void addDataRow(TestDataGenerator dataGenerator, String name, int intVal)
     {
-        Map<String, Object> sampleData = Map.of(
-            "name", name,
-            COL_INT.getName(), intVal,
-            COL_STR.getName(), "Parent Sample " + ((char) (intVal + 95)),
-            COL_DATE.getName(), intVal + "/14/2020");
+        Map<String, Object> sampleData = new HashMap<>();
+
+        // Cannot use Map.of there are too many fields.
+        sampleData.put("name", name);
+        sampleData.put(PARENT_FIELD_BACKSLASH.getName(),
+                String.format("%d %s 01", intVal, PARENT_FIELD_VALUE_PREFIX));
+        sampleData.put(PARENT_FIELD_DOLLAR_DATE.getName(), intVal + "/14/2020");
+        sampleData.put(PARENT_FIELD_FORWARDSLASH.getName(),
+                String.format("%d %s 03", intVal, PARENT_FIELD_VALUE_PREFIX));
+        sampleData.put(PARENT_FIELD_PERIOD.getName(),
+                String.format("%d %s 04", intVal, PARENT_FIELD_VALUE_PREFIX));
+        sampleData.put(PARENT_FIELD_AMPERSAND.getName(),
+                String.format("%d %s 05", intVal, PARENT_FIELD_VALUE_PREFIX));
+        sampleData.put(PARENT_FIELD_CURLY_LEFT.getName(),
+                String.format("%d %s 06", intVal, PARENT_FIELD_VALUE_PREFIX));
+        sampleData.put(PARENT_FIELD_CURLY_RIGHT_INT.getName(), intVal);
+        sampleData.put(PARENT_FIELD_TILDE.getName(),
+                String.format("%d %s 08", intVal, PARENT_FIELD_VALUE_PREFIX));
+        sampleData.put(PARENT_FIELD_COMMA.getName(),
+                String.format("%d %s 09", intVal, PARENT_FIELD_VALUE_PREFIX));
+
         dataGenerator.addCustomRow(sampleData);
     }
 
@@ -138,9 +166,15 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
 
         SampleTypeDefinition definition = new SampleTypeDefinition(PARENT_SAMPLE_TYPE);
         definition = definition.setFields(List.of(
-                COL_STR.getFieldDefinition(),
-                COL_INT.getFieldDefinition(),
-                COL_DATE.getFieldDefinition()));
+                PARENT_FIELD_BACKSLASH.getFieldDefinition(),
+                PARENT_FIELD_DOLLAR_DATE.getFieldDefinition(),
+                PARENT_FIELD_FORWARDSLASH.getFieldDefinition(),
+                PARENT_FIELD_PERIOD.getFieldDefinition(),
+                PARENT_FIELD_AMPERSAND.getFieldDefinition(),
+                PARENT_FIELD_CURLY_LEFT.getFieldDefinition(),
+                PARENT_FIELD_CURLY_RIGHT_INT.getFieldDefinition(),
+                PARENT_FIELD_TILDE.getFieldDefinition(),
+                PARENT_FIELD_COMMA.getFieldDefinition()));
 
         TestDataGenerator dataGenerator = SampleTypeAPIHelper.createEmptySampleType(getCurrentContainerPath(), definition);
 
@@ -418,6 +452,67 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         checker().screenShotIfNewError("SampleCreationError");
     }
 
+    /**
+     * <p>
+     *     Automation to cover issue 52180. The name expression for the sample type will reference fields that contain
+     *     "special" characters.
+     * </p>
+     */
+    @Test
+    public void testWithTrickyFieldNames() throws IOException, CommandException
+    {
+        goToProjectHome();
+
+        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
+
+        final String sampleType = "Issue 52180 Sample Type";
+
+        StringBuilder sbNameExpression = new StringBuilder();
+
+        // Covers Issue 52180
+        sbNameExpression.append("Trick-Field ${genId} ");
+        sbNameExpression.append(String.format("${materialInputs/%s/%s} ", PARENT_SAMPLE_TYPE_INPUT, PARENT_FIELD_BACKSLASH.getExpName()));
+        sbNameExpression.append(String.format("${materialInputs/%s/%s} ", PARENT_SAMPLE_TYPE_INPUT, PARENT_FIELD_DOLLAR_DATE.getExpName()));
+        sbNameExpression.append(String.format("${materialInputs/%s/%s} ", PARENT_SAMPLE_TYPE_INPUT, PARENT_FIELD_FORWARDSLASH.getExpName()));
+        sbNameExpression.append(String.format("${materialInputs/%s/%s} ", PARENT_SAMPLE_TYPE_INPUT, PARENT_FIELD_PERIOD.getExpName()));
+        sbNameExpression.append(String.format("${materialInputs/%s/%s} ", PARENT_SAMPLE_TYPE_INPUT, PARENT_FIELD_AMPERSAND.getExpName()));
+        sbNameExpression.append(String.format("${materialInputs/%s/%s} ", PARENT_SAMPLE_TYPE_INPUT, PARENT_FIELD_CURLY_LEFT.getExpName()));
+        sbNameExpression.append(String.format("${materialInputs/%s/%s} ", PARENT_SAMPLE_TYPE_INPUT, PARENT_FIELD_CURLY_RIGHT_INT.getExpName()));
+        sbNameExpression.append(String.format("${materialInputs/%s/%s} ", PARENT_SAMPLE_TYPE_INPUT, PARENT_FIELD_TILDE.getExpName()));
+        sbNameExpression.append(String.format("${materialInputs/%s/%s}", PARENT_SAMPLE_TYPE_INPUT, PARENT_FIELD_COMMA.getExpName()));
+
+        log(String.format("Create a sample type named '%s' with a name expression of '%s'.", sampleType, sbNameExpression));
+
+        CreateSampleTypePage createPage = sampleHelper.goToCreateNewSampleType();
+
+        createPage.setName(sampleType);
+
+        createPage.setNameExpression(sbNameExpression.toString());
+
+        // Issue 53306 There is a problem with the derived sample form and field names that contain "special" characters.
+//        String intField = TestDataGenerator.randomFieldName("Int");
+//        String strField = TestDataGenerator.randomFieldName("Str");
+        String intField = "Int";
+        String strField = "Str";
+        createPage.addFields(Arrays.asList(
+                new FieldDefinition(intField, FieldDefinition.ColumnType.Integer),
+                new FieldDefinition(strField, FieldDefinition.ColumnType.String)));
+
+        createPage.clickSave();
+
+        String flagString = "Hello, I'm a derived sample.";
+        String intVal = "678";
+        String derivedSampleName = deriveSample(PARENT_SAMPLE_01, PARENT_SAMPLE_TYPE, sampleType,
+                Map.of(intField, intVal,
+                        strField, flagString));
+
+        checker().verifyTrue("Name of derived sample doesn't look correct. Should start with 'Trick-Field '.",
+                derivedSampleName.startsWith("Trick-Field "));
+        checker().verifyTrue(String.format("Doesn't look like there is a link to the parent sample '%s'.", PARENT_SAMPLE_01),
+                isElementPresent(Locator.linkWithText(PARENT_SAMPLE_01)));
+
+    }
+
     @Test
     public void testInputsExpression()
     {
@@ -610,16 +705,13 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
     public void testDeriveSampleFromSampleDetailsPage() throws Exception
     {
 
-        // This test exposes Issue 44760. The issue is not caused by using the UI but rather by the latest lineage lookup
-        // name expression feature.
         goToProjectHome();
 
         SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
 
         final String sampleType = "DerivedUI_SampleType";
-        final String nameExpression = String.format("DUI_${genId}_${materialInputs/%s/%s}", PARENT_SAMPLE_TYPE_INPUT, COL_STR.getExpName());
-
-        // TODO: When Issue 44760 this test can be updated to use a parent alias in the name expression.
+        // Covers Issue 44760
+        final String nameExpression = String.format("DUI_${genId}_${materialInputs/%s/%s}", PARENT_SAMPLE_TYPE_INPUT, PARENT_FIELD_CURLY_LEFT.getExpName());
 
         log(String.format("Create a sample type named '%s' with a name expression of '%s'.", sampleType, nameExpression));
 
@@ -637,14 +729,17 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
 
         String flagString = "Hello, I'm a derived sample.";
         String intVal = "987";
-        String derivedSampleName = deriveSample(PARENT_SAMPLE_01, PARENT_SAMPLE_TYPE, sampleType, flagString, intVal);
+        String derivedSampleName = deriveSample(PARENT_SAMPLE_01, PARENT_SAMPLE_TYPE, sampleType,
+                Map.of(COL_DSTR.getName(), flagString,
+                        COL_DINT.getName(), intVal));
 
-        checker().verifyTrue("Name of derived sample doesn't look correct. Should contain 'Parent Sample'.",
-                derivedSampleName.contains("Parent Sample"));
+        checker().verifyTrue(String.format("Name of derived sample doesn't look correct. Should contain %s.", PARENT_FIELD_VALUE_PREFIX),
+                derivedSampleName.contains(PARENT_FIELD_VALUE_PREFIX));
         checker().verifyTrue(String.format("Doesn't look like there is a link to the parent sample '%s'.", PARENT_SAMPLE_01),
                 isElementPresent(Locator.linkWithText(PARENT_SAMPLE_01)));
 
-        final String ancestorNameExpression = String.format("GrandChild_${MaterialInputs/%s/..[MaterialInputs/%s]/%s}_${genId}", sampleType, PARENT_SAMPLE_TYPE_INPUT, COL_STR.getExpName());
+        // Covers Issue 44760
+        final String ancestorNameExpression = String.format("GrandChild_${MaterialInputs/%s/..[MaterialInputs/%s]/%s}_${genId}", sampleType, PARENT_SAMPLE_TYPE_INPUT, PARENT_FIELD_CURLY_LEFT.getExpName());
         log("Change the sample type name expression to support grandparent property lookup: " + ancestorNameExpression);
         goToProjectHome();
         SampleTypeHelper sampleTypeHelper = new SampleTypeHelper(this);
@@ -656,9 +751,11 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
 
         String flagStringGD = "grand child sample.";
         String intValGD = "567";
-        String grandChildSampleName = deriveSample(derivedSampleName, sampleType, sampleType, flagStringGD, intValGD);
-        checker().verifyTrue(String.format("Name of derived sample doesn't look correct. Should contain 'Parent Sample' and not contain '%s'.", flagString),
-                grandChildSampleName.contains("Parent Sample") && !grandChildSampleName.contains(flagString));
+        String grandChildSampleName = deriveSample(derivedSampleName, sampleType, sampleType,
+                Map.of(COL_DSTR.getName(), flagStringGD,
+                        COL_DINT.getName(), intValGD));
+        checker().verifyTrue(String.format("Name of derived sample doesn't look correct. Should contain %s and not contain '%s'.", PARENT_FIELD_VALUE_PREFIX, flagString),
+                grandChildSampleName.contains(PARENT_FIELD_VALUE_PREFIX) && !grandChildSampleName.contains(flagString));
         checker().verifyTrue(String.format("Doesn't look like there is a link to the parent sample '%s'.", derivedSampleName),
                 isElementPresent(Locator.linkWithText(derivedSampleName)));
 
@@ -681,16 +778,16 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         click(Locator.tagWithText("td", grandImportChildSampleName));
         waitForElement(Locator.tagWithText("td", flagStringBulkImport));
 
-        checker().verifyTrue(String.format("Name of derived sample doesn't look correct. Should contain 'Parent Sample' and not contain '%s'.", flagString),
-                grandChildSampleName.contains("Parent Sample") && !grandChildSampleName.contains(flagString));
+        checker().verifyTrue(String.format("Name of derived sample doesn't look correct. Should contain %s and not contain '%s'.", PARENT_FIELD_VALUE_PREFIX, flagString),
+                grandChildSampleName.contains(PARENT_FIELD_VALUE_PREFIX) && !grandChildSampleName.contains(flagString));
         checker().verifyTrue(String.format("Doesn't look like there is a link to the parent sample '%s'.", derivedSampleName),
                 isElementPresent(Locator.linkWithText(derivedSampleName)));
     }
 
-    private String deriveSample(String parentSampleName, String parentSampleType, String targetSampleType, String strVal, String intVal) throws IOException, CommandException
+    private String deriveSample(String parentSampleName, String parentSampleType, String targetSampleType, Map<String, String> setField) throws IOException, CommandException
     {
         log(String.format("Go to the 'overview' page for sample '%s' in sample type '%s'", parentSampleName, parentSampleType));
-        Integer sampleRowNum = SampleTypeAPIHelper.getSampleIdFromName(getProjectName(), parentSampleType, Arrays.asList(parentSampleName)).get(parentSampleName);
+        Integer sampleRowNum = SampleTypeAPIHelper.getRowIdsForSamples(getProjectName(), parentSampleType, Arrays.asList(parentSampleName)).get(parentSampleName);
 
         String url = WebTestHelper.buildRelativeUrl("experiment", getCurrentContainerPath(), "showMaterial", Map.of("rowId", sampleRowNum));
         beginAt(url);
@@ -704,11 +801,15 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         selectOptionByText(Locator.name("targetSampleTypeId"),  String.format("%s in /%s", targetSampleType, getProjectName()));
         clickButton("Next");
 
-        setFormElement(Locator.name("outputSample1_%s".formatted(COL_DINT.getName())), intVal);
-        setFormElement(Locator.name("outputSample1_%s".formatted(COL_DSTR.getName())), strVal);
+        String flagString = "";
+        for(Map.Entry<String, String> entry : setField.entrySet())
+        {
+            setFormElement(Locator.name(String.format("outputSample1_%s", entry.getKey())), entry.getValue());
+            flagString = entry.getValue();
+        }
         clickButton("Submit");
 
-        waitForElement(Locator.tagWithText("td", strVal));
+        waitForElement(Locator.tagWithText("td", flagString));
 
         return Locator.tagWithText("td", "Name:").followingSibling("td").findElement(getDriver()).getText();
     }
@@ -786,7 +887,7 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         createPage.addParentAlias(parentAlias, String.format("Sample Type: %1$s (%2$s)", PARENT_SAMPLE_TYPE, PROJECT_NAME));
 
         log("Use a name expression using a field from the named parent, with parent type not encoded.");
-        String nameExpressionBad = String.format("SNP_${genId}_${%s/%s}_${materialInputs/%s/%s}", parentAlias, COL_INT.getExpName(), PARENT_SAMPLE_TYPE, COL_STR.getExpName());
+        String nameExpressionBad = String.format("SNP_${genId}_${%s/%s}_${materialInputs/%s/%s}", parentAlias, PARENT_FIELD_CURLY_RIGHT_INT.getExpName(), PARENT_SAMPLE_TYPE, PARENT_FIELD_CURLY_LEFT.getExpName());
         createPage.setNameExpression(nameExpressionBad);
         actualMsg = createPage.getNameExpressionPreview();
         checker().withScreenshot("Parent_Fields_Preview_Error")
@@ -795,7 +896,7 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         mouseOver(createPage.getComponentElement());
 
         log("Use a name expression using a field from the named parent, with parent type not encoded.");
-        nameExpressionBad = String.format("SNP_${genId}_${%s/$s}_${materialInputs/%s/%s}", parentAlias, COL_INT.getExpName(), PARENT_SAMPLE_TYPE, COL_STR.getName());
+        nameExpressionBad = String.format("SNP_${genId}_${%s/$s}_${materialInputs/%s/%s}", parentAlias, PARENT_FIELD_CURLY_RIGHT_INT.getExpName(), PARENT_SAMPLE_TYPE, PARENT_FIELD_CURLY_LEFT.getName());
         createPage.setNameExpression(nameExpressionBad);
         actualMsg = createPage.getNameExpressionPreview();
         checker().withScreenshot("Parent_Fields_Preview_Error")
@@ -813,9 +914,9 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         mouseOver(createPage.getComponentElement());
 
         log("Use a name expression using a field from the named parent, with parent type encoded correctly.");
-        String nameExpression = String.format("SNP_${genId}_${%s/%s}_${materialInputs/%s/%s}", parentAlias, COL_INT.getExpName(), PARENT_SAMPLE_TYPE_INPUT, COL_STR.getExpName());
+        String nameExpression = String.format("SNP_${genId}_${%s/%s}_${materialInputs/%s/%s}", parentAlias, PARENT_FIELD_CURLY_RIGHT_INT.getExpName(), PARENT_SAMPLE_TYPE_INPUT, PARENT_FIELD_CURLY_LEFT.getExpName());
         createPage.setNameExpression(nameExpression);
-        expectedMsg = generateExpectedToolTip("SNP_1001_3_parent%sValue".formatted(COL_STR.getName()));
+        expectedMsg = generateExpectedToolTip("SNP_1001_3_parent%sValue".formatted(PARENT_FIELD_CURLY_LEFT.getName()));
         actualMsg = createPage.getNameExpressionPreview();
         log("Verify that the preview shows the fields as expected.");
         checker().withScreenshot("Parent_Fields_Preview_Error")
@@ -826,7 +927,7 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
 
         log("Use a name expression with a formatted date.");
 
-        nameExpression = String.format("SNP_${genId}_${%s/%s:date('yyyy-MM-dd')}", parentAlias, COL_DATE.getExpName());
+        nameExpression = String.format("SNP_${genId}_${%s/%s:date('yyyy-MM-dd')}", parentAlias, PARENT_FIELD_DOLLAR_DATE.getExpName());
 
         createPage.setNameExpression(nameExpression);
 

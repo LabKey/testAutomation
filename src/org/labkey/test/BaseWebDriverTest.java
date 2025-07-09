@@ -64,6 +64,7 @@ import org.labkey.test.pages.core.admin.logger.ManagerPage;
 import org.labkey.test.pages.query.NewQueryPage;
 import org.labkey.test.pages.query.SourceQueryPage;
 import org.labkey.test.pages.search.SearchResultsPage;
+import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldKey;
 import org.labkey.test.teamcity.TeamCityUtils;
 import org.labkey.test.util.APIAssayHelper;
@@ -222,6 +223,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     public static final String TRICKY_CHARACTERS = "><&/%\\' \"1\u00E4\u00F6\u00FC\u00C5";
     public static final String TRICKY_CHARACTERS_NO_QUOTES = "></% 1\u00E4\u00F6\u00FC\u00C5";
     public static final String TRICKY_CHARACTERS_FOR_PROJECT_NAMES = "\u2603~!@$&()_+{}-=[],.#\u00E4\u00F6\u00FC\u00C5"; // No slash or space
+    public static final String LONG_NON_ASCII_STRING = StringUtils.repeat(FieldDefinition.SNOWMAN, 22); // "☃" See Issue 52714
     public static final String INJECT_CHARS_1 = Crawler.injectScriptBlock;
     public static final String INJECT_CHARS_2 = Crawler.injectAttributeScript;
 

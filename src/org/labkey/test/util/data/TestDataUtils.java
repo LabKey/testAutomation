@@ -134,6 +134,95 @@ public class TestDataUtils
             "Miniprep Quant BL 18JAN2023",
             "CIS43LS ABCD PK Pre-Qual Run 3"
     );
+    public static final List<String> REALISTIC_DOMAIN_NAMES = List.of(
+            "10 minute placenta",
+            "30 minute placenta",
+            "Adiponectin ELISA Data Fields",
+            "Aqueous",
+            "Ascitic fluid",
+            "Biopsy tissue",
+            "Buccal swabs",
+            "Buffy coat",
+            "DSX Study",
+            "Cell-free DNA (cfDNA) and circulating tumor DNA (ctDNA) from plasma",
+            "Cerebrospinal fluid (CSF)",
+            "cfDNA",
+            "Chemical compounds-Solid powders",
+            "Circulating tumor cells (CTCs)",
+            "circulating tumor DNA (ctDNA) from plasma",
+            "Cord blood heparin",
+            "cord.blood.heparin",
+            "Cord DNA",
+            "cord.DNA",
+            "CRC_IV st_MMR",
+            "CSF",
+            "CTC",
+            "ctDNA",
+            "Cultured Cell Lines",
+            "Cytokine ELISA  Data Fields",
+            "D2G Oncology",
+            "2O18 Data Fields",
+            "NA",
+            "External Development",
+            "External Fixed Cells (Haematology)",
+            "FFPE - Blocks",
+            "FFPE",
+            "Formalin-fixed paraffin-embedded (FFPE) tissue",
+            "Fresh frozen tissue",
+            "Gastric_MMR",
+            "Gastrointestinal fluid (GI)",
+            "GI",
+            "In House Fixed Cells (Haematology)",
+            "Insulin ELISA Data Fields",
+            "Juul",
+            "Kindeva",
+            "Leptin ELISA Data Fields",
+            "LOY-001 PK Data Fields",
+            "Maternal DNA",
+            "Membrane",
+            "Microbiome",
+            "Molecular&other testing",
+            "Multiple Pathogen",
+            "mRNA",
+            "miRNA",
+            "NEFA Data Fields",
+            "Nonn Primers",
+            "Organoids",
+            "Paternal DNA",
+            "PAXGENE",
+            "PBMC",
+            "Peripheral blood mononuclear cells",
+            "Placenta DNA",
+            "Placenta RNA",
+            "Plasma",
+            "Platelet count",
+            "Primary Cells",
+            "Primary Cells from Tumor Tissue",
+            "Primes",
+            "PTSD",
+            "Recode Therapeutics",
+            "Research Development",
+            "Research Project",
+            "Retrospective archive_FFPE",
+            "RNA",
+            "Saliva swabs",
+            "Sample release",
+            "Samples created for V&V studies",
+            "Serum",
+            "Studies",
+            "Study",
+            "Surgical resection specimens",
+            "TFF pharmaceuticals",
+            "Trizol",
+            "Truvian Sciences",
+            "TSS",
+            "Urine",
+            "Virome",
+            "Vitreous",
+            "Water Stock",
+            "Whole Blood",
+            "Whole Globe"
+    );
 
     private TestDataUtils()
     {
@@ -142,7 +231,26 @@ public class TestDataUtils
 
     public static String getRealisticPlateName()
     {
-        return REALISTIC_PLATE_NAMES.get(TestDataGenerator.randomInt(0, REALISTIC_PLATE_NAMES.size() - 1));
+        return getRealisticPlateName(new ArrayList<>());
+    }
+
+    public static String getRealisticPlateName(List<String> excludePlateNames)
+    {
+        List<String> includeNames = new ArrayList<>(REALISTIC_PLATE_NAMES);
+        includeNames.removeAll(excludePlateNames);
+        return includeNames.get(TestDataGenerator.randomInt(0, includeNames.size() - 1));
+    }
+
+    public static String getRealisticDomainName()
+    {
+        return getRealisticDomainName(new ArrayList<>());
+    }
+
+    public static String getRealisticDomainName(List<String> excludeDomains)
+    {
+        List<String> includeNames = new ArrayList<>(REALISTIC_DOMAIN_NAMES);
+        includeNames.removeAll(excludeDomains);
+        return includeNames.get(TestDataGenerator.randomInt(0, includeNames.size() - 1));
     }
 
     public static List<Map<String, Object>> rowMapsFromTsv(File tsvFile) throws IOException
