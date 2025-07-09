@@ -15,9 +15,9 @@ public final class FieldKey implements CharSequence, WrapsFieldKey
     private static final String[] ILLEGAL = {"$", "/", "&", "}", "~", ",", "."};
     private static final String[] REPLACEMENT = {"$D", "$S", "$A", "$B", "$T", "$C", "$P"};
 
-    public static final FieldKey EMPTY = new FieldKey(""); // Useful as a sort of FieldKey builder starting point
-    public static final FieldKey SOURCES_FK = new FieldKey("DataInputs");
-    public static final FieldKey PARENTS_FK = new FieldKey("MaterialInputs");
+    public static final FieldKey EMPTY = new FieldKey(null, ""); // Useful as a sort of FieldKey builder starting point
+    public static final FieldKey SOURCES_FK = FieldKey.fromParts("DataInputs");
+    public static final FieldKey PARENTS_FK = FieldKey.fromParts("MaterialInputs");
 
     private static final String SEPARATOR = "/";
 
@@ -25,18 +25,20 @@ public final class FieldKey implements CharSequence, WrapsFieldKey
     private final String _name;
     private final String _fieldKey;
 
-    private FieldKey(String name)
-    {
-        _parent = null;
-        _name = name;
-        _fieldKey = encodePart(name);
-    }
-
     private FieldKey(FieldKey parent, String child)
     {
-        _parent = parent;
-        _name = parent.getName() + SEPARATOR + child;
-        _fieldKey = parent + SEPARATOR + encodePart(child);
+        if (parent != null && !parent.isEmpty())
+        {
+            _parent = parent;
+            _name = parent.getName() + SEPARATOR + child;
+            _fieldKey = parent + SEPARATOR + encodePart(child);
+        }
+        else
+        {
+            _parent = null;
+            _name = child;
+            _fieldKey = encodePart(child);
+        }
     }
 
     public static List<String> getIllegalChars()
@@ -46,14 +48,7 @@ public final class FieldKey implements CharSequence, WrapsFieldKey
 
     public static FieldKey fromParts(List<String> parts)
     {
-        FieldKey fieldKey = EMPTY;
-
-        for (String part : parts)
-        {
-            fieldKey = fieldKey.child(part);
-        }
-
-        return fieldKey;
+        return EMPTY.child(parts);
     }
 
     public static FieldKey fromParts(String... parts)
@@ -113,19 +108,23 @@ public final class FieldKey implements CharSequence, WrapsFieldKey
         return _parent;
     }
 
-    public FieldKey child(String part)
+    public FieldKey child(String... parts)
     {
-        if (StringUtils.isBlank(part))
-            throw new IllegalArgumentException("FieldKey can't have blank part(s): " + this);
+        return child(Arrays.asList(parts));
+    }
 
-        if (StringUtils.isBlank(getName()))
+    public FieldKey child(List<String> parts)
+    {
+        FieldKey child = this;
+
+        for (String part : parts)
         {
-            return new FieldKey(part);
+            if (StringUtils.isBlank(part))
+                throw new IllegalArgumentException("FieldKey can't have blank part(s): " + parts);
+
+            child = new FieldKey(child, part);
         }
-        else
-        {
-            return new FieldKey(this, part);
-        }
+        return child;
     }
 
     public Iterator<FieldKey> getIterator()

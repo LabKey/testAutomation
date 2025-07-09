@@ -43,6 +43,11 @@ public abstract class SampleTypeDesigner<T extends SampleTypeDesigner<T>> extend
 
     public T addParentAlias(String alias, @Nullable String optionDisplayText)
     {
+        return addParentAlias(alias, optionDisplayText, false);
+    }
+
+    public T addParentAlias(String alias, @Nullable String optionDisplayText, boolean isRequired)
+    {
         expandPropertiesPanel();
 
         WebDriverWrapper.waitFor(elementCache().addParentAliasButton::isDisplayed,
@@ -54,7 +59,7 @@ public abstract class SampleTypeDesigner<T extends SampleTypeDesigner<T>> extend
         {
             optionDisplayText = CURRENT_SAMPLE_TYPE;
         }
-        setParentAlias(initialCount, alias, optionDisplayText);
+        setParentAlias(initialCount, alias, optionDisplayText, isRequired);
         return getThis();
     }
 

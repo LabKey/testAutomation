@@ -367,12 +367,25 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
 
     public T setParentAlias(int index, @Nullable String alias, @Nullable String optionDisplayText)
     {
+        return setParentAlias(index, alias, optionDisplayText, false);
+    }
+
+    public T setParentAlias(int index, @Nullable String alias, @Nullable String optionDisplayText, boolean isRequired)
+    {
         expandPropertiesPanel();
         elementCache().parentAlias(index).setValue(alias);
         if (optionDisplayText != null)
         {
             elementCache().parentAliasSelect(index).select(optionDisplayText);
         }
+
+        // The "Required" checkbox is not presented outside of the apps. Only a test running in the app could set
+        // this parent field to being required.
+        if (isRequired)
+        {
+            getWrapper().setCheckbox(elementCache().parentAliasRequiredCheckbox(index), isRequired);
+        }
+
         return getThis();
     }
 
@@ -445,6 +458,12 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
         public Input parentAlias(int index)
         {
             return parentAliases().get(index);
+        }
+
+        public WebElement parentAliasRequiredCheckbox(int index)
+        {
+            return Locator.tagWithName("input","required").withAttribute("type", "checkbox")
+                    .findElements(propertiesPanel).get(index);
         }
 
         public WebElement removeParentAliasIcon(int index)

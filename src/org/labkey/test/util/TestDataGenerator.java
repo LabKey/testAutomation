@@ -580,6 +580,17 @@ public class TestDataGenerator
         String chars = ALL_ILLEGAL_QUERY_KEY_CHARACTERS + " %()=+-[]_|*`'\":;<>?!@#^" + NON_LATIN_STRING + WIDE_PLACEHOLDER ;
 
         String randomFieldName = randomName(part, numStartChars, numEndChars, chars, exclusion);
+
+        // Avoid generating fields names with reserved substitution format patterns. e.g. ":Date" or ":First"
+        if (numStartChars > 0 && randomFieldName.charAt(numStartChars - 1) == ':' &&
+                StringUtils.isAlpha(part.substring(0, 4))) // The shortest pattern is four characters (see org.labkey.api.util.SubstitutionFormat.getFormatNames)
+        {
+            String regenExclusion = Objects.requireNonNullElse(exclusion, "") + ":";
+            randomFieldName = randomFieldName.substring(0, numStartChars - 1) +
+                    randomString(1, regenExclusion, chars) +
+                    randomFieldName.substring(numStartChars + 1);
+        }
+
         TestLogger.log("Generated random field name: " + randomFieldName);
         return randomFieldName;
     }

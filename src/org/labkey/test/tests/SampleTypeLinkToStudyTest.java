@@ -1,6 +1,7 @@
 package org.labkey.test.tests;
 
 import org.jetbrains.annotations.Nullable;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -145,6 +146,14 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         log("Verifying the linked sample type in study");
         goToProjectHome(VISIT_BASED_STUDY);
         clickAndWait(Locator.linkWithText(SAMPLE_TYPE1));
+
+        // verify that the isPlated field renders correctly
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.addColumn("IsPlated");
+        _customizeViewsHelper.applyCustomView();
+        table = new DataRegionTable("Dataset", getDriver());
+        List<String> values = table.getColumnDataAsText("IsPlated");
+        Assert.assertEquals("Invalid isPlated row values", List.of("Not Plated", "Not Plated"), values);
         stopImpersonating();
 
         log("Verifying log entries");
@@ -862,10 +871,10 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         _userHelper.deleteUsers(false, READER_USER);
-        _containerHelper.deleteProject(SAMPLE_TYPE_PROJECT, afterTest);
-        _containerHelper.deleteProject(VISIT_BASED_STUDY, afterTest);
-        _containerHelper.deleteProject(DATE_BASED_STUDY, afterTest);
-        _containerHelper.deleteProject(SAMPLE_TYPE_PROJECT + " Study 1", afterTest);
-        _containerHelper.deleteProject(SAMPLE_TYPE_PROJECT + " Study 2", afterTest);
+        _containerHelper.deleteProject(SAMPLE_TYPE_PROJECT, false);
+        _containerHelper.deleteProject(VISIT_BASED_STUDY, false);
+        _containerHelper.deleteProject(DATE_BASED_STUDY, false);
+        _containerHelper.deleteProject(SAMPLE_TYPE_PROJECT + " Study 1", false);
+        _containerHelper.deleteProject(SAMPLE_TYPE_PROJECT + " Study 2", false);
     }
 }
