@@ -109,7 +109,7 @@ public abstract class TestFileUtils
     {
         try
         {
-            return new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
+            return Files.readString(path);
         }
         catch (IOException fail)
         {
@@ -306,7 +306,7 @@ public abstract class TestFileUtils
             if (sampledataDirsFile.exists())
             {
                 String path = getFileContents(sampledataDirsFile);
-                _sampledataDirs.addAll(Arrays.stream(path.split(";")).map(File::new).collect(Collectors.toList()));
+                _sampledataDirs.addAll(Arrays.stream(path.split(";")).map(File::new).toList());
             }
             else
             {
@@ -317,7 +317,7 @@ public abstract class TestFileUtils
                     // We know where the modules live; no reason to insist that sampledata.dirs exists.
                     Files.walkFileTree(modulesDir, Collections.emptySet(), 2, new SimpleFileVisitor<>(){
                         @Override
-                        public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException
+                        public @NotNull FileVisitResult preVisitDirectory(@NotNull Path dir, @NotNull BasicFileAttributes attrs)
                         {
                             if (dir.equals(modulesDir))
                             {

@@ -52,7 +52,7 @@ import org.labkey.test.pages.list.GridPage;
 import org.labkey.test.pages.query.UpdateQueryRowPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldDefinition.StringLookup;
-import org.labkey.test.params.FieldInfo;
+import org.labkey.test.params.FieldKey;
 import org.labkey.test.params.list.VarListDefinition;
 import org.labkey.test.tests.AuditLogTest;
 import org.labkey.test.util.AbstractDataRegionExportOrSignHelper.ColumnHeaderType;
@@ -598,8 +598,8 @@ public class ListTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(LIST_NAME_COLORS));
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.removeColumn(_listColGood.getName());
-        _customizeViewsHelper.addFilter(_listColGood.getName(), _listColGood.getLabel(), "Is Less Than", "10");
-        _customizeViewsHelper.addSort(_listColMonth.getName(), _listColMonth.getLabel(), SortDirection.ASC);
+        _customizeViewsHelper.addFilter(_listColGood.getName(), "Is Less Than", "10");
+        _customizeViewsHelper.addSort(_listColMonth.getName(), SortDirection.ASC);
         _customizeViewsHelper.saveCustomView(TEST_VIEW);
 
         log("Check Customize View worked");
@@ -718,13 +718,13 @@ public class ListTest extends BaseWebDriverTest
 
         log("Check that reference worked");
         _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.addColumn(EscapeUtil.fieldKeyEncodePart(_list2Col1.getName()) + "/" + _listColDesc.getName(), _list2Col1.getLabel() + " " + _listColDesc.getLabel());
-        _customizeViewsHelper.addColumn(EscapeUtil.fieldKeyEncodePart(_list2Col1.getName()) + "/" + _listColMonth.getName(), _list2Col1.getLabel() + " " + _listColMonth.getLabel());
-        _customizeViewsHelper.addColumn(EscapeUtil.fieldKeyEncodePart(_list2Col1.getName()) + "/" + _listColGood.getName(), _list2Col1.getLabel() + " " + _listColGood.getLabel());
-        _customizeViewsHelper.addFilter(EscapeUtil.fieldKeyEncodePart(_list2Col1.getName()) + "/" + _listColGood.getName(), _listColGood.getLabel(), "Is Less Than", "10");
-        _customizeViewsHelper.addSort(EscapeUtil.fieldKeyEncodePart(_list2Col1.getName()) + "/" + _listColGood.getName(), _listColGood.getLabel(), SortDirection.ASC);
-        _customizeViewsHelper.addColumn(_list3Col1.getName() + "/" + _list3Col1.getName(), _list3Col1.getLabel() + " " + _list3Col1.getLabel());
-        _customizeViewsHelper.addColumn(_list3Col1.getName() + "/" + _list3Col2.getName(), _list3Col1.getLabel() + " " + _list3Col2.getLabel());
+        _customizeViewsHelper.addColumn(FieldKey.fromParts(_list2Col1.getName(), _listColDesc.getName()));
+        _customizeViewsHelper.addColumn(FieldKey.fromParts(_list2Col1.getName(), _listColMonth.getName()));
+        _customizeViewsHelper.addColumn(FieldKey.fromParts(_list2Col1.getName(), _listColGood.getName()));
+        _customizeViewsHelper.addFilter(FieldKey.fromParts(_list2Col1.getName(), _listColGood.getName()), "Is Less Than", "10");
+        _customizeViewsHelper.addSort(FieldKey.fromParts(_list2Col1.getName(), _listColGood.getName()), SortDirection.ASC);
+        _customizeViewsHelper.addColumn(_list3Col1.getName() + "/" + _list3Col1.getName());
+        _customizeViewsHelper.addColumn(_list3Col1.getName() + "/" + _list3Col2.getName());
         _customizeViewsHelper.saveCustomView(TEST_VIEW);
 
         log("Check adding referenced fields worked");
@@ -2079,11 +2079,11 @@ public class ListTest extends BaseWebDriverTest
 
             // show all columns
             _customizeViewsHelper.openCustomizeViewPanel();
-            _customizeViewsHelper.addColumn("Bfk/B", "Bfk B");
-            _customizeViewsHelper.addColumn("Bfk/title", "Bfk Title");
-            _customizeViewsHelper.addColumn("Bfk/Cfk", "Bfk Cfk");
-            _customizeViewsHelper.addColumn("Bfk/Cfk/C", "Bfk Cfk C");
-            _customizeViewsHelper.addColumn("Bfk/Cfk/title", "Bfk Cfk Title");
+            _customizeViewsHelper.addColumn("Bfk/B");
+            _customizeViewsHelper.addColumn("Bfk/title");
+            _customizeViewsHelper.addColumn("Bfk/Cfk");
+            _customizeViewsHelper.addColumn("Bfk/Cfk/C");
+            _customizeViewsHelper.addColumn("Bfk/Cfk/title");
             _customizeViewsHelper.saveCustomView("allColumns");
 
             clickAndWait(Locator.linkWithText("one C").index(1));

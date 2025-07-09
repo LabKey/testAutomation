@@ -66,7 +66,7 @@ public class TabTest extends SimpleModuleTest
         navigateToFolder(getProjectName(), FOLDER_NAME);
 
         // Move tabs
-        portalHelper.enableTabEditMode();
+        portalHelper.enterAdminMode();
         portalHelper.moveTab("Tab 1", PortalHelper.Direction.LEFT); // Nothing should happen.
         portalHelper.moveTab("Tab 1", PortalHelper.Direction.RIGHT);
         List<PortalTab> tabs = PortalTab.findTabs(getDriver());
