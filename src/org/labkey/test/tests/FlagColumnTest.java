@@ -12,6 +12,7 @@ import org.labkey.test.SortDirection;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.FieldKey;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.RelativeUrl;
 
@@ -116,9 +117,9 @@ public class FlagColumnTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("view results"));
         var customizeView = _customizeViewsHelper.openCustomizeViewPanel();
         customizeView.showHiddenItems();
-        customizeView.addColumn(new String[] { "Run" });
-        customizeView.addColumn(new String[] { "Run", RUN_FLAG});
-        customizeView.addColumn(new String[] { "Run", "AnotherRunFlag" });
+        customizeView.addColumn(FieldKey.fromParts("Run"));
+        customizeView.addColumn(FieldKey.fromParts("Run", RUN_FLAG));
+        customizeView.addColumn(FieldKey.fromParts("Run", "AnotherRunFlag"));
         customizeView.addSort("RowId", SortDirection.ASC);
         customizeView.saveCustomView();
 

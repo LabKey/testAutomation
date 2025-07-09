@@ -191,7 +191,7 @@ public class DataReportsTest extends ReportTest
         clickAndWait(Locator.linkWithText("AE-1:(VTN) AE Log"));
         DataRegionTable dataSetTable = new DataRegionTable("Dataset", getDriver());
         dataSetTable.openCustomizeGrid();
-        _customizeViewsHelper.addFilter("MouseId", "Mouse Id", "Equals One Of", String.join(";", PTIDS_FOR_CUSTOM_VIEW));
+        _customizeViewsHelper.addFilter("MouseId", "Equals One Of", String.join(";", PTIDS_FOR_CUSTOM_VIEW));
         _customizeViewsHelper.saveCustomView(QUERY_REPORT_VIEW_NAME_2);
 
         goToManageViews().clickAddReport("Query Report");
@@ -337,8 +337,8 @@ public class DataReportsTest extends ReportTest
         DataRegionTable dataSetTable = new DataRegionTable("Dataset", getDriver());
         dataSetTable.openCustomizeGrid();
         _customizeViewsHelper.removeColumn(R_REMCOL);
-        _customizeViewsHelper.addFilter("DEMhisp", "3.Latino\\a or Hispanic?", "Does Not Equal", "Yes");
-        _customizeViewsHelper.addSort(R_SORT, "2.What is your sex?", SortDirection.DESC);
+        _customizeViewsHelper.addFilter("DEMhisp", "Does Not Equal", "Yes");
+        _customizeViewsHelper.addSort(R_SORT, SortDirection.DESC);
         _customizeViewsHelper.saveCustomView("Custom Query View");
 
         log("Check that customize view worked");
