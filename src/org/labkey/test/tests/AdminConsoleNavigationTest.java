@@ -1,5 +1,6 @@
 package org.labkey.test.tests;
 
+import org.assertj.core.api.Assertions;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -79,13 +80,14 @@ public class AdminConsoleNavigationTest extends BaseWebDriverTest
                 "View Primary Site Log File"        // No nav trail
         ));
         List<WebElement> adminLinks = ShowAdminPage.beginAt(this).getAllAdminConsoleLinks();
-        assertTrue(String.format("Failed sanity check. Only found %s admin links. There should be more.", adminLinks.size()), adminLinks.size() > 10);
+        assertTrue(String.format("Failed sanity check. Only found %s admin links. There should be more.", adminLinks.size()), adminLinks.size() > 20);
         Map<String, String> linkHrefs = new HashMap<>();
 
         for (WebElement link : adminLinks)
         {
             linkHrefs.put(link.getText(), link.getAttribute("href"));
         }
+        Assertions.assertThat(linkHrefs.keySet()).as("Expected links").containsAll(ignoredLinks);
 
         List<String> pagesMissingNavTrail = new ArrayList<>();
 
@@ -121,6 +123,7 @@ public class AdminConsoleNavigationTest extends BaseWebDriverTest
         impersonate(TROUBLESHOOTER);
         Map<String, String> linkHrefs = new LinkedHashMap<>();
         List<WebElement> troubleshooterLinks = adminConsole.getAllAdminConsoleLinks();
+        assertTrue(String.format("Failed sanity check. Only found %s admin links. There should be more.", troubleshooterLinks.size()), troubleshooterLinks.size() > 20);
         for (WebElement link : troubleshooterLinks)
             linkHrefs.put(link.getText(), link.getAttribute("href"));
 
@@ -155,6 +158,7 @@ public class AdminConsoleNavigationTest extends BaseWebDriverTest
         ));
         ShowAdminPage adminConsole = goToAdminConsole();
         List<WebElement> adminLinks = adminConsole.getAllAdminConsoleLinks();
+        assertTrue(String.format("Failed sanity check. Only found %s admin links. There should be more.", adminLinks.size()), adminLinks.size() > 20);
         Map<String, String> linkHrefs = new LinkedHashMap<>();
         for (WebElement link : adminLinks)
             linkHrefs.put(link.getText(), link.getAttribute("href"));
