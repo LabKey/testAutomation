@@ -202,7 +202,7 @@ public class StudyMissingValuesTest extends MissingValueIndicatorsTest
         waitAndClickAndWait(Locator.linkWithText(ASSAY_NAME));
         clickButton("Import Data");
         String targetStudyValue = "/" + getProjectName() + " (" + getProjectName() + " Study)";
-        selectOptionByText(Locator.xpath("//select[@name='targetStudy']"), targetStudyValue);
+        selectOptionByText(AssayConstants.TARGET_STUDY_FIELD_LOCATOR, targetStudyValue);
 
         clickButton("Next");
         setFormElement(AssayConstants.ASSAY_NAME_FIELD_LOCATOR, ASSAY_RUN_SINGLE_COLUMN);

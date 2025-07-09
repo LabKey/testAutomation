@@ -295,7 +295,7 @@ public class ElispotAssayTest extends AbstractAssayTest
     protected void uploadFile(File file, String uniqueifier, String finalButton, boolean testPrepopulation, boolean subtractBackground, boolean fluorospot)
     {
         if (subtractBackground)
-            checkCheckbox(Locator.checkboxByName("subtractBackground"));
+            checkCheckbox(Locator.checkboxByName("SubtractBackground"));
         for (int i = 0; i < 4; i++)
         {
             Locator specimenLocator = Locator.name("Specimen " + (i + 1) + "_ParticipantID");
@@ -329,9 +329,9 @@ public class ElispotAssayTest extends AbstractAssayTest
         if (fluorospot)
         {
             clickButton("Next");
-            setFormElement(Locator.input("cy3_CytokineName"), "Cytokine 1");
+            setFormElement(Locator.input("Cy3_CytokineName"), "Cytokine 1");
             setFormElement(Locator.input("FITC_CytokineName"), "Cytokine 2");
-            setFormElement(Locator.input("FITCCy3_CytokineName"), "Cytokine 3");
+            setFormElement(Locator.input("FITC+Cy3_CytokineName"), "Cytokine 3");
         }
         clickButton(finalButton);
     }

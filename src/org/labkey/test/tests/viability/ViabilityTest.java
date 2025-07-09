@@ -107,8 +107,8 @@ public class ViabilityTest extends AbstractViabilityTest
         log("** Insert specimen IDs");
         addSpecimenIds("_pool_160450533-5_0_SpecimenIDs", "vial2", "vial3", "vial1", "foobar");
         addSpecimenIds("_pool_159402032-5_1_SpecimenIDs", "vial1");
-        addSpecimenIds("_pool_16140000610-5_2_SpecimenIDs", "vial2");
-        addSpecimenIds("_pool_16140000611-5_3_SpecimenIDs", "vial3");
+        addSpecimenIds("_pool_161400006.10-5_2_SpecimenIDs", "vial2");
+        addSpecimenIds("_pool_161400006.11-5_3_SpecimenIDs", "vial3");
         addSpecimenIds("_pool_161401643-5_4_SpecimenIDs", "xyzzy");
 
         log("** Set Unreliable flag and IntValue");
