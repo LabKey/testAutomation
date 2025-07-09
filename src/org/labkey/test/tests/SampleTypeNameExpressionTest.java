@@ -896,16 +896,7 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         mouseOver(createPage.getComponentElement());
 
         log("Use a name expression using a field from the named parent, with parent type not encoded.");
-        nameExpressionBad = String.format("SNP_${genId}_${%s/$s}_${materialInputs/%s/%s}", parentAlias, PARENT_FIELD_CURLY_RIGHT_INT.getExpName(), PARENT_SAMPLE_TYPE, PARENT_FIELD_CURLY_LEFT.getName());
-        createPage.setNameExpression(nameExpressionBad);
-        actualMsg = createPage.getNameExpressionPreview();
-        checker().withScreenshot("Parent_Fields_Preview_Error")
-            .verifyTrue("Tool-tip message does not contain expected example.", actualMsg.contains("Unable to generate example name from the current pattern. Check for syntax errors."));
-        // Make the tooltip go away.
-        mouseOver(createPage.getComponentElement());
-
-        log("Use a name expression using a field from the named parent, with parent type not encoded.");
-        nameExpressionBad = String.format("SNP_${genId}_${%s/$s}_${materialInputs/%s/%s}", parentAlias, COL_INT.getExpName(), PARENT_SAMPLE_TYPE, COL_STR.getName());
+        nameExpressionBad = String.format("SNP_${genId}_${%s/%s}_${materialInputs/%s/%s}", parentAlias, PARENT_FIELD_CURLY_RIGHT_INT.getExpName(), PARENT_SAMPLE_TYPE, PARENT_FIELD_CURLY_LEFT.getName());
         createPage.setNameExpression(nameExpressionBad);
         actualMsg = createPage.getNameExpressionPreview();
         checker().withScreenshot("Parent_Fields_Preview_Error")
