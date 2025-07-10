@@ -249,11 +249,11 @@ public class SampleTypeTest extends BaseWebDriverTest
     public void testCustomProperties()
     {
         final String sampleTypeName = "SampleTypeCustomProps" + DOMAIN_TRICKY_CHARACTERS;
-        FieldInfo stringCol1 = new FieldInfo(TestDataGenerator.randomFieldName("StringColPlain"), ColumnType.String);
-        FieldInfo stringCol2 = new FieldInfo(TestDataGenerator.randomFieldName("StringCol%"), ColumnType.String);
+        FieldInfo stringCol1 = FieldInfo.random("StringColPlain", ColumnType.String);
+        FieldInfo stringCol2 = FieldInfo.random("StringCol%", ColumnType.String);
         // Used to make sure the details page shows properties with null values
-        FieldInfo stringCol3 = new FieldInfo(TestDataGenerator.randomFieldName("StringColNull"), ColumnType.String);
-        FieldInfo calcCol = new FieldInfo(TestDataGenerator.randomFieldName("CalcCol"), ColumnType.Calculation);
+        FieldInfo stringCol3 = FieldInfo.random("StringColNull", ColumnType.String);
+        FieldInfo calcCol = FieldInfo.random("CalcCol", ColumnType.Calculation);
         final List<FieldDefinition> fields = List.of(
                 stringCol1.getFieldDefinition(),
                 stringCol2.getFieldDefinition(),

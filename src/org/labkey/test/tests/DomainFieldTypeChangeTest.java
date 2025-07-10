@@ -62,11 +62,11 @@ public class DomainFieldTypeChangeTest extends BaseWebDriverTest
     {
         log("Creating list with variety of data fields");
         String listName = TestDataGenerator.randomDomainName("SampleListWithAllDataTypes");
-        FieldInfo stringField = new FieldInfo(TestDataGenerator.randomFieldName("name"), FieldDefinition.ColumnType.String);
-        FieldInfo integerField = new FieldInfo(TestDataGenerator.randomFieldName("Test/Integer"), FieldDefinition.ColumnType.Integer);
-        FieldInfo decimalField = new FieldInfo(TestDataGenerator.randomFieldName("Test/Decimal"), FieldDefinition.ColumnType.Decimal);
-        FieldInfo dateField = new FieldInfo(TestDataGenerator.randomFieldName("Test/Date"), FieldDefinition.ColumnType.DateAndTime);
-        FieldInfo booleanField = new FieldInfo(TestDataGenerator.randomFieldName("Test'/\"Boolean"), FieldDefinition.ColumnType.Boolean); // GH Issue #755
+        FieldInfo stringField = FieldInfo.random("name", FieldDefinition.ColumnType.String);
+        FieldInfo integerField = FieldInfo.random("Test/Integer", FieldDefinition.ColumnType.Integer);
+        FieldInfo decimalField = FieldInfo.random("Test/Decimal", FieldDefinition.ColumnType.Decimal);
+        FieldInfo dateField = FieldInfo.random("Test/Date", FieldDefinition.ColumnType.DateAndTime);
+        FieldInfo booleanField = FieldInfo.random("Test'/\"Boolean", FieldDefinition.ColumnType.Boolean); // GH Issue #755
         TestDataGenerator dgen = new TestDataGenerator("lists", listName, getProjectName())
                 .withColumns(List.of(
                         stringField.getFieldDefinition(),
