@@ -35,6 +35,7 @@ import org.labkey.test.pages.files.FileContentPage;
 import org.labkey.test.pages.study.CreateStudyPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldDefinition.ColumnType;
+import org.labkey.test.params.FieldInfo;
 import org.labkey.test.params.assay.GeneralAssayDesign;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.DataRegionTable;
@@ -42,6 +43,7 @@ import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
 import org.labkey.test.util.StudyHelper;
+import org.labkey.test.util.TestDataGenerator;
 import org.labkey.test.util.core.webdav.WebDavUploadHelper;
 import org.labkey.test.util.exp.SampleTypeAPIHelper;
 import org.openqa.selenium.By;
@@ -90,6 +92,7 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
     private final String RESULT_FILE_COL = "resultFile";
     private final String OTHER_RESULT_FILE_COL = "otherResultFile";
     private final String STUDY_DATASET_NAME = "ogreSpiteLevels";
+    private static final FieldInfo LIST_ATTACHMENT_FIELD = new FieldInfo(TestDataGenerator.randomFieldName("File / Attachment"), ColumnType.Attachment);
 
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
@@ -180,8 +183,8 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
         for (File testFile : downloadTestFiles)
         {
             int rowIndex = testListRegion.getRowIndex("Name", testFile.getName());
-            var downloadLink = testListRegion.link(rowIndex, "File");
-            doAndWaitForDownload(()-> downloadLink.click());
+            var downloadLink = testListRegion.link(rowIndex, LIST_ATTACHMENT_FIELD.getName());
+            doAndWaitForDownload(downloadLink::click);
         }
 
         // verify popup/sprite for jpeg
@@ -428,13 +431,13 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
         String LIST_KEY = "TestListId";
         listHelper.createList(getProjectName() + "/" + EXPORT_FOLDER_NAME, LIST_NAME, LIST_KEY,
                 new FieldDefinition("Name", ColumnType.String),
-                new FieldDefinition("File", ColumnType.Attachment));
+                LIST_ATTACHMENT_FIELD.getFieldDefinition());
         goToManageLists();
         listHelper.click(Locator.linkContainingText(LIST_NAME));
 
         for (File file : SAMPLE_FILES)
         {
-            Map<String, String> fileRow = Map.of("Name", file.getName(), "File", file.getAbsolutePath());
+            Map<String, String> fileRow = Map.of("Name", file.getName(), LIST_ATTACHMENT_FIELD.getName(), file.getAbsolutePath());
             listHelper.insertNewRow(fileRow, false);
         }
     }
@@ -448,7 +451,7 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
         for (File file : files)
         {
             sampleFileData.add(Map.of("Name", file.getName(), "Color", "green",
-                    "File", file.getName()));
+                    LIST_ATTACHMENT_FIELD.getName(), file.getName()));
         }
         helper.bulkImport(sampleFileData);
     }
@@ -513,7 +516,7 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
             else
             {
                 int rowIndex = testListRegion.getRowIndex("Name", testFile.getName());
-                var downloadLink = testListRegion.link(rowIndex, "File");
+                var downloadLink = testListRegion.link(rowIndex, LIST_ATTACHMENT_FIELD.getName());
                 doAndWaitForDownload(() -> downloadLink.click());
             }
         }
@@ -539,7 +542,7 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
             }
             else
             {
-                WebElement fileLinkCell = samplesRegion.findCell(rowIndex, "file");
+                WebElement fileLinkCell = samplesRegion.findCell(rowIndex, LIST_ATTACHMENT_FIELD.getName());
                 Optional<WebElement> optionalFileLink = Locator.tag("a").findOptionalElement(fileLinkCell);
                 checker().withScreenshot("unexpected_file_state")
                         .awaiting(Duration.ofSeconds(2),
