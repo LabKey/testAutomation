@@ -73,6 +73,7 @@ public class TestDataGenerator
     private static final String WIDE_CHAR = "\uD83D\uDC7E"; // 👾
     private static final char WIDE_PLACEHOLDER = '\u03A0'; // 'Π' - Wide character can't be picked from the string with 'charAt'
     private static final char REPEAT_PLACEHOLDER = '\u22EF'; // '⋯' - Used to indicate that the char will be repeated
+    private static final char ALL_CHARS_PLACEHOLDER = '\u2211'; // '∑' - Used to indicate that all characters from the charset should be used
     private static final String NON_LATIN_STRING = "\u0438\uC548\u306F"; // "и안は"
     // chose a Character random from this String
     public static final String CHARSET_STRING = "ABCDEFG01234abcdefvxyz~!@#$%^&*()-+=_{}[]|:;\"',.<>" + NON_LATIN_STRING + WIDE_PLACEHOLDER;
@@ -481,6 +482,12 @@ public class TestDataGenerator
                 c = charSetFrom.charAt(randIndex);
                 int repeatCount = randomInt(2, 15); // repeat between 2 and 15 times
                 val.append(StringUtils.repeat(c, repeatCount));
+                break; // we don't want to hit another REPEAT_PLACEHOLDER or ALL_CHARS_PLACEHOLDER in this for loop
+            }
+            else if (c == ALL_CHARS_PLACEHOLDER)
+            {
+                val.append(charSetFrom);
+                break; // we've added them all, no need to continue, and we don't want to hit another REPEAT_PLACEHOLDER or ALL_CHARS_PLACEHOLDER in this for loop
             }
             else if (c == WIDE_PLACEHOLDER)
                 val.append(WIDE_CHAR);
@@ -585,7 +592,8 @@ public class TestDataGenerator
     {
         // use the characters that we know are encoded in fieldKeys plus characters that we know clients are using
         // Issue 53197: Field name with double byte character can cause client side exception in Firefox when trying to customize grid view.
-        String chars = ALL_ILLEGAL_QUERY_KEY_CHARACTERS + " %()=+-[]_|*`'\":;<>?!@#^" + NON_LATIN_STRING + WIDE_PLACEHOLDER + REPEAT_PLACEHOLDER;
+        String chars = ALL_ILLEGAL_QUERY_KEY_CHARACTERS + " %()=+-[]_|*`'\":;<>?!@#^" + NON_LATIN_STRING
+                + WIDE_PLACEHOLDER + REPEAT_PLACEHOLDER + ALL_CHARS_PLACEHOLDER;
 
         String randomFieldName = randomName(part, numStartChars, numEndChars, chars, exclusion);
 
