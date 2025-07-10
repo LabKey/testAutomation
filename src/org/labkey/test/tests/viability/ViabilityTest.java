@@ -191,7 +191,7 @@ public class ViabilityTest extends AbstractViabilityTest
                 getValues("_pool_160450533-5_0_IntValue"));
 
         // Check the 'Unreliable' field isn't copied on re-run
-        assertNotChecked(Locator.checkboxByName("_pool_1604505335_0_Unreliable"));
+        assertNotChecked(Locator.checkboxByName("_pool_160450533-5_0_Unreliable"));
 
         doAndWaitForPageToLoad(() ->
         {

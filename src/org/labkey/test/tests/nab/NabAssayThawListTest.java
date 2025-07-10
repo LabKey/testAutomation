@@ -88,7 +88,7 @@ public class NabAssayThawListTest extends AbstractAssayTest
         init.doSetup();
     }
 
-    private void doSetup() throws Exception
+    private void doSetup()
     {
         // default project
         _containerHelper.createProject(getProjectName(), null);

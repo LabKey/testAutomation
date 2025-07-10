@@ -275,7 +275,7 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
 
         setFormElement(Locator.name("Output Sample 1_Name"), "SampleSetBVT15");
         setFormElement(Locator.name("Output Sample 2_Name"), "SampleSetBVT16");
-        checkCheckbox(Locator.name("Output Sample 1_IntCol-FolderCheckBox"));
+        checkCheckbox(Locator.name("outputSample1_IntColFolderCheckBox"));
         setFormElement(Locator.name("Output Sample 1_IntCol-Folder"), "500a");
         setFormElement(Locator.name("Output Sample 1_StringCol-Folder"), "firstOutput");
         setFormElement(Locator.name("Output Sample 2_StringCol-Folder"), "secondOutput");
@@ -284,7 +284,7 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
         log("Do a simple check that data validation works.");
         checker().verifyTrue("Expected error message '(String) for Integer field' is not present.",
                 isTextPresent("(String) for Integer field"));
-        checkCheckbox(Locator.name("Output Sample 1_IntCol-FolderCheckBox"));
+        checkCheckbox(Locator.name("outputSample1_IntColFolderCheckBox"));
         setFormElement(Locator.name("Output Sample 1_IntCol-Folder"), "500");
         clickButton("Submit");
 

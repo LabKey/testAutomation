@@ -113,10 +113,10 @@ public class APIAssayHelper extends AbstractAssayHelper
                 irc.setComment(runProperties.get("Comment").toString());
                 runProperties.remove("Comment");
             }
-            if (runProperties.containsKey("name") && StringUtils.isBlank(runName))
+            if (runProperties.containsKey("Name") && StringUtils.isBlank(runName))
             {
-                irc.setName(runProperties.get("name").toString());
-                runProperties.remove("name");
+                irc.setName(runProperties.get("Name").toString());
+                runProperties.remove("Name");
             }
 
             irc.setProperties(runProperties);
