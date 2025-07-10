@@ -72,6 +72,7 @@ public class TestDataGenerator
 {
     private static final String WIDE_CHAR = "\uD83D\uDC7E"; // 👾
     private static final char WIDE_PLACEHOLDER = '\u03A0'; // 'Π' - Wide character can't be picked from the string with 'charAt'
+    private static final char REPEAT_PLACEHOLDER = '\u22EF'; // '⋯' - Used to indicate that the char will be repeated
     private static final String NON_LATIN_STRING = "\u0438\uC548\u306F"; // "и안は"
     // chose a Character random from this String
     public static final String CHARSET_STRING = "ABCDEFG01234abcdefvxyz~!@#$%^&*()-+=_{}[]|:;\"',.<>" + NON_LATIN_STRING + WIDE_PLACEHOLDER;
@@ -474,7 +475,14 @@ public class TestDataGenerator
         {
             int randIndex = (int)(charSetFrom.length() * Math.random());
             char c = charSetFrom.charAt(randIndex);
-            if (c == WIDE_PLACEHOLDER)
+            if (c == REPEAT_PLACEHOLDER)
+            {
+                randIndex = (int)(charSetFrom.length() * Math.random());
+                c = charSetFrom.charAt(randIndex);
+                int repeatCount = randomInt(2, 15); // repeat between 2 and 15 times
+                val.append(StringUtils.repeat(c, repeatCount));
+            }
+            else if (c == WIDE_PLACEHOLDER)
                 val.append(WIDE_CHAR);
             else
                 val.append(c);
@@ -496,7 +504,7 @@ public class TestDataGenerator
      * Creates a String containing the given part with random characters from charSet surrounding it. The name
      * will have leading and trailing spaces removed and multiple internal spaces collapsed to a single space
      * in order to be compatible with UI display. Because of this space treatment, there may be fewer than the
-     * sepcified number of charcters before and after the given part.
+     * specified number of characters before and after the given part.
      *
      * @param part          the part that is to be included between random strings
      * @param numStartChars maximum number of random characters from charSet
@@ -577,7 +585,7 @@ public class TestDataGenerator
     {
         // use the characters that we know are encoded in fieldKeys plus characters that we know clients are using
         // Issue 53197: Field name with double byte character can cause client side exception in Firefox when trying to customize grid view.
-        String chars = ALL_ILLEGAL_QUERY_KEY_CHARACTERS + " %()=+-[]_|*`'\":;<>?!@#^" + NON_LATIN_STRING + WIDE_PLACEHOLDER ;
+        String chars = ALL_ILLEGAL_QUERY_KEY_CHARACTERS + " %()=+-[]_|*`'\":;<>?!@#^" + NON_LATIN_STRING + WIDE_PLACEHOLDER + REPEAT_PLACEHOLDER;
 
         String randomFieldName = randomName(part, numStartChars, numEndChars, chars, exclusion);
 
