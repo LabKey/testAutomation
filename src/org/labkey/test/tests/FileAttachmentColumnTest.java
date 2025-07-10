@@ -550,9 +550,9 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
                  {
                      // verify fie download behavior
                      File downloadedFile = doAndWaitForDownload(() -> optionalFileLink.get().click());
-                     checker().wrapAssertion(() -> Assertions.assertThat(TestFileUtils.getFileContents(downloadedFile))
+                     checker().wrapAssertion(() -> Assertions.assertThat(TestFileUtils.getMD5Hash(downloadedFile.toPath()))
                              .as("expect the downloaded file to be the expected file")
-                             .isEqualTo(TestFileUtils.getFileContents(file)));   // guard against renames like file2.xyz
+                             .isEqualTo(TestFileUtils.getMD5Hash(file.toPath())));   // guard against renames like file2.xyz
                  }
             }
         }
@@ -576,9 +576,9 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
         if (optionalFileLink.isPresent())
         {
             var file = doAndWaitForDownload(()-> optionalFileLink.get().click());
-            checker().wrapAssertion(()-> Assertions.assertThat(TestFileUtils.getFileContents(file))
+            checker().wrapAssertion(()-> Assertions.assertThat(TestFileUtils.getMD5Hash(file.toPath()))
                     .as("expect the downloaded file to have equivalent content")
-                    .isEqualTo(TestFileUtils.getFileContents(runFile)));
+                    .isEqualTo(TestFileUtils.getMD5Hash(runFile.toPath())));
         }
 
         var resultsPage = runsPage.clickAssayIdLink(runName);
@@ -644,9 +644,9 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
                 {
                     // verify fie download behavior
                     File downloadedFile = doAndWaitForDownload(() -> optionalFileLink.get().click());
-                    checker().wrapAssertion(() -> Assertions.assertThat(TestFileUtils.getFileContents(downloadedFile))
+                    checker().wrapAssertion(() -> Assertions.assertThat(TestFileUtils.getMD5Hash(downloadedFile.toPath()))
                             .as("expect the downloaded file to be the expected file")
-                            .isEqualTo(TestFileUtils.getFileContents(file)));   // guard against renames like file2.xyz
+                            .isEqualTo(TestFileUtils.getMD5Hash(file.toPath())));   // guard against renames like file2.xyz
                 }
             }
         }
