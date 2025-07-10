@@ -449,7 +449,7 @@ public class SampleTypeTest extends BaseWebDriverTest
         String overlap =  "Name1\tToBee\n";
         String newData = "Name2\tSee\n";
         setFormElement(Locator.name("text"), header + overlap + newData);
-        clickButton("Submit", "duplicate key");
+        clickButton("Submit", "already exists");
 
         log("Switch to 'Insert and Replace'");
         importDataPage.setCopyPasteMerge(true);
@@ -474,7 +474,7 @@ public class SampleTypeTest extends BaseWebDriverTest
         importDataPage = drt.clickImportBulkData();
         importDataPage.setFile(sampleData);
         final String errorText = importDataPage.submitExpectingError();
-        Assert.assertTrue("Wrong error when importing duplicate samples. " + errorText, errorText.contains("duplicate key"));
+        Assert.assertTrue("Wrong error when importing duplicate samples. " + errorText, errorText.contains("already exists"));
         // TODO: Regression check for Issue 44202: Ugly error when data import fails due to duplicate key
         // Assert.assertTrue("Wrong error when importing duplicate samples. " + errorText, errorText.length() < 100);
 
