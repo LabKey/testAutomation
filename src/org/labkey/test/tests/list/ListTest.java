@@ -660,10 +660,15 @@ public class ListTest extends BaseWebDriverTest
 
         log("Test list history");
         clickAndWait(Locator.linkWithText("manage lists"));
-        clickAndWait(Locator.linkWithText("view history"));
-        checker().wrapAssertion(()->assertTextPresent(":History"));
-        checker().wrapAssertion(()->assertTextPresent("record was modified", 2));    // An existing list record was modified
+        waitAndClickAndWait(Locator.linkWithText("view history"));
 
+        // Wait for the header to load on the page.
+        waitForElementToBeVisible(Locator.tagContainingText("h3", ":History"));
+
+        checker().verifyTrue("DataRegions didn't load.",
+                waitFor(()->new DataRegionTable.DataRegionFinder(getDriver()).findAll().size() == 2, 3_000));
+
+        checker().wrapAssertion(()->assertTextPresent("record was modified", 2));    // An existing list record was modified
         checker().wrapAssertion(()->assertTextPresent(" was created. The column(s) of domain ", 1));// Create domain and update columns combined into a single event
         checker().wrapAssertion(()->assertTextPresent(" were modified.", 7));          // The column(s) of LIST_NAME_COLORS domain were modified
         checker().wrapAssertion(()->assertTextPresent("The descriptor of domain", 1));          // The description LIST_NAME_COLORS domain were modified
@@ -674,13 +679,16 @@ public class ListTest extends BaseWebDriverTest
         checker().wrapAssertion(()->assertEquals("details Links", 6/*List Events*/ + 8/*Domain Audit*/, DataRegionTable.detailsLinkLocator().findElements(getDriver()).size()));
         checker().wrapAssertion(()->assertEquals("Project Links", 17, DataRegionTable.Locators.table().append(Locator.linkWithText(PROJECT_VERIFY)).findElements(getDriver()).size()));
         checker().wrapAssertion(()->assertEquals("List Links", 17, DataRegionTable.Locators.table().append(Locator.linkWithText(LIST_NAME_COLORS)).findElements(getDriver()).size()));
+        checker().screenShotIfNewError("List_History_Error");
+
         DataRegionTable dataRegionTable = new DataRegionTable("query", getDriver());
         dataRegionTable.clickRowDetails(0);
         checker().wrapAssertion(()->assertTextPresent("List Item Details"));
         checker().wrapAssertion(()->assertTextNotPresent("No details available for this event.", "Unable to find the audit history detail for this event"));
+        checker().screenShotIfNewError("History_Detail_Error");
 
         clickButton("Done");
-        clickAndWait(Locator.linkWithText(PROJECT_VERIFY).index(3));
+        waitAndClickAndWait(Locator.linkWithText(PROJECT_VERIFY).index(3));
 
         log("Test single list web part");
         new PortalHelper(this).addWebPart("List - Single");

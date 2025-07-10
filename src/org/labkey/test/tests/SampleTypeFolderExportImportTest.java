@@ -557,7 +557,7 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
         // create a test sampleType
         List<FieldDefinition> testFields = SampleTypeAPIHelper.sampleTypeTestFields(true);
         SampleTypeDefinition testSampleType = new SampleTypeDefinition(testSamples).setFields(testFields)
-                .addParentAlias("SelfParent"); // to derive from samles in the current type
+                .addParentAlias("SelfParent"); // to derive from samples in the current type
 
         TestDataGenerator parentDgen = SampleTypeAPIHelper.createEmptySampleType(subfolderPath, testSampleType);
         parentDgen.addCustomRow(Map.of("Name", "sample1", "intColumn", 1, "decimalColumn", 1.1, "stringColumn", "one"));
@@ -578,6 +578,11 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
         sourceSamplesTable.clickEditRow(1);
         waitForElementToBeVisible(Locator.tagWithAttribute("input", "type", "file"));
         setFormElement(Locator.tagWithAttribute("input", "type", "file"), SAMPLE_TXT_FILE);
+        // setFormElement doesn't check that the form element is set.
+        // Because this test uses random field names, we should validate that the file was actually uploaded. If the
+        // file is missing later in the test, we can be sure it was present at this point.
+        Assert.assertFalse("File not uploaded.",
+                getFormElement(Locator.tagWithAttribute("input", "type", "file")).isEmpty());
         clickAndWait(Locator.lkButton("Submit"));
 
         goToProjectFolder(getProjectName(), subfolder);
