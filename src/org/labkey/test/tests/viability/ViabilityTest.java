@@ -317,14 +317,14 @@ public class ViabilityTest extends AbstractViabilityTest
         String targetStudyOptionText = "/" + getProjectName() + "/" + getFolderName() + " (" + getFolderName() + " Study)";
         selectOptionByText(Locator.name("_pool_160450533-5_0_TargetStudy"), targetStudyOptionText);
         assertEquals("[None]", getSelectedOptionText(Locator.name("_pool_159402032-5_1_TargetStudy")));
-        checkCheckbox(Locator.checkboxById("_pool_160450533-5_0_TargetStudyCheckBox"));
+        checkCheckbox(Locator.checkboxById("_pool_1604505335_0_TargetStudyCheckBox"));
         assertEquals("Target study didn't propagate with 'Same' checkbox.",
                 getSelectedOptionValue(Locator.name("_pool_160450533-5_0_TargetStudy")),
                 getSelectedOptionValue(Locator.name("_pool_159402032-5_1_TargetStudy")));
         assertEquals("Target study didn't propagate with 'Same' checkbox.",
                 getSelectedOptionValue(Locator.name("_pool_160450533-5_0_TargetStudy")),
                 getSelectedOptionValue(Locator.name("_pool_16140000611-5_3_TargetStudy")));
-        uncheckCheckbox(Locator.checkboxById("_pool_160450533-5_0_TargetStudyCheckBox"));
+        uncheckCheckbox(Locator.checkboxById("_pool_1604505335_0_TargetStudyCheckBox"));
 
         // clear TargetStudy for 'vial2' and set the TargetStudy for 'vial3' and 'xyzzy'
         selectOptionByText(Locator.name("_pool_16140000610-5_2_TargetStudy"), "[None]");
