@@ -78,7 +78,6 @@ public class GridPanelTest extends GridPanelBaseTest
     private static final String VIEW_FILTERED_COLUMN = "Filtered_Column";
     private static final List<String> extraColumnsNames = Arrays.asList("IsAliquot", "genId"); // Special case for adding the columns to the view and calling getRows api.
     private static final List<String> extraColumnsHeaders = Arrays.asList("Is Aliquot", "Gen Id"); // The column headers as they appear in the UI and exported file.
-//    private static final List<String> removedColumns = Arrays.asList(FILTER_BOOL_COL);
 
     // Various values used to populate Str field for records. Also used in filtering/searching.
     // Note: Small_SampleType is populated with random data and will have none of these values.
