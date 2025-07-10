@@ -192,14 +192,14 @@ public class GridPanelTest extends GridPanelBaseTest
         log(String.format("Create the '%s' view for the '%s' sample type.", VIEW_FEWER_COLUMNS, SMALL_SAMPLE_TYPE));
         cv = drtSamples.openCustomizeGrid();
 
-        for(String columnName : List.of(FILTER_BOOL_COL.toString()))
+        for(FieldInfo column : List.of(FILTER_BOOL_COL))
         {
-            cv.removeColumn(columnName);
+            cv.removeColumn(column);
         }
         cv.saveCustomView(VIEW_FEWER_COLUMNS);
 
         log(String.format("Finally create a view named '%s' for '%s' that only has a filter.", VIEW_FILTERED_COLUMN, SMALL_SAMPLE_TYPE));
-        drtSamples.setFilter(FILTER_STRING_COL.toString(), "Contains One Of", String.format("%1$s\n%1$s%2$s", stringSetMembers.get(0), stringSetMembers.get(1)));
+        drtSamples.setFilter(FILTER_STRING_COL, "Contains One Of", String.format("%1$s\n%1$s%2$s", stringSetMembers.get(0), stringSetMembers.get(1)));
         cv = drtSamples.openCustomizeGrid();
         cv.saveCustomView(VIEW_FILTERED_COLUMN);
 
@@ -565,7 +565,7 @@ public class GridPanelTest extends GridPanelBaseTest
                 .verifyTrue("The 'Select All' button is not present.", grid.hasSelectAllButton());
 
         grid.selectAllRows();
-        grid.removeColumnFilter(FILTER_STRING_COL.getName());
+        grid.removeColumnFilter(FILTER_STRING_COL);
         checker().withScreenshot("Select_All_Button_Error")
                 .verifyEquals("Number of selected rows not as expected after filter removed.",
                         String.format(SELECTED_TEXT_FORMAT, MULTI_PAGE_COUNT * DEFAULT_PAGE_SIZE, FILTER_SAMPLE_TYPE_SIZE), grid.getSelectionStatusCount());
@@ -595,7 +595,7 @@ public class GridPanelTest extends GridPanelBaseTest
         log("Validate the select all check box at the top of the gird works as expected.");
         grid.filterColumn(FILTER_STRING_COL, Filter.Operator.EQUAL, MULTI_PAGE_STRING);
         grid.selectAllOnPage(true);
-        grid.removeColumnFilter(FILTER_STRING_COL.getName());
+        grid.removeColumnFilter(FILTER_STRING_COL);
         checker().withScreenshot("Select_All_On_Page_Error")
                 .verifyEquals("Using check box at top of grid did not select the expected samples.",
                         String.format(SELECTED_TEXT_FORMAT, DEFAULT_PAGE_SIZE, FILTER_SAMPLE_TYPE_SIZE), grid.getSelectionStatusCount());
