@@ -1,11 +1,13 @@
 package org.labkey.test.tests;
 
+import org.assertj.core.api.Assertions;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.SimpleGetCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
@@ -117,18 +119,25 @@ public class CrawlerTest extends BaseWebDriverTest
         beginAt(getInjectUrl(Crawler.injectScriptBlock), 10_000);
 
         log("Verify that enforced CSP is also reported");
-        CspLogUtil.checkNewCspWarnings(getArtifactCollector());
+        CspLogUtil.checkNewCspWarnings(getArtifactCollector()); // throws CspWarningDetectedException
     }
 
     @Test (expected = CspLogUtil.CspWarningDetectedException.class)
-    public void testCspWarning()
+    public void testCspWarning() throws Exception
     {
         Assume.assumeFalse("Can't test for CSP report", TestProperties.isCspCheckSkipped());
 
         _cspConfigHelper.setEnforceCsp(false);
 
-        beginAt(WebTestHelper.buildRelativeUrl(MODULE_NAME, getProjectName(), "cspWarning"));
-        CspLogUtil.checkNewCspWarnings(getArtifactCollector());
+        int initialLength = getCspReportLog().length();
+
+        String cspWarningUrl = WebTestHelper.buildRelativeUrl(MODULE_NAME, getProjectName(), "cspWarning");
+        beginAt(cspWarningUrl);
+
+        // 53261: Provide visibility into CSP reports for cloud clients
+        Assertions.assertThat(getCspReportLog().substring(initialLength)).as("CSP warning").contains(cspWarningUrl);
+
+        CspLogUtil.checkNewCspWarnings(getArtifactCollector()); // throws CspWarningDetectedException
     }
 
     // Crawler should flag external links without the correct 'rel' attribute
@@ -186,6 +195,13 @@ public class CrawlerTest extends BaseWebDriverTest
     protected boolean cspFailFast()
     {
         return false;
+    }
+
+    public String getCspReportLog() throws Exception
+    {
+        return new SimpleGetCommand("admin", "showCspReportLog")
+            .execute(createDefaultConnection(), null)
+            .getText();
     }
 
     @After
