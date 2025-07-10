@@ -20,6 +20,7 @@ public class FieldInfo implements CharSequence, WrapsFieldKey
     private final String _label;
     private final ColumnType _columnType;
     private final Consumer<FieldDefinition> _fieldDefinitionMutator;
+    private String _namePart; // used for random field generation to track the name part used
 
     private FieldInfo(FieldKey fieldKey, String label, ColumnType columnType, Consumer<FieldDefinition> fieldDefinitionMutator)
     {
@@ -54,7 +55,9 @@ public class FieldInfo implements CharSequence, WrapsFieldKey
      */
     public static FieldInfo random(String namePart, ColumnType columnType)
     {
-        return new FieldInfo(TestDataGenerator.randomFieldName(namePart), columnType);
+        FieldInfo field = new FieldInfo(TestDataGenerator.randomFieldName(namePart), columnType);
+        field.setNamePart(namePart);
+        return field;
     }
 
     /**
@@ -165,7 +168,16 @@ public class FieldInfo implements CharSequence, WrapsFieldKey
         {
             _fieldDefinitionMutator.accept(fieldDefinition);
         }
+        if (_namePart != null)
+        {
+            fieldDefinition.setNamePart(_namePart);
+        }
         return fieldDefinition;
+    }
+
+    private void setNamePart(String namePart)
+    {
+        _namePart = namePart;
     }
 
     @Override

@@ -443,9 +443,9 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
                 .addParentAlias("SelfParent"); // to derive from samles in the current type
 
         TestDataGenerator dataClassDgen = DataClassAPIHelper.createEmptyDataClass(subfolderPath, dataClassType);
-        dataClassDgen.addCustomRow(Map.of("Name", "data1", "intColumn", 1, "stringColumn", "one"));
-        dataClassDgen.addCustomRow(Map.of("Name", "data2", "intColumn", 2, "stringColumn", "two"));
-        dataClassDgen.addCustomRow(Map.of("Name", "data3", "intColumn", 3, "stringColumn", "three"));
+        dataClassDgen.addCustomRow(Map.of("Name", "data1"));
+        dataClassDgen.addCustomRow(Map.of("Name", "data2"));
+        dataClassDgen.addCustomRow(Map.of("Name", "data3"));
         dataClassDgen.insertRows();
 
         TestDataGenerator parentDgen = SampleTypeAPIHelper.createEmptySampleType(subfolderPath, parentType);
