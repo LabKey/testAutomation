@@ -44,6 +44,7 @@ import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.DataClassDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
@@ -526,12 +527,18 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
                     .findFirst().orElse(null);
             assertNotNull("expect all matching rows to come through", matchingMap);
 
+            String intColFieldKey = EscapeUtil.fieldKeyEncodePart(intColumn.getName());
+            assertNotNull("expect intColumn to be present in exported row", exportedRow.get(intColFieldKey));
             assertThat("expect export and import values to be equivalent",
-                    exportedRow.get("intColumn"), equalTo(matchingMap.get("intColumn"))); // TODO
+                    exportedRow.get(intColFieldKey), equalTo(matchingMap.get(intColFieldKey)));
+            String stringColFieldKey = EscapeUtil.fieldKeyEncodePart(stringColumn.getName());
+            assertNotNull("expect stringColumn to be present in exported row", exportedRow.get(stringColFieldKey));
             assertThat("expect export and import values to be equivalent",
-                    exportedRow.get("stringColumn"), equalTo(matchingMap.get("stringColumn")));
+                    exportedRow.get(stringColFieldKey), equalTo(matchingMap.get(stringColFieldKey)));
+            String decimalColFieldKey = EscapeUtil.fieldKeyEncodePart(decimalColumn.getName());
+            assertNotNull("expect decimalColumn to be present in exported row", exportedRow.get(decimalColFieldKey));
             assertThat("expect export and import values to be equivalent",
-                    exportedRow.get("decimalColumn"), equalTo(matchingMap.get("decimalColumn")));
+                    exportedRow.get(decimalColFieldKey), equalTo(matchingMap.get(decimalColFieldKey)));
 
             List<String> sourceParents = Arrays.asList(exportedRow.get("Inputs/Materials/parentSamples").toString()
                     .replace(" ", "").split(","));
