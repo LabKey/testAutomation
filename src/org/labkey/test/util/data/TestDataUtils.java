@@ -621,10 +621,4 @@ public class TestDataUtils
             return StringUtils.containsAny(value, _escapedChars);
         }
     }
-
-    @Deprecated // Going away soon
-    public static String getEscapedNameExpression(String name)
-    {
-        return EscapeUtil.escapeForNameExpression(name);
-    }
 }
