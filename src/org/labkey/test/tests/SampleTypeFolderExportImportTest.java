@@ -43,6 +43,7 @@ import org.labkey.test.pages.admin.FolderManagementPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.DataClassDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
+import org.labkey.test.util.ArtifactCollector;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
@@ -546,7 +547,7 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
     {
         String subfolder = "samplesWithAssayRunsFolder";
         String subfolderPath = getProjectName() + "/" + subfolder;
-        String testSamples = "testSamples";
+        String testSamples = "testSamplesWithFiles";
         String assayName = "testAssay";
         String importFolder = "assaySamplesImportFolder";
 
@@ -572,7 +573,7 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
         portalHelper.addWebPart("Experiment Runs");
         portalHelper.addWebPart("Assay List");
 
-        // upload a file for a sample's file field
+        log(String.format("Upload a file '%s' to a sample's file field.", SAMPLE_TXT_FILE.getName()));
         clickAndWait(Locator.linkWithText(testSamples));
         DataRegionTable sourceSamplesTable = new SampleTypeHelper(this).getSamplesDataRegionTable();
         sourceSamplesTable.clickEditRow(1);
@@ -586,6 +587,8 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
         clickAndWait(Locator.lkButton("Submit"));
 
         waitForElementToBeVisible(Locator.linkContainingText(SAMPLE_TXT_FILE.getName()));
+
+        new ArtifactCollector(this).dumpPageSnapshot("File_Attached_Proof");
 
         goToProjectFolder(getProjectName(), subfolder);
 
@@ -651,14 +654,26 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
             exportData.add(dataTable.getRowDataAsMap(i));
         }
 
-        // now export the current folder and import it to importProject
+        log("Now export the current folder and import it to importProject.");
         goToFolderManagement()
                 .goToExportTab();
 
-        Checkbox checkbox = new Checkbox(Locator.tagWithText("label", ExportFolderPage.EXPERIMENTS_AND_RUNS)
-                .precedingSibling("input").waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT));
-        new Checkbox(Locator.tagWithText("label", "Files").precedingSibling("input").findElement(getDriver())).check();
-        checkbox.check();
+        new Checkbox(Locator.tagWithText("label", ExportFolderPage.EXPERIMENTS_AND_RUNS)
+                .precedingSibling("input").waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT)).check();
+
+        new Checkbox(Locator.tagWithText("label", "Files")
+                .precedingSibling("input").waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT)).check();
+
+        Assert.assertTrue("Experiment and Runs not checked for export.",
+                new Checkbox(Locator.tagWithText("label", ExportFolderPage.EXPERIMENTS_AND_RUNS)
+                        .precedingSibling("input").waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT)).isChecked());
+
+        Assert.assertTrue("Files not checked for export.",
+                new Checkbox(Locator.tagWithText("label", "Files").precedingSibling("input").findElement(getDriver()))
+                        .isChecked());
+
+        log("'Experiment and Runs' & 'Files' are selected for export.");
+
         File exportedFolderFile = doAndWaitForDownload(()->findButton("Export").click());
 
         goToProjectFolder(IMPORT_PROJECT_NAME, importFolder);
