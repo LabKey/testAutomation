@@ -64,8 +64,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.security.Security;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -117,21 +115,6 @@ public abstract class TestFileUtils
             return Files.readString(path);
         }
         catch (IOException fail)
-        {
-            throw new RuntimeException(fail);
-        }
-    }
-
-    /**
-     * Compute MD5 hash for the given file. Useful checking file equivalence.
-     */
-    public static String getMD5Hash(Path path)
-    {
-        try
-        {
-            return new String(MessageDigest.getInstance("MD5").digest(Files.readAllBytes(path)), StandardCharsets.UTF_8);
-        }
-        catch (IOException | NoSuchAlgorithmException fail)
         {
             throw new RuntimeException(fail);
         }
