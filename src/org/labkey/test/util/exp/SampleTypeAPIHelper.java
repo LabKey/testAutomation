@@ -9,6 +9,7 @@ import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.remoteapi.query.Sort;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.FieldInfo;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.DomainUtils;
 import org.labkey.test.util.TestDataGenerator;
@@ -58,13 +59,13 @@ public class SampleTypeAPIHelper
     public static List<FieldDefinition> sampleTypeTestFields(boolean withFileField)
     {
         List<FieldDefinition> fields = new ArrayList<>(Arrays.asList(
-                new FieldDefinition("intColumn", FieldDefinition.ColumnType.Integer),
-                new FieldDefinition("decimalColumn", FieldDefinition.ColumnType.Decimal),
-                new FieldDefinition("stringColumn", FieldDefinition.ColumnType.String),
-                new FieldDefinition("sampleDate", FieldDefinition.ColumnType.DateAndTime),
-                new FieldDefinition("boolColumn", FieldDefinition.ColumnType.Boolean)));
+                FieldInfo.random("intColumn", FieldDefinition.ColumnType.Integer).getFieldDefinition(),
+                FieldInfo.random("decimalColumn", FieldDefinition.ColumnType.Decimal).getFieldDefinition(),
+                FieldInfo.random("stringColumn", FieldDefinition.ColumnType.String).getFieldDefinition(),
+                FieldInfo.random("sampleDate", FieldDefinition.ColumnType.DateAndTime).getFieldDefinition(),
+                FieldInfo.random("boolColumn", FieldDefinition.ColumnType.Boolean).getFieldDefinition()));
         if (withFileField)
-            fields.add(new FieldDefinition("fileColumn", FieldDefinition.ColumnType.File));
+            fields.add(FieldInfo.random("fileColumn", FieldDefinition.ColumnType.File).getFieldDefinition());
         return fields;
     }
 
