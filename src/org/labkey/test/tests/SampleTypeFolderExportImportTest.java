@@ -581,9 +581,11 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
         // setFormElement doesn't check that the form element is set.
         // Because this test uses random field names, we should validate that the file was actually uploaded. If the
         // file is missing later in the test, we can be sure it was present at this point.
-        Assert.assertFalse("File not uploaded.",
-                getFormElement(Locator.tagWithAttribute("input", "type", "file")).isEmpty());
+        Assert.assertTrue("File not uploaded to 'add new' form.",
+                waitFor(()->!getFormElement(Locator.tagWithAttribute("input", "type", "file")).isEmpty(), 1_500));
         clickAndWait(Locator.lkButton("Submit"));
+
+        waitForElementToBeVisible(Locator.linkContainingText(SAMPLE_TXT_FILE.getName()));
 
         goToProjectFolder(getProjectName(), subfolder);
 

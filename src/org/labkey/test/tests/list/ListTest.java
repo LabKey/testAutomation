@@ -535,6 +535,7 @@ public class ListTest extends BaseWebDriverTest
         checker().verifyEquals("Default value not as expected ", "42", updatePage.getTextInputValue(fieldWithDefault));
         updatePage.submit();
     }
+
     /* Issue 51572: Bug with creating a new list by uploading a csv file in "UTF-8 with BOM" format
      */
     @Test
@@ -580,7 +581,7 @@ public class ListTest extends BaseWebDriverTest
         setUpList(getProjectName());
 
         goToProjectHome();
-        clickAndWait(Locator.linkWithText(LIST_NAME_COLORS));
+        waitAndClickAndWait(Locator.linkWithText(LIST_NAME_COLORS));
 
         log("Test Sort and Filter in Data View");
         DataRegionTable region = new DataRegionTable("query", getDriver());
@@ -595,7 +596,7 @@ public class ListTest extends BaseWebDriverTest
         log("Test Customize View");
         // Re-navigate to the list to clear filters and sorts
         clickTab("List");
-        clickAndWait(Locator.linkWithText(LIST_NAME_COLORS));
+        waitAndClickAndWait(Locator.linkWithText(LIST_NAME_COLORS));
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.removeColumn(_listColGood.getName());
         _customizeViewsHelper.addFilter(_listColGood.getName(), "Is Less Than", "10");
@@ -660,6 +661,10 @@ public class ListTest extends BaseWebDriverTest
 
         log("Test list history");
         clickAndWait(Locator.linkWithText("manage lists"));
+        DataRegionTable drt = new DataRegionTable.DataRegionFinder(getDriver()).find();
+        drt.setFilter("Name", "Equals", LIST_NAME_COLORS);
+        waitFor(()->drt.getDataRowCount()==1,
+                String.format("DataRegion table did not filter to list %s", LIST_NAME_COLORS), 2_500);
         waitAndClickAndWait(Locator.linkWithText("view history"));
 
         // Wait for the header to load on the page.
