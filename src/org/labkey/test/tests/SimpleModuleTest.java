@@ -17,6 +17,7 @@ package org.labkey.test.tests;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hc.core5.http.HttpStatus;
+import org.assertj.core.api.Assertions;
 import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
@@ -1194,7 +1195,6 @@ public class SimpleModuleTest extends BaseWebDriverTest
         waitForElementToDisappear(Locator.tag("tr").withClass("x4-grid-row").containing(WANT_TO_BE_COOL).notHidden());
 
         File expectedIconFile = TestFileUtils.getSampleData(THUMBNAIL_FOLDER + KNITR_PEOPLE + ICON_FILENAME);
-        String expectedIcon = TestFileUtils.getMD5Hash(expectedIconFile.toPath());
 
         WebElement img = waitForElement(Locator.tag("img").withClass("dataview-icon").withoutClass("x4-tree-icon-parent").notHidden());
         String backgroundImage = StringUtils.trimToEmpty(img.getCssValue("background-image"));
@@ -1204,9 +1204,10 @@ public class SimpleModuleTest extends BaseWebDriverTest
             Assert.fail("Module report icon style is not as expected: " + img.getDomAttribute("style"));
         }
         String iconUrl = matcher.group(1);
-        String iconData = TestFileUtils.getMD5Hash(new SimpleHttpRequest(iconUrl).getResponseAsFile().toPath());
+        File downloadedIcon = new SimpleHttpRequest(iconUrl).getResponseAsFile(TestFileUtils.ensureTestTempFile(KNITR_PEOPLE + ICON_FILENAME));
 
-        assertEquals("Module report icon is not as expected", expectedIcon, iconData);
+        Assertions.assertThat(downloadedIcon).as("Module report icon is not as expected")
+                .hasSameBinaryContentAs(expectedIconFile);
     }
 
     @LogMethod
@@ -1222,14 +1223,15 @@ public class SimpleModuleTest extends BaseWebDriverTest
     private void verifyReportThumbnail(@LoggedParam String reportTitle) throws IOException
     {
         File expectedThumbnailFile = TestFileUtils.getSampleData(THUMBNAIL_FOLDER + reportTitle + THUMBNAIL_FILENAME);
-        String expectedThumbnail = TestFileUtils.getMD5Hash(expectedThumbnailFile.toPath());
 
         WebElement reportLink = waitForElement(Locator.xpath("//a[text()='" + reportTitle + "']"));
         mouseOver(reportLink);
         WebElement thumbnail = waitForElement(Locator.xpath("//div[@class='thumbnail']/img").notHidden());
-        String thumbnailData = TestFileUtils.getMD5Hash(new SimpleHttpRequest(thumbnail.getDomProperty("src")).getResponseAsFile().toPath());
+        File downloadedThumbnail = new SimpleHttpRequest(thumbnail.getDomProperty("src"))
+                .getResponseAsFile(TestFileUtils.ensureTestTempFile(reportTitle + THUMBNAIL_FILENAME));
 
-        assertEquals("Module report thumbnail is not as expected", expectedThumbnail, thumbnailData);
+        Assertions.assertThat(downloadedThumbnail).as("Module report thumbnail is not as expected")
+                .hasSameBinaryContentAs(expectedThumbnailFile);
     }
 
     @LogMethod

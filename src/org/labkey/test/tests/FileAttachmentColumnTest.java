@@ -553,9 +553,9 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
                  {
                      // verify fie download behavior
                      File downloadedFile = doAndWaitForDownload(() -> optionalFileLink.get().click());
-                     checker().wrapAssertion(() -> Assertions.assertThat(TestFileUtils.getMD5Hash(downloadedFile.toPath()))
+                     checker().wrapAssertion(() -> Assertions.assertThat(downloadedFile)
                              .as("expect the downloaded file to be the expected file")
-                             .isEqualTo(TestFileUtils.getMD5Hash(file.toPath())));   // guard against renames like file2.xyz
+                             .hasSameBinaryContentAs(file));   // guard against renames like file2.xyz
                  }
             }
         }
@@ -579,9 +579,9 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
         if (optionalFileLink.isPresent())
         {
             var file = doAndWaitForDownload(()-> optionalFileLink.get().click());
-            checker().wrapAssertion(()-> Assertions.assertThat(TestFileUtils.getMD5Hash(file.toPath()))
+            checker().wrapAssertion(()-> Assertions.assertThat(file)
                     .as("expect the downloaded file to have equivalent content")
-                    .isEqualTo(TestFileUtils.getMD5Hash(runFile.toPath())));
+                    .hasSameBinaryContentAs(runFile));
         }
 
         var resultsPage = runsPage.clickAssayIdLink(runName);
@@ -647,9 +647,9 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
                 {
                     // verify fie download behavior
                     File downloadedFile = doAndWaitForDownload(() -> optionalFileLink.get().click());
-                    checker().wrapAssertion(() -> Assertions.assertThat(TestFileUtils.getMD5Hash(downloadedFile.toPath()))
+                    checker().wrapAssertion(() -> Assertions.assertThat(downloadedFile)
                             .as("expect the downloaded file to be the expected file")
-                            .isEqualTo(TestFileUtils.getMD5Hash(file.toPath())));   // guard against renames like file2.xyz
+                            .hasSameBinaryContentAs(file));   // guard against renames like file2.xyz
                 }
             }
         }

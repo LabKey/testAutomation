@@ -372,10 +372,30 @@ public abstract class TestFileUtils
         return new File(buildDir, "testTemp");
     }
 
-    public static File ensureTestTempDir() throws IOException
+    public static File ensureTestTempDir(String... children) throws IOException
     {
         File file = getTestTempDir();
+        for (String child : children)
+        {
+            file = new File(file, child);
+        }
+
         FileUtils.forceMkdir(file);
+
+        return file;
+    }
+
+    public static File ensureTestTempFile(String child0, String... children) throws IOException
+    {
+        File file = new File(getTestTempDir(), child0);
+
+        for (String child : children)
+        {
+            file = new File(file, child);
+        }
+
+        FileUtils.forceMkdirParent(file);
+
         return file;
     }
 
