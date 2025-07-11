@@ -355,6 +355,12 @@ public abstract class TestFileUtils
         return new File(buildDir, "testTemp");
     }
 
+    /**
+     * Creates a directory under the 'testTemp' directory: 'build/testTemp/[children]'
+     * @param children will be appended to the testTemp path
+     * @return A file pointer to the specified directory. The directory will exist
+     * @throws IOException if the directories were not created
+     */
     public static File ensureTestTempDir(String... children) throws IOException
     {
         File file = getTestTempDir();
@@ -368,15 +374,25 @@ public abstract class TestFileUtils
         return file;
     }
 
-    public static File ensureTestTempFile(String child0, String... children) throws IOException
+    /**
+     * Creates a directory under the 'testTemp' directory to contain the specified file. 'build/testTemp[/children]/lastChild'
+     * @param children will be appended to the testTemp path to construct the desired file's path
+     * @return A file pointer to the specified file. The file's parents will exist but the file might not
+     * @throws IOException if the parent directories were not created
+     */
+    public static File ensureTestTempFile(String... children) throws IOException
     {
-        File file = new File(getTestTempDir(), child0);
+        File file = getTestTempDir();
 
         for (String child : children)
         {
             file = new File(file, child);
         }
 
+        if (file.toString().length() == getTestTempDir().toString().length())
+        {
+            throw new IllegalArgumentException("No valid children were provided: " + Arrays.toString(children));
+        }
         FileUtils.forceMkdirParent(file);
 
         return file;
