@@ -2102,23 +2102,27 @@ public class ListTest extends BaseWebDriverTest
     @Test
     public void testPkNameParameterCollision() throws IOException, CommandException
     {
-        String listName = TestDataGenerator.randomDomainName("list_key_check");
-        String pkCol = "Name";
+        // Create lists with PKs having the same name as detail URL list definition identifier
+        // params to ensure we can resolve detail pages correctly
+        validateDetailsView("list_name_key_check", "Name");
+        validateDetailsView("list_id_key_check", "ListId");
+    }
 
+    private void validateDetailsView(String listName, String pkCol) throws CommandException, IOException
+    {
+        listName = TestDataGenerator.randomDomainName(listName);
         var dgen = new VarListDefinition(listName)
-            .setFields(List.of(new FieldDefinition(pkCol)))
-            .create(createDefaultConnection(), getProjectName())
-            .withGeneratedRows(10);
+                .setFields(List.of(new FieldDefinition(pkCol)))
+                .create(createDefaultConnection(), getProjectName())
+                .withGeneratedRows(10);
         List<String> pks = dgen.getRows().stream().map(row -> (String) row.get(pkCol)).toList();
         dgen.insertRows();
 
         goToProjectHome();
-
         goToManageLists().getGrid().viewListData(listName);
 
         clickAndWait(Locator.linkWithText(pks.get(0)));
-        assertElementPresent(Locator.byClass("labkey-error-heading")
-            .withText("List item '%s' does not exist".formatted(listName)));
+        assertElementPresent(Locator.tagContainingText("td", pks.get(0)));
     }
 
     @Override
