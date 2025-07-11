@@ -850,7 +850,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
             Locator popup = Locator.tag("div").withAttribute("id", "helpDiv").descendant("img").withAttributeContaining("src", popupImage).
                     withAttributeContaining("style", popupWidth != null ? "width:" + popupWidth : "max-width:300px");
             shortWait().until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("#helpDiv")));
-            String src = StringUtils.trimToEmpty(popup.findElement(getDriver()).getDomAttribute("src"));
+            String src = StringUtils.trimToEmpty(popup.findElement(getDriver()).getDomProperty("src"));
 
             fireEvent(thumbnail, SeleniumEvent.mouseout);
             Locator.tagWithClass("th", "labkey-selectors").findElement(getDriver()).click(); // safe out-click in the first header cell
@@ -1230,7 +1230,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         WebElement reportLink = waitForElement(Locator.xpath("//a[text()='" + reportTitle + "']"));
         mouseOver(reportLink);
         WebElement thumbnail = waitForElement(Locator.xpath("//div[@class='thumbnail']/img").notHidden());
-        String thumbnailData = WebTestHelper.getHttpResponse(thumbnail.getDomAttribute("src")).getResponseBody();
+        String thumbnailData = WebTestHelper.getHttpResponse(thumbnail.getDomProperty("src")).getResponseBody();
 
         int lengthToCompare = 5000;
         int diff = LevenshteinDistance.getDefaultInstance().apply(expectedThumbnail.substring(0, lengthToCompare), thumbnailData.substring(0, lengthToCompare));

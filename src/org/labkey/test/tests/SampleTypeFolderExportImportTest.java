@@ -43,6 +43,7 @@ import org.labkey.test.pages.admin.FolderManagementPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.DataClassDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
+import org.labkey.test.util.ArtifactCollector;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
@@ -546,7 +547,7 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
     {
         String subfolder = "samplesWithAssayRunsFolder";
         String subfolderPath = getProjectName() + "/" + subfolder;
-        String testSamples = "testSamples";
+        String testSamples = "testSamplesWithFiles";
         String assayName = "testAssay";
         String importFolder = "assaySamplesImportFolder";
 
@@ -557,7 +558,7 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
         // create a test sampleType
         List<FieldDefinition> testFields = SampleTypeAPIHelper.sampleTypeTestFields(true);
         SampleTypeDefinition testSampleType = new SampleTypeDefinition(testSamples).setFields(testFields)
-                .addParentAlias("SelfParent"); // to derive from samles in the current type
+                .addParentAlias("SelfParent"); // to derive from samples in the current type
 
         TestDataGenerator parentDgen = SampleTypeAPIHelper.createEmptySampleType(subfolderPath, testSampleType);
         parentDgen.addCustomRow(Map.of("Name", "sample1", "intColumn", 1, "decimalColumn", 1.1, "stringColumn", "one"));
@@ -572,13 +573,22 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
         portalHelper.addWebPart("Experiment Runs");
         portalHelper.addWebPart("Assay List");
 
-        // upload a file for a sample's file field
+        log(String.format("Upload a file '%s' to a sample's file field.", SAMPLE_TXT_FILE.getName()));
         clickAndWait(Locator.linkWithText(testSamples));
         DataRegionTable sourceSamplesTable = new SampleTypeHelper(this).getSamplesDataRegionTable();
         sourceSamplesTable.clickEditRow(1);
         waitForElementToBeVisible(Locator.tagWithAttribute("input", "type", "file"));
         setFormElement(Locator.tagWithAttribute("input", "type", "file"), SAMPLE_TXT_FILE);
+        // setFormElement doesn't check that the form element is set.
+        // Because this test uses random field names, we should validate that the file was actually uploaded. If the
+        // file is missing later in the test, we can be sure it was present at this point.
+        Assert.assertTrue("File not uploaded to 'add new' form.",
+                waitFor(()->!getFormElement(Locator.tagWithAttribute("input", "type", "file")).isEmpty(), 1_500));
         clickAndWait(Locator.lkButton("Submit"));
+
+        waitForElementToBeVisible(Locator.linkContainingText(SAMPLE_TXT_FILE.getName()));
+
+        new ArtifactCollector(this).dumpPageSnapshot("File_Attached_Proof");
 
         goToProjectFolder(getProjectName(), subfolder);
 
@@ -644,14 +654,26 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
             exportData.add(dataTable.getRowDataAsMap(i));
         }
 
-        // now export the current folder and import it to importProject
+        log("Now export the current folder and import it to importProject.");
         goToFolderManagement()
                 .goToExportTab();
 
-        Checkbox checkbox = new Checkbox(Locator.tagWithText("label", ExportFolderPage.EXPERIMENTS_AND_RUNS)
-                .precedingSibling("input").waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT));
-        new Checkbox(Locator.tagWithText("label", "Files").precedingSibling("input").findElement(getDriver())).check();
-        checkbox.check();
+        new Checkbox(Locator.tagWithText("label", ExportFolderPage.EXPERIMENTS_AND_RUNS)
+                .precedingSibling("input").waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT)).check();
+
+        new Checkbox(Locator.tagWithText("label", "Files")
+                .precedingSibling("input").waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT)).check();
+
+        Assert.assertTrue("Experiment and Runs not checked for export.",
+                new Checkbox(Locator.tagWithText("label", ExportFolderPage.EXPERIMENTS_AND_RUNS)
+                        .precedingSibling("input").waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT)).isChecked());
+
+        Assert.assertTrue("Files not checked for export.",
+                new Checkbox(Locator.tagWithText("label", "Files").precedingSibling("input").findElement(getDriver()))
+                        .isChecked());
+
+        log("'Experiment and Runs' & 'Files' are selected for export.");
+
         File exportedFolderFile = doAndWaitForDownload(()->findButton("Export").click());
 
         goToProjectFolder(IMPORT_PROJECT_NAME, importFolder);
