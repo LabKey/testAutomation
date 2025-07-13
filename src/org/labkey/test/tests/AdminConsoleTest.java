@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
@@ -25,13 +26,16 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.util.OptionalFeatureHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.pages.core.admin.CustomizeSitePage;
+import org.labkey.test.pages.core.admin.OptionalFeaturesPage;
 import org.labkey.test.pages.core.login.LoginConfigRow;
 import org.labkey.test.pages.core.login.LoginConfigurePage;
 import org.labkey.test.util.LogMethod;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -224,6 +228,88 @@ public class AdminConsoleTest extends AbstractAdminConsoleTest
         refresh();
         checker().withScreenshot("banner is shown when not expected")
                 .verifyFalse("expect banner not to be shown", bannerLoc.isDisplayed(getDriver()));
+    }
+
+    @Test
+    public void testUIOptionalFeatures()
+    {
+        goToAdminConsole();
+        waitAndClickAndWait(Locator.linkWithText("optional features"));
+        var optionalFeaturesPage = new OptionalFeaturesPage(getDriver());
+        var featureIds = List.of("extendedMetrics", "StageFileUploads");
+        var cn = createDefaultConnection();
+
+        for (String testId : featureIds) {
+            // capture initial state
+            boolean initialState = OptionalFeatureHelper.isOptionalFeatureEnabled(cn, testId);
+
+            // ensure the UI reflects the same state
+            boolean initialUIState = optionalFeaturesPage.getFeatureStatus(testId);
+            checker().withScreenshot("initial state not as expected")
+                    .wrapAssertion(()-> Assertions.assertThat(initialUIState)
+                            .as("expect ui to align with API initial state")
+                            .isEqualTo(initialState));
+
+            // toggle it the other way
+            optionalFeaturesPage.setFeatureStatus(testId, !initialState);
+            checker().withScreenshot("toggled state not as expected")
+                    .awaiting(Duration.ofMillis(500), ()-> Assertions.assertThat(OptionalFeatureHelper.isOptionalFeatureEnabled(cn, testId))
+                            .as("expect toggling the UI to update the server status for the feature")
+                            .isEqualTo(!initialState));
+
+            // use the API to restore the initial state
+            OptionalFeatureHelper.setOptionalFeature(cn, testId, initialState);
+            optionalFeaturesPage.goToAdminConsole();
+
+            optionalFeaturesPage = OptionalFeaturesPage.beginAt(this,
+                    OptionalFeaturesPage.OptionalFeatureType.Optional);
+
+            // verify the page state reflects the API change after a reload
+            checker().withScreenshot("state not as expected after api set and refresh")
+                    .verifyEquals("expect page to reflect state after api config",
+                            initialState, optionalFeaturesPage.getFeatureStatus(testId));
+        }
+    }
+
+    @Test
+    public void testUIExperimentalFeatures()
+    {
+        goToAdminConsole();
+        waitAndClickAndWait(Locator.linkWithText("experimental features"));
+        var experimentalFeaturesPage = new OptionalFeaturesPage(getDriver());
+        var featureIds = List.of("queryBasedDatasets", "LinkedDatasetCheck", "blockMaliciousClients");
+        var cn = createDefaultConnection();
+
+        for (String testId : featureIds) {
+            // capture initial state
+            boolean initialState = OptionalFeatureHelper.isOptionalFeatureEnabled(cn, testId);
+
+            // ensure the UI reflects the same state
+            boolean initialUIState = experimentalFeaturesPage.getFeatureStatus(testId);
+            checker().withScreenshot("initial state not as expected")
+                    .wrapAssertion(()-> Assertions.assertThat(initialUIState)
+                            .as("expect ui to align with API initial state")
+                            .isEqualTo(initialState));
+
+            // toggle it the other way
+            experimentalFeaturesPage.setFeatureStatus(testId, !initialState);
+            checker().withScreenshot("toggled state not as expected")
+                    .awaiting(Duration.ofMillis(500), ()-> Assertions.assertThat(OptionalFeatureHelper.isOptionalFeatureEnabled(cn, testId))
+                            .as("expect toggling the UI to update the server status for the feature")
+                            .isEqualTo(!initialState));
+
+            // use the API to restore the initial state
+            OptionalFeatureHelper.setOptionalFeature(cn, testId, initialState);
+            experimentalFeaturesPage.goToAdminConsole();
+
+            experimentalFeaturesPage = OptionalFeaturesPage.beginAt(this,
+                    OptionalFeaturesPage.OptionalFeatureType.Experimental);
+
+            // verify the page state reflects the API change after a reload
+            checker().withScreenshot("state not as expected after api set and refresh")
+                    .verifyEquals("expect page to reflect state after api config",
+                            initialState, experimentalFeaturesPage.getFeatureStatus(testId));
+        }
     }
 
     @Test
