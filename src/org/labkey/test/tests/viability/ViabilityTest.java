@@ -23,6 +23,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.Daily;
+import org.labkey.test.components.assay.AssayConstants;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
@@ -302,8 +303,8 @@ public class ViabilityTest extends AbstractViabilityTest
         ReactAssayDesignerPage assayDesignerPage = _assayHelper.clickEditAssayDesign(true);
 
         // remove TargetStudy field from the Batch domain and add it to the Result domain.
-        assayDesignerPage.expandFieldsPanel("Batch").removeField("TargetStudy", true);
-        assayDesignerPage.expandFieldsPanel("Result").addField(new FieldDefinition("TargetStudy", FieldDefinition.ColumnType.String).setLabel("Target Study"));
+        assayDesignerPage.expandFieldsPanel("Batch").removeField(AssayConstants.TARGET_STUDY_FIELD_NAME, true);
+        assayDesignerPage.expandFieldsPanel("Result").addField(new FieldDefinition(AssayConstants.TARGET_STUDY_FIELD_NAME, FieldDefinition.ColumnType.String).setLabel("Target Study"));
         assayDesignerPage.clickFinish();
 
         navigateToFolder(getProjectName(), getFolderName());
@@ -348,7 +349,7 @@ public class ViabilityTest extends AbstractViabilityTest
         clickAndWait(Locator.linkWithText(runName));
 
         _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.addColumn("TargetStudy");
+        _customizeViewsHelper.addColumn(AssayConstants.TARGET_STUDY_FIELD_NAME);
         _customizeViewsHelper.saveDefaultView();
 
         DataRegionTable table = new DataRegionTable("Data", this);
@@ -356,25 +357,25 @@ public class ViabilityTest extends AbstractViabilityTest
         assertEquals("4", table.getDataAsText(0, "SpecimenCount"));
         assertEquals("3", table.getDataAsText(0, "SpecimenMatchCount"));
         assertEquals("52.11%", table.getDataAsText(0, "Recovery"));
-        assertEquals(getFolderName() + " Study", table.getDataAsText(0, "TargetStudy"));
+        assertEquals(getFolderName() + " Study", table.getDataAsText(0, AssayConstants.TARGET_STUDY_FIELD_NAME));
 
         assertEquals("vial2", table.getDataAsText(2, "Specimen IDs"));
         assertEquals("1", table.getDataAsText(2, "SpecimenCount"));
         assertEquals("0", table.getDataAsText(2, "SpecimenMatchCount"));
         assertEquals(" ", table.getDataAsText(2, "Recovery"));
-        assertEquals(" ", table.getDataAsText(2, "TargetStudy"));
+        assertEquals(" ", table.getDataAsText(2, AssayConstants.TARGET_STUDY_FIELD_NAME));
 
         assertEquals("vial3", table.getDataAsText(3, "Specimen IDs"));
         assertEquals("1", table.getDataAsText(3, "SpecimenCount"));
         assertEquals("0", table.getDataAsText(3, "SpecimenMatchCount"));
         assertEquals(" ", table.getDataAsText(3, "Recovery"));
-        assertEquals(STUDY2_NAME + " Study", table.getDataAsText(3, "TargetStudy"));
+        assertEquals(STUDY2_NAME + " Study", table.getDataAsText(3, AssayConstants.TARGET_STUDY_FIELD_NAME));
 
         assertEquals("xyzzy", table.getDataAsText(4, "Specimen IDs"));
         assertEquals("1", table.getDataAsText(4, "SpecimenCount"));
         assertEquals("1", table.getDataAsText(4, "SpecimenMatchCount"));
         assertEquals("88.88%", table.getDataAsText(4, "Recovery"));
-        assertEquals(STUDY2_NAME + " Study", table.getDataAsText(4, "TargetStudy"));
+        assertEquals(STUDY2_NAME + " Study", table.getDataAsText(4, AssayConstants.TARGET_STUDY_FIELD_NAME));
 
         // UNDONE: participant/visit resolver test
         // UNDONE: link to study

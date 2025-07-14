@@ -140,8 +140,8 @@ public abstract class TextChoiceTest extends BaseWebDriverTest
         fieldRow.setTextChoiceValues(BATCH_FIELD_VALUES);
 
         log("Remove the default batch fields.");
-        domainFormPanel.removeField("ParticipantVisitResolver");
-        domainFormPanel.removeField("TargetStudy");
+        domainFormPanel.removeField(AssayConstants.PARTICIPANT_VISIT_RESOLVER_FIELD_NAME);
+        domainFormPanel.removeField(AssayConstants.TARGET_STUDY_FIELD_NAME);
 
         log(String.format("Add a TextChoice field named '%s' to the run properties.", RUN_TC_FIELD));
         fieldRow = assayDesignerPage.goToRunFields().addField(RUN_TC_FIELD);

@@ -42,30 +42,30 @@ public class AssayImporter
         {
             if (options.getVisitResolver() == AssayImportOptions.VisitResolverType.SpecimenIDParticipantVisit)
             {
-                test.checkRadioButton(Locator.radioButtonByNameAndValue("ParticipantVisitResolver", AssayImportOptions.VisitResolverType.SpecimenID.name()));
+                test.checkRadioButton(Locator.radioButtonByNameAndValue(AssayConstants.PARTICIPANT_VISIT_RESOLVER_FIELD_NAME, AssayImportOptions.VisitResolverType.SpecimenID.name()));
                 Locator checkBox = Locator.checkboxByName("includeParticipantAndVisit");
                 test.waitForElement(checkBox);
                 test.checkCheckbox(checkBox);
             }
             else
-                test.checkRadioButton(Locator.radioButtonByNameAndValue("ParticipantVisitResolver", options.getVisitResolver().name()));
+                test.checkRadioButton(Locator.radioButtonByNameAndValue(AssayConstants.PARTICIPANT_VISIT_RESOLVER_FIELD_NAME, options.getVisitResolver().name()));
         }
         else
         {
             switch (options.getVisitResolver())
             {
                 case LookupList:
-                    test.assertChecked(Locator.radioButtonByNameAndValue("ThawListType", "List"));
+                    test.assertChecked(Locator.radioButtonByNameAndValue(AssayConstants.THAW_LIST_TYPE_FIELD_NAME, "List"));
                     test.waitForFormElementToNotEqual(Locator.name("ThawListList-QueryName"), "");
                     break;
                 case LookupText:
-                    test.assertChecked(Locator.radioButtonByNameAndValue("ThawListType", "Text"));
+                    test.assertChecked(Locator.radioButtonByNameAndValue(AssayConstants.THAW_LIST_TYPE_FIELD_NAME, "Text"));
                     break;
                 case SpecimenIDParticipantVisit:
-                    test.assertChecked(Locator.radioButtonByNameAndValue("ParticipantVisitResolver", AssayImportOptions.VisitResolverType.SpecimenID.name()));
+                    test.assertChecked(Locator.radioButtonByNameAndValue(AssayConstants.PARTICIPANT_VISIT_RESOLVER_FIELD_NAME, AssayImportOptions.VisitResolverType.SpecimenID.name()));
                     break;
                 default:
-                    test.assertChecked(Locator.radioButtonByNameAndValue("ParticipantVisitResolver", options.getVisitResolver().name()));
+                    test.assertChecked(Locator.radioButtonByNameAndValue(AssayConstants.PARTICIPANT_VISIT_RESOLVER_FIELD_NAME, options.getVisitResolver().name()));
             }
         }
 

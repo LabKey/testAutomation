@@ -25,6 +25,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.Daily;
+import org.labkey.test.components.assay.AssayConstants;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.pages.assay.plate.PlateDesignerPage;
 import org.labkey.test.pages.assay.plate.PlateTemplateListPage;
@@ -322,7 +323,7 @@ public class NabHighThroughputAssayTest extends BaseWebDriverTest
     {
         // high throughput Nab assays should not contain the Participant, Visit, Date resolver type
         clickAndWait(Locator.linkWithText("Import Data"));
-        assertElementNotPresent(Locator.radioButtonByNameAndValue("ParticipantVisitResolver", "ParticipantVisitDate"));
+        assertElementNotPresent(Locator.radioButtonByNameAndValue(AssayConstants.PARTICIPANT_VISIT_RESOLVER_FIELD_NAME, "ParticipantVisitDate"));
         clickButton("Cancel");
     }
 
