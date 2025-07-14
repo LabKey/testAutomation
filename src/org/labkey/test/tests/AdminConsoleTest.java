@@ -244,7 +244,7 @@ public class AdminConsoleTest extends AbstractAdminConsoleTest
     public void testUIExperimentalFeatures()
     {
         goToAdminConsole();
-        waitAndClickAndWait(Locator.linkWithText("experimental features"));
+
         var featureIds = List.of("queryBasedDatasets", "LinkedDatasetCheck", "blockMaliciousClients");
 
         verifyOptionalFeatures("experimental features", featureIds, OptionalFeaturesPage.OptionalFeatureType.Experimental);
