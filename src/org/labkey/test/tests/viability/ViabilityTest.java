@@ -262,8 +262,8 @@ public class ViabilityTest extends AbstractViabilityTest
         log("** Insert specimen IDs");
         addSpecimenIds("_pool_160450533-5_0_SpecimenIDs", "vial2", "vial3", "vial1", "foobar");
         addSpecimenIds("_pool_159402032-5_1_SpecimenIDs", "vial1");
-        addSpecimenIds("_pool_16140000610-5_2_SpecimenIDs", "vial2");
-        addSpecimenIds("_pool_16140000611-5_3_SpecimenIDs", "vial3");
+        addSpecimenIds("_pool_161400006.10-5_2_SpecimenIDs", "vial2");
+        addSpecimenIds("_pool_161400006.11-5_3_SpecimenIDs", "vial3");
         addSpecimenIds("_pool_161401643-5_4_SpecimenIDs", "xyzzy");
 
         doAndWaitForPageToLoad(() ->
@@ -323,19 +323,19 @@ public class ViabilityTest extends AbstractViabilityTest
                 getSelectedOptionValue(Locator.name("_pool_159402032-5_1_TargetStudy")));
         assertEquals("Target study didn't propagate with 'Same' checkbox.",
                 getSelectedOptionValue(Locator.name("_pool_160450533-5_0_TargetStudy")),
-                getSelectedOptionValue(Locator.name("_pool_16140000611-5_3_TargetStudy")));
+                getSelectedOptionValue(Locator.name("_pool_161400006.11-5_3_TargetStudy")));
         uncheckCheckbox(Locator.checkboxById("_pool_1604505335_0_TargetStudyCheckBox"));
 
         // clear TargetStudy for 'vial2' and set the TargetStudy for 'vial3' and 'xyzzy'
-        selectOptionByText(Locator.name("_pool_16140000610-5_2_TargetStudy"), "[None]");
-        selectOptionByText(Locator.name("_pool_16140000611-5_3_TargetStudy"), "/" + getProjectName() + "/" + STUDY2_NAME + " (" + STUDY2_NAME + " Study)");
+        selectOptionByText(Locator.name("_pool_161400006.10-5_2_TargetStudy"), "[None]");
+        selectOptionByText(Locator.name("_pool_161400006.11-5_3_TargetStudy"), "/" + getProjectName() + "/" + STUDY2_NAME + " (" + STUDY2_NAME + " Study)");
         selectOptionByText(Locator.name("_pool_161401643-5_4_TargetStudy"), "/" + getProjectName() + "/" + STUDY2_NAME + " (" + STUDY2_NAME + " Study)");
 
         log("** Insert specimen IDs");
         addSpecimenIds("_pool_160450533-5_0_SpecimenIDs", "vial2", "vial3", "vial1", "foobar");
         addSpecimenIds("_pool_159402032-5_1_SpecimenIDs", "vial1");
-        addSpecimenIds("_pool_16140000610-5_2_SpecimenIDs", "vial2");
-        addSpecimenIds("_pool_16140000611-5_3_SpecimenIDs", "vial3");
+        addSpecimenIds("_pool_161400006.10-5_2_SpecimenIDs", "vial2");
+        addSpecimenIds("_pool_161400006.11-5_3_SpecimenIDs", "vial3");
         addSpecimenIds("_pool_161401643-5_4_SpecimenIDs", "xyzzy");
 
         doAndWaitForPageToLoad(() ->
