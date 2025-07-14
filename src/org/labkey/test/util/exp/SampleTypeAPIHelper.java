@@ -59,13 +59,13 @@ public class SampleTypeAPIHelper
     public static List<FieldDefinition> sampleTypeTestFields(boolean withFileField)
     {
         List<FieldDefinition> fields = new ArrayList<>(Arrays.asList(
-                FieldInfo.random("intColumn", FieldDefinition.ColumnType.Integer).getFieldDefinition(),
+                FieldInfo.random("int,./Column", FieldDefinition.ColumnType.Integer).getFieldDefinition(), // Issue 53431: include special chars that are fieldKey encoded
                 FieldInfo.random("decimalColumn", FieldDefinition.ColumnType.Decimal).getFieldDefinition(),
                 FieldInfo.random("stringColumn", FieldDefinition.ColumnType.String).getFieldDefinition(),
                 FieldInfo.random("sampleDate", FieldDefinition.ColumnType.DateAndTime).getFieldDefinition(),
                 FieldInfo.random("boolColumn", FieldDefinition.ColumnType.Boolean).getFieldDefinition()));
         if (withFileField)
-            fields.add(FieldInfo.random("fileColumn", FieldDefinition.ColumnType.File).getFieldDefinition());
+            fields.add(FieldInfo.random("file,./Column", FieldDefinition.ColumnType.File).getFieldDefinition());
         return fields;
     }
 
