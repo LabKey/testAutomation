@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Set;
 
 /*
-    Wraps Optional Features, Experimental Featueres, Deprecated Features pages linked
+    Wraps Optional Features, Experimental Features, Deprecated Features pages linked
     from Admin Console
  */
 public class OptionalFeaturesPage extends LabKeyPage<OptionalFeaturesPage.ElementCache>

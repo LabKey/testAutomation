@@ -234,10 +234,10 @@ public class AdminConsoleTest extends AbstractAdminConsoleTest
     public void testUIOptionalFeatures()
     {
         goToAdminConsole();
-        waitAndClickAndWait(Locator.linkWithText("optional features"));
+
         var featureIds = List.of("extendedMetrics", "StageFileUploads");
 
-        verifyOptionalFeatures(featureIds, OptionalFeaturesPage.OptionalFeatureType.Optional);
+        verifyOptionalFeatures("optional features", featureIds, OptionalFeaturesPage.OptionalFeatureType.Optional);
     }
 
     @Test
@@ -247,7 +247,7 @@ public class AdminConsoleTest extends AbstractAdminConsoleTest
         waitAndClickAndWait(Locator.linkWithText("experimental features"));
         var featureIds = List.of("queryBasedDatasets", "LinkedDatasetCheck", "blockMaliciousClients");
 
-        verifyOptionalFeatures(featureIds, OptionalFeaturesPage.OptionalFeatureType.Experimental);
+        verifyOptionalFeatures("experimental features", featureIds, OptionalFeaturesPage.OptionalFeatureType.Experimental);
     }
 
     @Test
@@ -382,8 +382,9 @@ public class AdminConsoleTest extends AbstractAdminConsoleTest
         assertTextPresent("JAR Files Distributed with the API Module");
     }
 
-    private void verifyOptionalFeatures(List<String> featureIds, OptionalFeaturesPage.OptionalFeatureType optionalFeatureType)
+    private void verifyOptionalFeatures(String linkText, List<String> featureIds, OptionalFeaturesPage.OptionalFeatureType optionalFeatureType)
     {
+        waitAndClickAndWait(Locator.linkWithText(linkText));
         var optionalFeaturesPage = new OptionalFeaturesPage(getDriver());
         var cn = createDefaultConnection();
 
