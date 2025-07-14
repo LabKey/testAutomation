@@ -451,7 +451,7 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
         for (File file : files)
         {
             sampleFileData.add(Map.of("Name", file.getName(), "Color", "green",
-                    LIST_ATTACHMENT_FIELD.getName(), file.getName()));
+                    "file", file.getName()));
         }
         helper.bulkImport(sampleFileData);
     }
@@ -542,7 +542,7 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
             }
             else
             {
-                WebElement fileLinkCell = samplesRegion.findCell(rowIndex, LIST_ATTACHMENT_FIELD.getName());
+                WebElement fileLinkCell = samplesRegion.findCell(rowIndex, "file");
                 Optional<WebElement> optionalFileLink = Locator.tag("a").findOptionalElement(fileLinkCell);
                 checker().withScreenshot("unexpected_file_state")
                         .awaiting(Duration.ofSeconds(2),
