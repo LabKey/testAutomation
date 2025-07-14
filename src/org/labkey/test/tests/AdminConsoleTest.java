@@ -235,40 +235,9 @@ public class AdminConsoleTest extends AbstractAdminConsoleTest
     {
         goToAdminConsole();
         waitAndClickAndWait(Locator.linkWithText("optional features"));
-        var optionalFeaturesPage = new OptionalFeaturesPage(getDriver());
         var featureIds = List.of("extendedMetrics", "StageFileUploads");
-        var cn = createDefaultConnection();
 
-        for (String testId : featureIds) {
-            // capture initial state
-            boolean initialState = OptionalFeatureHelper.isOptionalFeatureEnabled(cn, testId);
-
-            // ensure the UI reflects the same state
-            boolean initialUIState = optionalFeaturesPage.getFeatureStatus(testId);
-            checker().withScreenshot("initial state not as expected")
-                    .wrapAssertion(()-> Assertions.assertThat(initialUIState)
-                            .as("expect ui to align with API initial state")
-                            .isEqualTo(initialState));
-
-            // toggle it the other way
-            optionalFeaturesPage.setFeatureStatus(testId, !initialState);
-            checker().withScreenshot("toggled state not as expected")
-                    .awaiting(Duration.ofMillis(500), ()-> Assertions.assertThat(OptionalFeatureHelper.isOptionalFeatureEnabled(cn, testId))
-                            .as("expect toggling the UI to update the server status for the feature")
-                            .isEqualTo(!initialState));
-
-            // use the API to restore the initial state
-            OptionalFeatureHelper.setOptionalFeature(cn, testId, initialState);
-            optionalFeaturesPage.goToAdminConsole();
-
-            optionalFeaturesPage = OptionalFeaturesPage.beginAt(this,
-                    OptionalFeaturesPage.OptionalFeatureType.Optional);
-
-            // verify the page state reflects the API change after a reload
-            checker().withScreenshot("state not as expected after api set and refresh")
-                    .verifyEquals("expect page to reflect state after api config",
-                            initialState, optionalFeaturesPage.getFeatureStatus(testId));
-        }
+        verifyOptionalFeatures(featureIds, OptionalFeaturesPage.OptionalFeatureType.Optional);
     }
 
     @Test
@@ -276,40 +245,9 @@ public class AdminConsoleTest extends AbstractAdminConsoleTest
     {
         goToAdminConsole();
         waitAndClickAndWait(Locator.linkWithText("experimental features"));
-        var experimentalFeaturesPage = new OptionalFeaturesPage(getDriver());
         var featureIds = List.of("queryBasedDatasets", "LinkedDatasetCheck", "blockMaliciousClients");
-        var cn = createDefaultConnection();
 
-        for (String testId : featureIds) {
-            // capture initial state
-            boolean initialState = OptionalFeatureHelper.isOptionalFeatureEnabled(cn, testId);
-
-            // ensure the UI reflects the same state
-            boolean initialUIState = experimentalFeaturesPage.getFeatureStatus(testId);
-            checker().withScreenshot("initial state not as expected")
-                    .wrapAssertion(()-> Assertions.assertThat(initialUIState)
-                            .as("expect ui to align with API initial state")
-                            .isEqualTo(initialState));
-
-            // toggle it the other way
-            experimentalFeaturesPage.setFeatureStatus(testId, !initialState);
-            checker().withScreenshot("toggled state not as expected")
-                    .awaiting(Duration.ofMillis(500), ()-> Assertions.assertThat(OptionalFeatureHelper.isOptionalFeatureEnabled(cn, testId))
-                            .as("expect toggling the UI to update the server status for the feature")
-                            .isEqualTo(!initialState));
-
-            // use the API to restore the initial state
-            OptionalFeatureHelper.setOptionalFeature(cn, testId, initialState);
-            experimentalFeaturesPage.goToAdminConsole();
-
-            experimentalFeaturesPage = OptionalFeaturesPage.beginAt(this,
-                    OptionalFeaturesPage.OptionalFeatureType.Experimental);
-
-            // verify the page state reflects the API change after a reload
-            checker().withScreenshot("state not as expected after api set and refresh")
-                    .verifyEquals("expect page to reflect state after api config",
-                            initialState, experimentalFeaturesPage.getFeatureStatus(testId));
-        }
+        verifyOptionalFeatures(featureIds, OptionalFeaturesPage.OptionalFeatureType.Experimental);
     }
 
     @Test
@@ -442,5 +380,41 @@ public class AdminConsoleTest extends AbstractAdminConsoleTest
         goToAdminConsole().clickCredits();
         log("Verifying the page is properly loaded");
         assertTextPresent("JAR Files Distributed with the API Module");
+    }
+
+    private void verifyOptionalFeatures(List<String> featureIds, OptionalFeaturesPage.OptionalFeatureType optionalFeatureType)
+    {
+        var optionalFeaturesPage = new OptionalFeaturesPage(getDriver());
+        var cn = createDefaultConnection();
+
+        for (String testId : featureIds) {
+            // capture initial state
+            boolean initialState = OptionalFeatureHelper.isOptionalFeatureEnabled(cn, testId);
+
+            // ensure the UI reflects the same state
+            boolean initialUIState = optionalFeaturesPage.getFeatureStatus(testId);
+            checker().withScreenshot("initial state not as expected")
+                    .wrapAssertion(()-> Assertions.assertThat(initialUIState)
+                            .as("expect ui to align with API initial state")
+                            .isEqualTo(initialState));
+
+            // toggle it the other way
+            optionalFeaturesPage.setFeatureStatus(testId, !initialState);
+            checker().withScreenshot("toggled state not as expected")
+                    .awaiting(Duration.ofMillis(500), ()-> Assertions.assertThat(OptionalFeatureHelper.isOptionalFeatureEnabled(cn, testId))
+                            .as("expect toggling the UI to update the server status for the feature")
+                            .isEqualTo(!initialState));
+
+            // use the API to restore the initial state
+            OptionalFeatureHelper.setOptionalFeature(cn, testId, initialState);
+            optionalFeaturesPage.goToAdminConsole();
+
+            optionalFeaturesPage = OptionalFeaturesPage.beginAt(this, optionalFeatureType);
+
+            // verify the page state reflects the API change after a reload
+            checker().withScreenshot("state not as expected after api set and refresh")
+                    .verifyEquals("expect page to reflect state after api config",
+                            initialState, optionalFeaturesPage.getFeatureStatus(testId));
+        }
     }
 }
