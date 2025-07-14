@@ -87,7 +87,7 @@ public class AdminConsoleNavigationTest extends BaseWebDriverTest
         {
             linkHrefs.put(link.getText(), link.getAttribute("href"));
         }
-        Assertions.assertThat(linkHrefs.keySet()).as("Expected links").containsAll(ignoredLinks);
+        Assertions.assertThat(linkHrefs.keySet()).as("Expected links").containsAll(ignoredLinks.stream().map(String::toUpperCase).toList());
 
         List<String> pagesMissingNavTrail = new ArrayList<>();
 

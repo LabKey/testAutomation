@@ -44,6 +44,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.function.Function;
@@ -1117,17 +1118,37 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     /**
      * @param row row index
      * @param columnIdentifier fieldKey, name, or label of column
+     * @return error popover text in the specified cell or 'null' if there is no error
+     */
+    public String getErrorPopoverText(int row, CharSequence columnIdentifier)
+    {
+        WebElement gridCell = getCell(row, columnIdentifier);
+
+        if (cellHasError(gridCell))
+            return getCellPopoverText(row, columnIdentifier);
+        return null;
+    }
+
+    /**
+     * @param row row index
+     * @param columnIdentifier fieldKey, name, or label of column
      * @return popover text when mousing over the specified cell or 'null' if there is none
      */
     public String getCellPopoverText(int row, CharSequence columnIdentifier)
     {
         WebElement cellDiv = Locator.tagWithClass("div", "cellular-display").findElement(getCell(row, columnIdentifier));
         getWrapper().mouseOver(cellDiv);   // cause the tooltip to be present
-        if (WebDriverWrapper.waitFor(()-> null != Locator.byClass("popover").findElementOrNull(getDriver()), 1000))
-        {
-            return Locator.byClass("popover").findElement(getDriver()).getText();
-        }
-        return null;
+        return Optional.ofNullable(WebDriverWrapper.waitFor(()-> Locators.popover.findElementOrNull(getDriver()), 1000))
+            .map(WebElement::getText)
+            .orElse(null);
+    }
+
+    public void dismissPopover()
+    {
+        Locators.popover.findOptionalElement(getDriver()).ifPresent(popover -> {
+            getWrapper().mouseOut();
+            getWrapper().shortWait().until(ExpectedConditions.invisibilityOf(popover));
+        });
     }
 
     public List<WebElement> getCellErrors()
@@ -1286,6 +1307,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         static final Locator.XPathLocator rows = Locator.tag("tbody").childTag("tr").withoutClass("grid-empty").withoutClass("grid-loading");
         static final Locator headerCells = Locator.css("thead tr th");
         static final Locator inputCell = Locator.css(".eg-input-cell");
+        static final Locator popover = Locator.byClass("popover");
     }
 
     public static class EditableGridFinder extends WebDriverComponent.WebDriverComponentFinder<EditableGrid, EditableGridFinder>
