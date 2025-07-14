@@ -896,7 +896,7 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         mouseOver(createPage.getComponentElement());
 
         log("Use a name expression using a field from the named parent, with parent type not encoded.");
-        nameExpressionBad = String.format("SNP_${genId}_${%s/$s}_${materialInputs/%s/%s}", parentAlias, PARENT_FIELD_CURLY_RIGHT_INT.getExpName(), PARENT_SAMPLE_TYPE, PARENT_FIELD_CURLY_LEFT.getName());
+        nameExpressionBad = String.format("SNP_${genId}_${%s/%s}_${materialInputs/%s/%s}", parentAlias, PARENT_FIELD_CURLY_RIGHT_INT.getExpName(), PARENT_SAMPLE_TYPE, PARENT_FIELD_CURLY_LEFT.getName());
         createPage.setNameExpression(nameExpressionBad);
         actualMsg = createPage.getNameExpressionPreview();
         checker().withScreenshot("Parent_Fields_Preview_Error")

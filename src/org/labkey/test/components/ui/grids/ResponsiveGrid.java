@@ -27,6 +27,7 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -447,6 +448,17 @@ public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverCompon
             selectRow(columnIdentifier, text, checked);
         }
         return getThis();
+    }
+
+    /**
+     * Checks the specified rows' selector checkboxes
+     * @param columnIdentifier fieldKey, name, or label of column
+     * @param texts         Text to search for in the specified column
+     * @return this grid
+     */
+    public T selectRows(CharSequence columnIdentifier, String... texts)
+    {
+        return selectRows(columnIdentifier, Arrays.asList(texts), true);
     }
 
     /**
