@@ -214,9 +214,9 @@ public class SampleTypeTest extends BaseWebDriverTest
     public void testCreateSampleTypeNoExpression()
     {
         final String sampleTypeName = "SimpleCreateNoExp";
-        final List<FieldDefinition> fields = List.of(
-                new FieldDefinition("StringValue", ColumnType.String),
-                new FieldDefinition("IntValue", ColumnType.Integer));
+        FieldInfo stringCol = FieldInfo.random("StringValue", ColumnType.String);
+        FieldInfo intCol = FieldInfo.random("IntValue", ColumnType.Integer);
+        final List<FieldDefinition> fields = List.of(stringCol.getFieldDefinition(), intCol.getFieldDefinition());
 
         SampleTypeDefinition sampleTypeDefinition = new SampleTypeDefinition(sampleTypeName).setFields(fields);
 
@@ -228,19 +228,22 @@ public class SampleTypeTest extends BaseWebDriverTest
         sampleTypeHelper.verifyFields(fields);
 
         log("Add a single row to the sample type");
-        Map<String, String> fieldMap = Map.of("Name", "S-1", "StringValue", "Ess", "IntValue", "1");
+        Map<String, String> fieldMap = Map.of("Name", "S-1", stringCol.getName(), "Ess", intCol.getName(), "1");
         sampleTypeHelper.insertRow(fieldMap);
 
         log("Verify values were saved");
+        fieldMap = Map.of("Name", "S-1", stringCol.toString(), "Ess", intCol.toString(), "1");
         sampleTypeHelper.verifyDataValues(Collections.singletonList(fieldMap));
 
         List<Map<String, String>> data = new ArrayList<>();
-        data.add(Map.of("Name", "S-2", "StringValue", "Tee", "IntValue", "2"));
-        data.add(Map.of("Name", "S-3", "StringValue", "Ewe", "IntValue", "3"));
+        data.add(Map.of("Name", "S-2", stringCol.getName(), "Tee", intCol.getName(), "2"));
+        data.add(Map.of("Name", "S-3", stringCol.getName(), "Ewe", intCol.getName(), "3"));
         sampleTypeHelper.bulkImport(data);
 
         assertEquals("Number of samples not as expected", 3, sampleTypeHelper.getSampleCount());
-
+        data = new ArrayList<>();
+        data.add(Map.of("Name", "S-2", stringCol.toString(), "Tee", intCol.toString(), "2"));
+        data.add(Map.of("Name", "S-3", stringCol.toString(), "Ewe", intCol.toString(), "3"));
         sampleTypeHelper.verifyDataValues(data);
     }
 
@@ -335,11 +338,13 @@ public class SampleTypeTest extends BaseWebDriverTest
         USER_FOR_FILTERTEST.create(this)
                 .addPermission("Folder Administrator", getProjectName());
         String sampleType = "meFilterSamples";
+        FieldInfo sizeField = FieldInfo.random("size", ColumnType.Integer);
+        FieldInfo userField = FieldInfo.random("user", ColumnType.User);
         var domainDesigner = CreateSampleTypePage.beginAt(this, getProjectName());
         domainDesigner.setName(sampleType)
-                .addField(new FieldDefinition("size", ColumnType.Integer))
-                .addField(new FieldDefinition("user", ColumnType.User));
-        var formatDialog = domainDesigner.getFieldsPanel().getField("user").clickConditionalFormatButton();
+                .addField(sizeField.getFieldDefinition())
+                .addField(userField.getFieldDefinition());
+        var formatDialog = domainDesigner.getFieldsPanel().getField(userField.getName()).clickConditionalFormatButton();
         formatDialog.getOpenFormatPanel()
                 .setFirstCondition(Filter.Operator.EQUAL)
                 .setFirstValue("~me~")
@@ -352,13 +357,13 @@ public class SampleTypeTest extends BaseWebDriverTest
 
         var insertPage = sampleHelper.getSamplesDataRegionTable().clickInsertNewRow();
         insertPage.setField("Name", "me")
-                    .setField("size", 2)
-                    .setField("user", OptionSelect.SelectOption.textOption(getDisplayName()))
+                    .setField(sizeField.getName(), 2)
+                    .setField(userField.getName(), OptionSelect.SelectOption.textOption(getDisplayName()))
                     .submit();
         insertPage = sampleHelper.getSamplesDataRegionTable().clickInsertNewRow();
         insertPage.setField("Name", "not me")
-                .setField("size", 3)
-                .setField("user", OptionSelect.SelectOption.textOption(USER_FOR_FILTERTEST.getUserDisplayName()))
+                .setField(sizeField.getName(), 3)
+                .setField(userField.getName(), OptionSelect.SelectOption.textOption(USER_FOR_FILTERTEST.getUserDisplayName()))
                 .submit();
 
         var meCell = Locator.tag("td").withChild(Locator.tagWithText("a", getDisplayName()))
@@ -574,7 +579,7 @@ public class SampleTypeTest extends BaseWebDriverTest
         clickProject(PROJECT_NAME);
         SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
         sampleHelper.createSampleType(new SampleTypeDefinition(SAMPLE_TYPE_NAME)
-                        .setFields(List.of(new FieldDefinition("Field01",  ColumnType.String))),
+                        .setFields(List.of(FieldInfo.random("Field01").getFieldDefinition())),
                 sampleData);
 
         DataRegionTable drtSamples = sampleHelper.getSamplesDataRegionTable();
@@ -781,6 +786,7 @@ public class SampleTypeTest extends BaseWebDriverTest
         final String DESC_UPDATE_1 = "New description when one did not exist before.";
         final String FLAG_UPDATE_2 = "Flag Value Updated After Add";
         final String DESC_UPDATE_2 = "Updated description after adding a description.";
+        FieldInfo field01 = FieldInfo.random("Field01", ColumnType.String);
 
         log("Validate that update and delete works correctly with the Comment and Flag fields.");
 
@@ -789,38 +795,38 @@ public class SampleTypeTest extends BaseWebDriverTest
         // Using Map.of() creates an immutable collection I want to be able to update these data/collection items.
         Map<String, String> descriptionUpdate = new HashMap<>();
         descriptionUpdate.put("Name", SAMPLE_DESC_UPDATE);
-        descriptionUpdate.put("Field01", "cc");
+        descriptionUpdate.put(field01.getName(), "cc");
         descriptionUpdate.put("Description", "Here is the second description.");
         descriptionUpdate.put("Flag", "");
 
         Map<String, String> flagUpdate = new HashMap<>();
         flagUpdate.put("Name", SAMPLE_FLAG_UPDATE);
-        flagUpdate.put("Field01", "bb");
+        flagUpdate.put(field01.getName(), "bb");
         flagUpdate.put("Description", "");
         flagUpdate.put("Flag", "Flag Value 2");
 
         Map<String, String> updateBoth = new HashMap<>();
         updateBoth.put("Name", SAMPLE_UPDATE_BOTH);
-        updateBoth.put("Field01", "dd");
+        updateBoth.put(field01.getName(), "dd");
         updateBoth.put("Description", "");
         updateBoth.put("Flag", "");
 
         Map<String, String> deleteSample = new HashMap<>();
         deleteSample.put("Name", SAMPLE_NAME_TO_DELETE);
-        deleteSample.put("Field01", "aa");
+        deleteSample.put(field01.getName(), "aa");
         deleteSample.put("Description", "This is description number 1.");
         deleteSample.put("Flag", "Flag Value 1");
 
         // Some extra samples not really sure I will need them.
         Map<String, String> canarySample01 = new HashMap<>();
         canarySample01.put("Name", "ud05");
-        canarySample01.put("Field01", "ee");
+        canarySample01.put(field01.getName(), "ee");
         canarySample01.put("Description", "This is description for sample 5.");
         canarySample01.put("Flag", "Flag Value 5");
 
         Map<String, String> canarySample02 = new HashMap<>();
         canarySample02.put("Name", "ud06");
-        canarySample02.put("Field01", "ff");
+        canarySample02.put(field01.getName(), "ff");
         canarySample02.put("Description", "This is description for sample 6.");
         canarySample02.put("Flag", "Flag Value 6");
 
@@ -834,11 +840,12 @@ public class SampleTypeTest extends BaseWebDriverTest
 
         SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
         sampleHelper.createSampleType(new SampleTypeDefinition(SAMPLE_TYPE_NAME)
-                        .setFields(List.of(new FieldDefinition("Field01",  ColumnType.String))),
+                        .setFields(List.of(field01.getFieldDefinition())),
                 sampleData);
 
-        List<String> dbFieldsToCheck = Arrays.asList("Name", "Flag/Comment", "Field01", "Description");
-        List<Map<String, String>> resultsFromDB = getSampleDataFromDB(getCurrentContainerPath(), SAMPLE_TYPE_NAME, dbFieldsToCheck);
+        List<String> dbFieldsToCheck = Arrays.asList("Name", "Flag/Comment", field01.toString(), "Description");
+        Map<String, String> fieldKeyMap = Map.of("Flag/Comment", "Flag", field01.toString(), field01.getName());
+        List<Map<String, String>> resultsFromDB = getSampleDataFromDB(getCurrentContainerPath(), SAMPLE_TYPE_NAME, dbFieldsToCheck, fieldKeyMap);
 
         checker().fatal().verifyTrue("Newly inserted SampleType data not as expected. Fatal error.",
                 areDataListEqual(resultsFromDB, sampleData));
@@ -860,7 +867,7 @@ public class SampleTypeTest extends BaseWebDriverTest
         sampleData.remove(testDataIndex);
 
         log("Check that the Sample has been removed.");
-        resultsFromDB = getSampleDataFromDB(getCurrentContainerPath(), SAMPLE_TYPE_NAME, dbFieldsToCheck);
+        resultsFromDB = getSampleDataFromDB(getCurrentContainerPath(), SAMPLE_TYPE_NAME, dbFieldsToCheck, fieldKeyMap);
         checker().verifyTrue("Sample Type data is not as expected after a delete.", areDataListEqual(resultsFromDB, sampleData));
 
         log("Now update a sample's description.");
@@ -870,7 +877,7 @@ public class SampleTypeTest extends BaseWebDriverTest
 
         updateSampleType(sampleData.get(testDataIndex));
 
-        resultsFromDB = getSampleDataFromDB(getCurrentContainerPath(), SAMPLE_TYPE_NAME, dbFieldsToCheck);
+        resultsFromDB = getSampleDataFromDB(getCurrentContainerPath(), SAMPLE_TYPE_NAME, dbFieldsToCheck, fieldKeyMap);
         checker().verifyTrue("Sample Type data is not as expected after a update of Description.", areDataListEqual(resultsFromDB, sampleData));
 
         log("Now delete the sample's description.");
@@ -878,7 +885,7 @@ public class SampleTypeTest extends BaseWebDriverTest
 
         updateSampleType(sampleData.get(testDataIndex));
 
-        resultsFromDB = getSampleDataFromDB(getCurrentContainerPath(), SAMPLE_TYPE_NAME, dbFieldsToCheck);
+        resultsFromDB = getSampleDataFromDB(getCurrentContainerPath(), SAMPLE_TYPE_NAME, dbFieldsToCheck, fieldKeyMap);
         checker().verifyTrue("Sample Type data is not as expected after deleting the Description.", areDataListEqual(resultsFromDB, sampleData));
 
         log("Let's repeat it all again for a sample's flag/comment.");
@@ -887,7 +894,7 @@ public class SampleTypeTest extends BaseWebDriverTest
 
         updateSampleType(sampleData.get(testDataIndex));
 
-        resultsFromDB = getSampleDataFromDB(getCurrentContainerPath(), SAMPLE_TYPE_NAME, dbFieldsToCheck);
+        resultsFromDB = getSampleDataFromDB(getCurrentContainerPath(), SAMPLE_TYPE_NAME, dbFieldsToCheck, fieldKeyMap);
         checker().verifyTrue("Sample Type data is not as expected after a update of Flag/Comment.", areDataListEqual(resultsFromDB, sampleData));
 
         log("Now delete the sample's Flag/Comment.");
@@ -895,7 +902,7 @@ public class SampleTypeTest extends BaseWebDriverTest
 
         updateSampleType(sampleData.get(testDataIndex));
 
-        resultsFromDB = getSampleDataFromDB(getCurrentContainerPath(), SAMPLE_TYPE_NAME, dbFieldsToCheck);
+        resultsFromDB = getSampleDataFromDB(getCurrentContainerPath(), SAMPLE_TYPE_NAME, dbFieldsToCheck, fieldKeyMap);
         checker().verifyTrue("Sample Type data is not as expected after deleting the Flag/Comment.", areDataListEqual(resultsFromDB, sampleData));
 
         log("Finally update and delete both flag and description for a sample.");
@@ -905,7 +912,7 @@ public class SampleTypeTest extends BaseWebDriverTest
 
         updateSampleType(sampleData.get(testDataIndex));
 
-        resultsFromDB = getSampleDataFromDB(getCurrentContainerPath(), SAMPLE_TYPE_NAME, dbFieldsToCheck);
+        resultsFromDB = getSampleDataFromDB(getCurrentContainerPath(), SAMPLE_TYPE_NAME, dbFieldsToCheck, fieldKeyMap);
         checker().verifyTrue("Sample Type data is not as expected after a adding a Description and a Flag/Comment to an existing sample.",
                 areDataListEqual(resultsFromDB, sampleData));
 
@@ -916,7 +923,7 @@ public class SampleTypeTest extends BaseWebDriverTest
 
         updateSampleType(sampleData.get(testDataIndex));
 
-        resultsFromDB = getSampleDataFromDB(getCurrentContainerPath(), SAMPLE_TYPE_NAME, dbFieldsToCheck);
+        resultsFromDB = getSampleDataFromDB(getCurrentContainerPath(), SAMPLE_TYPE_NAME, dbFieldsToCheck, fieldKeyMap);
         checker().verifyTrue("Sample Type data is not as expected after a updating both a Description and a Flag/Comment.",
                 areDataListEqual(resultsFromDB, sampleData));
 
@@ -926,7 +933,7 @@ public class SampleTypeTest extends BaseWebDriverTest
 
         updateSampleType(sampleData.get(testDataIndex));
 
-        resultsFromDB = getSampleDataFromDB(getCurrentContainerPath(), SAMPLE_TYPE_NAME, dbFieldsToCheck);
+        resultsFromDB = getSampleDataFromDB(getCurrentContainerPath(), SAMPLE_TYPE_NAME, dbFieldsToCheck, fieldKeyMap);
         checker().verifyTrue("Sample Type data is not as expected after deleting the Description and Flag/Comment.",
                 areDataListEqual(resultsFromDB, sampleData));
 
@@ -935,15 +942,15 @@ public class SampleTypeTest extends BaseWebDriverTest
 
         for(Map<String, String> sample : sampleData)
         {
-            String fieldValue = sample.get("Field01");
-            sample.replace("Field01", fieldValue.toUpperCase());
+            String fieldValue = sample.get(field01.getName());
+            sample.replace(field01.getName(), fieldValue.toUpperCase());
         }
 
         List<String> fileData = new ArrayList<>();
-        fileData.add(String.format("%s\t%s", "Name", "Field01"));
+        fileData.add(String.format("%s\t%s", "Name", field01.getLabel()));
         for(Map<String, String> sample : sampleData)
         {
-            fileData.add(String.format("%s\t%s", sample.get("Name"), sample.get("Field01")));
+            fileData.add(String.format("%s\t%s", sample.get("Name"), sample.get(field01.getName())));
         }
 
         String fileName = "SampleTypeTest_UpdateSamples.tsv";
@@ -953,7 +960,7 @@ public class SampleTypeTest extends BaseWebDriverTest
 
         sampleHelper.mergeImport(importFile);
 
-        resultsFromDB = getSampleDataFromDB(getCurrentContainerPath(), SAMPLE_TYPE_NAME, dbFieldsToCheck);
+        resultsFromDB = getSampleDataFromDB(getCurrentContainerPath(), SAMPLE_TYPE_NAME, dbFieldsToCheck, fieldKeyMap);
         checker().verifyTrue("SampleType data is not as expected after using a file to update samples..",
                 areDataListEqual(resultsFromDB, sampleData));
 
@@ -1020,7 +1027,7 @@ public class SampleTypeTest extends BaseWebDriverTest
 
     }
 
-    protected List<Map<String, String>> getSampleDataFromDB(String folderPath, String sampleTypeName, List<String> fields)
+    protected List<Map<String, String>> getSampleDataFromDB(String folderPath, String sampleTypeName, List<String> fields, Map<String, String> fieldKeyMap)
     {
         List<Map<String, String>> results = new ArrayList<>(6);
         Map<String, String> tempRow;
@@ -1041,21 +1048,18 @@ public class SampleTypeTest extends BaseWebDriverTest
                 for(String key : row.keySet())
                 {
 
-                    if (fields.contains(key))
+                    if (fields.contains(key) || fieldKeyMap.containsValue(key))
                     {
 
-                        String tmpFlag = key;
-
-                        if(key.equalsIgnoreCase("Flag/Comment"))
-                            tmpFlag = "Flag";
+                        String mappedKey = fieldKeyMap.getOrDefault(key, key);
 
                         if (null == row.get(key))
                         {
-                            tempRow.put(tmpFlag, "");
+                            tempRow.put(mappedKey, "");
                         }
                         else
                         {
-                            tempRow.put(tmpFlag, row.get(key).toString());
+                            tempRow.put(mappedKey, row.get(key).toString());
                         }
 
                     }
@@ -1179,7 +1183,7 @@ public class SampleTypeTest extends BaseWebDriverTest
         cv.addColumn(INDICATOR_FIELD_NAME);
         cv.saveCustomView();
 
-        List<Map<String, String>> resultsFromDB = getSampleDataFromDB(getCurrentContainerPath(), SAMPLE_TYPE_NAME, Arrays.asList("Name", REQUIRED_FIELD_NAME, MISSING_FIELD_NAME, INDICATOR_FIELD_NAME));
+        List<Map<String, String>> resultsFromDB = getSampleDataFromDB(getCurrentContainerPath(), SAMPLE_TYPE_NAME, Arrays.asList("Name", REQUIRED_FIELD_NAME, MISSING_FIELD_NAME, INDICATOR_FIELD_NAME), Map.of());
 
         // After doing a bulk upload it looks like the value field is stored as an empty field in the DB.
         // Need to update the sample data to reflect what is expected from the DB.
@@ -1232,7 +1236,7 @@ public class SampleTypeTest extends BaseWebDriverTest
                 Locator.xpath("//td[contains(@class, 'labkey-mv-indicator')]").findElements(getDriver()).size(),
                 expectedMissingCount);
 
-        resultsFromDB = getSampleDataFromDB(getCurrentContainerPath(), SAMPLE_TYPE_NAME, Arrays.asList("Name", REQUIRED_FIELD_NAME, MISSING_FIELD_NAME, INDICATOR_FIELD_NAME));
+        resultsFromDB = getSampleDataFromDB(getCurrentContainerPath(), SAMPLE_TYPE_NAME, Arrays.asList("Name", REQUIRED_FIELD_NAME, MISSING_FIELD_NAME, INDICATOR_FIELD_NAME), Map.of());
 
         checker().verifyTrue("After updating a value the data in the DB is not as expected.",
                 areDataListEqual(resultsFromDB, sampleData));
@@ -1272,7 +1276,7 @@ public class SampleTypeTest extends BaseWebDriverTest
                 Locator.xpath("//td[contains(@class, 'labkey-mv-indicator')]").findElements(getDriver()).size(),
                 expectedMissingCount);
 
-        resultsFromDB = getSampleDataFromDB(getCurrentContainerPath(), SAMPLE_TYPE_NAME, Arrays.asList("Name", REQUIRED_FIELD_NAME, MISSING_FIELD_NAME, INDICATOR_FIELD_NAME));
+        resultsFromDB = getSampleDataFromDB(getCurrentContainerPath(), SAMPLE_TYPE_NAME, Arrays.asList("Name", REQUIRED_FIELD_NAME, MISSING_FIELD_NAME, INDICATOR_FIELD_NAME), Map.of());
 
         checker().verifyTrue("After adding a sample with a missing value through the UI the data in the DB is not as expected.",
                 areDataListEqual(resultsFromDB, sampleData));
