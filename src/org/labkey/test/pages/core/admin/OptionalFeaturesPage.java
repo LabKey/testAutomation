@@ -42,16 +42,6 @@ public class OptionalFeaturesPage extends LabKeyPage<OptionalFeaturesPage.Elemen
         return new ShowAdminPage(getDriver());
     }
 
-    public Map<String, String> getFeatureMap()
-    {
-        return elementCache().getListItems();
-    }
-
-    public Set<String> getFeatureIds()
-    {
-        return getFeatureMap().keySet();
-    }
-
     public boolean getFeatureStatus(String id)
     {
         return elementCache().getCheckboxById(id).get();
@@ -75,22 +65,6 @@ public class OptionalFeaturesPage extends LabKeyPage<OptionalFeaturesPage.Elemen
         public final WebElement listGroupElement = listGroupLoc.waitForElement(getDriver(), 1500);
         public final Locator listItemLabelLoc = Locator.tagWithClass("div", "list-group-item")
                 .child(Locator.tag("Label"));
-        private Map<String, String> _listItems;
-
-        public Map<String, String> getListItems()
-        {
-            if (_listItems == null) {
-                _listItems = new HashMap<String, String>();
-                for (WebElement el : listItemLabelLoc.findElements(listGroupElement)) {
-                    WebElement idEl = Locator.tagWithAttribute("type", "checkbox")
-                            .findElement(el);
-                    WebElement labelEl = Locator.tagWithClass("span", "toggle-label-text")
-                            .findElement(el);
-                    _listItems.put(idEl.getText(), labelEl.getText());
-                }
-            }
-            return _listItems;
-        }
 
         public Checkbox getCheckboxById(String id)
         {
