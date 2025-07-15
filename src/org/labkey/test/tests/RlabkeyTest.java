@@ -123,15 +123,15 @@ public class RlabkeyTest extends BaseWebDriverTest
 
         clickProject(PROJECT_NAME);
         createNewIssueList(issuesHelper, ISSUE_LIST_NAME);
-        issuesHelper.addIssue(Maps.of("assignedTo", _userHelper.getDisplayNameForEmail(USER), "title", ISSUE_TITLE_0));
+        issuesHelper.addIssue(Maps.of("AssignedTo", _userHelper.getDisplayNameForEmail(USER), "title", ISSUE_TITLE_0));
 
         clickFolder(FOLDER_NAME);
         createNewIssueList(issuesHelper, ISSUE_LIST_NAME);
-        issuesHelper.addIssue(Maps.of("assignedTo", _userHelper.getDisplayNameForEmail(USER), "title", ISSUE_TITLE_1));
+        issuesHelper.addIssue(Maps.of("AssignedTo", _userHelper.getDisplayNameForEmail(USER), "title", ISSUE_TITLE_1));
 
         clickProject(PROJECT_NAME_2);
         createNewIssueList(issuesHelper, ISSUE_LIST_NAME);
-        issuesHelper.addIssue(Maps.of("assignedTo", _userHelper.getDisplayNameForEmail(USER), "title", ISSUE_TITLE_2));
+        issuesHelper.addIssue(Maps.of("AssignedTo", _userHelper.getDisplayNameForEmail(USER), "title", ISSUE_TITLE_2));
     }
 
     /**

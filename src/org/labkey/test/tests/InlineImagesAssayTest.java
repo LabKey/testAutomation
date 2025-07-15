@@ -28,6 +28,7 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.CustomizeView;
+import org.labkey.test.components.assay.AssayConstants;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldKey;
@@ -127,10 +128,10 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
         log("Populate the assay with data.");
         clickAndWait(Locator.linkWithText(assayName));
         clickButton("Import Data");
-        setFormElement(Locator.name("batchFileField"), XLS_FILE);
+        setFormElement(Locator.name("BatchFileField"), XLS_FILE);
         clickButton("Next");
-        setFormElement(Locator.name("name"), runName);
-        setFormElement(Locator.name("TextAreaDataCollector.textArea"), importData);
+        setFormElement(AssayConstants.ASSAY_NAME_FIELD_LOCATOR, runName);
+        setFormElement(AssayConstants.TEXT_AREA_DATA_COLLECTOR_LOCATOR, importData);
 
         clickButton("Save and Finish");
 

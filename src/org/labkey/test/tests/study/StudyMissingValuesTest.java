@@ -9,6 +9,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Daily;
+import org.labkey.test.components.assay.AssayConstants;
 import org.labkey.test.pages.DatasetPropertiesPage;
 import org.labkey.test.pages.ImportDataPage;
 import org.labkey.test.tests.MissingValueIndicatorsTest;
@@ -201,11 +202,11 @@ public class StudyMissingValuesTest extends MissingValueIndicatorsTest
         waitAndClickAndWait(Locator.linkWithText(ASSAY_NAME));
         clickButton("Import Data");
         String targetStudyValue = "/" + getProjectName() + " (" + getProjectName() + " Study)";
-        selectOptionByText(Locator.xpath("//select[@name='targetStudy']"), targetStudyValue);
+        selectOptionByText(AssayConstants.TARGET_STUDY_FIELD_LOCATOR, targetStudyValue);
 
         clickButton("Next");
-        setFormElement(Locator.name("name"), ASSAY_RUN_SINGLE_COLUMN);
-        click(Locator.xpath("//input[@value='textAreaDataProvider']"));
+        setFormElement(AssayConstants.ASSAY_NAME_FIELD_LOCATOR, ASSAY_RUN_SINGLE_COLUMN);
+        click(AssayConstants.TEXT_AREA_DATA_PROVIDER_LOCATOR);
         setFormElement(Locator.name("TextAreaDataCollector.textArea"), TEST_DATA_SINGLE_COLUMN_ASSAY);
         clickButton("Save and Finish");
         assertNoLabKeyErrors();

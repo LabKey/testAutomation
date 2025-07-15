@@ -27,6 +27,7 @@ import org.labkey.remoteapi.assay.ProtocolResponse;
 import org.labkey.remoteapi.assay.SaveProtocolCommand;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.Daily;
+import org.labkey.test.components.assay.AssayConstants;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.APIAssayHelper;
@@ -111,7 +112,7 @@ public class AssayAPITest extends BaseWebDriverTest
         _uiAssayHelper.uploadXarFileAsAssayDesign(assayPath, pipelineCount, container);
 
         APIAssayHelper _apiAssayHelper = new APIAssayHelper(this);
-        _apiAssayHelper.importAssay(assayName, runPath, getProjectName(), Collections.singletonMap("ParticipantVisitResolver", "SampleInfo"));
+        _apiAssayHelper.importAssay(assayName, runPath, getProjectName(), Collections.singletonMap(AssayConstants.PARTICIPANT_VISIT_RESOLVER_FIELD_NAME, "SampleInfo"));
 
         log("verify import worked");
         goToProjectHome();
