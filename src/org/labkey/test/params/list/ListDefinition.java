@@ -1,15 +1,11 @@
 package org.labkey.test.params.list;
 
 import org.jetbrains.annotations.NotNull;
-import org.labkey.remoteapi.CommandException;
-import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.domain.Domain;
-import org.labkey.remoteapi.domain.InferDomainCommand;
 import org.labkey.remoteapi.domain.PropertyDescriptor;
+import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.property.DomainProps;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,7 +15,7 @@ public abstract class ListDefinition extends DomainProps
 {
     private String _name;
     private String _description;
-    private List<PropertyDescriptor> _fields = new ArrayList<>();
+    private List<FieldDefinition> _fields = new ArrayList<>();
     private String _keyName;
     // API Options
     private String _titleColumn;
@@ -67,7 +63,7 @@ public abstract class ListDefinition extends DomainProps
         return new ArrayList<>(_fields); // return a copy
     }
 
-    public ListDefinition setFields(List<? extends PropertyDescriptor> fields)
+    public ListDefinition setFields(List<FieldDefinition> fields)
     {
         if (!fields.isEmpty() && getKeyName() == null)
         {
@@ -78,14 +74,7 @@ public abstract class ListDefinition extends DomainProps
         return this;
     }
 
-    public ListDefinition inferFields(File dataFile, Connection connection) throws IOException, CommandException
-    {
-        return setFields(new InferDomainCommand(dataFile, getKind())
-                .execute(connection, "/")
-                .getFields());
-    }
-
-    public ListDefinition addField(@NotNull PropertyDescriptor field)
+    public ListDefinition addField(@NotNull FieldDefinition field)
     {
         if (getKeyName() == null)
         {
@@ -157,4 +146,14 @@ public abstract class ListDefinition extends DomainProps
     }
 
     protected abstract String getKeyType();
+
+    public FieldDefinition getFieldByNamePart(String namePart)
+    {
+        for (FieldDefinition field : _fields)
+        {
+            if (field.isNamePartMatch(namePart))
+                return field;
+        }
+        throw new IllegalArgumentException("No field found with name part: " + namePart);
+    }
 }
