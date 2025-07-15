@@ -1786,7 +1786,7 @@ public class GridPanelTest extends GridPanelBaseTest
         grid.selectView(VIEW_EXTRA_COLUMNS);
 
         List<FilterStatusValue> filterPills = grid.getFilterStatusValues();
-        String expectedValue = String.format("%s = true", FILTER_BOOL_COL.getName());
+        String expectedValue = String.format("%s = true", FILTER_BOOL_COL.getLabel());
         checker().withScreenshot("View_Filter_Pill_Error").verifyTrue(String.format("Filter pills not as expected. There should only be one with value of '%s'", expectedValue),
                 filterPills.size() == 1 && filterPills.get(0).getText().equals(expectedValue));
 
