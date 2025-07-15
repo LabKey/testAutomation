@@ -19,6 +19,7 @@ import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
+import org.labkey.test.util.TestDataGenerator;
 
 import java.io.File;
 import java.util.List;
@@ -96,8 +97,8 @@ public class AttachmentFieldTest extends BaseWebDriverTest
     @Test
     public void testAttachmentFieldInLists()
     {
-        String listName = "List with attachment field";
-        String fieldName = "testFile";
+        String listName = TestDataGenerator.randomDomainName("List with attachment field");
+        String fieldName = TestDataGenerator.randomFieldName("Test File");
         goToProjectHome();
         log("Creating the list");
         _listHelper.createList(getProjectName(), listName, "id");
