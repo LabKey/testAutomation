@@ -23,6 +23,7 @@ import org.labkey.remoteapi.query.InsertRowsCommand;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.components.assay.AssayConstants;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.pages.ImportDataPage;
 import org.labkey.test.pages.experiment.CreateSampleTypePage;
@@ -378,7 +379,7 @@ public class SampleTypeHelper extends WebDriverWrapper
         samplesTable.clickHeaderButtonAndWait("Link to Study");
 
         log("Link to study: Choose target");
-        selectOptionByText(Locator.id("targetStudy"), "/" + targetStudy + " (" + targetStudy + " Study)");
+        selectOptionByText(AssayConstants.TARGET_STUDY_FIELD_LOCATOR, "/" + targetStudy + " (" + targetStudy + " Study)");
         if (categoryName != null)
             setFormElement(Locator.name("autoLinkCategory"), categoryName);
         clickButton("Next");

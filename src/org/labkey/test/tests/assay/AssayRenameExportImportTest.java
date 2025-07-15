@@ -60,6 +60,9 @@ public class AssayRenameExportImportTest extends BaseWebDriverTest
             .setDate(2024, 1, 29)
             .setTimeOfDay(10, 45, 0)
             .build().getTime();
+    public static final String RUN_DATE_FIELD_NAME = "RunDate";
+    public static final String RUN_TIME_FIELD_NAME = "RunTime";
+    public static final String RUN_DATE_TIME_FIELD_NAME = "RunDateTime";
 
     private final SimpleDateFormat _defaultDateFormat = new SimpleDateFormat("yyyy-MM-dd");
     private final SimpleDateFormat _defaultTimeFormat = new SimpleDateFormat("HH:mm:ss");
@@ -289,9 +292,9 @@ public class AssayRenameExportImportTest extends BaseWebDriverTest
         domainFormPanel.getField("Time").setType(FieldDefinition.ColumnType.Time);
 
         domainFormPanel = assayDesignerPage.expandFieldsPanel("Run Fields");
-        domainFormPanel.addField(new FieldDefinition("RunDate", FieldDefinition.ColumnType.Date));
-        domainFormPanel.addField(new FieldDefinition("RunTime", FieldDefinition.ColumnType.Time));
-        domainFormPanel.addField(new FieldDefinition("RunDateTime", FieldDefinition.ColumnType.DateAndTime));
+        domainFormPanel.addField(new FieldDefinition(RUN_DATE_FIELD_NAME, FieldDefinition.ColumnType.Date));
+        domainFormPanel.addField(new FieldDefinition(RUN_TIME_FIELD_NAME, FieldDefinition.ColumnType.Time));
+        domainFormPanel.addField(new FieldDefinition(RUN_DATE_TIME_FIELD_NAME, FieldDefinition.ColumnType.DateAndTime));
 
         assayDesignerPage.clickFinish();
 
@@ -300,13 +303,13 @@ public class AssayRenameExportImportTest extends BaseWebDriverTest
         WebElement runPropertiesPanel = Locator.tagWithAttributeContaining("form", "data-region-form", "Runs")
                 .findElement(getDriver());
 
-        setFormElement(Locator.name("runDate").findElement(runPropertiesPanel),
+        setFormElement(Locator.name(RUN_DATE_FIELD_NAME).findElement(runPropertiesPanel),
                 _defaultDateFormat.format(runDateValue));
 
-        setFormElement(Locator.name("runTime").findElement(runPropertiesPanel),
+        setFormElement(Locator.name(RUN_TIME_FIELD_NAME).findElement(runPropertiesPanel),
                 _defaultTimeFormat.format(runDateValue));
 
-        setFormElement(Locator.name("runDateTime").findElement(runPropertiesPanel),
+        setFormElement(Locator.name(RUN_DATE_TIME_FIELD_NAME).findElement(runPropertiesPanel),
                 _defaultDateTimeFormat.format(runDateValue));
 
         waitAndClick(Locator.lkButton("Save and Finish"));
