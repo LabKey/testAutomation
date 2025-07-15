@@ -436,7 +436,7 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
 
         // arrange - 2 sample types, one with samples derived from parents in the other (and also parents in the same one)
         List<FieldDefinition> testFields = SampleTypeAPIHelper.sampleTypeTestFields(false);
-        FieldDefinition intColumn = getFieldByNamePart(testFields, "intColumn");
+        FieldDefinition intColumn = getFieldByNamePart(testFields, "int,./Column");
         FieldDefinition stringColumn = getFieldByNamePart(testFields, "stringColumn");
         FieldDefinition decimalColumn = getFieldByNamePart(testFields, "decimalColumn");
         DataClassDefinition dataClassType = new DataClassDefinition(dataClass).setFields(DataClassAPIHelper.dataClassTestFields());
@@ -566,7 +566,7 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
 
         // create a test sampleType
         List<FieldDefinition> testFields = SampleTypeAPIHelper.sampleTypeTestFields(true);
-        FieldDefinition intColumn = getFieldByNamePart(testFields, "intColumn");
+        FieldDefinition intColumn = getFieldByNamePart(testFields, "int,./Column");
         FieldDefinition stringColumn = getFieldByNamePart(testFields, "stringColumn");
         FieldDefinition decimalColumn = getFieldByNamePart(testFields, "decimalColumn");
         SampleTypeDefinition testSampleType = new SampleTypeDefinition(testSamples).setFields(testFields)
