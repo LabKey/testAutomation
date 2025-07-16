@@ -199,17 +199,17 @@ public class SampleTypeLimitsTest extends BaseWebDriverTest
 
         log("Attempt Derive Samples with invalid lookup value");
         initDeriveSamplesForm(sampleTypeName, "Derivative1");
-        verifyInvalidLookupSample("outputSample1_lookUpField", "Sample3", "Could not convert value 'Sample3' (String) for Integer field 'lookUpField'.");
+        verifyInvalidLookupSample("Output Sample 1_lookUpField", "Sample3", "Could not convert value 'Sample3' (String) for Integer field 'lookUpField'.");
 
         log("Insert Derive Samples with valid lookup display value");
-        verifyValidLookupSample("outputSample1_lookUpField", "Sample2", "Sample2", "Material", true);
+        verifyValidLookupSample("Output Sample 1_lookUpField", "Sample2", "Sample2", "Material", true);
 
         log("Insert Derive Samples with valid lookup to sample RowId");
         initDeriveSamplesForm(sampleTypeName, "Derivative2");
         SelectRowsCommand command = new SelectRowsCommand("samples", SAMPLE_TYPE_NAME);
         command.setFilters(Arrays.asList(new Filter("Name", "Sample1")));
         SelectRowsResponse response = command.execute(createDefaultConnection(), getProjectName());
-        verifyValidLookupSample("outputSample1_lookUpField", response.getRows().get(0).get("RowId").toString(), "Sample1", "Material", true);
+        verifyValidLookupSample("Output Sample 1_lookUpField", response.getRows().get(0).get("RowId").toString(), "Sample1", "Material", true);
     }
 
     private void initDeriveSamplesForm(String sampleTypeName, String sampleName)
@@ -220,7 +220,7 @@ public class SampleTypeLimitsTest extends BaseWebDriverTest
         samplesTable.clickHeaderButtonAndWait("Derive Samples");
         selectOptionByText(Locator.name("targetSampleTypeId"), sampleTypeName + " in /" + getProjectName());
         clickButton("Next");
-        setFormElement(Locator.name("outputSample1_Name"), sampleName);
+        setFormElement(Locator.name("Output Sample 1_Name"), sampleName);
     }
 
     @Test

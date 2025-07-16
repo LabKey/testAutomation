@@ -41,6 +41,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.labkey.test.params.FieldDefinition.DOMAIN_TRICKY_CHARACTERS;
 import static org.labkey.test.util.exp.SampleTypeAPIHelper.SAMPLE_TYPE_DOMAIN_KIND;
 
 @Category({Daily.class})
@@ -272,19 +273,19 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
         selectOptionByText(Locator.name("targetSampleTypeId"), subFolderSampleType + " in /" + getProjectName() + "/" + SUB_FOLDER_NAME);
         clickButton("Next");
 
-        setFormElement(Locator.name("outputSample1_Name"), "SampleSetBVT15");
-        setFormElement(Locator.name("outputSample2_Name"), "SampleSetBVT16");
+        setFormElement(Locator.name("Output Sample 1_Name"), "SampleSetBVT15");
+        setFormElement(Locator.name("Output Sample 2_Name"), "SampleSetBVT16");
         checkCheckbox(Locator.name("outputSample1_IntColFolderCheckBox"));
-        setFormElement(Locator.name("outputSample1_IntColFolder"), "500a");
-        setFormElement(Locator.name("outputSample1_StringColFolder"), "firstOutput");
-        setFormElement(Locator.name("outputSample2_StringColFolder"), "secondOutput");
+        setFormElement(Locator.name("Output Sample 1_IntCol-Folder"), "500a");
+        setFormElement(Locator.name("Output Sample 1_StringCol-Folder"), "firstOutput");
+        setFormElement(Locator.name("Output Sample 2_StringCol-Folder"), "secondOutput");
         clickButton("Submit");
 
         log("Do a simple check that data validation works.");
         checker().verifyTrue("Expected error message '(String) for Integer field' is not present.",
                 isTextPresent("(String) for Integer field"));
         checkCheckbox(Locator.name("outputSample1_IntColFolderCheckBox"));
-        setFormElement(Locator.name("outputSample1_IntColFolder"), "500");
+        setFormElement(Locator.name("Output Sample 1_IntCol-Folder"), "500");
         clickButton("Submit");
 
         clickAndWait(Locator.linkContainingText("Derive 2 samples"));
@@ -301,17 +302,17 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
         clickButton("Next");
 
         String derivedSampleName = "Only_In_Sub_Folder";
-        setFormElement(Locator.name("outputSample1_Name"), derivedSampleName);
-        setFormElement(Locator.name("outputSample1_IntCol"), "600");
-        setFormElement(Locator.name("outputSample1_StringCol"), "String");
-        setFormElement(Locator.name("outputSample1_DateCol"), "BadDate");
-        uncheckCheckbox(Locator.name("outputSample1_BoolCol"));
+        setFormElement(Locator.name("Output Sample 1_Name"), derivedSampleName);
+        setFormElement(Locator.name("Output Sample 1_IntCol"), "600");
+        setFormElement(Locator.name("Output Sample 1_StringCol"), "String");
+        setFormElement(Locator.name("Output Sample 1_DateCol"), "BadDate");
+        uncheckCheckbox(Locator.name("Output Sample 1_BoolCol"));
         clickButton("Submit");
 
         log("Again check that data validation works as expected.");
         checker().verifyTrue("Expected error message 'is not a valid Date' is not present.",
                 isTextPresent("'BadDate' is not a valid Date for DateCol "));
-        setFormElement(Locator.name("outputSample1_DateCol"), "1/1/2007");
+        setFormElement(Locator.name("Output Sample 1_DateCol"), "1/1/2007");
         clickButton("Submit");
 
         log("Check that the correct sample id is shown as the parent.");
@@ -1117,31 +1118,37 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
     @Test
     public void testDeleteSamplesSomeWithDerivedSamples()
     {
-        final String SAMPLE_TYPE_NAME = "DeleteSamplesWithParents";
+        final String SAMPLE_TYPE_NAME = "DeleteSamplesWithParents" + DOMAIN_TRICKY_CHARACTERS;
         List<String> parentSampleNames = Arrays.asList("P-1", "P-2", "P-3");
         List<Map<String, String>> sampleData = new ArrayList<>();
-        parentSampleNames.forEach(name -> {
-            sampleData.add(Map.of("Name", name));
-        });
+        parentSampleNames.forEach(name -> sampleData.add(Map.of("Name", name)));
 
         clickProject(PROJECT_NAME);
         SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
         log("Create a sample type with some potential parents");
-        sampleHelper.createSampleType(new SampleTypeDefinition(SAMPLE_TYPE_NAME), sampleData);
+        sampleHelper.createSampleType(new SampleTypeDefinition(SAMPLE_TYPE_NAME).
+                addField(new FieldDefinition("Blood+")).
+                addField(new FieldDefinition("Blood-")),
+            sampleData);
         DataRegionTable drtSamples = sampleHelper.getSamplesDataRegionTable();
         log("Derive one sample from another");
         drtSamples.checkCheckbox(drtSamples.getRowIndex("Name", parentSampleNames.get(0)));
         clickButton("Derive Samples");
         waitAndClickAndWait(Locator.lkButton("Next"));
         String childName = parentSampleNames.get(0) + ".1";
-        setFormElement(Locator.name("outputSample1_Name"), childName);
+        String nameFieldInputFieldName = "Output Sample 1_Name";
+        String bloodPlusFieldInputFieldName = "Output Sample 1_Blood+";
+        String bloodMinusFieldInputFieldName = "Output Sample 1_Blood-";
+        setFormElement(Locator.name(nameFieldInputFieldName), childName);
+        setFormElement(Locator.name(bloodPlusFieldInputFieldName), "blood plus");
+        setFormElement(Locator.name(bloodMinusFieldInputFieldName), "blood minus");
         clickButton("Submit");
 
         log("Derive a sample from the one just created");
         clickAndWait(Locator.linkContainingText("derive samples from this sample"));
         clickButton("Next");
         String grandchildName = childName + ".1";
-        setFormElement(Locator.name("outputSample1_Name"), grandchildName);
+        setFormElement(Locator.name(nameFieldInputFieldName), grandchildName);
         clickButton("Submit");
 
         log("Derive a sample with two parents");
@@ -1151,10 +1158,15 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
         clickButton("Derive Samples");
         waitAndClickAndWait(Locator.lkButton("Next"));
         String twoParentChildName = parentSampleNames.get(1) + "+" + childName + ".1";
-        setFormElement(Locator.name("outputSample1_Name"), twoParentChildName);
+        setFormElement(Locator.name(nameFieldInputFieldName), twoParentChildName);
         clickButton("Submit");
 
         clickAndWait(Locator.linkContainingText(SAMPLE_TYPE_NAME));
+
+        // Issue 53306 - ensure that names differing only by special characters were captured correctly and are being
+        // shown in the grid
+        assertTextPresent("blood plus", "blood minus");
+
 
         log("Try to delete parent sample");
         drtSamples.checkCheckbox(drtSamples.getRowIndex("Name", parentSampleNames.get(0)));

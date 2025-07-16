@@ -132,7 +132,7 @@ public class AssayTransformImportUpdateTest extends BaseWebDriverTest
         new AssayRunsPage(getDriver()).getTable().clickHeaderButton("Import Data");
         clickButton("Next");
         var importPage = new AssayImportPage(getDriver());
-        importPage.setNamedInputText("name", "transformTestImport");
+        importPage.setNamedInputText("Name", "transformTestImport");
         importPage.setNamedTextAreaValue("TextAreaDataCollector.textArea", importData);
         importPage.clickSaveAndFinish();
 
@@ -169,7 +169,7 @@ public class AssayTransformImportUpdateTest extends BaseWebDriverTest
         new AssayRunsPage(getDriver()).getTable().clickHeaderButton("Import Data");
         clickButton("Next");
         importPage = new AssayImportPage(getDriver());
-        importPage.setNamedInputText("name", "non_transform_import");
+        importPage.setNamedInputText("Name", "non_transform_import");
         importPage.setNamedTextAreaValue("TextAreaDataCollector.textArea", importData);
         importPage.clickSaveAndFinish();
 
@@ -281,7 +281,7 @@ public class AssayTransformImportUpdateTest extends BaseWebDriverTest
         new AssayRunsPage(getDriver()).getTable().clickHeaderButton("Import Data");
         clickButton("Next");
         var importPage = new AssayImportPage(getDriver());
-        importPage.setNamedInputText("name", "cancelTransformTestImport");
+        importPage.setNamedInputText("Name", "cancelTransformTestImport");
         importPage.setNamedTextAreaValue("TextAreaDataCollector.textArea", importDataBuilder.toString());
         Instant before = Instant.now();
         importPage.clickSaveAndFinish();

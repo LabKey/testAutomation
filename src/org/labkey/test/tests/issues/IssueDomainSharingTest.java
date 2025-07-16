@@ -126,7 +126,8 @@ public class IssueDomainSharingTest extends BaseWebDriverTest
         final String assignTo = _userHelper.getDisplayNameForEmail(USER);
         final String customValue = "Value for shared domain";
         final String listDef = SHARED_LIST_DEF;
-        final String inheritedField = "inheritedfield";
+        // Append ":" to field name: Issue 32057: Issues forms can't handle complex field names
+        final String inheritedField = "inheritedfield:";
 
         goToProjectHome("Shared");
         _containerHelper.enableModule("Issues");
@@ -144,8 +145,7 @@ public class IssueDomainSharingTest extends BaseWebDriverTest
         adminPage.clickSave();
 
         adminPage = IssuesAdminPage.beginAt(this, "Shared", listDef);
-        // Append ":" to field name: Issue 32057: Issues forms can't handle complex field names
-        adminPage.getFieldsPanel().addField(new FieldDefinition(inheritedField + ":", ColumnType.String).setLabel(inheritedField));
+        adminPage.getFieldsPanel().addField(new FieldDefinition(inheritedField, ColumnType.String).setLabel(inheritedField));
         adminPage.clickSave();
 
         ListPage issueList = ListPage.beginAt(this, getProjectName(), listDef);

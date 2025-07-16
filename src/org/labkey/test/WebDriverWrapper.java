@@ -2735,15 +2735,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
     }
 
     /**
-     * @deprecated Use {@link org.junit.Assert#assertEquals(String, Object, Object) and {@link #getFormElement(Locator)}}
-     */
-    @Deprecated
-    public void assertFormElementEquals(Locator loc, String value)
-    {
-        assertEquals(value, getFormElement(loc));
-    }
-
-    /**
      * @deprecated Use {@link org.junit.Assert#assertEquals(String, Object, Object)} and
      * {@link #getSelectedOptionText(Locator)}
      */

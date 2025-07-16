@@ -153,13 +153,13 @@ public class GpatAssayTest extends BaseWebDriverTest
         WebElement runPropertiesPanel = Locator.tagWithAttributeContaining("form", "data-region-form", "Runs")
                 .findElement(getDriver());
 
-        setFormElement(Locator.name("date").findElement(runPropertiesPanel),
+        setFormElement(Locator.name("Date").findElement(runPropertiesPanel),
                 "11/22/24");
 
-        setFormElement(Locator.name("time").findElement(runPropertiesPanel),
+        setFormElement(Locator.name("Time").findElement(runPropertiesPanel),
                 "10:38 am");
 
-        setFormElement(Locator.name("dateTime").findElement(runPropertiesPanel),
+        setFormElement(Locator.name("DateTime").findElement(runPropertiesPanel),
                 "11/22/24 10:38 am");
 
         clickButton("Save and Finish", defaultWaitForPage);
