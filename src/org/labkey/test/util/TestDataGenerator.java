@@ -70,7 +70,7 @@ import static org.labkey.test.util.data.TestDataUtils.REALISTIC_SOURCE_FIELDS;
  */
 public class TestDataGenerator
 {
-    private static final String WIDE_CHAR = "\uD83D\uDC7E"; // 👾
+    public static final String WIDE_CHAR = "\uD83D\uDC7E"; // 👾
     private static final char WIDE_PLACEHOLDER = '\u03A0'; // 'Π' - Wide character can't be picked from the string with 'charAt'
     private static final String NON_LATIN_STRING = "\u0438\uC548\u306F"; // "и안は"
     // chose a Character random from this String
