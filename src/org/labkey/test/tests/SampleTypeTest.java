@@ -160,11 +160,11 @@ public class SampleTypeTest extends BaseWebDriverTest
         final FieldDefinition txtField = new FieldDefinition(
                 TestDataGenerator.randomFieldName("text"), ColumnType.String).setRequired(true);
         final FieldDefinition dateField = new FieldDefinition(
-                TestDataGenerator.randomFieldName("date", ":"), ColumnType.Date);
+                TestDataGenerator.randomFieldName("date"), ColumnType.Date);
         final FieldDefinition timeField = new FieldDefinition(
-                TestDataGenerator.randomFieldName("time", ":"), ColumnType.Time);
+                TestDataGenerator.randomFieldName("time"), ColumnType.Time);
         final FieldDefinition dateTimeField = new FieldDefinition(
-                TestDataGenerator.randomFieldName("dateTime", ":"),  ColumnType.DateAndTime);
+                TestDataGenerator.randomFieldName("dateTime"),  ColumnType.DateAndTime);
         final List<FieldDefinition> fields = List.of(txtField, dateField, timeField, dateTimeField);
 
         SampleTypeDefinition sampleTypeDefinition = new SampleTypeDefinition(sampleTypeName).setFields(fields);

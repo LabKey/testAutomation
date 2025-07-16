@@ -20,6 +20,7 @@ import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldInfo;
 import org.labkey.test.util.APIAssayHelper;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.DomainUtils;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.TestDataGenerator;
 
@@ -63,11 +64,11 @@ public class DomainFieldTypeChangeTest extends BaseWebDriverTest
     {
         log("Creating list with variety of data fields");
         String listName = TestDataGenerator.randomDomainName("SampleListWithAllDataTypes");
-        FieldInfo stringField = FieldInfo.random("name", FieldDefinition.ColumnType.String);
-        FieldInfo integerField = FieldInfo.random("Test/Integer", FieldDefinition.ColumnType.Integer);
-        FieldInfo decimalField = FieldInfo.random("Test/Decimal", FieldDefinition.ColumnType.Decimal);
-        FieldInfo dateField = FieldInfo.random("Test/Date", FieldDefinition.ColumnType.DateAndTime);
-        FieldInfo booleanField = FieldInfo.random("Test'/\"Boolean", FieldDefinition.ColumnType.Boolean); // GH Issue #755
+        FieldInfo stringField = FieldInfo.random("name", FieldDefinition.ColumnType.String, DomainUtils.DomainKind.IntList);
+        FieldInfo integerField = FieldInfo.random("Test/Integer", FieldDefinition.ColumnType.Integer, DomainUtils.DomainKind.IntList);
+        FieldInfo decimalField = FieldInfo.random("Test/Decimal", FieldDefinition.ColumnType.Decimal, DomainUtils.DomainKind.IntList);
+        FieldInfo dateField = FieldInfo.random("Test/Date", FieldDefinition.ColumnType.DateAndTime, DomainUtils.DomainKind.IntList);
+        FieldInfo booleanField = FieldInfo.random("Test'/\"Boolean", FieldDefinition.ColumnType.Boolean, DomainUtils.DomainKind.IntList); // GH Issue #755
         TestDataGenerator dgen = new TestDataGenerator("lists", listName, getProjectName())
                 .withColumns(List.of(
                         stringField.getFieldDefinition(),
@@ -75,7 +76,7 @@ public class DomainFieldTypeChangeTest extends BaseWebDriverTest
                         decimalField.getFieldDefinition(),
                         dateField.getFieldDefinition(),
                         booleanField.getFieldDefinition()));
-        dgen.createDomain(createDefaultConnection(), "IntList", Map.of("keyName", "id"));
+        dgen.createDomain(createDefaultConnection(), DomainUtils.DomainKind.IntList.name(), Map.of("keyName", "id"));
 
         log("Inserting sample rows in the list");
         dgen.addCustomRow(Map.of(

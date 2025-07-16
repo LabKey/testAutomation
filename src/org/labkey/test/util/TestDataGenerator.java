@@ -582,7 +582,7 @@ public class TestDataGenerator
         return randomFieldName(part, exclusion, null);
     }
 
-    public static String randomFieldName(String part, @Nullable String exclusion, String domainKind)
+    public static String randomFieldName(String part, @Nullable String exclusion, DomainUtils.DomainKind domainKind)
     {
         return randomFieldName(part, randomInt(0, 5), randomInt(0, 5), exclusion, domainKind);
     }
@@ -597,9 +597,9 @@ public class TestDataGenerator
         return randomFieldName(part, numStartChars, numEndChars, exclusion, null);
     }
 
-    public static String randomFieldName(@NotNull String part, int numStartChars, int numEndChars, @Nullable String exclusion, String domainKind)
+    public static String randomFieldName(@NotNull String part, int numStartChars, int numEndChars, @Nullable String exclusion, DomainUtils.DomainKind domainKind)
     {
-        String _domainKind = StringUtils.isEmpty(domainKind) ? "SampleSet" : domainKind;
+        DomainUtils.DomainKind _domainKind = domainKind == null ? DomainUtils.DomainKind.SampleSet : domainKind;
 
         // use the characters that we know are encoded in fieldKeys plus characters that we know clients are using
         // Issue 53197: Field name with double byte character can cause client side exception in Firefox when trying to customize grid view.
@@ -615,7 +615,7 @@ public class TestDataGenerator
         return randomFieldName;
     }
 
-    private static boolean validateDomainFieldName(Connection connection, String domainKind, String fieldName)
+    private static boolean validateDomainFieldName(Connection connection, DomainUtils.DomainKind domainKind, String fieldName)
     {
         SimplePostCommand command = new SimplePostCommand("property", "validateDomainFields");
         JSONObject domainDesign = new JSONObject();

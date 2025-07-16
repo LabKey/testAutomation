@@ -27,7 +27,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -321,8 +320,8 @@ public class CrossFolderListTest extends BaseWebDriverTest
     {
         var firstListName = TestDataGenerator.randomDomainName("First");
         var secondListName = TestDataGenerator.randomDomainName("Second");
-        var textColumnName = TestDataGenerator.randomFieldName("Text");
-        var lookupFieldName = TestDataGenerator.randomFieldName("LookAtFirst");
+        var textColumnName = TestDataGenerator.randomFieldName("Text", null, DomainUtils.DomainKind.IntList);
+        var lookupFieldName = TestDataGenerator.randomFieldName("LookAtFirst", null, DomainUtils.DomainKind.IntList);
         var encodedLookupFieldName = EscapeUtil.fieldKeyEncodePart(lookupFieldName);
 
         // Create and configure list definitions
@@ -388,11 +387,11 @@ public class CrossFolderListTest extends BaseWebDriverTest
     private List<FieldDefinition> testFields()
     {
         return Arrays.asList(
-                FieldInfo.random("intColumn", FieldDefinition.ColumnType.Integer).getFieldDefinition(),
-                FieldInfo.random("decimalColumn", FieldDefinition.ColumnType.Decimal).getFieldDefinition(),
-                FieldInfo.random("stringColumn", FieldDefinition.ColumnType.String).getFieldDefinition(),
-                FieldInfo.random("dateColumn", FieldDefinition.ColumnType.DateAndTime).getFieldDefinition(),
-                FieldInfo.random("boolColumn", FieldDefinition.ColumnType.Boolean).getFieldDefinition()
+                FieldInfo.random("intColumn", FieldDefinition.ColumnType.Integer, DomainUtils.DomainKind.IntList).getFieldDefinition(),
+                FieldInfo.random("decimalColumn", FieldDefinition.ColumnType.Decimal, DomainUtils.DomainKind.IntList).getFieldDefinition(),
+                FieldInfo.random("stringColumn", FieldDefinition.ColumnType.String, DomainUtils.DomainKind.IntList).getFieldDefinition(),
+                FieldInfo.random("dateColumn", FieldDefinition.ColumnType.DateAndTime, DomainUtils.DomainKind.IntList).getFieldDefinition(),
+                FieldInfo.random("boolColumn", FieldDefinition.ColumnType.Boolean, DomainUtils.DomainKind.IntList).getFieldDefinition()
         );
     }
 

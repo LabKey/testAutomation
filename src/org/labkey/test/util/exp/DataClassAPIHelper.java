@@ -55,12 +55,12 @@ public class DataClassAPIHelper
     public static List<FieldDefinition> dataClassTestFields()
     {
         return Arrays.asList(
-                FieldInfo.random("intColumn", FieldDefinition.ColumnType.Integer).getFieldDefinition(),
-                FieldInfo.random("decimalColumn", FieldDefinition.ColumnType.Decimal).getFieldDefinition(),
-                FieldInfo.random("stringColumn", FieldDefinition.ColumnType.String).getFieldDefinition(),
-                FieldInfo.random("sampleDate", FieldDefinition.ColumnType.DateAndTime).getFieldDefinition(),
-                FieldInfo.random("boolColumn", FieldDefinition.ColumnType.Boolean).getFieldDefinition(),
-                FieldInfo.random("attachmentColumn", FieldDefinition.ColumnType.Attachment).getFieldDefinition()
+                FieldInfo.random("intColumn", FieldDefinition.ColumnType.Integer, DomainUtils.DomainKind.DataClass).getFieldDefinition(),
+                FieldInfo.random("decimalColumn", FieldDefinition.ColumnType.Decimal, DomainUtils.DomainKind.DataClass).getFieldDefinition(),
+                FieldInfo.random("stringColumn", FieldDefinition.ColumnType.String, DomainUtils.DomainKind.DataClass).getFieldDefinition(),
+                FieldInfo.random("sampleDate", FieldDefinition.ColumnType.DateAndTime, DomainUtils.DomainKind.DataClass).getFieldDefinition(),
+                FieldInfo.random("boolColumn", FieldDefinition.ColumnType.Boolean, DomainUtils.DomainKind.DataClass).getFieldDefinition(),
+                FieldInfo.random("attachmentColumn", FieldDefinition.ColumnType.Attachment, DomainUtils.DomainKind.DataClass).getFieldDefinition()
             );
     }
 

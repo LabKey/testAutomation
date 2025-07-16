@@ -13,6 +13,7 @@ import org.labkey.test.params.FieldInfo;
 import org.labkey.test.params.list.IntListDefinition;
 import org.labkey.test.params.list.VarListDefinition;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.DomainUtils;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.data.TestDataUtils;
 
@@ -28,8 +29,8 @@ public class QueryLookupTest extends BaseWebDriverTest
     private static final String PROJECT_NAME = "QueryLookupTest" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
     private static final String LIST_NAME = "l&ist q";
 
-    private static final FieldInfo NAME_COLUMN = FieldInfo.random("Name", FieldDefinition.ColumnType.String);
-    private static final FieldInfo TSHIRT_COLUMN = FieldInfo.random("TShirt", FieldDefinition.ColumnType.String);
+    private static final FieldInfo NAME_COLUMN = FieldInfo.random("Name", FieldDefinition.ColumnType.String, DomainUtils.DomainKind.VarList);
+    private static final FieldInfo TSHIRT_COLUMN = FieldInfo.random("TShirt", FieldDefinition.ColumnType.String, DomainUtils.DomainKind.VarList);
 
     @Override
     protected void doCleanup(boolean afterTest)
