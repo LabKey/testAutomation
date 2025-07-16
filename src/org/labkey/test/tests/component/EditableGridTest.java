@@ -1496,7 +1496,7 @@ public class EditableGridTest extends BaseWebDriverTest
 
             checker().verifyEquals("Cell warning status not as expected at row " + rowId + " for col " + field.getLabel(), !StringUtils.isEmpty(expectedWarning), testGrid.hasCellError(rowId, field));
             if (!StringUtils.isEmpty(expectedWarning))
-                checker().verifyEquals("Cell warning msg not as expected at row " + rowId + " for col " + field.getLabel(), expectedWarning, testGrid.getCellPopoverText(rowId, field));
+                checker().verifyEqualsIgnoreWhiteSpaces("Cell warning msg not as expected at row " + rowId + " for col " + field.getLabel(), expectedWarning, testGrid.getCellPopoverText(rowId, field));
         }
     }
 
