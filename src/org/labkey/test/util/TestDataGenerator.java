@@ -582,7 +582,7 @@ public class TestDataGenerator
         String randomFieldName = randomName(part, numStartChars, numEndChars, chars, exclusion);
 
         // Avoid generating fields names with reserved substitution format patterns. e.g. ":Date" or ":First"
-        if (numStartChars > 0 && randomFieldName.charAt(numStartChars - 1) == ':' &&
+        if (numStartChars > 0 && part.length() >= 4 && randomFieldName.charAt(numStartChars - 1) == ':' &&
                 StringUtils.isAlpha(part.substring(0, 4))) // The shortest pattern is four characters (see org.labkey.api.util.SubstitutionFormat.getFormatNames)
         {
             String regenExclusion = Objects.requireNonNullElse(exclusion, "") + ":";

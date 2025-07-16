@@ -198,11 +198,11 @@ public class IssuesAdminTest extends BaseWebDriverTest
 
         DetailsPage detailsPage = _issuesHelper.addIssue(
                 Maps.of("title", mainTitle,
-                        "assignedTo", TEST_USER_DISPLAY_NAME,
+                        "AssignedTo", TEST_USER_DISPLAY_NAME,
                         "comment", "Main issue Comment"));
 
         Map<String, String> relatedIssueData = Maps.of("title", relatedIssueTitle,
-                "assignedTo", TEST_USER_DISPLAY_NAME,
+                "AssignedTo", TEST_USER_DISPLAY_NAME,
                 "comment", "Related issue Comment");
         InsertPage relatedIssuePage = detailsPage.clickCreateRelatedIssue(getProjectName(), ISSUE_LIST_NAME.toLowerCase());
         for (Map.Entry<String, String> field : relatedIssueData.entrySet())

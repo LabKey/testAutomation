@@ -13,6 +13,7 @@ import org.labkey.test.SortDirection;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.CustomizeView;
+import org.labkey.test.components.assay.AssayConstants;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.pages.ImportDataPage;
@@ -321,8 +322,8 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         samplesTable.clickHeaderButtonAndWait("Derive Samples");
         selectOptionByText(Locator.name("targetSampleTypeId"), "Plasma in /" + SAMPLE_TYPE_PROJECT);
         clickButton("Next");
-        setFormElement(Locator.name("outputSample1_Name"), derivedSampleName);
-        setFormElement(Locator.name("outputSample1_Volume"), "1");
+        setFormElement(Locator.name("Output Sample 1_Name"), derivedSampleName);
+        setFormElement(Locator.name("Output Sample 1_Volume"), "1");
         clickButton("Submit");
 
         goToProjectHome(SAMPLE_TYPE_PROJECT);
@@ -339,7 +340,7 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         samplesTable.clickHeaderButtonAndWait("Link to Study");
 
         log("Link to study: Choose target");
-        selectOptionByText(Locator.id("targetStudy"), "/" + DATE_BASED_STUDY + " (" + DATE_BASED_STUDY + " Study)");
+        selectOptionByText(AssayConstants.TARGET_STUDY_FIELD_LOCATOR, "/" + DATE_BASED_STUDY + " (" + DATE_BASED_STUDY + " Study)");
         clickButton("Next");
         new DataRegionTable("query", getDriver()).clickHeaderButtonAndWait("Link to Study");
 
@@ -370,8 +371,8 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         DataRegionTable table = new DataRegionTable("Runs", getDriver());
         table.clickHeaderButton("Import Data");
         clickButton("Next");
-        setFormElement(Locator.name("name"), runName);
-        setFormElement(Locator.name("TextAreaDataCollector.textArea"), importData);
+        setFormElement(AssayConstants.ASSAY_NAME_FIELD_LOCATOR, runName);
+        setFormElement(AssayConstants.TEXT_AREA_DATA_COLLECTOR_LOCATOR, importData);
         clickButton("Save and Finish");
 
         clickAndWait(Locator.linkWithText(runName));
@@ -385,7 +386,7 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
 
         table.checkCheckbox(0);
         table.clickHeaderButtonAndWait("Link to Study");
-        selectOptionByText(Locator.id("targetStudy"), "/" + DATE_BASED_STUDY + " (" + DATE_BASED_STUDY + " Study)");
+        selectOptionByText(AssayConstants.TARGET_STUDY_FIELD_LOCATOR, "/" + DATE_BASED_STUDY + " (" + DATE_BASED_STUDY + " Study)");
         clickButton("Next");
 
         checker().verifyEquals("Incorrect Participant ID deduced", "P4", Locator.name("participantId").findElement(getDriver()).getAttribute("value"));
@@ -672,7 +673,7 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         samplesTable.clickHeaderButtonAndWait("Derive Samples");
         selectOptionByText(Locator.name("targetSampleTypeId"), childSampleType + " in /" + getProjectName());
         clickButton("Next");
-        setFormElement(Locator.name("outputSample1_Name"), "derivedChildSample");
+        setFormElement(Locator.name("Output Sample 1_Name"), "derivedChildSample");
         clickButton("Submit");
 
         log("Verifying the auto link to study by deriving single samples from parent sample");
