@@ -997,6 +997,13 @@ public class Crawler
                 actualUrl = _test.getURL();
                 if (!actualUrl.toString().endsWith(relativeURL))
                 {
+                    try
+                    {
+                        String actualRelativeUrl = WebTestHelper.makeRelativeUrl(actualUrl.toString());
+                        _actionsVisited.add(new ControllerActionId(actualRelativeUrl));
+                        _urlsVisited.add(actualRelativeUrl);
+                        _urlsChecked.add(EscapeUtil.decodeUriPath(stripQueryParams(actualRelativeUrl)));
+                    } catch (IllegalArgumentException ignored) {}
                     originMessage = originMessage + "\nRedirected to: " + actualUrl;
                 }
 
