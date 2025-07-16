@@ -16,8 +16,8 @@
 package org.labkey.test.tests;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.apache.hc.core5.http.HttpStatus;
+import org.assertj.core.api.Assertions;
 import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
@@ -62,6 +62,7 @@ import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelper;
+import org.labkey.test.util.SimpleHttpRequest;
 import org.labkey.test.util.TestLogger;
 import org.labkey.test.util.WikiHelper;
 import org.labkey.test.util.ext4cmp.Ext4FieldRef;
@@ -1125,7 +1126,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
     }
 
     @LogMethod
-    private void doTestReports()
+    private void doTestReports() throws IOException
     {
         RReportHelper _rReportHelper = new RReportHelper(this);
         WikiHelper wikiHelper = new WikiHelper(this);
@@ -1177,7 +1178,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
     }
 
     @LogMethod
-    private void doTestReportThumbnails()
+    private void doTestReportThumbnails() throws IOException
     {
         goToProjectHome();
         log("Verify custom module report thumbnail images");
@@ -1187,14 +1188,13 @@ public class SimpleModuleTest extends BaseWebDriverTest
     }
 
     @LogMethod
-    private void doTestReportIcon()
+    private void doTestReportIcon() throws IOException
     {
         log("Verify custom module report icon image");
         setFormElement(Locator.xpath("//table[contains(@class, 'dataset-search')]//input"), KNITR_PEOPLE);
         waitForElementToDisappear(Locator.tag("tr").withClass("x4-grid-row").containing(WANT_TO_BE_COOL).notHidden());
 
         File expectedIconFile = TestFileUtils.getSampleData(THUMBNAIL_FOLDER + KNITR_PEOPLE + ICON_FILENAME);
-        String expectedIcon = TestFileUtils.getFileContents(expectedIconFile);
 
         WebElement img = waitForElement(Locator.tag("img").withClass("dataview-icon").withoutClass("x4-tree-icon-parent").notHidden());
         String backgroundImage = StringUtils.trimToEmpty(img.getCssValue("background-image"));
@@ -1204,12 +1204,10 @@ public class SimpleModuleTest extends BaseWebDriverTest
             Assert.fail("Module report icon style is not as expected: " + img.getDomAttribute("style"));
         }
         String iconUrl = matcher.group(1);
-        String iconData = WebTestHelper.getHttpResponse(iconUrl).getResponseBody();
+        File downloadedIcon = new SimpleHttpRequest(iconUrl).getResponseAsFile(TestFileUtils.ensureTestTempFile(KNITR_PEOPLE + ICON_FILENAME));
 
-        int lengthToCompare = 3000;
-        int diff = LevenshteinDistance.getDefaultInstance().apply(expectedIcon.substring(0, lengthToCompare), iconData.substring(0, lengthToCompare));
-        assertTrue("Module report icon is not as expected, diff is " + diff, expectedIcon.equals(iconData) ||
-                diff  <= lengthToCompare * 0.03); // Might be slightly different due to indentations, etc
+        Assertions.assertThat(downloadedIcon).as("Module report icon is not as expected")
+                .hasSameBinaryContentAs(expectedIconFile);
     }
 
     @LogMethod
@@ -1222,20 +1220,18 @@ public class SimpleModuleTest extends BaseWebDriverTest
     }
 
     @LogMethod
-    private void verifyReportThumbnail(@LoggedParam String reportTitle)
+    private void verifyReportThumbnail(@LoggedParam String reportTitle) throws IOException
     {
         File expectedThumbnailFile = TestFileUtils.getSampleData(THUMBNAIL_FOLDER + reportTitle + THUMBNAIL_FILENAME);
-        String expectedThumbnail = TestFileUtils.getFileContents(expectedThumbnailFile);
 
         WebElement reportLink = waitForElement(Locator.xpath("//a[text()='" + reportTitle + "']"));
         mouseOver(reportLink);
         WebElement thumbnail = waitForElement(Locator.xpath("//div[@class='thumbnail']/img").notHidden());
-        String thumbnailData = WebTestHelper.getHttpResponse(thumbnail.getDomProperty("src")).getResponseBody();
+        File downloadedThumbnail = new SimpleHttpRequest(thumbnail.getDomProperty("src"))
+                .getResponseAsFile(TestFileUtils.ensureTestTempFile(reportTitle + THUMBNAIL_FILENAME));
 
-        int lengthToCompare = 5000;
-        int diff = LevenshteinDistance.getDefaultInstance().apply(expectedThumbnail.substring(0, lengthToCompare), thumbnailData.substring(0, lengthToCompare));
-        assertTrue("Module report thumbnail is not as expected, diff is " + diff, expectedThumbnail.equals(thumbnailData) ||
-                diff  <= lengthToCompare * 0.03); // Might be slightly different due to indentations, etc
+        Assertions.assertThat(downloadedThumbnail).as("Module report thumbnail is not as expected")
+                .hasSameBinaryContentAs(expectedThumbnailFile);
     }
 
     @LogMethod

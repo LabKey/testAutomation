@@ -245,7 +245,6 @@ public abstract class AbstractKnitrReportTest extends BaseWebDriverTest
     public void testEmbeddedReportNonce()
     {
         CspConfigHelper.debugCspWarnings();
-        new CspConfigHelper(this).setEnforceCsp(false);
 
         String name = "rhtml nonce check";
         Locator[] reportContains = {nonceCheckSuccessLoc};

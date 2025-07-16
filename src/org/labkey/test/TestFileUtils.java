@@ -64,8 +64,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.security.Security;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -117,21 +115,6 @@ public abstract class TestFileUtils
             return Files.readString(path);
         }
         catch (IOException fail)
-        {
-            throw new RuntimeException(fail);
-        }
-    }
-
-    /**
-     * Compute MD5 hash for the given file. Useful checking file equivalence.
-     */
-    public static String getMD5Hash(Path path)
-    {
-        try
-        {
-            return new String(MessageDigest.getInstance("MD5").digest(Files.readAllBytes(path)), StandardCharsets.UTF_8);
-        }
-        catch (IOException | NoSuchAlgorithmException fail)
         {
             throw new RuntimeException(fail);
         }
@@ -372,10 +355,46 @@ public abstract class TestFileUtils
         return new File(buildDir, "testTemp");
     }
 
-    public static File ensureTestTempDir() throws IOException
+    /**
+     * Creates a directory under the 'testTemp' directory: 'build/testTemp/[children]'
+     * @param children will be appended to the testTemp path
+     * @return A file pointer to the specified directory. The directory will exist
+     * @throws IOException if the directories were not created
+     */
+    public static File ensureTestTempDir(String... children) throws IOException
     {
         File file = getTestTempDir();
+        for (String child : children)
+        {
+            file = new File(file, child);
+        }
+
         FileUtils.forceMkdir(file);
+
+        return file;
+    }
+
+    /**
+     * Creates a directory under the 'testTemp' directory to contain the specified file. 'build/testTemp[/children]/lastChild'
+     * @param children will be appended to the testTemp path to construct the desired file's path
+     * @return A file pointer to the specified file. The file's parents will exist but the file might not
+     * @throws IOException if the parent directories were not created
+     */
+    public static File ensureTestTempFile(String... children) throws IOException
+    {
+        File file = getTestTempDir();
+
+        for (String child : children)
+        {
+            file = new File(file, child);
+        }
+
+        if (file.toString().length() == getTestTempDir().toString().length())
+        {
+            throw new IllegalArgumentException("No valid children were provided: " + Arrays.toString(children));
+        }
+        FileUtils.forceMkdirParent(file);
+
         return file;
     }
 
