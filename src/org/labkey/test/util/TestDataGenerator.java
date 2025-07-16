@@ -20,11 +20,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.junit.Assert;
 import org.labkey.api.collections.CaseInsensitiveLinkedHashMap;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
 import org.labkey.remoteapi.domain.CreateDomainCommand;
 import org.labkey.remoteapi.domain.DomainResponse;
@@ -480,15 +483,11 @@ public class TestDataGenerator
             {
                 randIndex = (int)(charSetFrom.length() * Math.random());
                 c = charSetFrom.charAt(randIndex);
-                int repeatCount = randomInt(2, 15); // repeat between 2 and 15 times
+                int repeatCount = randomInt(2, 50); // repeat between 2 and 50 times
                 val.append(StringUtils.repeat(c, repeatCount));
-                break; // we don't want to hit another REPEAT_PLACEHOLDER or ALL_CHARS_PLACEHOLDER in this for loop
             }
             else if (c == ALL_CHARS_PLACEHOLDER)
-            {
                 val.append(charSetFrom);
-                break; // we've added them all, no need to continue, and we don't want to hit another REPEAT_PLACEHOLDER or ALL_CHARS_PLACEHOLDER in this for loop
-            }
             else if (c == WIDE_PLACEHOLDER)
                 val.append(WIDE_CHAR);
             else
@@ -580,7 +579,12 @@ public class TestDataGenerator
 
     public static String randomFieldName(String part, @Nullable String exclusion)
     {
-        return randomFieldName(part, randomInt(0, 5), randomInt(0, 5), exclusion);
+        return randomFieldName(part, exclusion, null);
+    }
+
+    public static String randomFieldName(String part, @Nullable String exclusion, String domainKind)
+    {
+        return randomFieldName(part, randomInt(0, 5), randomInt(0, 5), exclusion, domainKind);
     }
 
     public static String randomFieldName(String part, int numStartChars, int numEndChars)
@@ -590,6 +594,13 @@ public class TestDataGenerator
 
     public static String randomFieldName(@NotNull String part, int numStartChars, int numEndChars, @Nullable String exclusion)
     {
+        return randomFieldName(part, numStartChars, numEndChars, exclusion, null);
+    }
+
+    public static String randomFieldName(@NotNull String part, int numStartChars, int numEndChars, @Nullable String exclusion, String domainKind)
+    {
+        String _domainKind = StringUtils.isEmpty(domainKind) ? "SampleSet" : domainKind;
+
         // use the characters that we know are encoded in fieldKeys plus characters that we know clients are using
         // Issue 53197: Field name with double byte character can cause client side exception in Firefox when trying to customize grid view.
         String chars = ALL_ILLEGAL_QUERY_KEY_CHARACTERS + " %()=+-[]_|*`'\":;<>?!@#^" + NON_LATIN_STRING
@@ -597,18 +608,34 @@ public class TestDataGenerator
 
         String randomFieldName = randomName(part, numStartChars, numEndChars, chars, exclusion);
 
-        // Avoid generating fields names with reserved substitution format patterns. e.g. ":Date" or ":First"
-        if (numStartChars > 0 && part.length() >= 4 && randomFieldName.charAt(numStartChars - 1) == ':' &&
-                StringUtils.isAlpha(part.substring(0, 4))) // The shortest pattern is four characters (see org.labkey.api.util.SubstitutionFormat.getFormatNames)
-        {
-            String regenExclusion = Objects.requireNonNullElse(exclusion, "") + ":";
-            randomFieldName = randomFieldName.substring(0, numStartChars - 1) +
-                    randomString(1, regenExclusion, chars) +
-                    randomFieldName.substring(numStartChars + 1);
-        }
+        while (!validateDomainFieldName(WebTestHelper.getRemoteApiConnection(false), _domainKind, randomFieldName))
+            randomFieldName = randomName(part, numStartChars, numEndChars, chars, exclusion);
 
-        TestLogger.log("Generated random field name: " + randomFieldName);
+        TestLogger.log("Generated random field name for domainKind " + _domainKind + ": " + randomFieldName);
         return randomFieldName;
+    }
+
+    private static boolean validateDomainFieldName(Connection connection, String domainKind, String fieldName)
+    {
+        SimplePostCommand command = new SimplePostCommand("property", "validateDomainFields");
+        JSONObject domainDesign = new JSONObject();
+        JSONArray fields = new JSONArray();
+        fields.put(new JSONObject(Map.of("name", fieldName)));
+        domainDesign.put("fields", fields);
+        JSONObject json = new JSONObject();
+        json.put("kind", domainKind);
+        json.put("domainDesign", domainDesign);
+        command.setJsonObject(json);
+
+        try
+        {
+            CommandResponse response = command.execute(connection, "/");
+            return !response.getParsedData().containsKey("errors");
+        }
+        catch (CommandException | IOException e)
+        {
+            throw new RuntimeException("Failed to validate domain field name: %s.".formatted(fieldName), e);
+        }
     }
 
     public static String randomChoice(List<String> choices)
