@@ -531,7 +531,7 @@ public class TestDataGenerator
 
     public static String randomDomainName(@Nullable String part)
     {
-        return randomDomainName(part, randomInt(0, 20)); // TODO increase this after fix for 53478
+        return randomDomainName(part, null);
     }
 
     public static String randomInvalidDomainName(@Nullable String namePart, int numStartChars, int numEndChars)
@@ -541,42 +541,38 @@ public class TestDataGenerator
         return domainName;
     }
 
-    public static String randomDomainName(int numEndChars)
-    {
-        return randomDomainName(null, numEndChars);
-    }
-
     public static String randomDomainName(@Nullable String namePart, @Nullable DomainUtils.DomainKind domainKind)
     {
-        return randomDomainName(namePart, randomInt(0, 100), domainKind);
-    }
-
-    public static String randomDomainName(@Nullable String namePart, int numEndChars)
-    {
-        return randomDomainName(namePart, numEndChars, null);
+        return randomDomainName(namePart, null, null, domainKind);
     }
 
     /**
      * Generate a random domain name of the specified size.
      *
      * @param namePart    If a namePart is provided, the domain name will contain it. Pass null to generate a random alphanumeric single character for the prefix.
+     * @param numStartChars Number of random characters at end of name
      * @param numEndChars Number of random characters at end of name
      * @return name containing the given name part and appended random characters that should be a valid domain name
      */
-    public static String randomDomainName(@Nullable String namePart, int numEndChars, @Nullable DomainUtils.DomainKind domainKind)
+    public static String randomDomainName(@Nullable String namePart, @Nullable Integer numStartChars, @Nullable Integer numEndChars, @Nullable DomainUtils.DomainKind domainKind)
     {
         String _namePart = namePart == null ? "" : namePart;
         DomainUtils.DomainKind _domainKind = domainKind == null ? DomainUtils.DomainKind.SampleSet : domainKind;
-        String charSet = namePart != null ? DOMAIN_SPECIAL_STRING : ALPHANUMERIC_STRING + DOMAIN_SPECIAL_STRING;
-        String domainName = randomName(_namePart, 0, numEndChars, charSet, null);
-        while (!validateDomainAndFieldName(WebTestHelper.getRemoteApiConnection(false), _domainKind, domainName, null))
-            domainName = randomName(_namePart, 0, numEndChars, charSet, null);
+        String charSet = ALPHANUMERIC_STRING + DOMAIN_SPECIAL_STRING;
+        String domainName = randomName(_namePart, getNumChars(numStartChars, 5), getNumChars(numEndChars, 50), charSet, null);
+        while (isDomainAndFieldNameInvalid(WebTestHelper.getRemoteApiConnection(false), _domainKind, domainName, null))
+            domainName = randomName(_namePart, getNumChars(numStartChars, 5), getNumChars(numEndChars, 50), charSet, null);
 
         // Multiple spaces in the UI are collapsed into a single space. If we need to test for handling of multiple spaces, we'll not use this generator
         domainName = domainName.replaceAll("\\s+", " ");
 
         TestLogger.log("Generated random domain name for domainKind " + _domainKind + ": " + domainName);
         return domainName;
+    }
+
+    private static int getNumChars(Integer val, int max)
+    {
+        return val != null ? val : randomInt(0, max);
     }
 
     public static String randomFieldName(String part)
@@ -591,20 +587,10 @@ public class TestDataGenerator
 
     public static String randomFieldName(String part, @Nullable String exclusion, DomainUtils.DomainKind domainKind)
     {
-        return randomFieldName(part, randomInt(0, 5), randomInt(0, 5), exclusion, domainKind);
+        return randomFieldName(part, null, null, exclusion, domainKind);
     }
 
-    public static String randomFieldName(String part, int numStartChars, int numEndChars)
-    {
-       return randomFieldName(part, numStartChars, numEndChars, null);
-    }
-
-    public static String randomFieldName(@NotNull String part, int numStartChars, int numEndChars, @Nullable String exclusion)
-    {
-        return randomFieldName(part, numStartChars, numEndChars, exclusion, null);
-    }
-
-    public static String randomFieldName(@NotNull String part, int numStartChars, int numEndChars, @Nullable String exclusion, DomainUtils.DomainKind domainKind)
+    public static String randomFieldName(@NotNull String part, @Nullable Integer numStartChars, @Nullable Integer numEndChars, @Nullable String exclusion, @Nullable DomainUtils.DomainKind domainKind)
     {
         DomainUtils.DomainKind _domainKind = domainKind == null ? DomainUtils.DomainKind.SampleSet : domainKind;
 
@@ -613,16 +599,15 @@ public class TestDataGenerator
         String chars = ALL_ILLEGAL_QUERY_KEY_CHARACTERS + " %()=+-[]_|*`'\":;<>?!@#^" + NON_LATIN_STRING
                 + WIDE_PLACEHOLDER + REPEAT_PLACEHOLDER + ALL_CHARS_PLACEHOLDER;
 
-        String randomFieldName = randomName(part, numStartChars, numEndChars, chars, exclusion);
-
-        while (!validateDomainAndFieldName(WebTestHelper.getRemoteApiConnection(false), _domainKind, null, randomFieldName))
-            randomFieldName = randomName(part, numStartChars, numEndChars, chars, exclusion);
+        String randomFieldName = randomName(part, getNumChars(numStartChars, 5), getNumChars(numEndChars, 50), chars, exclusion);
+        while (isDomainAndFieldNameInvalid(WebTestHelper.getRemoteApiConnection(false), _domainKind, null, randomFieldName))
+            randomFieldName = randomName(part, getNumChars(numStartChars, 5), getNumChars(numEndChars, 50), chars, exclusion);
 
         TestLogger.log("Generated random field name for domainKind " + _domainKind + ": " + randomFieldName);
         return randomFieldName;
     }
 
-    private static boolean validateDomainAndFieldName(Connection connection, DomainUtils.DomainKind domainKind, @Nullable String domainName, @Nullable String fieldName)
+    private static boolean isDomainAndFieldNameInvalid(Connection connection, DomainUtils.DomainKind domainKind, @Nullable String domainName, @Nullable String fieldName)
     {
         SimplePostCommand command = new SimplePostCommand("property", "validateDomainAndFieldNames");
         JSONObject domainDesign = new JSONObject();
@@ -644,7 +629,7 @@ public class TestDataGenerator
         try
         {
             CommandResponse response = command.execute(connection, "/");
-            return !response.getParsedData().containsKey("errors");
+            return response.getParsedData().containsKey("errors");
         }
         catch (CommandException | IOException e)
         {
