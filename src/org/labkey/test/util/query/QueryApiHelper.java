@@ -13,7 +13,7 @@ import org.labkey.remoteapi.query.ImportDataCommand;
 import org.labkey.remoteapi.query.ImportDataResponse;
 import org.labkey.remoteapi.query.InsertRowsCommand;
 import org.labkey.remoteapi.query.BaseRowsCommand;
-import org.labkey.remoteapi.query.SaveRowsResponse;
+import org.labkey.remoteapi.query.RowsResponse;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.remoteapi.query.Sort;
@@ -85,7 +85,7 @@ public class QueryApiHelper
         return cmd.execute(_connection, _containerPath);
     }
 
-    public SaveRowsResponse insertRows(List<Map<String, Object>> rows) throws IOException, CommandException
+    public RowsResponse insertRows(List<Map<String, Object>> rows) throws IOException, CommandException
     {
         InsertRowsCommand insertRowsCommand = new InsertRowsCommand(_schema, _query);
         insertRowsCommand.setRows(rows);
@@ -94,7 +94,7 @@ public class QueryApiHelper
         return insertRowsCommand.execute(_connection, _containerPath);
     }
 
-    public SaveRowsResponse updateRows(List<Map<String, Object>> rows) throws IOException, CommandException
+    public RowsResponse updateRows(List<Map<String, Object>> rows) throws IOException, CommandException
     {
         UpdateRowsCommand updateRowsCommand = new UpdateRowsCommand(_schema, _query);
         updateRowsCommand.setRows(rows);
@@ -123,7 +123,7 @@ public class QueryApiHelper
      * @param rowsToDelete Should include primary key(s) for the table
      * @return a list of the rows that were deleted
      */
-    public SaveRowsResponse deleteRows(List<Map<String,Object>> rowsToDelete) throws IOException, CommandException
+    public RowsResponse deleteRows(List<Map<String,Object>> rowsToDelete) throws IOException, CommandException
     {
         DeleteRowsCommand cmd = new DeleteRowsCommand(_schema, _query);
         cmd.setRows(rowsToDelete);

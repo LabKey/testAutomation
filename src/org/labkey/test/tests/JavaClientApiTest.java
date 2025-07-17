@@ -36,7 +36,7 @@ import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.InsertRowsCommand;
 import org.labkey.remoteapi.query.SaveRowsApiResponse;
 import org.labkey.remoteapi.query.BaseRowsCommand;
-import org.labkey.remoteapi.query.SaveRowsResponse;
+import org.labkey.remoteapi.query.RowsResponse;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.remoteapi.query.Sort;
@@ -221,7 +221,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
         rowMap.put("GooAmount", 4.2);
         rowMap.put("Crazy", true);
         insertCmd.addRow(rowMap);
-        SaveRowsResponse saveResp = insertCmd.execute(cn, PROJECT_NAME);
+        RowsResponse saveResp = insertCmd.execute(cn, PROJECT_NAME);
         assertEquals(1, saveResp.getRowsAffected().intValue());
 
         //get new key value
@@ -563,7 +563,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
         Map<String, Object> rowMap = new HashMap<>();
         rowMap.put("FirstName", "inserted by impersonated user");
         insertCmd.addRow(rowMap);
-        SaveRowsResponse saveResp = insertCmd.execute(cn, PROJECT_NAME);
+        RowsResponse saveResp = insertCmd.execute(cn, PROJECT_NAME);
         assertEquals(1, saveResp.getRowsAffected().intValue());
 
         // stop impersonation

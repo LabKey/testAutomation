@@ -26,7 +26,7 @@ import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.DeleteRowsCommand;
 import org.labkey.remoteapi.query.InsertRowsCommand;
 import org.labkey.remoteapi.query.BaseRowsCommand;
-import org.labkey.remoteapi.query.SaveRowsResponse;
+import org.labkey.remoteapi.query.RowsResponse;
 import org.labkey.remoteapi.query.UpdateRowsCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -314,7 +314,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
         // to do the conversion. People.js should strip the "RemoveMe" prefix from Age and FavoriteDateTime
         InsertRowsCommand insCmd = new InsertRowsCommand(LIST_SCHEMA, PEOPLE_LIST_NAME);
         insCmd.addRow(Map.of("Name", "Jimbo", "Age", "RemoveMe25", "FavoriteDateTime", "RemoveMe2025-06-11 11:42", "Crazy", "true"));
-        SaveRowsResponse insResp = insCmd.execute(cn, getProjectName());
+        RowsResponse insResp = insCmd.execute(cn, getProjectName());
         List<Map<String, Object>> insertedRows = insResp.getRows();
         Assert.assertEquals(1, insertedRows.size());
 
@@ -327,7 +327,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
         UpdateRowsCommand upCmd = new UpdateRowsCommand(LIST_SCHEMA, PEOPLE_LIST_NAME);
         insertedRow.put("Age", "RemoveMe26");
         upCmd.addRow(insertedRow);
-        SaveRowsResponse upResp = upCmd.execute(cn, getProjectName());
+        RowsResponse upResp = upCmd.execute(cn, getProjectName());
         List<Map<String, Object>> updatedRows = upResp.getRows();
         Assert.assertEquals(1, updatedRows.size());
 
@@ -352,7 +352,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
 
         //Check After Insert Event
         InsertRowsCommand insCmd = new InsertRowsCommand(LIST_SCHEMA, LIST_NAME);
-        SaveRowsResponse resp;
+        RowsResponse resp;
 
         insCmd.addRow(row1.toMap()); //can add multiple rows to insert many at once
         insCmd.addRow(row2.toMap());
@@ -581,7 +581,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
 
         insCmd.addRow(row2);
         insCmd.addRow(row3);
-        SaveRowsResponse resp = insCmd.execute(cn, getProjectName());
+        RowsResponse resp = insCmd.execute(cn, getProjectName());
         row2 = resp.getRows().get(0);
         Assert.assertEquals("API BeforeInsert", row2.get(COUNTRY_FIELD));
 
