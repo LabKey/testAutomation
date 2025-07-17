@@ -665,7 +665,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
         SaveRowsApiCommand saveCmd = new SaveRowsApiCommand();
 
         // Draft Ken Griffey Jr.
-        saveCmd.addCommand(new Command(CommandType.Insert, schemaName, playersListName, List.of(
+        saveCmd.addCommands(new Command(CommandType.Insert, schemaName, playersListName, List.of(
             Map.of("FirstName", "Ken", "LastName", "Griffey Jr.", "JerseyNumber", 24, "Team", "Seattle Mariners")
         )));
 
@@ -677,10 +677,10 @@ public class JavaClientApiTest extends BaseWebDriverTest
         Command command = new Command(CommandType.Update, schemaName, playersListName, rows)
                 .setAuditBehavior(SaveRowsCommand.AuditBehavior.DETAILED)
                 .setAuditUserComment("Traded Jay Buhner for Ken Phelps on July 21, 1988");
-        saveCmd.addCommand(command);
+        saveCmd.addCommands(command);
 
         // Alvin Davis retires
-        saveCmd.addCommand(new Command(CommandType.Delete, schemaName, playersListName, List.of(Map.of("JerseyNumber", 21))));
+        saveCmd.addCommands(new Command(CommandType.Delete, schemaName, playersListName, List.of(Map.of("JerseyNumber", 21))));
 
         // Teams move west
         rows = List.of(
@@ -690,7 +690,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
         command = new Command(CommandType.Update, schemaName, teamsListName, rows)
                 .setContainerPath(SUB_FOLDER_PATH)
                 .setSkipReselectRows(true);
-        saveCmd.addCommand(command);
+        saveCmd.addCommands(command);
 
         // Some teams are relegated to history
         rows = List.of(Map.of("Team", "Expos"), Map.of("Team", "Pilots"));
@@ -698,7 +698,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
                 .setContainerPath(SUB_FOLDER_PATH)
                 .setAuditBehavior(SaveRowsCommand.AuditBehavior.DETAILED)
                 .setAuditUserComment("Expos and Pilots no longer play ball");
-        saveCmd.addCommand(command);
+        saveCmd.addCommands(command);
 
         // Act
         // Execute multiple query operations using a saveRows command
