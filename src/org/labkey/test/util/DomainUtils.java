@@ -98,6 +98,8 @@ public final class DomainUtils
         DataClass,
         SampleSet,
         IntList,
-        VarList
+        VarList,
+        StudyDatasetDate,
+        StudyDatasetVisit
     }
 }

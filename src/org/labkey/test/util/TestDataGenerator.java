@@ -531,7 +531,7 @@ public class TestDataGenerator
 
     public static String randomDomainName(@Nullable String part)
     {
-        return randomDomainName(part, randomInt(0, 10));
+        return randomDomainName(part, randomInt(0, 20)); // TODO increase this after fix for 53478
     }
 
     public static String randomInvalidDomainName(@Nullable String namePart, int numStartChars, int numEndChars)
@@ -546,6 +546,16 @@ public class TestDataGenerator
         return randomDomainName(null, numEndChars);
     }
 
+    public static String randomDomainName(@Nullable String namePart, @Nullable DomainUtils.DomainKind domainKind)
+    {
+        return randomDomainName(namePart, randomInt(0, 100), domainKind);
+    }
+
+    public static String randomDomainName(@Nullable String namePart, int numEndChars)
+    {
+        return randomDomainName(namePart, numEndChars, null);
+    }
+
     /**
      * Generate a random domain name of the specified size.
      *
@@ -553,22 +563,19 @@ public class TestDataGenerator
      * @param numEndChars Number of random characters at end of name
      * @return name containing the given name part and appended random characters that should be a valid domain name
      */
-    public static String randomDomainName(@Nullable String namePart, int numEndChars)
+    public static String randomDomainName(@Nullable String namePart, int numEndChars, @Nullable DomainUtils.DomainKind domainKind)
     {
-        String domainName;
-        do
-        {
-            String firstChar = namePart != null ? namePart.charAt(0) + "" : randomString(1, null, ALPHANUMERIC_STRING); // domain needs to start with alphanumeric char;
-            String _namePart = namePart != null ? namePart.substring(1) : "";
-            final String charset = namePart != null ? DOMAIN_SPECIAL_STRING : ALPHANUMERIC_STRING + DOMAIN_SPECIAL_STRING;
-            domainName = firstChar + randomName(_namePart, 0, numEndChars, charset, null);
-        }
-        while (Pattern.matches("(.*\\s--[^ ].*)|(.*\\s-[^- ].*)", domainName)); // domain name must not contain space followed by dash. (command like: Issue 49161)
+        String _namePart = namePart == null ? "" : namePart;
+        DomainUtils.DomainKind _domainKind = domainKind == null ? DomainUtils.DomainKind.SampleSet : domainKind;
+        String charSet = namePart != null ? DOMAIN_SPECIAL_STRING : ALPHANUMERIC_STRING + DOMAIN_SPECIAL_STRING;
+        String domainName = randomName(_namePart, 0, numEndChars, charSet, null);
+        while (!validateDomainAndFieldName(WebTestHelper.getRemoteApiConnection(false), _domainKind, domainName, null))
+            domainName = randomName(_namePart, 0, numEndChars, charSet, null);
 
         // Multiple spaces in the UI are collapsed into a single space. If we need to test for handling of multiple spaces, we'll not use this generator
         domainName = domainName.replaceAll("\\s+", " ");
 
-        TestLogger.log("Generated random domain name: " + domainName);
+        TestLogger.log("Generated random domain name for domainKind " + _domainKind + ": " + domainName);
         return domainName;
     }
 
@@ -608,20 +615,27 @@ public class TestDataGenerator
 
         String randomFieldName = randomName(part, numStartChars, numEndChars, chars, exclusion);
 
-        while (!validateDomainFieldName(WebTestHelper.getRemoteApiConnection(false), _domainKind, randomFieldName))
+        while (!validateDomainAndFieldName(WebTestHelper.getRemoteApiConnection(false), _domainKind, null, randomFieldName))
             randomFieldName = randomName(part, numStartChars, numEndChars, chars, exclusion);
 
         TestLogger.log("Generated random field name for domainKind " + _domainKind + ": " + randomFieldName);
         return randomFieldName;
     }
 
-    private static boolean validateDomainFieldName(Connection connection, DomainUtils.DomainKind domainKind, String fieldName)
+    private static boolean validateDomainAndFieldName(Connection connection, DomainUtils.DomainKind domainKind, @Nullable String domainName, @Nullable String fieldName)
     {
-        SimplePostCommand command = new SimplePostCommand("property", "validateDomainFields");
+        SimplePostCommand command = new SimplePostCommand("property", "validateDomainAndFieldNames");
         JSONObject domainDesign = new JSONObject();
-        JSONArray fields = new JSONArray();
-        fields.put(new JSONObject(Map.of("name", fieldName)));
-        domainDesign.put("fields", fields);
+        if (domainName != null)
+        {
+            domainDesign.put("name", domainName);
+        }
+        if (fieldName != null)
+        {
+            JSONArray fields = new JSONArray();
+            fields.put(new JSONObject(Map.of("name", fieldName)));
+            domainDesign.put("fields", fields);
+        }
         JSONObject json = new JSONObject();
         json.put("kind", domainKind);
         json.put("domainDesign", domainDesign);
