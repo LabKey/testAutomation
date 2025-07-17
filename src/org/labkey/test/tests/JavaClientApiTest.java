@@ -674,9 +674,9 @@ public class JavaClientApiTest extends BaseWebDriverTest
             Map.of("JerseyNumber", 19, "Team", "Seattle Mariners"),
             Map.of("JerseyNumber", 44, "Team", "New York Yankees")
         );
-        Command command = new Command(CommandType.Update, schemaName, playersListName, rows)
-                .setAuditBehavior(BaseRowsCommand.AuditBehavior.DETAILED)
-                .setAuditUserComment("Traded Jay Buhner for Ken Phelps on July 21, 1988");
+        Command command = new Command(CommandType.Update, schemaName, playersListName, rows);
+        command.setAuditBehavior(BaseRowsCommand.AuditBehavior.DETAILED);
+        command.setAuditUserComment("Traded Jay Buhner for Ken Phelps on July 21, 1988");
         saveCmd.addCommands(command);
 
         // Alvin Davis retires
@@ -687,17 +687,17 @@ public class JavaClientApiTest extends BaseWebDriverTest
             Map.of("Team", "Dodgers", "City", "Los Angeles"),
             Map.of("Team", "Giants", "City", "San Francisco")
         );
-        command = new Command(CommandType.Update, schemaName, teamsListName, rows)
-                .setContainerPath(SUB_FOLDER_PATH)
-                .setSkipReselectRows(true);
+        command = new Command(CommandType.Update, schemaName, teamsListName, rows);
+        command.setContainerPath(SUB_FOLDER_PATH);
+        command.setSkipReselectRows(true);
         saveCmd.addCommands(command);
 
         // Some teams are relegated to history
         rows = List.of(Map.of("Team", "Expos"), Map.of("Team", "Pilots"));
-        command = new Command(CommandType.Delete, schemaName, teamsListName, rows)
-                .setContainerPath(SUB_FOLDER_PATH)
-                .setAuditBehavior(BaseRowsCommand.AuditBehavior.DETAILED)
-                .setAuditUserComment("Expos and Pilots no longer play ball");
+        command = new Command(CommandType.Delete, schemaName, teamsListName, rows);
+        command.setContainerPath(SUB_FOLDER_PATH);
+        command.setAuditBehavior(BaseRowsCommand.AuditBehavior.DETAILED);
+        command.setAuditUserComment("Expos and Pilots no longer play ball");
         saveCmd.addCommands(command);
 
         // Act
