@@ -35,7 +35,7 @@ import org.labkey.remoteapi.query.DeleteRowsCommand;
 import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.InsertRowsCommand;
 import org.labkey.remoteapi.query.SaveRowsApiResponse;
-import org.labkey.remoteapi.query.SaveRowsCommand;
+import org.labkey.remoteapi.query.BaseRowsCommand;
 import org.labkey.remoteapi.query.SaveRowsResponse;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
@@ -675,7 +675,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
             Map.of("JerseyNumber", 44, "Team", "New York Yankees")
         );
         Command command = new Command(CommandType.Update, schemaName, playersListName, rows)
-                .setAuditBehavior(SaveRowsCommand.AuditBehavior.DETAILED)
+                .setAuditBehavior(BaseRowsCommand.AuditBehavior.DETAILED)
                 .setAuditUserComment("Traded Jay Buhner for Ken Phelps on July 21, 1988");
         saveCmd.addCommands(command);
 
@@ -696,7 +696,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
         rows = List.of(Map.of("Team", "Expos"), Map.of("Team", "Pilots"));
         command = new Command(CommandType.Delete, schemaName, teamsListName, rows)
                 .setContainerPath(SUB_FOLDER_PATH)
-                .setAuditBehavior(SaveRowsCommand.AuditBehavior.DETAILED)
+                .setAuditBehavior(BaseRowsCommand.AuditBehavior.DETAILED)
                 .setAuditUserComment("Expos and Pilots no longer play ball");
         saveCmd.addCommands(command);
 

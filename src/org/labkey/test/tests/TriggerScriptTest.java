@@ -25,7 +25,7 @@ import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.DeleteRowsCommand;
 import org.labkey.remoteapi.query.InsertRowsCommand;
-import org.labkey.remoteapi.query.SaveRowsCommand;
+import org.labkey.remoteapi.query.BaseRowsCommand;
 import org.labkey.remoteapi.query.SaveRowsResponse;
 import org.labkey.remoteapi.query.UpdateRowsCommand;
 import org.labkey.test.BaseWebDriverTest;
@@ -714,7 +714,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
      * @param expected error message to check
      * @param cn connection object to run against
      */
-    private void assertAPIErrorMessage(SaveRowsCommand cmd, String expected, Connection cn) throws IOException
+    private void assertAPIErrorMessage(BaseRowsCommand cmd, String expected, Connection cn) throws IOException
     {
         try
         {
