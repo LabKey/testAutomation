@@ -91,10 +91,10 @@ public class IssuesAttachmentTest extends BaseWebDriverTest implements NonWindow
     }
 
     @Test
-    public void testAttachmentInjection() throws Exception
+    public void testAttachmentInjection()
     {
         goToProjectHome();
-        Map<String, String> issue = Maps.of("assignedTo", getDisplayName(), "title", "Attempt Issue Attachment Injection");
+        Map<String, String> issue = Maps.of("AssignedTo", getDisplayName(), "title", "Attempt Issue Attachment Injection");
         final DetailsPage detailsPage = issuesHelper.addIssue(issue, ALERT_FILE, ESCAPE_FILE);
         final String issueId = detailsPage.getIssueId();
 

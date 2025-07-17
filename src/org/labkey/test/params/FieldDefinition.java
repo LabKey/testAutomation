@@ -58,6 +58,8 @@ public class FieldDefinition extends PropertyDescriptor
     // Collection of JSON properties not explicitly known by 'PropertyDescriptor'
     private final Map<String, Object> _extraFieldProperties = new HashMap<>();
 
+    private String _namePart;
+
     /**
      * Define a non-lookup field of the specified type
      * @param name field name
@@ -83,7 +85,7 @@ public class FieldDefinition extends PropertyDescriptor
      * Define a String field
      * @param name field name
      */
-    public FieldDefinition(String name)
+    public FieldDefinition(@NotNull String name)
     {
         this(name, ColumnType.String);
     }
@@ -465,6 +467,16 @@ public class FieldDefinition extends PropertyDescriptor
     {
         super.setDerivationDataScope(aliquotOption.name());
         _aliquotOption = aliquotOption;
+    }
+
+    public void setNamePart(String namePart)
+    {
+        _namePart = namePart;
+    }
+
+    public boolean isNamePartMatch(String namePart)
+    {
+        return _namePart != null && _namePart.equals(namePart);
     }
 
     public enum RangeType

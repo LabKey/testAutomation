@@ -70,7 +70,7 @@ import static org.labkey.test.util.data.TestDataUtils.REALISTIC_SOURCE_FIELDS;
  */
 public class TestDataGenerator
 {
-    private static final String WIDE_CHAR = "\uD83D\uDC7E"; // 👾
+    public static final String WIDE_CHAR = "\uD83D\uDC7E"; // 👾
     private static final char WIDE_PLACEHOLDER = '\u03A0'; // 'Π' - Wide character can't be picked from the string with 'charAt'
     private static final String NON_LATIN_STRING = "\u0438\uC548\u306F"; // "и안は"
     // chose a Character random from this String
@@ -582,7 +582,7 @@ public class TestDataGenerator
         String randomFieldName = randomName(part, numStartChars, numEndChars, chars, exclusion);
 
         // Avoid generating fields names with reserved substitution format patterns. e.g. ":Date" or ":First"
-        if (numStartChars > 0 && randomFieldName.charAt(numStartChars - 1) == ':' &&
+        if (numStartChars > 0 && part.length() >= 4 && randomFieldName.charAt(numStartChars - 1) == ':' &&
                 StringUtils.isAlpha(part.substring(0, 4))) // The shortest pattern is four characters (see org.labkey.api.util.SubstitutionFormat.getFormatNames)
         {
             String regenExclusion = Objects.requireNonNullElse(exclusion, "") + ":";

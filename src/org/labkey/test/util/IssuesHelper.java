@@ -188,7 +188,7 @@ public class IssuesHelper extends WebDriverWrapper
     {
         Map<String, String> fields = new TreeMap<>();
         fields.put("title", title);
-        fields.put("assignedTo", assignedTo);
+        fields.put("AssignedTo", assignedTo);
         fields.putAll(extraFields);
         return addIssue(fields, attachments);
     }

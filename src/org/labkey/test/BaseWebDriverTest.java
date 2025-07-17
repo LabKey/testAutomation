@@ -216,8 +216,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     public static final double DELTA = 10E-10;
 
-    @Deprecated // Going away soon
-    public static final String[] ILLEGAL_QUERY_KEY_CHARACTERS = FieldKey.getIllegalChars().toArray(new String[0]);
     public static final String ALL_ILLEGAL_QUERY_KEY_CHARACTERS = StringUtils.join(FieldKey.getIllegalChars(), "");
     // See TSVWriter.shouldQuote. Generally we are not able to use the tab and new line characters when creating field names in the UI, but including here for completeness
     public static final String[] TRICKY_IMPORT_FIELD_CHARACTERS = {"\\", "\"", "\\t", ",", "\\n", "\\r"};
@@ -300,7 +298,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         return SingletonWebDriver.getInstance().getWebDriver();
     }
 
-    protected abstract @Nullable String getProjectName();
+    protected abstract String getProjectName();
 
     public final @Nullable String getPrimaryTestProject()
     {

@@ -34,6 +34,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
+import static org.junit.Assert.assertEquals;
+
 /**
  * TODO: Move appropriate functionality into {@link org.labkey.test.pages.PortalBodyPanel} and {@link org.labkey.test.components.WebPart}
  */
@@ -453,15 +455,18 @@ public class PortalHelper extends WebDriverWrapper
         doInAdminMode(() -> {
             openWebpartPermissionWindow(webpart);
 
-            assertFormElementEquals(Locator.name("permission"), expectedPermission);
+            Locator loc1 = Locator.name("permission");
+            assertEquals(expectedPermission, getFormElement(loc1));
 
             if (expectedFolder == null)
             {
-                assertFormElementEquals(Locator.name("permissionContainer"), "");
+                Locator loc = Locator.name("permissionContainer");
+                assertEquals("", getFormElement(loc));
             }
             else
             {
-                assertFormElementEquals(Locator.name("permissionContainer"), expectedFolder);
+                Locator loc = Locator.name("permissionContainer");
+                assertEquals(expectedFolder, getFormElement(loc));
             }
 
             click(Locator.tagWithText("span", "Cancel"));

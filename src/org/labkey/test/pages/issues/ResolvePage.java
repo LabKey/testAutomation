@@ -74,7 +74,7 @@ public class ResolvePage extends BaseUpdatePage<ResolvePage.ElementCache>
     {
         protected ElementCache()
         {
-            resolution = getSelect("resolution");
+            resolution = getSelect("Resolution");
             duplicate = getSelect("duplicate");
         }
     }

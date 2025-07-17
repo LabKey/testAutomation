@@ -24,6 +24,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Daily;
+import org.labkey.test.components.assay.AssayConstants;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.APIAssayHelper;
@@ -165,14 +166,14 @@ public class ProgrammaticQCTest extends AbstractAssayTest
         clickButton("Import Data");
         clickButton("Next");
 
-        click(Locator.xpath("//input[@value='textAreaDataProvider']"));
-        setFormElement(Locator.id("TextAreaDataCollector.textArea"), TEST_RUN1_DATA1);
+        click(AssayConstants.TEXT_AREA_DATA_PROVIDER_LOCATOR);
+        setFormElement(AssayConstants.TEXT_AREA_DATA_COLLECTOR_LOCATOR, TEST_RUN1_DATA1);
         clickButton("Save and Finish");
 
         assertTextPresent("A duplicate PTID was discovered : b", "A duplicate PTID was discovered : e");
 
-        click(Locator.xpath("//input[@value='textAreaDataProvider']"));
-        setFormElement(Locator.id("TextAreaDataCollector.textArea"), TEST_RUN1_DATA2);
+        click(AssayConstants.TEXT_AREA_DATA_PROVIDER_LOCATOR);
+        setFormElement(AssayConstants.TEXT_AREA_DATA_COLLECTOR_LOCATOR, TEST_RUN1_DATA2);
         clickButton("Save and Finish");
 
         // verify the log entry
@@ -190,14 +191,14 @@ public class ProgrammaticQCTest extends AbstractAssayTest
         clickButton("Import Data");
         clickButton("Next");
 
-        click(Locator.xpath("//input[@value='textAreaDataProvider']"));
-        setFormElement(Locator.id("TextAreaDataCollector.textArea"), TEST_RUN1_DATA1);
+        click(AssayConstants.TEXT_AREA_DATA_PROVIDER_LOCATOR);
+        setFormElement(AssayConstants.TEXT_AREA_DATA_COLLECTOR_LOCATOR, TEST_RUN1_DATA1);
         clickButton("Save and Finish");
 
         assertTextPresent("A duplicate PTID was discovered : b", "A duplicate PTID was discovered : e");
 
-        click(Locator.xpath("//input[@value='textAreaDataProvider']"));
-        setFormElement(Locator.id("TextAreaDataCollector.textArea"), TEST_RUN1_DATA2);
+        click(AssayConstants.TEXT_AREA_DATA_PROVIDER_LOCATOR);
+        setFormElement(AssayConstants.TEXT_AREA_DATA_COLLECTOR_LOCATOR, TEST_RUN1_DATA2);
         clickButton("Save and Finish");
 
         clickAndWait(Locator.linkWithText("view results"));
@@ -259,14 +260,14 @@ public class ProgrammaticQCTest extends AbstractAssayTest
         clickButton("Import Data");
         clickButton("Next");
 
-        click(Locator.xpath("//input[@value='textAreaDataProvider']"));
-        setFormElement(Locator.id("TextAreaDataCollector.textArea"), TEST_RUN1_DATA2);
+        click(AssayConstants.TEXT_AREA_DATA_PROVIDER_LOCATOR);
+        setFormElement(AssayConstants.TEXT_AREA_DATA_COLLECTOR_LOCATOR, TEST_RUN1_DATA2);
         clickButton("Save and Finish");
 
         assertTextPresent("The animal column must contain a goat");
 
-        click(Locator.xpath("//input[@value='textAreaDataProvider']"));
-        setFormElement(Locator.id("TextAreaDataCollector.textArea"), TEST_RUN1_DATA3);
+        click(AssayConstants.TEXT_AREA_DATA_PROVIDER_LOCATOR);
+        setFormElement(AssayConstants.TEXT_AREA_DATA_COLLECTOR_LOCATOR, TEST_RUN1_DATA3);
         clickButton("Save and Finish");
 
         clickAndWait(Locator.linkWithText("view results"));

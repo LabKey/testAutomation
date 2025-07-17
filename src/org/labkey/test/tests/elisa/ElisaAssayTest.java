@@ -142,8 +142,8 @@ public class ElisaAssayTest extends AbstractAssayTest
     {
         for (int i = startSpecimen; i <= lastSpecimen; i++)
         {
-            Locator specimenLocator = Locator.name("specimen" + (i) + "_SpecimenID");
-            Locator participantLocator = Locator.name("specimen" + (i) + "_ParticipantID");
+            Locator specimenLocator = Locator.name("Specimen " + (i) + "_SpecimenID");
+            Locator participantLocator = Locator.name("Specimen " + (i) + "_ParticipantID");
 
             // test for prepopulation of specimen form element values
 //            if (testPrepopulation)
@@ -151,11 +151,11 @@ public class ElisaAssayTest extends AbstractAssayTest
             setFormElement(specimenLocator, "specimen " + (i) + " " + uniqueifier);
             setFormElement(participantLocator, "ptid " + (i) + " " + uniqueifier);
 
-            setFormElement(Locator.name("specimen" + (i) + "_VisitID"), "" + (i));
+            setFormElement(Locator.name("Specimen " + (i) + "_VisitID"), "" + (i));
         }
 
         setFormElement(Locator.name("__primaryFile__"), file);
-        setFormElement(Locator.name("curveFitMethod"), "Linear");
+        setFormElement(Locator.name("CurveFitMethod"), "Linear");
 
         clickButton("Next");
 
@@ -173,7 +173,7 @@ public class ElisaAssayTest extends AbstractAssayTest
         String[] letters = {"A","B","C","D","E","F","G","H"};
         for (int i = 0; i <= 5; i++)
         {
-            setFormElement(Locator.name(letters[i].toLowerCase()+"1"+letters[i]+"2_Concentration"), "" + (i + 1));
+            setFormElement(Locator.name(letters[i]+"1-"+letters[i]+"2_Concentration"), "" + (i + 1));
 
             if (!testPrepopulation)
             {

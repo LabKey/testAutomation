@@ -804,7 +804,7 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         String flagString = "";
         for(Map.Entry<String, String> entry : setField.entrySet())
         {
-            setFormElement(Locator.name(String.format("outputSample1_%s", entry.getKey())), entry.getValue());
+            setFormElement(Locator.name(String.format("Output Sample 1_%s", entry.getKey())), entry.getValue());
             flagString = entry.getValue();
         }
         clickButton("Submit");
@@ -896,7 +896,7 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         mouseOver(createPage.getComponentElement());
 
         log("Use a name expression using a field from the named parent, with parent type not encoded.");
-        nameExpressionBad = String.format("SNP_${genId}_${%s/$s}_${materialInputs/%s/%s}", parentAlias, PARENT_FIELD_CURLY_RIGHT_INT.getExpName(), PARENT_SAMPLE_TYPE, PARENT_FIELD_CURLY_LEFT.getName());
+        nameExpressionBad = String.format("SNP_${genId}_${%s/%s}_${materialInputs/%s/%s}", parentAlias, PARENT_FIELD_CURLY_RIGHT_INT.getExpName(), PARENT_SAMPLE_TYPE, PARENT_FIELD_CURLY_LEFT.getName());
         createPage.setNameExpression(nameExpressionBad);
         actualMsg = createPage.getNameExpressionPreview();
         checker().withScreenshot("Parent_Fields_Preview_Error")

@@ -38,6 +38,7 @@ import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.components.assay.AssayConstants;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.params.assay.AssayDesign;
 import org.openqa.selenium.NotFoundException;
@@ -113,10 +114,10 @@ public class APIAssayHelper extends AbstractAssayHelper
                 irc.setComment(runProperties.get("Comment").toString());
                 runProperties.remove("Comment");
             }
-            if (runProperties.containsKey("name") && StringUtils.isBlank(runName))
+            if (runProperties.containsKey("Name") && StringUtils.isBlank(runName))
             {
-                irc.setName(runProperties.get("name").toString());
-                runProperties.remove("name");
+                irc.setName(runProperties.get("Name").toString());
+                runProperties.remove("Name");
             }
 
             irc.setProperties(runProperties);
@@ -132,7 +133,7 @@ public class APIAssayHelper extends AbstractAssayHelper
     @Override
     public void importAssay(String assayName, File file, String projectPath) throws CommandException, IOException
     {
-        importAssay(assayName, file, projectPath, Collections.singletonMap("ParticipantVisitResolver", "SampleInfo"));
+        importAssay(assayName, file, projectPath, Collections.singletonMap(AssayConstants.PARTICIPANT_VISIT_RESOLVER_FIELD_NAME, "SampleInfo"));
     }
 
     @Override
