@@ -2109,8 +2109,8 @@ public class ListTest extends BaseWebDriverTest
     }
 
     /**
-     * Issue 53361: 'list-details.view' doesn't work when list pk is named "name"
-     * Expect bad product behavior. Convert this to a regression test once the issue is fixed.
+     * Regression for issue 53361: 'list-details.view' doesn't work when list pk is named "name"
+     * Test for both name and listId key field names.
      */
     @Test
     public void testPkNameParameterCollision() throws IOException, CommandException
