@@ -542,7 +542,7 @@ public class ListTest extends BaseWebDriverTest
     @Test
     public void testCreateListWithBOMFile()
     {
-        String listName = TestDataGenerator.randomDomainName("From BOM File", 4, DomainUtils.DomainKind.IntList);
+        String listName = TestDataGenerator.randomDomainName("From BOM File", DomainUtils.DomainKind.IntList);
         File bomFile = TestFileUtils.getSampleData("lists/TestUTF8_BOM.csv");
 
         EditListDefinitionPage listEditPage = _listHelper.beginCreateList(getProjectName(), listName);
@@ -991,7 +991,7 @@ public class ListTest extends BaseWebDriverTest
     public void testChangeListName()
     {
 
-        String listNameBefore = TestDataGenerator.randomDomainName("Before Rename", 7, DomainUtils.DomainKind.IntList);
+        String listNameBefore = TestDataGenerator.randomDomainName("Before Rename", DomainUtils.DomainKind.IntList);
 
         _listHelper.createList(PROJECT_VERIFY, listNameBefore,
                 new FieldDefinition("name", ColumnType.String),
