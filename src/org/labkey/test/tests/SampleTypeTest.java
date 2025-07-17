@@ -93,7 +93,8 @@ public class SampleTypeTest extends BaseWebDriverTest
     private static final String FOLDER_NAME = "SampleTypeTestFolder";
     private static final String LOOKUP_FOLDER = "LookupSampleTypeFolder";
     private static final String CASE_INSENSITIVE_SAMPLE_TYPE = "CaseInsensitiveSampleType";
-    private static final String LOWER_CASE_SAMPLE_TYPE = "caseinsensitivesampletype";
+    private static final String LOWER_CASE_SAMPLE_TYPE = CASE_INSENSITIVE_SAMPLE_TYPE.toLowerCase();
+    private static final String UPPER_CASE_SAMPLE_TYPE = CASE_INSENSITIVE_SAMPLE_TYPE.toUpperCase();
     private static final TestUser USER_FOR_FILTERTEST = new TestUser("filter_user@sampletypetest.test");
 
     @Override
@@ -1382,7 +1383,7 @@ public class SampleTypeTest extends BaseWebDriverTest
                 .goToCreateNewSampleType()
                 .setName(LOWER_CASE_SAMPLE_TYPE)
                 .clickSaveExpectingErrors();
-        assertEquals("Sample Type creation error", Arrays.asList("A Sample Type with that name already exists."), errors);
+        assertEquals("Sample Type creation error", Arrays.asList("A Sample Type with name '" + LOWER_CASE_SAMPLE_TYPE + "' already exists."), errors);
         clickProject(PROJECT_NAME);
         assertElementPresent(Locator.linkWithText(CASE_INSENSITIVE_SAMPLE_TYPE));
         assertElementNotPresent(Locator.linkWithText(LOWER_CASE_SAMPLE_TYPE));
@@ -1400,9 +1401,9 @@ public class SampleTypeTest extends BaseWebDriverTest
         log("Sample type cannot be renamed to an existing name");
         goToProjectHome();
         updatePage = sampleHelper.goToEditSampleType(updatedSampleType);
-        updatePage.setName(CASE_INSENSITIVE_SAMPLE_TYPE.toUpperCase());
+        updatePage.setName(UPPER_CASE_SAMPLE_TYPE);
         assertTrue("Sample type rename conflict error",
-                updatePage.clickSaveExpectingErrors().contains("A Sample Type with name 'CASEINSENSITIVESAMPLETYPE' already exists."));
+                updatePage.clickSaveExpectingErrors().contains("A Sample Type with name '" + UPPER_CASE_SAMPLE_TYPE + "' already exists."));
         updatePage.clickCancel();
     }
 
