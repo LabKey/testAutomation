@@ -34,7 +34,7 @@ import org.labkey.remoteapi.domain.SaveDomainCommand;
 import org.labkey.remoteapi.query.DeleteRowsCommand;
 import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.InsertRowsCommand;
-import org.labkey.remoteapi.query.SaveRowsApiResponse;
+import org.labkey.remoteapi.query.SaveRowsResponse;
 import org.labkey.remoteapi.query.BaseRowsCommand;
 import org.labkey.remoteapi.query.RowsResponse;
 import org.labkey.remoteapi.query.SelectRowsCommand;
@@ -43,9 +43,9 @@ import org.labkey.remoteapi.query.Sort;
 import org.labkey.remoteapi.query.TruncateTableCommand;
 import org.labkey.remoteapi.query.TruncateTableResponse;
 import org.labkey.remoteapi.query.UpdateRowsCommand;
-import org.labkey.remoteapi.query.SaveRowsApiCommand;
-import org.labkey.remoteapi.query.SaveRowsApiCommand.Command;
-import org.labkey.remoteapi.query.SaveRowsApiCommand.CommandType;
+import org.labkey.remoteapi.query.SaveRowsCommand;
+import org.labkey.remoteapi.query.SaveRowsCommand.Command;
+import org.labkey.remoteapi.query.SaveRowsCommand.CommandType;
 import org.labkey.remoteapi.security.AddGroupMembersCommand;
 import org.labkey.remoteapi.security.CreateGroupCommand;
 import org.labkey.remoteapi.security.CreateGroupResponse;
@@ -662,7 +662,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
             insertCmd.execute(conn, SUB_FOLDER_PATH);
         }
 
-        SaveRowsApiCommand saveCmd = new SaveRowsApiCommand();
+        SaveRowsCommand saveCmd = new SaveRowsCommand();
 
         // Draft Ken Griffey Jr.
         saveCmd.addCommands(new Command(CommandType.Insert, schemaName, playersListName, List.of(
@@ -702,7 +702,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
 
         // Act
         // Execute multiple query operations using a saveRows command
-        SaveRowsApiResponse response = saveCmd.execute(conn, PROJECT_NAME);
+        SaveRowsResponse response = saveCmd.execute(conn, PROJECT_NAME);
 
         // Assert
         assertEquals(200, response.getStatusCode());
