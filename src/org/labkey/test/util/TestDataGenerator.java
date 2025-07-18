@@ -30,7 +30,7 @@ import org.labkey.remoteapi.domain.CreateDomainCommand;
 import org.labkey.remoteapi.domain.DomainResponse;
 import org.labkey.remoteapi.domain.PropertyDescriptor;
 import org.labkey.remoteapi.query.Filter;
-import org.labkey.remoteapi.query.SaveRowsResponse;
+import org.labkey.remoteapi.query.RowsResponse;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.remoteapi.query.Sort;
 import org.labkey.serverapi.reader.TabLoader;
@@ -758,17 +758,17 @@ public class TestDataGenerator
         return getQueryHelper(cn).deleteDomain();
     }
 
-    public SaveRowsResponse insertRows() throws IOException, CommandException
+    public RowsResponse insertRows() throws IOException, CommandException
     {
         return insertRows(WebTestHelper.getRemoteApiConnection());
     }
 
-    public SaveRowsResponse insertRows(Connection cn) throws IOException, CommandException
+    public RowsResponse insertRows(Connection cn) throws IOException, CommandException
     {
         return insertRows(cn, getRows());
     }
 
-    public SaveRowsResponse insertRows(Connection cn, List<Map<String, Object>> rows) throws IOException, CommandException
+    public RowsResponse insertRows(Connection cn, List<Map<String, Object>> rows) throws IOException, CommandException
     {
         return getQueryHelper(cn).insertRows(rows);
     }
@@ -794,7 +794,7 @@ public class TestDataGenerator
      * @deprecated Use {@link QueryApiHelper}
      */
     @Deprecated(since = "22.4")
-    public SaveRowsResponse updateRows(Connection cn, List<Map<String, Object>> rows) throws IOException, CommandException
+    public RowsResponse updateRows(Connection cn, List<Map<String, Object>> rows) throws IOException, CommandException
     {
         return getQueryHelper(cn).updateRows(rows);
     }
@@ -839,7 +839,7 @@ public class TestDataGenerator
      * @deprecated Use {@link QueryApiHelper}
      */
     @Deprecated(since = "22.4")
-    public SaveRowsResponse deleteRows(Connection cn, List<Map<String,Object>> rowsToDelete) throws IOException, CommandException
+    public RowsResponse deleteRows(Connection cn, List<Map<String,Object>> rowsToDelete) throws IOException, CommandException
     {
         return getQueryHelper(cn).deleteRows(rowsToDelete);
     }

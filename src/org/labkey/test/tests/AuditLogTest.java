@@ -24,7 +24,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.InsertRowsCommand;
-import org.labkey.remoteapi.query.SaveRowsResponse;
+import org.labkey.remoteapi.query.RowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
@@ -437,7 +437,7 @@ public class AuditLogTest extends BaseWebDriverTest
             Map<String, Object> rowMap = new HashMap<>();
             rowMap.put("name", "Kia");
             insertCmd.addRow(rowMap);
-            SaveRowsResponse resp1 = insertCmd.execute(cn, AUDIT_DETAILED_TEST_PROJECT);
+            RowsResponse resp1 = insertCmd.execute(cn, AUDIT_DETAILED_TEST_PROJECT);
 
             Map<String, String> auditLog = getAuditLogRow(this, "Query update events", "Query Name", "Manufacturers");
             assertEquals("Did not find expected audit log for summary log level", "1 row(s) were inserted.", auditLog.get("Comment"));
