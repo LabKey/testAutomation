@@ -646,9 +646,11 @@ public class TestDataGenerator
 
     public static int randomInt(int min, int max)
     {
-        if (min >= max)
+        if (min > max)
             throw new IllegalArgumentException("min must be less than max");
 
+        if (min == max)
+            return min;
         return ThreadLocalRandom.current().nextInt((max - min) + 1) + min;
     }
 
