@@ -125,6 +125,17 @@ public class WikiHelper
         _test.setFormElement(Locator.name("body"), srcFragment);
     }
 
+    public void clickChooseAPage()
+    {
+        _test.waitAndClickAndWait(Locator.linkWithText("Choose an existing page to display"));
+    }
+
+    public void saveChosenPage()
+    {
+        _test.waitAndClickAndWait(Locator.id("btnSubmit"));
+    }
+
+
     public void saveWikiPage()
     {
         saveWikiPage(true);
