@@ -29,7 +29,7 @@ import org.labkey.remoteapi.assay.Run;
 import org.labkey.remoteapi.assay.SaveAssayBatchCommand;
 import org.labkey.remoteapi.assay.SaveAssayBatchResponse;
 import org.labkey.remoteapi.domain.PropertyDescriptor;
-import org.labkey.remoteapi.query.SaveRowsResponse;
+import org.labkey.remoteapi.query.RowsResponse;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -230,7 +230,7 @@ public class SampleTypeRemoteAPITest extends BaseWebDriverTest
         dgen.addCustomRow(Map.of("name", "G","mvStringData", "ValidValue", "volume", 17.5));
         dgen.addCustomRow(Map.of("name", "H","mvStringData", "ActualData", "volume", 17.5));
 
-        SaveRowsResponse insertResponse = dgen.insertRows(createDefaultConnection(), dgen.getRows());
+        RowsResponse insertResponse = dgen.insertRows(createDefaultConnection(), dgen.getRows());
 
         refresh();
         DataRegionTable sampleTypeList =  DataRegionTable.DataRegion(getDriver()).withName(SAMPLE_TYPE_DATA_REGION_NAME).waitFor();
@@ -251,7 +251,7 @@ public class SampleTypeRemoteAPITest extends BaseWebDriverTest
         rowD.put("mvstringdatamvindicator", null);
         rowD.put("mvStringData", "updatedValue");
 
-        SaveRowsResponse updateResponse = dgen.updateRows(createDefaultConnection(), Arrays.asList(rowD, rowE));
+        RowsResponse updateResponse = dgen.updateRows(createDefaultConnection(), Arrays.asList(rowD, rowE));
 
         // get a look at the result
         refresh();

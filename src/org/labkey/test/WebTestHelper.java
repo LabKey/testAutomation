@@ -49,7 +49,7 @@ import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.remoteapi.query.DeleteRowsCommand;
 import org.labkey.remoteapi.query.Filter;
-import org.labkey.remoteapi.query.SaveRowsResponse;
+import org.labkey.remoteapi.query.RowsResponse;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.serverapi.reader.Readers;
 import org.labkey.test.util.InstallCert;
@@ -200,7 +200,7 @@ public class WebTestHelper
                 {
                     DeleteRowsCommand deleteRowsCommand = new DeleteRowsCommand("core", "apiKeys");
                     deleteRowsCommand.setRows(rows);
-                    SaveRowsResponse response = deleteRowsCommand.execute(connection, null);
+                    RowsResponse response = deleteRowsCommand.execute(connection, null);
                     savedApiKeys.remove(apiKey);
                     deletedApiKeys.add(apiKey);
                     Assert.assertEquals("Wrong number of rows affected by apiKey deletion", 1, response.getRowsAffected());

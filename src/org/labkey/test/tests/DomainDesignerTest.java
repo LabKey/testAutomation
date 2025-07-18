@@ -20,7 +20,7 @@ import org.labkey.remoteapi.domain.DomainResponse;
 import org.labkey.remoteapi.domain.GetDomainDetailsCommand;
 import org.labkey.remoteapi.domain.PropertyDescriptor;
 import org.labkey.remoteapi.query.Filter;
-import org.labkey.remoteapi.query.SaveRowsResponse;
+import org.labkey.remoteapi.query.RowsResponse;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.serverapi.collections.ArrayListMap;
 import org.labkey.test.BaseWebDriverTest;
@@ -144,7 +144,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         dgen.addCustomRow(Map.of("Number", 3, "integerField", 123456789, "decimalField", 12345.678));
         dgen.addCustomRow(Map.of("Number", 4, "integerField", 98765432, "decimalField", 1234.56789));
         dgen.addCustomRow(Map.of("Number", 5, "integerField", 4, "decimalField", 5.654));
-        SaveRowsResponse response = dgen.insertRows(createDefaultConnection(), dgen.getRows());
+        RowsResponse response = dgen.insertRows(createDefaultConnection(), dgen.getRows());
 
         goToProjectHome();
         clickAndWait(Locator.linkWithText(listName));

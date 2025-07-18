@@ -9,7 +9,7 @@ import org.labkey.remoteapi.experiment.LineageCommand;
 import org.labkey.remoteapi.experiment.LineageNode;
 import org.labkey.remoteapi.experiment.LineageResponse;
 import org.labkey.remoteapi.query.Filter;
-import org.labkey.remoteapi.query.SaveRowsResponse;
+import org.labkey.remoteapi.query.RowsResponse;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
@@ -85,8 +85,8 @@ public class SampleTypeLimitsTest extends BaseWebDriverTest
             dgen.addDataSupplier("label", () -> TestDataGenerator.randomString(10, null, ALPHANUMERIC_STRING))
                     .withGeneratedRows(10000);
             dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
-            SaveRowsResponse saveRowsResponse = dgen.insertRows(createDefaultConnection(), dgen.getRows());
-            log("Successfully  inserted " + saveRowsResponse.getRowsAffected());
+            RowsResponse rowsResponse = dgen.insertRows(createDefaultConnection(), dgen.getRows());
+            log("Successfully  inserted " + rowsResponse.getRowsAffected());
 
             log("Waiting for the sample data to get generated");
             goToProjectHome();
@@ -237,7 +237,7 @@ public class SampleTypeLimitsTest extends BaseWebDriverTest
         dgen.setAlphaNumericStr(true);
         dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
         Map indexRow = Map.of("name", "seed", "data", TestDataGenerator.randomInt(3, 2000), "testIndex", 0); // create the first seed in the lineage
-        SaveRowsResponse seedInsert = dgen.insertRows(createDefaultConnection(), List.of(indexRow));
+        RowsResponse seedInsert = dgen.insertRows(createDefaultConnection(), List.of(indexRow));
         SelectRowsResponse seedSelect = dgen.getRowsFromServer(createDefaultConnection(),
                 List.of("lsid", "name", "parent", "data", "testIndex"));
 
