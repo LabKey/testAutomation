@@ -74,10 +74,10 @@ import static org.labkey.test.util.data.TestDataUtils.REALISTIC_SOURCE_FIELDS;
 public class TestDataGenerator
 {
     public static final String WIDE_CHAR = "\uD83D\uDC7E"; // 👾
-    private static final char WIDE_PLACEHOLDER = '\u03A0'; // 'Π' - Wide character can't be picked from the string with 'charAt'
-    private static final char REPEAT_PLACEHOLDER = '\u22EF'; // '⋯' - Used to indicate that the char will be repeated
-    private static final char ALL_CHARS_PLACEHOLDER = '\u2211'; // '∑' - Used to indicate that all characters from the charset should be used
-    private static final String NON_LATIN_STRING = "\u0438\uC548\u306F"; // "и안は"
+    public static final char WIDE_PLACEHOLDER = '\u03A0'; // 'Π' - Wide character can't be picked from the string with 'charAt'
+    public static final char REPEAT_PLACEHOLDER = '\u22EF'; // '⋯' - Used to indicate that the char will be repeated
+    public static final char ALL_CHARS_PLACEHOLDER = '\u2211'; // '∑' - Used to indicate that all characters from the charset should be used
+    public static final String NON_LATIN_STRING = "\u0438\uC548\u306F"; // "и안は"
     // chose a Character random from this String
     public static final String CHARSET_STRING = "ABCDEFG01234abcdefvxyz~!@#$%^&*()-+=_{}[]|:;\"',.<>" + NON_LATIN_STRING + WIDE_PLACEHOLDER;
     public static final String ALPHANUMERIC_STRING = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvxyz";
