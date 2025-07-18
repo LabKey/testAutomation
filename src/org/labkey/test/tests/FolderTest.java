@@ -98,8 +98,8 @@ public class FolderTest extends BaseWebDriverTest
         init._containerHelper.createProject(init.getProjectName(), null);
         init._containerHelper.createProject(secondProject, null);
         init.goToProjectHome();
-//        init.importFolderFromZip(TestFileUtils.getSampleData("FolderTest/FolderTestProject.folder.zip"));
-//        init.moveTestProjectToTop();
+        init.importFolderFromZip(TestFileUtils.getSampleData("FolderTest/FolderTestProject.folder.zip"));
+        init.moveTestProjectToTop();
     }
 
     @Test
