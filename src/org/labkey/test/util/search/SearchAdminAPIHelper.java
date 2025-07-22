@@ -42,13 +42,6 @@ import static org.labkey.test.WebDriverWrapper.WAIT_FOR_PAGE;
 public abstract class SearchAdminAPIHelper
 {
 
-    @LogMethod(quiet = true)
-    public static void purgeForContainer(String containerPath)
-    {
-        var cmd = new SimplePostCommand("search", "cancelIndexing");
-        executeCommand(cmd, containerPath);
-    }
-
     public static void waitForIndexer()
     {
         waitForIndexer(WAIT_FOR_PAGE);
@@ -64,7 +57,7 @@ public abstract class SearchAdminAPIHelper
         var cmd = new SimplePostCommand("search", "waitForIndexer");
         cmd.setTimeout(timeout);
 
-       executeCommand(cmd, null);
+       executeWaitForIndexer(cmd);
     }
 
     public static void waitForIndexerBackground()
@@ -80,7 +73,7 @@ public abstract class SearchAdminAPIHelper
         cmd.setTimeout(timeout);
         cmd.setParameters(Map.of("priority", "background"));
 
-        executeCommand(cmd, null);
+        executeWaitForIndexer(cmd);
     }
 
     @LogMethod(quiet = true)
@@ -113,11 +106,11 @@ public abstract class SearchAdminAPIHelper
         while (!timer.isTimedOut());
     }
 
-    private static void executeCommand(PostCommand<?> cmd, String containerPath)
+    private static void executeWaitForIndexer(PostCommand cmd)
     {
         try
         {
-            var response = cmd.execute(WebTestHelper.getRemoteApiConnection(), containerPath);
+            var response = cmd.execute(WebTestHelper.getRemoteApiConnection(), null);
             assertEquals("WaitForIndexer action timed out", HttpStatus.SC_OK, response.getStatusCode());
         } catch (Exception cmdException)
         {
