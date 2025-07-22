@@ -20,17 +20,20 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.junit.Assert;
 import org.labkey.api.collections.CaseInsensitiveLinkedHashMap;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
 import org.labkey.remoteapi.domain.CreateDomainCommand;
 import org.labkey.remoteapi.domain.DomainResponse;
 import org.labkey.remoteapi.domain.PropertyDescriptor;
 import org.labkey.remoteapi.query.Filter;
-import org.labkey.remoteapi.query.SaveRowsResponse;
+import org.labkey.remoteapi.query.RowsResponse;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.remoteapi.query.Sort;
 import org.labkey.serverapi.reader.TabLoader;
@@ -71,8 +74,10 @@ import static org.labkey.test.util.data.TestDataUtils.REALISTIC_SOURCE_FIELDS;
 public class TestDataGenerator
 {
     public static final String WIDE_CHAR = "\uD83D\uDC7E"; // 👾
-    private static final char WIDE_PLACEHOLDER = '\u03A0'; // 'Π' - Wide character can't be picked from the string with 'charAt'
-    private static final String NON_LATIN_STRING = "\u0438\uC548\u306F"; // "и안は"
+    public static final char WIDE_PLACEHOLDER = '\u03A0'; // 'Π' - Wide character can't be picked from the string with 'charAt'
+    public static final char REPEAT_PLACEHOLDER = '\u22EF'; // '⋯' - Used to indicate that the char will be repeated
+    public static final char ALL_CHARS_PLACEHOLDER = '\u2211'; // '∑' - Used to indicate that all characters from the charset should be used
+    public static final String NON_LATIN_STRING = "\u0438\uC548\u306F"; // "и안は"
     // chose a Character random from this String
     public static final String CHARSET_STRING = "ABCDEFG01234abcdefvxyz~!@#$%^&*()-+=_{}[]|:;\"',.<>" + NON_LATIN_STRING + WIDE_PLACEHOLDER;
     public static final String ALPHANUMERIC_STRING = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvxyz";
@@ -474,7 +479,16 @@ public class TestDataGenerator
         {
             int randIndex = (int)(charSetFrom.length() * Math.random());
             char c = charSetFrom.charAt(randIndex);
-            if (c == WIDE_PLACEHOLDER)
+            if (c == REPEAT_PLACEHOLDER)
+            {
+                randIndex = (int)(charSetFrom.length() * Math.random());
+                c = charSetFrom.charAt(randIndex);
+                int repeatCount = randomInt(2, 50); // repeat between 2 and 50 times
+                val.append(StringUtils.repeat(c, repeatCount));
+            }
+            else if (c == ALL_CHARS_PLACEHOLDER)
+                val.append(charSetFrom);
+            else if (c == WIDE_PLACEHOLDER)
                 val.append(WIDE_CHAR);
             else
                 val.append(c);
@@ -496,7 +510,7 @@ public class TestDataGenerator
      * Creates a String containing the given part with random characters from charSet surrounding it. The name
      * will have leading and trailing spaces removed and multiple internal spaces collapsed to a single space
      * in order to be compatible with UI display. Because of this space treatment, there may be fewer than the
-     * sepcified number of charcters before and after the given part.
+     * specified number of characters before and after the given part.
      *
      * @param part          the part that is to be included between random strings
      * @param numStartChars maximum number of random characters from charSet
@@ -517,7 +531,7 @@ public class TestDataGenerator
 
     public static String randomDomainName(@Nullable String part)
     {
-        return randomDomainName(part, randomInt(0, 10));
+        return randomDomainName(part, null);
     }
 
     public static String randomInvalidDomainName(@Nullable String namePart, int numStartChars, int numEndChars)
@@ -527,35 +541,39 @@ public class TestDataGenerator
         return domainName;
     }
 
-    public static String randomDomainName(int numEndChars)
+    public static String randomDomainName(@Nullable String namePart, @Nullable DomainUtils.DomainKind domainKind)
     {
-        return randomDomainName(null, numEndChars);
+        return randomDomainName(namePart, null, null, domainKind);
     }
 
     /**
      * Generate a random domain name of the specified size.
      *
      * @param namePart    If a namePart is provided, the domain name will contain it. Pass null to generate a random alphanumeric single character for the prefix.
+     * @param numStartChars Number of random characters at end of name
      * @param numEndChars Number of random characters at end of name
      * @return name containing the given name part and appended random characters that should be a valid domain name
      */
-    public static String randomDomainName(@Nullable String namePart, int numEndChars)
+    public static String randomDomainName(@Nullable String namePart, @Nullable Integer numStartChars, @Nullable Integer numEndChars, @Nullable DomainUtils.DomainKind domainKind)
     {
-        String domainName;
-        do
-        {
-            String firstChar = namePart != null ? namePart.charAt(0) + "" : randomString(1, null, ALPHANUMERIC_STRING); // domain needs to start with alphanumeric char;
-            String _namePart = namePart != null ? namePart.substring(1) : "";
-            final String charset = namePart != null ? DOMAIN_SPECIAL_STRING : ALPHANUMERIC_STRING + DOMAIN_SPECIAL_STRING;
-            domainName = firstChar + randomName(_namePart, 0, numEndChars, charset, null);
-        }
-        while (Pattern.matches("(.*\\s--[^ ].*)|(.*\\s-[^- ].*)", domainName)); // domain name must not contain space followed by dash. (command like: Issue 49161)
+        String _namePart = namePart == null ? "" : namePart;
+        DomainUtils.DomainKind _domainKind = domainKind == null ? DomainUtils.DomainKind.SampleSet : domainKind;
+        String charSet = ALPHANUMERIC_STRING + DOMAIN_SPECIAL_STRING;
+        // TODO increase min to 5 and max to 50
+        String domainName = randomName(_namePart, getNumChars(numStartChars, 0), getNumChars(numEndChars, 10), charSet, null);
+        while (isDomainAndFieldNameInvalid(WebTestHelper.getRemoteApiConnection(false), _domainKind, domainName, null))
+            domainName = randomName(_namePart, getNumChars(numStartChars, 0), getNumChars(numEndChars, 10), charSet, null);
 
         // Multiple spaces in the UI are collapsed into a single space. If we need to test for handling of multiple spaces, we'll not use this generator
         domainName = domainName.replaceAll("\\s+", " ");
 
-        TestLogger.log("Generated random domain name: " + domainName);
+        TestLogger.log("Generated random domain name for domainKind " + _domainKind + ": " + domainName);
         return domainName;
+    }
+
+    private static int getNumChars(Integer val, int max)
+    {
+        return val != null ? val : randomInt(0, max);
     }
 
     public static String randomFieldName(String part)
@@ -565,34 +583,60 @@ public class TestDataGenerator
 
     public static String randomFieldName(String part, @Nullable String exclusion)
     {
-        return randomFieldName(part, randomInt(0, 5), randomInt(0, 5), exclusion);
+        return randomFieldName(part, exclusion, null);
     }
 
-    public static String randomFieldName(String part, int numStartChars, int numEndChars)
+    public static String randomFieldName(String part, @Nullable String exclusion, DomainUtils.DomainKind domainKind)
     {
-       return randomFieldName(part, numStartChars, numEndChars, null);
+        return randomFieldName(part, null, null, exclusion, domainKind);
     }
 
-    public static String randomFieldName(@NotNull String part, int numStartChars, int numEndChars, @Nullable String exclusion)
+    public static String randomFieldName(@NotNull String part, @Nullable Integer numStartChars, @Nullable Integer numEndChars, @Nullable String exclusion, @Nullable DomainUtils.DomainKind domainKind)
     {
+        DomainUtils.DomainKind _domainKind = domainKind == null ? DomainUtils.DomainKind.SampleSet : domainKind;
+
         // use the characters that we know are encoded in fieldKeys plus characters that we know clients are using
         // Issue 53197: Field name with double byte character can cause client side exception in Firefox when trying to customize grid view.
-        String chars = ALL_ILLEGAL_QUERY_KEY_CHARACTERS + " %()=+-[]_|*`'\":;<>?!@#^" + NON_LATIN_STRING + WIDE_PLACEHOLDER ;
+        String chars = ALL_ILLEGAL_QUERY_KEY_CHARACTERS + " %()=+-[]_|*`'\":;<>?!@#^" + NON_LATIN_STRING
+                + WIDE_PLACEHOLDER + REPEAT_PLACEHOLDER + ALL_CHARS_PLACEHOLDER;
 
-        String randomFieldName = randomName(part, numStartChars, numEndChars, chars, exclusion);
+        // TODO increase max to 50
+        String randomFieldName = randomName(part, getNumChars(numStartChars, 5), getNumChars(numEndChars, 5), chars, exclusion);
+        while (isDomainAndFieldNameInvalid(WebTestHelper.getRemoteApiConnection(false), _domainKind, null, randomFieldName))
+            randomFieldName = randomName(part, getNumChars(numStartChars, 5), getNumChars(numEndChars, 5), chars, exclusion);
 
-        // Avoid generating fields names with reserved substitution format patterns. e.g. ":Date" or ":First"
-        if (numStartChars > 0 && part.length() >= 4 && randomFieldName.charAt(numStartChars - 1) == ':' &&
-                StringUtils.isAlpha(part.substring(0, 4))) // The shortest pattern is four characters (see org.labkey.api.util.SubstitutionFormat.getFormatNames)
-        {
-            String regenExclusion = Objects.requireNonNullElse(exclusion, "") + ":";
-            randomFieldName = randomFieldName.substring(0, numStartChars - 1) +
-                    randomString(1, regenExclusion, chars) +
-                    randomFieldName.substring(numStartChars + 1);
-        }
-
-        TestLogger.log("Generated random field name: " + randomFieldName);
+        TestLogger.log("Generated random field name for domainKind " + _domainKind + ": " + randomFieldName);
         return randomFieldName;
+    }
+
+    private static boolean isDomainAndFieldNameInvalid(Connection connection, DomainUtils.DomainKind domainKind, @Nullable String domainName, @Nullable String fieldName)
+    {
+        SimplePostCommand command = new SimplePostCommand("property", "validateDomainAndFieldNames");
+        JSONObject domainDesign = new JSONObject();
+        if (domainName != null)
+        {
+            domainDesign.put("name", domainName);
+        }
+        if (fieldName != null)
+        {
+            JSONArray fields = new JSONArray();
+            fields.put(new JSONObject(Map.of("name", fieldName)));
+            domainDesign.put("fields", fields);
+        }
+        JSONObject json = new JSONObject();
+        json.put("kind", domainKind);
+        json.put("domainDesign", domainDesign);
+        command.setJsonObject(json);
+
+        try
+        {
+            CommandResponse response = command.execute(connection, "/");
+            return response.getParsedData().containsKey("errors");
+        }
+        catch (CommandException | IOException e)
+        {
+            throw new RuntimeException("Failed to validate domain field name: %s.".formatted(fieldName), e);
+        }
     }
 
     public static String randomChoice(List<String> choices)
@@ -602,9 +646,11 @@ public class TestDataGenerator
 
     public static int randomInt(int min, int max)
     {
-        if (min >= max)
+        if (min > max)
             throw new IllegalArgumentException("min must be less than max");
 
+        if (min == max)
+            return min;
         return ThreadLocalRandom.current().nextInt((max - min) + 1) + min;
     }
 
@@ -758,17 +804,17 @@ public class TestDataGenerator
         return getQueryHelper(cn).deleteDomain();
     }
 
-    public SaveRowsResponse insertRows() throws IOException, CommandException
+    public RowsResponse insertRows() throws IOException, CommandException
     {
         return insertRows(WebTestHelper.getRemoteApiConnection());
     }
 
-    public SaveRowsResponse insertRows(Connection cn) throws IOException, CommandException
+    public RowsResponse insertRows(Connection cn) throws IOException, CommandException
     {
         return insertRows(cn, getRows());
     }
 
-    public SaveRowsResponse insertRows(Connection cn, List<Map<String, Object>> rows) throws IOException, CommandException
+    public RowsResponse insertRows(Connection cn, List<Map<String, Object>> rows) throws IOException, CommandException
     {
         return getQueryHelper(cn).insertRows(rows);
     }
@@ -794,7 +840,7 @@ public class TestDataGenerator
      * @deprecated Use {@link QueryApiHelper}
      */
     @Deprecated(since = "22.4")
-    public SaveRowsResponse updateRows(Connection cn, List<Map<String, Object>> rows) throws IOException, CommandException
+    public RowsResponse updateRows(Connection cn, List<Map<String, Object>> rows) throws IOException, CommandException
     {
         return getQueryHelper(cn).updateRows(rows);
     }
@@ -839,7 +885,7 @@ public class TestDataGenerator
      * @deprecated Use {@link QueryApiHelper}
      */
     @Deprecated(since = "22.4")
-    public SaveRowsResponse deleteRows(Connection cn, List<Map<String,Object>> rowsToDelete) throws IOException, CommandException
+    public RowsResponse deleteRows(Connection cn, List<Map<String,Object>> rowsToDelete) throws IOException, CommandException
     {
         return getQueryHelper(cn).deleteRows(rowsToDelete);
     }

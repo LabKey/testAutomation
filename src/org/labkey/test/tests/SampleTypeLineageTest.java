@@ -8,7 +8,7 @@ import org.labkey.remoteapi.experiment.LineageCommand;
 import org.labkey.remoteapi.experiment.LineageNode;
 import org.labkey.remoteapi.experiment.LineageResponse;
 import org.labkey.remoteapi.query.ContainerFilter;
-import org.labkey.remoteapi.query.SaveRowsResponse;
+import org.labkey.remoteapi.query.RowsResponse;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -121,12 +121,12 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
         dgen.addCustomRow(Map.of("name", "H", "data", 14, "stringData", TestDataGenerator.randomString(15), "MaterialInputs/implicitParentage", "A,B,C"));
         dgen.addCustomRow(Map.of("name", "I", "data", 12, "stringData", TestDataGenerator.randomString(15), "MaterialInputs/implicitParentage", "B,G"));
 
-        SaveRowsResponse saveRowsResponse = dgen.insertRows(createDefaultConnection(), dgen.getRows());
+        RowsResponse rowsResponse = dgen.insertRows(createDefaultConnection(), dgen.getRows());
 
         // get row 'B' after insert
-        Map<String, Object> rowB = saveRowsResponse.getRows().stream().filter((a)-> a.get("name").equals("B"))
+        Map<String, Object> rowB = rowsResponse.getRows().stream().filter((a)-> a.get("name").equals("B"))
                 .findFirst().orElse(null);
-        Map<String, Object> rowH = saveRowsResponse.getRows().stream().filter((a)-> a.get("name").equals("H"))
+        Map<String, Object> rowH = rowsResponse.getRows().stream().filter((a)-> a.get("name").equals("H"))
                 .findFirst().orElse(null);
 
         refresh();

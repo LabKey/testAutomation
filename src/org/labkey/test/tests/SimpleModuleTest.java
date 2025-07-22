@@ -32,7 +32,7 @@ import org.labkey.remoteapi.query.DeleteRowsCommand;
 import org.labkey.remoteapi.query.InsertRowsCommand;
 import org.labkey.remoteapi.query.Row;
 import org.labkey.remoteapi.query.RowMap;
-import org.labkey.remoteapi.query.SaveRowsResponse;
+import org.labkey.remoteapi.query.RowsResponse;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.remoteapi.query.UpdateRowsCommand;
@@ -372,7 +372,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         Map<String, Object> rowMapM = new HashMap<>();
         rowMapM.put("Name", "TestManufacturer");
         insertCmdM.addRow(rowMapM);
-        SaveRowsResponse respM = insertCmdM.execute(createDefaultConnection(), getProjectName());
+        RowsResponse respM = insertCmdM.execute(createDefaultConnection(), getProjectName());
         Object manufacturerId = respM.getRows().get(0).get("RowId");
 
         //This table has one validator defined in the schema XML and one in query XML.  First do insert that should fail schema validator:
@@ -400,7 +400,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         rowMap.put("ManufacturerId", manufacturerId);
         rowMap.put("InitialReleaseYear", 2000);
         insertCmd.addRow(rowMap);
-        SaveRowsResponse resp = insertCmd.execute(createDefaultConnection(), getProjectName());
+        RowsResponse resp = insertCmd.execute(createDefaultConnection(), getProjectName());
         Object rowId = resp.getRows().get(0).get("RowId");
 
         //now try to update it:
@@ -494,7 +494,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
                 Maps.of("Name", "Toyota"),
                 Maps.of("Name", "Honda")
         ));
-        SaveRowsResponse insertResp = insertCmd.execute(cn, getProjectName());
+        RowsResponse insertResp = insertCmd.execute(cn, getProjectName());
         assertEquals("Expected to insert 3 rows.", 3, insertResp.getRowsAffected().intValue());
 
         Integer fordId = null;
@@ -752,7 +752,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         }
 
         log("** Updating vehicles...");
-        SaveRowsResponse updateRows = updateCmd.execute(cn, getProjectName());
+        RowsResponse updateRows = updateCmd.execute(cn, getProjectName());
         assertEquals("Expected to update 1 row.", 1, updateRows.getRowsAffected().intValue());
         assertEquals(4, ((Number) (updateRows.getRows().get(0).get("Milage"))).intValue());
 

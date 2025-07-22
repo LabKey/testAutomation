@@ -67,9 +67,9 @@ public class GridPanelTest extends GridPanelBaseTest
     private static final String FILTER_EXPDATE_COL = "Expiration Date";
     private static final FieldInfo FILTER_STRING_COL = new FieldInfo("Str\uD83D\uDC7E]|*안", FieldDefinition.ColumnType.String);
     private static final FieldInfo FILTER_INT_COL = new FieldInfo("Int&`~_@", FieldDefinition.ColumnType.Integer);
-    private static final FieldInfo FILTER_EXTEND_CHAR_COL = new FieldInfo(TestDataGenerator.randomFieldName("\u0106\u00D8\u0139", 0, 5), FieldDefinition.ColumnType.String);
-    private static final FieldInfo FILTER_BOOL_COL = new FieldInfo(TestDataGenerator.randomFieldName("Bool", 0, 5), FieldDefinition.ColumnType.Boolean);
-    private static final FieldInfo FILTER_DATE_COL = new FieldInfo(TestDataGenerator.randomFieldName("Date", 0, 5), FieldDefinition.ColumnType.DateAndTime);
+    private static final FieldInfo FILTER_EXTEND_CHAR_COL = FieldInfo.random("\u0106\u00D8\u0139", FieldDefinition.ColumnType.String);
+    private static final FieldInfo FILTER_BOOL_COL = FieldInfo.random("Bool", FieldDefinition.ColumnType.Boolean);
+    private static final FieldInfo FILTER_DATE_COL = FieldInfo.random("Date", FieldDefinition.ColumnType.DateAndTime);
     private static final String FILTER_STORED_AMOUNT_COL = "Amount";
 
     // Views and columns used in the views. The views are only applied to the small sample type (Small_SampleType).
