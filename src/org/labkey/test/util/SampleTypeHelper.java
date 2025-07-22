@@ -30,6 +30,7 @@ import org.labkey.test.pages.experiment.CreateSampleTypePage;
 import org.labkey.test.pages.experiment.UpdateSampleTypePage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
+import org.labkey.test.util.data.TestDataUtils;
 import org.openqa.selenium.WebDriver;
 
 import java.io.File;
@@ -81,18 +82,11 @@ public class SampleTypeHelper extends WebDriverWrapper
     @NotNull
     private static String convertMapToTsv(@NotNull List<Map<String, String>> data)
     {
-        // first the header
-        List<String> rows = new ArrayList<>();
-        rows.add(String.join("\t", data.get(0).keySet()));
-        data.forEach(dataMap -> {
-            StringBuilder row = new StringBuilder();
-            data.get(0).keySet().forEach(key -> {
-                row.append(dataMap.get(key));
-                row.append("\t");
-            });
-            rows.add(row.substring(0, row.lastIndexOf("\t")));
-        });
-        return String.join("\n", rows);
+        List<String> headers = new ArrayList<>(data.get(0).keySet());
+        List<Map<String, Object>> rows = new ArrayList<>();
+        for (Map<String, String> row : data)
+            rows.add(new HashMap<>(row));
+        return TestDataUtils.tsvStringFromRowMaps(rows, headers, true);
     }
 
     @Override

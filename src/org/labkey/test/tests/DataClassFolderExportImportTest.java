@@ -99,14 +99,18 @@ public class DataClassFolderExportImportTest extends BaseWebDriverTest
         _containerHelper.createSubfolder(getProjectName(), subfolder);
 
         DataClassDefinition testType = new DataClassDefinition(testDataClass).setFields(DataClassAPIHelper.dataClassTestFields());
+        String intColumnName = testType.getFieldByNamePart("intColumn").getName();
+        String decimalColumnName = testType.getFieldByNamePart("decimalColumn").getName();
+        String stringColumnName = testType.getFieldByNamePart("stringColumn").getName();
+        String attachmentColumnName = testType.getFieldByNamePart("attachmentColumn").getName();
 
         TestDataGenerator testDgen = DataClassAPIHelper.createEmptyDataClass(subfolderPath, testType);
 
-        testDgen.addCustomRow(Map.of("Name", "class1", "intColumn", 7771, "decimalColumn", 1.1, "stringColumn", "one"));
-        testDgen.addCustomRow(Map.of("Name", "class2", "intColumn", 7772, "decimalColumn", 2.2, "stringColumn", "two"));
-        testDgen.addCustomRow(Map.of("Name", "class3", "intColumn", 7773, "decimalColumn", 3.3, "stringColumn", "three"));
-        testDgen.addCustomRow(Map.of("Name", "class4", "intColumn", 7774, "decimalColumn", 4.4, "stringColumn", "four"));
-        testDgen.addCustomRow(Map.of("Name", "class5", "intColumn", 7775, "decimalColumn", 5.5, "stringColumn", "five"));
+        testDgen.addCustomRow(Map.of("Name", "class1", intColumnName, 7771, decimalColumnName, 1.1, stringColumnName, "one"));
+        testDgen.addCustomRow(Map.of("Name", "class2", intColumnName, 7772, decimalColumnName, 2.2, stringColumnName, "two"));
+        testDgen.addCustomRow(Map.of("Name", "class3", intColumnName, 7773, decimalColumnName, 3.3, stringColumnName, "three"));
+        testDgen.addCustomRow(Map.of("Name", "class4", intColumnName, 7774, decimalColumnName, 4.4, stringColumnName, "four"));
+        testDgen.addCustomRow(Map.of("Name", "class5", intColumnName, 7775, decimalColumnName, 5.5, stringColumnName, "five"));
         testDgen.insertRows();
 
         PortalHelper portalHelper = new PortalHelper(this);
@@ -125,7 +129,7 @@ public class DataClassFolderExportImportTest extends BaseWebDriverTest
                                     // issue https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=42191 tracks this
                                     // until it is fixed we will have to add attachments via the UI, like this
             sourceTable.clickEditRow(i);
-            setFormElement(Locator.input("quf_attachmentColumn"), _attachments.get(i));
+            setFormElement(Locator.input("quf_" + attachmentColumnName), _attachments.get(i));
             clickButton("Submit");
         }
         List<Map<String, String>> sourceRowData = sourceTable.getTableData();

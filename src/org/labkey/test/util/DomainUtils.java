@@ -94,4 +94,12 @@ public final class DomainUtils
         }
     }
 
+    public enum DomainKind {
+        DataClass,
+        SampleSet,
+        IntList,
+        VarList,
+        StudyDatasetDate,
+        StudyDatasetVisit
+    }
 }

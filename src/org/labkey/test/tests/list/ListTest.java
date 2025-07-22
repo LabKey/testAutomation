@@ -59,6 +59,7 @@ import org.labkey.test.util.AbstractDataRegionExportOrSignHelper.ColumnHeaderTyp
 import org.labkey.test.util.AuditLogHelper;
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.DomainUtils;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.Maps;
@@ -513,7 +514,7 @@ public class ListTest extends BaseWebDriverTest
     public void testLongName()
     {
         String listName = "A_+-:''.¡™£¢∞§¶•ªº–≠œ∑´®†¥¨ˆøπ“‘«æ…¬˚∆˙©√ƒ∂ßΩ≈ç√∫µ≤≥÷‹›ﬁﬂ‡°·‚—±⁄€‹›‡‰Æ«»¢∫√∑∏∂";
-        String fieldWithDefault = TestDataGenerator.randomFieldName("With Default");
+        String fieldWithDefault = TestDataGenerator.randomFieldName("With Default", null, DomainUtils.DomainKind.IntList);
         EditListDefinitionPage listEditPage = _listHelper.beginCreateList(getProjectName(), listName);
         listEditPage.manuallyDefineFieldsWithAutoIncrementingKey("Key");
         listEditPage.addField(new FieldDefinition(fieldWithDefault, ColumnType.String));
@@ -541,7 +542,7 @@ public class ListTest extends BaseWebDriverTest
     @Test
     public void testCreateListWithBOMFile()
     {
-        String listName = TestDataGenerator.randomDomainName("From BOM File", 4);
+        String listName = TestDataGenerator.randomDomainName("From BOM File", DomainUtils.DomainKind.IntList);
         File bomFile = TestFileUtils.getSampleData("lists/TestUTF8_BOM.csv");
 
         EditListDefinitionPage listEditPage = _listHelper.beginCreateList(getProjectName(), listName);
@@ -990,7 +991,7 @@ public class ListTest extends BaseWebDriverTest
     public void testChangeListName()
     {
 
-        String listNameBefore = TestDataGenerator.randomDomainName("Before Rename", 7);
+        String listNameBefore = TestDataGenerator.randomDomainName("Before Rename", DomainUtils.DomainKind.IntList);
 
         _listHelper.createList(PROJECT_VERIFY, listNameBefore,
                 new FieldDefinition("name", ColumnType.String),
@@ -2115,7 +2116,7 @@ public class ListTest extends BaseWebDriverTest
     @Test
     public void testPkNameParameterCollision() throws IOException, CommandException
     {
-        String listName = TestDataGenerator.randomDomainName("list_key_check");
+        String listName = TestDataGenerator.randomDomainName("list_key_check", DomainUtils.DomainKind.IntList);
         String pkCol = "Name";
 
         var dgen = new VarListDefinition(listName)

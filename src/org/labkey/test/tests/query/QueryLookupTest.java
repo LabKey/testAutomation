@@ -13,6 +13,7 @@ import org.labkey.test.params.FieldInfo;
 import org.labkey.test.params.list.IntListDefinition;
 import org.labkey.test.params.list.VarListDefinition;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.DomainUtils;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.data.TestDataUtils;
 
@@ -28,10 +29,8 @@ public class QueryLookupTest extends BaseWebDriverTest
     private static final String PROJECT_NAME = "QueryLookupTest" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
     private static final String LIST_NAME = "l&ist q";
 
-    private static final FieldInfo NAME_COLUMN =
-            new FieldInfo("Name", FieldDefinition.ColumnType.String);
-    private static final FieldInfo TSHIRT_COLUMN =
-            new FieldInfo("TShirt", FieldDefinition.ColumnType.String);
+    private static final FieldInfo NAME_COLUMN = FieldInfo.random("Name", FieldDefinition.ColumnType.String, DomainUtils.DomainKind.VarList);
+    private static final FieldInfo TSHIRT_COLUMN = FieldInfo.random("TShirt", FieldDefinition.ColumnType.String, DomainUtils.DomainKind.VarList);
 
     @Override
     protected void doCleanup(boolean afterTest)
@@ -64,16 +63,18 @@ public class QueryLookupTest extends BaseWebDriverTest
     public void testLookupToQueryColumn() throws Exception
     {
         var insertedRows = executeSelectRowCommand("lists", LIST_NAME).getRows();
-        var itemNames = insertedRows.stream().map(a-> a.get("name").toString()).toList();
+        var itemNames = insertedRows.stream().map(a-> a.get(NAME_COLUMN.getName()).toString()).toList();
         String secondList = "secondList";
 
         // create a query from LIST_NAME list, with a key defined in the query xml
         String queryName = "query from list";
         String querySql = """
-                SELECT [list_name].Name,
-                [list_name].TShirt
+                SELECT [list_name].[name_column] AS Name,
+                [list_name].[tshirt_column] AS TShirt
                 FROM [list_name]
-                """.replace("[list_name]", EscapeUtil.getSqlQuotedValue(LIST_NAME));
+                """.replace("[list_name]", EscapeUtil.getSqlQuotedValue(LIST_NAME))
+                .replace("[name_column]", EscapeUtil.getSqlQuotedValue(NAME_COLUMN.getName()))
+                .replace("[tshirt_column]", EscapeUtil.getSqlQuotedValue(TSHIRT_COLUMN.getName()));
         String queryXml = """
                 <tables xmlns="http://labkey.org/data/xml">
                   <table tableName="[query_name]" tableDbType="NOT_IN_DB">
@@ -84,8 +85,7 @@ public class QueryLookupTest extends BaseWebDriverTest
                     </columns>
                   </table>
                 </tables>
-                """.replace("[query_name]", EscapeUtil.getMarkupEscapedValue(queryName))
-                .replace("[list_key]", EscapeUtil.getMarkupEscapedValue(NAME_COLUMN.getName()));
+                """.replace("[query_name]", EscapeUtil.getMarkupEscapedValue(queryName));
         // create a query on the list
         goToSchemaBrowser();
         createQuery(getProjectName(), queryName, "lists", querySql, queryXml, false);

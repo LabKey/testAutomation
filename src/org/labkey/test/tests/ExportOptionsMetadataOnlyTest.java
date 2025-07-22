@@ -67,8 +67,8 @@ public class ExportOptionsMetadataOnlyTest extends BaseWebDriverTest
 
         DataClassDefinition testType = new DataClassDefinition(dataClassName).setFields(DataClassAPIHelper.dataClassTestFields());
         TestDataGenerator testDgen = DataClassAPIHelper.createEmptyDataClass(getProjectName(), testType);
-        testDgen.addCustomRow(Map.of("Name", "class1", "intColumn", 1, "decimalColumn", 1.1, "stringColumn", "one"));
-        testDgen.addCustomRow(Map.of("Name", "class2", "intColumn", 2, "decimalColumn", 2.2, "stringColumn", "two"));
+        testDgen.addCustomRow(Map.of("Name", "class1"));
+        testDgen.addCustomRow(Map.of("Name", "class2"));
         testDgen.insertRows();
 
         log("Export data class design only");
