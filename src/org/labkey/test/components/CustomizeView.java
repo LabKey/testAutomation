@@ -367,7 +367,9 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
             _driver.scrollIntoView(fieldRow, false);
             if (!StringUtils.trimToEmpty(fieldRow.getAttribute("class")).contains("expanded"))
             {
-                Locator.css(".x4-tree-expander").findElement(fieldRow).click();
+                WebElement expander = Locator.css(".x4-tree-expander").findElement(fieldRow);
+                _driver.scrollIntoView(expander, true);
+                expander.click();
             }
             Locator.tag("tr").withClass("x4-grid-tree-node-expanded").withAttribute("data-recordid", dataRecordId).waitForElement(getComponentElement(), 10000);
             WebDriverWrapper.waitFor(() -> Locator.css("tr[data-recordid] + tr:not(.x4-grid-row)").findElements(getComponentElement()).isEmpty(), 2000); // Spacer row appears during expansion animation
