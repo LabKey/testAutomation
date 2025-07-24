@@ -16,11 +16,13 @@
 
 package org.labkey.test.tests.filecontent;
 
+import org.assertj.core.api.Assertions;
 import org.hamcrest.CoreMatchers;
 import org.jetbrains.annotations.NotNull;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
@@ -31,6 +33,7 @@ import org.labkey.test.components.DomainDesignerPage;
 import org.labkey.test.components.domain.DomainFieldRow;
 import org.labkey.test.components.ext4.ComboBox;
 import org.labkey.test.components.ext4.Window;
+import org.labkey.test.pages.admin.UsageStatisticsPage;
 import org.labkey.test.pages.files.WebDavPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldDefinition.ColumnType;
@@ -47,6 +50,8 @@ import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SearchHelper;
 import org.labkey.test.util.Timer;
 import org.labkey.test.util.core.webdav.WebDavUtils;
+import org.labkey.test.util.data.JSONUtils;
+import org.labkey.test.util.mothership.MothershipHelper;
 import org.openqa.selenium.WebElement;
 
 import java.io.File;
@@ -283,6 +288,7 @@ public class FileContentUploadTest extends BaseWebDriverTest
         Set<String> folders = new HashSet<>(_fileBrowserHelper.getFileList());
         assertEquals("Didn't create expected folders", expectedFolders, folders);
     }
+
     @Test
     public void testFileNameCharacters() throws IOException
     {
@@ -341,6 +347,35 @@ public class FileContentUploadTest extends BaseWebDriverTest
         log("Verifying file is uploaded");
         waitForElement(Locator.tagWithText("span", testFile.getName()));
         assertElementPresent(Locator.tagWithText("span", testFile.getName()));
+    }
+
+    @Test
+    public void testCalculateFileRootSize() throws Exception
+    {
+        String calculateFileRootSizeTask = "Calculate file root sizes";
+        goToAdminConsole().clickSystemMaintenance().runMaintenanceTask(calculateFileRootSizeTask);
+        Integer initialFileRootSize = getFileRootSize();
+
+        goToProjectHome();
+        File testFile = TestFileUtils.getSampleData("fileTypes/tsv_sample.tsv");
+
+        log("Dropping the file object in drop zone");
+        _fileBrowserHelper.uploadFile(testFile);
+
+        goToAdminConsole().clickSystemMaintenance().runMaintenanceTask(calculateFileRootSizeTask);
+        Integer finalFileRootSize = getFileRootSize();
+        if (!checker().wrapAssertion(() -> Assertions.assertThat(finalFileRootSize)
+                .as("Crawled file root size").isGreaterThan(initialFileRootSize)))
+        {
+            UsageStatisticsPage.beginAt(this).setJsonPathInput("modules.FileContent");
+            checker().screenShotIfNewError("file_root_size");
+        }
+    }
+
+    private @NotNull Integer getFileRootSize() throws IOException, CommandException
+    {
+        return JSONUtils.getProperty("jsonMetrics.modules.FileContent.fileRootsTotalSize",
+                new MothershipHelper(this).getUsageReportJson());
     }
 
     @NotNull
