@@ -57,7 +57,8 @@ public class AuditLogHelper
         INVENTORY_AUDIT_EVENT("InventoryAuditEvent"),
         LIST_AUDIT_EVENT("ListAuditEvent"),
         EXPERIMENT_AUDIT_EVENT("ExperimentAuditEvent"),
-        SAMPLE_WORKFLOW_AUDIT_EVENT("SamplesWorkflowAuditEvent");
+        SAMPLE_WORKFLOW_AUDIT_EVENT("SamplesWorkflowAuditEvent"),
+        FILE_SYSTEM_EVENT("FileSystem");
 
         private final String _name;
 
