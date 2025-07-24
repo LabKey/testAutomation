@@ -285,7 +285,7 @@
             <![CDATA[
                 Rows via createAndLoad = 3
                 Rows via insert = 2
-                already exists
+                duplicate key
                 Rows via merge = 10
                 Has audit transaction id = TRUE
              ]]>
