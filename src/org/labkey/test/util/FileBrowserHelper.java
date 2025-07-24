@@ -20,11 +20,17 @@ import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
+import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.query.Filter;
+import org.labkey.remoteapi.query.SelectRowsCommand;
+import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.TestProperties;
 import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.DomainDesignerPage;
 import org.labkey.test.components.ext4.Checkbox;
 import org.labkey.test.components.ext4.RadioButton;
@@ -40,6 +46,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
@@ -871,6 +878,54 @@ public class FileBrowserHelper extends WebDriverWrapper
             shortWait().until(ExpectedConditions.stalenessOf(rootNode));
             waitForElementToDisappear(Locator.xpath("//tbody[starts-with(@id, 'treeview')]/tr[not(starts-with(@id, 'treeview'))]")); // temoporary row exists during expansion animation
         }
+    }
+
+    private String stringOrNull(Object value)
+    {
+        if (value == null)
+            return null;
+        return (String) value;
+    }
+
+    public record FileDetailInfo(String fileName, String absoluteFilePath, String dataFileUrl, String webDavUrl, String webDavUrlRelative)
+    {
+
+    }
+
+    public FileDetailInfo getFileDetailInfo(String containerPath, String fileName)
+    {
+        List<String> filePathColumns = List.of("AbsoluteFilePath", "DataFileUrl", "WebDavUrl", "WebDavUrlRelative");
+        try
+        {
+            Connection cn = WebTestHelper.getRemoteApiConnection();
+            SelectRowsCommand cmd = new SelectRowsCommand("exp", "files");
+            cmd.addFilter("Name", fileName, Filter.Operator.EQUAL);
+            cmd.setColumns(filePathColumns);
+            SelectRowsResponse response = cmd.execute(cn, "/" + containerPath);
+
+            Map<String, Object> row = response.getRows().get(0);
+            Object absoluteFilePath = row.get("AbsoluteFilePath");
+            Object dataFileUrl = row.get("DataFileUrl");
+            Object webDavUrl = row.get("WebDavUrl");
+            Object webDavUrlRelative = row.get("WebDavUrlRelative");
+            return new FileDetailInfo(fileName, stringOrNull(absoluteFilePath), stringOrNull(dataFileUrl), stringOrNull(webDavUrl), stringOrNull(webDavUrlRelative));
+        }
+        catch (CommandException ce)
+        {
+            if (ce.getStatusCode() == 404)
+            {
+                return null;
+            }
+            else
+            {
+                throw new RuntimeException(ce);
+            }
+        }
+        catch (IOException ioe)
+        {
+            throw new RuntimeException(ioe);
+        }
+
     }
 
     // See PageFlowUtil.encodeURIComponent()
