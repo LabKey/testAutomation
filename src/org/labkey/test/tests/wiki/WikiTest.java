@@ -313,7 +313,6 @@ public class WikiTest extends BaseWebDriverTest
         var createResponse = createCmd.execute(cn, getProjectName());
         var createResponseJson = new JSONObject(createResponse.getParsedData());
         var wikiProps = createResponseJson.getJSONObject("wikiProps");
-        SearchAdminAPIHelper.waitForIndexer();
 
         // now, update the wiki with hostile inputs, expecting error/failure
         var updateJson = new JSONObject();
@@ -372,7 +371,6 @@ public class WikiTest extends BaseWebDriverTest
         createJson.put("pageVersionId", -1);
         createCmd.setJsonObject(createJson);
         createCmd.execute(cn, SUBFOLDER_PATH);
-        SearchAdminAPIHelper.waitForIndexer();
 
         // give the folder a wikiWebPart
         goToProjectFolder(PROJECT_NAME, SUBFOLDER_NAME);
@@ -383,13 +381,13 @@ public class WikiTest extends BaseWebDriverTest
                 .descendant(Locator.tagWithText("p", "content for wiki webpart rename"));
 
         // configure the webPart to use the wiki created above
-        waitAndClickAndWait(Locator.linkWithText("Choose an existing page to display"));
+        wikiHelper.clickChooseAPage();
         var selectedPageOption = getSelectedOptionText(Locator.name("name"));
         checker().withScreenshot("unexpected_selected_page")
                         .wrapAssertion(()-> Assertions.assertThat(selectedPageOption)
                                 .as("expect our wiki to be selected")
                                 .startsWith(wikiName));
-        waitAndClickAndWait(Locator.id("btnSubmit"));
+        wikiHelper.saveChosenPage();
 
         // verify the webpart's content is our expected content
         checker().withScreenshot("unexpected_wiki_content")
