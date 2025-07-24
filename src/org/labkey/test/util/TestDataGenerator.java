@@ -630,7 +630,7 @@ public class TestDataGenerator
 
         try
         {
-            CommandResponse response = command.execute(WebTestHelper.getRemoteApiConnection(), "/");
+            CommandResponse response = command.execute(WebTestHelper.getRemoteApiConnection(), "/home");
             return response.getParsedData().containsKey("errors");
         }
         catch (CommandException | IOException e)
