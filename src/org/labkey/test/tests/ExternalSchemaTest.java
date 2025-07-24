@@ -28,7 +28,7 @@ import org.labkey.remoteapi.query.ContainerFilter;
 import org.labkey.remoteapi.query.DeleteRowsCommand;
 import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.InsertRowsCommand;
-import org.labkey.remoteapi.query.SaveRowsResponse;
+import org.labkey.remoteapi.query.RowsResponse;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.remoteapi.query.Sort;
@@ -305,7 +305,7 @@ public class ExternalSchemaTest extends BaseWebDriverTest
 
         try
         {
-            SaveRowsResponse resp = cmd.execute(cn, PROJECT_NAME);
+            RowsResponse resp = cmd.execute(cn, PROJECT_NAME);
             fail("Expected to throw CommandException");
         }
         catch (CommandException ex)
@@ -403,7 +403,7 @@ public class ExternalSchemaTest extends BaseWebDriverTest
         for (Row row : rows)
             cmd.addRow(row.toMap());
         
-        SaveRowsResponse resp = cmd.execute(cn, containerPath);
+        RowsResponse resp = cmd.execute(cn, containerPath);
         assertEquals("Expected to insert " + rows.length + " rows", rows.length, resp.getRowsAffected().intValue());
         
         int[] pks = new int[rows.length];
@@ -449,7 +449,7 @@ public class ExternalSchemaTest extends BaseWebDriverTest
         UpdateRowsCommand cmd = new UpdateRowsCommand(USER_SCHEMA_NAME, TABLE_NAME);
         for (Row row : rows)
             cmd.addRow(row.toMap());
-        SaveRowsResponse resp = cmd.execute(cn, containerPath);
+        RowsResponse resp = cmd.execute(cn, containerPath);
         assertEquals("Expected to update " + rows.length + " rows", rows.length, resp.getRowsAffected().intValue());
 
         Row[] updated = new Row[rows.length];
@@ -491,7 +491,7 @@ public class ExternalSchemaTest extends BaseWebDriverTest
         for (Integer pk : pks)
             cmd.addRow(Collections.singletonMap("RowId", pk));
         
-        SaveRowsResponse resp = cmd.execute(cn, containerPath);
+        RowsResponse resp = cmd.execute(cn, containerPath);
         assertEquals("Expected to delete " + pks.length + " rows", pks.length, resp.getRowsAffected().intValue());
         
         SelectRowsCommand selectCmd = new SelectRowsCommand(USER_SCHEMA_NAME, TABLE_NAME);

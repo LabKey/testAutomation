@@ -3,6 +3,7 @@ package org.labkey.test.params;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.labkey.test.params.FieldDefinition.ColumnType;
+import org.labkey.test.util.DomainUtils;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.TestDataGenerator;
 
@@ -53,11 +54,19 @@ public class FieldInfo implements CharSequence, WrapsFieldKey
     /**
      * Creates a FieldInfo with a semi-random name
      */
-    public static FieldInfo random(String namePart, ColumnType columnType)
+    public static FieldInfo random(String namePart, ColumnType columnType, DomainUtils.DomainKind domainKind)
     {
-        FieldInfo field = new FieldInfo(TestDataGenerator.randomFieldName(namePart), columnType);
+        FieldInfo field = new FieldInfo(TestDataGenerator.randomFieldName(namePart, null, domainKind), columnType);
         field.setNamePart(namePart);
         return field;
+    }
+
+    /**
+     * Creates a FieldInfo with a semi-random name
+     */
+    public static FieldInfo random(String namePart, ColumnType columnType)
+    {
+        return random(namePart, columnType, null);
     }
 
     /**

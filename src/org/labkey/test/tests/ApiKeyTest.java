@@ -32,7 +32,7 @@ import org.labkey.remoteapi.query.GetQueryDetailsCommand;
 import org.labkey.remoteapi.query.GetQueryDetailsResponse;
 import org.labkey.remoteapi.query.GetSchemasCommand;
 import org.labkey.remoteapi.query.ImportDataResponse;
-import org.labkey.remoteapi.query.SaveRowsResponse;
+import org.labkey.remoteapi.query.RowsResponse;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.remoteapi.query.Sort;
@@ -379,7 +379,7 @@ public class ApiKeyTest extends BaseWebDriverTest
             valueCount.incrementAndGet();
             assertEquals("Rows imported", 1, importResponse.getRowCount());
 
-            SaveRowsResponse saveResponse = queryApiHelper.insertRows(List.of(Map.of(LIST_VALUE, "value" + valueCount.get())));
+            RowsResponse saveResponse = queryApiHelper.insertRows(List.of(Map.of(LIST_VALUE, "value" + valueCount.get())));
             valueCount.incrementAndGet();
             assertEquals("Rows inserted", 1, saveResponse.getRowsAffected());
 

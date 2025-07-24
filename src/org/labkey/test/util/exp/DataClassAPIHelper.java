@@ -9,6 +9,7 @@ import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.FieldInfo;
 import org.labkey.test.params.experiment.DataClassDefinition;
 import org.labkey.test.util.DomainUtils;
 import org.labkey.test.util.TestDataGenerator;
@@ -54,12 +55,13 @@ public class DataClassAPIHelper
     public static List<FieldDefinition> dataClassTestFields()
     {
         return Arrays.asList(
-                new FieldDefinition("intColumn", FieldDefinition.ColumnType.Integer),
-                new FieldDefinition("decimalColumn", FieldDefinition.ColumnType.Decimal),
-                new FieldDefinition("stringColumn", FieldDefinition.ColumnType.String),
-                new FieldDefinition("sampleDate", FieldDefinition.ColumnType.DateAndTime),
-                new FieldDefinition("boolColumn", FieldDefinition.ColumnType.Boolean),
-                new FieldDefinition("attachmentColumn", FieldDefinition.ColumnType.Attachment));
+                FieldInfo.random("intColumn", FieldDefinition.ColumnType.Integer, DomainUtils.DomainKind.DataClass).getFieldDefinition(),
+                FieldInfo.random("decimalColumn", FieldDefinition.ColumnType.Decimal, DomainUtils.DomainKind.DataClass).getFieldDefinition(),
+                FieldInfo.random("stringColumn", FieldDefinition.ColumnType.String, DomainUtils.DomainKind.DataClass).getFieldDefinition(),
+                FieldInfo.random("sampleDate", FieldDefinition.ColumnType.DateAndTime, DomainUtils.DomainKind.DataClass).getFieldDefinition(),
+                FieldInfo.random("boolColumn", FieldDefinition.ColumnType.Boolean, DomainUtils.DomainKind.DataClass).getFieldDefinition(),
+                FieldInfo.random("attachmentColumn", FieldDefinition.ColumnType.Attachment, DomainUtils.DomainKind.DataClass).getFieldDefinition()
+            );
     }
 
     /**

@@ -27,7 +27,7 @@ import org.labkey.remoteapi.di.UpdateTransformConfigurationCommand;
 import org.labkey.remoteapi.di.UpdateTransformConfigurationResponse;
 import org.labkey.remoteapi.query.ExecuteSqlCommand;
 import org.labkey.remoteapi.query.InsertRowsCommand;
-import org.labkey.remoteapi.query.SaveRowsResponse;
+import org.labkey.remoteapi.query.RowsResponse;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
@@ -84,9 +84,9 @@ public class DataIntegrationHelper
         return exRsp;
     }
 
-    public SaveRowsResponse executeInsert(String folderPath, String schemaName, String tableName, Map<String,Object> rows) throws Exception
+    public RowsResponse executeInsert(String folderPath, String schemaName, String tableName, Map<String,Object> rows) throws Exception
     {
-        SaveRowsResponse response;
+        RowsResponse response;
         Connection cn = new Connection(_baseUrl, _username, _password);
         InsertRowsCommand insCmd = new InsertRowsCommand(schemaName, tableName);
         insCmd.addRow(rows);

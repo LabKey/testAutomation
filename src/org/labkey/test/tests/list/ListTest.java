@@ -59,6 +59,7 @@ import org.labkey.test.util.AbstractDataRegionExportOrSignHelper.ColumnHeaderTyp
 import org.labkey.test.util.AuditLogHelper;
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.DomainUtils;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.Maps;
@@ -513,7 +514,7 @@ public class ListTest extends BaseWebDriverTest
     public void testLongName()
     {
         String listName = "A_+-:''.¡™£¢∞§¶•ªº–≠œ∑´®†¥¨ˆøπ“‘«æ…¬˚∆˙©√ƒ∂ßΩ≈ç√∫µ≤≥÷‹›ﬁﬂ‡°·‚—±⁄€‹›‡‰Æ«»¢∫√∑∏∂";
-        String fieldWithDefault = TestDataGenerator.randomFieldName("With Default");
+        String fieldWithDefault = TestDataGenerator.randomFieldName("With Default", null, DomainUtils.DomainKind.IntList);
         EditListDefinitionPage listEditPage = _listHelper.beginCreateList(getProjectName(), listName);
         listEditPage.manuallyDefineFieldsWithAutoIncrementingKey("Key");
         listEditPage.addField(new FieldDefinition(fieldWithDefault, ColumnType.String));
@@ -541,7 +542,7 @@ public class ListTest extends BaseWebDriverTest
     @Test
     public void testCreateListWithBOMFile()
     {
-        String listName = TestDataGenerator.randomDomainName("From BOM File", 4);
+        String listName = TestDataGenerator.randomDomainName("From BOM File", DomainUtils.DomainKind.IntList);
         File bomFile = TestFileUtils.getSampleData("lists/TestUTF8_BOM.csv");
 
         EditListDefinitionPage listEditPage = _listHelper.beginCreateList(getProjectName(), listName);
@@ -990,7 +991,7 @@ public class ListTest extends BaseWebDriverTest
     public void testChangeListName()
     {
 
-        String listNameBefore = TestDataGenerator.randomDomainName("Before Rename", 7);
+        String listNameBefore = TestDataGenerator.randomDomainName("Before Rename", DomainUtils.DomainKind.IntList);
 
         _listHelper.createList(PROJECT_VERIFY, listNameBefore,
                 new FieldDefinition("name", ColumnType.String),
@@ -2109,29 +2110,33 @@ public class ListTest extends BaseWebDriverTest
     }
 
     /**
-     * Issue 53361: 'list-details.view' doesn't work when list pk is named "name"
-     * Expect bad product behavior. Convert this to a regression test once the issue is fixed.
+     * Regression for issue 53361: 'list-details.view' doesn't work when list pk is named "name"
+     * Test for both name and listId key field names.
      */
     @Test
     public void testPkNameParameterCollision() throws IOException, CommandException
     {
-        String listName = TestDataGenerator.randomDomainName("list_key_check");
-        String pkCol = "Name";
+        // Create lists with PKs having the same name as detail URL list definition identifier
+        // params to ensure we can resolve detail pages correctly
+        validateDetailsView("list_name_key_check", "Name");
+        validateDetailsView("list_id_key_check", "ListId");
+    }
 
+    private void validateDetailsView(String listName, String pkCol) throws CommandException, IOException
+    {
+        listName = TestDataGenerator.randomDomainName(listName, DomainUtils.DomainKind.IntList);
         var dgen = new VarListDefinition(listName)
-            .setFields(List.of(new FieldDefinition(pkCol)))
-            .create(createDefaultConnection(), getProjectName())
-            .withGeneratedRows(10);
+                .setFields(List.of(new FieldDefinition(pkCol)))
+                .create(createDefaultConnection(), getProjectName())
+                .withGeneratedRows(10);
         List<String> pks = dgen.getRows().stream().map(row -> (String) row.get(pkCol)).toList();
         dgen.insertRows();
 
         goToProjectHome();
-
         goToManageLists().getGrid().viewListData(listName);
 
         clickAndWait(Locator.linkWithText(pks.get(0)));
-        assertElementPresent(Locator.byClass("labkey-error-heading")
-            .withText("List item '%s' does not exist".formatted(listName)));
+        assertElementPresent(Locator.tagContainingText("td", pks.get(0)));
     }
 
     @Override

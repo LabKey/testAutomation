@@ -168,4 +168,14 @@ public class DataClassDefinition extends DomainProps
     {
         return super.getTestDataGenerator(containerPath).withColumns(List.of(new FieldDefinition("Name", FieldDefinition.ColumnType.String)));
     }
+
+    public FieldDefinition getFieldByNamePart(String namePart)
+    {
+        for (FieldDefinition field : getFields())
+        {
+            if (field.isNamePartMatch(namePart))
+                return field;
+        }
+        throw new IllegalArgumentException("No field found with name part: " + namePart);
+    }
 }

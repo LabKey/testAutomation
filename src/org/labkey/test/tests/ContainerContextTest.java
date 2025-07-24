@@ -23,7 +23,7 @@ import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.DeleteRowsCommand;
 import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.InsertRowsCommand;
-import org.labkey.remoteapi.query.SaveRowsResponse;
+import org.labkey.remoteapi.query.RowsResponse;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
@@ -612,7 +612,7 @@ public class ContainerContextTest extends BaseWebDriverTest
         rowMap.put("result", false);
 
         insertCmd.addRow(rowMap);
-        SaveRowsResponse response = insertCmd.execute(cn, getProjectName() + "/" + workbookId);
+        RowsResponse response = insertCmd.execute(cn, getProjectName() + "/" + workbookId);
         Map<String, Object> row = response.getRows().get(0);
         Integer rowId = (Integer)row.get("RowId");
         return rowId.toString();
@@ -694,7 +694,7 @@ public class ContainerContextTest extends BaseWebDriverTest
         Map<String,Object> rowMap = new HashMap<>();
         rowMap.put("name", MANUFACTURER);
         insertCmd.addRow(rowMap);
-        SaveRowsResponse resp1 = insertCmd.execute(cn, getProjectName());
+        RowsResponse resp1 = insertCmd.execute(cn, getProjectName());
 
         //then create model
         InsertRowsCommand insertCmd2 = new InsertRowsCommand("vehicle", "models");
@@ -702,7 +702,7 @@ public class ContainerContextTest extends BaseWebDriverTest
         rowMap.put("manufacturerId",  resp1.getRows().get(0).get("rowid"));
         rowMap.put("name", MODEL);
         insertCmd2.addRow(rowMap);
-        SaveRowsResponse resp2 = insertCmd2.execute(cn, getProjectName());
+        RowsResponse resp2 = insertCmd2.execute(cn, getProjectName());
 
         InsertRowsCommand insertCmd3 = new InsertRowsCommand("vehicle", "vehicles");
         rowMap = new HashMap<>();
@@ -713,7 +713,7 @@ public class ContainerContextTest extends BaseWebDriverTest
         rowMap.put("LastService", new Date());
 
         insertCmd3.addRow(rowMap);
-        SaveRowsResponse response = insertCmd3.execute(cn, getProjectName());
+        RowsResponse response = insertCmd3.execute(cn, getProjectName());
 
         Map<String, Object> row = response.getRows().get(0);
         return (Integer)row.get("RowId");

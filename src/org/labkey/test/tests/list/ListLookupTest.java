@@ -14,6 +14,7 @@ import org.labkey.test.pages.ImportDataPage;
 import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.DomainUtils;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.TestDataGenerator;
 import org.labkey.test.util.data.TestDataUtils;
@@ -31,15 +32,15 @@ import static org.junit.Assert.assertEquals;
 @Category({Daily.class, Data.class, Hosting.class})
 public class ListLookupTest extends BaseWebDriverTest
 {
-    private static final String lookToListName = TestDataGenerator.randomDomainName("lookToList");
-    private static final String lookToKeyFieldName = TestDataGenerator.randomFieldName("lookToKeyField");
-    private static final String lookToFieldName = TestDataGenerator.randomFieldName("lookToField");
+    private static final String lookToListName = TestDataGenerator.randomDomainName("lookToList", DomainUtils.DomainKind.IntList);
+    private static final String lookToKeyFieldName = TestDataGenerator.randomFieldName("lookToKeyField", null, DomainUtils.DomainKind.IntList);
+    private static final String lookToFieldName = TestDataGenerator.randomFieldName("lookToField", null, DomainUtils.DomainKind.IntList);
     private static List<Map<String, String>> lookToListValues;
     private static String lookupKeyAsNameNumber;
     private static String lookupKeyAsNameFieldValue;
-    private static final String lookFromListName = TestDataGenerator.randomDomainName("lookFromList");
-    private static final String lookFromKeyFieldName = TestDataGenerator.randomFieldName("Look From Key Field");
-    private static final String lookFromLookupFieldName = TestDataGenerator.randomFieldName("Look From Lookup Field");
+    private static final String lookFromListName = TestDataGenerator.randomDomainName("lookFromList", DomainUtils.DomainKind.IntList);
+    private static final String lookFromKeyFieldName = TestDataGenerator.randomFieldName("Look From Key Field", null, DomainUtils.DomainKind.IntList);
+    private static final String lookFromLookupFieldName = TestDataGenerator.randomFieldName("Look From Lookup Field", null, DomainUtils.DomainKind.IntList);
     private static final String lookFromLookupFieldKey = EscapeUtil.fieldKeyEncodePart(lookFromLookupFieldName);
 
     @BeforeClass
