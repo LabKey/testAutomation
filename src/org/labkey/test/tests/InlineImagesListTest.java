@@ -33,6 +33,7 @@ import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldDefinition.ColumnType;
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.DomainUtils;
 import org.labkey.test.util.ExcelHelper;
 import org.labkey.test.util.TestDataGenerator;
 import org.openqa.selenium.By;
@@ -47,21 +48,24 @@ import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.labkey.test.util.TestDataGenerator.ALL_CHARS_PLACEHOLDER;
+import static org.labkey.test.util.TestDataGenerator.REPEAT_PLACEHOLDER;
 
 @Category(Daily.class)
 @BaseWebDriverTest.ClassTimeout(minutes = 5)
 public class InlineImagesListTest extends BaseWebDriverTest
 {
-    protected final static String LIST_NAME = TestDataGenerator.randomDomainName("InlineImagesList");
-    protected final static String LIST_KEY_NAME = TestDataGenerator.randomFieldName("Key");
+    protected final static String LIST_NAME = TestDataGenerator.randomDomainName("InlineImagesList", DomainUtils.DomainKind.IntList);
+    // list key name has a smaller max length than other field names, so we use a constant numEndChars and exclude the repeat and all chars placeholders
+    protected final static String LIST_KEY_NAME = TestDataGenerator.randomFieldName("Key" + ALL_CHARS_PLACEHOLDER, 0, 5, "" + ALL_CHARS_PLACEHOLDER + REPEAT_PLACEHOLDER, DomainUtils.DomainKind.IntList);
     protected final static ColumnType LIST_KEY_TYPE = ColumnType.Integer;
 
-    protected final static String LIST_ATTACHMENT01_NAME = TestDataGenerator.randomFieldName("Attachment01");
-    protected final static String LIST_ATTACHMENT01_LABEL = TestDataGenerator.randomFieldName("Attachment Column 01");
+    protected final static String LIST_ATTACHMENT01_NAME = TestDataGenerator.randomFieldName("Attachment01", null, DomainUtils.DomainKind.IntList);
+    protected final static String LIST_ATTACHMENT01_LABEL = "Attachment Column 01";
     protected final static String LIST_ATTACHMENT01_DESC = "An 1st attachment column.";
 
-    protected final static String LIST_ATTACHMENT02_NAME = TestDataGenerator.randomFieldName("Attachment02");
-    protected final static String LIST_ATTACHMENT02_LABEL = TestDataGenerator.randomFieldName("Attachment Column 02");
+    protected final static String LIST_ATTACHMENT02_NAME = TestDataGenerator.randomFieldName("Attachment02", null, DomainUtils.DomainKind.IntList);
+    protected final static String LIST_ATTACHMENT02_LABEL = "Attachment Column 02";
     protected final static String LIST_ATTACHMENT02_DESC = "An 2nd attachment column.";
 
     protected final static ColumnType LIST_ATTACHMENT_TYPE = ColumnType.Attachment;
