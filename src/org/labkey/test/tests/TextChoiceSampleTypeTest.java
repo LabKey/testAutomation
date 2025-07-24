@@ -110,7 +110,7 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
         expectedValues.add("A");
         expectedValues.add("\u00DC");
         expectedValues.add("|X|Y|Z|withPipeChars");
-        expectedValues.add("A string with spaces and backslash at end.\\");
+        expectedValues.add("A string with \"spaces\" and backslash at end.\\");
         expectedValues.add("B");
 
         // Identify a couple of TextChoice values that will be used in samples.
@@ -173,8 +173,8 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
 
         samples.add(Map.of(textChoiceFieldName, valuesUsed.get(0), textField, ""));
         samples.add(Map.of(textChoiceFieldName, "", textField, expectedConvertedValues.get(0)));
-        samples.add(Map.of(textChoiceFieldName, "\"" + valuesUsed.get(1)+ "\"", textField, ""));
-        samples.add(Map.of(textChoiceFieldName, "\"" + valuesUsed.get(1) + "\"", textField, ""));
+        samples.add(Map.of(textChoiceFieldName, valuesUsed.get(1), textField, ""));
+        samples.add(Map.of(textChoiceFieldName, valuesUsed.get(1), textField, ""));
         samples.add(Map.of(textChoiceFieldName, "", textField, expectedConvertedValues.get(1)));
 
         sampleTypeHelper.bulkImport(samples);
