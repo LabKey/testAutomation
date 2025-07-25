@@ -75,15 +75,15 @@ public class JSONUtils
                             .formatted(list.size(), getSubPath(path, pathIndex)));
             }
             else
-                throw new NoSuchElementException("No array found at path: '%s'"
-                        .formatted(getSubPath(path, pathIndex)));
+                throw new NoSuchElementException("No array found at path: '%s'. Found '%s'"
+                        .formatted(getSubPath(path, pathIndex), (prop == null ? "null" : prop.getClass().getSimpleName())));
         }
 
         // if this was the last path part, return the prop
         if (pathIndex == (path.size() - 1))
         {
             if (prop != null)
-                return (T)prop;
+                return (T) prop;
             else
                 throw new NoSuchElementException("No item found at path: '%s'"
                         .formatted(getSubPath(path, pathIndex)));
@@ -94,14 +94,14 @@ public class JSONUtils
             if (prop instanceof Map)
                 return getProperty(path, pathIndex + 1, (Map<String, Object>)prop);
             else
-                throw new NoSuchElementException("No map found at path: '%s'"
-                        .formatted(getSubPath(path, pathIndex)));
+                throw new NoSuchElementException("No map found at path: '%s'. Found: '%s'"
+                        .formatted(getSubPath(path, pathIndex), (prop == null ? "null" : prop.getClass().getSimpleName())));
         }
     }
 
     private static @NotNull String getSubPath(List<String> path, int pathIndex)
     {
-        return String.join(".", path.subList(0, pathIndex));
+        return String.join(".", path.subList(0, pathIndex + 1));
     }
 
 }

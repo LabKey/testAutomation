@@ -49,10 +49,9 @@ import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SearchHelper;
 import org.labkey.test.util.Timer;
+import org.labkey.test.util.core.admin.ServerUsageUtils;
 import org.labkey.test.util.core.webdav.WebDavUtils;
 import org.labkey.test.util.data.JSONUtils;
-import org.labkey.test.util.mothership.MothershipHelper;
-import org.openqa.selenium.WebElement;
 
 import java.io.File;
 import java.io.IOException;
@@ -246,7 +245,7 @@ public class FileContentUploadTest extends BaseWebDriverTest
         _fileBrowserHelper.goToConfigureButtonsTab();
         _fileBrowserHelper.unhideGridColumn(FileBrowserHelper.ABSOLUTE_FILE_PATH_COLUMN_ID);
         click(Ext4Helper.Locators.ext4Button("submit"));
-        WebElement columnHeader = waitForElement(Locator.byClass("x4-column-header").withText("Absolute File Path").notHidden());
+        waitForElement(Locator.byClass("x4-column-header").withText("Absolute File Path").notHidden());
 
         String absolutePath = FileBrowserHelper.Locators.gridRowWithNodeId(filename)
                 .append(Locator.byClass("x4-grid-cell").last()).findElement(getDriver()).getText();
@@ -374,8 +373,8 @@ public class FileContentUploadTest extends BaseWebDriverTest
 
     private @NotNull Integer getFileRootSize() throws IOException, CommandException
     {
-        return JSONUtils.getProperty("jsonMetrics.modules.FileContent.fileRootsTotalSize",
-                new MothershipHelper(this).getUsageReportJson());
+        return JSONUtils.getProperty("fileRootsTotalSize",
+                ServerUsageUtils.getModuleMetrics(createDefaultConnection(), "FileContent"));
     }
 
     @NotNull
@@ -402,7 +401,7 @@ public class FileContentUploadTest extends BaseWebDriverTest
         table.checkCheckbox(table.getRowIndex("Email", TEST_USER));
         shortWait().until(LabKeyExpectedConditions.elementIsEnabled(Locator.lkButton(MessagesLongTest.USERS_UPDATE_BUTTON)));
         table.clickHeaderMenu(MessagesLongTest.USERS_UPDATE_BUTTON, false, MessagesLongTest.FILES_MENU_ITEM);
-        final Window window = Window(getDriver()).withTitle("Update user settings for files").waitFor();
+        final Window<?> window = Window(getDriver()).withTitle("Update user settings for files").waitFor();
         ComboBox.ComboBox(getDriver()).withLabel(MessagesLongTest.NEW_SETTING_LABEL).find(window).selectComboBoxItem("No Email");
         window.clickButton(MessagesLongTest.POPUP_UPDATE_BUTTON, true);
         table.doAndWaitForUpdate(() -> Window(getDriver()).withTitle("Update selected users").waitFor().
