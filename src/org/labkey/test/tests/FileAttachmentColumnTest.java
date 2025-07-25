@@ -93,7 +93,9 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
     private final String RESULT_FILE_COL = "resultFile";
     private final String OTHER_RESULT_FILE_COL = "otherResultFile";
     private final String STUDY_DATASET_NAME = "ogreSpiteLevels";
-    private static final FieldInfo LIST_ATTACHMENT_FIELD = new FieldInfo(TestDataGenerator.randomFieldName("File / Attachment"), ColumnType.Attachment);
+    // Issue 53505: enable use of randomFieldName when issue is fixed
+    //private static final FieldInfo LIST_ATTACHMENT_FIELD = new FieldInfo(TestDataGenerator.randomFieldName("File / Attachment"), ColumnType.Attachment);
+    private static final FieldInfo LIST_ATTACHMENT_FIELD = new FieldInfo("File / Attachment", ColumnType.Attachment);
 
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
