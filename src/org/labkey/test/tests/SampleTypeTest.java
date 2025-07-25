@@ -51,11 +51,13 @@ import org.labkey.test.params.FieldDefinition.ColumnType;
 import org.labkey.test.params.FieldDefinition.LookupInfo;
 import org.labkey.test.params.FieldInfo;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
+import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.ExcelHelper;
 import org.labkey.test.util.FileBrowserHelper;
+import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
 import org.labkey.test.util.TestDataGenerator;
@@ -1583,6 +1585,9 @@ public class SampleTypeTest extends BaseWebDriverTest
     @Test // Issue 49830
     public void testFilePathOnBulkImport() throws IOException
     {
+        new ApiPermissionsHelper(this)
+                .setSiteRoleUserPermissions(PasswordUtil.getUsername(), "See Absolute File Paths");
+
         goToProjectHome();
 
         String fileFieldName = "FileField";
