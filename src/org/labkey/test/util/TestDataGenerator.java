@@ -559,10 +559,9 @@ public class TestDataGenerator
         String _namePart = namePart == null ? "" : namePart;
         DomainUtils.DomainKind _domainKind = domainKind == null ? DomainUtils.DomainKind.SampleSet : domainKind;
         String charSet = ALPHANUMERIC_STRING + DOMAIN_SPECIAL_STRING;
-        // TODO increase min to 5 and max to 50
-        String domainName = randomName(_namePart, getNumChars(numStartChars, 0), getNumChars(numEndChars, 10), charSet, null);
+        String domainName = randomName(_namePart, getNumChars(numStartChars, 5), getNumChars(numEndChars, 50), charSet, null);
         while (isDomainAndFieldNameInvalid(WebTestHelper.getRemoteApiConnection(false), _domainKind, domainName, null))
-            domainName = randomName(_namePart, getNumChars(numStartChars, 0), getNumChars(numEndChars, 10), charSet, null);
+            domainName = randomName(_namePart, getNumChars(numStartChars, 5), getNumChars(numEndChars, 50), charSet, null);
 
         // Multiple spaces in the UI are collapsed into a single space. If we need to test for handling of multiple spaces, we'll not use this generator
         domainName = domainName.replaceAll("\\s+", " ");
@@ -600,10 +599,9 @@ public class TestDataGenerator
         String chars = ALL_ILLEGAL_QUERY_KEY_CHARACTERS + " %()=+-[]_|*`'\":;<>?!@#^" + NON_LATIN_STRING
                 + WIDE_PLACEHOLDER + REPEAT_PLACEHOLDER + ALL_CHARS_PLACEHOLDER;
 
-        // TODO increase max to 50
-        String randomFieldName = randomName(part, getNumChars(numStartChars, 5), getNumChars(numEndChars, 5), chars, exclusion);
+        String randomFieldName = randomName(part, getNumChars(numStartChars, 5), getNumChars(numEndChars, 50), chars, exclusion);
         while (isDomainAndFieldNameInvalid(WebTestHelper.getRemoteApiConnection(false), _domainKind, null, randomFieldName))
-            randomFieldName = randomName(part, getNumChars(numStartChars, 5), getNumChars(numEndChars, 5), chars, exclusion);
+            randomFieldName = randomName(part, getNumChars(numStartChars, 5), getNumChars(numEndChars, 50), chars, exclusion);
 
         TestLogger.log("Generated random field name for domainKind " + _domainKind + ": " + randomFieldName);
         return randomFieldName;
