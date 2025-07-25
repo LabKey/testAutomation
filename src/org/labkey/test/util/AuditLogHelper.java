@@ -53,9 +53,10 @@ public class AuditLogHelper
     public enum AuditEvent
     {
         SAMPLE_TIMELINE_EVENT("SampleTimelineEvent"),
-        SOURCES_AUDIT_EVENT("SourcesAuditEvent"),
+        SOURCES_AUDIT_EVENT("SourcesAuditEvent"), // avaialble with SampleManagement module
         INVENTORY_AUDIT_EVENT("InventoryAuditEvent"),
         LIST_AUDIT_EVENT("ListAuditEvent"),
+        ASSAY_AUDIT_EVENT("AssayAuditEvent"), // avaialble with SampleManagement module
         EXPERIMENT_AUDIT_EVENT("ExperimentAuditEvent"),
         SAMPLE_WORKFLOW_AUDIT_EVENT("SamplesWorkflowAuditEvent"),
         FILE_SYSTEM_EVENT("FileSystem");
