@@ -298,12 +298,12 @@ public class TestDataGenerator
         return this;
     }
 
+    /**
+     * Clear any existing generated rows and add new ones
+     */
     public TestDataGenerator withGeneratedRows(int desiredRowCount)
     {
-        if (getRowCount() > 0)
-        {
-            throw new IllegalStateException("Rows have already been generated");
-        }
+        _rows.clear();
 
         generateRows(desiredRowCount);
 
