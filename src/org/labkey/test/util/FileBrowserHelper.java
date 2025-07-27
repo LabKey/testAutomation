@@ -889,12 +889,11 @@ public class FileBrowserHelper extends WebDriverWrapper
 
     public record FileDetailInfo(String fileName, String absoluteFilePath, String dataFileUrl, String webDavUrl, String webDavUrlRelative)
     {
-
     }
 
     public FileDetailInfo getFileDetailInfo(String containerPath, String fileName)
     {
-        List<String> filePathColumns = List.of("AbsoluteFilePath", "DataFileUrl", "WebDavUrl", "WebDavUrlRelative");
+        List<String> filePathColumns = List.of("AbsoluteFilePath", "FileExists", "DataFileUrl", "WebDavUrl", "WebDavUrlRelative");
         try
         {
             Connection cn = WebTestHelper.getRemoteApiConnection();
@@ -903,12 +902,16 @@ public class FileBrowserHelper extends WebDriverWrapper
             cmd.setColumns(filePathColumns);
             SelectRowsResponse response = cmd.execute(cn, "/" + containerPath);
 
-            Map<String, Object> row = response.getRows().get(0);
-            Object absoluteFilePath = row.get("AbsoluteFilePath");
-            Object dataFileUrl = row.get("DataFileUrl");
-            Object webDavUrl = row.get("WebDavUrl");
-            Object webDavUrlRelative = row.get("WebDavUrlRelative");
-            return new FileDetailInfo(fileName, stringOrNull(absoluteFilePath), stringOrNull(dataFileUrl), stringOrNull(webDavUrl), stringOrNull(webDavUrlRelative));
+            for (Map<String, Object> row: response.getRows())
+            {
+                if (!(Boolean) row.get("FileExists"))
+                    continue;
+                Object absoluteFilePath = row.get("AbsoluteFilePath");
+                Object dataFileUrl = row.get("DataFileUrl");
+                Object webDavUrl = row.get("WebDavUrl");
+                Object webDavUrlRelative = row.get("WebDavUrlRelative");
+                return new FileDetailInfo(fileName, stringOrNull(absoluteFilePath), stringOrNull(dataFileUrl), stringOrNull(webDavUrl), stringOrNull(webDavUrlRelative));
+            }
         }
         catch (CommandException ce)
         {
@@ -926,6 +929,7 @@ public class FileBrowserHelper extends WebDriverWrapper
             throw new RuntimeException(ioe);
         }
 
+        return null;
     }
 
     // See PageFlowUtil.encodeURIComponent()
