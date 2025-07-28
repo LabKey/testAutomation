@@ -78,7 +78,7 @@ public abstract class SearchAdminAPIHelper
         // Invoke a special server action that waits until all previous indexer tasks are complete, even wait for background indexing tasks to complete (e.g. deleteContainer)
         var cmd = new SimplePostCommand("search", "waitForIndexer");
         cmd.setTimeout(timeout);
-        cmd.setParameters(Map.of("priority", "crawlLow"));
+        cmd.setParameters(Map.of("priority", "idle"));
 
         executeCommand(cmd, null);
     }
