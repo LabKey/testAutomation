@@ -2893,8 +2893,9 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public void openLinkInNewWindow(WebElement link)
     {
+        int winCount = getDriver().getWindowHandles().size();
         link.sendKeys(Keys.chord(WebDriverUtils.MODIFIER_KEY, Keys.ENTER));
-        if (getDriver().getWindowHandles().size() < 2)
+        if (getDriver().getWindowHandles().size() < (winCount + 1))
             throw new IllegalStateException("Link did not open new window in tab.");
 
         switchToWindow(1);
