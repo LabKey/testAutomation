@@ -36,6 +36,10 @@ import static org.junit.Assert.fail;
 
 public class AuditLogHelper
 {
+    public static final String COL_FILE_AUDIT_FILE = "File";
+    public static final String COL_FILE_AUDIT_PROVIDED_FILE = "ProvidedFileName";
+    public static final String COL_FILE_AUDIT_FIELD_NAME = "FieldName";
+
     private final WebDriverWrapper _wrapper;
     private final ConnectionSupplier _connectionSupplier;
 
@@ -158,12 +162,12 @@ public class AuditLogHelper
         }
     }
 
-    public void checkAuditEventValuesForTransactionId(String containerPath, AuditEvent auditEventName, Integer transactionId, int rowCount, List<Map<String, Object>> expectedValues) throws IOException, CommandException
+    public void checkAuditEventValuesForTransactionId(String containerPath, AuditEvent auditEventName, Integer transactionId, List<Map<String, Object>> expectedValues) throws IOException, CommandException
     {
         List<String> columnNames = expectedValues.get(0).keySet().stream().map(Object::toString).toList();
         List<Map<String, Object>> events = getAuditLogsForTransactionId(containerPath, auditEventName, columnNames, transactionId, ContainerFilter.CurrentAndSubfolders);
-        assertEquals("Unexpected number of events for transactionId " + transactionId, rowCount, events.size());
-        for (int i = 0; i < rowCount; i++)
+        assertEquals("Unexpected number of events for transactionId " + transactionId, expectedValues.size(), events.size());
+        for (int i = 0; i < expectedValues.size(); i++)
         {
             for (String key : columnNames)
                 assertEquals("Event value for " + key + " not as expected", expectedValues.get(i).get(key), events.get(i).get(key));
