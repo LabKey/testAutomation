@@ -274,6 +274,8 @@ public class AssayAPITest extends BaseWebDriverTest
         ImportRunResponse resp = assayHelper.importAssay(assayId, "x", dataRows, getProjectName(), Collections.singletonMap("RunFileField", "foo.xls"), Collections.emptyMap());
         beginAt(resp.getSuccessURL());
         assertTextPresent("p01", "p02");
+        DataRegionTable table = new DataRegionTable("Data", this);
+        table.clearAllFilters(); // remove run filter
 
         // verify images are resolved and rendered properly
         assertElementPresent("Did not find the expected number of icons for images for " + CREST_FILE.getName() + " from the runs.", Locator.xpath("//img[contains(@title, '" + CREST_FILE.getName() + "')]"), 1);
