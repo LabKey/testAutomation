@@ -560,7 +560,7 @@ public class TestDataGenerator
         DomainUtils.DomainKind _domainKind = domainKind == null ? DomainUtils.DomainKind.SampleSet : domainKind;
         String charSet = ALPHANUMERIC_STRING + DOMAIN_SPECIAL_STRING;
         String domainName = randomName(_namePart, getNumChars(numStartChars, 5), getNumChars(numEndChars, 50), charSet, null);
-        while (isDomainAndFieldNameInvalid(WebTestHelper.getRemoteApiConnection(false), _domainKind, domainName, null))
+        while (isDomainAndFieldNameInvalid(_domainKind, domainName, null))
             domainName = randomName(_namePart, getNumChars(numStartChars, 5), getNumChars(numEndChars, 50), charSet, null);
 
         // Multiple spaces in the UI are collapsed into a single space. If we need to test for handling of multiple spaces, we'll not use this generator
@@ -600,14 +600,14 @@ public class TestDataGenerator
                 + WIDE_PLACEHOLDER + REPEAT_PLACEHOLDER + ALL_CHARS_PLACEHOLDER;
 
         String randomFieldName = randomName(part, getNumChars(numStartChars, 5), getNumChars(numEndChars, 50), chars, exclusion);
-        while (isDomainAndFieldNameInvalid(WebTestHelper.getRemoteApiConnection(false), _domainKind, null, randomFieldName))
+        while (isDomainAndFieldNameInvalid(_domainKind, null, randomFieldName))
             randomFieldName = randomName(part, getNumChars(numStartChars, 5), getNumChars(numEndChars, 50), chars, exclusion);
 
         TestLogger.log("Generated random field name for domainKind " + _domainKind + ": " + randomFieldName);
         return randomFieldName;
     }
 
-    private static boolean isDomainAndFieldNameInvalid(Connection connection, DomainUtils.DomainKind domainKind, @Nullable String domainName, @Nullable String fieldName)
+    private static boolean isDomainAndFieldNameInvalid(DomainUtils.DomainKind domainKind, @Nullable String domainName, @Nullable String fieldName)
     {
         SimplePostCommand command = new SimplePostCommand("property", "validateDomainAndFieldNames");
         JSONObject domainDesign = new JSONObject();
@@ -628,7 +628,7 @@ public class TestDataGenerator
 
         try
         {
-            CommandResponse response = command.execute(connection, "/");
+            CommandResponse response = command.execute(WebTestHelper.getRemoteApiConnection(), "/home");
             return response.getParsedData().containsKey("errors");
         }
         catch (CommandException | IOException e)
