@@ -1,4 +1,4 @@
-package org.labkey.test;
+package org.labkey.test.util;
 
 import org.jetbrains.annotations.NotNull;
 

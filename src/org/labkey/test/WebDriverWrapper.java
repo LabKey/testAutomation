@@ -53,6 +53,7 @@ import org.labkey.test.util.Crawler;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.ExtHelper;
+import org.labkey.test.util.HtmlFragmentSelection;
 import org.labkey.test.util.LabKeyExpectedConditions;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
