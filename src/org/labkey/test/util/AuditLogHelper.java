@@ -130,12 +130,13 @@ public class AuditLogHelper
      * @throws CommandException Can be thrown by the SelectRowsCommand.
      */
     public SelectRowsResponse getAuditLogsFromLKS(String containerPath, AuditEvent auditEventName, List<String> columnNames,
-                                                         List<Filter> filters, @Nullable Integer maxRows, @Nullable ContainerFilter containerFilter) throws IOException, CommandException
+                                                        @Nullable List<Filter> filters, @Nullable Integer maxRows, @Nullable ContainerFilter containerFilter) throws IOException, CommandException
     {
         SelectRowsCommand cmd = new SelectRowsCommand("auditLog", auditEventName.getName());
         cmd.setColumns(columnNames);
         cmd.addFilter("ProjectId/Name", _wrapper.getCurrentProject(), Filter.Operator.EQUAL);
-        filters.forEach(cmd::addFilter);
+        if (filters != null)
+            filters.forEach(cmd::addFilter);
         if (maxRows != null)
             cmd.setMaxRows(maxRows);
         if (containerFilter != null)
