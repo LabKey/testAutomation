@@ -123,8 +123,7 @@ public class FieldDefinition extends PropertyDescriptor
             }
         }
 
-        // Multiple spaces in the UI are collapsed into a single space
-        return buf.toString().replaceAll("\\s+", " ");
+        return buf.toString();
     }
 
     public String getEffectiveLabel()
