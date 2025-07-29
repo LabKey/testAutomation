@@ -39,6 +39,16 @@ public class AuditLogHelper
     public static final String COL_FILE_AUDIT_FILE = "File";
     public static final String COL_FILE_AUDIT_PROVIDED_FILE = "ProvidedFileName";
     public static final String COL_FILE_AUDIT_FIELD_NAME = "FieldName";
+    public static final String COL_FILE_AUDIT_DIRECTORY = "Directory";
+    // commonly used fields for validating file audit events
+    public static final List<String> FILE_AUDIT_COLUMNS = List.of(
+            AuditLogHelper.COL_FILE_AUDIT_FILE,
+            AuditLogHelper.COL_FILE_AUDIT_PROVIDED_FILE,
+            AuditLogHelper.COL_FILE_AUDIT_FIELD_NAME,
+            AuditLogHelper.COL_FILE_AUDIT_DIRECTORY,
+            "Container",
+            "Comment"
+    );
 
     private final WebDriverWrapper _wrapper;
     private final ConnectionSupplier _connectionSupplier;
@@ -156,22 +166,27 @@ public class AuditLogHelper
         List<String> columnNames = expectedValues.keySet().stream().map(Object::toString).toList();
         List<Map<String, Object>> events = getAuditLogsForTransactionId(containerPath, auditEventName, columnNames, transactionId, ContainerFilter.CurrentAndSubfolders);
         assertEquals("Unexpected number of events for transactionId " + transactionId, rowCount, events.size());
-        for (Map<String, Object> event : events)
+        for (int i = 0; i < rowCount; i++)
         {
             for (String key : columnNames)
-                assertEquals("Event value for " + key + " not as expected", expectedValues.get(key), event.get(key));
+                assertEquals("Event " + i + " value for " + key + " not as expected", expectedValues.get(key), events.get(i).get(key));
         }
     }
 
     public void checkAuditEventValuesForTransactionId(String containerPath, AuditEvent auditEventName, Integer transactionId, List<Map<String, Object>> expectedValues) throws IOException, CommandException
     {
         List<String> columnNames = expectedValues.get(0).keySet().stream().map(Object::toString).toList();
+        checkAuditEventValuesForTransactionId(containerPath, auditEventName, columnNames, transactionId, expectedValues);
+    }
+
+    public void checkAuditEventValuesForTransactionId(String containerPath, AuditEvent auditEventName, List<String> columnNames, Integer transactionId, List<Map<String, Object>> expectedValues) throws IOException, CommandException
+    {
         List<Map<String, Object>> events = getAuditLogsForTransactionId(containerPath, auditEventName, columnNames, transactionId, ContainerFilter.CurrentAndSubfolders);
         assertEquals("Unexpected number of events for transactionId " + transactionId, expectedValues.size(), events.size());
         for (int i = 0; i < expectedValues.size(); i++)
         {
-            for (String key : columnNames)
-                assertEquals("Event value for " + key + " not as expected", expectedValues.get(i).get(key), events.get(i).get(key));
+            for (String key : expectedValues.get(i).keySet())
+                assertEquals("Event " + i  + " value for " + key + " not as expected", expectedValues.get(i).get(key), events.get(i).get(key));
         }
     }
 
