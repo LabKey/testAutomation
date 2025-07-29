@@ -166,6 +166,12 @@ public class FolderManagementPage extends LabKeyPage<FolderManagementPage.Elemen
         return new ElementCache();
     }
 
+    public FolderAliasesPage goToAliases()
+    {
+        beginAt(WebTestHelper.buildRelativeUrl("admin", getCurrentContainerPath(), "folderAliases"));
+        return new FolderAliasesPage(getDriver());
+    }
+
     protected class ElementCache extends LabKeyPage.ElementCache
     {
         private final Map<String, WebElement> tabs = new HashMap<>();
