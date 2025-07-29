@@ -83,6 +83,7 @@ public class TestDataGenerator
     public static final String ALPHANUMERIC_STRING = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvxyz";
     public static final String DOMAIN_SPECIAL_STRING =  "+- _.:&()/";
     public static final String ILLEGAL_DOMAIN_NAME_CHARSET = "<>[]{};,`\"~!@#$%^*=|?\\";
+    private static final int MAX_RANDOM_TRIES = 100;
     // Used to set value of date pickers
     public static final Supplier<SimpleDateFormat> INPUT_DATE_FORMAT = () -> new SimpleDateFormat("MM/dd/yyyy");
     public static final Supplier<SimpleDateFormat> INPUT_DATETIME_FORMAT = () -> new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
@@ -559,10 +560,14 @@ public class TestDataGenerator
         String _namePart = namePart == null ? "" : namePart;
         DomainUtils.DomainKind _domainKind = domainKind == null ? DomainUtils.DomainKind.SampleSet : domainKind;
         String charSet = ALPHANUMERIC_STRING + DOMAIN_SPECIAL_STRING;
-        // TODO increase min to 5 and max to 50
-        String domainName = randomName(_namePart, getNumChars(numStartChars, 0), getNumChars(numEndChars, 10), charSet, null);
+        int currentTries = 0;
+        String domainName = randomName(_namePart, getNumChars(numStartChars, 5), getNumChars(numEndChars, 50), charSet, null);
         while (isDomainAndFieldNameInvalid(_domainKind, domainName, null))
-            domainName = randomName(_namePart, getNumChars(numStartChars, 0), getNumChars(numEndChars, 10), charSet, null);
+        {
+            domainName = randomName(_namePart, getNumChars(numStartChars, 5), getNumChars(numEndChars, 50), charSet, null);
+            if (++currentTries >= MAX_RANDOM_TRIES)
+                throw new IllegalStateException("Failed to generate a valid domain name after " + MAX_RANDOM_TRIES + " tries. Last generated name: " + domainName);
+        }
 
         // Multiple spaces in the UI are collapsed into a single space. If we need to test for handling of multiple spaces, we'll not use this generator
         domainName = domainName.replaceAll("\\s+", " ");
@@ -600,10 +605,14 @@ public class TestDataGenerator
         String chars = ALL_ILLEGAL_QUERY_KEY_CHARACTERS + " %()=+-[]_|*`'\":;<>?!@#^" + NON_LATIN_STRING
                 + WIDE_PLACEHOLDER + REPEAT_PLACEHOLDER + ALL_CHARS_PLACEHOLDER;
 
-        // TODO increase max to 50
-        String randomFieldName = randomName(part, getNumChars(numStartChars, 5), getNumChars(numEndChars, 5), chars, exclusion);
+        int currentTries = 0;
+        String randomFieldName = randomName(part, getNumChars(numStartChars, 5), getNumChars(numEndChars, 50), chars, exclusion);
         while (isDomainAndFieldNameInvalid(_domainKind, null, randomFieldName))
-            randomFieldName = randomName(part, getNumChars(numStartChars, 5), getNumChars(numEndChars, 5), chars, exclusion);
+        {
+            randomFieldName = randomName(part, getNumChars(numStartChars, 5), getNumChars(numEndChars, 50), chars, exclusion);
+            if (++currentTries >= MAX_RANDOM_TRIES)
+                throw new IllegalStateException("Failed to generate a valid field name after " + MAX_RANDOM_TRIES + " tries. Last generated name: " + randomFieldName);
+        }
 
         TestLogger.log("Generated random field name for domainKind " + _domainKind + ": " + randomFieldName);
         return randomFieldName;

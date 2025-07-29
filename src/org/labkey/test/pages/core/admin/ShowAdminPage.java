@@ -21,6 +21,7 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.DomainDesignerPage;
 import org.labkey.test.pages.ConfigureReportsAndScriptsPage;
 import org.labkey.test.pages.LabKeyPage;
+import org.labkey.test.pages.admin.ConfigureSystemMaintenancePage;
 import org.labkey.test.pages.admin.ExternalSourcesPage;
 import org.labkey.test.pages.compliance.ComplianceSettingsAccountsPage;
 import org.labkey.test.pages.core.login.LoginConfigurePage;
@@ -230,10 +231,11 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
         clickAndWait(elementCache().siteWideTermsLink);
     }
 
-    public void clickSystemMaintenance()
+    public ConfigureSystemMaintenancePage clickSystemMaintenance()
     {
         goToSettingsSection();
         clickAndWait(elementCache().systemMaintenanceLink);
+        return new ConfigureSystemMaintenancePage(getDriver());
     }
 
     public void clickSystemProperties()
