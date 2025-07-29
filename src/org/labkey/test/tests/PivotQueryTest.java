@@ -228,10 +228,9 @@ public class PivotQueryTest extends ReportTest
         createQueryPage.setName(queryName);
         var sourceQueryPage = createQueryPage.clickCreate();
         sourceQueryPage.setSource(queryText);
-        var executeQueryPage = sourceQueryPage.clickSaveAndFinish();
+        sourceQueryPage.clickSaveAndFinish();
 
         // ensure query results contain F1 contents
-        executeQueryPage.getDataRegion();
         assertTextPresent("this", "that", "the other", "and more", "but wait", "still more");
     }
 
