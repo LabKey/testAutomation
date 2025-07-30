@@ -16,6 +16,7 @@
 package org.labkey.test.components;
 
 import org.apache.commons.lang3.NotImplementedException;
+import org.jetbrains.annotations.NotNull;
 import org.labkey.test.Locator;
 import org.labkey.test.selenium.RefindingWebElement;
 import org.labkey.test.util.TestLogger;
@@ -44,13 +45,13 @@ public abstract class Component<EC extends Component.ElementCache> implements Se
     }
 
     @Override
-    public WebElement findElement(By by)
+    public @NotNull WebElement findElement(@NotNull By by)
     {
         return getComponentElement().findElement(by);
     }
 
     @Override
-    public List<WebElement> findElements(By by)
+    public @NotNull List<WebElement> findElements(@NotNull By by)
     {
         return getComponentElement().findElements(by);
     }
@@ -105,13 +106,13 @@ public abstract class Component<EC extends Component.ElementCache> implements Se
         }
 
         @Override
-        public List<WebElement> findElements(By by)
+        public @NotNull List<WebElement> findElements(@NotNull By by)
         {
             return getComponentElement().findElements(by);
         }
 
         @Override
-        public WebElement findElement(By by)
+        public @NotNull WebElement findElement(@NotNull By by)
         {
             return getComponentElement().findElement(by);
         }
