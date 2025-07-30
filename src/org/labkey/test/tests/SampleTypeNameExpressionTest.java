@@ -675,8 +675,10 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         DataRegionTable materialTable = new DataRegionTable("Material", this);
         List<String> names = materialTable.getColumnDataAsText("Name");
 
+        // The next two lines assume the name expression has specific values in specific locations, and as far as I
+        // can tell, that is how the tests are written.
         assertTrue("First name (" + names.get(0) + ") expected to start with " + defaultValue + "_ but it did not", names.get(0).startsWith(defaultValue + "_"));
-        String batchRandomId = names.get(0).split("_")[1];
+        String batchRandomId = names.get(0).substring(names.get(0).lastIndexOf("_") + 1);
 
         assertEquals("Second name not as expected", name2 + "_" + batchRandomId, names.get(1));
 
