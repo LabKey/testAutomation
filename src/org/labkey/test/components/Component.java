@@ -27,6 +27,7 @@ import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -69,8 +70,9 @@ public abstract class Component<EC extends Component.ElementCache> implements Se
                 // Pass if element doesn't exist. Might be checking if component is visible.
             }
 
-            _elementCache = newElementCache();
+            _elementCache = Objects.requireNonNull(newElementCache());
             waitForReady();
+            Objects.requireNonNull(_elementCache, "waitForReady() cleared the element cache");
         }
         return _elementCache;
     }
