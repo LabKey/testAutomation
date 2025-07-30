@@ -158,9 +158,9 @@ public class ServerNotificationMenu extends WebDriverComponent<ServerNotificatio
     public ImportsPage clickViewAll()
     {
         expand();
-        WebDriverWrapper.waitFor(elementCache().viewAllLink::isDisplayed,
+        WebDriverWrapper.waitFor(elementCache().viewAllLink()::isDisplayed,
                 "View all link did not become visible.", 2_500);
-        elementCache().viewAllLink.click();
+        elementCache().viewAllLink().click();
         return new ImportsPage(getWrapper());
     }
 
@@ -278,7 +278,10 @@ public class ServerNotificationMenu extends WebDriverComponent<ServerNotificatio
                     .refindWhenNeeded(elementCache().menuContent);
         }
 
-        public final WebElement viewAllLink = Locator.linkContainingText("View all activity").refindWhenNeeded(this);
+        public final WebElement viewAllLink()
+        {
+            return Locator.linkContainingText("View all activity").refindWhenNeeded(this);
+        }
 
     }
 

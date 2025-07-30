@@ -543,6 +543,7 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
     {
         String title = getSourceTitle();
         elementCache().cancelButton.click();
+        getWrapper().shortWait().until(ExpectedConditions.stalenessOf(elementCache().cancelButton));
         return new DetailDataPanel.DetailDataPanelFinder(getDriver()).withTitle(title).waitFor();
     }
 
