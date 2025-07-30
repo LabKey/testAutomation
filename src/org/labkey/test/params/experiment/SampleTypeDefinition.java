@@ -186,6 +186,17 @@ public class SampleTypeDefinition extends DomainProps
         return addParentAlias(columnName, SampleTypeDesigner.CURRENT_SAMPLE_TYPE);
     }
 
+
+    public FieldDefinition getFieldByNamePart(String namePart)
+    {
+        for (FieldDefinition field : _fields)
+        {
+            if (field.isNamePartMatch(namePart))
+                return field;
+        }
+        throw new IllegalArgumentException("No field found with name part: " + namePart);
+    }
+
     /*
     DomainProps
      */
