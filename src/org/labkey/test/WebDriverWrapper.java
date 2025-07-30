@@ -1070,27 +1070,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
         }
     }
 
-    protected void quietlyCloseExtraWindows()
-    {
-        List<String> windows = new ArrayList<>(getDriver().getWindowHandles());
-        for (int i = 1; i < windows.size(); i++)
-        {
-            getDriver().switchTo().window(windows.get(i));
-            try
-            {
-                getDriver().close();
-            }
-            catch (UnhandledAlertException uae)
-            {
-                Optional.ofNullable(getAlertIfPresent()).ifPresent(Alert::accept);
-            }
-        }
-        if (windows.size() > 1)
-        {
-            getDriver().switchTo().window(windows.get(0));
-        }
-    }
-
     public boolean isPageEmpty()
     {
         //IE and Firefox have different notions of empty.
@@ -2903,7 +2882,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         int winCount = getDriver().getWindowHandles().size();
         link.sendKeys(Keys.chord(WebDriverUtils.MODIFIER_KEY, Keys.ENTER));
-        boolean winOpen = waitFor(() -> getDriver().getWindowHandles().size() > winCount, 2000);
+        boolean winOpen = waitFor(() -> getDriver().getWindowHandles().size() > winCount, 1000);
         if (!winOpen)
             throw new IllegalStateException("Link did not open new window in tab.");
 
