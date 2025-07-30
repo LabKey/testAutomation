@@ -53,6 +53,7 @@ import org.labkey.test.util.Crawler;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.ExtHelper;
+import org.labkey.test.util.HtmlFragmentSelection;
 import org.labkey.test.util.LabKeyExpectedConditions;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
@@ -3503,14 +3504,14 @@ public abstract class WebDriverWrapper implements WrapsDriver
     }
 
     /**
-     *  puts the specified text into the clipboard, then pastes it into the specified element,
+     *  puts the specified text and html into the clipboard, then pastes it into the specified element,
      *  or whatever has focus at the moment.
      */
-    public void actionPaste(WebElement input, String text)
+    public void actionPaste(WebElement input, String text, boolean isHtml)
     {
         Keys cmdKey = WebDriverUtils.MODIFIER_KEY;
 
-        setClipboardContent(text);
+        setClipboardContent(text, isHtml);
 
         if (input == null)
         {
@@ -3531,16 +3532,40 @@ public abstract class WebDriverWrapper implements WrapsDriver
         }
     }
 
+    /**
+     *  puts the specified text into the clipboard, then pastes it into the specified element,
+     *  or whatever has focus at the moment.
+     */
+    public void actionPaste(WebElement input, String text)
+    {
+        actionPaste(input, text, false);
+    }
+
     public void clearClipboardContent()
     {
         setClipboardContent(" ");
     }
 
-    protected void setClipboardContent(String text)
+    protected void setClipboardContent(String text, boolean isHtml)
     {
         Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
-        StringSelection sel = new StringSelection(text);
-        c.setContents(sel, sel);
+        Transferable sel;
+
+        if (isHtml)
+        {
+            sel = new HtmlFragmentSelection(text);
+        }
+        else
+        {
+            sel = new StringSelection(text);
+        }
+
+        c.setContents(sel, null);
+    }
+
+    protected void setClipboardContent(String text)
+    {
+        setClipboardContent(text, false);
     }
 
     public String getClipboardContent() throws IOException, UnsupportedFlavorException
