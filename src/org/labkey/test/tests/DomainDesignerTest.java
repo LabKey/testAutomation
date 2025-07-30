@@ -312,7 +312,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         domainDesignerPage.clickFinish();
     }
 
-    @Test
+    @Test // GitHub Issue 788
     public void testInvalidSampleFieldFromDelete() throws Exception
     {
         String listName = TestDataGenerator.randomDomainName("Sample Lookups List", DomainUtils.DomainKind.IntList);
