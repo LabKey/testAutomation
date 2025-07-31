@@ -899,9 +899,14 @@ public class TestDataGenerator
         return getQueryHelper(cn).deleteRows(rowsToDelete);
     }
 
+    public QueryApiHelper getQueryHelper(Connection connection, String containerPath)
+    {
+        return new QueryApiHelper(connection, containerPath, _schemaName, _queryName);
+    }
+
     public QueryApiHelper getQueryHelper(Connection connection)
     {
-        return new QueryApiHelper(connection, _containerPath, _schemaName, _queryName);
+        return getQueryHelper(connection, _containerPath);
     }
 
     public TestDataValidator getValidator()
