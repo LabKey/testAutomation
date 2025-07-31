@@ -346,7 +346,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         editListDefinitionPage = _listHelper.goToEditDesign(listName);
         validateListSampleLookupField(editListDefinitionPage, allSamplesField.getName(), "All Samples", "All Samples");
         validateListSampleLookupField(editListDefinitionPage, st1SamplesField.getName(), sampleType1, sampleType1);
-        validateListSampleLookupField(editListDefinitionPage, st2SamplesField.getName(), sampleType2, "<Invalid sample type: " + sampleType2 + ">");
+        validateListSampleLookupField(editListDefinitionPage, st2SamplesField.getName(), sampleType2 + " Error: Invalid sample type", "<Invalid sample type: " + sampleType2 + ">");
     }
 
     @Test // GitHub Issue 788
@@ -357,13 +357,14 @@ public class DomainDesignerTest extends BaseWebDriverTest
         EditListDefinitionPage listDefinitionPage = _listHelper.beginCreateList(getProjectName(), listName);
         listDefinitionPage.getFieldsPanel().setInferFieldFile(jsonFile);
         validateListSampleLookupField(listDefinitionPage, "AllSamples", "New Field. All Samples", "All Samples");
-        validateListSampleLookupField(listDefinitionPage, "SampleID", "New Field. NoSuchSampleType", "<Invalid sample type: NoSuchSampleType>");
+        validateListSampleLookupField(listDefinitionPage, "SampleID", "New Field. NoSuchSampleType Error: Invalid sample type", "<Invalid sample type: NoSuchSampleType>");
         listDefinitionPage.clickCancel();
     }
 
     private void validateListSampleLookupField(EditListDefinitionPage definitionPage, String fieldName, String rowDetails, String lookupValue)
     {
         DomainFieldRow fieldRow = definitionPage.getFieldsPanel().getField(fieldName);
+        fieldRow.expand(); // so that we can get the full row details message
         checker().verifyEquals("Sample field row details not as expected", rowDetails, fieldRow.detailsMessage());
         checker().verifyEquals("Sample lookup select option not as expected", lookupValue, fieldRow.getSampleType());
     }
