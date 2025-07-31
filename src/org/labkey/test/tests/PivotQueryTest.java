@@ -193,7 +193,7 @@ public class PivotQueryTest extends ReportTest
     public void testBadPivotQuery()
     {
         String datasetName = TestDataGenerator.randomDomainName("D2", DomainUtils.DomainKind.StudyDatasetVisit);
-        String textFieldName = TestDataGenerator.randomFieldName("F1", ":,;'\"");
+        String textFieldName = TestDataGenerator.randomFieldName("F1");
         FieldDefinition textField = new FieldDefinition(textFieldName, FieldDefinition.ColumnType.String);
         goToProjectHome();
 
