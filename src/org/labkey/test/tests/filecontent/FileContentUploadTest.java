@@ -356,7 +356,6 @@ public class FileContentUploadTest extends BaseWebDriverTest
 
         Integer initialFileRootSize = getFileRootSize();
 
-        getDriver().close();
         switchToMainWindow();
 
         goToProjectHome();
