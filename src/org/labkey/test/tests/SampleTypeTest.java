@@ -1631,7 +1631,7 @@ public class SampleTypeTest extends BaseWebDriverTest
         goToProjectHome();
         clickAndWait(Locator.linkWithText(sampleTypeNameHome));
         DataRegionTable drt = DataRegionTable.findDataRegionWithinWebpart(this, "Sample Type Contents");
-        ImportDataPage importDataPage = drt.clickImportBulkData();
+        var importDataPage = drt.clickImportBulkData();
 
         // error cases for home sample type:
         // importing directory that does exist under current project root into project
