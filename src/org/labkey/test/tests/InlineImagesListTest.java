@@ -57,8 +57,8 @@ import static org.junit.Assert.assertTrue;
 @BaseWebDriverTest.ClassTimeout(minutes = 5)
 public class InlineImagesListTest extends BaseWebDriverTest
 {
-    private final static String PROJECT_NAME = "InlineImagesListTestProject";
-    private final static String IMPORT_PROJECT_NAME = "InlineImagesListImportTestProject";
+    private final static String PROJECT_NAME = "Inline Images List Test Project";
+    private final static String IMPORT_PROJECT_NAME = "Inline Images List Import Test Project";
 
     protected final static String LIST_NAME = TestDataGenerator.randomDomainName("InlineImagesList");
     protected final static String LIST_KEY_NAME = TestDataGenerator.randomFieldName("Key");
@@ -376,11 +376,11 @@ public class InlineImagesListTest extends BaseWebDriverTest
         try
         {
             String expectedError = "Row 1: Can't upload '" + attachmentValue + "' to field " + LIST_ATTACHMENT01_NAME + " with type Attachment.";
-            isElementPresent(Locator.tagWithClass("div", "labkey-error").withText(expectedError));
+            checker().withScreenshot("import_error").verifyTrue("Invalid attachment error not as expected", isElementPresent(Locator.tagWithClass("div", "labkey-error").withText(expectedError)));
         }
         catch(NoSuchElementException nse)
         {
-            checker().fatal().error("Invalid attachment error not present.");
+            checker().error("Invalid attachment error not present.");
         }
     }
 }
