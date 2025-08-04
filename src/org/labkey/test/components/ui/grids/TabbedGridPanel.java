@@ -85,10 +85,10 @@ public class TabbedGridPanel extends WebDriverComponent<TabbedGridPanel.ElementC
     }
 
 
-    private boolean isSelected(String tabText)
+    public boolean isSelected(String tabText)
     {
         String tabClass = elementCache().navTab(tabText).getAttribute("class");
-        return tabClass.toLowerCase().contains("active");
+        return tabClass != null && tabClass.toLowerCase().contains("active");
     }
 
     public QueryGrid selectGrid(String tabText)

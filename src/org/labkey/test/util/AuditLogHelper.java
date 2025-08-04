@@ -36,6 +36,20 @@ import static org.junit.Assert.fail;
 
 public class AuditLogHelper
 {
+    public static final String COL_FILE_AUDIT_FILE = "File";
+    public static final String COL_FILE_AUDIT_PROVIDED_FILE = "ProvidedFileName";
+    public static final String COL_FILE_AUDIT_FIELD_NAME = "FieldName";
+    public static final String COL_FILE_AUDIT_DIRECTORY = "Directory";
+    // commonly used fields for validating file audit events
+    public static final List<String> FILE_AUDIT_COLUMNS = List.of(
+            AuditLogHelper.COL_FILE_AUDIT_FILE,
+            AuditLogHelper.COL_FILE_AUDIT_PROVIDED_FILE,
+            AuditLogHelper.COL_FILE_AUDIT_FIELD_NAME,
+            AuditLogHelper.COL_FILE_AUDIT_DIRECTORY,
+            "Container",
+            "Comment"
+    );
+
     private final WebDriverWrapper _wrapper;
     private final ConnectionSupplier _connectionSupplier;
 
@@ -53,11 +67,13 @@ public class AuditLogHelper
     public enum AuditEvent
     {
         SAMPLE_TIMELINE_EVENT("SampleTimelineEvent"),
-        SOURCES_AUDIT_EVENT("SourcesAuditEvent"),
+        SOURCES_AUDIT_EVENT("SourcesAuditEvent"), // avaialble with SampleManagement module
         INVENTORY_AUDIT_EVENT("InventoryAuditEvent"),
         LIST_AUDIT_EVENT("ListAuditEvent"),
+        ASSAY_AUDIT_EVENT("AssayAuditEvent"), // avaialble with SampleManagement module
         EXPERIMENT_AUDIT_EVENT("ExperimentAuditEvent"),
-        SAMPLE_WORKFLOW_AUDIT_EVENT("SamplesWorkflowAuditEvent");
+        SAMPLE_WORKFLOW_AUDIT_EVENT("SamplesWorkflowAuditEvent"),
+        FILE_SYSTEM_EVENT("FileSystem");
 
         private final String _name;
 
@@ -124,12 +140,13 @@ public class AuditLogHelper
      * @throws CommandException Can be thrown by the SelectRowsCommand.
      */
     public SelectRowsResponse getAuditLogsFromLKS(String containerPath, AuditEvent auditEventName, List<String> columnNames,
-                                                         List<Filter> filters, @Nullable Integer maxRows, @Nullable ContainerFilter containerFilter) throws IOException, CommandException
+                                                        @Nullable List<Filter> filters, @Nullable Integer maxRows, @Nullable ContainerFilter containerFilter) throws IOException, CommandException
     {
         SelectRowsCommand cmd = new SelectRowsCommand("auditLog", auditEventName.getName());
         cmd.setColumns(columnNames);
         cmd.addFilter("ProjectId/Name", _wrapper.getCurrentProject(), Filter.Operator.EQUAL);
-        filters.forEach(cmd::addFilter);
+        if (filters != null)
+            filters.forEach(cmd::addFilter);
         if (maxRows != null)
             cmd.setMaxRows(maxRows);
         if (containerFilter != null)
@@ -149,10 +166,27 @@ public class AuditLogHelper
         List<String> columnNames = expectedValues.keySet().stream().map(Object::toString).toList();
         List<Map<String, Object>> events = getAuditLogsForTransactionId(containerPath, auditEventName, columnNames, transactionId, ContainerFilter.CurrentAndSubfolders);
         assertEquals("Unexpected number of events for transactionId " + transactionId, rowCount, events.size());
-        for (Map<String, Object> event : events)
+        for (int i = 0; i < rowCount; i++)
         {
             for (String key : columnNames)
-                assertEquals("Event value for " + key + " not as expected", expectedValues.get(key), event.get(key));
+                assertEquals("Event " + i + " value for " + key + " not as expected", expectedValues.get(key), events.get(i).get(key));
+        }
+    }
+
+    public void checkAuditEventValuesForTransactionId(String containerPath, AuditEvent auditEventName, Integer transactionId, List<Map<String, Object>> expectedValues) throws IOException, CommandException
+    {
+        List<String> columnNames = expectedValues.get(0).keySet().stream().map(Object::toString).toList();
+        checkAuditEventValuesForTransactionId(containerPath, auditEventName, columnNames, transactionId, expectedValues);
+    }
+
+    public void checkAuditEventValuesForTransactionId(String containerPath, AuditEvent auditEventName, List<String> columnNames, Integer transactionId, List<Map<String, Object>> expectedValues) throws IOException, CommandException
+    {
+        List<Map<String, Object>> events = getAuditLogsForTransactionId(containerPath, auditEventName, columnNames, transactionId, ContainerFilter.CurrentAndSubfolders);
+        assertEquals("Unexpected number of events for transactionId " + transactionId, expectedValues.size(), events.size());
+        for (int i = 0; i < expectedValues.size(); i++)
+        {
+            for (String key : expectedValues.get(i).keySet())
+                assertEquals("Event " + i  + " value for " + key + " not as expected", expectedValues.get(i).get(key), events.get(i).get(key));
         }
     }
 
@@ -214,10 +248,14 @@ public class AuditLogHelper
     {
         Integer transactionId = getLastTransactionId(containerPath, auditEventName);
         List<Filter> transactionFilter = List.of(new Filter("TransactionId", transactionId, Filter.Operator.EQUAL));
-        int eventCount = getAuditLogsFromLKS(containerPath, auditEventName, List.of("NewRecordMap"), transactionFilter, null, ContainerFilter.CurrentAndSubfolders).getRows().size();
+        List<Map<String, Object>> events = getAuditLogsFromLKS(containerPath, auditEventName, List.of("Comment", "UserComment", "NewRecordMap"), transactionFilter, null, ContainerFilter.CurrentAndSubfolders).getRows();
         if (expectedEventCount != null)
-            assertEquals("Unexpected number of events for transactionId " + transactionId, expectedEventCount.intValue(), eventCount);
-        List<Integer> expectedChangeCounts = Collections.nCopies(eventCount, expectedDiffCount);
+        {
+            if (expectedEventCount.intValue() != events.size())
+                TestLogger.log("Last audit event info: " + events.get(0));
+            assertEquals("Unexpected number of events for transactionId " + transactionId, expectedEventCount.intValue(), events.size());
+        }
+        List<Integer> expectedChangeCounts = Collections.nCopies(events.size(), expectedDiffCount);
         checkAuditEventDiffCount(containerPath, auditEventName, transactionFilter, expectedChangeCounts);
         return transactionId;
     }
