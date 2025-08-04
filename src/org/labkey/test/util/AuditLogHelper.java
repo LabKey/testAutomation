@@ -248,10 +248,14 @@ public class AuditLogHelper
     {
         Integer transactionId = getLastTransactionId(containerPath, auditEventName);
         List<Filter> transactionFilter = List.of(new Filter("TransactionId", transactionId, Filter.Operator.EQUAL));
-        int eventCount = getAuditLogsFromLKS(containerPath, auditEventName, List.of("NewRecordMap"), transactionFilter, null, ContainerFilter.CurrentAndSubfolders).getRows().size();
+        List<Map<String, Object>> events = getAuditLogsFromLKS(containerPath, auditEventName, List.of("Comment", "UserComment", "NewRecordMap"), transactionFilter, null, ContainerFilter.CurrentAndSubfolders).getRows();
         if (expectedEventCount != null)
-            assertEquals("Unexpected number of events for transactionId " + transactionId, expectedEventCount.intValue(), eventCount);
-        List<Integer> expectedChangeCounts = Collections.nCopies(eventCount, expectedDiffCount);
+        {
+            if (expectedEventCount.intValue() != events.size())
+                TestLogger.log("Last audit event info: " + events.get(0));
+            assertEquals("Unexpected number of events for transactionId " + transactionId, expectedEventCount.intValue(), events.size());
+        }
+        List<Integer> expectedChangeCounts = Collections.nCopies(events.size(), expectedDiffCount);
         checkAuditEventDiffCount(containerPath, auditEventName, transactionFilter, expectedChangeCounts);
         return transactionId;
     }
