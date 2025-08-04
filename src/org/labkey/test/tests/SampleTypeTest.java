@@ -1752,7 +1752,7 @@ public class SampleTypeTest extends BaseWebDriverTest
     private void importSampleTypeFilePathDataError(String sampleName, String filePath)
     {
         final String fileFieldName = "FileField";
-        String pasteData = TestDataUtils.tsvStringFromRowMapsWithQuote(List.of(Map.of("Name", sampleName, fileFieldName, filePath)),
+        String pasteData = TestDataUtils.tsvStringFromRowMapsEscapeBackslash(List.of(Map.of("Name", sampleName, fileFieldName, filePath)),
                 List.of("Name", fileFieldName), true);
         setFormElement(Locator.name("text"), pasteData);
         new ImportDataPage(getDriver()).submitExpectingError();
