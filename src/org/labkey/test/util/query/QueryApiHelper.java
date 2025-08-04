@@ -105,7 +105,7 @@ public class QueryApiHelper
         return  updateRowsCommand.execute(_connection, _containerPath);
     }
 
-    public <T> RowsResponse moveRows(String targetContainerPath, List<Map<String, T>> rows) throws IOException, CommandException
+    public <T> RowsResponse moveRows(List<Map<String, T>> rows, String targetContainerPath) throws IOException, CommandException
     {
         MoveRowsCommand moveRowsCommand = new MoveRowsCommand(targetContainerPath, _schema, _query);
         moveRowsCommand.setRows(makeApiRows(rows));

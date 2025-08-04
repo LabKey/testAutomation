@@ -20,7 +20,9 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 public class SampleTypeAPIHelper
 {
@@ -175,6 +177,32 @@ public class SampleTypeAPIHelper
                 new HashSet<>(sampleNames), rowIds.keySet());
 
         return rowIds;
+    }
+
+    /**
+     * Get sample state IDs defined in the specified folder. Useful for updating sample status via API
+     * @param containerPath Path to the folder where the sample statuses are defined
+     */
+    public static Map<String, Integer> getSampleStateIds(String containerPath) throws IOException, CommandException
+    {
+        Connection cn = WebTestHelper.getRemoteApiConnection();
+        SelectRowsCommand insertCmd = new SelectRowsCommand("core", "DataStates");
+        return insertCmd.execute(cn, containerPath).getRows().stream().collect(Collectors.toMap(row ->
+            (String) row.get("label"), row -> (Integer) row.get("rowId")));
+    }
+
+    /**
+     * Get sample state ID defined in the specified folder. Useful for updating sample status via API
+     * @param name Label of the sample state
+     * @param containerPath Path to the folder where the sample statuses are defined
+     */
+    public static Integer getSampleStateId(String name, String containerPath) throws IOException, CommandException
+    {
+        Map<String, Integer> sampleStateIds = getSampleStateIds(containerPath);
+        if(sampleStateIds.containsKey(name))
+            return sampleStateIds.get(name);
+        else
+            throw new NoSuchElementException("Sample state '%s' not defined in '%s': %s".formatted(name, containerPath, sampleStateIds.keySet()));
     }
 
 }
