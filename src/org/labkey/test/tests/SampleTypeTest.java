@@ -62,6 +62,7 @@ import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
 import org.labkey.test.util.TestDataGenerator;
 import org.labkey.test.util.TestUser;
+import org.labkey.test.util.data.TestDataUtils;
 import org.labkey.test.util.exp.SampleTypeAPIHelper;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
@@ -1751,9 +1752,9 @@ public class SampleTypeTest extends BaseWebDriverTest
     private void importSampleTypeFilePathDataError(String sampleName, String filePath)
     {
         final String fileFieldName = "FileField";
-        String header = "Name\t" + fileFieldName + "\n";
-        String data =  sampleName + "\t" + filePath + "\n";
-        setFormElement(Locator.name("text"), header + data);
+        String pasteData = TestDataUtils.tsvStringFromRowMapsWithQuote(List.of(Map.of("Name", sampleName, fileFieldName, filePath)),
+                List.of("Name", fileFieldName), true);
+        setFormElement(Locator.name("text"), pasteData);
         new ImportDataPage(getDriver()).submitExpectingError();
         try
         {

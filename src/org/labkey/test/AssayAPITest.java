@@ -425,7 +425,7 @@ public class AssayAPITest extends BaseWebDriverTest
                 "success: callback," +
                 "failure: callback," +
                 "rows: [{  RowId: \""+ runRowId + "\"," +
-                "\"" + EscapeUtil.toJSONStr(runFileField) + "\": \"" + filePath + "\"," +
+                "\"" + EscapeUtil.toJSONStr(runFileField) + "\": \"" + EscapeUtil.toJSONStr(filePath) + "\"," +
                 "}]" +
                 "})";
         executeAndVerifyScript(updateScript, errorMsg);

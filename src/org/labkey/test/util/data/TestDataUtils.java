@@ -296,6 +296,12 @@ public class TestDataUtils
         return stringFromRowMaps(rowMaps, columns, includeHeaders, CSVFormat.TDF);
     }
 
+    public static String tsvStringFromRowMapsWithQuote(List<Map<String, Object>> rowMaps, List<String> columns,
+                                              boolean includeHeaders)
+    {
+        return stringFromRowMaps(rowMaps, columns, includeHeaders, CSVFormat.MONGODB_TSV);
+    }
+
     public static <T> List<Map<String, T>> mapsFromRows(List<List<T>> allRows)
     {
         List<Map<String, T>> rowMaps = new ArrayList<>();
@@ -438,6 +444,12 @@ public class TestDataUtils
     {
         return writeRowsToFile(fileName, rows, CSVFormat.TDF);
     }
+
+    public static <T> File writeRowsToTsvWithQuote(String fileName, List<List<T>> rows) throws IOException
+    {
+        return writeRowsToFile(fileName, rows, CSVFormat.MONGODB_TSV);
+    }
+
 
     public static <T> File writeRowsToCsv(String fileName, List<List<T>> rows) throws IOException
     {
