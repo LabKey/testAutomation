@@ -1662,7 +1662,8 @@ public class SampleTypeTest extends BaseWebDriverTest
         importSampleTypeFilePathDataError("Fail", homeFileInfo.fileName() + "bad");
         // happy cases: create new records using valid relative or absolute file in Project/Child
         String header = "Name\t" + fileFieldName + "\n";
-        String homeSampleContent = "S-home-fullPath\t" + homeFileInfo.absoluteFilePath() + "\n"
+        TestDataUtils.TsvQuoter tsvQuoter = new TestDataUtils.TsvQuoter();
+        String homeSampleContent = "S-home-fullPath\t" + tsvQuoter.quoteValue(homeFileInfo.absoluteFilePath()) + "\n"
                 + "S-home-relativeDav\t" + homeFileInfo.webDavUrlRelative() + "\n"
                 + "S-home-dataUrl\t" + homeFileInfo.dataFileUrl() + "\n"
                 + "S-home-davUrl\t" + homeFileInfo.webDavUrl() + "\n"
@@ -1688,7 +1689,7 @@ public class SampleTypeTest extends BaseWebDriverTest
         checker().verifyEqualsSorted("File field not imported as expected", List.of(fName, fName, fName, fName, fName), drt.getColumnDataAsText(fileFieldName));
         importDataPage = drt.clickImportBulkData();
         importDataPage.setCopyPasteMerge(false, true);
-        String homeSampleUpdateContent = "S-home-fullPath\t" + homeFileBInfo.absoluteFilePath() + "\n"
+        String homeSampleUpdateContent = "S-home-fullPath\t" + tsvQuoter.quoteValue(homeFileBInfo.absoluteFilePath()) + "\n"
                 + "S-home-relativeDav\t\n"
                 + "S-home-dataUrl\t" + homeFileBInfo.dataFileUrl() + "\n"
                 + "S-home-davUrl\t" + homeFileBInfo.webDavUrl() + "\n"
@@ -1736,7 +1737,7 @@ public class SampleTypeTest extends BaseWebDriverTest
         importSampleTypeFilePathDataError("Fail", subDirInfo.webDavUrlRelative());
         importSampleTypeFilePathDataError("Fail", subDirInfo.fileName());
         // happy case for creating child sample
-        String childSampleContent = "S-child-fullPath\t" + subFileInfo.absoluteFilePath() + "\n"
+        String childSampleContent = "S-child-fullPath\t" + tsvQuoter.quoteValue(subFileInfo.absoluteFilePath()) + "\n"
                 + "S-child-relativeDav\t" + subFileInfo.webDavUrlRelative() + "\n"
                 + "S-child-dataUrl\t" + subFileInfo.dataFileUrl() + "\n"
                 + "S-child-davUrl\t" + subFileInfo.webDavUrl() + "\n"
