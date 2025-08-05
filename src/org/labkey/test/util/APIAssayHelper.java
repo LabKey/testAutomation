@@ -52,6 +52,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 public class APIAssayHelper extends AbstractAssayHelper
@@ -83,14 +84,44 @@ public class APIAssayHelper extends AbstractAssayHelper
 
     @LogMethod(quiet = true)
     public ImportRunResponse importAssay(int assayID, String runName, List<Map<String, Object>> dataRows, String projectPath,
-                                         Map<String, Object> runProperties, Map<String, Object> batchProperties)  throws CommandException, IOException
+                                         Map<String, Object> runProperties, Map<String, Object> batchProperties, String errorMsg) throws CommandException, IOException
     {
         ImportRunCommand  irc = new ImportRunCommand(assayID, dataRows);
         irc.setName(runName);
         irc.setProperties(runProperties);
         irc.setBatchProperties(batchProperties);
         irc.setTimeout(180000); // Wait 3 minutes for assay import
-        return irc.execute(_test.createDefaultConnection(), projectPath);
+        if (errorMsg != null)
+        {
+            try
+            {
+                irc.execute(_test.createDefaultConnection(), projectPath);
+                throw new Exception("This should have failed");
+            }
+            catch (CommandException e)
+            {
+                Map<String, Object> responseJson = e.getProperties();
+                if (!responseJson.containsKey("exception"))
+                    throw new CommandException("Response lacks exception");
+
+                String exception = responseJson.get("exception").toString();
+                assertEquals("Invalid file path message not as expected", errorMsg, exception);
+                return null;
+            }
+            catch (Exception e)
+            {
+                throw new CommandException(e.getMessage());
+            }
+        }
+        else
+            return irc.execute(_test.createDefaultConnection(), projectPath);
+    }
+
+    @LogMethod(quiet = true)
+    public ImportRunResponse importAssay(int assayID, String runName, List<Map<String, Object>> dataRows, String projectPath,
+                                         Map<String, Object> runProperties, Map<String, Object> batchProperties) throws CommandException, IOException
+    {
+        return importAssay(assayID, runName, dataRows, projectPath, runProperties, batchProperties, null);
     }
 
     @LogMethod(quiet = true)
@@ -280,7 +311,7 @@ public class APIAssayHelper extends AbstractAssayHelper
         return resultData;
     }
 
-    public void saveBatch(String assayName, String runName, Map<String, Object> runProperties, List<Map<String, Object>> resultRows, String projectName) throws IOException, CommandException
+    public void saveBatch(String assayName, String runName, Map<String, Object> runProperties, List<Map<String, Object>> resultRows, String projectName, @Nullable String errorMsg) throws Exception
     {
         int assayId = getIdFromAssayName(assayName, projectName);
 
@@ -294,14 +325,35 @@ public class APIAssayHelper extends AbstractAssayHelper
         runs.add(run);
         batch.setRuns(runs);
 
-        saveBatch(assayId, batch, projectName);
+        saveBatch(assayId, batch, projectName, errorMsg);
     }
 
-    public void saveBatch(int assayId, Batch batch, String projectPath) throws IOException, CommandException
+    public void saveBatch(int assayId, Batch batch, String projectPath, @Nullable String errorMsg) throws Exception
     {
         SaveAssayBatchCommand cmd = new SaveAssayBatchCommand(assayId, batch);
         cmd.setTimeout(180000); // Wait 3 minutes for assay import
-        cmd.execute(_test.createDefaultConnection(), projectPath);
+        if (errorMsg != null)
+        {
+            try
+            {
+                var result = cmd.execute(_test.createDefaultConnection(), projectPath);
+                throw new Exception("This should have failed");
+            }
+            catch (CommandException e)
+            {
+                Map<String, Object> responseJson = e.getProperties();
+                if (!responseJson.containsKey("exception"))
+                    throw new Exception("Response lacks exception");
+
+                String exception = responseJson.get("exception").toString();
+                assertEquals("Invalid file path message not as expected", errorMsg, exception);
+            }
+        }
+        else
+            cmd.execute(_test.createDefaultConnection(), projectPath);
+
+
+
     }
 
     public Protocol createAssayDesignWithDefaults(String containerPath, String providerName, String assayName) throws IOException, CommandException

@@ -51,14 +51,18 @@ import org.labkey.test.params.FieldDefinition.ColumnType;
 import org.labkey.test.params.FieldDefinition.LookupInfo;
 import org.labkey.test.params.FieldInfo;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
+import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.ExcelHelper;
+import org.labkey.test.util.FileBrowserHelper;
+import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
 import org.labkey.test.util.TestDataGenerator;
 import org.labkey.test.util.TestUser;
+import org.labkey.test.util.data.TestDataUtils;
 import org.labkey.test.util.exp.SampleTypeAPIHelper;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
@@ -1582,58 +1586,187 @@ public class SampleTypeTest extends BaseWebDriverTest
     @Test // Issue 49830
     public void testFilePathOnBulkImport() throws IOException
     {
-        projectMenu().navigateToFolder(PROJECT_NAME, FOLDER_NAME);
+        new ApiPermissionsHelper(this)
+                .setSiteRoleUserPermissions(PasswordUtil.getUsername(), "See Absolute File Paths");
 
-        String sampleTypeName = "FilePathValidation";
+        goToProjectHome();
+
         String fileFieldName = "FileField";
         SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
-        sampleHelper.createSampleType(new SampleTypeDefinition(sampleTypeName).setFields(
+        String sampleTypeNameHome = "FilePathValidationHome";
+        sampleHelper.createSampleType(new SampleTypeDefinition(sampleTypeNameHome).setFields(
+                List.of(new FieldDefinition(fileFieldName, ColumnType.File))
+        ));
+
+        projectMenu().navigateToFolder(PROJECT_NAME, FOLDER_NAME);
+
+        String sampleTypeNameSub = "FilePathValidationSub";
+        sampleHelper.createSampleType(new SampleTypeDefinition(sampleTypeNameSub).setFields(
             List.of(new FieldDefinition(fileFieldName, ColumnType.File))
         ));
 
         // add a file system file that isn't under the current container dir, i.e. in the parent dir
         goToProjectHome();
         goToModule("FileContent");
-        _fileBrowserHelper.uploadFile(TestFileUtils.getSampleData("sampleType.xlsx"));
 
-        // go back to subfolder and import data with relative path that shouldn't resolve
-        DataRegionTable drt = importSampleTypeFilePathData(sampleTypeName, fileFieldName, "Test1", "../sampleType.xlsx");
-        checker().verifyEquals("Sample name in data row not as expected", "Test1", drt.getDataAsText(0, "Name"));
-        checker().verifyEquals("File field should be empty as path was invalid", " ", drt.getDataAsText(0, fileFieldName));
+        String testFileHomeName = "Update_Lineage_A.tsv";
+        String testFileHomeNameB = "Update_Lineage_B.tsv";
+        String homeFileDirectory = "homeDir1";
+        _fileBrowserHelper.uploadFile(TestFileUtils.getSampleData(testFileHomeName));
+        _fileBrowserHelper.uploadFile(TestFileUtils.getSampleData(testFileHomeNameB));
+        _fileBrowserHelper.createFolder(homeFileDirectory);
+        FileBrowserHelper.FileDetailInfo homeFileInfo = _fileBrowserHelper.getFileDetailInfo(PROJECT_NAME, testFileHomeName);
+        FileBrowserHelper.FileDetailInfo homeFileBInfo = _fileBrowserHelper.getFileDetailInfo(PROJECT_NAME, testFileHomeNameB);
+        FileBrowserHelper.FileDetailInfo homeDirInfo = _fileBrowserHelper.getFileDetailInfo(PROJECT_NAME, homeFileDirectory);
 
-        // add a file system file in current container dir and import data with relative path that should resolve
+        String folderContainerPath = PROJECT_NAME + "/" + FOLDER_NAME;
+        String testFileSubName = "sampleType.tsv";
+        String subFileDirectory = "subDir1";
+        goToProjectFolder(PROJECT_NAME, FOLDER_NAME);
         goToModule("FileContent");
-        _fileBrowserHelper.uploadFile(TestFileUtils.getSampleData("sampleType.xlsx"));
-        drt = importSampleTypeFilePathData(sampleTypeName, fileFieldName, "Test2", "sampleType.xlsx");
-        checker().verifyEquals("Sample name in data row not as expected", "Test2", drt.getDataAsText(0, "Name"));
-        checker().verifyEquals("File field should contain file name", " sampleType.xlsx", drt.getDataAsText(0, fileFieldName));
+        _fileBrowserHelper.uploadFile(TestFileUtils.getSampleData(testFileSubName));
+        _fileBrowserHelper.createFolder(subFileDirectory);
+        FileBrowserHelper.FileDetailInfo subFileInfo = _fileBrowserHelper.getFileDetailInfo(folderContainerPath, testFileSubName);
+        FileBrowserHelper.FileDetailInfo subDirInfo = _fileBrowserHelper.getFileDetailInfo(folderContainerPath, subFileDirectory);
 
-        // try an import with a valid file that isn't accessible from this container
-        File propFile = new File(TestFileUtils.getTestRoot(), "test.properties");
-        drt = importSampleTypeFilePathData(sampleTypeName, fileFieldName, "Test3", propFile.getAbsolutePath());
-        checker().verifyEquals("Sample name in data row not as expected", "Test3", drt.getDataAsText(0, "Name"));
-        String actualValue = drt.getDataAsText(0, fileFieldName);
-        checker().verifyTrue("File field should not be valid", " ".equals(actualValue) || actualValue.contains("properties (unavailable)"));
-
-        // try an import with an invalid file path
-        drt = importSampleTypeFilePathData(sampleTypeName, fileFieldName, "Test4", "invalid/path/to/file");
-        checker().verifyEquals("Sample name in data row not as expected", "Test4", drt.getDataAsText(0, "Name"));
-        checker().verifyTrue("File field should not be valid", drt.getDataAsText(0, fileFieldName).contains("file (unavailable)"));
-    }
-
-    private DataRegionTable importSampleTypeFilePathData(String sampleTypeName, String fileFieldName, String sampleName, String filePath)
-    {
-        projectMenu().navigateToFolder(PROJECT_NAME, FOLDER_NAME);
-        clickAndWait(Locator.linkWithText(sampleTypeName));
+        goToProjectHome();
+        clickAndWait(Locator.linkWithText(sampleTypeNameHome));
         DataRegionTable drt = DataRegionTable.findDataRegionWithinWebpart(this, "Sample Type Contents");
-        drt.clickImportBulkData();
+        var importDataPage = drt.clickImportBulkData();
+
+        // error cases for home sample type:
+        // importing directory that does exist under current project root into project
+        importSampleTypeFilePathDataError("Fail", homeDirInfo.absoluteFilePath());
+        importSampleTypeFilePathDataError("Fail", homeDirInfo.webDavUrl());
+        importSampleTypeFilePathDataError("Fail", homeDirInfo.dataFileUrl());
+        importSampleTypeFilePathDataError("Fail", homeDirInfo.webDavUrlRelative());
+        importSampleTypeFilePathDataError("Fail", homeDirInfo.fileName());
+        // importing directory that's not under current project root
+        importSampleTypeFilePathDataError("Fail", "/");
+        importSampleTypeFilePathDataError("Fail", "../");
+        importSampleTypeFilePathDataError("Fail", "../@files");
+        importSampleTypeFilePathDataError("Fail", subDirInfo.absoluteFilePath());
+        importSampleTypeFilePathDataError("Fail", subDirInfo.webDavUrl());
+        importSampleTypeFilePathDataError("Fail", subDirInfo.dataFileUrl());
+        importSampleTypeFilePathDataError("Fail", subDirInfo.webDavUrlRelative());
+        // importing file that does exist, but not under current root
+        importSampleTypeFilePathDataError("Fail", subFileInfo.absoluteFilePath());
+        importSampleTypeFilePathDataError("Fail", subFileInfo.webDavUrl());
+        importSampleTypeFilePathDataError("Fail", subFileInfo.dataFileUrl());
+        importSampleTypeFilePathDataError("Fail", "../" + FOLDER_NAME + "/@files/" + subDirInfo.webDavUrlRelative());
+        // importing file that does not exist
+        importSampleTypeFilePathDataError("Fail", homeFileInfo.absoluteFilePath() + "bad");
+        importSampleTypeFilePathDataError("Fail", homeFileInfo.webDavUrl() + "bad");
+        importSampleTypeFilePathDataError("Fail", homeFileInfo.dataFileUrl() + "bad");
+        importSampleTypeFilePathDataError("Fail", homeFileInfo.webDavUrlRelative() + "bad");
+        importSampleTypeFilePathDataError("Fail", homeFileInfo.fileName() + "bad");
+        // happy cases: create new records using valid relative or absolute file in Project/Child
         String header = "Name\t" + fileFieldName + "\n";
-        String data =  sampleName + "\t" + filePath + "\n";
-        setFormElement(Locator.name("text"), header + data);
+        TestDataUtils.TsvQuoter tsvQuoter = new TestDataUtils.TsvQuoter();
+        String homeSampleContent = "S-home-fullPath\t" + tsvQuoter.quoteValue(homeFileInfo.absoluteFilePath()) + "\n"
+                + "S-home-relativeDav\t" + homeFileInfo.webDavUrlRelative() + "\n"
+                + "S-home-dataUrl\t" + homeFileInfo.dataFileUrl() + "\n"
+                + "S-home-davUrl\t" + homeFileInfo.webDavUrl() + "\n"
+                + "S-home-relative\t" + "../@files/" + homeFileInfo.fileName();
+        setFormElement(Locator.name("text"), header + homeSampleContent);
         clickButton("Submit");
-        return DataRegionTable.findDataRegionWithinWebpart(this, "Sample Type Contents");
+        drt = DataRegionTable.findDataRegionWithinWebpart(this, "Sample Type Contents");
+        String fName = " " + homeFileInfo.fileName();
+        checker().verifyEqualsSorted("File field not imported as expected", List.of(fName, fName, fName, fName, fName), drt.getColumnDataAsText(fileFieldName));
+        // error case for update
+        importDataPage = drt.clickImportBulkData();
+        importDataPage.setCopyPasteMerge(false, true);
+        importSampleTypeFilePathDataError("S-home-fullPath", homeDirInfo.absoluteFilePath());
+        importSampleTypeFilePathDataError("S-home-fullPath", homeDirInfo.fileName());
+        importSampleTypeFilePathDataError("S-home-fullPath", "../");
+        importSampleTypeFilePathDataError("S-home-fullPath", subDirInfo.webDavUrl());
+        importSampleTypeFilePathDataError("S-home-fullPath", subDirInfo.dataFileUrl());
+        importSampleTypeFilePathDataError("S-home-fullPath", homeFileInfo.absoluteFilePath() + "bad");
+        // happy cases for update
+        setFormElement(Locator.name("text"), header + homeSampleContent); // no change
+        clickButton("Submit");
+        drt = DataRegionTable.findDataRegionWithinWebpart(this, "Sample Type Contents");
+        checker().verifyEqualsSorted("File field not imported as expected", List.of(fName, fName, fName, fName, fName), drt.getColumnDataAsText(fileFieldName));
+        importDataPage = drt.clickImportBulkData();
+        importDataPage.setCopyPasteMerge(false, true);
+        String homeSampleUpdateContent = "S-home-fullPath\t" + tsvQuoter.quoteValue(homeFileBInfo.absoluteFilePath()) + "\n"
+                + "S-home-relativeDav\t\n"
+                + "S-home-dataUrl\t" + homeFileBInfo.dataFileUrl() + "\n"
+                + "S-home-davUrl\t" + homeFileBInfo.webDavUrl() + "\n"
+                + "S-home-relative\t" + "../@files/" + homeFileBInfo.fileName();
+        setFormElement(Locator.name("text"), header + homeSampleUpdateContent);
+        clickButton("Submit");
+        String fNameUpdated = " " + homeFileBInfo.fileName();
+        drt = DataRegionTable.findDataRegionWithinWebpart(this, "Sample Type Contents");
+        checker().verifyEqualsSorted("File field not imported as expected", List.of(fNameUpdated, fNameUpdated, fNameUpdated, " "/*removed*/, fNameUpdated), drt.getColumnDataAsText(fileFieldName));
+        // error case for merge
+        importDataPage = drt.clickImportBulkData();
+        importDataPage.setCopyPasteMerge(true, true);
+        importSampleTypeFilePathDataError("S-home-fullPath", homeDirInfo.absoluteFilePath());
+        importSampleTypeFilePathDataError("S-home-fullPath", subDirInfo.webDavUrl());
+        importSampleTypeFilePathDataError("Bad", subDirInfo.webDavUrlRelative());
+        // happy case for merge
+        String homeSampleMergeContent = homeSampleContent
+                + "\nS-home-merge1\t" + "../@files/" + homeFileBInfo.fileName();
+        setFormElement(Locator.name("text"), header + homeSampleMergeContent);
+        clickButton("Submit");
+        drt = DataRegionTable.findDataRegionWithinWebpart(this, "Sample Type Contents");
+        checker().verifyEqualsSorted("File field not imported as expected", List.of(fNameUpdated, fName, fName, fName, fName, fName), drt.getColumnDataAsText(fileFieldName));
+
+        // error cases for child sample type
+        goToProjectFolder(PROJECT_NAME, FOLDER_NAME);
+        clickAndWait(Locator.linkWithText(sampleTypeNameSub));
+        drt = DataRegionTable.findDataRegionWithinWebpart(this, "Sample Type Contents");
+        importDataPage = drt.clickImportBulkData();
+        // import data in subfolder with home folder file absolute path, or invalid relative path, or directory
+        importSampleTypeFilePathDataError("Fail", homeFileInfo.absoluteFilePath());
+        importSampleTypeFilePathDataError("Fail", homeFileInfo.webDavUrl());
+        importSampleTypeFilePathDataError("Fail", homeFileInfo.dataFileUrl());
+        importSampleTypeFilePathDataError("Fail", "../" + testFileHomeName);
+        importSampleTypeFilePathDataError("Fail", "../../" + testFileHomeName);
+        importSampleTypeFilePathDataError("Fail", "../");
+        importSampleTypeFilePathDataError("Fail", "../../@files");
+        importSampleTypeFilePathDataError("Fail", "../../@files/" + homeFileDirectory);
+        importSampleTypeFilePathDataError("Fail", homeDirInfo.absoluteFilePath());
+        importSampleTypeFilePathDataError("Fail", homeDirInfo.webDavUrl());
+        importSampleTypeFilePathDataError("Fail", homeDirInfo.dataFileUrl());
+        // import data in subfolder with directory that's under current root
+        importSampleTypeFilePathDataError("Fail", subDirInfo.absoluteFilePath());
+        importSampleTypeFilePathDataError("Fail", subDirInfo.webDavUrl());
+        importSampleTypeFilePathDataError("Fail", subDirInfo.dataFileUrl());
+        importSampleTypeFilePathDataError("Fail", subDirInfo.webDavUrlRelative());
+        importSampleTypeFilePathDataError("Fail", subDirInfo.fileName());
+        // happy case for creating child sample
+        String childSampleContent = "S-child-fullPath\t" + tsvQuoter.quoteValue(subFileInfo.absoluteFilePath()) + "\n"
+                + "S-child-relativeDav\t" + subFileInfo.webDavUrlRelative() + "\n"
+                + "S-child-dataUrl\t" + subFileInfo.dataFileUrl() + "\n"
+                + "S-child-davUrl\t" + subFileInfo.webDavUrl() + "\n"
+                + "S-child-relative\t" + "../@files/" + subFileInfo.fileName();
+        setFormElement(Locator.name("text"), header + childSampleContent);
+        clickButton("Submit");
+        drt = DataRegionTable.findDataRegionWithinWebpart(this, "Sample Type Contents");
+        fName = " " + subFileInfo.fileName();
+        checker().verifyEqualsSorted("File field not imported as expected", List.of(fName, fName, fName, fName, fName), drt.getColumnDataAsText(fileFieldName));
     }
 
+
+    private void importSampleTypeFilePathDataError(String sampleName, String filePath)
+    {
+        final String fileFieldName = "FileField";
+        String pasteData = TestDataUtils.tsvStringFromRowMapsEscapeBackslash(List.of(Map.of("Name", sampleName, fileFieldName, filePath)),
+                List.of("Name", fileFieldName), true);
+        setFormElement(Locator.name("text"), pasteData);
+        new ImportDataPage(getDriver()).submitExpectingError();
+        try
+        {
+            waitForElementToBeVisible(Locator.xpath("//div[contains(@class, 'labkey-error')][contains(text(),'Invalid file path: " + filePath + "')]"));
+        }
+        catch(NoSuchElementException nse)
+        {
+            checker().fatal().error("Invalid file path error not present.");
+        }
+    }
+    
     @Test
     public void testCreateViaScript()
     {
