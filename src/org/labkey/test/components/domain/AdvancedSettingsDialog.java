@@ -77,6 +77,11 @@ public class AdvancedSettingsDialog extends ModalDialog
     }
 
     // default value options
+    public boolean isDefaultValueTypeVisible()
+    {
+        return elementCache().defaultTypeSelect.getWrappedElement().isDisplayed();
+    }
+
     public String getDefaultValueType()
     {
         return elementCache().defaultTypeSelect.getFirstSelectedOption().getText();
@@ -176,6 +181,11 @@ public class AdvancedSettingsDialog extends ModalDialog
         getWrapper().waitFor(()-> elementCache().uniqueConstraint.get().equals(checked),
                 "uniqueConstraint checkbox was not set as expected", 1000);
         return this;
+    }
+
+    public boolean isMissingValuesVisible()
+    {
+        return elementCache().enableMissingValues.isDisplayed();
     }
 
     public boolean missingValuesEnabled()
