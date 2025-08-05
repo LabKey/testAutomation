@@ -16,6 +16,7 @@
 package org.labkey.test.components;
 
 import org.apache.commons.lang3.NotImplementedException;
+import org.jetbrains.annotations.NotNull;
 import org.labkey.test.Locator;
 import org.labkey.test.selenium.RefindingWebElement;
 import org.labkey.test.util.TestLogger;
@@ -27,6 +28,7 @@ import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -43,13 +45,13 @@ public abstract class Component<EC extends Component.ElementCache> implements Se
     }
 
     @Override
-    public WebElement findElement(By by)
+    public @NotNull WebElement findElement(@NotNull By by)
     {
         return getComponentElement().findElement(by);
     }
 
     @Override
-    public List<WebElement> findElements(By by)
+    public @NotNull List<WebElement> findElements(@NotNull By by)
     {
         return getComponentElement().findElements(by);
     }
@@ -69,8 +71,9 @@ public abstract class Component<EC extends Component.ElementCache> implements Se
                 // Pass if element doesn't exist. Might be checking if component is visible.
             }
 
-            _elementCache = newElementCache();
+            _elementCache = Objects.requireNonNull(newElementCache());
             waitForReady();
+            Objects.requireNonNull(_elementCache, "waitForReady() cleared the element cache");
         }
         return _elementCache;
     }
@@ -103,13 +106,13 @@ public abstract class Component<EC extends Component.ElementCache> implements Se
         }
 
         @Override
-        public List<WebElement> findElements(By by)
+        public @NotNull List<WebElement> findElements(@NotNull By by)
         {
             return getComponentElement().findElements(by);
         }
 
         @Override
-        public WebElement findElement(By by)
+        public @NotNull WebElement findElement(@NotNull By by)
         {
             return getComponentElement().findElement(by);
         }
