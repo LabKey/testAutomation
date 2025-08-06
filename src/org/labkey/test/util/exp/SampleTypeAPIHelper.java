@@ -12,6 +12,7 @@ import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldInfo;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.DomainUtils;
+import org.labkey.test.util.DomainUtils.DomainKind;
 import org.labkey.test.util.TestDataGenerator;
 
 import java.io.IOException;
@@ -30,7 +31,7 @@ public class SampleTypeAPIHelper
     public static final String SCHEMA_NAME = "exp.materials";
 
     // Global constants to ease migration from "Sample Set" to "Sample Type"
-    public static final String SAMPLE_TYPE_DOMAIN_KIND = "SampleSet";
+    public static final String SAMPLE_TYPE_DOMAIN_KIND = DomainKind.SampleSet.name();
     public static final String SAMPLE_TYPE_DATA_REGION_NAME = "SampleSet";
     public static final String SAMPLE_TYPE_COLUMN_NAME = "Sample Set";
     public static final String SAMPLE_NAME_EXPRESSION = "S-${now:date}-${dailySampleCount}";
@@ -180,8 +181,9 @@ public class SampleTypeAPIHelper
     }
 
     /**
-     * Get sample state IDs defined in the specified folder. Useful for updating sample status via API
-     * @param containerPath Path to the folder where the sample statuses are defined
+     * Get sample state IDs defined in the specified project/folder. Useful for updating sample status via API
+     * @param containerPath Path to the project/folder where the sample statuses are defined (typically project)
+     * @return Map of
      */
     public static Map<String, Integer> getSampleStateIds(String containerPath) throws IOException, CommandException
     {
@@ -192,17 +194,18 @@ public class SampleTypeAPIHelper
     }
 
     /**
-     * Get sample state ID defined in the specified folder. Useful for updating sample status via API
-     * @param name Label of the sample state
-     * @param containerPath Path to the folder where the sample statuses are defined
+     * Get sample state ID defined in the specified project/folder. Useful for updating sample status via API
+     * @param label Label of the sample state (typically "Available", "Locked", or "Consumed")
+     * @param containerPath Path to the project/folder where the sample statuses are defined (typically project)
+     * @return rowId for the specified state
      */
-    public static Integer getSampleStateId(String name, String containerPath) throws IOException, CommandException
+    public static Integer getSampleStateId(String label, String containerPath) throws IOException, CommandException
     {
         Map<String, Integer> sampleStateIds = getSampleStateIds(containerPath);
-        if(sampleStateIds.containsKey(name))
-            return sampleStateIds.get(name);
+        if(sampleStateIds.containsKey(label))
+            return sampleStateIds.get(label);
         else
-            throw new NoSuchElementException("Sample state '%s' not defined in '%s': %s".formatted(name, containerPath, sampleStateIds.keySet()));
+            throw new NoSuchElementException("Sample state '%s' not defined in '%s': %s".formatted(label, containerPath, sampleStateIds.keySet()));
     }
 
 }

@@ -116,7 +116,7 @@ public class TestDataGenerator
         _containerPath = containerPath;
     }
 
-    public static File writeCsvFile(List<FieldDefinition> fields, List<Map<String, Object>> entityData, String fileName) throws IOException
+    public static <T> File writeCsvFile(List<FieldDefinition> fields, List<Map<String, T>> entityData, String fileName) throws IOException
     {
         List<List<String>> rows = TestDataUtils.replaceColumnHeaders(
             TestDataUtils.rowListsFromMaps(entityData), ColumnNameMapper.labelToName(fields)); // Use field names
@@ -821,6 +821,11 @@ public class TestDataGenerator
     public RowsResponse insertRows(Connection cn) throws IOException, CommandException
     {
         return insertRows(cn, getRows());
+    }
+
+    public RowsResponse insertRows(Connection cn, String containerPath) throws IOException, CommandException
+    {
+        return getQueryHelper(cn, containerPath).insertRows(getRows());
     }
 
     public RowsResponse insertRows(Connection cn, List<Map<String, Object>> rows) throws IOException, CommandException
