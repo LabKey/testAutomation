@@ -37,7 +37,7 @@ public class FieldInfo implements CharSequence, WrapsFieldKey
 
     public FieldInfo(String name, String label, ColumnType columnType)
     {
-        this(FieldKey.fromParts(name.trim()), label, columnType, null, null);
+        this(FieldKey.fromParts(name.trim()), label, columnType, null, name);
     }
 
     public FieldInfo(String name, String label)
@@ -60,8 +60,7 @@ public class FieldInfo implements CharSequence, WrapsFieldKey
      */
     public static FieldInfo random(String namePart, ColumnType columnType)
     {
-        FieldInfo field = new FieldInfo(FieldKey.fromParts(TestDataGenerator.randomFieldName(namePart)), null, columnType, null, namePart);
-        return field;
+        return new FieldInfo(FieldKey.fromParts(TestDataGenerator.randomFieldName(namePart)), null, columnType, null, namePart);
     }
 
     /**
