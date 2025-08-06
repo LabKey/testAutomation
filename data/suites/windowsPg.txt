@@ -16,6 +16,7 @@ LuminexRTransformTest
 LuminexJavaTransformTest
 QueryExportTest
 StudyDatasetFileFieldTest
+StudyPublishTest
 NonStandardDateAndTimeFormatTest
 ReportThumbnailTest
 MessagesAttachmentTest
