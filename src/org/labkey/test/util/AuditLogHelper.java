@@ -232,10 +232,18 @@ public class AuditLogHelper
         }
     }
 
-    public Integer getLastTransactionId(String containerPath, AuditEvent auditEventName) throws IOException, CommandException
+    public Integer getLastTransactionId(String containerPath, AuditEvent auditEventName)
     {
-        List<Map<String, Object>> events = getAuditLogsFromLKS(containerPath, auditEventName, List.of("TransactionId"), Collections.emptyList(), 1, ContainerFilter.CurrentAndSubfolders).getRows();
-        return events.size() == 1 ? (Integer) events.get(0).get("TransactionId") : null;
+        try
+        {
+            List<Map<String, Object>> events = getAuditLogsFromLKS(containerPath, auditEventName, List.of("TransactionId"), Collections.emptyList(), 1, ContainerFilter.CurrentAndSubfolders).getRows();
+            return events.size() == 1 ? (Integer) events.get(0).get("TransactionId") : null;
+        }
+        catch (Exception e)
+        {
+            // don't fail here, just return null if we can't get the last transactionId
+            return null;
+        }
     }
 
     /**
