@@ -15,9 +15,11 @@
  */
 package org.labkey.test;
 
+import org.jetbrains.annotations.Nullable;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.api.util.Pair;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.assay.GetProtocolCommand;
@@ -31,8 +33,13 @@ import org.labkey.test.components.assay.AssayConstants;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.APIAssayHelper;
+import org.labkey.test.util.APITestHelper;
+import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.EscapeUtil;
+import org.labkey.test.util.FileBrowserHelper;
 import org.labkey.test.util.Maps;
+import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.UIAssayHelper;
 
 import java.io.File;
@@ -47,6 +54,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.labkey.test.params.FieldDefinition.DOMAIN_TRICKY_CHARACTERS;
@@ -228,6 +236,8 @@ public class AssayAPITest extends BaseWebDriverTest
     {
         ReactAssayDesignerPage assayDesigner = _assayHelper.createAssayDesign("General", assayName);
 
+        assayDesigner.setEditableRuns(true); // test updateRows.api
+
         log("Create a 'File' column for the assay run.");
         assayDesigner.goToRunFields()
                 .addField("RunFileField")
@@ -247,6 +257,9 @@ public class AssayAPITest extends BaseWebDriverTest
     @Test
     public void testImportRun_dataRows() throws Exception
     {
+        new ApiPermissionsHelper(this)
+                .setSiteRoleUserPermissions(PasswordUtil.getUsername(), "See Absolute File Paths");
+
         goToProjectHome();
 
         log("create GPAT assay");
@@ -267,28 +280,56 @@ public class AssayAPITest extends BaseWebDriverTest
         ImportRunResponse resp = assayHelper.importAssay(assayId, "x", dataRows, getProjectName(), Collections.singletonMap("RunFileField", "foo.xls"), Collections.emptyMap());
         beginAt(resp.getSuccessURL());
         assertTextPresent("p01", "p02");
+        DataRegionTable table = new DataRegionTable("Data", this);
+        table.clearAllFilters(); // remove run filter
 
         // verify images are resolved and rendered properly
         assertElementPresent("Did not find the expected number of icons for images for " + CREST_FILE.getName() + " from the runs.", Locator.xpath("//img[contains(@title, '" + CREST_FILE.getName() + "')]"), 1);
         assertElementPresent("Did not find the expected number of icons for images for " + SCREENSHOT_FILE.getName() + " from the runs.", Locator.xpath("//img[contains(@title, '" + SCREENSHOT_FILE.getName() + "')]"), 1);
         assertElementPresent("Did not find the expected number of icons for images for " + FOO_XLS_FILE.getName() + " from the runs.", Locator.xpath("//a[contains(text(), '" + FOO_XLS_FILE.getName() + "')]"), 2);
 
-        log("verify files can be resolved after the run is imported");
         String runName = "file resolution run";
 
-        dataRows = Arrays.asList(
-                Maps.of("ptid", "p03", "date", "2017-05-10", "DataFileField", "crest-2.png")
+        List<Map<String, Object>> dataRowsInvalidResultFileName = Arrays.asList(
+                Maps.of("ptid", "p03", "date", "2017-05-10", "DataFileField", CREST_2_FILE.getName())
+        );
+        List<Map<String, Object>> dataRowsInvalidResultFileAbsolutePath = Arrays.asList(
+                Maps.of("ptid", "p03", "date", "2017-05-10", "DataFileField", CREST_2_FILE.getAbsolutePath())
+        );
+        List<Map<String, Object>> dataRowsInvalidResultFileDirectory = Arrays.asList(
+                Maps.of("ptid", "p03", "date", "2017-05-10", "DataFileField", "../")
         );
 
-        // import the file using a relative path
-        resp = assayHelper.importAssay(assayId, runName, dataRows, getProjectName(), Collections.singletonMap("RunFileField", "crest-2.png"), Collections.emptyMap());
-        beginAt(resp.getSuccessURL());
-        assertElementNotPresent("File should not exist for " + CREST_2_FILE.getName() + " from the runs.", Locator.xpath("//img[contains(@title, '" + CREST_2_FILE.getName() + "')]"));
+        log("verify invalid file path is rejected during import");
+        // invalid run file and result file
+        assayHelper.importAssay(assayId, runName, dataRowsInvalidResultFileName, getProjectName(), Collections.singletonMap("RunFileField", CREST_2_FILE.getName()), Collections.emptyMap(), "Invalid file path: crest-2.png");
+        assayHelper.importAssay(assayId, runName, dataRowsInvalidResultFileName, getProjectName(), Collections.singletonMap("RunFileField", CREST_2_FILE.getAbsolutePath()), Collections.emptyMap(), "Invalid file path: " + CREST_2_FILE.getAbsolutePath());
+        assayHelper.importAssay(assayId, runName, dataRowsInvalidResultFileName, getProjectName(), Collections.singletonMap("RunFileField", "../"), Collections.emptyMap(), "Invalid file path: ../");
+        // valid run file but invalid result file
+        assayHelper.importAssay(assayId, runName, dataRowsInvalidResultFileName, getProjectName(), Collections.singletonMap("RunFileField", CREST_FILE.getName()), Collections.emptyMap(), "Invalid file path: crest-2.png");
+        assayHelper.importAssay(assayId, runName, dataRowsInvalidResultFileAbsolutePath, getProjectName(), Collections.singletonMap("RunFileField", CREST_FILE.getName()), Collections.emptyMap(), "Invalid file path: " + CREST_2_FILE.getAbsolutePath());
+        assayHelper.importAssay(assayId, runName, dataRowsInvalidResultFileDirectory, getProjectName(), Collections.singletonMap("RunFileField", CREST_FILE.getName()), Collections.emptyMap(), "Invalid file path: ../");
 
-        goToModule("FileContent");
-        _fileBrowserHelper.uploadFile(CREST_2_FILE);
-        beginAt(resp.getSuccessURL());
-        assertElementPresent("Did not find the expected number of icons for " + CREST_2_FILE.getName() + " from the runs.", Locator.xpath("//img[contains(@title, '" + CREST_2_FILE.getName() + "')]"), 2);
+        // valid run file and valid result file
+        FileBrowserHelper.FileDetailInfo runFileInfo = _fileBrowserHelper.getFileDetailInfo(getProjectName(), CREST_FILE.getName());
+        FileBrowserHelper.FileDetailInfo resultFileInfo = _fileBrowserHelper.getFileDetailInfo(getProjectName(), SCREENSHOT_FILE.getName());
+        List<Pair<String, String>> scenarios = List.of(new Pair<>(CREST_FILE.getName(), SCREENSHOT_FILE.getName()),
+                new Pair<>(runFileInfo.absoluteFilePath(), resultFileInfo.absoluteFilePath()),
+                new Pair<>(runFileInfo.webDavUrl(), resultFileInfo.webDavUrl()),
+                new Pair<>(runFileInfo.dataFileUrl(), resultFileInfo.dataFileUrl()),
+                new Pair<>(runFileInfo.webDavUrlRelative(), resultFileInfo.webDavUrlRelative()));
+        int count = 3;
+        for (Pair<String, String> scenario : scenarios)
+        {
+            List<Map<String, Object>> dataRowsValid = Arrays.asList(Maps.of("ptid", "p0" + count++, "date", "2017-05-10", "DataFileField", scenario.second));
+            assayHelper.importAssay(assayId, "ValidPath" + count, dataRowsValid, getProjectName(), Collections.singletonMap("RunFileField", scenario.first), Collections.emptyMap());
+        }
+
+        clickAndWait(Locator.linkContainingText(assayName));
+        clickAndWait(Locator.linkContainingText("view runs"));
+        assertElementPresent("Did not find the expected number of icons for " + CREST_FILE.getName() + " from the runs.", Locator.xpath("//img[contains(@title, '" + CREST_FILE.getName() + "')]"), 5);
+        clickAndWait(Locator.linkContainingText("view results"));
+        assertElementPresent("Did not find the expected number of icons for " + SCREENSHOT_FILE.getName() + " from the runs.", Locator.xpath("//img[contains(@title, '" + SCREENSHOT_FILE.getName() + "')]"), 6);
     }
 
 
@@ -296,6 +337,9 @@ public class AssayAPITest extends BaseWebDriverTest
     @Test
     public void testGpatSaveBatch() throws Exception
     {
+        new ApiPermissionsHelper(this)
+                .setSiteRoleUserPermissions(PasswordUtil.getUsername(), "See Absolute File Paths");
+
         goToProjectHome();
 
         log("create GPAT assay");
@@ -303,17 +347,18 @@ public class AssayAPITest extends BaseWebDriverTest
         createAssayWithFileFields(assayName);
 
         log("create run via saveBatch");
-        String runName = "created-via-saveBatch";
+        String runNameSaved = "created-via-saveBatch";
         List<Map<String, Object>> resultRows = new ArrayList<>();
         resultRows.add(Maps.of("ptid", "188438418", "SpecimenID", "K770K3VY-19", "DataFileField", "crest.png"));
         resultRows.add(Maps.of("ptid", "188487431", "SpecimenID", "A770K4W1-15", "DataFileField", "screenshot.png"));
 
-        ((APIAssayHelper) _assayHelper).saveBatch(assayName, runName, Collections.singletonMap("RunFileField", "foo.xls"), resultRows, getProjectName());
+        ((APIAssayHelper) _assayHelper).saveBatch(assayName, runNameSaved, Collections.singletonMap("RunFileField", "foo.xls"), resultRows, getProjectName(), null);
+        Integer savedRunId = getRunId(assayName, runNameSaved);
 
         log("verify assay saveBatch worked");
         goToManageAssays();
         clickAndWait(Locator.linkContainingText(assayName));
-        clickAndWait(Locator.linkContainingText(runName));
+        clickAndWait(Locator.linkContainingText(runNameSaved));
         DataRegionTable table = new DataRegionTable("Data", this);
         assertEquals(Arrays.asList("K770K3VY-19", "A770K4W1-15"), table.getColumnDataAsText("SpecimenID"));
 
@@ -322,23 +367,83 @@ public class AssayAPITest extends BaseWebDriverTest
         assertElementPresent("Did not find the expected number of icons for images for " + SCREENSHOT_FILE.getName() + " from the runs.", Locator.xpath("//img[contains(@title, '" + SCREENSHOT_FILE.getName() + "')]"), 1);
         assertElementPresent("Did not find the expected number of icons for images for " + FOO_XLS_FILE.getName() + " from the runs.", Locator.xpath("//a[contains(text(), '" + FOO_XLS_FILE.getName() + "')]"), 2);
 
-        log("verify files can be resolved after the run is imported");
+        String runName = "invalid run file path";
         resultRows.clear();
         resultRows.add(Maps.of("ptid", "188438419", "SpecimenID", "K770K3VY-20", "DataFileField", "help.jpg"));
+        ((APIAssayHelper) _assayHelper).saveBatch(assayName, runName, Collections.singletonMap("RunFileField", "help.jpg"), resultRows, getProjectName(), "Invalid file path: help.jpg");
+        ((APIAssayHelper) _assayHelper).saveBatch(assayName, runName, Collections.singletonMap("RunFileField", HELP_ICON_FILE.getAbsolutePath()), resultRows, getProjectName(), "Invalid file path: " + HELP_ICON_FILE.getAbsolutePath());
+        ((APIAssayHelper) _assayHelper).saveBatch(assayName, runName, Collections.singletonMap("RunFileField", CREST_FILE.getAbsolutePath()), resultRows, getProjectName(), "Invalid file path: " + CREST_FILE.getAbsolutePath());
+        ((APIAssayHelper) _assayHelper).saveBatch(assayName, runName, Collections.singletonMap("RunFileField", "../"), resultRows, getProjectName(), "Invalid file path: ../");
 
-        runName = "file resolution run";
-        ((APIAssayHelper) _assayHelper).saveBatch(assayName, runName, Collections.singletonMap("RunFileField", "help.jpg"), resultRows, getProjectName());
-        goToManageAssays();
-        clickAndWait(Locator.linkContainingText(assayName));
-        clickAndWait(Locator.linkContainingText(runName));
-        assertElementNotPresent("File should not exist for " + HELP_ICON_FILE.getName() + " from the runs.", Locator.xpath("//img[contains(@title, '" + HELP_ICON_FILE.getName() + "')]"));
+        // update run file using updateRows
+        verifyUpdateRunFileAPIError(assayName, "RunFileField", savedRunId, "help.jpg");
+        verifyUpdateRunFileAPIError(assayName, "RunFileField", savedRunId, HELP_ICON_FILE.getAbsolutePath());
+        verifyUpdateRunFileAPIError(assayName, "RunFileField", savedRunId, CREST_FILE.getAbsolutePath());
+        verifyUpdateRunFileAPIError(assayName, "RunFileField", savedRunId, "../");
+
+        runName = "valid run file path, invalid result file path";
+        ((APIAssayHelper) _assayHelper).saveBatch(assayName, runName, Collections.singletonMap("RunFileField", CREST_FILE.getName()), resultRows, getProjectName(), "Invalid file path: help.jpg");
+        ((APIAssayHelper) _assayHelper).saveBatch(assayName, runName, Collections.singletonMap("RunFileField", CREST_FILE.getName()), List.of(Maps.of("ptid", "188438419", "SpecimenID", "K770K3VY-20", "DataFileField", CREST_FILE.getAbsolutePath())), getProjectName(), "Invalid file path: " + CREST_FILE.getAbsolutePath());
 
         goToModule("FileContent");
         _fileBrowserHelper.uploadFile(HELP_ICON_FILE);
         goToManageAssays();
+        FileBrowserHelper.FileDetailInfo runFileInfo = _fileBrowserHelper.getFileDetailInfo(getProjectName(), "help.jpg");
+        ((APIAssayHelper) _assayHelper).saveBatch(assayName, "Valid absolute path", Collections.singletonMap("RunFileField", runFileInfo.absoluteFilePath()), resultRows, getProjectName(), null);
+        ((APIAssayHelper) _assayHelper).saveBatch(assayName, "Valid webdav full path", Collections.singletonMap("RunFileField", runFileInfo.webDavUrl()), resultRows, getProjectName(), null);
+        ((APIAssayHelper) _assayHelper).saveBatch(assayName, "Valid webdav relative path", Collections.singletonMap("RunFileField", runFileInfo.webDavUrlRelative()), resultRows, getProjectName(), null);
+        ((APIAssayHelper) _assayHelper).saveBatch(assayName, "Valid data file url", Collections.singletonMap("RunFileField", runFileInfo.dataFileUrl()), resultRows, getProjectName(), null);
+
         clickAndWait(Locator.linkContainingText(assayName));
-        clickAndWait(Locator.linkContainingText(runName));
-        assertElementPresent("Did not find the expected number of icons for " + HELP_ICON_FILE.getName() + " from the runs.", Locator.xpath("//img[contains(@title, '" + HELP_ICON_FILE.getName() + "')]"), 2);
+        clickAndWait(Locator.linkContainingText("view runs"));
+        assertElementPresent("Did not find the expected number of icons for " + HELP_ICON_FILE.getName() + " from the runs.", Locator.xpath("//img[contains(@title, '" + HELP_ICON_FILE.getName() + "')]"), 4);
+
+        // verify updateRows successful
+        verifyUpdateRunFileAPI(assayName, "RunFileField", savedRunId, runFileInfo.absoluteFilePath(), null);
+        verifyUpdateRunFileAPI(assayName, "RunFileField", savedRunId, runFileInfo.webDavUrl(), null);
+        verifyUpdateRunFileAPI(assayName, "RunFileField", savedRunId, runFileInfo.webDavUrlRelative(), null);
+        verifyUpdateRunFileAPI(assayName, "RunFileField", savedRunId, runFileInfo.dataFileUrl(), null);
+    }
+
+    protected void executeAndVerifyScript(String script, @Nullable String errorMsg)
+    {
+        log(script);
+        Map<String, Object> result = (Map<String, Object>)executeAsyncScript(script);
+
+        String failureResult = APITestHelper.parseScriptResult(result);
+
+        if (errorMsg == null)
+            assertNull(failureResult);
+        else
+            assertEquals("Unexpected error message", errorMsg, result.get("exception"));
+    }
+
+    private void verifyUpdateRunFileAPI(String assayName, String runFileField, int runRowId, String filePath, String errorMsg)
+    {
+        String updateScript = "LABKEY.Query.updateRows({ schemaName: \"assay.General." + EscapeUtil.fieldKeyEncodePart(assayName) + "\", "+
+                "queryName: \"Runs\", " +
+                "success: callback," +
+                "failure: callback," +
+                "rows: [{  RowId: \""+ runRowId + "\"," +
+                "\"" + EscapeUtil.toJSONStr(runFileField) + "\": \"" + EscapeUtil.toJSONStr(filePath) + "\"," +
+                "}]" +
+                "})";
+        executeAndVerifyScript(updateScript, errorMsg);
+    }
+
+    private void verifyUpdateRunFileAPIError(String assayName, String runFileField, int runRowId, String filePath)
+    {
+        verifyUpdateRunFileAPI(assayName, runFileField, runRowId, filePath, "Invalid file path: " + filePath);
+    }
+
+    private @Nullable Integer getRunId(String assayName, String runName)
+    {
+        var rows = executeSelectRowCommand("assay.General." + EscapeUtil.fieldKeyEncodePart(assayName), "Runs").getRows();
+        var row = rows.stream().filter(a-> a.get("name").equals(runName)).findFirst().orElse(null);
+        if (row == null)
+            return null;
+
+        return (Integer) row.get("rowId");
     }
 
     @Override

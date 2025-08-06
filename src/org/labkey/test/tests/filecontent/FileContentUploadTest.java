@@ -353,7 +353,10 @@ public class FileContentUploadTest extends BaseWebDriverTest
     {
         String calculateFileRootSizeTask = "Calculate file root sizes";
         goToAdminConsole().clickSystemMaintenance().runMaintenanceTask(calculateFileRootSizeTask);
+
         Integer initialFileRootSize = getFileRootSize();
+
+        switchToMainWindow();
 
         goToProjectHome();
         File testFile = TestFileUtils.getSampleData("fileTypes/tsv_sample.tsv");
@@ -363,6 +366,9 @@ public class FileContentUploadTest extends BaseWebDriverTest
 
         goToAdminConsole().clickSystemMaintenance().runMaintenanceTask(calculateFileRootSizeTask);
         Integer finalFileRootSize = getFileRootSize();
+
+        switchToMainWindow();
+
         if (!checker().wrapAssertion(() -> Assertions.assertThat(finalFileRootSize)
                 .as("Crawled file root size").isGreaterThan(initialFileRootSize)))
         {

@@ -13,6 +13,7 @@ import org.labkey.test.categories.Daily;
 import org.labkey.test.components.DomainDesignerPage;
 import org.labkey.test.components.domain.DomainFieldRow;
 import org.labkey.test.components.domain.DomainFormPanel;
+import org.labkey.test.pages.admin.FileRootsManagementPage;
 import org.labkey.test.pages.experiment.UpdateSampleTypePage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
@@ -81,6 +82,15 @@ public class AttachmentFieldTest extends BaseWebDriverTest
         setFormElement(Locator.name("quf_" + fieldName), SAMPLE_FILE);
         clickButton("Submit");
 
+        assertElementPresent(Locator.tagWithAttribute("a", "title", "Download attached file"));
+
+        clickAndWait(Locator.tagWithText("a", "S1"));
+        clickAndWait(Locator.tagWithClass("a", "labkey-text-link").withText("edit"));
+        waitForElement(Locator.tagContainingText("div", "sampletype/jpg_sample.jpg"));
+        // Issue 53200: Update form incorrectly shows that a file is not available
+        assertTextNotPresent("sampletype/jpg_sample.jpg (unavailable)");
+        clickButton("Cancel");
+
         log("Verifying view in browser works");
         clickAndWait(Locator.tagWithAttributeContaining("img", "title", SAMPLE_FILE.getName()));
         Assertions.assertThat(getDriver().getCurrentUrl()).as("File field view URL.").contains("core-downloadFileLink.view");
@@ -92,6 +102,49 @@ public class AttachmentFieldTest extends BaseWebDriverTest
 
         File downloadedFile = doAndWaitForDownload(() -> Locator.tagWithAttributeContaining("img", "title", SAMPLE_FILE.getName()).findElement(getDriver()).click());
         Assert.assertTrue("Downloaded file is empty", downloadedFile.length() > 0);
+
+        // create a subfolder and set the Project file root to child folder file root, to simulate sample file path not under current file root
+        String subFolder = "ChildFolder";
+        _containerHelper.createSubfolder(getProjectName(), subFolder);
+        clickFolder(subFolder);
+        FileRootsManagementPage fileRootsManagementPage = goToFolderManagement().goToFilesTab();
+        String childFileRoot = fileRootsManagementPage.getRootPath();
+        goToProjectHome();
+        fileRootsManagementPage = goToFolderManagement().goToFilesTab();
+        fileRootsManagementPage.useCustomFileRoot(childFileRoot).clickSave();
+
+        // verify file path display for files that's present but outside of current file root
+        verifyUnavailableFile();
+
+        // reset file root to default
+        goToFolderManagement()
+                .goToFilesTab()
+                .selectFileRootType(FileRootsManagementPage.FileRootOption.siteDefault)
+                .clickSave();
+        goToProjectHome();
+        clickAndWait(Locator.linkWithText(sampleTypeName));
+        assertElementPresent(Locator.tagWithAttribute("a", "title", "Download attached file"));
+
+        // delete the file and verify file path that doesn't exist
+        goToModule("FileContent");
+        _fileBrowserHelper.deleteFile("sampletype");
+        verifyUnavailableFile();
+    }
+
+    private void verifyUnavailableFile()
+    {
+        String sampleTypeName = "Sample type with attachment";
+        goToProjectHome();
+        clickAndWait(Locator.linkWithText(sampleTypeName));
+        waitForElement(Locator.tagContainingText("td", "jpg_sample.jpg (unavailable)"));
+        assertElementNotPresent(Locator.tagWithAttribute("a", "title", "Download attached file"));
+
+        // "(unavailable)" suffix is present in update view
+        clickAndWait(Locator.tagWithText("a", "S1"));
+        clickAndWait(Locator.tagWithClass("a", "labkey-text-link").withText("edit"));
+        waitForElement(Locator.tagContainingText("div", "jpg_sample.jpg (unavailable)"));
+        assertElementNotPresent(Locator.tagWithAttributeContaining("img", "src", "/_icons/image.png"));
+
     }
 
     @Test

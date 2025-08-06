@@ -14,7 +14,6 @@ import org.labkey.serverapi.reader.DataLoader;
 import org.labkey.serverapi.reader.TabLoader;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.params.FieldDefinition;
-import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.TestDataGenerator;
 import org.labkey.test.util.TestLogger;
 
@@ -296,6 +295,12 @@ public class TestDataUtils
         return stringFromRowMaps(rowMaps, columns, includeHeaders, CSVFormat.TDF);
     }
 
+    public static String tsvStringFromRowMapsEscapeBackslash(List<Map<String, Object>> rowMaps, List<String> columns,
+                                                             boolean includeHeaders)
+    {
+        return stringFromRowMaps(rowMaps, columns, includeHeaders, CSVFormat.MYSQL);
+    }
+
     public static <T> List<Map<String, T>> mapsFromRows(List<List<T>> allRows)
     {
         List<Map<String, T>> rowMaps = new ArrayList<>();
@@ -438,6 +443,12 @@ public class TestDataUtils
     {
         return writeRowsToFile(fileName, rows, CSVFormat.TDF);
     }
+
+    public static <T> File writeRowsToTsvEscapeBackslash(String fileName, List<List<T>> rows) throws IOException
+    {
+        return writeRowsToFile(fileName, rows, CSVFormat.MYSQL);
+    }
+
 
     public static <T> File writeRowsToCsv(String fileName, List<List<T>> rows) throws IOException
     {

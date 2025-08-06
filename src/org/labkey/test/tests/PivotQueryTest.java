@@ -25,8 +25,14 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Data;
 import org.labkey.test.components.ChartTypeDialog;
+import org.labkey.test.pages.query.SourceQueryPage;
 import org.labkey.test.pages.study.DatasetDesignerPage;
+import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.DomainUtils;
+import org.labkey.test.util.EscapeUtil;
+import org.labkey.test.util.TestDataGenerator;
+import org.labkey.test.util.data.TestDataUtils;
 
 import java.io.File;
 import java.util.Arrays;
@@ -180,6 +186,69 @@ public class PivotQueryTest extends ReportTest
 
         //Confirm warning message indicating a non-numeric value could not be used.
         assertTextPresent("The y-axis measure '" + MEASURE_COLUMN + "' had 1 value(s) that could not be converted to a number and are not included in the plot");
+    }
+
+    // coverage for Issue 52739
+    @Test
+    public void testBadPivotQuery()
+    {
+        String datasetName = TestDataGenerator.randomDomainName("D2", DomainUtils.DomainKind.StudyDatasetVisit);
+        String textFieldName = TestDataGenerator.randomFieldName("F1");
+        FieldDefinition textField = new FieldDefinition(textFieldName, FieldDefinition.ColumnType.String);
+        goToProjectHome();
+
+        var datasetDesigner = _studyHelper.defineDataset(datasetName, getProjectName());
+        datasetDesigner.getFieldsPanel().addFields(List.of(textField));
+        var viewDatasetPage = datasetDesigner.clickSave()
+                .clickViewData();
+        TestDataUtils.TsvQuoter _tsvQuoter = new TestDataUtils.TsvQuoter();
+        String bulkData = """
+                ParticipantId	date	[F1]
+                1	7/28/2025	this
+                2	7/29/2025	that
+                3	7/30/2025	the other
+                4	7/31/2025	and more
+                5	8/1/2025	but wait
+                6	8/2/2025	still more
+                """.replace("[F1]", _tsvQuoter.quoteValue(textFieldName));
+        var importPage = viewDatasetPage.getDataRegion().clickImportBulkData();
+        importPage.setText(bulkData);
+        importPage.submit();
+
+        // configure the query without F1 as pivot field
+        String queryName = "Q1";
+        String queryText = """
+                SELECT ParticipantId, SequenceNum, MAX([F1]) AS I1Max FROM study.[D2]
+                GROUP BY ParticipantId, SequenceNum, [F1]
+                PIVOT I1Max BY [F1]
+                """.replace("[F1]", EscapeUtil.getSqlQuotedValue(textFieldName))
+                .replace("[D2]", EscapeUtil.getSqlQuotedValue(datasetName));
+
+        goToModule("Query");
+        var createQueryPage = createNewQuery("study", datasetName);
+        createQueryPage.setName(queryName);
+        var sourceQueryPage = createQueryPage.clickCreate();
+        sourceQueryPage.setSource(queryText);
+        sourceQueryPage.clickSaveAndFinish();
+
+        // expect query error
+        waitForText("Query 'Q1' has errors", "Error on line 3: Can not find pivot column:");
+
+        // update the query to include the pivot column and verify it works
+        String updatedQueryText = """
+                SELECT ParticipantId, SequenceNum, MAX([F1]) AS I1Max, [F1] FROM study.[D2]
+                GROUP BY ParticipantId, SequenceNum, [F1]
+                PIVOT I1Max BY [F1]
+                """.replace("[F1]", EscapeUtil.getSqlQuotedValue(textFieldName))
+                .replace("[D2]", EscapeUtil.getSqlQuotedValue(datasetName));
+
+        clickAndWait(Locator.linkWithText("Edit Query"));
+        var editQueryPage = new SourceQueryPage(getDriver());
+        editQueryPage.setSource(updatedQueryText);
+        editQueryPage.clickSaveAndFinish();
+
+        // ensure query results contain F1 contents
+        assertTextPresent("this", "that", "the other", "and more", "but wait", "still more");
     }
 
     @Override public BrowserType bestBrowser()
