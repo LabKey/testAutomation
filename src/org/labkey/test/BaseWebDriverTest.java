@@ -1902,7 +1902,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         {
             _setPipelineRoot(rootPath, inherit);
 
-            waitForElement(Locators.labkeyMessage.withText("The pipeline root was set to '" + Paths.get(rootPath).normalize() + "'"));
+            waitForElement(Locators.labkeyMessage.withTextIgnoreCase("The pipeline root was set to '" + Paths.get(rootPath).normalize() + "'"));
 
             getArtifactCollector().addArtifactLocation(new File(rootPath));
 
