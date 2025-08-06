@@ -21,6 +21,7 @@ import org.labkey.test.params.FieldInfo;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.params.list.IntListDefinition;
 import org.labkey.test.params.list.ListDefinition;
+import org.labkey.test.util.TextUtils;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
@@ -1341,11 +1342,11 @@ public class EditableGridTest extends BaseWebDriverTest
         log("Input empty string for required field should trigger cell warning.");
         testGrid.setCellValue(1, REQ_STR_FIELD, " ");
         checker().verifyEquals("Cell warning status not as expected at row " + 1 + " for col " + REQ_STR_FIELD.getLabel(), true, testGrid.hasCellError(1, REQ_STR_FIELD));
-        checker().verifyEquals("Cell warning msg not as expected at row " + 1 + " for col " + REQ_STR_FIELD.getLabel(), REQ_STR_FIELD.getLabel() + " is required.", testGrid.getCellPopoverText(1, REQ_STR_FIELD));
+        checker().verifyEquals("Cell warning msg not as expected at row " + 1 + " for col " + REQ_STR_FIELD.getLabel(), REQ_STR_FIELD.getUiLabel() + " is required.", testGrid.getCellPopoverText(1, REQ_STR_FIELD));
         mouseOver(testGrid.getCell(0, "Row")); // dismiss warning popup
         testGrid.setCellValue(1, REQ_INT_FIELD, " ");
         checker().verifyEquals("Cell warning status not as expected at row " + 1 + " for col " + REQ_INT_FIELD.getLabel(), true, testGrid.hasCellError(1, REQ_INT_FIELD));
-        checker().verifyEquals("Cell warning msg not as expected at row " + 1 + " for col " + REQ_INT_FIELD.getLabel(), REQ_INT_FIELD.getLabel() + " is required.", testGrid.getCellPopoverText(1, REQ_INT_FIELD));
+        checker().verifyEquals("Cell warning msg not as expected at row " + 1 + " for col " + REQ_INT_FIELD.getLabel(), REQ_INT_FIELD.getUiLabel() + " is required.", testGrid.getCellPopoverText(1, REQ_INT_FIELD));
 
         log("Correct values should remove cell warning, keep entering wrong values should update warning");
         mouseOver(testGrid.getCell(0, "Row")); // dismiss warning popup
@@ -1496,7 +1497,7 @@ public class EditableGridTest extends BaseWebDriverTest
 
             checker().verifyEquals("Cell warning status not as expected at row " + rowId + " for col " + field.getLabel(), !StringUtils.isEmpty(expectedWarning), testGrid.hasCellError(rowId, field));
             if (!StringUtils.isEmpty(expectedWarning))
-                checker().verifyEquals("Cell warning msg not as expected at row " + rowId + " for col " + field.getLabel(), expectedWarning, testGrid.getCellPopoverText(rowId, field));
+                checker().verifyEquals("Cell warning msg not as expected at row " + rowId + " for col " + field.getLabel(), TextUtils.normalizeSpace(expectedWarning), testGrid.getCellPopoverText(rowId, field));
         }
     }
 
