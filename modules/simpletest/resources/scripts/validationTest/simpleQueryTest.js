@@ -37,7 +37,7 @@ var testFunctions = [
 
     function() //testResults[1]
     {
-        testResults[testResults.length] = LABKEY.Query.selectRows({schemaName:schemaName, queryName:queryName, sort: "-Date", filterArray: filters});
+        testResults[testResults.length] = LABKEY.Query.selectRows({schemaName:schemaName, queryName:queryName, sort: "-Created", filterArray: filters});
         executeNext();
     },
 
@@ -49,7 +49,7 @@ var testFunctions = [
 
     function() //testResults[3]
     {
-        testResults[testResults.length] = LABKEY.Query.executeSql({schemaName: schemaName, sort: "Date", sql: "select Date from UserAuditEvent"});
+        testResults[testResults.length] = LABKEY.Query.executeSql({schemaName: schemaName, sort: "Created", sql: "select Created from UserAuditEvent"});
         executeNext();
     },
 

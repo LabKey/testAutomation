@@ -28,6 +28,31 @@ import java.util.stream.Collectors;
 
 public class EscapeUtil
 {
+    static public String toJSONStr(String str)
+    {
+        if (str == null) return null;
+        StringBuilder escaped = new StringBuilder();
+        for (char c : str.toCharArray()) {
+            switch (c) {
+                case '"': escaped.append("\\\""); break;
+                case '\\': escaped.append("\\\\"); break;
+                case '\b': escaped.append("\\b"); break;
+                case '\f': escaped.append("\\f"); break;
+                case '\n': escaped.append("\\n"); break;
+                case '\r': escaped.append("\\r"); break;
+                case '\t': escaped.append("\\t"); break;
+                default:
+                    // Escape control characters (ASCII 0-31) and ensure Unicode compatibility
+                    if (c < 32) {
+                        escaped.append(String.format("\\u%04x", (int) c));
+                    } else {
+                        escaped.append(c);
+                    }
+            }
+        }
+        return escaped.toString();
+    }
+
     static public String jsString(String s)
     {
         if (s == null)
