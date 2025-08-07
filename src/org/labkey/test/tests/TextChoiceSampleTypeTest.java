@@ -29,10 +29,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Category({Daily.class})
@@ -330,10 +328,6 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
 
         TestDataGenerator dataGenerator = createSampleType(sampleTypeName, namePrefix, textChoiceFieldName, expectedUnLockedValues);
 
-        // Add the list of the event ids to an ignore list so future tests don't look at them again.
-        Set<Integer> ignoreIds = new HashSet<>();
-        ignoreIds.addAll(_auditLogHelper.getDomainEventIds(getProjectName(), sampleTypeName, null));
-
         log("Create some samples that have TextChoice values set.");
 
         // Only assign a few of the values to samples (i.e. lock them).
@@ -347,7 +341,7 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
         Map<String, String> samplesWithTC = new HashMap<>();
 
         int index = 0;
-        for(int i = 1; i <= 20; i++)
+        for (int i = 1; i <= 20; i++)
         {
 
             String sampleName = String.format("%s%d", namePrefix, i);
@@ -357,10 +351,10 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
             String strFieldValue;
 
             // Give a TextChoice value to every other sample.
-            if(i%2 == 0)
+            if (i%2 == 0)
             {
 
-                if(index >= expectedLockedValues.size())
+                if (index >= expectedLockedValues.size())
                     index = 0;
 
                 String tcValue = expectedLockedValues.get(index);
@@ -413,7 +407,7 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
         value = expectedUnLockedValues.get(0);
         fieldRow.selectTextChoiceValue(value);
 
-        if(checker().verifyTrue(String.format("Delete button is not enabled for value '%s', it should be.", value),
+        if (checker().verifyTrue(String.format("Delete button is not enabled for value '%s', it should be.", value),
                 fieldRow.isTextChoiceDeleteButtonEnabled()))
         {
             fieldRow.deleteTextChoiceValue(value);
@@ -474,13 +468,13 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
         // Construct a list of samples that have TextChoice set and what they are expected to be.
         List<Map<String, String>> expectedSamples = new ArrayList<>();
 
-        for(Map.Entry<String, String> entry : samplesWithTC.entrySet())
+        for (Map.Entry<String, String> entry : samplesWithTC.entrySet())
         {
             String sampleId = entry.getKey();
 
             // Need to special case for the TC value that was just updated.
             String sampleValue;
-            if(entry.getValue().equals(valueToUpdate))
+            if (entry.getValue().equals(valueToUpdate))
             {
                 sampleValue = updatedValue;
             }
@@ -618,7 +612,7 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
 
         List<String> availableSamples = new ArrayList<>();
 
-        for(int i = 1; i <= 5; i++)
+        for (int i = 1; i <= 5; i++)
         {
             Map<String, Object> sample = new HashMap<>();
             String sampleName = String.format("%s%d", namePrefix, i);
