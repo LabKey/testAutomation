@@ -192,8 +192,9 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         var checkBoxes = Locator.tag("tr").child("td")
                 .child(Locator.tagWithAttribute("input", "type", "checkbox"))
                 .findElements(elementCache().table);
+        getWrapper().scrollIntoView(checkBoxes.get(start)); // Make sure the header isn't in the way
         checkBoxes.get(start).click();
-        getWrapper().scrollIntoView(checkBoxes.get(end), true); // Actions.click() doesn't scroll
+        getWrapper().scrollIntoView(checkBoxes.get(end)); // Actions.click() doesn't scroll
         new Actions(getDriver())
                 .keyDown(Keys.SHIFT)
                 .click(checkBoxes.get(end))
