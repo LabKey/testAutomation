@@ -33,6 +33,8 @@ import java.util.stream.Stream;
 import static java.lang.Integer.parseInt;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
+import static org.labkey.test.WebDriverWrapper.waitFor;
 
 public class AuditLogHelper
 {
@@ -241,9 +243,30 @@ public class AuditLogHelper
         }
         catch (Exception e)
         {
-            // don't fail here, just return null if we can't get the last transactionId
-            return null;
+            throw new RuntimeException(e);
         }
+    }
+
+    public Integer doAndWaitForTransaction(Runnable action, String containerPath, AuditEvent auditEventName)
+    {
+        int prevTransactionId;
+        if (action != null)
+        {
+            prevTransactionId = Objects.requireNonNullElse(getLastTransactionId(containerPath, auditEventName), -1);
+            action.run();
+        }
+        else
+        {
+            prevTransactionId = -1;
+        }
+
+        return waitFor(() -> {
+            Integer transactionId = getLastTransactionId(containerPath, auditEventName);
+            if (transactionId != null && transactionId > prevTransactionId)
+                return transactionId;
+            else
+                return null;
+        }, "Error waiting for next transactionId in " + auditEventName, WAIT_FOR_JAVASCRIPT);
     }
 
     /**
