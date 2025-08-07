@@ -640,6 +640,8 @@ public class TestDataGenerator
         try
         {
             CommandResponse response = command.execute(WebTestHelper.getRemoteApiConnection(), "/home");
+            if (response.getParsedData() == null)
+                throw new RuntimeException("Failed to parse response for command: " + response.getText());
             return response.getParsedData().containsKey("errors");
         }
         catch (CommandException | IOException e)
