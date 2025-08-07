@@ -18,6 +18,7 @@ import org.labkey.test.components.ui.entities.EntityBulkUpdateDialog;
 import org.labkey.test.components.ui.grids.FieldReferenceManager.FieldReference;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldKey;
+import org.labkey.test.util.CachingSupplier;
 import org.labkey.test.util.selenium.ScrollUtils;
 import org.labkey.test.util.selenium.WebElementUtils;
 import org.openqa.selenium.By;
@@ -151,55 +152,29 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
     private boolean hasSelectColumn()
     {
-        return elementCache().selectColumn.isDisplayed();
+        return elementCache().hasSelectColumn.get();
     }
 
     public EditableGrid selectRow(int index, boolean checked)
     {
-        if (hasSelectColumn())
-        {
-            WebElement checkBox = Locator.css("td > input[type=checkbox]").findElement(getRow(index));
-            getWrapper().setCheckbox(checkBox, checked);
-        }
-        else
-        {
-            throw new NoSuchElementException("There is no select checkbox for row " + index);
-        }
+        elementCache().getCheckbox(index).set(checked);
         return this;
     }
 
     public boolean isRowSelected(int index)
     {
-        if (hasSelectColumn())
-        {
-            WebElement checkBox = Locator.css("td > input[type=checkbox]").findElement(getRow(index));
-            return checkBox.isSelected();
-        }
-        else
-        {
-            throw new NoSuchElementException("There is no select checkbox for row " + index);
-        }
+        return elementCache().getCheckbox(index).isSelected();
     }
 
     public EditableGrid selectAll(boolean checked)
     {
-        if (hasSelectColumn())
-        {
-            getWrapper().setCheckbox(elementCache().selectColumn, checked);
-        }
-        else
-        {
-            throw new NoSuchElementException("There is no select checkbox for all rows.");
-        }
+        elementCache().selectAllCheckbox.set(checked);
         return this;
     }
 
     public boolean areAllRowsSelected()
     {
-        if (hasSelectColumn())
-            return new Checkbox(elementCache().selectColumn).isSelected();
-        else
-            throw new NoSuchElementException("There is no select checkbox for all rows.");
+        return elementCache().selectAllCheckbox.isSelected();
     }
 
     /**
@@ -212,24 +187,19 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     public EditableGrid shiftSelectRange(int start, int end)
     {
         if (!hasSelectColumn())
-            throw new NoSuchElementException("there is no select checkbox for all rows");
+            throw new NoSuchElementException("there is no selection column for grid");
 
         var checkBoxes = Locator.tag("tr").child("td")
                 .child(Locator.tagWithAttribute("input", "type", "checkbox"))
                 .findElements(elementCache().table);
-        getWrapper().scrollIntoView(checkBoxes.get(0), true); // bring as much of the grid into view as possible
+        checkBoxes.get(start).click();
+        getWrapper().scrollIntoView(checkBoxes.get(end), true); // Actions.click() doesn't scroll
         new Actions(getDriver())
-                .click(checkBoxes.get(start))
                 .keyDown(Keys.SHIFT)
                 .click(checkBoxes.get(end))
                 .keyUp(Keys.SHIFT)
                 .perform();
         return this;
-    }
-
-    private List<WebElement> getRows()
-    {
-        return Locators.rows.findElements(elementCache().table);
     }
 
     /**
@@ -291,7 +261,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
             }
         }
 
-        for (WebElement row : getRows())
+        for (WebElement row : elementCache().getRows())
         {
             List<WebElement> cells = row.findElements(By.tagName("td"));
             Map<T, String> rowMap = new LinkedHashMap<>(includedColHeaders.size());
@@ -337,7 +307,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
     private WebElement getRow(int index)
     {
-        return getRows().get(index);
+        return elementCache().getRows().get(index);
     }
 
     /**
@@ -387,7 +357,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
     public int getRowCount()
     {
-        return getRows().size();
+        return elementCache().getRows().size();
     }
 
     /**
@@ -657,6 +627,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         // Account for the cell already being active.
         if(!textArea.isDisplayed())
         {
+            getWrapper().scrollIntoView(gridCell);
             getWrapper().doubleClick(gridCell);
             waitFor(textArea::isDisplayed,
                     String.format("Table cell for row %d and column '%s' was not activated.", row, columnIdentifier), 1_000);
@@ -1086,7 +1057,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         List<String> columns = getColumnLabels();
         int selectIndexOffset = hasSelectColumn() ? 1 : 0;
         WebElement indexCell = getCell(0, columns.get(1 + selectIndexOffset));
-        WebElement endCell = getCell(getRows().size()-1, columns.get(columns.size()-1));
+        WebElement endCell = getCell(elementCache().getRows().size()-1, columns.get(columns.size()-1));
         return (isInSelection(indexCell) && isInSelection(endCell));
     }
 
@@ -1219,7 +1190,13 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         final WebElement deleteRowsBtn =  Locator.byClass("bulk-remove-button").findWhenNeeded(topControls);
         final ExportMenu exportMenu = ExportMenu.finder(getDriver()).findWhenNeeded(topControls);
         final WebElement table = Locator.byClass("table-cellular").findWhenNeeded(this);
-        private final WebElement selectColumn = Locator.xpath("//th/input[@type='checkbox']").findWhenNeeded(table);
+        private final Checkbox selectAllCheckbox = new Checkbox(Locator.xpath("//th/input[@type='checkbox']").findWhenNeeded(table));
+        private final CachingSupplier<Boolean> hasSelectColumn = new CachingSupplier<>(selectAllCheckbox::isDisplayed);
+
+        Checkbox getCheckbox(int rowIndex)
+        {
+            return new Checkbox(Locator.css("td > input[type=checkbox]").findElement(getRow(rowIndex)));
+        }
 
         protected WebElement getColumnHeaderCell(CharSequence columnIdentifier)
         {
@@ -1292,6 +1269,11 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         final WebElement addRowsPanel = Locator.byClass("editable-grid__controls").findWhenNeeded(this);
         final Input addCountInput = Input.Input(Locator.name("addCount"), getDriver()).findWhenNeeded(addRowsPanel);
         final WebElement addRowsButton = Locator.byClass("btn-primary").findWhenNeeded(addRowsPanel);
+
+        List<WebElement> getRows()
+        {
+            return Locators.rows.findElements(table);
+        }
     }
 
     protected abstract static class Locators

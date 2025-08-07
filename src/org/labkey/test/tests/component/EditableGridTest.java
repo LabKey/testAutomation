@@ -36,6 +36,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.everyItem;
@@ -1102,7 +1103,7 @@ public class EditableGridTest extends BaseWebDriverTest
 
         checker().verifyTrue(String.format("The expected cell on row %d and column %s is not selected after hitting <tab>.",
                         gridRow, PASTE_2),
-                endCell.getAttribute("class").toLowerCase().contains("cell-selected"));
+                Objects.requireNonNullElse(endCell.getAttribute("class"), "").toLowerCase().contains("cell-selected"));
 
         checker().screenShotIfNewError("TAB_ERROR");
     }
@@ -1252,8 +1253,8 @@ public class EditableGridTest extends BaseWebDriverTest
             for(int rowIndex = startRow; rowIndex <= endRow; rowIndex++)
             {
                 WebElement gridCell = Locator.tag("div").findElement(editableGrid.getCell(rowIndex, columnNames.get(colIndex)));
-                checker().verifyTrue(String.format("Cell (%s, %d) is not selected.",columnNames.get(colIndex), rowIndex),
-                        gridCell.getAttribute("class").toLowerCase().contains("cell-selection"));
+                checker().verifyTrue(String.format("Cell (%s, %d) is not selected.", columnNames.get(colIndex), rowIndex),
+                        Objects.requireNonNullElse(gridCell.getAttribute("class"), "").toLowerCase().contains("cell-selection"));
             }
         }
 
@@ -1398,9 +1399,8 @@ public class EditableGridTest extends BaseWebDriverTest
         testGrid.addRows(3);
 
         log("Pasting invalid values");
-        testGrid.selectCell(0, STR_FIELD);
+        testGrid.pasteFromCell(0, STR_FIELD, rowsToString(clipRows), false);
 
-        actionPaste(null, rowsToString(clipRows));
         List<List<String>> expectedCellWarnings = List.of(
                 Arrays.asList(null, null, null, null, null, null, null, null, null, null, null, null, null, null),
                 Arrays.asList(null, REQ_STR_FIELD.getLabel() + " is required.", null, REQ_INT_FIELD.getLabel() + " is required.", null, REQ_DATETIME_FIELD.getLabel() + " is required.", null, REQ_TIME_FIELD.getLabel() + " is required.", null, null, null, REQ_TEXTCHOICE_FIELD.getLabel() + " is required.", null, REQ_LOOKUP_FIELD.getLabel() + " is required."),
@@ -1511,8 +1511,7 @@ public class EditableGridTest extends BaseWebDriverTest
         testGrid.addRows(3);
 
         log("Start with pasting invalid values, so we can fill down invalid values for dropdowns and data/time inputs");
-        testGrid.selectCell(0, STR_FIELD);
-        actionPaste(null, rowsToString(clipRows));
+        testGrid.pasteFromCell(0, STR_FIELD, rowsToString(clipRows), false);
 
         // Scroll one column to the right into view, this will help ensure the REQ_LOOKUP_FIELD is within the viewport.
         var index = testGrid.getColumnLabels().indexOf(REQ_LOOKUP_FIELD.getLabel() + " *") + 1;
