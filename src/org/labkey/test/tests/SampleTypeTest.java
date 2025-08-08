@@ -1584,7 +1584,7 @@ public class SampleTypeTest extends BaseWebDriverTest
     }
 
     @Test // Issue 49830
-    public void testFilePathOnBulkImport() throws IOException
+    public void testFilePathOnBulkImport()
     {
         new ApiPermissionsHelper(this)
                 .setSiteRoleUserPermissions(PasswordUtil.getUsername(), "See Absolute File Paths");
@@ -1661,14 +1661,15 @@ public class SampleTypeTest extends BaseWebDriverTest
         importSampleTypeFilePathDataError("Fail", homeFileInfo.webDavUrlRelative() + "bad");
         importSampleTypeFilePathDataError("Fail", homeFileInfo.fileName() + "bad");
         // happy cases: create new records using valid relative or absolute file in Project/Child
-        String header = "Name\t" + fileFieldName + "\n";
-        TestDataUtils.TsvQuoter tsvQuoter = new TestDataUtils.TsvQuoter();
-        String homeSampleContent = "S-home-fullPath\t" + tsvQuoter.quoteValue(homeFileInfo.absoluteFilePath()) + "\n"
-                + "S-home-relativeDav\t" + homeFileInfo.webDavUrlRelative() + "\n"
-                + "S-home-dataUrl\t" + homeFileInfo.dataFileUrl() + "\n"
-                + "S-home-davUrl\t" + homeFileInfo.webDavUrl() + "\n"
-                + "S-home-relative\t" + "../@files/" + homeFileInfo.fileName();
-        setFormElement(Locator.name("text"), header + homeSampleContent);
+        List<String> header = List.of("Name", fileFieldName);
+        List<List<String>> homeSampleContent = List.of(
+            header,
+            List.of("S-home-fullPath", homeFileInfo.absoluteFilePath()),
+            List.of("S-home-relativeDav", homeFileInfo.webDavUrlRelative()),
+            List.of("S-home-dataUrl", homeFileInfo.dataFileUrl()),
+            List.of("S-home-davUrl", homeFileInfo.webDavUrl()),
+            List.of("S-home-relative", "../@files/" + homeFileInfo.fileName()));
+        setFormElement(Locator.name("text"), TestDataUtils.stringFromRows(homeSampleContent));
         clickButton("Submit");
         drt = DataRegionTable.findDataRegionWithinWebpart(this, "Sample Type Contents");
         String fName = " " + homeFileInfo.fileName();
@@ -1683,19 +1684,21 @@ public class SampleTypeTest extends BaseWebDriverTest
         importSampleTypeFilePathDataError("S-home-fullPath", subDirInfo.dataFileUrl());
         importSampleTypeFilePathDataError("S-home-fullPath", homeFileInfo.absoluteFilePath() + "bad");
         // happy cases for update
-        setFormElement(Locator.name("text"), header + homeSampleContent); // no change
+        setFormElement(Locator.name("text"), TestDataUtils.stringFromRows(homeSampleContent)); // no change
         clickButton("Submit");
         drt = DataRegionTable.findDataRegionWithinWebpart(this, "Sample Type Contents");
         checker().verifyEqualsSorted("File field not imported as expected", List.of(fName, fName, fName, fName, fName), drt.getColumnDataAsText(fileFieldName));
         importDataPage = drt.clickImportBulkData();
         importDataPage.setCopyPasteMerge(false, true);
-        String homeSampleUpdateContent = "S-home-fullPath\t" + tsvQuoter.quoteValue(homeFileBInfo.absoluteFilePath()) + "\n"
-                + "S-home-relativeDav\t\n"
-                + "S-home-dataUrl\t" + homeFileBInfo.dataFileUrl() + "\n"
-                + "S-home-davUrl\t" + homeFileBInfo.webDavUrl() + "\n"
-                + "S-home-relative\t" + "../@files/" + homeFileBInfo.fileName();
-        setFormElement(Locator.name("text"), header + homeSampleUpdateContent);
-        clickButton("Submit");
+        List<List<String>> homeSampleUpdateContent = List.of(
+            header,
+            List.of("S-home-fullPath", homeFileBInfo.absoluteFilePath()),
+            List.of("S-home-relativeDav", ""),
+            List.of("S-home-dataUrl", homeFileBInfo.dataFileUrl()),
+            List.of("S-home-davUrl", homeFileBInfo.webDavUrl()),
+            List.of("S-home-relative", "../@files/" + homeFileBInfo.fileName()));
+        importDataPage.setText(TestDataUtils.stringFromRows(homeSampleUpdateContent));
+        importDataPage.submit();
         String fNameUpdated = " " + homeFileBInfo.fileName();
         drt = DataRegionTable.findDataRegionWithinWebpart(this, "Sample Type Contents");
         checker().verifyEqualsSorted("File field not imported as expected", List.of(fNameUpdated, fNameUpdated, fNameUpdated, " "/*removed*/, fNameUpdated), drt.getColumnDataAsText(fileFieldName));
@@ -1737,12 +1740,14 @@ public class SampleTypeTest extends BaseWebDriverTest
         importSampleTypeFilePathDataError("Fail", subDirInfo.webDavUrlRelative());
         importSampleTypeFilePathDataError("Fail", subDirInfo.fileName());
         // happy case for creating child sample
-        String childSampleContent = "S-child-fullPath\t" + tsvQuoter.quoteValue(subFileInfo.absoluteFilePath()) + "\n"
-                + "S-child-relativeDav\t" + subFileInfo.webDavUrlRelative() + "\n"
-                + "S-child-dataUrl\t" + subFileInfo.dataFileUrl() + "\n"
-                + "S-child-davUrl\t" + subFileInfo.webDavUrl() + "\n"
-                + "S-child-relative\t" + "../@files/" + subFileInfo.fileName();
-        setFormElement(Locator.name("text"), header + childSampleContent);
+        List<List<String>> childSampleContent = List.of(
+            header,
+            List.of("S-child-fullPath", subFileInfo.absoluteFilePath()),
+            List.of("S-child-relativeDav", subFileInfo.webDavUrlRelative()),
+            List.of("S-child-dataUrl", subFileInfo.dataFileUrl()),
+            List.of("S-child-davUrl", subFileInfo.webDavUrl()),
+            List.of("S-child-relative", "../@files/" + subFileInfo.fileName()));
+        setFormElement(Locator.name("text"), TestDataUtils.stringFromRows(childSampleContent));
         clickButton("Submit");
         drt = DataRegionTable.findDataRegionWithinWebpart(this, "Sample Type Contents");
         fName = " " + subFileInfo.fileName();
@@ -1752,19 +1757,14 @@ public class SampleTypeTest extends BaseWebDriverTest
 
     private void importSampleTypeFilePathDataError(String sampleName, String filePath)
     {
+        ImportDataPage importDataPage = new ImportDataPage(getDriver());
         final String fileFieldName = "FileField";
         String pasteData = TestDataUtils.tsvStringFromRowMapsEscapeBackslash(List.of(Map.of("Name", sampleName, fileFieldName, filePath)),
                 List.of("Name", fileFieldName), true);
-        setFormElement(Locator.name("text"), pasteData);
-        new ImportDataPage(getDriver()).submitExpectingError();
-        try
-        {
-            waitForElementToBeVisible(Locator.xpath("//div[contains(@class, 'labkey-error')][contains(text(),'Invalid file path: " + filePath + "')]"));
-        }
-        catch(NoSuchElementException nse)
-        {
-            checker().fatal().error("Invalid file path error not present.");
-        }
+        importDataPage.setText(pasteData);
+        String error = importDataPage.submitExpectingError();
+
+        Assertions.assertThat(error).as("Error message").contains("Invalid file path: " + filePath);
     }
     
     @Test

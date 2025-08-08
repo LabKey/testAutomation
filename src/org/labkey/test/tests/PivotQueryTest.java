@@ -201,18 +201,16 @@ public class PivotQueryTest extends ReportTest
         datasetDesigner.getFieldsPanel().addFields(List.of(textField));
         var viewDatasetPage = datasetDesigner.clickSave()
                 .clickViewData();
-        TestDataUtils.TsvQuoter _tsvQuoter = new TestDataUtils.TsvQuoter();
-        String bulkData = """
-                ParticipantId	date	[F1]
-                1	7/28/2025	this
-                2	7/29/2025	that
-                3	7/30/2025	the other
-                4	7/31/2025	and more
-                5	8/1/2025	but wait
-                6	8/2/2025	still more
-                """.replace("[F1]", _tsvQuoter.quoteValue(textFieldName));
+        List<List<String>> bulkData = List.of(
+            List.of("ParticipantId", "date", textFieldName),
+            List.of("1", "7/28/2025", "this"),
+            List.of("2", "7/29/2025", "that"),
+            List.of("3", "7/30/2025", "the other"),
+            List.of("4", "7/31/2025", "and more"),
+            List.of("5", "8/1/2025", "but wait"),
+            List.of("6", "8/2/2025", "still more"));
         var importPage = viewDatasetPage.getDataRegion().clickImportBulkData();
-        importPage.setText(bulkData);
+        importPage.setText(TestDataUtils.stringFromRows(bulkData));
         importPage.submit();
 
         // configure the query without F1 as pivot field
