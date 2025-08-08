@@ -24,7 +24,6 @@ public class FieldInfo implements CharSequence, WrapsFieldKey
     private final Consumer<FieldDefinition> _fieldDefinitionMutator;
     private final String _namePart; // used for random field generation to track the name part used
     private final CachingSupplier<String> _label = new CachingSupplier<>(() -> Objects.requireNonNullElseGet(getRawLabel(), () -> FieldDefinition.labelFromName(getName())));
-    private final CachingSupplier<String> _uiLabel = new CachingSupplier<>(() -> TextUtils.normalizeSpace(getLabel()));
 
     private FieldInfo(FieldKey fieldKey, String label, ColumnType columnType, Consumer<FieldDefinition> fieldDefinitionMutator, String namePart)
     {
@@ -106,7 +105,7 @@ public class FieldInfo implements CharSequence, WrapsFieldKey
     @Contract(pure = true)
     public String getUiLabel()
     {
-        return _uiLabel.get();
+        return TextUtils.normalizeSpace(getLabel());
     }
 
     @Override
@@ -120,6 +119,15 @@ public class FieldInfo implements CharSequence, WrapsFieldKey
     public String getName()
     {
         return _fieldKey.getName();
+    }
+
+    /**
+     * Get column name quoted for use in queries and calculated field expressions
+     */
+    @Contract(pure = true)
+    public String getSqlName()
+    {
+        return EscapeUtil.getSqlQuotedValue(_fieldKey.getName());
     }
 
     /**
