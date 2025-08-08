@@ -77,7 +77,7 @@ public class TestDataGenerator
     public static final char WIDE_PLACEHOLDER = '\u03A0'; // 'Π' - Wide character can't be picked from the string with 'charAt'
     public static final char REPEAT_PLACEHOLDER = '\u22EF'; // '⋯' - Used to indicate that the char will be repeated
     public static final char ALL_CHARS_PLACEHOLDER = '\u2211'; // '∑' - Used to indicate that all characters from the charset should be used
-    public static final String NON_LATIN_STRING = "\u0438\uC548\u306F"; // "и안は"
+    public static final String NON_LATIN_STRING = "\u0438\u0418\uC548\u306F"; // "иИ안は"
     // chose a Character random from this String
     public static final String CHARSET_STRING = "ABCDEFG01234abcdefvxyz~!@#$%^&*()-+=_{}[]|:;\"',.<>" + NON_LATIN_STRING + WIDE_PLACEHOLDER;
     public static final String ALPHANUMERIC_STRING = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvxyz";
@@ -116,7 +116,7 @@ public class TestDataGenerator
         _containerPath = containerPath;
     }
 
-    public static File writeCsvFile(List<FieldDefinition> fields, List<Map<String, Object>> entityData, String fileName) throws IOException
+    public static <T> File writeCsvFile(List<FieldDefinition> fields, List<Map<String, T>> entityData, String fileName) throws IOException
     {
         List<List<String>> rows = TestDataUtils.replaceColumnHeaders(
             TestDataUtils.rowListsFromMaps(entityData), ColumnNameMapper.labelToName(fields)); // Use field names
@@ -299,12 +299,12 @@ public class TestDataGenerator
         return this;
     }
 
+    /**
+     * Clear any existing generated rows and add new ones
+     */
     public TestDataGenerator withGeneratedRows(int desiredRowCount)
     {
-        if (getRowCount() > 0)
-        {
-            throw new IllegalStateException("Rows have already been generated");
-        }
+        _rows.clear();
 
         generateRows(desiredRowCount);
 
@@ -640,6 +640,8 @@ public class TestDataGenerator
         try
         {
             CommandResponse response = command.execute(WebTestHelper.getRemoteApiConnection(), "/home");
+            if (response.getParsedData() == null)
+                throw new RuntimeException("Failed to parse response for command: " + response.getText());
             return response.getParsedData().containsKey("errors");
         }
         catch (CommandException | IOException e)
@@ -823,6 +825,11 @@ public class TestDataGenerator
         return insertRows(cn, getRows());
     }
 
+    public RowsResponse insertRows(Connection cn, String containerPath) throws IOException, CommandException
+    {
+        return getQueryHelper(cn, containerPath).insertRows(getRows());
+    }
+
     public RowsResponse insertRows(Connection cn, List<Map<String, Object>> rows) throws IOException, CommandException
     {
         return getQueryHelper(cn).insertRows(rows);
@@ -899,9 +906,14 @@ public class TestDataGenerator
         return getQueryHelper(cn).deleteRows(rowsToDelete);
     }
 
+    public QueryApiHelper getQueryHelper(Connection connection, String containerPath)
+    {
+        return new QueryApiHelper(connection, containerPath, _schemaName, _queryName);
+    }
+
     public QueryApiHelper getQueryHelper(Connection connection)
     {
-        return new QueryApiHelper(connection, _containerPath, _schemaName, _queryName);
+        return getQueryHelper(connection, _containerPath);
     }
 
     public TestDataValidator getValidator()

@@ -55,6 +55,6 @@ public class ColumnNameMapper implements Function<String, String>
             .map(Supplier::get)
             .filter(Objects::nonNull)
             .findFirst()
-            .orElse(s);
+            .orElseThrow(() -> new IllegalArgumentException("No column mapping found for " + s));
     }
 }
