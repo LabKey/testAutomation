@@ -75,6 +75,7 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.NoSuchWindowException;
 import org.openqa.selenium.ScriptTimeoutException;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.StaleElementReferenceException;
@@ -2130,6 +2131,29 @@ public abstract class WebDriverWrapper implements WrapsDriver
         }
 
         return loadTimer.elapsed().toMillis();
+    }
+
+    public long doAndWaitForWindow(Runnable action, String windowName)
+    {
+        return doAndMaybeWaitForPageToLoad(10_000, () -> {
+            String initialWindow = getDriver().getWindowHandle();
+            boolean targetWindowExists;
+            try
+            {
+                getDriver().switchTo().window(windowName);
+                getDriver().switchTo().window(initialWindow);
+                targetWindowExists = true;
+            }
+            catch (NoSuchWindowException e)
+            {
+                targetWindowExists = false;
+            }
+
+            action.run();
+
+            getDriver().switchTo().window(windowName);
+            return targetWindowExists;
+        });
     }
 
     public long doAndAcceptUnloadAlert(Runnable func, String partialAlertText)

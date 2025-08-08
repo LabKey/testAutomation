@@ -26,9 +26,8 @@ public class ConfigureSystemMaintenancePage extends LabKeyPage<ConfigureSystemMa
      */
     public PipelineStatusDetailsPage runMaintenanceTask(String description)
     {
-        click(Locator.tagWithAttribute("input", "type", "checkbox")
-            .followingSibling("a").withText(description));
-        getDriver().switchTo().window("systemMaintenance");
+        doAndWaitForWindow(() -> click(Locator.tagWithAttribute("input", "type", "checkbox")
+                .followingSibling("a").withText(description)), "systemMaintenance");
 
         PipelineStatusDetailsPage pipelineStatusDetailsPage = new PipelineStatusDetailsPage(getDriver());
         pipelineStatusDetailsPage.waitForComplete();
