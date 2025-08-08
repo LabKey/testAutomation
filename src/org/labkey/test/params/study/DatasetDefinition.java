@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.labkey.remoteapi.domain.Domain;
 import org.labkey.remoteapi.domain.PropertyDescriptor;
 import org.labkey.test.params.property.DomainProps;
+import org.labkey.test.util.DomainUtils.DomainKind;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,7 +13,7 @@ import java.util.Map;
 
 public class DatasetDefinition extends DomainProps
 {
-    private String _name;
+    private final String _name;
     private String _description;
     private List<PropertyDescriptor> _fields = new ArrayList<>();
     private String _kindName;
@@ -21,8 +22,8 @@ public class DatasetDefinition extends DomainProps
     private String _keyPropertyName;
     private Boolean _timeKeyField;
 
-    public static final String VISIT_BASED_STUDY = "StudyDatasetVisit";
-    public static final String DATE_BASED_STUDY = "StudyDatasetDate";
+    public static final String VISIT_BASED_STUDY = DomainKind.StudyDatasetVisit.name();
+    public static final String DATE_BASED_STUDY = DomainKind.StudyDatasetDate.name();
 
     public static DatasetDefinition create(String name)
     {

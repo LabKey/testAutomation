@@ -3,6 +3,7 @@ package org.labkey.test.params.list;
 import org.jetbrains.annotations.NotNull;
 import org.labkey.remoteapi.domain.PropertyDescriptor;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.util.DomainUtils.DomainKind;
 import org.labkey.test.util.TestDataGenerator;
 
 import java.util.List;
@@ -11,7 +12,6 @@ import java.util.function.Supplier;
 
 public class IntListDefinition extends ListDefinition
 {
-    private static final String DOMAIN_KIND = "IntList";
 
     private final boolean isAutoIncrementKey;
 
@@ -43,7 +43,7 @@ public class IntListDefinition extends ListDefinition
     @Override
     protected String getKind()
     {
-        return DOMAIN_KIND;
+        return DomainKind.IntList.name();
     }
 
     @Override

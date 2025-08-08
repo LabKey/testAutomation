@@ -7,12 +7,13 @@ import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.domain.DomainDetailsResponse;
 import org.labkey.remoteapi.domain.DropDomainCommand;
 import org.labkey.remoteapi.domain.GetDomainDetailsCommand;
+import org.labkey.remoteapi.query.BaseRowsCommand;
 import org.labkey.remoteapi.query.DeleteRowsCommand;
 import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.ImportDataCommand;
 import org.labkey.remoteapi.query.ImportDataResponse;
 import org.labkey.remoteapi.query.InsertRowsCommand;
-import org.labkey.remoteapi.query.BaseRowsCommand;
+import org.labkey.remoteapi.query.MoveRowsCommand;
 import org.labkey.remoteapi.query.RowsResponse;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
@@ -24,6 +25,7 @@ import org.labkey.remoteapi.query.UpdateRowsCommand;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -85,22 +87,31 @@ public class QueryApiHelper
         return cmd.execute(_connection, _containerPath);
     }
 
-    public RowsResponse insertRows(List<Map<String, Object>> rows) throws IOException, CommandException
+    public <T> RowsResponse insertRows(List<Map<String, T>> rows) throws IOException, CommandException
     {
         InsertRowsCommand insertRowsCommand = new InsertRowsCommand(_schema, _query);
-        insertRowsCommand.setRows(rows);
+        insertRowsCommand.setRows(makeApiRows(rows));
         insertRowsCommand.setTimeout(_insertTimout);
         insertRowsCommand.setAuditBehavior(BaseRowsCommand.AuditBehavior.DETAILED);
         return insertRowsCommand.execute(_connection, _containerPath);
     }
 
-    public RowsResponse updateRows(List<Map<String, Object>> rows) throws IOException, CommandException
+    public <T> RowsResponse updateRows(List<Map<String, T>> rows) throws IOException, CommandException
     {
         UpdateRowsCommand updateRowsCommand = new UpdateRowsCommand(_schema, _query);
-        updateRowsCommand.setRows(rows);
+        updateRowsCommand.setRows(makeApiRows(rows));
         updateRowsCommand.setTimeout(_insertTimout);
         updateRowsCommand.setAuditBehavior(BaseRowsCommand.AuditBehavior.DETAILED);
         return  updateRowsCommand.execute(_connection, _containerPath);
+    }
+
+    public <T> RowsResponse moveRows(List<Map<String, T>> rows, String targetContainerPath) throws IOException, CommandException
+    {
+        MoveRowsCommand moveRowsCommand = new MoveRowsCommand(targetContainerPath, _schema, _query);
+        moveRowsCommand.setRows(makeApiRows(rows));
+        moveRowsCommand.setTimeout(_insertTimout);
+        moveRowsCommand.setAuditBehavior(BaseRowsCommand.AuditBehavior.DETAILED);
+        return  moveRowsCommand.execute(_connection, _containerPath);
     }
 
     public ImportDataResponse importData(String text) throws IOException, CommandException
@@ -123,12 +134,23 @@ public class QueryApiHelper
      * @param rowsToDelete Should include primary key(s) for the table
      * @return a list of the rows that were deleted
      */
-    public RowsResponse deleteRows(List<Map<String,Object>> rowsToDelete) throws IOException, CommandException
+    public <T> RowsResponse deleteRows(List<Map<String, T>> rowsToDelete) throws IOException, CommandException
     {
         DeleteRowsCommand cmd = new DeleteRowsCommand(_schema, _query);
-        cmd.setRows(rowsToDelete);
+        cmd.setRows(makeApiRows(rowsToDelete));
         cmd.setAuditBehavior(BaseRowsCommand.AuditBehavior.DETAILED);
         return cmd.execute(_connection, _containerPath);
+    }
+
+    private <T> List<Map<String, Object>> makeApiRows(List<Map<String, T>> rows)
+    {
+        List<Map<String, Object>> result = new ArrayList<>();
+        for (Map<String, T> row : rows)
+        {
+            Map<String, Object> rowMap = new HashMap<>(row);
+            result.add(rowMap);
+        }
+        return result;
     }
 
     /**
