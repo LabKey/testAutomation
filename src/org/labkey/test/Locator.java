@@ -1249,7 +1249,7 @@ public abstract class Locator extends By
 
         public XPathLocator withTextIgnoreCase(String text)
         {
-            return this.withPredicate("contains(" + toLowerCase("normalize-space()", text) + ", "+xq(ns(text.toLowerCase()))+")");
+            return this.withPredicate(toLowerCase("normalize-space()", text) + "= "+xq(ns(text.toLowerCase())));
         }
 
         public XPathLocator withText()
