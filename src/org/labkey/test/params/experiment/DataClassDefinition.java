@@ -5,6 +5,7 @@ import org.labkey.remoteapi.domain.Domain;
 import org.labkey.remoteapi.domain.PropertyDescriptor;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.property.DomainProps;
+import org.labkey.test.util.DomainUtils.DomainKind;
 import org.labkey.test.util.TestDataGenerator;
 
 import java.util.ArrayList;
@@ -123,7 +124,7 @@ public class DataClassDefinition extends DomainProps
     @Override
     protected String getKind()
     {
-        return "DataClass";
+        return DomainKind.DataClass.name();
     }
 
     @NotNull

@@ -199,11 +199,15 @@ public abstract class AbstractContainerHelper
         }
     }
 
-    public void enableModule(String projectName, String moduleName)
+    public void enableModule(String containerPath, String moduleName)
     {
-        _test.ensureAdminMode();
-        _test.clickProject(projectName);
-        enableModule(moduleName);
+        enableModules(containerPath, List.of(moduleName));
+    }
+
+    public void enableModules(String containerPath, List<String> moduleNames)
+    {
+        _test.goToProjectHome(containerPath);
+        enableModules(moduleNames);
     }
 
     public void enableModule(String moduleName)

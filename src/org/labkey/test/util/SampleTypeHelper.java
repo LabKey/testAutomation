@@ -83,10 +83,7 @@ public class SampleTypeHelper extends WebDriverWrapper
     private static String convertMapToTsv(@NotNull List<Map<String, String>> data)
     {
         List<String> headers = new ArrayList<>(data.get(0).keySet());
-        List<Map<String, Object>> rows = new ArrayList<>();
-        for (Map<String, String> row : data)
-            rows.add(new HashMap<>(row));
-        return TestDataUtils.tsvStringFromRowMaps(rows, headers, true);
+        return TestDataUtils.tsvStringFromRowMaps(data, headers, true);
     }
 
     @Override
