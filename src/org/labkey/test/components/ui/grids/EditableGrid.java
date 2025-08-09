@@ -149,6 +149,19 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         return this;
     }
 
+    public boolean canRemoveColumn(CharSequence columnIdentifier)
+    {
+        WebElement headerCell = elementCache().getColumnHeaderCell(columnIdentifier);
+        WebElement downBtn = Locator.byClass("fa-chevron-circle-down").findElementOrNull(headerCell);
+        if (downBtn == null)
+            return false;
+        downBtn.click();
+        WebElement removeBtn = Locator.tagWithText("a", "Remove Column").findElementOrNull(headerCell);
+        boolean canRemove = removeBtn != null && removeBtn.isDisplayed() && removeBtn.isEnabled();
+        downBtn.click(); // close dropdown
+        return canRemove;
+    }
+
     private boolean hasSelectColumn()
     {
         return elementCache().selectColumn.isDisplayed();

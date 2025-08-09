@@ -670,6 +670,8 @@ public class SampleTypeParentColumnTest extends BaseWebDriverTest
         checker().verifyTrue("Missing expected parent alias option", options.contains("Sample Type: " + PARENT_CONTAINER_SAMPLE_TYPE_NAME + " (" + PROJECT_NAME + ")"));
         checker().verifyTrue("Missing expected parent alias option", options.contains("Sample Type: " + SIBLING_SAMPLE_TYPE_NAME + " (" + SUB_FOLDER_NAME + ")"));
 
+        //
+
         createPage.clickCancel();
     }
 

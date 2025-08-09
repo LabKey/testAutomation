@@ -23,6 +23,7 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -51,6 +52,19 @@ public class EscapeUtil
             }
         }
         return escaped.toString();
+    }
+
+    static public String toJSONRow(Map<String, Object> row)
+    {
+        StringBuilder sb = new StringBuilder("{");
+        for (Map.Entry<String, Object> entry : row.entrySet())
+        {
+            Object value = entry.getValue();
+            sb.append("\"").append(EscapeUtil.toJSONStr(entry.getKey()))
+                    .append("\": \"").append(value instanceof String ? EscapeUtil.toJSONStr((String) entry.getValue()) : value).append("\",");
+        }
+        sb.append("}");
+        return sb.toString();
     }
 
     static public String jsString(String s)
