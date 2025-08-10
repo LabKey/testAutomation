@@ -57,11 +57,14 @@ public class EscapeUtil
     static public String toJSONRow(Map<String, Object> row)
     {
         StringBuilder sb = new StringBuilder("{");
+        String comma = "";
         for (Map.Entry<String, Object> entry : row.entrySet())
         {
+            sb.append(comma);
             Object value = entry.getValue();
             sb.append(EscapeUtil.toJSONStr(entry.getKey()))
-                    .append(": ").append(value instanceof String ? EscapeUtil.toJSONStr((String) entry.getValue()) : value).append(",");
+                    .append(": ").append(value instanceof String ? EscapeUtil.toJSONStr((String) entry.getValue()) : value);
+            comma = ",";
         }
         sb.append("}");
         return sb.toString();
