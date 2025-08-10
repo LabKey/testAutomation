@@ -51,7 +51,7 @@ public class EscapeUtil
                     }
             }
         }
-        return escaped.toString();
+        return "\"" + escaped + "\"";
     }
 
     static public String toJSONRow(Map<String, Object> row)
@@ -60,8 +60,8 @@ public class EscapeUtil
         for (Map.Entry<String, Object> entry : row.entrySet())
         {
             Object value = entry.getValue();
-            sb.append("\"").append(EscapeUtil.toJSONStr(entry.getKey()))
-                    .append("\": \"").append(value instanceof String ? EscapeUtil.toJSONStr((String) entry.getValue()) : value).append("\",");
+            sb.append(EscapeUtil.toJSONStr(entry.getKey()))
+                    .append(": ").append(value instanceof String ? EscapeUtil.toJSONStr((String) entry.getValue()) : value).append(",");
         }
         sb.append("}");
         return sb.toString();
