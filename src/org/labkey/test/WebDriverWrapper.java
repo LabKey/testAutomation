@@ -1615,6 +1615,16 @@ public abstract class WebDriverWrapper implements WrapsDriver
     }
 
     /**
+     * Check whether all the specified text is present on the page
+     * @param texts un-encoded text to search for
+     * @return true if all the specified texts are present on the page
+     */
+    public boolean isTextPresent(String... texts)
+    {
+        return new TextSearcher(this).areAllTextsPresent(texts);
+    }
+
+    /**
      * Check whether the HTML-encoded text is in the page source
      * @param htmlFragments encoded html fragments to search for
      * @return true if all the specified texts are present on the page
@@ -1625,16 +1635,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
         searcher.setSearchTransformer(TextTransformers.IDENTITY);
 
         return searcher.areAllTextsPresent(htmlFragments);
-    }
-
-    /**
-     * Check whether all the specified text is present on the page
-     * @param texts un-encoded text to search for
-     * @return true if all the specified texts are present on the page
-     */
-    public boolean isTextPresent(String... texts)
-    {
-        return new TextSearcher(this).areAllTextsPresent(texts);
     }
 
     public List<String> getTextOrder(TextSearcher searcher, String... texts)
