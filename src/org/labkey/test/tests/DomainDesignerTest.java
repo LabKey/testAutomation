@@ -282,7 +282,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                 .clickSave();
 
         AuditLogHelper.DetailedAuditEventRow expectedDomainEvent = new AuditLogHelper.DetailedAuditEventRow(null, listName, null,
-                "The name of the list domain 'InvalidLookUpNameList' was changed to 'InvalidLookUpNameList_edited'. The descriptor of domain InvalidLookUpNameList_edited was updated.",
+                String.format("The name of the list domain '%s' was changed to '%s'. The descriptor of domain %s was updated.", listName, editedListName, editedListName),
                 "", null, null, "Name: " + listName + " > " + editedListName);
         boolean pass = _auditLogHelper.validateLastDomainAuditEvents(editedListName, getProjectName(), expectedDomainEvent, Collections.emptyMap());
         checker().verifyTrue("The comment logged for the list renaming was not as expected", pass);
