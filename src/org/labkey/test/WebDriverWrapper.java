@@ -61,6 +61,7 @@ import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.RelativeUrl;
 import org.labkey.test.util.TestLogger;
 import org.labkey.test.util.TextSearcher;
+import org.labkey.test.util.TextSearcher.TextTransformers;
 import org.labkey.test.util.Timer;
 import org.labkey.test.util.selenium.ScrollUtils;
 import org.labkey.test.util.selenium.WebDriverUtils;
@@ -1614,15 +1615,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         fail("No errors found");
     }
 
-    public static String encodeText(String unencodedText)
-    {
-        return unencodedText
-                .replace("&", "&amp;")
-                .replace("<", "&lt;")
-                .replace(">", "&gt;");
-    }
-
-    public boolean isTextPresent(String... texts)
+    public boolean isHtmlPresent(String... texts)
     {
         final MutableBoolean present = new MutableBoolean(true);
 
@@ -1634,9 +1627,15 @@ public abstract class WebDriverWrapper implements WrapsDriver
             return present.get();
         };
         TextSearcher searcher = new TextSearcher(this);
+        searcher.setSearchTransformer(TextTransformers.IDENTITY);
         searcher.searchForTexts(handler, Arrays.asList(texts));
 
         return present.get();
+    }
+
+    public boolean isTextPresent(String... texts)
+    {
+        return isHtmlPresent(Arrays.stream(texts).map(TextTransformers.ENCODE_HTML).toArray(String[]::new));
     }
 
     public List<String> getTextOrder(TextSearcher searcher, String... texts)
@@ -1709,7 +1708,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         TextSearcher searcher = new TextSearcher(this);
 
-        searcher.setSearchTransformer((text) -> encodeText(text).toLowerCase());
+        searcher.setSearchTransformer(TextTransformers.ENCODE_HTML.andThen(String::toLowerCase));
 
         searcher.setSourceTransformer(String::toLowerCase);
 
@@ -1892,7 +1891,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
     public void assertTextNotPresent(String... texts)
     {
         TextSearcher searcher = new TextSearcher(this);
-        searcher.setSearchTransformer((text) -> encodeText(text).replace("&nbsp;", " "));
+        searcher.setSearchTransformer(TextTransformers.ENCODE_HTML.andThen(t -> t.replace("&nbsp;", " ")));
 
         assertTextNotPresent(searcher, texts);
     }

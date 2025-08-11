@@ -15,7 +15,6 @@
  */
 package org.labkey.test.util;
 
-import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebDriverWrapper;
 
@@ -129,7 +128,10 @@ public class TextSearcher
 
     public static abstract class TextTransformers
     {
-        public static final Function<String, String> ENCODE_HTML = BaseWebDriverTest::encodeText;
+        public static final Function<String, String> ENCODE_HTML = t -> t
+                .replace("&", "&amp;")
+                .replace("<", "&lt;")
+                .replace(">", "&gt;");
         public static final Function<String, String> IDENTITY = text -> text;
 
         //Inserts spaces between camel-cased words
