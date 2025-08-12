@@ -608,7 +608,9 @@ public class TestDataUtils
     /**
      * Used to quote values to be written to a TSV file
      * @see org.labkey.api.data.TSVWriter
+     * @deprecated Use {@link CSVFormat#format(Object...)} or {@link org.labkey.test.components.ui.grids.EditableGrid#quoteForPaste(String...)} to quote individual values
      */
+    @Deprecated (since = "25.9")
     public static class TsvQuoter
     {
         protected char _escapeChar = '\\';
