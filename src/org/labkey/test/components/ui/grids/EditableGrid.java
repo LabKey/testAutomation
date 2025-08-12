@@ -1,5 +1,6 @@
 package org.labkey.test.components.ui.grids;
 
+import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.commons.lang3.mutable.MutableObject;
@@ -95,6 +96,17 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     {
         Locators.loadingGrid.waitForElementToDisappear(this, 30000);
         Locators.spinner.waitForElementToDisappear(this, 30000);
+    }
+
+    /**
+     * Quote values to be pasted into lookup columns. Prevents a value containing a comma from being interpreted as
+     * multiple values.
+     * @param values the raw values
+     * @return The values, quoted if necessary for pasting into a single lookup cell
+     */
+    public static String quoteForPaste(String... values)
+    {
+        return Arrays.stream(values).map(CSVFormat.DEFAULT::format).collect(Collectors.joining(","));
     }
 
     public void clickDelete()
