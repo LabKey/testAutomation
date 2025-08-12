@@ -50,7 +50,6 @@ public abstract class BaseSearchHelper<H extends BaseSearchHelper<H, SearchResul
     public void initialize()
     {
         clearSearchQueue();
-        SearchAdminAPIHelper.deleteIndex(getDriver());
     }
 
     public void clearSearchQueue()
