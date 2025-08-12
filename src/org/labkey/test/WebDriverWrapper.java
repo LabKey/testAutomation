@@ -167,6 +167,7 @@ import static org.labkey.test.TestProperties.isScriptCheckEnabled;
 import static org.labkey.test.TestProperties.isWebDriverLoggingEnabled;
 import static org.labkey.test.WebTestHelper.makeRelativeUrl;
 import static org.labkey.test.components.html.RadioButton.RadioButton;
+import static org.labkey.test.util.LabKeyExpectedConditions.windowIsPresent;
 import static org.openqa.selenium.chrome.ChromeDriverService.CHROME_DRIVER_LOG_PROPERTY;
 import static org.openqa.selenium.chrome.ChromeDriverService.CHROME_DRIVER_VERBOSE_LOG_PROPERTY;
 import static org.openqa.selenium.firefox.GeckoDriverService.GECKO_DRIVER_LOG_PROPERTY;
@@ -2151,7 +2152,8 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
             action.run();
 
-            getDriver().switchTo().window(windowName);
+            new WebDriverWait(getDriver(), Duration.ofSeconds(5)).until(windowIsPresent(windowName));
+
             return targetWindowExists;
         });
     }
