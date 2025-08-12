@@ -64,10 +64,10 @@ public class TestDataUtils
             () -> new FieldDefinition("2.0"),
             () -> new FieldDefinition("12.0"),
             () -> new FieldDefinition("FAM-Lambda..cp.Rxn."),
-            () -> new FieldDefinition("VIC-Precision...1"),
+            () -> new FieldDefinition("VIC\\Precision...1"),
             () -> new FieldDefinition("Product.Type"),
             () -> new FieldDefinition("Weight.Balance_%", FieldDefinition.ColumnType.Decimal),
-            () -> new FieldDefinition("Cumulative.Yield.DCW/Glucose.Consumed_g/g", FieldDefinition.ColumnType.Decimal),
+            () -> new FieldDefinition("Cumulative.Yield\\DCW/Glucose.Consumed_g/g", FieldDefinition.ColumnType.Decimal),
             () -> new FieldDefinition("Average.Volume.Productivity_g/L/day", FieldDefinition.ColumnType.Decimal),
             () -> new FieldDefinition("Cmol.Biomass/Cmol.Glucose.Consumed_%", FieldDefinition.ColumnType.Decimal)
     );
@@ -295,12 +295,6 @@ public class TestDataUtils
         return stringFromRowMaps(rowMaps, columns, includeHeaders, CSVFormat.TDF);
     }
 
-    public static String tsvStringFromRowMapsEscapeBackslash(List<Map<String, Object>> rowMaps, List<String> columns,
-                                                             boolean includeHeaders)
-    {
-        return stringFromRowMaps(rowMaps, columns, includeHeaders, CSVFormat.MYSQL);
-    }
-
     public static <T> List<Map<String, T>> mapsFromRows(List<List<T>> allRows)
     {
         List<Map<String, T>> rowMaps = new ArrayList<>();
@@ -470,12 +464,6 @@ public class TestDataUtils
     {
         return writeRowsToFile(fileName, rows, CSVFormat.TDF);
     }
-
-    public static <T> File writeRowsToTsvEscapeBackslash(String fileName, List<List<T>> rows) throws IOException
-    {
-        return writeRowsToFile(fileName, rows, CSVFormat.MYSQL);
-    }
-
 
     public static <T> File writeRowsToCsv(String fileName, List<List<T>> rows) throws IOException
     {
