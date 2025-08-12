@@ -17,11 +17,16 @@ package org.labkey.test.pages.reports;
 
 import org.labkey.test.Locator;
 import org.labkey.test.components.ChartQueryDialog;
+import org.labkey.test.components.ext4.Window;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.util.LogMethod;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+import java.time.Duration;
 
 import static org.labkey.test.components.ext4.Window.Window;
 
@@ -34,7 +39,7 @@ public class ManageViewsPage extends LabKeyPage
 
     public void clickAddReport(String reportType)
     {
-        BootstrapMenu.find(getDriver(),"Add Report").clickSubMenu(true,reportType);
+        new BootstrapMenu.BootstrapMenuFinder(getDriver()).withButtonTextContaining("Add Report").find().clickSubMenu(true,reportType);
     }
 
     public ChartQueryDialog clickAddChart()
@@ -88,5 +93,22 @@ public class ManageViewsPage extends LabKeyPage
                         .append(Locator.tag("a").withText(reportName)), 10000);
         mouseOver(reportLink);
         clickAndWait(reportLink);
+    }
+
+    public void createCategory(String categoryName)
+    {
+        Locator.linkWithText("Manage Categories").findElement(getDriver()).click();
+        Window<?> categoryWindow = new Window.WindowFinder(getDriver()).withTitle("Manage Categories").waitFor();
+        for (int retry = 0; retry < 3; retry++)
+        {
+            categoryWindow.clickButton("New Category", 0);
+            WebElement newCategoryField = Locator.input("label").withAttributeContaining("id", "textfield").notHidden().waitForElement(categoryWindow, WAIT_FOR_JAVASCRIPT);
+            setFormElementJS(newCategoryField, categoryName);
+            fireEvent(newCategoryField, SeleniumEvent.blur);
+            new WebDriverWait(getDriver(), Duration.ofSeconds(2)).until(ExpectedConditions.invisibilityOf(newCategoryField));
+            Locator.tagWithText("div", categoryName).waitForElement(categoryWindow, 2_000);
+        }
+        clickButton("Done", 0);
+        categoryWindow.waitForClose();
     }
 }
