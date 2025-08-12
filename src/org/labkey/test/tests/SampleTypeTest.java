@@ -46,6 +46,7 @@ import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.pages.core.admin.BaseSettingsPage;
 import org.labkey.test.pages.experiment.CreateSampleTypePage;
 import org.labkey.test.pages.experiment.UpdateSampleTypePage;
+import org.labkey.test.pages.query.UpdateQueryRowPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldDefinition.ColumnType;
 import org.labkey.test.params.FieldDefinition.LookupInfo;
@@ -446,11 +447,11 @@ public class SampleTypeTest extends BaseWebDriverTest
 
         log("Go to the sample type and add some data");
         clickAndWait(Locator.linkWithText(sampleTypeName));
-        DataRegionTable.findDataRegionWithinWebpart(this, "Sample Type Contents")
-                .clickInsertNewRow();
-        setFormElement(Locator.name("quf_Name"), "Name1");
-        setFormElement(Locator.name("quf_" + fieldNames.get(0)), "Bee");
-        clickButton("Submit");
+        UpdateQueryRowPage updateQueryRowPage = DataRegionTable.findDataRegionWithinWebpart(this, "Sample Type Contents")
+            .clickInsertNewRow();
+        updateQueryRowPage.setField("Name", "Name1");
+        updateQueryRowPage.setField(fieldNames.get(0), "Bee");
+        updateQueryRowPage.submit();
 
         log("Try to import overlapping data with TSV");
 
@@ -459,12 +460,12 @@ public class SampleTypeTest extends BaseWebDriverTest
         String header = "Name\t" + fieldNames.get(0) + "\n";
         String overlap =  "Name1\tToBee\n";
         String newData = "Name2\tSee\n";
-        setFormElement(Locator.name("text"), header + overlap + newData);
-        clickButton("Submit", "duplicate key");
+        importDataPage.setText(header + overlap + newData);
+        Assertions.assertThat(importDataPage.submitExpectingError()).contains("duplicate key");
 
         log("Switch to 'Insert and Replace'");
         importDataPage.setCopyPasteMerge(true);
-        clickButton("Submit");
+        importDataPage.submit();
 
         log("Validate data was updated and new data added");
         drt = sampleHelper.getSamplesDataRegionTable();
@@ -1261,18 +1262,12 @@ public class SampleTypeTest extends BaseWebDriverTest
         final String UI_STATIC_FIELD_TEXT = "This sample was added from the UI.";
 
         DataRegionTable drt = sampleHelper.getSamplesDataRegionTable();
-        drt.clickInsertNewRow();
+        UpdateQueryRowPage updateQueryRowPage = drt.clickInsertNewRow();
 
-        Locator sampleNameElement = Locator.name("quf_Name");
-        Locator sampleStaticFieldElement = Locator.name("quf_" + REQUIRED_FIELD_NAME);
-        Locator sampleMissingFieldElement = Locator.name("quf_" + MISSING_FIELD_NAME);
-        Locator sampleMissingFieldIndElement = Locator.name("quf_" + INDICATOR_FIELD_NAME);
-        waitForElementToBeVisible(sampleNameElement);
-
-        setFormElement(sampleNameElement, UI_INSERT_SAMPLE_NAME);
-        setFormElement(sampleStaticFieldElement, UI_STATIC_FIELD_TEXT);
-        selectOptionByValue(sampleMissingFieldIndElement, MV_INDICATOR_03);
-        clickButton("Submit");
+        updateQueryRowPage.setField("Name", UI_INSERT_SAMPLE_NAME);
+        updateQueryRowPage.setField(REQUIRED_FIELD_NAME, UI_STATIC_FIELD_TEXT);
+        updateQueryRowPage.setField(INDICATOR_FIELD_NAME, OptionSelect.SelectOption.valueOption(MV_INDICATOR_03));
+        updateQueryRowPage.submit();
         expectedMissingCount++;
 
         // Add this element to expected sample data.
@@ -1290,28 +1285,20 @@ public class SampleTypeTest extends BaseWebDriverTest
         log("Validate that the required field check works as expected.");
         updateSampleData = new ArrayList<>();
         updateSampleData.add(Map.of("Name", "mv10", REQUIRED_FIELD_NAME, "", MISSING_FIELD_NAME, "There should be no value in the required field.", INDICATOR_FIELD_NAME, ""));
-        sampleHelper.bulkImportExpectingError(updateSampleData, SampleTypeHelper.IMPORT_OPTION);
+        String error = sampleHelper.bulkImportExpectingError(updateSampleData, SampleTypeHelper.IMPORT_OPTION);
 
-        try
-        {
-            waitForElementToBeVisible(Locator.xpath("//div[contains(@class, 'labkey-error')][contains(text(),'Missing value for required property')]"));
-            clickButton("Cancel");
-        }
-        catch(NoSuchElementException nse)
-        {
-            checker().error("No error message was shown when a required field is missing.");
-        }
+        checker().wrapAssertion(() -> Assertions.assertThat(error).as("Import error").contains("Missing value for required property"));
+        clickButton("Cancel");
 
         log("Now validate that adding a single row from the UI has the same behavior.");
         final String UI_MISSING_REQ_SAMPLE_NAME = "mv10";
         final String UI_MISSING_FIELD_TEXT = "This should generate an error.";
         drt = sampleHelper.getSamplesDataRegionTable();
-        drt.clickInsertNewRow();
-        waitForElementToBeVisible(sampleNameElement);
+        updateQueryRowPage = drt.clickInsertNewRow();
 
-        setFormElement(sampleNameElement, UI_MISSING_REQ_SAMPLE_NAME);
-        setFormElement(sampleMissingFieldElement, UI_MISSING_FIELD_TEXT);
-        clickButton("Submit", 0);
+        updateQueryRowPage.setField("Name", UI_MISSING_REQ_SAMPLE_NAME);
+        updateQueryRowPage.setField(MISSING_FIELD_NAME, UI_MISSING_FIELD_TEXT);
+        updateQueryRowPage.submit();
 
         try
         {
@@ -1509,18 +1496,17 @@ public class SampleTypeTest extends BaseWebDriverTest
         SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
         SampleTypeDefinition definition = new SampleTypeDefinition(SAMPLE_TYPE);
         definition.addField(new FieldDefinition("Key",
-                new LookupInfo(null, "lists", listName)
-                        .setTableType(ColumnType.Integer)).setLabel(lookupColumnLabel).setLookupValidatorEnabled(true));
+                new FieldDefinition.IntLookup(null, "lists", listName)).setLabel(lookupColumnLabel).setLookupValidatorEnabled(true));
         sampleHelper.createSampleType(definition);
 
         goToProjectHome();
         clickAndWait(Locator.linkWithText(SAMPLE_TYPE));
         DataRegionTable table = sampleHelper.getSamplesDataRegionTable();
-        table.clickInsertNewRow();
+        UpdateQueryRowPage updateQueryRowPage = table.clickInsertNewRow();
 
-        setFormElement(Locator.name("quf_Name"),"1");
-        selectOptionByText(Locator.name("quf_Key"),"apple");
-        clickButton("Submit");
+        updateQueryRowPage.setField("Name","1");
+        updateQueryRowPage.setField("Key", OptionSelect.SelectOption.textOption("apple"));
+        updateQueryRowPage.submit();
 
         assertEquals("Single row inserted",1, table.getDataRowCount());
         assertElementPresent(Locator.linkWithText("apple"));
@@ -1562,10 +1548,10 @@ public class SampleTypeTest extends BaseWebDriverTest
         setFileAttachment(1, TestFileUtils.getSampleData( "RawAndSummary~!@#$%^&()_+-[]{};',..xlsx"));
 
         DataRegionTable drt = DataRegionTable.findDataRegionWithinWebpart(this, "Sample Type Contents");
-        drt.clickInsertNewRow();
-        setFormElement(Locator.name("quf_Name"), "SampleTypeInsertedManually");
-        setFormElement(Locator.name("quf_FileAttachment"), experimentFilePath);
-        clickButton("Submit");
+        UpdateQueryRowPage updateQueryRowPage = drt.clickInsertNewRow();
+        updateQueryRowPage.setField("Name", "SampleTypeInsertedManually");
+        updateQueryRowPage.setField("FileAttachment", experimentFilePath);
+        updateQueryRowPage.submit();
         //a double upload causes the file to be appended with a count
         assertTextPresent("xml_sample-1.xml");
         int attachIndex = drt.getColumnIndex("File Attachment");
@@ -1584,7 +1570,7 @@ public class SampleTypeTest extends BaseWebDriverTest
     }
 
     @Test // Issue 49830
-    public void testFilePathOnBulkImport() throws IOException
+    public void testFilePathOnBulkImport()
     {
         new ApiPermissionsHelper(this)
                 .setSiteRoleUserPermissions(PasswordUtil.getUsername(), "See Absolute File Paths");
@@ -1661,15 +1647,16 @@ public class SampleTypeTest extends BaseWebDriverTest
         importSampleTypeFilePathDataError("Fail", homeFileInfo.webDavUrlRelative() + "bad");
         importSampleTypeFilePathDataError("Fail", homeFileInfo.fileName() + "bad");
         // happy cases: create new records using valid relative or absolute file in Project/Child
-        String header = "Name\t" + fileFieldName + "\n";
-        TestDataUtils.TsvQuoter tsvQuoter = new TestDataUtils.TsvQuoter();
-        String homeSampleContent = "S-home-fullPath\t" + tsvQuoter.quoteValue(homeFileInfo.absoluteFilePath()) + "\n"
-                + "S-home-relativeDav\t" + homeFileInfo.webDavUrlRelative() + "\n"
-                + "S-home-dataUrl\t" + homeFileInfo.dataFileUrl() + "\n"
-                + "S-home-davUrl\t" + homeFileInfo.webDavUrl() + "\n"
-                + "S-home-relative\t" + "../@files/" + homeFileInfo.fileName();
-        setFormElement(Locator.name("text"), header + homeSampleContent);
-        clickButton("Submit");
+        List<String> header = List.of("Name", fileFieldName);
+        List<List<String>> homeSampleContent = List.of(
+            header,
+            List.of("S-home-fullPath", homeFileInfo.absoluteFilePath()),
+            List.of("S-home-relativeDav", homeFileInfo.webDavUrlRelative()),
+            List.of("S-home-dataUrl", homeFileInfo.dataFileUrl()),
+            List.of("S-home-davUrl", homeFileInfo.webDavUrl()),
+            List.of("S-home-relative", "../@files/" + homeFileInfo.fileName()));
+        importDataPage.setText(TestDataUtils.stringFromRows(homeSampleContent));
+        importDataPage.submit();
         drt = DataRegionTable.findDataRegionWithinWebpart(this, "Sample Type Contents");
         String fName = " " + homeFileInfo.fileName();
         checker().verifyEqualsSorted("File field not imported as expected", List.of(fName, fName, fName, fName, fName), drt.getColumnDataAsText(fileFieldName));
@@ -1683,19 +1670,21 @@ public class SampleTypeTest extends BaseWebDriverTest
         importSampleTypeFilePathDataError("S-home-fullPath", subDirInfo.dataFileUrl());
         importSampleTypeFilePathDataError("S-home-fullPath", homeFileInfo.absoluteFilePath() + "bad");
         // happy cases for update
-        setFormElement(Locator.name("text"), header + homeSampleContent); // no change
-        clickButton("Submit");
+        importDataPage.setText(TestDataUtils.stringFromRows(homeSampleContent)); // no change
+        importDataPage.submit();
         drt = DataRegionTable.findDataRegionWithinWebpart(this, "Sample Type Contents");
         checker().verifyEqualsSorted("File field not imported as expected", List.of(fName, fName, fName, fName, fName), drt.getColumnDataAsText(fileFieldName));
         importDataPage = drt.clickImportBulkData();
         importDataPage.setCopyPasteMerge(false, true);
-        String homeSampleUpdateContent = "S-home-fullPath\t" + tsvQuoter.quoteValue(homeFileBInfo.absoluteFilePath()) + "\n"
-                + "S-home-relativeDav\t\n"
-                + "S-home-dataUrl\t" + homeFileBInfo.dataFileUrl() + "\n"
-                + "S-home-davUrl\t" + homeFileBInfo.webDavUrl() + "\n"
-                + "S-home-relative\t" + "../@files/" + homeFileBInfo.fileName();
-        setFormElement(Locator.name("text"), header + homeSampleUpdateContent);
-        clickButton("Submit");
+        List<List<String>> homeSampleUpdateContent = List.of(
+            header,
+            List.of("S-home-fullPath", homeFileBInfo.absoluteFilePath()),
+            List.of("S-home-relativeDav", ""),
+            List.of("S-home-dataUrl", homeFileBInfo.dataFileUrl()),
+            List.of("S-home-davUrl", homeFileBInfo.webDavUrl()),
+            List.of("S-home-relative", "../@files/" + homeFileBInfo.fileName()));
+        importDataPage.setText(TestDataUtils.stringFromRows(homeSampleUpdateContent));
+        importDataPage.submit();
         String fNameUpdated = " " + homeFileBInfo.fileName();
         drt = DataRegionTable.findDataRegionWithinWebpart(this, "Sample Type Contents");
         checker().verifyEqualsSorted("File field not imported as expected", List.of(fNameUpdated, fNameUpdated, fNameUpdated, " "/*removed*/, fNameUpdated), drt.getColumnDataAsText(fileFieldName));
@@ -1706,10 +1695,10 @@ public class SampleTypeTest extends BaseWebDriverTest
         importSampleTypeFilePathDataError("S-home-fullPath", subDirInfo.webDavUrl());
         importSampleTypeFilePathDataError("Bad", subDirInfo.webDavUrlRelative());
         // happy case for merge
-        String homeSampleMergeContent = homeSampleContent
-                + "\nS-home-merge1\t" + "../@files/" + homeFileBInfo.fileName();
-        setFormElement(Locator.name("text"), header + homeSampleMergeContent);
-        clickButton("Submit");
+        List<List<String>> homeSampleMergeContent = new ArrayList<>(homeSampleContent);
+        homeSampleMergeContent.add(List.of("S-home-merge1", "../@files/" + homeFileBInfo.fileName()));
+        importDataPage.setText(TestDataUtils.stringFromRows(homeSampleMergeContent));
+        importDataPage.submit();
         drt = DataRegionTable.findDataRegionWithinWebpart(this, "Sample Type Contents");
         checker().verifyEqualsSorted("File field not imported as expected", List.of(fNameUpdated, fName, fName, fName, fName, fName), drt.getColumnDataAsText(fileFieldName));
 
@@ -1737,13 +1726,15 @@ public class SampleTypeTest extends BaseWebDriverTest
         importSampleTypeFilePathDataError("Fail", subDirInfo.webDavUrlRelative());
         importSampleTypeFilePathDataError("Fail", subDirInfo.fileName());
         // happy case for creating child sample
-        String childSampleContent = "S-child-fullPath\t" + tsvQuoter.quoteValue(subFileInfo.absoluteFilePath()) + "\n"
-                + "S-child-relativeDav\t" + subFileInfo.webDavUrlRelative() + "\n"
-                + "S-child-dataUrl\t" + subFileInfo.dataFileUrl() + "\n"
-                + "S-child-davUrl\t" + subFileInfo.webDavUrl() + "\n"
-                + "S-child-relative\t" + "../@files/" + subFileInfo.fileName();
-        setFormElement(Locator.name("text"), header + childSampleContent);
-        clickButton("Submit");
+        List<List<String>> childSampleContent = List.of(
+            header,
+            List.of("S-child-fullPath", subFileInfo.absoluteFilePath()),
+            List.of("S-child-relativeDav", subFileInfo.webDavUrlRelative()),
+            List.of("S-child-dataUrl", subFileInfo.dataFileUrl()),
+            List.of("S-child-davUrl", subFileInfo.webDavUrl()),
+            List.of("S-child-relative", "../@files/" + subFileInfo.fileName()));
+        importDataPage.setText(TestDataUtils.stringFromRows(childSampleContent));
+        importDataPage.submit();
         drt = DataRegionTable.findDataRegionWithinWebpart(this, "Sample Type Contents");
         fName = " " + subFileInfo.fileName();
         checker().verifyEqualsSorted("File field not imported as expected", List.of(fName, fName, fName, fName, fName), drt.getColumnDataAsText(fileFieldName));
@@ -1752,19 +1743,14 @@ public class SampleTypeTest extends BaseWebDriverTest
 
     private void importSampleTypeFilePathDataError(String sampleName, String filePath)
     {
+        ImportDataPage importDataPage = new ImportDataPage(getDriver());
         final String fileFieldName = "FileField";
         String pasteData = TestDataUtils.tsvStringFromRowMapsEscapeBackslash(List.of(Map.of("Name", sampleName, fileFieldName, filePath)),
                 List.of("Name", fileFieldName), true);
-        setFormElement(Locator.name("text"), pasteData);
-        new ImportDataPage(getDriver()).submitExpectingError();
-        try
-        {
-            waitForElementToBeVisible(Locator.xpath("//div[contains(@class, 'labkey-error')][contains(text(),'Invalid file path: " + filePath + "')]"));
-        }
-        catch(NoSuchElementException nse)
-        {
-            checker().fatal().error("Invalid file path error not present.");
-        }
+        importDataPage.setText(pasteData);
+        String error = importDataPage.submitExpectingError();
+
+        Assertions.assertThat(error).as("Error message").contains("Invalid file path: " + filePath);
     }
     
     @Test
@@ -1884,9 +1870,9 @@ public class SampleTypeTest extends BaseWebDriverTest
     private void setFileAttachment(int index, File attachment)
     {
         DataRegionTable drt = DataRegionTable.findDataRegionWithinWebpart(this, "Sample Type Contents");
-        drt.clickEditRow(index);
-        setFormElement(Locator.name("quf_FileAttachment"),  attachment);
-        clickButton("Submit");
+        UpdateQueryRowPage updateQueryRowPage = drt.clickEditRow(index);
+        updateQueryRowPage.setField("FileAttachment",  attachment);
+        updateQueryRowPage.submit();
 
         String path = drt.getDataAsText(index, "File Attachment");
         assertNotNull("Path shouldn't be null", path);
