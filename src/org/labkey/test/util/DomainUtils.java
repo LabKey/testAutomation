@@ -95,11 +95,18 @@ public final class DomainUtils
     }
 
     public enum DomainKind {
-        DataClass,
-        SampleSet,
+        Assay,
+        DataClass, // aka "Sources"
+        SampleSet, // aka "Sample Type"
         IntList,
         VarList,
         StudyDatasetDate,
-        StudyDatasetVisit
+        StudyDatasetVisit,
+        ;
+
+        public String randomName(String namePart)
+        {
+            return TestDataGenerator.randomDomainName(namePart, this);
+        }
     }
 }
