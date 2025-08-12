@@ -1,6 +1,7 @@
 package org.labkey.test.util;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONException;
 import org.labkey.remoteapi.CommandException;
@@ -199,10 +200,12 @@ public class AuditLogHelper
     {
         checkAuditEventDiffCount(containerPath, getAuditEventNameFromURL(), expectedDiffCounts);
     }
+
     public void checkAuditEventDiffCount(String containerPath, AuditEvent auditEventName, List<Integer> expectedDiffCounts) throws IOException, CommandException
     {
         checkAuditEventDiffCount(containerPath, auditEventName, Collections.emptyList(), expectedDiffCounts);
     }
+
     public void checkAuditEventDiffCount(String containerPath, AuditEvent auditEventName, List<Filter> filters, List<Integer> expectedDiffCounts) throws IOException, CommandException
     {
         checkAuditEventDiffCount(containerPath, auditEventName, "NewRecordMap", filters, expectedDiffCounts);
@@ -326,12 +329,13 @@ public class AuditLogHelper
             return true;
         Map<String, DetailedAuditEventRow> actualAuditDetails = getDomainPropertyEvents(domainName, domainEventId);
         boolean pass = true;
-        if (expectedAuditDetails.keySet().size() != actualAuditDetails.keySet().size())
+        if (expectedAuditDetails.size() != actualAuditDetails.size())
         {
             pass = false;
-            TestLogger.log("Number of DomainPropertyAuditEvent events not as expected.");
+            TestLogger.log(String.format("Number of DomainPropertyAuditEvent events not as expected. Expected %d, Actual %d.", expectedAuditDetails.size(), actualAuditDetails.size()));
         }
-        for (String key  : expectedAuditDetails.keySet())
+
+        for (String key : expectedAuditDetails.keySet())
         {
             DetailedAuditEventRow expectedAuditDetail = expectedAuditDetails.get(key);
             DetailedAuditEventRow actualAuditDetail = actualAuditDetails.get(key);
@@ -350,13 +354,19 @@ public class AuditLogHelper
     public boolean validateLastDomainAuditEvents(String domainName, String projectName, DetailedAuditEventRow expectedDomainEvent, Map<String, DetailedAuditEventRow> expectedDomainPropertyEvents)
     {
         DetailedAuditEventRow latestDomainEvent = getLastDomainEvent(projectName, domainName);
+        if (latestDomainEvent == null)
+        {
+            TestLogger.log(String.format("No DomainAuditEvent found for domain '%s' in project '%s'.", domainName, projectName));
+            return false;
+        }
+
         boolean pass = validateDetailAuditLog(expectedDomainEvent, latestDomainEvent);
         return pass && validateDomainPropertiesAuditLog(domainName, latestDomainEvent.rowId, expectedDomainPropertyEvents);
     }
 
     public List<Integer> getDomainEventIds(String projectName, String domainName, @Nullable Collection<Integer> ignoreIds)
     {
-        List<DetailedAuditEventRow> domainAuditEventAllRows = getDomainEventLog(projectName, domainName, ignoreIds);
+        List<DetailedAuditEventRow> domainAuditEventAllRows = getDomainAuditEventLog(projectName, domainName, ignoreIds, null);
 
         List<Integer> domainEventIds = new ArrayList<>();
         domainAuditEventAllRows.forEach((event)->domainEventIds.add(event.rowId));
@@ -366,14 +376,20 @@ public class AuditLogHelper
         return domainEventIds;
     }
 
-    public DetailedAuditEventRow getLastDomainEvent(String projectName, String domainName)
+    public @Nullable DetailedAuditEventRow getLastDomainEvent(String projectName, String domainName)
     {
-        return getDomainEventLog(projectName, domainName, null).get(0);
+        List<DetailedAuditEventRow> eventLog = getDomainAuditEventLog(projectName, domainName, null, 1);
+        if (eventLog.isEmpty())
+            return null;
+        return eventLog.get(0);
     }
 
-    public Integer getLastDomainEventId(String projectName, String domainName)
+    public @Nullable Integer getLastDomainEventId(String projectName, String domainName)
     {
-        return getLastDomainEvent(projectName, domainName).rowId;
+        DetailedAuditEventRow event = getLastDomainEvent(projectName, domainName);
+        if (event == null)
+            return null;
+        return event.rowId;
     }
 
     public static List<String> propertyAuditColumns = List.of("type", "comment", "usercomment", "oldvalues", "newvalues", "datachanges");
@@ -402,8 +418,11 @@ public class AuditLogHelper
         }
     }
 
-    public Map<String, DetailedAuditEventRow> getDomainPropertyEvents(String domainName, Integer domainEventId)
+    public @NotNull Map<String, DetailedAuditEventRow> getDomainPropertyEvents(String domainName, Integer domainEventId)
     {
+        if (domainEventId == null)
+            return Collections.emptyMap();
+
         List<Map<String, Object>> allRows = getDomainPropertyEventLog(domainName, Collections.singletonList(domainEventId));
         Map<String, DetailedAuditEventRow> domainPropEventComments = new HashMap<>();
         allRows.forEach((event)->{
@@ -417,8 +436,8 @@ public class AuditLogHelper
             String dataChanges = getLogColumnDisplayValue(event, "dataChanges");
             domainPropEventComments.put(propertyName, new DetailedAuditEventRow(rowId, propertyName, action, comment, userComment, oldValue, newValue, dataChanges));
         });
-        return domainPropEventComments;
 
+        return domainPropEventComments;
     }
 
     public Map<String, DetailedAuditEventRow> getLastDomainPropertyEvents(String projectName, String domainName)
@@ -434,18 +453,14 @@ public class AuditLogHelper
 
     public List<String> getDomainEventComments(String projectName, String domainName, @Nullable Collection<Integer> ignoreIds)
     {
-        List<DetailedAuditEventRow> domainAuditEventAllRows = getDomainEventLog(projectName, domainName, ignoreIds);
-
-        List<String> domainEventComments = new ArrayList<>();
-        domainAuditEventAllRows.forEach((event)->domainEventComments.add(event.comment));
-        return domainEventComments;
+        return getDomainAuditEventLog(projectName, domainName, ignoreIds, null).stream().map(event -> event.comment).toList();
     }
 
     public Set<Integer> getDomainEventIdsFromPropertyEvents(List<Map<String, Object>> domainPropertyEventRows)
     {
         Set<Integer> domainEventIds = new HashSet<>();
 
-        for(Map<String, Object> row : domainPropertyEventRows)
+        for (Map<String, Object> row : domainPropertyEventRows)
         {
             domainEventIds.add(getLogColumnIntValue(row, "domaineventid"));
         }
@@ -453,48 +468,43 @@ public class AuditLogHelper
         return domainEventIds;
     }
 
-    private List<DetailedAuditEventRow> getDomainEventLog(String projectName, String domainName, @Nullable Collection<Integer> ignoreIds)
+    private List<DetailedAuditEventRow> getDomainAuditEventLog(String projectName, String domainName, @Nullable Collection<Integer> ignoreIds, @Nullable Integer maxRows)
     {
         TestLogger.log("Get a list of the Domain Events for project '" + projectName + "'. ");
+        domainName = domainName.trim();
 
         Connection cn = WebTestHelper.getRemoteApiConnection();
         SelectRowsCommand cmd = new SelectRowsCommand("auditLog", "DomainAuditEvent");
         cmd.setRequiredVersion(9.1);
         cmd.setColumns(Arrays.asList("rowid", "domainuri", "domainname", "comment", "usercomment", "oldvalues", "newvalues", "datachanges"));
         cmd.addFilter("projectid/DisplayName", projectName, Filter.Operator.EQUAL);
-        if(null != ignoreIds)
+        cmd.addFilter("domainname", domainName, Filter.Operator.EQUAL);
+        if (null != ignoreIds)
         {
-            StringBuilder stringBuilder = new StringBuilder();
-            ignoreIds.forEach((id)->{
-                if(!stringBuilder.isEmpty())
-                    stringBuilder.append(";");
-                stringBuilder.append(id);
-            });
-            cmd.addFilter("rowId", stringBuilder, Filter.Operator.NOT_IN);
+            String rowIds = StringUtils.join(ignoreIds, ";");
+            cmd.addFilter("rowId", rowIds, Filter.Operator.NOT_IN);
         }
         cmd.setContainerFilter(ContainerFilter.AllFolders);
-        cmd.setSorts(Arrays.asList(new Sort("RowId", Sort.Direction.DESCENDING)));
+        cmd.setSorts(List.of(new Sort("RowId", Sort.Direction.DESCENDING)));
+
+        if (maxRows != null)
+            cmd.setMaxRows(maxRows);
 
         List<Map<String, Object>> domainAuditEventAllRows = executeSelectCommand(cn, cmd);
-        TestLogger.log("Number of 'Domain Event' log entries for '" + projectName + "': " + domainAuditEventAllRows.size());
+        TestLogger.log(String.format("Number of Domain Event log entries for domain '%s' in '%s': %d", domainName, projectName, domainAuditEventAllRows.size()));
 
-        TestLogger.log("Filter the list to look only at '" + domainName + "'.");
         List<DetailedAuditEventRow> domainAuditEventRows = new ArrayList<>();
 
-        for(Map<String, Object> row : domainAuditEventAllRows)
+        for (Map<String, Object> row : domainAuditEventAllRows)
         {
-            String domainName_ = getLogColumnValue(row, "domainname");
-
-            if(domainName_.trim().equalsIgnoreCase(domainName.trim()))
-            {
-                Integer rowId = getLogColumnIntValue(row, "rowid");
-                String comment = getLogColumnValue(row, "comment");
-                String userComment = getLogColumnValue(row, "usercomment");
-                String oldValue = getLogColumnValue(row, "oldvalues");
-                String newValue = getLogColumnValue(row, "newvalues");
-                String dataChanges = getLogColumnDisplayValue(row, "dataChanges");
-                domainAuditEventRows.add(new DetailedAuditEventRow(rowId, domainName, null, comment, userComment, oldValue, newValue, dataChanges));
-            }
+            String eventDomainName = getLogColumnValue(row, "domainname");
+            Integer rowId = getLogColumnIntValue(row, "rowid");
+            String comment = getLogColumnValue(row, "comment");
+            String userComment = getLogColumnValue(row, "usercomment");
+            String oldValue = getLogColumnValue(row, "oldvalues");
+            String newValue = getLogColumnValue(row, "newvalues");
+            String dataChanges = getLogColumnDisplayValue(row, "dataChanges");
+            domainAuditEventRows.add(new DetailedAuditEventRow(rowId, eventDomainName, null, comment, userComment, oldValue, newValue, dataChanges));
         }
 
         return domainAuditEventRows;
@@ -508,15 +518,10 @@ public class AuditLogHelper
         cmd.setColumns(Arrays.asList("Created", "CreatedBy", "ImpersonatedBy", "propertyname", "action", "domainname", "domaineventid", "Comment", "UserComment", "oldvalues", "newvalues", "datachanges"));
         cmd.addFilter("domainname", domainName, Filter.Operator.EQUAL);
 
-        if(null != eventIds)
+        if (null != eventIds)
         {
-            StringBuilder stringBuilder = new StringBuilder();
-            eventIds.forEach((id)->{
-                if(!stringBuilder.isEmpty())
-                    stringBuilder.append(";");
-                stringBuilder.append(id);
-            });
-            cmd.addFilter("domaineventid/rowid", stringBuilder, Filter.Operator.IN);
+            String rowIds = StringUtils.join(eventIds, ";");
+            cmd.addFilter("domaineventid/rowid", rowIds, Filter.Operator.IN);
         }
 
         cmd.setContainerFilter(ContainerFilter.AllFolders);
@@ -533,7 +538,7 @@ public class AuditLogHelper
             TestLogger.log("Number of rows: " + response.getRowCount());
             rowsReturned.addAll(response.getRows());
         }
-        catch(IOException | CommandException ex)
+        catch (IOException | CommandException ex)
         {
             // Just fail here, don't toss the exception up the stack.
             fail("There was a command exception when getting the log: " + ex);
@@ -590,7 +595,7 @@ public class AuditLogHelper
                 return null;
             return value.toString();
         }
-        catch(JSONException je)
+        catch (JSONException je)
         {
             // Just fail here, don't toss the exception up the stack.
             throw new IllegalArgumentException(je);
@@ -616,7 +621,7 @@ public class AuditLogHelper
                 return null;
             return parseInt(strVal);
         }
-        catch(JSONException je)
+        catch (JSONException je)
         {
             // Just fail here, don't toss the exception up the stack.
             throw new IllegalArgumentException(je);
