@@ -3,9 +3,11 @@ package org.labkey.test.params;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.labkey.test.params.FieldDefinition.ColumnType;
+import org.labkey.test.util.CachingSupplier;
 import org.labkey.test.util.DomainUtils;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.TestDataGenerator;
+import org.labkey.test.util.TextUtils;
 
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -18,22 +20,24 @@ import java.util.function.Consumer;
 public class FieldInfo implements CharSequence, WrapsFieldKey
 {
     private final FieldKey _fieldKey;
-    private final String _label;
+    private final String _rawLabel;
     private final ColumnType _columnType;
     private final Consumer<FieldDefinition> _fieldDefinitionMutator;
-    private String _namePart; // used for random field generation to track the name part used
+    private final String _namePart; // used for random field generation to track the name part used
+    private final CachingSupplier<String> _label = new CachingSupplier<>(() -> Objects.requireNonNullElseGet(getRawLabel(), () -> FieldDefinition.labelFromName(getName())));
 
-    private FieldInfo(FieldKey fieldKey, String label, ColumnType columnType, Consumer<FieldDefinition> fieldDefinitionMutator)
+    private FieldInfo(FieldKey fieldKey, String label, ColumnType columnType, Consumer<FieldDefinition> fieldDefinitionMutator, String namePart)
     {
         _fieldKey = fieldKey;
-        _label = label;
+        _rawLabel = label;
         _columnType = Objects.requireNonNullElse(columnType, ColumnType.String);
         _fieldDefinitionMutator = fieldDefinitionMutator;
+        _namePart = namePart;
     }
 
     public FieldInfo(String name, String label, ColumnType columnType)
     {
-        this(FieldKey.fromParts(name.trim()), label, columnType, null);
+        this(FieldKey.fromParts(name.trim()), label, columnType, null, name);
     }
 
     public FieldInfo(String name, String label)
@@ -56,9 +60,7 @@ public class FieldInfo implements CharSequence, WrapsFieldKey
      */
     public static FieldInfo random(String namePart, ColumnType columnType, DomainUtils.DomainKind domainKind)
     {
-        FieldInfo field = new FieldInfo(TestDataGenerator.randomFieldName(namePart, null, domainKind), columnType);
-        field.setNamePart(namePart);
-        return field;
+        return new FieldInfo(FieldKey.fromParts(TestDataGenerator.randomFieldName(namePart)), null, columnType, null, namePart);
     }
 
     /**
@@ -91,19 +93,28 @@ public class FieldInfo implements CharSequence, WrapsFieldKey
         {
             throw new IllegalArgumentException("FieldDefinition customizer should not modify field label");
         }
-        return new FieldInfo(_fieldKey, _label, _columnType, fieldDefinitionMutator);
+        return new FieldInfo(_fieldKey, _rawLabel, _columnType, fieldDefinitionMutator, _namePart);
     }
 
     @Contract(pure = true)
     protected String getRawLabel()
     {
-        return _label;
+        return _rawLabel;
     }
 
     @Contract(pure = true)
     public String getLabel()
     {
-        return Objects.requireNonNullElseGet(getRawLabel(), () -> FieldDefinition.labelFromName(_fieldKey.getName()));
+        return _label.get();
+    }
+
+    /**
+     * Get field label as it appears when rendered in browser
+     */
+    @Contract(pure = true)
+    public String getUiLabel()
+    {
+        return TextUtils.normalizeSpace(getLabel());
     }
 
     @Override
@@ -117,6 +128,15 @@ public class FieldInfo implements CharSequence, WrapsFieldKey
     public String getName()
     {
         return _fieldKey.getName();
+    }
+
+    /**
+     * Get column name quoted for use in queries and calculated field expressions
+     */
+    @Contract(pure = true)
+    public String getSqlName()
+    {
+        return EscapeUtil.getSqlQuotedValue(_fieldKey.getName());
     }
 
     /**
@@ -182,11 +202,6 @@ public class FieldInfo implements CharSequence, WrapsFieldKey
             fieldDefinition.setNamePart(_namePart);
         }
         return fieldDefinition;
-    }
-
-    private void setNamePart(String namePart)
-    {
-        _namePart = namePart;
     }
 
     @Override

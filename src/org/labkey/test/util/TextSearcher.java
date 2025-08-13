@@ -22,6 +22,7 @@ import org.labkey.test.WebDriverWrapper;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -59,10 +60,7 @@ public class TextSearcher
 
     public final TextSearcher setSourceTransformer(Function<String, String> sourceTransformer)
     {
-        if (sourceTransformer == null)
-            this.sourceTransformer = TextTransformers.IDENTITY;
-        else
-            this.sourceTransformer = sourceTransformer;
+        this.sourceTransformer = Objects.requireNonNullElse(sourceTransformer, TextTransformers.IDENTITY);
         return this;
     }
 
@@ -73,10 +71,7 @@ public class TextSearcher
 
     public final TextSearcher setSearchTransformer(Function<String, String> searchTransformer)
     {
-        if (searchTransformer == null)
-            this.searchTransformer = TextTransformers.IDENTITY;
-        else
-            this.searchTransformer = searchTransformer;
+        this.searchTransformer = Objects.requireNonNullElse(searchTransformer, TextTransformers.IDENTITY);
         return this;
     }
 
