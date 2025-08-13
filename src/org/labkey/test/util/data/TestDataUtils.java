@@ -14,7 +14,6 @@ import org.labkey.serverapi.reader.DataLoader;
 import org.labkey.serverapi.reader.TabLoader;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.params.FieldDefinition;
-import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.TestDataGenerator;
 import org.labkey.test.util.TestLogger;
 
@@ -285,15 +284,21 @@ public class TestDataUtils
         }
     }
 
-    public static String stringFromRowMaps(List<Map<String, Object>> rowMaps, List<String> columns, boolean includeHeaders, CSVFormat format)
+    public static <T> String stringFromRowMaps(List<Map<String, T>> rowMaps, List<String> columns, boolean includeHeaders, CSVFormat format)
     {
         return stringFromRows(rowListsFromMaps(rowMaps, columns, includeHeaders, true), format);
     }
 
-    public static String tsvStringFromRowMaps(List<Map<String, Object>> rowMaps, List<String> columns,
+    public static <T> String tsvStringFromRowMaps(List<Map<String, T>> rowMaps, List<String> columns,
                                               boolean includeHeaders)
     {
         return stringFromRowMaps(rowMaps, columns, includeHeaders, CSVFormat.TDF);
+    }
+
+    public static String tsvStringFromRowMapsEscapeBackslash(List<Map<String, Object>> rowMaps, List<String> columns,
+                                                             boolean includeHeaders)
+    {
+        return stringFromRowMaps(rowMaps, columns, includeHeaders, CSVFormat.MYSQL);
     }
 
     public static <T> List<Map<String, T>> mapsFromRows(List<List<T>> allRows)
@@ -320,33 +325,43 @@ public class TestDataUtils
         return rowMaps;
     }
 
-    public static List<List<String>> dataRowsFromMaps(List<Map<String, Object>> rowMaps, List<String> columns)
+    public static <T> List<List<String>> dataRowsFromMaps(List<Map<String, T>> rowMaps, List<String> columns)
     {
         return rowListsFromMaps(rowMaps, columns, false, true);
     }
 
-    public static List<List<String>> rowListsFromMaps(List<Map<String, Object>> rowMaps)
+    /**
+     * @see #rowListsFromMaps(List, List, boolean, boolean)
+     */
+    public static <T> List<List<String>> rowListsFromMaps(List<Map<String, T>> rowMaps)
     {
         Set<String> columns = new LinkedHashSet<>();
-        for (Map<String, Object> row : rowMaps)
+        for (Map<String, T> row : rowMaps)
         {
             columns.addAll(row.keySet());
         }
         return rowListsFromMaps(rowMaps, new ArrayList<>(columns), true, true);
     }
 
-    public static List<List<String>> rowListsFromMaps(List<Map<String, Object>> rowMaps, List<String> columns)
+    /**
+     * @see #rowListsFromMaps(List, List, boolean, boolean)
+     */
+    public static <T> List<List<String>> rowListsFromMaps(List<Map<String, T>> rowMaps, List<String> columns)
     {
         return rowListsFromMaps(rowMaps, columns, true, true);
     }
 
     /**
-     * convert a List of Map<String, Object> to a list of List<String>
+     * convert a List of row maps to a tabular format. Column headers can be included optionally.<br>
+     * Useful for writing to file or TSV String.
      * @param rowMaps   Source data
      * @param columns   keys contained in each map, will copy values associated with them to the resulting list
-     * @return A List<List<String>> containing values
+     * @param includeHeaders Include headers in tabular data
+     * @param allowMissingValues Replace missing values with an empty string. Missing values will throw otherwise.
+     * @return Data rows represented as a List<List<String>>
+     * @param <T> Value type of row maps
      */
-    public static List<List<String>> rowListsFromMaps(List<Map<String, Object>> rowMaps, List<String> columns, boolean includeHeaders, boolean allowMissingValues)
+    public static <T> List<List<String>> rowListsFromMaps(List<Map<String, T>> rowMaps, List<String> columns, boolean includeHeaders, boolean allowMissingValues)
     {
         List<List<String>> lists = new ArrayList<>();
 
@@ -357,12 +372,12 @@ public class TestDataUtils
             lists.add(headers);
         }
 
-        for (Map<String, Object> rowMap : rowMaps)
+        for (Map<String, T> rowMap : rowMaps)
         {
             List<String> rowList = new ArrayList<>();
             for (String column : columns)
             {
-                var value = rowMap.get(column);
+                Object value = rowMap.get(column);
                 if (value == null)
                 {
                     if (allowMissingValues)
@@ -381,31 +396,48 @@ public class TestDataUtils
         return lists;
     }
 
+    /**
+     * Replace the column headers of the provided tabular data. The first row should represent the column headers.
+     * Useful for converting column headers between name, label, or fieldKey
+     * @param rowLists Tabular data. Will not be modified.
+     * @param columnMapper Mapping function to calculate new headers
+     * @return A new list tabular data with replaced headers. Individual data rows will be contained in the new list.
+     * @see ColumnNameMapper
+     */
     public static List<List<String>> replaceColumnHeaders(List<List<String>> rowLists, Function<String, String> columnMapper)
     {
+        if (rowLists == null || rowLists.isEmpty())
+            return rowLists;
+
         List<String> headerRow = rowLists.get(0);
-        List<String> updatedHeaderRow = new ArrayList<>();
-        for (String oldHeader : headerRow)
-        {
-            updatedHeaderRow.add(columnMapper.apply(oldHeader));
-        }
 
         List<List<String>> updatedRows = new ArrayList<>();
-        updatedRows.add(updatedHeaderRow);
-        updatedRows.addAll(rowLists.subList(1, rowLists.size()));
+        updatedRows.add(headerRow.stream().map(columnMapper).collect(Collectors.toList()));
+        updatedRows.addAll(List.copyOf(rowLists.subList(1, rowLists.size())));
 
         return updatedRows;
     }
 
-    public static List<Map<String, Object>> replaceMapKeys(List<Map<String, Object>> rowMaps, Function<String, String> columnMapper)
+    /**
+     * Replace the keys for the provided data maps.
+     * Useful for converting column headers between name, label, or fieldKey
+     * @param rowMaps Data row maps. Will not be modified.
+     * @param columnMapper Mapping function to calculate new headers
+     * @return A new list of row maps with replaced headers
+     * @param <K> Key type of input data (usually String)
+     * @param <R> Key type of returned data (usually String)
+     * @param <T> Value type for data (usually String or Object)
+     * @see ColumnNameMapper
+     */
+    public static <K, R, T> List<Map<R, T>> replaceMapKeys(List<Map<K, T>> rowMaps, Function<K, R> columnMapper)
     {
-        List<Map<String, Object>> updatedRows = new ArrayList<>();
-        for (Map<String, Object> original : rowMaps)
+        List<Map<R, T>> updatedRows = new ArrayList<>();
+        for (Map<K, T> original : rowMaps)
         {
-            Map<String, Object> updatedRow = new LinkedHashMap<>();
-            for (Map.Entry<String, Object> entry : original.entrySet())
+            Map<R, T> updatedRow = new LinkedHashMap<>();
+            for (Map.Entry<K, T> entry : original.entrySet())
             {
-                String updatedKey = columnMapper.apply(entry.getKey());
+                R updatedKey = columnMapper.apply(entry.getKey());
                 if (updatedRow.containsKey(updatedKey))
                 {
                     throw new IllegalArgumentException("Duplicate key mapping for '" + updatedKey + "' in row: " +  original);
@@ -438,6 +470,12 @@ public class TestDataUtils
     {
         return writeRowsToFile(fileName, rows, CSVFormat.TDF);
     }
+
+    public static <T> File writeRowsToTsvEscapeBackslash(String fileName, List<List<T>> rows) throws IOException
+    {
+        return writeRowsToFile(fileName, rows, CSVFormat.MYSQL);
+    }
+
 
     public static <T> File writeRowsToCsv(String fileName, List<List<T>> rows) throws IOException
     {
@@ -557,10 +595,22 @@ public class TestDataUtils
         return stringFromRows(rows, CSVFormat.TDF);
     }
 
+    public static @NotNull <T> List<String> getColumnValues(Collection<Map<String, T>> rows, String name)
+    {
+        return getColumnValues(rows, name, String.class);
+    }
+
+    public static @NotNull <R, T> List<R> getColumnValues(Collection<Map<String, T>> rows, String name, Class<R> type)
+    {
+        return rows.stream().map(row -> type.cast(row.get(name))).toList();
+    }
+
     /**
      * Used to quote values to be written to a TSV file
      * @see org.labkey.api.data.TSVWriter
+     * @deprecated Use {@link CSVFormat#format(Object...)} or {@link org.labkey.test.components.ui.grids.EditableGrid#quoteForPaste(String...)} to quote individual values
      */
+    @Deprecated (since = "25.9")
     public static class TsvQuoter
     {
         protected char _escapeChar = '\\';

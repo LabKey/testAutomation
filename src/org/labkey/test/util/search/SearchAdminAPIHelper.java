@@ -42,6 +42,13 @@ import static org.labkey.test.WebDriverWrapper.WAIT_FOR_PAGE;
 public abstract class SearchAdminAPIHelper
 {
 
+    @LogMethod(quiet = true)
+    public static void purgeForContainer(String containerPath)
+    {
+        var cmd = new SimplePostCommand("search", "cancelIndexing");
+        executeCommand(cmd, containerPath);
+    }
+
     public static void waitForIndexer()
     {
         waitForIndexer(WAIT_FOR_PAGE);
@@ -57,7 +64,7 @@ public abstract class SearchAdminAPIHelper
         var cmd = new SimplePostCommand("search", "waitForIndexer");
         cmd.setTimeout(timeout);
 
-       executeWaitForIndexer(cmd);
+       executeCommand(cmd, null);
     }
 
     public static void waitForIndexerBackground()
@@ -71,9 +78,9 @@ public abstract class SearchAdminAPIHelper
         // Invoke a special server action that waits until all previous indexer tasks are complete, even wait for background indexing tasks to complete (e.g. deleteContainer)
         var cmd = new SimplePostCommand("search", "waitForIndexer");
         cmd.setTimeout(timeout);
-        cmd.setParameters(Map.of("priority", "background"));
+        cmd.setParameters(Map.of("priority", "idle"));
 
-        executeWaitForIndexer(cmd);
+        executeCommand(cmd, null);
     }
 
     @LogMethod(quiet = true)
@@ -106,11 +113,11 @@ public abstract class SearchAdminAPIHelper
         while (!timer.isTimedOut());
     }
 
-    private static void executeWaitForIndexer(PostCommand cmd)
+    private static void executeCommand(PostCommand<?> cmd, String containerPath)
     {
         try
         {
-            var response = cmd.execute(WebTestHelper.getRemoteApiConnection(), null);
+            var response = cmd.execute(WebTestHelper.getRemoteApiConnection(), containerPath);
             assertEquals("WaitForIndexer action timed out", HttpStatus.SC_OK, response.getStatusCode());
         } catch (Exception cmdException)
         {

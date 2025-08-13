@@ -6,6 +6,7 @@ import org.labkey.remoteapi.domain.PropertyDescriptor;
 import org.labkey.test.components.ui.domainproperties.samples.SampleTypeDesigner;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.property.DomainProps;
+import org.labkey.test.util.DomainUtils.DomainKind;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,8 +14,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import static org.labkey.test.util.exp.SampleTypeAPIHelper.SAMPLE_TYPE_DOMAIN_KIND;
 
 /**
  * Defines a Sample Type. Suitable for use with UI and API helpers.
@@ -217,7 +216,7 @@ public class SampleTypeDefinition extends DomainProps
     @Override
     protected String getKind()
     {
-        return SAMPLE_TYPE_DOMAIN_KIND;
+        return DomainKind.SampleSet.name();
     }
 
     @NotNull

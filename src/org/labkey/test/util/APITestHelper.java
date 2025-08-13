@@ -38,6 +38,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import static org.junit.Assert.fail;
@@ -204,6 +205,35 @@ public class APITestHelper
         org.openqa.selenium.Cookie session = WebTestHelper.getCookies(username).get(Connection.JSESSIONID);
         if (session != null)
             method.setHeader(session.getName(), session.getValue());
+    }
+
+    /*
+        reads a script result object, returns a string representation of an exception if it exists.
+        calling code should check the result and assert accordingly.
+        an exception means there was a server-side exception, rather than a script error.
+    */
+    static public String parseScriptResult(Map<String, Object> scriptResult)
+    {
+        if (scriptResult.containsKey("exception"))
+        {
+            String exType = (String)scriptResult.get("exception");
+            if (exType.contains("ERROR:"))
+                return exType;      // not an exception, but a friendly error message
+
+            ArrayList<String> frames = (ArrayList<String>)scriptResult.get("stackTrace");
+
+            StringBuilder builder = new StringBuilder();
+            if (null != frames)
+            {
+                for (String frame : frames)
+                {
+                    builder.append(frame + "\n");
+                }
+                return "An exception of type [" + exType + "] occurred while executing the script.\n[ " + builder + " ]";
+            }
+        }
+
+        return null;
     }
 
     public static class ApiTestCase
