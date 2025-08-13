@@ -365,18 +365,18 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
         return elementCache().parentAliasSelect(index).getOptions();
     }
 
-    public T setParentAlias(int index, @Nullable String alias, @Nullable String optionDisplayText)
+    public T setParentAlias(int index, @Nullable String alias, @Nullable String dataType)
     {
-        return setParentAlias(index, alias, optionDisplayText, false);
+        return setParentAlias(index, alias, dataType, false);
     }
 
-    public T setParentAlias(int index, @Nullable String alias, @Nullable String optionDisplayText, boolean isRequired)
+    public T setParentAlias(int index, @Nullable String alias, @Nullable String dataType, boolean isRequired)
     {
         expandPropertiesPanel();
         elementCache().parentAlias(index).setValue(alias);
-        if (optionDisplayText != null)
+        if (dataType != null)
         {
-            elementCache().parentAliasSelect(index).select(optionDisplayText);
+            elementCache().parentAliasSelect(index).select(dataType);
         }
 
         // The "Required" checkbox is not presented outside of the apps. Only a test running in the app could set
