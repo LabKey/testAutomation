@@ -276,6 +276,18 @@ public class TestDataUtils
         }
     }
 
+    public static List<String> columnHeaderFromCsv(File csvFile) throws IOException
+    {
+        try (DataLoader loader = new TabLoader.CsvFactory().createLoader(csvFile, true))
+        {
+            List<String> columnHeaders = new ArrayList<>();
+            for (var column : loader.getColumns())
+                columnHeaders.add(column.name);
+
+            return columnHeaders;
+        }
+    }
+
     public static List<Map<String, Object>> rowMapsFromCsv(String tsvString) throws IOException
     {
         try (InputStream dataStream = IOUtils.toInputStream(tsvString, StandardCharsets.UTF_8))

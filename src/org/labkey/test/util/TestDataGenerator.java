@@ -166,7 +166,7 @@ public class TestDataGenerator
                     }
                     else if (fieldDefinition.getType().equals(FieldDefinition.ColumnType.String))
                     {
-                        entityData.put(key, randomString(5).trim() + "Entity " + i);
+                        entityData.put(key, "Entity " + i + randomString(5).trim());
                     }
                     else if (fieldDefinition.getType().equals(FieldDefinition.ColumnType.TextChoice))
                     {
