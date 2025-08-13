@@ -23,6 +23,7 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -50,7 +51,23 @@ public class EscapeUtil
                     }
             }
         }
-        return escaped.toString();
+        return "\"" + escaped + "\"";
+    }
+
+    static public String toJSONRow(Map<String, Object> row)
+    {
+        StringBuilder sb = new StringBuilder("{");
+        String comma = "";
+        for (Map.Entry<String, Object> entry : row.entrySet())
+        {
+            sb.append(comma);
+            Object value = entry.getValue();
+            sb.append(EscapeUtil.toJSONStr(entry.getKey()))
+                    .append(": ").append(value instanceof String ? EscapeUtil.toJSONStr((String) entry.getValue()) : value);
+            comma = ",";
+        }
+        sb.append("}");
+        return sb.toString();
     }
 
     static public String jsString(String s)

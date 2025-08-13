@@ -424,8 +424,8 @@ public class AssayAPITest extends BaseWebDriverTest
                 "queryName: \"Runs\", " +
                 "success: callback," +
                 "failure: callback," +
-                "rows: [{  RowId: \""+ runRowId + "\"," +
-                "\"" + EscapeUtil.toJSONStr(runFileField) + "\": \"" + EscapeUtil.toJSONStr(filePath) + "\"," +
+                "rows: [{  \"RowId\": " + runRowId + "," +
+                EscapeUtil.toJSONStr(runFileField) + ": " + EscapeUtil.toJSONStr(filePath) +
                 "}]" +
                 "})";
         executeAndVerifyScript(updateScript, errorMsg);
