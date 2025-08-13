@@ -20,7 +20,10 @@ public class TextUtils
      */
     public static String normalizeSpace(String value)
     {
-        return NS_PATTERN.matcher(value).replaceAll(" ").trim();
+        if (value == null)
+            return value;
+        else
+            return NS_PATTERN.matcher(value).replaceAll(" ").trim();
     }
 
     public static List<String> normalizeSpace(List<String> values)

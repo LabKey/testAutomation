@@ -15,7 +15,8 @@ import static org.labkey.test.util.TextUtils.containerPath;
 
 public class ContainerInfo
 {
-    public static final String TRICKY_CHARACTERS = "\u2603~!@$&()_+{}-=[],.#\u00E4\u00F6\u00FC\u00C5" + WIDE_PLACEHOLDER + ALL_CHARS_PLACEHOLDER; // No slash or space
+    public static final String TRICKY_CHARACTERS = "\u2603~!@$&()_+{}-=[],.#\u00E4\u00F6\u00FC\u00C5"; // No slash or space. Don't change; hard-coded in some test data
+    public static final String RANDOM_CHARSET = TRICKY_CHARACTERS + WIDE_PLACEHOLDER + ALL_CHARS_PLACEHOLDER;
 
     private final @NotNull String _name;
     private final String _parentContainerPath;
@@ -35,8 +36,16 @@ public class ContainerInfo
     private static @NotNull String getRandomName(String folderName)
     {
         if (TestProperties.isTestRunningOnTeamCity())
-            return TestDataGenerator.randomName(folderName, TestDataGenerator.randomInt(0, 5), 5, TRICKY_CHARACTERS, null);
-        else
+        {
+            String name = TestDataGenerator.randomName(folderName, TestDataGenerator.randomInt(0, 5), 5, RANDOM_CHARSET, null);
+            if (name.startsWith("@"))
+            {
+                // Folder name may not begin with '@'
+                name = name.replaceFirst("@", TestDataGenerator.randomString(1, "@", RANDOM_CHARSET));
+            }
+            return name;
+        }
+        else // Don't clutter dev machines with random project names
             return folderName + TRICKY_CHARACTERS;
     }
 
