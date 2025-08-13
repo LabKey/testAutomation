@@ -641,7 +641,12 @@ public class TestDataGenerator
         {
             CommandResponse response = command.execute(WebTestHelper.getRemoteApiConnection(), "/home");
             if (response.getParsedData() == null)
-                throw new RuntimeException("Failed to parse response for command: " + response.getText());
+            {
+                if (response.getText().contains("Register First User"))
+                    throw new RuntimeException("Unable to validate domain/field name. Server not initialized.");
+                else
+                    throw new RuntimeException("Failed to parse response for command: " + response.getText());
+            }
             return response.getParsedData().containsKey("errors");
         }
         catch (CommandException | IOException e)

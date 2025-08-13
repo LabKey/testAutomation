@@ -262,10 +262,17 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
      *
      * @return A select at this given ordinal position.
      */
-    private ReactSelect getEntityTypeByPosition(int index)
+    public ReactSelect getEntityTypeByPosition(int index)
     {
         return ReactSelect.finder(getDriver())
                 .withNamedInput(String.format("entityType%d", index))
+                .waitFor(elementCache());
+    }
+
+    public ReactSelect getDisabledEntityTypeByLabel(String typeName)
+    {
+        return ReactSelect.finder(getDriver())
+                .followingLabelWithSpan(typeName)
                 .waitFor(elementCache());
     }
 
@@ -344,6 +351,10 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
         return addParents(typeName, Arrays.asList(parentId));
     }
 
+    public ParentEntityEditPanel addParents(String typeName, List<String> parentIds)
+    {
+        return addParents(typeName, parentIds, false);
+    }
     /**
      * Add a specific parents (samples or sources) from the given type. If the type is not currently being used for
      * parent elements it will be added.
@@ -353,9 +364,9 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
      * @param parentIds A list of the individuals samples or sources to add.
      * @return A reference to this panel.
      */
-    public ParentEntityEditPanel addParents(String typeName, List<String> parentIds)
+    public ParentEntityEditPanel addParents(String typeName, List<String> parentIds, boolean skipAdd)
     {
-        if (getEntityType(typeName) == null)
+        if (!skipAdd && getEntityType(typeName) == null)
             getAddNewEntityTypeSelect().select(typeName);
 
         var selectParent = getParentFinder(typeName).waitFor(elementCache());
@@ -393,6 +404,9 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
         boolean found = false;
         for (ReactSelect reactSelect : selectControls)
         {
+            if (reactSelect.isDisabled())
+                continue;
+
             if (reactSelect.getSelections().contains(typeName))
             {
                 found = true;
@@ -442,6 +456,11 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
     public void clearActionComment()
     {
         elementCache().commentInput.clear();
+    }
+
+    public boolean hasParentInputError()
+    {
+        return Locator.tagWithClass("div", "edit-parent-danger").isDisplayed(this);
     }
 
 

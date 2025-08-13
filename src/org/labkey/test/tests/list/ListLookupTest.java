@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.labkey.test.params.FieldDefinition.labelFromName;
+import static org.labkey.test.util.TextUtils.normalizeSpace;
 import static org.labkey.test.util.TestDataGenerator.ALL_CHARS_PLACEHOLDER;
 import static org.labkey.test.util.TestDataGenerator.REPEAT_PLACEHOLDER;
 
@@ -125,7 +127,8 @@ public class ListLookupTest extends BaseWebDriverTest
         String error = importDataPage
                 .setText(bulkData)
                 .submitExpectingError();
-        checker().withScreenshot().verifyEquals("Error message for invalid primary key not as expected", "Could not convert value 'noneSuch' (String) for Integer field '" + lookFromLookupFieldName + "'", error);
+        checker().withScreenshot().verifyEquals("Error message for invalid primary key not as expected",
+                "Could not convert value 'noneSuch' (String) for Integer field '" + normalizeSpace(lookFromLookupFieldName) + "'", error);
     }
 
     @Test
@@ -171,7 +174,8 @@ public class ListLookupTest extends BaseWebDriverTest
                 .setText(bulkData)
                 .setImportLookupByAlternateKey(true)
                 .submitExpectingError();
-        checker().withScreenshot().verifyEquals("Error message after supplying invalid alternate key not as expected", "Value 'NotAValue' not found for field " + lookFromLookupFieldName + " in the current context.", error);
+        checker().withScreenshot().verifyEquals("Error message after supplying invalid alternate key not as expected",
+                "Value 'NotAValue' not found for field " + normalizeSpace(lookFromLookupFieldName) + " in the current context.", error);
     }
 
     @Test
@@ -199,13 +203,16 @@ public class ListLookupTest extends BaseWebDriverTest
         String error = importDataPage
                 .setText(tsvFromColumn(List.of(lookFromLookupFieldName, "1000")))
                 .submitExpectingError();
-        checker().withScreenshot().verifyEquals("Error message for invalid primary key value not as expected", "Value '1000' was not present in lookup target 'lists." + lookToListName + "' for field '" + FieldDefinition.labelFromName(lookFromLookupFieldName) + "'", error);
+        checker().withScreenshot().verifyEquals("Error message for invalid primary key value not as expected",
+                "Value '1000' was not present in lookup target 'lists." + normalizeSpace(lookToListName)
+                        + "' for field '" + normalizeSpace(labelFromName(lookFromLookupFieldName)) + "'", error);
 
         log("With lookup validation on, import data and provide an invalid primary key of type string.");
         error = importDataPage
                 .setText(tsvFromColumn(List.of(lookFromLookupFieldName, "Look")))
                 .submitExpectingError();
-        checker().withScreenshot().verifyEquals("Error message for invalid primary key type not as expected", "Could not convert value 'Look' (String) for Integer field '" + lookFromLookupFieldName + "'", error);
+        checker().withScreenshot().verifyEquals("Error message for invalid primary key type not as expected",
+                "Could not convert value 'Look' (String) for Integer field '" + normalizeSpace(lookFromLookupFieldName) + "'", error);
     }
 
     @Test
@@ -249,14 +256,17 @@ public class ListLookupTest extends BaseWebDriverTest
                 .setText(bulkData)
                 .setImportLookupByAlternateKey(true)
                 .submitExpectingError();
-        checker().withScreenshot().verifyEquals("Error message for invalid string alternate key not as expected", "Value 'Invalid' not found for field " + lookFromLookupFieldName + " in the current context.", error);
+        checker().withScreenshot().verifyEquals("Error message for invalid string alternate key not as expected",
+                "Value 'Invalid' not found for field " + normalizeSpace(lookFromLookupFieldName) + " in the current context.", error);
 
         bulkData = tsvFromColumn(List.of(lookFromLookupFieldName, "1234"));
         error = importDataPage
                 .setText(bulkData)
                 .setImportLookupByAlternateKey(true)
                 .submitExpectingError();
-        checker().withScreenshot().verifyEquals("Error message for invalid number-like alternate key not as expected", "Value '1234' was not present in lookup target 'lists." + lookToListName + "' for field '" + FieldDefinition.labelFromName(lookFromLookupFieldName) + "'", error);
+        checker().withScreenshot().verifyEquals("Error message for invalid number-like alternate key not as expected",
+                "Value '1234' was not present in lookup target 'lists." + normalizeSpace(lookToListName)
+                        + "' for field '" + normalizeSpace(labelFromName(lookFromLookupFieldName)) + "'", error);
 
     }
 
