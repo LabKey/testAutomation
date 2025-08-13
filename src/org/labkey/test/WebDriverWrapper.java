@@ -18,7 +18,6 @@ package org.labkey.test;
 import org.apache.commons.collections4.MultiValuedMap;
 import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -61,6 +60,7 @@ import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.RelativeUrl;
 import org.labkey.test.util.TestLogger;
 import org.labkey.test.util.TextSearcher;
+import org.labkey.test.util.TextSearcher.TextTransformers;
 import org.labkey.test.util.Timer;
 import org.labkey.test.util.selenium.ScrollUtils;
 import org.labkey.test.util.selenium.WebDriverUtils;
@@ -1615,29 +1615,27 @@ public abstract class WebDriverWrapper implements WrapsDriver
         fail("No errors found");
     }
 
-    public static String encodeText(String unencodedText)
-    {
-        return unencodedText
-                .replace("&", "&amp;")
-                .replace("<", "&lt;")
-                .replace(">", "&gt;");
-    }
-
+    /**
+     * Check whether all the specified text is present on the page
+     * @param texts un-encoded text to search for
+     * @return true if all the specified texts are present on the page
+     */
     public boolean isTextPresent(String... texts)
     {
-        final MutableBoolean present = new MutableBoolean(true);
+        return new TextSearcher(this).areAllTextsPresent(texts);
+    }
 
-        TextSearcher.TextHandler handler = (htmlSource, text) -> {
-            // Not found... stop enumerating and return false
-            if (htmlSource == null || !htmlSource.contains(text))
-                present.setFalse();
-
-            return present.get();
-        };
+    /**
+     * Check whether the HTML-encoded text is in the page source
+     * @param htmlFragments encoded html fragments to search for
+     * @return true if all the specified texts are present on the page
+     */
+    public boolean isHtmlPresent(String... htmlFragments)
+    {
         TextSearcher searcher = new TextSearcher(this);
-        searcher.searchForTexts(handler, Arrays.asList(texts));
+        searcher.setSearchTransformer(TextTransformers.IDENTITY);
 
-        return present.get();
+        return searcher.areAllTextsPresent(htmlFragments);
     }
 
     public List<String> getTextOrder(TextSearcher searcher, String... texts)
@@ -1658,11 +1656,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
                 .forEachOrdered((pair) -> orderedTexts.add(pair.getKey()));
 
         return orderedTexts;
-    }
-
-    public List<String> getMissingTexts(TextSearcher searcher, String... texts)
-    {
-        return searcher.getMissingTexts(Arrays.asList(texts));
     }
 
     public String getText(Locator elementLocator)
@@ -1693,7 +1686,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public void assertTextPresent(TextSearcher searcher, String... texts)
     {
-        List<String> missingTexts = getMissingTexts(searcher, texts);
+        List<String> missingTexts = searcher.getMissingTexts(texts);
 
         if (!missingTexts.isEmpty())
         {
@@ -1710,7 +1703,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         TextSearcher searcher = new TextSearcher(this);
 
-        searcher.setSearchTransformer((text) -> encodeText(text).toLowerCase());
+        searcher.setSearchTransformer(TextTransformers.ENCODE_HTML.andThen(String::toLowerCase));
 
         searcher.setSourceTransformer(String::toLowerCase);
 
@@ -1722,18 +1715,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
      */
     public boolean isAnyTextPresent(String... texts)
     {
-        final MutableBoolean found = new MutableBoolean(false);
-
-        TextSearcher.TextHandler handler = (htmlSource, text) -> {
-            if (htmlSource.contains(text))
-                found.setTrue();
-
-            return !found.get(); // stop searching if any value is found
-        };
-        TextSearcher searcher = new TextSearcher(this);
-        searcher.searchForTexts(handler, Arrays.asList(texts));
-
-        return found.get();
+        return new TextSearcher(this).isAnyTextPresent(texts);
     }
 
     /**
@@ -1893,7 +1875,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
     public void assertTextNotPresent(String... texts)
     {
         TextSearcher searcher = new TextSearcher(this);
-        searcher.setSearchTransformer((text) -> encodeText(text).replace("&nbsp;", " "));
+        searcher.setSearchTransformer(TextTransformers.ENCODE_HTML.andThen(t -> t.replace("&nbsp;", " ")));
 
         assertTextNotPresent(searcher, texts);
     }

@@ -150,4 +150,5 @@ public class EscapeUtil
     {
         return nameExpressionNeedsEscaping.matcher(name).replaceAll("\\\\$1");
     }
+
 }
