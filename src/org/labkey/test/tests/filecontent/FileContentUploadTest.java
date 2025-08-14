@@ -356,7 +356,7 @@ public class FileContentUploadTest extends BaseWebDriverTest
 
         Integer initialFileRootSize = getFileRootSize();
 
-        switchToMainWindow();
+        closeExtraWindows();
 
         goToProjectHome();
         File testFile = TestFileUtils.getSampleData("fileTypes/tsv_sample.tsv");
