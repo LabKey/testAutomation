@@ -71,6 +71,10 @@ public class UpdateQueryRowPage extends LabKeyPage<UpdateQueryRowPage.ElementCac
             {
                 setField(entry.getKey(), i);
             }
+            else if (value instanceof Long l)
+            {
+                setField(entry.getKey(), l);
+            }
             else if (value instanceof File f)
             {
                 setField(entry.getKey(), f);
@@ -103,6 +107,11 @@ public class UpdateQueryRowPage extends LabKeyPage<UpdateQueryRowPage.ElementCac
     }
 
     public UpdateQueryRowPage setField(String fieldName, Integer value)
+    {
+        return setField(fieldName, String.valueOf(value));
+    }
+
+    public UpdateQueryRowPage setField(String fieldName, Long value)
     {
         return setField(fieldName, String.valueOf(value));
     }
