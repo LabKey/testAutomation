@@ -429,7 +429,7 @@ public class TestDataGenerator
     private Supplier<Object> getDefaultDataSupplier(PropertyDescriptor propertyDescriptor)
     {
         Map<String, Object> allProperties = Objects.requireNonNullElse(propertyDescriptor.getAllProperties(), Collections.emptyMap());
-        Function<String, String> getType = s -> s == null ? null : s.substring(s.indexOf('#') + 1).toLowerCase();
+        Function<String, String> getType = s -> s == null ? "" : s.substring(s.indexOf('#') + 1).toLowerCase().trim();
         String conceptUriName = getType.apply((String) allProperties.get("conceptURI"));
         String rangeUriName = getType.apply(propertyDescriptor.getRangeURI());
 
