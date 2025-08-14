@@ -339,4 +339,32 @@
       </column>
     </columns>
   </table>
+
+  <table tableName="Owners" tableDbType="TABLE">
+    <columns>
+      <column columnName="RowId"/>
+      <column columnName="Name"/>
+    </columns>
+  </table>
+
+  <table tableName="OwnedVehicles" tableDbType="TABLE">
+    <columns>
+      <column columnName="RowId"/>
+      <column columnName="Owner">
+        <fk>
+          <fkColumnName>RowId</fkColumnName>
+          <fkTable>Owners</fkTable>
+          <fkDbSchema>vehicle</fkDbSchema>
+        </fk>
+      </column>
+      <column columnName="Vehicle">
+        <fk>
+          <fkColumnName>RowId</fkColumnName>
+          <fkTable>Vehicles</fkTable>
+          <fkDbSchema>vehicle</fkDbSchema>
+        </fk>
+      </column>
+    </columns>
+  </table>
+
 </tables>
