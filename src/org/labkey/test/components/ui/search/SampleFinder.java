@@ -70,11 +70,13 @@ public class SampleFinder extends WebDriverComponent<SampleFinder.ElementCache>
     /**
      * Open the entity filter dialog for the specified filter type.
      *
-     * @param filterKind "Source" or "Parent" or "Assay" in SM. "Registry Parent" or "Sample Parent" or "Assay" in Biologics
+     * @param filterKind "Sample", "Source" or "Parent" or "Assay" in SM. "Registry Parent" or "Sample Parent" or "Assay" in Biologics
      * @return component wrapper for the EntityFieldFilterModal
      */
     public EntityFieldFilterModal clickAddParent(String filterKind)
     {
+        // Why is this method called clickAddParent?
+
         elementCache().findFilterKindButton(filterKind).click();
         return new EntityFieldFilterModal(getDriver(), this::doAndWaitForUpdate);
     }
