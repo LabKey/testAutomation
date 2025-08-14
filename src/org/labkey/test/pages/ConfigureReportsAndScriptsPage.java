@@ -27,6 +27,7 @@ import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.TestLogger;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.io.File;
@@ -45,7 +46,7 @@ public class ConfigureReportsAndScriptsPage extends LabKeyPage
     private static final String DEFAULT_ENGINE = "Mozilla Rhino";
     private static final String EDIT_WINDOW_TITLE = "Edit Engine Configuration";
 
-    public ConfigureReportsAndScriptsPage(WebDriverWrapper test)
+    public ConfigureReportsAndScriptsPage(WebDriver test)
     {
         super(test);
         waitForEnginesGrid();
@@ -54,7 +55,7 @@ public class ConfigureReportsAndScriptsPage extends LabKeyPage
     public static ConfigureReportsAndScriptsPage beginAt(WebDriverWrapper driver)
     {
         driver.beginAt(WebTestHelper.buildURL("core", "configureReportsAndScripts"));
-        return new ConfigureReportsAndScriptsPage(driver);
+        return new ConfigureReportsAndScriptsPage(driver.getDriver());
     }
 
     public void waitForEnginesGrid()

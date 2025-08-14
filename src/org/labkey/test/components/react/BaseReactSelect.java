@@ -115,7 +115,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
 
     public boolean isDisabled()
     {
-        return hasClass("select-input__control--is-disabled");
+        return hasClass("select-input__control--is-disabled") || hasClass("select-input--is-disabled");
     }
 
     public boolean isEnabled()
