@@ -369,6 +369,14 @@ public class InlineImagesListTest extends BaseWebDriverTest
         importFilePathError(listImportPage, "1", "absent.txt");
         importFilePathError(listImportPage, "1", PDF_FILE.getName());
         importFilePathError(listImportPage, "5", PDF_FILE.getName());
+
+        String attachmentPdfError = "Can't upload '" + PDF_FILE.getName() + "' to field " + LIST_ATTACHMENT01_NAME + " with type Attachment.";
+        String attachmentAbsentError = "Can't upload 'Absent.txt'" + " to field " + LIST_ATTACHMENT01_NAME + " with type Attachment.";
+        verifyQueryAPI("lists", LIST_NAME, Map.of(LIST_KEY_NAME, 5, LIST_ATTACHMENT01_NAME, PDF_FILE.getName()), true, "Row 1: " + attachmentPdfError);
+        verifyQueryAPI("lists", LIST_NAME, Map.of(LIST_KEY_NAME, 5, LIST_ATTACHMENT01_NAME, "Absent.txt"), true, "Row 1: " + attachmentAbsentError);
+        verifyQueryAPI("lists", LIST_NAME, Map.of(LIST_KEY_NAME, 1, LIST_ATTACHMENT01_NAME, PDF_FILE.getName()), false, attachmentPdfError);
+        verifyQueryAPI("lists", LIST_NAME, Map.of(LIST_KEY_NAME, 1, LIST_ATTACHMENT01_NAME, "Absent.txt"), false, attachmentAbsentError);
+        verifyQueryAPI("lists", LIST_NAME, Map.of(LIST_KEY_NAME, 1, LIST_ATTACHMENT01_NAME, ""/*can remove attachment*/), false);
     }
 
     private void importFilePathError(ImportDataPage listImportPage, String key, String attachmentValue)
