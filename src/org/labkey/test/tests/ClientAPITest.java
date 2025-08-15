@@ -213,7 +213,7 @@ public class ClientAPITest extends BaseWebDriverTest
 
         init._containerHelper.createSubfolder(PROJECT_NAME, API_FOLDER_NAME, SUBFOLDER_NAME, "None", null);
 
-//        init.createStudies();
+        init.createStudies();
 
         init.clickFolder(API_FOLDER_NAME);
 
@@ -221,7 +221,7 @@ public class ClientAPITest extends BaseWebDriverTest
 
         init.createLists();
 
-//        init.createUsers();
+        init.createUsers();
     }
 
     private static boolean dirtyList = false;
