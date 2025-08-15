@@ -21,6 +21,7 @@ import org.labkey.test.components.ext4.Window;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.util.LogMethod;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -97,18 +98,39 @@ public class ManageViewsPage extends LabKeyPage
 
     public void createCategory(String categoryName)
     {
+        createCategories(categoryName);
+    }
+
+    public void createCategories(String... categoryNames)
+    {
         Locator.linkWithText("Manage Categories").findElement(getDriver()).click();
         Window<?> categoryWindow = new Window.WindowFinder(getDriver()).withTitle("Manage Categories").waitFor();
-        for (int retry = 0; retry < 3; retry++)
+        for (String categoryName : categoryNames)
+            addCategory(categoryName, categoryWindow);
+        clickButton("Done", 0);
+        categoryWindow.waitForClose();
+    }
+
+    private void addCategory(String categoryName, Window<?> categoryWindow)
+    {
+        int attempt = 0;
+        while (true)
         {
             categoryWindow.clickButton("New Category", 0);
             WebElement newCategoryField = Locator.input("label").withAttributeContaining("id", "textfield").notHidden().waitForElement(categoryWindow, WAIT_FOR_JAVASCRIPT);
             setFormElementJS(newCategoryField, categoryName);
             fireEvent(newCategoryField, SeleniumEvent.blur);
             new WebDriverWait(getDriver(), Duration.ofSeconds(2)).until(ExpectedConditions.invisibilityOf(newCategoryField));
-            Locator.tagWithText("div", categoryName).waitForElement(categoryWindow, 2_000);
+            try
+            {
+                Locator.tagWithText("div", categoryName).waitForElement(categoryWindow, 2_000);
+                break;
+            }
+            catch (NoSuchElementException e)
+            {
+                if (++attempt >= 3)
+                    throw e;
+            }
         }
-        clickButton("Done", 0);
-        categoryWindow.waitForClose();
     }
 }
