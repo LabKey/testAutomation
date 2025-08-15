@@ -985,10 +985,39 @@ public abstract class Locator extends By
      *     Direct port from attibuteValue function in selenium IDE locatorBuilders.js
      * @param value to be quoted
      * @return value with either ' or " around it or assembled from parts
+     * @implNote {@link Quotes#escape(String)} doesn't handle trailing quotes correctly
      */
     public static String xq(String value)
     {
-        return Quotes.escape(value);
+        if (!value.contains("'")) {
+            return "'" + value + "'";
+        } else if (!value.contains("\"")) {
+            return '"' + value + '"';
+        } else {
+            StringBuilder result = new StringBuilder("concat(");
+            while (true) {
+                int apos = value.indexOf("'");
+                int quot = value.indexOf('"');
+                if (apos < 0) {
+                    result.append("'").append(value).append("'");
+                    break;
+                } else if (quot < 0) {
+                    result.append('"').append(value).append('"');
+                    break;
+                } else if (quot < apos) {
+                    String part = value.substring(0, apos);
+                    result.append("'").append(part).append("'");
+                    value = value.substring(part.length());
+                } else {
+                    String part = value.substring(0, quot);
+                    result.append('"').append(part).append('"');
+                    value = value.substring(part.length());
+                }
+                result.append(',');
+            }
+            result.append(')');
+            return result.toString();
+        }
     }
 
     /**
