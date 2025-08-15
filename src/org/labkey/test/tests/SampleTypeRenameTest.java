@@ -102,6 +102,8 @@ public class SampleTypeRenameTest extends BaseWebDriverTest
             testDataGenerator.addCustomRow(Map.of(FIELD_INT, intVal++));
         testDataGenerator.insertRows();
 
+        SearchAdminAPIHelper.waitForIndexer();
+
         goToProjectHome();
         SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
         UpdateSampleTypePage updatePage = sampleHelper.goToEditSampleType(sampleTypeName);
