@@ -148,6 +148,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -2118,25 +2119,29 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public long doAndWaitForWindow(Runnable action, String windowName)
     {
+        String initialWindow = getDriver().getWindowHandle();
+        AtomicBoolean targetWindowExists = new AtomicBoolean(false);
+        try
+        {
+            getDriver().switchTo().window(windowName);
+            targetWindowExists.set(true);
+        }
+        catch (NoSuchWindowException e)
+        {
+            targetWindowExists.set(false);
+        }
+
+        // Call doAndMaybeWaitForPageToLoad with target window in focus (if present)
+        // Then it will correctly detect the page load in that window
         return doAndMaybeWaitForPageToLoad(10_000, () -> {
-            String initialWindow = getDriver().getWindowHandle();
-            boolean targetWindowExists;
-            try
-            {
-                getDriver().switchTo().window(windowName);
+            if (targetWindowExists.get())
                 getDriver().switchTo().window(initialWindow);
-                targetWindowExists = true;
-            }
-            catch (NoSuchWindowException e)
-            {
-                targetWindowExists = false;
-            }
 
             action.run();
 
             new WebDriverWait(getDriver(), Duration.ofSeconds(5)).until(windowIsPresent(windowName));
 
-            return targetWindowExists;
+            return targetWindowExists.get();
         });
     }
 
