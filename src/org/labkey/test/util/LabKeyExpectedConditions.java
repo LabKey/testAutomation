@@ -21,8 +21,8 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.NoSuchWindowException;
 import org.openqa.selenium.Point;
-import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -33,6 +33,7 @@ import org.openqa.selenium.support.ui.Wait;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 
 public class LabKeyExpectedConditions
@@ -40,32 +41,6 @@ public class LabKeyExpectedConditions
     private LabKeyExpectedConditions()
     {
         // Utility class
-    }
-
-    /**
-     * An expectation for checking child WebElement as a part of parent element to be present
-     *
-     * @param context SearchContext to find element within
-     * @param childLocator used to find child element. For example Locator.xpath("./tr/td")
-     * @return subelement
-     */
-    public static ExpectedCondition<WebElement> presenceOfNestedElementLocatedBy(final SearchContext context, final By childLocator)
-    {
-        return new ExpectedCondition<>()
-        {
-
-            @Override
-            public WebElement apply(WebDriver webDriver)
-            {
-                return context.findElement(childLocator);
-            }
-
-            @Override
-            public String toString()
-            {
-                return String.format("visibility of element located by %s", childLocator);
-            }
-        };
     }
 
     /**
@@ -101,7 +76,7 @@ public class LabKeyExpectedConditions
     /**
      * Another expectation for checking that an element has stopped moving
      *
-     * @param el the element who's position changes
+     * @param el the element whose position changes
      * @return the element when animation is complete
      */
     public static ExpectedCondition<WebElement> animationIsDone(final WebElement el) {
@@ -165,7 +140,7 @@ public class LabKeyExpectedConditions
                     return null;
                 }
 
-                if (el.isEnabled() && !el.getAttribute("class").contains("disabled"))
+                if (el.isEnabled() && !Objects.requireNonNullElse(el.getAttribute("class"), "").contains("disabled"))
                     return el;
                 else
                     return null;
@@ -202,43 +177,7 @@ public class LabKeyExpectedConditions
             @Override
             public String toString()
             {
-                return staleCheck.toString() + " after clicking";
-            }
-        };
-    }
-
-    /**
-     * Wraps {@link ExpectedConditions#visibilityOfAllElements(WebElement...)}
-     * This expectations accounts for the behavior of LabKey WebElement wrappers, which will throw if you attempt to
-     * inspect them before the element has appeared.
-     *
-     * @param elements list of WebElements
-     * @return the list of WebElements once they are located
-     * @see org.labkey.test.selenium.LazyWebElement
-     */
-    public static ExpectedCondition<List<WebElement>> visibilityOfAllElements(WebElement... elements)
-    {
-        return new ExpectedCondition<>()
-        {
-            final ExpectedCondition<List<WebElement>> wrapped = ExpectedConditions.visibilityOfAllElements(elements);
-
-            @Override
-            public List<WebElement> apply(WebDriver driver)
-            {
-                try
-                {
-                    return wrapped.apply(driver);
-                }
-                catch (StaleElementReferenceException | NoSuchElementException ignore)
-                {
-                    return null;
-                }
-            }
-
-            @Override
-            public String toString()
-            {
-                return wrapped.toString();
+                return staleCheck + " after clicking";
             }
         };
     }
@@ -246,10 +185,10 @@ public class LabKeyExpectedConditions
     /**
      * Wraps {@link ExpectedConditions#stalenessOf(WebElement)}
      * Firefox occasionally throws "NoSuchElementException: Web element reference not seen before"
-     * for short lived elements.
+     * for short-lived elements.
      *
      * @param element WebElement that should go stale.
-     * @return false if the element is still attached to the DOM, true otherwise.
+     * @return ExpectedCondition that returns false if the element is still attached to the DOM, true otherwise.
      */
     public static ExpectedCondition<Boolean> stalenessOf(WebElement element)
     {
@@ -290,6 +229,31 @@ public class LabKeyExpectedConditions
         return visible
                 ? ExpectedConditions.visibilityOf(element)
                 : ExpectedConditions.invisibilityOf(element);
+    }
+
+    /**
+     * An expectation for checking whether a window or tab with the give name is present.
+     * If the window/tab is available it switches the given driver to the specified window/tab.
+     * @param windowName The name of the window
+     * @return An expected condition that returns the driver with focus switched to the specified window or tab.
+     * @see WebDriver.TargetLocator#window(String)
+     */
+    public static ExpectedCondition<WebDriver> windowIsPresent(final String windowName) {
+        return new ExpectedCondition<>() {
+            @Override
+            public WebDriver apply(WebDriver driver) {
+                try {
+                    return driver.switchTo().window(windowName);
+                } catch (NoSuchWindowException e) {
+                    return null;
+                }
+            }
+
+            @Override
+            public String toString() {
+                return "window named " + windowName;
+            }
+        };
     }
 
     /**
