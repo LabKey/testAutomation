@@ -213,7 +213,7 @@ public class ClientAPITest extends BaseWebDriverTest
 
         init._containerHelper.createSubfolder(PROJECT_NAME, API_FOLDER_NAME, SUBFOLDER_NAME, "None", null);
 
-        init.createStudies();
+//        init.createStudies();
 
         init.clickFolder(API_FOLDER_NAME);
 
@@ -221,7 +221,7 @@ public class ClientAPITest extends BaseWebDriverTest
 
         init.createLists();
 
-        init.createUsers();
+//        init.createUsers();
     }
 
     private static boolean dirtyList = false;
@@ -1565,24 +1565,30 @@ public class ClientAPITest extends BaseWebDriverTest
     @Test // Issue 53699
     public void testLargeMultibytePayload()
     {
-        // Arrange
-        int characterCount = 5_000;
-        String tooManyMultibyteCharacters = "\uD83D\uDC7E".repeat(characterCount);
+        for (int i = 0; i < 10; i++)
+        {
+            // Arrange
+            int characterCount = 5_000;
+            // We had problems fetching the JSON content server-side due to Tomcat's InputBuffer not dealing with
+            // characters that span multiple "pages" of the byte buffer. Test with different numbers of single-byte
+            // UTF-8 characters before the 4-byte characters to ensure we get different boundary conditions
+            String tooManyMultibyteCharacters = "a".repeat(i) + "\uD83D\uDC7E".repeat(characterCount);
 
-        TestDataGenerator dataGenerator = new TestDataGenerator("lists", LIST_NAME, API_FOLDER_PATH)
-                .addCustomRow(Map.of("FirstName", tooManyMultibyteCharacters, "LastName", "Chaplin", "Age", 42));
+            TestDataGenerator dataGenerator = new TestDataGenerator("lists", LIST_NAME, API_FOLDER_PATH)
+                    .addCustomRow(Map.of("FirstName", tooManyMultibyteCharacters, "LastName", "Chaplin", "Age", 42));
 
-        // Act
-        // Prior to fix for Issue 53699 this would throw a BufferUnderflowException when processing the JSON payload
-        Exception exception = assertThrows(Exception.class, dataGenerator::insertRows);
+            // Act
+            // Prior to fix for Issue 53699 this would throw a BufferUnderflowException when processing the JSON payload
+            Exception exception = assertThrows(Exception.class, dataGenerator::insertRows);
 
-        // Assert
-        // Prior to fix length validation incorrectly checked for string length rather than character code point length
-        String expectedPrefix = "Value is too long for column 'FirstName', a maximum length of 4000 is allowed.";
-        String expectedSuffix = String.format("was %d characters long.", characterCount);
+            // Assert
+            // Prior to fix length validation incorrectly checked for string length rather than character code point length
+            String expectedPrefix = "Value is too long for column 'FirstName', a maximum length of 4000 is allowed.";
+            String expectedSuffix = String.format("was %d characters long.", characterCount + i);
 
-        assertThat(exception.getMessage(), startsWith(expectedPrefix));
-        assertThat(exception.getMessage(), endsWith(expectedSuffix));
+            assertThat(exception.getMessage(), startsWith(expectedPrefix));
+            assertThat(exception.getMessage(), endsWith(expectedSuffix));
+        }
     }
 
     @Override
