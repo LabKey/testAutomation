@@ -29,6 +29,7 @@ import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.SampleTypeHelper;
 import org.labkey.test.util.TestDataGenerator;
+import org.labkey.test.util.data.TestDataUtils;
 import org.labkey.test.util.exp.SampleTypeAPIHelper;
 import org.openqa.selenium.WebElement;
 
@@ -1863,37 +1864,26 @@ public class GridPanelTest extends GridPanelBaseTest
      */
     private void validateExportedData(File exportedFile, List<Map<String, Object>> expectedValues, List<FieldInfo> columns) throws IOException
     {
+        List<Map<String, Object>> rowMaps = TestDataUtils.rowMapsFromCsv(exportedFile);
 
-        try (CSVReader reader = new CSVReader(Readers.getReader(exportedFile), GridBar.ExportType.CSV.getSeparator()))
+        checker().verifyEquals("Number of rows is not as expected.", expectedValues.size(), rowMaps.size());
+        List<String> columnNames = columns.stream().map(FieldInfo::getName).toList();
+        List<String> columnLabels = columns.stream().map(FieldInfo::getLabel).toList();
+
+        for (int rowIndex = 0; rowIndex < expectedValues.size(); rowIndex++)
         {
-            List<String> columnNames = columns.stream().map(FieldInfo::getName).toList();
-            List<String> columnLabels = columns.stream().map(FieldInfo::getLabel).toList();
-            List<String[]> allRows = reader.readAll();
+            // Get the expected row value.
+            Map<String, Object> expectedRowData = expectedValues.get(rowIndex);
 
-            // Use headerRow, the column names, as keys for the map of actual data.
-            String[] headerRow = allRows.get(0);
+            // Create a map of the actual row data returned.
+            Map<String, Object> actualRowData = rowMaps.get(rowIndex);
 
-            checker().verifyEquals("Number of rows is not as expected.", expectedValues.size()+1, allRows.size());
-
-            for (int rowIndex = 0; rowIndex < expectedValues.size(); rowIndex++)
+            // Check the values from the identified columns (exported vs. expected). All exported values are stings
+            // so need to convert the expected values.
+            for (int colIndex = 0; colIndex < columnNames.size(); colIndex++)
             {
-                // Get the expected row value.
-                Map<String, Object> expectedRowData = expectedValues.get(rowIndex);
-
-                // Create a map of the actual row data returned.
-                Map<String, String> actualRowData = new HashMap<>();
-                String[] row = allRows.get(rowIndex+1);
-                for (int i = 0; i < headerRow.length; i++)
-                    actualRowData.put(headerRow[i], row[i]);
-
-                // Check the values from the identified columns (exported vs. expected). All exported values are stings
-                // so need to convert the expected values.
-                for (int colIndex = 0; colIndex < columnNames.size(); colIndex++)
-                {
-                    checker().verifyEquals(String.format("Value for column '%s' on row %d not as expected.", columnNames.get(colIndex), rowIndex + 1),
-                            expectedRowData.get(columnNames.get(colIndex)).toString(), actualRowData.get(columnLabels.get(colIndex)));
-                }
-
+                checker().verifyEquals(String.format("Value for column '%s' on row %d not as expected.", columnNames.get(colIndex), rowIndex),
+                        expectedRowData.get(columnNames.get(colIndex)).toString(), actualRowData.get(columnLabels.get(colIndex)));
             }
 
         }
@@ -1911,22 +1901,14 @@ public class GridPanelTest extends GridPanelBaseTest
     private void validateExportedColumnHeader(File exportedFile, List<String> expectedColumns, List<String> expectedMissingColumns) throws IOException
     {
 
-        try (CSVReader reader = new CSVReader(Readers.getReader(exportedFile), GridBar.ExportType.CSV.getSeparator()))
+        List<String> actualHeader = TestDataUtils.columnHeaderFromCsv(exportedFile);
+        checker().verifyTrue(String.format("Expected column headers '%s' not exported.", expectedColumns),
+                actualHeader.containsAll(expectedColumns));
+
+        for(String missingColumn : expectedMissingColumns)
         {
-
-            List<String[]> allRows = reader.readAll();
-
-            List<String> actualHeader = Arrays.asList(allRows.get(0));
-
-            checker().verifyTrue(String.format("Expected column headers '%s' not exported.", expectedColumns),
-                    actualHeader.containsAll(expectedColumns));
-
-            for(String missingColumn : expectedMissingColumns)
-            {
-                checker().verifyFalse(String.format("Column header '%s' was exported and it should not have been.", missingColumn),
-                        actualHeader.contains(missingColumn));
-            }
-
+            checker().verifyFalse(String.format("Column header '%s' was exported and it should not have been.", missingColumn),
+                    actualHeader.contains(missingColumn));
         }
 
     }
