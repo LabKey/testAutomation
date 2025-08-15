@@ -75,7 +75,7 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
 
     // Issue 53548: Naming Pattern with a default value containing a () or {} cannot be saved.
     private static final String DEFAULT_SAMPLE_PARENT_VALUE = "SS" +
-            EscapeUtil.escapeForNameExpression(TestDataGenerator.randomString(3, "{}()"));
+            EscapeUtil.escapeForNameExpression(TestDataGenerator.randomString(3, "{}()_"));
 
     private static final String PARENT_SAMPLE_TYPE = "PS" + DOMAIN_TRICKY_CHARACTERS;
     private static final String PARENT_SAMPLE_TYPE_INPUT = escapeForNameExpression(PARENT_SAMPLE_TYPE);
