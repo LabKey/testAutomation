@@ -79,7 +79,7 @@ public class TestDataGenerator
     public static final char ALL_CHARS_PLACEHOLDER = '\u2211'; // '∑' - Used to indicate that all characters from the charset should be used
     public static final String NON_LATIN_STRING = "\u0438\u0418\uC548\u306F"; // "иИ안は"
     // chose a Character random from this String
-    public static final String CHARSET_STRING = "ABCDEFG01234abcdefvxyz~!@#$%^&*()-+=_{}[]|:;\"',.<>" + NON_LATIN_STRING + WIDE_PLACEHOLDER;
+    public static final String CHARSET_STRING = "ABCDEFG01234abcdefvxyz~!@#$%^&*()-+=_{}[]|\\:;\"',.<>" + NON_LATIN_STRING + WIDE_PLACEHOLDER;
     public static final String ALPHANUMERIC_STRING = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvxyz";
     public static final String DOMAIN_SPECIAL_STRING =  "+- _.:&()/";
     public static final String ILLEGAL_DOMAIN_NAME_CHARSET = "<>[]{};,`\"~!@#$%^*=|?\\";
@@ -166,7 +166,7 @@ public class TestDataGenerator
                     }
                     else if (fieldDefinition.getType().equals(FieldDefinition.ColumnType.String))
                     {
-                        entityData.put(key, "Entity " + i);
+                        entityData.put(key, "Entity " + i + randomString(5).trim());
                     }
                     else if (fieldDefinition.getType().equals(FieldDefinition.ColumnType.TextChoice))
                     {
@@ -602,7 +602,7 @@ public class TestDataGenerator
 
         // use the characters that we know are encoded in fieldKeys plus characters that we know clients are using
         // Issue 53197: Field name with double byte character can cause client side exception in Firefox when trying to customize grid view.
-        String chars = ALL_ILLEGAL_QUERY_KEY_CHARACTERS + " %()=+-[]_|*`'\":;<>?!@#^" + NON_LATIN_STRING
+        String chars = ALL_ILLEGAL_QUERY_KEY_CHARACTERS + " %()=+-[]_|*`'\":;\\<>?!@#^" + NON_LATIN_STRING
                 + WIDE_PLACEHOLDER + REPEAT_PLACEHOLDER + ALL_CHARS_PLACEHOLDER;
 
         int currentTries = 0;

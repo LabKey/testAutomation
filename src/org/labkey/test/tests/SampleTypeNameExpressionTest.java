@@ -73,8 +73,9 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "SampleType_Name_Expression_Test";
 
+    // Issue 53548: Naming Pattern with a default value containing a () or {} cannot be saved.
     private static final String DEFAULT_SAMPLE_PARENT_VALUE = "SS" +
-            EscapeUtil.escapeForNameExpression(TestDataGenerator.randomString(3));
+            EscapeUtil.escapeForNameExpression(TestDataGenerator.randomString(3, "{}()_"));
 
     private static final String PARENT_SAMPLE_TYPE = "PS" + DOMAIN_TRICKY_CHARACTERS;
     private static final String PARENT_SAMPLE_TYPE_INPUT = escapeForNameExpression(PARENT_SAMPLE_TYPE);
@@ -251,14 +252,14 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
 
         log("Verify import tsv to create derivative would ignore lines starting with #");
         String nameExpression = "${MaterialInputs/" + PARENT_SAMPLE_TYPE_INPUT + "}-child";
-        String data = "MaterialInputs/" + PARENT_SAMPLE_TYPE + "\n"; // unencoded header
+        String data = "MaterialInputs/" + PARENT_SAMPLE_TYPE + "\n";
         data += PARENT_SAMPLE_01 + "\n";
 
         SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
         sampleHelper.createSampleType(new SampleTypeDefinition(sampleTypeName)
                         .setNameExpression(nameExpression), data);
 
-        data = "MaterialInputs/" + PARENT_SAMPLE_TYPE_INPUT + "\n"; // "/" encoded in header
+        data = "MaterialInputs/" + PARENT_SAMPLE_TYPE + "\n";
         data += PARENT_SAMPLE_01 + "," + PARENT_SAMPLE_02 + "," + PARENT_SAMPLE_03 + "\n";
         // tsv lines starting with # should be ignored
         data += PARENT_SAMPLE_03 + "\n";
