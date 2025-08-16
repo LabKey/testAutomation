@@ -141,7 +141,7 @@ public class TabLoader extends DataLoader
     private String _strQuote = null;
     private String _strQuoteQuote = null;
     private boolean _parseQuotes = true;
-    private final boolean _unescapeBackslashes = true;
+    private final boolean _unescapeBackslashes = false;
     private Filter<Map<String, Object>> _mapFilter;
 
     // Infer whether there are headers
