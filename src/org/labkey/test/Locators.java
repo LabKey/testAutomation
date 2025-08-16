@@ -17,6 +17,8 @@ package org.labkey.test;
 
 public abstract class Locators
 {
+    private Locators() { }
+
     public static final Locator documentRoot = Locator.css(":root");
     public static final Locator.IdLocator folderMenu = Locator.id("folderBar");
     public static final Locator.XPathLocator labkeyError = Locator.byClass("labkey-error");

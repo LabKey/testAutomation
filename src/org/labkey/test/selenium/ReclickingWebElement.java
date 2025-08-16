@@ -15,6 +15,8 @@
  */
 package org.labkey.test.selenium;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.jetbrains.annotations.NotNull;
@@ -214,6 +216,10 @@ public class ReclickingWebElement extends WebElementDecorator
             Locator.XPathLocator interceptingElLoc = parseInterceptingElementLoc(shortMessage);
             if (interceptingElLoc != null)
             {
+                if (Strings.CS.containsAny(interceptingElLoc.toString(), "popover", "tip"))
+                {
+                    new Actions(getDriver()).moveToLocation(0,0).perform();
+                }
                 List<WebElement> interceptingElements = interceptingElLoc.findElements(getDriver());
                 TestLogger.debug("Found %s element(s) matching extracted locator: %s".formatted(interceptingElements.size(), shortMessage));
                 if (interceptingElements.size() == 1)
