@@ -1745,7 +1745,7 @@ public class SampleTypeTest extends BaseWebDriverTest
     {
         ImportDataPage importDataPage = new ImportDataPage(getDriver());
         final String fileFieldName = "FileField";
-        String pasteData = TestDataUtils.tsvStringFromRowMapsEscapeBackslash(List.of(Map.of("Name", sampleName, fileFieldName, filePath)),
+        String pasteData = TestDataUtils.tsvStringFromRowMaps(List.of(Map.of("Name", sampleName, fileFieldName, filePath)),
                 List.of("Name", fileFieldName), true);
         importDataPage.setText(pasteData);
         String error = importDataPage.submitExpectingError();
