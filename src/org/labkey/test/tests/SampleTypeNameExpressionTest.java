@@ -71,7 +71,10 @@ import static org.labkey.test.util.EscapeUtil.escapeForNameExpression;
 public class SampleTypeNameExpressionTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "SampleType_Name_Expression_Test";
-    private static final String DEFAULT_SAMPLE_PARENT_VALUE = "SS" + TestDataGenerator.randomString(3).replaceAll("[_)]", "."); // '_' is used as delimiter to get batchRandomId and ) is used to close the defaultValue()
+
+    // Issue 53548: Naming Pattern with a default value containing a () or {} cannot be saved.
+    private static final String DEFAULT_SAMPLE_PARENT_VALUE = "SS" +
+            EscapeUtil.escapeForNameExpression(TestDataGenerator.randomString(3, "{}()_"));
 
     private static final String PARENT_SAMPLE_TYPE = "PS" + DOMAIN_TRICKY_CHARACTERS;
     private static final String PARENT_SAMPLE_TYPE_INPUT = escapeForNameExpression(PARENT_SAMPLE_TYPE);
