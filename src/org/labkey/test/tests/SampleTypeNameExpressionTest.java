@@ -252,14 +252,14 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
 
         log("Verify import tsv to create derivative would ignore lines starting with #");
         String nameExpression = "${MaterialInputs/" + PARENT_SAMPLE_TYPE_INPUT + "}-child";
-        String data = "MaterialInputs/" + PARENT_SAMPLE_TYPE + "\n"; // unencoded header
+        String data = "MaterialInputs/" + PARENT_SAMPLE_TYPE + "\n";
         data += PARENT_SAMPLE_01 + "\n";
 
         SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
         sampleHelper.createSampleType(new SampleTypeDefinition(sampleTypeName)
                         .setNameExpression(nameExpression), data);
 
-        data = "MaterialInputs/" + PARENT_SAMPLE_TYPE_INPUT + "\n"; // "/" encoded in header
+        data = "MaterialInputs/" + PARENT_SAMPLE_TYPE + "\n";
         data += PARENT_SAMPLE_01 + "," + PARENT_SAMPLE_02 + "," + PARENT_SAMPLE_03 + "\n";
         // tsv lines starting with # should be ignored
         data += PARENT_SAMPLE_03 + "\n";
