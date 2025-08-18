@@ -1363,6 +1363,16 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         return formatValue;
     }
 
+    public List<String> getDateTimeFormatDateOptions()
+    {
+        ArrayList<String> formatValues = new ArrayList<>();
+        for (String formatOption : elementCache().dateTimeFormatDateSelect.getOptions())
+        {
+            formatValues.add(getFormatWithoutExample(formatOption));
+        }
+        return formatValues;
+    }
+
     public boolean isDateTimeFormatDateEnabled()
     {
         return elementCache().dateTimeFormatDateSelect.isInteractive();
@@ -1382,6 +1392,16 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         }
 
         return formatValue;
+    }
+
+    public List<String> getDateTimeFormatTimeOptions()
+    {
+        ArrayList<String> formatValues = new ArrayList<>();
+        for (String formatOption : elementCache().dateTimeFormatTimeSelect.getOptions())
+            {
+                formatValues.add(getFormatWithoutExample(formatOption));
+            }
+        return formatValues;
     }
 
     public boolean isDateTimeFormatTimeEnabled()
@@ -1425,6 +1445,16 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         }
 
         return formatValue;
+    }
+
+    public List<String> getDateFormatOptions()
+    {
+        List<String> options = new ArrayList<>();
+        for (String option : elementCache().dateFormatSelect.getOptions())
+            {
+                options.add(getFormatWithoutExample(option));
+            }
+        return options;
     }
 
     public boolean isDateFormatEnabled()
@@ -1478,6 +1508,16 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         }
 
         return formatValue;
+    }
+
+    public List<String> getTimeFormatOptions()
+    {
+        ArrayList<String> formatValues = new ArrayList<>();
+        for (String formatOption : elementCache().timeFormatSelect.getOptions())
+        {
+            formatValues.add(getFormatWithoutExample(formatOption));
+        }
+        return formatValues;
     }
 
     public boolean isTimeFormatEnabled()
