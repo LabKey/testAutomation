@@ -486,6 +486,7 @@ public class AuditLogHelper
             .replace("%", "%25") // '%' needs to be first
             .replace(" ", "%20")
             .replace("&", "%26")
+            .replace("/", "%2F")
             .replace("=", "%3D");
     }
 
