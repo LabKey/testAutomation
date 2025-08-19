@@ -44,6 +44,7 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.exp.SampleTypeAPIHelper;
+import org.labkey.test.util.search.SearchAdminAPIHelper;
 import org.openqa.selenium.Alert;
 
 import java.io.IOException;
@@ -585,6 +586,8 @@ public class TriggerScriptTest extends BaseWebDriverTest
         row2 = resp.getRows().get(0);
         Assert.assertEquals("API BeforeInsert", row2.get(COUNTRY_FIELD));
 
+        SearchAdminAPIHelper.waitForIndexer();
+
         row3 = resp.getRows().get(1);
 
         //Check Before Update Event
@@ -601,6 +604,8 @@ public class TriggerScriptTest extends BaseWebDriverTest
         Assert.assertEquals(BEFORE_UPDATE_COMPANY, updateCo.get(updateField));
         //Check update persisted
         Assert.assertEquals("BeforeUpdate", updateCo.get(flagField));
+
+        SearchAdminAPIHelper.waitForIndexer();
 
         //Check After Update Event
         step = "AfterUpdate";
