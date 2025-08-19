@@ -71,7 +71,7 @@ public class DeleteConfirmationDialog<ConfirmPage extends WebDriverWrapper> exte
         WebDriverWrapper.waitFor(()-> elementCache().body.isDisplayed() &&
                         !elementCache().title.getText().isEmpty() &&
                         !BootstrapLocators.loadingSpinner.existsIn(this),
-                "The delete / archive confirmation dialog did not become ready.", 1_000);
+                "The delete confirmation dialog did not become ready.", 1_000);
     }
 
     public DeleteConfirmationDialog<ConfirmPage> setSkipAuditEventCheck(boolean skipAuditEventCheck)
@@ -92,15 +92,10 @@ public class DeleteConfirmationDialog<ConfirmPage extends WebDriverWrapper> exte
 
     public ConfirmPage confirmDelete(Integer waitSeconds)
     {
-        return clickConfirmButton(waitSeconds, "Yes, Delete");
-    }
-
-    protected ConfirmPage clickConfirmButton(Integer waitSeconds, String buttonText)
-    {
         Integer count = getCountFromTitle();
         AuditLogHelper.AuditEvent auditEventName = getAuditEvent();
 
-        var confirmPage = _confirmationSynchronizationFunction.apply(() -> this.dismiss(buttonText, waitSeconds));
+        var confirmPage = _confirmationSynchronizationFunction.apply(() -> this.dismiss("Yes, Delete", waitSeconds));
 
         if (!skipAuditEventCheck && count != null && auditEventName != null && !TestProperties.isTrialServer())
             verifyAuditEvents(getWrapper(), getWrapper().getCurrentProject(), auditEventName, count);
