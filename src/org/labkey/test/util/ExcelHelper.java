@@ -15,6 +15,7 @@
  */
 package org.labkey.test.util;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.format.CellGeneralFormatter;
 import org.apache.poi.ss.formula.FormulaParseException;
 import org.apache.poi.ss.usermodel.Cell;
@@ -28,6 +29,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.ss.util.WorkbookUtil;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
@@ -35,6 +37,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -266,7 +269,7 @@ public abstract class ExcelHelper
     {
         try (Workbook workbook = ExcelHelper.create(file))
         {
-            Map<String, List<Map<String, String>>> allData = new LinkedHashMap<>();
+            Map<String, List<Map<String, String>>> allData = new WorsheetMap();
 
             for (int s = 0; s < workbook.getNumberOfSheets(); s++)
             {
@@ -291,11 +294,35 @@ public abstract class ExcelHelper
                 allData.put(sheet.getSheetName(), rowMaps);
             }
 
-            return allData;
+            return Collections.unmodifiableMap(allData);
         }
         catch (IOException e)
         {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * Truncate and make safe a proposed Excel sheet name
+     * @see org.labkey.api.data.ExcelWriter#cleanSheetName(String)
+     */
+    public static String sheetName(String sheetName)
+    {
+        return WorkbookUtil.createSafeSheetName(StringUtils.truncate(sheetName, 31), '_');
+    }
+}
+
+class WorsheetMap extends LinkedHashMap<String, List<Map<String, String>>>
+{
+    @Override
+    public List<Map<String, String>> get(Object key)
+    {
+        return super.get(ExcelHelper.sheetName((String) key));
+    }
+
+    @Override
+    public List<Map<String, String>> getOrDefault(Object key, List<Map<String, String>> defaultValue)
+    {
+        return super.getOrDefault(ExcelHelper.sheetName((String) key), defaultValue);
     }
 }

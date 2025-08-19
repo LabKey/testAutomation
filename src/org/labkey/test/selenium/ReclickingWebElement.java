@@ -216,7 +216,7 @@ public class ReclickingWebElement extends WebElementDecorator
             Locator.XPathLocator interceptingElLoc = parseInterceptingElementLoc(shortMessage);
             if (interceptingElLoc != null)
             {
-                if (Strings.CS.containsAny(interceptingElLoc.toString(), "popover", "tip"))
+                if (Strings.CS.containsAny(interceptingElLoc.toString(), "popover", "ws-pre-wrap", "tip"))
                 {
                     new Actions(getDriver()).moveToLocation(0,0).perform();
                 }

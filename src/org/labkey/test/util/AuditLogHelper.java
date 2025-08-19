@@ -469,9 +469,24 @@ public class AuditLogHelper
         {
             if (!sb.isEmpty())
                 sb.append("&");
-            sb.append(EscapeUtil.encode(pairs[i])).append("=").append(EscapeUtil.encode(pairs[i + 1]));
+            sb.append(encodeValue(pairs[i])).append("=").append(encodeValue(pairs[i + 1]));
         }
         return sb.toString();
+    }
+
+    /**
+     * Perform selective URL encoding for use {@link DetailedAuditEventRow#newValues} or
+     * {@link DetailedAuditEventRow#oldValues}
+     * @param value raw key or value
+     * @return Partially URL-encoded value
+     */
+    private static String encodeValue(String value)
+    {
+        return value
+            .replace("%", "%25") // '%' needs to be first
+            .replace(" ", "%20")
+            .replace("&", "%26")
+            .replace("=", "%3D");
     }
 
     public static String formatDataChange(String name, String oldValue, String newValue)
