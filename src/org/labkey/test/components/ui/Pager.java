@@ -93,8 +93,7 @@ public class Pager extends WebDriverComponent<Pager.ElementCache>
         }
         else
         {
-            // Tooltip sometimes blocks button. Click active option to dismiss menu.
-            activeLi.click();
+            elementCache().jumpToDropdown.collapse();
         }
 
         return initialSize;
