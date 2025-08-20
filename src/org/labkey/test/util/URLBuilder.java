@@ -114,6 +114,7 @@ public class URLBuilder
     private String encodeAppResourcePathPart(String pathPart)
     {
         return EscapeUtil.encode(pathPart)
+            // We generally don't encode parentheses in app resource paths
             .replace("%28", "(")
             .replace("%29", ")");
     }
