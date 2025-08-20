@@ -7,6 +7,7 @@ import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.util.TestLogger;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 /**
  * <p>
@@ -73,14 +74,7 @@ public class ServerNotificationItem extends WebDriverComponent<ServerNotificatio
      */
     public String getMessage()
     {
-        if(elementCache().message.isDisplayed())
-        {
-            return elementCache().message.getText();
-        }
-        else
-        {
-            return "";
-        }
+        return getWrapper().shortWait().until(ExpectedConditions.visibilityOf(elementCache().message)).getText();
     }
 
     /**
