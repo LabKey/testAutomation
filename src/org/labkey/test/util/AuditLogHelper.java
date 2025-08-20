@@ -482,12 +482,19 @@ public class AuditLogHelper
      */
     private static String encodeValue(String value)
     {
-        return value
-            .replace("%", "%25") // '%' needs to be first
-            .replace(" ", "%20")
-            .replace("&", "%26")
-            .replace("/", "%2F")
-            .replace("=", "%3D");
+        return EscapeUtil.encode(value)
+            .replace("%28", "(")
+            .replace("%29", ")");
+//        return value
+//            .replace("%", "%25") // '%' needs to be first
+//            .replace(" ", "%20")
+//            .replace("$", "%24")
+//            .replace("&", "%26")
+//            .replace("'", "%27")
+//            .replace("/", "%2F")
+//            .replace("=", "%3D")
+//            .replace("{", "%7B")
+//            .replace("}", "%7D");
     }
 
     public static String formatDataChange(String name, String oldValue, String newValue)
