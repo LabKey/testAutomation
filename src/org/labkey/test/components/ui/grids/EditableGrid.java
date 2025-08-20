@@ -791,7 +791,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
      */
     public EditableGrid pasteColumn(CharSequence columnIdentifier, List<?> pasteValues)
     {
-        return pasteFromCell(0, columnIdentifier, getPastable(pasteValues), false);
+        return pasteFromCell(0, columnIdentifier, getPastableColumn(pasteValues), false);
     }
 
     /**
