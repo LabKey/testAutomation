@@ -791,6 +791,8 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
      */
     public EditableGrid pasteColumn(CharSequence columnIdentifier, List<?> pasteValues)
     {
+        if (pasteValues.isEmpty())
+            throw new IllegalArgumentException("No paste values provided");
         return pasteFromCell(0, columnIdentifier, getPastableColumn(pasteValues), false);
     }
 
