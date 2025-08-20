@@ -44,6 +44,12 @@ public class ServerNotificationItem extends WebDriverComponent<ServerNotificatio
         return componentElement;
     }
 
+    @Override
+    protected void waitForReady()
+    {
+        getWrapper().quickWait().until(ExpectedConditions.visibilityOf(getComponentElement()));
+    }
+
     /**
      * Get the status as indicated by the icon.
      *
@@ -74,7 +80,14 @@ public class ServerNotificationItem extends WebDriverComponent<ServerNotificatio
      */
     public String getMessage()
     {
-        return getWrapper().shortWait().until(ExpectedConditions.visibilityOf(elementCache().message)).getText();
+        if (elementCache().message.isDisplayed())
+        {
+            return elementCache().message.getText();
+        }
+        else
+        {
+            return "";
+        }
     }
 
     /**
