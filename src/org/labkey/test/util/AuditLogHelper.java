@@ -67,6 +67,13 @@ public class AuditLogHelper
         this(wrapper, wrapper::createDefaultConnection);
     }
 
+    public enum AuditBehaviorType
+    {
+        NONE,
+        DETAILED,
+        SUMMARY;
+    }
+
     public enum AuditEvent
     {
         SAMPLE_TIMELINE_EVENT("SampleTimelineEvent"),
