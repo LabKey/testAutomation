@@ -455,6 +455,11 @@ public class TestDataUtils
         return updatedRows;
     }
 
+    public static <T> File writeDataToFile(String fileName, List<Map<String, T>> rowMaps) throws IOException
+    {
+        return writeRowsToFile(fileName, new RecordIterator(rowMaps));
+    }
+
     public static <T> File writeRowsToFile(String fileName, List<List<T>> rows) throws IOException
     {
         return writeRowsToFile(fileName, rows.iterator());
