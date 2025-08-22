@@ -141,6 +141,7 @@ def initPropertiesTask = project.tasks.register("initProperties", Copy) {
                 return line
             }
         }
+        task.onlyIf{ !project.file('test.properties').exists() }
 }
 
 project.tasks.register("convertHarToStressXml", JavaExec) {
