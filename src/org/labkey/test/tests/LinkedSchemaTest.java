@@ -25,6 +25,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Data;
 import org.labkey.test.components.CustomizeView;
@@ -32,6 +33,8 @@ import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.pages.list.GridPage;
 import org.labkey.test.pages.query.QueryMetadataEditorPage;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.FieldInfo;
+import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.params.list.IntListDefinition;
 import org.labkey.test.params.list.ListDefinition;
 import org.labkey.test.params.list.VarListDefinition;
@@ -41,6 +44,8 @@ import org.labkey.test.util.AuditLogHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.SchemaHelper;
+import org.labkey.test.util.TestDataGenerator;
+import org.labkey.test.util.exp.SampleTypeAPIHelper;
 
 import java.io.File;
 import java.io.IOException;
@@ -112,6 +117,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     private static final String STUDY_FOLDER = "StudyFolder"; // Folder used to validate fix for issues 32454 & 32456
     private static final String MOTHER = "Mother";
     private static final String READER_USER = "reader@linkedschema.test";
+    private static final String EXTERNAL_SCHEMA_USER = "external@linkedschema.test";
     private final AuditLogHelper _auditLogHelper = new AuditLogHelper(this);
 
     public static final String LIST_NAME = "LinkedSchemaTestPeople";
@@ -401,6 +407,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     {
         super.doCleanup(afterTest);
         _userHelper.deleteUsers(false, READER_USER);
+        _userHelper.deleteUsers(false, EXTERNAL_SCHEMA_USER);
     }
 
     @BeforeClass
@@ -632,8 +639,13 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     {
         ApiPermissionsHelper apiPermissionsHelper = new ApiPermissionsHelper(this);
         _userHelper.createUser(READER_USER);
+        _userHelper.createUser(EXTERNAL_SCHEMA_USER);
 
         _containerHelper.createProject(getProjectName(), null);
+
+        // Giving this user more permissions in the test project so it can access the schema browser.
+        apiPermissionsHelper.setUserPermissions(EXTERNAL_SCHEMA_USER, "Folder Administrator");
+
         _containerHelper.createSubfolder(getProjectName(), SOURCE_FOLDER);
         // Enable linkedschematest in source folder so the "BPeopleTemplate" is visible.
         _containerHelper.enableModule("linkedschematest");
@@ -916,6 +928,96 @@ public class LinkedSchemaTest extends BaseWebDriverTest
 
         // clean up after ourselves
         _schemaHelper.deleteSchema(sourceContainerPath, linkedSchemaName);
+    }
+
+    // Issue 53421: linked schemas can't use sample type as a source in a container different from where the type is defined
+    @Test
+    public void testLinkedSchemaToExternalSubfolder() throws IOException, CommandException
+    {
+
+        String externalProject = "Linked Schema Other Project";
+        String subFolder = "Sub Folder 01";
+        String externalPath = externalProject + "/" + subFolder;
+
+        log(String.format("Create a separate project %s with sub-folder %s.",
+                externalProject, subFolder));
+
+        // Delete the external project if it already exists.
+        _containerHelper.deleteProject(externalProject, false);
+        _containerHelper.createProject(externalProject, null);
+        _containerHelper.createSubfolder(externalProject, subFolder);
+
+        String sampleType = "Linked Schema Test";
+        FieldInfo strField = new FieldInfo(TestDataGenerator.randomFieldName("Str"), FieldDefinition.ColumnType.String);
+        SampleTypeDefinition sampleTypeDefinition = new SampleTypeDefinition(sampleType);
+        sampleTypeDefinition.setNameExpression("External ${genId}");
+        sampleTypeDefinition.addField(new FieldDefinition(strField.getName()));
+
+        log(String.format("In project %s create a sample type %s.",
+                externalProject, sampleType));
+
+        TestDataGenerator testDataGenerator = SampleTypeAPIHelper.createEmptySampleType(externalProject, sampleTypeDefinition);
+
+        log(String.format("In project %s add samples to the sample type.",
+                externalProject));
+
+        List<String> parentFolderValues = List.of("A", "B", "C", "D");
+        for (String value : parentFolderValues)
+        {
+            testDataGenerator.addCustomRow(Map.of(strField.getName(), value));
+        }
+        testDataGenerator.insertRows(WebTestHelper.getRemoteApiConnection(), testDataGenerator.getRows());
+
+        log(String.format("From the sub-folder %s add samples to the sample type.",
+                externalPath));
+
+        List<String> subFolderValues = List.of("W", "X", "Y", "Z");
+        testDataGenerator = new TestDataGenerator("samples", sampleType, externalProject + "/" + subFolder);
+        for (String value : subFolderValues)
+        {
+            testDataGenerator.addCustomRow(Map.of(strField.getName(), value));
+        }
+        testDataGenerator.insertRows(WebTestHelper.getRemoteApiConnection(), testDataGenerator.getRows());
+
+        // It looks like the createProject call puts you on the new project.
+        log("Go back to the test project.");
+        goToProjectHome();
+
+        String linkedSchemaName = "External_Project_Schema";
+        log(String.format("Create a linked schema named %s that looks at %s.",
+                linkedSchemaName, externalPath));
+
+        _schemaHelper.createLinkedSchema(getProjectName(), linkedSchemaName, externalPath, null, "samples", null, null);
+
+        goToProjectHome();
+
+        log(String.format("Use the schema browser to validate only the samples in the sub-folder %s are visible.",
+                externalPath));
+
+        validateDataFromExternalProject(linkedSchemaName, sampleType, strField,
+                subFolderValues, String.format("Data displayed for linked schema '%s' not as expected.", linkedSchemaName));
+
+        log("Impersonate a user, reader in the current project, with no permissions in the external project.");
+
+        goToProjectHome();
+        impersonate(EXTERNAL_SCHEMA_USER);
+        validateDataFromExternalProject(linkedSchemaName, sampleType, strField,
+                subFolderValues, String.format("User with no permissions did not see the expected data for the linked schema '%s'.", linkedSchemaName));
+
+        stopImpersonating();
+    }
+
+    private void validateDataFromExternalProject(String linkedSchemaName, String sampleType, FieldInfo strField,
+                                                 List<String> expectedValues, String errorMsg)
+    {
+        goToSchemaBrowser();
+        viewQueryData(linkedSchemaName, sampleType);
+        DataRegionTable table = new DataRegionTable("query", getDriver());
+        List<String> actualValues = table.getColumnDataAsText(strField);
+
+        checker().withScreenshot().verifyEqualsSorted(errorMsg,
+                expectedValues, actualValues);
+
     }
 
     /*
