@@ -58,7 +58,7 @@ public class SampleFinder extends WebDriverComponent<SampleFinder.ElementCache>
     }
 
     /**
-     * Waits for initial state (empty filter card panel) or for search results grid to appear
+     * Waits for the initial state (empty filter card panel) or for the search results grid to appear
      */
     @Override
     public void waitForReady()
@@ -70,10 +70,10 @@ public class SampleFinder extends WebDriverComponent<SampleFinder.ElementCache>
     /**
      * Open the entity filter dialog for the specified filter type.
      *
-     * @param filterKind "Source" or "Parent" or "Assay" in SM. "Registry Parent" or "Sample Parent" or "Assay" in Biologics
+     * @param filterKind "Sample", "Source" or "Parent" or "Assay" in SM. "Registry Parent" or "Sample Parent" or "Assay" in Biologics
      * @return component wrapper for the EntityFieldFilterModal
      */
-    public EntityFieldFilterModal clickAddParent(String filterKind)
+    public EntityFieldFilterModal clickAddSearchCard(String filterKind)
     {
         elementCache().findFilterKindButton(filterKind).click();
         return new EntityFieldFilterModal(getDriver(), this::doAndWaitForUpdate);
@@ -110,7 +110,7 @@ public class SampleFinder extends WebDriverComponent<SampleFinder.ElementCache>
     }
 
     /**
-     * Reset sample finder to its initial state, with no search criteria
+     * Reset the sample finder to its initial state, with no search criteria
      */
     public void removeAllSearchCards()
     {
