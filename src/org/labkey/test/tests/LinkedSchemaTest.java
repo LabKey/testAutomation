@@ -34,6 +34,7 @@ import org.labkey.test.pages.list.GridPage;
 import org.labkey.test.pages.query.QueryMetadataEditorPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldInfo;
+import org.labkey.test.params.experiment.DataClassDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.params.list.IntListDefinition;
 import org.labkey.test.params.list.ListDefinition;
@@ -43,13 +44,16 @@ import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.AuditLogHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SchemaHelper;
 import org.labkey.test.util.TestDataGenerator;
+import org.labkey.test.util.exp.DataClassAPIHelper;
 import org.labkey.test.util.exp.SampleTypeAPIHelper;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -936,84 +940,168 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     {
 
         String externalProject = "Linked Schema Other Project";
-        String subFolder = "Sub Folder 01";
-        String externalPath = externalProject + "/" + subFolder;
 
-        log(String.format("Create a separate project %s with sub-folder %s.",
-                externalProject, subFolder));
-
+        log(String.format("Create a separate project %s.",
+                externalProject));
         // Delete the external project if it already exists.
         _containerHelper.deleteProject(externalProject, false);
         _containerHelper.createProject(externalProject, null);
-        _containerHelper.createSubfolder(externalProject, subFolder);
+
+        validateExternalLinkedSampleType(externalProject);
+        validateExternalLinkedExperiment(externalProject); // Flow. Is this right?
+        validateExternalLinkedDataclass(externalProject);
+    }
+
+    private void validateExternalLinkedSampleType(String externalProject) throws IOException, CommandException
+    {
+        String subFolder = "Sub Folder Sample Type";
+        String subFolderPath = externalProject + "/" + subFolder;
 
         String sampleType = "Linked Schema Test";
-        FieldInfo strField = new FieldInfo(TestDataGenerator.randomFieldName("Str"), FieldDefinition.ColumnType.String);
-        SampleTypeDefinition sampleTypeDefinition = new SampleTypeDefinition(sampleType);
-        sampleTypeDefinition.setNameExpression("External ${genId}");
-        sampleTypeDefinition.addField(new FieldDefinition(strField.getName()));
+        String strField = TestDataGenerator.randomFieldName("Str");
 
-        log(String.format("In project %s create a sample type %s.",
-                externalProject, sampleType));
+        log(String.format("Create sub-folder %s for the sample type test.", subFolderPath));
+        _containerHelper.createSubfolder(externalProject, subFolder);
 
-        TestDataGenerator testDataGenerator = SampleTypeAPIHelper.createEmptySampleType(externalProject, sampleTypeDefinition);
+        List<String> expectedValues = populateDomain(externalProject, subFolder, true, sampleType, strField);
 
-        log(String.format("In project %s add samples to the sample type.",
-                externalProject));
+        String linkedSampleTypeSchema = "External_Sample_Type_Schema";
+        validateExternalLinkedSchema(linkedSampleTypeSchema, subFolderPath, "samples", sampleType, strField, expectedValues);
 
-        List<String> parentFolderValues = List.of("A", "B", "C", "D");
-        for (String value : parentFolderValues)
+    }
+
+    private void validateExternalLinkedExperiment(String externalProject)
+    {
+        String subFolder = "Sub Folder Experiment";
+        String subfolderPath = externalProject + "/" + subFolder;
+
+        createExperiment(externalProject, subFolder);
+
+        List<String> expectedValues = List.of("Example 5 Run (XTandem peptide search)");
+        String linkedExpRunSchema = "External_Exp_Run_Schema";
+
+        validateExternalLinkedSchema(linkedExpRunSchema, subfolderPath, "flow", "Runs", "Name", expectedValues);
+
+    }
+
+    private void validateExternalLinkedDataclass(String externalProject) throws IOException, CommandException
+    {
+
+        String subFolder = "DataClass Sub Folder";
+        String subfolderPath = externalProject + "/" + subFolder;
+
+        String dataClassName = "Export data class";
+        String strField = TestDataGenerator.randomFieldName("Str");
+
+        log(String.format("Create sub-folder %s for the data classs test.", subfolderPath));
+        _containerHelper.createSubfolder(externalProject, subFolder);
+
+        List<String> expectedValues = populateDomain(externalProject, subFolder, false, dataClassName, strField);
+
+        String linkedDataclassSchema = "External_Dataclass_Schema";
+        validateExternalLinkedSchema(linkedDataclassSchema, subfolderPath, "exp.data", dataClassName, strField, expectedValues);
+
+    }
+
+    // Populating a sample type and a data class is very similar.
+    private List<String> populateDomain(String parentProject, String subFolder, boolean isSampleType, String query, String fieldName) throws IOException, CommandException
+    {
+
+        TestDataGenerator testDataGenerator;
+        FieldDefinition field = new FieldDefinition(fieldName);
+        String subFolderPath = parentProject + "/" + subFolder;
+        String schema;
+
+        if (isSampleType)
         {
-            testDataGenerator.addCustomRow(Map.of(strField.getName(), value));
+            schema = "samples";
+            SampleTypeDefinition sampleTypeDefinition = new SampleTypeDefinition(query);
+            sampleTypeDefinition.setNameExpression("External ${genId}");
+            sampleTypeDefinition.addField(field);
+            testDataGenerator = SampleTypeAPIHelper.createEmptySampleType(parentProject, sampleTypeDefinition);
+        }
+        else
+        {
+            schema = "exp.data";
+            DataClassDefinition dataClassDefinition = new DataClassDefinition(query);
+            dataClassDefinition.setNameExpression("DC - ${genId}");
+            dataClassDefinition.addField(field);
+            testDataGenerator = DataClassAPIHelper.createEmptyDataClass(parentProject, dataClassDefinition);
+        }
+
+        for (String value : List.of("A", "B", "C", "D"))
+        {
+            testDataGenerator.addCustomRow(Map.of(fieldName, value));
         }
         testDataGenerator.insertRows(WebTestHelper.getRemoteApiConnection(), testDataGenerator.getRows());
 
-        log(String.format("From the sub-folder %s add samples to the sample type.",
-                externalPath));
-
+        // Add entries in the subfolder. Send these back as values to check.
         List<String> subFolderValues = List.of("W", "X", "Y", "Z");
-        testDataGenerator = new TestDataGenerator("samples", sampleType, externalProject + "/" + subFolder);
+        testDataGenerator = new TestDataGenerator(schema, query, subFolderPath);
         for (String value : subFolderValues)
         {
-            testDataGenerator.addCustomRow(Map.of(strField.getName(), value));
+            testDataGenerator.addCustomRow(Map.of(fieldName, value));
         }
         testDataGenerator.insertRows(WebTestHelper.getRemoteApiConnection(), testDataGenerator.getRows());
 
-        // It looks like the createProject call puts you on the new project.
-        log("Go back to the test project.");
+        return subFolderValues;
+    }
+
+    private void createExperiment(String projectName, String subFolder)
+    {
+        // This is cut-and-paste code from ExpTest setup.
+
+        _containerHelper.createSubfolder(projectName, subFolder, new String[]{"Experiment", "Query"});
+
+        new PortalHelper(this)
+                .doInAdminMode(portalHelper -> {
+                    portalHelper.addWebPart("Data Pipeline");
+                    portalHelper.addWebPart("Run Groups");
+                });
+        clickButton("Setup");
+        setPipelineRoot(TestFileUtils.getSampleData("xarfiles/expVerify").getAbsolutePath());
+        clickFolder(subFolder);
+
+        clickButton("Process and Import Data");
+
+        _fileBrowserHelper.importFile("experiment.xar.xml", "Import Experiment");
+        Date importDate = new Date(); // Import timestamp will have various formats applied to it
+        clickAndWait(Locator.linkWithText("Data Pipeline"));
+        waitForPipelineJobsToComplete(1, false);
+
+    }
+
+    private void validateExternalLinkedSchema(String linkedSchemaName, String subfolderPath, String sourceSchemaName, String sourceQueryName, String fieldName, List<String> expectedValues)
+    {
         goToProjectHome();
 
-        String linkedSchemaName = "External_Project_Schema";
         log(String.format("Create a linked schema named %s that looks at %s.",
-                linkedSchemaName, externalPath));
+                linkedSchemaName, subfolderPath));
 
-        _schemaHelper.createLinkedSchema(getProjectName(), linkedSchemaName, externalPath, null, "samples", null, null);
+        _schemaHelper.createLinkedSchema(getProjectName(), linkedSchemaName, subfolderPath, null, sourceSchemaName, null, null);
 
         goToProjectHome();
 
-        log(String.format("Use the schema browser to validate only the samples in the sub-folder %s are visible.",
-                externalPath));
+        validateExternalLinkedData(linkedSchemaName, sourceQueryName, fieldName,
+                expectedValues, String.format("Data displayed for linked schema '%s' not as expected.", linkedSchemaName));
 
-        validateDataFromExternalProject(linkedSchemaName, sampleType, strField,
-                subFolderValues, String.format("Data displayed for linked schema '%s' not as expected.", linkedSchemaName));
-
-        log("Impersonate a user, with no permissions in the external project, and validate the linked schema and data is as expected.");
-
+        log("Impersonate a user, with no permissions in the external source project, and validate.");
         goToProjectHome();
         impersonate(EXTERNAL_SCHEMA_USER);
-        validateDataFromExternalProject(linkedSchemaName, sampleType, strField,
-                subFolderValues, String.format("User with no permissions did not see the expected data for the linked schema '%s'.", linkedSchemaName));
-
+        validateExternalLinkedData(linkedSchemaName, sourceQueryName, fieldName,
+                expectedValues, String.format("User with no permissions did not see the expected data for the linked schema '%s'.", linkedSchemaName));
         stopImpersonating();
     }
 
-    private void validateDataFromExternalProject(String linkedSchemaName, String sampleType, FieldInfo strField,
-                                                 List<String> expectedValues, String errorMsg)
+    private void validateExternalLinkedData(String linkedSchemaName, String query, String fieldName, List<String> expectedValues, String errorMsg)
     {
+
+        // Use a FieldInfo object to deal with any tricky characters.
+        FieldInfo fieldInfo = new FieldInfo(fieldName, FieldDefinition.ColumnType.String);
         goToSchemaBrowser();
-        viewQueryData(linkedSchemaName, sampleType);
+        viewQueryData(linkedSchemaName, query);
         DataRegionTable table = new DataRegionTable("query", getDriver());
-        List<String> actualValues = table.getColumnDataAsText(strField);
+        List<String> actualValues = table.getColumnDataAsText(fieldInfo);
 
         // Using a sort list to validate because the list should be equal and I don't want to worry about the order.
         checker().withScreenshot().verifyEqualsSorted(errorMsg,
