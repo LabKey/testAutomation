@@ -2753,7 +2753,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         String action = isInsert ? "insertRows" : "updateRows";
         String updateScript = "LABKEY.Query." + action + "({ schemaName: \"" + schema + "\", "+
                 "queryName: " + EscapeUtil.toJSONStr(dataType) + ", " +
-                (auditBehavior == null ? "" : "auditBehavior: " + EscapeUtil.toJSONStr(auditBehavior.name())) + ", " +
+                (auditBehavior == null ? "" : ("auditBehavior: " + EscapeUtil.toJSONStr(auditBehavior.name())) + ", ") +
                 "success: callback," +
                 "failure: callback," +
                 "rows: [" + EscapeUtil.toJSONRow(row) + "]" +
