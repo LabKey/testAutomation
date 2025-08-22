@@ -997,7 +997,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         validateDataFromExternalProject(linkedSchemaName, sampleType, strField,
                 subFolderValues, String.format("Data displayed for linked schema '%s' not as expected.", linkedSchemaName));
 
-        log("Impersonate a user, reader in the current project, with no permissions in the external project.");
+        log("Impersonate a user, with no permissions in the external project, and validate the linked schema and data is as expected.");
 
         goToProjectHome();
         impersonate(EXTERNAL_SCHEMA_USER);
@@ -1015,6 +1015,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         DataRegionTable table = new DataRegionTable("query", getDriver());
         List<String> actualValues = table.getColumnDataAsText(strField);
 
+        // Using a sort list to validate because the list should be equal and I don't want to worry about the order.
         checker().withScreenshot().verifyEqualsSorted(errorMsg,
                 expectedValues, actualValues);
 
