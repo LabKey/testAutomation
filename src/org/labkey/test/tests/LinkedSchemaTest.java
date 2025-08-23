@@ -1004,12 +1004,12 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     }
 
     // Populating a sample type and a data class is very similar.
-    private List<String> populateDomain(String parentProject, String subFolder, boolean isSampleType, String query, String fieldName) throws IOException, CommandException
+    private List<String> populateDomain(String externalProject, String subFolder, boolean isSampleType, String query, String fieldName) throws IOException, CommandException
     {
 
         TestDataGenerator testDataGenerator;
         FieldDefinition field = new FieldDefinition(fieldName);
-        String subFolderPath = parentProject + "/" + subFolder;
+        String subFolderPath = externalProject + "/" + subFolder;
         String schema;
 
         if (isSampleType)
@@ -1018,7 +1018,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
             SampleTypeDefinition sampleTypeDefinition = new SampleTypeDefinition(query);
             sampleTypeDefinition.setNameExpression("External ${genId}");
             sampleTypeDefinition.addField(field);
-            testDataGenerator = SampleTypeAPIHelper.createEmptySampleType(parentProject, sampleTypeDefinition);
+            testDataGenerator = SampleTypeAPIHelper.createEmptySampleType(externalProject, sampleTypeDefinition);
         }
         else
         {
@@ -1026,7 +1026,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
             DataClassDefinition dataClassDefinition = new DataClassDefinition(query);
             dataClassDefinition.setNameExpression("DC - ${genId}");
             dataClassDefinition.addField(field);
-            testDataGenerator = DataClassAPIHelper.createEmptyDataClass(parentProject, dataClassDefinition);
+            testDataGenerator = DataClassAPIHelper.createEmptyDataClass(externalProject, dataClassDefinition);
         }
 
         for (String value : List.of("A", "B", "C", "D"))
@@ -1047,11 +1047,11 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         return subFolderValues;
     }
 
-    private void createExperiment(String projectName, String subFolder)
+    private void createExperiment(String externalProject, String subFolder)
     {
         // This is cut-and-paste code from ExpTest setup.
 
-        _containerHelper.createSubfolder(projectName, subFolder, new String[]{"Experiment", "Query"});
+        _containerHelper.createSubfolder(externalProject, subFolder, new String[]{"Experiment", "Query"});
 
         new PortalHelper(this)
                 .doInAdminMode(portalHelper -> {
@@ -1071,14 +1071,14 @@ public class LinkedSchemaTest extends BaseWebDriverTest
 
     }
 
-    private void validateExternalLinkedSchema(String linkedSchemaName, String subfolderPath, String sourceSchemaName, String sourceQueryName, String fieldName, List<String> expectedValues)
+    private void validateExternalLinkedSchema(String linkedSchemaName, String sourceSubFolderPath, String sourceSchemaName, String sourceQueryName, String fieldName, List<String> expectedValues)
     {
         goToProjectHome();
 
         log(String.format("Create a linked schema named %s that looks at %s.",
-                linkedSchemaName, subfolderPath));
+                linkedSchemaName, sourceSubFolderPath));
 
-        _schemaHelper.createLinkedSchema(getProjectName(), linkedSchemaName, subfolderPath, null, sourceSchemaName, null, null);
+        _schemaHelper.createLinkedSchema(getProjectName(), linkedSchemaName, sourceSubFolderPath, null, sourceSchemaName, null, null);
 
         goToProjectHome();
 
