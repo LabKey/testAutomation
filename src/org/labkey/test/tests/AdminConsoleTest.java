@@ -113,6 +113,19 @@ public class AdminConsoleTest extends AbstractAdminConsoleTest
             throw new RuntimeException("Failed to get Server HTTP response header", e);
         }
     }
+
+    @Test
+    public void testBogusSiteSettings()
+    {
+        // Issue 53562: Cap max BLOB size
+        CustomizeSitePage customizeSitePage = goToAdminConsole().clickSiteSettings();
+        customizeSitePage.setMaxBLOBSize(Integer.toString(200 * 1024 * 1024 + 1));
+        customizeSitePage.setSslPort("-4");
+        customizeSitePage.save();
+        assertTextPresent("Maximum BLOB size cannot be set higher than 209715200 bytes");
+        assertTextPresent("HTTPS port must be between 1 and 65,535");
+
+    }
     
     @Test
     public void testRibbonBar()
