@@ -121,10 +121,24 @@ public class AdminConsoleTest extends AbstractAdminConsoleTest
         CustomizeSitePage customizeSitePage = goToAdminConsole().clickSiteSettings();
         customizeSitePage.setMaxBLOBSize(Integer.toString(200 * 1024 * 1024 + 1));
         customizeSitePage.setSslPort("-4");
+        customizeSitePage.setMemoryUsageDumpInterval("-3");
+        customizeSitePage.setReadOnlyHttpRequestTimeout("-1");
         customizeSitePage.save();
-        assertTextPresent("Maximum BLOB size cannot be set higher than 209715200 bytes");
-        assertTextPresent("HTTPS port must be between 1 and 65,535");
+        assertTextPresent(
+            "Maximum BLOB size cannot be set higher than 209715200 bytes",
+            "HTTPS port must be between 1 and 65,535",
+            "Memory logging frequency must be non-negative",
+            "HTTP timeout must be non-negative"
+        );
 
+        customizeSitePage = new CustomizeSitePage(getDriver());
+        customizeSitePage.setMaxBLOBSize("-10");
+        customizeSitePage.setSslPort(Integer.toString(256 * 256)); // 2^16
+        customizeSitePage.save();
+        assertTextPresent(
+            "Maximum BLOB size cannot be negative",
+            "HTTPS port must be between 1 and 65,535"
+        );
     }
     
     @Test
