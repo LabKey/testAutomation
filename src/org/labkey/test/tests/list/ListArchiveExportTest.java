@@ -76,7 +76,7 @@ public class ListArchiveExportTest extends BaseWebDriverTest
     {
         var connection = createDefaultConnection();
         // Issue 53672: Use a long key column name
-        var listDef = new IntListDefinition(name, "keya123456789a123456789a123456789a123456789a123456789a123456789").setFields(List.of(
+        var listDef = new IntListDefinition(name, "keyA123456789a123456789A123456789a123456789a123456789a123456789").setFields(List.of(
                 new FieldDefinition("Shape", FieldDefinition.ColumnType.String),
                 new FieldDefinition("Count", FieldDefinition.ColumnType.Integer)));
         var dataGenerator = listDef.create(connection, getCurrentContainerPath());
