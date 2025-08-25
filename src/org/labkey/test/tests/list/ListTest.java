@@ -331,7 +331,8 @@ public class ListTest extends BaseWebDriverTest
         DomainFormPanel fieldsPanel = listDefinitionPage.getFieldsPanel();
         fieldsPanel.getField(_listColFake.getName())
             .setName(_listColDesc.getName())
-            .setLabel(_listColDesc.getLabel());
+            .setLabel(_listColDesc.getLabel())
+            .setImportAliases(_listColFake.getName());
         fieldsPanel.addField(_listColGood);
 
         // Create "Hidden Field" and remove from all views.
