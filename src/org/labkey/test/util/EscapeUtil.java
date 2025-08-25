@@ -54,6 +54,13 @@ public class EscapeUtil
         return "\"" + escaped + "\"";
     }
 
+    static public String toJSONStr(Object value)
+    {
+        if (value instanceof String strVal)
+            return toJSONStr(strVal);
+        return String.valueOf(value);
+    }
+
     static public String toJSONRow(Map<String, Object> row)
     {
         StringBuilder sb = new StringBuilder("{");
@@ -63,7 +70,7 @@ public class EscapeUtil
             sb.append(comma);
             Object value = entry.getValue();
             sb.append(EscapeUtil.toJSONStr(entry.getKey()))
-                    .append(": ").append(value instanceof String ? EscapeUtil.toJSONStr((String) entry.getValue()) : value);
+                    .append(": ").append(toJSONStr(value));
             comma = ",";
         }
         sb.append("}");
@@ -192,4 +199,5 @@ public class EscapeUtil
     {
         return nameExpressionNeedsEscaping.matcher(name).replaceAll("\\\\$1");
     }
+
 }
