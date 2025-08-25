@@ -91,6 +91,7 @@ public class AuditLogHelper
         ASSAY_RESULT_AUDIT_EVENT("AssayResultAuditEvent"), // avaialble with SampleManagement module
         EXPERIMENT_AUDIT_EVENT("ExperimentAuditEvent"),
         SAMPLE_WORKFLOW_AUDIT_EVENT("SamplesWorkflowAuditEvent"),
+        QUERY_UPDATE_AUDIT_EVENT("QueryUpdateAuditEvent"),
         FILE_SYSTEM_EVENT("FileSystem");
 
         private final String _name;

@@ -2762,6 +2762,20 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         executeAndVerifyScript(updateScript, errorMsg);
     }
 
+    protected void verifyQueryAPI(String schema, String dataType, @Nullable AuditLogHelper.AuditBehaviorType auditBehavior, List<Map<String, Object>> rows, boolean isInsert, String... errorMsg)
+    {
+        String action = isInsert ? "insertRows" : "updateRows";
+        String updateScript = "LABKEY.Query." + action + "({ schemaName: \"" + schema + "\", "+
+                "queryName: " + EscapeUtil.toJSONStr(dataType) + ", " +
+                (auditBehavior == null ? "" : ("auditBehavior: " + EscapeUtil.toJSONStr(auditBehavior.name())) + ", ") +
+                "success: callback," +
+                "failure: callback," +
+                "rows: [" + EscapeUtil.toJSONRow(rows) + "]" +
+                "})";
+        log(updateScript);
+        executeAndVerifyScript(updateScript, errorMsg);
+    }
+
     protected void executeAndVerifyScript(String script, @Nullable String... altErrors)
     {
         List<String> errors = new ArrayList<>();

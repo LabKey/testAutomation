@@ -23,6 +23,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.query.BaseRowsCommand;
 import org.labkey.remoteapi.query.InsertRowsCommand;
 import org.labkey.remoteapi.query.RowsResponse;
 import org.labkey.test.BaseWebDriverTest;
@@ -428,7 +429,7 @@ public class AuditLogTest extends BaseWebDriverTest
         {
             _containerHelper.createProject(AUDIT_DETAILED_TEST_PROJECT, "Custom");
             _containerHelper.enableModule("simpletest");
-            goToProjectHome();
+            goToProjectHome(AUDIT_DETAILED_TEST_PROJECT);
 
             Connection cn = WebTestHelper.getRemoteApiConnection();
 
@@ -439,8 +440,42 @@ public class AuditLogTest extends BaseWebDriverTest
             insertCmd.addRow(rowMap);
             RowsResponse resp1 = insertCmd.execute(cn, AUDIT_DETAILED_TEST_PROJECT);
 
+            Integer transactionId = _auditLogHelper.checkAuditEventDiffCountForLastTransaction(AUDIT_DETAILED_TEST_PROJECT, AuditLogHelper.AuditEvent.QUERY_UPDATE_AUDIT_EVENT, 0, 1);
+            Map<String, Object> expectedValues = new HashMap<>();
+            expectedValues.put("Comment", "1 row(s) were inserted.");
+            _auditLogHelper.checkAuditEventValuesForTransactionId(AUDIT_DETAILED_TEST_PROJECT, AuditLogHelper.AuditEvent.QUERY_UPDATE_AUDIT_EVENT, transactionId, 1, expectedValues);
+            goToProjectHome(AUDIT_DETAILED_TEST_PROJECT);
+
             Map<String, String> auditLog = getAuditLogRow(this, "Query update events", "Query Name", "Manufacturers");
             assertEquals("Did not find expected audit log for summary log level", "1 row(s) were inserted.", auditLog.get("Comment"));
+
+            // create manufacturer (which has summary audit log level) with api audit override to detail
+            insertCmd = new InsertRowsCommand("vehicle", "manufacturers");
+            insertCmd.setAuditBehavior(BaseRowsCommand.AuditBehavior.DETAILED);
+            rowMap = new HashMap<>();
+            rowMap.put("name", "Kia_ev");
+            insertCmd.addRow(rowMap);
+            insertCmd.execute(cn, AUDIT_DETAILED_TEST_PROJECT);
+
+            goToProjectHome(AUDIT_DETAILED_TEST_PROJECT);
+            transactionId = _auditLogHelper.checkAuditEventDiffCountForLastTransaction(AUDIT_DETAILED_TEST_PROJECT, AuditLogHelper.AuditEvent.QUERY_UPDATE_AUDIT_EVENT, 7, 1);
+            expectedValues = new HashMap<>();
+            expectedValues.put("Comment", "A row was inserted.");
+            _auditLogHelper.checkAuditEventValuesForTransactionId(AUDIT_DETAILED_TEST_PROJECT, AuditLogHelper.AuditEvent.QUERY_UPDATE_AUDIT_EVENT, transactionId, 1, expectedValues);
+
+            // create manufacturer (which has summary audit log level) with api audit override to NONE. The override should be ignored
+            insertCmd = new InsertRowsCommand("vehicle", "manufacturers");
+            insertCmd.setAuditBehavior(BaseRowsCommand.AuditBehavior.NONE);
+            rowMap = new HashMap<>();
+            rowMap.put("name", "Kia_hybrid");
+            insertCmd.addRow(rowMap);
+            insertCmd.execute(cn, AUDIT_DETAILED_TEST_PROJECT);
+
+            goToProjectHome(AUDIT_DETAILED_TEST_PROJECT);
+            transactionId = _auditLogHelper.checkAuditEventDiffCountForLastTransaction(AUDIT_DETAILED_TEST_PROJECT, AuditLogHelper.AuditEvent.QUERY_UPDATE_AUDIT_EVENT, 0, 1);
+            expectedValues = new HashMap<>();
+            expectedValues.put("Comment", "1 row(s) were inserted.");
+            _auditLogHelper.checkAuditEventValuesForTransactionId(AUDIT_DETAILED_TEST_PROJECT, AuditLogHelper.AuditEvent.QUERY_UPDATE_AUDIT_EVENT, transactionId, 1, expectedValues);
 
             //then create model (which has detailed audit log level)
             InsertRowsCommand insertCmd2 = new InsertRowsCommand("vehicle", "models");
@@ -453,6 +488,20 @@ public class AuditLogTest extends BaseWebDriverTest
             refresh();
             auditLog = getAuditLogRow(this, "Query update events", "Query Name", "Models");
             assertEquals("Did not find expected audit log for detailed log level", "A row was inserted.", auditLog.get("Comment"));
+            goToProjectHome(AUDIT_DETAILED_TEST_PROJECT);
+
+            // create model (which has detailed audit log level), with API audit SUMMARY, effective audit should be detailed
+            rowMap.put("name", "Carnival");
+            insertCmd2 = new InsertRowsCommand("vehicle", "models");
+            insertCmd2.setAuditBehavior(BaseRowsCommand.AuditBehavior.SUMMARY);
+            insertCmd2.addRow(rowMap);
+            insertCmd2.execute(cn, AUDIT_DETAILED_TEST_PROJECT);
+
+            transactionId = _auditLogHelper.checkAuditEventDiffCountForLastTransaction(AUDIT_DETAILED_TEST_PROJECT, AuditLogHelper.AuditEvent.QUERY_UPDATE_AUDIT_EVENT, 8, 1);
+            expectedValues = new HashMap<>();
+            expectedValues.put("Comment", "A row was inserted.");
+            _auditLogHelper.checkAuditEventValuesForTransactionId(AUDIT_DETAILED_TEST_PROJECT, AuditLogHelper.AuditEvent.QUERY_UPDATE_AUDIT_EVENT, transactionId, 1, expectedValues);
+
             _containerHelper.deleteProject(AUDIT_DETAILED_TEST_PROJECT, false);
         }
         else
