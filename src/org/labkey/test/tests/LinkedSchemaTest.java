@@ -988,11 +988,14 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     private void validateExternalLinkedDataclass(String externalProject) throws IOException, CommandException
     {
 
-        String subFolder = "Sub Folder " + TRICKY_CHARACTERS_FOR_PROJECT_NAMES + "DataClass";
+        String subFolder = "Sub Folder " + TRICKY_CHARACTERS_FOR_PROJECT_NAMES + " DataClass";
         String subfolderPath = externalProject + "/" + subFolder;
 
         String dataClassName = TestDataGenerator.randomDomainName("Export data class");
-        String strField = TestDataGenerator.randomFieldName("Str");
+
+        // This is the last sscenario to run. Adding this check here will allow the other scenarios to run before the test fails.
+        //Issue 53784: Field name with a quote causes a "QueryParseException: syntax error" when creating a linked schema.
+        String strField = TestDataGenerator.randomFieldName("Str \" ");
 
         log(String.format("Create sub-folder %s for the data classs test.", subfolderPath));
         _containerHelper.createSubfolder(externalProject, subFolder);
