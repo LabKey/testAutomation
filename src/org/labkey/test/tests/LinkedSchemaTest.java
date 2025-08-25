@@ -53,7 +53,6 @@ import org.labkey.test.util.exp.SampleTypeAPIHelper;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -646,10 +645,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         _userHelper.createUser(EXTERNAL_SCHEMA_USER);
 
         _containerHelper.createProject(getProjectName(), null);
-
-        // Giving this user more permissions in the test project so it can access the schema browser.
-        apiPermissionsHelper.setUserPermissions(EXTERNAL_SCHEMA_USER, "Folder Administrator");
-
+        apiPermissionsHelper.setUserPermissions(EXTERNAL_SCHEMA_USER, "Reader");
         _containerHelper.createSubfolder(getProjectName(), SOURCE_FOLDER);
         // Enable linkedschematest in source folder so the "BPeopleTemplate" is visible.
         _containerHelper.enableModule("linkedschematest");
@@ -939,25 +935,29 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     public void testLinkedSchemaToExternalSubfolder() throws IOException, CommandException
     {
 
-        String externalProject = "Linked Schema Other Project";
+        String externalProject = "Linked Schema Other Project" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
 
         log(String.format("Create a separate project %s.",
                 externalProject));
+
         // Delete the external project if it already exists.
         _containerHelper.deleteProject(externalProject, false);
         _containerHelper.createProject(externalProject, null);
 
+        // Add the Experiment module to test schemas linked to exp.
+        _containerHelper.enableModule("Experiment");
+
         validateExternalLinkedSampleType(externalProject);
-        validateExternalLinkedExperiment(externalProject); // Flow. Is this right?
+        validateExternalLinkedExperiment(externalProject);
         validateExternalLinkedDataclass(externalProject);
     }
 
     private void validateExternalLinkedSampleType(String externalProject) throws IOException, CommandException
     {
-        String subFolder = "Sub Folder Sample Type";
+        String subFolder = "Sub Folder " + TRICKY_CHARACTERS_FOR_PROJECT_NAMES + " Sample Type";
         String subFolderPath = externalProject + "/" + subFolder;
 
-        String sampleType = "Linked Schema Test";
+        String sampleType = TestDataGenerator.randomDomainName("Linked Schema Test");
         String strField = TestDataGenerator.randomFieldName("Str");
 
         log(String.format("Create sub-folder %s for the sample type test.", subFolderPath));
@@ -972,25 +972,26 @@ public class LinkedSchemaTest extends BaseWebDriverTest
 
     private void validateExternalLinkedExperiment(String externalProject)
     {
-        String subFolder = "Sub Folder Experiment";
+        String subFolder = "Sub Folder " + TRICKY_CHARACTERS_FOR_PROJECT_NAMES + " Experiment";
         String subfolderPath = externalProject + "/" + subFolder;
 
-        createExperiment(externalProject, subFolder);
+        String subFolderRunGroup = "SubFolder Run Group";
+        createExperiment(externalProject, subFolder, subFolderRunGroup);
 
-        List<String> expectedValues = List.of("Example 5 Run (XTandem peptide search)");
+        List<String> expectedValues = List.of(subFolderRunGroup);
         String linkedExpRunSchema = "External_Exp_Run_Schema";
 
-        validateExternalLinkedSchema(linkedExpRunSchema, subfolderPath, "flow", "Runs", "Name", expectedValues);
+        validateExternalLinkedSchema(linkedExpRunSchema, subfolderPath, "exp", "RunGroups", "Name", expectedValues);
 
     }
 
     private void validateExternalLinkedDataclass(String externalProject) throws IOException, CommandException
     {
 
-        String subFolder = "DataClass Sub Folder";
+        String subFolder = "Sub Folder " + TRICKY_CHARACTERS_FOR_PROJECT_NAMES + "DataClass";
         String subfolderPath = externalProject + "/" + subFolder;
 
-        String dataClassName = "Export data class";
+        String dataClassName = TestDataGenerator.randomDomainName("Export data class");
         String strField = TestDataGenerator.randomFieldName("Str");
 
         log(String.format("Create sub-folder %s for the data classs test.", subfolderPath));
@@ -1047,27 +1048,22 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         return subFolderValues;
     }
 
-    private void createExperiment(String externalProject, String subFolder)
+    private void createExperiment(String externalProject, String subFolder, String subFolderRunGroup)
     {
-        // This is cut-and-paste code from ExpTest setup.
+        // Create a RunGroup in the parent folder.
+        goToProjectHome(externalProject);
+        clickTab("Experiment");
+        waitAndClickAndWait(Locator.linkContainingText("Create Run Group"));
+        setFormElement(Locator.name("name"), "Parent Run Group");
+        clickButton("Submit");
 
-        _containerHelper.createSubfolder(externalProject, subFolder, new String[]{"Experiment", "Query"});
+        _containerHelper.createSubfolder(externalProject, subFolder);
 
-        new PortalHelper(this)
-                .doInAdminMode(portalHelper -> {
-                    portalHelper.addWebPart("Data Pipeline");
-                    portalHelper.addWebPart("Run Groups");
-                });
-        clickButton("Setup");
-        setPipelineRoot(TestFileUtils.getSampleData("xarfiles/expVerify").getAbsolutePath());
-        clickFolder(subFolder);
-
-        clickButton("Process and Import Data");
-
-        _fileBrowserHelper.importFile("experiment.xar.xml", "Import Experiment");
-        Date importDate = new Date(); // Import timestamp will have various formats applied to it
-        clickAndWait(Locator.linkWithText("Data Pipeline"));
-        waitForPipelineJobsToComplete(1, false);
+        // Create a RunGroup in the subfolder.
+        clickTab("Experiment");
+        waitAndClickAndWait(Locator.linkContainingText("Create Run Group"));
+        setFormElement(Locator.name("name"), subFolderRunGroup);
+        clickButton("Submit");
 
     }
 
@@ -1098,7 +1094,8 @@ public class LinkedSchemaTest extends BaseWebDriverTest
 
         // Use a FieldInfo object to deal with any tricky characters.
         FieldInfo fieldInfo = new FieldInfo(fieldName, FieldDefinition.ColumnType.String);
-        goToSchemaBrowser();
+        String url = WebTestHelper.buildURL("query", getProjectName(), "begin.view");
+        beginAt(url);
         viewQueryData(linkedSchemaName, query);
         DataRegionTable table = new DataRegionTable("query", getDriver());
         List<String> actualValues = table.getColumnDataAsText(fieldInfo);
