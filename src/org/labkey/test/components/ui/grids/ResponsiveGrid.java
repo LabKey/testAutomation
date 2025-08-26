@@ -305,7 +305,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverCompon
         return new FieldSelectionDialog(getDriver(), this);
     }
 
-    protected void clickColumnMenuItem(CharSequence columnIdentifier, String menuText, boolean waitForUpdate)
+    public void clickColumnMenuItem(CharSequence columnIdentifier, String menuText, boolean waitForUpdate)
     {
 
         if(hasLockedColumn())

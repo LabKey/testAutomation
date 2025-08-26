@@ -163,7 +163,7 @@ public class ModeratorReviewTest extends BaseWebDriverTest
 
         // commonmark-java auto-linking turns all email addresses into mailto: links
         String formattedResponse = replaceEmailAddressesWithMailToLinks(response);
-        boolean responseAdded = isTextPresent(formattedResponse);
+        boolean responseAdded = isHtmlPresent(formattedResponse);
         if (expectAutoApproved && !responseAdded)
         {
             checker().fatal().error(String.format("Expected response '%s' was not present on the thread page.", formattedResponse));

@@ -70,6 +70,7 @@ import org.labkey.test.params.FieldKey;
 import org.labkey.test.teamcity.TeamCityUtils;
 import org.labkey.test.util.APIAssayHelper;
 import org.labkey.test.util.APIContainerHelper;
+import org.labkey.test.util.APITestHelper;
 import org.labkey.test.util.AbstractAssayHelper;
 import org.labkey.test.util.AbstractContainerHelper;
 import org.labkey.test.util.ApiPermissionsHelper;
@@ -80,6 +81,7 @@ import org.labkey.test.util.CspLogUtil;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.DebugUtils;
 import org.labkey.test.util.DeferredErrorCollector;
+import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.FileBrowserHelper;
 import org.labkey.test.util.ListHelper;
@@ -147,6 +149,7 @@ import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.labkey.test.TestProperties.isHeapDumpCollectionEnabled;
@@ -218,7 +221,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     public static final double DELTA = 10E-10;
 
     public static final String ALL_ILLEGAL_QUERY_KEY_CHARACTERS = StringUtils.join(FieldKey.getIllegalChars(), "");
-    // See TSVWriter.shouldQuote. Generally we are not able to use the tab and new line characters when creating field names in the UI, but including here for completeness
+    // See TSVWriter.shouldQuote. Generally, we are not able to use the tab and new line characters when creating field names in the UI, but including here for completeness
     public static final String[] TRICKY_IMPORT_FIELD_CHARACTERS = {"\\", "\"", "\\t", ",", "\\n", "\\r"};
 
     public static final String TRICKY_CHARACTERS = "><&/%\\' \"1\u00E4\u00F6\u00FC\u00C5";
@@ -2737,6 +2740,56 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             executeScript("localStorage.setItem('" + dismissBannerKey + "', 'true')");
         else
             executeScript("localStorage.removeItem('" + dismissBannerKey + "')");
+    }
+
+    protected void verifyQueryAPI(String schema, String dataType, Map<String, Object> row, boolean isInsert, String... errorMsg)
+    {
+        String action = isInsert ? "insertRows" : "updateRows";
+        String updateScript = "LABKEY.Query." + action + "({ schemaName: \"" + schema + "\", "+
+                "queryName: " + EscapeUtil.toJSONStr(dataType) + ", " +
+                "success: callback," +
+                "failure: callback," +
+                "rows: [" + EscapeUtil.toJSONRow(row) + "]" +
+                "})";
+        executeAndVerifyScript(updateScript, errorMsg);
+    }
+
+    protected void executeAndVerifyScript(String script, @Nullable String... altErrors)
+    {
+        List<String> errors = new ArrayList<>();
+        if (altErrors != null)
+            errors = Arrays.stream(altErrors).filter(Objects::nonNull).toList();
+
+        Map<String, Object> result = (Map<String, Object>)executeAsyncScript(script);
+
+        String failureResult = APITestHelper.parseScriptResult(result);
+
+        if (altErrors == null || errors.isEmpty())
+        {
+            assertNull(failureResult);  // null here means there was an unhandled server-side exception
+            checker().verifyNull("Unexpected error message", result.get("exception"));
+        }
+        else
+        {
+            Object exception = result.get("exception");
+            checker().verifyNotNull("Error is empty", exception);
+
+            if (exception instanceof String exceptionStr)
+            {
+                if (errors.size() == 1)
+                    checker().verifyEquals("Unexpected error message", errors.get(0), exception);
+                else
+                {
+                    for (String error : altErrors)
+                    {
+                        if (exceptionStr.equals(error))
+                            return;
+
+                    }
+                    checker().error("Unexpected error message: " + exception);
+                }
+            }
+        }
     }
 
     @Target(ElementType.TYPE)

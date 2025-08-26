@@ -306,9 +306,9 @@ public class AssayAPITest extends BaseWebDriverTest
         assayHelper.importAssay(assayId, runName, dataRowsInvalidResultFileName, getProjectName(), Collections.singletonMap("RunFileField", CREST_2_FILE.getAbsolutePath()), Collections.emptyMap(), "Invalid file path: " + CREST_2_FILE.getAbsolutePath());
         assayHelper.importAssay(assayId, runName, dataRowsInvalidResultFileName, getProjectName(), Collections.singletonMap("RunFileField", "../"), Collections.emptyMap(), "Invalid file path: ../");
         // valid run file but invalid result file
-        assayHelper.importAssay(assayId, runName, dataRowsInvalidResultFileName, getProjectName(), Collections.singletonMap("RunFileField", CREST_FILE.getName()), Collections.emptyMap(), "Invalid file path: crest-2.png");
-        assayHelper.importAssay(assayId, runName, dataRowsInvalidResultFileAbsolutePath, getProjectName(), Collections.singletonMap("RunFileField", CREST_FILE.getName()), Collections.emptyMap(), "Invalid file path: " + CREST_2_FILE.getAbsolutePath());
-        assayHelper.importAssay(assayId, runName, dataRowsInvalidResultFileDirectory, getProjectName(), Collections.singletonMap("RunFileField", CREST_FILE.getName()), Collections.emptyMap(), "Invalid file path: ../");
+        assayHelper.importAssay(assayId, runName, dataRowsInvalidResultFileName, getProjectName(), Collections.singletonMap("RunFileField", CREST_FILE.getName()), Collections.emptyMap(), "DataFileField: Invalid file path: crest-2.png");
+        assayHelper.importAssay(assayId, runName, dataRowsInvalidResultFileAbsolutePath, getProjectName(), Collections.singletonMap("RunFileField", CREST_FILE.getName()), Collections.emptyMap(), "DataFileField: Invalid file path: " + CREST_2_FILE.getAbsolutePath());
+        assayHelper.importAssay(assayId, runName, dataRowsInvalidResultFileDirectory, getProjectName(), Collections.singletonMap("RunFileField", CREST_FILE.getName()), Collections.emptyMap(), "DataFileField: Invalid file path: ../");
 
         // valid run file and valid result file
         FileBrowserHelper.FileDetailInfo runFileInfo = _fileBrowserHelper.getFileDetailInfo(getProjectName(), CREST_FILE.getName());
@@ -382,8 +382,8 @@ public class AssayAPITest extends BaseWebDriverTest
         verifyUpdateRunFileAPIError(assayName, "RunFileField", savedRunId, "../");
 
         runName = "valid run file path, invalid result file path";
-        ((APIAssayHelper) _assayHelper).saveBatch(assayName, runName, Collections.singletonMap("RunFileField", CREST_FILE.getName()), resultRows, getProjectName(), "Invalid file path: help.jpg");
-        ((APIAssayHelper) _assayHelper).saveBatch(assayName, runName, Collections.singletonMap("RunFileField", CREST_FILE.getName()), List.of(Maps.of("ptid", "188438419", "SpecimenID", "K770K3VY-20", "DataFileField", CREST_FILE.getAbsolutePath())), getProjectName(), "Invalid file path: " + CREST_FILE.getAbsolutePath());
+        ((APIAssayHelper) _assayHelper).saveBatch(assayName, runName, Collections.singletonMap("RunFileField", CREST_FILE.getName()), resultRows, getProjectName(), "DataFileField: Invalid file path: help.jpg");
+        ((APIAssayHelper) _assayHelper).saveBatch(assayName, runName, Collections.singletonMap("RunFileField", CREST_FILE.getName()), List.of(Maps.of("ptid", "188438419", "SpecimenID", "K770K3VY-20", "DataFileField", CREST_FILE.getAbsolutePath())), getProjectName(), "DataFileField: Invalid file path: " + CREST_FILE.getAbsolutePath());
 
         goToModule("FileContent");
         _fileBrowserHelper.uploadFile(HELP_ICON_FILE);

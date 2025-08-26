@@ -362,13 +362,30 @@ public class InlineImagesListTest extends BaseWebDriverTest
         ImportDataPage listImportPage = _listHelper.clickImportData();
         importFilePathError(listImportPage, "5", "absent.txt");
         importFilePathError(listImportPage, "5", PDF_FILE.getName());
+        importFilePathError(listImportPage, "5", "123");
         listImportPage.setCopyPasteMerge(false, true);
         importFilePathError(listImportPage, "1", "absent.txt");
         importFilePathError(listImportPage, "1", PDF_FILE.getName());
+        importFilePathError(listImportPage, "1", "true");
         listImportPage.setCopyPasteMerge(true, true);
         importFilePathError(listImportPage, "1", "absent.txt");
         importFilePathError(listImportPage, "1", PDF_FILE.getName());
         importFilePathError(listImportPage, "5", PDF_FILE.getName());
+
+        String attachmentError = "Can't upload '%s' to field %s with type Attachment.";
+        String attachmentPdfError = String.format(attachmentError, PDF_FILE.getName(), LIST_ATTACHMENT01_NAME);
+        String attachmentAbsentError = String.format(attachmentError, "Absent.txt", LIST_ATTACHMENT01_NAME);
+        verifyQueryAPI("lists", LIST_NAME, Map.of(LIST_KEY_NAME, 5, LIST_ATTACHMENT01_NAME, PDF_FILE.getName()), true, "Row 1: " + attachmentPdfError);
+        verifyQueryAPI("lists", LIST_NAME, Map.of(LIST_KEY_NAME, 5, LIST_ATTACHMENT01_NAME, "Absent.txt"), true, "Row 1: " + attachmentAbsentError);
+        verifyQueryAPI("lists", LIST_NAME, Map.of(LIST_KEY_NAME, 5, LIST_ATTACHMENT01_NAME, 123), true, "Row 1: " + String.format(attachmentError, "123", LIST_ATTACHMENT01_NAME));
+        verifyQueryAPI("lists", LIST_NAME, Map.of(LIST_KEY_NAME, 5, LIST_ATTACHMENT01_NAME, 123.456), true, "Row 1: " + String.format(attachmentError, "123.456", LIST_ATTACHMENT01_NAME));
+        verifyQueryAPI("lists", LIST_NAME, Map.of(LIST_KEY_NAME, 5, LIST_ATTACHMENT01_NAME, true), true, "Row 1: " + String.format(attachmentError, "true", LIST_ATTACHMENT01_NAME));
+        verifyQueryAPI("lists", LIST_NAME, Map.of(LIST_KEY_NAME, 1, LIST_ATTACHMENT01_NAME, PDF_FILE.getName()), false, attachmentPdfError);
+        verifyQueryAPI("lists", LIST_NAME, Map.of(LIST_KEY_NAME, 1, LIST_ATTACHMENT01_NAME, "Absent.txt"), false, attachmentAbsentError);
+        verifyQueryAPI("lists", LIST_NAME, Map.of(LIST_KEY_NAME, 1, LIST_ATTACHMENT01_NAME, 123), false, String.format(attachmentError, "123", LIST_ATTACHMENT01_NAME));
+        verifyQueryAPI("lists", LIST_NAME, Map.of(LIST_KEY_NAME, 1, LIST_ATTACHMENT01_NAME, 123.456), false, String.format(attachmentError, "123.456", LIST_ATTACHMENT01_NAME));
+        verifyQueryAPI("lists", LIST_NAME, Map.of(LIST_KEY_NAME, 1, LIST_ATTACHMENT01_NAME, true), false, String.format(attachmentError, "true", LIST_ATTACHMENT01_NAME));
+        verifyQueryAPI("lists", LIST_NAME, Map.of(LIST_KEY_NAME, 1, LIST_ATTACHMENT01_NAME, ""/*can remove attachment*/), false);
     }
 
     private void importFilePathError(ImportDataPage listImportPage, String key, String attachmentValue)

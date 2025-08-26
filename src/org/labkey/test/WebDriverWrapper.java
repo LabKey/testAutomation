@@ -18,7 +18,6 @@ package org.labkey.test;
 import org.apache.commons.collections4.MultiValuedMap;
 import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -62,6 +61,7 @@ import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.RelativeUrl;
 import org.labkey.test.util.TestLogger;
 import org.labkey.test.util.TextSearcher;
+import org.labkey.test.util.TextSearcher.TextTransformers;
 import org.labkey.test.util.Timer;
 import org.labkey.test.util.selenium.ScrollUtils;
 import org.labkey.test.util.selenium.WebDriverUtils;
@@ -149,6 +149,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -168,6 +169,7 @@ import static org.labkey.test.TestProperties.isScriptCheckEnabled;
 import static org.labkey.test.TestProperties.isWebDriverLoggingEnabled;
 import static org.labkey.test.WebTestHelper.makeRelativeUrl;
 import static org.labkey.test.components.html.RadioButton.RadioButton;
+import static org.labkey.test.util.LabKeyExpectedConditions.windowIsPresent;
 import static org.openqa.selenium.chrome.ChromeDriverService.CHROME_DRIVER_LOG_PROPERTY;
 import static org.openqa.selenium.chrome.ChromeDriverService.CHROME_DRIVER_VERBOSE_LOG_PROPERTY;
 import static org.openqa.selenium.firefox.GeckoDriverService.GECKO_DRIVER_LOG_PROPERTY;
@@ -1128,6 +1130,12 @@ public abstract class WebDriverWrapper implements WrapsDriver
     }
 
     @Contract(pure = true)
+    public WebDriverWait quickWait()
+    {
+        return new WebDriverWait(getDriver(), Duration.ofSeconds(1));
+    }
+
+    @Contract(pure = true)
     public WebDriverWait shortWait()
     {
         return new WebDriverWait(getDriver(), Duration.ofSeconds(10));
@@ -1621,29 +1629,27 @@ public abstract class WebDriverWrapper implements WrapsDriver
         fail("No errors found");
     }
 
-    public static String encodeText(String unencodedText)
-    {
-        return unencodedText
-                .replace("&", "&amp;")
-                .replace("<", "&lt;")
-                .replace(">", "&gt;");
-    }
-
+    /**
+     * Check whether all the specified text is present on the page
+     * @param texts un-encoded text to search for
+     * @return true if all the specified texts are present on the page
+     */
     public boolean isTextPresent(String... texts)
     {
-        final MutableBoolean present = new MutableBoolean(true);
+        return new TextSearcher(this).areAllTextsPresent(texts);
+    }
 
-        TextSearcher.TextHandler handler = (htmlSource, text) -> {
-            // Not found... stop enumerating and return false
-            if (htmlSource == null || !htmlSource.contains(text))
-                present.setFalse();
-
-            return present.get();
-        };
+    /**
+     * Check whether the HTML-encoded text is in the page source
+     * @param htmlFragments encoded html fragments to search for
+     * @return true if all the specified texts are present on the page
+     */
+    public boolean isHtmlPresent(String... htmlFragments)
+    {
         TextSearcher searcher = new TextSearcher(this);
-        searcher.searchForTexts(handler, Arrays.asList(texts));
+        searcher.setSearchTransformer(TextTransformers.IDENTITY);
 
-        return present.get();
+        return searcher.areAllTextsPresent(htmlFragments);
     }
 
     public List<String> getTextOrder(TextSearcher searcher, String... texts)
@@ -1664,11 +1670,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
                 .forEachOrdered((pair) -> orderedTexts.add(pair.getKey()));
 
         return orderedTexts;
-    }
-
-    public List<String> getMissingTexts(TextSearcher searcher, String... texts)
-    {
-        return searcher.getMissingTexts(Arrays.asList(texts));
     }
 
     public String getText(Locator elementLocator)
@@ -1699,7 +1700,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public void assertTextPresent(TextSearcher searcher, String... texts)
     {
-        List<String> missingTexts = getMissingTexts(searcher, texts);
+        List<String> missingTexts = searcher.getMissingTexts(texts);
 
         if (!missingTexts.isEmpty())
         {
@@ -1716,7 +1717,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         TextSearcher searcher = new TextSearcher(this);
 
-        searcher.setSearchTransformer((text) -> encodeText(text).toLowerCase());
+        searcher.setSearchTransformer(TextTransformers.ENCODE_HTML.andThen(String::toLowerCase));
 
         searcher.setSourceTransformer(String::toLowerCase);
 
@@ -1728,18 +1729,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
      */
     public boolean isAnyTextPresent(String... texts)
     {
-        final MutableBoolean found = new MutableBoolean(false);
-
-        TextSearcher.TextHandler handler = (htmlSource, text) -> {
-            if (htmlSource.contains(text))
-                found.setTrue();
-
-            return !found.get(); // stop searching if any value is found
-        };
-        TextSearcher searcher = new TextSearcher(this);
-        searcher.searchForTexts(handler, Arrays.asList(texts));
-
-        return found.get();
+        return new TextSearcher(this).isAnyTextPresent(texts);
     }
 
     /**
@@ -1899,7 +1889,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
     public void assertTextNotPresent(String... texts)
     {
         TextSearcher searcher = new TextSearcher(this);
-        searcher.setSearchTransformer((text) -> encodeText(text).replace("&nbsp;", " "));
+        searcher.setSearchTransformer(TextTransformers.ENCODE_HTML.andThen(t -> t.replace("&nbsp;", " ")));
 
         assertTextNotPresent(searcher, texts);
     }
@@ -2141,24 +2131,29 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public long doAndWaitForWindow(Runnable action, String windowName)
     {
+        String initialWindow = getDriver().getWindowHandle();
+        AtomicBoolean targetWindowExists = new AtomicBoolean(false);
+        try
+        {
+            getDriver().switchTo().window(windowName);
+            targetWindowExists.set(true);
+        }
+        catch (NoSuchWindowException e)
+        {
+            targetWindowExists.set(false);
+        }
+
+        // Call doAndMaybeWaitForPageToLoad with target window in focus (if present)
+        // Then it will correctly detect the page load in that window
         return doAndMaybeWaitForPageToLoad(10_000, () -> {
-            String initialWindow = getDriver().getWindowHandle();
-            boolean targetWindowExists;
-            try
-            {
-                getDriver().switchTo().window(windowName);
+            if (targetWindowExists.get())
                 getDriver().switchTo().window(initialWindow);
-                targetWindowExists = true;
-            }
-            catch (NoSuchWindowException e)
-            {
-                targetWindowExists = false;
-            }
 
             action.run();
 
-            getDriver().switchTo().window(windowName);
-            return targetWindowExists;
+            new WebDriverWait(getDriver(), Duration.ofSeconds(5)).until(windowIsPresent(windowName));
+
+            return targetWindowExists.get();
         });
     }
 

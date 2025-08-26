@@ -26,12 +26,10 @@ import org.labkey.test.pages.study.ManageVisitPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
 import org.labkey.test.util.StudyHelper;
 import org.labkey.test.util.TestDataGenerator;
-import org.openqa.selenium.WebElement;
 
 import java.io.File;
 import java.io.IOException;
@@ -783,17 +781,7 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
     private void createDatasetCategory(String projectName, String name)
     {
         goToProjectHome(projectName);
-        goToManageViews();
-        Locator.linkWithText("Manage Categories").findElement(getDriver()).click();
-        _extHelper.waitForExtDialog("Manage Categories");
-        Window<?> categoryWindow = new Window.WindowFinder(getDriver()).withTitle("Manage Categories").waitFor();
-        categoryWindow.clickButton("New Category", 0);
-        WebElement newCategoryField = Locator.input("label").withAttributeContaining("id", "textfield").notHidden().waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
-        setFormElementJS(newCategoryField, name);
-        fireEvent(newCategoryField, SeleniumEvent.blur);
-        waitForElement(Ext4Helper.Locators.window("Manage Categories").append("//div").withText(name));
-        clickButton("Done", 0);
-        _extHelper.waitForExtDialogToDisappear("Manage Categories");
+        goToManageViews().createCategory(name);
     }
 
     private String getCategory(String projectName, String datasetName)

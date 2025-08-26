@@ -23,7 +23,7 @@ public abstract class NavBar extends WebDriverComponent<NavBar.ElementCache>
 
     protected NavBar(WebDriver driver)
     {
-        this(Locator.tagWithClass("nav", "navbar-container").findElement(driver), driver);
+        this(Locator.tagWithClass("nav", "navbar").findElement(driver), driver);
     }
 
     protected NavBar(WebElement element, WebDriver driver)

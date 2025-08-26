@@ -431,7 +431,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             errorText = getText(Locator.tagWithClass("div", "auth-form-body").childTag("p"));
         }
 
-        List<String> missingErrors = getMissingTexts(new TextSearcher(errorText), expectedMessages);
+        List<String> missingErrors = new TextSearcher(errorText).getMissingTexts(expectedMessages);
         assertTrue(String.format("Wrong errors.\nExpected: ['%s']\nActual: '%s'", String.join("',\n'", expectedMessages), errorText), missingErrors.isEmpty());
     }
 
