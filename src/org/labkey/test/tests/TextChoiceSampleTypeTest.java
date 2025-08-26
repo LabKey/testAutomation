@@ -450,12 +450,29 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
         updatePage.clickSave();
 
         log("Validate that the expected rows after the update are in the log.");
-        String fieldOldValues = "Name=TextChoice_Field_1&Type=String&Scale=4000&PHI=Not%20PHI&DefaultScale=Linear&Required=false&Hidden=false&MvEnabled=false&Measure=false&Dimension=false" +
-                "&ShownInInsert=true&ShownInDetails=true&ShownInUpdate=true&ShownInLookupView=false&RecommendedVariable=false&ExcludedFromShifting=false&Scannable=false" +
-                "&DefaultValueType=Editable%20default&Validator=Text%20Choice%20Validator%2C%20%C3%85%5C%7C%C3%85%7CBB%7CCC%7CDD%7CE%20E%20E%7C%C2%83%C2%83%7CGG%7CH%2C%20Text%20Choice%20Validator";
-        String fieldUpdateValues = "Name=TextChoice_Field_1&Type=String&Scale=4000&PHI=Not%20PHI&DefaultScale=Linear&Required=false&Hidden=false&MvEnabled=false&Measure=false&Dimension=false" +
-                "&ShownInInsert=true&ShownInDetails=true&ShownInUpdate=true&ShownInLookupView=false&RecommendedVariable=false&ExcludedFromShifting=false&Scannable=false" +
-                "&DefaultValueType=Editable%20default&Validator=Text%20Choice%20Validator%2C%20BB%7CCC%20and%20here%20is%20an%20update%7CE%20E%20E%7CGG%7CH%7C%C2%83%C2%83%20updated%7C%C3%85%5C%7C%C3%85%2C%20Text%20Choice%20Validator";
+        String fieldSharedValues = AuditLogHelper.encodeValues(
+            "Name", textChoiceFieldName,
+            "Type", "String",
+            "Scale", "4000",
+            "PHI", "Not PHI",
+            "DefaultScale", "Linear",
+            "Required", "false",
+            "Hidden", "false",
+            "MvEnabled", "false",
+            "Measure", "false",
+            "Dimension", "false",
+            "ShownInInsert", "true",
+            "ShownInDetails", "true",
+            "ShownInUpdate", "true",
+            "ShownInLookupView", "false",
+            "RecommendedVariable", "false",
+            "ExcludedFromShifting", "false",
+            "Scannable", "false",
+            "DefaultValueType", "Editable default");
+        String fieldOldValues = fieldSharedValues + "&" + AuditLogHelper.encodeValues(
+            "Validator", "Text Choice Validator, \u00C5\\|\u00C5|BB|CC|DD|E E E|\u0083\u0083|GG|H, Text Choice Validator");
+        String fieldUpdateValues = fieldSharedValues + "&" + AuditLogHelper.encodeValues(
+            "Validator", "Text Choice Validator, BB|CC and here is an update|E E E|GG|H|\u0083\u0083 updated|\u00C5\\|\u00C5, Text Choice Validator");
         AuditLogHelper.DetailedAuditEventRow fieldEvent = new AuditLogHelper.DetailedAuditEventRow(null, textChoiceFieldName, "Modified",
                 "The following property was updated: Validator", "", fieldOldValues, fieldUpdateValues, null);
         AuditLogHelper.DetailedAuditEventRow expectedDomainEvent = new AuditLogHelper.DetailedAuditEventRow(null, sampleTypeName, null,
@@ -548,9 +565,8 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
         updatePage.clickSave();
 
         log("Validate that the expected rows after the update are in the log.");
-        String fieldUpdateValues2 = "Name=TextChoice_Field_1&Type=String&Scale=4000&PHI=Not%20PHI&DefaultScale=Linear&Required=false&Hidden=false&MvEnabled=false&Measure=false" +
-                "&Dimension=false&ShownInInsert=true&ShownInDetails=true&ShownInUpdate=true&ShownInLookupView=false&RecommendedVariable=false&ExcludedFromShifting=false" +
-                "&Scannable=false&DefaultValueType=Editable%20default&Validator=Text%20Choice%20Validator%2C%20BB%7CCC%20and%20here%20is%20an%20update%7CE%20E%20E%7CGG%7CH%20no%20change%7C%C2%83%C2%83%20updated%7C%C3%85%5C%7C%C3%85%2C%20Text%20Choice%20Validator";
+        String fieldUpdateValues2 = fieldSharedValues + "&" + AuditLogHelper.encodeValues(
+            "Validator", "Text Choice Validator, BB|CC and here is an update|E E E|GG|H no change|\u0083\u0083 updated|\u00C5\\|\u00C5, Text Choice Validator");
         fieldEvent = new AuditLogHelper.DetailedAuditEventRow(null, textChoiceFieldName, "Modified",
                 "The following property was updated: Validator", "", fieldUpdateValues, fieldUpdateValues2, null);
         pass = _auditLogHelper.validateLastDomainAuditEvents(sampleTypeName, getProjectName(), expectedDomainEvent, Map.of(textChoiceFieldName, fieldEvent));
