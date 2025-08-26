@@ -27,6 +27,7 @@
     </table>
 
     <table tableName="target2" tableDbType="TABLE">
+        <auditLogging>DETAILED</auditLogging>
         <columns>
             <column columnName="rowid"/>
             <column columnName="container"/>

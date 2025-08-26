@@ -183,7 +183,8 @@ public class AuditLogHelper
                                                          Integer transactionId, List<Filter> eventFilters, @Nullable ContainerFilter containerFilter) throws IOException, CommandException
     {
         List<Filter> transactionFilter = new ArrayList<>();
-        transactionFilter.add(new Filter("TransactionId", transactionId, Filter.Operator.EQUAL));
+        if (transactionId != null)
+            transactionFilter.add(new Filter("TransactionId", transactionId, Filter.Operator.EQUAL));
         if (eventFilters != null && !eventFilters.isEmpty())
             transactionFilter.addAll(eventFilters);
         return getAuditLogsFromLKS(containerPath, auditEventName, columnNames, transactionFilter, null, containerFilter).getRows();
@@ -280,6 +281,19 @@ public class AuditLogHelper
         }
     }
 
+    public Integer getLastEventId(String containerPath, AuditEvent auditEventName)
+    {
+        try
+        {
+            List<Map<String, Object>> events = getAuditLogsFromLKS(containerPath, auditEventName, List.of("RowId"), Collections.emptyList(), 1, ContainerFilter.CurrentAndSubfolders).getRows();
+            return events.size() == 1 ? (Integer) events.get(0).get("RowId") : null;
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
     public Integer doAndWaitForTransaction(Runnable action, String containerPath, AuditEvent auditEventName)
     {
         int prevTransactionId;
@@ -318,7 +332,8 @@ public class AuditLogHelper
     {
         Integer transactionId = getLastTransactionId(containerPath, auditEventName);
         List<Filter> transactionFilter = new ArrayList<>();
-        transactionFilter.add(new Filter("TransactionId", transactionId, Filter.Operator.EQUAL));
+        if (transactionId != null)
+            transactionFilter.add(new Filter("TransactionId", transactionId, Filter.Operator.EQUAL));
         if (eventFilters != null && !eventFilters.isEmpty())
             transactionFilter.addAll(eventFilters);
         List<Map<String, Object>> events = getAuditLogsFromLKS(containerPath, auditEventName, List.of("Comment", "UserComment", "NewRecordMap"), transactionFilter, null, ContainerFilter.CurrentAndSubfolders).getRows();
