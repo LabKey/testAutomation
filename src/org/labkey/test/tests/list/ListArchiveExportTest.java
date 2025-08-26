@@ -11,6 +11,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Hosting;
 import org.labkey.test.components.list.ManageListsGrid;
+import org.labkey.test.pages.list.BeginPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.list.IntListDefinition;
 import org.labkey.test.util.ApiPermissionsHelper;
@@ -71,10 +72,11 @@ public class ListArchiveExportTest extends BaseWebDriverTest
         _permissionHelper.addMemberToRole(_listUser, "Reader", PermissionsHelper.MemberType.user);
     }
 
-    private void createListWithData(String name, Map rowData) throws IOException, CommandException
+    private void createListWithData(String name, Map<String, Object> rowData) throws IOException, CommandException
     {
         var connection = createDefaultConnection();
-        var listDef = new IntListDefinition(name, "RowId").setFields(List.of(
+        // Issue 53672: Use a long key column name
+        var listDef = new IntListDefinition(name, "keyA123456789a123456789A123456789a123456789a123456789a123456789").setFields(List.of(
                 new FieldDefinition("Shape", FieldDefinition.ColumnType.String),
                 new FieldDefinition("Count", FieldDefinition.ColumnType.Integer)));
         var dataGenerator = listDef.create(connection, getCurrentContainerPath());
@@ -118,6 +120,14 @@ public class ListArchiveExportTest extends BaseWebDriverTest
         listsGrid.checkAllOnPage();
         File listExport = listsGrid.exportSelectedLists();
         Assert.assertTrue("Empty export file downloaded", listExport.length() > 0);
+
+        // Issue 53672: Delete the lists and reimport, ensuring we have no errors
+        listsGrid.deleteSelectedLists();
+        listsGrid = goToManageLists().getGrid();
+        assertTextNotPresent(LIST_A, LIST_B);
+        listsGrid.clickImportArchive().setZipFile(listExport).clickImport();
+        goToManageLists().getGrid();
+        assertTextPresent(LIST_A, LIST_B);
     }
 
     @Override
