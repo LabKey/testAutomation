@@ -1,12 +1,14 @@
 package org.labkey.test.tests.component;
 
 import org.apache.commons.lang3.StringUtils;
+import org.json.JSONObject;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.remoteapi.query.InsertRowsCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -21,7 +23,7 @@ import org.labkey.test.params.FieldInfo;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.params.list.IntListDefinition;
 import org.labkey.test.params.list.ListDefinition;
-import org.labkey.test.util.TextUtils;
+import org.labkey.test.util.EscapeUtil;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
@@ -130,41 +132,82 @@ public class EditableGridTest extends BaseWebDriverTest
         createLookupList(connection);
 
         new SampleTypeDefinition(EXTRAPOLATING_SAMPLE_TYPE)
-                .setFields(
-                        List.of(
-                                ASC_STRING.getFieldDefinition(),
-                                DESC_STRING.getFieldDefinition(),
-                                ASC_INT.getFieldDefinition(),
-                                DESC_INT.getFieldDefinition(),
-                                ASC_DATE.getFieldDefinition(),
-                                DESC_DATE.getFieldDefinition()
-                        ))
-                .create(connection, getProjectName());
+            .setFields(
+                List.of(
+                    ASC_STRING.getFieldDefinition(),
+                    DESC_STRING.getFieldDefinition(),
+                    ASC_INT.getFieldDefinition(),
+                    DESC_INT.getFieldDefinition(),
+                    ASC_DATE.getFieldDefinition(),
+                    DESC_DATE.getFieldDefinition()
+                ))
+            .getCreateCommand()
+            .execute(connection, getProjectName());
+
         new SampleTypeDefinition(FILLING_SAMPLE_TYPE)
-                .setFields(
-                        List.of(
-                                FILL_STRING.getFieldDefinition(),
-                                FILL_MULTI_LINE.getFieldDefinition(),
-                                FILL_INT.getFieldDefinition(),
-                                FILL_DATE.getFieldDefinition()
-                        ))
-                .create(connection, getProjectName());
+            .setFields(
+                List.of(
+                    FILL_STRING.getFieldDefinition(),
+                    FILL_MULTI_LINE.getFieldDefinition(),
+                    FILL_INT.getFieldDefinition(),
+                    FILL_DATE.getFieldDefinition()
+                ))
+            .getCreateCommand()
+            .execute(connection, getProjectName());
+
         new SampleTypeDefinition(PASTING_SAMPLE_TYPE)
-                .setFields(
-                        List.of(
-                                PASTE_1.getFieldDefinition(),
-                                PASTE_2.getFieldDefinition(),
-                                PASTE_3.getFieldDefinition(),
-                                PASTE_4.getFieldDefinition(),
-                                PASTE_5.getFieldDefinition(),
-                                PASTE_ML.getFieldDefinition()
-                        ))
-                .create(connection, getProjectName());
+            .setFields(
+                List.of(
+                    PASTE_1.getFieldDefinition(),
+                    PASTE_2.getFieldDefinition(),
+                    PASTE_3.getFieldDefinition(),
+                    PASTE_4.getFieldDefinition(),
+                    PASTE_5.getFieldDefinition(),
+                    PASTE_ML.getFieldDefinition()
+                ))
+            .getCreateCommand()
+            .execute(connection, getProjectName());
 
         new SampleTypeDefinition(ALL_TYPE_SAMPLE_TYPE)
-                .setFields(
-                    ALL_FIELDS.stream().map(FieldInfo::getFieldDefinition).toList())
-                .create(connection, getProjectName());
+            .setFields(
+                ALL_FIELDS.stream().map(FieldInfo::getFieldDefinition).toList())
+            .getCreateCommand()
+            .execute(connection, getProjectName());
+
+        for (String sampleType : List.of(EXTRAPOLATING_SAMPLE_TYPE, FILLING_SAMPLE_TYPE, PASTING_SAMPLE_TYPE, ALL_TYPE_SAMPLE_TYPE))
+        {
+            // Hide columns from editable grid so that test columns are in view
+            String metadataXml = """
+                <tables xmlns="http://labkey.org/data/xml">
+                  <table tableName="%s" tableDbType="NOT_IN_DB">
+                    <columns>
+                      <column columnName="Name">
+                        <shownInInsertView>false</shownInInsertView>
+                      </column>
+                      <column columnName="Alias">
+                        <shownInInsertView>false</shownInInsertView>
+                      </column>
+                      <column columnName="MaterialExpDate">
+                        <shownInInsertView>false</shownInInsertView>
+                      </column>
+                      <column columnName="Flag">
+                        <shownInInsertView>false</shownInInsertView>
+                      </column>
+                      <column columnName="SampleState">
+                        <shownInInsertView>false</shownInInsertView>
+                      </column>
+                    </columns>
+                  </table>
+                </tables>
+                """.formatted(EscapeUtil.getMarkupEscapedValue(sampleType));
+
+            SimplePostCommand postCommand = new SimplePostCommand("query", "saveSourceQuery");
+            postCommand.setJsonObject(new JSONObject());
+            postCommand.getJsonObject().put("ff_metadataText", metadataXml);
+            postCommand.getJsonObject().put("schemaName", "samples");
+            postCommand.getJsonObject().put("queryName", sampleType);
+            postCommand.execute(connection, getProjectName());
+}
     }
 
     @Test
@@ -1000,10 +1043,10 @@ public class EditableGridTest extends BaseWebDriverTest
                 .verifyEquals("There should be no grid cells already selected. Fatal error.",
                         0, editableGrid.getSelectedCells().size());
 
-        int startColumn = editableGrid.getColumnIndex(PASTE_1);
+        int startColumn = editableGrid.getColumnIndex(PASTE_3);
 
         int gridRow = 4;
-        WebElement startCell = editableGrid.getCell(gridRow, PASTE_1);
+        WebElement startCell = editableGrid.getCell(gridRow, PASTE_3);
         startCell.click();
 
         log("Select a few horizontal cells the the left in the grid.");
@@ -1100,10 +1143,10 @@ public class EditableGridTest extends BaseWebDriverTest
         checker().verifyEquals("Hitting <tab> should have removed the selection.",
                 0, editableGrid.getSelectedCells().size());
 
-        WebElement endCell = Locator.tag("div").findWhenNeeded(editableGrid.getCell(gridRow, PASTE_2));
+        WebElement endCell = Locator.tag("div").findWhenNeeded(editableGrid.getCell(gridRow, PASTE_4));
 
         checker().verifyTrue(String.format("The expected cell on row %d and column %s is not selected after hitting <tab>.",
-                        gridRow, PASTE_2),
+                        gridRow, PASTE_4),
                 Objects.requireNonNullElse(endCell.getAttribute("class"), "").toLowerCase().contains("cell-selected"));
 
         checker().screenShotIfNewError("TAB_ERROR");
@@ -1138,7 +1181,7 @@ public class EditableGridTest extends BaseWebDriverTest
                         0, editableGrid.getSelectedCells().size());
 
         List<String> columns = editableGrid.getColumnLabels();
-        int startColumn = columns.indexOf("Description");
+        int startColumn = 4;
 
         int startRow = 5;
         WebElement startCell = editableGrid.getCell(startRow, columns.get(startColumn));
