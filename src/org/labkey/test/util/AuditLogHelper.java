@@ -453,6 +453,46 @@ public class AuditLogHelper
         }
     }
 
+    /**
+     * URL-encode fields and values for {@link DetailedAuditEventRow#newValues} or {@link DetailedAuditEventRow#oldValues}
+     * @param pairs alternating field names and their associated values
+     * @return URL-encoded String for use in DetailedAuditEventRow
+     */
+    public static String encodeValues(String... pairs)
+    {
+        if (pairs.length % 2 != 0)
+        {
+            throw new IllegalArgumentException("pairs length must be even");
+        }
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < pairs.length; i = i + 2)
+        {
+            if (!sb.isEmpty())
+                sb.append("&");
+            sb.append(encodeValue(pairs[i])).append("=").append(encodeValue(pairs[i + 1]));
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Perform selective URL encoding for use {@link DetailedAuditEventRow#newValues} or
+     * {@link DetailedAuditEventRow#oldValues}
+     * @param value raw key or value
+     * @return Partially URL-encoded value
+     */
+    private static String encodeValue(String value)
+    {
+        return EscapeUtil.encode(value)
+            // Parentheses aren't encoded
+            .replace("%28", "(")
+            .replace("%29", ")");
+    }
+
+    public static String formatDataChange(String name, String oldValue, String newValue)
+    {
+        return name + ": " + oldValue + " > " + newValue;
+    }
+
     public @NotNull Map<String, DetailedAuditEventRow> getDomainPropertyEvents(String domainName, Integer domainEventId)
     {
         if (domainEventId == null)

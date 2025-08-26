@@ -1130,6 +1130,12 @@ public abstract class WebDriverWrapper implements WrapsDriver
     }
 
     @Contract(pure = true)
+    public WebDriverWait quickWait()
+    {
+        return new WebDriverWait(getDriver(), Duration.ofSeconds(1));
+    }
+
+    @Contract(pure = true)
     public WebDriverWait shortWait()
     {
         return new WebDriverWait(getDriver(), Duration.ofSeconds(10));
