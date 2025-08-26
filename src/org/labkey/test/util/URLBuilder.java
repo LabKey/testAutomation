@@ -106,9 +106,17 @@ public class URLBuilder
     public URLBuilder setAppResourcePath(Object... pathParts)
     {
         List<String> encodedParts = Arrays.stream(pathParts).map(Objects::requireNonNull).map(String::valueOf)
-                .map(s -> EscapeUtil.encode(s).replace("+", " ")).collect(Collectors.toList());
+                .map(this::encodeAppResourcePathPart).collect(Collectors.toList());
         setFragment("/" + String.join("/", encodedParts));
         return this;
+    }
+
+    private String encodeAppResourcePathPart(String pathPart)
+    {
+        return EscapeUtil.encode(pathPart)
+            // We generally don't encode parentheses in app resource paths
+            .replace("%28", "(")
+            .replace("%29", ")");
     }
 
     /**

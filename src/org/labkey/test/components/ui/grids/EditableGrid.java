@@ -770,6 +770,33 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     }
 
     /**
+     * Values will be quoted appropriately for pasting into editable grid lookups.
+     */
+    public static String getPastableColumn(List<?> values)
+    {
+        List<String> valueList = new ArrayList<>();
+        for (Object value : values)
+        {
+            String strVal = CSVFormat.DEFAULT.format(value); // Just quote commas
+            valueList.add(strVal);
+        }
+        return String.join("\n", valueList);
+    }
+
+    /**
+     * Pastes text to a single column of the grid.
+     * @param columnIdentifier fieldKey, name, or label of column
+     * @param pasteValues      list of values to paste
+     * @return A Reference to this editableGrid object.
+     */
+    public EditableGrid pasteColumn(CharSequence columnIdentifier, List<?> pasteValues)
+    {
+        if (pasteValues.isEmpty())
+            throw new IllegalArgumentException("No paste values provided");
+        return pasteFromCell(0, columnIdentifier, getPastableColumn(pasteValues), false);
+    }
+
+    /**
      * Pastes delimited text to the grid, via a single target.  The component is clever enough to target
      * text into cells based on text delimiters; thus we can paste a square of data into the grid.
      * @param row           index of the target cell
