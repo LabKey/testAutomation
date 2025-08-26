@@ -345,7 +345,7 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
 
     public DomainFormPanel goToResultsFields()
     {
-        return expandFieldsPanel("Results");
+        return expandFieldsPanel("Result");
     }
 
     protected void expandPropertiesPanel()
