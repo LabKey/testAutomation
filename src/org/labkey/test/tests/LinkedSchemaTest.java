@@ -25,6 +25,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Data;
 import org.labkey.test.components.CustomizeView;
@@ -32,6 +33,9 @@ import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.pages.list.GridPage;
 import org.labkey.test.pages.query.QueryMetadataEditorPage;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.FieldInfo;
+import org.labkey.test.params.experiment.DataClassDefinition;
+import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.params.list.IntListDefinition;
 import org.labkey.test.params.list.ListDefinition;
 import org.labkey.test.params.list.VarListDefinition;
@@ -40,7 +44,11 @@ import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.AuditLogHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SchemaHelper;
+import org.labkey.test.util.TestDataGenerator;
+import org.labkey.test.util.exp.DataClassAPIHelper;
+import org.labkey.test.util.exp.SampleTypeAPIHelper;
 
 import java.io.File;
 import java.io.IOException;
@@ -112,6 +120,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     private static final String STUDY_FOLDER = "StudyFolder"; // Folder used to validate fix for issues 32454 & 32456
     private static final String MOTHER = "Mother";
     private static final String READER_USER = "reader@linkedschema.test";
+    private static final String EXTERNAL_SCHEMA_USER = "external@linkedschema.test";
     private final AuditLogHelper _auditLogHelper = new AuditLogHelper(this);
 
     public static final String LIST_NAME = "LinkedSchemaTestPeople";
@@ -401,6 +410,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     {
         super.doCleanup(afterTest);
         _userHelper.deleteUsers(false, READER_USER);
+        _userHelper.deleteUsers(false, EXTERNAL_SCHEMA_USER);
     }
 
     @BeforeClass
@@ -632,8 +642,10 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     {
         ApiPermissionsHelper apiPermissionsHelper = new ApiPermissionsHelper(this);
         _userHelper.createUser(READER_USER);
+        _userHelper.createUser(EXTERNAL_SCHEMA_USER);
 
         _containerHelper.createProject(getProjectName(), null);
+        apiPermissionsHelper.setUserPermissions(EXTERNAL_SCHEMA_USER, "Reader");
         _containerHelper.createSubfolder(getProjectName(), SOURCE_FOLDER);
         // Enable linkedschematest in source folder so the "BPeopleTemplate" is visible.
         _containerHelper.enableModule("linkedschematest");
@@ -916,6 +928,185 @@ public class LinkedSchemaTest extends BaseWebDriverTest
 
         // clean up after ourselves
         _schemaHelper.deleteSchema(sourceContainerPath, linkedSchemaName);
+    }
+
+    // Issue 53421: linked schemas can't use sample type as a source in a container different from where the type is defined
+    @Test
+    public void testLinkedSchemaToExternalSubfolder() throws IOException, CommandException
+    {
+
+        String externalProject = "Linked Schema Other Project" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
+
+        log(String.format("Create a separate project %s.",
+                externalProject));
+
+        // Delete the external project if it already exists.
+        _containerHelper.deleteProject(externalProject, false);
+        _containerHelper.createProject(externalProject, null);
+
+        // Add the Experiment module to test schemas linked to exp.
+        _containerHelper.enableModule("Experiment");
+
+        validateExternalLinkedSampleType(externalProject);
+        validateExternalLinkedExperiment(externalProject);
+        validateExternalLinkedDataclass(externalProject);
+    }
+
+    private void validateExternalLinkedSampleType(String externalProject) throws IOException, CommandException
+    {
+        String subFolder = "Sub Folder " + TRICKY_CHARACTERS_FOR_PROJECT_NAMES + " Sample Type";
+        String subFolderPath = externalProject + "/" + subFolder;
+
+        String sampleType = TestDataGenerator.randomDomainName("Linked Schema Test");
+        String strField = TestDataGenerator.randomFieldName("Str");
+
+        log(String.format("Create sub-folder %s for the sample type test.", subFolderPath));
+        _containerHelper.createSubfolder(externalProject, subFolder);
+
+        List<String> expectedValues = populateDomain(externalProject, subFolder, true, sampleType, strField);
+
+        String linkedSampleTypeSchema = "External_Sample_Type_Schema";
+        validateExternalLinkedSchema(linkedSampleTypeSchema, subFolderPath, "samples", sampleType, strField, expectedValues);
+
+    }
+
+    private void validateExternalLinkedExperiment(String externalProject)
+    {
+        String subFolder = "Sub Folder " + TRICKY_CHARACTERS_FOR_PROJECT_NAMES + " Experiment";
+        String subfolderPath = externalProject + "/" + subFolder;
+
+        String subFolderRunGroup = "SubFolder Run Group";
+        createExperiment(externalProject, subFolder, subFolderRunGroup);
+
+        List<String> expectedValues = List.of(subFolderRunGroup);
+        String linkedExpRunSchema = "External_Exp_Run_Schema";
+
+        validateExternalLinkedSchema(linkedExpRunSchema, subfolderPath, "exp", "RunGroups", "Name", expectedValues);
+
+    }
+
+    private void validateExternalLinkedDataclass(String externalProject) throws IOException, CommandException
+    {
+
+        String subFolder = "Sub Folder " + TRICKY_CHARACTERS_FOR_PROJECT_NAMES + " DataClass";
+        String subfolderPath = externalProject + "/" + subFolder;
+
+        String dataClassName = TestDataGenerator.randomDomainName("Export data class");
+
+        // This is the last sscenario to run. Adding this check here will allow the other scenarios to run before the test fails.
+        //Issue 53784: Field name with a quote causes a "QueryParseException: syntax error" when creating a linked schema.
+        String strField = TestDataGenerator.randomFieldName("Str \" ");
+
+        log(String.format("Create sub-folder %s for the data classs test.", subfolderPath));
+        _containerHelper.createSubfolder(externalProject, subFolder);
+
+        List<String> expectedValues = populateDomain(externalProject, subFolder, false, dataClassName, strField);
+
+        String linkedDataclassSchema = "External_Dataclass_Schema";
+        validateExternalLinkedSchema(linkedDataclassSchema, subfolderPath, "exp.data", dataClassName, strField, expectedValues);
+
+    }
+
+    // Populating a sample type and a data class is very similar.
+    private List<String> populateDomain(String externalProject, String subFolder, boolean isSampleType, String query, String fieldName) throws IOException, CommandException
+    {
+
+        TestDataGenerator testDataGenerator;
+        FieldDefinition field = new FieldDefinition(fieldName);
+        String subFolderPath = externalProject + "/" + subFolder;
+        String schema;
+
+        if (isSampleType)
+        {
+            schema = "samples";
+            SampleTypeDefinition sampleTypeDefinition = new SampleTypeDefinition(query);
+            sampleTypeDefinition.setNameExpression("External ${genId}");
+            sampleTypeDefinition.addField(field);
+            testDataGenerator = SampleTypeAPIHelper.createEmptySampleType(externalProject, sampleTypeDefinition);
+        }
+        else
+        {
+            schema = "exp.data";
+            DataClassDefinition dataClassDefinition = new DataClassDefinition(query);
+            dataClassDefinition.setNameExpression("DC - ${genId}");
+            dataClassDefinition.addField(field);
+            testDataGenerator = DataClassAPIHelper.createEmptyDataClass(externalProject, dataClassDefinition);
+        }
+
+        for (String value : List.of("A", "B", "C", "D"))
+        {
+            testDataGenerator.addCustomRow(Map.of(fieldName, value));
+        }
+        testDataGenerator.insertRows(WebTestHelper.getRemoteApiConnection(), testDataGenerator.getRows());
+
+        // Add entries in the subfolder. Send these back as values to check.
+        List<String> subFolderValues = List.of("W", "X", "Y", "Z");
+        testDataGenerator = new TestDataGenerator(schema, query, subFolderPath);
+        for (String value : subFolderValues)
+        {
+            testDataGenerator.addCustomRow(Map.of(fieldName, value));
+        }
+        testDataGenerator.insertRows(WebTestHelper.getRemoteApiConnection(), testDataGenerator.getRows());
+
+        return subFolderValues;
+    }
+
+    private void createExperiment(String externalProject, String subFolder, String subFolderRunGroup)
+    {
+        // Create a RunGroup in the parent folder.
+        goToProjectHome(externalProject);
+        clickTab("Experiment");
+        waitAndClickAndWait(Locator.linkContainingText("Create Run Group"));
+        setFormElement(Locator.name("name"), "Parent Run Group");
+        clickButton("Submit");
+
+        _containerHelper.createSubfolder(externalProject, subFolder);
+
+        // Create a RunGroup in the subfolder.
+        clickTab("Experiment");
+        waitAndClickAndWait(Locator.linkContainingText("Create Run Group"));
+        setFormElement(Locator.name("name"), subFolderRunGroup);
+        clickButton("Submit");
+
+    }
+
+    private void validateExternalLinkedSchema(String linkedSchemaName, String sourceSubFolderPath, String sourceSchemaName, String sourceQueryName, String fieldName, List<String> expectedValues)
+    {
+        goToProjectHome();
+
+        log(String.format("Create a linked schema named %s that looks at %s.",
+                linkedSchemaName, sourceSubFolderPath));
+
+        _schemaHelper.createLinkedSchema(getProjectName(), linkedSchemaName, sourceSubFolderPath, null, sourceSchemaName, null, null);
+
+        goToProjectHome();
+
+        validateExternalLinkedData(linkedSchemaName, sourceQueryName, fieldName,
+                expectedValues, String.format("Data displayed for linked schema '%s' not as expected.", linkedSchemaName));
+
+        log("Impersonate a user, with no permissions in the external source project, and validate.");
+        goToProjectHome();
+        impersonate(EXTERNAL_SCHEMA_USER);
+        validateExternalLinkedData(linkedSchemaName, sourceQueryName, fieldName,
+                expectedValues, String.format("User with no permissions did not see the expected data for the linked schema '%s'.", linkedSchemaName));
+        stopImpersonating();
+    }
+
+    private void validateExternalLinkedData(String linkedSchemaName, String query, String fieldName, List<String> expectedValues, String errorMsg)
+    {
+
+        // Use a FieldInfo object to deal with any tricky characters.
+        FieldInfo fieldInfo = new FieldInfo(fieldName, FieldDefinition.ColumnType.String);
+        String url = WebTestHelper.buildURL("query", getProjectName(), "begin.view");
+        beginAt(url);
+        viewQueryData(linkedSchemaName, query);
+        DataRegionTable table = new DataRegionTable("query", getDriver());
+        List<String> actualValues = table.getColumnDataAsText(fieldInfo);
+
+        // Using a sort list to validate because the list should be equal and I don't want to worry about the order.
+        checker().withScreenshot().verifyEqualsSorted(errorMsg,
+                expectedValues, actualValues);
+
     }
 
     /*
