@@ -132,47 +132,41 @@ public class EditableGridTest extends BaseWebDriverTest
         createLookupList(connection);
 
         new SampleTypeDefinition(EXTRAPOLATING_SAMPLE_TYPE)
-            .setFields(
-                List.of(
-                    ASC_STRING.getFieldDefinition(),
-                    DESC_STRING.getFieldDefinition(),
-                    ASC_INT.getFieldDefinition(),
-                    DESC_INT.getFieldDefinition(),
-                    ASC_DATE.getFieldDefinition(),
-                    DESC_DATE.getFieldDefinition()
-                ))
-            .getCreateCommand()
-            .execute(connection, getProjectName());
-
+                .setFields(
+                        List.of(
+                                ASC_STRING.getFieldDefinition(),
+                                DESC_STRING.getFieldDefinition(),
+                                ASC_INT.getFieldDefinition(),
+                                DESC_INT.getFieldDefinition(),
+                                ASC_DATE.getFieldDefinition(),
+                                DESC_DATE.getFieldDefinition()
+                        ))
+                .create(connection, getProjectName());
         new SampleTypeDefinition(FILLING_SAMPLE_TYPE)
-            .setFields(
-                List.of(
-                    FILL_STRING.getFieldDefinition(),
-                    FILL_MULTI_LINE.getFieldDefinition(),
-                    FILL_INT.getFieldDefinition(),
-                    FILL_DATE.getFieldDefinition()
-                ))
-            .getCreateCommand()
-            .execute(connection, getProjectName());
-
+                .setFields(
+                        List.of(
+                                FILL_STRING.getFieldDefinition(),
+                                FILL_MULTI_LINE.getFieldDefinition(),
+                                FILL_INT.getFieldDefinition(),
+                                FILL_DATE.getFieldDefinition()
+                        ))
+                .create(connection, getProjectName());
         new SampleTypeDefinition(PASTING_SAMPLE_TYPE)
-            .setFields(
-                List.of(
-                    PASTE_1.getFieldDefinition(),
-                    PASTE_2.getFieldDefinition(),
-                    PASTE_3.getFieldDefinition(),
-                    PASTE_4.getFieldDefinition(),
-                    PASTE_5.getFieldDefinition(),
-                    PASTE_ML.getFieldDefinition()
-                ))
-            .getCreateCommand()
-            .execute(connection, getProjectName());
+                .setFields(
+                        List.of(
+                                PASTE_1.getFieldDefinition(),
+                                PASTE_2.getFieldDefinition(),
+                                PASTE_3.getFieldDefinition(),
+                                PASTE_4.getFieldDefinition(),
+                                PASTE_5.getFieldDefinition(),
+                                PASTE_ML.getFieldDefinition()
+                        ))
+                .create(connection, getProjectName());
 
         new SampleTypeDefinition(ALL_TYPE_SAMPLE_TYPE)
-            .setFields(
-                ALL_FIELDS.stream().map(FieldInfo::getFieldDefinition).toList())
-            .getCreateCommand()
-            .execute(connection, getProjectName());
+                .setFields(
+                    ALL_FIELDS.stream().map(FieldInfo::getFieldDefinition).toList())
+                .create(connection, getProjectName());
 
         for (String sampleType : List.of(EXTRAPOLATING_SAMPLE_TYPE, FILLING_SAMPLE_TYPE, PASTING_SAMPLE_TYPE, ALL_TYPE_SAMPLE_TYPE))
         {
@@ -207,7 +201,7 @@ public class EditableGridTest extends BaseWebDriverTest
             postCommand.getJsonObject().put("schemaName", "samples");
             postCommand.getJsonObject().put("queryName", sampleType);
             postCommand.execute(connection, getProjectName());
-}
+        }
     }
 
     @Test
