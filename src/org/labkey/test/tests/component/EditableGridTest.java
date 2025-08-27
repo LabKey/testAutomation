@@ -466,15 +466,12 @@ public class EditableGridTest extends BaseWebDriverTest
         Locator boxes = Locator.tag("tr").child("td")
                 .child(Locator.tagWithAttribute("input", "type", "checkbox"));
         var checkBoxes = boxes.findElements(testGrid);
-        scrollIntoView(checkBoxes.get(0), true); // bring as much of the grid into view as possible
+        scrollIntoView(checkBoxes.get(2), false);
+        checkBoxes.get(2).click();
 
-        new Actions(getDriver())
-                .click(checkBoxes.get(2))
-                .keyDown(Keys.SHIFT)
-                .click(checkBoxes.get(5))
-                .click(checkBoxes.get(7))
-                .keyUp(Keys.SHIFT)
-                .perform();
+        shiftClickCheckbox(checkBoxes.get(5));
+
+        shiftClickCheckbox(checkBoxes.get(7));
 
         // make sure 2-7 are still selected
         for (int i=2; i<7; i++)
@@ -494,11 +491,8 @@ public class EditableGridTest extends BaseWebDriverTest
         checkBoxes = boxes.findElements(testGrid);
 
         // verify shift-select to another row does not select the range from the now-removed row
-        new Actions(getDriver())
-                .keyDown(Keys.SHIFT)
-                .click(checkBoxes.get(7))
-                .keyUp(Keys.SHIFT)
-                .perform();
+
+        shiftClickCheckbox(checkBoxes.get(7));
 
         for (int i=2; i<6; i++)
         {
@@ -506,6 +500,16 @@ public class EditableGridTest extends BaseWebDriverTest
         }
         checker().verifyTrue(String.format("row %d should be checked", 7), testGrid.isRowSelected(7));
         checker().screenShotIfNewError("unexpected_selection_range");
+    }
+
+    private void shiftClickCheckbox(WebElement el)
+    {
+        scrollIntoView(el, false);
+        new Actions(getDriver())
+            .keyDown(Keys.SHIFT)
+            .click(el)
+            .keyUp(Keys.SHIFT)
+            .perform();
     }
 
     @Test
@@ -518,6 +522,7 @@ public class EditableGridTest extends BaseWebDriverTest
         EditableGrid testGrid = goToEditableGrid(PASTING_SAMPLE_TYPE);
         testGrid.addRows(5);
 
+        scrollIntoView(testGrid.getCell(3, PASTE_4), false); // Get target area into view
         log("Test wide");
         testGrid.selectCellRange(testGrid.getCell(0, PASTE_1), testGrid.getCell(1, PASTE_4));
         actionPaste(null, rowsToString(clipRows));
