@@ -4,46 +4,20 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
-public final class FieldKey implements CharSequence, WrapsFieldKey
+public final class FieldKey extends QueryKey<FieldKey> implements CharSequence, WrapsFieldKey
 {
-    private static final String[] ILLEGAL = {"$", "/", "&", "}", "~", ",", "."};
-    private static final String[] REPLACEMENT = {"$D", "$S", "$A", "$B", "$T", "$C", "$P"};
-
     public static final FieldKey EMPTY = new FieldKey(null, ""); // Useful as a sort of FieldKey builder starting point
     public static final FieldKey SOURCES_FK = FieldKey.fromParts("DataInputs");
     public static final FieldKey PARENTS_FK = FieldKey.fromParts("MaterialInputs");
 
-    private static final String SEPARATOR = "/";
-
-    private final FieldKey _parent;
-    private final String _name;
-    private final String _fieldKey;
+    private static final String DIVIDER = "/";
 
     private FieldKey(FieldKey parent, String child)
     {
-        if (parent != null && !parent.isEmpty())
-        {
-            _parent = parent;
-            _name = parent.getName() + SEPARATOR + child;
-            _fieldKey = parent + SEPARATOR + encodePart(child);
-        }
-        else
-        {
-            _parent = null;
-            _name = child;
-            _fieldKey = encodePart(child);
-        }
-    }
-
-    public static List<String> getIllegalChars()
-    {
-        return List.of(ILLEGAL);
+        super(parent, child);
     }
 
     public static FieldKey fromParts(List<String> parts)
@@ -71,7 +45,7 @@ public final class FieldKey implements CharSequence, WrapsFieldKey
         {
             try
             {
-                return fromParts(Arrays.stream(fieldKey.toString().split(SEPARATOR)).map(FieldKey::decodePart).toList());
+                return fromParts(Arrays.stream(fieldKey.toString().split(DIVIDER)).map(FieldKey::decodePart).toList());
             }
             catch (IllegalArgumentException iae)
             {
@@ -93,21 +67,6 @@ public final class FieldKey implements CharSequence, WrapsFieldKey
             return fromParts(nameOrFieldKey.toString());
     }
 
-    public static String encodePart(String str)
-    {
-        return StringUtils.replaceEach(str, ILLEGAL, REPLACEMENT);
-    }
-
-    public static String decodePart(String str)
-    {
-        return StringUtils.replaceEach(str, REPLACEMENT, ILLEGAL);
-    }
-
-    public FieldKey getParent()
-    {
-        return _parent;
-    }
-
     public FieldKey child(String... parts)
     {
         return child(Arrays.asList(parts));
@@ -127,35 +86,21 @@ public final class FieldKey implements CharSequence, WrapsFieldKey
         return child;
     }
 
-    public Iterator<FieldKey> getIterator()
+    // QueryKey
+
+    @Override
+    protected String getDivider()
     {
-        List<FieldKey> ancestors = new ArrayList<>();
-        FieldKey temp = this;
-
-        while (temp != null)
-        {
-            ancestors.add(temp);
-            temp = temp.getParent();
-        }
-
-        Collections.reverse(ancestors);
-
-        return ancestors.iterator();
+        return DIVIDER;
     }
 
-    public String getName()
+    @Override
+    protected FieldKey getThis()
     {
-        return _name;
+        return this;
     }
 
-    /**
-     * Inverse of {@link #fromParts(String...)}
-     * @return decoded parts of the field key
-     */
-    public String[] getNameArray()
-    {
-        return Arrays.stream(_fieldKey.split(SEPARATOR)).map(FieldKey::decodePart).toArray(String[]::new);
-    }
+    // WrapsFieldKey
 
     @Override
     public FieldKey getFieldKey()
@@ -163,41 +108,39 @@ public final class FieldKey implements CharSequence, WrapsFieldKey
         return this;
     }
 
-    @Override
-    public @NotNull String toString()
-    {
-        return _fieldKey;
-    }
+    // CharSequence
 
     @Override
     public int length()
     {
-        return _fieldKey.length();
+        return toString().length();
     }
 
     @Override
     public char charAt(int index)
     {
-        return _fieldKey.charAt(index);
+        return toString().charAt(index);
     }
 
     @Override
     public @NotNull CharSequence subSequence(int start, int end)
     {
-        return _fieldKey.subSequence(start, end);
+        return toString().subSequence(start, end);
     }
+
+    // Object
 
     @Override
     public boolean equals(Object o)
     {
         if (!(o instanceof FieldKey fieldKey)) return false;
 
-        return _fieldKey.equalsIgnoreCase(fieldKey._fieldKey); // FieldKeys aren't case-sensitive?
+        return toString().equalsIgnoreCase(fieldKey.toString()); // FieldKeys aren't case-sensitive?
     }
 
     @Override
     public int hashCode()
     {
-        return _fieldKey.toLowerCase().hashCode(); // FieldKeys aren't case-sensitive?
+        return toString().toLowerCase().hashCode(); // FieldKeys aren't case-sensitive?
     }
 }

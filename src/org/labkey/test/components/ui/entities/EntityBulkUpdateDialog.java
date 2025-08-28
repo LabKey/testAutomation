@@ -335,7 +335,7 @@ public class EntityBulkUpdateDialog extends ModalDialog
         List<WebElement> labels = Locator.tagWithClass("label", "control-label").withAttribute("for")
                 .waitForElements(elementCache(), 2_000);
 
-        return labels.stream().map(a -> FieldKey.fromFieldKey(a.getDomAttribute("for")).getName()).toList();
+        return labels.stream().map(a -> FieldKey.fromFieldKey(a.getDomAttribute("for")).getFullName()).toList();
     }
 
     public EntityBulkUpdateDialog waitForFieldsToBe(List<String> expectedFieldNames, int waitMilliseconds)

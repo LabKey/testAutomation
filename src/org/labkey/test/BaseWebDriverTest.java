@@ -67,6 +67,7 @@ import org.labkey.test.pages.search.SearchResultsPage;
 import org.labkey.test.params.ContainerInfo;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldKey;
+import org.labkey.test.params.SchemaKey;
 import org.labkey.test.teamcity.TeamCityUtils;
 import org.labkey.test.util.APIAssayHelper;
 import org.labkey.test.util.APIContainerHelper;
@@ -139,6 +140,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -2186,32 +2188,38 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             assertTextPresent(searchFor);
         }
     }
-    public void selectSchema(String schemaName)
+
+    /**
+     * @param schemaKey encoded schema key
+     */
+    public void selectSchema(String schemaKey)
     {
-        String[] schemaParts = schemaName.split("\\.");
-        selectSchema(schemaParts);
+        selectSchema(SchemaKey.parse(schemaKey));
     }
-    // Helper methods for interacting with the query schema browser
+
     public void selectSchema(String[] schemaParts)
     {
-        StringBuilder schemaWithParents = new StringBuilder();
-        String separator = "";
-        for (String schemaPart : schemaParts)
-        {
-            schemaWithParents.append(separator).append(schemaPart);
-            separator = ".";
+        selectSchema(SchemaKey.fromParts(schemaParts));
+    }
 
-            Locator.XPathLocator loc = Locator.tag("tr").withClass("x4-grid-row").append("/td/div/span").withText(schemaPart).precedingSibling("img").withClass("x4-tree-icon");
+    public void selectSchema(SchemaKey schemaKey)
+    {
+        Iterator<SchemaKey> iterator = schemaKey.getIterator();
+        while (iterator.hasNext())
+        {
+            schemaKey = iterator.next();
+
+            Locator.XPathLocator loc = Locator.tag("tr").withClass("x4-grid-row").append("/td/div/span").withText(schemaKey.getName()).precedingSibling("img").withClass("x4-tree-icon");
 
             //first load of schemas might a few seconds
             shortWait().until(ExpectedConditions.elementToBeClickable(loc));
-            Locator.XPathLocator selectedSchema = Locator.xpath("//tr").withClass("x4-grid-row-selected").append("/td/div/span").withText(schemaPart);
+            Locator.XPathLocator selectedSchema = Locator.xpath("//tr").withClass("x4-grid-row-selected").append("/td/div/span").withText(schemaKey.getName());
 
-            if (getDriver().getCurrentUrl().endsWith("schemaName=" + schemaPart))
+            if (getDriver().getCurrentUrl().endsWith("schemaName=" + EscapeUtil.encode(schemaKey.toString())))
                 waitForElement(selectedSchema);
             if (isElementPresent(selectedSchema))
                 continue; // already selected
-            log("Selecting schema " + schemaWithParents + " in the schema browser...");
+            log("Selecting schema " + schemaKey.getFullName() + " in the schema browser...");
             waitForElementToDisappear(Locator.xpath("//tbody[starts-with(@id, 'treeview')]/tr[not(starts-with(@id, 'treeview'))]"));
             // select/expand tree node
             try
@@ -2242,19 +2250,23 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     public void selectQuery(String schemaName, String queryName)
     {
-        selectQuery(schemaName.split("\\."), queryName);
+        selectQuery(SchemaKey.parse(schemaName), queryName);
     }
 
-    public void selectQuery(String[] schemaPart, String queryName)
+    public void selectQuery(String[] schemaParts, String queryName)
     {
-        String schemaName = StringUtils.join(schemaPart, ".");
-        log("Selecting query " + schemaName + "." + queryName + " in the schema browser...");
-        selectSchema(schemaPart);
+        selectQuery(SchemaKey.fromParts(schemaParts), queryName);
+    }
+
+    public void selectQuery(SchemaKey schemaKey, String queryName)
+    {
+        log("Selecting query " + schemaKey.getFullName() + "." + queryName + " in the schema browser...");
+        selectSchema(schemaKey);
         mouseOver(Locator.byClass(".x4-tab-button")); // Move away from schema tree to dismiss tooltip
-        waitAndClick(Ext4Helper.Locators.tab(schemaName)); // Click schema tab to make sure query list is visible
+        waitAndClick(Ext4Helper.Locators.tab(schemaKey.getFullName())); // Click schema tab to make sure query list is visible
         WebElement queryLink = Locator.tagWithClass("table", "lk-qd-coltable").append(Locator.tagWithClass("span", "labkey-link")).withText(queryName).notHidden().waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
         queryLink.click();
-        waitForElement(Locator.tagWithClass("div", "lk-qd-name").startsWith(schemaName + "." + queryName), 30000);
+        waitForElement(Locator.tagWithClass("div", "lk-qd-name").startsWith(schemaKey.getFullName() + "." + queryName), 30000);
     }
 
     public DataRegionTable viewQueryData(String schemaName, String queryName)

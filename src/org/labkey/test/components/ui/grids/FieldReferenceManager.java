@@ -170,7 +170,7 @@ public class FieldReferenceManager
 
         public String getName()
         {
-            return getFieldKey().getName();
+            return getFieldKey().getFullName();
         }
 
         public int getDomIndex()
