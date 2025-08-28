@@ -53,6 +53,7 @@ import org.labkey.test.pages.query.UpdateQueryRowPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldDefinition.StringLookup;
 import org.labkey.test.params.FieldKey;
+import org.labkey.test.params.list.IntListDefinition;
 import org.labkey.test.params.list.VarListDefinition;
 import org.labkey.test.tests.AuditLogTest;
 import org.labkey.test.util.AbstractDataRegionExportOrSignHelper.ColumnHeaderType;
@@ -97,6 +98,7 @@ public class ListTest extends BaseWebDriverTest
     protected final static String PROJECT_VERIFY = "ListVerifyProject" ;//+ TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
     private final static String PROJECT_OTHER = "OtherListVerifyProject";
     protected final static String LIST_NAME_COLORS = "A_Colors_" + DOMAIN_TRICKY_CHARACTERS;
+    protected final static String LIST_NAME_HTML_KEY = "A_HtmlKey_" + DOMAIN_TRICKY_CHARACTERS;
     protected final static ColumnType LIST_KEY_TYPE = ColumnType.String;
     protected final static String LIST_KEY_NAME = "Key";
 
@@ -260,15 +262,33 @@ public class ListTest extends BaseWebDriverTest
                 .submit();
     }
 
+    /** Issue 53796: 25.3 -> 25.7: DataRegion.getChecked() incorrectly HTML encodes the results */
+    @Test
+    public void testKeyWithHtmlCharacters()
+    {
+        _listHelper.createList(getProjectName(), LIST_NAME_HTML_KEY, new FieldDefinition(LIST_KEY_NAME2, LIST_KEY_TYPE));
+        ImportDataPage importDataPage = _listHelper.clickImportData();
+        String value = "<>ThisIsTheKeyValueWithHtmlCharacters</>";
+        importDataPage.setText(LIST_KEY_NAME2_BULK + "\n" + value);
+        importDataPage.submit();
+        assertTextPresent(value);
+        final DataRegionTable dt = DataRegion(getDriver()).withName("query").find();
+        dt.checkAllOnPage();
+        @SuppressWarnings("unchecked") List<String> checked = (List<String>)executeScript("return LABKEY.DataRegions.query.getChecked()");
+        assertEquals(Arrays.asList(value), checked);
+        dt.deleteSelectedRows();
+        assertTextNotPresent(value);
+    }
+
     @LogMethod
-    protected void setUpList(String projectName)
+    protected void setUpList()
     {
         // TODO: Break this up into explicit test cases and remove redundant test coverage.
         // But at least now it's only called from the one test case that relies on this list, testCustomViews().
         // Previously it was called from the @BeforeClass method, even though none of the other test cases use this list.
 
         log("Add list -- " + LIST_NAME_COLORS);
-        _listHelper.createList(projectName, LIST_NAME_COLORS, new FieldDefinition(LIST_KEY_NAME2, LIST_KEY_TYPE), _listColFake,
+        _listHelper.createList(getProjectName(), LIST_NAME_COLORS, new FieldDefinition(LIST_KEY_NAME2, LIST_KEY_TYPE), _listColFake,
         _listColMonth, _listColTone);
 
         log("Add description and test edit");
@@ -307,13 +327,13 @@ public class ListTest extends BaseWebDriverTest
         log("Test check/uncheck of checkboxes");
         // Second row (Green)
         assertEquals(1, table.getRowIndex(TEST_DATA[TD_COLOR][1]));
-        clickAndWait(table.updateLink(1));
+        table.clickEditRow(1);
         setFormElement(Locator.name("quf_" + _listColMonth.getName()), VALID_MONTHS[1]);  // Has a funny format -- need to post converted date
         checkCheckbox(Locator.checkboxByName("quf_JewelTone"));
         clickButton("Submit");
         // Third row (Red)
         assertEquals(2, table.getRowIndex(TEST_DATA[TD_COLOR][2]));
-        clickAndWait(table.updateLink(2));
+        table.clickEditRow(2);
         setFormElement(Locator.name("quf_" + _listColMonth.getName()), VALID_MONTHS[2]);  // Has a funny format -- need to post converted date
         uncheckCheckbox(Locator.checkboxByName("quf_JewelTone"));
         clickButton("Submit");
@@ -578,7 +598,7 @@ public class ListTest extends BaseWebDriverTest
     public void testCustomViews()
     {
         goToProjectHome();
-        setUpList(getProjectName());
+        setUpList();
 
         goToProjectHome();
         waitAndClickAndWait(Locator.linkWithText(LIST_NAME_COLORS));
@@ -1062,7 +1082,7 @@ public class ListTest extends BaseWebDriverTest
         clickButton("Edit");
         assertTextPresent("dummy one");
         clickButton("Cancel");
-        clickAndWait(regionTable.updateLink(0));
+        regionTable.clickEditRow(0);
         assertTextPresent("dummy one");
         clickButton("Cancel");
     }
