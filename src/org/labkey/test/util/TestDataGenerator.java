@@ -646,7 +646,7 @@ public class TestDataGenerator
 
     private static boolean isDomainAndFieldNameInvalid(DomainUtils.DomainKind domainKind, @Nullable String domainName, @Nullable String fieldName)
     {
-        if (TestProperties.isTrialServer()) // WebTestHelper.getRemoteApiConnection() won't work against trial server
+        if (TestProperties.isTrialServer()) // WebTestHelper.getRemoteApiConnection() won't work against trial server before logging in via UI
         {
             if (domainName != null)
             {
