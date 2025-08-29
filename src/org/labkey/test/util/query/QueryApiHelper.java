@@ -12,6 +12,7 @@ import org.labkey.remoteapi.query.DeleteRowsCommand;
 import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.ImportDataCommand;
 import org.labkey.remoteapi.query.ImportDataResponse;
+import org.labkey.remoteapi.query.ImportExperimentDataCommand;
 import org.labkey.remoteapi.query.InsertRowsCommand;
 import org.labkey.remoteapi.query.MoveRowsCommand;
 import org.labkey.remoteapi.query.RowsResponse;
@@ -21,6 +22,7 @@ import org.labkey.remoteapi.query.Sort;
 import org.labkey.remoteapi.query.TruncateTableCommand;
 import org.labkey.remoteapi.query.TruncateTableResponse;
 import org.labkey.remoteapi.query.UpdateRowsCommand;
+import org.labkey.test.util.AuditLogHelper;
 
 import java.io.File;
 import java.io.IOException;
@@ -127,7 +129,20 @@ public class QueryApiHelper
         ImportDataCommand importDataCommand = new ImportDataCommand(_schema, _query);
         importDataCommand.setFile(file);
         importDataCommand.setTimeout(_insertTimout);
-        return  importDataCommand.execute(_connection, _containerPath);
+        return importDataCommand.execute(_connection, _containerPath);
+    }
+
+    public ImportDataResponse importExperimentData(String text, AuditLogHelper.AuditBehaviorType auditBehaviorType, ImportDataCommand.InsertOption insertOption, boolean isCrossType, boolean isCrossFolder, boolean isAsync) throws IOException, CommandException
+    {
+        ImportExperimentDataCommand importDataCommand = new ImportExperimentDataCommand(_schema, _query, _containerPath);
+        importDataCommand.setAuditBehavior(auditBehaviorType);
+        importDataCommand.setUseAsync(isAsync);
+        importDataCommand.setCrossFolderImport(isCrossFolder);
+        importDataCommand.setCrossTypeImport(isCrossType);
+        importDataCommand.setText(text);
+        importDataCommand.setInsertOption(insertOption);
+        importDataCommand.setTimeout(_insertTimout);
+        return importDataCommand.execute(_connection, _containerPath);
     }
 
     /**
