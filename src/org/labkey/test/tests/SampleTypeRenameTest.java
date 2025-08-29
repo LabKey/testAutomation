@@ -113,7 +113,7 @@ public class SampleTypeRenameTest extends BaseWebDriverTest
         updatePage.clickSave();
 
         //Issue 51979: BadSqlGrammarException indexing sample types immediately after a field rename
-        // This issue has been fixed in Postgres, but continues to fail in MSSQL. Many attempts were made to fix in
+        // This issue has been fixed in Postgres but continues to fail in MSSQL. Many attempts were made to fix in
         // MSSQL, but it was decided not to spend any more time on it (for MSSQL).
         // Only do these other "rapid fire" updates if on Postgre.
         if (WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.PostgreSQL)
