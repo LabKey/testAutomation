@@ -37,6 +37,7 @@ import org.labkey.remoteapi.query.RowsResponse;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.remoteapi.query.Sort;
 import org.labkey.serverapi.reader.TabLoader;
+import org.labkey.test.TestProperties;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.data.ColumnNameMapper;
@@ -594,7 +595,8 @@ public class TestDataGenerator
         }
 
         // Multiple spaces in the UI are collapsed into a single space. If we need to test for handling of multiple spaces, we'll not use this generator
-        domainName = domainName.replaceAll("\\s+", " ");
+        // Capitalize to make it easier to match grid header labels and audit events
+        domainName = StringUtils.capitalize(domainName).replaceAll("\\s+", " ");
 
         TestLogger.log("Generated random domain name for domainKind " + _domainKind + ": " + domainName);
         return domainName;
@@ -644,6 +646,31 @@ public class TestDataGenerator
 
     private static boolean isDomainAndFieldNameInvalid(DomainUtils.DomainKind domainKind, @Nullable String domainName, @Nullable String fieldName)
     {
+        if (TestProperties.isTrialServer()) // WebTestHelper.getRemoteApiConnection() won't work against trial server
+        {
+            if (domainName != null)
+            {
+                int maxLength = switch (domainKind)
+                {
+                    case Assay -> 200 - 13; // Make room for "{$domainName} Batch Fields" domain
+                    case SampleSet -> 100;
+                    default -> 200; // Sources, lists, and datasets allow 200 character names
+                };
+                if (domainName.length() > maxLength)
+                    return true;
+            }
+            if (fieldName != null)
+            {
+                if (fieldName.length() > 200 || Pattern.matches(".*:[a-zA-Z]{3}.*", fieldName)) // Avoid illegal patterns like ":Date"
+                {
+                    return true;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
         SimplePostCommand command = new SimplePostCommand("property", "validateDomainAndFieldNames");
         JSONObject domainDesign = new JSONObject();
         if (domainName != null)
