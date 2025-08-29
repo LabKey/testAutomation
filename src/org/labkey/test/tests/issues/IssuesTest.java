@@ -83,6 +83,7 @@ public class IssuesTest extends BaseWebDriverTest
     private static final String USER1 = "user1_issuetest@issues.test";
     private static final String USER2 = "user2_issuetest@issues.test";
     private static final String USER3 = "user3_issuetest@issues.test";
+    private static final String USER4 = "user4_issuetest@issues.test";
     private static final String user = "reader@issues.test";
     private static final Map<String, String> ISSUE_0 = new HashMap<>(Maps.of("title", ISSUE_TITLE_0, "Priority", "2", "comment", "a bright flash of light"));
     private static final Map<String, String> ISSUE_1 = new HashMap<>(Maps.of("title", ISSUE_TITLE_1, "Priority", "1", "comment", "alien autopsy"));
@@ -155,7 +156,7 @@ public class IssuesTest extends BaseWebDriverTest
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        _userHelper.deleteUsers(false, USER1, USER2);
+        _userHelper.deleteUsers(false, USER1, USER2, USER3, USER4);
         _containerHelper.deleteProject(getProjectName(), afterTest);
     }
 
@@ -179,9 +180,11 @@ public class IssuesTest extends BaseWebDriverTest
         _userHelper.createUser(USER1);
         _userHelper.createUser(USER2);
         _userHelper.createUser(USER3);
+        _userHelper.createUser(USER4);
         _permissionsHelper.addUserToProjGroup(getUsername(), getProjectName(), TEST_GROUP);
         _permissionsHelper.addUserToProjGroup(USER1, getProjectName(), TEST_GROUP);
         _permissionsHelper.addUserToProjGroup(USER3, getProjectName(), TEST_GROUP);
+        _permissionsHelper.addUserToProjGroup(USER4, getProjectName(), TEST_GROUP);
 
         // Create issues
         clickProject(getProjectName());
@@ -954,6 +957,32 @@ public class IssuesTest extends BaseWebDriverTest
         assertEquals("Wrong assignedTo after issue close.", closeTo, closePage.assignedTo().get());
         ListPage listPage = closePage.save();
         assertEquals("Wrong assignedTo after issue close.", closeTo, listPage.dataRegion().getDataAsText(0, "Assigned To"));
+
+        // Regression for 53713. Close an issue opened by a user no longer valid for the project
+        String issueId;
+        String issueTitle = "Repro for 53713";
+
+        impersonate(USER4);
+        {
+            detailsPage = _issuesHelper.addIssue(issueTitle, _userHelper.getDisplayNameForEmail(getUsername()));
+            issueId = detailsPage.getIssueId();
+        }
+        stopImpersonating();
+
+        clickProject(getProjectName());
+        detailsPage = DetailsPage.beginAt(this, issueId);
+
+        resolvePage = detailsPage.clickResolve();
+        assertEquals("Wrong assignedTo after issue resolve.", _userHelper.getDisplayNameForEmail(USER4), resolvePage.assignedTo().get());
+        resolvePage.save();
+
+        // remove user4
+        _userHelper.deleteUsers(false, USER4);
+        closePage = detailsPage.clickClose();
+        closePage.save();
+
+        DetailsPage.beginAt(this, issueId);
+        assertTextPresent("closed", issueTitle);
     }
 
     // NOTE: returning string here to avoid extra casting

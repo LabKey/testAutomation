@@ -121,6 +121,7 @@ public class AssayRunsPage extends LabKeyPage<AssayRunsPage.ElementCache>
 
     protected class ElementCache extends LabKeyPage.ElementCache
     {
-        MultiMenu manageMenu = new MultiMenu.MultiMenuFinder(getDriver()).withText("Manage").findWhenNeeded(getDriver());
+        MultiMenu manageMenu = new MultiMenu.MultiMenuFinder(getDriver()).withText("Manage")
+                .timeout(WAIT_FOR_JAVASCRIPT).findWhenNeeded(getDriver());
     }
 }

@@ -1,5 +1,6 @@
 package org.labkey.test.components.ui.grids;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.params.FieldKey;
@@ -132,7 +133,11 @@ public class FieldReferenceManager
             }
         }
 
-        return null;
+        String capitalized = StringUtils.capitalize(label);
+        if (capitalized.equals(label))
+            return null;
+        else
+            return findColumnHeaderByLabel(capitalized); // Handle domain names that aren't capitalized
     }
 
     public static class FieldReference

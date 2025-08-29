@@ -7,6 +7,7 @@ import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.util.TestLogger;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 /**
  * <p>
@@ -43,6 +44,12 @@ public class ServerNotificationItem extends WebDriverComponent<ServerNotificatio
         return componentElement;
     }
 
+    @Override
+    protected void waitForReady()
+    {
+        getWrapper().quickWait().until(ExpectedConditions.visibilityOf(getComponentElement()));
+    }
+
     /**
      * Get the status as indicated by the icon.
      *
@@ -73,7 +80,7 @@ public class ServerNotificationItem extends WebDriverComponent<ServerNotificatio
      */
     public String getMessage()
     {
-        if(elementCache().message.isDisplayed())
+        if (elementCache().message.isDisplayed())
         {
             return elementCache().message.getText();
         }
