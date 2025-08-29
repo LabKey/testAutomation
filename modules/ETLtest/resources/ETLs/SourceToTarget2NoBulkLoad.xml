@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<etl xmlns="http://labkey.org/etl/xml" transactDestinationSchema="etltest">
+    <name>Source to target2 no bulk load</name>
+    <description>append rows from source to target, with detailed auditing</description>
+    <transforms>
+        <transform id="step1" type="org.labkey.di.pipeline.TransformTask">
+            <description>Copy to target2 no bulkLoad</description>
+            <source schemaName="etltest" queryName="source" />
+            <destination schemaName="etltest" queryName="target2" />
+        </transform>
+    </transforms>
+    <schedule>
+        <poll interval="15s" />
+    </schedule>
+</etl>

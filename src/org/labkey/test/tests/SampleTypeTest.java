@@ -53,6 +53,7 @@ import org.labkey.test.params.FieldDefinition.LookupInfo;
 import org.labkey.test.params.FieldInfo;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.ApiPermissionsHelper;
+import org.labkey.test.util.AuditLogHelper;
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
@@ -296,7 +297,7 @@ public class SampleTypeTest extends BaseWebDriverTest
 
         // Issue 47280: LKSM: Trailing/Leading whitespace in Source name won't resolve when deriving samples
     @Test
-    public void testImportSamplesWithTrailingSpace()
+    public void testImportSamplesWithTrailingSpace() throws IOException, CommandException
     {
         final String sampleTypeName = "SampleTypeWithProvidedName";
         final List<FieldDefinition> fields = List.of(
@@ -316,6 +317,12 @@ public class SampleTypeTest extends BaseWebDriverTest
         log("Add a single row to the sample type, with trailing spaces");
         Map<String, String> fieldMap = Map.of("Name", " S-1 ", "StringCol", "Ess ", "IntCol", "1 ");
         sampleTypeHelper.insertRow(fieldMap);
+
+        AuditLogHelper auditLogHelper = new AuditLogHelper(this);
+        int transactionId = auditLogHelper.checkAuditEventDiffCountForLastTransaction(getProjectName(), AuditLogHelper.AuditEvent.SAMPLE_TIMELINE_EVENT, 21, 1);
+        Map<String, Object>expectedValues = new HashMap<>();
+        expectedValues.put("Comment", "Sample was registered.");
+        auditLogHelper.checkAuditEventValuesForTransactionId(getProjectName(), AuditLogHelper.AuditEvent.SAMPLE_TIMELINE_EVENT, transactionId, 1, expectedValues);
 
         log("Verify values were saved are without trailing spaces");
         sampleTypeHelper.verifyDataValues(Collections.singletonList(fieldMap));

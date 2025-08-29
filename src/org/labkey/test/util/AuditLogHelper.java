@@ -53,6 +53,13 @@ public class AuditLogHelper
             "Comment"
     );
 
+    public static final String SCHEMA_XML_AUDIT = "<tables xmlns=\"http://labkey.org/data/xml\">\n" +
+            "  <table tableName=\"%s\" tableDbType=\"NOT_IN_DB\">\n" +
+            "    <auditLogging>%s</auditLogging>\n" +
+            "  </table>\n" +
+            "</tables>\n";
+
+
     private final WebDriverWrapper _wrapper;
     private final ConnectionSupplier _connectionSupplier;
 
@@ -67,6 +74,13 @@ public class AuditLogHelper
         this(wrapper, wrapper::createDefaultConnection);
     }
 
+    public enum AuditBehaviorType
+    {
+        NONE,
+        DETAILED,
+        SUMMARY;
+    }
+
     public enum AuditEvent
     {
         SAMPLE_TIMELINE_EVENT("SampleTimelineEvent"),
@@ -74,8 +88,10 @@ public class AuditLogHelper
         INVENTORY_AUDIT_EVENT("InventoryAuditEvent"),
         LIST_AUDIT_EVENT("ListAuditEvent"),
         ASSAY_AUDIT_EVENT("AssayAuditEvent"), // avaialble with SampleManagement module
+        ASSAY_RESULT_AUDIT_EVENT("AssayResultAuditEvent"), // avaialble with SampleManagement module
         EXPERIMENT_AUDIT_EVENT("ExperimentAuditEvent"),
         SAMPLE_WORKFLOW_AUDIT_EVENT("SamplesWorkflowAuditEvent"),
+        QUERY_UPDATE_AUDIT_EVENT("QueryUpdateAuditEvent"),
         FILE_SYSTEM_EVENT("FileSystem");
 
         private final String _name;
@@ -158,16 +174,31 @@ public class AuditLogHelper
     }
 
     public List<Map<String, Object>> getAuditLogsForTransactionId(String containerPath, AuditEvent auditEventName, List<String> columnNames,
-                                                         Integer transactionId, @Nullable ContainerFilter containerFilter) throws IOException, CommandException
+                                                                  Integer transactionId, @Nullable ContainerFilter containerFilter) throws IOException, CommandException
     {
-        List<Filter> transactionFilter = List.of(new Filter("TransactionId", transactionId, Filter.Operator.EQUAL));
+        return getAuditLogsForTransactionId(containerPath, auditEventName, columnNames, transactionId, null, containerFilter);
+    }
+
+    public List<Map<String, Object>> getAuditLogsForTransactionId(String containerPath, AuditEvent auditEventName, List<String> columnNames,
+                                                         Integer transactionId, List<Filter> eventFilters, @Nullable ContainerFilter containerFilter) throws IOException, CommandException
+    {
+        List<Filter> transactionFilter = new ArrayList<>();
+        if (transactionId != null)
+            transactionFilter.add(new Filter("TransactionId", transactionId, Filter.Operator.EQUAL));
+        if (eventFilters != null && !eventFilters.isEmpty())
+            transactionFilter.addAll(eventFilters);
         return getAuditLogsFromLKS(containerPath, auditEventName, columnNames, transactionFilter, null, containerFilter).getRows();
     }
 
     public void checkAuditEventValuesForTransactionId(String containerPath, AuditEvent auditEventName, Integer transactionId, int rowCount, Map<String, Object> expectedValues) throws IOException, CommandException
     {
+        checkAuditEventValuesForTransactionId(containerPath, auditEventName, transactionId, null, rowCount, expectedValues);
+    }
+
+    public void checkAuditEventValuesForTransactionId(String containerPath, AuditEvent auditEventName, Integer transactionId, List<Filter> eventFilters, int rowCount, Map<String, Object> expectedValues) throws IOException, CommandException
+    {
         List<String> columnNames = expectedValues.keySet().stream().map(Object::toString).toList();
-        List<Map<String, Object>> events = getAuditLogsForTransactionId(containerPath, auditEventName, columnNames, transactionId, ContainerFilter.CurrentAndSubfolders);
+        List<Map<String, Object>> events = getAuditLogsForTransactionId(containerPath, auditEventName, columnNames, transactionId, eventFilters, ContainerFilter.CurrentAndSubfolders);
         assertEquals("Unexpected number of events for transactionId " + transactionId, rowCount, events.size());
         for (int i = 0; i < rowCount; i++)
         {
@@ -250,6 +281,19 @@ public class AuditLogHelper
         }
     }
 
+    public Integer getLastEventId(String containerPath, AuditEvent auditEventName)
+    {
+        try
+        {
+            List<Map<String, Object>> events = getAuditLogsFromLKS(containerPath, auditEventName, List.of("RowId"), Collections.emptyList(), 1, ContainerFilter.CurrentAndSubfolders).getRows();
+            return events.size() == 1 ? (Integer) events.get(0).get("RowId") : null;
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
     public Integer doAndWaitForTransaction(Runnable action, String containerPath, AuditEvent auditEventName)
     {
         int prevTransactionId;
@@ -272,16 +316,26 @@ public class AuditLogHelper
         }, "Error waiting for next transactionId in " + auditEventName, WAIT_FOR_JAVASCRIPT);
     }
 
+    public Integer checkAuditEventDiffCountForLastTransaction(String containerPath, AuditEvent auditEventName, int expectedDiffCount,
+                                                              @Nullable Integer expectedEventCount) throws IOException, CommandException
+    {
+        return checkAuditEventDiffCountForLastTransaction(containerPath, auditEventName, Collections.emptyList(), expectedDiffCount, expectedEventCount);
+    }
+
     /**
      * Check for the expected number of diffs in the audit event for the last transactionId.
      * If an expectedEventCount is also provided, it will check that the number of events for that transactionId matches the expectedEventCount.
      * @return transactionId
      */
-    public Integer checkAuditEventDiffCountForLastTransaction(String containerPath, AuditEvent auditEventName, int expectedDiffCount,
+    public Integer checkAuditEventDiffCountForLastTransaction(String containerPath, AuditEvent auditEventName, @Nullable List<Filter> eventFilters, int expectedDiffCount,
                                                                       @Nullable Integer expectedEventCount) throws IOException, CommandException
     {
         Integer transactionId = getLastTransactionId(containerPath, auditEventName);
-        List<Filter> transactionFilter = List.of(new Filter("TransactionId", transactionId, Filter.Operator.EQUAL));
+        List<Filter> transactionFilter = new ArrayList<>();
+        if (transactionId != null)
+            transactionFilter.add(new Filter("TransactionId", transactionId, Filter.Operator.EQUAL));
+        if (eventFilters != null && !eventFilters.isEmpty())
+            transactionFilter.addAll(eventFilters);
         List<Map<String, Object>> events = getAuditLogsFromLKS(containerPath, auditEventName, List.of("Comment", "UserComment", "NewRecordMap"), transactionFilter, null, ContainerFilter.CurrentAndSubfolders).getRows();
         if (expectedEventCount != null)
         {
