@@ -1,6 +1,7 @@
 package org.labkey.remoteapi.issues;
 
 import org.json.JSONObject;
+import org.json.JSONParserConfiguration;
 import org.labkey.api.collections.CaseInsensitiveHashMap;
 
 import java.io.File;
@@ -27,7 +28,8 @@ public class IssueModel
 
     public JSONObject toJSON()
     {
-        var json = new JSONObject(_properties);
+        // Ensure that null values are sent instead of omitted
+        var json = new JSONObject(_properties, new JSONParserConfiguration().withUseNativeNulls(true));
 
         // handle attachments
         if (!_attachments.isEmpty())
