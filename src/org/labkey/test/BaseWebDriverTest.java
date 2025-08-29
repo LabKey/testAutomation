@@ -76,6 +76,7 @@ import org.labkey.test.util.AbstractAssayHelper;
 import org.labkey.test.util.AbstractContainerHelper;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.ArtifactCollector;
+import org.labkey.test.util.AuditLogHelper;
 import org.labkey.test.util.ComponentQuery;
 import org.labkey.test.util.Crawler;
 import org.labkey.test.util.CspLogUtil;
@@ -2756,13 +2757,34 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     protected void verifyQueryAPI(String schema, String dataType, Map<String, Object> row, boolean isInsert, String... errorMsg)
     {
+        verifyQueryAPI(schema, dataType, null, row, isInsert, errorMsg);
+    }
+
+    protected void verifyQueryAPI(String schema, String dataType, @Nullable AuditLogHelper.AuditBehaviorType auditBehavior, Map<String, Object> row, boolean isInsert, String... errorMsg)
+    {
         String action = isInsert ? "insertRows" : "updateRows";
         String updateScript = "LABKEY.Query." + action + "({ schemaName: \"" + schema + "\", "+
                 "queryName: " + EscapeUtil.toJSONStr(dataType) + ", " +
+                (auditBehavior == null ? "" : ("auditBehavior: " + EscapeUtil.toJSONStr(auditBehavior.name())) + ", ") +
                 "success: callback," +
                 "failure: callback," +
                 "rows: [" + EscapeUtil.toJSONRow(row) + "]" +
                 "})";
+        log(updateScript);
+        executeAndVerifyScript(updateScript, errorMsg);
+    }
+
+    protected void verifyQueryAPI(String schema, String dataType, @Nullable AuditLogHelper.AuditBehaviorType auditBehavior, List<Map<String, Object>> rows, boolean isInsert, String... errorMsg)
+    {
+        String action = isInsert ? "insertRows" : "updateRows";
+        String updateScript = "LABKEY.Query." + action + "({ schemaName: \"" + schema + "\", "+
+                "queryName: " + EscapeUtil.toJSONStr(dataType) + ", " +
+                (auditBehavior == null ? "" : ("auditBehavior: " + EscapeUtil.toJSONStr(auditBehavior.name())) + ", ") +
+                "success: callback," +
+                "failure: callback," +
+                "rows: [" + EscapeUtil.toJSONRow(rows) + "]" +
+                "})";
+        log(updateScript);
         executeAndVerifyScript(updateScript, errorMsg);
     }
 

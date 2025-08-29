@@ -80,6 +80,19 @@ public class EscapeUtil
         return sb.toString();
     }
 
+    static public String toJSONRow(List<Map<String, Object>> rows)
+    {
+        StringBuilder sb = new StringBuilder();
+        String sep = "";
+        for (Map<String, Object> row : rows)
+        {
+            sb.append(sep).append(toJSONRow(row));
+            sep = ",";
+        }
+
+        return sb.toString();
+    }
+
     static public String jsString(String s)
     {
         if (s == null)
