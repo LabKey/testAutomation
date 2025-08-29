@@ -1,12 +1,14 @@
 package org.labkey.test.tests.component;
 
 import org.apache.commons.lang3.StringUtils;
+import org.json.JSONObject;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.remoteapi.query.InsertRowsCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -21,7 +23,7 @@ import org.labkey.test.params.FieldInfo;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.params.list.IntListDefinition;
 import org.labkey.test.params.list.ListDefinition;
-import org.labkey.test.util.TextUtils;
+import org.labkey.test.util.EscapeUtil;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
@@ -165,6 +167,41 @@ public class EditableGridTest extends BaseWebDriverTest
                 .setFields(
                     ALL_FIELDS.stream().map(FieldInfo::getFieldDefinition).toList())
                 .create(connection, getProjectName());
+
+        for (String sampleType : List.of(EXTRAPOLATING_SAMPLE_TYPE, FILLING_SAMPLE_TYPE, PASTING_SAMPLE_TYPE, ALL_TYPE_SAMPLE_TYPE))
+        {
+            // Hide columns from editable grid so that test columns are in view
+            String metadataXml = """
+                <tables xmlns="http://labkey.org/data/xml">
+                  <table tableName="%s" tableDbType="NOT_IN_DB">
+                    <columns>
+                      <column columnName="Name">
+                        <shownInInsertView>false</shownInInsertView>
+                      </column>
+                      <column columnName="Alias">
+                        <shownInInsertView>false</shownInInsertView>
+                      </column>
+                      <column columnName="MaterialExpDate">
+                        <shownInInsertView>false</shownInInsertView>
+                      </column>
+                      <column columnName="Flag">
+                        <shownInInsertView>false</shownInInsertView>
+                      </column>
+                      <column columnName="SampleState">
+                        <shownInInsertView>false</shownInInsertView>
+                      </column>
+                    </columns>
+                  </table>
+                </tables>
+                """.formatted(EscapeUtil.getMarkupEscapedValue(sampleType));
+
+            SimplePostCommand postCommand = new SimplePostCommand("query", "saveSourceQuery");
+            postCommand.setJsonObject(new JSONObject());
+            postCommand.getJsonObject().put("ff_metadataText", metadataXml);
+            postCommand.getJsonObject().put("schemaName", "samples");
+            postCommand.getJsonObject().put("queryName", sampleType);
+            postCommand.execute(connection, getProjectName());
+        }
     }
 
     @Test
@@ -429,15 +466,12 @@ public class EditableGridTest extends BaseWebDriverTest
         Locator boxes = Locator.tag("tr").child("td")
                 .child(Locator.tagWithAttribute("input", "type", "checkbox"));
         var checkBoxes = boxes.findElements(testGrid);
-        scrollIntoView(checkBoxes.get(0), true); // bring as much of the grid into view as possible
+        scrollIntoView(checkBoxes.get(2), false);
+        checkBoxes.get(2).click();
 
-        new Actions(getDriver())
-                .click(checkBoxes.get(2))
-                .keyDown(Keys.SHIFT)
-                .click(checkBoxes.get(5))
-                .click(checkBoxes.get(7))
-                .keyUp(Keys.SHIFT)
-                .perform();
+        shiftClickCheckbox(checkBoxes.get(5));
+
+        shiftClickCheckbox(checkBoxes.get(7));
 
         // make sure 2-7 are still selected
         for (int i=2; i<7; i++)
@@ -457,11 +491,8 @@ public class EditableGridTest extends BaseWebDriverTest
         checkBoxes = boxes.findElements(testGrid);
 
         // verify shift-select to another row does not select the range from the now-removed row
-        new Actions(getDriver())
-                .keyDown(Keys.SHIFT)
-                .click(checkBoxes.get(7))
-                .keyUp(Keys.SHIFT)
-                .perform();
+
+        shiftClickCheckbox(checkBoxes.get(7));
 
         for (int i=2; i<6; i++)
         {
@@ -469,6 +500,16 @@ public class EditableGridTest extends BaseWebDriverTest
         }
         checker().verifyTrue(String.format("row %d should be checked", 7), testGrid.isRowSelected(7));
         checker().screenShotIfNewError("unexpected_selection_range");
+    }
+
+    private void shiftClickCheckbox(WebElement el)
+    {
+        scrollIntoView(el, false);
+        new Actions(getDriver())
+            .keyDown(Keys.SHIFT)
+            .click(el)
+            .keyUp(Keys.SHIFT)
+            .perform();
     }
 
     @Test
@@ -481,6 +522,7 @@ public class EditableGridTest extends BaseWebDriverTest
         EditableGrid testGrid = goToEditableGrid(PASTING_SAMPLE_TYPE);
         testGrid.addRows(5);
 
+        scrollIntoView(testGrid.getCell(3, PASTE_4), false); // Get target area into view
         log("Test wide");
         testGrid.selectCellRange(testGrid.getCell(0, PASTE_1), testGrid.getCell(1, PASTE_4));
         actionPaste(null, rowsToString(clipRows));
@@ -1000,10 +1042,10 @@ public class EditableGridTest extends BaseWebDriverTest
                 .verifyEquals("There should be no grid cells already selected. Fatal error.",
                         0, editableGrid.getSelectedCells().size());
 
-        int startColumn = editableGrid.getColumnIndex(PASTE_1);
+        int startColumn = editableGrid.getColumnIndex(PASTE_3);
 
         int gridRow = 4;
-        WebElement startCell = editableGrid.getCell(gridRow, PASTE_1);
+        WebElement startCell = editableGrid.getCell(gridRow, PASTE_3);
         startCell.click();
 
         log("Select a few horizontal cells the the left in the grid.");
@@ -1100,10 +1142,10 @@ public class EditableGridTest extends BaseWebDriverTest
         checker().verifyEquals("Hitting <tab> should have removed the selection.",
                 0, editableGrid.getSelectedCells().size());
 
-        WebElement endCell = Locator.tag("div").findWhenNeeded(editableGrid.getCell(gridRow, PASTE_2));
+        WebElement endCell = Locator.tag("div").findWhenNeeded(editableGrid.getCell(gridRow, PASTE_4));
 
         checker().verifyTrue(String.format("The expected cell on row %d and column %s is not selected after hitting <tab>.",
-                        gridRow, PASTE_2),
+                        gridRow, PASTE_4),
                 Objects.requireNonNullElse(endCell.getAttribute("class"), "").toLowerCase().contains("cell-selected"));
 
         checker().screenShotIfNewError("TAB_ERROR");
@@ -1138,7 +1180,7 @@ public class EditableGridTest extends BaseWebDriverTest
                         0, editableGrid.getSelectedCells().size());
 
         List<String> columns = editableGrid.getColumnLabels();
-        int startColumn = columns.indexOf("Description");
+        int startColumn = 4;
 
         int startRow = 5;
         WebElement startCell = editableGrid.getCell(startRow, columns.get(startColumn));
