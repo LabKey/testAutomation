@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
+import java.util.function.BiFunction;
 
 public abstract class QueryKey<T extends QueryKey<T>>
 {
@@ -17,12 +19,12 @@ public abstract class QueryKey<T extends QueryKey<T>>
     private final String _name;
     private final String _encodedKey;
 
-    protected QueryKey(T parent, String name)
+    protected QueryKey(T parent, @NotNull String name)
     {
+        _name = Objects.requireNonNull(name);
         _parent = parent;
-        _name = name;
 
-        if (parent != null && !parent.getName().isEmpty())
+        if (parent != null)
         {
             _encodedKey = parent + getDivider() + encodePart(name);
         }
@@ -35,6 +37,16 @@ public abstract class QueryKey<T extends QueryKey<T>>
     protected abstract String getDivider();
 
     protected abstract T getThis();
+
+    protected static <T> T fromParts(BiFunction<T, String, T> factory, List<String> parts)
+    {
+        T fieldKey = null;
+        for (String part : parts)
+        {
+            fieldKey = factory.apply(fieldKey, part);
+        }
+        return fieldKey;
+    }
 
     public static List<String> getIllegalChars()
     {

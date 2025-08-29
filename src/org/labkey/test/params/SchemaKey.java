@@ -13,12 +13,7 @@ public class SchemaKey extends QueryKey<SchemaKey>
 
     public static SchemaKey fromParts(List<String> parts)
     {
-        SchemaKey schemaKey = null;
-        for (String part : parts)
-        {
-            schemaKey = new SchemaKey(schemaKey, part);
-        }
-        return schemaKey;
+        return QueryKey.fromParts(SchemaKey::new, parts);
     }
 
     public static SchemaKey fromParts(String... parts)

@@ -9,7 +9,6 @@ import java.util.List;
 
 public final class FieldKey extends QueryKey<FieldKey> implements CharSequence, WrapsFieldKey
 {
-    public static final FieldKey EMPTY = new FieldKey(null, ""); // Useful as a sort of FieldKey builder starting point
     public static final FieldKey SOURCES_FK = FieldKey.fromParts("DataInputs");
     public static final FieldKey PARENTS_FK = FieldKey.fromParts("MaterialInputs");
 
@@ -22,7 +21,7 @@ public final class FieldKey extends QueryKey<FieldKey> implements CharSequence, 
 
     public static FieldKey fromParts(List<String> parts)
     {
-        return EMPTY.child(parts);
+        return QueryKey.fromParts(FieldKey::new, parts);
     }
 
     public static FieldKey fromParts(String... parts)
