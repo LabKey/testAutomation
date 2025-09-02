@@ -46,6 +46,7 @@ public class LinkedReportTest extends BaseWebDriverTest
         goToManageViews().clickAddReport("Link Report");
         setFormElement(Locator.name("viewName"), REPORT_NAME);
         setFormElement(Locator.name("linkUrl"), LINK_REPORT_URL);
+        sleep(1000);  // Hack to prevent saving before the form is ready to submit, lacking a way to check before clicking
         clickButton("Save");
         waitForText("Manage Views");
 
