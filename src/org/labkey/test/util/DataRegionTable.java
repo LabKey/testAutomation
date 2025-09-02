@@ -169,10 +169,7 @@ public class DataRegionTable extends DataRegion
 
     public ManageViewsPage openManageViews()
     {
-        if (!getCustomizeView().isPanelExpanded())
-        {
-            getViewsMenu().clickSubMenu(false, "Manage Views");
-        }
+        getViewsMenu().clickSubMenu(false, "Manage Views");
         return new ManageViewsPage(getDriver());
     }
 
