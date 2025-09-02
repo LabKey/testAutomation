@@ -75,12 +75,6 @@ public class CustomizeSitePage extends LabKeyPage<CustomizeSitePage.ElementCache
         return elementCache().baseServerUrl.get();
     }
 
-    public CustomizeSitePage setContainerRelativeUrl(boolean enable)
-    {
-        elementCache().containerRelativeUrl.set(enable);
-        return this;
-    }
-
     public CustomizeSitePage setUsageReportingLevel(ReportingLevel level)
     {
         elementCache().usageReportingLevel(level).check();
@@ -233,7 +227,6 @@ public class CustomizeSitePage extends LabKeyPage<CustomizeSitePage.ElementCache
         // Site URLs
         protected final Input defaultDomain = Input(Locator.id("defaultDomain"), getDriver()).findWhenNeeded(this);
         protected final Input baseServerUrl = Input(Locator.id("baseServerURL"), getDriver()).findWhenNeeded(this);
-        protected final Checkbox containerRelativeUrl = Checkbox(Locator.id("useContainerRelativeURL")).findWhenNeeded(this);
 
         // Usage Reporting
         protected RadioButton usageReportingLevel(ReportingLevel level)
