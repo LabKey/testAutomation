@@ -40,13 +40,13 @@ public class LinkedReportTest extends BaseWebDriverTest
     /* Regression coverage : Issue 47004: Add Test Automation for LinkedReports  */
 
     @Test
-    public void testLinkedReportToExternalURL() throws InterruptedException
+    public void testLinkedReportToExternalURL()
     {
         goToProjectHome();
         goToManageViews().clickAddReport("Link Report");
         setFormElement(Locator.name("viewName"), REPORT_NAME);
         setFormElement(Locator.name("linkUrl"), LINK_REPORT_URL);
-        Thread.sleep(1000);  // Hack to prevent saving before the form is ready to submit, lacking a way to check before clicking
+        sleep(1000);  // Hack to prevent saving before the form is ready to submit, lacking a way to check before clicking
         clickButton("Save");
         waitForText("Manage Views");
 
