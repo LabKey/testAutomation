@@ -25,6 +25,8 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.ext4.Window;
+import org.labkey.test.pages.reports.ManageViewsPage;
+import org.labkey.test.pages.user.ShowUsersPage;
 import org.labkey.test.util.PortalHelper;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
@@ -131,6 +133,15 @@ public class DataViewsReportOrderingTest extends BaseWebDriverTest
             reverseReports[x] = reportsOriginalOrder.get(reportsOriginalOrder.size() - x -1);
         }
         return reverseReports;
+    }
+
+    @Test
+    public void testRootFolderAccess()
+    {
+        // Regression for issue 53630
+        ShowUsersPage showUsersPage = goToSiteUsers();
+        ManageViewsPage mvp = showUsersPage.getUsersTable().openManageViews();
+        mvp.clickAddReport("R Report");
     }
 
     @Override
