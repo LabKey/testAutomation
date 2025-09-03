@@ -18,13 +18,12 @@ package org.labkey.test.util;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.commons.lang3.mutable.MutableObject;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
 import org.labkey.remoteapi.CommandException;
-import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.SelectRowsCommand;
-import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
@@ -51,9 +50,11 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Collections.emptyList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -880,56 +881,100 @@ public class FileBrowserHelper extends WebDriverWrapper
         }
     }
 
-    private String stringOrNull(Object value)
+    private static String stringOrNull(Object value)
     {
         if (value == null)
             return null;
         return (String) value;
     }
 
-    public record FileDetailInfo(String fileName, String absoluteFilePath, String dataFileUrl, String webDavUrl, String webDavUrlRelative)
+    public record FileDetailInfo(String fileName, String absoluteFilePath, String dataFileUrl, String relativeFolder, String webDavUrl, String webDavUrlRelative)
     {
     }
 
-    public FileDetailInfo getFileDetailInfo(String containerPath, String fileName)
+    /**
+     * Queries the "exp"."files" table to gather metadata about a specific file.
+     *
+     * @param containerPath The container path in which to make the request.
+     * @param fileName The name of the file to find.
+     */
+    public static @Nullable FileDetailInfo getFileDetailInfo(String containerPath, String fileName)
     {
-        List<String> filePathColumns = List.of("AbsoluteFilePath", "FileExists", "DataFileUrl", "WebDavUrl", "WebDavUrlRelative");
+        return getFileDetailInfo(containerPath, fileName, null);
+    }
+
+    /**
+     * Queries the "exp"."files" table to gather metadata about a specific file. Optionally, a relativeFolder can be
+     * supplied to match against the "RelativeFolder" column. This is useful when looking for files in a specific
+     * subdirectory.
+     *
+     * @param containerPath  The container path in which to make the request.
+     * @param fileName       The name of the file to find.
+     * @param relativeFolder The expected value of the "RelativeFolder" column. If null, the column is not checked.
+     */
+    public static @Nullable FileDetailInfo getFileDetailInfo(String containerPath, String fileName, @Nullable String relativeFolder)
+    {
+        var fileInfos = getFileDetailInfos(containerPath, List.of(new Filter("Name", fileName)));
+
+        // "RelativeFolder" is not a filterable column on the query table
+        if (relativeFolder != null)
+            fileInfos = fileInfos.stream().filter(f -> relativeFolder.equals(f.relativeFolder)).toList();
+
+        if (fileInfos.size() > 1)
+        {
+            String message = String.format("%d files found with name \"%s\"", fileInfos.size(), fileName);
+            if (relativeFolder != null)
+                message += String.format(" in relative folder \"%s\"", relativeFolder);
+            message += ". Expected 0 or 1 files with that name.";
+
+            throw new AssertionError(message);
+        }
+
+        return fileInfos.isEmpty() ? null : fileInfos.get(0);
+    }
+
+    private static @NotNull List<FileDetailInfo> getFileDetailInfos(String containerPath, @Nullable Collection<Filter> filters)
+    {
         try
         {
-            Connection cn = WebTestHelper.getRemoteApiConnection();
-            SelectRowsCommand cmd = new SelectRowsCommand("exp", "files");
-            cmd.addFilter("Name", fileName, Filter.Operator.EQUAL);
-            cmd.setColumns(filePathColumns);
-            SelectRowsResponse response = cmd.execute(cn, "/" + containerPath);
+            var cmd = new SelectRowsCommand("exp", "files");
+            cmd.setColumns(List.of("AbsoluteFilePath", "DataFileUrl", "FileExists", "Name", "RelativeFolder", "WebDavUrl", "WebDavUrlRelative"));
 
-            for (Map<String, Object> row: response.getRows())
+            if (filters != null)
+            {
+                for (var filter : filters)
+                    cmd.addFilter(filter);
+            }
+
+            var response = cmd.execute(WebTestHelper.getRemoteApiConnection(), "/" + containerPath);
+
+            var files = new ArrayList<FileDetailInfo>();
+            for (var row : response.getRows())
             {
                 if (!(Boolean) row.get("FileExists"))
                     continue;
-                Object absoluteFilePath = row.get("AbsoluteFilePath");
-                Object dataFileUrl = row.get("DataFileUrl");
-                Object webDavUrl = row.get("WebDavUrl");
-                Object webDavUrlRelative = row.get("WebDavUrlRelative");
-                return new FileDetailInfo(fileName, stringOrNull(absoluteFilePath), stringOrNull(dataFileUrl), stringOrNull(webDavUrl), stringOrNull(webDavUrlRelative));
+                String fileName = stringOrNull(row.get("Name"));
+                String absoluteFilePath = stringOrNull(row.get("AbsoluteFilePath"));
+                String dataFileUrl = stringOrNull(row.get("DataFileUrl"));
+                String relativeFolder = stringOrNull(row.get("RelativeFolder"));
+                String webDavUrl = stringOrNull(row.get("WebDavUrl"));
+                String webDavUrlRelative = stringOrNull(row.get("WebDavUrlRelative"));
+                files.add(new FileDetailInfo(fileName, absoluteFilePath, dataFileUrl, relativeFolder, webDavUrl, webDavUrlRelative));
             }
+
+            return files;
         }
         catch (CommandException ce)
         {
-            if (ce.getStatusCode() == 404)
-            {
-                return null;
-            }
-            else
-            {
+            if (ce.getStatusCode() != 404)
                 throw new RuntimeException(ce);
-            }
         }
         catch (IOException ioe)
         {
             throw new RuntimeException(ioe);
         }
 
-        return null;
+        return emptyList();
     }
 
     // See PageFlowUtil.encodeURIComponent()
