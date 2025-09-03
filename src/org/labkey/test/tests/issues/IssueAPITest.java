@@ -187,7 +187,9 @@ public class IssueAPITest extends BaseWebDriverTest
         String title = "Updated issue test issue";
         Integer updatedPri = 4;
         IssueModel originalIssue = basicIssueModel(originalTitle, originalComment);
-        IssueModel updateIssue = basicIssueModel(title, comment)
+        IssueModel updateIssue = new IssueModel()
+            .setTitle(title)
+            .setComment(comment)
             .setAction(IssueModel.IssueAction.update)
             .setPriority(updatedPri);
 
@@ -216,7 +218,9 @@ public class IssueAPITest extends BaseWebDriverTest
         Integer updatedPri = 4;
         IssueModel originalIssue = basicIssueModel(originalTitle, originalComment);
 
-        IssueModel resolveIssue = basicIssueModel(newTitle, newComment)
+        IssueModel resolveIssue = new IssueModel()
+            .setTitle(newTitle)
+            .setComment(newComment)
             .setAction(IssueModel.IssueAction.resolve)
             .setResolution("Fixed")
             .setPriority(updatedPri);
@@ -245,7 +249,9 @@ public class IssueAPITest extends BaseWebDriverTest
         String newTitle = "Closed test issue";
         Integer updatedPri = 4;
         IssueModel originalIssue = basicIssueModel(originalTitle, originalComment);
-        IssueModel closeIssue = basicIssueModel(newTitle, newComment)
+        IssueModel closeIssue = new IssueModel()
+            .setTitle(newTitle)
+            .setComment(newComment)
             .setAction(IssueModel.IssueAction.close)
             .setPriority(updatedPri);
 
@@ -267,7 +273,8 @@ public class IssueAPITest extends BaseWebDriverTest
     {
         String title = "Assign Test Issue";
         IssueModel originalIssue = basicIssueModel(title, "Gonna assign this");
-        IssueModel updateIssue = basicIssueModel(null, "assigned now")
+        IssueModel updateIssue = new IssueModel()
+                .setComment("assigned now")
                 .setAction(IssueModel.IssueAction.update)
                 .setAssignedTo(TEST_BUDDY_ID);
 
@@ -288,9 +295,9 @@ public class IssueAPITest extends BaseWebDriverTest
     public void testReopenAnIssue() throws Exception
     {
         IssueModel originalIssue = basicIssueModel("Reopen test issue", "Gonna close and reopen this");
-        IssueModel closeIssue = basicIssueModel(null, null)
+        IssueModel closeIssue = new IssueModel()
                 .setAction(IssueModel.IssueAction.close);
-        IssueModel reopenIssue = basicIssueModel(null, null)
+        IssueModel reopenIssue = new IssueModel()
                 .setAction(IssueModel.IssueAction.reopen);
 
         // insert
@@ -347,10 +354,11 @@ public class IssueAPITest extends BaseWebDriverTest
 
         var issueId = doIssueAction(issue);
 
-        IssueModel close = basicIssueModel(null, null).setAction(IssueModel.IssueAction.close)
+        IssueModel close = new IssueModel().setAction(IssueModel.IssueAction.close)
                 .setIssueId(issueId);
-        IssueModel resolve = basicIssueModel(null, null).setAction(IssueModel.IssueAction.resolve)
-                .setIssueId(issueId);
+        IssueModel resolve = new IssueModel().setAction(IssueModel.IssueAction.resolve)
+                .setIssueId(issueId).
+                setAssignedTo(TEST_USER_ID);
 
         doIssueAction(close);
         var closedResponse = getIssueResponse(issueId);
