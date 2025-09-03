@@ -2308,8 +2308,12 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         return new NewQueryPage(getDriver());
     }
 
-
     protected void createQuery(String container, String name, String schemaName, String sql, String xml, boolean inheritable)
+    {
+        createQuery(container, name, schemaName, sql, xml, inheritable, null);
+    }
+
+    protected void createQuery(String container, String name, String schemaName, String sql, String xml, boolean inheritable, @Nullable String description)
     {
         SourceQueryPage sourcePage = createQuery(container, name, schemaName);
         sourcePage.setSource(sql);
@@ -2319,12 +2323,15 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             sourcePage.setMetadataXml(xml);
         }
         sourcePage.clickSave();
-        if (inheritable)
+        if (inheritable || !StringUtils.isEmpty(description))
         {
-            String queryURL = "query/" + container + "/begin.view?schemaName=" + schemaName;
+            String queryURL = buildURL("query", getProjectName(), "begin",  Map.of("schemaName", schemaName));
             beginAt(queryURL);
             editQueryProperties(schemaName, name);
-            selectOptionByValue(Locator.name("inheritable"), "true");
+            if (inheritable)
+                selectOptionByValue(Locator.name("inheritable"), "true");
+            if (description != null)
+                setFormElement(Locator.tagWithName("textarea", "description"), description);
             clickButton("Save");
         }
     }
