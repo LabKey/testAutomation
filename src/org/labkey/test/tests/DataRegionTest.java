@@ -169,6 +169,8 @@ public class DataRegionTest extends AbstractQWPTest
         Assertions.assertThat(chartTypeDialog.getColumnList())
                 .as("List should be pre-selected for chart")
                 .containsExactlyInAnyOrder(LIST_KEY_NAME, NAME_COLUMN.getName(), HEX_COLUMN.getName());
+        getDriver().close();
+        switchToMainWindow();
     }
 
     @Override
