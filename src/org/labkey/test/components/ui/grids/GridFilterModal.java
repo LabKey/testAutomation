@@ -44,6 +44,7 @@ public class GridFilterModal extends ModalDialog
     public GridFilterModal selectField(CharSequence fieldIdentifier)
     {
         WebElement fieldItem = elementCache().findFieldOption(fieldIdentifier);
+        getWrapper().scrollIntoView(fieldItem);
         String fieldLabel = WebElementUtils.getTextContent(fieldItem);
         fieldItem.click();
         Locator.byClass("field-modal__col-sub-title").withText("Find values for " + fieldLabel)

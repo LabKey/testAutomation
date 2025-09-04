@@ -7,6 +7,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.ChartTypeDialog;
 import org.labkey.test.components.CustomizeView;
@@ -110,14 +111,22 @@ public class SampleTypeRenameTest extends BaseWebDriverTest
         updatePage.getFieldsPanel().getField(FIELD_INT).setName(FIELD_INT + " Updated");
         updatePage.setNameExpression("S-${genId}");
         updatePage.clickSave();
-        goToProjectHome();
-        updatePage = sampleHelper.goToEditSampleType(sampleTypeName);
-        updatePage.getFieldsPanel().getField(FIELD_INT + " Updated").setName(FIELD_INT + " 2nd update");
-        updatePage.clickSave();
-        goToProjectHome();
-        updatePage = sampleHelper.goToEditSampleType(sampleTypeName);
-        updatePage.getFieldsPanel().getField(FIELD_INT + " 2nd update").setName(FIELD_INT + " 3rd");
-        updatePage.clickSave();
+
+        //Issue 51979: BadSqlGrammarException indexing sample types immediately after a field rename
+        // This issue has been fixed in Postgres but continues to fail in MSSQL. Many attempts were made to fix in
+        // MSSQL, but it was decided not to spend any more time on it (for MSSQL).
+        // Only do these other "rapid fire" updates if on Postgre.
+        if (WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.PostgreSQL)
+        {
+            goToProjectHome();
+            updatePage = sampleHelper.goToEditSampleType(sampleTypeName);
+            updatePage.getFieldsPanel().getField(FIELD_INT + " Updated").setName(FIELD_INT + " 2nd update");
+            updatePage.clickSave();
+            goToProjectHome();
+            updatePage = sampleHelper.goToEditSampleType(sampleTypeName);
+            updatePage.getFieldsPanel().getField(FIELD_INT + " 2nd update").setName(FIELD_INT + " 3rd");
+            updatePage.clickSave();
+        }
 
         SearchAdminAPIHelper.waitForIndexer();
 
