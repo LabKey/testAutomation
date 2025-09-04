@@ -19,6 +19,7 @@ import org.apache.commons.compress.archivers.ArchiveException;
 import org.apache.commons.compress.archivers.ArchiveStreamFactory;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
+import org.apache.commons.io.FileSystem;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -27,8 +28,6 @@ import org.apache.logging.log4j.Logger;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
-import org.apache.poi.xssf.streaming.SXSSFRow;
-import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openpgp.PGPCompressedData;
 import org.bouncycastle.openpgp.PGPEncryptedDataList;
@@ -41,12 +40,10 @@ import org.bouncycastle.openpgp.operator.jcajce.JcaPGPDigestCalculatorProviderBu
 import org.bouncycastle.openpgp.operator.jcajce.JcePBEDataDecryptorFactoryBuilder;
 import org.bouncycastle.util.io.Streams;
 import org.jetbrains.annotations.NotNull;
-import org.labkey.serverapi.reader.Readers;
 import org.openqa.selenium.NotFoundException;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -71,6 +68,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
@@ -707,34 +705,15 @@ public abstract class TestFileUtils
         return Streams.readAll(ld.getInputStream());
     }
 
+    private static final Pattern badChars = Pattern.compile("[\\\\:/\\[\\]?*|]");
 
-    public static File convertTabularToXlsx(File tabularFile, String delimiter, String sheetName, String xlsxFileName) throws IOException, PGPException
+    /**
+     * Determining expected file names for downloaded files that are named according to some
+     * value that might include characters that are not legal for files
+     * @see FileSystem#toLegalFileName(String, char)
+     */
+    public static String makeLegalFileName(String candidate)
     {
-        File excelFile = new File(getTestTempDir(), xlsxFileName);
-        FileUtils.forceMkdirParent(excelFile);
-
-        try(SXSSFWorkbook workBook = new SXSSFWorkbook(1000); // holds 1000 rows at a time
-            BufferedReader br = Readers.getReader(tabularFile);
-            FileOutputStream out =  new FileOutputStream(excelFile))
-        {
-            var sheet = workBook.createSheet(sheetName);
-
-            String currentLine;
-            int rowNum=0;
-
-            while ((currentLine = br.readLine()) != null)
-            {
-                String str[] = currentLine.split(delimiter);
-                SXSSFRow currentRow = sheet.createRow(rowNum);
-                for (int i = 0; i < str.length; i++)
-                {
-                    currentRow.createCell(i).setCellValue(str[i]);
-                }
-                rowNum++;
-            }
-            workBook.write(out);    // flush remaining rows
-        }
-
-        return excelFile;
+        return badChars.matcher(candidate).replaceAll("_");
     }
 }
