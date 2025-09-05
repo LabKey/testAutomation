@@ -29,7 +29,7 @@ public class QueryLookupTest extends BaseWebDriverTest
     private static final String PROJECT_NAME = "QueryLookupTest" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
     private static final String LIST_NAME = "l&ist q";
 
-    private static final FieldInfo NAME_COLUMN = FieldInfo.random("Name", FieldDefinition.ColumnType.String, DomainUtils.DomainKind.VarList);
+    private static final FieldInfo NAME_COLUMN = FieldInfo.random("Key", FieldDefinition.ColumnType.String, DomainUtils.DomainKind.VarList);
     private static final FieldInfo TSHIRT_COLUMN = FieldInfo.random("TShirt", FieldDefinition.ColumnType.String, DomainUtils.DomainKind.VarList);
 
     @Override
