@@ -135,7 +135,7 @@ public class ExportFolderPage extends LabKeyPage<ExportFolderPage.ElementCache>
         return this;
     }
 
-    public ExportFolderPage includeETLDefintions(boolean checked)
+    public ExportFolderPage includeETLDefinitions(boolean checked)
     {
         elementCache().etlDefinitionsCheckbox.set(checked);
         return this;
@@ -168,6 +168,12 @@ public class ExportFolderPage extends LabKeyPage<ExportFolderPage.ElementCache>
     public ExportFolderPage includeObject(String label, boolean include)
     {
         elementCache().exportItemCheckbox(label).set(include);
+        return this;
+    }
+
+    public ExportFolderPage clearAllObjects()
+    {
+        elementCache().clearAllObjects.click();
         return this;
     }
 
@@ -281,6 +287,7 @@ public class ExportFolderPage extends LabKeyPage<ExportFolderPage.ElementCache>
         );
 
         public final WebElement exportBtn = Locator.linkWithSpan("Export").findWhenNeeded(getDriver());
+        public final WebElement clearAllObjects = Locator.linkWithSpan("Clear All Objects").findWhenNeeded(getDriver());
     }
 
     public enum ExportLocation
