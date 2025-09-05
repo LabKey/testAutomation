@@ -12,9 +12,12 @@ import org.labkey.remoteapi.issues.IssueResponse;
 import org.labkey.remoteapi.issues.IssueResponseModel;
 import org.labkey.remoteapi.issues.IssuesCommand;
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Issues;
+import org.labkey.test.pages.issues.IssuesAdminPage;
+import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.APIUserHelper;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.IssuesHelper;
@@ -24,7 +27,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -36,9 +38,11 @@ import static org.labkey.test.util.PasswordUtil.getUsername;
 @Category({Issues.class, Daily.class})
 public class IssueAPITest extends BaseWebDriverTest
 {
+    public static final String CUSTOM_REQUIRED_FIELD = "CustomField";
     IssuesHelper _issuesHelper = new IssuesHelper(this);
     APIUserHelper _userHelper = new APIUserHelper(this);
     static String ISSUES = "issues";
+    static String ISSUES_WITH_REQUIRED = "required";
     static Integer TEST_USER_ID;
     static String TEST_USER_NAME;
     static String TEST_USER_DISPLAY_NAME;
@@ -59,6 +63,12 @@ public class IssueAPITest extends BaseWebDriverTest
     {
         _containerHelper.createProject(getProjectName(), null);
         _issuesHelper.createNewIssuesList(ISSUES, getContainerHelper());
+
+        _issuesHelper.createNewIssuesList(ISSUES_WITH_REQUIRED, getContainerHelper());
+        clickAndWait(Locator.linkWithText(ISSUES_WITH_REQUIRED));
+        IssuesAdminPage adminPage = _issuesHelper.goToAdmin();
+        adminPage.getFieldsPanel().addField(new FieldDefinition(CUSTOM_REQUIRED_FIELD, FieldDefinition.ColumnType.String).setRequired(true));
+        adminPage.clickSave();
 
         TEST_USER_NAME = getUsername();
         TEST_USER_ID = _userHelper.getUserId(TEST_USER_NAME);
@@ -99,6 +109,76 @@ public class IssueAPITest extends BaseWebDriverTest
     }
 
     @Test
+    public void testUpdateAnIssueWithRequiredField() throws Exception
+    {
+        // First try inserting without a required custom field
+        IssueModel testIssue = basicIssueModel("Custom field test issue", "Let's see if we can update this");
+        testIssue.setIssueDefName(ISSUES_WITH_REQUIRED);
+        IssuesCommand cmd = new IssuesCommand();
+        cmd.setIssues(List.of(testIssue));
+        final String expectedError = "Missing value for required property: CustomField";
+        try
+        {
+            cmd.execute(createDefaultConnection(), getProjectName());
+            fail("Should have thrown an exception because the required field was not set");
+        }
+        catch (CommandException expectedFailure)
+        {
+            assertEquals(expectedError, expectedFailure.getMessage());
+        }
+
+        // Retry, supplying a value
+        String customFieldValue = "test value";
+        testIssue.setProp(CUSTOM_REQUIRED_FIELD, customFieldValue);
+        IssueResponse response = cmd.execute(createDefaultConnection(), getProjectName());
+        assertEquals(1, response.getIssueIds().size());
+
+        // Update without including the custom field, ensuring that the old value is retained
+        IssueModel toUpdate = new IssueModel();
+        toUpdate.setIssueId(response.getIssueIds().get(0));
+        final String updatedTitle = "Updated custom field test issue";
+        toUpdate.setTitle(updatedTitle);
+        toUpdate.setIssueDefName(ISSUES_WITH_REQUIRED);
+        toUpdate.setAction(IssueModel.IssueAction.update);
+        IssueResponse updateResponse = new IssuesCommand(List.of(toUpdate)).execute(createDefaultConnection(), getProjectName());
+        assertEquals(1, updateResponse.getIssueIds().size());
+
+        IssueResponseModel updatedIssue = getIssueResponse(updateResponse.getIssueIds().get(0));
+        assertEquals(updatedTitle, updatedIssue.getTitle());
+        assertEquals(customFieldValue, updatedIssue.getProperties(CUSTOM_REQUIRED_FIELD));
+
+        // Update with a new value for the custom field
+        toUpdate = new IssueModel();
+        toUpdate.setIssueId(response.getIssueIds().get(0));
+        toUpdate.setIssueDefName(ISSUES_WITH_REQUIRED);
+        toUpdate.setAction(IssueModel.IssueAction.update);
+        final String newCustomFieldValue = "new value";
+        toUpdate.setProp(CUSTOM_REQUIRED_FIELD, newCustomFieldValue);
+        updateResponse = new IssuesCommand(List.of(toUpdate)).execute(createDefaultConnection(), getProjectName());
+        assertEquals(1, updateResponse.getIssueIds().size());
+
+        updatedIssue = getIssueResponse(updateResponse.getIssueIds().get(0));
+        assertEquals(updatedTitle, updatedIssue.getTitle());
+        assertEquals(newCustomFieldValue, updatedIssue.getProperties(CUSTOM_REQUIRED_FIELD));
+
+        // Attempt an update setting the value to null, which should fail
+        toUpdate = new IssueModel();
+        toUpdate.setIssueId(response.getIssueIds().get(0));
+        toUpdate.setIssueDefName(ISSUES_WITH_REQUIRED);
+        toUpdate.setAction(IssueModel.IssueAction.update);
+        toUpdate.setProp(CUSTOM_REQUIRED_FIELD, null);
+        try
+        {
+            new IssuesCommand(List.of(toUpdate)).execute(createDefaultConnection(), getProjectName());
+            fail("Should have thrown an exception because the required field was set to null");
+        }
+        catch (CommandException expectedFailure)
+        {
+            assertEquals(expectedError, expectedFailure.getMessage());
+        }
+    }
+
+    @Test
     public void testUpdateAnIssue() throws Exception
     {
         String originalComment = "This is an issue comment that will be updated";
@@ -107,7 +187,9 @@ public class IssueAPITest extends BaseWebDriverTest
         String title = "Updated issue test issue";
         Integer updatedPri = 4;
         IssueModel originalIssue = basicIssueModel(originalTitle, originalComment);
-        IssueModel updateIssue = basicIssueModel(title, comment)
+        IssueModel updateIssue = new IssueModel()
+            .setTitle(title)
+            .setComment(comment)
             .setAction(IssueModel.IssueAction.update)
             .setPriority(updatedPri);
 
@@ -136,7 +218,9 @@ public class IssueAPITest extends BaseWebDriverTest
         Integer updatedPri = 4;
         IssueModel originalIssue = basicIssueModel(originalTitle, originalComment);
 
-        IssueModel resolveIssue = basicIssueModel(newTitle, newComment)
+        IssueModel resolveIssue = new IssueModel()
+            .setTitle(newTitle)
+            .setComment(newComment)
             .setAction(IssueModel.IssueAction.resolve)
             .setResolution("Fixed")
             .setPriority(updatedPri);
@@ -165,7 +249,9 @@ public class IssueAPITest extends BaseWebDriverTest
         String newTitle = "Closed test issue";
         Integer updatedPri = 4;
         IssueModel originalIssue = basicIssueModel(originalTitle, originalComment);
-        IssueModel closeIssue = basicIssueModel(newTitle, newComment)
+        IssueModel closeIssue = new IssueModel()
+            .setTitle(newTitle)
+            .setComment(newComment)
             .setAction(IssueModel.IssueAction.close)
             .setPriority(updatedPri);
 
@@ -187,7 +273,8 @@ public class IssueAPITest extends BaseWebDriverTest
     {
         String title = "Assign Test Issue";
         IssueModel originalIssue = basicIssueModel(title, "Gonna assign this");
-        IssueModel updateIssue = basicIssueModel(null, "assigned now")
+        IssueModel updateIssue = new IssueModel()
+                .setComment("assigned now")
                 .setAction(IssueModel.IssueAction.update)
                 .setAssignedTo(TEST_BUDDY_ID);
 
@@ -208,9 +295,9 @@ public class IssueAPITest extends BaseWebDriverTest
     public void testReopenAnIssue() throws Exception
     {
         IssueModel originalIssue = basicIssueModel("Reopen test issue", "Gonna close and reopen this");
-        IssueModel closeIssue = basicIssueModel(null, null)
+        IssueModel closeIssue = new IssueModel()
                 .setAction(IssueModel.IssueAction.close);
-        IssueModel reopenIssue = basicIssueModel(null, null)
+        IssueModel reopenIssue = new IssueModel()
                 .setAction(IssueModel.IssueAction.reopen);
 
         // insert
@@ -267,10 +354,11 @@ public class IssueAPITest extends BaseWebDriverTest
 
         var issueId = doIssueAction(issue);
 
-        IssueModel close = basicIssueModel(null, null).setAction(IssueModel.IssueAction.close)
+        IssueModel close = new IssueModel().setAction(IssueModel.IssueAction.close)
                 .setIssueId(issueId);
-        IssueModel resolve = basicIssueModel(null, null).setAction(IssueModel.IssueAction.resolve)
-                .setIssueId(issueId);
+        IssueModel resolve = new IssueModel().setAction(IssueModel.IssueAction.resolve)
+                .setIssueId(issueId).
+                setAssignedTo(TEST_USER_ID);
 
         doIssueAction(close);
         var closedResponse = getIssueResponse(issueId);
@@ -303,7 +391,7 @@ public class IssueAPITest extends BaseWebDriverTest
         insertCmd.setIssues(issues);
         var insertResponse = insertCmd.execute(createDefaultConnection(), getProjectName());
         List<Long> issueIds =  insertResponse.getIssueIds();
-        var distinctIds = issueIds.stream().distinct().collect(Collectors.toList());
+        var distinctIds = issueIds.stream().distinct().toList();
         // ensure we got as many issueIDs back as we sent issues in
         assertEquals("Expect to get as many issueIds as there are inputs", issues.size(), issueIds.size());
         // make sure we didn't get a list of IDs with duplicates
