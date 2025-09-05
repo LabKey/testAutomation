@@ -311,8 +311,8 @@ public class AssayAPITest extends BaseWebDriverTest
         assayHelper.importAssay(assayId, runName, dataRowsInvalidResultFileDirectory, getProjectName(), Collections.singletonMap("RunFileField", CREST_FILE.getName()), Collections.emptyMap(), "DataFileField: Invalid file path: ../");
 
         // valid run file and valid result file
-        FileBrowserHelper.FileDetailInfo runFileInfo = _fileBrowserHelper.getFileDetailInfo(getProjectName(), CREST_FILE.getName());
-        FileBrowserHelper.FileDetailInfo resultFileInfo = _fileBrowserHelper.getFileDetailInfo(getProjectName(), SCREENSHOT_FILE.getName());
+        FileBrowserHelper.FileDetailInfo runFileInfo = FileBrowserHelper.getFileDetailInfo(getProjectName(), CREST_FILE.getName());
+        FileBrowserHelper.FileDetailInfo resultFileInfo = FileBrowserHelper.getFileDetailInfo(getProjectName(), SCREENSHOT_FILE.getName());
         List<Pair<String, String>> scenarios = List.of(new Pair<>(CREST_FILE.getName(), SCREENSHOT_FILE.getName()),
                 new Pair<>(runFileInfo.absoluteFilePath(), resultFileInfo.absoluteFilePath()),
                 new Pair<>(runFileInfo.webDavUrl(), resultFileInfo.webDavUrl()),
@@ -388,7 +388,7 @@ public class AssayAPITest extends BaseWebDriverTest
         goToModule("FileContent");
         _fileBrowserHelper.uploadFile(HELP_ICON_FILE);
         goToManageAssays();
-        FileBrowserHelper.FileDetailInfo runFileInfo = _fileBrowserHelper.getFileDetailInfo(getProjectName(), "help.jpg");
+        FileBrowserHelper.FileDetailInfo runFileInfo = FileBrowserHelper.getFileDetailInfo(getProjectName(), "help.jpg");
         ((APIAssayHelper) _assayHelper).saveBatch(assayName, "Valid absolute path", Collections.singletonMap("RunFileField", runFileInfo.absoluteFilePath()), resultRows, getProjectName(), null);
         ((APIAssayHelper) _assayHelper).saveBatch(assayName, "Valid webdav full path", Collections.singletonMap("RunFileField", runFileInfo.webDavUrl()), resultRows, getProjectName(), null);
         ((APIAssayHelper) _assayHelper).saveBatch(assayName, "Valid webdav relative path", Collections.singletonMap("RunFileField", runFileInfo.webDavUrlRelative()), resultRows, getProjectName(), null);
