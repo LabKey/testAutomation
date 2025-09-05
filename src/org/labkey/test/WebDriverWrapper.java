@@ -2117,6 +2117,14 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return loadTimer.elapsed().toMillis();
     }
 
+    public void doAndWaitForNewWindow(Runnable action)
+    {
+        Set<String> windows = getDriver().getWindowHandles();
+        action.run();
+        switchToWindow(windows.size());
+        waitForDocument();
+    }
+
     public long doAndWaitForWindow(Runnable action, String windowName)
     {
         String initialWindow = getDriver().getWindowHandle();
