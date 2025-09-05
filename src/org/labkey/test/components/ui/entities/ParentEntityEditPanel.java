@@ -194,7 +194,7 @@ public class ParentEntityEditPanel extends Panel<ParentEntityEditPanel.ElementCa
         else
         {
             getWrapper().quickWait().until(ExpectedConditions.visibilityOf(
-                Locator.tag("td").containing("has been set for this sample.").findWhenNeeded(detailsPanel)));
+                Locator.tag("td").containing("has been set for this").findWhenNeeded(detailsPanel))); // e.g. "No source parent type has been set for this source."
         }
     }
 
