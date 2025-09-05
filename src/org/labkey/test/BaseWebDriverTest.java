@@ -1705,14 +1705,14 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     }
 
     @LogMethod
-    private ExportFolderPage prepareForFolderExport(@Nullable String folderName, boolean exportSecurityGroups, boolean exportRoleAssignments, boolean includeSubfolders, boolean includeFiles, boolean exportETLDefination)
+    private ExportFolderPage prepareForFolderExport(@Nullable String folderName, boolean exportSecurityGroups, boolean exportRoleAssignments, boolean includeSubfolders, boolean includeFiles, boolean exportETLDefinition)
     {
         if (folderName != null)
             clickFolder(folderName);
         ExportFolderPage exportFolderPage = goToFolderManagement().goToExportTab();
 
-        if (exportETLDefination)
-            exportFolderPage.includeETLDefintions(exportETLDefination);
+        if (exportETLDefinition)
+            exportFolderPage.includeETLDefinitions(exportETLDefinition);
 
         if (exportSecurityGroups)
             exportFolderPage.includeSecurityGroups(exportSecurityGroups);
@@ -2283,12 +2283,11 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         clickAndWait(Locator.linkContainingText("edit source"));
         return new SourceQueryPage(getDriver());
     }
+
     public void editQueryProperties(String schemaName, String queryName)
     {
-        selectQuery(schemaName, queryName);
-        Locator loc = Locator.tagWithText("a", "edit properties");
-        waitForElement(loc, WAIT_FOR_JAVASCRIPT);
-        clickAndWait(loc);
+        String url = WebTestHelper.buildRelativeUrl("query", getCurrentContainerPath(), "propertiesQuery", Map.of("schemaName", schemaName, "query.queryName", queryName));
+        beginAt(url);
     }
 
     public void createNewQuery(String schemaName)
@@ -2322,7 +2321,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         {
             sourcePage.setMetadataXml(xml);
         }
-        sourcePage.clickSave();
+        sourcePage.clickSave(); // This seems very slow... maybe clickSaveAndFinish() instead?
         if (inheritable || !StringUtils.isEmpty(description))
         {
             String queryURL = buildURL("query", getProjectName(), "begin",  Map.of("schemaName", schemaName));
