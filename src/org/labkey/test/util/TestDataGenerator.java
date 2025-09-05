@@ -647,6 +647,9 @@ public class TestDataGenerator
 
     private static boolean isDomainAndFieldNameInvalid(DomainKind domainKind, @Nullable String domainName, @Nullable String fieldName)
     {
+        if (fieldName != null && fieldName.length() > 64 && fieldName.toLowerCase().contains("key")) // Not guaranteed but likely a list key
+            return true; // Issue 53706: List key field name length is limited to 64 characters
+
         if (TestProperties.isRemoteNameValidationEnabled())
         {
             return isNameInvalidRemote(domainKind, domainName, fieldName);
@@ -718,8 +721,6 @@ public class TestDataGenerator
                 return true;
             if (Pattern.matches(".*:[a-zA-Z]{3}.*", fieldName)) // Avoid illegal patterns like ":Date"
                 return true;
-            if (fieldName.toLowerCase().contains("key")) // Not guaranteed but likely a list key
-                return true; // Issue 53706: List key field name length is limited to 64 characters
         }
 
         return false;
