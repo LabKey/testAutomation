@@ -83,6 +83,7 @@ public class EntityBulkUpdateDialog extends ModalDialog
             toggle.set(enable);
             if (enable) _changeCounter++;
             else _changeCounter--;
+            getWrapper().mouseOut(); // Toggle is dangerously close to field info tooltip
         }
         return this;
     }
