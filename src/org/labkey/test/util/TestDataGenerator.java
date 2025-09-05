@@ -594,8 +594,7 @@ public class TestDataGenerator
         }
 
         // Multiple spaces in the UI are collapsed into a single space. If we need to test for handling of multiple spaces, we'll not use this generator
-        // Capitalize to make it easier to match grid header labels
-        domainName = StringUtils.capitalize(domainName).replaceAll("\\s+", " ");
+        domainName = domainName.replaceAll("\\s+", " ");
 
         TestLogger.log("Generated random domain name for domainKind " + _domainKind + ": " + domainName);
         return domainName;
