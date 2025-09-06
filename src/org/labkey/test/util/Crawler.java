@@ -527,6 +527,8 @@ public class Crawler
                 p += (_prioritizeAdminPages ? -1 : 1);
             priority = p + random.nextFloat();
 
+            checkControllerRelativeUrl();
+
             try
             {
                 isVisitableURL();
@@ -605,6 +607,18 @@ public class Crawler
             return _projects.contains(currentProject);
         }
 
+        private void checkControllerRelativeUrl()
+        {
+            if (_actionId != null && _actionId.isControllerFirstUrl() && WebTestHelper.isUseContainerRelativeUrl())
+            {
+                RuntimeException ex = new RuntimeException("Found a controller-first URL (%s) on %s".formatted(getUrlText(), getOrigin()));
+                if (TestProperties.isControllerFirstUrlFatal())
+                    throw ex;
+                else
+                    TestLogger.warn(ex.getMessage(), ex);
+            }
+        }
+
         public boolean isVisitableURL()
         {
             if (StringUtils.isBlank(getRelativeURL()))
@@ -677,12 +691,14 @@ public class Crawler
         @NotNull private final String _controller;
         @NotNull private String _action = "";
         private final String _containerPath;
+        private final boolean _controllerFirstUrl;
 
         public ControllerActionId(@NotNull String controller, @NotNull String action)
         {
             _controller = controller;
             _action = action;
             _containerPath = null;
+            _controllerFirstUrl = false;
         }
 
         public ControllerActionId(@NotNull String url)
@@ -691,6 +707,7 @@ public class Crawler
 
             if (rootRelativeURL.startsWith("_webdav/"))
             {
+                _controllerFirstUrl = false;
                 _controller = "_webdav";
                 String path = EscapeUtil.decode(rootRelativeURL.substring("_webdav/".length()));
                 if (path.startsWith("@"))
@@ -711,6 +728,7 @@ public class Crawler
             }
             if (rootRelativeURL.startsWith("_webfiles/"))
             {
+                _controllerFirstUrl = false;
                 _controller = "_webfiles";
                 _containerPath = EscapeUtil.decode(rootRelativeURL.substring("_webfiles/".length()));
                 return;
@@ -735,6 +753,7 @@ public class Crawler
                 int dash = _action.lastIndexOf("-");
                 _controller = _action.substring(0,dash);
                 _action = _action.substring(dash+1);
+                _controllerFirstUrl = false;
             }
             else
             {
@@ -744,6 +763,7 @@ public class Crawler
                     throw new IllegalArgumentException("Unable to parse folder out of relative URL: \"" + rootRelativeURL + "\"");
                 _controller = rootRelativeURL.substring(0, postControllerSlashIdx);
                 rootRelativeURL = rootRelativeURL.substring(postControllerSlashIdx+1);
+                _controllerFirstUrl = true;
             }
             _containerPath = EscapeUtil.decode(StringUtils.strip(rootRelativeURL, "/"));
         }
@@ -766,6 +786,14 @@ public class Crawler
         public String getContainerPath()
         {
             return _containerPath;
+        }
+
+        /**
+         * Allows us to track down pages that still create controller-first URLs
+         */
+        public boolean isControllerFirstUrl()
+        {
+            return _controllerFirstUrl;
         }
 
         @Override
