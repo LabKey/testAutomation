@@ -2454,11 +2454,17 @@ public abstract class WebDriverWrapper implements WrapsDriver
                 },
                 "File(s) did not appear in download dir: " + downloadDir.toString(), WAIT_FOR_PAGE);
 
+        List<File> tempFiles = new ArrayList<>();
         waitFor(() -> {
                     final File[] files = downloadDir.listFiles(tempFilesFilter);
+                    tempFiles.clear();
+                    if (files != null)
+                    {
+                        tempFiles.addAll(Arrays.asList(files));
+                    }
                     return files != null && files.length == 0;
                 },
-                "Temp files remain in download dir: " + downloadDir, WAIT_FOR_PAGE);
+            () -> "Temp files remain in download dir: " + downloadDir + ": " + tempFiles.stream().map(File::getName).collect(Collectors.joining(", ")), WAIT_FOR_PAGE);
 
         MutableInt downloadSize = new MutableInt(-1);
         MutableInt stabilityDuration = new MutableInt(0);
