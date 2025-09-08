@@ -257,6 +257,11 @@ public abstract class TestProperties
         return getBooleanProperty("webtest.server.trial", false);
     }
 
+    public static boolean isRemoteNameValidationEnabled()
+    {
+        return getBooleanProperty("webtest.remote.domain.validation", false);
+    }
+
     public static boolean isCheckerFatal()
     {
         return "true".equals(System.getProperty("webtest.checker.fatal"));

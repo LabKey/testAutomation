@@ -316,7 +316,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
     public void testInvalidSampleFieldFromDelete() throws Exception
     {
         String listName = TestDataGenerator.randomDomainName("Sample Lookups List", DomainUtils.DomainKind.IntList);
-        String listKey = TestDataGenerator.randomFieldName("Id", null, 10, null, DomainUtils.DomainKind.IntList);
+        String listKey = DomainUtils.DomainKind.IntList.randomFieldName("Key");
         String sampleType1 = TestDataGenerator.randomDomainName("Sample Type 1");
         String sampleType2 = TestDataGenerator.randomDomainName("Sample Type 2");
         SampleTypeAPIHelper.createEmptySampleType(getProjectName(), new SampleTypeDefinition(sampleType1));
