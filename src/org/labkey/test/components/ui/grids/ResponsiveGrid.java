@@ -317,7 +317,10 @@ public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverCompon
         // Scroll to middle in order to make room for the dropdown menu
         getWrapper().scrollToMiddle(headerCell);
 
-        headerCell.click();
+        WebElement toggle = Locator.tagWithClass("span", "fa-chevron-circle-down")
+                .findElement(headerCell);
+        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(toggle));
+        toggle.click();
 
         // Use getDriver() because the grid menus are rendered in a "react portal" at the end of the HTML body, so they
         // are totally detached from the rest of the grid.
