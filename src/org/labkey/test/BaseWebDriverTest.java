@@ -984,7 +984,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             }
             try
             {
-                if (wasCausedBy(error, Arrays.asList(TestTimeoutException.class, SocketTimeoutException.class)))
+                if (wasCausedBy(error, Arrays.asList(TestTimeoutException.class, SocketTimeoutException.class)) ||
+                        wasCausedBy(error, Arrays.asList(RuntimeException.class, SocketTimeoutException.class)))
                     ArtifactCollector.dumpThreads();
             }
             catch (RuntimeException | Error e)
