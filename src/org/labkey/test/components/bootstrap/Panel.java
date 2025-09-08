@@ -71,26 +71,20 @@ public abstract class Panel<EC extends ElementCache> extends WebDriverComponent<
         protected final WebElement panelBody = Locator.byClass("panel-body").findWhenNeeded(this);
     }
 
-    public static class PanelFinder extends WebDriverComponentFinder<Panel<?>, PanelFinder>
+    protected static abstract class AbstractPanelFinder<C extends Panel<?>, F extends AbstractPanelFinder<C, F>> extends WebDriverComponentFinder<C, F>
     {
-        private final Locator.XPathLocator _baseLocator = Locator.tagWithClass("div", "panel-default");
+        private final Locator.XPathLocator _baseLocator = Locator.tagWithClass("div", "panel");
         private String _title = null;
 
-        public PanelFinder(WebDriver driver)
+        public AbstractPanelFinder(WebDriver driver)
         {
             super(driver);
         }
 
-        public PanelFinder withTitle(String title)
+        public F withTitle(String title)
         {
             _title = title;
-            return this;
-        }
-
-        @Override
-        protected Panel<?> construct(WebElement el, WebDriver driver)
-        {
-            return new PanelImpl(el, driver);
+            return getThis();
         }
 
         @Override
@@ -101,6 +95,26 @@ public abstract class Panel<EC extends ElementCache> extends WebDriverComponent<
                 return _baseLocator.withChild(Locator.byClass("panel-heading").containing(_title));
             else
                 return _baseLocator;
+        }
+    }
+
+    public static class PanelFinder extends AbstractPanelFinder<Panel<?>, PanelFinder>
+    {
+        public PanelFinder(WebDriver driver)
+        {
+            super(driver);
+        }
+
+        @Override
+        protected PanelFinder getThis()
+        {
+            return this;
+        }
+
+        @Override
+        protected Panel<?> construct(WebElement el, WebDriver driver)
+        {
+            return new PanelImpl(el, driver);
         }
     }
 }
