@@ -262,6 +262,11 @@ public abstract class TestProperties
         return "true".equals(System.getProperty("webtest.checker.fatal"));
     }
 
+    public static boolean isControllerFirstUrlFatal()
+    {
+        return getBooleanProperty("webtest.fatalControllerFirstUrl", false);
+    }
+
     public static boolean isAssayProductFeatureAvailable()
     {
         return isProductFeatureAvailable("assay");
