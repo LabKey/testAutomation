@@ -15,12 +15,15 @@ import org.labkey.test.params.list.VarListDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.DomainUtils;
 import org.labkey.test.util.EscapeUtil;
+import org.labkey.test.util.TestDataGenerator;
 import org.labkey.test.util.data.TestDataUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+
+import static org.labkey.test.WebTestHelper.buildURL;
 
 
 @Category({Daily.class})
@@ -88,13 +91,20 @@ public class QueryLookupTest extends BaseWebDriverTest
                 """.replace("[query_name]", EscapeUtil.getMarkupEscapedValue(queryName));
         // create a query on the list
         goToSchemaBrowser();
-        createQuery(getProjectName(), queryName, "lists", querySql, queryXml, false);
+        createQuery(getProjectName(), queryName, "lists", querySql, queryXml, false, queryName);
 
         // now create another list, with a lookup to the custom query
         new IntListDefinition(secondList, "Key")
                 .setFields(List.of(NAME_COLUMN.getFieldDefinition(),
                         new FieldDefinition("lookup", new FieldDefinition.StringLookup(getProjectName(), "lists", queryName))))
                 .create(createDefaultConnection(), PROJECT_NAME);
+
+        // Issue 53846: Character limit on query property limit throws unhandled exception
+        String queryURL = buildURL("query", getProjectName(), "begin", Map.of("schemaName", "lists"));
+        beginAt(queryURL);
+        editQueryProperties("lists", queryName);
+        setFormElement(Locator.tagWithName("textarea", "description"), TestDataGenerator.randomString(300));
+        clickButton("Save");
 
         // insert data into the list
         goToManageLists();
