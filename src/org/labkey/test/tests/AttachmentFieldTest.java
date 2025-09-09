@@ -18,6 +18,7 @@ import org.labkey.test.pages.experiment.UpdateSampleTypePage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
 import org.labkey.test.util.TestDataGenerator;
@@ -78,8 +79,8 @@ public class AttachmentFieldTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(sampleTypeName));
         DataRegionTable samplesTable = DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
         samplesTable.clickInsertNewRow();
-        setFormElement(Locator.name("quf_Name"), "S1");
-        setFormElement(Locator.name("quf_" + fieldName), SAMPLE_FILE);
+        setFormElement(Locator.name(EscapeUtil.getFormFieldName("Name")), "S1");
+        setFormElement(Locator.name(EscapeUtil.getFormFieldName(fieldName)), SAMPLE_FILE);
         clickButton("Submit");
 
         assertElementPresent(Locator.tagWithAttribute("a", "title", "Download attached file"));
@@ -170,7 +171,7 @@ public class AttachmentFieldTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(listName));
         DataRegionTable listTable = new DataRegionTable("query", getDriver());
         listTable.clickInsertNewRow();
-        setFormElement(Locator.name("quf_" + fieldName), SAMPLE_FILE);
+        setFormElement(Locator.name(EscapeUtil.getFormFieldName(fieldName)), SAMPLE_FILE);
         clickButton("Submit");
 
         log("Verify file opened in browser");

@@ -14,6 +14,7 @@ import org.labkey.test.components.CustomizeView;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.DataClassDefinition;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.TestDataGenerator;
@@ -129,7 +130,7 @@ public class DataClassFolderExportImportTest extends BaseWebDriverTest
                                     // issue https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=42191 tracks this
                                     // until it is fixed we will have to add attachments via the UI, like this
             sourceTable.clickEditRow(i);
-            setFormElement(Locator.input("quf_" + attachmentColumnName), _attachments.get(i));
+            setFormElement(Locator.input(EscapeUtil.getFormFieldName(attachmentColumnName)), _attachments.get(i));
             clickButton("Submit");
         }
         List<Map<String, String>> sourceRowData = sourceTable.getTableData();

@@ -16,6 +16,7 @@ import org.labkey.test.components.DomainDesignerPage;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.EscapeUtil;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -79,8 +80,8 @@ public class UserTableCustomFieldUpdateTest extends BaseWebDriverTest
         {
             goToMyAccount();
             clickButton("Edit");
-            setFormElement(Locator.name("quf_" + CUSTOM_FIELD1), "Value for " + CUSTOM_FIELD1);
-            setFormElement(Locator.name("quf_" + CUSTOM_FIELD2), "Value for " + CUSTOM_FIELD2);
+            setFormElement(Locator.name(EscapeUtil.getFormFieldName(CUSTOM_FIELD1)), "Value for " + CUSTOM_FIELD1);
+            setFormElement(Locator.name(EscapeUtil.getFormFieldName(CUSTOM_FIELD2)), "Value for " + CUSTOM_FIELD2);
             clickButton("Submit");
         }
         stopImpersonating();

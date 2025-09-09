@@ -32,6 +32,7 @@ import org.labkey.test.pages.query.ExecuteQueryPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable.DataRegionFinder;
+import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
@@ -117,8 +118,8 @@ public class UserDetailsPermissionTest extends BaseWebDriverTest
         {
             goToMyAccount();
             clickButton("Edit");
-            setFormElement(Locator.name("quf_Phone"), HIDDEN_STRING);
-            setFormElement(Locator.name("quf_" + CUSTOM_USER_COLUMN), HIDDEN_STRING);
+            setFormElement(Locator.name(EscapeUtil.getFormFieldName("Phone")), HIDDEN_STRING);
+            setFormElement(Locator.name(EscapeUtil.getFormFieldName(CUSTOM_USER_COLUMN)), HIDDEN_STRING);
             clickButton("Submit");
         }
         stopImpersonating();
@@ -126,8 +127,8 @@ public class UserDetailsPermissionTest extends BaseWebDriverTest
         {
             goToMyAccount();
             clickButton("Edit");
-            setFormElement(Locator.name("quf_Phone"), HIDDEN_STRING);
-            setFormElement(Locator.name("quf_" + CUSTOM_USER_COLUMN), HIDDEN_STRING);
+            setFormElement(Locator.name(EscapeUtil.getFormFieldName("Phone")), HIDDEN_STRING);
+            setFormElement(Locator.name(EscapeUtil.getFormFieldName(CUSTOM_USER_COLUMN)), HIDDEN_STRING);
             clickButton("Submit");
         }
         stopImpersonating();

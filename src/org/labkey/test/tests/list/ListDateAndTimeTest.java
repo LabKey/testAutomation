@@ -30,6 +30,7 @@ import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.AuditLogHelper;
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.ExcelHelper;
 
 import java.io.File;
@@ -1101,9 +1102,9 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
 
         DataRegionTable regionTable = new DataRegionTable("query", getDriver());
         regionTable.clickInsertNewRow();
-        setFormElement(Locator.name("quf_" + timeCol), badTime);
-        setFormElement(Locator.name("quf_" + dateCol), badDate);
-        setFormElement(Locator.name("quf_" + dateTimeCol), badDateTime);
+        setFormElement(Locator.name(EscapeUtil.getFormFieldName(timeCol)), badTime);
+        setFormElement(Locator.name(EscapeUtil.getFormFieldName(dateCol)), badDate);
+        setFormElement(Locator.name(EscapeUtil.getFormFieldName(dateTimeCol)), badDateTime);
         clickButton("Submit");
 
         checker().verifyTrue("Bad value error message in UI not as expected.",
