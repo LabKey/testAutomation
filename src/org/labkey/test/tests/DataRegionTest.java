@@ -17,19 +17,23 @@
 package org.labkey.test.tests;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Data;
+import org.labkey.test.components.ChartTypeDialog;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldDefinition.ColumnType;
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
+import org.labkey.test.util.selenium.WebDriverUtils;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -141,10 +145,32 @@ public class DataRegionTest extends AbstractQWPTest
         clickAndWait(Locator.linkWithText(LIST_NAME));
         URL url = getURL();
         dataRegionTest(url, INJECT_CHARS_1);
-        dataRegionTest(url, INJECT_CHARS_2);
+        DataRegionTable dataRegionTable = dataRegionTest(url, INJECT_CHARS_2);
+        testOpenMenuItemInNewTab(dataRegionTable);
         exportLoggingTest();
 
         testQWPDemoPage();
+    }
+
+    /**
+     * Regression coverage for Issue 53629: NavMenu doesn't open in new tab correctly
+     */
+    private void testOpenMenuItemInNewTab(DataRegionTable dataRegionTable)
+    {
+        WebElement createChartMenuItem = dataRegionTable
+                .getReportMenu()
+                .openMenuTo("Create Chart");
+        doAndWaitForNewWindow(() ->
+                new Actions(getDriver())
+                        .keyDown(WebDriverUtils.MODIFIER_KEY)
+                        .click(createChartMenuItem)
+                        .perform());
+        ChartTypeDialog chartTypeDialog = new ChartTypeDialog(getDriver());
+        Assertions.assertThat(chartTypeDialog.getColumnList())
+                .as("List should be pre-selected for chart")
+                .containsExactlyInAnyOrder(LIST_KEY_NAME, NAME_COLUMN.getName(), HEX_COLUMN.getName());
+        getDriver().close();
+        switchToMainWindow();
     }
 
     @Override
@@ -188,7 +214,7 @@ public class DataRegionTest extends AbstractQWPTest
         _listHelper.uploadData(LIST_DATA);
     }
 
-    private void dataRegionTest(URL url, String dataRegionName) throws MalformedURLException
+    private DataRegionTable dataRegionTest(URL url, String dataRegionName) throws MalformedURLException
     {
         log("** Beginning test for dataRegionName: " + dataRegionName);
 
@@ -281,6 +307,8 @@ public class DataRegionTest extends AbstractQWPTest
 
         table.rowSelector().showAll();
         assertEquals(15, table.getDataRowCount());
+
+        return table;
     }
 
     private void enableComplianceIfInstalled()
