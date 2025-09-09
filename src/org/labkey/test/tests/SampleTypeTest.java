@@ -32,6 +32,7 @@ import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.SortDirection;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
@@ -1890,12 +1891,12 @@ public class SampleTypeTest extends BaseWebDriverTest
         clickButton("Cancel");
 
         log("verify inserting a row with compatible units succeeds and are converted");
-        sampleHelper.insertRow(Map.of("Name", "AU-SUCCESS-1", "StoredAmount", "5.0", "Units", "mL"));
-        verifySampleAmountUnitValues("AU-SUCCESS-1", "0.005", "L");
-        sampleHelper.insertRow(Map.of("Name", "AU-SUCCESS-2", "StoredAmount", "0.005", "Units", "L"));
-        verifySampleAmountUnitValues("AU-SUCCESS-2", "0.005", "L");
-        sampleHelper.insertRow(Map.of("Name", "AU-SUCCESS-3", "StoredAmount", "5000", "Units", "uL"));
-        verifySampleAmountUnitValues("AU-SUCCESS-3", "0.005", "L");
+        sampleHelper.insertRow(Map.of("Name", "AU-SUCCESS-1", "StoredAmount", "1.0", "Units", "mL"));
+        verifySampleAmountUnitValues("AU-SUCCESS-1", "0.001", "L");
+        sampleHelper.insertRow(Map.of("Name", "AU-SUCCESS-2", "StoredAmount", "0.002", "Units", "L"));
+        verifySampleAmountUnitValues("AU-SUCCESS-2", "0.002", "L");
+        sampleHelper.insertRow(Map.of("Name", "AU-SUCCESS-3", "StoredAmount", "3000", "Units", "uL"));
+        verifySampleAmountUnitValues("AU-SUCCESS-3", "0.003", "L");
 
         log("verify updating a row with incompatible units fails");
         sampleHelper.updateRow(0, Map.of("Units", "mg"));
@@ -1920,8 +1921,20 @@ public class SampleTypeTest extends BaseWebDriverTest
         verifySampleAmountUnitValues("AU-BULK-SUCCESS-1", "0.0", "L");
         sampleHelper.bulkImport(List.of(Map.of("Name", "AU-BULK-SUCCESS-2", "StoredAmount", "0.005", "Units", "L")));
         verifySampleAmountUnitValues("AU-BULK-SUCCESS-2", "0.005", "L");
-        sampleHelper.bulkImport(List.of(Map.of("Name", "AU-BULK-SUCCESS-3", "StoredAmount", "5000", "Units", "uL")));
-        verifySampleAmountUnitValues("AU-BULK-SUCCESS-3", "0.005", "L");
+        sampleHelper.bulkImport(List.of(Map.of("Name", "AU-BULK-SUCCESS-3", "StoredAmount", "4000", "Units", "uL")));
+        verifySampleAmountUnitValues("AU-BULK-SUCCESS-3", "0.004", "L");
+
+        log("verify sorting on converted amounts works as expected");
+        sampleHelper.getSamplesDataRegionTable().setSort("Amount", SortDirection.ASC);
+        assertEquals("Sample order sorted asc not as expected",
+                List.of("AU-BULK-SUCCESS-1", "AU-SUCCESS-2", "AU-SUCCESS-3", "AU-BULK-SUCCESS-3", "AU-BULK-SUCCESS-2", "AU-SUCCESS-1"),
+                sampleHelper.getSamplesDataRegionTable().getColumnDataAsText("Name"));
+
+        log("verify filtering on converted amounts works as expected");
+        sampleHelper.getSamplesDataRegionTable().setFilter("Amount", "Is Greater Than", "0.004");
+        assertEquals("Sample order filtered not as expected",
+                List.of("AU-BULK-SUCCESS-2", "AU-SUCCESS-1"),
+                sampleHelper.getSamplesDataRegionTable().getColumnDataAsText("Name"));
     }
 
     @Test
