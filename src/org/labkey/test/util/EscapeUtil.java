@@ -17,13 +17,16 @@ package org.labkey.test.util;
 
 import org.apache.commons.text.StringEscapeUtils;
 import org.eclipse.jetty.util.URIUtil;
+import org.jetbrains.annotations.NotNull;
 import org.labkey.test.params.FieldKey;
 
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -213,4 +216,25 @@ public class EscapeUtil
         return nameExpressionNeedsEscaping.matcher(name).replaceAll("\\\\$1");
     }
 
+    /**
+     * Generate an app path for use as a URL fragment. Parts will be encoded and joined.<br>
+     * e.g. <code>encodeAppResourcePath("samples", "my samples")</code> will return "/samples/my%20samples"<br>
+     *
+     * @param pathParts Parts to be combined into an app path. Most likely strings and/or Integers
+     * @return encoded resource path
+     */
+    public static @NotNull String encodeAppResourcePath(Object... pathParts)
+    {
+        List<String> encodedParts = Arrays.stream(pathParts).map(Objects::requireNonNull).map(String::valueOf)
+                .map(EscapeUtil::encodeAppResourcePathPart).collect(Collectors.toList());
+        return "/" + String.join("/", encodedParts);
+    }
+
+    private static String encodeAppResourcePathPart(String pathPart)
+    {
+        return encode(pathPart)
+            // We generally don't encode parentheses in app resource paths
+            .replace("%28", "(")
+            .replace("%29", ")");
+    }
 }

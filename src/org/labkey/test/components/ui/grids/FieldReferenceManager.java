@@ -170,7 +170,7 @@ public class FieldReferenceManager
 
         public String getName()
         {
-            return getFieldKey().getName();
+            return getFieldKey().getFullName();
         }
 
         public int getDomIndex()
@@ -192,14 +192,7 @@ public class FieldReferenceManager
                 path = getElement().getDomAttribute("id");
             }
 
-            if (path != null)
-            {
-                return FieldKey.fromFieldKey(path);
-            }
-            else
-            {
-                return FieldKey.EMPTY;
-            }
+            return FieldKey.fromFieldKey(path);
         }
     }
 }

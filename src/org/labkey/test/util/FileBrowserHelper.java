@@ -205,9 +205,10 @@ public class FileBrowserHelper extends WebDriverWrapper
         }
         else if (!folderTreeNode.getAttribute("class").contains("x4-grid-row-selected"))
         {
+            WebElement folderIcon = Locator.byClass("x4-tree-icon").findElement(folderTreeNode);
             // Scroll bars get in the way sometimes, need to scroll folder tree manually
-            scrollIntoView(folderTreeNode);
-            doAndWaitForFileListRefresh(folderTreeNode::click);
+            scrollIntoView(folderIcon);
+            doAndWaitForFileListRefresh(folderIcon::click);
         }
     }
 

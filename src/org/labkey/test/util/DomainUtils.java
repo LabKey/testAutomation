@@ -102,6 +102,7 @@ public final class DomainUtils
         SampleSet, // aka "Sample Type"
         IntList,
         VarList,
+        Picklist,
         StudyDatasetDate,
         StudyDatasetVisit,
         ;
