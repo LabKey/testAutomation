@@ -38,6 +38,7 @@ import org.labkey.test.components.domain.DomainFieldRow;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.pages.core.admin.logger.ManagerPage.LoggingLevel;
 import org.labkey.test.pages.list.EditListDefinitionPage;
+import org.labkey.test.pages.query.ExecuteQueryPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldDefinition.ColumnType;
 import org.labkey.test.util.ApiPermissionsHelper;
@@ -63,7 +64,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.labkey.test.WebTestHelper.buildURL;
 import static org.labkey.test.util.PasswordUtil.getUsername;
 
 @Category({Daily.class, Hosting.class})
@@ -527,27 +527,22 @@ public class AuditLogTest extends BaseWebDriverTest
 
     protected void verifyListAuditLogQueries(Visibility v)
     {
-        beginAt(buildURL("query", getProjectName(), "executeQuery",
-            Map.of("schemaName", "auditLog",
-                "query.queryName", "ListAuditEvent",
-                "query.containerFilterName", "CurrentAndSubfolders")));
+        ExecuteQueryPage.getPageFactory("auditLog", "ListAuditEvent")
+                .addParameter("query.containerFilterName", "CurrentAndSubfolders")
+                .navigate(this, getProjectName());
         verifyAuditQueryEvent(this, "List", "Parent List", 1, canSeeParent(v));
         verifyAuditQueryEvent(this, "List", "Child List", 1, canSeeChild(v));
     }
 
     protected void verifyAuditQueries(boolean canSeeAuditLog)
     {
-        beginAt(buildURL("query", getProjectName(), "executeQuery",
-            Map.of("schemaName", "auditLog",
-                "query.queryName", "ContainerAuditEvent")));
+        ExecuteQueryPage.beginAt(this, getProjectName(), "auditLog", "ContainerAuditEvent");
         if (canSeeAuditLog)
             verifyAuditQueryEvent(this, COMMENT_COLUMN, AUDIT_TEST_PROJECT + " was created", 1);
         else
             assertTextPresent("No data to show.");
 
-        beginAt(buildURL("query", getProjectName(), "executeQuery",
-            Map.of("schemaName", "auditLog",
-                "query.queryName", "GroupAuditEvent")));
+        ExecuteQueryPage.beginAt(this, getProjectName(), "auditLog", "GroupAuditEvent");
         if (canSeeAuditLog)
             verifyAuditQueryEvent(this, COMMENT_COLUMN, "The user " + AUDIT_TEST_USER + " was assigned to the security role Editor.", 1);
         else

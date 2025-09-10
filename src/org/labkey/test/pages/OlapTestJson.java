@@ -38,7 +38,7 @@ public class OlapTestJson
 
     public void goToPage(String path, String configId, String schemaName, String cubeName)
     {
-        _test.beginAt(WebTestHelper.buildURL("olap", path, "testJson.view", Map.of(
+        _test.beginAt(WebTestHelper.buildURL("olap", path, "testJson", Map.of(
                 "configId", configId,
                 "schemaName", schemaName,
                 "cubeName", cubeName)));
