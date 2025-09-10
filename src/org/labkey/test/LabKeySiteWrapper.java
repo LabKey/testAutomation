@@ -861,7 +861,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     @LogMethod
     private void verifyRedirectBehavior(String upgradeText) throws IOException
     {
-        // Do these checks via direct http requests the primary upgrade window seems to interfere with this test, F15853
+        // Do these checks via direct http requests the primary upgrade window seems to interfere with this test, #15853
 
         CloseableHttpResponse response = null;
         HttpUriRequest method;
