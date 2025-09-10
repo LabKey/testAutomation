@@ -6,6 +6,8 @@ import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.domain.DropDomainCommand;
 import org.labkey.remoteapi.domain.GetDomainDetailsCommand;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.FieldInfo;
 
 import java.io.IOException;
 
@@ -108,6 +110,21 @@ public final class DomainUtils
         public String randomName(String namePart)
         {
             return TestDataGenerator.randomDomainName(namePart, this);
+        }
+
+        public String randomFieldName(String namePart)
+        {
+            return randomField(namePart).getName();
+        }
+
+        public FieldInfo randomField(String namePart)
+        {
+            return randomField(namePart, null);
+        }
+
+        public FieldInfo randomField(String namePart, FieldDefinition.ColumnType columnType)
+        {
+            return FieldInfo.random(namePart, columnType, this);
         }
     }
 }
