@@ -212,7 +212,7 @@ public class ContainerContextTest extends BaseWebDriverTest
         insertJobIntoSubFolder(SUB_FOLDER_B);
 
         log("** Viewing pipeline status from project container. Sort by Description (report name) and include sub-folders");
-        beginAt("/" + getProjectName() + "/pipeline-status-showList.view?StatusFiles.sort=Description&StatusFiles.containerFilterName=CurrentAndSubfolders");
+        beginAt(WebTestHelper.buildURL("pipeline-status", getProjectName(), "showList", Map.of("StatusFiles.sort", "Description", "StatusFiles.containerFilterName", "CurrentAndSubfolders")));
 
         log("** Checking URLs go to correct container...");
         String href = getAttribute(Locator.tagWithText("a", "COMPLETE").index(0), "href");
@@ -336,7 +336,7 @@ public class ContainerContextTest extends BaseWebDriverTest
 
         // Verify Issue 16243: Details URL creating URLs with null container unless the container column is actually added to current view
         log("** Removing container column and rechecking lookup URLs...");
-        beginAt("/query/" + getProjectName() + "/executeQuery.view?schemaName=vehicle&query.queryName=EmissionTest&query.sort=RowId");
+        beginAt(WebTestHelper.buildURL("query", getProjectName(), "executeQuery", Map.of("schemaName", "vehicle", "query.queryName", "EmissionTest", "query.sort", "RowId")));
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.showHiddenItems();
         _customizeViewsHelper.removeColumn("Container");
@@ -365,7 +365,7 @@ public class ContainerContextTest extends BaseWebDriverTest
         overrideMetadata(getProjectName(), "vehicle", emissionTestQuery, customMetadata.apply(emissionTestQuery));
         verifySimpleModuleTables(emissionTestQuery, "XXX.view", "XXX.view", max, workbookIds, emissionIds, parentRowIds, rowIdToWorkbookId, false, true, vehicleId);
         removeMetadata(getProjectName(), "vehicle", emissionTestQuery);
-        
+
         log("** Create custom query with custom metadata over vehicle.emissiontest table WITH container");
         String customQueryWithContainer =
                 "SELECT emissiontest.rowid,\n" +
@@ -504,7 +504,7 @@ public class ContainerContextTest extends BaseWebDriverTest
             int vehicleId)
     {
         log("** Checking containers on lookup URLs for '" + queryName + "'");
-        beginAt("/query/" + getProjectName() + "/executeQuery.view?schemaName=vehicle&query.queryName=" + queryName + "&query.sort=RowId");
+        beginAt(WebTestHelper.buildURL("query", getProjectName(), "executeQuery", Map.of("schemaName", "vehicle", "query.queryName", queryName, "query.sort", "RowId")));
 
         DataRegionTable dr = new DataRegionTable("query", this);
 

@@ -63,6 +63,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.labkey.test.WebTestHelper.buildURL;
 import static org.labkey.test.util.PasswordUtil.getUsername;
 
 @Category({Daily.class, Hosting.class})
@@ -526,20 +527,27 @@ public class AuditLogTest extends BaseWebDriverTest
 
     protected void verifyListAuditLogQueries(Visibility v)
     {
-        beginAt("/query/" + getProjectName() + "/executeQuery.view?schemaName=auditLog&query.queryName=ListAuditEvent&query.containerFilterName=CurrentAndSubfolders");
+        beginAt(buildURL("query", getProjectName(), "executeQuery",
+            Map.of("schemaName", "auditLog",
+                "query.queryName", "ListAuditEvent",
+                "query.containerFilterName", "CurrentAndSubfolders")));
         verifyAuditQueryEvent(this, "List", "Parent List", 1, canSeeParent(v));
         verifyAuditQueryEvent(this, "List", "Child List", 1, canSeeChild(v));
     }
 
     protected void verifyAuditQueries(boolean canSeeAuditLog)
     {
-        beginAt("/query/" + getProjectName() + "/executeQuery.view?schemaName=auditLog&query.queryName=ContainerAuditEvent");
+        beginAt(buildURL("query", getProjectName(), "executeQuery",
+            Map.of("schemaName", "auditLog",
+                "query.queryName", "ContainerAuditEvent")));
         if (canSeeAuditLog)
             verifyAuditQueryEvent(this, COMMENT_COLUMN, AUDIT_TEST_PROJECT + " was created", 1);
         else
             assertTextPresent("No data to show.");
 
-        beginAt("/query/" + getProjectName() + "/executeQuery.view?schemaName=auditLog&query.queryName=GroupAuditEvent");
+        beginAt(buildURL("query", getProjectName(), "executeQuery",
+            Map.of("schemaName", "auditLog",
+                "query.queryName", "GroupAuditEvent")));
         if (canSeeAuditLog)
             verifyAuditQueryEvent(this, COMMENT_COLUMN, "The user " + AUDIT_TEST_USER + " was assigned to the security role Editor.", 1);
         else

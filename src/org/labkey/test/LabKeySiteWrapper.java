@@ -98,7 +98,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.labkey.test.TestProperties.isDevModeEnabled;
 import static org.labkey.test.WebTestHelper.buildURL;
-import static org.labkey.test.WebTestHelper.getBaseURL;
 import static org.labkey.test.WebTestHelper.getHttpClientBuilder;
 import static org.labkey.test.WebTestHelper.getHttpResponse;
 import static org.labkey.test.WebTestHelper.getRemoteApiConnection;
@@ -853,16 +852,16 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         String initialText = "Welcome! We see that this is your first time logging in.";
 
         // These requests should redirect to the initial user page
-        beginAt("/login/resetPassword.view");
+        beginAt(WebTestHelper.buildURL("login", "resetPassword"));
         assertTextPresent(initialText);
-        beginAt("/admin/maintenance.view");
+        beginAt(WebTestHelper.buildURL("admin", "maintenance"));
         assertTextPresent(initialText);
     }
 
     @LogMethod
     private void verifyRedirectBehavior(String upgradeText) throws IOException
     {
-        // Do these checks via direct http requests the primary upgrade window seems to interfere with this test, #15853
+        // Do these checks via direct http requests the primary upgrade window seems to interfere with this test, F15853
 
         CloseableHttpResponse response = null;
         HttpUriRequest method;
@@ -872,14 +871,14 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         {
             // These requests should NOT redirect to the upgrade page
 
-            method = new HttpGet(getBaseURL() + "/login/resetPassword.view");
+            method = new HttpGet(WebTestHelper.buildURL("login", "resetPassword"));
             response = client.execute(method, WebTestHelper.getBasicHttpContext());
             status = response.getCode();
             assertEquals("Unexpected response", HttpStatus.SC_OK, status);
             assertFalse("Upgrade text found", WebTestHelper.getHttpResponseBody(response).contains(upgradeText));
             EntityUtils.consume(response.getEntity());
 
-            method = new HttpGet(getBaseURL() + "/admin/maintenance.view");
+            method = new HttpGet(WebTestHelper.buildURL("admin", "maintenance"));
             response = client.execute(method, WebTestHelper.getBasicHttpContext());
             status = response.getCode();
             assertEquals("Unexpected response", HttpStatus.SC_OK, status);
@@ -941,7 +940,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                 loginParams.add(new BasicNameValuePair("password", PasswordUtil.getPassword()));
 
                 // Login to get CSRF token
-                HttpPost loginMethod = new HttpPost(getBaseURL() + "/login/loginApi.api");
+                HttpPost loginMethod = new HttpPost(WebTestHelper.buildURL("login", "loginApi.api"));
                 loginMethod.setEntity(new UrlEncodedFormEntity(loginParams));
                 HttpClientContext httpContext = WebTestHelper.getBasicHttpContext();
                 response = redirectClient.execute(loginMethod, httpContext);
@@ -953,7 +952,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                 Optional<Cookie> csrfToken = httpContext.getCookieStore().getCookies().stream().filter(c -> c.getName().equals(Connection.X_LABKEY_CSRF)).findAny();
                 csrfToken.ifPresent(cookie -> logoutParams.add(new BasicNameValuePair(Connection.X_LABKEY_CSRF, cookie.getValue())));
                 // Logout to verify redirect
-                HttpPost logoutMethod = new HttpPost(getBaseURL() + "/login/logout.view");
+                HttpPost logoutMethod = new HttpPost(WebTestHelper.buildURL("login", "logout"));
                 logoutMethod.setEntity(new UrlEncodedFormEntity(logoutParams));
                 response = redirectClient.execute(logoutMethod, httpContext);
                 status = response.getCode();

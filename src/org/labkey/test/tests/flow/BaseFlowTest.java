@@ -26,6 +26,7 @@ import org.labkey.test.components.BodyWebPart;
 import org.labkey.test.pages.ImportDataPage;
 import org.labkey.test.pages.experiment.CreateSampleTypePage;
 import org.labkey.test.pages.pipeline.PipelineStatusDetailsPage;
+import org.labkey.test.pages.query.ExecuteQueryPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
@@ -87,7 +88,6 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
 
     private void init()
     {
-        beginAt("/admin/begin.view");
         goToAdminConsole().goToSettingsSection();
         clickAndWait(Locator.linkWithText("flow cytometry"));
         getPipelineWorkDirectory().mkdir();
@@ -162,7 +162,7 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
         _containerHelper.deleteProject(getProjectName(), afterTest);
         try
         {
-            beginAt("/admin/begin.view");
+            goToAdminConsole();
             clickAndWait(Locator.linkWithText("flow cytometry"));
             setFormElement(Locator.id("workingDirectory"), "");
             clickButton("update");
@@ -179,8 +179,8 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
             return;
         }
 
-        beginAt("/query/" + getProjectName() + "/" + getFolderName() + "/executeQuery.view?schemaName=exp&query.queryName=Runs");
-        DataRegionTable table = new DataRegionTable("query", this);
+        DataRegionTable table = ExecuteQueryPage.beginAt(this, getContainerPath(), "exp", "Runs")
+            .getDataRegion();
         if (table.getDataRowCount() > 0)
         {
             // Delete all runs
@@ -189,11 +189,15 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
             assertEquals("Expected all experiment Runs to be deleted", 0, table.getDataRowCount());
 
             // Check all DataInputs were deleted
-            beginAt("/query/" + getProjectName() + "/" + getFolderName() + "/executeQuery.view?schemaName=exp&query.queryName=DataInputs");
+            table = ExecuteQueryPage.beginAt(this, getContainerPath(), "exp", "DataInputs")
+                .getDataRegion();
             assertEquals("Expected all experiment DataInputs to be deleted", 0, table.getDataRowCount());
 
             // Check all Datas were deleted except for flow analysis scripts (FlowDataType.Script)
-            beginAt("/query/" + getProjectName() + "/" + getFolderName() + "/executeQuery.view?schemaName=exp&query.queryName=Datas&query.LSID~doesnotcontain=Flow-AnalysisScript");
+            table = ExecuteQueryPage.getPageFactory("exp", "Datas")
+                .addParameter("query.LSID~doesnotcontain", "Flow-AnalysisScript")
+                .navigate(this)
+                .getDataRegion();
             assertEquals("Expected all experiment Datas to be deleted", 0, table.getDataRowCount());
         }
     }
