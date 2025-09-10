@@ -33,6 +33,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Data;
+import org.labkey.test.pages.query.ExecuteQueryPage;
 import org.labkey.test.pages.reports.ScriptReportPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldKey;
@@ -336,7 +337,9 @@ public class ContainerContextTest extends BaseWebDriverTest
 
         // Verify Issue 16243: Details URL creating URLs with null container unless the container column is actually added to current view
         log("** Removing container column and rechecking lookup URLs...");
-        beginAt(WebTestHelper.buildURL("query", getProjectName(), "executeQuery", Map.of("schemaName", "vehicle", "query.queryName", "EmissionTest", "query.sort", "RowId")));
+        ExecuteQueryPage queryPage = ExecuteQueryPage.getPageFactory("vehicle", "EmissionTest")
+                .addParameter("query.sort", "RowId")
+                .navigate(this, getProjectName());
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.showHiddenItems();
         _customizeViewsHelper.removeColumn("Container");
@@ -504,9 +507,11 @@ public class ContainerContextTest extends BaseWebDriverTest
             int vehicleId)
     {
         log("** Checking containers on lookup URLs for '" + queryName + "'");
-        beginAt(WebTestHelper.buildURL("query", getProjectName(), "executeQuery", Map.of("schemaName", "vehicle", "query.queryName", queryName, "query.sort", "RowId")));
+        ExecuteQueryPage queryPage = ExecuteQueryPage.getPageFactory("vehicle", queryName)
+                .addParameter("query.sort", "RowId")
+                .navigate(this, getProjectName());
 
-        DataRegionTable dr = new DataRegionTable("query", this);
+        DataRegionTable dr = queryPage.getDataRegion();
 
         for (int i = 0; i < max; i++)
         {

@@ -1095,7 +1095,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     {
         if ( isGuestModeTest() )
             return;
-        beginAt("/admin/customizeSite.view");
+        beginAt(WebTestHelper.buildURL("admin", "customizeSite"));
         click(Locator.radioButtonByNameAndValue("systemMaintenanceInterval", "never"));
         clickButton("Save");
     }

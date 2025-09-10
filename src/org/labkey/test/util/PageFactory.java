@@ -49,6 +49,11 @@ public class PageFactory<P extends LabKeyPage<?>>
         return navigate(driverWrapper, _url);
     }
 
+    public final P navigate(WebDriverWrapper driverWrapper, String containerPath)
+    {
+        return navigate(driverWrapper, _url.copy().setContainerPath(containerPath));
+    }
+
     public final P navigate(WebDriverWrapper driverWrapper, Integer msTimeout)
     {
         return navigate(driverWrapper, _url.copy().setTimeout(msTimeout));
