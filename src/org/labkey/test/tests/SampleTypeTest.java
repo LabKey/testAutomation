@@ -1610,9 +1610,9 @@ public class SampleTypeTest extends BaseWebDriverTest
         _fileBrowserHelper.uploadFile(TestFileUtils.getSampleData(testFileHomeName));
         _fileBrowserHelper.uploadFile(TestFileUtils.getSampleData(testFileHomeNameB));
         _fileBrowserHelper.createFolder(homeFileDirectory);
-        FileBrowserHelper.FileDetailInfo homeFileInfo = _fileBrowserHelper.getFileDetailInfo(PROJECT_NAME, testFileHomeName);
-        FileBrowserHelper.FileDetailInfo homeFileBInfo = _fileBrowserHelper.getFileDetailInfo(PROJECT_NAME, testFileHomeNameB);
-        FileBrowserHelper.FileDetailInfo homeDirInfo = _fileBrowserHelper.getFileDetailInfo(PROJECT_NAME, homeFileDirectory);
+        FileBrowserHelper.FileDetailInfo homeFileInfo = FileBrowserHelper.getFileDetailInfo(PROJECT_NAME, testFileHomeName);
+        FileBrowserHelper.FileDetailInfo homeFileBInfo = FileBrowserHelper.getFileDetailInfo(PROJECT_NAME, testFileHomeNameB);
+        FileBrowserHelper.FileDetailInfo homeDirInfo = FileBrowserHelper.getFileDetailInfo(PROJECT_NAME, homeFileDirectory);
 
         String folderContainerPath = PROJECT_NAME + "/" + FOLDER_NAME;
         String testFileSubName = "sampleType.tsv";
@@ -1621,8 +1621,8 @@ public class SampleTypeTest extends BaseWebDriverTest
         goToModule("FileContent");
         _fileBrowserHelper.uploadFile(TestFileUtils.getSampleData(testFileSubName));
         _fileBrowserHelper.createFolder(subFileDirectory);
-        FileBrowserHelper.FileDetailInfo subFileInfo = _fileBrowserHelper.getFileDetailInfo(folderContainerPath, testFileSubName);
-        FileBrowserHelper.FileDetailInfo subDirInfo = _fileBrowserHelper.getFileDetailInfo(folderContainerPath, subFileDirectory);
+        FileBrowserHelper.FileDetailInfo subFileInfo = FileBrowserHelper.getFileDetailInfo(folderContainerPath, testFileSubName);
+        FileBrowserHelper.FileDetailInfo subDirInfo = FileBrowserHelper.getFileDetailInfo(folderContainerPath, subFileDirectory);
 
         goToProjectHome();
         clickAndWait(Locator.linkWithText(sampleTypeNameHome));
