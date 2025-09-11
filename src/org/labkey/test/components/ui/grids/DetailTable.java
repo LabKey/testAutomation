@@ -105,6 +105,11 @@ public class DetailTable extends WebDriverComponent<DetailTable.ElementCache>
         }
     }
 
+    public boolean fieldHasFormatPill(String identifier)
+    {
+        return Locator.tagWithClass("*", "status-pill").existsIn(getField(identifier));
+    }
+
     /**
      * Return the value of a cell identified by the text in the left most column.
      *

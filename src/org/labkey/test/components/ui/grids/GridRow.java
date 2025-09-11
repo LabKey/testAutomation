@@ -45,6 +45,11 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
         return _grid.hasSelectColumn();
     }
 
+    public boolean hasConditionalFormatPill(CharSequence columnIdentifier)
+    {
+        return Locator.tagWithClass("*", "status-pill").existsIn(getCell(columnIdentifier));
+    }
+
     /**
      * Returns the selected state of the row selector checkbox, if one is present
      * @return true if the select checkbox is checked.
