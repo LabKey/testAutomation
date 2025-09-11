@@ -1,5 +1,6 @@
 package org.labkey.test.components.domain;
 
+import org.labkey.remoteapi.domain.ConditionalFormat;
 import org.labkey.remoteapi.query.Filter;
 import org.labkey.test.Locator;
 import org.labkey.test.components.WebDriverComponent;
@@ -22,6 +23,32 @@ public class ConditionalFormatPanel extends WebDriverComponent<ConditionalFormat
     {
         _el = element;
         _dialog = dialog;
+    }
+
+    public ConditionalFormatPanel setConditionalFormat(ConditionalFormat conditionalFormat)
+    {
+        for (int i = 0; i < conditionalFormat.getQueryFilter().size(); i++)
+        {
+            var filterCondition = conditionalFormat.getQueryFilter().get(i);
+            if (i==0)
+            {
+                setFirstCondition(filterCondition.getOperator());
+                if (filterCondition.getValue() != null)
+                    setFirstValue(filterCondition.getValue().toString());
+            }
+            if (i==1)
+            {
+                setSecondCondition(filterCondition.getOperator());
+                if (filterCondition.getValue() != null)
+                    setSecondValue(filterCondition.getValue().toString());
+            }
+        }
+        setBoldCheckbox(conditionalFormat.getBold());
+        setItalicsCheckbox(conditionalFormat.getItalic());
+        setStrikethroughCheckbox(conditionalFormat.getStrikethrough());
+        setTextColor(conditionalFormat.getTextColor());
+        setFillColor(conditionalFormat.getBackgroundColor());
+        return this;
     }
 
     public ConditionalFormatPanel setFirstCondition(Filter.Operator operator)
