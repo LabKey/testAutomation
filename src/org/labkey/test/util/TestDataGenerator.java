@@ -715,6 +715,10 @@ public class TestDataGenerator
             };
             if (domainName.name().length() > maxLength)
                 return true;
+            if (COLON_NAME_PATTERN.matcher(domainName.name())
+                    .results().map(mr -> mr.group(0))
+                    .anyMatch(s -> !domainName.part().contains(s))) // Only check random portion of the name
+                return true;
         }
         if (fieldName != null)
         {
