@@ -337,7 +337,7 @@ public class ContainerContextTest extends BaseWebDriverTest
 
         // Verify Issue 16243: Details URL creating URLs with null container unless the container column is actually added to current view
         log("** Removing container column and rechecking lookup URLs...");
-        ExecuteQueryPage queryPage = ExecuteQueryPage.getPageFactory("vehicle", "EmissionTest")
+        ExecuteQueryPage.getPageFactory("vehicle", "EmissionTest")
                 .addParameter("query.sort", "RowId")
                 .navigate(this, getProjectName());
         _customizeViewsHelper.openCustomizeViewPanel();
