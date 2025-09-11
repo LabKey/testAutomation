@@ -568,9 +568,9 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
     {
         verifyNames(
                 "ParentAliasInputsExpressionTest",
-                "Name\tFieldB\tParent",
-                "${Parent:first:defaultValue('" + DEFAULT_SAMPLE_PARENT_VALUE + "')}_${batchRandomId}",
-                "Parent", "Jessi");
+                "Name\tFieldB\tParentAlias",
+                "${ParentAlias:first:defaultValue('" + DEFAULT_SAMPLE_PARENT_VALUE + "')}_${batchRandomId}",
+                "ParentAlias", "Jessi");
     }
 
     // Issue 42857: samples: bulk import with name expression containing lookup fails to convert lookup string value
@@ -627,9 +627,9 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
     {
         verifyNames(
                 "MaterialInputsExpressionWithParentAliasData",
-                "Name\tFieldB\tParent",
+                "Name\tFieldB\tParentAlias",
                 "${MaterialInputs:first:defaultValue('" + DEFAULT_SAMPLE_PARENT_VALUE + "')}_${batchRandomId}",
-                "Parent", "Sam");
+                "ParentAlias", "Sam");
     }
 
     private void verifyNames(String sampleTypeName, String header, String nameExpression, @Nullable String currentTypeAlias, String namePrefix)
