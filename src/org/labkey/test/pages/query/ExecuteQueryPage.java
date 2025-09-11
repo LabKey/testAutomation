@@ -44,7 +44,7 @@ public class ExecuteQueryPage extends LabKeyPage<ExecuteQueryPage.ElementCache>
     {
         return new RelativeUrl("query", "executeQuery")
                 .addParameters(Maps.of("schemaName", schemaName, "query.queryName", queryName))
-                .getPageFactory(wd -> new ExecuteQueryPage(wd));
+                .getPageFactory(ExecuteQueryPage::new);
     }
 
     public DataRegionTable getDataRegion()
@@ -58,7 +58,7 @@ public class ExecuteQueryPage extends LabKeyPage<ExecuteQueryPage.ElementCache>
         return new ElementCache();
     }
 
-    protected class ElementCache extends LabKeyPage.ElementCache
+    protected class ElementCache extends LabKeyPage<?>.ElementCache
     {
         DataRegionTable _dataRegionTable = new DataRegionTable.DataRegionFinder(getDriver()).withName("query").findWhenNeeded(this);
     }

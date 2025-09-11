@@ -51,6 +51,7 @@ import org.labkey.test.components.html.SiteNavBar;
 import org.labkey.test.pages.core.admin.BaseSettingsPage;
 import org.labkey.test.pages.core.admin.LookAndFeelSettingsPage;
 import org.labkey.test.pages.core.admin.ProjectSettingsPage;
+import org.labkey.test.pages.query.ExecuteQueryPage;
 import org.labkey.test.pages.study.DatasetDesignerPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.list.IntListDefinition;
@@ -91,6 +92,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.labkey.test.TestFileUtils.getDefaultFileRoot;
+import static org.labkey.test.WebTestHelper.buildURL;
 
 /**
 * Tests the simple module and file-based resources introduced in version 9.1
@@ -213,7 +215,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         SimpleModuleTest init = getCurrentTest();
         init.doSetup();
     }
-    
+
     protected void doSetup()
     {
         assertModuleDeployed(MODULE_NAME);
@@ -483,7 +485,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
     private void doTestSchemas() throws Exception
     {
         log("** Testing schemas in modules...");
-        beginAt("/query/" + getProjectName() + "/begin.view?schemaName=" + VEHICLE_SCHEMA);
+        beginAt(buildURL("query", getProjectName(), "begin", Map.of("schemaName", VEHICLE_SCHEMA)));
 
         Connection cn = WebTestHelper.getRemoteApiConnection();
 
@@ -599,13 +601,15 @@ public class SimpleModuleTest extends BaseWebDriverTest
         updateCmd.execute(cn, getProjectName());
 
         log("** Testing vehicle.Manufacturers default queryDetailsRow.view url link...");
-        beginAt("/query/" + getProjectName() + "/executeQuery.view?schemaName=" + VEHICLE_SCHEMA + "&query.queryName=Manufacturers&query.Name~eq=Toyota");
+        ExecuteQueryPage.getPageFactory(VEHICLE_SCHEMA, "Manufacturers")
+                .addParameter("query.Name~eq", "Toyota")
+                .navigate(this, getProjectName());
         DataRegionTable table = new DataRegionTable("query", getDriver());
         clickAndWait(table.detailsLink(0));
         assertTextPresent("Name", "Toyota");
 
         log("** Testing vehicle.Model RowId url link...");
-        beginAt(getProjectName() + "/query-begin.view");
+        beginAt(buildURL("query", getProjectName(), "begin"));
         viewQueryData(VEHICLE_SCHEMA, "Models");
         clickAndWait(Locator.linkWithText("Prius"));
         assertTextPresent("Hooray!");
@@ -615,7 +619,9 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
 
         log("** Testing url expression null behavior for null InitialReleaseYear...");
-        beginAt("/query/" + getProjectName() + "/executeQuery.view?schemaName=vehicle&query.queryName=Models&query.InitialReleaseYear~isblank=");
+        ExecuteQueryPage.getPageFactory("vehicle", "Models")
+                .addParameter("query.InitialReleaseYear~isblank", "")
+                .navigate(this, getProjectName());
         DataRegionTable modelsGrid = new DataRegionTable("query", this);
 
         // URLs with a bad (missing) column should result in no URL being rendered
@@ -647,7 +653,9 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
 
         log("** Testing url expression null behavior for non-null InitialReleaseYear...");
-        beginAt("/query/" + getProjectName() + "/executeQuery.view?schemaName=vehicle&query.queryName=Models&query.InitialReleaseYear~isnonblank=");
+        ExecuteQueryPage.getPageFactory("vehicle", "Models")
+                .addParameter("query.InitialReleaseYear~isnonblank", "")
+                .navigate(this, getProjectName());
         modelsGrid = new DataRegionTable("query", this);
 
         href = modelsGrid.getHref(0, "urlNullableColumnWithDefaultBehavior");
@@ -758,7 +766,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
 
         log("** Testing vehicle.Vehicles details url link...");
-        beginAt("/query/" + getProjectName() + "/schema.view?schemaName=" + VEHICLE_SCHEMA);
+        beginAt(buildURL("query", getProjectName(), "schema", Map.of("schemaName", VEHICLE_SCHEMA)));
         viewQueryData(VEHICLE_SCHEMA, "Vehicles");
         DataRegionTable vehicles = new DataRegionTable("query", getDriver());
         clickAndWait(vehicles.detailsLink(0));
@@ -870,23 +878,23 @@ public class SimpleModuleTest extends BaseWebDriverTest
     @LogMethod
     private void doTestViewEditing()
     {
-        beginAt("/" + getProjectName() + "/query-executeQuery.view?schemaName=" + VEHICLE_SCHEMA + "&query.queryName=Vehicles");
+        ExecuteQueryPage page = ExecuteQueryPage.beginAt(this, getProjectName(), VEHICLE_SCHEMA, "Vehicles");
 
-        DataRegionTable dr = new DataRegionTable("query", this);
+        DataRegionTable dr = page.getDataRegion();
 
         log("** Try to edit file-based default view");
-        _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.removeColumn("Color");
-        CustomizeView.SaveWindow saveWindow = _customizeViewsHelper.clickSave();
+        CustomizeView customizeView = dr.openCustomizeGrid();
+        customizeView.removeColumn("Color");
+        CustomizeView.SaveWindow saveWindow = customizeView.clickSave();
         assertFalse("should not be able to select default view", saveWindow.defaultViewRadio.isEnabled());
         saveWindow.cancel();
 
         dr.goToView("EditableFileBasedView");
 
         log("** Try to edit overridable file-based view");
-        _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.addColumn("Color");
-        saveWindow = _customizeViewsHelper.clickSave();
+        customizeView = dr.openCustomizeGrid();
+        customizeView.addColumn("Color");
+        saveWindow = customizeView.clickSave();
 
         assertTrue("should be able to select default view", saveWindow.defaultViewRadio.isEnabled());
         saveWindow.defaultViewRadio.check();
@@ -1023,7 +1031,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
                     deleteCmd.setRows(rows);
                     deleteCmd.execute(cn, c);
                 }
-                
+
                 assertEquals("Expected no rows remaining", 0, selectCmd.execute(cn, "Home").getRowCount().intValue());
             }
         }
@@ -1285,7 +1293,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
     @LogMethod
     private void doTestRowLevelContainerPath()
     {
-        beginAt("/simpletest/" + getProjectName() + "/workbookTest.view");
+        beginAt(buildURL("simpletest", getProjectName(), "workbookTest"));
 
         clickButton("RunContainerPathTest", 0);
 
@@ -1806,7 +1814,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         lookAndFeelSettingsPage.save();
         signOut();
 
-        beginAt(WebTestHelper.buildURL("login", "login"));
+        beginAt(buildURL("login", "login"));
         waitForAnyElement("Should be on login or Home portal", Locator.id("email"), SiteNavBar.Locators.userMenu);
         assertElementPresent(Locator.tagWithText("p", "SimpleTest Module Custom Sign In"));
         signIn();
@@ -1819,7 +1827,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         lookAndFeelSettingsPage.save();
         signOut();
 
-        beginAt(WebTestHelper.buildURL("login", "login"));
+        beginAt(buildURL("login", "login"));
         waitForAnyElement("Should be on login or Home portal", Locator.id("email"), SiteNavBar.Locators.userMenu);
         assertElementPresent(Locator.tagWithText("p", "SimpleTest Module Custom Sign In With Custom ReturnUrl"));
         signIn();

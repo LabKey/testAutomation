@@ -23,6 +23,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Charting;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Reports;
@@ -34,6 +35,7 @@ import org.labkey.test.util.WikiHelper;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This test imports a folder archive that has 2 subfolders (a date based study and a visit based study) which have been
@@ -314,8 +316,9 @@ public class TimeChartImportTest extends StudyBaseTest
         {
             clickTab("Clinical and Assay Data");
             waitAndClickAndWait(Locator.linkWithText(chartInfo.getName()));
-            beginAt("/reports/" + getProjectName() + "/" + VISIT_STUDY_FOLDER_NAME + "/" + publishFolderName + "/reportInfo.view?reportId="
-                    + getUrlParam("reportId"));
+            beginAt(WebTestHelper.buildURL("reports",
+                getProjectName() + "/" + VISIT_STUDY_FOLDER_NAME + "/" + publishFolderName,
+                "reportInfo", Map.of("reportId", getUrlParam("reportId"))));
             waitForText("Report Debug Information");
             for (String origMouseId : origMouseIds)
             {

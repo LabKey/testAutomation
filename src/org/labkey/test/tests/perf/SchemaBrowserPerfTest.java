@@ -20,6 +20,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.serverapi.writer.PrintWriters;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Perf;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldDefinition.ColumnType;
@@ -27,6 +28,7 @@ import org.labkey.test.params.FieldDefinition.ColumnType;
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Map;
 
 // this test generates ball park times for Schema Browser use cases on a study that has 200 dataSets.
 //
@@ -86,7 +88,7 @@ public class SchemaBrowserPerfTest extends PerformanceTest
         long[] emptyCacheOpenStudyTimes = new long[5];
         // run tests
         for (int x = 0 ; x < 5; x++) {
-            beginAt("/admin/caches.view?clearCaches=1", 120000);
+            beginAt(WebTestHelper.buildURL("admin", "caches", Map.of("clearCaches", 1)), 120000);
             goToHome();
             clickProject(getProjectName());
             goToSchemaBrowser();
@@ -101,7 +103,7 @@ public class SchemaBrowserPerfTest extends PerformanceTest
     private long[] studyBaselineFullCache() {
         long[] fullCacheOpenStudyTimes = new long[5];
         // prepare cache
-        beginAt("/admin/caches.view?clearCaches=1", 120000);
+        beginAt(WebTestHelper.buildURL("admin", "caches", Map.of("clearCaches", 1)), 120000);
         goToHome();
         clickProject(getProjectName());
         goToSchemaBrowser();
@@ -123,7 +125,7 @@ public class SchemaBrowserPerfTest extends PerformanceTest
     private long[] studyDataBaselineFullCache() {
         long[] emptyCacheOpenStudyDataTimes = new long[5];
         // prepare cache
-        beginAt("/admin/caches.view?clearCaches=1", 120000);
+        beginAt(WebTestHelper.buildURL("admin", "caches", Map.of("clearCaches", 1)), 120000);
         goToHome();
         clickProject(getProjectName());
         goToSchemaBrowser();
