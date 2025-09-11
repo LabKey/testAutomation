@@ -37,7 +37,7 @@ public class ContainerInfo
     {
         if (TestProperties.isTestRunningOnTeamCity())
         {
-            String name = TestDataGenerator.randomName(folderName, TestDataGenerator.randomInt(0, 5), 5, RANDOM_CHARSET, null);
+            String name = TestDataGenerator.randomName(folderName, TestDataGenerator.randomInt(0, 5), 5, RANDOM_CHARSET, null).name();
             if (name.startsWith("@"))
             {
                 // Folder name may not begin with '@'
