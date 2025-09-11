@@ -443,7 +443,7 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
         DataClassDefinition dataClassType = new DataClassDefinition(dataClass).setFields(DataClassAPIHelper.dataClassTestFields());
         SampleTypeDefinition parentType = new SampleTypeDefinition(parentSampleType).setFields(testFields);
         SampleTypeDefinition testSampleType = new SampleTypeDefinition(testSamples).setFields(testFields)
-                .addParentAlias("Parent", parentSampleType) // to derive from parent sampleType
+                .addParentAlias("ParentAlias", parentSampleType) // to derive from parent sampleType
                 .addDataParentAlias("DataClassParent", dataClass)
                 .addParentAlias("SelfParent"); // to derive from samles in the current type
 
@@ -461,19 +461,19 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
 
         TestDataGenerator testDgen = SampleTypeAPIHelper.createEmptySampleType(subfolderPath, testSampleType);
         testDgen.addCustomRow(Map.of("Name", "Child1", intColumn.getName(), 1, decimalColumn.getName(), 1.1, stringColumn.getName(), "one",
-                "Parent", "Parent1"));
+                "ParentAlias", "Parent1"));
         testDgen.addCustomRow(Map.of("Name", "Child2", intColumn.getName(), 2, decimalColumn.getName(), 2.2, stringColumn.getName(), "two",
-                "Parent", "Parent2"));
+                "ParentAlias", "Parent2"));
         testDgen.addCustomRow(Map.of("Name", "Child3", intColumn.getName(), 3, decimalColumn.getName(), 3.3, stringColumn.getName(), "three",
-                "Parent", "Parent3", "DataClassParent", "data1"));
+                "ParentAlias", "Parent3", "DataClassParent", "data1"));
         testDgen.addCustomRow(Map.of("Name", "Child4", intColumn.getName(), 4, decimalColumn.getName(), 4.4, stringColumn.getName(), "four",
-                "Parent", "Parent3, Parent2"));
+                "ParentAlias", "Parent3, Parent2"));
         testDgen.addCustomRow(Map.of("Name", "Child5", intColumn.getName(), 5, decimalColumn.getName(), 5.5, stringColumn.getName(), "five",
-                "Parent", "Parent1, Parent2"));
+                "ParentAlias", "Parent1, Parent2"));
         testDgen.addCustomRow(Map.of("Name", "Child6", intColumn.getName(), 6, decimalColumn.getName(), 6.6, stringColumn.getName(), "six",
-                "Parent", "Parent3, Parent2", "SelfParent", "Child5"));
+                "ParentAlias", "Parent3, Parent2", "SelfParent", "Child5"));
         testDgen.addCustomRow(Map.of("Name", "Child7", intColumn.getName(), 7, decimalColumn.getName(), 7.7, stringColumn.getName(), "seven",
-                "Parent", "Parent3, Parent2", "SelfParent", "Child5", "DataClassParent", "data2, data3"));
+                "ParentAlias", "Parent3, Parent2", "SelfParent", "Child5", "DataClassParent", "data2, data3"));
         testDgen.insertRows();
 
         PortalHelper portalHelper = new PortalHelper(this);
