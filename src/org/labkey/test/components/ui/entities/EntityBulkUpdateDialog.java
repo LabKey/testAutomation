@@ -83,6 +83,7 @@ public class EntityBulkUpdateDialog extends ModalDialog
             toggle.set(enable);
             if (enable) _changeCounter++;
             else _changeCounter--;
+            getWrapper().mouseOut(); // Toggle is dangerously close to field info tooltip
         }
         return this;
     }
@@ -335,7 +336,7 @@ public class EntityBulkUpdateDialog extends ModalDialog
         List<WebElement> labels = Locator.tagWithClass("label", "control-label").withAttribute("for")
                 .waitForElements(elementCache(), 2_000);
 
-        return labels.stream().map(a -> FieldKey.fromFieldKey(a.getDomAttribute("for")).getName()).toList();
+        return labels.stream().map(a -> FieldKey.fromFieldKey(a.getDomAttribute("for")).getFullName()).toList();
     }
 
     public EntityBulkUpdateDialog waitForFieldsToBe(List<String> expectedFieldNames, int waitMilliseconds)

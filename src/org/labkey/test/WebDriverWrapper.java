@@ -135,6 +135,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -187,6 +188,8 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     private final Stack<String> _locationStack = new Stack<>();
     private String _savedLocation = null;
+
+    private static final Set<String> _controllerFirstUrls = new HashSet<>();
 
     static
     {
@@ -1210,9 +1213,10 @@ public abstract class WebDriverWrapper implements WrapsDriver
             {
                 try
                 {
-                    if (new Crawler.ControllerActionId(relativeURL).isControllerFirstUrl())
+                    if (new Crawler.ControllerActionId(relativeURL).isControllerFirstUrl() && !_controllerFirstUrls.contains(url))
                     {
-                        RuntimeException ex = new RuntimeException("Controller first url found in URL: " + relativeURL);
+                        _controllerFirstUrls.add(url);
+                        RuntimeException ex = new RuntimeException("Controller-first url used: " + relativeURL);
                         if (TestProperties.isControllerFirstUrlFatal())
                             throw ex;
                         else
@@ -2462,11 +2466,17 @@ public abstract class WebDriverWrapper implements WrapsDriver
                 },
                 "File(s) did not appear in download dir: " + downloadDir.toString(), WAIT_FOR_PAGE);
 
+        List<File> tempFiles = new ArrayList<>();
         waitFor(() -> {
                     final File[] files = downloadDir.listFiles(tempFilesFilter);
+                    tempFiles.clear();
+                    if (files != null)
+                    {
+                        tempFiles.addAll(Arrays.asList(files));
+                    }
                     return files != null && files.length == 0;
                 },
-                "Temp files remain in download dir: " + downloadDir, WAIT_FOR_PAGE);
+            () -> "Temp files remain in download dir: " + downloadDir + ": " + tempFiles.stream().map(File::getName).collect(Collectors.joining(", ")), WAIT_FOR_PAGE);
 
         MutableInt downloadSize = new MutableInt(-1);
         MutableInt stabilityDuration = new MutableInt(0);

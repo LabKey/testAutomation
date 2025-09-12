@@ -42,6 +42,7 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DomainUtils.DomainKind;
 import org.labkey.test.util.data.ColumnNameMapper;
+import org.labkey.test.util.data.RecordIterator;
 import org.labkey.test.util.data.TestDataUtils;
 import org.labkey.test.util.query.QueryApiHelper;
 
@@ -57,7 +58,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
@@ -816,7 +816,7 @@ public class TestDataGenerator
      */
     public File writeData(String fileName)
     {
-        return writeData(fileName, new FileRowIterator(getFieldsForFile(), _rows));
+        return writeData(fileName, new RecordIterator(getFieldsForFile(), _rows));
     }
 
     /**
@@ -827,7 +827,7 @@ public class TestDataGenerator
      */
     public File writeData(String fileName, int numRows)
     {
-        return writeData(fileName, new FileRowIterator(getFieldsForFile(), this::generateRow, numRows));
+        return writeData(fileName, new RecordIterator(getFieldsForFile(), this::generateRow, numRows));
     }
 
     /**
@@ -1026,72 +1026,4 @@ public class TestDataGenerator
         return DomainUtils.doesDomainExist(containerPath, schema, queryName);
     }
 
-}
-
-class FileRowIterator implements Iterator<List<Object>>
-{
-    private final List<String> headers;
-    private final Iterator<Map<String, Object>> rows;
-
-    private boolean firstRow = true;
-
-    public FileRowIterator(@NotNull List<String> headers, @NotNull Iterator<Map<String, Object>> rows)
-    {
-        this.headers = Objects.requireNonNull(headers);
-        this.rows = Objects.requireNonNull(rows);
-    }
-
-    public FileRowIterator(@NotNull List<String> headers, @NotNull Supplier<Map<String, Object>> rowSupplier, final int rowCount)
-    {
-        this(headers, new Iterator<>()
-        {
-            int count = 0;
-
-            @Override
-            public boolean hasNext()
-            {
-                return count < rowCount;
-            }
-
-            @Override
-            public Map<String, Object> next()
-            {
-                count++;
-                return rowSupplier.get();
-            }
-        });
-    }
-
-    public FileRowIterator(@NotNull List<String> headers, @NotNull List<Map<String, Object>> rows)
-    {
-        this(headers, rows.iterator());
-    }
-
-    @Override
-    public boolean hasNext()
-    {
-        return firstRow || rows.hasNext();
-    }
-
-    @Override
-    public List<Object> next()
-    {
-        if (!hasNext())
-            throw new NoSuchElementException();
-
-        if (firstRow)
-        {
-            firstRow = false;
-            return Collections.unmodifiableList(headers);
-        }
-        else
-        {
-            return rowMapToList(rows.next());
-        }
-    }
-
-    private List<Object> rowMapToList(Map<String, Object> row)
-    {
-        return headers.stream().map(h -> row.getOrDefault(h, "")).toList();
-    }
 }

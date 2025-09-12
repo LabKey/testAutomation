@@ -22,6 +22,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.pages.TourEditor;
 import org.labkey.test.util.DataRegionTable;
@@ -204,7 +205,7 @@ public class TourTest extends BaseWebDriverTest
 
     private DataRegionTable navigateToTours(String folder)
     {
-        beginAt("/tours/" + getProjectName() + "/" + folder + "/begin.view");
+        beginAt(WebTestHelper.buildURL("tours", getProjectName() + "/" + folder, "begin"));
         return new DataRegionTable("query", getDriver());
     }
 

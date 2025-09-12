@@ -22,6 +22,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static org.labkey.test.util.TextUtils.normalizeSpace;
 import static org.labkey.test.util.selenium.WebElementUtils.getTextContent;
 
 /**
@@ -180,13 +181,13 @@ public class FieldSelectionDialog extends ModalDialog
             if(iterator.hasNext())
             {
                 // If the field is already expanded don't try to expand it.
-                if(!isFieldKeyExpanded(elementCache().findAvailableField(fieldKey.toString())))
-                    expandOrCollapseByFieldKey(fieldKey.toString(), true);
+                if(!isFieldKeyExpanded(elementCache().findAvailableField(fieldKey)))
+                    expandOrCollapseByFieldKey(fieldKey, true);
             }
 
         }
 
-        return elementCache().findAvailableField(fieldKey.toString());
+        return elementCache().findAvailableField(fieldKey);
     }
 
     /**
@@ -195,7 +196,7 @@ public class FieldSelectionDialog extends ModalDialog
      * @param fieldKey The data-fieldkey value of the field to expand.
      * @param expand True to expand false to collapse.
      */
-    private void expandOrCollapseByFieldKey(String fieldKey, boolean expand)
+    private void expandOrCollapseByFieldKey(FieldKey fieldKey, boolean expand)
     {
 
         WebElement listItem = elementCache().findAvailableField(fieldKey);
@@ -433,7 +434,7 @@ public class FieldSelectionDialog extends ModalDialog
      */
     public FieldSelectionDialog setFieldLabel(FieldKey fieldKey, String newFieldLabel)
     {
-        WebElement listItem = elementCache().findSelectedField(fieldKey.toString());
+        WebElement listItem = elementCache().findSelectedField(fieldKey);
         WebElement updateIcon = Locator.tagWithClass("span", "edit-inline-field__toggle").findWhenNeeded(listItem);
         updateIcon.click();
 
@@ -453,9 +454,9 @@ public class FieldSelectionDialog extends ModalDialog
 
         getWrapper().mouseOver(elementCache().title); // Dismiss tooltip
 
-        WebDriverWrapper.waitFor(()->!elementCache().fieldLabelEdit.isDisplayed() &&
-                        elementCache().getListItemElement(elementCache().selectedFieldsPanel, newFieldLabel).isDisplayed(),
+        WebDriverWrapper.waitFor(()->!elementCache().fieldLabelEdit.isDisplayed(),
                 String.format("New field label '%s' is not in the list.", newFieldLabel), 500);
+        Assert.assertEquals("Label after update", normalizeSpace(newFieldLabel), elementCache().getFieldLabel(fieldKey));
 
         return this;
     }
@@ -503,10 +504,10 @@ public class FieldSelectionDialog extends ModalDialog
      * @param beforeTarget Will the field being moved go before (above) or after (below) the target field.
      * @return This dialog.
      */
-    public FieldSelectionDialog repositionField(String fieldToMove, String targetField, boolean beforeTarget)
+    public FieldSelectionDialog repositionField(FieldKey fieldToMove, FieldKey targetField, boolean beforeTarget)
     {
-        WebElement elementToMove = elementCache().getListItemElement(elementCache().selectedFieldsPanel, fieldToMove);
-        WebElement elementTarget = elementCache().getListItemElement(elementCache().selectedFieldsPanel, targetField);
+        WebElement elementToMove = elementCache().findSelectedField(fieldToMove);
+        WebElement elementTarget = elementCache().findSelectedField(targetField);
 
         int yBefore =  elementToMove.getRect().getY();
 
@@ -633,28 +634,27 @@ public class FieldSelectionDialog extends ModalDialog
                     .findElements(panel);
         }
 
-        // Will get the first list item that matches the fieldLabel.
-        protected WebElement getListItemElement(WebElement panel, String fieldLabel)
+        protected String getFieldLabel(FieldKey fieldKey)
         {
-            return Locator.tagWithClass("div", "list-group-item")
-                    .withDescendant(Locator.tagWithClass("div", "field-caption").withText(fieldLabel))
-                    .findElement(panel);
+            return Locator.tagWithClass("div", "field-caption")
+                .findElement(findFieldRow(fieldKey, selectedFieldsPanel))
+                .getText();
         }
 
-        protected WebElement findSelectedField(String fieldKey)
+        protected WebElement findSelectedField(FieldKey fieldKey)
         {
             return findFieldRow(fieldKey, selectedFieldsPanel);
         }
 
-        protected WebElement findAvailableField(String fieldKey)
+        protected WebElement findAvailableField(FieldKey fieldKey)
         {
             return findFieldRow(fieldKey, availableFieldsPanel);
         }
 
-        protected WebElement findFieldRow(String fieldKey, WebElement panel)
+        protected WebElement findFieldRow(FieldKey fieldKey, WebElement panel)
         {
             return Locator.tagWithClass("div", "list-group-item")
-                .withAttributeIgnoreCase("data-fieldkey", fieldKey)
+                .withAttributeIgnoreCase("data-fieldkey", fieldKey.toString())
                 .findElement(panel);
         }
 

@@ -29,7 +29,7 @@ public class RelativeUrl
     private final String _controller;
     private String _containerPath = null;
     private final String _action;
-    private final Map<String, String> _parameters;
+    private final Map<String, Object> _parameters;
     private Integer _msTimeout;
 
     public RelativeUrl(String controller, String action)
@@ -66,13 +66,13 @@ public class RelativeUrl
         return this;
     }
 
-    public RelativeUrl addParameters(Map<String, String> params)
+    public RelativeUrl addParameters(Map<String, ?> params)
     {
         _parameters.putAll(params);
         return this;
     }
 
-    public RelativeUrl addParameter(String param, String value)
+    public <T> RelativeUrl addParameter(String param, T value)
     {
         _parameters.put(param, value);
         return this;
@@ -103,7 +103,7 @@ public class RelativeUrl
         return this;
     }
 
-    public <P extends LabKeyPage> PageFactory<P> getPageFactory(Function<WebDriver, P> pageConstructor)
+    public <P extends LabKeyPage<?>> PageFactory<P> getPageFactory(Function<WebDriver, P> pageConstructor)
     {
         return new PageFactory<>(this, pageConstructor);
     }

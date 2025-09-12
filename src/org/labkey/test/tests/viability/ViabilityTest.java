@@ -25,6 +25,7 @@ import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.assay.AssayConstants;
 import org.labkey.test.pages.ReactAssayDesignerPage;
+import org.labkey.test.pages.query.ExecuteQueryPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.QCAssayScriptHelper;
@@ -226,8 +227,8 @@ public class ViabilityTest extends AbstractViabilityTest
     protected void runResultSpecimenLookupTest()
     {
         log("** Checking ResultSpecimens lookups");
-        beginAt("/" + getProjectName() + "/" + getFolderName() + "/query-executeQuery.view?schemaName=assay&query.queryName=" + getAssayName() + " ResultSpecimens");
-        DataRegionTable table = new DataRegionTable("query", this);
+        ExecuteQueryPage page = ExecuteQueryPage.beginAt(this, getProjectName() + "/" + getFolderName(), "assay", getAssayName() + " ResultSpecimens");
+        DataRegionTable table = page.getDataRegion();
         assertTextPresent(new TextSearcher(table.getComponentElement()::getText), "foobar", "vial1", "xyzzy", "160450533-5", "161400006.11-5");
 
         setSelectedFields("/" + getProjectName() + "/" + getFolderName(), "assay", getAssayName() + " ResultSpecimens", null,

@@ -49,6 +49,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -222,14 +223,14 @@ public class UserTest extends BaseWebDriverTest
         goToHome();
 
         log("Validate that only the user who requested the change can use the link");
-        goToURL(resetUrl, 30000);
+        beginAt(resetUrl.toString(), 30000);
         assertTextPresent("The current user is not the same user that initiated this request. Please log in with the account you used to make this email change request.");
         goToHome();
 
         log("Again impersonate user " + SELF_SERVICE_EMAIL_USER + " to validate the confirmation link.");
         impersonate(SELF_SERVICE_EMAIL_USER);
 
-        goToURL(resetUrl, 30000);
+        beginAt(resetUrl.toString(), 30000);
 
         String tempStr = AFFIRM_CHANGE_MSG.replace("@1", SELF_SERVICE_EMAIL_USER);
         tempStr = tempStr.replace("@2", SELF_SERVICE_EMAIL_USER_CHANGED);
@@ -239,7 +240,7 @@ public class UserTest extends BaseWebDriverTest
         stopImpersonating();
 
         log("Go to dumpster and make sure the notification email was there.");
-        assertTrue(null != getEmailChangeMsgBody("Notification .* Web Site email has changed.*"));
+        assertNotNull(getEmailChangeMsgBody("Notification .* Web Site email has changed.*"));
 
         log("Validate that the old email address has been removed.");
 
@@ -251,7 +252,7 @@ public class UserTest extends BaseWebDriverTest
         impersonate(SELF_SERVICE_EMAIL_USER_CHANGED);
 
         log("Validate that trying to use the link from the email message again will result in an error.");
-        goToURL(resetUrl, 30000);
+        beginAt(resetUrl.toString(), 30000);
         assertTextPresent("Verification failed.");
         goToHome();
 
@@ -313,8 +314,7 @@ public class UserTest extends BaseWebDriverTest
 
     private String getEmailChangeMsgBody(String subjectRegex)
     {
-        EmailRecordTable ert = new EmailRecordTable(getDriver());
-        beginAt("/dumbster-begin.view");
+        EmailRecordTable ert = goToEmailRecord();
         EmailRecordTable.EmailMessage eMsg = ert.getMessageRegEx(subjectRegex);
         ert.clickMessage(eMsg);
         eMsg = ert.getMessageRegEx(subjectRegex);
@@ -348,7 +348,7 @@ public class UserTest extends BaseWebDriverTest
             }
         }
 
-        assertTrue("Could not find a url in the email to follow.", !urlString.isEmpty());
+        assertFalse("Could not find a url in the email to follow.", urlString.isEmpty());
         try
         {
             resetUrl = new URL(urlString);
@@ -503,8 +503,7 @@ public class UserTest extends BaseWebDriverTest
 
         StringBuilder sb = new StringBuilder();
         final int maxFieldLength = 64;
-        for (int i = 0; i < maxFieldLength + 1; i++)
-            sb.append("X");
+        sb.append("X".repeat(maxFieldLength + 1));
         String illegalLongProperty = sb.toString();
 
         log("Set illegal properties");
