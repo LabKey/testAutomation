@@ -546,9 +546,9 @@ public class TestDataGenerator
      * @param exclusions    characters that are to be excluded from the random parts of the name
      * @return a name with given characters that will be displayed as returned in the UI.
      */
-    public static String randomName(@NotNull String part, int numStartChars, int numEndChars, String charSet, @Nullable String exclusions)
+    public static RandomName randomName(@NotNull String part, int numStartChars, int numEndChars, String charSet, @Nullable String exclusions)
     {
-        return (randomString(numStartChars, exclusions, charSet) + part + randomString(numEndChars, exclusions, charSet)).trim();
+        return new RandomName(part, (randomString(numStartChars, exclusions, charSet) + part + randomString(numEndChars, exclusions, charSet)).trim());
     }
 
     public static String randomDomainName()
@@ -563,7 +563,7 @@ public class TestDataGenerator
 
     public static String randomInvalidDomainName(@Nullable String namePart, int numStartChars, int numEndChars)
     {
-        String domainName = randomName(namePart == null ? "" : namePart, numStartChars, numEndChars, ILLEGAL_DOMAIN_NAME_CHARSET, null);
+        String domainName = randomName(namePart == null ? "" : namePart, numStartChars, numEndChars, ILLEGAL_DOMAIN_NAME_CHARSET, null).name();
         TestLogger.log("Generated random invalid domain name: " + domainName);
         return domainName;
     }
@@ -583,20 +583,20 @@ public class TestDataGenerator
      */
     public static String randomDomainName(@Nullable String namePart, @Nullable Integer numStartChars, @Nullable Integer numEndChars, @Nullable DomainKind domainKind)
     {
-        String _namePart = namePart == null ? "" : namePart;
+        namePart = namePart == null ? "" : namePart;
         DomainKind _domainKind = domainKind == null ? DomainKind.SampleSet : domainKind;
         String charSet = ALPHANUMERIC_STRING + DOMAIN_SPECIAL_STRING;
         int currentTries = 0;
-        String domainName = randomName(_namePart, getNumChars(numStartChars, 5), getNumChars(numEndChars, 50), charSet, null);
-        while (isDomainAndFieldNameInvalid(_domainKind, domainName, null))
+        RandomName randomName = randomName(namePart, getNumChars(numStartChars, 5), getNumChars(numEndChars, 50), charSet, null);
+        while (isDomainAndFieldNameInvalid(_domainKind, randomName, null))
         {
-            domainName = randomName(_namePart, getNumChars(numStartChars, 5), getNumChars(numEndChars, 50), charSet, null);
+            randomName = randomName(namePart, getNumChars(numStartChars, 5), getNumChars(numEndChars, 50), charSet, null);
             if (++currentTries >= MAX_RANDOM_TRIES)
-                throw new IllegalStateException("Failed to generate a valid domain name after " + MAX_RANDOM_TRIES + " tries. Last generated name: " + domainName);
+                throw new IllegalStateException("Failed to generate a valid domain name after " + MAX_RANDOM_TRIES + " tries. Last generated name: " + randomName);
         }
 
         // Multiple spaces in the UI are collapsed into a single space. If we need to test for handling of multiple spaces, we'll not use this generator
-        domainName = domainName.replaceAll("\\s+", " ");
+        String domainName = randomName.name().replaceAll("\\s+", " ");
 
         TestLogger.log("Generated random domain name for domainKind " + _domainKind + ": " + domainName);
         return domainName;
@@ -632,7 +632,7 @@ public class TestDataGenerator
                 + WIDE_PLACEHOLDER + REPEAT_PLACEHOLDER + ALL_CHARS_PLACEHOLDER;
 
         int currentTries = 0;
-        String randomFieldName = randomName(part, getNumChars(numStartChars, 5), getNumChars(numEndChars, 50), chars, exclusion);
+        RandomName randomFieldName = randomName(part, getNumChars(numStartChars, 5), getNumChars(numEndChars, 50), chars, exclusion);
         while (isDomainAndFieldNameInvalid(_domainKind, null, randomFieldName))
         {
             randomFieldName = randomName(part, getNumChars(numStartChars, 5), getNumChars(numEndChars, 50), chars, exclusion);
@@ -641,12 +641,13 @@ public class TestDataGenerator
         }
 
         TestLogger.log("Generated random field name for domainKind " + _domainKind + ": " + randomFieldName);
-        return randomFieldName;
+        return randomFieldName.name();
     }
 
-    private static boolean isDomainAndFieldNameInvalid(DomainKind domainKind, @Nullable String domainName, @Nullable String fieldName)
+    private static boolean isDomainAndFieldNameInvalid(DomainKind domainKind, @Nullable RandomName domainName, @Nullable RandomName fieldName)
     {
-        if (fieldName != null && fieldName.length() > 64 && fieldName.toLowerCase().contains("key")) // Not guaranteed but likely a list key
+        // TODO: remove when merging to develop
+        if (fieldName != null && fieldName.name().length() > 64 && fieldName.part().toLowerCase().contains("key")) // Not guaranteed but likely a list key
             return true; // Issue 53706: List key field name length is limited to 64 characters
 
         if (TestProperties.isRemoteNameValidationEnabled())
@@ -659,7 +660,7 @@ public class TestDataGenerator
         }
     }
 
-    private static boolean isNameInvalidRemote(DomainKind domainKind, @Nullable String domainName, @Nullable String fieldName)
+    private static boolean isNameInvalidRemote(DomainKind domainKind, @Nullable RandomName domainName, @Nullable RandomName fieldName)
     {
         SimplePostCommand command = new SimplePostCommand("property", "validateDomainAndFieldNames");
         JSONObject domainDesign = new JSONObject();
@@ -696,13 +697,14 @@ public class TestDataGenerator
         }
     }
 
-    public static boolean isNameInvalidLocal(DomainKind domainKind, @Nullable String domainName, @Nullable String fieldName)
+    private static final Pattern COLON_NAME_PATTERN = Pattern.compile(":[a-zA-Z]{3}"); // Avoid illegal patterns like ":Date"
+    private static boolean isNameInvalidLocal(DomainKind domainKind, @Nullable RandomName domainName, @Nullable RandomName fieldName)
     {
         if (domainName != null)
         {
-            if (!Character.isLetterOrDigit(domainName.charAt(0)))
+            if (!Character.isLetterOrDigit(domainName.name().charAt(0)))
                 return true; // domain needs to start with alphanumeric char
-            if (Pattern.matches("(.*\\s--[^ ].*)|(.*\\s-[^- ].*)", domainName))
+            if (Pattern.matches("(.*\\s--[^ ].*)|(.*\\s-[^- ].*)", domainName.name()))
                 return true; // domain name must not contain space followed by dash. (command like: Issue 49161)
 
             int maxLength = switch (domainKind)
@@ -711,14 +713,20 @@ public class TestDataGenerator
                 case SampleSet -> 100;
                 default -> 200; // Sources, lists, and datasets allow 200 character names
             };
-            if (domainName.length() > maxLength)
+            if (domainName.name().length() > maxLength)
+                return true;
+            if (COLON_NAME_PATTERN.matcher(domainName.name())
+                    .results().map(mr -> mr.group(0))
+                    .anyMatch(s -> !domainName.part().contains(s))) // Only check random portion of the name
                 return true;
         }
         if (fieldName != null)
         {
-            if (fieldName.length() > 200)
+            if (fieldName.name().length() > 200)
                 return true;
-            if (Pattern.matches(".*:[a-zA-Z]{3}.*", fieldName)) // Avoid illegal patterns like ":Date"
+            if (COLON_NAME_PATTERN.matcher(fieldName.name())
+                    .results().map(mr -> mr.group(0))
+                    .anyMatch(s -> !fieldName.part().contains(s))) // Only check random portion of the name
                 return true;
         }
 
