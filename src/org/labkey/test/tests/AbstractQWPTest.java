@@ -19,6 +19,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
+import org.labkey.test.WebTestHelper;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -39,7 +40,7 @@ public abstract class AbstractQWPTest extends BaseWebDriverTest
     protected void testQWPDemoPage()
     {
         log("Begin testing QWPDemo page");
-        beginAt("/simpletest/" + getProjectName() + "/QWPDemo.view");
+        beginAt(WebTestHelper.buildURL("simpletest", getProjectName(), "QWPDemo"));
 
         log("Drop and reload QWPDemo test data");
         clickButton("Drop schema and clear test data");
@@ -60,7 +61,7 @@ public abstract class AbstractQWPTest extends BaseWebDriverTest
         getTabSignalsPairs().stream().forEach(this::testQWPTab);
 
         log("Drop QWPDemo test data");
-        beginAt("/simpletest/" + getProjectName() + "/QWPDemo.view");
+        beginAt(WebTestHelper.buildURL("simpletest", getProjectName(), "QWPDemo"));
         clickButton("Drop schema and clear test data"); // drop domain, needed for clean up project
     }
 

@@ -24,6 +24,7 @@ import org.labkey.remoteapi.security.BulkUpdateGroupCommand;
 import org.labkey.remoteapi.security.BulkUpdateGroupResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.tests.AuditLogTest;
 import org.labkey.test.util.APIUserHelper;
@@ -75,7 +76,10 @@ public class BulkUpdateGroupApiTest extends BaseWebDriverTest
         if (suffix.length() < 10)
             throw new IllegalArgumentException("Use a longer suffix for test user emails.");
 
-        beginAt("user/showUsers.view?inactive=true&Users.showRows=all&Users.Email~contains=" + suffix);
+        beginAt(WebTestHelper.buildURL("user", "showUsers", Map.of(
+            "inactive", "true",
+            "Users.showRows", "all",
+            "Users.Email~contains", suffix)));
         DataRegionTable usersTable = new DataRegionTable("Users", this);
 
         if (usersTable.getDataRowCount() > 0)

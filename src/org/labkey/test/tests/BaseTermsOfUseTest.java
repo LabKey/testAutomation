@@ -19,12 +19,14 @@ import org.junit.BeforeClass;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.WikiHelper;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 public class BaseTermsOfUseTest extends BaseWebDriverTest
 {
@@ -119,7 +121,7 @@ public class BaseTermsOfUseTest extends BaseWebDriverTest
         else // site-wide terms of use page
         {
             message = "Create site-wide terms of use page";
-            beginAt("/wiki/page.view?name=_termsOfUse");
+            beginAt(WebTestHelper.buildURL("wiki", "page", Map.of("name", TERMS_OF_USE_NAME)));
         }
         if (isElementPresent(Locator.linkContainingText("add a new page")))
         {

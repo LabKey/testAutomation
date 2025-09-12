@@ -21,32 +21,42 @@ import org.openqa.selenium.WebDriver;
 
 import java.util.function.Function;
 
-public class PageFactory<P extends LabKeyPage>
+public class PageFactory<P extends LabKeyPage<?>>
 {
-    private final RelativeUrl url;
-    private final Function<WebDriver, P> pageConstructor;
-    private final String containerPath = null;
+    private final RelativeUrl _url;
+    private final Function<WebDriver, P> _pageConstructor;
 
     PageFactory(RelativeUrl url, Function<WebDriver, P> pageConstructor)
     {
-        this.url = url.copy();
-        this.pageConstructor = pageConstructor;
+        this._url = url.copy();
+        this._pageConstructor = pageConstructor;
     }
 
     public final PageFactory<P> setContainerPath(String containerPath)
     {
-        url.setContainerPath(containerPath);
+        _url.setContainerPath(containerPath);
+        return this;
+    }
+
+    public final <T> PageFactory<P> addParameter(String name, T value)
+    {
+        _url.addParameter(name, value);
         return this;
     }
 
     public final P navigate(WebDriverWrapper driverWrapper)
     {
-        return navigate(driverWrapper, url);
+        return navigate(driverWrapper, _url);
+    }
+
+    public final P navigate(WebDriverWrapper driverWrapper, String containerPath)
+    {
+        return navigate(driverWrapper, _url.copy().setContainerPath(containerPath));
     }
 
     public final P navigate(WebDriverWrapper driverWrapper, Integer msTimeout)
     {
-        return navigate(driverWrapper, url.copy().setTimeout(msTimeout));
+        return navigate(driverWrapper, _url.copy().setTimeout(msTimeout));
     }
 
     protected P navigate(WebDriverWrapper driverWrapper, RelativeUrl url)
@@ -56,6 +66,6 @@ public class PageFactory<P extends LabKeyPage>
             url = url.copy().setContainerPath(driverWrapper.getCurrentContainerPath());
         }
         url.navigate(driverWrapper);
-        return pageConstructor.apply(driverWrapper.getDriver());
+        return _pageConstructor.apply(driverWrapper.getDriver());
     }
 }

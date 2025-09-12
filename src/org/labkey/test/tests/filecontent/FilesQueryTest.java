@@ -21,11 +21,12 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
-import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.FileBrowser;
 import org.labkey.test.components.DomainDesignerPage;
+import org.labkey.test.pages.query.UpdateQueryRowPage;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.FileBrowserExtendedProperty;
@@ -35,6 +36,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 @Category({Daily.class, FileBrowser.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 6)
@@ -169,17 +171,17 @@ public class FilesQueryTest extends BaseWebDriverTest
     private void ensureFilesUpToDate()
     {
         log("Clear cache so that exp.files will do a sync immediately");
-        beginAt("/admin/caches.view?clearCaches=1", 120000);
+        beginAt(WebTestHelper.buildURL("admin", "caches", Map.of("clearCaches", "1")), 120000);
         goToProjectHome();
     }
 
     private void insertFileRecord(String absoluteFilePath, String customProp)
     {
         DataRegionTable table = new DataRegionTable.DataRegionFinder(getDriver()).find();
-        table.clickInsertNewRow();
-        setFormElement(Locator.name("quf_CustomProp"), customProp);
-        setFormElement(Locator.name("quf_AbsoluteFilePath"), absoluteFilePath);
-        clickButton("Submit");
+        UpdateQueryRowPage page = table.clickInsertNewRow();
+        page.setField("CustomProp", customProp);
+        page.setField("AbsoluteFilePath", absoluteFilePath);
+        page.submit();
     }
 
     private void verifyFileRecordsGrid(boolean canSeeAbsolutePath, String filename, String customPropValue, String relativeFolder)
@@ -206,9 +208,9 @@ public class FilesQueryTest extends BaseWebDriverTest
     {
         DataRegionTable table = new DataRegionTable.DataRegionFinder(getDriver()).find();
         int rowIndex = table.getRowIndex("Name", filename);
-        table.clickEditRow(rowIndex);
-        setFormElement(Locator.name("quf_CustomProp"), updatedCustomPropValue);
-        clickButton("Submit");
+        UpdateQueryRowPage page = table.clickEditRow(rowIndex);
+        page.setField("CustomProp", updatedCustomPropValue);
+        page.submit();
 
         List<String> results = table.getRowDataAsText(rowIndex, "Custom Prop");
         Assert.assertEquals("Custom Prop is not as expected", updatedCustomPropValue, results.get(0));

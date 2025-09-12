@@ -45,7 +45,7 @@ public class SchemaHelper
     @LogMethod
     public void deleteSchema(String containerPath, String schemaToDelete)
     {
-        _test.beginAt("/query/" + containerPath + "/admin.view");
+        _test.beginAt(WebTestHelper.buildURL("query", containerPath, "admin"));
         Locator link = Locator.xpath("//td[text()='" + schemaToDelete + "']/..//a[text()='delete']");
         _test.waitAndClickAndWait(link);
         _test.assertTextPresent("Are you sure you want to delete the schema '" + schemaToDelete + "'? The tables and queries defined in this schema will no longer be accessible.");

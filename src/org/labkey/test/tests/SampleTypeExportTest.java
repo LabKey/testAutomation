@@ -19,6 +19,7 @@ import org.junit.BeforeClass;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
@@ -49,7 +50,7 @@ public class SampleTypeExportTest extends AbstractExportTest
 
         initTest._containerHelper.createProject(initTest.getProjectName(), null);
 
-        initTest.beginAt("/" + initTest.getProjectName() + "/experiment-listSampleTypes.view");
+        initTest.beginAt(WebTestHelper.buildURL("experiment", initTest.getProjectName(), "listSampleTypes"));
         SampleTypeHelper sampleHelper = new SampleTypeHelper(initTest);
         sampleHelper.createSampleType(new SampleTypeDefinition(SAMPLE_TYPE_NAME)
                         .setFields(List.of(new FieldDefinition("Barcode", FieldDefinition.ColumnType.String))),
@@ -143,7 +144,7 @@ public class SampleTypeExportTest extends AbstractExportTest
     @Override
     protected void goToDataRegionPage()
     {
-        beginAt("/" + getProjectName() + "/experiment-listSampleTypes.view");
+        beginAt(WebTestHelper.buildURL("experiment", getProjectName(), "listSampleTypes"));
         clickAndWait(Locator.linkWithText(SAMPLE_TYPE_NAME));
     }
 

@@ -48,6 +48,13 @@ public class UpdateQueryRowPage extends LabKeyPage<UpdateQueryRowPage.ElementCac
         return new UpdateQueryRowPage(webDriverWrapper.getDriver());
     }
 
+    public static UpdateQueryRowPage beginAtInsertRowPage(WebDriverWrapper webDriverWrapper, String containerPath, String schemaName, String queryName)
+    {
+        webDriverWrapper.beginAt(WebTestHelper.buildURL("query", containerPath, "insertQueryRow",
+            Map.of("schemaName", schemaName, "query.queryName", queryName)));
+        return new UpdateQueryRowPage(webDriverWrapper.getDriver());
+    }
+
     public void update(Map<String, ?> fields)
     {
         setFields(fields);

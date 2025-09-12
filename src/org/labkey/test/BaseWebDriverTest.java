@@ -1418,7 +1418,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 }
             }
             msSinceTestStart = System.currentTimeMillis() - previousLeakCheck;
-            beginAt("/admin/memTracker.view?gc=1&clearCaches=1", 120000);
+            beginAt(WebTestHelper.buildURL("admin", "memTracker", Map.of("gc", 1, "clearCaches", 1)), 120000);
             if (!isTextPresent("In-Use Objects"))
                 throw new IllegalStateException("Asserts must be enabled to track memory leaks; add -ea to your server VM params and restart or add -DmemCheck=false to your test VM params.");
             leakCount = getImageWithAltTextCount("expand/collapse");
@@ -1612,7 +1612,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         int rowCount, coveredActions, totalActions;
         double actionCoveragePercent;
         String actionCoveragePercentString;
-        beginAt("/admin/actions.view");
+        beginAt(WebTestHelper.buildURL("admin", "actions"));
 
         rowCount = getTableRowCount(ACTION_SUMMARY_TABLE_NAME);
         if (getTableCellText(Locator.id(ACTION_SUMMARY_TABLE_NAME), rowCount - 1, 0).equals("Total"))
@@ -1689,7 +1689,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     protected void setSelectedFields(String containerPath, String schema, String query, String viewName, String[] fields)
     {
         pushLocation();
-        beginAt("/query" + containerPath + "/internalNewView.view");
+        beginAt(WebTestHelper.buildURL("query", containerPath, "internalNewView"));
         setFormElement(Locator.name("ff_schemaName"), schema);
         setFormElement(Locator.name("ff_queryName"), query);
         if (viewName != null)

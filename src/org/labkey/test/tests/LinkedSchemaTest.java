@@ -29,9 +29,11 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Data;
 import org.labkey.test.components.CustomizeView;
+import org.labkey.test.pages.list.BeginPage;
 import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.pages.list.GridPage;
 import org.labkey.test.pages.query.QueryMetadataEditorPage;
+import org.labkey.test.pages.query.SourceQueryPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldInfo;
 import org.labkey.test.params.experiment.DataClassDefinition;
@@ -44,7 +46,6 @@ import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.AuditLogHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
-import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SchemaHelper;
 import org.labkey.test.util.TestDataGenerator;
 import org.labkey.test.util.exp.DataClassAPIHelper;
@@ -680,18 +681,16 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         listDef.getCreateCommand().execute(createDefaultConnection(), getProjectName() + "/" + SOURCE_FOLDER);
 
         log("** Importing some data...");
-        beginAt("/" + PROJECT_NAME + "/" + SOURCE_FOLDER + "/list-begin.view");
+        BeginPage.beginAt(this, PROJECT_NAME + "/" + SOURCE_FOLDER);
         _listHelper.goToList(LIST_NAME);
         _listHelper.clickImportData()
                 .setText(LIST_DATA)
                 .submit();
 
         log("** Applying metadata xml override to list...");
-        beginAt("/query/" + PROJECT_NAME + "/" + SOURCE_FOLDER + "/sourceQuery.view?schemaName=lists&query.queryName=" + LIST_NAME + "#metadata");
-        setCodeEditorValue("metadataText", LIST_METADATA_OVERRIDE);
-        clickButton("Save", 0);
-        waitForElement(Locator.id("status").withText("Saved"), WAIT_FOR_JAVASCRIPT);
-        waitForElementToDisappear(Locator.id("status").withText("Saved"), WAIT_FOR_JAVASCRIPT);
+        SourceQueryPage page = SourceQueryPage.beginAt(this, PROJECT_NAME + "/" + SOURCE_FOLDER, "lists", LIST_NAME);
+        page.setMetadataXml(LIST_METADATA_OVERRIDE);
+        page.clickSaveAndFinish();
     }
 
     @LogMethod
@@ -713,20 +712,15 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         _schemaHelper.createLinkedSchema(getProjectName() + "/" + TARGET_FOLDER, A_PEOPLE_SCHEMA_NAME, sourceContainerPath, null, "lists", LIST_NAME + "," + QUERY_NAME, A_PEOPLE_METADATA);
 
         log("** Applying metadata to " + LIST_NAME + " in linked schema container");
-        beginAt("/query/" + PROJECT_NAME + "/" + TARGET_FOLDER + "/sourceQuery.view?schemaName=" + A_PEOPLE_SCHEMA_NAME + "&query.queryName=" + LIST_NAME + "#metadata");
-        setCodeEditorValue("metadataText", A_PEOPLE_LIST_METADATA_OVERRIDE);
-        clickButton("Save", 0);
-        waitForElement(Locator.id("status").withText("Saved"), WAIT_FOR_JAVASCRIPT);
-        waitForElementToDisappear(Locator.id("status").withText("Saved"), WAIT_FOR_JAVASCRIPT);
+        SourceQueryPage sourceQueryPage = SourceQueryPage.beginAt(this, PROJECT_NAME + "/" + TARGET_FOLDER, A_PEOPLE_SCHEMA_NAME, LIST_NAME);
+        sourceQueryPage.setMetadataXml(A_PEOPLE_LIST_METADATA_OVERRIDE);
+        sourceQueryPage.clickSaveAndFinish();
 
         log("** Applying metadata to " + QUERY_NAME + " in linked schema container");
-        beginAt("/query/" + PROJECT_NAME + "/" + TARGET_FOLDER + "/sourceQuery.view?schemaName=" + A_PEOPLE_SCHEMA_NAME + "&queryName=" + QUERY_NAME);
+        sourceQueryPage = SourceQueryPage.beginAt(this, PROJECT_NAME + "/" + TARGET_FOLDER, A_PEOPLE_SCHEMA_NAME, QUERY_NAME);
         assertElementPresent(Locator.tagWithClass("div", "labkey-customview-message").withText("This query is not editable"));
-        _ext4Helper.clickExt4Tab("XML Metadata");
-        setCodeEditorValue("metadataText", A_PEOPLE_QUERY_METADATA_OVERRIDE);
-        clickButton("Save", 0);
-        waitForElement(Locator.id("status").withText("Saved"), WAIT_FOR_JAVASCRIPT);
-        waitForElementToDisappear(Locator.id("status").withText("Saved"), WAIT_FOR_JAVASCRIPT);
+        sourceQueryPage.setMetadataXml(A_PEOPLE_QUERY_METADATA_OVERRIDE);
+        sourceQueryPage.clickSaveAndFinish();
     }
 
     @LogMethod

@@ -86,6 +86,7 @@ public class Crawler
     private static final Set<ControllerActionId> _actionsWithErrors = new HashSet<>();
     private static final Set<String> _urlsChecked = new HashSet<>();
     private static final Map<String, CrawlStats> _crawlStats = new LinkedHashMap<>();
+    private static final Set<ControllerActionId> _controllerFirstUrls = new HashSet<>();
 
     // All parameters seen by the crawler. Used to randomly attempt injection against parameters not found in UI
     private static final LinkedHashMap<String,String> _dictionary = new LinkedHashMap<>();
@@ -609,8 +610,9 @@ public class Crawler
 
         private void checkControllerRelativeUrl()
         {
-            if (_actionId != null && _actionId.isControllerFirstUrl() && WebTestHelper.isUseContainerRelativeUrl())
+            if (_actionId != null && _actionId.isControllerFirstUrl() && WebTestHelper.isUseContainerRelativeUrl() && !_controllerFirstUrls.contains(_actionId))
             {
+                _controllerFirstUrls.add(_actionId);
                 RuntimeException ex = new RuntimeException("Found a controller-first URL (%s) on %s".formatted(getUrlText(), getOrigin()));
                 if (TestProperties.isControllerFirstUrlFatal())
                     throw ex;

@@ -55,6 +55,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -493,7 +494,9 @@ public class NabAssayTest extends AbstractAssayTest
     //Issue 17050: UnsupportedOperationException from org.labkey.nab.query.NabProtocolSchema$NabResultsQueryView.createDataView
     private void directBrowserQueryTest()
     {
-        beginAt("/query/Nab%20Test%20Verify%20Project/selectRows.api?schemaName=assay&queryName=TestAssayNab%20Data");
+        beginAt(WebTestHelper.buildURL("query", "Nab Test Verify Project", "selectRows.api", Map.of(
+                "schemaName", "assay",
+                "queryName", "TestAssayNab Data")));
         assertTextPresent("metaData");
     }
 
