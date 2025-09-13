@@ -239,6 +239,10 @@ public class EscapeUtil
             .replace("%29", ")");
     }
 
+    /**
+     * Form field prefix prepended to all query update form field names.
+     * See {@link org.labkey.api.query.QueryUpdateForm#PREFIX}.
+     */
     public static final String FORM_FIELD_PREFIX = "quf_";
     private static final char BACKSLASH = '\\';
     private static final String SPECIAL_CHARS = BACKSLASH + "\";=,";
