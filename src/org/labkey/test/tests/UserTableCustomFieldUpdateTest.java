@@ -8,7 +8,6 @@ import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.query.UpdateRowsCommand;
 import org.labkey.test.BaseWebDriverTest;
-import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
@@ -16,12 +15,12 @@ import org.labkey.test.components.DomainDesignerPage;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.EscapeUtil;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 3)
@@ -63,10 +62,7 @@ public class UserTableCustomFieldUpdateTest extends BaseWebDriverTest
         _userHelper.createUser(TEST_USER);
     }
 
-    /*
-        Regression coverage for Issue 48185: Update of the User table clears any non-specified custom fields
-     */
-    @Test
+    @Test // Issue 48185
     public void testCustomFieldUpdate() throws IOException, CommandException
     {
         log("Extract the userId");
@@ -78,15 +74,15 @@ public class UserTableCustomFieldUpdateTest extends BaseWebDriverTest
         goToHome();
         impersonate(TEST_USER);
         {
-            goToMyAccount();
-            clickButton("Edit");
-            setFormElement(Locator.name(EscapeUtil.getFormFieldName(CUSTOM_FIELD1)), "Value for " + CUSTOM_FIELD1);
-            setFormElement(Locator.name(EscapeUtil.getFormFieldName(CUSTOM_FIELD2)), "Value for " + CUSTOM_FIELD2);
-            clickButton("Submit");
+            goToMyAccount()
+                .clickEdit()
+                .setField(CUSTOM_FIELD1, "Value for " + CUSTOM_FIELD1)
+                .setField(CUSTOM_FIELD2, "Value for " + CUSTOM_FIELD2)
+                .clickSubmit();
         }
         stopImpersonating();
 
-        HashMap row = new HashMap<String, String>();
+        Map<String, Object> row = new HashMap<>();
         row.put("UserId", userId);
         row.put(CUSTOM_FIELD1, "Updated value for " + CUSTOM_FIELD1);
 
@@ -109,5 +105,4 @@ public class UserTableCustomFieldUpdateTest extends BaseWebDriverTest
     {
         _userHelper.deleteUsers(false, TEST_USER);
     }
-
 }
