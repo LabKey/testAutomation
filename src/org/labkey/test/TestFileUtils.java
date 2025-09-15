@@ -44,10 +44,12 @@ import org.openqa.selenium.NotFoundException;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -116,6 +118,15 @@ public abstract class TestFileUtils
         {
             throw new RuntimeException(fail);
         }
+    }
+
+    public static int getFileRowCount(final File file) throws IOException
+    {
+        BufferedReader reader = new BufferedReader(new FileReader(file));
+        int lines = 0;
+        while (reader.readLine() != null) lines++;
+        reader.close();
+        return lines;
     }
 
     public static String getStreamContentsAsString(InputStream is) throws IOException
