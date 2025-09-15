@@ -214,11 +214,11 @@ public abstract class TestFileUtils
     {
         if (_modulesDir == null)
         {
-            _modulesDir = new File(getDefaultDeployDir(), "modules");
+            // Module root when deploying from embedded distribution
+            _modulesDir =  new File(getDefaultDeployDir(), "embedded/modules");
             if (!_modulesDir.isDirectory())
             {
-                // Module root when deploying from embedded distribution
-                _modulesDir = new File(getDefaultDeployDir(), "embedded/modules");
+                _modulesDir = new File(getDefaultDeployDir(), "modules");
             }
         }
         return _modulesDir;
