@@ -205,6 +205,17 @@ public class SampleTypeHelper extends WebDriverWrapper
         clickButton("Submit");
     }
 
+    public void updateRow(int rowIndex, Map<String, String> fieldValues)
+    {
+        DataRegionTable drt = getSamplesDataRegionTable();
+        drt.clickEditRow(rowIndex);
+        for (Map.Entry<String, String> fieldValue : fieldValues.entrySet())
+        {
+            setFormElement(Locator.name("quf_" + fieldValue.getKey()), fieldValue.getValue());
+        }
+        clickButton("Submit");
+    }
+
     public void bulkImport(File dataFile)
     {
         fileImport(dataFile, IMPORT_OPTION);
