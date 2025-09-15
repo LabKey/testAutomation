@@ -19,6 +19,7 @@ package org.labkey.test;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.intellij.lang.annotations.Language;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.selenium.LazyWebElement;
@@ -373,11 +374,13 @@ public abstract class Locator extends By
         return wrappedContext.getValue();
     }
 
+    @Contract(pure = true)
     public LazyWebElement<?> findWhenNeeded(SearchContext context)
     {
         return new LazyWebElement<>(this, context);
     }
 
+    @Contract(pure = true)
     public RefindingWebElement refindWhenNeeded(SearchContext context)
     {
         return new RefindingWebElement(this, context);
@@ -391,11 +394,13 @@ public abstract class Locator extends By
                 new NoSuchElementException("Unable to find element: " + getFindDescription(context)));
     }
 
+    @Contract(pure = true)
     public WebElement findElementOrNull(SearchContext context)
     {
         return findOptionalElement(context).orElse(null);
     }
 
+    @Contract(pure = true)
     public Optional<WebElement> findOptionalElement(SearchContext context)
     {
         List<WebElement> elements = findElements(context);
@@ -404,6 +409,7 @@ public abstract class Locator extends By
         return Optional.of(elements.get(0));
     }
 
+    @Contract(pure = true)
     @Override
     public List<WebElement> findElements(SearchContext context)
     {
@@ -454,11 +460,13 @@ public abstract class Locator extends By
         }
     }
 
+    @Contract(pure = true)
     public boolean existsIn(SearchContext context)
     {
         return findElementOrNull(context) != null;
     }
 
+    @Contract(pure = true)
     public boolean isDisplayed(SearchContext context)
     {
         WebElement element = findElementOrNull(context);
@@ -471,6 +479,7 @@ public abstract class Locator extends By
      * @param context Search context.
      * @return True if there are any elements visible, false otherwise.
      */
+    @Contract(pure = true)
     public boolean areAnyVisible(SearchContext context)
     {
         List<WebElement> elements = findElements(context);

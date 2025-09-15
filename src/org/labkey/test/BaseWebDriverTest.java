@@ -67,6 +67,7 @@ import org.labkey.test.pages.search.SearchResultsPage;
 import org.labkey.test.params.ContainerInfo;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldKey;
+import org.labkey.test.params.SchemaKey;
 import org.labkey.test.teamcity.TeamCityUtils;
 import org.labkey.test.util.APIAssayHelper;
 import org.labkey.test.util.APIContainerHelper;
@@ -140,6 +141,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -1416,7 +1418,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 }
             }
             msSinceTestStart = System.currentTimeMillis() - previousLeakCheck;
-            beginAt("/admin/memTracker.view?gc=1&clearCaches=1", 120000);
+            beginAt(WebTestHelper.buildURL("admin", "memTracker", Map.of("gc", 1, "clearCaches", 1)), 120000);
             if (!isTextPresent("In-Use Objects"))
                 throw new IllegalStateException("Asserts must be enabled to track memory leaks; add -ea to your server VM params and restart or add -DmemCheck=false to your test VM params.");
             leakCount = getImageWithAltTextCount("expand/collapse");
@@ -1610,7 +1612,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         int rowCount, coveredActions, totalActions;
         double actionCoveragePercent;
         String actionCoveragePercentString;
-        beginAt("/admin/actions.view");
+        beginAt(WebTestHelper.buildURL("admin", "actions"));
 
         rowCount = getTableRowCount(ACTION_SUMMARY_TABLE_NAME);
         if (getTableCellText(Locator.id(ACTION_SUMMARY_TABLE_NAME), rowCount - 1, 0).equals("Total"))
@@ -1687,7 +1689,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     protected void setSelectedFields(String containerPath, String schema, String query, String viewName, String[] fields)
     {
         pushLocation();
-        beginAt("/query" + containerPath + "/internalNewView.view");
+        beginAt(WebTestHelper.buildURL("query", containerPath, "internalNewView"));
         setFormElement(Locator.name("ff_schemaName"), schema);
         setFormElement(Locator.name("ff_queryName"), query);
         if (viewName != null)
@@ -1705,14 +1707,14 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     }
 
     @LogMethod
-    private ExportFolderPage prepareForFolderExport(@Nullable String folderName, boolean exportSecurityGroups, boolean exportRoleAssignments, boolean includeSubfolders, boolean includeFiles, boolean exportETLDefination)
+    private ExportFolderPage prepareForFolderExport(@Nullable String folderName, boolean exportSecurityGroups, boolean exportRoleAssignments, boolean includeSubfolders, boolean includeFiles, boolean exportETLDefinition)
     {
         if (folderName != null)
             clickFolder(folderName);
         ExportFolderPage exportFolderPage = goToFolderManagement().goToExportTab();
 
-        if (exportETLDefination)
-            exportFolderPage.includeETLDefintions(exportETLDefination);
+        if (exportETLDefinition)
+            exportFolderPage.includeETLDefinitions(exportETLDefinition);
 
         if (exportSecurityGroups)
             exportFolderPage.includeSecurityGroups(exportSecurityGroups);
@@ -2187,32 +2189,38 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             assertTextPresent(searchFor);
         }
     }
-    public void selectSchema(String schemaName)
+
+    /**
+     * @param schemaKey encoded schema key
+     */
+    public void selectSchema(String schemaKey)
     {
-        String[] schemaParts = schemaName.split("\\.");
-        selectSchema(schemaParts);
+        selectSchema(SchemaKey.parse(schemaKey));
     }
-    // Helper methods for interacting with the query schema browser
+
     public void selectSchema(String[] schemaParts)
     {
-        StringBuilder schemaWithParents = new StringBuilder();
-        String separator = "";
-        for (String schemaPart : schemaParts)
-        {
-            schemaWithParents.append(separator).append(schemaPart);
-            separator = ".";
+        selectSchema(SchemaKey.fromParts(schemaParts));
+    }
 
-            Locator.XPathLocator loc = Locator.tag("tr").withClass("x4-grid-row").append("/td/div/span").withText(schemaPart).precedingSibling("img").withClass("x4-tree-icon");
+    public void selectSchema(SchemaKey schemaKey)
+    {
+        Iterator<SchemaKey> iterator = schemaKey.getIterator();
+        while (iterator.hasNext())
+        {
+            schemaKey = iterator.next();
+
+            Locator.XPathLocator loc = Locator.tag("tr").withClass("x4-grid-row").append("/td/div/span").withText(schemaKey.getName()).precedingSibling("img").withClass("x4-tree-icon");
 
             //first load of schemas might a few seconds
             shortWait().until(ExpectedConditions.elementToBeClickable(loc));
-            Locator.XPathLocator selectedSchema = Locator.xpath("//tr").withClass("x4-grid-row-selected").append("/td/div/span").withText(schemaPart);
+            Locator.XPathLocator selectedSchema = Locator.xpath("//tr").withClass("x4-grid-row-selected").append("/td/div/span").withText(schemaKey.getName());
 
-            if (getDriver().getCurrentUrl().endsWith("schemaName=" + schemaPart))
+            if (getDriver().getCurrentUrl().endsWith("schemaName=" + EscapeUtil.encode(schemaKey.toString())))
                 waitForElement(selectedSchema);
             if (isElementPresent(selectedSchema))
                 continue; // already selected
-            log("Selecting schema " + schemaWithParents + " in the schema browser...");
+            log("Selecting schema " + schemaKey.getFullName() + " in the schema browser...");
             waitForElementToDisappear(Locator.xpath("//tbody[starts-with(@id, 'treeview')]/tr[not(starts-with(@id, 'treeview'))]"));
             // select/expand tree node
             try
@@ -2243,19 +2251,23 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     public void selectQuery(String schemaName, String queryName)
     {
-        selectQuery(schemaName.split("\\."), queryName);
+        selectQuery(SchemaKey.parse(schemaName), queryName);
     }
 
-    public void selectQuery(String[] schemaPart, String queryName)
+    public void selectQuery(String[] schemaParts, String queryName)
     {
-        String schemaName = StringUtils.join(schemaPart, ".");
-        log("Selecting query " + schemaName + "." + queryName + " in the schema browser...");
-        selectSchema(schemaPart);
+        selectQuery(SchemaKey.fromParts(schemaParts), queryName);
+    }
+
+    public void selectQuery(SchemaKey schemaKey, String queryName)
+    {
+        log("Selecting query " + schemaKey.getFullName() + "." + queryName + " in the schema browser...");
+        selectSchema(schemaKey);
         mouseOver(Locator.byClass(".x4-tab-button")); // Move away from schema tree to dismiss tooltip
-        waitAndClick(Ext4Helper.Locators.tab(schemaName)); // Click schema tab to make sure query list is visible
+        waitAndClick(Ext4Helper.Locators.tab(schemaKey.getFullName())); // Click schema tab to make sure query list is visible
         WebElement queryLink = Locator.tagWithClass("table", "lk-qd-coltable").append(Locator.tagWithClass("span", "labkey-link")).withText(queryName).notHidden().waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
         queryLink.click();
-        waitForElement(Locator.tagWithClass("div", "lk-qd-name").startsWith(schemaName + "." + queryName), 30000);
+        waitForElement(Locator.tagWithClass("div", "lk-qd-name").startsWith(schemaKey.getFullName() + "." + queryName), 30000);
     }
 
     public DataRegionTable viewQueryData(String schemaName, String queryName)
@@ -2283,12 +2295,11 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         clickAndWait(Locator.linkContainingText("edit source"));
         return new SourceQueryPage(getDriver());
     }
+
     public void editQueryProperties(String schemaName, String queryName)
     {
-        selectQuery(schemaName, queryName);
-        Locator loc = Locator.tagWithText("a", "edit properties");
-        waitForElement(loc, WAIT_FOR_JAVASCRIPT);
-        clickAndWait(loc);
+        String url = WebTestHelper.buildRelativeUrl("query", getCurrentContainerPath(), "propertiesQuery", Map.of("schemaName", schemaName, "query.queryName", queryName));
+        beginAt(url);
     }
 
     public void createNewQuery(String schemaName)
@@ -2308,8 +2319,12 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         return new NewQueryPage(getDriver());
     }
 
-
     protected void createQuery(String container, String name, String schemaName, String sql, String xml, boolean inheritable)
+    {
+        createQuery(container, name, schemaName, sql, xml, inheritable, null);
+    }
+
+    protected void createQuery(String container, String name, String schemaName, String sql, String xml, boolean inheritable, @Nullable String description)
     {
         SourceQueryPage sourcePage = createQuery(container, name, schemaName);
         sourcePage.setSource(sql);
@@ -2318,13 +2333,16 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         {
             sourcePage.setMetadataXml(xml);
         }
-        sourcePage.clickSave();
-        if (inheritable)
+        sourcePage.clickSave(); // This seems very slow... maybe clickSaveAndFinish() instead?
+        if (inheritable || !StringUtils.isEmpty(description))
         {
-            String queryURL = "query/" + container + "/begin.view?schemaName=" + schemaName;
+            String queryURL = buildURL("query", getProjectName(), "begin",  Map.of("schemaName", schemaName));
             beginAt(queryURL);
             editQueryProperties(schemaName, name);
-            selectOptionByValue(Locator.name("inheritable"), "true");
+            if (inheritable)
+                selectOptionByValue(Locator.name("inheritable"), "true");
+            if (description != null)
+                setFormElement(Locator.tagWithName("textarea", "description"), description);
             clickButton("Save");
         }
     }

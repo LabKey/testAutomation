@@ -37,9 +37,12 @@ import org.labkey.remoteapi.query.RowsResponse;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.remoteapi.query.Sort;
 import org.labkey.serverapi.reader.TabLoader;
+import org.labkey.test.TestProperties;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.util.DomainUtils.DomainKind;
 import org.labkey.test.util.data.ColumnNameMapper;
+import org.labkey.test.util.data.RecordIterator;
 import org.labkey.test.util.data.TestDataUtils;
 import org.labkey.test.util.query.QueryApiHelper;
 
@@ -55,7 +58,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
@@ -566,7 +568,7 @@ public class TestDataGenerator
         return domainName;
     }
 
-    public static String randomDomainName(@Nullable String namePart, @Nullable DomainUtils.DomainKind domainKind)
+    public static String randomDomainName(@Nullable String namePart, @Nullable DomainKind domainKind)
     {
         return randomDomainName(namePart, null, null, domainKind);
     }
@@ -579,10 +581,10 @@ public class TestDataGenerator
      * @param numEndChars Number of random characters at end of name
      * @return name containing the given name part and appended random characters that should be a valid domain name
      */
-    public static String randomDomainName(@Nullable String namePart, @Nullable Integer numStartChars, @Nullable Integer numEndChars, @Nullable DomainUtils.DomainKind domainKind)
+    public static String randomDomainName(@Nullable String namePart, @Nullable Integer numStartChars, @Nullable Integer numEndChars, @Nullable DomainKind domainKind)
     {
         String _namePart = namePart == null ? "" : namePart;
-        DomainUtils.DomainKind _domainKind = domainKind == null ? DomainUtils.DomainKind.SampleSet : domainKind;
+        DomainKind _domainKind = domainKind == null ? DomainKind.SampleSet : domainKind;
         String charSet = ALPHANUMERIC_STRING + DOMAIN_SPECIAL_STRING;
         int currentTries = 0;
         String domainName = randomName(_namePart, getNumChars(numStartChars, 5), getNumChars(numEndChars, 50), charSet, null);
@@ -615,14 +617,14 @@ public class TestDataGenerator
         return randomFieldName(part, exclusion, null);
     }
 
-    public static String randomFieldName(String part, @Nullable String exclusion, DomainUtils.DomainKind domainKind)
+    public static String randomFieldName(String part, @Nullable String exclusion, DomainKind domainKind)
     {
         return randomFieldName(part, null, null, exclusion, domainKind);
     }
 
-    public static String randomFieldName(@NotNull String part, @Nullable Integer numStartChars, @Nullable Integer numEndChars, @Nullable String exclusion, @Nullable DomainUtils.DomainKind domainKind)
+    public static String randomFieldName(@NotNull String part, @Nullable Integer numStartChars, @Nullable Integer numEndChars, @Nullable String exclusion, @Nullable DomainKind domainKind)
     {
-        DomainUtils.DomainKind _domainKind = domainKind == null ? DomainUtils.DomainKind.SampleSet : domainKind;
+        DomainKind _domainKind = domainKind == null ? DomainKind.SampleSet : domainKind;
 
         // use the characters that we know are encoded in fieldKeys plus characters that we know clients are using
         // Issue 53197: Field name with double byte character can cause client side exception in Firefox when trying to customize grid view.
@@ -642,7 +644,22 @@ public class TestDataGenerator
         return randomFieldName;
     }
 
-    private static boolean isDomainAndFieldNameInvalid(DomainUtils.DomainKind domainKind, @Nullable String domainName, @Nullable String fieldName)
+    private static boolean isDomainAndFieldNameInvalid(DomainKind domainKind, @Nullable String domainName, @Nullable String fieldName)
+    {
+        if (fieldName != null && fieldName.length() > 64 && fieldName.toLowerCase().contains("key")) // Not guaranteed but likely a list key
+            return true; // Issue 53706: List key field name length is limited to 64 characters
+
+        if (TestProperties.isRemoteNameValidationEnabled())
+        {
+            return isNameInvalidRemote(domainKind, domainName, fieldName);
+        }
+        else
+        {
+            return isNameInvalidLocal(domainKind, domainName, fieldName);
+        }
+    }
+
+    private static boolean isNameInvalidRemote(DomainKind domainKind, @Nullable String domainName, @Nullable String fieldName)
     {
         SimplePostCommand command = new SimplePostCommand("property", "validateDomainAndFieldNames");
         JSONObject domainDesign = new JSONObject();
@@ -677,6 +694,35 @@ public class TestDataGenerator
         {
             throw new RuntimeException("Failed to validate domain field name: %s.".formatted(fieldName), e);
         }
+    }
+
+    public static boolean isNameInvalidLocal(DomainKind domainKind, @Nullable String domainName, @Nullable String fieldName)
+    {
+        if (domainName != null)
+        {
+            if (!Character.isLetterOrDigit(domainName.charAt(0)))
+                return true; // domain needs to start with alphanumeric char
+            if (Pattern.matches("(.*\\s--[^ ].*)|(.*\\s-[^- ].*)", domainName))
+                return true; // domain name must not contain space followed by dash. (command like: Issue 49161)
+
+            int maxLength = switch (domainKind)
+            {
+                case Assay -> 200 - 13; // Make room for "{$domainName} Batch Fields" domain
+                case SampleSet -> 100;
+                default -> 200; // Sources, lists, and datasets allow 200 character names
+            };
+            if (domainName.length() > maxLength)
+                return true;
+        }
+        if (fieldName != null)
+        {
+            if (fieldName.length() > 200)
+                return true;
+            if (Pattern.matches(".*:[a-zA-Z]{3}.*", fieldName)) // Avoid illegal patterns like ":Date"
+                return true;
+        }
+
+        return false;
     }
 
     public static <T> T randomChoice(List<T> choices)
@@ -770,7 +816,7 @@ public class TestDataGenerator
      */
     public File writeData(String fileName)
     {
-        return writeData(fileName, new FileRowIterator(getFieldsForFile(), _rows));
+        return writeData(fileName, new RecordIterator(getFieldsForFile(), _rows));
     }
 
     /**
@@ -781,7 +827,7 @@ public class TestDataGenerator
      */
     public File writeData(String fileName, int numRows)
     {
-        return writeData(fileName, new FileRowIterator(getFieldsForFile(), this::generateRow, numRows));
+        return writeData(fileName, new RecordIterator(getFieldsForFile(), this::generateRow, numRows));
     }
 
     /**
@@ -980,72 +1026,4 @@ public class TestDataGenerator
         return DomainUtils.doesDomainExist(containerPath, schema, queryName);
     }
 
-}
-
-class FileRowIterator implements Iterator<List<Object>>
-{
-    private final List<String> headers;
-    private final Iterator<Map<String, Object>> rows;
-
-    private boolean firstRow = true;
-
-    public FileRowIterator(@NotNull List<String> headers, @NotNull Iterator<Map<String, Object>> rows)
-    {
-        this.headers = Objects.requireNonNull(headers);
-        this.rows = Objects.requireNonNull(rows);
-    }
-
-    public FileRowIterator(@NotNull List<String> headers, @NotNull Supplier<Map<String, Object>> rowSupplier, final int rowCount)
-    {
-        this(headers, new Iterator<>()
-        {
-            int count = 0;
-
-            @Override
-            public boolean hasNext()
-            {
-                return count < rowCount;
-            }
-
-            @Override
-            public Map<String, Object> next()
-            {
-                count++;
-                return rowSupplier.get();
-            }
-        });
-    }
-
-    public FileRowIterator(@NotNull List<String> headers, @NotNull List<Map<String, Object>> rows)
-    {
-        this(headers, rows.iterator());
-    }
-
-    @Override
-    public boolean hasNext()
-    {
-        return firstRow || rows.hasNext();
-    }
-
-    @Override
-    public List<Object> next()
-    {
-        if (!hasNext())
-            throw new NoSuchElementException();
-
-        if (firstRow)
-        {
-            firstRow = false;
-            return Collections.unmodifiableList(headers);
-        }
-        else
-        {
-            return rowMapToList(rows.next());
-        }
-    }
-
-    private List<Object> rowMapToList(Map<String, Object> row)
-    {
-        return headers.stream().map(h -> row.getOrDefault(h, "")).toList();
-    }
 }

@@ -24,6 +24,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestProperties;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Base;
 import org.labkey.test.categories.DRT;
 import org.labkey.test.categories.Daily;
@@ -108,7 +109,7 @@ public class BasicAdminTest extends BaseWebDriverTest
         goToHome();
         final String expectedTitle = getDriver().getTitle();
 
-        beginAt("/login/initialUser.view");
+        beginAt(WebTestHelper.buildURL("login", "initialUser"));
         Assert.assertEquals("Initial user action did not redirect properly when logged in", expectedTitle, getDriver().getTitle());
     }
 

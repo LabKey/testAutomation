@@ -40,6 +40,7 @@ import org.labkey.test.components.ui.grids.FieldReferenceManager.FieldReference;
 import org.labkey.test.pages.ImportDataPage;
 import org.labkey.test.pages.TimeChartWizard;
 import org.labkey.test.pages.query.UpdateQueryRowPage;
+import org.labkey.test.pages.reports.ManageViewsPage;
 import org.labkey.test.params.FieldKey;
 import org.labkey.test.selenium.LazyWebElement;
 import org.labkey.test.selenium.RefindingWebElement;
@@ -164,6 +165,12 @@ public class DataRegionTable extends DataRegion
                     DataRegion.PANEL_SHOW_SIGNAL);
         }
         return getCustomizeView();
+    }
+
+    public ManageViewsPage openManageViews()
+    {
+        getViewsMenu().clickSubMenu(false, "Manage Views");
+        return new ManageViewsPage(getDriver());
     }
 
     protected DataRegionExportHelper getExportPanel()

@@ -42,7 +42,9 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Data;
 import org.labkey.test.pages.core.admin.ShowAuditLogPage;
+import org.labkey.test.pages.query.ExecuteQueryPage;
 import org.labkey.test.pages.query.InsertExternalSchemaPage;
+import org.labkey.test.pages.query.UpdateQueryRowPage;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.SchemaHelper;
 import org.labkey.test.util.SimpleHttpResponse;
@@ -87,7 +89,7 @@ public class ExternalSchemaTest extends BaseWebDriverTest
         {
             this(null, text, intNotNull, dateTimeNotNull);
         }
-        
+
         public Row(Integer rowid, String text, int intNotNull, Date dateTimeNotNull)
         {
             this.rowid = rowid;
@@ -108,7 +110,7 @@ public class ExternalSchemaTest extends BaseWebDriverTest
         {
             this(test, intNotNull, null);
         }
-        
+
         public Row(int rowid, String test, int intNotNull)
         {
             this(rowid, test, intNotNull, null);
@@ -188,7 +190,7 @@ public class ExternalSchemaTest extends BaseWebDriverTest
     void ensureExternalSchema(String containerPath)
     {
         log("** Create ExternalSchema: " + USER_SCHEMA_NAME);
-        beginAt("/query/" + containerPath + "/admin.view");
+        beginAt(WebTestHelper.buildURL("query", containerPath, "admin"));
 
         if (!isElementPresent(Locator.linkWithText("reload")))
         {
@@ -206,7 +208,7 @@ public class ExternalSchemaTest extends BaseWebDriverTest
 
     void setEditable(String containerPath, boolean editable)
     {
-        beginAt("/query/" + containerPath + "/admin.view");
+        beginAt(WebTestHelper.buildURL("query", containerPath, "admin"));
         clickAndWait(Locator.linkWithText("edit"));
         if (editable)
             checkCheckbox(Locator.checkboxByName("editable"));
@@ -322,10 +324,11 @@ public class ExternalSchemaTest extends BaseWebDriverTest
     void doTestContainer()
     {
         log("** Trying to visit schema in container where it hasn't been configured");
-        beginAt("/query/" + PROJECT_NAME + "/" + FOLDER_NAME + "/executeQuery.view?query.queryName=" + TABLE_NAME + "&schemaName=" + USER_SCHEMA_NAME);
+        ExecuteQueryPage.getPageFactory(USER_SCHEMA_NAME, TABLE_NAME)
+                .navigate(this, PROJECT_NAME + "/" + FOLDER_NAME);
         assertTitleEquals("404: Error Page -- The specified schema does not exist");
     }
-    
+
     void doTestViaForm()
     {
         String containerPath = StringUtils.join(Arrays.asList(PROJECT_NAME, FOLDER_NAME), "/");
@@ -348,7 +351,7 @@ public class ExternalSchemaTest extends BaseWebDriverTest
         log("** Delete via form");
         deleteViaForm(containerPath, new int[] { pk1, pk2});
     }
-    
+
     void doTestViaJavaApi() throws Exception
     {
         String containerPath = StringUtils.join(Arrays.asList(PROJECT_NAME, FOLDER_NAME), "/");
@@ -360,7 +363,7 @@ public class ExternalSchemaTest extends BaseWebDriverTest
         Row[] selected = selectViaJavaApi(containerPath, cn, pks);
         for (int i = 0; i < inserted.length; i++)
             assertEquals(inserted[i], selected[i]);
-        
+
         Row[] updated = new Row[] {new Row(pks[0], "AA", 30), new Row(pks[1], "BB", 40)};
         updateViaJavaApi(containerPath, cn, updated);
 
@@ -379,7 +382,7 @@ public class ExternalSchemaTest extends BaseWebDriverTest
         }
 
         updateDuplicateRows(PROJECT_NAME, cn, updated);
-        
+
         try
         {
             log("** Try to delete via api from a different container");
@@ -392,20 +395,20 @@ public class ExternalSchemaTest extends BaseWebDriverTest
 //            assertEquals("The row is from the wrong container.", ex.getMessage());
 //            assertEquals("org.labkey.api.view.UnauthorizedException", ex.getProperties().get("exceptionClass"));
         }
-        
+
         deleteViaJavaApi(containerPath, cn, pks);
     }
-    
+
     int[] insertViaJavaApi(String containerPath, Connection cn, Row... rows) throws IOException, CommandException
     {
         log("** Inserting via api...");
         InsertRowsCommand cmd = new InsertRowsCommand(USER_SCHEMA_NAME, TABLE_NAME);
         for (Row row : rows)
             cmd.addRow(row.toMap());
-        
+
         RowsResponse resp = cmd.execute(cn, containerPath);
         assertEquals("Expected to insert " + rows.length + " rows", rows.length, resp.getRowsAffected().intValue());
-        
+
         int[] pks = new int[rows.length];
         for (int i = 0; i < rows.length; i++)
         {
@@ -413,10 +416,10 @@ public class ExternalSchemaTest extends BaseWebDriverTest
             assertTrue(row.containsKey("rowid"));
             pks[i] = ((Number)row.get("rowid")).intValue();
         }
-        
+
         return pks;
     }
-    
+
     Row[] selectViaJavaApi(String containerPath, Connection cn, int... pks) throws IOException, CommandException
     {
         log("** Select via api: " + join(",", pks) + "...");
@@ -433,7 +436,7 @@ public class ExternalSchemaTest extends BaseWebDriverTest
             Map<String, Object> row = resp.getRows().get(i);
             Integer rowid = (Integer)row.get("RowId");
             assertEquals("Expected requested rowid and selected rowid to be the same", rowid.intValue(), pks[i]);
-            
+
             String text = (String)row.get("Text");
             int intNotNull = ((Number)row.get("IntNotNull")).intValue();
             Date datetimeNotNull = (Date)row.get("DatetimeNotNull");
@@ -442,7 +445,7 @@ public class ExternalSchemaTest extends BaseWebDriverTest
         }
         return rows.toArray(new Row[0]);
     }
-    
+
     Row[] updateViaJavaApi(String containerPath, Connection cn, Row... rows) throws ParseException, IOException, CommandException
     {
         log("** Updating via api...");
@@ -483,17 +486,17 @@ public class ExternalSchemaTest extends BaseWebDriverTest
         }
 
     }
-    
+
     void deleteViaJavaApi(String containerPath, Connection cn, int... pks) throws IOException, CommandException
     {
         log("** Deleting via api: pks=" + join(",", pks) + "...");
         DeleteRowsCommand cmd = new DeleteRowsCommand(USER_SCHEMA_NAME, TABLE_NAME);
         for (Integer pk : pks)
             cmd.addRow(Collections.singletonMap("RowId", pk));
-        
+
         RowsResponse resp = cmd.execute(cn, containerPath);
         assertEquals("Expected to delete " + pks.length + " rows", pks.length, resp.getRowsAffected().intValue());
-        
+
         SelectRowsCommand selectCmd = new SelectRowsCommand(USER_SCHEMA_NAME, TABLE_NAME);
         selectCmd.addFilter("RowId", join(";", pks), Filter.Operator.IN);
         SelectRowsResponse selectResp = selectCmd.execute(cn, containerPath);
@@ -512,17 +515,17 @@ public class ExternalSchemaTest extends BaseWebDriverTest
     private void _insertViaForm(String containerPath, String text, int intNotNull)
     {
         log("** Inserting via form: text='" + text + "', intNotNull=" + intNotNull + "...");
-        beginAt("/query/" + containerPath + "/insertQueryRow.view?query.queryName=" + TABLE_NAME + "&schemaName=" + USER_SCHEMA_NAME);
-        setFormElement(Locator.name("quf_Text"), text);
-        setFormElement(Locator.name("quf_IntNotNull"), String.valueOf(intNotNull));
-        setFormElement(Locator.name("quf_DatetimeNotNull"), "2008-09-25");
-        submit();
+        UpdateQueryRowPage page = UpdateQueryRowPage.beginAtInsertRowPage(this, containerPath, USER_SCHEMA_NAME, TABLE_NAME);
+        page.setField("Text", text);
+        page.setField("IntNotNull", String.valueOf(intNotNull));
+        page.setField("DatetimeNotNull", "2008-09-25");
+        page.submit();
     }
 
     public void insertViaFormNoPerms(String containerPath, String text, int intNotNull)
     {
         log("** Inserting via form: text='" + text + "', intNotNull=" + intNotNull + "...");
-        beginAt("/query/" + containerPath + "/insertQueryRow.view?query.queryName=" + TABLE_NAME + "&schemaName=" + USER_SCHEMA_NAME);
+        UpdateQueryRowPage.beginAtInsertRowPage(this, containerPath, USER_SCHEMA_NAME, TABLE_NAME);
         assertTextPresent("You do not have permission");
     }
 
@@ -552,11 +555,11 @@ public class ExternalSchemaTest extends BaseWebDriverTest
     private void _updateViaForm(String containerPath, int pk, String text, int intNotNull)
     {
         log("** Updating via form: RowId=" + pk + ", text='" + text + "', intNotNull=" + intNotNull + "...");
-        beginAt("/query/" + containerPath + "/updateQueryRow.view?query.queryName=" + TABLE_NAME + "&schemaName=" + USER_SCHEMA_NAME + "&RowId=" + pk);
-        setFormElement(Locator.name("quf_Text"), text);
-        setFormElement(Locator.name("quf_IntNotNull"), String.valueOf(intNotNull));
-        setFormElement(Locator.name("quf_DatetimeNotNull"), "2008-09-25");
-        submit();
+        UpdateQueryRowPage page = UpdateQueryRowPage.beginAt(this, containerPath, USER_SCHEMA_NAME, TABLE_NAME, pk);
+        page.setField("Text", text);
+        page.setField("IntNotNull", String.valueOf(intNotNull));
+        page.setField("DatetimeNotNull", "2008-09-25");
+        page.submit();
     }
 
     public void updateViaFormNoPerms(String containerPath, int pk, String text, int intNotNull) throws IOException
@@ -585,9 +588,11 @@ public class ExternalSchemaTest extends BaseWebDriverTest
     private void _deleteViaForm(String containerPath, int[] pk)
     {
         log("** Deleting via form: pks=" + join(",", pk) + "...");
-        beginAt("/query/" + containerPath + "/executeQuery.view?query.queryName=" + TABLE_NAME + "&schemaName=" + USER_SCHEMA_NAME);
+        ExecuteQueryPage page = ExecuteQueryPage.getPageFactory(USER_SCHEMA_NAME, TABLE_NAME)
+                .setContainerPath(containerPath)
+                .navigate(this);
 
-        DataRegionTable drt = new DataRegionTable("query", getDriver());
+        DataRegionTable drt = page.getDataRegion();
         for (int aPk : pk)
             drt.checkCheckboxByPrimaryKey(aPk);
         doAndWaitForPageToLoad(() ->

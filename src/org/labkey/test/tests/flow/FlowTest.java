@@ -38,7 +38,6 @@ import org.labkey.test.params.FieldKey;
 import org.labkey.test.tests.AuditLogTest;
 import org.labkey.test.util.DataRegion;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.FileBrowserHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
@@ -59,6 +58,7 @@ import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.labkey.test.WebTestHelper.buildURL;
 
 @Category({Daily.class, Flow.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 18)
@@ -250,7 +250,7 @@ public class FlowTest extends BaseFlowTest
 
     private void beginAtFCSFileQueryView()
     {
-        beginAt("/flow" + getContainerPath() + "/query.view?schemaName=flow&query.queryName=FCSFiles");
+        beginAt(buildURL("flow", getContainerPath(), "query", Map.of("schemaName", "flow", "query.queryName", "FCSFiles")));
     }
 
     private void confirmKeywordValue(String keywordName, String expectedKeywordValue)
@@ -581,7 +581,8 @@ public class FlowTest extends BaseFlowTest
         createQuery(getProjectName(), "GraphQuery", graphQuery, null, true);
 
         log("** Executing custom query with Graph columns");
-        beginAt("/flow" + getContainerPath() + "/query.view?schemaName=flow&query.queryName=GraphQuery&query.showGraphs=Inline");
+        beginAt(buildURL("flow", getContainerPath(), "query",
+            Map.of("schemaName", "flow", "query.queryName", "GraphQuery", "query.showGraphs", "Inline")));
 
         // verify Issue 16304: query over flow.FCSFiles doesn't include URL for Name column
         DataRegionTable table = new DataRegionTable("query", getDriver());
@@ -786,7 +787,7 @@ public class FlowTest extends BaseFlowTest
     @LogMethod
     private void verifyReport(@LoggedParam String reportName)
     {
-        beginAt("/flow" + getContainerPath() + "/query.view?schemaName=flow&query.queryName=FCSAnalyses");
+        beginAt(buildURL("flow", getContainerPath(), "query", Map.of("schemaName", "flow", "query.queryName", "FCSAnalyses")));
 
         FieldKey reportNameFk = FieldKey.fromParts(reportName);
 
@@ -817,7 +818,7 @@ public class FlowTest extends BaseFlowTest
     @LogMethod(quiet = true)
     private void verifyDeleted(@LoggedParam String reportName)
     {
-        beginAt("/flow" + getContainerPath() + "/query.view?schemaName=flow&query.queryName=FCSAnalyses");
+        beginAt(buildURL("flow", getContainerPath(), "query", Map.of("schemaName", "flow", "query.queryName", "FCSAnalyses")));
         DataRegionTable drt = new DataRegionTable("query", getDriver());
         String error = BootstrapLocators.warningBanner.findElement(drt.getComponentElement()).getText();
         assertEquals("Ignoring filter/sort on column '" + reportName + ".Response' because it does not exist.", error);

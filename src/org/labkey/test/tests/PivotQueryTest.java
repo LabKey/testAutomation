@@ -25,6 +25,7 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Data;
 import org.labkey.test.components.ChartTypeDialog;
+import org.labkey.test.pages.query.ExecuteQueryPage;
 import org.labkey.test.pages.query.SourceQueryPage;
 import org.labkey.test.pages.study.DatasetDesignerPage;
 import org.labkey.test.params.FieldDefinition;
@@ -38,8 +39,8 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 @Category({Daily.class, Data.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 7)
@@ -86,8 +87,8 @@ public class PivotQueryTest extends ReportTest
     @Test
     public void testPivotQuery()
     {
-        beginAt("/query/" + getProjectName() + "/executeQuery.view?schemaName=study&query.queryName=LuminexPivot");
-        DataRegionTable pivotTable = new DataRegionTable("query", this);
+        ExecuteQueryPage queryPage = ExecuteQueryPage.beginAt(this, getProjectName(), "study", "LuminexPivot");
+        DataRegionTable pivotTable = queryPage.getDataRegion();
         pivotTable.setSort("ParticipantId", SortDirection.ASC);
 
         Locator.XPathLocator region = Locator.tagWithAttribute("table", "data-region-name", "query");
@@ -119,7 +120,7 @@ public class PivotQueryTest extends ReportTest
         String contents = getText(ConcInRange_CONCAT_cell);
         assertNotNull("The GROUP_CONCAT cell is empty", contents);
         String[] concats = contents.split(", *");
-        assertTrue("Expected 5 GROUP_CONCAT values", concats.length == 5);
+        assertEquals("Expected 5 GROUP_CONCAT values", 5, concats.length);
     }
 
     @Test
