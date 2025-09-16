@@ -18,6 +18,7 @@ import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.params.list.IntListDefinition;
 import org.labkey.test.params.list.ListDefinition;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
@@ -303,11 +304,12 @@ public class AllowedFileExtensionTest extends AllowedFileExtensionBaseTest
         waitForElement(Locator.button("Back"));
         clickButton("Back");
 
-        waitForElement(Locator.name("quf_" + attachmentField));
+        var attachmentFieldLocator = Locator.name(EscapeUtil.getFormFieldName(attachmentField));
+        waitForElement(attachmentFieldLocator);
 
         // Issue 53026, the fields are cleared after hitting the back button. Unlikely the issue will be fixed.
         log("Clear the file field.");
-        FileInput el = FileInput.FileInput(Locator.name("quf_" + attachmentField), getDriver()).findWhenNeeded();
+        FileInput el = FileInput.FileInput(attachmentFieldLocator, getDriver()).findWhenNeeded();
         el.clear();
 
         File fileAgain = fileMap.get(".txt");

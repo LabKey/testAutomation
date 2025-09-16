@@ -18,6 +18,7 @@ package org.labkey.test.util;
 import org.apache.commons.text.StringEscapeUtils;
 import org.eclipse.jetty.util.URIUtil;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.labkey.test.params.FieldKey;
 
 import java.net.URLDecoder;
@@ -236,5 +237,35 @@ public class EscapeUtil
             // We generally don't encode parentheses in app resource paths
             .replace("%28", "(")
             .replace("%29", ")");
+    }
+
+    /**
+     * Form field prefix prepended to all query update form field names.
+     * See {@link org.labkey.api.query.QueryUpdateForm#PREFIX}.
+     */
+    public static final String FORM_FIELD_PREFIX = "quf_";
+    private static final char BACKSLASH = '\\';
+    private static final String SPECIAL_CHARS = BACKSLASH + "\";=,";
+
+    public static String getFormFieldName(String columnName)
+    {
+        return getFormFieldName(columnName, FORM_FIELD_PREFIX);
+    }
+
+    /**
+     * Escapes special characters in a column name to be used as a form field name.
+     * See associated {@link org.labkey.api.query.QueryUpdateForm#getFormFieldName}
+     */
+    public static String getFormFieldName(String columnName, @Nullable String prefix)
+    {
+        StringBuilder fieldName = new StringBuilder();
+        for (char c : columnName.toCharArray())
+        {
+            if (SPECIAL_CHARS.indexOf(c) >= 0)
+                fieldName.append(BACKSLASH);
+            fieldName.append(c);
+        }
+
+        return prefix == null ? fieldName.toString() : prefix + fieldName;
     }
 }

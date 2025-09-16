@@ -12,6 +12,7 @@ import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.OptionSelect;
 import org.labkey.test.pages.LabKeyPage;
+import org.labkey.test.util.EscapeUtil;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -185,7 +186,7 @@ public class UpdateQueryRowPage extends LabKeyPage<UpdateQueryRowPage.ElementCac
         {
             if (!fieldMap.containsKey(name))
             {
-                fieldMap.put(name, Locator.name("quf_" + name).findElement(this));
+                fieldMap.put(name, Locator.name(EscapeUtil.getFormFieldName(name)).findElement(this));
             }
             return fieldMap.get(name);
         }

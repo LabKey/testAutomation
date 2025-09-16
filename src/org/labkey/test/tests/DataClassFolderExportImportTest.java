@@ -124,13 +124,13 @@ public class DataClassFolderExportImportTest extends BaseWebDriverTest
 
         clickAndWait(Locator.linkWithText(testDataClass));
         DataRegionTable sourceTable = DataRegionTable.DataRegion(getDriver()).withName("query").waitFor();
-        for (int i=0; i<_attachments.size(); i++)
-        {                           // for the nonce, we cannot add file attachments to an attachment column via remoteAPI
-                                    // issue https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=42191 tracks this
-                                    // until it is fixed we will have to add attachments via the UI, like this
-            sourceTable.clickEditRow(i);
-            setFormElement(Locator.input("quf_" + attachmentColumnName), _attachments.get(i));
-            clickButton("Submit");
+        for (int i = 0; i < _attachments.size(); i++)
+        {
+            // For the nonce, we cannot add file attachments to an attachment column via remoteAPI
+            // Issue 42191 tracks this until it is fixed we will have to add attachments via the UI
+            sourceTable.clickEditRow(i)
+                    .setField(attachmentColumnName, _attachments.get(i))
+                    .submit();
         }
         List<Map<String, String>> sourceRowData = sourceTable.getTableData();
 
@@ -306,7 +306,7 @@ public class DataClassFolderExportImportTest extends BaseWebDriverTest
             shortWait().until(ExpectedConditions.stalenessOf(deleteButton));
         }
 
-        for(int index = 0; index < missingValueIndicators.size(); index++)
+        for (int index = 0; index < missingValueIndicators.size(); index++)
         {
             clickButton("Add", 0);
             WebElement mvInd = Locator.css("#mvIndicatorsDiv input[name=mvIndicators]").index(index).waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);

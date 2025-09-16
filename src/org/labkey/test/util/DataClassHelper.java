@@ -143,7 +143,7 @@ public class DataClassHelper extends WebDriverWrapper
                 .clickInsertNewRow();
         for (Map.Entry<String, String> fieldValue : fieldValues.entrySet())
         {
-            setFormElement(Locator.name("quf_" + fieldValue.getKey()), fieldValue.getValue());
+            setFormElement(Locator.name(EscapeUtil.getFormFieldName(fieldValue.getKey())), fieldValue.getValue());
         }
         clickButton("Submit");
     }
