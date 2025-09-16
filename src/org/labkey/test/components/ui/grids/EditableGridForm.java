@@ -26,5 +26,12 @@ public abstract class EditableGridForm<T> extends EditableGrid
         return getComponentAfterSave();
     }
 
+    public T cancelChanges()
+    {
+        Locator.tagWithClass("button", "btn-default").withText("Cancel").findElement(_outerScope).click();
+        getWrapper().shortWait().until(ExpectedConditions.stalenessOf(getComponentElement()));
+        return getComponentAfterSave();
+    }
+
     protected abstract T getComponentAfterSave();
 }

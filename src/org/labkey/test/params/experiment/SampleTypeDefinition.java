@@ -101,7 +101,7 @@ public class SampleTypeDefinition extends DomainProps
         return _inventoryMetricUnit;
     }
 
-    protected SampleTypeDefinition setInventoryMetricUnit(MetricUnit inventoryMetricUnit)
+    public SampleTypeDefinition setInventoryMetricUnit(MetricUnit inventoryMetricUnit)
     {
         _inventoryMetricUnit = inventoryMetricUnit;
         return this;

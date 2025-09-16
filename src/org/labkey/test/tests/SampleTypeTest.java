@@ -32,6 +32,7 @@ import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.SortDirection;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
@@ -51,6 +52,7 @@ import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldDefinition.ColumnType;
 import org.labkey.test.params.FieldDefinition.LookupInfo;
 import org.labkey.test.params.FieldInfo;
+import org.labkey.test.params.experiment.MetricUnit;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.AuditLogHelper;
@@ -1858,6 +1860,150 @@ public class SampleTypeTest extends BaseWebDriverTest
         assertTextNotPresent("unique_constraint_test_fieldname_2");
     }
 
+    @Test
+    public void testAmountsAndUnitsWithDisplayUnit()
+    {
+        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
+        String sampleTypeName = "Sample Amounts and Units with Display Unit Test";
+
+        clickProject(PROJECT_NAME);
+        SampleTypeDefinition sampleTypeDefinition = new SampleTypeDefinition(sampleTypeName);
+        sampleTypeDefinition.setInventoryMetricUnit(TestMetricUnit.L);
+        SampleTypeAPIHelper.createEmptySampleType(getProjectName(), sampleTypeDefinition);
+        refresh();
+        sampleHelper.goToSampleType(sampleTypeName);
+
+        log("verify error when inserting a row with an amount but no unit");
+        sampleHelper.insertRow(Map.of("Name", "AU-ERR-1", "StoredAmount", "0.0"));
+        assertTextPresent("No Units value provided for Amount 0.0.");
+        clickButton("Cancel");
+        log("verify error when inserting a row with a unit but no amount");
+        sampleHelper.insertRow(Map.of("Name", "AU-ERR-2", "Units", "mL"));
+        assertTextPresent("No Amount value provided for Units mL.");
+        clickButton("Cancel");
+
+        log("verify error when inserting a row with incompatible units");
+        sampleHelper.insertRow(Map.of("Name", "AU-ERR-1", "StoredAmount", "5.0", "Units", "mg"));
+        assertTextPresent("Units value (mg) is not compatible with the display units (mL).");
+        clickButton("Cancel");
+        sampleHelper.insertRow(Map.of("Name", "AU-ERR-1", "StoredAmount", "5.0", "Units", "unit"));
+        assertTextPresent("Units value (unit) is not compatible with the display units (mL).");
+        clickButton("Cancel");
+
+        log("verify inserting a row with compatible units succeeds and are converted");
+        sampleHelper.insertRow(Map.of("Name", "AU-SUCCESS-1", "StoredAmount", "1.0", "Units", "mL"));
+        verifySampleAmountUnitValues("AU-SUCCESS-1", "0.001", "L");
+        sampleHelper.insertRow(Map.of("Name", "AU-SUCCESS-2", "StoredAmount", "0.002", "Units", "L"));
+        verifySampleAmountUnitValues("AU-SUCCESS-2", "0.002", "L");
+        sampleHelper.insertRow(Map.of("Name", "AU-SUCCESS-3", "StoredAmount", "3000", "Units", "uL"));
+        verifySampleAmountUnitValues("AU-SUCCESS-3", "0.003", "L");
+
+        log("verify updating a row with incompatible units fails");
+        sampleHelper.updateRow(0, Map.of("Units", "mg"));
+        assertTextPresent("Units value (mg) is not compatible with the display units (mL).");
+        clickButton("Cancel");
+
+        log("verify updating a row with compatible units succeeds and are converted");
+        sampleHelper.updateRow(2, Map.of("StoredAmount", "0.00123", "Units", "mL"));
+        verifySampleAmountUnitValues("AU-SUCCESS-1", "1.23E-6", "L");
+
+        log("verify rounding precision for display units");
+        sampleHelper.updateRow(2, Map.of("StoredAmount", "0.12345678999", "Units", "L"));
+        verifySampleAmountUnitValues("AU-SUCCESS-1", "0.12345679", "L");
+
+        log("verify bulk import with incompatible units fails");
+        sampleHelper.bulkImportExpectingError(List.of(Map.of("Name", "AU-BULK-ERR-1", "StoredAmount", "0", "Units", "kg")), SampleTypeHelper.IMPORT_OPTION);
+        assertTextPresent("Units value (kg) is not compatible with the display units (mL).");
+        clickButton("Cancel");
+
+        log("verify bulk import with compatible units succeeds and are converted");
+        sampleHelper.bulkImport(List.of(Map.of("Name", "AU-BULK-SUCCESS-1", "StoredAmount", "0", "Units", "mL")));
+        verifySampleAmountUnitValues("AU-BULK-SUCCESS-1", "0.0", "L");
+        sampleHelper.bulkImport(List.of(Map.of("Name", "AU-BULK-SUCCESS-2", "StoredAmount", "0.005", "Units", "L")));
+        verifySampleAmountUnitValues("AU-BULK-SUCCESS-2", "0.005", "L");
+        sampleHelper.bulkImport(List.of(Map.of("Name", "AU-BULK-SUCCESS-3", "StoredAmount", "4000", "Units", "uL")));
+        verifySampleAmountUnitValues("AU-BULK-SUCCESS-3", "0.004", "L");
+
+        log("verify sorting on converted amounts works as expected");
+        sampleHelper.getSamplesDataRegionTable().setSort("Amount", SortDirection.ASC);
+        assertEquals("Sample order sorted asc not as expected",
+                List.of("AU-BULK-SUCCESS-1", "AU-SUCCESS-2", "AU-SUCCESS-3", "AU-BULK-SUCCESS-3", "AU-BULK-SUCCESS-2", "AU-SUCCESS-1"),
+                sampleHelper.getSamplesDataRegionTable().getColumnDataAsText("Name"));
+
+        log("verify filtering on converted amounts works as expected");
+        sampleHelper.getSamplesDataRegionTable().setFilter("Amount", "Is Greater Than", "0.004");
+        assertEquals("Sample order filtered not as expected",
+                List.of("AU-BULK-SUCCESS-2", "AU-SUCCESS-1"),
+                sampleHelper.getSamplesDataRegionTable().getColumnDataAsText("Name"));
+    }
+
+    @Test
+    public void testAmountsAndUnitsWithoutDisplayUnit()
+    {
+        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
+        String sampleTypeName = "Sample Amounts and Units without Display Unit Test";
+
+        clickProject(PROJECT_NAME);
+        CreateSampleTypePage createPage = sampleHelper
+                .goToCreateNewSampleType()
+                .setName(sampleTypeName);
+        assertTextNotPresent("Amount Display Units");
+        createPage.clickSave();
+        sampleHelper.goToSampleType(sampleTypeName);
+
+        log("verify that inserting a row with an amount or unit requires both fields to be filled in");
+        // insert row with amount but not unit (error expected)
+        sampleHelper.insertRow(Map.of("Name", "AU-ERR-1", "StoredAmount", "5.0"));
+        assertTextPresent("No Units value provided for Amount 5.0.");
+        clickButton("Cancel");
+        // insert row with unit but not amount (error expected)
+        sampleHelper.insertRow(Map.of("Name", "AU-ERR-2", "Units", "mg"));
+        assertTextPresent("No Amount value provided for Units mg.");
+        clickButton("Cancel");
+        // insert row with both amount and unit (success)
+        sampleHelper.insertRow(Map.of("Name", "AU-SUCCESS-1", "StoredAmount", "5.0", "Units", "mg"));
+        verifySampleAmountUnitValues("AU-SUCCESS-1", "5", "mg");
+
+        log("verify that updating a row with an amount or unit requires both fields to be filled in");
+        // update row with amount but not unit (error expected)
+        sampleHelper.updateRow(0, Map.of("Units", ""));
+        assertTextPresent("No Units value provided for Amount 5.0.");
+        clickButton("Cancel");
+        // update row with unit but not amount (error expected)
+        sampleHelper.updateRow(0, Map.of("StoredAmount", ""));
+        assertTextPresent("No Amount value provided for Units mg.");
+        clickButton("Cancel");
+        // update row with both amount and unit (success)
+        sampleHelper.updateRow(0, Map.of("StoredAmount", "10.0123", "Units", "g"));
+        verifySampleAmountUnitValues("AU-SUCCESS-1", "10.0123", "g");
+
+        log("verify that bulk import with an amount or unit requires both fields to be filled in");
+        // bulk import with amount but not unit (error expected)
+        sampleHelper.bulkImportExpectingError(List.of(Map.of("Name", "AU-BULK-ERR-1", "StoredAmount", "0")), SampleTypeHelper.IMPORT_OPTION);
+        assertTextPresent("When adding or updating samples, a Units value must be provided when there is a value for Amount.");
+        clickButton("Cancel");
+        // bulk import with unit but not amount (error expected)
+        sampleHelper.bulkImportExpectingError(List.of(Map.of("Name", "AU-BULK-ERR-2", "Units", "mL")), SampleTypeHelper.IMPORT_OPTION);
+        assertTextPresent("When adding or updating samples, a Amount value must be provided when there is a value for Units.");
+        clickButton("Cancel");
+        // bulk import with both amount and unit (success expected)
+        sampleHelper.bulkImport(List.of(Map.of("Name", "AU-BULK-SUCCESS-1", "StoredAmount", "0", "Units", "L")));
+        verifySampleAmountUnitValues("AU-BULK-SUCCESS-1", "0", "L");
+
+        log("verify the bulk import with RawAmount and RawUnits are ignored");
+        sampleHelper.bulkImport(List.of(Map.of("Name", "AU-BULK-SUCCESS-2", "RawAmount", "1000", "RawUnits", "kg")));
+        verifySampleAmountUnitValues("AU-BULK-SUCCESS-2", " ", " ");
+    }
+
+    private void verifySampleAmountUnitValues(String name, String expectedAmount, String expectedUnits)
+    {
+        DataRegionTable drt = DataRegionTable.findDataRegionWithinWebpart(this, "Sample Type Contents");
+        drt.setFilter("Name", "Equals", name);
+        checker().verifyEquals("StoredAmount value not as expected for sample " + name, expectedAmount, drt.getDataAsText(0, "Amount"));
+        checker().verifyEquals("Units value not as expected for sample " + name, expectedUnits, drt.getDataAsText(0, "Units"));
+        drt.clearAllFilters();
+    }
+
     private void viewRawTableMetadata(String sampleTypeName)
     {
         beginAt(WebTestHelper.buildURL("query", getProjectName(), "rawTableMetaData", Map.of("schemaName", "samples", "query.queryName", sampleTypeName)));
@@ -1921,5 +2067,37 @@ public class SampleTypeTest extends BaseWebDriverTest
     public BrowserType bestBrowser()
     {
         return BrowserType.CHROME;
+    }
+
+    public enum TestMetricUnit implements MetricUnit
+    {
+        G("g", "g (grams)"),
+        MG("mg", "mg (milligrams)"),
+        KG("kg", "kg (kilograms)"),
+        ML("mL", "mL (milliliters)"),
+        UL("uL", "uL (microliters)"),
+        L("L", "L (liters)"),
+        UNIT("unit", "unit");
+
+        private final String _value;
+        private final String _label;
+
+        TestMetricUnit(String value, String label)
+        {
+            _value = value;
+            _label = label;
+        }
+
+        @Override
+        public String getLabel()
+        {
+            return _label;
+        }
+
+        @Override
+        public String getValue()
+        {
+            return _value;
+        }
     }
 }

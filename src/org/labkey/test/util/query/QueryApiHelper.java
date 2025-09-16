@@ -8,6 +8,7 @@ import org.labkey.remoteapi.domain.DomainDetailsResponse;
 import org.labkey.remoteapi.domain.DropDomainCommand;
 import org.labkey.remoteapi.domain.GetDomainDetailsCommand;
 import org.labkey.remoteapi.query.BaseRowsCommand;
+import org.labkey.remoteapi.query.ContainerFilter;
 import org.labkey.remoteapi.query.DeleteRowsCommand;
 import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.ImportDataCommand;
@@ -71,21 +72,20 @@ public class QueryApiHelper
 
     public SelectRowsResponse selectRows(List<String> columns, @Nullable List<Filter> filters, @Nullable List<Sort> sorts) throws IOException, CommandException
     {
+        return selectRows(columns, filters, sorts, null);
+    }
+
+    public SelectRowsResponse selectRows(List<String> columns, @Nullable List<Filter> filters, @Nullable List<Sort> sorts, @Nullable ContainerFilter cf) throws IOException, CommandException
+    {
         SelectRowsCommand cmd = new SelectRowsCommand(_schema, _query);
-
-        if(filters != null)
-        {
+        if (filters != null)
             cmd.setFilters(new ArrayList<>(filters));
-        }
-
-        if(sorts != null)
-        {
+        if (sorts != null)
             cmd.setSorts(sorts);
-        }
-
         if (columns!=null)
             cmd.setColumns(columns);
-
+        if (cf != null)
+            cmd.setContainerFilter(cf);
         return cmd.execute(_connection, _containerPath);
     }
 
