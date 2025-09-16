@@ -3,6 +3,7 @@ package org.labkey.test.tests;
 import org.assertj.core.api.Assertions;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -10,11 +11,9 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Daily;
-import org.labkey.test.components.DomainDesignerPage;
-import org.labkey.test.components.domain.DomainFieldRow;
-import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.pages.admin.FileRootsManagementPage;
 import org.labkey.test.pages.experiment.UpdateSampleTypePage;
+import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.DataRegionTable;
@@ -58,14 +57,18 @@ public class AttachmentFieldTest extends BaseWebDriverTest
         portalHelper.addBodyWebPart("Lists");
     }
 
+    @Before
+    public void preTest()
+    {
+        goToProjectHome();
+    }
+
     @Test
     public void testFileFieldInSampleType()
     {
-        goToProjectHome();
         String sampleTypeName = "Sample type with attachment";
         String fieldName = "testFile";
         SampleTypeHelper sampleTypeHelper = new SampleTypeHelper(this);
-        goToProjectHome();
 
         log("Create a sample type with attachment field");
         sampleTypeHelper.createSampleType(new SampleTypeDefinition(sampleTypeName)
@@ -76,11 +79,13 @@ public class AttachmentFieldTest extends BaseWebDriverTest
         log("Inserting samples in sample Type");
         goToProjectHome();
         clickAndWait(Locator.linkWithText(sampleTypeName));
-        DataRegionTable samplesTable = DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
-        samplesTable.clickInsertNewRow();
-        setFormElement(Locator.name("quf_Name"), "S1");
-        setFormElement(Locator.name("quf_" + fieldName), SAMPLE_FILE);
-        clickButton("Submit");
+
+        DataRegionTable.DataRegion(getDriver()).withName("Material")
+                .waitFor()
+                .clickInsertNewRow()
+                .setField("Name", "S1")
+                .setField(fieldName, SAMPLE_FILE)
+                .submit();
 
         assertElementPresent(Locator.tagWithAttribute("a", "title", "Download attached file"));
 
@@ -113,7 +118,7 @@ public class AttachmentFieldTest extends BaseWebDriverTest
         fileRootsManagementPage = goToFolderManagement().goToFilesTab();
         fileRootsManagementPage.useCustomFileRoot(childFileRoot).clickSave();
 
-        // verify file path display for files that's present but outside of current file root
+        // verify file path display for files that are present but outside the current file root
         verifyUnavailableFile();
 
         // reset file root to default
@@ -125,7 +130,7 @@ public class AttachmentFieldTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(sampleTypeName));
         assertElementPresent(Locator.tagWithAttribute("a", "title", "Download attached file"));
 
-        // delete the file and verify file path that doesn't exist
+        // delete the file and verify the file path that doesn't exist
         goToModule("FileContent");
         _fileBrowserHelper.deleteFile("sampletype");
         verifyUnavailableFile();
@@ -139,12 +144,11 @@ public class AttachmentFieldTest extends BaseWebDriverTest
         waitForElement(Locator.tagContainingText("td", "jpg_sample.jpg (unavailable)"));
         assertElementNotPresent(Locator.tagWithAttribute("a", "title", "Download attached file"));
 
-        // "(unavailable)" suffix is present in update view
+        // "(unavailable)" suffix is present in the update view
         clickAndWait(Locator.tagWithText("a", "S1"));
         clickAndWait(Locator.tagWithClass("a", "labkey-text-link").withText("edit"));
         waitForElement(Locator.tagContainingText("div", "jpg_sample.jpg (unavailable)"));
         assertElementNotPresent(Locator.tagWithAttributeContaining("img", "src", "/_icons/image.png"));
-
     }
 
     @Test
@@ -152,26 +156,23 @@ public class AttachmentFieldTest extends BaseWebDriverTest
     {
         String listName = TestDataGenerator.randomDomainName("List with attachment field");
         String fieldName = TestDataGenerator.randomFieldName("Test File");
-        goToProjectHome();
         log("Creating the list");
         _listHelper.createList(getProjectName(), listName, "id");
 
         log("Adding a attachment field with Show attachment in Browser");
-        DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
-        DomainFormPanel panel = domainDesignerPage.fieldsPanel();
-        DomainFieldRow stringRow = panel
-                .addField(fieldName)
-                .setType(FieldDefinition.ColumnType.Attachment);
-        stringRow.setAttachmentBehavior("Show Attachment in Browser");
-        domainDesignerPage.clickFinish();
+        EditListDefinitionPage editPage = _listHelper.goToEditDesign(listName)
+                .addField(new FieldDefinition(fieldName, FieldDefinition.ColumnType.Attachment));
+        editPage.getFieldsPanel()
+                .getField(fieldName)
+                .setAttachmentBehavior("Show Attachment in Browser");
+        editPage.clickSave();
 
         log("Insert row in list");
-        goToProjectHome();
-        clickAndWait(Locator.linkWithText(listName));
-        DataRegionTable listTable = new DataRegionTable("query", getDriver());
-        listTable.clickInsertNewRow();
-        setFormElement(Locator.name("quf_" + fieldName), SAMPLE_FILE);
-        clickButton("Submit");
+        _listHelper.beginAtList(getProjectName(), listName);
+        new DataRegionTable("query", getDriver())
+                .clickInsertNewRow()
+                .setField(fieldName, SAMPLE_FILE)
+                .submit();
 
         log("Verify file opened in browser");
         Locator.tagWithAttributeContaining("img", "title", SAMPLE_FILE.getName()).findElement(getDriver()).click();
@@ -181,13 +182,12 @@ public class AttachmentFieldTest extends BaseWebDriverTest
         switchToMainWindow();
 
         log("Verify file is downloaded");
-        domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "lists", listName);
-        panel = domainDesignerPage.fieldsPanel();
-        panel.getField(fieldName).setAttachmentBehavior("Download Attachment");
-        domainDesignerPage.clickFinish();
+        editPage = _listHelper.goToEditDesign(listName);
+        editPage.getFieldsPanel()
+                .getField(fieldName)
+                .setAttachmentBehavior("Download Attachment");
+        editPage.clickSave();
 
-        goToProjectHome();
-        clickAndWait(Locator.linkWithText(listName));
         File downloadedFile = doAndWaitForDownload(() -> Locator.tagWithAttributeContaining("img", "title", SAMPLE_FILE.getName()).findElement(getDriver()).click());
         Assert.assertTrue("Downloaded file is empty", downloadedFile.length() > 0);
     }

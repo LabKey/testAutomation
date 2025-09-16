@@ -45,6 +45,7 @@ import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.AbstractDataRegionExportOrSignHelper;
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.TestDataGenerator;
 import org.labkey.test.util.TestDataValidator;
@@ -272,7 +273,7 @@ public class SampleTypeRemoteAPITest extends BaseWebDriverTest
         String mvIndicatorColName = "mvStringDataMVIndicator";
         materialsList.updateRow(dIndex, Map.of("mvStringData", "reallyUpdatedValue", mvIndicatorColName, "Q"));  // update the underlying value but set it mv-Q
         materialsList.clickEditRow(eIndex);
-        selectOptionByText(Locator.name("quf_"+mvIndicatorColName), "");    // clear the mv value, reveal underlying value
+        selectOptionByText(Locator.name(EscapeUtil.getFormFieldName(mvIndicatorColName)), "");    // clear the mv value, reveal underlying value
         clickButton("Submit");
 
         eIndex = materialsList.getRowIndex("Name", "E");
