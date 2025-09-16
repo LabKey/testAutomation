@@ -52,7 +52,7 @@ import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldDefinition.ColumnType;
 import org.labkey.test.params.FieldDefinition.LookupInfo;
 import org.labkey.test.params.FieldInfo;
-import org.labkey.test.params.experiment.MetricUnit;
+import org.labkey.test.params.experiment.InventoryMetricUnit;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.AuditLogHelper;
@@ -1868,7 +1868,7 @@ public class SampleTypeTest extends BaseWebDriverTest
 
         clickProject(PROJECT_NAME);
         SampleTypeDefinition sampleTypeDefinition = new SampleTypeDefinition(sampleTypeName);
-        sampleTypeDefinition.setInventoryMetricUnit(TestMetricUnit.L);
+        sampleTypeDefinition.setInventoryMetricUnit(InventoryMetricUnit.L);
         SampleTypeAPIHelper.createEmptySampleType(getProjectName(), sampleTypeDefinition);
         refresh();
         sampleHelper.goToSampleType(sampleTypeName);
@@ -2067,37 +2067,5 @@ public class SampleTypeTest extends BaseWebDriverTest
     public BrowserType bestBrowser()
     {
         return BrowserType.CHROME;
-    }
-
-    public enum TestMetricUnit implements MetricUnit
-    {
-        G("g", "g (grams)"),
-        MG("mg", "mg (milligrams)"),
-        KG("kg", "kg (kilograms)"),
-        ML("mL", "mL (milliliters)"),
-        UL("uL", "uL (microliters)"),
-        L("L", "L (liters)"),
-        UNIT("unit", "unit");
-
-        private final String _value;
-        private final String _label;
-
-        TestMetricUnit(String value, String label)
-        {
-            _value = value;
-            _label = label;
-        }
-
-        @Override
-        public String getLabel()
-        {
-            return _label;
-        }
-
-        @Override
-        public String getValue()
-        {
-            return _value;
-        }
     }
 }
