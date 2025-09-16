@@ -122,11 +122,12 @@ public abstract class TestFileUtils
 
     public static int getFileRowCount(final File file) throws IOException
     {
-        BufferedReader reader = new BufferedReader(new FileReader(file));
-        int lines = 0;
-        while (reader.readLine() != null) lines++;
-        reader.close();
-        return lines;
+        try (BufferedReader reader = new BufferedReader(new FileReader(file)))
+        {
+            int lines = 0;
+            while (reader.readLine() != null) lines++;
+            return lines;
+        }
     }
 
     public static String getStreamContentsAsString(InputStream is) throws IOException
