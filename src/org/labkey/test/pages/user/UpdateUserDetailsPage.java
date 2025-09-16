@@ -5,6 +5,7 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.pages.LabKeyPage;
+import org.labkey.test.util.EscapeUtil;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -109,7 +110,7 @@ public class UpdateUserDetailsPage extends LabKeyPage<UpdateUserDetailsPage.Elem
         {
             if (!formElements.containsKey(fieldName))
             {
-                Input input = Input.Input(Locator.name("quf_" + fieldName), getDriver()).find();
+                Input input = Input.Input(Locator.name(EscapeUtil.getFormFieldName(fieldName)), getDriver()).find();
                 formElements.put(fieldName, input);
             }
             return formElements.get(fieldName);

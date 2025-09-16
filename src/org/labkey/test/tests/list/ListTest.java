@@ -329,14 +329,14 @@ public class ListTest extends BaseWebDriverTest
         // Second row (Green)
         assertEquals(1, table.getRowIndex(TEST_DATA[TD_COLOR][1]));
         table.clickEditRow(1);
-        setFormElement(Locator.name("quf_" + _listColMonth.getName()), VALID_MONTHS[1]);  // Has a funny format -- need to post converted date
-        checkCheckbox(Locator.checkboxByName("quf_JewelTone"));
+        setFormElement(Locator.name(EscapeUtil.getFormFieldName(_listColMonth.getName())), VALID_MONTHS[1]);  // Has a funny format -- need to post converted date
+        checkCheckbox(Locator.checkboxByName(EscapeUtil.getFormFieldName("JewelTone")));
         clickButton("Submit");
         // Third row (Red)
         assertEquals(2, table.getRowIndex(TEST_DATA[TD_COLOR][2]));
         table.clickEditRow(2);
-        setFormElement(Locator.name("quf_" + _listColMonth.getName()), VALID_MONTHS[2]);  // Has a funny format -- need to post converted date
-        uncheckCheckbox(Locator.checkboxByName("quf_JewelTone"));
+        setFormElement(Locator.name(EscapeUtil.getFormFieldName(_listColMonth.getName())), VALID_MONTHS[2]);  // Has a funny format -- need to post converted date
+        uncheckCheckbox(Locator.checkboxByName(EscapeUtil.getFormFieldName("JewelTone")));
         clickButton("Submit");
 
         table = new DataRegionTable("query", getDriver());
@@ -413,12 +413,12 @@ public class ListTest extends BaseWebDriverTest
         String html = getHtmlSource();
         assertTrue("Description \"" + _listColDesc.getDescription() + "\" not present.", html.contains(_listColDesc.getDescription()));
         assertTrue("Description \"" + _listColTone.getDescription() + "\" not present.", html.contains(_listColTone.getDescription()));
-        setFormElement(Locator.name("quf_" + _listColDesc.getName()), TEST_DATA[TD_DESC][3]);
+        setFormElement(Locator.name(EscapeUtil.getFormFieldName(_listColDesc.getName())), TEST_DATA[TD_DESC][3]);
         // Jewel Tone checkbox is left blank -- we'll make sure it's posted as false below
-        setFormElement(Locator.name("quf_" + _listColGood.getName()), TEST_DATA[TD_GOOD][3]);
+        setFormElement(Locator.name(EscapeUtil.getFormFieldName(_listColGood.getName())), TEST_DATA[TD_GOOD][3]);
         clickButton("Submit");
         assertTextPresent("This field is required");
-        setFormElement(Locator.name("quf_" + LIST_KEY_NAME2), TEST_DATA[TD_COLOR][3]);
+        setFormElement(Locator.name(EscapeUtil.getFormFieldName(LIST_KEY_NAME2)), TEST_DATA[TD_COLOR][3]);
         clickButton("Submit");
 
         log("Check new row was added");
@@ -1649,9 +1649,9 @@ public class ListTest extends BaseWebDriverTest
         // insert a new row and verify the key is encoded in the form input
         table.clickInsertNewRow();
         String html = getHtmlSource();
-        checker().verifyFalse("List key hidden input not present.", html.contains("quf_" + encodedKeyName));
+        checker().verifyFalse("List key hidden input not present.", html.contains(EscapeUtil.getFormFieldName(encodedKeyName)));
         String nameValue = "test";
-        setFormElement(Locator.name("quf_Name"), nameValue);
+        setFormElement(Locator.name(EscapeUtil.getFormFieldName("Name")), nameValue);
         clickButton("Submit");
 
         // verify the name value is persisted
@@ -1662,9 +1662,9 @@ public class ListTest extends BaseWebDriverTest
         // verify name value can be updated
         table.clickEditRow(0);
         html = getHtmlSource();
-        checker().verifyTrue("List key hidden input not present.", html.contains("quf_" + encodedKeyName));
+        checker().verifyTrue("List key hidden input not present.", html.contains(EscapeUtil.getFormFieldName(encodedKeyName)));
         nameValue = "test updated";
-        setFormElement(Locator.name("quf_Name"), nameValue);
+        setFormElement(Locator.name(EscapeUtil.getFormFieldName("Name")), nameValue);
         clickButton("Submit");
 
         // verify the name value is persisted
