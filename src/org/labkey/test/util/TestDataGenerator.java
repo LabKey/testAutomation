@@ -702,7 +702,7 @@ public class TestDataGenerator
     {
         if (domainName != null)
         {
-            if (domainName.name().isEmpty())
+            if (domainName.name().isBlank())
                 return true;
             if (!Character.isLetterOrDigit(domainName.name().charAt(0)))
                 return true; // domain needs to start with alphanumeric char
@@ -724,7 +724,7 @@ public class TestDataGenerator
         }
         if (fieldName != null)
         {
-            if (fieldName.name().isEmpty())
+            if (fieldName.name().isBlank())
                 return true;
             if (fieldName.name().length() > 200)
                 return true;
