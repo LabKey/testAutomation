@@ -15,7 +15,7 @@ public record RandomName(String part, String name)
     public RandomName(String part, String name)
     {
         this.part = part == null ? "" : part; // Don't trim
-        this.name = Objects.requireNonNull(name);
+        this.name = Objects.requireNonNull(name).trim();
     }
 
     @Override

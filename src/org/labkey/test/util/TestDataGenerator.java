@@ -702,6 +702,8 @@ public class TestDataGenerator
     {
         if (domainName != null)
         {
+            if (domainName.name().isEmpty())
+                return true;
             if (!Character.isLetterOrDigit(domainName.name().charAt(0)))
                 return true; // domain needs to start with alphanumeric char
             if (Pattern.matches("(.*\\s--[^ ].*)|(.*\\s-[^- ].*)", domainName.name()))
@@ -722,6 +724,8 @@ public class TestDataGenerator
         }
         if (fieldName != null)
         {
+            if (fieldName.name().isEmpty())
+                return true;
             if (fieldName.name().length() > 200)
                 return true;
             if (COLON_NAME_PATTERN.matcher(fieldName.name())
