@@ -646,10 +646,6 @@ public class TestDataGenerator
 
     private static boolean isDomainAndFieldNameInvalid(DomainKind domainKind, @Nullable RandomName domainName, @Nullable RandomName fieldName)
     {
-        // TODO: remove when merging to develop
-        if (fieldName != null && fieldName.name().length() > 64 && fieldName.part().toLowerCase().contains("key")) // Not guaranteed but likely a list key
-            return true; // Issue 53706: List key field name length is limited to 64 characters
-
         if (TestProperties.isRemoteNameValidationEnabled())
         {
             return isNameInvalidRemote(domainKind, domainName, fieldName);
