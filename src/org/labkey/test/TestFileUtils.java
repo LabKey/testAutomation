@@ -120,11 +120,11 @@ public abstract class TestFileUtils
         }
     }
 
-    public static int getFileRowCount(final File file) throws IOException
+    public static long getFileRowCount(final File file) throws IOException
     {
         try (BufferedReader reader = new BufferedReader(new FileReader(file)))
         {
-            int lines = 0;
+            long lines = 0;
             while (reader.readLine() != null) lines++;
             return lines;
         }
