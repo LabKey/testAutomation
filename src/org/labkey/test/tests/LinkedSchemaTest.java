@@ -1051,7 +1051,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         goToProjectHome(externalProject);
         clickTab("Experiment");
         waitAndClickAndWait(Locator.linkContainingText("Create Run Group"));
-        setFormElement(Locator.name("name"), "Parent Run Group");
+        setFormElement(Locator.name("Name"), "Parent Run Group");
         clickButton("Submit");
 
         _containerHelper.createSubfolder(externalProject, subFolder);
@@ -1059,7 +1059,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         // Create a RunGroup in the subfolder.
         clickTab("Experiment");
         waitAndClickAndWait(Locator.linkContainingText("Create Run Group"));
-        setFormElement(Locator.name("name"), subFolderRunGroup);
+        setFormElement(Locator.name("Name"), subFolderRunGroup);
         clickButton("Submit");
 
     }

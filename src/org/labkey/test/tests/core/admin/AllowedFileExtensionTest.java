@@ -397,12 +397,14 @@ public class AllowedFileExtensionTest extends AllowedFileExtensionBaseTest
         log("Create a sample that tries to upload a disallowed file type.");
         String sampleId = String.format("S-%d", i);
         String description= "Some text for the description.";
-        String amount = "5.0";
+        String amount = "5.1";
+        String units = "mg";
 
         fieldMap = Map.of("Name", sampleId,
                 "Description", description,
                 stFileField, fileMap.get(excludedType).getAbsolutePath(),
-                "StoredAmount", amount);
+                "StoredAmount", amount,
+                "Units", units);
         sampleTypeHelper.insertRow(fieldMap);
 
         validateErrorPage(fileMap.get(excludedType).getName(), allowedTypes);
@@ -413,7 +415,8 @@ public class AllowedFileExtensionTest extends AllowedFileExtensionBaseTest
         sampleTypeHelper.goToSampleType(stName);
         fieldMap = Map.of("Name", sampleId,
                 "Description", description,
-                "StoredAmount", amount);
+                "StoredAmount", amount,
+                "Units", units);
         sampleTypeHelper.insertRow(fieldMap);
 
         Map<String, String> rowMap = sampleTypeHelper.getSamplesDataRegionTable().getRowDataAsMap(0);
@@ -423,6 +426,9 @@ public class AllowedFileExtensionTest extends AllowedFileExtensionBaseTest
 
         checker().verifyEquals("'Amount' field in grid does not have expected value.",
                 amount, rowMap.get("StoredAmount"));
+
+        checker().verifyEquals("'Units' field in grid does not have expected value.",
+                units, rowMap.get("Units"));
 
         checker().verifyEquals(String.format("'%s' field in grid does not have expected value.", stFileField),
                 " ", rowMap.get(stFileField));
