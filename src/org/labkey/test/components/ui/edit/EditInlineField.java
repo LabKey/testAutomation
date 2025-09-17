@@ -40,7 +40,9 @@ public class EditInlineField extends WebDriverComponent<EditInlineField.ElementC
         // 'setFormElement' calls 'WebElement.clear()' which can close the edit-in-place input
         getWrapper().actionClear(input);
 
-        if (!skipEnter)
+        if (skipEnter)
+            input.sendKeys(value);
+        else
         {
             input.sendKeys(value, Keys.ENTER);
             getWrapper().shortWait().until(ExpectedConditions.stalenessOf(input));
