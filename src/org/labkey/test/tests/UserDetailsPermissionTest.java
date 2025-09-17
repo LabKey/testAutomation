@@ -29,6 +29,7 @@ import org.labkey.test.categories.Daily;
 import org.labkey.test.components.DomainDesignerPage;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.pages.query.ExecuteQueryPage;
+import org.labkey.test.pages.user.UpdateUserDetailsPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable.DataRegionFinder;
@@ -115,20 +116,18 @@ public class UserDetailsPermissionTest extends BaseWebDriverTest
 
         impersonate(ADMIN_USER);
         {
-            goToMyAccount();
-            clickButton("Edit");
-            setFormElement(Locator.name("quf_Phone"), HIDDEN_STRING);
-            setFormElement(Locator.name("quf_" + CUSTOM_USER_COLUMN), HIDDEN_STRING);
-            clickButton("Submit");
+            UpdateUserDetailsPage page = goToMyAccount().clickEdit();
+            page.setField("Phone", HIDDEN_STRING);
+            page.setField(CUSTOM_USER_COLUMN, HIDDEN_STRING);
+            page.clickSubmit();
         }
         stopImpersonating();
         impersonate(CHECKED_USER);
         {
-            goToMyAccount();
-            clickButton("Edit");
-            setFormElement(Locator.name("quf_Phone"), HIDDEN_STRING);
-            setFormElement(Locator.name("quf_" + CUSTOM_USER_COLUMN), HIDDEN_STRING);
-            clickButton("Submit");
+            UpdateUserDetailsPage page = goToMyAccount().clickEdit();
+            page.setField("Phone", HIDDEN_STRING);
+            page.setField(CUSTOM_USER_COLUMN, HIDDEN_STRING);
+            page.clickSubmit();
         }
         stopImpersonating();
     }

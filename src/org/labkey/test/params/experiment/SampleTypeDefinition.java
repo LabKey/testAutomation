@@ -32,7 +32,7 @@ public class SampleTypeDefinition extends DomainProps
     private final Set<String> _dataParentAliases = new HashSet<>();
 
     // Currently, these values are only used by the SampleManager module.
-    private MetricUnit _inventoryMetricUnit;
+    private InventoryMetricUnit _inventoryMetricUnit;
     private String _labelColor;
     private String _aliquotNameExpression;
 
@@ -96,12 +96,12 @@ public class SampleTypeDefinition extends DomainProps
         return this;
     }
 
-    protected MetricUnit getInventoryMetricUnit()
+    protected InventoryMetricUnit getInventoryMetricUnit()
     {
         return _inventoryMetricUnit;
     }
 
-    public SampleTypeDefinition setInventoryMetricUnit(MetricUnit inventoryMetricUnit)
+    public SampleTypeDefinition setInventoryMetricUnit(InventoryMetricUnit inventoryMetricUnit)
     {
         _inventoryMetricUnit = inventoryMetricUnit;
         return this;

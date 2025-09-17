@@ -35,6 +35,7 @@ import org.labkey.test.components.dumbster.EmailRecordTable;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.IssuesHelper;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.UIUserHelper;
@@ -481,7 +482,7 @@ public class UserTest extends BaseWebDriverTest
         clickAndWait(Locator.lkButton("Edit"));
         for (String field : REQUIRED_FIELDS)
         {
-            WebElement el = Locator.name("quf_" + field).waitForElement(new WebDriverWait(getDriver(), Duration.ofSeconds(5)));
+            WebElement el = Locator.name(EscapeUtil.getFormFieldName(field)).waitForElement(new WebDriverWait(getDriver(), Duration.ofSeconds(5)));
             if (getFormElement(el).isEmpty())
                 setFormElement(el, getDisplayName());
         }
