@@ -94,7 +94,7 @@ public class SampleTypeLookupDisplayColumnTest extends BaseWebDriverTest
         sampleTypeList.clickInsertNewRow();
 
         String comment = "inserted with lookup by ingredient.intcolumn";
-        setFieldValues("intSample", comment, "3.5", "2");
+        setFieldValues("intSample", comment, "3.5", "mL", "2");
 
         sampleTypeList =  DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
         var row = sampleTypeList.getRowDataAsMap("Comment", comment);
@@ -111,7 +111,7 @@ public class SampleTypeLookupDisplayColumnTest extends BaseWebDriverTest
         sampleTypeList.clickInsertNewRow();
 
         String comment = "inserted with lookup by ingredient.titleColumn";
-        setFieldValues("nameSample", comment, "3.5", "sodium hexafluoride");
+        setFieldValues("nameSample", comment, "3.5", "mL", "sodium hexafluoride");
 
         sampleTypeList =  DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
         var row = sampleTypeList.getRowDataAsMap("Comment", comment);
@@ -129,13 +129,14 @@ public class SampleTypeLookupDisplayColumnTest extends BaseWebDriverTest
 
     }
 
-    private void setFieldValues(String name, String comment, String amount, String ingredient)
+    private void setFieldValues(String name, String comment, String amount, String units, String ingredient)
     {
         var insertPage = new UpdateQueryRowPage(getDriver());
         if (name != null)   // for update, name field is disabled
             insertPage.setField("Name", name);
         insertPage.setField("comment", comment);
         insertPage.setField("StoredAmount", amount);
+        insertPage.setField("Units", units);
         insertPage.setField("ingredient", ingredient);
         insertPage.submit();
     }
