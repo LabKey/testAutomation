@@ -100,7 +100,6 @@ import org.labkey.test.util.UIPermissionsHelper;
 import org.labkey.test.util.core.webdav.WebDavUploadHelper;
 import org.labkey.test.util.ext4cmp.Ext4FieldRef;
 import org.labkey.test.util.query.QueryUtils;
-import org.labkey.test.util.search.SearchAdminAPIHelper;
 import org.labkey.test.util.selenium.WebDriverUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.ElementClickInterceptedException;
@@ -1322,8 +1321,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         if (pendingRequestCount.getValue() < 0)
             TestLogger.log("Unable to fetch pending request count" + msWait + "ms");
 
-        if (_containerHelper.getAllModules().contains("Search"))
-            SearchAdminAPIHelper.waitForIndexerBackground();
     }
 
     private int getPendingRequestCount(Connection connection)
