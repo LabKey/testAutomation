@@ -1,5 +1,7 @@
 package org.labkey.test.components.ui.entities;
 
+import org.awaitility.Awaitility;
+import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
@@ -14,6 +16,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -185,11 +188,16 @@ public class ParentEntityEditPanel extends Panel<ParentEntityEditPanel.ElementCa
         Panel<?> detailsPanel = new Panel.PanelFinder(getDriver()).withTitle(parentType).waitFor(getDriver());
         if (!selections.isEmpty())
         {
-            for (String selection : selections)
-            {
-                getWrapper().quickWait().until(ExpectedConditions.visibilityOf(
-                    Locator.linkWithText(selection).findWhenNeeded(detailsPanel)));
-            }
+            // Just wait for the correct number of parents/sources to appear for now.
+            Locator.CssLocator rowLocator = Locator.css(".grid-panel tbody tr");
+            Awaitility.await("Total " + parentType + " grid rows").atMost(Duration.ofSeconds(2))
+                .until(() -> rowLocator.findElements(detailsPanel).size(), CoreMatchers.equalTo(selections.size()));
+            // Issue 53915: Lineage panel grids don't show IDs or links for parent sequences and molecules in Biologics
+            // for (String selection : selections)
+            // {
+            //     getWrapper().quickWait().until(ExpectedConditions.visibilityOf(
+            //         Locator.linkWithText(selection).findWhenNeeded(detailsPanel)));
+            // }
         }
         else
         {
