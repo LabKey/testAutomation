@@ -45,7 +45,7 @@ public abstract class AbstractQWPTest extends BaseWebDriverTest
         log("Drop and reload QWPDemo test data");
         clickButton("Drop schema and clear test data");
         waitForElement(Locator.button("Populate test data"));
-        clickButton("Populate test data");
+        clickButton("Populate test data", 90_000); // 'sampleDataTest5k' takes over a minute to load
         WebElement populateMessage = Locator.id("populatemessage").waitForElement(shortWait());
         new WebDriverWait(getDriver(), Duration.ofSeconds(90)).until(ExpectedConditions.visibilityOf(populateMessage)).getText();
         assertEquals("Test data is populated!", populateMessage.getText());
