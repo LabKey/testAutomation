@@ -649,7 +649,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
         public BaseReactSelectFinder<Select> withinFormGroupSkipSelect(String labelText)
         {
             _locator = Locator.tagWithClass("div", "form-group")
-                    .withChild(Locator.tag("label").withPredicate("text() = " + Locator.xq(labelText)));
+                    .withChild(Locator.tag("label").withChild(Locator.tagWithText("span", labelText)));
             return this;
         }
 
