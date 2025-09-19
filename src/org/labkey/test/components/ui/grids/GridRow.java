@@ -96,6 +96,16 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
     }
 
     /**
+     * gets the style attribute of the value-wrapper for the specified cell
+     * @return
+     */
+    public String getCellStyle(CharSequence columnIdentifier)
+    {
+        var cell =  getCell(columnIdentifier);
+        return Locator.tagWithClass("span", "ws-pre-wrap").findElement(cell).getAttribute("style");
+    }
+
+    /**
      * Returns true if the row contains all of the specified column/value pairs
      * @param partialMap Map of key (column) value (text)
      */
