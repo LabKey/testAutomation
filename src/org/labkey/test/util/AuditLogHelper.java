@@ -540,12 +540,10 @@ public class AuditLogHelper
         for (String part : recordMapString.split("&"))
         {
             String[] keyValue = part.split("=");
-            assertEquals("Audit record map string does not have expected shape", 2, keyValue.length);
-
             String key = EscapeUtil.decode(keyValue[0]);
             assertFalse(String.format("Audit record map already contains key for %s", key), recordMap.containsKey(key));
 
-            recordMap.put(key, EscapeUtil.decode(keyValue[1]));
+            recordMap.put(key, keyValue.length > 1 ? EscapeUtil.decode(keyValue[1]) : null);
         }
 
         return recordMap;
