@@ -92,9 +92,9 @@ public class AuditLogHelper
         FILE_SYSTEM_EVENT("FileSystem"),
         INVENTORY_AUDIT_EVENT("InventoryAuditEvent"),
         LIST_AUDIT_EVENT("ListAuditEvent"),
-        PLATE_AUDIT_EVENT("PlateAuditEvent"), // available in Biologics module
+        PLATE_AUDIT_EVENT("PlateEvent"), // available in Biologics module
         PLATE_DATA_AUDIT_EVENT("PlateDataAuditEvent"), // available in Biologics module
-        PLATE_SET_AUDIT_EVENT("PlateSetAuditEvent"), // available in Biologics module
+        PLATE_SET_AUDIT_EVENT("PlateSetEvent"), // available in Biologics module
         QUERY_UPDATE_AUDIT_EVENT("QueryUpdateAuditEvent"),
         SAMPLE_TIMELINE_EVENT("SampleTimelineEvent"),
         SAMPLE_WORKFLOW_AUDIT_EVENT("SamplesWorkflowAuditEvent"),
