@@ -1636,7 +1636,7 @@ public class ListTest extends BaseWebDriverTest
         // setup a list with an auto-increment key that we need to make sure is encoded in the form input
         String encodedListName = "autoIncrementEncodeList";
         String keyName = "'><script>alert(\":(\")</script>'";
-        String encodedKeyName = StringUtils.replace(keyName, "\"", "&quot;");
+        String encodedKeyFieldName = EscapeUtil.getFormFieldName(keyName).replaceAll("\"", "&quot;");
         _listHelper.createList(PROJECT_VERIFY, encodedListName, keyName, col("Name", ColumnType.String));
         _listHelper.goToList(encodedListName);
 
@@ -1649,7 +1649,7 @@ public class ListTest extends BaseWebDriverTest
         // insert a new row and verify the key is encoded in the form input
         table.clickInsertNewRow();
         String html = getHtmlSource();
-        checker().verifyFalse("List key hidden input not present.", html.contains(EscapeUtil.getFormFieldName(encodedKeyName)));
+        checker().verifyFalse("List key hidden input not present.", html.contains(encodedKeyFieldName));
         String nameValue = "test";
         setFormElement(Locator.name(EscapeUtil.getFormFieldName("Name")), nameValue);
         clickButton("Submit");
@@ -1662,7 +1662,7 @@ public class ListTest extends BaseWebDriverTest
         // verify name value can be updated
         table.clickEditRow(0);
         html = getHtmlSource();
-        checker().verifyTrue("List key hidden input not present.", html.contains(EscapeUtil.getFormFieldName(encodedKeyName)));
+        checker().verifyTrue("List key hidden input not present.", html.contains(encodedKeyFieldName));
         nameValue = "test updated";
         setFormElement(Locator.name(EscapeUtil.getFormFieldName("Name")), nameValue);
         clickButton("Submit");

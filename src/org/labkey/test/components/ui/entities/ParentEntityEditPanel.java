@@ -185,10 +185,11 @@ public class ParentEntityEditPanel extends Panel<ParentEntityEditPanel.ElementCa
         Panel<?> detailsPanel = new Panel.PanelFinder(getDriver()).withTitle(parentType).waitFor(getDriver());
         if (!selections.isEmpty())
         {
+            // Issue 53915: Lineage panel grids don't show IDs or links for parent sequences and molecules in Biologics
             for (String selection : selections)
             {
                 getWrapper().quickWait().until(ExpectedConditions.visibilityOf(
-                    Locator.linkWithText(selection).findWhenNeeded(detailsPanel)));
+                        Locator.linkWithText(selection).findWhenNeeded(detailsPanel)));
             }
         }
         else
