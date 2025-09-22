@@ -694,6 +694,7 @@ public class TestDataGenerator
     }
 
     private static final Pattern COLON_NAME_PATTERN = Pattern.compile(":[a-zA-Z]{3}"); // Avoid illegal patterns like ":Date"
+    private static final Set<String> ILLEGAL_PROPERTY_NAMES = Set.of("*"); // Issue 53416
     private static boolean isNameInvalidLocal(DomainKind domainKind, @Nullable RandomName domainName, @Nullable RandomName fieldName)
     {
         if (domainName != null)
@@ -724,9 +725,11 @@ public class TestDataGenerator
                 return true;
             if (fieldName.name().length() > 200)
                 return true;
+            if (ILLEGAL_PROPERTY_NAMES.contains(fieldName.name()))
+                return true;
             if (COLON_NAME_PATTERN.matcher(fieldName.name())
                     .results().map(mr -> mr.group(0))
-                    .anyMatch(s -> !fieldName.part().contains(s))) // Only check random portion of the name
+                    .anyMatch(s -> !fieldName.part().contains(s))) // Only check the random portions of the name
                 return true;
         }
 

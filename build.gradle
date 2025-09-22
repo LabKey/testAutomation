@@ -125,32 +125,23 @@ if (!BuildUtils.isIntellij())  {
     }
 }
 
-def initPropertiesTask = project.tasks.register("initProperties", Task) {
-    Task task ->
+def initPropertiesTask = project.tasks.register("initProperties", Copy) {
+    Copy task ->
         task.group = GroupNames.TEST
         task.description = "Create test.properties if missing"
-        task.doLast({
-            File testProperties = project.file('test.properties')
-            File testPropertiesTemplate = project.file('test.properties.template')
-
-            if (!testProperties.exists())
-            {
-                project.copy {
-                    CopySpec copy ->
-                        copy.from(testPropertiesTemplate)
-                        copy.into(project.file("."))
-                        copy.rename(testPropertiesTemplate.getName(), testProperties.getName())
-                        copy.filter { String line ->
-                            if (line.startsWith("#!!")) {
-                                return null
-                            }
-                            else {
-                                return line
-                            }
-                        }
-                }
+        task.from(project.file('test.properties.template'))
+        task.into(".")
+        task.outputs.files(project.file('test.properties'))
+        task.rename('test.properties.template', 'test.properties')
+        task.filter { String line ->
+            if (line.startsWith("#!!")) {
+                return null
             }
-        })
+            else {
+                return line
+            }
+        }
+        task.onlyIf{ !project.file('test.properties').exists() }
 }
 
 project.tasks.register("convertHarToStressXml", JavaExec) {
