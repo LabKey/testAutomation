@@ -2,20 +2,25 @@ package org.labkey.remoteapi.plate;
 
 import org.json.JSONObject;
 
+import java.util.Map;
+
 public class PlateParams
 {
+    private boolean _archived;
+    private String _assayType;
+    private int _columns;
+    private String _description;
     private String _name;
     private String _plateId;
-    private int _rowId;
     private int _plateSetId;
-    private String _description;
-    private int _rows;
-    private int _columns;
     private int _plateType;
-    private String _assayType;
+    private int _rowId;
+    private int _rows;
     private boolean _template;
-    private boolean _archived;
 
+    private PlateParams()
+    {
+    }
 
     public PlateParams(JSONObject json)
     {
@@ -45,6 +50,24 @@ public class PlateParams
 
         if (json.has("archived"))
             _archived = json.getBoolean("archived");
+    }
+
+    public static PlateParams fromQueryRow(Map<String, Object> row)
+    {
+        var params = new PlateParams();
+        params._archived = (Boolean) row.get("Archived");
+        params._assayType = (String) row.get("AssayType");
+        params._columns = (Integer) row.get("PlateType/Columns");
+        params._description = (String) row.get("Description");
+        params._name = (String) row.get("Name");
+        params._plateId = (String) row.get("PlateId");
+        params._plateSetId = (Integer) row.get("PlateSet");
+        params._plateType = (Integer) row.get("PlateType");
+        params._rowId = (Integer) row.get("RowId");
+        params._rows = (Integer) row.get("PlateType/Rows");
+        params._template = (Boolean) row.get("Template");
+
+        return params;
     }
 
     public String getName()

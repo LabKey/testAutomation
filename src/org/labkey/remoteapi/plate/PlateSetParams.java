@@ -2,6 +2,9 @@ package org.labkey.remoteapi.plate;
 
 import org.json.JSONObject;
 
+import java.util.Date;
+import java.util.Map;
+
 public class PlateSetParams
 {
     private boolean _archived;
@@ -21,6 +24,10 @@ public class PlateSetParams
     private Integer _rowId;
     private boolean _template;
     private CreatePlateSetParams.PlateSetType _plateSetType;
+
+    private PlateSetParams()
+    {
+    }
 
     public PlateSetParams(JSONObject json)
     {
@@ -56,6 +63,29 @@ public class PlateSetParams
             _rowId = json.getInt("rowId");
         if (json.has("type"))
             _plateSetType = CreatePlateSetParams.PlateSetType.fromName(json.getString("type"));
+    }
+
+    public static PlateSetParams fromQueryRow(Map<String, Object> row)
+    {
+        var params = new PlateSetParams();
+        params._containerId = (String) row.get("Folder/EntityId");
+        params._containerName = (String) row.get("Folder/Name");
+        params._containerPath = (String) row.get("Folder/Path");
+        params._created = row.get("Created").toString();
+        params._createdBy = (Integer) row.get("CreatedBy");
+        params._description = (String) row.get("Description");
+        params._modified = row.get("Modified").toString();
+        params._modifiedBy = (Integer) row.get("ModifiedBy");
+        params._name = (String) row.get("Name");
+        params._plateCount = (Integer) row.get("PlateCount");
+        params._plateSetId = (String) row.get("PlateSetId");
+        params._plateSetType = CreatePlateSetParams.PlateSetType.fromName((String) row.get("Type"));
+        params._primaryPlateSetId = (Integer) row.get("PrimaryPlateSetId");
+        params._rootPlateSetId = (Integer) row.get("RootPlateSetId");
+        params._rowId = (Integer) row.get("RowId");
+        params._template = (Boolean) row.get("Template");
+
+        return params;
     }
 
     public boolean getArchived()
