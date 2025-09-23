@@ -33,9 +33,11 @@ import java.util.stream.Stream;
 
 import static java.lang.Integer.parseInt;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 import static org.labkey.test.WebDriverWrapper.waitFor;
+import static org.labkey.test.util.TestLogger.log;
 
 public class AuditLogHelper
 {
@@ -262,10 +264,28 @@ public class AuditLogHelper
             // filter out RowId as that is not a change, it is added for display purposes
             dataChanges = Stream.of(dataChanges).filter(s -> !s.toLowerCase().startsWith("rowid=")).toArray(String[]::new);
 
-            TestLogger.log("Audit record data changes diff count check (" + eventDiffFieldName + "): " + dataChangesStr);
+            log("Audit record data changes diff count check (" + eventDiffFieldName + "): " + dataChangesStr);
             assertEquals("Audit record data changes did not include the expected number of diffs in " + eventDiffFieldName + ", expected " + expectedDiffCount + " but was " + dataChanges.length + ": " + dataChangesStr,
                     expectedDiffCount, dataChanges.length);
         }
+    }
+
+    public void checkAuditLogDataChanges(AuditEvent auditEventName, int transactionId, List<String> changes)
+    {
+        Connection cn = WebTestHelper.getRemoteApiConnection();
+        SelectRowsCommand cmd = new SelectRowsCommand("auditLog", auditEventName.getName());
+        cmd.setRequiredVersion(9.1);
+        cmd.setColumns(Arrays.asList("oldvalues", "newvalues", "datachanges"));
+        cmd.addFilter("transactionauditid", transactionId, Filter.Operator.EQUAL);
+        cmd.setContainerFilter(ContainerFilter.AllFolders);
+
+        Map<String, Object> event = executeSelectCommand(cn, cmd).get(0);
+
+        String datachanges = getLogColumnDisplayValue(event, "datachanges").toLowerCase();
+
+        log(datachanges);
+        for (String change : changes)
+            assertTrue("Expected change not found in audit log data changes: " + change, datachanges.contains(change.toLowerCase()));
     }
 
     public Integer getLastTransactionId(String containerPath, AuditEvent auditEventName)
@@ -340,7 +360,7 @@ public class AuditLogHelper
         if (expectedEventCount != null)
         {
             if (expectedEventCount.intValue() != events.size())
-                TestLogger.log("Last audit event info: " + events.get(0));
+                log("Last audit event info: " + events.get(0));
             assertEquals("Unexpected number of events for transactionId " + transactionId, expectedEventCount.intValue(), events.size());
         }
         List<Integer> expectedChangeCounts = Collections.nCopies(events.size(), expectedDiffCount);
@@ -405,7 +425,7 @@ public class AuditLogHelper
                 if (!expectedValue.equalsIgnoreCase(actualValue))
                 {
                     pass = false;
-                    TestLogger.log(prop + " is not as expected. Expected: " + expectedValue + ", Actual: " + actualValue);
+                    log(prop + " is not as expected. Expected: " + expectedValue + ", Actual: " + actualValue);
                 }
             }
         }
@@ -421,7 +441,7 @@ public class AuditLogHelper
         if (expectedAuditDetails.size() != actualAuditDetails.size())
         {
             pass = false;
-            TestLogger.log(String.format("Number of DomainPropertyAuditEvent events not as expected. Expected %d, Actual %d.", expectedAuditDetails.size(), actualAuditDetails.size()));
+            log(String.format("Number of DomainPropertyAuditEvent events not as expected. Expected %d, Actual %d.", expectedAuditDetails.size(), actualAuditDetails.size()));
         }
 
         for (String key : expectedAuditDetails.keySet())
@@ -431,7 +451,7 @@ public class AuditLogHelper
             if (actualAuditDetail == null)
             {
                 pass = false;
-                TestLogger.log("Field " + key + " is missing DomainPropertyAuditEvent.");
+                log("Field " + key + " is missing DomainPropertyAuditEvent.");
             }
             else
                 pass = pass && validateDetailAuditLog(expectedAuditDetail, actualAuditDetail);
@@ -445,7 +465,7 @@ public class AuditLogHelper
         DetailedAuditEventRow latestDomainEvent = getLastDomainEvent(projectName, domainName);
         if (latestDomainEvent == null)
         {
-            TestLogger.log(String.format("No DomainAuditEvent found for domain '%s' in project '%s'.", domainName, projectName));
+            log(String.format("No DomainAuditEvent found for domain '%s' in project '%s'.", domainName, projectName));
             return false;
         }
 
@@ -460,7 +480,7 @@ public class AuditLogHelper
         List<Integer> domainEventIds = new ArrayList<>();
         domainAuditEventAllRows.forEach((event)->domainEventIds.add(event.rowId));
 
-        TestLogger.log("Number of 'Domain Event' log entries for '" + domainName + "': " + domainEventIds.size());
+        log("Number of 'Domain Event' log entries for '" + domainName + "': " + domainEventIds.size());
 
         return domainEventIds;
     }
@@ -599,7 +619,7 @@ public class AuditLogHelper
 
     private List<DetailedAuditEventRow> getDomainAuditEventLog(String projectName, String domainName, @Nullable Collection<Integer> ignoreIds, @Nullable Integer maxRows)
     {
-        TestLogger.log("Get a list of the Domain Events for project '" + projectName + "'. ");
+        log("Get a list of the Domain Events for project '" + projectName + "'. ");
         domainName = domainName.trim();
 
         Connection cn = WebTestHelper.getRemoteApiConnection();
@@ -620,7 +640,7 @@ public class AuditLogHelper
             cmd.setMaxRows(maxRows);
 
         List<Map<String, Object>> domainAuditEventAllRows = executeSelectCommand(cn, cmd);
-        TestLogger.log(String.format("Number of Domain Event log entries for domain '%s' in '%s': %d", domainName, projectName, domainAuditEventAllRows.size()));
+        log(String.format("Number of Domain Event log entries for domain '%s' in '%s': %d", domainName, projectName, domainAuditEventAllRows.size()));
 
         List<DetailedAuditEventRow> domainAuditEventRows = new ArrayList<>();
 
@@ -664,7 +684,7 @@ public class AuditLogHelper
         try
         {
             SelectRowsResponse response = cmd.execute(cn, "/");
-            TestLogger.log("Number of rows: " + response.getRowCount());
+            log("Number of rows: " + response.getRowCount());
             rowsReturned.addAll(response.getRows());
         }
         catch (IOException | CommandException ex)
