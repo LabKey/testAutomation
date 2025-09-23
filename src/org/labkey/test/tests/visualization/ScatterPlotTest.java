@@ -62,6 +62,7 @@ import java.util.Map;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
 
 @Category({Daily.class, Reports.class, Charting.class, Hosting.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 15)
@@ -803,7 +804,7 @@ public class ScatterPlotTest extends GenericChartsTest
         _userHelper.createUser(DEVELOPER_USER);
         clickProject(getProjectName());
         _permissionsHelper.enterPermissionsUI();
-        _permissionsHelper.setUserPermissions(DEVELOPER_USER, "Editor");
+        _permissionsHelper.setUserPermissions(DEVELOPER_USER, EDITOR_ROLE);
         impersonate(DEVELOPER_USER);
         navigateToFolder(getProjectName(), getFolderName());
         clickAndWait(Locator.linkWithText(SCATTER_PLOT_NAME_MV + " PointClickFn"));

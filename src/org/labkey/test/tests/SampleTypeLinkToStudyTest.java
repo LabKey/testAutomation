@@ -41,6 +41,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static org.labkey.test.util.PermissionsHelper.READER_ROLE;
+
 @Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 15)
 public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
@@ -72,7 +74,7 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         _studyHelper.startCreateStudy()
                 .setTimepointType(StudyHelper.TimepointType.VISIT)
                 .createStudy();
-        createUserWithPermissions(READER_USER, VISIT_BASED_STUDY, "Reader");
+        createUserWithPermissions(READER_USER, VISIT_BASED_STUDY, READER_ROLE);
 
         _containerHelper.createProject(DATE_BASED_STUDY, "Study");
         _studyHelper.startCreateStudy()

@@ -51,6 +51,10 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.Locator.NBSP;
+import static org.labkey.test.util.PermissionsHelper.AUTHOR_ROLE;
+import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
+import static org.labkey.test.util.PermissionsHelper.PROJECT_ADMIN_ROLE;
+import static org.labkey.test.util.PermissionsHelper.READER_ROLE;
 
 @Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 15)
@@ -119,10 +123,10 @@ public class MessagesLongTest extends BaseWebDriverTest
     {
         clickProject(PROJECT_NAME);
         PermissionsPage permissionsPage = navBar().goToPermissionsPage()
-            .removePermission("Users", "Reader")
-            .removePermission("Users","Reader")
-            .removePermission("Users","Author")
-            .removePermission("Users","Editor")
+            .removePermission("Users", READER_ROLE)
+            .removePermission("Users",READER_ROLE)
+            .removePermission("Users",AUTHOR_ROLE)
+            .removePermission("Users",EDITOR_ROLE)
             .setPermissions("Users", permission);
         permissionsPage.clickSaveAndFinish();
         impersonate(USER1);
@@ -166,7 +170,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         _containerHelper.createProject(PROJECT_NAME, "Collaboration");
         navBar().goToPermissionsPage()
                 .createPermissionsGroup("Administrators")
-                .setPermissions("Administrators", "Project Administrator")
+                .setPermissions("Administrators", PROJECT_ADMIN_ROLE)
                 .createPermissionsGroup("testers1")
                 .assertPermissionSetting("testers1", "No Permissions")
                 .clickSaveAndFinish();
@@ -343,8 +347,8 @@ public class MessagesLongTest extends BaseWebDriverTest
         clickButton("Update Group Membership");
 
         log("Check if permissions work without security");
-        permissionCheck("Reader", true);
-        permissionCheck("Editor", true);
+        permissionCheck(READER_ROLE, true);
+        permissionCheck(EDITOR_ROLE, true);
 
         log("Check with security");
         // TODO: Convert to test.pages.announcements.AdminPage
@@ -354,8 +358,8 @@ public class MessagesLongTest extends BaseWebDriverTest
         _portalHelper.clickWebpartMenuItem("Messages", true, "Admin");
         checkCheckbox(Locator.radioButtonByName("secure").index(1));
         clickButton("Save");
-        permissionCheck("Reader", false);
-        permissionCheck("Editor", true);
+        permissionCheck(READER_ROLE, false);
+        permissionCheck(EDITOR_ROLE, true);
 
         log("Check if the customized names work");
 
@@ -569,8 +573,8 @@ public class MessagesLongTest extends BaseWebDriverTest
         // USER1 is now a reader
         log("Test notify list");
         navBar().goToPermissionsPage()
-            .removePermission("Users", "Editor")
-            .setPermissions("Users", "Reader")
+            .removePermission("Users", EDITOR_ROLE)
+            .setPermissions("Users", READER_ROLE)
             .clickSaveAndFinish();
 
         // USER2 is a nobody
@@ -622,7 +626,7 @@ public class MessagesLongTest extends BaseWebDriverTest
 
         log("Verify member list failed user lookup reports error");
         clickProject(PROJECT_NAME);
-        impersonateRole("Editor");
+        impersonateRole(EDITOR_ROLE);
         clickAndWait(Locator.linkWithText(MSG3_TITLE));
         clickRespondButton();
         // enter invalid username, ensure error appears
@@ -667,7 +671,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         String _messageTitle = "Mine Message";
         String _messageBody = "test";
 
-        createUserWithPermissions(RESPONDER, PROJECT_NAME, "Editor");
+        createUserWithPermissions(RESPONDER, PROJECT_NAME, EDITOR_ROLE);
         goToProjectHome(PROJECT_NAME);
 
         // Unlike EmailPrefsPage.beginAt(), this ensures returnUrl is passed to the action
@@ -729,7 +733,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         goToProjectHome();
         navBar().goToPermissionsPage()
             .createPermissionsGroup(GROUP)
-            .setPermissions(GROUP, "Editor")
+            .setPermissions(GROUP, EDITOR_ROLE)
             .addUserToProjGroup(USER, getProjectName(), GROUP);
         goToProjectHome();
 

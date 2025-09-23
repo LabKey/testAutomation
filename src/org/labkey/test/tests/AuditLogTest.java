@@ -64,6 +64,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.labkey.test.util.PermissionsHelper.AUTHOR_ROLE;
+import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
+import static org.labkey.test.util.PermissionsHelper.FOLDER_ADMIN_ROLE;
+import static org.labkey.test.util.PermissionsHelper.PROJECT_ADMIN_ROLE;
 import static org.labkey.test.util.PasswordUtil.getUsername;
 
 @Category({Daily.class, Hosting.class})
@@ -81,9 +85,6 @@ public class AuditLogTest extends BaseWebDriverTest
     private static final String AUDIT_TEST_USER3 = "audit_user3@auditlog.test";
 
     private static final String AUDIT_SECURITY_GROUP = "Testers";
-
-    private static final String PROJECT_ADMIN_ROLE = "Project Administrator";
-    private static final String AUTHOR_ROLE = "Author";
 
     private static final String AUDIT_TEST_PROJECT = "AuditVerifyTest";
     private static final String AUDIT_DETAILED_TEST_PROJECT = "AuditDetailedLogTest";
@@ -328,7 +329,7 @@ public class AuditLogTest extends BaseWebDriverTest
 
         _containerHelper.createProject(AUDIT_TEST_PROJECT, null);
         permissionsHelper.createPermissionsGroup(AUDIT_SECURITY_GROUP);
-        permissionsHelper.setPermissions(AUDIT_SECURITY_GROUP, "Editor");
+        permissionsHelper.setPermissions(AUDIT_SECURITY_GROUP, EDITOR_ROLE);
         _userHelper.createUser(AUDIT_TEST_USER, false, true);
         permissionsHelper.addUserToProjGroup(AUDIT_TEST_USER, getProjectName(), AUDIT_SECURITY_GROUP);
         _userHelper.deleteUsers(true, AUDIT_TEST_USER);
@@ -373,8 +374,8 @@ public class AuditLogTest extends BaseWebDriverTest
         createList(AUDIT_TEST_PROJECT, "Parent List", "Name\nData", new FieldDefinition("Name", ColumnType.String).setDescription("Name") );
         createList(AUDIT_TEST_PROJECT + "/" + AUDIT_TEST_SUBFOLDER, "Child List", "Name\nData", new FieldDefinition("Name", ColumnType.String).setDescription("Name"));
 
-        createUserWithPermissions(AUDIT_TEST_USER, AUDIT_TEST_PROJECT, "Editor");
-        createUserWithPermissions(AUDIT_TEST_USER2, AUDIT_TEST_PROJECT, "Project Administrator");
+        createUserWithPermissions(AUDIT_TEST_USER, AUDIT_TEST_PROJECT, EDITOR_ROLE);
+        createUserWithPermissions(AUDIT_TEST_USER2, AUDIT_TEST_PROJECT, PROJECT_ADMIN_ROLE);
 
         // signed in as an admin so we should see rows here
         verifyAuditQueries(true);
@@ -404,15 +405,15 @@ public class AuditLogTest extends BaseWebDriverTest
         navigateToFolder(AUDIT_TEST_PROJECT, AUDIT_TEST_SUBFOLDER);
 
         ApiPermissionsHelper ph = new ApiPermissionsHelper(this);
-        ph.addMemberToRole(AUDIT_TEST_USER2,"Folder Administrator", PermissionsHelper.MemberType.user);
+        ph.addMemberToRole(AUDIT_TEST_USER2,FOLDER_ADMIN_ROLE, PermissionsHelper.MemberType.user);
         impersonate(AUDIT_TEST_USER2);
         verifyListAuditLogQueries(Visibility.All);
         stopImpersonating();
 
         // verify issue 19832 - opposite of above.  Ensure that user who has access to child folder but not parent folder can still see
         // audit log events from the child forder if using a CurrentAndSubFolders container filter
-        createUserWithPermissions(AUDIT_TEST_USER3, AUDIT_TEST_PROJECT, "Editor");
-        permissionsHelper.addMemberToRole(AUDIT_TEST_USER3, "Folder Administrator", PermissionsHelper.MemberType.user, AUDIT_TEST_PROJECT + "/" + AUDIT_TEST_SUBFOLDER);
+        createUserWithPermissions(AUDIT_TEST_USER3, AUDIT_TEST_PROJECT, EDITOR_ROLE);
+        permissionsHelper.addMemberToRole(AUDIT_TEST_USER3, FOLDER_ADMIN_ROLE, PermissionsHelper.MemberType.user, AUDIT_TEST_PROJECT + "/" + AUDIT_TEST_SUBFOLDER);
         impersonate(AUDIT_TEST_USER3);
         verifyListAuditLogQueries(Visibility.ChildFolder);
         stopImpersonating();

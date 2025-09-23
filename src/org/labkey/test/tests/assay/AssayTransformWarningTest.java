@@ -41,6 +41,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.pages.ReactAssayDesignerPage.ScriptFileEvent.Edit;
 import static org.labkey.test.pages.ReactAssayDesignerPage.ScriptFileEvent.Import;
+import static org.labkey.test.util.PermissionsHelper.FOLDER_ADMIN_ROLE;
 
 @Category({Assays.class, Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 4)
@@ -322,7 +323,7 @@ public class AssayTransformWarningTest extends BaseWebDriverTest
 
         // verify file exists in @scripts dir via webdav page
         goToProjectHome();
-        impersonateRole("Folder Administrator");
+        impersonateRole(FOLDER_ADMIN_ROLE);
         WebDavPage.beginAt(this, getProjectName() + "/@scripts");
         waitForElement(Locators.labkeyErrorHeading.withText("/_webdav/" + getProjectName() + "/@scripts"));
         stopImpersonatingHTTP();

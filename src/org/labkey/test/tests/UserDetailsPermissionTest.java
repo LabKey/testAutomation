@@ -45,6 +45,8 @@ import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.labkey.test.util.PermissionsHelper.READER_ROLE;
+import static org.labkey.test.util.PermissionsHelper.SITE_ADMIN_ROLE;
 
 @Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 6)
@@ -105,13 +107,13 @@ public class UserDetailsPermissionTest extends BaseWebDriverTest
 
         _containerHelper.createProject(getProjectName(), null);
 
-        new ApiPermissionsHelper(this).setSiteRoleUserPermissions(ADMIN_USER, "Site Administrator");
+        new ApiPermissionsHelper(this).setSiteRoleUserPermissions(ADMIN_USER, SITE_ADMIN_ROLE);
         // Use created user to ensure we have a known 'Modified by' column for created users
         ApiPermissionsHelper apiPermissionsHelper = new ApiPermissionsHelper(this,
                 () -> new Connection(WebTestHelper.getBaseURL(), ADMIN_USER, PasswordUtil.getPassword()));
 
         apiPermissionsHelper.createPermissionsGroup(TEST_GROUP, USER_INFO_VIEWER, IMPERSONATED_USER, CHECKED_USER);
-        apiPermissionsHelper.setPermissions(TEST_GROUP, "Reader");
+        apiPermissionsHelper.setPermissions(TEST_GROUP, READER_ROLE);
         apiPermissionsHelper.setSiteRoleUserPermissions(USER_INFO_VIEWER, "See User and Group Details");
 
         impersonate(ADMIN_USER);

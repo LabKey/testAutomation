@@ -28,6 +28,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
+import static org.labkey.test.util.PermissionsHelper.READER_ROLE;
+
 public class BaseTermsOfUseTest extends BaseWebDriverTest
 {
     protected static final String PUBLIC_NO_TERMS_PROJECT_NAME = "Public No Terms Project";
@@ -80,9 +83,9 @@ public class BaseTermsOfUseTest extends BaseWebDriverTest
     {
         log("Create public project " + projectName);
         _containerHelper.createProject(projectName, null);
-        _permissionsHelper.setPermissions(USERS_GROUP, "Editor");
-        _permissionsHelper.setSiteGroupPermissions("All Site Users", "Reader");
-        _permissionsHelper.setSiteGroupPermissions("Guests", "Reader");
+        _permissionsHelper.setPermissions(USERS_GROUP, EDITOR_ROLE);
+        _permissionsHelper.setSiteGroupPermissions("All Site Users", READER_ROLE);
+        _permissionsHelper.setSiteGroupPermissions("Guests", READER_ROLE);
     }
 
     protected void createWikiTabForProject(String projectName)
@@ -102,10 +105,10 @@ public class BaseTermsOfUseTest extends BaseWebDriverTest
         log("Create project " + name);
         _containerHelper.createProject(name, null);
         createTermsOfUsePage(name, termsText);
-        _permissionsHelper.setSiteGroupPermissions("All Site Users", "Reader");
+        _permissionsHelper.setSiteGroupPermissions("All Site Users", READER_ROLE);
         if (isPublic)
         {
-            _permissionsHelper.setSiteGroupPermissions("Guests", "Reader");
+            _permissionsHelper.setSiteGroupPermissions("Guests", READER_ROLE);
         }
     }
 

@@ -42,6 +42,10 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.labkey.test.util.PermissionsHelper.AUTHOR_ROLE;
+import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
+import static org.labkey.test.util.PermissionsHelper.PROJECT_ADMIN_ROLE;
+import static org.labkey.test.util.PermissionsHelper.READER_ROLE;
 
 @Category({Daily.class, Reports.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 15)
@@ -372,7 +376,7 @@ public class DataReportsTest extends ReportTest
         if (!TestProperties.isPrimaryUserAppAdmin())
         {
             log("Test user permissions");
-            createSiteDeveloper(AUTHOR_USER).addMemberToRole(AUTHOR_USER, "Author", PermissionsHelper.MemberType.user, getProjectName());
+            createSiteDeveloper(AUTHOR_USER).addMemberToRole(AUTHOR_USER, AUTHOR_ROLE, PermissionsHelper.MemberType.user, getProjectName());
             impersonate(AUTHOR_USER);
         }
         else
@@ -406,7 +410,7 @@ public class DataReportsTest extends ReportTest
 
         _userHelper.createUser(R_USER);
         _apiPermissionsHelper.addUserToProjGroup(R_USER, getProjectName(), "Users");
-        _apiPermissionsHelper.addMemberToRole("Users", "Editor", PermissionsHelper.MemberType.group, getProjectName());
+        _apiPermissionsHelper.addMemberToRole("Users", EDITOR_ROLE, PermissionsHelper.MemberType.group, getProjectName());
 
         //create R report with dev
         impersonate(R_USER);
@@ -424,7 +428,7 @@ public class DataReportsTest extends ReportTest
         stopImpersonating();
 
         log("Change user permission");
-        _apiPermissionsHelper.addMemberToRole("Users", "Project Administrator", PermissionsHelper.MemberType.group, getProjectName());
+        _apiPermissionsHelper.addMemberToRole("Users", PROJECT_ADMIN_ROLE, PermissionsHelper.MemberType.group, getProjectName());
 
         log("Create a new R script that uses other R scripts");
         navigateToFolder(getProjectName(), getFolderName());
@@ -495,7 +499,7 @@ public class DataReportsTest extends ReportTest
         log("Test showing the source tab to all users");
         createRReport(reportName, R_SCRIPT, true, true, new String[0]);
 
-        impersonateRole("Reader");
+        impersonateRole(READER_ROLE);
         clickFolder(getFolderName());
         scrollIntoView(Locator.linkWithText(DATA_SET_APX1));
         clickAndWait(Locator.linkWithText(DATA_SET_APX1));
@@ -515,7 +519,7 @@ public class DataReportsTest extends ReportTest
         _rReportHelper.clearOption(ScriptReportPage.StandardReportOption.showSourceTab);
         resaveReport();
 
-        impersonateRole("Reader");
+        impersonateRole(READER_ROLE);
 
         navigateToFolder(getProjectName(), getFolderName());
         scrollIntoView(Locator.linkWithText(DATA_SET_APX1));

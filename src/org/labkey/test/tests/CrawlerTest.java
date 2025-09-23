@@ -27,6 +27,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import static org.labkey.test.util.PermissionsHelper.READER_ROLE;
+
 @Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 5)
 public class CrawlerTest extends BaseWebDriverTest
@@ -57,7 +59,7 @@ public class CrawlerTest extends BaseWebDriverTest
         CspConfigHelper.debugCspWarnings();
         _containerHelper.createProject(getProjectName(), null);
         _userHelper.createUser(USER);
-        new ApiPermissionsHelper(this).addMemberToRole(USER, "Reader", MemberType.user, getProjectName());
+        new ApiPermissionsHelper(this).addMemberToRole(USER, READER_ROLE, MemberType.user, getProjectName());
     }
 
     /**

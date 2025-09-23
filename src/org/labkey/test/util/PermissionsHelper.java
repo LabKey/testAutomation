@@ -38,6 +38,12 @@ public abstract class PermissionsHelper
     public static final String APP_ADMIN_ROLE = "Application Admin";
     public static final String DEVELOPER_ROLE = "Platform Developer";
     public static final String IMP_TROUBLESHOOTER_ROLE = "Impersonating Troubleshooter";
+    public static final String PROJECT_ADMIN_ROLE = "Project Administrator";
+    public static final String FOLDER_ADMIN_ROLE = "Folder Administrator";
+    public static final String READER_ROLE = "Reader";
+    public static final String EDITOR_ROLE = "Editor";
+    public static final String AUTHOR_ROLE = "Author";
+    public static final String SUBMITTER_ROLE = "Submitter";
 
     public static String toRole(final String name)
     {
@@ -100,21 +106,21 @@ public abstract class PermissionsHelper
     {user, group, siteGroup}
 
     @LogMethod
-    public void setPermissions(@LoggedParam String groupName, @LoggedParam String roleClass)
+    public void setPermissions(@LoggedParam String groupName, @LoggedParam String roleName)
     {
-        addMemberToRole(groupName, roleClass, MemberType.group);
+        addMemberToRole(groupName, roleName, MemberType.group);
     }
 
     @LogMethod
-    public void setSiteGroupPermissions(@LoggedParam String groupName, @LoggedParam String roleClass)
+    public void setSiteGroupPermissions(@LoggedParam String groupName, @LoggedParam String roleName)
     {
-        addMemberToRole(groupName, roleClass, MemberType.siteGroup);
+        addMemberToRole(groupName, roleName, MemberType.siteGroup);
     }
 
     @LogMethod
-    public void setUserPermissions(@LoggedParam String userName, @LoggedParam String roleClass)
+    public void setUserPermissions(@LoggedParam String userName, @LoggedParam String roleName)
     {
-        addMemberToRole(userName, roleClass, MemberType.user);
+        addMemberToRole(userName, roleName, MemberType.user);
     }
 
     @LogMethod

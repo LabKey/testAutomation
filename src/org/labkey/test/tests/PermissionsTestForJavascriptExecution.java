@@ -15,6 +15,9 @@ import org.labkey.test.util.PermissionsHelper;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.labkey.test.util.PermissionsHelper.DEVELOPER_ROLE;
+import static org.labkey.test.util.PermissionsHelper.PROJECT_ADMIN_ROLE;
+
 @Category({Daily.class})
 public class PermissionsTestForJavascriptExecution extends BaseWebDriverTest
 {
@@ -73,7 +76,7 @@ public class PermissionsTestForJavascriptExecution extends BaseWebDriverTest
         _containerHelper.enableModule("simpletest");
 
         _userHelper.createUser(USER);
-        _apiPermissionsHelper.addMemberToRole(USER, "Project Administrator", PermissionsHelper.MemberType.user);
+        _apiPermissionsHelper.addMemberToRole(USER, PROJECT_ADMIN_ROLE, PermissionsHelper.MemberType.user);
     }
 
     /*
@@ -105,7 +108,7 @@ public class PermissionsTestForJavascriptExecution extends BaseWebDriverTest
         stopImpersonating();
 
         log("Adding developer role to the user");
-        _apiPermissionsHelper.setSiteRoleUserPermissions(USER, "Platform Developer");
+        _apiPermissionsHelper.setSiteRoleUserPermissions(USER, DEVELOPER_ROLE);
 
         log("Verifying editing metadata is success");
         goToProjectHome();

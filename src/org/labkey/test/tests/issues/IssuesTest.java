@@ -73,6 +73,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.util.PasswordUtil.getUsername;
+import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
+import static org.labkey.test.util.PermissionsHelper.READER_ROLE;
 
 @Category({Issues.class, Daily.class, Data.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 20)
@@ -168,7 +170,7 @@ public class IssuesTest extends BaseWebDriverTest
         _containerHelper.createProject(getProjectName(), null);
         _permissionsHelper.createPermissionsGroup(TEST_GROUP);
         _permissionsHelper.assertPermissionSetting(TEST_GROUP, "No Permissions");
-        _permissionsHelper.setPermissions(TEST_GROUP, "Editor");
+        _permissionsHelper.setPermissions(TEST_GROUP, EDITOR_ROLE);
 
         _issuesHelper.createNewIssuesList("issues", _containerHelper);
         waitAndClickAndWait(Locator.linkContainingText(ISSUE_SUMMARY_WEBPART_NAME));
@@ -843,7 +845,7 @@ public class IssuesTest extends BaseWebDriverTest
         // create reader user (issue 20598)
         _userHelper.createUser(user);
         _permissionsHelper.createPermissionsGroup("Readers", user);
-        _permissionsHelper.setPermissions("Readers", "Reader");
+        _permissionsHelper.setPermissions("Readers", READER_ROLE);
 
         String user1DisplayName = _userHelper.getDisplayNameForEmail(USER1);
 

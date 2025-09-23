@@ -38,6 +38,7 @@ import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.OptionalFeatureHelper;
 import org.labkey.test.util.PasswordUtil;
+import org.labkey.test.util.PermissionsHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SimpleHttpResponse;
 import org.labkey.test.util.UIPermissionsHelper;
@@ -59,6 +60,9 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.labkey.test.WebTestHelper.buildURL;
+import static org.labkey.test.util.PermissionsHelper.AUTHOR_ROLE;
+import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
+import static org.labkey.test.util.PermissionsHelper.READER_ROLE;
 
 @Category(BVT.class)
 @BaseWebDriverTest.ClassTimeout(minutes = 11)
@@ -69,8 +73,6 @@ public class SecurityTest extends BaseWebDriverTest
     protected static final String NORMAL_USER_TEMPLATE = "_user.template@security.test";
     protected static final String BOGUS_USER_TEMPLATE = "bogus@bogus@bogus";
     protected static final String PROJECT_ADMIN_USER = "admin_securitytest@security.test";
-    private static final String PROJECT_ADMIN_ROLE = "Project Administrator";
-    private static final String FOLDER_ADMIN_ROLE = "Folder Administrator";
     protected static final String NORMAL_USER = "user_securitytest@security.test";
     private static final String ADDED_USER = "fromprojectusers@security.test";
     protected static final String TO_BE_DELETED_USER = "delete_me@security.test";
@@ -254,8 +256,8 @@ public class SecurityTest extends BaseWebDriverTest
     {
         goToProjectHome();
         ApiPermissionsHelper permissionsHelper = new ApiPermissionsHelper(this);
-        permissionsHelper.setSiteGroupPermissions("All Site Users", "Author");
-        permissionsHelper.setSiteGroupPermissions("Guests", "Reader");
+        permissionsHelper.setSiteGroupPermissions("All Site Users", AUTHOR_ROLE);
+        permissionsHelper.setSiteGroupPermissions("Guests", READER_ROLE);
 
         PortalHelper portalHelper = new PortalHelper(this);
         portalHelper.addWebPart("Messages");
@@ -305,19 +307,19 @@ public class SecurityTest extends BaseWebDriverTest
 
         goToProjectHome();
         // Add permissions for a site group
-        _permissionsHelper.setSiteGroupPermissions("Guests", "Reader");
+        _permissionsHelper.setSiteGroupPermissions("Guests", READER_ROLE);
         // Add a non-group permission
-        _permissionsHelper.setUserPermissions(ADMIN_USER_TEMPLATE, "Editor");
+        _permissionsHelper.setUserPermissions(ADMIN_USER_TEMPLATE, EDITOR_ROLE);
         _permissionsHelper.createPermissionsGroup("Administrators");
         _permissionsHelper.clickManageGroup("Administrators");
         setFormElement(Locator.name("names"), ADMIN_USER_TEMPLATE);
         clickButton("Update Group Membership");
         _permissionsHelper.enterPermissionsUI();
-        _permissionsHelper.setPermissions("Administrators", "Project Administrator");
+        _permissionsHelper.setPermissions("Administrators", PermissionsHelper.PROJECT_ADMIN_ROLE);
 
         _permissionsHelper.createPermissionsGroup("Testers");
         _permissionsHelper.assertPermissionSetting("Testers", "No Permissions");
-        _permissionsHelper.setPermissions("Testers", "Editor");
+        _permissionsHelper.setPermissions("Testers", EDITOR_ROLE);
         _permissionsHelper.clickManageGroup("Testers");
         setFormElement(Locator.name("names"), NORMAL_USER_TEMPLATE);
         clickButton("Update Group Membership");
@@ -339,11 +341,11 @@ public class SecurityTest extends BaseWebDriverTest
         log("Verify individual (non-group) permissions were cloned");
         goToProjectHome();
         ApiPermissionsHelper helper = new ApiPermissionsHelper(this);
-        helper.assertPermissionSetting(PROJECT_ADMIN_USER, "Editor");
+        helper.assertPermissionSetting(PROJECT_ADMIN_USER, EDITOR_ROLE);
         log("Verify that group permissions did not get assigned individually");
-        _permissionsHelper.assertNoPermission(PROJECT_ADMIN_USER, "Reader");
-        _permissionsHelper.assertNoPermission(NORMAL_USER, "Reader");
-        _permissionsHelper.assertNoPermission(NORMAL_USER, "Editor");
+        _permissionsHelper.assertNoPermission(PROJECT_ADMIN_USER, READER_ROLE);
+        _permissionsHelper.assertNoPermission(NORMAL_USER, READER_ROLE);
+        _permissionsHelper.assertNoPermission(NORMAL_USER, EDITOR_ROLE);
 
         // verify permissions
         checkGroupMembership(PROJECT_ADMIN_USER, "SecurityVerifyProject/Administrators", 2);
@@ -355,7 +357,7 @@ public class SecurityTest extends BaseWebDriverTest
     public void testAddUserAsProjAdmin()
     {
         beginAt(WebTestHelper.buildURL("project", getProjectName(), "begin"));
-        impersonateRoles(PROJECT_ADMIN_ROLE);
+        impersonateRoles(PermissionsHelper.PROJECT_ADMIN_ROLE);
         ShowUsersPage usersPage = goToProjectUsers();
 
         usersPage
@@ -372,7 +374,7 @@ public class SecurityTest extends BaseWebDriverTest
     public void testCantAddUserAsFolderAdmin()
     {
         beginAt(WebTestHelper.buildURL("project", getProjectName(), "begin"));
-        impersonateRoles(FOLDER_ADMIN_ROLE);
+        impersonateRoles(PermissionsHelper.FOLDER_ADMIN_ROLE);
         goToProjectUsers();
 
         assertElementNotPresent(Locator.lkButton("Add Users"));

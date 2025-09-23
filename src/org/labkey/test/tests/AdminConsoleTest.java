@@ -46,6 +46,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.labkey.test.util.PermissionsHelper.APP_ADMIN_ROLE;
+import static org.labkey.test.util.PermissionsHelper.READER_ROLE;
 
 @Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 3)
@@ -175,7 +177,7 @@ public class AdminConsoleTest extends AbstractAdminConsoleTest
         assertEquals("Incorrect URL", expected, href);
 
         goToHome();
-        impersonateRole("Reader");
+        impersonateRole(READER_ROLE);
         assertElementPresent(ribbon);
         assertElementPresent(ribbonLink);
         stopImpersonating();
@@ -229,7 +231,7 @@ public class AdminConsoleTest extends AbstractAdminConsoleTest
                 .verifyTrue("expect banner to be shown", bannerLoc.isDisplayed(getDriver()));
 
         // as app admin
-        impersonateRole("Application Admin");
+        impersonateRole(APP_ADMIN_ROLE);
         var reHideBannerCmd = new SimplePostCommand("admin", "setRibbonMessage.api");
         reHideBannerCmd.setParameters(Map.of("show", false));
         try

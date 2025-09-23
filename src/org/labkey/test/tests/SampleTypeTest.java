@@ -92,6 +92,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.params.FieldDefinition.DOMAIN_TRICKY_CHARACTERS;
 import static org.labkey.test.util.DataRegionTable.DataRegion;
+import static org.labkey.test.util.PermissionsHelper.FOLDER_ADMIN_ROLE;
 
 @Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 20)
@@ -352,7 +353,7 @@ public class SampleTypeTest extends BaseWebDriverTest
     public void testMeFilterOnSampleType()
     {
         USER_FOR_FILTERTEST.create(this)
-                .addPermission("Folder Administrator", getProjectName());
+                .addPermission(FOLDER_ADMIN_ROLE, getProjectName());
         String sampleType = "meFilterSamples";
         FieldInfo sizeField = FieldInfo.random("size", ColumnType.Integer);
         FieldInfo userField = FieldInfo.random("user", ColumnType.User);
