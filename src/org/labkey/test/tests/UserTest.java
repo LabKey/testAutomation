@@ -53,6 +53,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
 
 @Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 9)
@@ -107,7 +108,7 @@ public class UserTest extends BaseWebDriverTest
     private void doSetup()
     {
         _containerHelper.createProject(getProjectName(), null);
-        _normalUserId = createUserWithPermissions(NORMAL_USER, getProjectName(), "Editor").getUserId();
+        _normalUserId = createUserWithPermissions(NORMAL_USER, getProjectName(), EDITOR_ROLE).getUserId();
     }
 
     @Override
@@ -365,7 +366,7 @@ public class UserTest extends BaseWebDriverTest
     @Test
     public void testDeactivatedUser()
     {
-        createUserWithPermissions(DEACTIVATED_USER, getProjectName(), "Editor");
+        createUserWithPermissions(DEACTIVATED_USER, getProjectName(), EDITOR_ROLE);
         goToSiteUsers();
         DataRegionTable usersTable = new DataRegionTable("Users", this);
         int row = usersTable.getRowIndex("Email", DEACTIVATED_USER);

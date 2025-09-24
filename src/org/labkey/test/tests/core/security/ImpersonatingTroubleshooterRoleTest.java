@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.labkey.test.util.PermissionsHelper.IMP_TROUBLESHOOTER_ROLE;
+import static org.labkey.test.util.PermissionsHelper.SITE_ADMIN_ROLE;
 import static org.labkey.test.util.PermissionsHelper.toRole;
 
 @Category({Git.class})
@@ -61,7 +62,7 @@ public class ImpersonatingTroubleshooterRoleTest extends TroubleshooterRoleTest
                 .hasMessage(LabkeyErrorPage.UNAUTHORIZED_FULL_PAGE_MESSAGE);
 
         apiAsImpersonatingSiteAdmin().addMemberToRole(USER, "Site Admin", PermissionsHelper.MemberType.user, "/");
-        Assertions.assertThat(_apiPermissionsHelper.getUserRoles("/", USER)).contains(PermissionsHelper.toRole("Site Administrator"));
+        Assertions.assertThat(_apiPermissionsHelper.getUserRoles("/", USER)).contains(PermissionsHelper.toRole(SITE_ADMIN_ROLE));
     }
 
     @Override
@@ -73,7 +74,7 @@ public class ImpersonatingTroubleshooterRoleTest extends TroubleshooterRoleTest
         log("Verify permissions from troubleshooter");
         verifySitePermissionSetting(false);
 
-        impersonateRole("Site Administrator");
+        impersonateRole(SITE_ADMIN_ROLE);
         log("Verify the permissions while impersonating admin");
         verifySitePermissionSetting(true);
     }
@@ -86,7 +87,7 @@ public class ImpersonatingTroubleshooterRoleTest extends TroubleshooterRoleTest
     private ApiPermissionsHelper apiAsImpersonatingSiteAdmin() throws IOException, CommandException
     {
         Connection connection = new Connection(WebTestHelper.getBaseURL(), TROUBLESHOOTER, PasswordUtil.getPassword());
-        new ImpersonateRolesCommand(toRole("Site Administrator")).execute(connection, "/");
+        new ImpersonateRolesCommand(toRole(SITE_ADMIN_ROLE)).execute(connection, "/");
         return new ApiPermissionsHelper(this, () -> connection);
     }
 

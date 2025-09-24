@@ -69,6 +69,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.labkey.test.components.ext4.Window.Window;
 import static org.labkey.test.util.FileBrowserHelper.BrowserAction;
+import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
 
 @Category({Daily.class, FileBrowser.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 6)
@@ -124,7 +125,7 @@ public class FileContentUploadTest extends BaseWebDriverTest
         portalHelper.addWebPart("Files");
         ApiPermissionsHelper permissionsHelper = new ApiPermissionsHelper(this);
         permissionsHelper.createPermissionsGroup(TEST_GROUP, TEST_USER);
-        permissionsHelper.setPermissions(TEST_GROUP, "Editor");
+        permissionsHelper.setPermissions(TEST_GROUP, EDITOR_ROLE);
 
         _containerHelper.createSubfolder(getProjectName(), subfolderName);
         clickFolder(subfolderName);

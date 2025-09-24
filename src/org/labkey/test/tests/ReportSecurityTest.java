@@ -28,6 +28,8 @@ import org.labkey.test.pages.admin.PermissionsPage;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 
+import static org.labkey.test.util.PermissionsHelper.READER_ROLE;
+
 @Category({Daily.class, Reports.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 8)
 public class ReportSecurityTest extends ReportTest
@@ -85,7 +87,7 @@ public class ReportSecurityTest extends ReportTest
         clickButton("Update Group Membership");
 
         navBar().goToPermissionsPage();
-        permissionsPage.setPermissions(TEST_GROUP, "Reader");
+        permissionsPage.setPermissions(TEST_GROUP, READER_ROLE);
         permissionsPage.clickSaveAndFinish();
 
         // give the test group read access to only the DEM-1 dataset
@@ -102,7 +104,7 @@ public class ReportSecurityTest extends ReportTest
         click(Locator.xpath("//td[.='" + TEST_GROUP + "']/..//td/input[@value='READOWN']"));
         clickAndWait(Locator.id("groupUpdateButton"));
 
-        selectOptionByText(Locator.name("dataset.1"), "Reader");
+        selectOptionByText(Locator.name("dataset.1"), READER_ROLE);
         clickAndWait(Locator.xpath("//form[@id='datasetSecurityForm']").append(Locator.lkButton("Save")));
     }
 

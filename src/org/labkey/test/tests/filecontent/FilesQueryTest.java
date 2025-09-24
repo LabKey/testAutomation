@@ -38,6 +38,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import static org.labkey.test.util.PermissionsHelper.PROJECT_ADMIN_ROLE;
+
 @Category({Daily.class, FileBrowser.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 6)
 public class FilesQueryTest extends BaseWebDriverTest
@@ -90,7 +92,7 @@ public class FilesQueryTest extends BaseWebDriverTest
 
         ApiPermissionsHelper permissionsHelper = new ApiPermissionsHelper(this);
         permissionsHelper.createPermissionsGroup(TEST_GROUP, TEST_USER, TEST_USER_NO_PATHS);
-        permissionsHelper.setPermissions(TEST_GROUP, "Project Administrator");
+        permissionsHelper.setPermissions(TEST_GROUP, PROJECT_ADMIN_ROLE);
         permissionsHelper.setSiteRoleUserPermissions(TEST_USER, "See Absolute File Paths");
     }
 

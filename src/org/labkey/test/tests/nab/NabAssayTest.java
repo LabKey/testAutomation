@@ -60,6 +60,7 @@ import java.util.Map;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.labkey.test.util.PermissionsHelper.READER_ROLE;
 
 @Category({Daily.class, Assays.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 15)
@@ -456,7 +457,7 @@ public class NabAssayTest extends AbstractAssayTest
             pushLocation();  // Save our location because impersonated user won't have permission to project
             PermissionsPage permissionsPage = navBar().goToPermissionsPage();
             permissionsPage.createPermissionsGroup(TEST_ASSAY_GRP_NAB_READER, TEST_ASSAY_USR_NAB_READER);
-            setSubfolderSecurity(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_STUDY1, TEST_ASSAY_GRP_NAB_READER, TEST_ASSAY_PERMS_READER);
+            setSubfolderSecurity(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_STUDY1, TEST_ASSAY_GRP_NAB_READER, READER_ROLE);
             setStudyPerms(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_STUDY1, TEST_ASSAY_GRP_NAB_READER, TEST_ASSAY_PERMS_STUDY_READALL);
 
             // view dataset, click [assay] link, see assay details in subfolder
@@ -880,15 +881,14 @@ public class NabAssayTest extends AbstractAssayTest
         DilutionAssayHelper detailHelper = new DilutionAssayHelper(this);
         waitForText("View QC");
         detailHelper.clickDetailsLink("View QC", "Review/QC Data");
-        RunQCPage runQCPage = new RunQCPage(getDriver());
+        RunQCPage<?> runQCPage = new RunQCPage<>(getDriver());
 
         log("Select a few values to remove from 'Plate 1'.");
         List<String> valuesToIgnore = new ArrayList<>();
-        List<String> allIgnoredValues = new ArrayList<>();
         valuesToIgnore.add("115243");
         valuesToIgnore.add("910");
         runQCPage.selectPlateItemsToIgnore("Plate 1 Controls", valuesToIgnore);
-        allIgnoredValues.addAll(valuesToIgnore);
+        List<String> allIgnoredValues = new ArrayList<>(valuesToIgnore);
 
         log("Select data points to remove from 'Specimen 2'.");
         valuesToIgnore = new ArrayList<>();
@@ -970,6 +970,6 @@ public class NabAssayTest extends AbstractAssayTest
         mouseOver(summaryPlateGrid.getCellElement("A", "2"));
         sleep(500); // Wait for a moment to allow the tool tip to show up.
         String tipText = getText(Locator.xpath("//div[contains(@class, 'x4-tip-body')]//span//div"));
-        assertTrue("Tool tip comment not as expected. Expected: '" + COMMENT + "' Found: '" + tipText + "'.", tipText.equals(COMMENT));
+        assertEquals("Tool tip comment not as expected. Expected: '" + COMMENT + "' Found: '" + tipText + "'.", COMMENT, tipText);
     }
 }

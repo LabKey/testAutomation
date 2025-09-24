@@ -87,6 +87,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
 
 /**
  * Tests for the Java Client API library.
@@ -192,7 +193,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
 
         log("Setting permissions...");
         clickProject(PROJECT_NAME);
-        _permissionsHelper.setSiteGroupPermissions("Guests", "Editor");
+        _permissionsHelper.setSiteGroupPermissions("Guests", EDITOR_ROLE);
 
         clickProject(PROJECT_NAME);
         clickAndWait(Locator.linkWithText(LIST_NAME));
@@ -541,7 +542,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
         // grant edit permission
         int userId = ensureUser(cn, USER2_NAME);
         ApiPermissionsHelper permHelper = new ApiPermissionsHelper(this);
-        permHelper.setUserPermissions(USER2_NAME, "Editor");
+        permHelper.setUserPermissions(USER2_NAME, EDITOR_ROLE);
 
         // check whoami
         WhoAmIResponse who = new WhoAmICommand().execute(cn, PROJECT_NAME);
@@ -594,7 +595,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
         // grant edit permission
         int userId = ensureUser(createDefaultConnection(), USER2_NAME);
         ApiPermissionsHelper permHelper = new ApiPermissionsHelper(this);
-        permHelper.setUserPermissions(USER2_NAME, "Editor");
+        permHelper.setUserPermissions(USER2_NAME, EDITOR_ROLE);
 
         Connection cn = new Connection(WebTestHelper.getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword())
                 .impersonate(USER2_NAME, PROJECT_NAME);

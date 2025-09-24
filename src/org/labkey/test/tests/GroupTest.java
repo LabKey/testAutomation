@@ -44,6 +44,9 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.labkey.test.util.PermissionsHelper.AUTHOR_ROLE;
+import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
+import static org.labkey.test.util.PermissionsHelper.READER_ROLE;
 
 @Category(Daily.class)
 @BaseWebDriverTest.ClassTimeout(minutes = 9)
@@ -129,9 +132,9 @@ public class GroupTest extends BaseWebDriverTest
         _permissionsHelper.enterPermissionsUI();
         waitForText("Author");
 
-        _permissionsHelper.setSiteGroupPermissions(COMPOUND_GROUP, "Author");
-        _permissionsHelper.setSiteGroupPermissions(COMPOUND_GROUP, "Reader");
-        _permissionsHelper.setSiteGroupPermissions(SIMPLE_GROUP, "Editor");
+        _permissionsHelper.setSiteGroupPermissions(COMPOUND_GROUP, AUTHOR_ROLE);
+        _permissionsHelper.setSiteGroupPermissions(COMPOUND_GROUP, READER_ROLE);
+        _permissionsHelper.setSiteGroupPermissions(SIMPLE_GROUP, EDITOR_ROLE);
         clickButton("Save and Finish");
         assertUserCanSeeProject(TEST_USERS_FOR_GROUP[0], getProjectName());
         //can't add built in group to regular group
@@ -141,7 +144,7 @@ public class GroupTest extends BaseWebDriverTest
         clickProject(getProjectName());
         _permissionsHelper.enterPermissionsUI();
         waitForText("Author");
-        _permissionsHelper.setSiteGroupPermissions("All Site Users", "Author");
+        _permissionsHelper.setSiteGroupPermissions("All Site Users", AUTHOR_ROLE);
         permissionsReportTest();
 
         // Ensure that deleting from the group's page works too. Issue 52614
@@ -178,7 +181,7 @@ public class GroupTest extends BaseWebDriverTest
         String displayName = _userHelper.getDisplayNameForEmail(TEST_USERS_FOR_GROUP[0]);
         int rowIndex = access.getRowIndex(userColumn, displayName) - headerIndex;
         assertTrue("Unable to find user: " + displayName, rowIndex >= 0);
-        List<String> expectedGroups = Arrays.asList("Author", "Reader", "Editor");
+        List<String> expectedGroups = Arrays.asList(AUTHOR_ROLE, READER_ROLE, EDITOR_ROLE);
         List<String> groupsForUser = Arrays.asList(access.getDataAsText(rowIndex + headerIndex, accessColumn).replace(" ", "").split(","));
 
         //confirm correct perms
@@ -205,7 +208,7 @@ public class GroupTest extends BaseWebDriverTest
         WikiHelper wikiHelper = new WikiHelper(this);
 
         //set simple group as editor
-        _permissionsHelper.setSiteGroupPermissions(SIMPLE_GROUP, "Editor");
+        _permissionsHelper.setSiteGroupPermissions(SIMPLE_GROUP, EDITOR_ROLE);
 
         //impersonate user 1, make several wiki edits
         impersonate(TEST_USERS_FOR_GROUP[0]);
@@ -229,11 +232,11 @@ public class GroupTest extends BaseWebDriverTest
         verifyAuthorPermission(nameTitleBody);
         stopImpersonating();
 
-        impersonateRoles("Author");
+        impersonateRoles(AUTHOR_ROLE);
         verifyAuthorPermission(nameTitleBody);
         stopImpersonating();
 
-        impersonateRoles("Editor");
+        impersonateRoles(EDITOR_ROLE);
         verifyEditorPermission(nameTitleBody);
         stopImpersonating();
 

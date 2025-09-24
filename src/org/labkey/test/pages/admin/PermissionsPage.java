@@ -37,6 +37,9 @@ import java.util.Date;
 import java.util.List;
 
 import static org.labkey.test.WebTestHelper.buildURL;
+import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
+import static org.labkey.test.util.PermissionsHelper.PROJECT_ADMIN_ROLE;
+import static org.labkey.test.util.PermissionsHelper.READER_ROLE;
 
 public class PermissionsPage extends LabKeyPage<PermissionsPage.ElementCache>
 {
@@ -104,7 +107,7 @@ public class PermissionsPage extends LabKeyPage<PermissionsPage.ElementCache>
         String R = "security.roles.";
         if ("No Permissions".equals(perm))
             return R + "NoPermissionsRole";
-        if ("Project Administrator".equals(perm))
+        if (PROJECT_ADMIN_ROLE.equals(perm))
             return R + "ProjectAdminRole";
         else if (!perm.contains("."))
             return R + perm + "Role";
@@ -498,9 +501,9 @@ public class PermissionsPage extends LabKeyPage<PermissionsPage.ElementCache>
 
         if (role.endsWith("security.roles.NoPermissionsRole"))
         {
-            assertNoPermission(userOrGroupName, "Reader");
-            assertNoPermission(userOrGroupName, "Editor");
-            assertNoPermission(userOrGroupName, "Project Administrator");
+            assertNoPermission(userOrGroupName, READER_ROLE);
+            assertNoPermission(userOrGroupName, EDITOR_ROLE);
+            assertNoPermission(userOrGroupName, PROJECT_ADMIN_ROLE);
             return this;
         }
         waitForElement(Locator.permissionRendered(), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);

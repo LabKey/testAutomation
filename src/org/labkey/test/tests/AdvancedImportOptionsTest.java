@@ -49,6 +49,8 @@ import java.util.stream.Collectors;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.labkey.test.util.PermissionsHelper.FOLDER_ADMIN_ROLE;
+import static org.labkey.test.util.PermissionsHelper.READER_ROLE;
 
 @Category(Daily.class)
 @BaseWebDriverTest.ClassTimeout(minutes = 9)
@@ -324,11 +326,11 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest implements Post
 
         log("Setting up permissions for a limited user");
         clickFolder(IMPORT_FOLDER_MULTI01);
-        permissionsHelper.addMemberToRole(LIMITED_USER, "Folder Administrator", PermissionsHelper.MemberType.user);
+        permissionsHelper.addMemberToRole(LIMITED_USER, FOLDER_ADMIN_ROLE, PermissionsHelper.MemberType.user);
         clickFolder(IMPORT_FOLDER_MULTI02);
-        permissionsHelper.addMemberToRole(LIMITED_USER, "Reader", PermissionsHelper.MemberType.user);
+        permissionsHelper.addMemberToRole(LIMITED_USER, READER_ROLE, PermissionsHelper.MemberType.user);
         clickFolder(IMPORT_FOLDER_MULTI03);
-        permissionsHelper.addMemberToRole(LIMITED_USER, "Folder Administrator", PermissionsHelper.MemberType.user);
+        permissionsHelper.addMemberToRole(LIMITED_USER, FOLDER_ADMIN_ROLE, PermissionsHelper.MemberType.user);
 
         pushLocation();
         impersonate(LIMITED_USER);

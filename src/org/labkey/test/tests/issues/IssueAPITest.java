@@ -33,6 +33,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
+import static org.labkey.test.util.PermissionsHelper.PROJECT_ADMIN_ROLE;
 import static org.labkey.test.util.PasswordUtil.getUsername;
 
 @Category({Issues.class, Daily.class})
@@ -76,7 +77,7 @@ public class IssueAPITest extends BaseWebDriverTest
         TEST_BUDDY_ID = _userHelper.createUser(TEST_BUDDY_NAME).getUserId();
         TEST_BUDDY_DISPLAY_NAME = _userHelper.getDisplayNameForEmail(TEST_BUDDY_NAME);
         var permissionsHelper = new ApiPermissionsHelper(this);
-        permissionsHelper.addMemberToRole(TEST_BUDDY_NAME, "Project Administrator",
+        permissionsHelper.addMemberToRole(TEST_BUDDY_NAME, PROJECT_ADMIN_ROLE,
                 PermissionsHelper.MemberType.user, getProjectName());
     }
 

@@ -40,6 +40,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.labkey.test.util.PermissionsHelper.FOLDER_ADMIN_ROLE;
+
 @Category({Daily.class})
 public class GridPanelViewTest extends GridPanelBaseTest
 {
@@ -130,7 +132,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
         createSampleType(DEFAULT_VIEW_SAMPLE_TYPE, DEFAULT_VIEW_SAMPLE_PREFIX, DEFAULT_VIEW_SAMPLE_TYPE_SIZE, fields);
 
         _userHelper.createUser(OTHER_USER, true,false);
-        new ApiPermissionsHelper(this).addMemberToRole(OTHER_USER, "Folder Administrator", PermissionsHelper.MemberType.user, getProjectName());
+        new ApiPermissionsHelper(this).addMemberToRole(OTHER_USER, FOLDER_ADMIN_ROLE, PermissionsHelper.MemberType.user, getProjectName());
 
     }
 

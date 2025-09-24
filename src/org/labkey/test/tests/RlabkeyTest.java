@@ -54,6 +54,7 @@ import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
 
 @Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 8)
@@ -112,9 +113,9 @@ public class RlabkeyTest extends BaseWebDriverTest
         _userHelper.createUser(USER);
         ApiPermissionsHelper apiPermissionsHelper = new ApiPermissionsHelper(this);
         apiPermissionsHelper.addUserToProjGroup(USER, PROJECT_NAME_2, "Users");
-        apiPermissionsHelper.addMemberToRole("Users", "Editor", PermissionsHelper.MemberType.group, PROJECT_NAME_2);
+        apiPermissionsHelper.addMemberToRole("Users", EDITOR_ROLE, PermissionsHelper.MemberType.group, PROJECT_NAME_2);
         apiPermissionsHelper.addUserToProjGroup(USER, PROJECT_NAME, "Users");
-        apiPermissionsHelper.addMemberToRole("Users", "Editor", PermissionsHelper.MemberType.group, PROJECT_NAME);
+        apiPermissionsHelper.addMemberToRole("Users", EDITOR_ROLE, PermissionsHelper.MemberType.group, PROJECT_NAME);
         IssuesHelper issuesHelper = new IssuesHelper(this);
 
         // create an site wide issues list

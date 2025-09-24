@@ -42,6 +42,8 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
+import static org.labkey.test.util.PermissionsHelper.READER_ROLE;
 
 @Category({Daily.class, Reports.class, Charting.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 15)
@@ -70,9 +72,9 @@ public class TimeChartDateBasedTest extends TimeChartTest
 
         navigateToFolder(getProjectName(), getFolderName());
         ApiPermissionsHelper permissionsHelper = new ApiPermissionsHelper(this);
-        permissionsHelper.setUserPermissions(USER1, "Reader");
-        permissionsHelper.setUserPermissions(USER2, "Editor");
-        permissionsHelper.setSiteGroupPermissions("Guests", "Reader");
+        permissionsHelper.setUserPermissions(USER1, READER_ROLE);
+        permissionsHelper.setUserPermissions(USER2, EDITOR_ROLE);
+        permissionsHelper.setSiteGroupPermissions("Guests", READER_ROLE);
 
         PortalHelper portalHelper = new PortalHelper(this);
         portalHelper.addWebPart("Views");
