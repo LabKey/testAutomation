@@ -1947,7 +1947,7 @@ public class SampleTypeTest extends BaseWebDriverTest
         CreateSampleTypePage createPage = sampleHelper
                 .goToCreateNewSampleType()
                 .setName(sampleTypeName);
-        assertTextNotPresent("Amount Display Units");
+        assertTextNotPresent("Display Units");
         createPage.clickSave();
         sampleHelper.goToSampleType(sampleTypeName);
 
