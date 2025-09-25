@@ -1980,11 +1980,11 @@ public class SampleTypeTest extends BaseWebDriverTest
         log("verify that bulk import with an amount or unit requires both fields to be filled in");
         // bulk import with amount but not unit (error expected)
         sampleHelper.bulkImportExpectingError(List.of(Map.of("Name", "AU-BULK-ERR-1", "StoredAmount", "0")), SampleTypeHelper.IMPORT_OPTION);
-        assertTextPresent("When adding or updating samples, a Units value must be provided when there is a value for Amount.");
+        assertTextPresent("A Units value must be provided when Amounts are provided");
         clickButton("Cancel");
         // bulk import with unit but not amount (error expected)
         sampleHelper.bulkImportExpectingError(List.of(Map.of("Name", "AU-BULK-ERR-2", "Units", "mL")), SampleTypeHelper.IMPORT_OPTION);
-        assertTextPresent("When adding or updating samples, a Amount value must be provided when there is a value for Units.");
+        assertTextPresent("An Amount value must be provided Units are provided.");
         clickButton("Cancel");
         // bulk import with both amount and unit (success expected)
         sampleHelper.bulkImport(List.of(Map.of("Name", "AU-BULK-SUCCESS-1", "StoredAmount", "0", "Units", "L")));
