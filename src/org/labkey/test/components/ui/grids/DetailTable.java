@@ -99,6 +99,10 @@ public class DetailTable extends WebDriverComponent<DetailTable.ElementCache>
         {
             return elementCache().siblingField(identifier);
         }
+        else if (elementCache().dataFieldByKey(identifier).isDisplayed())
+        {
+            return elementCache().dataFieldByKey(identifier);
+        }
         else
         {
             throw new NoSuchElementException(String.format("Could not find field '%s'.", identifier));
@@ -234,18 +238,21 @@ public class DetailTable extends WebDriverComponent<DetailTable.ElementCache>
     {
         public final WebElement dataByLabel(String fieldLabel)
         {
-            return Locator.tagWithAttribute("td", "data-caption", fieldLabel).findWhenNeeded(this);
+            return Locator.tagWithAttribute("td", "data-caption", fieldLabel).findWhenNeeded(this)
+                    .withTimeout(2000);
         }
 
         public final WebElement dataFieldByKey(String fieldKey)
         {
-            return Locator.tagWithAttribute("td", "data-fieldkey", fieldKey).findElement(this);
+            return Locator.tagWithAttribute("td", "data-fieldkey", fieldKey)
+                    .findWhenNeeded(this).withTimeout(2000);
         }
 
         // Some tables will show a value in a td with no attributes, use the td that has the text (label) to find the value.
         public final WebElement siblingField(String fieldLabel)
         {
-            return Locator.tagContainingText("td", fieldLabel).followingSibling("td").findWhenNeeded(this);
+            return Locator.tagContainingText("td", fieldLabel).followingSibling("td")
+                    .findWhenNeeded(this).withTimeout(2000);
         }
 
     }
