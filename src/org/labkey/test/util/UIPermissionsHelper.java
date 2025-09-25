@@ -24,7 +24,6 @@ import org.labkey.test.util.ext4cmp.Ext4CmpRef;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.Date;
@@ -145,9 +144,9 @@ public class UIPermissionsHelper extends PermissionsHelper
 
         if ("org.labkey.api.security.roles.NoPermissionsRole".equals(role))
         {
-            assertNoPermission(userOrGroupName, "Reader");
-            assertNoPermission(userOrGroupName, "Editor");
-            assertNoPermission(userOrGroupName, "Project Administrator");
+            assertNoPermission(userOrGroupName, READER_ROLE);
+            assertNoPermission(userOrGroupName, EDITOR_ROLE);
+            assertNoPermission(userOrGroupName, PROJECT_ADMIN_ROLE);
             return;
         }
         _driver.waitForElement(Locator.permissionRendered(), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
@@ -425,47 +424,11 @@ public class UIPermissionsHelper extends PermissionsHelper
         _driver.waitForElement(loc);
     }
 
-    public void clickManageSiteGroup(String groupName, BaseWebDriverTest _test)
-    {
-        _driver._ext4Helper.clickTabContainingText("Site Groups");
-        // warning Administrators can appear multiple times
-        List<Ext4CmpRef> refs = _driver._ext4Helper.componentQuery("grid", Ext4CmpRef.class);
-        Ext4CmpRef ref = refs.get(0);
-        Long idx = (Long)ref.getEval("getStore().find(\"name\", \"" + groupName + "\")");
-        assertFalse("Unable to locate group: \"" + groupName + "\"", idx < 0);
-        ref.eval("getSelectionModel().select(" + idx + ")");
-        _driver.waitAndClickAndWait(Locator.tagContainingText("a", "manage group"));
-        _driver.waitForElement(Locator.name("names"));
-    }
-
-    @LogMethod(quiet = true)
-    public void dragGroupToRole(@LoggedParam String group, @LoggedParam String srcRole, @LoggedParam String destRole, BaseWebDriverTest _test)
-    {
-        Actions builder = new Actions(_driver.getDriver());
-        builder
-                .clickAndHold(Locator.permissionButton(group, srcRole).findElement(_driver.getDriver()))
-                .moveToElement(Locator.xpath("//div[contains(@class, 'rolepanel')][.//h3[text()='" + destRole + "']]/div/div").findElement(_driver.getDriver()))
-                .release()
-                .build().perform();
-
-        _driver.waitForElementToDisappear(Locator.permissionButton(group, srcRole), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        _driver.waitForElement(Locator.permissionButton(group, destRole));
-    }
-
     public void addUserToGroupFromGroupScreen(String userName)
     {
         _driver.waitForElement(Locator.name("names"));
         _driver.uncheckCheckbox(Locator.name("sendEmail"));
         _driver.setFormElement(Locator.name("names"), userName);
         _driver.clickButton("Update Group Membership");
-    }
-
-    public void removeUserFromGroupFromGroupScreen(String userName)
-    {
-        _driver.checkCheckbox(Locator.checkboxByNameAndValue("delete", userName));
-        _driver.doAndWaitForPageToLoad(() -> {
-            _driver.clickButton("Update Group Membership", 0);
-            _driver.assertAlert("Are you sure you want to permanently remove the selected user from this group?");
-        }, BaseWebDriverTest.WAIT_FOR_PAGE);
     }
 }

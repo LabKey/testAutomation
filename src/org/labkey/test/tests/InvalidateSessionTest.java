@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Set;
 
 import static org.junit.Assert.fail;
+import static org.labkey.test.util.PermissionsHelper.FOLDER_ADMIN_ROLE;
 
 @Category({Daily.class})
 public class InvalidateSessionTest extends BaseWebDriverTest
@@ -53,7 +54,7 @@ public class InvalidateSessionTest extends BaseWebDriverTest
     {
         CreateUserResponse response = _userHelper.createUser(USER);
         ApiPermissionsHelper permissionsHelper = new ApiPermissionsHelper(this);
-        permissionsHelper.addMemberToRole(USER, "Folder Administrator", PermissionsHelper.MemberType.user);
+        permissionsHelper.addMemberToRole(USER, FOLDER_ADMIN_ROLE, PermissionsHelper.MemberType.user);
         setInitialPassword(response.getUserId());
     }
 

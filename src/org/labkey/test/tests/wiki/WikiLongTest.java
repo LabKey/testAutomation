@@ -38,6 +38,9 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
+import static org.labkey.test.util.PermissionsHelper.PROJECT_ADMIN_ROLE;
+import static org.labkey.test.util.PermissionsHelper.READER_ROLE;
 
 @Category({Daily.class, Wiki.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 11)
@@ -180,13 +183,13 @@ public class WikiLongTest extends BaseWebDriverTest
         enableEmailRecorder();
         _containerHelper.createProject(PROJECT2_NAME, null);
         _containerHelper.enableModule(PROJECT2_NAME, "MS2");
-        _permissionsHelper.setPermissions(USERS_GROUP, "Editor");
+        _permissionsHelper.setPermissions(USERS_GROUP, EDITOR_ROLE);
         clickButton("Save and Finish");
         _containerHelper.createProject(PROJECT_NAME, null);
         _containerHelper.enableModule(PROJECT_NAME, "MS2");
         _permissionsHelper.createPermissionsGroup("testers");
-        _permissionsHelper.setPermissions("testers", "Editor");
-        _permissionsHelper.setPermissions(USERS_GROUP, "Editor");
+        _permissionsHelper.setPermissions("testers", EDITOR_ROLE);
+        _permissionsHelper.setPermissions(USERS_GROUP, EDITOR_ROLE);
         clickButton("Save and Finish");
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Folder Type"));
@@ -460,7 +463,7 @@ public class WikiLongTest extends BaseWebDriverTest
 
         log("Check if permissions work");
         _permissionsHelper.enterPermissionsUI();
-        _permissionsHelper.setPermissions(USERS_GROUP, "Reader");
+        _permissionsHelper.setPermissions(USERS_GROUP, READER_ROLE);
         clickButton("Save and Finish");
         impersonate(USER1);
         clickProject(PROJECT2_NAME);
@@ -471,10 +474,10 @@ public class WikiLongTest extends BaseWebDriverTest
         stopImpersonating();
         clickProject(PROJECT2_NAME);
         _permissionsHelper.enterPermissionsUI();
-        _permissionsHelper.removePermission(USERS_GROUP, "Editor");
+        _permissionsHelper.removePermission(USERS_GROUP, EDITOR_ROLE);
         clickButton("Save and Finish");
         _permissionsHelper.enterPermissionsUI();
-        _permissionsHelper.removePermission(USERS_GROUP, "Reader");
+        _permissionsHelper.removePermission(USERS_GROUP, READER_ROLE);
         clickButton("Save and Finish");
         impersonate(USER1);
         assertElementNotPresent(Locator.linkWithText(PROJECT2_NAME));     // Project should not be visible
@@ -495,7 +498,7 @@ public class WikiLongTest extends BaseWebDriverTest
         submit();
         assertTextPresent(WIKI_PAGE2_TITLE);
         _permissionsHelper.enterPermissionsUI();
-        _permissionsHelper.setPermissions(USERS_GROUP, "Project Administrator");
+        _permissionsHelper.setPermissions(USERS_GROUP, PROJECT_ADMIN_ROLE);
         clickButton("Save and Finish");
         impersonate(USER1);
         clickProject(PROJECT2_NAME);
@@ -522,7 +525,7 @@ public class WikiLongTest extends BaseWebDriverTest
         stopImpersonating();
         clickProject(PROJECT_NAME);
         _permissionsHelper.enterPermissionsUI();
-        _permissionsHelper.setPermissions(USERS_GROUP, "Project Administrator");
+        _permissionsHelper.setPermissions(USERS_GROUP, PROJECT_ADMIN_ROLE);
         clickButtonContainingText("Save and Finish");
 
         log("make sure the changes went through");

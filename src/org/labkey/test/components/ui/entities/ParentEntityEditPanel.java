@@ -188,13 +188,13 @@ public class ParentEntityEditPanel extends Panel<ParentEntityEditPanel.ElementCa
             // Issue 53915: Lineage panel grids don't show IDs or links for parent sequences and molecules in Biologics
             for (String selection : selections)
             {
-                getWrapper().quickWait().until(ExpectedConditions.visibilityOf(
+                getWrapper().shortWait().until(ExpectedConditions.visibilityOf(
                         Locator.linkWithText(selection).findWhenNeeded(detailsPanel)));
             }
         }
         else
         {
-            getWrapper().quickWait().until(ExpectedConditions.visibilityOf(
+            getWrapper().shortWait().until(ExpectedConditions.visibilityOf(
                 Locator.tag("td").containing("has been set for this").findWhenNeeded(detailsPanel))); // e.g. "No source parent type has been set for this source."
         }
     }

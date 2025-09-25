@@ -41,6 +41,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
 
 @Category({Issues.class, Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 5)
@@ -120,7 +121,7 @@ public class IssueDomainSharingTest extends BaseWebDriverTest
         final String projectGroup = "ProjectGroup";
         _permissionsHelper.createProjectGroup(projectGroup, getProjectName());
         _permissionsHelper.addUserToProjGroup(USER, getProjectName(), projectGroup);
-        _permissionsHelper.addMemberToRole(projectGroup, "Editor", PermissionsHelper.MemberType.group, getProjectName());
+        _permissionsHelper.addMemberToRole(projectGroup, EDITOR_ROLE, PermissionsHelper.MemberType.group, getProjectName());
 
         final String title = "Child Issue";
         final String assignTo = _userHelper.getDisplayNameForEmail(USER);

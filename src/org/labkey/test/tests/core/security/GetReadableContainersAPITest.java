@@ -19,6 +19,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
+import static org.labkey.test.util.PermissionsHelper.READER_ROLE;
 
 @Category({Daily.class})
 public class GetReadableContainersAPITest extends BaseWebDriverTest
@@ -163,11 +164,11 @@ public class GetReadableContainersAPITest extends BaseWebDriverTest
 
         if (readable)
         {
-            _permissions.addMemberToRole(USER, "Reader", MemberType.user, path);
+            _permissions.addMemberToRole(USER, READER_ROLE, MemberType.user, path);
         }
         else
         {
-            _permissions.removeUserRoleAssignment(USER, "Reader", path);
+            _permissions.removeUserRoleAssignment(USER, READER_ROLE, path);
         }
 
         containerInfos.add(new ContainerInfo(path, readable, foldersReadable.length + 1));

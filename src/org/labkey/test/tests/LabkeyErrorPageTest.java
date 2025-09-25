@@ -13,6 +13,8 @@ import org.labkey.test.pages.LabkeyErrorPage;
 
 import java.util.List;
 
+import static org.labkey.test.util.PermissionsHelper.READER_ROLE;
+
 @Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 7)
 public class LabkeyErrorPageTest extends BaseWebDriverTest
@@ -29,7 +31,7 @@ public class LabkeyErrorPageTest extends BaseWebDriverTest
     private void doSetup()
     {
         _containerHelper.createProject(getProjectName(), null);
-        createUserWithPermissions(READER_USER, getProjectName(), "Reader");
+        createUserWithPermissions(READER_USER, getProjectName(), READER_ROLE);
     }
 
     @Test

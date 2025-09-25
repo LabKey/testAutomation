@@ -40,6 +40,11 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.labkey.test.util.PermissionsHelper.AUTHOR_ROLE;
+import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
+import static org.labkey.test.util.PermissionsHelper.PROJECT_ADMIN_ROLE;
+import static org.labkey.test.util.PermissionsHelper.READER_ROLE;
+import static org.labkey.test.util.PermissionsHelper.SUBMITTER_ROLE;
 
 @Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 7)
@@ -108,7 +113,7 @@ public class UserPermissionsTest extends BaseWebDriverTest
         _containerHelper.createProject(PERM_PROJECT_NAME, null);
         _permissionsHelper.createPermissionsGroup(GAMMA_EDITOR_GROUP_NAME);
         _permissionsHelper.assertPermissionSetting(GAMMA_EDITOR_GROUP_NAME, "No Permissions");
-        _permissionsHelper.setPermissions(GAMMA_EDITOR_GROUP_NAME, "Editor");
+        _permissionsHelper.setPermissions(GAMMA_EDITOR_GROUP_NAME, EDITOR_ROLE);
         createUserInProjectForGroup(GAMMA_EDITOR_USER, PERM_PROJECT_NAME, GAMMA_EDITOR_GROUP_NAME, false);
 
         _containerHelper.createSubfolder(PERM_PROJECT_NAME, PERM_PROJECT_NAME, DENIED_SUB_FOLDER_NAME, "None", new String[]{"Messages", "Wiki"}, true);
@@ -125,7 +130,7 @@ public class UserPermissionsTest extends BaseWebDriverTest
         _permissionsHelper.enterPermissionsUI();
         _permissionsHelper.createPermissionsGroup(GAMMA_READER_GROUP_NAME);
         _permissionsHelper.assertPermissionSetting(GAMMA_READER_GROUP_NAME, "No Permissions");
-        _permissionsHelper.setPermissions(GAMMA_READER_GROUP_NAME, "Reader");
+        _permissionsHelper.setPermissions(GAMMA_READER_GROUP_NAME, READER_ROLE);
         createUserInProjectForGroup(GAMMA_READER_USER, PERM_PROJECT_NAME, GAMMA_READER_GROUP_NAME, false);
 
         //Create Author User
@@ -133,7 +138,7 @@ public class UserPermissionsTest extends BaseWebDriverTest
         _permissionsHelper.enterPermissionsUI();
         _permissionsHelper.createPermissionsGroup(GAMMA_AUTHOR_GROUP_NAME);
         _permissionsHelper.assertPermissionSetting(GAMMA_AUTHOR_GROUP_NAME, "No Permissions");
-        _permissionsHelper.setPermissions(GAMMA_AUTHOR_GROUP_NAME, "Author");
+        _permissionsHelper.setPermissions(GAMMA_AUTHOR_GROUP_NAME, AUTHOR_ROLE);
         createUserInProjectForGroup(GAMMA_AUTHOR_USER, PERM_PROJECT_NAME, GAMMA_AUTHOR_GROUP_NAME, false);
 
         //Create the Submitter User
@@ -141,7 +146,7 @@ public class UserPermissionsTest extends BaseWebDriverTest
         _permissionsHelper.enterPermissionsUI();
         _permissionsHelper.createPermissionsGroup(GAMMA_SUBMITTER_GROUP_NAME);
         _permissionsHelper.assertPermissionSetting(GAMMA_SUBMITTER_GROUP_NAME, "No Permissions");
-        _permissionsHelper.setPermissions(GAMMA_SUBMITTER_GROUP_NAME, "Submitter");
+        _permissionsHelper.setPermissions(GAMMA_SUBMITTER_GROUP_NAME, SUBMITTER_ROLE);
 
         // TODO: Add submitter to a group
         /*
@@ -226,14 +231,14 @@ public class UserPermissionsTest extends BaseWebDriverTest
         clickFolder(DENIED_SUB_FOLDER_NAME);
         _permissionsHelper.enterPermissionsUI();
         _permissionsHelper.uncheckInheritedPermissions();
-        _permissionsHelper.removePermission(GAMMA_READER_GROUP_NAME, "Reader");
+        _permissionsHelper.removePermission(GAMMA_READER_GROUP_NAME, READER_ROLE);
         clickButton("Save and Finish");
 
         // Test that a project admin is confined to a single project when impersonating a project user. Site admins
         // are not restricted in this way, so we need to create and login as a new user with project admin permissions.
         clickProject(PERM_PROJECT_NAME);
         _permissionsHelper.createPermissionsGroup(GAMMA_ADMIN_GROUP_NAME);
-        _permissionsHelper.setPermissions(GAMMA_ADMIN_GROUP_NAME, "Project Administrator");
+        _permissionsHelper.setPermissions(GAMMA_ADMIN_GROUP_NAME, PROJECT_ADMIN_ROLE);
         createUserInProjectForGroup(GAMMA_PROJECT_ADMIN_USER, PERM_PROJECT_NAME, GAMMA_ADMIN_GROUP_NAME, true);
         setInitialPassword(GAMMA_PROJECT_ADMIN_USER);
         signOut();

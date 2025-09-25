@@ -39,6 +39,7 @@ import static org.junit.Assert.fail;
 import static org.labkey.test.util.PermissionsHelper.APP_ADMIN_ROLE;
 import static org.labkey.test.util.PermissionsHelper.DEVELOPER_ROLE;
 import static org.labkey.test.util.PermissionsHelper.IMP_TROUBLESHOOTER_ROLE;
+import static org.labkey.test.util.PermissionsHelper.READER_ROLE;
 import static org.labkey.test.util.PermissionsHelper.SITE_ADMIN_ROLE;
 
 @Category({Daily.class})
@@ -123,7 +124,7 @@ public class AppAdminRoleTest extends BaseWebDriverTest
     @Test
     public void testAppAdminAssignPlatformDeveloper()
     {
-        CommandException apiException = getApiException(() -> permissionsApiAsAppAdmin().addMemberToRole(USER, "Platform Developer", MemberType.user, "/"));
+        CommandException apiException = getApiException(() -> permissionsApiAsAppAdmin().addMemberToRole(USER, DEVELOPER_ROLE, MemberType.user, "/"));
         if (apiException == null)
             fail("App Admin was able to assign Platform Developer role");
 
@@ -133,7 +134,7 @@ public class AppAdminRoleTest extends BaseWebDriverTest
     @Test
     public void testAssignGroupPlatformDeveloper()
     {
-        CommandException apiException = getApiException(() -> permissionsApiAsAppAdmin().addMemberToRole(SITE_GROUP, "Platform Developer", MemberType.group, "/"));
+        CommandException apiException = getApiException(() -> permissionsApiAsAppAdmin().addMemberToRole(SITE_GROUP, DEVELOPER_ROLE, MemberType.group, "/"));
         if (apiException == null)
             fail("App Admin was able to assign group to Platform Developer role");
 
@@ -143,7 +144,7 @@ public class AppAdminRoleTest extends BaseWebDriverTest
     @Test
     public void testAppAdminAssignReader()
     {
-        permissionsApiAsAppAdmin().addMemberToRole(USER, "Reader", MemberType.user, "home");
+        permissionsApiAsAppAdmin().addMemberToRole(USER, READER_ROLE, MemberType.user, "home");
     }
 
     @Test

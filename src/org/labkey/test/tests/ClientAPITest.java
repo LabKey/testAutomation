@@ -87,6 +87,7 @@ import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.WebTestHelper.getHttpResponse;
 import static org.labkey.test.params.FieldDefinition.DOMAIN_TRICKY_CHARACTERS;
+import static org.labkey.test.util.PermissionsHelper.APP_ADMIN_ROLE;
 
 @Category({BVT.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 14)
@@ -1114,7 +1115,7 @@ public class ClientAPITest extends BaseWebDriverTest
 
         enableEmailRecorder();
 
-        apiPermissionsHelper.addMemberToRole(EMAIL_SENDER, "Application Admin", PermissionsHelper.MemberType.user, "/");
+        apiPermissionsHelper.addMemberToRole(EMAIL_SENDER, APP_ADMIN_ROLE, PermissionsHelper.MemberType.user, "/");
 
         goToHome();
         impersonate(EMAIL_SENDER);
