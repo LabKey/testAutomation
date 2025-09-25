@@ -63,6 +63,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.labkey.test.util.PermissionsHelper.READER_ROLE;
 
 /**
  * This test created linked schemas from a source container in a target container.
@@ -646,13 +647,13 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         _userHelper.createUser(EXTERNAL_SCHEMA_USER);
 
         _containerHelper.createProject(getProjectName(), null);
-        apiPermissionsHelper.setUserPermissions(EXTERNAL_SCHEMA_USER, "Reader");
+        apiPermissionsHelper.setUserPermissions(EXTERNAL_SCHEMA_USER, READER_ROLE);
         _containerHelper.createSubfolder(getProjectName(), SOURCE_FOLDER);
         // Enable linkedschematest in source folder so the "BPeopleTemplate" is visible.
         _containerHelper.enableModule("linkedschematest");
 
         _containerHelper.createSubfolder(getProjectName(), TARGET_FOLDER);
-        apiPermissionsHelper.setUserPermissions(READER_USER, "Reader");
+        apiPermissionsHelper.setUserPermissions(READER_USER, READER_ROLE);
 
         // Create a study folder.
         _containerHelper.createSubfolder(getProjectName(), STUDY_FOLDER, "Study");

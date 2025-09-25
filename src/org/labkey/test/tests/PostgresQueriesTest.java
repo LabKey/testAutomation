@@ -36,6 +36,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
+import static org.labkey.test.util.PermissionsHelper.PROJECT_ADMIN_ROLE;
 
 @Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 3)
@@ -54,7 +55,7 @@ public class PostgresQueriesTest extends AbstractAdminConsoleTest implements Pos
         // Verify project admin gets a 401 for activity grid
         pushLocation();
         goToHome();
-        impersonateRole("Project Administrator");
+        impersonateRole(PROJECT_ADMIN_ROLE);
         popLocation();
         LabkeyErrorPage errorPage = new LabkeyErrorPage(getDriver());
         errorPage.assertUnauthorized(checker());
@@ -69,7 +70,7 @@ public class PostgresQueriesTest extends AbstractAdminConsoleTest implements Pos
         // Verify project admin gets a 401 for locks grid
         pushLocation();
         goToHome();
-        impersonateRole("Project Administrator");
+        impersonateRole(PROJECT_ADMIN_ROLE);
         popLocation();
         errorPage = new LabkeyErrorPage(getDriver());
         errorPage.assertUnauthorized(checker());

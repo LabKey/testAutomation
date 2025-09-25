@@ -30,6 +30,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.fail;
+import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
+import static org.labkey.test.util.PermissionsHelper.PROJECT_ADMIN_ROLE;
+import static org.labkey.test.util.PermissionsHelper.READER_ROLE;
 
 @Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 6)
@@ -127,9 +130,9 @@ public class WebpartPermissionsTest extends BaseWebDriverTest
     {
         // Target permissions operations at non-default project
         PermissionsHelper helper = new ApiPermissionsHelper(DUMMY_PROJECT_NAME);
-        helper.setUserPermissions(users[0], "Reader");
-        helper.setUserPermissions(users[1], "Editor");
-        helper.setUserPermissions(users[2], "Project Administrator");
+        helper.setUserPermissions(users[0], READER_ROLE);
+        helper.setUserPermissions(users[1], EDITOR_ROLE);
+        helper.setUserPermissions(users[2], PROJECT_ADMIN_ROLE);
     }
 
     private void verifyNoWebpartsVisible()
@@ -155,7 +158,7 @@ public class WebpartPermissionsTest extends BaseWebDriverTest
         _containerHelper.createProject(getProjectName(), "Collaboration");
         importFolderFromZip(TestFileUtils.getSampleData("webpartPerm/webPerms.folder.zip"));
         //set all users to Reader so they have access to the folder
-        _permissionsHelper.setSiteGroupPermissions("All Site Users", "Reader");
+        _permissionsHelper.setSiteGroupPermissions("All Site Users", READER_ROLE);
     }
 
     //This folder contains no data, but will create users and set them with specific permissions

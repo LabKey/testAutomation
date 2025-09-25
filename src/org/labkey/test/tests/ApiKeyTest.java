@@ -71,6 +71,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
+import static org.labkey.test.util.PermissionsHelper.PROJECT_ADMIN_ROLE;
 
 @Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 4)
@@ -105,7 +107,7 @@ public class ApiKeyTest extends BaseWebDriverTest
 
         EDITOR_USER.create(this)
                 .setInitialPassword()
-                .addPermission("Editor", getProjectName());
+                .addPermission(EDITOR_ROLE, getProjectName());
 
         new IntListDefinition(LIST_NAME, "Key")
             .addField(new FieldDefinition(LIST_VALUE))
@@ -306,7 +308,7 @@ public class ApiKeyTest extends BaseWebDriverTest
 
         log("Verify " + APIKEYS_TABLE + " table is not accessible for non site-admin");
         goToProjectHome();
-        impersonateRoles("Project Administrator");
+        impersonateRoles(PROJECT_ADMIN_ROLE);
         verifyAPIKeysTablePresence(false);
     }
 

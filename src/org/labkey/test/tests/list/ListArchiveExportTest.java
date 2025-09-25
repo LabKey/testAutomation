@@ -24,6 +24,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import static org.labkey.test.util.PermissionsHelper.FOLDER_ADMIN_ROLE;
+import static org.labkey.test.util.PermissionsHelper.READER_ROLE;
+
 @Category({Daily.class, Hosting.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 2)
 public class ListArchiveExportTest extends BaseWebDriverTest
@@ -66,10 +69,10 @@ public class ListArchiveExportTest extends BaseWebDriverTest
 
         _userHelper.createUser(_listUser);
         ApiPermissionsHelper _permissionHelper = new ApiPermissionsHelper(LIST_FOLDER_A);
-        _permissionHelper.addMemberToRole(_listUser, "Folder Administrator", PermissionsHelper.MemberType.user);
+        _permissionHelper.addMemberToRole(_listUser, FOLDER_ADMIN_ROLE, PermissionsHelper.MemberType.user);
 
         _permissionHelper = new ApiPermissionsHelper(getProjectName());
-        _permissionHelper.addMemberToRole(_listUser, "Reader", PermissionsHelper.MemberType.user);
+        _permissionHelper.addMemberToRole(_listUser, READER_ROLE, PermissionsHelper.MemberType.user);
     }
 
     private void createListWithData(String name, Map<String, Object> rowData) throws IOException, CommandException

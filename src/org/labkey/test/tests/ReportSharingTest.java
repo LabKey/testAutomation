@@ -32,6 +32,11 @@ import org.labkey.test.util.RReportHelper;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
+import static org.labkey.test.util.PermissionsHelper.READER_ROLE;
+import static org.labkey.test.util.PermissionsHelper.SITE_ADMIN_ROLE;
+import static org.labkey.test.util.PermissionsHelper.SUBMITTER_ROLE;
+
 @Category({Daily.class, Reports.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 6)
 public class ReportSharingTest extends BaseWebDriverTest
@@ -68,10 +73,10 @@ public class ReportSharingTest extends BaseWebDriverTest
 
         ApiPermissionsHelper apiPermissionsHelper = new ApiPermissionsHelper(this);
         apiPermissionsHelper.addUserToProjGroup(USER_EDITOR, getProjectName(), "Users");
-        apiPermissionsHelper.setPermissions("Users", "Editor");
-        apiPermissionsHelper.setUserPermissions(USER_EDITOR,"Reader");
-        apiPermissionsHelper.setUserPermissions(USER_NON_EDITOR,"Submitter");
-        apiPermissionsHelper.setSiteRoleUserPermissions(USER_DEV, "Site Administrator");
+        apiPermissionsHelper.setPermissions("Users", EDITOR_ROLE);
+        apiPermissionsHelper.setUserPermissions(USER_EDITOR,READER_ROLE);
+        apiPermissionsHelper.setUserPermissions(USER_NON_EDITOR,SUBMITTER_ROLE);
+        apiPermissionsHelper.setSiteRoleUserPermissions(USER_DEV, SITE_ADMIN_ROLE);
     }
 
     @Before

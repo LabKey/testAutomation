@@ -17,6 +17,13 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
+import static org.labkey.test.util.PermissionsHelper.APP_ADMIN_ROLE;
+import static org.labkey.test.util.PermissionsHelper.AUTHOR_ROLE;
+import static org.labkey.test.util.PermissionsHelper.DEVELOPER_ROLE;
+import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
+import static org.labkey.test.util.PermissionsHelper.SITE_ADMIN_ROLE;
+import static org.labkey.test.util.PermissionsHelper.SUBMITTER_ROLE;
+
 @Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 3)
 public class UserClonePermissionTest extends BaseWebDriverTest
@@ -54,23 +61,23 @@ public class UserClonePermissionTest extends BaseWebDriverTest
         _permissionsHelper = new ApiPermissionsHelper(this);
 
         _userHelper.createUser(CLONED_SOURCE_SITE_USER);
-        _permissionsHelper.setSiteRoleUserPermissions(CLONED_SOURCE_SITE_USER, "Site Administrator");
+        _permissionsHelper.setSiteRoleUserPermissions(CLONED_SOURCE_SITE_USER, SITE_ADMIN_ROLE);
 
         _userHelper.createUser(CLONED_SOURCE_APP_USER);
         _permissionsHelper.addUserAsAppAdmin(CLONED_SOURCE_APP_USER);
 
         goToProjectHome();
         _permissionsHelper.createPermissionsGroup(CLONE_GROUP);
-        _permissionsHelper.setPermissions(CLONE_GROUP, "Editor");
-        _permissionsHelper.setPermissions(CLONE_GROUP, "Author");
+        _permissionsHelper.setPermissions(CLONE_GROUP, EDITOR_ROLE);
+        _permissionsHelper.setPermissions(CLONE_GROUP, AUTHOR_ROLE);
         _permissionsHelper.addUserToProjGroup(CLONED_SOURCE_SITE_USER, getProjectName(), CLONE_GROUP);
-        _permissionsHelper.addMemberToRole(CLONED_SOURCE_SITE_USER, "Author", PermissionsHelper.MemberType.user);
+        _permissionsHelper.addMemberToRole(CLONED_SOURCE_SITE_USER, AUTHOR_ROLE, PermissionsHelper.MemberType.user);
         _permissionsHelper.addUserToProjGroup(CLONED_SOURCE_APP_USER, getProjectName(), CLONE_GROUP);
 
-        _permissionsHelper.setSiteRoleUserPermissions(CLONED_SOURCE_SITE_USER, "Platform Developer");
+        _permissionsHelper.setSiteRoleUserPermissions(CLONED_SOURCE_SITE_USER, DEVELOPER_ROLE);
 
         _userHelper.createUser(CLONED_TARGET_SITE_USER);
-        _permissionsHelper.addMemberToRole(CLONED_TARGET_SITE_USER, "Submitter", PermissionsHelper.MemberType.user);
+        _permissionsHelper.addMemberToRole(CLONED_TARGET_SITE_USER, SUBMITTER_ROLE, PermissionsHelper.MemberType.user);
 
         _userHelper.createUser(CLONED_TARGET_APP_USER);
     }
@@ -102,9 +109,9 @@ public class UserClonePermissionTest extends BaseWebDriverTest
 
         log("Verifying project level permission");
         _permissionsHelper = new ApiPermissionsHelper(getProjectName());
-        _permissionsHelper.assertPermissionSetting(CLONED_TARGET_SITE_USER, "Author");
-        _permissionsHelper.assertPermissionSetting(CLONED_TARGET_SITE_USER, "Editor");
-        _permissionsHelper.assertNoPermission(CLONED_TARGET_SITE_USER, "Submitter");
+        _permissionsHelper.assertPermissionSetting(CLONED_TARGET_SITE_USER, AUTHOR_ROLE);
+        _permissionsHelper.assertPermissionSetting(CLONED_TARGET_SITE_USER, EDITOR_ROLE);
+        _permissionsHelper.assertNoPermission(CLONED_TARGET_SITE_USER, SUBMITTER_ROLE);
         Assert.assertTrue("Project group is not cloned",
                 _permissionsHelper.isUserInGroup(CLONED_TARGET_SITE_USER, CLONE_GROUP, getProjectName(), PermissionsHelper.PrincipalType.USER));
 
@@ -134,7 +141,7 @@ public class UserClonePermissionTest extends BaseWebDriverTest
     public void testAppAdminClonePermission()
     {
         goToSiteUsers();
-        impersonateRole("Application Admin");
+        impersonateRole(APP_ADMIN_ROLE);
         clickAndWait(Locator.linkWithText(_userHelper.getDisplayNameForEmail(CLONED_TARGET_APP_USER)));
         clickAndWait(Locator.linkWithText("Clone Permissions"));
         ClonePermissionsPage clonePermissionsPage = new ClonePermissionsPage(getDriver());
@@ -156,8 +163,8 @@ public class UserClonePermissionTest extends BaseWebDriverTest
 
         log("Verifying project level permission");
         _permissionsHelper = new ApiPermissionsHelper(getProjectName());
-        _permissionsHelper.assertPermissionSetting(CLONED_TARGET_APP_USER, "Author");
-        _permissionsHelper.assertPermissionSetting(CLONED_TARGET_APP_USER, "Editor");
+        _permissionsHelper.assertPermissionSetting(CLONED_TARGET_APP_USER, AUTHOR_ROLE);
+        _permissionsHelper.assertPermissionSetting(CLONED_TARGET_APP_USER, EDITOR_ROLE);
         Assert.assertTrue("Project group is not cloned",
                 _permissionsHelper.isUserInGroup(CLONED_TARGET_APP_USER, CLONE_GROUP, getProjectName(), PermissionsHelper.PrincipalType.USER));
 

@@ -37,6 +37,8 @@ import org.openqa.selenium.WebElement;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
+
 @Category({Base.class, DRT.class, Daily.class, Git.class, Hosting.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 6)
 public class BasicAdminTest extends BaseWebDriverTest
@@ -91,7 +93,7 @@ public class BasicAdminTest extends BaseWebDriverTest
         permissionsHelper.createPermissionsGroup("testers");
         _ext4Helper.clickTabContainingText("Permissions");
         permissionsHelper.assertPermissionSetting("testers", "No Permissions");
-        permissionsHelper.setPermissions("testers", "Editor");
+        permissionsHelper.setPermissions("testers", EDITOR_ROLE);
 
         clickButton("Save and Finish");
         log("Test folder aliasing");
@@ -100,7 +102,7 @@ public class BasicAdminTest extends BaseWebDriverTest
         popLocation();
         assertTextPresent(FOLDER_RENAME);
 
-        permissionsHelper.assertPermissionSetting("testers", "Editor");
+        permissionsHelper.assertPermissionSetting("testers", EDITOR_ROLE);
     }
 
     @Test @Ignore

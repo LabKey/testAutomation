@@ -48,6 +48,7 @@ import java.util.Map;
 import static org.junit.Assert.assertEquals;
 import static org.labkey.test.params.FieldDefinition.ColumnType;
 import static org.labkey.test.params.FieldDefinition.DOMAIN_TRICKY_CHARACTERS;
+import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
 import static org.labkey.test.util.PermissionsHelper.MemberType;
 
 @Category({Daily.class, Data.class})
@@ -115,8 +116,8 @@ public class FilterTest extends BaseWebDriverTest
         _userHelper.createUser(EDITOR1);
         _userHelper.createUser(EDITOR2);
         ApiPermissionsHelper apiPermissionsHelper = new ApiPermissionsHelper(this);
-        apiPermissionsHelper.addMemberToRole(EDITOR1, "Editor", MemberType.user, getProjectName());
-        apiPermissionsHelper.addMemberToRole(EDITOR2, "Editor", MemberType.user, getProjectName());
+        apiPermissionsHelper.addMemberToRole(EDITOR1, EDITOR_ROLE, MemberType.user, getProjectName());
+        apiPermissionsHelper.addMemberToRole(EDITOR2, EDITOR_ROLE, MemberType.user, getProjectName());
 
         createList();
         createList2();

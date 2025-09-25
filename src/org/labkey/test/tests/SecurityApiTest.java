@@ -30,6 +30,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
+import static org.labkey.test.util.PermissionsHelper.READER_ROLE;
+import static org.labkey.test.util.PermissionsHelper.SITE_ADMIN_ROLE;
+
 @Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 5)
 public class SecurityApiTest extends BaseWebDriverTest
@@ -76,13 +80,13 @@ public class SecurityApiTest extends BaseWebDriverTest
         ApiPermissionsHelper apiPermissionsHelper = new ApiPermissionsHelper(this);
         apiPermissionsHelper.createPermissionsGroup(GROUP_1, USER_1);
         apiPermissionsHelper.createPermissionsGroup(GROUP_2, USER_1, USER_2);
-        apiPermissionsHelper.setPermissions(GROUP_1, "Editor");
-        apiPermissionsHelper.setPermissions(GROUP_2, "Reader");
+        apiPermissionsHelper.setPermissions(GROUP_1, EDITOR_ROLE);
+        apiPermissionsHelper.setPermissions(GROUP_2, READER_ROLE);
 
         // Create the admin user that will be used to call the APIs.
         int userId = _userHelper.createUserAndNotify(ADMIN_USER).getUserId();
         setInitialPassword(userId);
-        apiPermissionsHelper.setSiteRoleUserPermissions(ADMIN_USER, "Site Administrator");
+        apiPermissionsHelper.setSiteRoleUserPermissions(ADMIN_USER, SITE_ADMIN_ROLE);
 
     }
 

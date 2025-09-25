@@ -59,6 +59,12 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.labkey.test.util.PermissionsHelper.AUTHOR_ROLE;
+import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
+import static org.labkey.test.util.PermissionsHelper.FOLDER_ADMIN_ROLE;
+import static org.labkey.test.util.PermissionsHelper.PROJECT_ADMIN_ROLE;
+import static org.labkey.test.util.PermissionsHelper.READER_ROLE;
+import static org.labkey.test.util.PermissionsHelper.SUBMITTER_ROLE;
 
 @Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 17)
@@ -268,7 +274,7 @@ public class FolderExportTest extends BaseWebDriverTest
         _containerHelper.createSubfolder(importProjects[4], "Subfolder as Subfolder");
         importFolder("Subfolder as Subfolder", subfolderPermsZip);
         clickFolder("Subfolder as Subfolder");
-        _permissionsHelper.assertPermissionSetting(testUser1, "Reader");
+        _permissionsHelper.assertPermissionSetting(testUser1, READER_ROLE);
     }
 
     @Test
@@ -295,22 +301,22 @@ public class FolderExportTest extends BaseWebDriverTest
         if (groupsExist)
         {
             log("Verifying role assignments to groups");
-            _permissionsHelper.assertPermissionSetting(groupGroup, "Reader");
-            _permissionsHelper.assertPermissionSetting(superTesterGroup, "Author");
-            _permissionsHelper.assertPermissionSetting(groupGroup, "Author");
-            _permissionsHelper.assertPermissionSetting(submitterGroup, "Submitter");
-            _permissionsHelper.assertPermissionSetting(superTesterGroup, "Editor");
-            _permissionsHelper.assertPermissionSetting(parentGroup, "Editor");
+            _permissionsHelper.assertPermissionSetting(groupGroup, READER_ROLE);
+            _permissionsHelper.assertPermissionSetting(superTesterGroup, AUTHOR_ROLE);
+            _permissionsHelper.assertPermissionSetting(groupGroup, AUTHOR_ROLE);
+            _permissionsHelper.assertPermissionSetting(submitterGroup, SUBMITTER_ROLE);
+            _permissionsHelper.assertPermissionSetting(superTesterGroup, EDITOR_ROLE);
+            _permissionsHelper.assertPermissionSetting(parentGroup, EDITOR_ROLE);
         }
         if (usersExist)
         {
             log("Verifying role assignments to users");
-            _permissionsHelper.assertPermissionSetting(testUser3, "Author");
+            _permissionsHelper.assertPermissionSetting(testUser3, AUTHOR_ROLE);
             if (!isSubfolder)
-                _permissionsHelper.assertPermissionSetting(testUser3, "Project Administrator");
-            _permissionsHelper.assertPermissionSetting(testUser2, "Editor");
-            _permissionsHelper.assertPermissionSetting(testUser1, "Folder Administrator");
-            _permissionsHelper.assertPermissionSetting(testUser3, "Folder Administrator");
+                _permissionsHelper.assertPermissionSetting(testUser3, PROJECT_ADMIN_ROLE);
+            _permissionsHelper.assertPermissionSetting(testUser2, EDITOR_ROLE);
+            _permissionsHelper.assertPermissionSetting(testUser1, FOLDER_ADMIN_ROLE);
+            _permissionsHelper.assertPermissionSetting(testUser3, FOLDER_ADMIN_ROLE);
         }
     }
 
@@ -355,7 +361,7 @@ public class FolderExportTest extends BaseWebDriverTest
     @LogMethod
     private void verifyCreateFolderFromTemplate()
     {
-        impersonateRole("Folder Administrator"); // Issue 52254
+        impersonateRole(FOLDER_ADMIN_ROLE); // Issue 52254
         new UIContainerHelper(this).createSubFolderFromTemplate(getProjectName(), folderFromTemplate, "/" + getProjectName() + "/" + folderFromZip, new String[]{"Grid Views"});
         verifyExpectedWebPartsPresent();
         verifySubfolderImport(folderFromTemplate, true);
@@ -407,18 +413,18 @@ public class FolderExportTest extends BaseWebDriverTest
     @LogMethod
     private void setPermissions()
     {
-        _permissionsHelper.setUserPermissions(testUser1, "Folder Administrator");
-        _permissionsHelper.setUserPermissions(testUser2, "Editor");
-        _permissionsHelper.setUserPermissions(testUser3, "Project Administrator");
-        _permissionsHelper.setUserPermissions(testUser4, "Author");
-        _permissionsHelper.setUserPermissions(testUser3, "Author");
+        _permissionsHelper.setUserPermissions(testUser1, FOLDER_ADMIN_ROLE);
+        _permissionsHelper.setUserPermissions(testUser2, EDITOR_ROLE);
+        _permissionsHelper.setUserPermissions(testUser3, PROJECT_ADMIN_ROLE);
+        _permissionsHelper.setUserPermissions(testUser4, AUTHOR_ROLE);
+        _permissionsHelper.setUserPermissions(testUser3, AUTHOR_ROLE);
 
-        _permissionsHelper.setPermissions(superTesterGroup, "Author");
-        _permissionsHelper.setPermissions(superTesterGroup, "Editor");
-        _permissionsHelper.setPermissions(submitterGroup, "Submitter");
-        _permissionsHelper.setPermissions(parentGroup, "Editor");
-        _permissionsHelper.setPermissions(groupGroup, "Reader");
-        _permissionsHelper.setPermissions(groupGroup, "Author");
+        _permissionsHelper.setPermissions(superTesterGroup, AUTHOR_ROLE);
+        _permissionsHelper.setPermissions(superTesterGroup, EDITOR_ROLE);
+        _permissionsHelper.setPermissions(submitterGroup, SUBMITTER_ROLE);
+        _permissionsHelper.setPermissions(parentGroup, EDITOR_ROLE);
+        _permissionsHelper.setPermissions(groupGroup, READER_ROLE);
+        _permissionsHelper.setPermissions(groupGroup, AUTHOR_ROLE);
     }
 
     @LogMethod
@@ -432,7 +438,7 @@ public class FolderExportTest extends BaseWebDriverTest
         _containerHelper.createSubfolder(getProjectName(), folderWithPermissions);
 //         stop inheriting permissions from the parent project and set specific permissions in the subfolder
 
-        _permissionsHelper.setUserPermissions(testUser1, "Reader");
+        _permissionsHelper.setUserPermissions(testUser1, READER_ROLE);
         _containerHelper.createSubfolder(getProjectName() + "/" + folderWithPermissions, "Subfolder5", "Collaboration");
         _containerHelper.createSubfolder(getProjectName(), folderInheritingPermissions);
         _permissionsHelper.checkInheritedPermissions();

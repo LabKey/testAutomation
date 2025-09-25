@@ -1984,7 +1984,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         }
         else
         {
-            apiPermissionsHelper.setSiteRoleUserPermissions(userEmail, "Platform Developer");
+            apiPermissionsHelper.setSiteRoleUserPermissions(userEmail, PermissionsHelper.DEVELOPER_ROLE);
         }
 
         return apiPermissionsHelper;

@@ -26,6 +26,8 @@ import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.PortalHelper;
 
 import static org.junit.Assert.assertTrue;
+import static org.labkey.test.util.PermissionsHelper.AUTHOR_ROLE;
+import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
 
 @Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 10)
@@ -76,13 +78,13 @@ public class DataViewsPermissionsTest extends StudyBaseTest
         _permissionsHelper.enterPermissionsUI();
         _permissionsHelper.createPermissionsGroup("Editor Group");
         _permissionsHelper.assertPermissionSetting("Editor Group", "No Permissions");
-        _permissionsHelper.setPermissions("Editor Group", "Editor");
+        _permissionsHelper.setPermissions("Editor Group", EDITOR_ROLE);
         createUserInProjectForGroup(EDITOR_USER, "StudyVerifyProject", "Editor Group", false);
         clickFolder(getFolderName());
         _permissionsHelper.enterPermissionsUI();
         _permissionsHelper.createPermissionsGroup("Author Group");
         _permissionsHelper.assertPermissionSetting("Author Group", "No Permissions");
-        _permissionsHelper.setPermissions("Author Group", "Author");
+        _permissionsHelper.setPermissions("Author Group", AUTHOR_ROLE);
         createUserInProjectForGroup(AUTHOR_USER, "StudyVerifyProject", "Author Group", false);
 
         clickFolder(getFolderName());
