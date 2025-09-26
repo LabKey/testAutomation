@@ -1885,10 +1885,10 @@ public class SampleTypeTest extends BaseWebDriverTest
 
         log("verify error when inserting a row with incompatible units");
         sampleHelper.insertRow(Map.of("Name", "AU-ERR-1", "StoredAmount", "5.0", "Units", "mg"));
-        assertTextPresent("Units value (mg) is not compatible with the display units (mL).");
+        assertTextPresent("Units value (mg) is not compatible with the " + sampleTypeName + " display units (mL).");
         clickButton("Cancel");
         sampleHelper.insertRow(Map.of("Name", "AU-ERR-1", "StoredAmount", "5.0", "Units", "unit"));
-        assertTextPresent("Units value (unit) is not compatible with the display units (mL).");
+        assertTextPresent("Units value (unit) is not compatible with the " + sampleTypeName + " display units (mL).");
         clickButton("Cancel");
 
         log("verify inserting a row with compatible units succeeds and are converted");
@@ -1901,7 +1901,7 @@ public class SampleTypeTest extends BaseWebDriverTest
 
         log("verify updating a row with incompatible units fails");
         sampleHelper.updateRow(0, Map.of("Units", "mg"));
-        assertTextPresent("Units value (mg) is not compatible with the display units (mL).");
+        assertTextPresent("Units value (mg) is not compatible with the " + sampleTypeName + " display units (mL).");
         clickButton("Cancel");
 
         log("verify updating a row with compatible units succeeds and are converted");
@@ -1914,7 +1914,7 @@ public class SampleTypeTest extends BaseWebDriverTest
 
         log("verify bulk import with incompatible units fails");
         sampleHelper.bulkImportExpectingError(List.of(Map.of("Name", "AU-BULK-ERR-1", "StoredAmount", "0", "Units", "kg")), SampleTypeHelper.IMPORT_OPTION);
-        assertTextPresent("Units value (kg) is not compatible with the display units (mL).");
+        assertTextPresent("Units value (kg) is not compatible with the " + sampleTypeName + " display units (mL).");
         clickButton("Cancel");
 
         log("verify bulk import with compatible units succeeds and are converted");
@@ -1948,7 +1948,7 @@ public class SampleTypeTest extends BaseWebDriverTest
         CreateSampleTypePage createPage = sampleHelper
                 .goToCreateNewSampleType()
                 .setName(sampleTypeName);
-        assertTextNotPresent("Amount Display Units");
+        assertTextNotPresent("Display Units");
         createPage.clickSave();
         sampleHelper.goToSampleType(sampleTypeName);
 
@@ -1981,11 +1981,11 @@ public class SampleTypeTest extends BaseWebDriverTest
         log("verify that bulk import with an amount or unit requires both fields to be filled in");
         // bulk import with amount but not unit (error expected)
         sampleHelper.bulkImportExpectingError(List.of(Map.of("Name", "AU-BULK-ERR-1", "StoredAmount", "0")), SampleTypeHelper.IMPORT_OPTION);
-        assertTextPresent("When adding or updating samples, a Units value must be provided when there is a value for Amount.");
+        assertTextPresent("A Units value must be provided when Amounts are provided");
         clickButton("Cancel");
         // bulk import with unit but not amount (error expected)
         sampleHelper.bulkImportExpectingError(List.of(Map.of("Name", "AU-BULK-ERR-2", "Units", "mL")), SampleTypeHelper.IMPORT_OPTION);
-        assertTextPresent("When adding or updating samples, a Amount value must be provided when there is a value for Units.");
+        assertTextPresent("An Amount value must be provided Units are provided.");
         clickButton("Cancel");
         // bulk import with both amount and unit (success expected)
         sampleHelper.bulkImport(List.of(Map.of("Name", "AU-BULK-SUCCESS-1", "StoredAmount", "0", "Units", "L")));
