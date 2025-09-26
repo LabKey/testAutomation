@@ -40,6 +40,10 @@ import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.labkey.test.util.PermissionsHelper.AUTHOR_ROLE;
+import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
+import static org.labkey.test.util.PermissionsHelper.READER_ROLE;
+import static org.labkey.test.util.PermissionsHelper.SUBMITTER_ROLE;
 
 @Category({Daily.class, FileBrowser.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 5)
@@ -94,7 +98,7 @@ public class FileContentActionButtonsTest extends BaseWebDriverTest
     @Test
     public void testEditorActions()
     {
-        impersonateRoles("Editor");
+        impersonateRoles(EDITOR_ROLE);
 
         assertActionsAvailable(
                 BrowserAction.FOLDER_TREE,
@@ -118,7 +122,7 @@ public class FileContentActionButtonsTest extends BaseWebDriverTest
     @Test
     public void testSubmitterReaderActions()
     {
-        impersonateRoles("Submitter", "Reader");
+        impersonateRoles(SUBMITTER_ROLE, READER_ROLE);
 
         assertActionsAvailable(
                 BrowserAction.FOLDER_TREE,
@@ -139,7 +143,7 @@ public class FileContentActionButtonsTest extends BaseWebDriverTest
     @Test
     public void testAuthorActions()
     {
-        impersonateRoles("Author");
+        impersonateRoles(AUTHOR_ROLE);
 
         assertActionsAvailable(
                 BrowserAction.FOLDER_TREE,
@@ -160,7 +164,7 @@ public class FileContentActionButtonsTest extends BaseWebDriverTest
     @Test
     public void testReaderActions()
     {
-        impersonateRoles("Reader");
+        impersonateRoles(READER_ROLE);
 
         assertActionsAvailable(
                 BrowserAction.FOLDER_TREE,

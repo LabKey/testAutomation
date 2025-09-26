@@ -29,6 +29,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.WebTestHelper.getRemoteApiConnection;
+import static org.labkey.test.util.PermissionsHelper.FOLDER_ADMIN_ROLE;
+import static org.labkey.test.util.PermissionsHelper.PROJECT_ADMIN_ROLE;
 
 @Category(Daily.class)
 @BaseWebDriverTest.ClassTimeout(minutes = 2)
@@ -101,8 +103,8 @@ public class ProjectCreatorUserTest extends BaseWebDriverTest
 
         log("Verifying the permissions");
         goToProjectHome(PROJECT_NAME_PC);
-        navBar().goToPermissionsPage().assertPermissionSetting(PROJECT_CREATOR_USER, "Project Administrator");
-        navBar().goToPermissionsPage().assertPermissionSetting(PROJECT_CREATOR_USER, "Folder Administrator");
+        navBar().goToPermissionsPage().assertPermissionSetting(PROJECT_CREATOR_USER, PROJECT_ADMIN_ROLE);
+        navBar().goToPermissionsPage().assertPermissionSetting(PROJECT_CREATOR_USER, FOLDER_ADMIN_ROLE);
 
         log("Cleanup : Deleting the project");
         _containerHelper.deleteProject(PROJECT_NAME_PC, false, WAIT_FOR_PAGE);
@@ -157,8 +159,8 @@ public class ProjectCreatorUserTest extends BaseWebDriverTest
 
         goToProjectHome(PROJECT_NAME_PC);
         PermissionsPage permissionsPage = navBar().goToPermissionsPage();
-        permissionsPage.assertPermissionSetting(PROJECT_CREATOR_USER, "Project Administrator");
-        permissionsPage.assertPermissionSetting(PROJECT_CREATOR_USER, "Folder Administrator");
+        permissionsPage.assertPermissionSetting(PROJECT_CREATOR_USER, PROJECT_ADMIN_ROLE);
+        permissionsPage.assertPermissionSetting(PROJECT_CREATOR_USER, FOLDER_ADMIN_ROLE);
 
         ManageListsGrid listsGrid = goToManageLists().getGrid();
         listsGrid.setContainerFilter(DataRegionTable.ContainerFilterType.CURRENT_FOLDER);

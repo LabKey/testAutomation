@@ -99,10 +99,19 @@ public class DetailTable extends WebDriverComponent<DetailTable.ElementCache>
         {
             return elementCache().siblingField(identifier);
         }
+        else if (elementCache().dataFieldByKey(identifier).isDisplayed())
+        {
+            return elementCache().dataFieldByKey(identifier);
+        }
         else
         {
             throw new NoSuchElementException(String.format("Could not find field '%s'.", identifier));
         }
+    }
+
+    public boolean fieldHasFormatPill(String identifier)
+    {
+        return Locator.tagWithClass("*", "status-pill").existsIn(getField(identifier));
     }
 
     /**
@@ -234,7 +243,7 @@ public class DetailTable extends WebDriverComponent<DetailTable.ElementCache>
 
         public final WebElement dataFieldByKey(String fieldKey)
         {
-            return Locator.tagWithAttribute("td", "data-fieldkey", fieldKey).findElement(this);
+            return Locator.tagWithAttribute("td", "data-fieldkey", fieldKey).findWhenNeeded(this);
         }
 
         // Some tables will show a value in a td with no attributes, use the td that has the text (label) to find the value.

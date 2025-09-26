@@ -36,6 +36,7 @@ import java.io.File;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
 
 @Category({Daily.class, Reports.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 6)
@@ -168,7 +169,7 @@ public class NonStudyReportsTest extends ReportTest
         _userHelper.createUser(ATTACHMENT_USER);
         clickProject(getProjectName());
         _permissionsHelper.enterPermissionsUI();
-        _permissionsHelper.setUserPermissions(ATTACHMENT_USER, "Editor");
+        _permissionsHelper.setUserPermissions(ATTACHMENT_USER, EDITOR_ROLE);
         impersonate(ATTACHMENT_USER);
         clickProject(getProjectName());
 

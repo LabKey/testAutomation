@@ -93,6 +93,8 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.labkey.test.TestFileUtils.getDefaultFileRoot;
 import static org.labkey.test.WebTestHelper.buildURL;
+import static org.labkey.test.util.PermissionsHelper.FOLDER_ADMIN_ROLE;
+import static org.labkey.test.util.PermissionsHelper.READER_ROLE;
 
 /**
 * Tests the simple module and file-based resources introduced in version 9.1
@@ -1862,12 +1864,12 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
         log("folder admin without restricted permission can still see existing restricted folder, web parts");
         navigateToFolder(getProjectName(), RESTRICTED_FOLDER_NAME);
-        impersonateRole("Reader");
+        impersonateRole(READER_ROLE);
         assertTextPresent("This is a web part view in the restricted module.");     // Can still see web part
         stopImpersonating();
         goToProjectHome();
         navigateToFolder(getProjectName(), RESTRICTED_FOLDER_NAME);
-        impersonateRole("Folder Administrator");
+        impersonateRole(FOLDER_ADMIN_ROLE);
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Folder Type"));
         // Shouldn't see folder type, module name

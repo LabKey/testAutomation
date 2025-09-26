@@ -43,6 +43,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
 
 @Category({Issues.class, Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 5)
@@ -83,7 +84,7 @@ public class IssuesAdminTest extends BaseWebDriverTest
         _userHelper.createUser(TEST_USER);
         _permissionsHelper.createPermissionsGroup(TEST_GROUP);
         _permissionsHelper.assertPermissionSetting(TEST_GROUP, "No Permissions");
-        _permissionsHelper.setPermissions(TEST_GROUP, "Editor");
+        _permissionsHelper.setPermissions(TEST_GROUP, EDITOR_ROLE);
 
         _issuesHelper.createNewIssuesList(ISSUE_LIST_NAME, _containerHelper);
         IssuesAdminPage adminPage = IssuesAdminPage.beginAt(this, getProjectName(), ISSUE_LIST_NAME);

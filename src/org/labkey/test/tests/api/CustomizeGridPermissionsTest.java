@@ -37,7 +37,9 @@ import java.util.List;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
 import static org.labkey.test.util.PermissionsHelper.MemberType;
+import static org.labkey.test.util.PermissionsHelper.READER_ROLE;
 
 @Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 7)
@@ -78,8 +80,8 @@ public class CustomizeGridPermissionsTest extends BaseWebDriverTest
         _userHelper.createUser(VIEW_EDITOR);
 
         ApiPermissionsHelper permissionsHelper = new ApiPermissionsHelper(this);
-        permissionsHelper.addMemberToRole(READER, "Reader", MemberType.user, getProjectName());
-        permissionsHelper.addMemberToRole(EDITOR, "Editor", MemberType.user, getProjectName());
+        permissionsHelper.addMemberToRole(READER, READER_ROLE, MemberType.user, getProjectName());
+        permissionsHelper.addMemberToRole(EDITOR, EDITOR_ROLE, MemberType.user, getProjectName());
         permissionsHelper.addMemberToRole(VIEW_EDITOR, "Shared View Editor", MemberType.user, getProjectName());
     }
 
