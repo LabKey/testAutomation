@@ -217,6 +217,14 @@ public class APIUserHelper extends AbstractUserHelper
         return getUserIds(Arrays.asList(userEmail)).get(userEmail);
     }
 
+    public int getUserIdStrict(String userEmail)
+    {
+        Integer userId = getUserIds(Arrays.asList(userEmail)).get(userEmail);
+        if (userId == null)
+            throw new IllegalStateException("No user with email " + userEmail + " found.");
+        return userId;
+    }
+
     @Override
     protected void _deleteUser(String userEmail)
     {
@@ -254,6 +262,11 @@ public class APIUserHelper extends AbstractUserHelper
     }
 
     private static final Pattern regEmailVerification = Pattern.compile("verification=([A-Za-z0-9]+)");
+
+    public String setInitialPassword(String email)
+    {
+        return setInitialPassword(getUserIdStrict(email));
+    }
 
     @Override
     public String setInitialPassword(int userId)
