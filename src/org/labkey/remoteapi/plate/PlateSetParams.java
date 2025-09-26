@@ -2,7 +2,7 @@ package org.labkey.remoteapi.plate;
 
 import org.json.JSONObject;
 
-import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 public class PlateSetParams
@@ -64,6 +64,8 @@ public class PlateSetParams
         if (json.has("type"))
             _plateSetType = CreatePlateSetParams.PlateSetType.fromName(json.getString("type"));
     }
+
+    public static final List<String> QUERY_COLUMNS = List.of("Archived", "Created", "CreatedBy", "Description", "Folder/EntityId", "Folder/Name", "Folder/Path", "Modified", "ModifiedBy", "Name", "PlateCount", "PlateSetId", "PrimaryPlateSetId", "RootPlateSetId", "RowId", "Template", "Type");
 
     public static PlateSetParams fromQueryRow(Map<String, Object> row)
     {

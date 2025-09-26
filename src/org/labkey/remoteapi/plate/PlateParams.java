@@ -2,12 +2,14 @@ package org.labkey.remoteapi.plate;
 
 import org.json.JSONObject;
 
+import java.util.List;
 import java.util.Map;
 
 public class PlateParams
 {
     private boolean _archived;
     private String _assayType;
+    private String _barcode;
     private int _columns;
     private String _description;
     private String _name;
@@ -50,13 +52,19 @@ public class PlateParams
 
         if (json.has("archived"))
             _archived = json.getBoolean("archived");
+
+        if (json.has("barcode"))
+            _barcode = json.getString("barcode");
     }
+
+    public static final List<String> QUERY_COLUMNS = List.of("Archived", "AssayType", "Barcode", "Description", "Name", "PlateId", "PlateSet", "PlateType", "PlateType/Columns", "PlateType/Rows", "RowId", "Template");
 
     public static PlateParams fromQueryRow(Map<String, Object> row)
     {
         var params = new PlateParams();
         params._archived = (Boolean) row.get("Archived");
         params._assayType = (String) row.get("AssayType");
+        params._barcode = (String) row.get("Barcode");
         params._columns = (Integer) row.get("PlateType/Columns");
         params._description = (String) row.get("Description");
         params._name = (String) row.get("Name");
@@ -68,6 +76,11 @@ public class PlateParams
         params._template = (Boolean) row.get("Template");
 
         return params;
+    }
+
+    public String getBarcode()
+    {
+        return _barcode;
     }
 
     public String getName()
