@@ -238,21 +238,18 @@ public class DetailTable extends WebDriverComponent<DetailTable.ElementCache>
     {
         public final WebElement dataByLabel(String fieldLabel)
         {
-            return Locator.tagWithAttribute("td", "data-caption", fieldLabel).findWhenNeeded(this)
-                    .withTimeout(2000);
+            return Locator.tagWithAttribute("td", "data-caption", fieldLabel).findWhenNeeded(this);
         }
 
         public final WebElement dataFieldByKey(String fieldKey)
         {
-            return Locator.tagWithAttribute("td", "data-fieldkey", fieldKey)
-                    .findWhenNeeded(this).withTimeout(2000);
+            return Locator.tagWithAttribute("td", "data-fieldkey", fieldKey).findWhenNeeded(this);
         }
 
         // Some tables will show a value in a td with no attributes, use the td that has the text (label) to find the value.
         public final WebElement siblingField(String fieldLabel)
         {
-            return Locator.tagContainingText("td", fieldLabel).followingSibling("td")
-                    .findWhenNeeded(this).withTimeout(2000);
+            return Locator.tagContainingText("td", fieldLabel).followingSibling("td").findWhenNeeded(this);
         }
 
     }
