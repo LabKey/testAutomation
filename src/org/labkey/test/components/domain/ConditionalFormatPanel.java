@@ -1,5 +1,6 @@
 package org.labkey.test.components.domain;
 
+import org.labkey.remoteapi.domain.ConditionalFormat;
 import org.labkey.remoteapi.query.Filter;
 import org.labkey.test.Locator;
 import org.labkey.test.components.WebDriverComponent;
@@ -24,17 +25,52 @@ public class ConditionalFormatPanel extends WebDriverComponent<ConditionalFormat
         _dialog = dialog;
     }
 
+    public ConditionalFormatPanel setConditionalFormat(ConditionalFormat conditionalFormat)
+    {
+        for (int i = 0; i < conditionalFormat.getQueryFilter().size(); i++)
+        {
+            var filterCondition = conditionalFormat.getQueryFilter().get(i);
+            if (i==0)
+            {
+                setFirstCondition(filterCondition.getOperator());
+                if (filterCondition.getValue() != null)
+                    setFirstValue(filterCondition.getValue().toString());
+            }
+            if (i==1)
+            {
+                setSecondCondition(filterCondition.getOperator());
+                if (filterCondition.getValue() != null)
+                    setSecondValue(filterCondition.getValue().toString());
+            }
+        }
+        setBoldCheckbox(conditionalFormat.getBold());
+        setItalicsCheckbox(conditionalFormat.getItalic());
+        setStrikethroughCheckbox(conditionalFormat.getStrikethrough());
+        setTextColor(conditionalFormat.getTextColor());
+        setFillColor(conditionalFormat.getBackgroundColor());
+        return this;
+    }
+
     public ConditionalFormatPanel setFirstCondition(Filter.Operator operator)
     {
         expand();
         elementCache().firstConditionSelect().selectByValue(operator.getUrlKey());
         return this;
     }
+    public String getFirstCondition()
+    {
+        return elementCache().firstConditionSelect().getFirstSelectedOption().getText();
+    }
+
     public ConditionalFormatPanel setFirstValue(String value)
     {
         expand();
         elementCache().firstFilterValueInput().setValue(value);
         return this;
+    }
+    public String getFirstValue()
+    {
+        return elementCache().firstFilterValueInput().getValue();
     }
 
     public ConditionalFormatPanel setSecondCondition(Filter.Operator operator)
@@ -43,11 +79,20 @@ public class ConditionalFormatPanel extends WebDriverComponent<ConditionalFormat
         elementCache().secondConditionSelect().selectByValue(operator.getUrlKey());
         return this;
     }
+    public String getSecondCondition()
+    {
+        return elementCache().secondConditionSelect().getFirstSelectedOption().getText();
+    }
+
     public ConditionalFormatPanel setSecondValue(String value)
     {
         expand();
         elementCache().secondFilterValueInput().setValue(value);
         return this;
+    }
+    public String getSecondValue()
+    {
+        return elementCache().secondFilterValueInput().getValue();
     }
 
     public ConditionalFormatPanel setBoldCheckbox(boolean checked)
@@ -56,17 +101,34 @@ public class ConditionalFormatPanel extends WebDriverComponent<ConditionalFormat
         elementCache().boldCheckbox().set(checked);
         return this;
     }
+
+    public boolean getBoldChecked()
+    {
+        return elementCache().boldCheckbox().get();
+    }
+
     public ConditionalFormatPanel setItalicsCheckbox(boolean checked)
     {
         expand();
         elementCache().italicsCheckbox().set(checked);
         return this;
     }
+
+    public boolean getItalicsChecked()
+    {
+        return elementCache().italicsCheckbox().get();
+    }
+
     public ConditionalFormatPanel setStrikethroughCheckbox(boolean checked)
     {
         expand();
         elementCache().strikethroughCheckbox().set(checked);
         return this;
+    }
+
+    public boolean getStrikethroughChecked()
+    {
+        return elementCache().strikethroughCheckbox().get();
     }
 
     public ConditionalFormatPanel setTextColor(String colorHex)
@@ -78,6 +140,12 @@ public class ConditionalFormatPanel extends WebDriverComponent<ConditionalFormat
         return this;
     }
 
+    public String getTextStyle()
+    {
+        expand();
+        return elementCache().textColorPreview.getAttribute("style");
+    }
+
     public ConditionalFormatPanel setFillColor(String colorHex)
     {
         expand();
@@ -85,6 +153,18 @@ public class ConditionalFormatPanel extends WebDriverComponent<ConditionalFormat
         getWrapper().click(Locator.tagWithAttribute("div", "title", colorHex));
         getWrapper().click(Locator.tagWithClass("div", "domain-validator-color-cover")); // click elsewhere on the dialog to close the color picker
         return this;
+    }
+
+    public String getFillStyle()
+    {
+        expand();
+        return elementCache().fillColorPreview.getAttribute("style");
+    }
+
+    public String getPreviewTextStyle()
+    {
+        expand();
+        return elementCache().previewTextInput.getAttribute("style");
     }
 
     public ConditionalFormatDialog clickRemove()
@@ -171,7 +251,10 @@ public class ConditionalFormatPanel extends WebDriverComponent<ConditionalFormat
 
         final Locator collapseIconLocator = Locator.tagWithClass("div", "domain-validator-collapse-icon");
         final WebElement textColor = Locator.tagWithName("button", "domainpropertiesrow-textColor").findWhenNeeded(this);
+        final WebElement textColorPreview = Locator.tagWithClass("div", "domain-color-preview").index(0).findWhenNeeded(this);
         final WebElement fillColor = Locator.tagWithName("button", "domainpropertiesrow-backgroundColor").findWhenNeeded(this);
+        final WebElement fillColorPreview = Locator.tagWithClass("div", "domain-color-preview").index(1).findWhenNeeded(this);
+        final WebElement previewTextInput = Locator.tagWithAttribute("input", "value", "Preview Text").findWhenNeeded(this);
         final WebElement removeButton = Locator.button("Remove Formatting").findWhenNeeded(this);
     }
 
