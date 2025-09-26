@@ -2,8 +2,8 @@ package org.labkey.test.util;
 
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
-import org.labkey.remoteapi.security.CreateUserResponse;
 import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.WebTestHelper;
 
 import java.io.IOException;
 
@@ -117,6 +117,15 @@ public class TestUser
             throw new IllegalStateException("Password has not been set for user: " + _email);
         }
         return _password;
+    }
+
+    /**
+     * Create a non-impersonating API connection for the user.
+     * @return new Connection
+     */
+    public Connection getUserConnection()
+    {
+        return new Connection(WebTestHelper.getBaseURL(), getEmail(), getPassword());
     }
 
     public TestUser addPermission(String role, String containerPath)
