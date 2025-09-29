@@ -6,13 +6,8 @@ import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.SelectRowsCommand;
-import org.labkey.test.WebTestHelper;
 import org.labkey.test.params.FieldInfo;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
-import org.labkey.test.util.ApiPermissionsHelper;
-import org.labkey.test.util.PasswordUtil;
-import org.labkey.test.util.PermissionsHelper;
-import org.labkey.test.util.PermissionsHelper.MemberType;
 import org.labkey.test.util.TestUser;
 
 import java.io.IOException;
@@ -20,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static org.labkey.test.util.PermissionsHelper.READER_ROLE;
 
 @Category({})
