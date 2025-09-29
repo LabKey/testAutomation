@@ -88,7 +88,6 @@ public class MenuBarTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("Menu Bar"));
 
         log("Add menu bar webparts");
-        portalHelper.addWebPart("AssayList2");
         portalHelper.addWebPart("Study List");
         portalHelper.addWebPart("Wiki Menu");
 
@@ -114,7 +113,6 @@ public class MenuBarTest extends BaseWebDriverTest
 
         //Make sure that the menus are shown, but the content is not yet loaded.
         assertElementPresent(Locator.tagWithClass("div", "navbar-header"));
-        assertElementPresent(menuBarItem("Assays"));
         assertElementPresent(menuBarItem("Studies"));
         assertElementPresent(menuBarItem(WIKI_PAGE_TITLE));
 
@@ -125,15 +123,6 @@ public class MenuBarTest extends BaseWebDriverTest
 
         openMenu(WIKI_PAGE_TITLE);
         waitForElement(Locator.xpath("//div").withClass("labkey-wiki").withText(WIKI_PAGE_CONTENT));
-        openMenu("Assays");
-        waitForElement(Locator.lkButton("Manage Assays"), 3000);
-
-        _assayHelper.uploadXarFileAsAssayDesign(TestFileUtils.getSampleData("menubar/Test Assay.xar"), 1);
-        clickProject(PROJECT_NAME);
-
-        assertTextNotPresent("Test Assay");
-        openMenu("Assays");
-        waitForElement(Locator.linkWithText("Test Assay"));
 
         _containerHelper.createSubfolder(PROJECT_NAME, PROJECT_NAME, "StudyFolder", "Study", null);
         createDefaultStudy();
@@ -218,7 +207,6 @@ public class MenuBarTest extends BaseWebDriverTest
         // Issue 47841: verify that menu config comes through with folder export/import (via create from template)
         UIContainerHelper uiContainerHelper = new UIContainerHelper(this);
         uiContainerHelper.createProjectFromTemplate(getAltProjectName(), "/" + getProjectName());
-        openMenu("Assays");
         openMenu("Studies");
         openMenu(WIKI_PAGE_TITLE);
         openMenu("Wiki Render Types");

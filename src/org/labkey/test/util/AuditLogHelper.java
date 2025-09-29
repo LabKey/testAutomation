@@ -4,6 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONException;
+import org.labkey.api.collections.CaseInsensitiveHashMap;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.ContainerFilter;
@@ -29,10 +30,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Stream;
 
 import static java.lang.Integer.parseInt;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
@@ -85,16 +86,19 @@ public class AuditLogHelper
 
     public enum AuditEvent
     {
-        SAMPLE_TIMELINE_EVENT("SampleTimelineEvent"),
-        SOURCES_AUDIT_EVENT("SourcesAuditEvent"), // avaialble with SampleManagement module
+        ASSAY_AUDIT_EVENT("AssayAuditEvent"), // available with SampleManagement module
+        ASSAY_RESULT_AUDIT_EVENT("AssayResultAuditEvent"), // available with SampleManagement module
+        EXPERIMENT_AUDIT_EVENT("ExperimentAuditEvent"),
+        FILE_SYSTEM_EVENT("FileSystem"),
         INVENTORY_AUDIT_EVENT("InventoryAuditEvent"),
         LIST_AUDIT_EVENT("ListAuditEvent"),
-        ASSAY_AUDIT_EVENT("AssayAuditEvent"), // avaialble with SampleManagement module
-        ASSAY_RESULT_AUDIT_EVENT("AssayResultAuditEvent"), // avaialble with SampleManagement module
-        EXPERIMENT_AUDIT_EVENT("ExperimentAuditEvent"),
-        SAMPLE_WORKFLOW_AUDIT_EVENT("SamplesWorkflowAuditEvent"),
+        PLATE_AUDIT_EVENT("PlateEvent"), // available in Biologics module
+        PLATE_DATA_AUDIT_EVENT("PlateDataAuditEvent"), // available in Biologics module
+        PLATE_SET_AUDIT_EVENT("PlateSetEvent"), // available in Biologics module
         QUERY_UPDATE_AUDIT_EVENT("QueryUpdateAuditEvent"),
-        FILE_SYSTEM_EVENT("FileSystem");
+        SAMPLE_TIMELINE_EVENT("SampleTimelineEvent"),
+        SAMPLE_WORKFLOW_AUDIT_EVENT("SamplesWorkflowAuditEvent"),
+        SOURCES_AUDIT_EVENT("SourcesAuditEvent"); // available with SampleManagement module
 
         private final String _name;
 
@@ -257,16 +261,16 @@ public class AuditLogHelper
             boolean isInventoryUpdateType = event.get("InventoryUpdateType") != null;
             int expectedDiffCount = isInventoryUpdateType ? 0 : expectedDiffCounts.get(i);
             String dataChangesStr = (String) event.get(eventDiffFieldName);
-            String[] dataChanges = dataChangesStr != null ? dataChangesStr.split("&") : new String[0];
+            Map<String, String> dataChanges = decodeValues(dataChangesStr);
 
             // filter out SampleStateLabel as that is not a change, it is added for display purposes
-            dataChanges = Stream.of(dataChanges).filter(s -> !s.toLowerCase().startsWith("samplestatelabel=")).toArray(String[]::new);
+            dataChanges.remove("SampleStateLabel");
             // filter out RowId as that is not a change, it is added for display purposes
-            dataChanges = Stream.of(dataChanges).filter(s -> !s.toLowerCase().startsWith("rowid=")).toArray(String[]::new);
+            dataChanges.remove("RowId");
 
             log("Audit record data changes diff count check (" + eventDiffFieldName + "): " + dataChangesStr);
-            assertEquals("Audit record data changes did not include the expected number of diffs in " + eventDiffFieldName + ", expected " + expectedDiffCount + " but was " + dataChanges.length + ": " + dataChangesStr,
-                    expectedDiffCount, dataChanges.length);
+            assertEquals("Audit record data changes did not include the expected number of diffs in " + eventDiffFieldName + ", expected " + expectedDiffCount + " but was " + dataChanges.size() + ": " + dataChangesStr,
+                    expectedDiffCount, dataChanges.size());
         }
     }
 
@@ -525,6 +529,24 @@ public class AuditLogHelper
         {
             return "Comment: " + comment + "\nOldValue:" + oldValues + "\nNewValue:" + newValues;
         }
+    }
+
+    public static Map<String, String> decodeValues(String recordMapString)
+    {
+        if (recordMapString == null || recordMapString.isEmpty())
+            return Collections.emptyMap();
+
+        Map<String, String> recordMap = new CaseInsensitiveHashMap<>();
+        for (String part : recordMapString.split("&"))
+        {
+            String[] keyValue = part.split("=");
+            String key = EscapeUtil.decode(keyValue[0]);
+            assertFalse(String.format("Audit record map already contains key for %s", key), recordMap.containsKey(key));
+
+            recordMap.put(key, keyValue.length > 1 ? EscapeUtil.decode(keyValue[1]) : null);
+        }
+
+        return recordMap;
     }
 
     /**
