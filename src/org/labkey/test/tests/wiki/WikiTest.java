@@ -26,6 +26,7 @@ import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Wiki;
 import org.labkey.test.pages.admin.ExternalSourcesPage;
@@ -38,6 +39,7 @@ import org.labkey.test.util.WikiHelper;
 import org.labkey.test.util.search.SearchAdminAPIHelper;
 
 import java.io.File;
+import java.io.IOException;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
@@ -238,6 +240,75 @@ public class WikiTest extends BaseWebDriverTest
 
         searchFor(PROJECT_NAME, "commas", 1, null);
         Assert.assertEquals("Incorrect result with comma", Arrays.asList(wikiTitle + "\n/" + getProjectName() + "\n" + wikiContent), getTexts(new SearchResultsPage(getDriver()).getResults()));
+    }
+
+    // Issue 49321
+    @Test
+    public void testDeleteUndeleteAttachment() throws IOException
+    {
+        String wikiName = "Wiki with attachments";
+        String wikiTitle = "Attach Delete Undelete file";
+        String wikiContent = "Lorem Ipsum something";
+        String fileName = "wiki_temp_file_attachment.txt";
+        File testAttachment = TestFileUtils.writeTempFile(fileName, "it was a dark and stormy night");
+        Locator.XPathLocator attachmentParentLoc = Locator.id("wiki-ea-name-0");
+        Locator.XPathLocator removeLinkLoc = Locator.tag("td").child(Locator.linkContainingText("remove"));
+        Locator.XPathLocator deleteLinkLoc = Locator.tag("td").child(Locator.linkContainingText("delete"));
+        Locator undeleteLinkLoc = Locator.tag("td").child("a").child("span").containing("un-delete");
+        Locator filePickerLinkLoc = Locator.id("filePickerLink");
+        Locator fileInputLoc = Locator.tag("input").withAttribute("type", "file")
+                .withAttributeContaining("id", "formFile");
+
+        goToProjectHome();
+        log("Creating the wiki " + wikiTitle);
+        WikiHelper wikiHelper = new WikiHelper(this);
+        wikiHelper.createNewWikiPage("HTML");
+        wikiHelper.setWikiName(wikiName);
+        wikiHelper.setWikiTitle(wikiTitle);
+        wikiHelper.setWikiBody("<p>" + wikiContent + "</p>");
+        wikiHelper.saveWikiPage();
+        numberOfWikiCreated++;
+
+        log("adding an attachment");
+        wikiHelper.editWikiPage();
+        click(filePickerLinkLoc);
+        setFormElement(fileInputLoc, testAttachment);
+        waitForElement(removeLinkLoc);  // when just attached, 'remove' will be an option but delete will not be
+        assertElementNotPresent(deleteLinkLoc);
+        click(removeLinkLoc);   // verify remove removes the file
+        waitForElementToDisappear(Locator.linkWithText(fileName));
+        click(filePickerLinkLoc);
+        setFormElement(fileInputLoc, testAttachment);
+        wikiHelper.saveWikiPage();  // save with the attachment
+        waitForElement(Locator.linkWithText(fileName));
+
+        log("Deleting attachment");
+        wikiHelper.editWikiPage();
+        click(deleteLinkLoc);
+        waitForElement(attachmentParentLoc.withAttributeContaining("style", "text-decoration: line-through"));
+        wikiHelper.saveWikiPage();
+        // verify save while in deleted state actually deletes the attachment
+        assertElementNotPresent(Locator.linkWithText(fileName));
+
+        log("prepare to delete/undelete attachment");
+        // re-attach the file and save
+        wikiHelper.editWikiPage();
+        click(filePickerLinkLoc);
+        setFormElement(fileInputLoc, testAttachment);
+        wikiHelper.saveWikiPage();
+
+        log("Un-Deleting attachment");
+        wikiHelper.editWikiPage();
+        click(deleteLinkLoc);   // delete
+        waitForElement(attachmentParentLoc.withAttributeContaining("style", "text-decoration: line-through"));
+        waitAndClick(undeleteLinkLoc);
+        checker().awaiting(Duration.ofMillis(500), ()-> Assertions.assertThat(attachmentParentLoc.findElement(getDriver()).getAttribute("style"))
+                .as("expect strikethrough style not to be present")
+                .doesNotContain("text-decoration: line-through"));
+        wikiHelper.saveWikiPage();
+
+        // verify save after undelete persists the attachment
+        assertElementPresent(Locator.linkWithText(fileName));
     }
 
     // Issue 51382
