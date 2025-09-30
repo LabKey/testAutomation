@@ -455,7 +455,7 @@ public class EntityBulkUpdateDialog extends ModalDialog
 
         public Input numericInput(CharSequence fieldIdentifier)
         {
-            WebElement inputEl = numberInputLoc.waitForElement(formRow(fieldIdentifier), WAIT_TIMEOUT);
+            WebElement inputEl = textInputLoc.waitForElement(formRow(fieldIdentifier), WAIT_TIMEOUT);
             return new Input(inputEl, getDriver());
         }
 
@@ -475,7 +475,6 @@ public class EntityBulkUpdateDialog extends ModalDialog
         }
 
         final Locator textInputLoc = Locator.tagWithAttribute("input", "type", "text");
-        final Locator numberInputLoc = Locator.tagWithAttribute("input", "type", "number");
         final Locator checkBoxLoc = Locator.tagWithAttribute("input", "type", "checkbox");
         final Locator.XPathLocator commentInputLocator = Locator.tagWithId("textarea", "actionComments");
         final WebElement commentInput = commentInputLocator.refindWhenNeeded(this);
