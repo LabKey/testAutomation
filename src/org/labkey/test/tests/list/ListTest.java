@@ -16,7 +16,6 @@
 
 package org.labkey.test.tests.list;
 
-import org.apache.commons.lang3.StringUtils;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.MatcherAssert;
 import org.junit.Before;
@@ -52,8 +51,8 @@ import org.labkey.test.pages.list.GridPage;
 import org.labkey.test.pages.query.UpdateQueryRowPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldDefinition.StringLookup;
+import org.labkey.test.params.FieldInfo;
 import org.labkey.test.params.FieldKey;
-import org.labkey.test.params.list.IntListDefinition;
 import org.labkey.test.params.list.VarListDefinition;
 import org.labkey.test.tests.AuditLogTest;
 import org.labkey.test.util.AbstractDataRegionExportOrSignHelper.ColumnHeaderType;
@@ -2158,6 +2157,47 @@ public class ListTest extends BaseWebDriverTest
 
         clickAndWait(Locator.linkWithText(pks.get(0)));
         assertElementPresent(Locator.tagContainingText("td", pks.get(0)));
+    }
+
+    @Test // Issue 53979
+    public void testDecimalFieldFiniteValues()
+    {
+        String listName = "DecimalFieldList";
+        FieldInfo decField = FieldInfo.random("decimalField", ColumnType.Decimal);
+        String[][] data = new String[][]
+        {
+                {"1", "1.1"},
+                {"2", "1.7976931348623157e+308"},
+                {"3", "-1.7976931348623157e+308"},
+                {"4", "Infinity"},
+                {"5", "-Infinity"},
+                {"6", "Inf"},
+                {"7", "-Inf"},
+                {"8", "NaN"}
+        };
+        createList(listName, List.of(
+                new FieldDefinition("key", ColumnType.Integer),
+                decField.getFieldDefinition()
+        ), data);
+
+        DataRegionTable table = new DataRegionTable("query", getDriver());
+        checker().verifyEquals("Decimal field values not as expected",
+                List.of("1.1", "1.7976931348623157E308", "-1.7976931348623157E308", "Infinity", "-Infinity", "Infinity", "-Infinity", "NaN"),
+                table.getColumnDataAsText(decField.getName()));
+
+        table.clickInsertNewRow();
+        setFormElement(Locator.name(EscapeUtil.getFormFieldName("key")), "9");
+        setFormElement(Locator.name(EscapeUtil.getFormFieldName(decField.getName())), "bogus");
+        clickButton("Submit");
+        assertTextPresent("Could not convert value: bogus");
+
+        setFormElement(Locator.name(EscapeUtil.getFormFieldName(decField.getName())), "1.7976931348623157e+309");
+        clickButton("Submit");
+        assertTextPresent("Could not convert value: 1.7976931348623157e+309");
+
+        setFormElement(Locator.name(EscapeUtil.getFormFieldName(decField.getName())), "-1.7976931348623157e+309");
+        clickButton("Submit");
+        assertTextPresent("Could not convert value: -1.7976931348623157e+309");
     }
 
     @Override

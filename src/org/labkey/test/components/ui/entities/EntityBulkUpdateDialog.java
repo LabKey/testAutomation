@@ -217,7 +217,7 @@ public class EntityBulkUpdateDialog extends ModalDialog
      */
     public EntityBulkUpdateDialog setNumericField(CharSequence fieldIdentifier, String value)
     {
-        enableAndWait(fieldIdentifier, elementCache().numericInput(fieldIdentifier)).set(value);
+        enableAndWait(fieldIdentifier, elementCache().textInput(fieldIdentifier)).set(value);
         return this;
     }
 
@@ -227,7 +227,7 @@ public class EntityBulkUpdateDialog extends ModalDialog
      */
     public String getNumericField(CharSequence fieldIdentifier)
     {
-        return elementCache().numericInput(fieldIdentifier).get();
+        return elementCache().textInput(fieldIdentifier).get();
     }
 
     /**
@@ -453,12 +453,6 @@ public class EntityBulkUpdateDialog extends ModalDialog
             return new Input(inputEl, getDriver());
         }
 
-        public Input numericInput(CharSequence fieldIdentifier)
-        {
-            WebElement inputEl = numberInputLoc.waitForElement(formRow(fieldIdentifier), WAIT_TIMEOUT);
-            return new Input(inputEl, getDriver());
-        }
-
         public ReactDateTimePicker dateInput(CharSequence fieldIdentifier)
         {
             return new ReactDateTimePicker.ReactDateTimeInputFinder(getDriver()).waitFor(formRow(fieldIdentifier));
@@ -475,7 +469,6 @@ public class EntityBulkUpdateDialog extends ModalDialog
         }
 
         final Locator textInputLoc = Locator.tagWithAttribute("input", "type", "text");
-        final Locator numberInputLoc = Locator.tagWithAttribute("input", "type", "number");
         final Locator checkBoxLoc = Locator.tagWithAttribute("input", "type", "checkbox");
         final Locator.XPathLocator commentInputLocator = Locator.tagWithId("textarea", "actionComments");
         final WebElement commentInput = commentInputLocator.refindWhenNeeded(this);
