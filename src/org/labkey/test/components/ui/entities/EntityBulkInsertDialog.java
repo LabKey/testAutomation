@@ -208,7 +208,7 @@ public class EntityBulkInsertDialog extends ModalDialog
      */
     public EntityBulkInsertDialog setNumericField(CharSequence fieldIdentifier, String value)
     {
-        elementCache().numericInput(fieldIdentifier).set(value);
+        elementCache().textInput(fieldIdentifier).set(value);
         return this;
     }
 
@@ -218,7 +218,7 @@ public class EntityBulkInsertDialog extends ModalDialog
      */
     public String getNumericField(CharSequence fieldIdentifier)
     {
-        return elementCache().numericInput(fieldIdentifier).get();
+        return elementCache().textInput(fieldIdentifier).get();
     }
 
     /**
@@ -491,12 +491,6 @@ public class EntityBulkInsertDialog extends ModalDialog
             return new Input(inputEl, getDriver());
         }
 
-        public Input numericInput(CharSequence fieldIdentifier)
-        {
-            WebElement inputEl = numberInputLoc.findElement(formRow(fieldIdentifier));
-            return new Input(inputEl, getDriver());
-        }
-
         public ReactDateTimePicker dateInput(CharSequence fieldIdentifier)
         {
             return new ReactDateTimePicker.ReactDateTimeInputFinder(getDriver()).find(formRow(fieldIdentifier));
@@ -540,7 +534,6 @@ public class EntityBulkInsertDialog extends ModalDialog
                 .findWhenNeeded(getComponentElement());
 
         final Locator textInputLoc = Locator.tagWithAttribute("input", "type", "text");
-        final Locator numberInputLoc = Locator.tagWithAttribute("input", "type", "number");
         final Locator checkBoxLoc = Locator.tagWithAttribute("input", "type", "checkbox");
         final Locator fieldLabels = Locator.tag("hr").followingSibling("div").childTag("label");
     }
