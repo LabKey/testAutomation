@@ -88,6 +88,7 @@ public class AuditLogHelper
     {
         ASSAY_AUDIT_EVENT("AssayAuditEvent"), // available with SampleManagement module
         ASSAY_RESULT_AUDIT_EVENT("AssayResultAuditEvent"), // available with SampleManagement module
+        ATTACHMENT_AUDIT_EVENT("AttachmentAuditEvent"),
         EXPERIMENT_AUDIT_EVENT("ExperimentAuditEvent"),
         FILE_SYSTEM_EVENT("FileSystem"),
         INVENTORY_AUDIT_EVENT("InventoryAuditEvent"),
