@@ -251,6 +251,8 @@ public class WikiTest extends BaseWebDriverTest
         String wikiContent = "Lorem Ipsum something";
         String fileName = "wiki_temp_file_attachment.txt";
         File testAttachment = TestFileUtils.writeTempFile(fileName, "it was a dark and stormy night");
+        Locator wikiPageLinkLoc = Locator.linkWithText(wikiTitle);
+        Locator editLinkLoc = Locator.linkWithText("Edit");
         Locator.XPathLocator attachmentParentLoc = Locator.id("wiki-ea-name-0");
         Locator.XPathLocator removeLinkLoc = Locator.tag("td").child(Locator.linkContainingText("remove"));
         Locator.XPathLocator deleteLinkLoc = Locator.tag("td").child(Locator.linkContainingText("delete"));
@@ -268,9 +270,10 @@ public class WikiTest extends BaseWebDriverTest
         wikiHelper.setWikiBody("<p>" + wikiContent + "</p>");
         wikiHelper.saveWikiPage();
         numberOfWikiCreated++;
+        clickAndWait(wikiPageLinkLoc);
 
         log("adding an attachment");
-        wikiHelper.editWikiPage();
+        clickAndWait(editLinkLoc);
         click(filePickerLinkLoc);
         setFormElement(fileInputLoc, testAttachment);
         waitForElement(removeLinkLoc);  // when just attached, 'remove' will be an option but delete will not be
@@ -281,24 +284,27 @@ public class WikiTest extends BaseWebDriverTest
         setFormElement(fileInputLoc, testAttachment);
         wikiHelper.saveWikiPage();  // save with the attachment
         waitForElement(Locator.linkWithText(fileName));
+        clickAndWait(wikiPageLinkLoc);
 
         log("Deleting attachment");
-        wikiHelper.editWikiPage();
+        clickAndWait(editLinkLoc);
         click(deleteLinkLoc);
         waitForElement(attachmentParentLoc.withAttributeContaining("style", "text-decoration: line-through"));
         wikiHelper.saveWikiPage();
         // verify save while in deleted state actually deletes the attachment
         assertElementNotPresent(Locator.linkWithText(fileName));
+        clickAndWait(wikiPageLinkLoc);
 
         log("prepare to delete/undelete attachment");
         // re-attach the file and save
-        wikiHelper.editWikiPage();
+        clickAndWait(editLinkLoc);
         click(filePickerLinkLoc);
         setFormElement(fileInputLoc, testAttachment);
         wikiHelper.saveWikiPage();
+        clickAndWait(wikiPageLinkLoc);
 
         log("Un-Deleting attachment");
-        wikiHelper.editWikiPage();
+        clickAndWait(editLinkLoc);
         click(deleteLinkLoc);   // delete
         waitForElement(attachmentParentLoc.withAttributeContaining("style", "text-decoration: line-through"));
         waitAndClick(undeleteLinkLoc);
