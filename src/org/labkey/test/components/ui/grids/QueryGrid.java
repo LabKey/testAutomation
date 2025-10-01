@@ -317,7 +317,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
 
     public boolean hasItemsSelected()
     {
-        return Locator.tagWithClass("span", "selection-status__count").existsIn(elementCache());
+        return Locator.byClass("selection-status__count").existsIn(elementCache());
     }
 
     public String getSelectionStatusCount()
@@ -764,8 +764,8 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         final Locator.XPathLocator selectionStatusContainerLoc = Locator.tagWithClass("div", "selection-status");
         final Locator selectAllBtnLoc = selectionStatusContainerLoc.append(Locator.tagWithClass("span", "selection-status__select-all")
                 .child(Locator.buttonContainingText("Select all")));
-        final Locator clearBtnLoc = selectionStatusContainerLoc.append(Locator.tagWithClass("span", "selection-status__clear-all")
-                .child(Locator.tagContainingText("button", "Clear")));
+        final Locator clearBtnLoc = selectionStatusContainerLoc.append(Locator.byClass("selection-status__clear-all")
+                .child(Locator.tag("button")));
 
         final WebElement filterStatusPanel = Locator.css("div.grid-panel__filter-status").findWhenNeeded(this);
 
