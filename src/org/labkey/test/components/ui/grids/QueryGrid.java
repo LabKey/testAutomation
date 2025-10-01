@@ -273,7 +273,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
             doAndWaitForUpdate(obValue::remove);
         }
 
-        Assert.assertEquals("not all of the filter values were cleared", 0, elementCache().getFilterStatusFilterValues().size());
+        Assert.assertEquals("Not all of the filter values were cleared.", 0, elementCache().getFilterStatusFilterValues().size());
         return this;
     }
 
@@ -342,6 +342,8 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
                 doAndWaitForUpdate(() -> selectAllOnPage(false));
             }
         }
+
+        Assert.assertFalse("Did not successfully clear all the selected items in the grid.", hasItemsSelected());
 
         return this;
     }
