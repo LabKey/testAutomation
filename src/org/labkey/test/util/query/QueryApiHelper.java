@@ -118,19 +118,32 @@ public class QueryApiHelper
 
     public ImportDataResponse importData(String text) throws IOException, CommandException
     {
+        return importData(text, false);
+    }
+
+    public ImportDataResponse importData(String text, boolean lookupByAlternateKey) throws IOException, CommandException
+    {
         ImportDataCommand importDataCommand = new ImportDataCommand(_schema, _query);
         importDataCommand.setText(text);
         importDataCommand.setTimeout(_insertTimout);
+        importDataCommand.setImportLookupByAlternateKey(lookupByAlternateKey);
         return  importDataCommand.execute(_connection, _containerPath);
     }
 
     public ImportDataResponse importData(File file) throws IOException, CommandException
     {
+        return importData(file, false);
+    }
+
+    public ImportDataResponse importData(File file, boolean importByAlternateKey) throws IOException, CommandException
+    {
         ImportDataCommand importDataCommand = new ImportDataCommand(_schema, _query);
         importDataCommand.setFile(file);
         importDataCommand.setTimeout(_insertTimout);
+        importDataCommand.setImportLookupByAlternateKey(importByAlternateKey);
         return importDataCommand.execute(_connection, _containerPath);
     }
+
 
     public ImportDataResponse importExperimentData(String text, AuditLogHelper.AuditBehaviorType auditBehaviorType, ImportDataCommand.InsertOption insertOption, boolean isCrossType, boolean isCrossFolder, boolean isAsync) throws IOException, CommandException
     {
