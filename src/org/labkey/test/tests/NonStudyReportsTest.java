@@ -67,7 +67,6 @@ public class NonStudyReportsTest extends ReportTest
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         _userHelper.deleteUsers(false, ATTACHMENT_USER);
-        OptionalFeatureHelper.disableOptionalFeature(createDefaultConnection(), "deprecatedObjectLevelDiscussions");
         super.doCleanup(afterTest);
     }
 
@@ -90,7 +89,6 @@ public class NonStudyReportsTest extends ReportTest
         doAttachmentReportTest();
         doLinkReportTest();
         doThumbnailChangeTest();
-        doReportDiscussionTest();
     }
 
     @LogMethod
@@ -256,47 +254,6 @@ public class NonStudyReportsTest extends ReportTest
         _ext4Helper.waitForMaskToDisappear();
 
         //no way to verify, unfortunately
-    }
-
-    @LogMethod
-    private void doReportDiscussionTest()
-    {
-        // Issue 51620: Remove the UI for Object-level discussions
-        OptionalFeatureHelper.enableOptionalFeature(createDefaultConnection(), "deprecatedObjectLevelDiscussions");
-
-        clickProject(getProjectName());
-
-        goToManageViews();
-        BootstrapMenu.find(getDriver(), "Add Report").clickSubMenu(true, "R Report");
-        RReportHelper RReportHelper = new RReportHelper(this);
-        RReportHelper.executeScript("# Placeholder script for discussion", "");
-        click(Locator.linkWithText("Source"));
-        RReportHelper.saveReport(DISCUSSED_REPORT);
-        clickReportGridLink(DISCUSSED_REPORT);
-
-        clickMenuButton(true, Locator.tagWithClass("div", "discussion-toggle").findElement(getDriver()), false, "Start new discussion");
-        waitForElement(Locator.id("title"), WAIT_FOR_JAVASCRIPT);
-        setFormElement(Locator.id("title"), DISCUSSION_TITLE_1);
-        setFormElement(Locator.id("body"), DISCUSSION_BODY_1);
-        clickButton("Submit");
-
-        clickMenuButton(true, Locator.tagWithClass("div", "discussion-toggle").findElement(getDriver()), false, DISCUSSION_TITLE_1);
-        waitForText(DISCUSSION_TITLE_1);
-        assertTextPresent(DISCUSSION_BODY_1);
-
-        clickButton("Respond");
-        waitForElement(Locator.id("body"));
-        setFormElement(Locator.id("body"), DISCUSSION_BODY_2);
-        clickButton("Submit");
-
-        assertTextPresent(DISCUSSION_BODY_2);
-
-        clickAndWait(Locator.linkContainingText("edit"));
-        waitForElement(Locator.id("body"));
-        setFormElement(Locator.id("body"), DISCUSSION_BODY_3);
-        clickButton("Submit");
-
-        assertTextPresent(DISCUSSION_BODY_3);
     }
 
     @LogMethod

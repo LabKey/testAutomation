@@ -26,7 +26,6 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Wiki;
 import org.labkey.test.pages.LabkeyErrorPage;
-import org.labkey.test.util.OptionalFeatureHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.WikiHelper;
 import org.openqa.selenium.WebElement;
@@ -67,8 +66,6 @@ public class WikiLongTest extends BaseWebDriverTest
     private static final String WIKI_PAGE8_NAME= "Page 8 Name For Delete Subtree Test " + BaseWebDriverTest.INJECT_CHARS_1;
     private static final String WIKI_PAGE9_NAME= "Page 9 _blank " + BaseWebDriverTest.INJECT_CHARS_1;
 
-    private static final String DISC1_TITLE = "Let's Talk";
-    private static final String DISC1_BODY = "I don't know how normal this wiki is";
     private static final String RESP1_TITLE = "Let's Keep Talking";
     private static final String RESP1_BODY = "I disagree";
     private static final String USER1 = "wikilong_user1@wikilong.test";
@@ -177,9 +174,6 @@ public class WikiLongTest extends BaseWebDriverTest
     @Test
     public void testSteps()
     {
-        // Issue 51620: Remove the UI for Object-level discussions
-        OptionalFeatureHelper.enableOptionalFeature(createDefaultConnection(), "deprecatedObjectLevelDiscussions");
-
         enableEmailRecorder();
         _containerHelper.createProject(PROJECT2_NAME, null);
         _containerHelper.enableModule(PROJECT2_NAME, "MS2");
@@ -351,33 +345,6 @@ public class WikiLongTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(WIKI_PAGE1_TITLE));
         clickAndWait(Locator.linkWithText("next"));
         assertTextPresent("Some HTML content");
-
-        log("Check that discussion board works");
-        clickAndWait(Locator.linkWithText(WIKI_PAGE1_TITLE));
-        _ext4Helper.waitForOnReady();
-        click(Locator.linkWithText("discussions"));
-        waitForElement(Locator.linkWithText("Start new discussion"), defaultWaitForPage);
-        clickAndWait(Locator.linkWithText("Start new discussion"));
-        _wikiHelper.setWikiTitle(DISC1_TITLE);
-        setFormElement(Locator.id("body"), DISC1_BODY);
-        submit();
-        _ext4Helper.waitForOnReady();
-        clickMenuButton(true, Locator.linkWithText("discussions")
-                .findElement(getDriver()), false, DISC1_TITLE);
-
-        assertTextPresent(DISC1_TITLE,
-                DISC1_BODY);
-
-        log("Check response on discussion board works");
-        clickButton("Respond");
-        _wikiHelper.setWikiTitle(RESP1_TITLE);
-        setFormElement(Locator.id("body"), RESP1_BODY);
-        submit();
-        assertTextPresent(RESP1_TITLE,
-                RESP1_BODY);
-        clickButton("Delete Message");
-        clickButton("Delete");
-        assertTextNotPresent(DISC1_TITLE, DISC1_BODY);
 
         log("test navTree and header");
         _wikiHelper.createNewWikiPage("RADEOX");
@@ -820,7 +787,6 @@ public class WikiLongTest extends BaseWebDriverTest
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        OptionalFeatureHelper.disableOptionalFeature(createDefaultConnection(), "deprecatedObjectLevelDiscussions");
         deleteUsersIfPresent(USER1);
         _containerHelper.deleteProject(PROJECT2_NAME, afterTest);
         _containerHelper.deleteProject(PROJECT_NAME, afterTest);
