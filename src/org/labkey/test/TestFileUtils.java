@@ -635,6 +635,10 @@ public abstract class TestFileUtils
             while ((entry = inputStream.getNextEntry()) != null)
             {
                 final File outputFile = new File(outputDir, entry.getName());
+
+                if (!outputFile.toPath().normalize().startsWith(outputDir.toPath()))
+                    throw new IOException("Bad zip entry (" + entry.getName() + ") in " + inputFile.getAbsolutePath());
+
                 if (entry.isDirectory())
                 {
                     if (!outputFile.exists())
