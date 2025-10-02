@@ -635,9 +635,9 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
         public Locator validationMsg = Locator.tagWithClass("span", "validation-message");
 
         public WebElement saveButton = Locator.tagWithAttribute("button", "type", "submit")
-                .findWhenNeeded(this);
+                .containing("Save").findWhenNeeded(this);
         public WebElement cancelButton = Locator.tagWithAttribute("button", "type", "button")
-                .findWhenNeeded(this);
+                .withText("Cancel").findWhenNeeded(this);
 
         public WebElement commentInput = Locator.tagWithId("textarea", "actionComments").refindWhenNeeded(getDriver());
 
