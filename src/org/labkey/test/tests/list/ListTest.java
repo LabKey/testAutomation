@@ -66,6 +66,7 @@ import org.labkey.test.util.Maps;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.TestDataGenerator;
 import org.labkey.test.util.TextSearcher;
+import org.labkey.test.util.data.TestDataUtils;
 import org.labkey.test.util.search.SearchAdminAPIHelper;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -2050,11 +2051,16 @@ public class ListTest extends BaseWebDriverTest
 
     void createList(String name, List<FieldDefinition> cols, String[][] data)
     {
+        createList(name, cols, toTSV(cols,data));
+    }
+
+    void createList(String name, List<FieldDefinition> cols, String tsvData)
+    {
         log("Add List -- " + name);
         _listHelper.createList(PROJECT_VERIFY, name, cols.get(0), cols.subList(1, cols.size()).toArray(new FieldDefinition[cols.size() - 1]));
         _listHelper.goToList(name);
         _listHelper.clickImportData();
-        setListImportAsTestDataField(toTSV(cols,data));
+        setListImportAsTestDataField(tsvData);
     }
 
     private void setListImportAsTestDataField(String data, String... expectedErrors)
@@ -2164,21 +2170,20 @@ public class ListTest extends BaseWebDriverTest
     {
         String listName = "DecimalFieldList";
         FieldInfo decField = FieldInfo.random("decimalField", ColumnType.Decimal);
-        String[][] data = new String[][]
-        {
-                {"1", "1.1"},
-                {"2", "1.7976931348623157e+308"},
-                {"3", "-1.7976931348623157e+308"},
-                {"4", "Infinity"},
-                {"5", "-Infinity"},
-                {"6", "Inf"},
-                {"7", "-Inf"},
-                {"8", "NaN"}
-        };
+        List<Map<String, Object>> rowMaps = new ArrayList<>();
+        rowMaps.add(Map.of("key", 1, decField.getName(), "1.1"));
+        rowMaps.add(Map.of("key", 2, decField.getName(), "1.7976931348623157e+308"));
+        rowMaps.add(Map.of("key", 3, decField.getName(), "-1.7976931348623157e+308"));
+        rowMaps.add(Map.of("key", 4, decField.getName(), "Infinity"));
+        rowMaps.add(Map.of("key", 5, decField.getName(), "-Infinity"));
+        rowMaps.add(Map.of("key", 6, decField.getName(), "Inf"));
+        rowMaps.add(Map.of("key", 7, decField.getName(), "-Inf"));
+        rowMaps.add(Map.of("key", 8, decField.getName(), "NaN"));
+
         createList(listName, List.of(
                 new FieldDefinition("key", ColumnType.Integer),
                 decField.getFieldDefinition()
-        ), data);
+        ), TestDataUtils.tsvStringFromRowMaps(rowMaps, List.of("key", decField.getName()), true));
 
         DataRegionTable table = new DataRegionTable("query", getDriver());
         checker().verifyEquals("Decimal field values not as expected",
