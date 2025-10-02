@@ -223,14 +223,12 @@ public class JUnitTest extends TestSuite
             if (status == HttpStatus.SC_OK)
             {
                 final String responseBody = response.getText();
-                if (responseBody.isEmpty())
-                    throw new AssertionFailedError("Failed to fetch remote junit test list: empty response");
 
                 final JSONObject json;
 
                 try
                 {
-                    json = new JSONObject(responseBody);
+                    json = new JSONObject(response.getParsedData());
                 }
                 catch (JSONException e)
                 {
