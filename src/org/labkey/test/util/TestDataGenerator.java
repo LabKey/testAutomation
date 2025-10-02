@@ -33,6 +33,7 @@ import org.labkey.remoteapi.domain.CreateDomainCommand;
 import org.labkey.remoteapi.domain.DomainResponse;
 import org.labkey.remoteapi.domain.PropertyDescriptor;
 import org.labkey.remoteapi.query.Filter;
+import org.labkey.remoteapi.query.ImportDataResponse;
 import org.labkey.remoteapi.query.RowsResponse;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.remoteapi.query.Sort;
@@ -918,6 +919,26 @@ public class TestDataGenerator
     public RowsResponse insertRows(Connection cn, List<Map<String, Object>> rows) throws IOException, CommandException
     {
         return getQueryHelper(cn).insertRows(rows);
+    }
+
+    public ImportDataResponse importRows() throws IOException, CommandException
+    {
+        return importRows(false);
+    }
+
+    public ImportDataResponse importRows(boolean lookupByAlternateKey) throws IOException, CommandException
+    {
+        return importRows(WebTestHelper.getRemoteApiConnection(), lookupByAlternateKey);
+    }
+
+    public ImportDataResponse importRows(Connection cn, boolean lookupByAlternateKey) throws IOException, CommandException
+    {
+        return importRows(cn, getRows(), lookupByAlternateKey);
+    }
+
+    public ImportDataResponse importRows(Connection cn, List<Map<String, Object>> rows, boolean lookupByAlternateKey) throws IOException, CommandException
+    {
+        return getQueryHelper(cn).importData(TestDataUtils.stringFromRows(TestDataUtils.rowListsFromMaps(rows)), lookupByAlternateKey);
     }
 
     public static <T> List<T> shuffleSelect(List<T> allFields, int selectCount)
