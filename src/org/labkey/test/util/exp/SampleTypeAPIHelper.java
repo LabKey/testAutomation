@@ -13,12 +13,14 @@ import org.labkey.test.params.FieldInfo;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.DomainUtils;
 import org.labkey.test.util.DomainUtils.DomainKind;
+import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.TestDataGenerator;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -133,10 +135,25 @@ public class SampleTypeAPIHelper
     public static Map<String, Integer> getRowIdsForSamples(String containerPath, String sampleTypeName, List<String> sampleNames) throws IOException, CommandException
     {
 
+        // Use json for the value parameter of the filter. This allows for tricky characters like ";" to be passed to the API.
+        StringBuilder json = new StringBuilder("{json:[");
+
+        Iterator<String> iterator = sampleNames.iterator();
+
+        while (iterator.hasNext()) {
+            String sampleName = iterator.next();
+            json.append(EscapeUtil.toJSONStr(sampleName));
+            if (iterator.hasNext()) {
+                json.append(", ");
+            } else {
+                json.append("]}");
+            }
+        }
+
         Connection connection = WebTestHelper.getRemoteApiConnection();
         SelectRowsCommand cmd = new SelectRowsCommand("samples", sampleTypeName);
         cmd.setColumns(Arrays.asList("RowId", "Name"));
-        cmd.addFilter("Name", String.join(";", sampleNames), Filter.Operator.IN);
+        cmd.addFilter("Name", json, Filter.Operator.IN);
 
         SelectRowsResponse response = cmd.execute(connection, containerPath);
 
