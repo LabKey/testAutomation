@@ -13,6 +13,7 @@ import org.labkey.test.params.FieldInfo;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.DomainUtils;
 import org.labkey.test.util.DomainUtils.DomainKind;
+import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.TestDataGenerator;
 
 import java.io.IOException;
@@ -141,11 +142,7 @@ public class SampleTypeAPIHelper
 
         while (iterator.hasNext()) {
             String sampleName = iterator.next();
-
-            json.append("\"");
-            json.append(sampleName.replace("\"", "\\\""));
-            json.append("\"");
-
+            json.append(EscapeUtil.toJSONStr(sampleName));
             if (iterator.hasNext()) {
                 json.append(", ");
             } else {
