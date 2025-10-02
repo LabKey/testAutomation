@@ -195,17 +195,29 @@ public class JUnitTest extends TestSuite
         }
 
         HttpContext context = WebTestHelper.getBasicHttpContext();
-        CommandResponse response = null;
+        CloseableHttpResponse response = null;
         try (CloseableHttpClient client = WebTestHelper.getHttpClient())
         {
             final String url = WebTestHelper.getBaseURL() + "/junit-testlist.view";
+            HttpGet whoAmI = new HttpGet(WebTestHelper.buildURL("login", "whoami.api"));
             HttpGet method = new HttpGet(url);
             try
             {
-                Connection remoteApiConnection = WebTestHelper.getRemoteApiConnection();
-                response = new SimplePostCommand("junit", "testlist").execute(remoteApiConnection, "/");
+                client.execute(whoAmI, context, r -> {
+                    try
+                    {
+                        JSONObject jsonObject = new JSONObject(WebTestHelper.getHttpResponseBody(r));
+                        LOG.info("WhoAmI: {}", jsonObject.getString("email"));
+                    }
+                    catch (JSONException e)
+                    {
+                        LOG.info("WhoAmI: {}", r.getCode());
+                    }
+                    return null;
+                });
+                response = client.execute(method, context);
             }
-            catch (IOException | CommandException ex)
+            catch (IOException ex)
             {
                 if (!startupTimer.isTimedOut() && upgradeAttempts == 0)
                 {
@@ -219,16 +231,18 @@ public class JUnitTest extends TestSuite
                     return failsuite;
                 }
             }
-            int status = response.getStatusCode();
+            int status = response.getCode();
             if (status == HttpStatus.SC_OK)
             {
-                final String responseBody = response.getText();
+                final String responseBody = WebTestHelper.getHttpResponseBody(response);
+                if (responseBody.isEmpty())
+                    throw new AssertionFailedError("Failed to fetch remote junit test list: empty response");
 
                 final JSONObject json;
 
                 try
                 {
-                    json = new JSONObject(response.getParsedData());
+                    json = new JSONObject(responseBody);
                 }
                 catch (JSONException e)
                 {
@@ -338,15 +352,15 @@ public class JUnitTest extends TestSuite
             else
             {
                 LOG.error("Getting unit test list from server failed with error code " + status + ". Error page content is:");
-//                final OutputStream streamLogger = IoBuilder.forLogger(LOG).setLevel(Level.ERROR).buildOutputStream();
-                LOG.error(response.getText());
-                throw new AssertionFailedError("Failed to fetch remote junit test list (" + status + "): " + url);
+                final OutputStream streamLogger = IoBuilder.forLogger(LOG).setLevel(Level.ERROR).buildOutputStream();
+                response.getEntity().writeTo(streamLogger);
+                throw new AssertionFailedError("Failed to fetch remote junit test list (" + status + " - " + response.getReasonPhrase() + "): " + url);
             }
         }
         finally
         {
-//            if (response != null)
-//                EntityUtils.consumeQuietly(response.getEntity());
+            if (response != null)
+                EntityUtils.consumeQuietly(response.getEntity());
         }
     }
 
