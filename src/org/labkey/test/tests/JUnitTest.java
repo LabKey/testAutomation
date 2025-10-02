@@ -195,16 +195,17 @@ public class JUnitTest extends TestSuite
         }
 
         HttpContext context = WebTestHelper.getBasicHttpContext();
-        CloseableHttpResponse response = null;
+        CommandResponse response = null;
         try (CloseableHttpClient client = WebTestHelper.getHttpClient())
         {
             final String url = WebTestHelper.getBaseURL() + "/junit-testlist.view";
             HttpGet method = new HttpGet(url);
             try
             {
-                response = client.execute(method, context);
+                Connection remoteApiConnection = WebTestHelper.getRemoteApiConnection();
+                response = new SimplePostCommand("junit", "testlist").execute(remoteApiConnection, "/");
             }
-            catch (IOException ex)
+            catch (IOException | CommandException ex)
             {
                 if (!startupTimer.isTimedOut() && upgradeAttempts == 0)
                 {
@@ -218,10 +219,10 @@ public class JUnitTest extends TestSuite
                     return failsuite;
                 }
             }
-            int status = response.getCode();
+            int status = response.getStatusCode();
             if (status == HttpStatus.SC_OK)
             {
-                final String responseBody = WebTestHelper.getHttpResponseBody(response);
+                final String responseBody = response.getText();
                 if (responseBody.isEmpty())
                     throw new AssertionFailedError("Failed to fetch remote junit test list: empty response");
 
@@ -339,15 +340,15 @@ public class JUnitTest extends TestSuite
             else
             {
                 LOG.error("Getting unit test list from server failed with error code " + status + ". Error page content is:");
-                final OutputStream streamLogger = IoBuilder.forLogger(LOG).setLevel(Level.ERROR).buildOutputStream();
-                response.getEntity().writeTo(streamLogger);
-                throw new AssertionFailedError("Failed to fetch remote junit test list (" + status + " - " + response.getReasonPhrase() + "): " + url);
+//                final OutputStream streamLogger = IoBuilder.forLogger(LOG).setLevel(Level.ERROR).buildOutputStream();
+                LOG.error(response.getText());
+                throw new AssertionFailedError("Failed to fetch remote junit test list (" + status + "): " + url);
             }
         }
         finally
         {
-            if (response != null)
-                EntityUtils.consumeQuietly(response.getEntity());
+//            if (response != null)
+//                EntityUtils.consumeQuietly(response.getEntity());
         }
     }
 
