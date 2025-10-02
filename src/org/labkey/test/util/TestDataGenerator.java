@@ -703,7 +703,7 @@ public class TestDataGenerator
                 return true;
             if (!Character.isLetterOrDigit(domainName.name().charAt(0)))
                 return true; // domain needs to start with alphanumeric char
-            if (Pattern.matches("(.*\\s--[^ ].*)|(.*\\s-[^- ].*)", domainName.name()))
+            if (Pattern.matches("(.*\\s--[^ ].*)|(.*\\s-.*)", domainName.name()))
                 return true; // domain name must not contain space followed by dash. (command like: Issue 49161)
 
             int maxLength = switch (domainKind)
