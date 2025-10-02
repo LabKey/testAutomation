@@ -17,7 +17,6 @@
 package org.labkey.test;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.commons.lang3.time.FastDateFormat;
@@ -109,7 +108,6 @@ import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.html5.WebStorage;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.UnreachableBrowserException;
 import org.openqa.selenium.remote.service.DriverService;
@@ -780,12 +778,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             {
                 // Clears browser localStorage. Needed in order to reset some state such as grid filters/sorts/etc.
                 // which are sticky, but can interfere with what tests expect.
-                WebDriver driver = getDriver();
-
-                if (driver instanceof WebStorage webStorage)
-                {
-                    webStorage.getLocalStorage().clear();
-                }
+                executeScript("window.localStorage.clear();");
+                executeScript("window.sessionStorage.clear();");
             }
 
             @Override
