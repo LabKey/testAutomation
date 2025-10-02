@@ -312,6 +312,8 @@ public class WikiTest extends BaseWebDriverTest
                 .as("expect strikethrough style not to be present")
                 .doesNotContain("text-decoration: line-through"));
         wikiHelper.saveWikiPage();
+        // note: attaching the file and leaving it there will create a search result, so increment wikiCreated count here
+        numberOfWikiCreated++;
 
         // verify save after undelete persists the attachment
         assertElementPresent(Locator.linkWithText(fileName));
