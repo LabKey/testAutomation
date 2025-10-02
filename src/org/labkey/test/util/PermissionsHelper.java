@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.junit.Assert.fail;
 
@@ -44,6 +45,13 @@ public abstract class PermissionsHelper
     public static final String EDITOR_ROLE = "Editor";
     public static final String AUTHOR_ROLE = "Author";
     public static final String SUBMITTER_ROLE = "Submitter";
+
+    public static final Set<String> AUDIT_LOG_VIEWER_ROLES = Set.of(SITE_ADMIN_ROLE, APP_ADMIN_ROLE, PROJECT_ADMIN_ROLE, FOLDER_ADMIN_ROLE);
+
+    public static boolean canSeeAuditLogs(String roleName)
+    {
+        return AUDIT_LOG_VIEWER_ROLES.contains(roleName);
+    }
 
     public static String toRole(final String name)
     {
