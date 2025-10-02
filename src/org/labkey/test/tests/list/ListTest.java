@@ -33,7 +33,6 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.TestFileUtils;
-import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Data;
@@ -224,13 +223,6 @@ public class ListTest extends BaseWebDriverTest
         log("Create second project");
         _containerHelper.createProject(PROJECT_OTHER, null);
         goToProjectHome();
-    }
-
-    @Override
-    protected void doCleanup(boolean afterTest) throws TestTimeoutException
-    {
-        _containerHelper.deleteProject(getProjectName(), afterTest);
-        _containerHelper.deleteProject(PROJECT_OTHER, afterTest);
     }
 
     @Before

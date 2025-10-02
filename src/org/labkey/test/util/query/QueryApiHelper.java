@@ -39,7 +39,7 @@ public class QueryApiHelper
     private final String _schema;
     private final String _query;
 
-    private int _insertTimout = 180_000;
+    private int _insertTimeout = 180_000;
 
     public QueryApiHelper(Connection connection, String containerPath, String schema, String query)
     {
@@ -49,9 +49,9 @@ public class QueryApiHelper
         _query = query;
     }
 
-    public QueryApiHelper setInsertTimout(int insertTimout)
+    public QueryApiHelper setInsertTimeout(int insertTimeout)
     {
-        _insertTimout = insertTimout;
+        _insertTimeout = insertTimeout;
         return this;
     }
 
@@ -93,7 +93,7 @@ public class QueryApiHelper
     {
         InsertRowsCommand insertRowsCommand = new InsertRowsCommand(_schema, _query);
         insertRowsCommand.setRows(makeApiRows(rows));
-        insertRowsCommand.setTimeout(_insertTimout);
+        insertRowsCommand.setTimeout(_insertTimeout);
         insertRowsCommand.setAuditBehavior(BaseRowsCommand.AuditBehavior.DETAILED);
         return insertRowsCommand.execute(_connection, _containerPath);
     }
@@ -102,33 +102,34 @@ public class QueryApiHelper
     {
         UpdateRowsCommand updateRowsCommand = new UpdateRowsCommand(_schema, _query);
         updateRowsCommand.setRows(makeApiRows(rows));
-        updateRowsCommand.setTimeout(_insertTimout);
+        updateRowsCommand.setTimeout(_insertTimeout);
         updateRowsCommand.setAuditBehavior(BaseRowsCommand.AuditBehavior.DETAILED);
-        return  updateRowsCommand.execute(_connection, _containerPath);
+        return updateRowsCommand.execute(_connection, _containerPath);
     }
 
-    public <T> RowsResponse moveRows(List<Map<String, T>> rows, String targetContainerPath) throws IOException, CommandException
+    public <T> MoveRowsResponse moveRows(List<Map<String, T>> rows, String targetContainerPath) throws IOException, CommandException
     {
         MoveRowsCommand moveRowsCommand = new MoveRowsCommand(targetContainerPath, _schema, _query);
         moveRowsCommand.setRows(makeApiRows(rows));
-        moveRowsCommand.setTimeout(_insertTimout);
+        moveRowsCommand.setTimeout(_insertTimeout);
         moveRowsCommand.setAuditBehavior(BaseRowsCommand.AuditBehavior.DETAILED);
-        return  moveRowsCommand.execute(_connection, _containerPath);
+        RowsResponse response = moveRowsCommand.execute(_connection, _containerPath);
+        return new MoveRowsResponse(response);
     }
 
     public ImportDataResponse importData(String text) throws IOException, CommandException
     {
         ImportDataCommand importDataCommand = new ImportDataCommand(_schema, _query);
         importDataCommand.setText(text);
-        importDataCommand.setTimeout(_insertTimout);
-        return  importDataCommand.execute(_connection, _containerPath);
+        importDataCommand.setTimeout(_insertTimeout);
+        return importDataCommand.execute(_connection, _containerPath);
     }
 
     public ImportDataResponse importData(File file) throws IOException, CommandException
     {
         ImportDataCommand importDataCommand = new ImportDataCommand(_schema, _query);
         importDataCommand.setFile(file);
-        importDataCommand.setTimeout(_insertTimout);
+        importDataCommand.setTimeout(_insertTimeout);
         return importDataCommand.execute(_connection, _containerPath);
     }
 
@@ -141,7 +142,7 @@ public class QueryApiHelper
         importDataCommand.setCrossTypeImport(isCrossType);
         importDataCommand.setText(text);
         importDataCommand.setInsertOption(insertOption);
-        importDataCommand.setTimeout(_insertTimout);
+        importDataCommand.setTimeout(_insertTimeout);
         return importDataCommand.execute(_connection, _containerPath);
     }
 
@@ -189,5 +190,4 @@ public class QueryApiHelper
         DropDomainCommand delCmd = new DropDomainCommand(_schema, _query);
         return delCmd.execute(_connection, _containerPath);
     }
-
 }
