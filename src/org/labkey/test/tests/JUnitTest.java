@@ -199,23 +199,24 @@ public class JUnitTest extends TestSuite
         try (CloseableHttpClient client = WebTestHelper.getHttpClient())
         {
             final String url = WebTestHelper.getBaseURL() + "/junit-testlist.view";
-            HttpGet whoAmI = new HttpGet(WebTestHelper.buildURL("login", "whoami.api"));
-            HttpGet method = new HttpGet(url);
+            HttpGet ensureLogin = new HttpGet(WebTestHelper.buildURL("security", "ensureLogin.api"));
+            HttpGet getTestList = new HttpGet(url);
             try
             {
-                client.execute(whoAmI, context, r -> {
+                client.execute(ensureLogin, context, r -> {
+                    String ensureLoginResponse = WebTestHelper.getHttpResponseBody(r);
                     try
                     {
-                        JSONObject jsonObject = new JSONObject(WebTestHelper.getHttpResponseBody(r));
-                        LOG.info("WhoAmI: {}", jsonObject.getString("email"));
+                        JSONObject jsonObject = new JSONObject(ensureLoginResponse);
+                        LOG.info("ensureLogin: {}", jsonObject.getJSONObject("currentUser").getString("email"));
                     }
                     catch (JSONException e)
                     {
-                        LOG.info("WhoAmI: {}", r.getCode());
+                        LOG.info("ensureLogin: {}", ensureLoginResponse);
                     }
                     return null;
                 });
-                response = client.execute(method, context);
+                response = client.execute(getTestList, context);
             }
             catch (IOException ex)
             {
@@ -253,6 +254,7 @@ public class JUnitTest extends TestSuite
                         // Server still starting up.  We don't need to use the upgradeHelper to sign in.
                         LOG.info("Remote JUnitTest: Server modules starting up (remaining " + TestDateUtils.durationString(startupTimer.timeRemaining()) + ") ...");
 
+                        EntityUtils.consumeQuietly(response.getEntity()); // Consume before possible recursion
                         if (!startupTimer.isTimedOut())
                         {
                             Thread.sleep(1000);
@@ -271,6 +273,7 @@ public class JUnitTest extends TestSuite
                         responseBody.contains("<title>Account Setup</title>") ||
                         responseBody.contains("This server is being upgraded to a new version of LabKey Server."))
                     {
+                        EntityUtils.consumeQuietly(response.getEntity()); // Consume before possible recursion
                         LOG.info("Remote JUnitTest: Server needs install or upgrade ...");
                         if (upgradeAttempts > 3)
                             throw new AssertionFailedError("Failed to update or bootstrap on second attempt: " + responseBody);
