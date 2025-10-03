@@ -27,6 +27,7 @@ import org.labkey.test.util.query.QueryApiHelper;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -159,7 +160,6 @@ public class ListMoveRowsTest extends BaseWebDriverTest
     @Test
     public void testAutoIntListMove() throws Exception
     {
-        // Arrange
         truncateList(AUTO_INCREMENT_LIST);
 
         int totalRows = 100;
@@ -172,7 +172,6 @@ public class ListMoveRowsTest extends BaseWebDriverTest
     @Test
     public void testIntListMove() throws Exception
     {
-        // Arrange
         truncateList(INTEGER_KEY_LIST);
 
         int totalRows = 100;
@@ -185,7 +184,6 @@ public class ListMoveRowsTest extends BaseWebDriverTest
     @Test
     public void testVarListMove() throws Exception
     {
-        // Arrange
         truncateList(STRING_KEY_LIST);
 
         int totalRows = 100;
@@ -283,21 +281,21 @@ public class ListMoveRowsTest extends BaseWebDriverTest
 
     private void successfullyMoveRows(ListDefinition list, List<Map<String, Object>> rows) throws Exception
     {
-        var rowCount = rows.size();
+        var rowsSize = rows.size();
         var rowAttachmentSize = attachmentCount(rows);
 
-        var mid = rowCount / 2;
+        var mid = rowsSize / 2;
         var firstRows = rows.subList(0, mid);
         var firstRowsSize = firstRows.size();
         var firstRowAttachmentSize = attachmentCount(firstRows);
 
-        var secondRows = rows.subList(mid, rowCount);
+        var secondRows = rows.subList(mid, rowsSize);
         var secondRowsSize = secondRows.size();
         var secondRowAttachmentSize = attachmentCount(secondRows);
 
         // Act
         var moveResponse = moveRows(list, getProjectName(), SUBFOLDER_A_PATH, rows);
-        var expectedCounts = new UpdateCounts(rowAttachmentSize, rowCount + 2, rowCount, rowCount, rowCount - rowAttachmentSize);
+        var expectedCounts = new UpdateCounts(rowAttachmentSize, rowsSize + 2, rowsSize, rowsSize, rowsSize - rowAttachmentSize);
         verifySuccessfulMove(list, moveResponse, getProjectName(), SUBFOLDER_A_PATH, expectedCounts);
         if (checker().errorsSinceMark() > 0)
             return;
@@ -366,17 +364,18 @@ public class ListMoveRowsTest extends BaseWebDriverTest
         checker().verifyEquals("Unexpected number of query audit events moved", expectedCounts.queryAuditEventsMoved, response.getUpdateCounts().get("queryAuditEventsMoved"));
 
         // Verify audit logs
+        var decimalFormat = new DecimalFormat("#,##0");
         var hasUpdates = expectedCounts != NO_UPDATE;
         var listAuditEvents = _auditLogHelper.getAuditLogsForTransactionId(getProjectName(), LIST_AUDIT_EVENT, List.of("Comment", "Container/Path", "ListId"), response.getTransactionAuditId(), ContainerFilter.CurrentAndSubfolders);
         checker().verifyEquals("Unexpected number of list audit events", expectedCounts.listAuditEventsCreated, listAuditEvents.size());
         checker().wrapAssertion(() -> {
-            var matches = auditEventMatches(listAuditEvents, targetPath, list.getListId(), String.format("Moved %d rows from %s", expectedCounts.listRecords, sourcePath));
+            var matches = auditEventMatches(listAuditEvents, targetPath, list.getListId(), String.format("Moved %s rows from %s", decimalFormat.format(expectedCounts.listRecords), sourcePath));
             Assertions.assertThat(matches)
                     .as("Expected one event recording move in target container")
                     .hasSize(hasUpdates ? 1 : 0);
         });
         checker().wrapAssertion(() -> {
-            var matches = auditEventMatches(listAuditEvents, sourcePath, list.getListId(), String.format("Moved %d rows to %s", expectedCounts.listRecords, targetPath));
+            var matches = auditEventMatches(listAuditEvents, sourcePath, list.getListId(), String.format("Moved %s rows to %s", decimalFormat.format(expectedCounts.listRecords), targetPath));
             Assertions.assertThat(matches)
                     .as("Expected one event recording move in source container")
                     .hasSize(hasUpdates ? 1 : 0);
