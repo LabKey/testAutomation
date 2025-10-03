@@ -33,7 +33,7 @@ import org.labkey.test.util.ext4cmp.Ext4FileFieldRef;
 import java.io.File;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
 
@@ -50,11 +50,6 @@ public class NonStudyReportsTest extends ReportTest
     private static final String UPDATE_ATTACHMENT_REPORT = "Update Attachment Report";
     private static final String ATTACHMENT_REPORT2_DESCRIPTION = BaseWebDriverTest.INJECT_CHARS_2;
     private static final File ATTACHMENT_REPORT2_FILE = TestFileUtils.getSampleData("Microarray/test2.jpg"); // arbitrary image file
-    private static final String DISCUSSED_REPORT = "Blank R Report";
-    private static final String DISCUSSION_BODY_1 = "Starting a discussion";
-    private static final String DISCUSSION_TITLE_1 = "Discussion about R report";
-    private static final String DISCUSSION_BODY_2 = "Responding to a discussion";
-    private static final String DISCUSSION_BODY_3 = "Editing a discussion response";
     private static final String LINK_REPORT1_NAME = "Link report 1" + BaseWebDriverTest.INJECT_CHARS_2;
     private static final String LINK_REPORT1_DESCRIPTION = "Link report 1" + BaseWebDriverTest.INJECT_CHARS_2;
     private static final String LINK_REPORT1_URL = "/home/project-begin.view";
@@ -226,7 +221,7 @@ public class NonStudyReportsTest extends ReportTest
         // verify we can set a property
         clickAndWait(Locator.linkContainingText("Edit Report"));
         waitForText(UPDATE_ATTACHMENT_REPORT);
-        assertFalse("Locked".equals(getFormElement(statusElement)));
+        assertNotEquals("Locked", getFormElement(statusElement));
         setFormElement(Locator.name("status"), "Locked");
         clickButton("Save");
         waitForText(ATTACHMENT_REPORT3_NAME);
