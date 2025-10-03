@@ -107,12 +107,22 @@ public class QueryApiHelper
         return updateRowsCommand.execute(_connection, _containerPath);
     }
 
-    public <T> MoveRowsResponse moveRows(List<Map<String, T>> rows, String targetContainerPath) throws IOException, CommandException
+    public <T> MoveRowsCommand createMoveRowsCommand(List<Map<String, T>> rows, String targetContainerPath)
     {
         MoveRowsCommand moveRowsCommand = new MoveRowsCommand(targetContainerPath, _schema, _query);
         moveRowsCommand.setRows(makeApiRows(rows));
         moveRowsCommand.setTimeout(_insertTimeout);
         moveRowsCommand.setAuditBehavior(BaseRowsCommand.AuditBehavior.DETAILED);
+        return moveRowsCommand;
+    }
+
+    public <T> MoveRowsResponse moveRows(List<Map<String, T>> rows, String targetContainerPath) throws IOException, CommandException
+    {
+        return moveRows(createMoveRowsCommand(rows, targetContainerPath));
+    }
+
+    public MoveRowsResponse moveRows(MoveRowsCommand moveRowsCommand) throws IOException, CommandException
+    {
         RowsResponse response = moveRowsCommand.execute(_connection, _containerPath);
         return new MoveRowsResponse(response);
     }

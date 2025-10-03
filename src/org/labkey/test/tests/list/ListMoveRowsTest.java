@@ -7,8 +7,10 @@ import org.junit.experimental.categories.Category;
 import org.labkey.api.collections.CaseInsensitiveHashMap;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.query.BaseRowsCommand;
 import org.labkey.remoteapi.query.ContainerFilter;
 import org.labkey.remoteapi.query.Filter;
+import org.labkey.remoteapi.query.MoveRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.remoteapi.query.TruncateTableCommand;
@@ -279,6 +281,42 @@ public class ListMoveRowsTest extends BaseWebDriverTest
         moveRowsExpectingError(subfolderList, SUBFOLDER_A_PATH, SUBFOLDER_MINOR_A_PATH, subARows.getRows(), expectedError);
     }
 
+    @Test
+    public void testAuditDetailsNone() throws Exception
+    {
+        truncateList(STRING_KEY_LIST);
+
+        // Arrange
+        int totalRows = 5;
+        int numRowsWithAttachmentValue = 2;
+        var response = addRows(STRING_KEY_LIST, SUBFOLDER_A_PATH, totalRows, numRowsWithAttachmentValue);
+
+        QueryApiHelper queryApiHelper = getQueryApiHelper(SUBFOLDER_A_PATH, STRING_KEY_LIST);
+        MoveRowsCommand command = queryApiHelper.createMoveRowsCommand(response.getRows(), SUBFOLDER_B_PATH);
+        command.setAuditBehavior(BaseRowsCommand.AuditBehavior.NONE);
+
+        // Act
+        MoveRowsResponse moveRowsResponse = queryApiHelper.moveRows(command);
+
+        // Assert
+        UpdateCounts updateCount = new UpdateCounts(numRowsWithAttachmentValue, 0, totalRows, totalRows, totalRows - numRowsWithAttachmentValue);
+        checker().verifyNull("Expected a null transaction audit Id", moveRowsResponse.getTransactionAuditId());
+        verifyUpdateCounts(updateCount, moveRowsResponse.getUpdateCounts());
+    }
+
+    @Test
+    public void testInvalidArguments() throws Exception
+    {
+        truncateList(AUTO_INCREMENT_LIST);
+        var response = addRows(AUTO_INCREMENT_LIST, getProjectName(), 1, 0);
+        var validId = response.getRows().get(0).get(autoIncrementKeyFieldName);
+
+        moveRowsExpectingError(AUTO_INCREMENT_LIST, getProjectName(), SUBFOLDER_B_PATH, List.of(), "No 'rows' array supplied.");
+        moveRowsExpectingError(AUTO_INCREMENT_LIST, getProjectName(), SUBFOLDER_B_PATH, List.of(Map.of("InvalidKey", validId)), "Key field value required for moving list rows.");
+        moveRowsExpectingError(AUTO_INCREMENT_LIST, getProjectName(), null, response.getRows(), "A target container must be specified for the move operation.");
+        moveRowsExpectingError(AUTO_INCREMENT_LIST, getProjectName(), "/Shared", response.getRows(), "Invalid target container for the move operation: /Shared.");
+    }
+
     private void successfullyMoveRows(ListDefinition list, List<Map<String, Object>> rows) throws Exception
     {
         var rowsSize = rows.size();
@@ -306,12 +344,6 @@ public class ListMoveRowsTest extends BaseWebDriverTest
         if (checker().errorsSinceMark() > 0)
             return;
 
-        // Attempt to move some rows from the project to a different subfolder even though they have already been moved
-        moveResponse = moveRows(list, getProjectName(), SUBFOLDER_B_PATH, firstRows);
-        verifySuccessfulMove(list, moveResponse, getProjectName(), SUBFOLDER_B_PATH, NO_UPDATE);
-        if (checker().errorsSinceMark() > 0)
-            return;
-
         // Now move them between subfolders
         moveResponse = moveRows(list, SUBFOLDER_A_PATH, SUBFOLDER_B_PATH, firstRows);
         expectedCounts = new UpdateCounts(firstRowAttachmentSize, firstRowsSize + 2, firstRowsSize + firstRowsSize, firstRowsSize, firstRowsSize - firstRowAttachmentSize);
@@ -330,6 +362,13 @@ public class ListMoveRowsTest extends BaseWebDriverTest
         moveResponse = moveRows(list, SUBFOLDER_B_PATH, SUBFOLDER_MINOR_A_PATH, secondRows);
         expectedCounts = new UpdateCounts(secondRowAttachmentSize, secondRowsSize + 2, secondRowsSize * 3, secondRowsSize, secondRowsSize - secondRowAttachmentSize);
         verifySuccessfulMove(list, moveResponse, SUBFOLDER_B_PATH, SUBFOLDER_MINOR_A_PATH, expectedCounts);
+        if (checker().errorsSinceMark() > 0)
+            return;
+
+        // Now move all rows back to the project
+        moveResponse = moveRows(list, PROJECT_PATH, PROJECT_PATH, rows);
+        expectedCounts = new UpdateCounts(rowAttachmentSize, rowsSize + 4, (rowsSize * 3) + secondRowsSize, rowsSize, rowsSize - rowAttachmentSize);
+        verifySuccessfulMove(list, moveResponse, Map.of(SUBFOLDER_B_PATH, secondRowsSize, SUBFOLDER_MINOR_A_PATH, secondRowsSize), PROJECT_PATH, expectedCounts);
     }
 
     private int attachmentCount(List<Map<String, Object>> rows)
@@ -345,7 +384,17 @@ public class ListMoveRowsTest extends BaseWebDriverTest
         UpdateCounts expectedCounts
     ) throws IOException, CommandException
     {
-        final String sourcePath = sourceContainerPath.startsWith("/") ? sourceContainerPath : "/" + sourceContainerPath;
+        verifySuccessfulMove(list, response, Map.of(sourceContainerPath, expectedCounts.listRecords), targetContainerPath, expectedCounts);
+    }
+
+    private void verifySuccessfulMove(
+        ListDefinition list,
+        MoveRowsResponse response,
+        Map<String, Integer> sourceContainerPathCounts,
+        String targetContainerPath,
+        UpdateCounts expectedCounts
+    ) throws IOException, CommandException
+    {
         final String targetPath = targetContainerPath.startsWith("/") ? targetContainerPath : "/" + targetContainerPath;
 
         // Verify response
@@ -354,38 +403,54 @@ public class ListMoveRowsTest extends BaseWebDriverTest
         checker().verifyEquals("Unexpected container path", targetPath, response.getContainerPath());
 
         // Verify update counts
-        checker().wrapAssertion(() -> Assertions.assertThat(response.getUpdateCounts().keySet())
-                .as("Expect list moveRows response to contain specific update counts")
-                .containsExactlyInAnyOrder("fileAttachmentsMoved", "listAuditEventsCreated", "listAuditEventsMoved", "listRecords", "queryAuditEventsMoved"));
-        checker().verifyEquals("Unexpected number of file attachments moved", expectedCounts.fileAttachmentsMoved, response.getUpdateCounts().get("fileAttachmentsMoved"));
-        checker().verifyEquals("Unexpected number of list audit events created", expectedCounts.listAuditEventsCreated, response.getUpdateCounts().get("listAuditEventsCreated"));
-        checker().verifyEquals("Unexpected number of list audit events moved", expectedCounts.listAuditEventsMoved, response.getUpdateCounts().get("listAuditEventsMoved"));
-        checker().verifyEquals("Unexpected number of list records moved", expectedCounts.listRecords, response.getUpdateCounts().get("listRecords"));
-        checker().verifyEquals("Unexpected number of query audit events moved", expectedCounts.queryAuditEventsMoved, response.getUpdateCounts().get("queryAuditEventsMoved"));
+        verifyUpdateCounts(expectedCounts, response.getUpdateCounts());
 
         // Verify audit logs
         var decimalFormat = new DecimalFormat("#,##0");
         var hasUpdates = expectedCounts != NO_UPDATE;
         var listAuditEvents = _auditLogHelper.getAuditLogsForTransactionId(getProjectName(), LIST_AUDIT_EVENT, List.of("Comment", "Container/Path", "ListId"), response.getTransactionAuditId(), ContainerFilter.CurrentAndSubfolders);
         checker().verifyEquals("Unexpected number of list audit events", expectedCounts.listAuditEventsCreated, listAuditEvents.size());
-        checker().wrapAssertion(() -> {
-            var matches = auditEventMatches(listAuditEvents, targetPath, list.getListId(), String.format("Moved %s rows from %s", decimalFormat.format(expectedCounts.listRecords), sourcePath));
-            Assertions.assertThat(matches)
-                    .as("Expected one event recording move in target container")
-                    .hasSize(hasUpdates ? 1 : 0);
-        });
-        checker().wrapAssertion(() -> {
-            var matches = auditEventMatches(listAuditEvents, sourcePath, list.getListId(), String.format("Moved %s rows to %s", decimalFormat.format(expectedCounts.listRecords), targetPath));
-            Assertions.assertThat(matches)
-                    .as("Expected one event recording move in source container")
-                    .hasSize(hasUpdates ? 1 : 0);
-        });
+
+        for (var entry : sourceContainerPathCounts.entrySet())
+        {
+            String sourcePath = entry.getKey().startsWith("/") ? entry.getKey() : "/" + entry.getKey();
+            Integer expectedListRecordCount = entry.getValue();
+
+            checker().wrapAssertion(() -> {
+                var comment = String.format("Moved %s rows from %s", decimalFormat.format(expectedListRecordCount), sourcePath);
+                var matches = auditEventMatches(listAuditEvents, targetPath, list.getListId(), comment);
+                Assertions.assertThat(matches)
+                        .as(String.format("Expected audit summary event in target container \"%s\"", comment))
+                        .hasSize(hasUpdates ? 1 : 0);
+            });
+
+            checker().wrapAssertion(() -> {
+                var comment = String.format("Moved %s rows to %s", decimalFormat.format(expectedListRecordCount), targetPath);
+                var matches = auditEventMatches(listAuditEvents, sourcePath, list.getListId(), comment);
+                Assertions.assertThat(matches)
+                        .as(String.format("Expected audit summary event in source container \"%s\"", comment))
+                        .hasSize(hasUpdates ? 1 : 0);
+            });
+        }
+
         checker().wrapAssertion(() -> {
             var matches = auditEventMatches(listAuditEvents, targetPath, list.getListId(), "An existing list record was moved");
             Assertions.assertThat(matches)
                     .as("Expected each list record move to be audited in the target container")
                     .hasSize(expectedCounts.listRecords);
         });
+    }
+
+    private void verifyUpdateCounts(UpdateCounts expectedCounts, Map<String, Object> responseCounts)
+    {
+        checker().wrapAssertion(() -> Assertions.assertThat(responseCounts.keySet())
+                .as("Expect list moveRows response to contain specific update counts")
+                .containsExactlyInAnyOrder("fileAttachmentsMoved", "listAuditEventsCreated", "listAuditEventsMoved", "listRecords", "queryAuditEventsMoved"));
+        checker().verifyEquals("Unexpected number of file attachments moved", expectedCounts.fileAttachmentsMoved, responseCounts.get("fileAttachmentsMoved"));
+        checker().verifyEquals("Unexpected number of list audit events created", expectedCounts.listAuditEventsCreated, responseCounts.get("listAuditEventsCreated"));
+        checker().verifyEquals("Unexpected number of list audit events moved", expectedCounts.listAuditEventsMoved, responseCounts.get("listAuditEventsMoved"));
+        checker().verifyEquals("Unexpected number of list records moved", expectedCounts.listRecords, responseCounts.get("listRecords"));
+        checker().verifyEquals("Unexpected number of query audit events moved", expectedCounts.queryAuditEventsMoved, responseCounts.get("queryAuditEventsMoved"));
     }
 
     private List<Map<String, Object>> auditEventMatches(List<Map<String, Object>> events, String containerPath, Integer listId, String comment)
@@ -398,14 +463,14 @@ public class ListMoveRowsTest extends BaseWebDriverTest
                 .toList();
     }
 
-    private QueryApiHelper getQueryApiHelper(String containerPath, String listName)
+    private QueryApiHelper getQueryApiHelper(String containerPath, ListDefinition list)
     {
-        return new QueryApiHelper(createDefaultConnection(), containerPath, LIST_SCHEMA, listName);
+        return new QueryApiHelper(createDefaultConnection(), containerPath, LIST_SCHEMA, list.getName());
     }
 
     private MoveRowsResponse moveRows(ListDefinition list, String sourceContainerPath, String targetContainerPath, List<Map<String, Object>> rows) throws Exception
     {
-        return getQueryApiHelper(sourceContainerPath, list.getName())
+        return getQueryApiHelper(sourceContainerPath, list)
                 .moveRows(rows, targetContainerPath);
     }
 
@@ -455,7 +520,7 @@ public class ListMoveRowsTest extends BaseWebDriverTest
             _listHelper.insertNewRow(newRow, false);
         }
 
-        return getQueryApiHelper(containerPath, list.getName())
+        return getQueryApiHelper(containerPath, list)
                 .selectRows();
     }
 
