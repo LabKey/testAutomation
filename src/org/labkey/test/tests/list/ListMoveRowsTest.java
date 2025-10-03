@@ -16,6 +16,9 @@ import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.remoteapi.query.TruncateTableCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.TestFileUtils;
+import org.labkey.test.categories.Daily;
+import org.labkey.test.categories.Data;
+import org.labkey.test.categories.Hosting;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.list.IntListDefinition;
 import org.labkey.test.params.list.ListDefinition;
@@ -39,7 +42,7 @@ import static org.labkey.test.util.PermissionsHelper.AUTHOR_ROLE;
 import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
 import static org.labkey.test.util.PermissionsHelper.READER_ROLE;
 
-@Category({})
+@Category({Daily.class, Data.class, Hosting.class}) // Matches ListTest for now
 public class ListMoveRowsTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "ListMoveRowsTest";
