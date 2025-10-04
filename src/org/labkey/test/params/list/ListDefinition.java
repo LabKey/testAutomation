@@ -13,6 +13,7 @@ import java.util.Map;
 
 public abstract class ListDefinition extends DomainProps
 {
+    private Integer _listId;
     private String _name;
     private String _description;
     private List<FieldDefinition> _fields = new ArrayList<>();
@@ -23,6 +24,16 @@ public abstract class ListDefinition extends DomainProps
     public ListDefinition(String name)
     {
         _name = name;
+    }
+
+    public Integer getListId()
+    {
+        return _listId;
+    }
+
+    public void setListId(Integer listId)
+    {
+        _listId = listId;
     }
 
     public String getName()

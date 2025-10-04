@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.assertj.core.api.Assertions;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
 import org.junit.Before;
@@ -26,6 +27,7 @@ import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.DeleteRowsCommand;
 import org.labkey.remoteapi.query.InsertRowsCommand;
 import org.labkey.remoteapi.query.BaseRowsCommand;
+import org.labkey.remoteapi.query.MoveRowsCommand;
 import org.labkey.remoteapi.query.RowsResponse;
 import org.labkey.remoteapi.query.UpdateRowsCommand;
 import org.labkey.test.BaseWebDriverTest;
@@ -40,6 +42,8 @@ import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldDefinition.ColumnType;
 import org.labkey.test.params.experiment.DataClassDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
+import org.labkey.test.params.list.IntListDefinition;
+import org.labkey.test.params.list.ListDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PortalHelper;
@@ -61,6 +65,10 @@ import java.util.Map;
 @BaseWebDriverTest.ClassTimeout(minutes = 8)
 public class TriggerScriptTest extends BaseWebDriverTest
 {
+    private static final String PROJECT_NAME = "Test Trigger Script Project";
+    private static final String SUBFOLDER_NAME = "SubfolderA";
+    private static final String SUBFOLDER_PATH = "/" + PROJECT_NAME + "/" + SUBFOLDER_NAME;
+
     //List constants
     private static final String TRIGGER_MODULE = "triggerTestModule";
     private static final String SIMPLE_MODULE = "simpletest";
@@ -90,6 +98,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
     public static final String PEOPLE_LIST_NAME = "People";
 
     protected final PortalHelper _portalHelper = new PortalHelper(this);
+    private static ListDefinition EMPLOYEE_LIST;
 
     @Override
     public List<String> getAssociatedModules()
@@ -101,7 +110,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
     @Override
     protected String getProjectName()
     {
-        return "Test Trigger Script Project";
+        return PROJECT_NAME;
     }
 
     @Override
@@ -167,36 +176,42 @@ public class TriggerScriptTest extends BaseWebDriverTest
     }
 
     @BeforeClass
-    public static void projectSetup()
+    public static void projectSetup() throws Exception
     {
         TriggerScriptTest init = getCurrentTest();
         init.doSetup();
     }
 
-
-    protected void doSetup()
+    protected void doSetup() throws Exception
     {
         _containerHelper.createProject(getProjectName(), null);
+        _containerHelper.createSubfolder(getProjectName(), SUBFOLDER_NAME);
         _containerHelper.enableModule(getProjectName(), "Query");
         _containerHelper.enableModule(getProjectName(), SIMPLE_MODULE);
         _containerHelper.enableModule(getProjectName(), TRIGGER_MODULE);
 
-        //create List
-        FieldDefinition[] columns = new FieldDefinition[] {
+        // Create lists
+        {
+            List<FieldDefinition> fields = List.of(
                 new FieldDefinition("name", ColumnType.String).setLabel("Name"),
                 new FieldDefinition("ssn", ColumnType.String).setLabel("SSN"),
                 new FieldDefinition("company", ColumnType.String).setLabel("Company")
+            );
 
-        };
+            EMPLOYEE_LIST = new IntListDefinition(LIST_NAME, "Key").setFields(fields);
+            EMPLOYEE_LIST.create(createDefaultConnection(), getProjectName());
 
-        _listHelper.createList(getProjectName(), LIST_NAME, "Key", columns);
-
-        log("Create the People list");
-        _listHelper.createList(getProjectName(), PEOPLE_LIST_NAME, "Key",
+            fields = List.of(
                 new FieldDefinition("Name", ColumnType.String).setDescription("Name"),
                 new FieldDefinition("Age", ColumnType.Integer).setDescription("Age"),
                 new FieldDefinition("FavoriteDateTime", ColumnType.DateAndTime).setDescription("Favorite date time. Who doesn't have one?"),
-                new FieldDefinition("Crazy", ColumnType.Boolean).setDescription("Crazy?"));
+                new FieldDefinition("Crazy", ColumnType.Boolean).setDescription("Crazy?")
+            );
+
+            new IntListDefinition(PEOPLE_LIST_NAME, "Key")
+                    .setFields(fields)
+                    .create(createDefaultConnection(), getProjectName());
+        }
 
         importFolderFromZip(TestFileUtils.getSampleData("studies/LabkeyDemoStudy.zip"));
 
@@ -217,6 +232,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
     @Test
     public void testListIndividualTriggers()
     {
+        cleanUpListRows();
         EmployeeRecord caughtAfter = new EmployeeRecord("Emp 1", "1112223333", "Test"),
                 changedBefore = new EmployeeRecord("Emp 2", "2223334444", "Some Other");
 
@@ -267,12 +283,12 @@ public class TriggerScriptTest extends BaseWebDriverTest
         clickButton("Back");
         //Verify validation error prevented delete
         waitForElement(Locator.tagWithText("td", "Emp 3"));
-        cleanUpListRows();
     }
 
     @Test
     public void testListImportTriggers()
     {
+        cleanUpListRows();
         goToManagedList(LIST_NAME);
         _listHelper.clickImportData();
 
@@ -302,7 +318,27 @@ public class TriggerScriptTest extends BaseWebDriverTest
         importDataPage.submit();
 
         waitForElement(Locator.tagWithText("td","Importing TSV"));
+    }
+
+    @Test
+    public void testListMoveTriggers() throws Exception
+    {
         cleanUpListRows();
+
+        RowsResponse response = EMPLOYEE_LIST.getTestDataGenerator(getProjectName())
+            .addCustomRow(Map.of("name", "Emp 11", "ssn", "123-45-6789", "company", "LK"))
+            .insertRows();
+
+        List<EmployeeRecord> records = response.getRows().stream().map(EmployeeRecord::fromMap).toList();
+
+        openServerJavaScriptConsole();
+
+        MoveRowsCommand command = new MoveRowsCommand(SUBFOLDER_PATH, LIST_SCHEMA, LIST_NAME);
+        command.setRows(List.of(Map.of("Key", records.get(0).key)));
+        command.execute(createDefaultConnection(), getProjectName());
+        waitForConsole("init got triggered with event: move", "complete got triggered with event: move");
+
+        closeServerJavaScriptConsole();
     }
 
     /** Issue 52098 - ensure trigger scripts have a chance to do custom type conversion with the incoming row */
@@ -336,9 +372,10 @@ public class TriggerScriptTest extends BaseWebDriverTest
         Assert.assertEquals(26, updatedRow.get("Age"));
     }
 
-        @Test
+    @Test
     public void testListAPITriggers() throws Exception
     {
+        cleanUpListRows();
         String ssn1 = "111111112";
         String ssn2 = "222211111";
 
@@ -408,8 +445,6 @@ public class TriggerScriptTest extends BaseWebDriverTest
         delCmd = new DeleteRowsCommand(LIST_SCHEMA, LIST_NAME);
         delCmd.addRow(row3.toMap());
         assertAPIErrorMessage(delCmd, BEFORE_DELETE_ERROR, cn);
-
-        cleanUpListRows();
     }
 
     /********************************
@@ -470,7 +505,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
     @Test
     public void testDatasetAPITriggers() throws Exception
     {
-        doAPITriggerTest(STUDY_SCHEMA,DATASET_NAME,"ParticipantId", true);
+        doAPITriggerTest(STUDY_SCHEMA, DATASET_NAME, "ParticipantId", true);
     }
 
     /********************************
@@ -484,22 +519,14 @@ public class TriggerScriptTest extends BaseWebDriverTest
         GoToDataUI goToDataClass = () -> goTo("Data Classes", DATA_CLASSES_NAME);
 
         setupDataClass();
+        openServerJavaScriptConsole();
 
-        // Go to the log view to start capturing messages
-        new SiteNavBar(getDriver()).clickAdminMenuItem(false, "Developer Links", "Server JavaScript Console");
-        switchToWindow(1);
-        waitForText("Message");
-
-        switchToMainWindow();
         doIndividualTriggerTest("query", goToDataClass, "Name", false, "Yes, Delete", false);
 
-        // Go back to the console window
-        switchToWindow(1);
-        waitForText("init got triggered with event: delete",
+        waitForConsole("init got triggered with event: delete",
                 "exp.data: this is from the shared function",
                 "complete got triggered with event: delete");
-        getDriver().close();
-        switchToMainWindow();
+        closeServerJavaScriptConsole();
     }
 
 
@@ -728,7 +755,9 @@ public class TriggerScriptTest extends BaseWebDriverTest
         }
         catch (CommandException e)
         {
-            Assert.assertTrue("Trigger script error message was wrong", e.getMessage().contains(expected));
+            Assertions.assertThat(e.getMessage())
+                    .as("Trigger script error should contain expected text")
+                    .contains(expected);
         }
     }
 
@@ -834,7 +863,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
     /**
      * Generate delimited string of keys from a map
      */
-    private String joinMapValues(Map<String,String> data, String delimiter )
+    private String joinMapValues(Map<String,String> data, String delimiter)
     {
         StringBuilder sb = new StringBuilder();
         data.values().forEach(val -> sb.append(val).append(delimiter));
@@ -844,7 +873,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
     /**
      * Generate delimited string of keys from a map
      */
-    private String joinMapKeys(Map<String,String> data, String delimiter )
+    private String joinMapKeys(Map<String,String> data, String delimiter)
     {
         StringBuilder sb = new StringBuilder();
         data.keySet().forEach(val -> sb.append(val).append(delimiter));
@@ -884,5 +913,28 @@ public class TriggerScriptTest extends BaseWebDriverTest
                         new FieldDefinition(COMMENTS_FIELD, ColumnType.String),
                         new FieldDefinition(COUNTRY_FIELD, ColumnType.String)));
         SampleTypeAPIHelper.createEmptySampleType(getProjectName(), sampleType);
+    }
+
+    private void closeServerJavaScriptConsole()
+    {
+        switchToWindow(1);
+        getDriver().close();
+        switchToMainWindow();
+    }
+
+    private void openServerJavaScriptConsole()
+    {
+        // Go to the log view to start capturing messages
+        new SiteNavBar(getDriver()).clickAdminMenuItem(false, "Developer Links", "Server JavaScript Console");
+        switchToWindow(1);
+        waitForText("Message");
+        switchToMainWindow();
+    }
+
+    private void waitForConsole(String... text)
+    {
+        switchToWindow(1);
+        waitForText(text);
+        switchToMainWindow();
     }
 }
