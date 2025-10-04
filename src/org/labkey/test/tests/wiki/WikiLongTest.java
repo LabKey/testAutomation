@@ -586,7 +586,7 @@ public class WikiLongTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("Edit"));
         deleteWikiPage(true);
         clickAndWait(Locator.linkWithText(WIKI_PAGE1_TITLE));
-        assertElementPresent(Locator.linkWithText(WIKI_PAGE1_TITLE), 1);
+        assertElementPresent(Locator.linkWithText(WIKI_PAGE1_TITLE), 2);
         assertElementNotPresent(Locator.linkWithText(WIKI_PAGE3_ALTTITLE));
         assertElementNotPresent(Locator.linkWithText(WIKI_PAGE8_TITLE));
 
