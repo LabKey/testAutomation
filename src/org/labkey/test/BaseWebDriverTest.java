@@ -543,7 +543,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 else
                     minutes = ClassTimeout.DEFAULT;
 
-                minutes *= timeoutMultiplier;
+                minutes = Math.round(minutes * timeoutMultiplier);
 
                 if (minutes == 0)
                     minutes = 1;
