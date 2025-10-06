@@ -16,6 +16,7 @@
 package org.labkey.test.util;
 
 import org.apache.commons.text.StringEscapeUtils;
+import org.apache.poi.ss.util.WorkbookUtil;
 import org.eclipse.jetty.util.URIUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -227,7 +228,7 @@ public class EscapeUtil
      */
     public static String escapeForExcelSheetName(String value)
     {
-        return excelPageNeedsEscaping.matcher(value).replaceAll("_");
+        return WorkbookUtil.createSafeSheetName(value, '_');
     }
 
     /**
