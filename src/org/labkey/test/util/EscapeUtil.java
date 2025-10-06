@@ -212,9 +212,15 @@ public class EscapeUtil
     }
 
     private static final Pattern nameExpressionNeedsEscaping = Pattern.compile("([\\\\$/&}~,.])");
-    public static String escapeForNameExpression(String name)
+    public static String escapeForNameExpression(String value)
     {
-        return nameExpressionNeedsEscaping.matcher(name).replaceAll("\\\\$1");
+        return nameExpressionNeedsEscaping.matcher(value).replaceAll("\\\\$1");
+    }
+
+    private static final Pattern excelPageNeedsEscaping = Pattern.compile("([:/])");
+    public static String escapeForExcelSheetName(String value)
+    {
+        return excelPageNeedsEscaping.matcher(value).replaceAll("_");
     }
 
     /**
