@@ -270,10 +270,10 @@ public class WikiTest extends BaseWebDriverTest
         wikiHelper.setWikiBody("<p>" + wikiContent + "</p>");
         wikiHelper.saveWikiPage();
         numberOfWikiCreated++;
-        clickAndWait(wikiPageLinkLoc);
+        waitAndClickAndWait(wikiPageLinkLoc);
 
         log("adding an attachment");
-        clickAndWait(editLinkLoc);
+        waitAndClickAndWait(editLinkLoc);
         click(filePickerLinkLoc);
         setFormElement(fileInputLoc, testAttachment);
         waitForElement(removeLinkLoc);  // when just attached, 'remove' will be an option but delete will not be
@@ -287,7 +287,7 @@ public class WikiTest extends BaseWebDriverTest
         clickAndWait(wikiPageLinkLoc);
 
         log("Deleting attachment");
-        clickAndWait(editLinkLoc);
+        waitAndClickAndWait(editLinkLoc);
         click(deleteLinkLoc);
         waitForElement(attachmentParentLoc.withAttributeContaining("style", "text-decoration: line-through"));
         wikiHelper.saveWikiPage();
@@ -297,14 +297,14 @@ public class WikiTest extends BaseWebDriverTest
 
         log("prepare to delete/undelete attachment");
         // re-attach the file and save
-        clickAndWait(editLinkLoc);
+        waitAndClickAndWait(editLinkLoc);
         click(filePickerLinkLoc);
         setFormElement(fileInputLoc, testAttachment);
         wikiHelper.saveWikiPage();
         clickAndWait(wikiPageLinkLoc);
 
         log("Un-Deleting attachment");
-        clickAndWait(editLinkLoc);
+        waitAndClickAndWait(editLinkLoc);
         click(deleteLinkLoc);   // delete
         waitForElement(attachmentParentLoc.withAttributeContaining("style", "text-decoration: line-through"));
         waitAndClick(undeleteLinkLoc);
@@ -312,6 +312,8 @@ public class WikiTest extends BaseWebDriverTest
                 .as("expect strikethrough style not to be present")
                 .doesNotContain("text-decoration: line-through"));
         wikiHelper.saveWikiPage();
+        // note: attaching the file and leaving it there will create a search result, so increment wikiCreated count here
+        numberOfWikiCreated++;
 
         // verify save after undelete persists the attachment
         assertElementPresent(Locator.linkWithText(fileName));
