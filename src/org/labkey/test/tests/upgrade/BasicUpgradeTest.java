@@ -87,6 +87,6 @@ public class BasicUpgradeTest extends BaseUpgradeTest
     @Override
     protected String getProjectName()
     {
-        return "SampleTypeUpgradeTest Project";
+        return getClass().getSimpleName() + " Project";
     }
 }
