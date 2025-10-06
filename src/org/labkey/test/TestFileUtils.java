@@ -632,9 +632,15 @@ public abstract class TestFileUtils
              TarArchiveInputStream inputStream = new ArchiveStreamFactory().createArchiveInputStream("tar", is))
         {
             TarArchiveEntry entry;
+            Path normalizedOutputPath = outputDir.toPath().normalize();
+
             while ((entry = inputStream.getNextEntry()) != null)
             {
                 final File outputFile = new File(outputDir, entry.getName());
+
+                if (!outputFile.toPath().normalize().startsWith(normalizedOutputPath))
+                    throw new IOException("Bad zip entry (" + entry.getName() + ") in " + inputFile.getAbsolutePath());
+
                 if (entry.isDirectory())
                 {
                     if (!outputFile.exists())
