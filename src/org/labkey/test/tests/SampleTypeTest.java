@@ -1963,7 +1963,7 @@ public class SampleTypeTest extends BaseWebDriverTest
         clickButton("Cancel");
         // insert row with both amount and unit (success)
         sampleHelper.insertRow(Map.of("Name", "AU-SUCCESS-1", "StoredAmount", "5.0", "Units", "mg"));
-        verifySampleAmountUnitValues("AU-SUCCESS-1", "5", "mg");
+        verifySampleAmountUnitValues("AU-SUCCESS-1", "5.0", "mg");
 
         log("verify that updating a row with an amount or unit requires both fields to be filled in");
         // update row with amount but not unit (error expected)
@@ -1989,7 +1989,7 @@ public class SampleTypeTest extends BaseWebDriverTest
         clickButton("Cancel");
         // bulk import with both amount and unit (success expected)
         sampleHelper.bulkImport(List.of(Map.of("Name", "AU-BULK-SUCCESS-1", "StoredAmount", "0", "Units", "L")));
-        verifySampleAmountUnitValues("AU-BULK-SUCCESS-1", "0", "L");
+        verifySampleAmountUnitValues("AU-BULK-SUCCESS-1", "0.0", "L");
 
         log("verify the bulk import with RawAmount and RawUnits are ignored");
         sampleHelper.bulkImport(List.of(Map.of("Name", "AU-BULK-SUCCESS-2", "RawAmount", "1000", "RawUnits", "kg")));

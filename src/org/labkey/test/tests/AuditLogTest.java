@@ -650,8 +650,8 @@ public class AuditLogTest extends BaseWebDriverTest
 
         log("Validate that the expected rows are there.");
 
-        String eventInitValue = "Name=ChangeMyColumns&AllowDelete=true&AllowUpload=true&AllowExport=true&DiscussionSetting=0" +
-                "&EntireListIndexSetting=0&EntireListBodySetting=0&EachItemBodySetting=0&EntireListIndex=false&EachItemIndex=false&FileAttachmentIndex=false";
+        String eventInitValue = "Name=ChangeMyColumns&AllowDelete=true&AllowUpload=true&AllowExport=true&EntireListIndexSetting=0" +
+                "&EntireListBodySetting=0&EachItemBodySetting=0&EntireListIndex=false&EachItemIndex=false&FileAttachmentIndex=false";
         AuditLogHelper.DetailedAuditEventRow expectedDomainEvent = new AuditLogHelper.DetailedAuditEventRow(null, LIST_CHECK_LOG, null,
                 "The domain " + LIST_CHECK_LOG + " was created. The column(s) of domain " + LIST_CHECK_LOG + " were modified.",
                 null, null, eventInitValue, null);
@@ -780,5 +780,4 @@ public class AuditLogTest extends BaseWebDriverTest
 
         Assert.assertTrue(failComment + " See log for details.", pass);
     }
-
 }
