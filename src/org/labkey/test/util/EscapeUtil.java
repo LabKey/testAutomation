@@ -16,6 +16,7 @@
 package org.labkey.test.util;
 
 import org.apache.commons.text.StringEscapeUtils;
+import org.apache.poi.ss.util.WorkbookUtil;
 import org.eclipse.jetty.util.URIUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -212,9 +213,22 @@ public class EscapeUtil
     }
 
     private static final Pattern nameExpressionNeedsEscaping = Pattern.compile("([\\\\$/&}~,.])");
-    public static String escapeForNameExpression(String name)
+    public static String escapeForNameExpression(String value)
     {
-        return nameExpressionNeedsEscaping.matcher(name).replaceAll("\\\\$1");
+        return nameExpressionNeedsEscaping.matcher(value).replaceAll("\\\\$1");
+    }
+
+    private static final Pattern excelPageNeedsEscaping = Pattern.compile("([:/])");
+    /**
+     * Escapes invalid characters in a string to ensure it can be used as a valid Excel sheet name.
+     * Replaces characters matching the {@code excelPageNeedsEscaping} pattern with an underscore ("_").
+     *
+     * @param value the input string to be escaped
+     * @return the escaped string that can safely be used as an Excel sheet name
+     */
+    public static String escapeForExcelSheetName(String value)
+    {
+        return WorkbookUtil.createSafeSheetName(value, '_');
     }
 
     /**
