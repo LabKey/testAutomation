@@ -56,11 +56,13 @@ public class AuditLogHelper
             "Comment"
     );
 
-    public static final String SCHEMA_XML_AUDIT = "<tables xmlns=\"http://labkey.org/data/xml\">\n" +
-            "  <table tableName=\"%s\" tableDbType=\"NOT_IN_DB\">\n" +
-            "    <auditLogging>%s</auditLogging>\n" +
-            "  </table>\n" +
-            "</tables>\n";
+    public static final String SCHEMA_XML_AUDIT = """
+        <tables xmlns="http://labkey.org/data/xml">
+          <table tableName="%s" tableDbType="NOT_IN_DB">
+            <auditLogging>%s</auditLogging>
+          </table>
+        </tables>
+        """;
 
 
     private final WebDriverWrapper _wrapper;

@@ -69,7 +69,7 @@ public class GridPanelTest extends GridPanelBaseTest
     private static final FieldInfo FILTER_STRING_COL = new FieldInfo("Str\uD83D\uDC7E]|*안", FieldDefinition.ColumnType.String);
     private static final FieldInfo FILTER_INT_COL = new FieldInfo("Int&`~_@", FieldDefinition.ColumnType.Integer);
     private static final FieldInfo FILTER_EXTEND_CHAR_COL = FieldInfo.random("\u0106\u00D8\u0139", FieldDefinition.ColumnType.String);
-    private static final FieldInfo FILTER_BOOL_COL = FieldInfo.random("Bool", FieldDefinition.ColumnType.Boolean);
+    private static final FieldInfo FILTER_BOOL_COL = FieldInfo.random("$Bool", FieldDefinition.ColumnType.Boolean);
     private static final FieldInfo FILTER_DATE_COL = FieldInfo.random("Date", FieldDefinition.ColumnType.DateAndTime);
     private static final String FILTER_STORED_AMOUNT_COL = "Amount";
     private static final String FILTER_UNITS_COL = "Units";
