@@ -219,7 +219,7 @@ public class APIUserHelper extends AbstractUserHelper
 
     public int getUserIdStrict(String userEmail)
     {
-        Integer userId = getUserIds(Arrays.asList(userEmail)).get(userEmail);
+        Integer userId = getUserId(userEmail);
         if (userId == null)
             throw new IllegalStateException("No user with email " + userEmail + " found.");
         return userId;
