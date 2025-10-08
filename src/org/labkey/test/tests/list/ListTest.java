@@ -545,7 +545,7 @@ public class ListTest extends BaseWebDriverTest
                 .getField(fieldWithDefault.getName())
                 .clickAdvancedSettings()
                 .clickDefaultValuesLink();
-        var input = Locator.tagContainingText("td", fieldWithDefault.getName()).followingSibling("td")
+        var input = Locator.tagContainingText("td", fieldWithDefault.getLabel()).followingSibling("td")
                 .descendant("input").findElement(page.getDriver());
         setFormElement(input, "42");
         clickButton("Save Defaults");
