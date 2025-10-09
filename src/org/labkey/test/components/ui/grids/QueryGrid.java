@@ -293,6 +293,11 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         return elementCache().selectAllBtnLoc.findWhenNeeded(this).isDisplayed();
     }
 
+    public WebElement getSelectAllButton()
+    {
+        return elementCache().selectAllBtnLoc.findWhenNeeded(this);
+    }
+
     /**
      *  Selects all rows in the target domain, including those on other pages, if there are any
      */
@@ -765,7 +770,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
 
         final Locator.XPathLocator selectionStatusContainerLoc = Locator.tagWithClass("div", "selection-status");
         final Locator selectAllBtnLoc = selectionStatusContainerLoc.append(Locator.tagWithClass("span", "selection-status__select-all")
-                .child(Locator.buttonContainingText("Select all")));
+                .child(Locator.buttonContainingText("Select")));
         final Locator clearBtnLoc = selectionStatusContainerLoc.append(Locator.byClass("selection-status__clear-all")
                 .child(Locator.tag("button")));
 
