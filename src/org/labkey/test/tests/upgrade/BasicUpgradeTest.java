@@ -20,7 +20,7 @@ import static org.labkey.test.util.PermissionsHelper.READER_ROLE;
 @Category({})
 public class BasicUpgradeTest extends BaseUpgradeTest
 {
-    private static final TestUser USER = new TestUser("basic_upgrade_reader@sampletypeupgradetest.test");
+    private static final TestUser USER = new TestUser("basic_upgrade_reader@basicupgradetest.test");
     private static final String SAMPLE_TYPE = "UpgradeTestSamples";
 
     private static final FieldInfo STR_COL = new FieldInfo("String Col1");
