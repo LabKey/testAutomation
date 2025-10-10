@@ -383,7 +383,7 @@ public abstract class TestProperties
      * @param def Default value
      * @return value of the specified property
      */
-    private static boolean getBooleanProperty(String key, boolean def)
+    public static boolean getBooleanProperty(String key, boolean def)
     {
         String prop = System.getProperty(key);
         if (!StringUtils.isBlank(prop))
@@ -403,7 +403,7 @@ public abstract class TestProperties
      * @param def Default value
      * @return value of the specified property
      */
-    private static int getIntegerProperty(String key, int def)
+    public static int getIntegerProperty(String key, int def)
     {
         String prop = System.getProperty(key);
         if (!StringUtils.isBlank(prop))
@@ -427,7 +427,7 @@ public abstract class TestProperties
      * @param def Default value
      * @return value of the specified property
      */
-    private static double getDoubleProperty(String key, double def)
+    public static double getDoubleProperty(String key, double def)
     {
         String prop = System.getProperty(key);
         if (!StringUtils.isBlank(prop))
