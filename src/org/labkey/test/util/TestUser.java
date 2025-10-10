@@ -14,7 +14,7 @@ public class TestUser
 {
     private WebDriverWrapper _test;
     private final String _email;
-    private CreateUserResponse _createUserResponse;
+    private Integer _userId;
     private String _password;
     private APIUserHelper _apiUserHelper;
     private Connection _impersonationConnection;
@@ -32,9 +32,22 @@ public class TestUser
     {
         _test = test;
         _apiUserHelper = new APIUserHelper(_test);
-        _createUserResponse = _apiUserHelper.createUser(_email);
+        _userId = _apiUserHelper.createUser(_email).getUserId();
         _impersonationConnection = null;
         _password = null;
+        return this;
+    }
+
+    /**
+     * Gets info for an already existing user
+     */
+    public TestUser load(WebDriverWrapper test)
+    {
+        _test = test;
+        _apiUserHelper = new APIUserHelper(_test);
+        _userId = _apiUserHelper.getUserId(_email);
+        _impersonationConnection = null;
+        _password = PasswordUtil.getPassword();
         return this;
     }
 
@@ -45,7 +58,11 @@ public class TestUser
 
     public Integer getUserId()
     {
-        return getCreateUserResponse().getUserId();
+        if (_userId == null)
+        {
+            throw new IllegalStateException("User" + _email + " has not yet been created");
+        }
+        return _userId;
     }
 
     public String getEmail()
@@ -69,7 +86,7 @@ public class TestUser
     {
         if (_password == null)  // if null, this is the initial password - we can use the UI to set it now
         {
-            _password = _apiUserHelper.setInitialPassword(_createUserResponse.getUserId());
+            _password = _apiUserHelper.setInitialPassword(_userId);
         }
         else
         {
@@ -160,15 +177,6 @@ public class TestUser
 
         if (refresh)
             getWrapper().refresh();
-    }
-
-    private CreateUserResponse getCreateUserResponse()
-    {
-        if (_createUserResponse == null)
-        {
-            throw new IllegalStateException("User" + _email + " has not yet been created");
-        }
-        return _createUserResponse;
     }
 
     private APIUserHelper getApiUserHelper()

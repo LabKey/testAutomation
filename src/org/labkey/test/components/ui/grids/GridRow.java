@@ -79,6 +79,11 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
         return this;
     }
 
+    public ReactCheckBox getCheckbox()
+    {
+        return elementCache().selectCheckbox;
+    }
+
     /**
      * gets the cell at the specified index
      */
