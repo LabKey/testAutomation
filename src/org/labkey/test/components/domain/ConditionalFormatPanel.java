@@ -151,7 +151,7 @@ public class ConditionalFormatPanel extends WebDriverComponent<ConditionalFormat
         expand();
         elementCache().fillColor.click();
         getWrapper().click(Locator.tagWithAttribute("div", "title", colorHex));
-        getWrapper().click(Locator.tagWithClass("div", "domain-validator-color-cover")); // click elsewhere on the dialog to close the color picker
+        getWrapper().actionClick(elementCache().fillColor); // close the color picker
         return this;
     }
 
