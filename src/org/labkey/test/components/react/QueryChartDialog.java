@@ -206,9 +206,6 @@ public class QueryChartDialog extends ModalDialog
         return elementCache().reactSelectByLabel("Y Axis").getOptions();
     }
 
-    /*
-        Y Axis Aggregate Method is an option for bar chart
-     */
     public QueryChartDialog selectYAxisAggregateMethod(String option)
     {
         clickFieldOptions("Y Axis"); // open the popover
@@ -227,9 +224,23 @@ public class QueryChartDialog extends ModalDialog
 
     private ReactSelect getAggregateMethodSelect()
     {
-        // can't use elementCache().reactSelectByLabel because the popover is outside the dialog
+        // can't use elementCache() because the popover is outside the dialog
         Locator loc = Locator.tag("div").withChild(Locator.tagContainingText("label", "Aggregate Method"));
         return ReactSelect.finder(getDriver()).find(loc.waitForElement(getDriver(), 1500));
+    }
+
+    private RadioButton getErrorBarsRadio(String value)
+    {
+        // can't use elementCache() because the popover is outside the dialog
+        return RadioButton.RadioButton(Locator.radioButtonByNameAndValue("error-bar-method", value)).find(getDriver());
+    }
+
+    public QueryChartDialog selectYAxisErrorBar(String value)
+    {
+        clickFieldOptions("Y Axis"); // open the popover
+        getErrorBarsRadio(value).check();
+        Locator.tagWithText("label", "Name *").findElement(this).click(); // close the popover
+        return this;
     }
 
     /*
