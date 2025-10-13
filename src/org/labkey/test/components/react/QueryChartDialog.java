@@ -214,6 +214,14 @@ public class QueryChartDialog extends ModalDialog
         return this;
     }
 
+    public List<String> getYAxisAggregateMethodOptions()
+    {
+        clickFieldOptions("Y Axis"); // open the popover
+        List<String> options = getAggregateMethodSelect().getOptions();
+        Locator.tagWithText("label", "Name *").findElement(this).click(); // close the popover
+        return options;
+    }
+
     public String getYAxisAggregateMethod()
     {
         clickFieldOptions("Y Axis"); // open the popover
@@ -241,6 +249,14 @@ public class QueryChartDialog extends ModalDialog
         getErrorBarsRadio(value).check();
         Locator.tagWithText("label", "Name *").findElement(this).click(); // close the popover
         return this;
+    }
+
+    public boolean isYAxisErrorBarOptionEnabled(String value)
+    {
+        clickFieldOptions("Y Axis"); // open the popover
+        boolean enabled = getErrorBarsRadio(value).isEnabled();
+        Locator.tagWithText("label", "Name *").findElement(this).click(); // close the popover
+        return enabled;
     }
 
     /*
