@@ -1054,7 +1054,7 @@ public class ListTest extends BaseWebDriverTest
         final String dummyCol = dummyBase + TRICKY_CHARACTERS;
         final String lookupField = "lookupField" + TRICKY_CHARACTERS;
         final String lookupSchema = "lists";
-        final String keyCol = "Key &%<+";
+        final String keyCol = "Key &%<+\\"; // Issue 54094: Verify key field ending with "\"
 
         log("Issue 6883: test list self join");
 
