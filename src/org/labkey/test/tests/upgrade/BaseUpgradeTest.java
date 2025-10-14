@@ -24,9 +24,9 @@ import java.util.Optional;
 import static org.apache.commons.lang3.StringUtils.trimToNull;
 
 /**
- * Base test class for tests that setup data and configure a server then verify the persistence or modification of those
- * data and configurations after upgrading to a newer version of LabKey.<br>
- * The {@code EariestVersion} and {@code LatestVersion} annotations can be used to skip particular tests when they are
+ * Base test class for tests that set up data and configure a server, then verify the persistence or modification of
+ * those data and configurations after upgrading to a newer version of LabKey.<br>
+ * The {@link EarliestVersion} and {@link LatestVersion} annotations can be used to skip particular tests when they are
  * not relevant to the version of LabKey being upgraded from (specified in the {@code webtest.upgradePreviousVersion}
  * system property).<br>
  * The setup steps will be skipped if the {@code webtest.upgradeSetup} system property is set to {@code false}.
@@ -77,7 +77,8 @@ public abstract class BaseUpgradeTest extends BaseWebDriverTest
      */
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.METHOD})
-    protected @interface EariestVersion {
+    protected @interface EarliestVersion
+    {
         String value();
     }
 
@@ -98,12 +99,12 @@ public abstract class BaseUpgradeTest extends BaseWebDriverTest
         @Override
         public @NotNull Statement apply(Statement base, Description description)
         {
-            String eariestVersion = Optional.ofNullable(description.getAnnotation(EariestVersion.class))
-                .map(EariestVersion::value).orElse(null);
+            String earliestVersion = Optional.ofNullable(description.getAnnotation(EarliestVersion.class))
+                .map(EarliestVersion::value).orElse(null);
             String latestVersion = Optional.ofNullable(description.getAnnotation(LatestVersion.class))
                 .map(LatestVersion::value).orElse(null);
 
-            if (isUpgradeSetupPhase || previousVersion == null || (eariestVersion == null && latestVersion == null))
+            if (isUpgradeSetupPhase || previousVersion == null || (earliestVersion == null && latestVersion == null))
             {
                 return base; // Run the test normally
             }
@@ -114,7 +115,7 @@ public abstract class BaseUpgradeTest extends BaseWebDriverTest
                 public void evaluate() throws Throwable
                 {
                     Assume.assumeTrue("Test doesn't support upgrading from version: " + previousVersion,
-                        VersionRange.versionRange(eariestVersion, latestVersion).contains(previousVersion)
+                        VersionRange.versionRange(earliestVersion, latestVersion).contains(previousVersion)
                     );
                     base.evaluate();
                 }
