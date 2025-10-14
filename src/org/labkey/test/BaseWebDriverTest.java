@@ -1337,11 +1337,16 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         }
     }
 
+    protected boolean skipCleanup(boolean afterTest)
+    {
+        return false;
+    }
+
     private void cleanup(boolean afterTest)
     {
         ensureSignedInAsPrimaryTestUser();
 
-        if (!ClassUtils.getAllInterfaces(getClass()).contains(ReadOnlyTest.class) || ((ReadOnlyTest) this).needsSetup())
+        if (!skipCleanup(afterTest) && (!(this instanceof ReadOnlyTest readOnlyTest) || readOnlyTest.needsSetup()))
         {
             if (afterTest)
                 waitForPendingRequests(WAIT_FOR_PAGE);

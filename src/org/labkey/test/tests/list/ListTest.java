@@ -534,26 +534,27 @@ public class ListTest extends BaseWebDriverTest
     public void testLongName()
     {
         String listName = "A_+-:''.¡™£¢∞§¶•ªº–≠œ∑´®†¥¨ˆøπ“‘«æ…¬˚∆˙©√ƒ∂ßΩ≈ç√∫µ≤≥÷‹›ﬁﬂ‡°·‚—±⁄€‹›‡‰Æ«»¢∫√∑∏∂";
-        String fieldWithDefault = TestDataGenerator.randomFieldName("With Default", null, DomainUtils.DomainKind.IntList);
+        var fieldWithDefault = FieldInfo.random("With Default", ColumnType.String);
         EditListDefinitionPage listEditPage = _listHelper.beginCreateList(getProjectName(), listName);
         listEditPage.manuallyDefineFieldsWithAutoIncrementingKey("Key");
-        listEditPage.addField(new FieldDefinition(fieldWithDefault, ColumnType.String));
+        listEditPage.addField(fieldWithDefault.getFieldDefinition());
         listEditPage.clickSave();
 
         listEditPage = _listHelper.goToEditDesign(listName);
         var page = listEditPage.getFieldsPanel()
                 .expand()
-                .getField(fieldWithDefault)
+                .getField(fieldWithDefault.getName())
                 .clickAdvancedSettings()
                 .clickDefaultValuesLink();
-        var input = Locator.tagContainingText("td", "With Default").followingSibling("td").descendant("input").findElement(page.getDriver());
+        var input = Locator.tagContainingText("td", fieldWithDefault.getLabel()).followingSibling("td")
+                .descendant("input").findElement(page.getDriver());
         setFormElement(input, "42");
         clickButton("Save Defaults");
         _listHelper.beginAtList(getProjectName(), listName);
 
         DataRegionTable list = new DataRegionTable("query", getDriver());
         UpdateQueryRowPage updatePage = list.clickInsertNewRow();
-        checker().verifyEquals("Default value not as expected ", "42", updatePage.getTextInputValue(fieldWithDefault));
+        checker().verifyEquals("Default value not as expected ", "42", updatePage.getTextInputValue(fieldWithDefault.getName()));
         updatePage.submit();
     }
 
