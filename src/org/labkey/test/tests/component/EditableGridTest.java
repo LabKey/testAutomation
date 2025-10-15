@@ -51,27 +51,28 @@ import static org.labkey.test.util.TestDataGenerator.randomDomainName;
 @Category({Daily.class})
 public class EditableGridTest extends BaseWebDriverTest
 {
+    private static final int MAX_LENGTH = 32; // Avoid excessively long field names to avoid blocking clicks
     private static final String EXTRAPOLATING_SAMPLE_TYPE = randomDomainName("ExtrapolatingSampleType");
-    private static final FieldInfo ASC_STRING = FieldInfo.random("Ascending String");
-    private static final FieldInfo DESC_STRING = FieldInfo.random("Descending String");
-    private static final FieldInfo ASC_INT = FieldInfo.random("Ascending Int", ColumnType.Integer);
-    private static final FieldInfo DESC_INT = FieldInfo.random("Descending Int", ColumnType.Integer);
-    private static final FieldInfo ASC_DATE = FieldInfo.random("Ascending Date", ColumnType.DateAndTime);
-    private static final FieldInfo DESC_DATE = FieldInfo.random("Descending Date", ColumnType.DateAndTime);
+    private static final FieldInfo ASC_STRING = FieldInfo.random("Ascending String", ColumnType.String, MAX_LENGTH);
+    private static final FieldInfo DESC_STRING = FieldInfo.random("Descending String", ColumnType.String, MAX_LENGTH);
+    private static final FieldInfo ASC_INT = FieldInfo.random("Ascending Int", ColumnType.Integer, MAX_LENGTH);
+    private static final FieldInfo DESC_INT = FieldInfo.random("Descending Int", ColumnType.Integer, MAX_LENGTH);
+    private static final FieldInfo ASC_DATE = FieldInfo.random("Ascending Date", ColumnType.DateAndTime, MAX_LENGTH);
+    private static final FieldInfo DESC_DATE = FieldInfo.random("Descending Date", ColumnType.DateAndTime, MAX_LENGTH);
 
     private static final String FILLING_SAMPLE_TYPE = randomDomainName("FillingSampleType");
-    private static final FieldInfo FILL_STRING = FieldInfo.random("Filling String");
-    private static final FieldInfo FILL_MULTI_LINE = FieldInfo.random("Filling Multi Line", ColumnType.MultiLine);
-    private static final FieldInfo FILL_INT = FieldInfo.random("Filling Int", ColumnType.Integer);
-    private static final FieldInfo FILL_DATE = FieldInfo.random("Filling Date", ColumnType.DateAndTime);
+    private static final FieldInfo FILL_STRING = FieldInfo.random("Filling String", ColumnType.String, MAX_LENGTH);
+    private static final FieldInfo FILL_MULTI_LINE = FieldInfo.random("Filling Multi Line", ColumnType.MultiLine, MAX_LENGTH);
+    private static final FieldInfo FILL_INT = FieldInfo.random("Filling Int", ColumnType.Integer, MAX_LENGTH);
+    private static final FieldInfo FILL_DATE = FieldInfo.random("Filling Date", ColumnType.DateAndTime, MAX_LENGTH);
 
     private static final String PASTING_SAMPLE_TYPE = randomDomainName("PastingSampleType");
-    private static final FieldInfo PASTE_1 = FieldInfo.random("Paste Column 1");
-    private static final FieldInfo PASTE_2 = FieldInfo.random("Paste Column 2");
-    private static final FieldInfo PASTE_3 = FieldInfo.random("Paste Column 3");
-    private static final FieldInfo PASTE_4 = FieldInfo.random("Paste Column 4");
-    private static final FieldInfo PASTE_5 = FieldInfo.random("Paste Column 5");
-    private static final FieldInfo PASTE_ML = FieldInfo.random("Paste Multi Line", ColumnType.MultiLine);
+    private static final FieldInfo PASTE_1 = FieldInfo.random("Paste Column 1", ColumnType.String, MAX_LENGTH);
+    private static final FieldInfo PASTE_2 = FieldInfo.random("Paste Column 2", ColumnType.String, MAX_LENGTH);
+    private static final FieldInfo PASTE_3 = FieldInfo.random("Paste Column 3", ColumnType.String, MAX_LENGTH);
+    private static final FieldInfo PASTE_4 = FieldInfo.random("Paste Column 4", ColumnType.String, MAX_LENGTH);
+    private static final FieldInfo PASTE_5 = FieldInfo.random("Paste Column 5", ColumnType.String, MAX_LENGTH);
+    private static final FieldInfo PASTE_ML = FieldInfo.random("Paste Multi Line", ColumnType.MultiLine, MAX_LENGTH);
 
     private static final List<String> TEXT_CHOICES = Arrays.asList("red", "Orange", "YELLOW");
     private static final String LOOKUP_LIST = randomDomainName("Fruits");
@@ -79,24 +80,24 @@ public class EditableGridTest extends BaseWebDriverTest
 
     private static final String ALL_TYPE_SAMPLE_TYPE = randomDomainName("AllFieldsSampleType");
 
-    private static final FieldInfo STR_FIELD = FieldInfo.random("strCol")
+    private static final FieldInfo STR_FIELD = FieldInfo.random("strCol", ColumnType.String, MAX_LENGTH)
         .customizeFieldDefinition(fd -> fd.setScale(10));
-    private static final FieldInfo REQ_STR_FIELD = FieldInfo.random("strColReq")
+    private static final FieldInfo REQ_STR_FIELD = FieldInfo.random("strColReq", ColumnType.String, MAX_LENGTH)
         .customizeFieldDefinition(fd -> fd.setScale(10).setRequired(true));
-    private static final FieldInfo INT_FIELD = FieldInfo.random("intCol", ColumnType.Integer);
-    private static final FieldInfo REQ_INT_FIELD = FieldInfo.random("intColReq", ColumnType.Integer)
+    private static final FieldInfo INT_FIELD = FieldInfo.random("intCol", ColumnType.Integer, MAX_LENGTH);
+    private static final FieldInfo REQ_INT_FIELD = FieldInfo.random("intColReq", ColumnType.Integer, MAX_LENGTH)
         .customizeFieldDefinition(fd -> fd.setRequired(true));
-    private static final FieldInfo DATE_FIELD = FieldInfo.random("dateCol", ColumnType.Date);
-    private static final FieldInfo REQ_DATETIME_FIELD = FieldInfo.random("datetimeColReq", ColumnType.DateAndTime)
+    private static final FieldInfo DATE_FIELD = FieldInfo.random("dateCol", ColumnType.Date, MAX_LENGTH);
+    private static final FieldInfo REQ_DATETIME_FIELD = FieldInfo.random("datetimeColReq", ColumnType.DateAndTime, MAX_LENGTH)
         .customizeFieldDefinition(fd -> fd.setRequired(true));
-    private static final FieldInfo TIME_FIELD = FieldInfo.random("timeCol", ColumnType.Time);
-    private static final FieldInfo REQ_TIME_FIELD = FieldInfo.random("timeColReq", ColumnType.Time)
+    private static final FieldInfo TIME_FIELD = FieldInfo.random("timeCol", ColumnType.Time, MAX_LENGTH);
+    private static final FieldInfo REQ_TIME_FIELD = FieldInfo.random("timeColReq", ColumnType.Time, MAX_LENGTH)
         .customizeFieldDefinition(fd -> fd.setRequired(true));
-    private static final FieldInfo BOOL_FIELD = FieldInfo.random("boolCol", ColumnType.Boolean);
-    private static final FieldInfo FLOAT_FIELD = FieldInfo.random("floatCol", ColumnType.Decimal);
-    private static final FieldInfo TEXTCHOICE_FIELD = FieldInfo.random("textchoiceCol", ColumnType.TextChoice)
+    private static final FieldInfo BOOL_FIELD = FieldInfo.random("boolCol", ColumnType.Boolean, MAX_LENGTH);
+    private static final FieldInfo FLOAT_FIELD = FieldInfo.random("floatCol", ColumnType.Decimal, MAX_LENGTH);
+    private static final FieldInfo TEXTCHOICE_FIELD = FieldInfo.random("textchoiceCol", ColumnType.TextChoice, MAX_LENGTH)
         .customizeFieldDefinition(fd -> fd.setTextChoiceValues(TEXT_CHOICES));
-    private static final FieldInfo REQ_TEXTCHOICE_FIELD = FieldInfo.random("textchoiceColReq", ColumnType.TextChoice)
+    private static final FieldInfo REQ_TEXTCHOICE_FIELD = FieldInfo.random("textchoiceColReq", ColumnType.TextChoice, MAX_LENGTH)
         .customizeFieldDefinition(fd -> fd.setRequired(true).setTextChoiceValues(TEXT_CHOICES));
     private static final FieldInfo LOOKUP_FIELD = FieldInfo.random("lookupCol", new IntLookup(null, "lists", LOOKUP_LIST));
     private static final FieldInfo REQ_LOOKUP_FIELD = FieldInfo.random("lookupColReq", new IntLookup(null, "lists", LOOKUP_LIST))
