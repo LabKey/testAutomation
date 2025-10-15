@@ -972,7 +972,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverCompon
 
         static final Locator loadingGrid = Locator.css("tbody tr.grid-loading");
         static final Locator emptyGrid = Locator.css("tbody tr.grid-empty");
-        static final Locator spinner = Locator.css("span i.fa-spinner");
+        static final Locator spinner = Locator.byClass("fa-spinner");
         static final Locator headerCells = Locator.tagWithClass("th", "grid-header-cell");
         static public Locator.XPathLocator headerCellBody(String label)
         {
