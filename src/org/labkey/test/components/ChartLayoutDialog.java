@@ -190,6 +190,25 @@ public class ChartLayoutDialog<EC extends ChartLayoutDialog.ElementCache> extend
         return this;
     }
 
+    public ChartLayoutDialog setYAxisAggregateMethod(String method)
+    {
+        clickYAxisTab();
+        getWrapper()._ext4Helper.selectComboBoxItem("Aggregate Method:", method);
+        return this;
+    }
+
+    public ChartLayoutDialog setYAxisErrorBarsMethod(String method)
+    {
+        clickYAxisTab();
+        if (method.equals("Standard Deviation"))
+            getWrapper().click(elementCache().sdErrorBarRadioButton);
+        else if (method.equals("Standard Error of the Mean"))
+            getWrapper().click(elementCache().semErrorBarRadioButton);
+        else
+            getWrapper().click(elementCache().noneErrorBarRadioButton);
+        return this;
+    }
+
     protected void setLabel(String label)
     {
         getWrapper().setFormElement(elementCache().visibleLabelTextBox, label);
@@ -461,6 +480,9 @@ public class ChartLayoutDialog<EC extends ChartLayoutDialog.ElementCache> extend
         public Locator visibleLabelTextBox = Locator.xpath(VISIBLE_PANEL_XPATH + "//input[@name='label']");
         public Locator visibleRangeMinTextBox = Locator.xpath(VISIBLE_PANEL_XPATH + "//input[@name='rangeMin']");
         public Locator visibleRangeMaxTextBox = Locator.xpath(VISIBLE_PANEL_XPATH + "//input[@name='rangeMax']");
+        public Locator noneErrorBarRadioButton = Locator.xpath(VISIBLE_PANEL_XPATH + "//label[text()='None']/preceding-sibling::input[@type='button']");
+        public Locator sdErrorBarRadioButton = Locator.xpath(VISIBLE_PANEL_XPATH + "//label[text()='Standard Deviation']/preceding-sibling::input[@type='button']");
+        public Locator semErrorBarRadioButton = Locator.xpath(VISIBLE_PANEL_XPATH + "//label[text()='Standard Error of the Mean']/preceding-sibling::input[@type='button']");
     }
 
     public enum ScaleType
