@@ -52,7 +52,7 @@ public class QueryChartPanel extends WebDriverComponent<QueryChartPanel.ElementC
 
     public WebElement getSvgChart()
     {
-        return Locator.byClass("svg-chart").waitForElement(this, WAIT_FOR_JAVASCRIPT);
+        return Locator.byClass("svg-chart__chart").childTag("svg").waitForElement(this, WAIT_FOR_JAVASCRIPT);
     }
 
     public QueryGrid clickClose()
