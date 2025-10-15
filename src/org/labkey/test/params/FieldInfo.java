@@ -58,9 +58,25 @@ public class FieldInfo implements CharSequence, WrapsFieldKey
     /**
      * Creates a FieldInfo with a semi-random name
      */
+    public static FieldInfo random(String namePart, ColumnType columnType, DomainUtils.DomainKind domainKind, Integer maxLength)
+    {
+        return new FieldInfo(FieldKey.fromParts(TestDataGenerator.randomFieldName(namePart, domainKind, maxLength)), null, columnType, null, namePart);
+    }
+
+    /**
+     * Creates a FieldInfo with a semi-random name
+     */
     public static FieldInfo random(String namePart, ColumnType columnType, DomainUtils.DomainKind domainKind)
     {
-        return new FieldInfo(FieldKey.fromParts(TestDataGenerator.randomFieldName(namePart)), null, columnType, null, namePart);
+        return random(namePart, columnType, domainKind, null);
+    }
+
+    /**
+     * Creates a FieldInfo with a semi-random name
+     */
+    public static FieldInfo random(String namePart, ColumnType columnType, int maxLength)
+    {
+        return random(namePart, columnType, null, maxLength);
     }
 
     /**
