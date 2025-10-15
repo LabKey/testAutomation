@@ -613,7 +613,7 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
         checker().withScreenshot("unexpected_run_file_links")
                 .wrapAssertion(()-> Assertions.assertThat(runFileTexts.stream().map(String::trim).toList())
                         .as("expect complete run files")
-                        .containsOnly(String.format("assaydata%s%s", File.separatorChar, runFile.getName()))
+                        .containsOnly(runFile.getName())
                         .hasSize(5));
     }
 
@@ -637,7 +637,7 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
             }
             else
             {
-                Optional<WebElement> optionalFileLink = Locator.linkContainingText(String.format("datasetdata%s%s", File.separatorChar, file.getName()))
+                Optional<WebElement> optionalFileLink = Locator.linkContainingText(file.getName())
                         .findOptionalElement(dataRegionTable);
                 checker().withScreenshot("unexpected_file_state")
                         .awaiting(Duration.ofSeconds(2),
