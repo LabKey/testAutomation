@@ -612,6 +612,16 @@ public class TestDataGenerator
         return randomFieldName(part, null);
     }
 
+    public static String randomFieldName(String part, int maxLength)
+    {
+        return randomFieldName(part, null, null, null, null, maxLength);
+    }
+
+    public static String randomFieldName(String part, @Nullable DomainKind domainKind, Integer maxLength)
+    {
+        return randomFieldName(part, null, null, null, domainKind, maxLength);
+    }
+
     public static String randomFieldName(String part, @Nullable String exclusion)
     {
         return randomFieldName(part, exclusion, null);
@@ -624,6 +634,11 @@ public class TestDataGenerator
 
     public static String randomFieldName(@NotNull String part, @Nullable Integer numStartChars, @Nullable Integer numEndChars, @Nullable String exclusion, @Nullable DomainKind domainKind)
     {
+        return randomFieldName(part, numStartChars, numEndChars, exclusion, domainKind, null);
+    }
+
+    public static String randomFieldName(@NotNull String part, @Nullable Integer numStartChars, @Nullable Integer numEndChars, @Nullable String exclusion, @Nullable DomainKind domainKind, @Nullable Integer maxLength)
+    {
         DomainKind _domainKind = domainKind == null ? DomainKind.SampleSet : domainKind;
 
         // use the characters that we know are encoded in fieldKeys plus characters that we know clients are using
@@ -633,7 +648,7 @@ public class TestDataGenerator
 
         int currentTries = 0;
         RandomName randomFieldName = randomName(part, getNumChars(numStartChars, 5), getNumChars(numEndChars, 50), chars, exclusion);
-        while (isDomainAndFieldNameInvalid(_domainKind, null, randomFieldName))
+        while ((maxLength != null && randomFieldName.name().length() > maxLength) || isDomainAndFieldNameInvalid(_domainKind, null, randomFieldName))
         {
             randomFieldName = randomName(part, getNumChars(numStartChars, 5), getNumChars(numEndChars, 50), chars, exclusion);
             if (++currentTries >= MAX_RANDOM_TRIES)

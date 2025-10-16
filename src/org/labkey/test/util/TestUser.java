@@ -2,7 +2,6 @@ package org.labkey.test.util;
 
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
-import org.labkey.remoteapi.security.CreateUserResponse;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 
