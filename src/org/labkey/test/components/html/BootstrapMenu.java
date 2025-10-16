@@ -118,6 +118,11 @@ public class BootstrapMenu extends BaseBootstrapMenu
         clickSubMenu(wait ? getWrapper().getDefaultWaitForPage() : 0, subMenuLabels);
     }
 
+    public boolean menuItemIsDisabled(String text)
+    {
+        return findDisabledMenuItemOrNull(text) != null;
+    }
+
     @Override
     protected Locator getToggleLocator()
     {

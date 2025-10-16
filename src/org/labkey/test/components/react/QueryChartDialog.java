@@ -394,8 +394,9 @@ public class QueryChartDialog extends ModalDialog
     {
         WebDriverWrapper.waitFor(this::isCreateChartButtonEnabled,
                 "the create chart button did not become enabled", 2000);
+        String name = getName();
         dismiss("Create Chart");
-        return _queryGrid.getChartPanel();
+        return _queryGrid.getChartPanel(name);
     }
 
     /*
@@ -405,8 +406,9 @@ public class QueryChartDialog extends ModalDialog
     {
         WebDriverWrapper.waitFor(this::isSaveChartButtonEnabled,
                 "the Save chart button did not become enabled", 2000);
+        String name = getName();
         dismiss("Save Chart");
-        return _queryGrid.getChartPanel();
+        return _queryGrid.getChartPanel(name);
     }
 
     /*
