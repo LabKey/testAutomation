@@ -383,7 +383,7 @@ public class AllowedFileExtensionTest extends AllowedFileExtensionBaseTest
         {
             fieldMap = Map.of("Name", String.format("S-%d", i), stFileField, fileMap.get(allowedType).getAbsolutePath());
             sampleTypeHelper.insertRow(fieldMap);
-            expectedValues.add(String.format(" sampletype%s%s", File.separator, fileMap.get(allowedType).getName()));
+            expectedValues.add(String.format(" %s", fileMap.get(allowedType).getName()));
             i++;
         }
 
