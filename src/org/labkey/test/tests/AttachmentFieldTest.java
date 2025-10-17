@@ -91,9 +91,9 @@ public class AttachmentFieldTest extends BaseWebDriverTest
 
         clickAndWait(Locator.tagWithText("a", "S1"));
         clickAndWait(Locator.tagWithClass("a", "labkey-text-link").withText("edit"));
-        waitForElement(Locator.tagContainingText("div", "sampletype/jpg_sample.jpg"));
+        waitForElement(Locator.tagContainingText("div", "jpg_sample.jpg"));
         // Issue 53200: Update form incorrectly shows that a file is not available
-        assertTextNotPresent("sampletype/jpg_sample.jpg (unavailable)");
+        assertTextNotPresent("jpg_sample.jpg (unavailable)");
         clickButton("Cancel");
 
         log("Verifying view in browser works");
