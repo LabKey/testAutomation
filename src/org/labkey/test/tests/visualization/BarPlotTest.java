@@ -60,7 +60,7 @@ public class BarPlotTest extends GenericChartsTest
     private final String ALT_GROUPED_BAR_PLOT_SVG_TEXT = "0\nNormal\nNot Done\n0\n2\n4\n6\n8\n10\n12\n14\n16\n18\n20\n22\nAPX-1: Abbreviated Physical Exam\nNew Label\n0\nNegative";
     private final String SECOND_BAR_PLOT_SVG_TEXT = "0\nNegative\n0\n200\n400\n600\n800\n1000\n1200\n1400\n1600\n1800\n2000\n2200\n2400\n" + TRICKY_CHART_TITLE + "\n" + PREG_TEST_RESULTS + "\nSum of " + BP_DIASTOLIC;
     private final String THIRD_BAR_PLOT_SVG_TEXT = "0\nNegative\n-50\n-49\n-48\n-47\n-46\n-45\n-44\n-43\n-42\n-41\n-40\n"+ TRICKY_CHART_TITLE + "\n" + PREG_TEST_RESULTS + "\nSum of " + BP_DIASTOLIC;
-    private final String FOURTH_BAR_PLOT_SVG_TEXT = "0\nNegative\n200\n400\n600\n800\n1000\n1200\n1400\n1600\n1800\n2000\n2200\n2400\n2600\n2800\n3000\n"+ TRICKY_CHART_TITLE + "\n" + PREG_TEST_RESULTS + "\nSum of " + BP_DIASTOLIC;
+    private final String FOURTH_BAR_PLOT_SVG_TEXT = "0\nNegative\n0\n500\n1000\n1500\n2000\n2500\n3000\n"+ TRICKY_CHART_TITLE + "\n" + PREG_TEST_RESULTS + "\nSum of " + BP_DIASTOLIC;
     private final String SUM_BAR_PLOT_SVG_TEXT = "Group 1\nGroup 2\n0\n2e+7\n4e+7\n6e+7\n8e+7\n1e+8\n1.2e+8\n1.4e+8\n1.6e+8\n1.8e+8\n2e+8\n2.2e+8\n2.4e+8\nTypes\nStudy: Cohort\nSum of Double";
     private final String COUNT_BAR_PLOT_SVG_TEXT = "Group 1\nGroup 2\n0\n2\n4\n6\n8\n10\n12\n14\n16\n18\n20\nTypes\nStudy: Cohort\nCount (non-blank) of Double";
     private final String MIN_BAR_PLOT_SVG_TEXT = "Group 1\nGroup 2\n-1\n-0.9\n-0.8\n-0.7\n-0.6\n-0.5\n-0.4\n-0.3\n-0.2\n-0.1\n0\nTypes\nStudy: Cohort\nMin of Double";
