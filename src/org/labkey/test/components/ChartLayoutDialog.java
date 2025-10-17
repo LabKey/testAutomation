@@ -197,6 +197,11 @@ public class ChartLayoutDialog<EC extends ChartLayoutDialog.ElementCache> extend
         return this;
     }
 
+    public boolean isYAxisAggregateMethodVisible()
+    {
+        return getWrapper().isElementPresent(Ext4Helper.Locators.formItemWithLabel("Aggregate Method:"));
+    }
+
     public ChartLayoutDialog setYAxisErrorBarsMethod(String method)
     {
         clickYAxisTab();
@@ -207,6 +212,11 @@ public class ChartLayoutDialog<EC extends ChartLayoutDialog.ElementCache> extend
         else
             getWrapper().click(elementCache().noneErrorBarRadioButton);
         return this;
+    }
+
+    public boolean isYAxisErrorBarsMethodVisible()
+    {
+        return getWrapper().isElementPresent(Ext4Helper.Locators.formItemWithLabel("Error Bars:"));
     }
 
     protected void setLabel(String label)
