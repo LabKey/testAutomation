@@ -527,7 +527,7 @@ public class QueryChartDialog extends ModalDialog
         }
 
         private final Locator previewBodyLoc = Locator.tagWithClass("div", "chart-builder-preview-body");
-        private final Locator svgLoc = Locator.tagWithClass("div", "svg-chart__chart");
+        private final Locator svgLoc = Locator.tagWithClass("div", "svg-chart__chart").childTag("svg");
 
         public WebElement svg()
         {

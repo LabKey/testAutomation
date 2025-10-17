@@ -719,7 +719,14 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
 
     public QueryChartPanel showChart(String chartName)
     {
+        // if there was a different chart already shown, wait for it to close first
+        // NOTE: this will need to be updated soon with the changes for the "multiple chart rendering" feature
+        WebElement prevChart = hasChartPanel() ? getChartPanel().getSvgChart() : null;
+
         elementCache().chartsMenu.clickSubMenu(false, chartName);
+
+        if (prevChart != null)
+            getWrapper().shortWait().until(ExpectedConditions.stalenessOf(prevChart));
         return getChartPanel();
     }
 
@@ -735,6 +742,12 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     public QueryChartPanel getChartPanel()
     {
         return new QueryChartPanel.QueryChartPanelFinder(getDriver(), this).waitFor(this);
+    }
+
+    public boolean hasChartPanel()
+    {
+        QueryChartPanel chartPanel = new QueryChartPanel.QueryChartPanelFinder(getDriver(), this).findOrNull(this);
+        return chartPanel != null;
     }
 
     public WebElement showRReport(String reportName)
