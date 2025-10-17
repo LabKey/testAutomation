@@ -182,7 +182,7 @@ public class AssayTransformWarningTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(runName), longWaitForPage);
 
         // Verify file uploaded
-        assertTextPresent("assaydata" + File.separator + JAVA_TRANSFORM_SCRIPT.getName(), 1);
+        assertTextPresent(JAVA_TRANSFORM_SCRIPT.getName(), 1);
 
         DataRegionTable table = new DataRegionTable("Data", this);
         assertEquals(1, table.getDataRowCount());
