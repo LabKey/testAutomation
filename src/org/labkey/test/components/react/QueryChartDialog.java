@@ -442,13 +442,13 @@ public class QueryChartDialog extends ModalDialog
      */
     public QueryChartPanel clickSaveChart()
     {
-        WebElement prevChart = _queryGrid.getChartPanel().getSvgChart();
+        String name = getName();
+        WebElement prevChart = _queryGrid.getChartPanel(name).getSvgChart();
         WebDriverWrapper.waitFor(this::isSaveChartButtonEnabled,
                 "the Save chart button did not become enabled", 2000);
-        String name = getName();
         dismiss("Save Chart");
         getWrapper().shortWait().until(ExpectedConditions.stalenessOf(prevChart));
-        return _queryGrid.getChartPanel();
+        return _queryGrid.getChartPanel(name);
     }
 
     /*
