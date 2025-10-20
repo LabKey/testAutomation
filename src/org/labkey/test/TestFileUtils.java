@@ -38,6 +38,7 @@ import org.bouncycastle.openpgp.operator.jcajce.JcaPGPDigestCalculatorProviderBu
 import org.bouncycastle.openpgp.operator.jcajce.JcePBEDataDecryptorFactoryBuilder;
 import org.bouncycastle.util.io.Streams;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.openqa.selenium.NotFoundException;
 
 import java.io.BufferedInputStream;
@@ -72,6 +73,10 @@ import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+
+import static org.labkey.test.util.TestDataGenerator.CHARSET_STRING;
+import static org.labkey.test.util.TestDataGenerator.randomInt;
+import static org.labkey.test.util.TestDataGenerator.randomName;
 
 /**
  * Static methods for finding and reading test-related files
@@ -782,5 +787,18 @@ public abstract class TestFileUtils
             ret[lastIndex] = '_';
 
         return new String(ret);
+    }
+
+    public static String randomFileName(@NotNull String part, @Nullable String extension)
+    {
+        return randomFileName(part, extension, null, null);
+    }
+
+    public static String randomFileName(@NotNull String part, @Nullable String extension, @Nullable Integer numStartChars, @Nullable Integer numEndChars)
+    {
+        String baseName = makeLegalFileName(randomName(part, numStartChars == null ? randomInt(0, 5) : numStartChars, numEndChars == null ? randomInt(0, 5) : numEndChars, CHARSET_STRING, null).name());
+        if (extension != null)
+            return baseName + extension;
+        return baseName;
     }
 }
