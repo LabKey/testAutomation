@@ -732,8 +732,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
 
     public boolean createChartIsDisabled()
     {
-        elementCache().chartsMenu.expand();
-        return elementCache().chartsMenu.menuItemIsDisabled("Create Chart");
+        return chartIsDisabled("Create Chart");
     }
 
     public boolean chartIsDisabled(String name)
