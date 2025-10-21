@@ -115,18 +115,16 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest implements Post
         _userHelper.deleteUser(LIMITED_USER);
     }
 
-    // This test class has no @Before or @BeforeClass. Each of the test cases, creates its own project to be used for importing.
+    // This test class has no @Before or @BeforeClass. Each of the test cases creates its own project to be used for importing.
 
     @Test
     public void testBasicImportFromFile()
     {
-        File zipFile = IMPORT_STUDY_FILE;
-
         log("Create a new project to import the existing data.");
         _containerHelper.createProject(IMPORT_PROJECT_FILE01, "Study");
 
         log("Get to the import page and validate that is looks as expected.");
-        StartImportPage importPage = StartImportPage.startImportFromFile(this, zipFile, true);
+        StartImportPage importPage = StartImportPage.startImportFromFile(this, IMPORT_STUDY_FILE, true);
         importPage.setSelectSpecificImportOptions(true);
         assertTrue("The 'Select specific objects to import' is not visible, and it should be in this case.", importPage.isSelectSpecificImportOptionsVisible());
 
@@ -176,54 +174,19 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest implements Post
     @Test
     public void testFilteredImportFromFile()
     {
-        File zipFile = IMPORT_STUDY_FILE;
-
         log("Create a new project to import the existing data.");
         _containerHelper.createProject(IMPORT_PROJECT_FILE02);
 
         log("Get to the import page and validate that is looks as expected.");
-        StartImportPage importPage = StartImportPage.startImportFromFile(this, zipFile, true);
+        StartImportPage importPage = StartImportPage.startImportFromFile(this, IMPORT_STUDY_FILE, true);
         importPage.setSelectSpecificImportOptions(true);
-        assertTrue("The 'Select specific objects to import' is not visible, and it should be in this case.", importPage.isSelectSpecificImportOptionsVisible());
-
-        boolean chkSet = false;
-        Map<StartImportPage.AdvancedOptionsCheckBoxes, Boolean> myList = new HashMap<>();
-        myList.put(StartImportPage.AdvancedOptionsCheckBoxes.AssaySchedule, chkSet);
-        myList.put(StartImportPage.AdvancedOptionsCheckBoxes.CohortSettings, chkSet);
-        myList.put(StartImportPage.AdvancedOptionsCheckBoxes.TreatmentData, chkSet);
-        myList.put(StartImportPage.AdvancedOptionsCheckBoxes.WikisAndTheirAttachments, chkSet);
-
-        log("Uncheck a few of the options.");
-        importPage.setAdvancedOptionCheckBoxes(myList);
-
-        log("Start the import");
-        importPage.clickStartImport();
-
-        waitForText("Data Pipeline");
-        waitForPipelineJobsToComplete(EXPECTED_COMPLETED_IMPORT_JOBS, "Folder import", EXPECTED_IMPORT_ERRORS, IMPORT_WAIT_TIME);
-
-        goToProjectHome(IMPORT_PROJECT_FILE02);
-
-        log("Validate that the expected data has been imported.");
-
-        log("Validate assay schedule.");
-        clickTab("Assays");
-        AssayScheduleWebpart assayScheduleWebpart = new AssayScheduleWebpart(getDriver());
-        assertTrue(assayScheduleWebpart.isEmpty());
-
-        log("Validate Immunizations.");
-        clickTab("Immunizations");
-        ImmunizationScheduleWebpart immunizationScheduleWebpart = new ImmunizationScheduleWebpart(getDriver());
-        assertTrue(immunizationScheduleWebpart.isEmpty());
-
-        log("Validate Vaccine Design.");
-        clickTab("Vaccine Design");
-        VaccineDesignWebpart vaccineDesignWebpart = new VaccineDesignWebpart(getDriver());
-        assertTrue(vaccineDesignWebpart.isEmpty());
-
-        log("Validate that Locations have been imported unchanged.");
-        clickTab("Manage");
+        configureAndValidateFilteredImport(importPage, IMPORT_PROJECT_FILE02);
         clickAndWait(Locator.linkWithText("Manage Locations"));
+        validateQCStatesAndWiki(IMPORT_PROJECT_FILE02);
+    }
+
+    private void validateQCStatesAndWiki(String projectName)
+    {
         assertTextPresent("Jimmy Neutron Lab", "Dexter's Lab");
 
         log("Validate QC State.");
@@ -233,22 +196,27 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest implements Post
         assertEquals("Wrong QC states imported", expectedStates, states);
 
         log("Validate wiki content are not imported");
-        goToProjectHome(IMPORT_PROJECT_FILE02);
+        goToProjectHome(projectName);
         assertTextPresent("WikiPage01", "This folder does not currently contain any wiki pages to display.");
         assertElementNotPresent(Locator.xpath("//div[@class='labkey-wiki']//p[text() = 'This is a very basic wiki page.']"));
-
     }
 
     @Test
     public void testFilteredImportFromPipeline()
     {
-        File zipFile = IMPORT_STUDY_FILE;
-
         log("Create a new project to import the existing data.");
         _containerHelper.createProject(IMPORT_PROJECT_FILE03);
 
         log("Get to the import page and validate that is looks as expected.");
-        StartImportPage importPage = StartImportPage.startImportFromPipeline(this, zipFile, true, true);
+        StartImportPage importPage = StartImportPage.startImportFromPipeline(this, IMPORT_STUDY_FILE, true, true);
+        configureAndValidateFilteredImport(importPage, IMPORT_PROJECT_FILE03);
+        clickAndWait(Locator.linkWithText("Manage Locations"), WAIT_FOR_PAGE);
+        validateQCStatesAndWiki(IMPORT_PROJECT_FILE03);
+
+    }
+
+    private void configureAndValidateFilteredImport(StartImportPage importPage, String projectName)
+    {
         assertTrue("The 'Select specific objects to import' is not visible, and it should be in this case.", importPage.isSelectSpecificImportOptionsVisible());
 
         boolean chkSet = false;
@@ -267,7 +235,7 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest implements Post
         waitForText("Data Pipeline");
         waitForPipelineJobsToComplete(EXPECTED_COMPLETED_IMPORT_JOBS, "Folder import", EXPECTED_IMPORT_ERRORS, IMPORT_WAIT_TIME);
 
-        goToProjectHome(IMPORT_PROJECT_FILE03);
+        goToProjectHome(projectName);
 
         log("Validate that the expected data has been imported.");
 
@@ -288,20 +256,6 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest implements Post
 
         log("Validate that Locations have been imported unchanged.");
         clickTab("Manage");
-        clickAndWait(Locator.linkWithText("Manage Locations"), WAIT_FOR_PAGE);
-        assertTextPresent("Jimmy Neutron Lab", "Dexter's Lab");
-
-        log("Validate QC State.");
-        ManageDatasetQCStatesPage manageDatasetQCStatesPage = goToManageStudy().manageDatasetQCStates();
-        List<String> expectedStates = Arrays.asList("[none]", "QC State Name 01");
-        List<String> states = manageDatasetQCStatesPage.getStateRows().stream().map(QCStateTableRow::getState).collect(Collectors.toList());
-        assertEquals("Wrong QC states imported", expectedStates, states);
-
-        log("Validate wiki content are not imported");
-        goToProjectHome(IMPORT_PROJECT_FILE03);
-        assertTextPresent("WikiPage01", "This folder does not currently contain any wiki pages to display.");
-        assertElementNotPresent(Locator.xpath("//div[@class='labkey-wiki']//p[text() = 'This is a very basic wiki page.']"));
-
     }
 
     @Test
@@ -376,7 +330,7 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest implements Post
         waitForText("Data Pipeline");
         log("Verify the container filter has been set to see multiple import jobs");
 
-        // if the container filter has been set correctly we should see all 2 pipeline jobs
+        // if the container filter has been set correctly, we should see all 2 pipeline jobs
         waitForPipelineJobsToComplete(EXPECTED_COMPLETED_MULTI_FOLDER_JOBS, "Folder import", EXPECTED_IMPORT_ERRORS, IMPORT_WAIT_TIME * EXPECTED_COMPLETED_IMPORT_JOBS);
 
         log("Validate that the expected data has been imported.");

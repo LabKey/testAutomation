@@ -130,7 +130,7 @@ public class FileBasedPipelineTest extends BaseWebDriverTest
         goToModule("FileContent");
         _fileBrowserHelper.uploadFile(SAMPLE_FILE);
 
-        final String jobDescription = "@files/sample (InlineRCopy)";
+        final String jobDescription = "sample (InlineRCopy)";
 
         pipelineAnalysis.runPipelineAnalysis(importAction, targetFiles, protocolProperties, "Duplicate File(s)", true);
         pipelineAnalysis.verifyPipelineAnalysis(pipelineName, protocolName, jobDescription, null, fileRoot, outputFiles);
@@ -239,7 +239,7 @@ public class FileBasedPipelineTest extends BaseWebDriverTest
         goToModule("FileContent");
         _fileBrowserHelper.uploadFile(SAMPLE_FILE);
 
-        final String jobDescription = "@files/sample (with_output_location)";
+        final String jobDescription = "sample (with_output_location)";
 
         pipelineAnalysis.runPipelineAnalysis(importAction, targetFiles, protocolProperties);
         pipelineAnalysis.verifyPipelineAnalysis(pipelineName, protocolName, null, jobDescription, fileRoot, outputFiles);
