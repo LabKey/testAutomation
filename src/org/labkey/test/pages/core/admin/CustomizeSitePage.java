@@ -47,7 +47,7 @@ public class CustomizeSitePage extends LabKeyPage<CustomizeSitePage.ElementCache
 
     public ShowAdminPage save()
     {
-        clickAndWait(elementCache().saveButton);
+        clickAndWait(scrollIntoView(elementCache().saveButton));
 
         return new ShowAdminPage(getDriver());
     }
@@ -217,7 +217,7 @@ public class CustomizeSitePage extends LabKeyPage<CustomizeSitePage.ElementCache
         return new ElementCache();
     }
 
-    protected class ElementCache extends LabKeyPage.ElementCache
+    protected class ElementCache extends LabKeyPage<?>.ElementCache
     {
         protected final WebElement saveButton = Locator.lkButton("Save").findWhenNeeded(this);
 
