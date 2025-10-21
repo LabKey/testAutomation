@@ -132,7 +132,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
             TestFileUtils.getSampleData("SimpleAndRestrictedModule/FolderWithRestricted.folder.zip");
 
     private static final String THUMBNAIL_FOLDER = "thumbnails/";
-    private static final String THUMBNAIL_FILENAME = "/Thumbnail.png";
+    private static final String THUMBNAIL_FILENAME = "Thumbnail.png";
     private static final String ICON_FILENAME = "/SmallThumbnail.png";
 
     private static final String KNITR_PEOPLE = "Knitr People";
@@ -1204,7 +1204,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         setFormElement(Locator.xpath("//table[contains(@class, 'dataset-search')]//input"), KNITR_PEOPLE);
         waitForElementToDisappear(Locator.tag("tr").withClass("x4-grid-row").containing(WANT_TO_BE_COOL).notHidden());
 
-        File expectedIconFile = TestFileUtils.getSampleData(THUMBNAIL_FOLDER + KNITR_PEOPLE + ICON_FILENAME);
+        File expectedIconFile = TestFileUtils.getSampleData(THUMBNAIL_FOLDER + KNITR_PEOPLE + "/" + ICON_FILENAME);
 
         WebElement img = waitForElement(Locator.tag("img").withClass("dataview-icon").withoutClass("x4-tree-icon-parent").notHidden());
         String backgroundImage = StringUtils.trimToEmpty(img.getCssValue("background-image"));
@@ -1214,7 +1214,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
             Assert.fail("Module report icon style is not as expected: " + img.getDomAttribute("style"));
         }
         String iconUrl = matcher.group(1);
-        File downloadedIcon = new SimpleHttpRequest(iconUrl).getResponseAsFile(TestFileUtils.ensureTestTempFile(KNITR_PEOPLE + ICON_FILENAME));
+        File downloadedIcon = new SimpleHttpRequest(iconUrl).getResponseAsFile(TestFileUtils.ensureTestTempFile(KNITR_PEOPLE, ICON_FILENAME));
 
         Assertions.assertThat(downloadedIcon).as("Module report icon is not as expected")
                 .hasSameBinaryContentAs(expectedIconFile);
@@ -1232,13 +1232,13 @@ public class SimpleModuleTest extends BaseWebDriverTest
     @LogMethod
     private void verifyReportThumbnail(@LoggedParam String reportTitle) throws IOException
     {
-        File expectedThumbnailFile = TestFileUtils.getSampleData(THUMBNAIL_FOLDER + reportTitle + THUMBNAIL_FILENAME);
+        File expectedThumbnailFile = TestFileUtils.getSampleData(THUMBNAIL_FOLDER + reportTitle + "/" + THUMBNAIL_FILENAME);
 
         WebElement reportLink = waitForElement(Locator.xpath("//a[text()='" + reportTitle + "']"));
         mouseOver(reportLink);
         WebElement thumbnail = waitForElement(Locator.xpath("//div[@class='thumbnail']/img").notHidden());
         File downloadedThumbnail = new SimpleHttpRequest(thumbnail.getDomProperty("src"))
-                .getResponseAsFile(TestFileUtils.ensureTestTempFile(reportTitle + THUMBNAIL_FILENAME));
+                .getResponseAsFile(TestFileUtils.ensureTestTempFile(reportTitle, THUMBNAIL_FILENAME));
 
         Assertions.assertThat(downloadedThumbnail).as("Module report thumbnail is not as expected")
                 .hasSameBinaryContentAs(expectedThumbnailFile);
