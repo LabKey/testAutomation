@@ -20,6 +20,7 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.react.BaseBootstrapMenu;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -116,6 +117,14 @@ public class BootstrapMenu extends BaseBootstrapMenu
     public void clickSubMenu(boolean wait, @LoggedParam String ... subMenuLabels)
     {
         clickSubMenu(wait ? getWrapper().getDefaultWaitForPage() : 0, subMenuLabels);
+    }
+
+    public boolean menuItemIsDisabled(String text)
+    {
+        if (findVisibleMenuItemOrNull(text) == null)
+            throw new NoSuchElementException("Menu item not found: " + text);
+
+        return findDisabledMenuItemOrNull(text) != null;
     }
 
     @Override

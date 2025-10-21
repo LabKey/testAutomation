@@ -16,6 +16,7 @@ import org.labkey.test.components.react.ReactCheckBox;
 import org.labkey.test.components.ui.FilterStatusValue;
 import org.labkey.test.util.selenium.WebElementUtils;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
@@ -720,7 +721,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     public QueryChartPanel showChart(String chartName)
     {
         elementCache().chartsMenu.clickSubMenu(false, chartName);
-        return getChartPanel();
+        return getChartPanel(chartName);
     }
 
     public QueryChartDialog createChart()
@@ -729,12 +730,39 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         return new QueryChartDialog("Create Chart", getDriver(), this);
     }
 
-    /*
-        gets a chart panel that is already being shown
-     */
-    public QueryChartPanel getChartPanel()
+    public boolean createChartIsDisabled()
     {
-        return new QueryChartPanel.QueryChartPanelFinder(getDriver(), this).waitFor(this);
+        return chartIsDisabled("Create Chart");
+    }
+
+    public boolean chartIsDisabled(String name)
+    {
+        elementCache().chartsMenu.expand();
+        return elementCache().chartsMenu.menuItemIsDisabled(name);
+    }
+
+    public boolean chartIsSelected(String name)
+    {
+        elementCache().chartsMenu.expand();
+        List<WebElement> menuItems = elementCache().chartsMenu.findVisibleMenuItems();
+
+        Optional<WebElement> menuItem = menuItems.stream().filter(item -> item.getText().contains(name)).findFirst();
+
+        if (menuItem.isEmpty()) {
+            throw new NoSuchElementException(String.format("Could not find chart menu item %s", name));
+        }
+
+        WebElement checkbox = menuItem.get().findElement(Locator.byClass("chart-menu-checkbox"));
+
+        return checkbox.getAttribute("class").contains("fa-check-square");
+    }
+
+    /*
+        gets a chart panel that is already being shown for a given chart name
+     */
+    public QueryChartPanel getChartPanel(String name)
+    {
+        return new QueryChartPanel.QueryChartPanelFinder(getDriver(), this, name).waitFor(this);
     }
 
     public WebElement showRReport(String reportName)
@@ -743,9 +771,9 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         return elementCache().rReport();
     }
 
-    public void closeChart()
+    public void closeChart(String name)
     {
-        getChartPanel().clickClose();
+        getChartPanel(name).clickClose();
     }
 
     @Override
