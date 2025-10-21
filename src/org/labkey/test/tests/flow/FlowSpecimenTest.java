@@ -32,6 +32,7 @@ import org.labkey.test.util.PipelineStatusTable;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -227,7 +228,8 @@ public class FlowSpecimenTest extends BaseFlowTest
         beginAt(WebTestHelper.buildURL("flow", getContainerPath(), "query", Map.of("schemaName", "flow", "query.queryName", "FCSAnalyses")));
         click(Locator.checkboxByName(".toggle"));
         clickButton("Link to Study");
-        selectOptionByText(AssayConstants.TARGET_STUDY_FIELD_LOCATOR, "/" + getProjectName() + "/" + STUDY_FOLDER + " (" + STUDY_FOLDER + " Study)");
+        // Target study is fixed
+        assertFalse("Target study selector visibility", AssayConstants.TARGET_STUDY_FIELD_LOCATOR.findElement(getDriver()).isDisplayed());
         clickButton("Next");
         assertTitleContains("Link to " + STUDY_FOLDER + " Study: Verify Results");
         // verify specimen information is filled in for '118795.fcs' FCS file
