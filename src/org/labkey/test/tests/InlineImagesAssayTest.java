@@ -182,12 +182,15 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
         customizeView.addColumn(FieldKey.fromParts("Run", "RowId"));
         customizeView.addColumn(FieldKey.fromParts("Run", "Protocol", "RowId"));
         customizeView.applyCustomView();
-        String helpJpgFilePath = HELP_JPG_FILE.getName();
+        var protocolId = list.getDataAsText(0, "Run/Protocol/RowId");
+        var runId = list.getDataAsText(0, "Run/RowId");
+        String helpJpgFilePath = String.format("AssayId_%s%sRunId_%s%s%s", protocolId, File.separatorChar,
+                runId, File.separatorChar, HELP_JPG_FILE.getName());
 
         log("Validate that two links to this image file are now present.");
         assertElementPresent("Did not find the expected number of icons for images for " + PNG01_FILE.getName() + " from the runs.", Locator.xpath("//img[contains(@title, '" + PNG01_FILE.getName() + "')]"), 3);
         assertElementPresent("Did not find the expected number of icons for images for " + LRG_PNG_FILE.getName() + " from the runs.", Locator.xpath("//img[contains(@title, '" + LRG_PNG_FILE.getName() + "')]"), 1);
-        assertElementPresent("Did not find the expected number of icons for images for " + helpJpgFilePath + " from the runs.", Locator.xpath("//img[contains(@title, '" + helpJpgFilePath + "')]"), 1);
+        assertElementPresent("Did not find the expected number of icons for images for " + HELP_JPG_FILE.getName() + " from the runs.", Locator.xpath("//img[contains(@title, '" + HELP_JPG_FILE.getName() + "')]"), 1);
 
         log("Export the grid to excel.");
         File exportedFile;
@@ -203,7 +206,7 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
 
             log("Validate that the 'File' (last) column is as expected.");
             assertEquals("Values in 'File' column not exported as expected [" + exportedFile.getName() + "]",
-                    Arrays.asList("Batch File Field", XLS_FILE.getName(), XLS_FILE.getName(), XLS_FILE.getName()),
+                    Arrays.asList("Batch File Field", "assaydata" + File.separator + XLS_FILE.getName(), "assaydata" + File.separator + XLS_FILE.getName(), "assaydata" + File.separator + XLS_FILE.getName()),
                     ExcelHelper.getColumnData(workbook.getSheetAt(workbook.getActiveSheetIndex()), 7));
         }
 
@@ -221,7 +224,7 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
         log("Verify that the other 'File' fields are not affected.");
         assertElementPresent("Did not find the expected number of icons for images for " + PNG01_FILE.getName() + " from the runs.", Locator.xpath("//img[contains(@title, '" + PNG01_FILE.getName() + "')]"), 3);
         assertElementPresent("Did not find the expected number of icons for images for " + LRG_PNG_FILE.getName() + " from the runs.", Locator.xpath("//img[contains(@title, '" + LRG_PNG_FILE.getName() + "')]"), 1);
-        assertElementPresent("Did not find the expected number of icons for images for " + helpJpgFilePath + " from the runs.", Locator.xpath("//img[contains(@title, '" + helpJpgFilePath + "')]"), 1);
+        assertElementPresent("Did not find the expected number of icons for images for " + HELP_JPG_FILE.getName() + " from the runs.", Locator.xpath("//img[contains(@title, '" + HELP_JPG_FILE.getName() + "')]"), 1);
 
 
         log("Export the grid to excel again and make sure that everything is as expected.");
@@ -283,7 +286,7 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
 
         exportedColumn = ExcelHelper.getColumnData(sheet, 5);
         assertEquals("Values in 'File' column not exported as expected [" + exportedFile.getName() + "]",
-                Arrays.asList("Run File Field", PNG01_FILE.getName(), PNG01_FILE.getName(), PNG01_FILE.getName()),
+                Arrays.asList("Run File Field", "assaydata" + File.separator + PNG01_FILE.getName(), "assaydata" + File.separator + PNG01_FILE.getName(), "assaydata" + File.separator + PNG01_FILE.getName()),
                 exportedColumn);
 
     }
