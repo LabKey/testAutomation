@@ -86,12 +86,14 @@ public class IssuesTest extends BaseWebDriverTest
     private static final String USER2 = "user2_issuetest@issues.test";
     private static final String USER3 = "user3_issuetest@issues.test";
     private static final String USER4 = "user4_issuetest@issues.test";
+    private static final String CLIENT_USER1 = "clientuser1_issuetest@issues.test";
     private static final String user = "reader@issues.test";
     private static final Map<String, String> ISSUE_0 = new HashMap<>(Maps.of("title", ISSUE_TITLE_0, "Priority", "2", "comment", "a bright flash of light"));
     private static final Map<String, String> ISSUE_1 = new HashMap<>(Maps.of("title", ISSUE_TITLE_1, "Priority", "1", "comment", "alien autopsy"));
     private static final String ISSUE_SUMMARY_WEBPART_NAME = "Issues Summary";
     private static final String ISSUE_LIST_REGION_NAME = "issues-issues";
     private static final String TEST_GROUP = "testers";
+    private static final String CLIENT_GROUP = "clients";
     private static final String TEST_EMAIL_TEMPLATE =
             "You can review this issue here: ^detailsURL^\n" +
                     "Modified by: ^user^\n" +
@@ -105,6 +107,7 @@ public class IssuesTest extends BaseWebDriverTest
     private static String NAME;
     protected IssuesHelper _issuesHelper;
     private final ApiPermissionsHelper _permissionsHelper = new ApiPermissionsHelper(this);
+    private static String CLIENT_PORTAL = "Client Issues";
 
     public IssuesTest()
     {
@@ -158,8 +161,9 @@ public class IssuesTest extends BaseWebDriverTest
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        _userHelper.deleteUsers(false, USER1, USER2, USER3, USER4);
+        _userHelper.deleteUsers(false, USER1, USER2, USER3, CLIENT_USER1);
         _containerHelper.deleteProject(getProjectName(), afterTest);
+        _containerHelper.deleteProject(CLIENT_PORTAL, afterTest);
     }
 
     public void doInit()
@@ -193,6 +197,15 @@ public class IssuesTest extends BaseWebDriverTest
         waitAndClickAndWait(Locator.linkContainingText(ISSUE_SUMMARY_WEBPART_NAME));
         _issuesHelper.addIssue(ISSUE_0);
         _issuesHelper.addIssue(ISSUE_1);
+
+        // Create a second project with different permissions
+        _containerHelper.createProject(CLIENT_PORTAL);
+        goToProjectHome(CLIENT_PORTAL);
+        _userHelper.createUser(CLIENT_USER1);
+        _permissionsHelper.createPermissionsGroup(CLIENT_GROUP);
+        _permissionsHelper.setPermissions(CLIENT_GROUP, "Editor");
+        _permissionsHelper.addUserToProjGroup(CLIENT_USER1, CLIENT_PORTAL, CLIENT_GROUP);
+        _issuesHelper.createNewIssuesList("tickets", _containerHelper);
     }
 
     @Before
@@ -834,7 +847,32 @@ public class IssuesTest extends BaseWebDriverTest
                 .clickSubMenu(false, "Hide related comments");
         assertElementNotVisible(related);
 
-        // NOTE: still need to test for case where user doesn't have permission to related issue...
+        // related issue permission tests
+        Locator commentLocator = Locator.name("related");
+        goToProjectHome(CLIENT_PORTAL);
+        waitAndClickAndWait(Locator.linkContainingText(ISSUE_SUMMARY_WEBPART_NAME));
+        String clientIssueId = _issuesHelper.addIssue(Maps.of("assignedTo", NAME, "title", "Client ticket", "priority", "3", "related", issueIdA)).getIssueId();
+
+        // impersonate a user without permissions to the related issues
+        impersonate(CLIENT_USER1);
+        clickAndWait(Locator.linkWithText("Issues List"));
+        clickAndWait(Locator.linkWithText(clientIssueId));
+        updateIssue();
+        setFormElement(Locator.name("comment"), "This should work");
+        clickButton("Save");
+
+        // try to add related issue they don't have permission to see
+        updateIssue();
+        setFormElement(relatedLocator, String.format("%s,%s", issueIdA, issueIdB));
+        clickButton("Save");
+        assertTextPresent("User does not have Read Permission for related issue");
+
+        // Issue 53820 try to remove a related issue they don't have permission to see
+        setFormElement(relatedLocator, "");
+        clickButton("Save");
+        assertTextPresent(String.format("User does not have Read Permission for related issue '%s'", issueIdA));
+        clickButton("Cancel");
+        stopImpersonating();
     }
 
     @Test

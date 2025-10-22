@@ -208,6 +208,13 @@ public class ListTest extends BaseWebDriverTest
         return PROJECT_VERIFY;
     }
 
+    @Override
+    protected void doCleanup(boolean afterTest)
+    {
+        _containerHelper.deleteProject(PROJECT_VERIFY, afterTest);
+        _containerHelper.deleteProject(PROJECT_OTHER, afterTest);
+    }
+
     @BeforeClass
     public static void setupProject()
     {
@@ -1629,7 +1636,7 @@ public class ListTest extends BaseWebDriverTest
         // setup a list with an auto-increment key that we need to make sure is encoded in the form input
         String encodedListName = "autoIncrementEncodeList";
         String keyName = "'><script>alert(\":(\")</script>'";
-        String encodedKeyFieldName = EscapeUtil.getFormFieldName(keyName).replaceAll("\"", "&quot;");
+        String encodedKeyFieldName = EscapeUtil.getFormFieldName(keyName);
         _listHelper.createList(PROJECT_VERIFY, encodedListName, keyName, col("Name", ColumnType.String));
         _listHelper.goToList(encodedListName);
 
@@ -1639,10 +1646,9 @@ public class ListTest extends BaseWebDriverTest
         customizeView.addColumn(EscapeUtil.fieldKeyEncodePart(keyName));
         customizeView.applyCustomView();
 
-        // insert a new row and verify the key is encoded in the form input
+        // insert a new row and verify the key field is not present
         table.clickInsertNewRow();
-        String html = getHtmlSource();
-        checker().verifyFalse("List key hidden input not present.", html.contains(encodedKeyFieldName));
+        checker().withScreenshot().verifyEquals("List fields on insert form.", List.of("quf_Name"), getQueryFormFieldNames());
         String nameValue = "test";
         setFormElement(Locator.name(EscapeUtil.getFormFieldName("Name")), nameValue);
         clickButton("Submit");
@@ -1654,8 +1660,7 @@ public class ListTest extends BaseWebDriverTest
 
         // verify name value can be updated
         table.clickEditRow(0);
-        html = getHtmlSource();
-        checker().verifyTrue("List key hidden input not present.", html.contains(encodedKeyFieldName));
+        checker().withScreenshot().verifyEquals("List fields on update form.", List.of("quf_Name", encodedKeyFieldName), getQueryFormFieldNames());
         nameValue = "test updated";
         setFormElement(Locator.name(EscapeUtil.getFormFieldName("Name")), nameValue);
         clickButton("Submit");
@@ -1666,6 +1671,14 @@ public class ListTest extends BaseWebDriverTest
         checker().verifyEquals("Name value not as expected", nameValue, table.getDataAsText(0, "Name"));
 
         _listHelper.deleteList();
+    }
+
+    private List<String> getQueryFormFieldNames()
+    {
+        return Locator.tag("input").attributeStartsWith("name", "quf_")
+            .findElements(getDriver()).stream()
+            .map(el -> el.getDomAttribute("name"))
+            .toList();
     }
 
     private void viewRawTableMetadata(String listName)
