@@ -133,7 +133,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
     private static final String THUMBNAIL_FOLDER = "thumbnails/";
     private static final String THUMBNAIL_FILENAME = "Thumbnail.png";
-    private static final String ICON_FILENAME = "/SmallThumbnail.png";
+    private static final String ICON_FILENAME = "SmallThumbnail.png";
 
     private static final String KNITR_PEOPLE = "Knitr People";
     private static final String SUPER_COOL_R_REPORT = "Super Cool R Report";
