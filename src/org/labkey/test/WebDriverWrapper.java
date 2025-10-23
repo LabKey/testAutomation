@@ -1235,6 +1235,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
             long elapsedTime = doAndWaitForPageToLoad(() -> {
                 try
                 {
+                    mouseOut();
                     getDriver().navigate().to(fullURL);
                 }
                 catch (TimeoutException ex)
@@ -3006,9 +3007,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         try
         {
             scrollToTop();
-            WebElement root = Locators.documentRoot.findElement(getDriver());
-            final Dimension rootSize = root.getSize();
-            new Actions(getDriver()).moveToElement(root, - (rootSize.getWidth() / 2), - (rootSize.getHeight() / 2)).perform();
+            new Actions(getDriver()).moveToLocation(0, 0).perform();
         }
         catch (WebDriverException ignore) { }
     }
