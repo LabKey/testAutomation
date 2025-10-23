@@ -46,7 +46,12 @@ public class TestCredentials
     {
         if (null == credentialsFile)
         {
-            setCredentialsFile(new File(System.getProperty("test.credentials.file", TestFileUtils.getTestRoot() + "/test.credentials.json")));
+            String credentialsFileLocation = System.getProperty("test.credentials.file");
+            if (credentialsFileLocation == null || credentialsFileLocation.isEmpty())
+            {
+                credentialsFileLocation = TestFileUtils.getTestRoot() + "/test.credentials.json";
+            }
+            setCredentialsFile(new File(credentialsFileLocation));
         }
         return credentialsFile;
     }
