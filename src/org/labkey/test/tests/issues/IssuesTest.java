@@ -848,10 +848,9 @@ public class IssuesTest extends BaseWebDriverTest
         assertElementNotVisible(related);
 
         // related issue permission tests
-        Locator commentLocator = Locator.name("related");
         goToProjectHome(CLIENT_PORTAL);
         waitAndClickAndWait(Locator.linkContainingText(ISSUE_SUMMARY_WEBPART_NAME));
-        String clientIssueId = _issuesHelper.addIssue(Maps.of("assignedTo", NAME, "title", "Client ticket", "priority", "3", "related", issueIdA)).getIssueId();
+        String clientIssueId = _issuesHelper.addIssue(Maps.of("AssignedTo", NAME, "title", "Client ticket", "Priority", "3", "related", issueIdA)).getIssueId();
 
         // impersonate a user without permissions to the related issues
         impersonate(CLIENT_USER1);

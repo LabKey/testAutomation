@@ -73,7 +73,7 @@ public class GridPanelBaseTest extends BaseWebDriverTest
 
     protected void initProject()
     {
-        _containerHelper.createProject(getProjectName(), null);
+        _containerHelper.createProject(getProjectName(), "Collaboration");
 
         // Add the 'Sample Types' web part. It is easier when debugging etc...
         new PortalHelper(this).addWebPart("Sample Types");
