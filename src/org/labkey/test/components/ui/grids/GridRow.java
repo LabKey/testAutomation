@@ -45,6 +45,11 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
         return _grid.hasSelectColumn();
     }
 
+    public boolean hasConditionalFormatPill(CharSequence columnIdentifier)
+    {
+        return Locator.tagWithClass("*", "status-pill").existsIn(getCell(columnIdentifier));
+    }
+
     /**
      * Returns the selected state of the row selector checkbox, if one is present
      * @return true if the select checkbox is checked.
@@ -74,6 +79,11 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
         return this;
     }
 
+    public ReactCheckBox getCheckbox()
+    {
+        return elementCache().selectCheckbox;
+    }
+
     /**
      * gets the cell at the specified index
      */
@@ -88,6 +98,16 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
     public WebElement getCell(CharSequence columnIdentifier)
     {
         return getCell(_grid.getColumnIndex(columnIdentifier));
+    }
+
+    /**
+     * gets the style attribute of the value-wrapper for the specified cell
+     * @return
+     */
+    public String getCellStyle(CharSequence columnIdentifier)
+    {
+        var cell =  getCell(columnIdentifier);
+        return Locator.tagWithClass("span", "ws-pre-wrap").findElement(cell).getAttribute("style");
     }
 
     /**

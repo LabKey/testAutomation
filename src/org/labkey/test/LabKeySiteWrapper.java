@@ -1530,7 +1530,6 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     protected SelectRowsResponse executeSelectRowCommand(String schemaName, String queryName, ContainerFilter containerFilter,
                                                          String path, @Nullable List<Filter> filters, @Nullable List<String> requestedColumns)
     {
-        Connection cn = createDefaultConnection();
         SelectRowsCommand selectCmd = new SelectRowsCommand(schemaName, queryName);
         selectCmd.setMaxRows(-1);
         selectCmd.setContainerFilter(containerFilter);
@@ -1538,18 +1537,19 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         if (filters != null)
             selectCmd.setFilters(filters);
 
-        SelectRowsResponse selectResp;
+        return executeSelectRowCommand(path, selectCmd);
+    }
 
+    protected SelectRowsResponse executeSelectRowCommand(String containerPath, SelectRowsCommand command)
+    {
         try
         {
-            selectResp = selectCmd.execute(cn, path);
+            return command.execute(createDefaultConnection(), containerPath);
         }
         catch (CommandException | IOException e)
         {
             throw new RuntimeException(e);
         }
-
-        return selectResp;
     }
 
     // Returns the text contents of every "Status" cell in the pipeline StatusFiles grid

@@ -138,10 +138,10 @@ public class DataViewsReportOrderingTest extends BaseWebDriverTest
     @Test
     public void testRootFolderAccess()
     {
-        // Regression for issue 53630
+        // Regression for Issue 53630
         ShowUsersPage showUsersPage = goToSiteUsers();
         ManageViewsPage mvp = showUsersPage.getUsersTable().openManageViews();
-        mvp.clickAddReport("R Report");
+        mvp.clickAddReport("Query Report");
     }
 
     @Override

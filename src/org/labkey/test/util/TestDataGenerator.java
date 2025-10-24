@@ -33,6 +33,7 @@ import org.labkey.remoteapi.domain.CreateDomainCommand;
 import org.labkey.remoteapi.domain.DomainResponse;
 import org.labkey.remoteapi.domain.PropertyDescriptor;
 import org.labkey.remoteapi.query.Filter;
+import org.labkey.remoteapi.query.ImportDataResponse;
 import org.labkey.remoteapi.query.RowsResponse;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.remoteapi.query.Sort;
@@ -81,7 +82,6 @@ public class TestDataGenerator
     public static final char REPEAT_PLACEHOLDER = '\u22EF'; // '⋯' - Used to indicate that the char will be repeated
     public static final char ALL_CHARS_PLACEHOLDER = '\u2211'; // '∑' - Used to indicate that all characters from the charset should be used
     public static final String NON_LATIN_STRING = "\u0438\u0418\uC548\u306F"; // "иИ안は"
-    // chose a Character random from this String
     public static final String CHARSET_STRING = "ABCDEFG01234abcdefvxyz~!@#$%^&*()-+=_{}[]|\\:;\"',.<>" + NON_LATIN_STRING + WIDE_PLACEHOLDER;
     public static final String ALPHANUMERIC_STRING = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvxyz";
     public static final String DOMAIN_SPECIAL_STRING =  "+- _.:&()/";
@@ -612,6 +612,16 @@ public class TestDataGenerator
         return randomFieldName(part, null);
     }
 
+    public static String randomFieldName(String part, int maxLength)
+    {
+        return randomFieldName(part, null, null, null, null, maxLength);
+    }
+
+    public static String randomFieldName(String part, @Nullable DomainKind domainKind, Integer maxLength)
+    {
+        return randomFieldName(part, null, null, null, domainKind, maxLength);
+    }
+
     public static String randomFieldName(String part, @Nullable String exclusion)
     {
         return randomFieldName(part, exclusion, null);
@@ -624,6 +634,11 @@ public class TestDataGenerator
 
     public static String randomFieldName(@NotNull String part, @Nullable Integer numStartChars, @Nullable Integer numEndChars, @Nullable String exclusion, @Nullable DomainKind domainKind)
     {
+        return randomFieldName(part, numStartChars, numEndChars, exclusion, domainKind, null);
+    }
+
+    public static String randomFieldName(@NotNull String part, @Nullable Integer numStartChars, @Nullable Integer numEndChars, @Nullable String exclusion, @Nullable DomainKind domainKind, @Nullable Integer maxLength)
+    {
         DomainKind _domainKind = domainKind == null ? DomainKind.SampleSet : domainKind;
 
         // use the characters that we know are encoded in fieldKeys plus characters that we know clients are using
@@ -633,7 +648,7 @@ public class TestDataGenerator
 
         int currentTries = 0;
         RandomName randomFieldName = randomName(part, getNumChars(numStartChars, 5), getNumChars(numEndChars, 50), chars, exclusion);
-        while (isDomainAndFieldNameInvalid(_domainKind, null, randomFieldName))
+        while ((maxLength != null && randomFieldName.name().length() > maxLength) || isDomainAndFieldNameInvalid(_domainKind, null, randomFieldName))
         {
             randomFieldName = randomName(part, getNumChars(numStartChars, 5), getNumChars(numEndChars, 50), chars, exclusion);
             if (++currentTries >= MAX_RANDOM_TRIES)
@@ -703,7 +718,7 @@ public class TestDataGenerator
                 return true;
             if (!Character.isLetterOrDigit(domainName.name().charAt(0)))
                 return true; // domain needs to start with alphanumeric char
-            if (Pattern.matches("(.*\\s--[^ ].*)|(.*\\s-[^- ].*)", domainName.name()))
+            if (Pattern.matches("(.*\\s--[^ ].*)|(.*\\s-.*)", domainName.name()))
                 return true; // domain name must not contain space followed by dash. (command like: Issue 49161)
 
             int maxLength = switch (domainKind)
@@ -919,6 +934,26 @@ public class TestDataGenerator
     public RowsResponse insertRows(Connection cn, List<Map<String, Object>> rows) throws IOException, CommandException
     {
         return getQueryHelper(cn).insertRows(rows);
+    }
+
+    public ImportDataResponse importRows() throws IOException, CommandException
+    {
+        return importRows(false);
+    }
+
+    public ImportDataResponse importRows(boolean lookupByAlternateKey) throws IOException, CommandException
+    {
+        return importRows(WebTestHelper.getRemoteApiConnection(), lookupByAlternateKey);
+    }
+
+    public ImportDataResponse importRows(Connection cn, boolean lookupByAlternateKey) throws IOException, CommandException
+    {
+        return importRows(cn, getRows(), lookupByAlternateKey);
+    }
+
+    public ImportDataResponse importRows(Connection cn, List<Map<String, Object>> rows, boolean lookupByAlternateKey) throws IOException, CommandException
+    {
+        return getQueryHelper(cn).importData(TestDataUtils.stringFromRows(TestDataUtils.rowListsFromMaps(rows)), lookupByAlternateKey);
     }
 
     public static <T> List<T> shuffleSelect(List<T> allFields, int selectCount)

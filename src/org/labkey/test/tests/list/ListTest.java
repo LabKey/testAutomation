@@ -16,7 +16,6 @@
 
 package org.labkey.test.tests.list;
 
-import org.apache.commons.lang3.StringUtils;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.MatcherAssert;
 import org.junit.Before;
@@ -34,7 +33,6 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.TestFileUtils;
-import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Data;
@@ -52,8 +50,8 @@ import org.labkey.test.pages.list.GridPage;
 import org.labkey.test.pages.query.UpdateQueryRowPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldDefinition.StringLookup;
+import org.labkey.test.params.FieldInfo;
 import org.labkey.test.params.FieldKey;
-import org.labkey.test.params.list.IntListDefinition;
 import org.labkey.test.params.list.VarListDefinition;
 import org.labkey.test.tests.AuditLogTest;
 import org.labkey.test.util.AbstractDataRegionExportOrSignHelper.ColumnHeaderType;
@@ -67,6 +65,7 @@ import org.labkey.test.util.Maps;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.TestDataGenerator;
 import org.labkey.test.util.TextSearcher;
+import org.labkey.test.util.data.TestDataUtils;
 import org.labkey.test.util.search.SearchAdminAPIHelper;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -209,6 +208,13 @@ public class ListTest extends BaseWebDriverTest
         return PROJECT_VERIFY;
     }
 
+    @Override
+    protected void doCleanup(boolean afterTest)
+    {
+        _containerHelper.deleteProject(PROJECT_VERIFY, afterTest);
+        _containerHelper.deleteProject(PROJECT_OTHER, afterTest);
+    }
+
     @BeforeClass
     public static void setupProject()
     {
@@ -224,13 +230,6 @@ public class ListTest extends BaseWebDriverTest
         log("Create second project");
         _containerHelper.createProject(PROJECT_OTHER, null);
         goToProjectHome();
-    }
-
-    @Override
-    protected void doCleanup(boolean afterTest) throws TestTimeoutException
-    {
-        _containerHelper.deleteProject(getProjectName(), afterTest);
-        _containerHelper.deleteProject(PROJECT_OTHER, afterTest);
     }
 
     @Before
@@ -535,26 +534,27 @@ public class ListTest extends BaseWebDriverTest
     public void testLongName()
     {
         String listName = "A_+-:''.¡™£¢∞§¶•ªº–≠œ∑´®†¥¨ˆøπ“‘«æ…¬˚∆˙©√ƒ∂ßΩ≈ç√∫µ≤≥÷‹›ﬁﬂ‡°·‚—±⁄€‹›‡‰Æ«»¢∫√∑∏∂";
-        String fieldWithDefault = TestDataGenerator.randomFieldName("With Default", null, DomainUtils.DomainKind.IntList);
+        var fieldWithDefault = FieldInfo.random("With Default", ColumnType.String);
         EditListDefinitionPage listEditPage = _listHelper.beginCreateList(getProjectName(), listName);
         listEditPage.manuallyDefineFieldsWithAutoIncrementingKey("Key");
-        listEditPage.addField(new FieldDefinition(fieldWithDefault, ColumnType.String));
+        listEditPage.addField(fieldWithDefault.getFieldDefinition());
         listEditPage.clickSave();
 
         listEditPage = _listHelper.goToEditDesign(listName);
         var page = listEditPage.getFieldsPanel()
                 .expand()
-                .getField(fieldWithDefault)
+                .getField(fieldWithDefault.getName())
                 .clickAdvancedSettings()
                 .clickDefaultValuesLink();
-        var input = Locator.tagContainingText("td", "With Default").followingSibling("td").descendant("input").findElement(page.getDriver());
+        var input = Locator.tagContainingText("td", fieldWithDefault.getLabel()).followingSibling("td")
+                .descendant("input").findElement(page.getDriver());
         setFormElement(input, "42");
         clickButton("Save Defaults");
         _listHelper.beginAtList(getProjectName(), listName);
 
         DataRegionTable list = new DataRegionTable("query", getDriver());
         UpdateQueryRowPage updatePage = list.clickInsertNewRow();
-        checker().verifyEquals("Default value not as expected ", "42", updatePage.getTextInputValue(fieldWithDefault));
+        checker().verifyEquals("Default value not as expected ", "42", updatePage.getTextInputValue(fieldWithDefault.getName()));
         updatePage.submit();
     }
 
@@ -1055,7 +1055,7 @@ public class ListTest extends BaseWebDriverTest
         final String dummyCol = dummyBase + TRICKY_CHARACTERS;
         final String lookupField = "lookupField" + TRICKY_CHARACTERS;
         final String lookupSchema = "lists";
-        final String keyCol = "Key &%<+";
+        final String keyCol = "Key &%<+\\"; // Issue 54094: Verify key field ending with "\"
 
         log("Issue 6883: test list self join");
 
@@ -1636,7 +1636,7 @@ public class ListTest extends BaseWebDriverTest
         // setup a list with an auto-increment key that we need to make sure is encoded in the form input
         String encodedListName = "autoIncrementEncodeList";
         String keyName = "'><script>alert(\":(\")</script>'";
-        String encodedKeyFieldName = EscapeUtil.getFormFieldName(keyName).replaceAll("\"", "&quot;");
+        String encodedKeyFieldName = EscapeUtil.getFormFieldName(keyName);
         _listHelper.createList(PROJECT_VERIFY, encodedListName, keyName, col("Name", ColumnType.String));
         _listHelper.goToList(encodedListName);
 
@@ -1646,10 +1646,9 @@ public class ListTest extends BaseWebDriverTest
         customizeView.addColumn(EscapeUtil.fieldKeyEncodePart(keyName));
         customizeView.applyCustomView();
 
-        // insert a new row and verify the key is encoded in the form input
+        // insert a new row and verify the key field is not present
         table.clickInsertNewRow();
-        String html = getHtmlSource();
-        checker().verifyFalse("List key hidden input not present.", html.contains(encodedKeyFieldName));
+        checker().withScreenshot().verifyEquals("List fields on insert form.", List.of("quf_Name"), getQueryFormFieldNames());
         String nameValue = "test";
         setFormElement(Locator.name(EscapeUtil.getFormFieldName("Name")), nameValue);
         clickButton("Submit");
@@ -1661,8 +1660,7 @@ public class ListTest extends BaseWebDriverTest
 
         // verify name value can be updated
         table.clickEditRow(0);
-        html = getHtmlSource();
-        checker().verifyTrue("List key hidden input not present.", html.contains(encodedKeyFieldName));
+        checker().withScreenshot().verifyEquals("List fields on update form.", List.of("quf_Name", encodedKeyFieldName), getQueryFormFieldNames());
         nameValue = "test updated";
         setFormElement(Locator.name(EscapeUtil.getFormFieldName("Name")), nameValue);
         clickButton("Submit");
@@ -1673,6 +1671,14 @@ public class ListTest extends BaseWebDriverTest
         checker().verifyEquals("Name value not as expected", nameValue, table.getDataAsText(0, "Name"));
 
         _listHelper.deleteList();
+    }
+
+    private List<String> getQueryFormFieldNames()
+    {
+        return Locator.tag("input").attributeStartsWith("name", "quf_")
+            .findElements(getDriver()).stream()
+            .map(el -> el.getDomAttribute("name"))
+            .toList();
     }
 
     private void viewRawTableMetadata(String listName)
@@ -2051,11 +2057,16 @@ public class ListTest extends BaseWebDriverTest
 
     void createList(String name, List<FieldDefinition> cols, String[][] data)
     {
+        createList(name, cols, toTSV(cols,data));
+    }
+
+    void createList(String name, List<FieldDefinition> cols, String tsvData)
+    {
         log("Add List -- " + name);
         _listHelper.createList(PROJECT_VERIFY, name, cols.get(0), cols.subList(1, cols.size()).toArray(new FieldDefinition[cols.size() - 1]));
         _listHelper.goToList(name);
         _listHelper.clickImportData();
-        setListImportAsTestDataField(toTSV(cols,data));
+        setListImportAsTestDataField(tsvData);
     }
 
     private void setListImportAsTestDataField(String data, String... expectedErrors)
@@ -2158,6 +2169,46 @@ public class ListTest extends BaseWebDriverTest
 
         clickAndWait(Locator.linkWithText(pks.get(0)));
         assertElementPresent(Locator.tagContainingText("td", pks.get(0)));
+    }
+
+    @Test // Issue 53979
+    public void testDecimalFieldFiniteValues()
+    {
+        String listName = "DecimalFieldList";
+        FieldInfo decField = FieldInfo.random("decimalField", ColumnType.Decimal);
+        List<Map<String, Object>> rowMaps = new ArrayList<>();
+        rowMaps.add(Map.of("key", 1, decField.getName(), "1.1"));
+        rowMaps.add(Map.of("key", 2, decField.getName(), "1.7976931348623157e+308"));
+        rowMaps.add(Map.of("key", 3, decField.getName(), "-1.7976931348623157e+308"));
+        rowMaps.add(Map.of("key", 4, decField.getName(), "Infinity"));
+        rowMaps.add(Map.of("key", 5, decField.getName(), "-Infinity"));
+        rowMaps.add(Map.of("key", 6, decField.getName(), "Inf"));
+        rowMaps.add(Map.of("key", 7, decField.getName(), "-Inf"));
+        rowMaps.add(Map.of("key", 8, decField.getName(), "NaN"));
+
+        createList(listName, List.of(
+                new FieldDefinition("key", ColumnType.Integer),
+                decField.getFieldDefinition()
+        ), TestDataUtils.tsvStringFromRowMaps(rowMaps, List.of("key", decField.getName()), true));
+
+        DataRegionTable table = new DataRegionTable("query", getDriver());
+        checker().verifyEquals("Decimal field values not as expected",
+                List.of("1.1", "1.7976931348623157E308", "-1.7976931348623157E308", "Infinity", "-Infinity", "Infinity", "-Infinity", "NaN"),
+                table.getColumnDataAsText(decField.getName()));
+
+        table.clickInsertNewRow();
+        setFormElement(Locator.name(EscapeUtil.getFormFieldName("key")), "9");
+        setFormElement(Locator.name(EscapeUtil.getFormFieldName(decField.getName())), "bogus");
+        clickButton("Submit");
+        assertTextPresent("Could not convert value: bogus");
+
+        setFormElement(Locator.name(EscapeUtil.getFormFieldName(decField.getName())), "1.7976931348623157e+309");
+        clickButton("Submit");
+        assertTextPresent("Could not convert value: 1.7976931348623157e+309");
+
+        setFormElement(Locator.name(EscapeUtil.getFormFieldName(decField.getName())), "-1.7976931348623157e+309");
+        clickButton("Submit");
+        assertTextPresent("Could not convert value: -1.7976931348623157e+309");
     }
 
     @Override

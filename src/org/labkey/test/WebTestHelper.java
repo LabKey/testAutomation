@@ -34,6 +34,7 @@ import org.apache.hc.client5.http.io.HttpClientConnectionManager;
 import org.apache.hc.client5.http.protocol.HttpClientContext;
 import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory;
 import org.apache.hc.client5.http.ssl.TrustSelfSignedStrategy;
+import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.core5.http.HttpHost;
 import org.apache.hc.core5.http.config.CharCodingConfig;
 import org.apache.hc.core5.ssl.SSLContextBuilder;
@@ -808,7 +809,7 @@ public class WebTestHelper
         return localcontext;
     }
 
-    public static String getHttpResponseBody(CloseableHttpResponse response)
+    public static String getHttpResponseBody(ClassicHttpResponse response)
     {
         StringBuilder builder = new StringBuilder();
         try

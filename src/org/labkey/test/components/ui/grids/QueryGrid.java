@@ -16,6 +16,7 @@ import org.labkey.test.components.react.ReactCheckBox;
 import org.labkey.test.components.ui.FilterStatusValue;
 import org.labkey.test.util.selenium.WebElementUtils;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
@@ -273,7 +274,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
             doAndWaitForUpdate(obValue::remove);
         }
 
-        Assert.assertEquals("not all of the filter values were cleared", 0, elementCache().getFilterStatusFilterValues().size());
+        Assert.assertEquals("Not all of the filter values were cleared.", 0, elementCache().getFilterStatusFilterValues().size());
         return this;
     }
 
@@ -291,6 +292,11 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     public boolean hasSelectAllButton()
     {
         return elementCache().selectAllBtnLoc.findWhenNeeded(this).isDisplayed();
+    }
+
+    public WebElement getSelectAllButton()
+    {
+        return elementCache().selectAllBtnLoc.findWhenNeeded(this);
     }
 
     /**
@@ -317,7 +323,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
 
     public boolean hasItemsSelected()
     {
-        return Locator.tagWithClass("span", "selection-status__count").existsIn(elementCache());
+        return Locator.byClass("selection-status__count").existsIn(elementCache());
     }
 
     public String getSelectionStatusCount()
@@ -342,6 +348,8 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
                 doAndWaitForUpdate(() -> selectAllOnPage(false));
             }
         }
+
+        Assert.assertFalse("Did not successfully clear all the selected items in the grid.", hasItemsSelected());
 
         return this;
     }
@@ -713,7 +721,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     public QueryChartPanel showChart(String chartName)
     {
         elementCache().chartsMenu.clickSubMenu(false, chartName);
-        return getChartPanel();
+        return getChartPanel(chartName);
     }
 
     public QueryChartDialog createChart()
@@ -722,12 +730,39 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         return new QueryChartDialog("Create Chart", getDriver(), this);
     }
 
-    /*
-        gets a chart panel that is already being shown
-     */
-    public QueryChartPanel getChartPanel()
+    public boolean createChartIsDisabled()
     {
-        return new QueryChartPanel.QueryChartPanelFinder(getDriver(), this).waitFor(this);
+        return chartIsDisabled("Create Chart");
+    }
+
+    public boolean chartIsDisabled(String name)
+    {
+        elementCache().chartsMenu.expand();
+        return elementCache().chartsMenu.menuItemIsDisabled(name);
+    }
+
+    public boolean chartIsSelected(String name)
+    {
+        elementCache().chartsMenu.expand();
+        List<WebElement> menuItems = elementCache().chartsMenu.findVisibleMenuItems();
+
+        Optional<WebElement> menuItem = menuItems.stream().filter(item -> item.getText().contains(name)).findFirst();
+
+        if (menuItem.isEmpty()) {
+            throw new NoSuchElementException(String.format("Could not find chart menu item %s", name));
+        }
+
+        WebElement checkbox = menuItem.get().findElement(Locator.byClass("chart-menu-checkbox"));
+
+        return checkbox.getAttribute("class").contains("fa-check-square");
+    }
+
+    /*
+        gets a chart panel that is already being shown for a given chart name
+     */
+    public QueryChartPanel getChartPanel(String name)
+    {
+        return new QueryChartPanel.QueryChartPanelFinder(getDriver(), this, name).waitFor(this);
     }
 
     public WebElement showRReport(String reportName)
@@ -736,9 +771,9 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         return elementCache().rReport();
     }
 
-    public void closeChart()
+    public void closeChart(String name)
     {
-        getChartPanel().clickClose();
+        getChartPanel(name).clickClose();
     }
 
     @Override
@@ -763,9 +798,9 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
 
         final Locator.XPathLocator selectionStatusContainerLoc = Locator.tagWithClass("div", "selection-status");
         final Locator selectAllBtnLoc = selectionStatusContainerLoc.append(Locator.tagWithClass("span", "selection-status__select-all")
-                .child(Locator.buttonContainingText("Select all")));
-        final Locator clearBtnLoc = selectionStatusContainerLoc.append(Locator.tagWithClass("span", "selection-status__clear-all")
-                .child(Locator.tagContainingText("button", "Clear")));
+                .child(Locator.buttonContainingText("Select")));
+        final Locator clearBtnLoc = selectionStatusContainerLoc.append(Locator.byClass("selection-status__clear-all")
+                .child(Locator.tag("button")));
 
         final WebElement filterStatusPanel = Locator.css("div.grid-panel__filter-status").findWhenNeeded(this);
 

@@ -15,11 +15,9 @@
  */
 package org.labkey.test;
 
-import org.apache.commons.compress.archivers.ArchiveException;
 import org.apache.commons.compress.archivers.ArchiveStreamFactory;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
-import org.apache.commons.io.FileSystem;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -40,6 +38,7 @@ import org.bouncycastle.openpgp.operator.jcajce.JcaPGPDigestCalculatorProviderBu
 import org.bouncycastle.openpgp.operator.jcajce.JcePBEDataDecryptorFactoryBuilder;
 import org.bouncycastle.util.io.Streams;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.openqa.selenium.NotFoundException;
 
 import java.io.BufferedInputStream;
@@ -70,11 +69,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+
+import static org.labkey.test.util.TestDataGenerator.CHARSET_STRING;
+import static org.labkey.test.util.TestDataGenerator.randomInt;
+import static org.labkey.test.util.TestDataGenerator.randomName;
 
 /**
  * Static methods for finding and reading test-related files
@@ -628,16 +630,22 @@ public abstract class TestFileUtils
      * The output file is created in the output folder, having the same name
      * as the input file, minus the '.tar' extension.
      */
-    private static List<File> unTar(final File inputFile, final File outputDir) throws IOException, ArchiveException
+    private static List<File> unTar(final File inputFile, final File outputDir) throws IOException
     {
         final List<File> untaredFiles = new ArrayList<>();
         try (InputStream is = new FileInputStream(inputFile);
              TarArchiveInputStream inputStream = new ArchiveStreamFactory().createArchiveInputStream("tar", is))
         {
             TarArchiveEntry entry;
+            Path normalizedOutputPath = outputDir.toPath().normalize();
+
             while ((entry = inputStream.getNextEntry()) != null)
             {
                 final File outputFile = new File(outputDir, entry.getName());
+
+                if (!outputFile.toPath().normalize().startsWith(normalizedOutputPath))
+                    throw new IOException("Bad zip entry (" + entry.getName() + ") in " + inputFile.getAbsolutePath());
+
                 if (entry.isDirectory())
                 {
                     if (!outputFile.exists())
@@ -678,7 +686,7 @@ public abstract class TestFileUtils
         return outputFile;
     }
 
-    public static List<File> extractTarGz(File archive, File destDir) throws IOException, ArchiveException
+    public static List<File> extractTarGz(File archive, File destDir) throws IOException
     {
         destDir.mkdirs();
         return unTar(unGzip(archive, destDir), destDir);
@@ -717,15 +725,80 @@ public abstract class TestFileUtils
         return Streams.readAll(ld.getInputStream());
     }
 
-    private static final Pattern badChars = Pattern.compile("[\\\\:/\\[\\]?*|]");
+    // NOTE: These constants are copied from FileUtil.java and should be kept in sync.
+    private static final char[] ILLEGAL_CHARS = {'/','\\',':','?','<','>','*','|','"','^', '\n', '\r', '\''};
+    public static final String ILLEGAL_CHARS_STRING = new String(ILLEGAL_CHARS);
 
     /**
      * Determining expected file names for downloaded files that are named according to some
-     * value that might include characters that are not legal for files
-     * @see FileSystem#toLegalFileName(String, char)
+     * value that might include characters that are not legal for files.
+     * NOTE: This implementation is expected to exactly match FileUtil.makeLegalName(String name) defined on the server.
      */
-    public static String makeLegalFileName(String candidate)
+    public static String makeLegalFileName(String name)
     {
-        return badChars.matcher(candidate).replaceAll("_");
+        if (name == null)
+        {
+            return "__null__";
+        }
+
+        if (name.isEmpty())
+        {
+            return "__empty__";
+        }
+
+        //limit to 255 chars (FAT and OS X)
+        //replace illegal chars
+        char[] ret = new char[Math.min(255, name.length())];
+        for(int idx = 0; idx < ret.length; ++idx)
+        {
+            char ch = name.charAt(idx);
+            // Reject characters that are illegal anywhere
+            if (StringUtils.contains(ILLEGAL_CHARS_STRING, ch) ||
+                    // Or characters that are illegal starts to a file name
+                    (idx == 0 && (ch == '-' || ch == '$')))
+            {
+                ch = '_';
+            }
+            else if (ch == '-' &&
+                    idx > 0 &&
+                    name.charAt(idx - 1) == ' ')
+            {
+                int i = idx + 1;
+                // Skip through as many consecutive '-' as there might be
+                while (i < name.length() && name.charAt(i) == '-')
+                {
+                    i++;
+                }
+                // If the next character after the '-' isn't a space, transform the leading '-' in the sequence
+                if (i < name.length() && name.charAt(i) != ' ')
+                {
+                    ch = '_';
+                }
+            }
+
+            ret[idx] = ch;
+        }
+
+        //can't end with space (windows)
+        //can't end with period (windows)
+        int lastIndex = ret.length - 1;
+        char ch = ret[lastIndex];
+        if (ch == ' ' || ch == '.')
+            ret[lastIndex] = '_';
+
+        return new String(ret);
+    }
+
+    public static String randomFileName(@NotNull String part, @Nullable String extension)
+    {
+        return randomFileName(part, extension, null, null);
+    }
+
+    public static String randomFileName(@NotNull String part, @Nullable String extension, @Nullable Integer numStartChars, @Nullable Integer numEndChars)
+    {
+        String baseName = makeLegalFileName(randomName(part, numStartChars == null ? randomInt(0, 5) : numStartChars, numEndChars == null ? randomInt(0, 5) : numEndChars, CHARSET_STRING, null).name());
+        if (extension != null)
+            return baseName + extension;
+        return baseName;
     }
 }

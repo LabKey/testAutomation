@@ -52,7 +52,7 @@ public class QueryChartPanel extends WebDriverComponent<QueryChartPanel.ElementC
 
     public WebElement getSvgChart()
     {
-        return Locator.byClass("svg-chart").waitForElement(this, WAIT_FOR_JAVASCRIPT);
+        return Locator.byClass("svg-chart__chart").childTag("svg").waitForElement(this, WAIT_FOR_JAVASCRIPT);
     }
 
     public QueryGrid clickClose()
@@ -100,11 +100,13 @@ public class QueryChartPanel extends WebDriverComponent<QueryChartPanel.ElementC
     {
         private final QueryGrid _queryGrid;
         private final Locator.XPathLocator _baseLocator = Locator.tagWithClass("div", "chart-panel");
+        private final String _name;
 
-        public QueryChartPanelFinder(WebDriver driver, QueryGrid queryGrid)
+        public QueryChartPanelFinder(WebDriver driver, QueryGrid queryGrid, String name)
         {
             super(driver);
             _queryGrid = queryGrid;
+            _name = name;
         }
 
         @Override
@@ -116,7 +118,8 @@ public class QueryChartPanel extends WebDriverComponent<QueryChartPanel.ElementC
         @Override
         protected Locator locator()
         {
-            return _baseLocator;
+            Locator.XPathLocator headingLocator = Locator.tagWithClass("div", "chart-panel__heading").withChild(Locator.tagWithClass("div", "chart-panel__heading-title").containing(_name));
+            return _baseLocator.withChild(headingLocator);
         }
     }
 }

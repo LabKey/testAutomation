@@ -190,7 +190,7 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
         log("Validate that two links to this image file are now present.");
         assertElementPresent("Did not find the expected number of icons for images for " + PNG01_FILE.getName() + " from the runs.", Locator.xpath("//img[contains(@title, '" + PNG01_FILE.getName() + "')]"), 3);
         assertElementPresent("Did not find the expected number of icons for images for " + LRG_PNG_FILE.getName() + " from the runs.", Locator.xpath("//img[contains(@title, '" + LRG_PNG_FILE.getName() + "')]"), 1);
-        assertElementPresent("Did not find the expected number of icons for images for " + helpJpgFilePath + " from the runs.", Locator.xpath("//img[contains(@title, '" + helpJpgFilePath + "')]"), 1);
+        assertElementPresent("Did not find the expected number of icons for images for " + HELP_JPG_FILE.getName() + " from the runs.", Locator.xpath("//img[contains(@title, '" + HELP_JPG_FILE.getName() + "')]"), 1);
 
         log("Export the grid to excel.");
         File exportedFile;
@@ -224,7 +224,7 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
         log("Verify that the other 'File' fields are not affected.");
         assertElementPresent("Did not find the expected number of icons for images for " + PNG01_FILE.getName() + " from the runs.", Locator.xpath("//img[contains(@title, '" + PNG01_FILE.getName() + "')]"), 3);
         assertElementPresent("Did not find the expected number of icons for images for " + LRG_PNG_FILE.getName() + " from the runs.", Locator.xpath("//img[contains(@title, '" + LRG_PNG_FILE.getName() + "')]"), 1);
-        assertElementPresent("Did not find the expected number of icons for images for " + helpJpgFilePath + " from the runs.", Locator.xpath("//img[contains(@title, '" + helpJpgFilePath + "')]"), 1);
+        assertElementPresent("Did not find the expected number of icons for images for " + HELP_JPG_FILE.getName() + " from the runs.", Locator.xpath("//img[contains(@title, '" + HELP_JPG_FILE.getName() + "')]"), 1);
 
 
         log("Export the grid to excel again and make sure that everything is as expected.");

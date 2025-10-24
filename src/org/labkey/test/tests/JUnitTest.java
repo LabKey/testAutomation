@@ -56,11 +56,14 @@ import org.labkey.test.util.ArtifactCollector;
 import org.labkey.test.util.JUnitFooter;
 import org.labkey.test.util.JUnitHeader;
 import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.TestDateUtils;
 import org.labkey.test.util.TestLogger;
+import org.labkey.test.util.Timer;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.SocketTimeoutException;
+import java.time.Duration;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -181,10 +184,10 @@ public class JUnitTest extends TestSuite
 
     public static TestSuite _suite(Predicate<Map<String,Object>> accept, boolean skipInitialUserChecks) throws Exception
     {
-        return _suite(accept, skipInitialUserChecks, 0, 0);
+        return _suite(accept, skipInitialUserChecks, new Timer(Duration.ofMinutes(5)), 0);
     }
 
-    private static TestSuite _suite(Predicate<Map<String,Object>> accept, boolean skipInitialUserChecks, final int startupAttempts, final int upgradeAttempts) throws Exception
+    private static TestSuite _suite(Predicate<Map<String,Object>> accept, boolean skipInitialUserChecks, final Timer startupTimer, final int upgradeAttempts) throws Exception
     {
         if (TestProperties.isPrimaryUserAppAdmin())
         {
@@ -196,17 +199,31 @@ public class JUnitTest extends TestSuite
         try (CloseableHttpClient client = WebTestHelper.getHttpClient())
         {
             final String url = WebTestHelper.getBaseURL() + "/junit-testlist.view";
-            HttpGet method = new HttpGet(url);
+            HttpGet ensureLogin = new HttpGet(WebTestHelper.buildURL("security", "ensureLogin.api"));
+            HttpGet getTestList = new HttpGet(url);
             try
             {
-                response = client.execute(method, context);
+                client.execute(ensureLogin, context, r -> {
+                    String ensureLoginResponse = WebTestHelper.getHttpResponseBody(r);
+                    try
+                    {
+                        JSONObject jsonObject = new JSONObject(ensureLoginResponse);
+                        LOG.info("ensureLogin: {}", jsonObject.getJSONObject("currentUser").getString("email"));
+                    }
+                    catch (JSONException e)
+                    {
+                        LOG.info("ensureLogin: {}", ensureLoginResponse);
+                    }
+                    return null;
+                });
+                response = client.execute(getTestList, context);
             }
             catch (IOException ex)
             {
-                if (startupAttempts < 60 && upgradeAttempts == 0)
+                if (!startupTimer.isTimedOut() && upgradeAttempts == 0)
                 {
                     Thread.sleep(1000);
-                    return _suite(accept, skipInitialUserChecks, startupAttempts + 1, upgradeAttempts);
+                    return _suite(accept, skipInitialUserChecks, startupTimer, upgradeAttempts);
                 }
                 else
                 {
@@ -235,12 +252,13 @@ public class JUnitTest extends TestSuite
                     if (responseBody.contains("<title>Start Modules</title>"))
                     {
                         // Server still starting up.  We don't need to use the upgradeHelper to sign in.
-                        LOG.info("Remote JUnitTest: Server modules starting up (attempt " + startupAttempts + ") ...");
+                        LOG.info("Remote JUnitTest: Server modules starting up (remaining " + TestDateUtils.durationString(startupTimer.timeRemaining()) + ") ...");
 
-                        if (startupAttempts < 60)
+                        EntityUtils.consumeQuietly(response.getEntity()); // Consume before possible recursion
+                        if (!startupTimer.isTimedOut())
                         {
                             Thread.sleep(1000);
-                            return _suite(accept, skipInitialUserChecks, startupAttempts + 1, upgradeAttempts);
+                            return _suite(accept, skipInitialUserChecks, startupTimer, upgradeAttempts);
                         }
                         else
                         {
@@ -255,6 +273,7 @@ public class JUnitTest extends TestSuite
                         responseBody.contains("<title>Account Setup</title>") ||
                         responseBody.contains("This server is being upgraded to a new version of LabKey Server."))
                     {
+                        EntityUtils.consumeQuietly(response.getEntity()); // Consume before possible recursion
                         LOG.info("Remote JUnitTest: Server needs install or upgrade ...");
                         if (upgradeAttempts > 3)
                             throw new AssertionFailedError("Failed to update or bootstrap on second attempt: " + responseBody);
@@ -273,7 +292,7 @@ public class JUnitTest extends TestSuite
                         TestSuite testSuite;
                         try
                         {
-                            testSuite = _suite(accept, skipInitialUserChecks, startupAttempts + 1, upgradeAttempts + 1);
+                            testSuite = _suite(accept, skipInitialUserChecks, startupTimer, upgradeAttempts + 1);
                         }
                         catch (Exception retryException)
                         {
