@@ -156,6 +156,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         doAndWaitForColumnUpdate(() ->
         {
             WebElement headerCell = elementCache().getColumnHeaderCell(columnIdentifier);
+            getWrapper().scrollToMiddle(headerCell);
             Locator.byClass("fa-chevron-circle-down").findElement(headerCell).click();
             Locator.tagWithText("a", "Remove Column").findElement(headerCell).click();
         });
