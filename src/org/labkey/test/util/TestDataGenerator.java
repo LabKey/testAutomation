@@ -469,7 +469,7 @@ public class TestDataGenerator
                     case "double":
                         return () -> randomDouble(0, 20);
                     case "boolean":
-                        return this::randomBoolean;
+                        return TestDataGenerator::randomBoolean;
                     case "date":
                     case "datetime":
                         return () -> randomDateString(DateUtils.addWeeks(new Date(), -39), new Date());
@@ -797,7 +797,7 @@ public class TestDataGenerator
         return new SimpleDateFormat(dateFormat).format(date);
     }
 
-    public boolean randomBoolean()
+    public static boolean randomBoolean()
     {
         return ThreadLocalRandom.current().nextBoolean();
     }
