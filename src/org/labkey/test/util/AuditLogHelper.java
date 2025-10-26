@@ -4,6 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.labkey.api.collections.CaseInsensitiveHashMap;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
@@ -101,7 +102,8 @@ public class AuditLogHelper
         QUERY_UPDATE_AUDIT_EVENT("QueryUpdateAuditEvent"),
         SAMPLE_TIMELINE_EVENT("SampleTimelineEvent"),
         SAMPLE_WORKFLOW_AUDIT_EVENT("SamplesWorkflowAuditEvent"),
-        SOURCES_AUDIT_EVENT("SourcesAuditEvent"); // available with SampleManagement module
+        SOURCES_AUDIT_EVENT("SourcesAuditEvent"),
+        TRANSACTION_AUDIT_EVENT("TransactionAuditEvent"); // available with SampleManagement module
 
         private final String _name;
 
@@ -114,6 +116,22 @@ public class AuditLogHelper
         {
             return _name;
         }
+    }
+
+    public enum TransactionDetail
+    {
+        AuditEvents(),
+        ImportFileName(),
+        ClientLibrary,
+        Product,
+        Action,
+        QueryCommand,
+        DataIteratorUsed,
+        ImportOptions,
+        EditMethod,
+        RequestSource,
+        ETL,
+        FileWatcher;
     }
 
     public Integer getLatestAuditRowId(String auditTable) throws IOException, CommandException
@@ -233,6 +251,49 @@ public class AuditLogHelper
         }
     }
 
+    public Map<String, Object> getTransactionAuditLogDetails(Integer transactionAuditId)
+    {
+        Connection cn = WebTestHelper.getRemoteApiConnection();
+        SelectRowsCommand cmd = new SelectRowsCommand("auditLog", "TransactionAuditEvent");
+        cmd.setRequiredVersion(9.1);
+        cmd.setColumns(Arrays.asList("TransactionDetails"));
+        cmd.addFilter("RowId", transactionAuditId, Filter.Operator.EQUAL);
+        cmd.setContainerFilter(ContainerFilter.AllFolders);
+
+        Map<String, Object> event = executeSelectCommand(cn, cmd).get(0);
+        String detailJSON = getLogColumnValue(event, "TransactionDetails");
+        log("TransactionAuditEvent Details: " + detailJSON);
+        if (detailJSON == null || detailJSON.isEmpty())
+            return Collections.emptyMap();
+
+        return new JSONObject(detailJSON).toMap();
+    }
+
+    public void checkLastTransactionAuditLogDetails(String containerPath, Map<TransactionDetail, Object> expectedDetails)
+    {
+        Integer transactionAuditId = getLastTransactionId(containerPath);
+        if (transactionAuditId == null)
+            fail("No TransactionAuditEvent found in container: " + containerPath);
+        checkTransactionAuditLogDetails(transactionAuditId, expectedDetails);
+    }
+
+    public void checkTransactionAuditLogDetails(Integer transactionAuditId, Map<TransactionDetail, Object> expectedDetails)
+    {
+        Map<String, Object> actualDetails = getTransactionAuditLogDetails(transactionAuditId);
+        assertEquals("Unexpected number of events for transactionId " + transactionAuditId, expectedDetails.size(), actualDetails.size());
+        for (TransactionDetail key : expectedDetails.keySet())
+        {
+            assertTrue("Expected detail key not found: " + key, actualDetails.containsKey(key.name()));
+            if (TransactionDetail.RequestSource.name().equals(key.name()))
+            {
+                String expectedValue = expectedDetails.get(key).toString();
+                String actualValue = actualDetails.get(key.name()) != null ? actualDetails.get(key.name()).toString() : null;
+                assertTrue("Detail value for key " + key + " not as expected", actualValue != null && actualValue.startsWith(expectedValue));
+            }
+            else
+                assertEquals("Detail value for key " + key + " not as expected", expectedDetails.get(key), actualDetails.get(key.name()));
+        }
+    }
     /**
      * Check the number of diffs in the audit event. This is a helper function to check the number of diffs in the
      * newRecordMap for an audit entry. If a transactionId is provided, it will check all rows for that
@@ -301,6 +362,19 @@ public class AuditLogHelper
         {
             List<Map<String, Object>> events = getAuditLogsFromLKS(containerPath, auditEventName, List.of("TransactionId"), Collections.emptyList(), 1, ContainerFilter.CurrentAndSubfolders).getRows();
             return events.size() == 1 ? (Integer) events.get(0).get("TransactionId") : null;
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public Integer getLastTransactionId(String containerPath)
+    {
+        try
+        {
+            List<Map<String, Object>> events = getAuditLogsFromLKS(containerPath, AuditEvent.TRANSACTION_AUDIT_EVENT, List.of("RowId"), Collections.emptyList(), 1, ContainerFilter.CurrentAndSubfolders).getRows();
+            return events.size() == 1 ? (Integer) events.get(0).get("RowId") : null;
         }
         catch (Exception e)
         {
