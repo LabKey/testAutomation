@@ -1,8 +1,8 @@
-library(Rlabkey);
-
-run.props = labkey.transform.readRunPropertiesFile("${runInfo}");
-run.data.file = labkey.transform.getRunPropertyValue(run.props, "runDataFile");
-run.output.file = run.props$val3[run.props$name == "runDataFile"];
+all.lines = readLines("${runInfo}")
+runDataFile.line = grep("^runDataFile", all.lines, value = TRUE);
+runDataFile.props <- strsplit(runDataFile.line, "\t")[[1]]
+run.data.file = runDataFile.props[2];
+run.output.file = runDataFile.props[4];
 
 run.data = read.delim(run.data.file, header=TRUE, sep="\t", quote="", check.names=FALSE);
 run.data$TransformType = "${transformOperation}";
