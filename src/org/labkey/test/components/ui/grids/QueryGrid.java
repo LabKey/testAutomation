@@ -221,6 +221,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     @Override
     public void doAndWaitForUpdate(Runnable func)
     {
+        waitForLoaded();
         Optional<WebElement> optionalStatus = elementCache().selectionStatusContainerLoc.findOptionalElement(elementCache());
 
         func.run();
