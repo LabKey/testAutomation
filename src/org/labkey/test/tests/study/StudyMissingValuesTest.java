@@ -207,7 +207,7 @@ public class StudyMissingValuesTest extends MissingValueIndicatorsTest
         clickButton("Next");
         setFormElement(AssayConstants.ASSAY_NAME_FIELD_LOCATOR, ASSAY_RUN_SINGLE_COLUMN);
         click(AssayConstants.TEXT_AREA_DATA_PROVIDER_LOCATOR);
-        setFormElement(Locator.name("TextAreaDataCollector.textArea"), TEST_DATA_SINGLE_COLUMN_ASSAY);
+        setFormElement(AssayConstants.TEXT_AREA_DATA_COLLECTOR_LOCATOR, TEST_DATA_SINGLE_COLUMN_ASSAY);
         clickButton("Save and Finish");
         assertNoLabKeyErrors();
 

@@ -160,7 +160,7 @@ public class PipelineProtocolArchiveTest extends BaseWebDriverTest
     {
         doAndWaitForPageToLoad(()->
         {
-            protocols.clickHeaderButtonByText("archive");
+            protocols.clickHeaderButton("archive");
             assertAlert("Are you sure you want to archive the selected protocol?");
         });
     }
@@ -169,7 +169,7 @@ public class PipelineProtocolArchiveTest extends BaseWebDriverTest
     {
         doAndWaitForPageToLoad(()->
         {
-            protocols.clickHeaderButtonByText("unarchive");
+            protocols.clickHeaderButton("unarchive");
             assertAlert("Are you sure you want to unarchive the selected protocol?");
         });
     }
