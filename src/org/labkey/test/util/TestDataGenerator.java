@@ -723,7 +723,7 @@ public class TestDataGenerator
 
             int maxLength = switch (domainKind)
             {
-                case Assay -> 200 - 13; // Make room for "{$domainName} Batch Fields" domain
+                case Assay -> 186; // Make room for "{$domainName} Batch Fields" domain
                 case SampleSet -> 100;
                 default -> 200; // Sources, lists, and datasets allow 200 character names
             };
