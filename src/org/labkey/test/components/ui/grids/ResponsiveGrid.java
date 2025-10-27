@@ -66,10 +66,10 @@ public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverCompon
     public Boolean isLoaded()
     {
         return getComponentElement().isDisplayed() &&
-                (!Locators.loadingGrid.existsIn(this) &&
+                !Locators.loadingGrid.existsIn(this) &&
                 !Locators.spinner.existsIn(this) &&
-                Locator.tag("td").existsIn(this)) ||
-                getGridEmptyMessage().isPresent();
+            (Locator.tag("td").existsIn(this) ||
+                getGridEmptyMessage().isPresent());
     }
 
     protected void waitForLoaded()
@@ -788,7 +788,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverCompon
 
         try
         {
-            WebElement tr = Locator.tagWithClass("tr", "grid-empty").refindWhenNeeded(this);
+            WebElement tr = Locator.tagWithClass("tr", "grid-empty").findWhenNeeded(this);
             if (tr.isDisplayed())
             {
                 msg = Optional.of(Locator.tag("td").findElement(tr).getText());
