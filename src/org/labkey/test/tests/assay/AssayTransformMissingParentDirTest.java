@@ -6,6 +6,7 @@ import org.labkey.api.util.FileUtil;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Assays;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.components.assay.AssayConstants;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.pages.assay.AssayImportPage;
@@ -20,7 +21,7 @@ import java.nio.file.Path;
  * Issue 54156: Regression test to ensure a reasonable error message is shown when an assay design references
  * a transform script whose parent directory has since been deleted, and that the assay design can be fixed by removing the script.
  */
-@Category({Assays.class})
+@Category({Assays.class, Daily.class})
 public class AssayTransformMissingParentDirTest extends AbstractAssayTransformTest
 {
     @Test
