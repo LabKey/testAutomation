@@ -18,7 +18,6 @@ import org.labkey.test.components.react.ReactCheckBox;
 import org.labkey.test.components.ui.grids.FieldReferenceManager.FieldReference;
 import org.labkey.test.components.ui.search.FilterExpressionPanel;
 import org.labkey.test.params.FieldKey;
-import org.labkey.test.util.LabKeyExpectedConditions;
 import org.labkey.test.util.selenium.WebElementUtils;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NotFoundException;
@@ -328,13 +327,13 @@ public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverCompon
         // Use getDriver() because the grid menus are rendered in a "react portal" at the end of the HTML body, so they
         // are totally detached from the rest of the grid.
         WebElement menu = Locator.css("ul.grid-header-cell__dropdown-menu.open").findWhenNeeded(getDriver());
-        WebElement menuItem = getWrapper().quickWait().until(LabKeyExpectedConditions
-            .visibilityOf(Locator.css("li > a").containing(menuText), menu));
+        WebElement menuItem = Locator.css("li > a").containing(menuText).findWhenNeeded(menu);
+        waitFor(menuItem::isDisplayed, 1000);
         if (waitForUpdate)
             doAndWaitForUpdate(menuItem::click);
         else
             menuItem.click();
-        getWrapper().quickWait().until(ExpectedConditions.invisibilityOf(menuItem));
+        waitFor(()-> !menuItem.isDisplayed(), 1000);
     }
 
     /**
