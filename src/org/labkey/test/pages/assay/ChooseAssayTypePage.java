@@ -62,11 +62,15 @@ public class ChooseAssayTypePage extends LabKeyPage<ChooseAssayTypePage.ElementC
             return selectStandardAssay();
         }
 
-        WebElement activeTab = elementCache().assayTypeTabs.selectTab("Specialty Assays");
+        WebElement specialtySelect = Locator.id("specialty-assay-type-select")
+                .waitForElement(elementCache().assayTypeTabs.findPanelForTab("Specialty Assays"), 2_000);
+        // Ensure that assay types have loaded before attempting to switch tabs
+        Locator.tagWithAttribute("option", "value", name).waitForElement(specialtySelect, 2_000);
 
-        WebElement specialtySelect = Locator.id("specialty-assay-type-select").findWhenNeeded(activeTab);
+        elementCache().assayTypeTabs.selectTab("Specialty Assays");
+
         shortWait().until(ExpectedConditions.visibilityOf(specialtySelect));
-        selectOptionByText(specialtySelect, name);
+        selectOptionByValue(specialtySelect, name);
 
         waitFor(()->
            elementCache().selectButton.getText().toLowerCase().contains(name.toLowerCase()),

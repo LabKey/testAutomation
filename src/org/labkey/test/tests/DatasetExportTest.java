@@ -20,6 +20,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.Daily;
+import org.labkey.test.components.assay.AssayConstants;
 import org.labkey.test.util.DataRegionTable;
 
 import java.util.Arrays;
@@ -91,7 +92,7 @@ public class DatasetExportTest extends AssayResultsExportTest
     @BeforeClass
     public static void doSetup() throws Exception
     {
-        DatasetExportTest initTest = (DatasetExportTest)getCurrentTest();
+        DatasetExportTest initTest = getCurrentTest();
         initTest.setupDataset();
     }
 
@@ -108,9 +109,9 @@ public class DatasetExportTest extends AssayResultsExportTest
         clickAndWait(Locator.linkWithText(ASSAY_RUN_FILE.getName()));
 
         DataRegionTable assayResults = new DataRegionTable(super.getDataRegionId(), this);
-        assayResults.checkAll();
+        assayResults.checkAllOnPage();
         clickButton("Link to Study");
-        selectOptionByText(Locator.name("targetStudy"), "/" + getProjectName() + "/" + getFolderName() + " (" + getFolderName() + " Study)");
+        selectOptionByText(AssayConstants.TARGET_STUDY_FIELD_LOCATOR, "/" + getProjectName() + "/" + getFolderName() + " (" + getFolderName() + " Study)");
         clickButton("Next");
         clickButton("Link to Study");
     }

@@ -40,7 +40,7 @@ public class StarterArtifactsController extends SpringActionController
     {
         public ModelAndView getView(Object o, BindException errors)
         {
-            return new JspView("/org/labkey/starterartifacts/view/hello.jsp");
+            return new JspView<>("/org/labkey/starterartifacts/view/hello.jsp");
         }
 
         @Override

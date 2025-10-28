@@ -41,6 +41,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
 
 @Category({Issues.class, Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 5)
@@ -53,8 +54,8 @@ public class IssueDomainSharingTest extends BaseWebDriverTest
     private static final String SHARED_LIST_DEF = "SharedTestDef";
     private final String FOLDER_PATH = "/" + getProjectName() + "/" + FOLDER;
 
-    private IssuesHelper _issuesHelper = new IssuesHelper(this);
-    private ApiPermissionsHelper _permissionsHelper = new ApiPermissionsHelper(this);
+    private final IssuesHelper _issuesHelper = new IssuesHelper(this);
+    private final ApiPermissionsHelper _permissionsHelper = new ApiPermissionsHelper(this);
 
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
@@ -72,7 +73,7 @@ public class IssueDomainSharingTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        IssueDomainSharingTest init = (IssueDomainSharingTest) getCurrentTest();
+        IssueDomainSharingTest init = getCurrentTest();
 
         init.doSetup();
     }
@@ -120,13 +121,14 @@ public class IssueDomainSharingTest extends BaseWebDriverTest
         final String projectGroup = "ProjectGroup";
         _permissionsHelper.createProjectGroup(projectGroup, getProjectName());
         _permissionsHelper.addUserToProjGroup(USER, getProjectName(), projectGroup);
-        _permissionsHelper.addMemberToRole(projectGroup, "Editor", PermissionsHelper.MemberType.group, getProjectName());
+        _permissionsHelper.addMemberToRole(projectGroup, EDITOR_ROLE, PermissionsHelper.MemberType.group, getProjectName());
 
         final String title = "Child Issue";
         final String assignTo = _userHelper.getDisplayNameForEmail(USER);
         final String customValue = "Value for shared domain";
         final String listDef = SHARED_LIST_DEF;
-        final String inheritedField = "inheritedfield";
+        // Append ":" to field name: Issue 32057: Issues forms can't handle complex field names
+        final String inheritedField = "inheritedfield:";
 
         goToProjectHome("Shared");
         _containerHelper.enableModule("Issues");
@@ -144,8 +146,7 @@ public class IssueDomainSharingTest extends BaseWebDriverTest
         adminPage.clickSave();
 
         adminPage = IssuesAdminPage.beginAt(this, "Shared", listDef);
-        // Append ":" to field name: Issue 32057: Issues forms can't handle complex field names
-        adminPage.getFieldsPanel().addField(new FieldDefinition(inheritedField + ":", ColumnType.String).setLabel(inheritedField));
+        adminPage.getFieldsPanel().addField(new FieldDefinition(inheritedField, ColumnType.String).setLabel(inheritedField));
         adminPage.clickSave();
 
         ListPage issueList = ListPage.beginAt(this, getProjectName(), listDef);

@@ -23,7 +23,6 @@ import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.DeleteRowsCommand;
 import org.labkey.remoteapi.query.InsertRowsCommand;
-import org.labkey.remoteapi.query.SaveRowsResponse;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
@@ -35,6 +34,7 @@ import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Hosting;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.pages.FolderManagementFolderTree;
+import org.labkey.test.pages.admin.FolderAliasesPage;
 import org.labkey.test.pages.admin.FolderManagementPage;
 import org.labkey.test.pages.admin.ReorderFoldersPage;
 import org.labkey.test.pages.list.BeginPage;
@@ -45,9 +45,11 @@ import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.WikiHelper;
 import org.labkey.test.util.WorkbookHelper;
 import org.openqa.selenium.WebElement;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -62,7 +64,7 @@ import static org.junit.Assert.assertTrue;
 @BaseWebDriverTest.ClassTimeout(minutes = 25 )
 public class FolderTest extends BaseWebDriverTest
 {
-    private static String secondProject = "FolderTestProject2";
+    private static final String secondProject = "FolderTestProject2";
 
     @Override
     public List<String> getAssociatedModules()
@@ -92,12 +94,76 @@ public class FolderTest extends BaseWebDriverTest
     @BeforeClass
     public static void testSetup()
     {
-        FolderTest init = (FolderTest)getCurrentTest();
+        FolderTest init = getCurrentTest();
         init._containerHelper.createProject(init.getProjectName(), null);
         init._containerHelper.createProject(secondProject, null);
         init.goToProjectHome();
         init.importFolderFromZip(TestFileUtils.getSampleData("FolderTest/FolderTestProject.folder.zip"));
         init.moveTestProjectToTop();
+    }
+
+    @Test
+    public void testAliases()
+    {
+        String firstContent = "This is the first folder";
+        String secondContent = "This is the second folder";
+        String originalName1 = "OriginalName1" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
+        String originalName2 = "OriginalName2" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
+        String newName = "NewName" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
+        String additionalAlias = "AdditionalAlias" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
+
+        // Create folders and give them a wiki as content so we can be sure we land in the right spot when following an alias
+        _containerHelper.createSubfolder(getProjectName(), originalName1);
+        createWikiAndAddToPortal(firstContent, originalName1);
+        _containerHelper.createSubfolder(getProjectName(), originalName2);
+        createWikiAndAddToPortal(secondContent, originalName2);
+
+        _containerHelper.renameFolder(getProjectName(), originalName1, newName, true);
+        navigateToFolder(getProjectName(), newName);
+        assertTextPresent(firstContent);
+
+        // Ensure the alias was created and works
+        beginAt(WebTestHelper.buildURL("project", getProjectName() + "/" + originalName1 , "begin"));
+        assertTextPresent(firstContent);
+        FolderAliasesPage aliasesPage = goToFolderManagement().goToAliases();
+        List<String> aliases = new ArrayList<>(aliasesPage.getAliases());
+        // Ensure it's being saved as lower case
+        assertEquals(Arrays.asList(("/" + getProjectName() + "/" + originalName1).toLowerCase()), aliases);
+        aliases.add("/" + getProjectName() + "/" + additionalAlias);
+        aliasesPage.setAliases(aliases);
+        aliasesPage.clickSave();
+
+        beginAt(WebTestHelper.buildURL("project", getProjectName() + "/" + originalName1 , "begin"));
+        assertTextPresent(firstContent);
+        beginAt(WebTestHelper.buildURL("project", getProjectName() + "/" + additionalAlias , "begin"));
+        assertTextPresent(firstContent);
+
+        // Steal the alias in another folder
+        navigateToFolder(getProjectName(), originalName2);
+        assertTextPresent(secondContent);
+        aliasesPage = goToFolderManagement().goToAliases();
+        aliasesPage.setAliases(Arrays.asList("/" + getProjectName() + "/" + additionalAlias));
+        aliasesPage.clickSave();
+        beginAt(WebTestHelper.buildURL("project", getProjectName() + "/" + additionalAlias , "begin"));
+        assertTextPresent(secondContent);
+    }
+
+    private void createWikiAndAddToPortal(String body, String folderName)
+    {
+        navigateToFolder(getProjectName(), folderName);
+        WikiHelper wikiHelper = new WikiHelper(this);
+        wikiHelper.createNewWikiPage("HTML");
+        String pageName = "ReferencePoint";
+        wikiHelper.setWikiName(pageName);
+        wikiHelper.setWikiTitle(pageName);
+        wikiHelper.setWikiBody(body);
+        wikiHelper.saveWikiPage();
+
+        navigateToFolder(getProjectName(), folderName);
+        PortalHelper portalHelper = new PortalHelper(this);
+        portalHelper.addBodyWebPart("Wiki");
+        wikiHelper.clickChooseAPage();
+        wikiHelper.saveChosenPage();
     }
 
     @LogMethod

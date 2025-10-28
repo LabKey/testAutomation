@@ -152,7 +152,7 @@ public class DataRegionExportHelper extends AbstractDataRegionExportOrSignHelper
         SAS(5),
         URL(6);
 
-        private Locator fileTypeRadio;
+        private final Locator fileTypeRadio;
 
         ScriptExportType(int radioIndex)
         {

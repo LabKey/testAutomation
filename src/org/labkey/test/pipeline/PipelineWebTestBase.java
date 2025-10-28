@@ -23,7 +23,7 @@ import org.labkey.test.TestTimeoutException;
  */
 abstract public class PipelineWebTestBase extends BaseWebDriverTest
 {
-    private String _projectName;
+    private final String _projectName;
 
     public PipelineWebTestBase(String projectName)
     {

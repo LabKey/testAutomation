@@ -32,7 +32,7 @@ import org.labkey.remoteapi.query.GetQueryDetailsCommand;
 import org.labkey.remoteapi.query.GetQueryDetailsResponse;
 import org.labkey.remoteapi.query.GetSchemasCommand;
 import org.labkey.remoteapi.query.ImportDataResponse;
-import org.labkey.remoteapi.query.SaveRowsResponse;
+import org.labkey.remoteapi.query.RowsResponse;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.remoteapi.query.Sort;
@@ -71,6 +71,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
+import static org.labkey.test.util.PermissionsHelper.PROJECT_ADMIN_ROLE;
 
 @Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 4)
@@ -105,7 +107,7 @@ public class ApiKeyTest extends BaseWebDriverTest
 
         EDITOR_USER.create(this)
                 .setInitialPassword()
-                .addPermission("Editor", getProjectName());
+                .addPermission(EDITOR_ROLE, getProjectName());
 
         new IntListDefinition(LIST_NAME, "Key")
             .addField(new FieldDefinition(LIST_VALUE))
@@ -161,7 +163,7 @@ public class ApiKeyTest extends BaseWebDriverTest
 
         QueryGrid grid = new QueryGrid.QueryGridFinder(getDriver()).waitFor();
         int beforeDeleteCount = grid.getRecordCount();
-        assertFalse("Row with description not found", grid.getRowMap("Description", keyDescription).isEmpty());
+        assertFalse("Row with description not found", grid.getRowMapByLabel("Description", keyDescription).isEmpty());
         grid = deleteAPIKeyViaUI();
         assertEquals("Number of keys after UI deletion not as expected", beforeDeleteCount - 1, grid.getRecordCount());
         verifyInvalidAPIKey(createApiKeyConnection(apiKey), false);
@@ -279,9 +281,8 @@ public class ApiKeyTest extends BaseWebDriverTest
         impersonate(EDITOR_USER.getEmail());
         goToExternalToolPage();
         List<WebElement> banners = Locator.byClass(BootstrapLocators.BannerType.WARNING.getCss()).findElements(this.getDriver());
-        assertEquals("Number of warning banners not as expected", 2, banners.size());
-        assertEquals("API key generation warning not as expected", "API key generation is not available while impersonating.", banners.get(0).getText());
-        assertEquals("Session key generation warning not as expected", "Session key generation is not available while impersonating.", banners.get(1).getText());
+        assertEquals("Number of warning banners not as expected", 1, banners.size());
+        assertEquals("API and session key generation warning not as expected", "API and session key generation is not available while impersonating.", banners.get(0).getText());
     }
 
     @Test
@@ -307,7 +308,7 @@ public class ApiKeyTest extends BaseWebDriverTest
 
         log("Verify " + APIKEYS_TABLE + " table is not accessible for non site-admin");
         goToProjectHome();
-        impersonateRoles("Project Administrator");
+        impersonateRoles(PROJECT_ADMIN_ROLE);
         verifyAPIKeysTablePresence(false);
     }
 
@@ -380,7 +381,7 @@ public class ApiKeyTest extends BaseWebDriverTest
             valueCount.incrementAndGet();
             assertEquals("Rows imported", 1, importResponse.getRowCount());
 
-            SaveRowsResponse saveResponse = queryApiHelper.insertRows(List.of(Map.of(LIST_VALUE, "value" + valueCount.get())));
+            RowsResponse saveResponse = queryApiHelper.insertRows(List.of(Map.of(LIST_VALUE, "value" + valueCount.get())));
             valueCount.incrementAndGet();
             assertEquals("Rows inserted", 1, saveResponse.getRowsAffected());
 

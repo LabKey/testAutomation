@@ -9,6 +9,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,7 +48,15 @@ public class TabbedGridPanel extends WebDriverComponent<TabbedGridPanel.ElementC
 
     public List<String> getTabs()
     {
-        return getWrapper().getTexts(elementCache().navTabs());
+        List<WebElement> tabElements = elementCache().navTabs();
+        List<String> tabLabels = new ArrayList<>();
+        //noinspection ResultOfMethodCallIgnored
+        WebDriverWrapper.waitFor(() -> {
+            tabLabels.clear();
+            tabLabels.addAll(tabElements.stream().map(WebElement::getText).toList());
+            return tabLabels.stream().noneMatch(String::isBlank);
+        }, 5_000);
+        return tabLabels;
     }
 
     public List<String> getTabsWithoutCounts()
@@ -76,10 +85,10 @@ public class TabbedGridPanel extends WebDriverComponent<TabbedGridPanel.ElementC
     }
 
 
-    private boolean isSelected(String tabText)
+    public boolean isSelected(String tabText)
     {
         String tabClass = elementCache().navTab(tabText).getAttribute("class");
-        return tabClass.toLowerCase().contains("active");
+        return tabClass != null && tabClass.toLowerCase().contains("active");
     }
 
     public QueryGrid selectGrid(String tabText)

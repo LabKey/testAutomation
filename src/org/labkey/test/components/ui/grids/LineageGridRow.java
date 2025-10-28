@@ -29,7 +29,7 @@ public class LineageGridRow extends GridRow
 
     public String getLineageNameTitle()
     {
-        return elementCache().lineageNameElement.getAttribute("title");
+        return elementCache().lineageNameElement.getDomAttribute("title");
     }
 
     public boolean isSeed()

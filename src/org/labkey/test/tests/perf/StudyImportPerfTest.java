@@ -20,8 +20,6 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Perf;
 
-import java.io.File;
-
 @Category(Perf.class)
 public class StudyImportPerfTest extends PerformanceTest
 {

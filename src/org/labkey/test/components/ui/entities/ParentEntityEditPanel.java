@@ -4,17 +4,20 @@ import org.junit.Assert;
 import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
-import org.labkey.test.components.Component;
-import org.labkey.test.components.WebDriverComponent;
+import org.labkey.test.components.bootstrap.Panel;
+import org.labkey.test.components.react.BaseReactSelect;
 import org.labkey.test.components.react.FilteringReactSelect;
 import org.labkey.test.components.react.ReactSelect;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * <p>
@@ -24,11 +27,8 @@ import java.util.List;
  * </p>
  * @see <a href="https://github.com/LabKey/labkey-ui-components/blob/master/packages/components/src/components/entities/ParentEntityEditPanel.tsx">ParentEntityEditPanel.tsx</a>
  */
-public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPanel.ElementCache>
+public class ParentEntityEditPanel extends Panel<ParentEntityEditPanel.ElementCache>
 {
-    private final WebDriver driver;
-    private final WebElement editingDiv;
-
     /**
      * Constructor for the panel.
      *
@@ -37,20 +37,7 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
      */
     public ParentEntityEditPanel(WebElement element, WebDriver driver)
     {
-        this.driver = driver;
-        editingDiv = element;
-    }
-
-    @Override
-    public WebElement getComponentElement()
-    {
-        return editingDiv;
-    }
-
-    @Override
-    protected WebDriver getDriver()
-    {
-        return driver;
+        super(element, driver);
     }
 
     @Override
@@ -183,6 +170,10 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
         WebDriverWrapper.waitFor(()->elementCache().saveButton.isEnabled(),
                 "Save button is not enabled.", 2_500);
 
+        String parentType = getTitle().split(" ", 2)[1].trim(); // Trim "Editing" from the title
+        Set<String> selections = new HashSet<>();
+        getAllParents().stream().map(BaseReactSelect::getSelections).forEach(selections::addAll);
+
         // The wait time is used here to validate the panel exits edit mode.
         clickButtonWaitForPanel(elementCache().saveButton, waitTime);
 
@@ -191,6 +182,21 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
         WebDriverWrapper.waitFor(()->!progressbar.isDisplayed(),
                 "It looks like an update took too long.", waitTime);
 
+        Panel<?> detailsPanel = new Panel.PanelFinder(getDriver()).withTitle(parentType).waitFor(getDriver());
+        if (!selections.isEmpty())
+        {
+            // Issue 53915: Lineage panel grids don't show IDs or links for parent sequences and molecules in Biologics
+            for (String selection : selections)
+            {
+                getWrapper().shortWait().until(ExpectedConditions.visibilityOf(
+                        Locator.linkWithText(selection).findWhenNeeded(detailsPanel)));
+            }
+        }
+        else
+        {
+            getWrapper().shortWait().until(ExpectedConditions.visibilityOf(
+                Locator.tag("td").containing("has been set for this").findWhenNeeded(detailsPanel))); // e.g. "No source parent type has been set for this source."
+        }
     }
 
     /**
@@ -261,10 +267,17 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
      *
      * @return A select at this given ordinal position.
      */
-    private ReactSelect getEntityTypeByPosition(int index)
+    public ReactSelect getEntityTypeByPosition(int index)
     {
         return ReactSelect.finder(getDriver())
                 .withNamedInput(String.format("entityType%d", index))
+                .waitFor(elementCache());
+    }
+
+    public ReactSelect getDisabledEntityTypeByLabel(String typeName)
+    {
+        return ReactSelect.finder(getDriver())
+                .followingLabelWithSpan(typeName)
                 .waitFor(elementCache());
     }
 
@@ -276,10 +289,8 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
             String inputName = input.findElement(this).getAttribute("name");
             return new ReactSelect.ReactSelectFinder(getDriver()).withNamedInput(inputName).find(this);
         }
-        else
-        {
-            return null;
-        }
+
+        return null;
     }
 
     /**
@@ -305,6 +316,11 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
                 .findAll(elementCache());
     }
 
+    private BaseReactSelect.BaseReactSelectFinder<FilteringReactSelect> getParentFinder(String typeName)
+    {
+        return FilteringReactSelect.finder(getDriver()).withNamedInput(String.format("parentEntityValue_%s", typeName));
+    }
+
     /**
      * Get a select for a given parent entity type.
      *
@@ -313,8 +329,7 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
      */
     public FilteringReactSelect getParent(String typeName)
     {
-        return FilteringReactSelect.finder(getDriver()).withNamedInput(String.format("parentEntityValue_%s", typeName))
-                .find(elementCache());
+        return getParentFinder(typeName).waitFor(elementCache());
     }
 
     /**
@@ -341,6 +356,10 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
         return addParents(typeName, Arrays.asList(parentId));
     }
 
+    public ParentEntityEditPanel addParents(String typeName, List<String> parentIds)
+    {
+        return addParents(typeName, parentIds, false);
+    }
     /**
      * Add a specific parents (samples or sources) from the given type. If the type is not currently being used for
      * parent elements it will be added.
@@ -350,14 +369,12 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
      * @param parentIds A list of the individuals samples or sources to add.
      * @return A reference to this panel.
      */
-    public ParentEntityEditPanel addParents(String typeName, List<String> parentIds)
+    public ParentEntityEditPanel addParents(String typeName, List<String> parentIds, boolean skipAdd)
     {
-        if(getEntityType(typeName) == null)
+        if (!skipAdd && getEntityType(typeName) == null)
             getAddNewEntityTypeSelect().select(typeName);
 
-        var selectParent = FilteringReactSelect.finder(getDriver())
-                .withNamedInput(String.format("parentEntityValue_%s", typeName))
-                .waitFor(elementCache());
+        var selectParent = getParentFinder(typeName).waitFor(elementCache());
 
         // Adding for debugging (trying to understand why save button is not enabled after setting).
         getWrapper().log(String.format("Selections before adding: %s", selectParent.getSelections()));
@@ -392,6 +409,9 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
         boolean found = false;
         for (ReactSelect reactSelect : selectControls)
         {
+            if (reactSelect.isDisabled())
+                continue;
+
             if (reactSelect.getSelections().contains(typeName))
             {
                 found = true;
@@ -443,31 +463,27 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
         elementCache().commentInput.clear();
     }
 
+    public boolean hasParentInputError()
+    {
+        return Locator.tagWithClass("div", "edit-parent-danger").isDisplayed(this);
+    }
+
 
     /**
      * Simple finder for this panel.
      */
-    public static class ParentEntityEditPanelFinder extends WebDriverComponentFinder<ParentEntityEditPanel, ParentEntityEditPanelFinder>
+    public static class ParentEntityEditPanelFinder extends AbstractPanelFinder<ParentEntityEditPanel, ParentEntityEditPanelFinder>
     {
         public ParentEntityEditPanelFinder(WebDriver driver)
         {
             super(driver);
+            withTitle("Editing");
         }
 
         @Override
         protected ParentEntityEditPanel construct(WebElement element, WebDriver driver)
         {
             return new ParentEntityEditPanel(element, driver);
-        }
-
-        @Override
-        protected Locator locator()
-        {
-            return Locator
-                    .tagContainingText("div", "Editing")
-                    .withClass("panel-heading")
-                    .parent()
-                    .child(Locator.tagWithClass("div", "panel-body"));
         }
     }
 
@@ -497,10 +513,10 @@ public class ParentEntityEditPanel extends WebDriverComponent<ParentEntityEditPa
         return new ElementCache();
     }
 
-    protected class ElementCache extends Component<?>.ElementCache
+    protected class ElementCache extends Panel<?>.ElementCache
     {
         final WebElement saveButton = Locator.byClass("btn-success").withText("Save").findWhenNeeded(this);
-        final WebElement cancelButton = Locator.byClass("btn-default").withText("Cancel").findWhenNeeded(this);
+        final WebElement cancelButton = Locator.byClass("btn-default").withText("Cancel").refindWhenNeeded(this);
 
         // This is the 'Add' button that is contained inside the panel.
         final WebElement addButton = Locator

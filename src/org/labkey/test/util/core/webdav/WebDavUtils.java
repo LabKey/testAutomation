@@ -43,7 +43,6 @@ public class WebDavUtils
     /**
      * Create a Sardine WebDav connection. Use a session key
      * @param user User email
-     * @return
      */
     public static Sardine beginSardine(String user)
     {

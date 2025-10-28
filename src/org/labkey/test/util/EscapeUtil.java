@@ -15,18 +15,86 @@
  */
 package org.labkey.test.util;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.text.StringEscapeUtils;
+import org.apache.poi.ss.util.WorkbookUtil;
 import org.eclipse.jetty.util.URIUtil;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.labkey.test.params.FieldKey;
 
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
-/**
- * UNDONE: Refactor useful methods from PageFlowUtil into util.jar that can be used by the test harness then delete this class.
- */
 public class EscapeUtil
 {
+    static public String toJSONStr(String str)
+    {
+        if (str == null) return null;
+        StringBuilder escaped = new StringBuilder();
+        for (char c : str.toCharArray()) {
+            switch (c) {
+                case '"': escaped.append("\\\""); break;
+                case '\\': escaped.append("\\\\"); break;
+                case '\b': escaped.append("\\b"); break;
+                case '\f': escaped.append("\\f"); break;
+                case '\n': escaped.append("\\n"); break;
+                case '\r': escaped.append("\\r"); break;
+                case '\t': escaped.append("\\t"); break;
+                default:
+                    // Escape control characters (ASCII 0-31) and ensure Unicode compatibility
+                    if (c < 32) {
+                        escaped.append(String.format("\\u%04x", (int) c));
+                    } else {
+                        escaped.append(c);
+                    }
+            }
+        }
+        return "\"" + escaped + "\"";
+    }
+
+    static public String toJSONStr(Object value)
+    {
+        if (value instanceof String strVal)
+            return toJSONStr(strVal);
+        return String.valueOf(value);
+    }
+
+    static public String toJSONRow(Map<String, Object> row)
+    {
+        StringBuilder sb = new StringBuilder("{");
+        String comma = "";
+        for (Map.Entry<String, Object> entry : row.entrySet())
+        {
+            sb.append(comma);
+            Object value = entry.getValue();
+            sb.append(EscapeUtil.toJSONStr(entry.getKey()))
+                    .append(": ").append(toJSONStr(value));
+            comma = ",";
+        }
+        sb.append("}");
+        return sb.toString();
+    }
+
+    static public String toJSONRow(List<Map<String, Object>> rows)
+    {
+        StringBuilder sb = new StringBuilder();
+        String sep = "";
+        for (Map<String, Object> row : rows)
+        {
+            sb.append(sep).append(toJSONRow(row));
+            sep = ",";
+        }
+
+        return sb.toString();
+    }
+
     static public String jsString(String s)
     {
         if (s == null)
@@ -118,25 +186,100 @@ public class EscapeUtil
 
     public static String fieldKeyEncodePart(String str)
     {
-        str = StringUtils.replace(str, "$", "$D");
-        str = StringUtils.replace(str, "/", "$S");
-        str = StringUtils.replace(str, "&", "$A");
-        str = StringUtils.replace(str, "}", "$B");
-        str = StringUtils.replace(str, "~", "$T");
-        str = StringUtils.replace(str, ",", "$C");
-        str = StringUtils.replace(str, ".", "$P");
-        return str;
+        return FieldKey.encodePart(str);
     }
 
     public static String fieldKeyDecodePart(String str)
     {
-        str = StringUtils.replace(str, "$C", ",");
-        str = StringUtils.replace(str, "$T", "~");
-        str = StringUtils.replace(str, "$B", "}");
-        str = StringUtils.replace(str, "$A", "&");
-        str = StringUtils.replace(str, "$S", "/");
-        str = StringUtils.replace(str, "$D", "$");
-        str = StringUtils.replace(str, "$P", ".");
-        return str;
+        return FieldKey.decodePart(str);
+    }
+
+    public static String getTextChoiceValidatorExpression(List<String> options)
+    {
+        return options.stream()
+                .map(String::trim)
+                .map(value -> value.replaceAll("([\\\\|])", "\\\\$1"))
+                .collect(Collectors.joining("|"));
+    }
+
+    public static String getSqlQuotedValue(String value)
+    {
+        return String.format("\"%s\"", value.replaceAll("\"", "\"\""));
+    }
+
+    public static String getMarkupEscapedValue(String value)
+    {
+        return StringEscapeUtils.escapeXml11(value);
+    }
+
+    private static final Pattern nameExpressionNeedsEscaping = Pattern.compile("([\\\\$/&}~,.])");
+    public static String escapeForNameExpression(String value)
+    {
+        return nameExpressionNeedsEscaping.matcher(value).replaceAll("\\\\$1");
+    }
+
+    private static final Pattern excelPageNeedsEscaping = Pattern.compile("([:/])");
+    /**
+     * Escapes invalid characters in a string to ensure it can be used as a valid Excel sheet name.
+     * Replaces characters matching the {@code excelPageNeedsEscaping} pattern with an underscore ("_").
+     *
+     * @param value the input string to be escaped
+     * @return the escaped string that can safely be used as an Excel sheet name
+     */
+    public static String escapeForExcelSheetName(String value)
+    {
+        return WorkbookUtil.createSafeSheetName(value, '_');
+    }
+
+    /**
+     * Generate an app path for use as a URL fragment. Parts will be encoded and joined.<br>
+     * e.g. <code>encodeAppResourcePath("samples", "my samples")</code> will return "/samples/my%20samples"<br>
+     *
+     * @param pathParts Parts to be combined into an app path. Most likely strings and/or Integers
+     * @return encoded resource path
+     */
+    public static @NotNull String encodeAppResourcePath(Object... pathParts)
+    {
+        List<String> encodedParts = Arrays.stream(pathParts).map(Objects::requireNonNull).map(String::valueOf)
+                .map(EscapeUtil::encodeAppResourcePathPart).collect(Collectors.toList());
+        return "/" + String.join("/", encodedParts);
+    }
+
+    private static String encodeAppResourcePathPart(String pathPart)
+    {
+        return encode(pathPart)
+            // We generally don't encode parentheses in app resource paths
+            .replace("%28", "(")
+            .replace("%29", ")");
+    }
+
+    /**
+     * Form field prefix prepended to all query update form field names.
+     * See {@link org.labkey.api.query.QueryUpdateForm#PREFIX}.
+     */
+    public static final String FORM_FIELD_PREFIX = "quf_";
+    private static final char BACKSLASH = '\\';
+    private static final String SPECIAL_CHARS = BACKSLASH + "\";=,";
+
+    public static String getFormFieldName(String columnName)
+    {
+        return getFormFieldName(columnName, FORM_FIELD_PREFIX);
+    }
+
+    /**
+     * Escapes special characters in a column name to be used as a form field name.
+     * See associated {@link org.labkey.api.query.QueryUpdateForm#getFormFieldName}
+     */
+    public static String getFormFieldName(String columnName, @Nullable String prefix)
+    {
+        StringBuilder fieldName = new StringBuilder();
+        for (char c : columnName.toCharArray())
+        {
+            if (SPECIAL_CHARS.indexOf(c) >= 0)
+                fieldName.append(BACKSLASH);
+            fieldName.append(c);
+        }
+
+        return prefix == null ? fieldName.toString() : prefix + fieldName;
     }
 }

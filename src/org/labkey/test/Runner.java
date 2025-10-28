@@ -97,16 +97,16 @@ public class Runner extends TestSuite
     private static final Logger LOG = LogManager.getLogger(Runner.class);
 
     private static final int DEFAULT_MAX_TEST_FAILURES = 10;
-    private static SuiteFactory _suites = SuiteFactory.getInstance();
-    private static Map<Test, Long> _testStats = new LinkedHashMap<>();
+    private static final SuiteFactory _suites = SuiteFactory.getInstance();
+    private static final Map<Test, Long> _testStats = new LinkedHashMap<>();
     private static int _testCount;
     private static List<Class<?>> _remainingTests;
-    private static List<String> _passedTests = new ArrayList<>();
-    private static List<String> _failedTests = new ArrayList<>();
-    private static List<String> _erroredTests = new ArrayList<>();
+    private static final List<String> _passedTests = new ArrayList<>();
+    private static final List<String> _failedTests = new ArrayList<>();
+    private static final List<String> _erroredTests = new ArrayList<>();
 
-    private Set<TestFailure> _failures = new HashSet<>();
-    private boolean _cleanOnly;
+    private final Set<TestFailure> _failures = new HashSet<>();
+    private final boolean _cleanOnly;
 
     private Runner(boolean cleanOnly)
     {
@@ -237,9 +237,8 @@ public class Runner extends TestSuite
                 }
                 else if (test instanceof Cleanable)
                     ((Cleanable) test).cleanup();
-                else if (test instanceof JUnit4TestAdapter)
+                else if (test instanceof JUnit4TestAdapter adapter)
                 {
-                    JUnit4TestAdapter adapter = (JUnit4TestAdapter) test;
                     if (Cleanable.class.isAssignableFrom(adapter.getTestClass()))
                     {
                         Cleanable cleanable = (Cleanable) adapter.getTestClass().getDeclaredConstructor().newInstance();
@@ -356,7 +355,7 @@ public class Runner extends TestSuite
         }
     }
 
-    private static Map<Class<?>, List<String>> specifiedTestMethods = new HashMap<>();
+    private static final Map<Class<?>, List<String>> specifiedTestMethods = new HashMap<>();
     // Set up only the requested tests
     private static List<Class<?>> getTestClasses(List<String> testNames)
     {
@@ -510,7 +509,7 @@ public class Runner extends TestSuite
                     }
                     catch (NoTestsRemainException ignore) {}
 
-                    if (unfoundTests.size() > 0)
+                    if (!unfoundTests.isEmpty())
                     {
                         LOG.error("Test(s) do not exist in class " + testClass.getSimpleName());
                         LOG.error("Specified:");
@@ -523,7 +522,7 @@ public class Runner extends TestSuite
                         {
                             LOG.error("    " + foundTest);
                         }
-                        if (ignoredTests.size() > 0)
+                        if (!ignoredTests.isEmpty())
                             LOG.error("Disabled:");
                         for (String ignoredTest : ignoredTests)
                         {
@@ -977,7 +976,7 @@ public class Runner extends TestSuite
             {
                 frontLoadTestsOfModifiedModules(set);
             }
-            if (testRecentlyFailed && 0<recentlyFailedTestsFile.length())
+            if (testRecentlyFailed && !recentlyFailedTestsFile.isEmpty())
             {
                 //put previously failed tests at the front of the test queue (determined by TeamCity).
                 Class<?>[] recentlyFailedTests = readClasses(new File(recentlyFailedTestsFile), set.getTestList());
@@ -1029,7 +1028,7 @@ public class Runner extends TestSuite
         Collection<String> modifiedModules = getModifiedModules();
 
         // If changedFilesFile exists where TeamCity indicates then order the tests starting from most recently modified
-        if (modifiedModules.size() > 0)
+        if (!modifiedModules.isEmpty())
         {
             LOG.info("Prioritizing tests for modified modules:");
             for (String module : modifiedModules)

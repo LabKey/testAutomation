@@ -133,7 +133,7 @@ public class TabLoader extends DataLoader
     private BufferedReader _reader = null;
 
     private int _commentLines = 0;
-    private Map<String, String> _comments = new HashMap<>();
+    private final Map<String, String> _comments = new HashMap<>();
     private char _chDelimiter = '\t';
     private String _strDelimiter = new String(new char[]{_chDelimiter});
     private String _lineDelimiter = null;
@@ -141,7 +141,7 @@ public class TabLoader extends DataLoader
     private String _strQuote = null;
     private String _strQuoteQuote = null;
     private boolean _parseQuotes = true;
-    private boolean _unescapeBackslashes = true;
+    private final boolean _unescapeBackslashes = false;
     private Filter<Map<String, Object>> _mapFilter;
 
     // Infer whether there are headers
@@ -290,7 +290,7 @@ public class TabLoader extends DataLoader
         return value;
     }
 
-    private ArrayList<String> listParse = new ArrayList<>(30);
+    private final ArrayList<String> listParse = new ArrayList<>(30);
 
 
     private CharSequence readLine(BufferedReader r, boolean skipComments, boolean skipBlankLines)
@@ -326,7 +326,7 @@ public class TabLoader extends DataLoader
                 if (line == null)
                     return null;
             }
-            while ((skipComments && line.length() > 0 && line.charAt(0) == COMMENT_CHAR) || (skipBlankLines && null == StringUtils.trimToNull(line)));
+            while ((skipComments && !line.isEmpty() && line.charAt(0) == COMMENT_CHAR) || (skipBlankLines && null == StringUtils.trimToNull(line)));
             return line;
         }
         catch (Exception e)
@@ -462,7 +462,7 @@ public class TabLoader extends DataLoader
             start = end;
         }
 
-        return listParse.toArray(new String[listParse.size()]);
+        return listParse.toArray(new String[0]);
     }
 
     @Deprecated // Just use a CloseableFilteredIterator.  TODO: Remove
@@ -545,7 +545,7 @@ public class TabLoader extends DataLoader
                 if (null == s)
                     break;
 
-                if (s.length() == 0 || s.charAt(0) == COMMENT_CHAR)
+                if (s.isEmpty() || s.charAt(0) == COMMENT_CHAR)
                 {
                     _commentLines++;
 
@@ -554,7 +554,7 @@ public class TabLoader extends DataLoader
                     {
                         String key = s.substring(1, eq).trim();
                         String value = s.substring(eq + 1).trim();
-                        if (key.length() > 0 || value.length() > 0)
+                        if (!key.isEmpty() || !value.isEmpty())
                             _comments.put(key, value);
                     }
                 }

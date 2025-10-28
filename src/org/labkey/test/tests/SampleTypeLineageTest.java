@@ -8,7 +8,7 @@ import org.labkey.remoteapi.experiment.LineageCommand;
 import org.labkey.remoteapi.experiment.LineageNode;
 import org.labkey.remoteapi.experiment.LineageResponse;
 import org.labkey.remoteapi.query.ContainerFilter;
-import org.labkey.remoteapi.query.SaveRowsResponse;
+import org.labkey.remoteapi.query.RowsResponse;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -17,6 +17,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.FieldKey;
 import org.labkey.test.params.experiment.DataClassDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.DataRegionTable;
@@ -40,6 +41,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.labkey.test.params.FieldDefinition.DOMAIN_TRICKY_CHARACTERS;
 import static org.labkey.test.util.exp.SampleTypeAPIHelper.SAMPLE_TYPE_DOMAIN_KIND;
 
 @Category({Daily.class})
@@ -64,7 +66,7 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        SampleTypeLineageTest init = (SampleTypeLineageTest) getCurrentTest();
+        SampleTypeLineageTest init = getCurrentTest();
 
         // Comment out this line (after you run once) it will make iterating on  tests much easier.
         init.doSetup();
@@ -119,12 +121,12 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
         dgen.addCustomRow(Map.of("name", "H", "data", 14, "stringData", TestDataGenerator.randomString(15), "MaterialInputs/implicitParentage", "A,B,C"));
         dgen.addCustomRow(Map.of("name", "I", "data", 12, "stringData", TestDataGenerator.randomString(15), "MaterialInputs/implicitParentage", "B,G"));
 
-        SaveRowsResponse saveRowsResponse = dgen.insertRows(createDefaultConnection(), dgen.getRows());
+        RowsResponse rowsResponse = dgen.insertRows(createDefaultConnection(), dgen.getRows());
 
         // get row 'B' after insert
-        Map<String, Object> rowB = saveRowsResponse.getRows().stream().filter((a)-> a.get("name").equals("B"))
+        Map<String, Object> rowB = rowsResponse.getRows().stream().filter((a)-> a.get("name").equals("B"))
                 .findFirst().orElse(null);
-        Map<String, Object> rowH = saveRowsResponse.getRows().stream().filter((a)-> a.get("name").equals("H"))
+        Map<String, Object> rowH = rowsResponse.getRows().stream().filter((a)-> a.get("name").equals("H"))
                 .findFirst().orElse(null);
 
         refresh();
@@ -271,19 +273,19 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
         selectOptionByText(Locator.name("targetSampleTypeId"), subFolderSampleType + " in /" + getProjectName() + "/" + SUB_FOLDER_NAME);
         clickButton("Next");
 
-        setFormElement(Locator.name("outputSample1_Name"), "SampleSetBVT15");
-        setFormElement(Locator.name("outputSample2_Name"), "SampleSetBVT16");
+        setFormElement(Locator.name("Output Sample 1_Name"), "SampleSetBVT15");
+        setFormElement(Locator.name("Output Sample 2_Name"), "SampleSetBVT16");
         checkCheckbox(Locator.name("outputSample1_IntColFolderCheckBox"));
-        setFormElement(Locator.name("outputSample1_IntColFolder"), "500a");
-        setFormElement(Locator.name("outputSample1_StringColFolder"), "firstOutput");
-        setFormElement(Locator.name("outputSample2_StringColFolder"), "secondOutput");
+        setFormElement(Locator.name("Output Sample 1_IntCol-Folder"), "500a");
+        setFormElement(Locator.name("Output Sample 1_StringCol-Folder"), "firstOutput");
+        setFormElement(Locator.name("Output Sample 2_StringCol-Folder"), "secondOutput");
         clickButton("Submit");
 
         log("Do a simple check that data validation works.");
         checker().verifyTrue("Expected error message '(String) for Integer field' is not present.",
                 isTextPresent("(String) for Integer field"));
         checkCheckbox(Locator.name("outputSample1_IntColFolderCheckBox"));
-        setFormElement(Locator.name("outputSample1_IntColFolder"), "500");
+        setFormElement(Locator.name("Output Sample 1_IntCol-Folder"), "500");
         clickButton("Submit");
 
         clickAndWait(Locator.linkContainingText("Derive 2 samples"));
@@ -300,17 +302,17 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
         clickButton("Next");
 
         String derivedSampleName = "Only_In_Sub_Folder";
-        setFormElement(Locator.name("outputSample1_Name"), derivedSampleName);
-        setFormElement(Locator.name("outputSample1_IntCol"), "600");
-        setFormElement(Locator.name("outputSample1_StringCol"), "String");
-        setFormElement(Locator.name("outputSample1_DateCol"), "BadDate");
-        uncheckCheckbox(Locator.name("outputSample1_BoolCol"));
+        setFormElement(Locator.name("Output Sample 1_Name"), derivedSampleName);
+        setFormElement(Locator.name("Output Sample 1_IntCol"), "600");
+        setFormElement(Locator.name("Output Sample 1_StringCol"), "String");
+        setFormElement(Locator.name("Output Sample 1_DateCol"), "BadDate");
+        uncheckCheckbox(Locator.name("Output Sample 1_BoolCol"));
         clickButton("Submit");
 
         log("Again check that data validation works as expected.");
         checker().verifyTrue("Expected error message 'is not a valid Date' is not present.",
-                isTextPresent("'BadDate’ is not a valid Date for DateCol "));
-        setFormElement(Locator.name("outputSample1_DateCol"), "1/1/2007");
+                isTextPresent("'BadDate' is not a valid Date for DateCol "));
+        setFormElement(Locator.name("Output Sample 1_DateCol"), "1/1/2007");
         clickButton("Submit");
 
         log("Check that the correct sample id is shown as the parent.");
@@ -383,7 +385,7 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
 
         log("Check that the imported data is as expected.");
         DataRegionTable dataRegionTable = new DataRegionTable("Material", this);
-        int row = dataRegionTable.getIndexWhereDataAppears(testSample, "Name");
+        int row = dataRegionTable.getRowIndex("Name", testSample);
         String data = dataRegionTable.getDataAsText(row, columnName);
         checker().verifyEquals("Something doesn't look right. Value for column not as expected.",
                 testData, data);
@@ -406,7 +408,7 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
 
         log("Check that the updated data is shown.");
         dataRegionTable = new DataRegionTable("Material", this);
-        row = dataRegionTable.getIndexWhereDataAppears(testSample, "Name");
+        row = dataRegionTable.getRowIndex("Name", testSample);
         data = dataRegionTable.getDataAsText(row, columnName);
         checker().verifyEquals("Value for column not updated as expected.",
                 updatedTestData, data);
@@ -459,7 +461,7 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
         DataRegionTable table = sampleHelper.getSamplesDataRegionTable();
         table.openCustomizeGrid();
         _customizeViewsHelper.showHiddenItems();
-        _customizeViewsHelper.addColumn(new String[]{"Inputs", "Materials", parentSampleType});
+        _customizeViewsHelper.addColumn(FieldKey.fromParts("Inputs", "Materials", parentSampleType));
         _customizeViewsHelper.applyCustomView();
         waitAndClickAndWait(Locator.linkWithText("SampleSetBVT4"));
 
@@ -652,7 +654,7 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
 
         for(String parent : parents)
         {
-            int index = drt.getIndexWhereDataAppears(parent, "Name");
+            int index = drt.getRowIndex("Name", parent);
             drt.checkCheckbox(index);
         }
 
@@ -852,7 +854,7 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
         sampleGenerator.addCustomRow(Map.of("name", "J", "MaterialInputs/Family", "A", "DataInputs/Sources", "S-1"));
         sampleGenerator.addCustomRow(Map.of("name", "K", "MaterialInputs/Family", "D", "DataInputs/Sources", "S-1"));
         sampleGenerator.addCustomRow(Map.of("name", "L", "MaterialInputs/Family", "A,B", "DataInputs/Sources", "S-1,S-2"));
-        List<Map<String, Object>> savedSampleRows = sampleGenerator.insertRows(createDefaultConnection(), sampleGenerator.getRows()).getRows();;
+        List<Map<String, Object>> savedSampleRows = sampleGenerator.insertRows(createDefaultConnection(), sampleGenerator.getRows()).getRows();
 
         // add data objects with samples as parents
         dataGenerator = dataClass.getTestDataGenerator(getProjectName());
@@ -1116,54 +1118,65 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
     @Test
     public void testDeleteSamplesSomeWithDerivedSamples()
     {
-        final String SAMPLE_TYPE_NAME = "DeleteSamplesWithParents";
+        final String SAMPLE_TYPE_NAME = "DeleteSamplesWithParents" + DOMAIN_TRICKY_CHARACTERS;
         List<String> parentSampleNames = Arrays.asList("P-1", "P-2", "P-3");
         List<Map<String, String>> sampleData = new ArrayList<>();
-        parentSampleNames.forEach(name -> {
-            sampleData.add(Map.of("Name", name));
-        });
+        parentSampleNames.forEach(name -> sampleData.add(Map.of("Name", name)));
 
         clickProject(PROJECT_NAME);
         SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
         log("Create a sample type with some potential parents");
-        sampleHelper.createSampleType(new SampleTypeDefinition(SAMPLE_TYPE_NAME), sampleData);
+        sampleHelper.createSampleType(new SampleTypeDefinition(SAMPLE_TYPE_NAME).
+                addField(new FieldDefinition("Blood+")).
+                addField(new FieldDefinition("Blood-")),
+            sampleData);
         DataRegionTable drtSamples = sampleHelper.getSamplesDataRegionTable();
         log("Derive one sample from another");
-        drtSamples.checkCheckbox(drtSamples.getIndexWhereDataAppears(parentSampleNames.get(0), "Name"));
+        drtSamples.checkCheckbox(drtSamples.getRowIndex("Name", parentSampleNames.get(0)));
         clickButton("Derive Samples");
         waitAndClickAndWait(Locator.lkButton("Next"));
         String childName = parentSampleNames.get(0) + ".1";
-        setFormElement(Locator.name("outputSample1_Name"), childName);
+        String nameFieldInputFieldName = "Output Sample 1_Name";
+        String bloodPlusFieldInputFieldName = "Output Sample 1_Blood+";
+        String bloodMinusFieldInputFieldName = "Output Sample 1_Blood-";
+        setFormElement(Locator.name(nameFieldInputFieldName), childName);
+        setFormElement(Locator.name(bloodPlusFieldInputFieldName), "blood plus");
+        setFormElement(Locator.name(bloodMinusFieldInputFieldName), "blood minus");
         clickButton("Submit");
 
         log("Derive a sample from the one just created");
         clickAndWait(Locator.linkContainingText("derive samples from this sample"));
         clickButton("Next");
         String grandchildName = childName + ".1";
-        setFormElement(Locator.name("outputSample1_Name"), grandchildName);
+        setFormElement(Locator.name(nameFieldInputFieldName), grandchildName);
         clickButton("Submit");
 
         log("Derive a sample with two parents");
         clickAndWait(Locator.linkContainingText(SAMPLE_TYPE_NAME));
-        drtSamples.checkCheckbox(drtSamples.getIndexWhereDataAppears(parentSampleNames.get(1), "Name"));
-        drtSamples.checkCheckbox(drtSamples.getIndexWhereDataAppears(childName, "Name"));
+        drtSamples.checkCheckbox(drtSamples.getRowIndex("Name", parentSampleNames.get(1)));
+        drtSamples.checkCheckbox(drtSamples.getRowIndex("Name", childName));
         clickButton("Derive Samples");
         waitAndClickAndWait(Locator.lkButton("Next"));
         String twoParentChildName = parentSampleNames.get(1) + "+" + childName + ".1";
-        setFormElement(Locator.name("outputSample1_Name"), twoParentChildName);
+        setFormElement(Locator.name(nameFieldInputFieldName), twoParentChildName);
         clickButton("Submit");
 
         clickAndWait(Locator.linkContainingText(SAMPLE_TYPE_NAME));
 
+        // Issue 53306 - ensure that names differing only by special characters were captured correctly and are being
+        // shown in the grid
+        assertTextPresent("blood plus", "blood minus");
+
+
         log("Try to delete parent sample");
-        drtSamples.checkCheckbox(drtSamples.getIndexWhereDataAppears(parentSampleNames.get(0), "Name"));
+        drtSamples.checkCheckbox(drtSamples.getRowIndex("Name", parentSampleNames.get(0)));
         drtSamples.clickHeaderButton("Delete");
         Window.Window(getDriver()).withTitle("No samples can be deleted").waitFor()
                 .clickButton("Dismiss", true);
 
         log("Try to delete multiple parent samples");
-        drtSamples.checkCheckbox(drtSamples.getIndexWhereDataAppears(parentSampleNames.get(1), "Name"));
-        drtSamples.checkCheckbox(drtSamples.getIndexWhereDataAppears(childName, "Name"));
+        drtSamples.checkCheckbox(drtSamples.getRowIndex("Name", parentSampleNames.get(1)));
+        drtSamples.checkCheckbox(drtSamples.getRowIndex("Name", childName));
         drtSamples.clickHeaderButton("Delete");
         Window.Window(getDriver()).withTitle("No samples can be deleted").waitFor()
                 .clickButton("Dismiss", true);
@@ -1172,21 +1185,21 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
         assertEquals("No selection should remain", 0, drtSamples.getSelectedCount());
 
         log("Try to delete parent and child");
-        drtSamples.checkCheckbox(drtSamples.getIndexWhereDataAppears(parentSampleNames.get(1), "Name"));
-        drtSamples.checkCheckbox(drtSamples.getIndexWhereDataAppears(twoParentChildName, "Name"));
+        drtSamples.checkCheckbox(drtSamples.getRowIndex("Name", parentSampleNames.get(1)));
+        drtSamples.checkCheckbox(drtSamples.getRowIndex("Name", twoParentChildName));
         assertEquals("Parent and child should be checked", 2, drtSamples.getCheckedCount());
         assertEquals("Parent and child should be checked", 2, drtSamples.getSelectedCount());
 
         sampleHelper.deleteSamples(drtSamples, "Permanently delete 1 sample");
-        assertEquals("Deleted sample " + twoParentChildName + " still appears in grid", -1, drtSamples.getIndexWhereDataAppears(twoParentChildName, "Name"));
-        assertTrue("Parent sample " + parentSampleNames.get(1) + " does not appears in grid", drtSamples.getIndexWhereDataAppears(parentSampleNames.get(1), "Name") > -1);
+        assertEquals("Deleted sample " + twoParentChildName + " still appears in grid", -1, drtSamples.getRowIndex("Name", twoParentChildName));
+        assertTrue("Parent sample " + parentSampleNames.get(1) + " does not appears in grid", drtSamples.getRowIndex("Name", parentSampleNames.get(1)) > -1);
         assertEquals("Only parent sample should be checked", 1, drtSamples.getCheckedCount());
         assertEquals("Only parent sample should be checked", 1, drtSamples.getSelectedCount());
 
         log("Now that the child is gone, try to delete the parent");
         sampleHelper.deleteSamples(drtSamples, "Permanently delete 1 sample");
 
-        assertEquals("Deleted sample " + parentSampleNames.get(1) + " still appears in grid", -1, drtSamples.getIndexWhereDataAppears(parentSampleNames.get(1), "Name"));
+        assertEquals("Deleted sample " + parentSampleNames.get(1) + " still appears in grid", -1, drtSamples.getRowIndex("Name", parentSampleNames.get(1)));
         assertEquals("No selection should remain", 0, drtSamples.getCheckedCount());
 
         log("Now try to delete what's left, in several hitches");

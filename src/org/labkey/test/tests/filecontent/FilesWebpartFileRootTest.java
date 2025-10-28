@@ -17,7 +17,6 @@ package org.labkey.test.tests.filecontent;
 
 import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -38,7 +37,10 @@ import java.util.List;
 @BaseWebDriverTest.ClassTimeout(minutes = 5)
 public class FilesWebpartFileRootTest extends BaseWebDriverTest
 {
-    private static final String CHILD_CONTAINER = "ChildContainerNotForFileRootSelection";
+    private static final String PROJECT_NAME = "FilesWebpartFileRoot Project" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
+    private static final String WORK_FOLDER = "Work Folder" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
+    private static final String WORK_CONTAINER_PATH = PROJECT_NAME + "/" + WORK_FOLDER;
+    private static final String GRANDCHILD_CONTAINER = "ChildContainerNotForFileRootSelection";
     PortalHelper portalHelper = new PortalHelper(this);
     FileBrowserHelper fileBrowserHelper = new FileBrowserHelper(this);
 
@@ -51,29 +53,29 @@ public class FilesWebpartFileRootTest extends BaseWebDriverTest
     @Override
     protected @Nullable String getProjectName()
     {
-        return "FilesWebpartFileRoot Project" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
+        return PROJECT_NAME;
     }
 
     @BeforeClass
     public static void initTest()
     {
-        FilesWebpartFileRootTest init = (FilesWebpartFileRootTest)getCurrentTest();
+        FilesWebpartFileRootTest init = getCurrentTest();
         init.doInit();
     }
 
     private void doInit()
     {
         _containerHelper.createProject(getProjectName(), null);
-        _containerHelper.createSubfolder(getProjectName(), CHILD_CONTAINER);
+        _containerHelper.createSubfolder(getProjectName(), WORK_FOLDER);
+        _containerHelper.createSubfolder(WORK_CONTAINER_PATH, GRANDCHILD_CONTAINER);
 
-        goToProjectHome();
+        goToWorkFolder();
         portalHelper.addWebPart("Files");
     }
 
-    @Before
-    public void preTest()
+    private void goToWorkFolder()
     {
-        goToProjectHome();
+        goToProjectHome(WORK_CONTAINER_PATH);
     }
 
     @Test
@@ -81,6 +83,8 @@ public class FilesWebpartFileRootTest extends BaseWebDriverTest
     {
         String folderName = "Folder " + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
         File testFile = TestFileUtils.getSampleData("fileTypes/sample.txt");
+
+        goToWorkFolder();
 
         _fileBrowserHelper.createFolder(folderName);
         _fileBrowserHelper.selectFileBrowserItem(folderName + "/");
@@ -92,17 +96,17 @@ public class FilesWebpartFileRootTest extends BaseWebDriverTest
         customizePage.setFileRoot("@files", folderName);
         Assert.assertEquals("File in custom file root", List.of(testFile.getName()), _fileBrowserHelper.getFileList());
 
-        goToProjectHome();
+        goToWorkFolder();
 
         portalHelper.clickWebpartMenuItem("Files", true, "Customize");
-        customizePage.verifyFileRootNodeNotPresent(CHILD_CONTAINER); //child container shouldn't show up as file root options
+        customizePage.verifyFileRootNodeNotPresent(GRANDCHILD_CONTAINER); //child container shouldn't show up as file root options
         customizePage.setFileRoot("@files");
         Locator.XPathLocator importDataBtn = Locator.tagWithClass("a", "importDataBtn");
         Assert.assertTrue("Import Data button should be present when file root is @files and no pipeline override exists", isElementPresent(importDataBtn));
 
         log("Override pipeline root for project");
         setPipelineRoot(TestFileUtils.getSampleData("AssayAPI").getParentFile().getAbsolutePath());
-        goToProjectHome();
+        goToWorkFolder();
         Assert.assertTrue("Import Data button should not be present when file root is @files and pipeline override exists", !isElementPresent(importDataBtn));
 
         log("Set webpart file root to @pipeline");

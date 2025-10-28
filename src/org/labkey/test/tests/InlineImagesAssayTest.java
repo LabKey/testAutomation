@@ -28,8 +28,10 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.CustomizeView;
+import org.labkey.test.components.assay.AssayConstants;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.FieldKey;
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExcelHelper;
@@ -81,7 +83,7 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
     @BeforeClass
     public static void initTest()
     {
-        InlineImagesAssayTest init = (InlineImagesAssayTest)getCurrentTest();
+        InlineImagesAssayTest init = getCurrentTest();
         init.doInit();
     }
 
@@ -126,10 +128,10 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
         log("Populate the assay with data.");
         clickAndWait(Locator.linkWithText(assayName));
         clickButton("Import Data");
-        setFormElement(Locator.name("batchFileField"), XLS_FILE);
+        setFormElement(Locator.name("BatchFileField"), XLS_FILE);
         clickButton("Next");
-        setFormElement(Locator.name("name"), runName);
-        setFormElement(Locator.name("TextAreaDataCollector.textArea"), importData);
+        setFormElement(AssayConstants.ASSAY_NAME_FIELD_LOCATOR, runName);
+        setFormElement(AssayConstants.TEXT_AREA_DATA_COLLECTOR_LOCATOR, importData);
 
         clickButton("Save and Finish");
 
@@ -177,8 +179,8 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
         DataRegionTable list = new DataRegionTable("Data", getDriver());
         CustomizeView customizeView = list.openCustomizeGrid();
         customizeView.showHiddenItems();
-        customizeView.addColumn(new String[]{"Run", "RowId"});
-        customizeView.addColumn(new String[]{"Run", "Protocol", "RowId"});
+        customizeView.addColumn(FieldKey.fromParts("Run", "RowId"));
+        customizeView.addColumn(FieldKey.fromParts("Run", "Protocol", "RowId"));
         customizeView.applyCustomView();
         var protocolId = list.getDataAsText(0, "Run/Protocol/RowId");
         var runId = list.getDataAsText(0, "Run/RowId");
@@ -188,7 +190,7 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
         log("Validate that two links to this image file are now present.");
         assertElementPresent("Did not find the expected number of icons for images for " + PNG01_FILE.getName() + " from the runs.", Locator.xpath("//img[contains(@title, '" + PNG01_FILE.getName() + "')]"), 3);
         assertElementPresent("Did not find the expected number of icons for images for " + LRG_PNG_FILE.getName() + " from the runs.", Locator.xpath("//img[contains(@title, '" + LRG_PNG_FILE.getName() + "')]"), 1);
-        assertElementPresent("Did not find the expected number of icons for images for " + helpJpgFilePath + " from the runs.", Locator.xpath("//img[contains(@title, '" + helpJpgFilePath + "')]"), 1);
+        assertElementPresent("Did not find the expected number of icons for images for " + HELP_JPG_FILE.getName() + " from the runs.", Locator.xpath("//img[contains(@title, '" + HELP_JPG_FILE.getName() + "')]"), 1);
 
         log("Export the grid to excel.");
         File exportedFile;
@@ -222,7 +224,7 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
         log("Verify that the other 'File' fields are not affected.");
         assertElementPresent("Did not find the expected number of icons for images for " + PNG01_FILE.getName() + " from the runs.", Locator.xpath("//img[contains(@title, '" + PNG01_FILE.getName() + "')]"), 3);
         assertElementPresent("Did not find the expected number of icons for images for " + LRG_PNG_FILE.getName() + " from the runs.", Locator.xpath("//img[contains(@title, '" + LRG_PNG_FILE.getName() + "')]"), 1);
-        assertElementPresent("Did not find the expected number of icons for images for " + helpJpgFilePath + " from the runs.", Locator.xpath("//img[contains(@title, '" + helpJpgFilePath + "')]"), 1);
+        assertElementPresent("Did not find the expected number of icons for images for " + HELP_JPG_FILE.getName() + " from the runs.", Locator.xpath("//img[contains(@title, '" + HELP_JPG_FILE.getName() + "')]"), 1);
 
 
         log("Export the grid to excel again and make sure that everything is as expected.");

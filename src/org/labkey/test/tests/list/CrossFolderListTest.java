@@ -8,25 +8,30 @@ import org.labkey.test.Locator;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Data;
 import org.labkey.test.categories.Hosting;
+import org.labkey.test.components.DomainDesignerPage;
+import org.labkey.test.components.html.OptionSelect;
 import org.labkey.test.pages.LabkeyErrorPage;
 import org.labkey.test.pages.list.GridPage;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.FieldInfo;
 import org.labkey.test.params.list.IntListDefinition;
 import org.labkey.test.params.list.ListDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.DomainUtils;
+import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.TestDataGenerator;
 import org.labkey.test.util.query.QueryApiHelper;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.labkey.test.util.ListHelper.LIST_SCHEMA;
 
 @Category({Daily.class, Data.class, Hosting.class})
 public class CrossFolderListTest extends BaseWebDriverTest
@@ -34,20 +39,19 @@ public class CrossFolderListTest extends BaseWebDriverTest
     private static final String PROJECT_NAME = "CrossFolderListTest Project";
     private static final String SUBFOLDER_A = "subA";
     private static final String SUBFOLDER_A_PATH = PROJECT_NAME + "/" + SUBFOLDER_A;
-
     private static final String SHARED_LIST = "shared_list_for_crossfolder_test";
 
     @Override
     protected void doCleanup(boolean afterTest)
     {
         _containerHelper.deleteProject(getProjectName(), afterTest);
-        DomainUtils.ensureDeleted("/Shared", "lists", SHARED_LIST);
+        DomainUtils.ensureDeleted("/Shared", LIST_SCHEMA, SHARED_LIST);
     }
 
     @BeforeClass
     public static void setupProject()
     {
-        CrossFolderListTest init = (CrossFolderListTest) getCurrentTest();
+        CrossFolderListTest init = getCurrentTest();
         init.doSetup();
     }
 
@@ -106,7 +110,7 @@ public class CrossFolderListTest extends BaseWebDriverTest
                 .setName(newListName)
                 .clickSave();
 
-        // Issue 47356: Rewrite returnURL in the event of a list name change
+        // Issue 47356: Rewrite returnUrl in the event of a list name change
         new GridPage(getDriver()).getGrid();
         assertThat(getURL().getQuery()).contains("name=" + newListName);
         assertThat(getURL().getPath()).contains("/" + SUBFOLDER_A);
@@ -129,8 +133,11 @@ public class CrossFolderListTest extends BaseWebDriverTest
         helper.beginAtList(getProjectName(), SHARED_LIST);
 
         // insert a record into the shared list, in the current folder
+        String intColumnName = sharedListDef.getFieldByNamePart("intColumn").getName();
+        String decimalColumnName = sharedListDef.getFieldByNamePart("decimalColumn").getName();
+        String stringColumnName = sharedListDef.getFieldByNamePart("stringColumn").getName();
         DataRegionTable.DataRegion(getDriver()).find().clickInsertNewRow()
-                .update(Map.of("intColumn", 1, "decimalColumn", "2.2", "stringColumn", "stringy"));
+                .update(Map.of(intColumnName, 1, decimalColumnName, "2.2", stringColumnName, "stringy"));
 
         // navigate to the shared list but view it in the project
         helper.beginAtList(getProjectName(), SHARED_LIST);
@@ -175,23 +182,31 @@ public class CrossFolderListTest extends BaseWebDriverTest
         dGen.withGeneratedRows(3);
         dGen.insertRows();
 
+        String intColumnName = listDef.getFieldByNamePart("intColumn").getName();
+        String decimalColumnName = listDef.getFieldByNamePart("decimalColumn").getName();
+        String stringColumnName = listDef.getFieldByNamePart("stringColumn").getName();
+        String dateColumnName = listDef.getFieldByNamePart("dateColumn").getName();
+        String boolColumnName = listDef.getFieldByNamePart("boolColumn").getName();
+
         // make a couple rows of data for the subfolder
         List<Map<String, Object>> rowsToInsert = List.of(
-                Map.of("intColumn", 1, "decimalColumn", 1.1,
-                        "stringColumn", "stringy", "dateColumn", "11/11/2023", "boolColumn", true),
-                Map.of("intColumn", 2, "decimalColumn", 2.2,
-                        "stringColumn", "chewy", "dateColumn", "11/12/2023", "boolColumn", false)
+                Map.of(intColumnName, 1, decimalColumnName, 1.1,
+                        stringColumnName, "stringy", dateColumnName, "11/11/2023",
+                        boolColumnName, true),
+                Map.of(intColumnName, 2, decimalColumnName, 2.2,
+                        stringColumnName, "chewy", dateColumnName, "11/12/2023",
+                        boolColumnName, false)
         );
 
         // insert 2 records into the list, in the subfolder
-        var qah = new QueryApiHelper(createDefaultConnection(), SUBFOLDER_A_PATH, "lists", listName);
+        var qah = new QueryApiHelper(createDefaultConnection(), SUBFOLDER_A_PATH, LIST_SCHEMA, listName);
         qah.insertRows(rowsToInsert);
         var subFolderListPage = GridPage.beginAt(this, SUBFOLDER_A_PATH, listName);
 
         var displayedData = subFolderListPage.getGrid().getTableData();
         assertEquals("expect only subfolder data to be shown here by default",
                 rowsToInsert.size(), displayedData.size());
-        assertThat(subFolderListPage.getGrid().getColumnDataAsText("String Column"))
+        assertThat(subFolderListPage.getGrid().getColumnDataAsText(stringColumnName))
                 .as("expect only the data inserted here to be shown").contains("stringy", "chewy");
     }
 
@@ -205,13 +220,23 @@ public class CrossFolderListTest extends BaseWebDriverTest
         dGen.withGeneratedRows(2);
         dGen.insertRows();
 
+        String intColumnName = listDef.getFieldByNamePart("intColumn").getName();
+        String decimalColumnName = listDef.getFieldByNamePart("decimalColumn").getName();
+        String stringColumnName = listDef.getFieldByNamePart("stringColumn").getName();
+        String dateColumnName = listDef.getFieldByNamePart("dateColumn").getName();
+        String boolColumnName = listDef.getFieldByNamePart("boolColumn").getName();
+
         // make a row of data for the subfolder
         List<Map<String, Object>> rowToInsert = List.of(
-                Map.of("intColumn", 3, "decimalColumn", 3.3,
-                        "stringColumn", "meta", "dateColumn", "11/14/2023", "boolColumn", true));
+                Map.of(intColumnName, 3,
+                        decimalColumnName, 3.3,
+                        stringColumnName, "meta",
+                        dateColumnName, "11/14/2023",
+                        boolColumnName, true
+                ));
 
         // insert 1 record into the list, in the subfolder
-        var qah = new QueryApiHelper(createDefaultConnection(), SUBFOLDER_A_PATH, "lists", listName);
+        var qah = new QueryApiHelper(createDefaultConnection(), SUBFOLDER_A_PATH, LIST_SCHEMA, listName);
         qah.insertRows(rowToInsert);
         var subFolderListPage = GridPage.beginAt(this, SUBFOLDER_A_PATH, listName);
 
@@ -262,30 +287,94 @@ public class CrossFolderListTest extends BaseWebDriverTest
         // same name in the same scope.
 
         // create a simple list in subfolder, insert some values, and grab a column's worth of data from it
-        ListDefinition listDef = createListDef(listName, testFields());
+        List<FieldDefinition> fields = testFields();
+        ListDefinition listDef = createListDef(listName, fields);
         var dGen = listDef.create(createDefaultConnection(), SUBFOLDER_A_PATH);
         dGen.withGeneratedRows(2);
         dGen.insertRows();
-        var subfolderData = dGen.getRows().stream().map(a-> a.get("stringColumn").toString()).collect(Collectors.toList());
+        String stringColumnName = listDef.getFieldByNamePart("stringColumn").getName();
+        var subfolderData = dGen.getRows().stream().map(a-> a.get(stringColumnName).toString()).toList();
 
         // create another list with the same name at the project level, insert a little different data and capture the string values
-        ListDefinition listDef2 = createListDef(listName, testFields());
+        ListDefinition listDef2 = createListDef(listName, fields);
         var dgen2 = listDef2.create(createDefaultConnection(), getProjectName());
         dgen2.withGeneratedRows(3);
         dgen2.insertRows();
-        var topFolderData = dgen2.getRows().stream().map(a-> a.get("stringColumn").toString()).collect(Collectors.toList());
+        var topFolderData = dgen2.getRows().stream().map(a-> a.get(stringColumnName).toString()).toList();
 
         // navigate to the top folder, open the container filter to include the subfolder and ensure only data from this list is shown
         var topPage = GridPage.beginAt(this, getProjectName(), listName);
         topPage.getGrid().setContainerFilter(DataRegionTable.ContainerFilterType.CURRENT_AND_SUBFOLDERS_PLUS_SHARED);
         assertEquals("expect the view in the top folder to only show current list data even with different subfolder list by the same name",
-                new HashSet<>(topFolderData), new HashSet<>(topPage.getGrid().getColumnDataAsText("String Column")));
+                new HashSet<>(topFolderData), new HashSet<>(topPage.getGrid().getColumnDataAsText(stringColumnName)));
 
         // now view the list from the subfolder and ensure the list contents aren't mixed despite name ambiguity
         var subfolderPage = GridPage.beginAt(this, SUBFOLDER_A_PATH, listName);
         subfolderPage.getGrid().setContainerFilter(DataRegionTable.ContainerFilterType.CURRENT_PLUS_PROJECT_AND_SHARED);
         assertEquals("expect the view in the top folder to only show current list data even with different subfolder list by the same name",
-                new HashSet<>(subfolderData), new HashSet<>(subfolderPage.getGrid().getColumnDataAsText("String Column")));
+                new HashSet<>(subfolderData), new HashSet<>(subfolderPage.getGrid().getColumnDataAsText(stringColumnName)));
+    }
+
+    @Test // Issue 52501
+    public void testLookupValidatorFolderScope() throws Exception
+    {
+        var firstListName = TestDataGenerator.randomDomainName(null, DomainUtils.DomainKind.IntList);
+        var secondListName = TestDataGenerator.randomDomainName(null, DomainUtils.DomainKind.IntList);
+        var textColumnName = TestDataGenerator.randomFieldName("Text", null, DomainUtils.DomainKind.IntList);
+        var lookupFieldName = TestDataGenerator.randomFieldName("LookAtFirst", null, DomainUtils.DomainKind.IntList);
+        var encodedLookupFieldName = EscapeUtil.fieldKeyEncodePart(lookupFieldName);
+
+        // Create and configure list definitions
+        {
+            createListDef(firstListName, List.of(new FieldDefinition(textColumnName)))
+                    .create(createDefaultConnection(), getProjectName());
+
+            createListDef(secondListName, List.of(
+                new FieldDefinition("Name"),
+                new FieldDefinition(lookupFieldName, new FieldDefinition.IntLookup(null, LIST_SCHEMA, firstListName))
+            )).create(createDefaultConnection(), getProjectName());
+
+            // Update the lookup to require validation
+            var domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), LIST_SCHEMA, secondListName);
+            domainDesignerPage.fieldsPanel()
+                    .getField(lookupFieldName)
+                    .setLookupValidatorEnabled(true);
+            domainDesignerPage.clickFinish();
+        }
+
+        // Insert data into the first list
+        {
+            var projectApi = new QueryApiHelper(createDefaultConnection(), getProjectName(), LIST_SCHEMA, firstListName);
+            projectApi.insertRows(List.of(Map.of(textColumnName, "Alpha"), Map.of(textColumnName, "Aileron"), Map.of(textColumnName, "Alpaca")));
+
+            var subfolderApi = new QueryApiHelper(createDefaultConnection(), SUBFOLDER_A_PATH, LIST_SCHEMA, firstListName);
+            subfolderApi.insertRows(List.of(Map.of(textColumnName, "Beta"), Map.of(textColumnName, "Bingo"), Map.of(textColumnName, "Beep")));
+        }
+
+        var secondListGridPage = GridPage.beginAt(this, SUBFOLDER_A_PATH, secondListName);
+        secondListGridPage.getGrid()
+                .clickInsertNewRow()
+                .setField("Name", "OnFirst")
+                .setField(lookupFieldName, OptionSelect.SelectOption.textOption("Beep"))
+                .submit();
+        secondListGridPage = new GridPage(getDriver());
+
+        // Act
+        // Attempt to update a validated list lookup
+        secondListGridPage.getGrid()
+                .clickEditRow(0)
+                .setField(lookupFieldName, OptionSelect.SelectOption.textOption("Bingo"))
+                .submit();
+
+        // Assert
+        // Expect to be navigated back to the grid
+        secondListGridPage = new GridPage(getDriver());
+        var grid = secondListGridPage.getGrid();
+        assertEquals("Unexpected number of rows in the list", 1, grid.getDataRowCount());
+
+        var rowMap = grid.getRowDataAsMap(0);
+        assertEquals("Unexpected number of column values", 2, rowMap.size());
+        assertEquals(String.format("Unexpected value for the lookup field \"%s\"", lookupFieldName), "Bingo", rowMap.get(encodedLookupFieldName));
     }
 
     private ListDefinition createListDef(String listName, List<FieldDefinition> listColumns)
@@ -298,11 +387,12 @@ public class CrossFolderListTest extends BaseWebDriverTest
     private List<FieldDefinition> testFields()
     {
         return Arrays.asList(
-                new FieldDefinition("intColumn", FieldDefinition.ColumnType.Integer),
-                new FieldDefinition("decimalColumn", FieldDefinition.ColumnType.Decimal),
-                new FieldDefinition("stringColumn", FieldDefinition.ColumnType.String),
-                new FieldDefinition("dateColumn", FieldDefinition.ColumnType.DateAndTime),
-                new FieldDefinition("boolColumn", FieldDefinition.ColumnType.Boolean));
+                FieldInfo.random("intColumn", FieldDefinition.ColumnType.Integer, DomainUtils.DomainKind.IntList).getFieldDefinition(),
+                FieldInfo.random("decimalColumn", FieldDefinition.ColumnType.Decimal, DomainUtils.DomainKind.IntList).getFieldDefinition(),
+                FieldInfo.random("stringColumn", FieldDefinition.ColumnType.String, DomainUtils.DomainKind.IntList).getFieldDefinition(),
+                FieldInfo.random("dateColumn", FieldDefinition.ColumnType.DateAndTime, DomainUtils.DomainKind.IntList).getFieldDefinition(),
+                FieldInfo.random("boolColumn", FieldDefinition.ColumnType.Boolean, DomainUtils.DomainKind.IntList).getFieldDefinition()
+        );
     }
 
     @Override

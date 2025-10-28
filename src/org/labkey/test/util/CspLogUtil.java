@@ -3,6 +3,7 @@ package org.labkey.test.util;
 import org.apache.commons.collections4.MultiValuedMap;
 import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
 import org.apache.commons.io.IOUtils;
+import org.json.JSONObject;
 import org.junit.Assert;
 import org.labkey.serverapi.writer.PrintWriters;
 import org.labkey.test.TestFileUtils;
@@ -16,17 +17,20 @@ import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 public class CspLogUtil
 {
     private static final List<String> ignoredViolations = List.of(
             "/_rstudio/",
-            "/_rstudioReport/",
-            "/reports-createScriptReport.view?",
-            "/reports-runReport.view?"
+            "/_rstudioReport/"
     );
+    private static final Set<String> ignoredDirectives = Collections.emptySet();
+
     private static final String logName = "csp-report.log";
     private static final File logFile = new File(TestFileUtils.getServerLogDir(), logName);
 
@@ -35,6 +39,25 @@ public class CspLogUtil
     private static boolean missingLog = false;
 
     private CspLogUtil() { }
+
+    public static void init()
+    {
+        if (lastModified == 0)
+        {
+            try
+            {
+                BasicFileAttributes logFileAttributes;
+                logFileAttributes = Files.readAttributes(logFile.toPath(), BasicFileAttributes.class);
+
+                lastSize = logFileAttributes.size();
+                lastModified = logFileAttributes.lastModifiedTime().toMillis();
+            }
+            catch (IOException e)
+            {
+                lastModified = System.currentTimeMillis();
+            }
+        }
+    }
 
     public static void checkNewCspWarnings(ArtifactCollector artifactCollector)
     {
@@ -87,28 +110,40 @@ public class CspLogUtil
 
                 boolean foundVioloation = false;
                 MultiValuedMap<Crawler.ControllerActionId, String> violoations = new HashSetValuedHashMap<>();
+                List<CspReport> cspReports = new ArrayList<>();
+                StringBuilder sb = new StringBuilder();
                 for (String line : warningLines)
                 {
-                    String[] split = line.split("ContentSecurityPolicy warning on page: ");
-                    if (split.length > 1)
+                    if (!sb.isEmpty() || line.equals("{"))
                     {
+                        sb.append(line);
+                    }
+                    if (line.equals("}"))
+                    {
+                        cspReports.add(new CspReport(sb.toString()));
+                        sb = new StringBuilder();
                         foundVioloation = true;
-                        String url = split[1];
-                        if (ignoredViolations.stream().anyMatch(url::contains))
-                        {
-                            TestLogger.warn("Ignoring CSP warning on page: " + url);
-                        }
-                        else
-                        {
-                            Crawler.ControllerActionId actionId = new Crawler.ControllerActionId(url);
-                            violoations.put(actionId, url);
-                        }
                     }
                 }
 
                 if (!foundVioloation)
                 {
                     throw new AssertionError("Detected CSP violations but unable to parse log file: " + recentWarningsFile.getAbsolutePath());
+                }
+
+                for (CspReport cspReport : cspReports)
+                {
+                    String url = cspReport.getDocumentUri();
+                    String violatedDirective = cspReport.getViolatedDirective();
+                    if (ignoredViolations.stream().anyMatch(url::contains) || ignoredDirectives.contains(violatedDirective))
+                    {
+                        TestLogger.warn("Ignoring %s CSP warning on page: %s".formatted(violatedDirective, url));
+                    }
+                    else
+                    {
+                        Crawler.ControllerActionId actionId = new Crawler.ControllerActionId(url);
+                        violoations.put(actionId, cspReport.toString());
+                    }
                 }
 
                 if (!violoations.isEmpty())
@@ -165,5 +200,34 @@ public class CspLogUtil
         {
             super(detailMessage);
         }
+    }
+}
+
+class CspReport
+{
+    private final String _violatedDirective;
+    private final String _documentUri;
+
+    CspReport(String reportStr)
+    {
+        JSONObject report = new JSONObject(reportStr).getJSONObject("csp-report");
+        _violatedDirective = report.getString("violated-directive");
+        _documentUri = report.getString("document-uri");
+    }
+
+    public String getViolatedDirective()
+    {
+        return _violatedDirective;
+    }
+
+    public String getDocumentUri()
+    {
+        return _documentUri;
+    }
+
+    @Override
+    public String toString()
+    {
+        return getViolatedDirective() + ": " + getDocumentUri();
     }
 }

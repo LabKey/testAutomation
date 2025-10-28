@@ -42,6 +42,7 @@ import static org.labkey.test.util.DataRegionTable.DataRegion;
 public class ListHelper extends LabKeySiteWrapper
 {
     public static final String IMPORT_ERROR_SIGNAL = "importFailureSignal"; // See query/import.jsp
+    public static final String LIST_SCHEMA = "lists";
     private final WrapsDriver _wrapsDriver;
 
     public ListHelper(WrapsDriver wrapsDriver)
@@ -112,7 +113,7 @@ public class ListHelper extends LabKeySiteWrapper
     {
         for (String key : data.keySet())
         {
-            WebElement field = waitForElement(Locator.name("quf_" + key));
+            WebElement field = waitForElement(Locator.name(EscapeUtil.getFormFieldName(key)));
             String inputType = field.getAttribute("type");
             Object value = data.get(key);
             if (value instanceof File)

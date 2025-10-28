@@ -27,7 +27,7 @@ public class ExperimentGraph
 {
     private static final String MAP_NAME = "graphmap";
     
-    private PipelineWebTestBase _test;
+    private final PipelineWebTestBase _test;
 
     public ExperimentGraph(PipelineWebTestBase test)
     {

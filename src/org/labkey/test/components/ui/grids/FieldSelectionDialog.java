@@ -7,7 +7,10 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.UpdatingComponent;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.html.Checkbox;
+import org.labkey.test.params.FieldKey;
+import org.labkey.test.util.selenium.WebElementUtils;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
@@ -15,10 +18,12 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static org.labkey.test.util.TextUtils.normalizeSpace;
+import static org.labkey.test.util.selenium.WebElementUtils.getTextContent;
 
 /**
  * Wraps ColumnSelectionModal.tsx in UI components.
@@ -85,58 +90,64 @@ public class FieldSelectionDialog extends ModalDialog
      *
      * @return The list of field names.
      */
-    public List<String> getAvailableFields()
+    public List<String> getAvailableFieldLabels()
     {
         List<WebElement> listItemElements = elementCache().getListItemNameElements(elementCache().availableFieldsPanel);
-        return listItemElements.stream().map(WebElement::getText).collect(Collectors.toList());
+        return listItemElements.stream().map(WebElementUtils::getTextContent).collect(Collectors.toList());
     }
 
     /**
      * Check to see if the available field listed is shown as selected, has a checkmark, in the 'Available Fields' panel.
      *
-     * @param fieldName Can be an individual field or a path to a nested field.
+     * @param fieldNameParts Can be an individual field or a path to a nested field.
      * @return True if row has the checkmark, false otherwise.
      */
-    public boolean isAvailableFieldSelected(String... fieldName)
+    public boolean isAvailableFieldSelected(String... fieldNameParts)
     {
-        WebElement listItem = elementCache().getListItemElementByFieldKey(expandAvailableFields(fieldName));
+        return isAvailableFieldSelected(FieldKey.fromParts(fieldNameParts));
+    }
+
+    public boolean isAvailableFieldSelected(FieldKey fieldKey)
+    {
+        WebElement listItem = getAvailableFieldElement(fieldKey);
         return Locator.tagWithClass("i", "fa-check").findWhenNeeded(listItem).isDisplayed();
     }
 
-    public boolean isFieldAvailable(String... fieldName)
+    public boolean isFieldAvailable(String... fieldNameParts)
     {
-        return elementCache().getListItemElementByFieldKeyOrNull(expandAvailableFields(fieldName)) != null;
+        return isFieldAvailable(FieldKey.fromParts(fieldNameParts));
+    }
+
+    public boolean isFieldAvailable(FieldKey fieldKey)
+    {
+        try
+        {
+            getAvailableFieldElement(fieldKey);
+            return true;
+        }
+        catch (NoSuchElementException e)
+        {
+            return false;
+        }
     }
 
     /**
      * Select a field the list of available fields. If more than one value is passed in it is assumed to be an expandable path.
      *
-     * @param fieldName Either an individual field or the path to a field to add.
+     * @param fieldNameParts Either an individual field or the path to a field to add.
      * @return This dialog.
      */
-    public FieldSelectionDialog selectAvailableField(String... fieldName)
+    public FieldSelectionDialog selectAvailableField(String... fieldNameParts)
     {
-        return addFieldByFieldKeyToGrid(expandAvailableFields(fieldName));
+        return selectAvailableField(FieldKey.fromParts(fieldNameParts));
     }
 
-    public WebElement getAvailableFieldElement(String fieldName)
+    public FieldSelectionDialog selectAvailableField(FieldKey fieldKey)
     {
-        String fieldKey = expandAvailableFields(fieldName);
-        return elementCache().getListItemElementByFieldKey(fieldKey);
-    }
-
-    /**
-     * Private helper to add a field to the 'Shown in Grid' list. Use the data-fieldkey value to identify the item.
-     *
-     * @param fieldKey The value in the data-fieldkay attribute for the row.
-     * @return This dialog.
-     */
-    private FieldSelectionDialog addFieldByFieldKeyToGrid(String fieldKey)
-    {
-        WebElement listItem = elementCache().getListItemElementByFieldKey(fieldKey);
+        WebElement listItem = getAvailableFieldElement(fieldKey);
 
         Assert.assertTrue(String.format(FIELD_NOT_AVAILABLE, fieldKey),
-                listItem.isDisplayed());
+            listItem.isDisplayed());
 
         WebElement addIcon = Locator.tagWithClass("div", "view-field__action")
                 .withChild(Locator.tagWithClass("i", "fa-plus"))
@@ -147,48 +158,36 @@ public class FieldSelectionDialog extends ModalDialog
         return this;
     }
 
-    /**
-     * Expand a field or a hierarchy of fields. If a single field is passed in only it will be expanded. If multiple values
-     * are passed in it is assumed to be a path and all fields will be expanded to the last field.
-     *
-     * @param fields The list of fields to expand.
-     * @return key for the expanded field.
-     */
-    private String expandAvailableFields(String... fields)
+    public WebElement getAvailableFieldElement(String... fieldNameParts)
     {
-        StringBuilder fieldKey = new StringBuilder();
+        return getAvailableFieldElement(FieldKey.fromParts(fieldNameParts));
+    }
 
-        Iterator<String> iterator = Arrays.stream(fields).iterator();
+    /**
+     * Expand available field tree to the specified field
+     *
+     * @param fieldKey FieldKey for the target field
+     * @return row element for the specified field
+     */
+    public WebElement getAvailableFieldElement(FieldKey fieldKey)
+    {
+        Iterator<FieldKey> iterator = fieldKey.getIterator();
 
         while(iterator.hasNext())
         {
-            fieldKey.append(iterator.next().trim());
+            fieldKey = iterator.next();
 
             // If this isn't the last item in the collection keep expanding and building the expected data-fieldkey value.
             if(iterator.hasNext())
             {
                 // If the field is already expanded don't try to expand it.
-                if(!isFieldKeyExpanded(elementCache().getListItemElementByFieldKey(fieldKey.toString())))
-                    expandOrCollapseByFieldKey(fieldKey.toString(), true);
-
-                fieldKey.append("/");
+                if(!isFieldKeyExpanded(elementCache().findAvailableField(fieldKey)))
+                    expandOrCollapseByFieldKey(fieldKey, true);
             }
 
         }
 
-        return fieldKey.toString();
-    }
-
-    /**
-     * Collapse a top level field in 'Available Fields' panel.
-     *
-     * @param fieldName Name of the field to collapse.
-     * @return This dialog.
-     */
-    public FieldSelectionDialog collapseAvailableField(String fieldName)
-    {
-        expandOrCollapseByFieldKey(fieldName.replace(" ", ""), false);
-        return this;
+        return elementCache().findAvailableField(fieldKey);
     }
 
     /**
@@ -197,10 +196,10 @@ public class FieldSelectionDialog extends ModalDialog
      * @param fieldKey The data-fieldkey value of the field to expand.
      * @param expand True to expand false to collapse.
      */
-    private void expandOrCollapseByFieldKey(String fieldKey, boolean expand)
+    private void expandOrCollapseByFieldKey(FieldKey fieldKey, boolean expand)
     {
 
-        WebElement listItem = elementCache().getListItemElementByFieldKey(fieldKey);
+        WebElement listItem = elementCache().findAvailableField(fieldKey);
 
         // Check to see if row is already in the desired state. If so don't do anything.
         if((expand && isFieldKeyExpanded(listItem) || (!expand && !isFieldKeyExpanded(listItem))))
@@ -249,10 +248,10 @@ public class FieldSelectionDialog extends ModalDialog
      *
      * @return The list of selected fields.
      */
-    public List<String> getSelectedFields()
+    public List<String> getSelectedFieldLabels()
     {
         List<WebElement> listItemElements = elementCache().getListItemNameElements(elementCache().selectedFieldsPanel);
-        return listItemElements.stream().map(WebElement::getText).collect(Collectors.toList());
+        return listItemElements.stream().map(WebElementUtils::getTextContent).collect(Collectors.toList());
     }
 
     /**
@@ -260,7 +259,7 @@ public class FieldSelectionDialog extends ModalDialog
      *
      * @return Text of highlighted (active) selected field. Empty string if none is highlighted.
      */
-    public String getActiveSelectedField()
+    public String getActiveSelectedFieldLabel()
     {
         WebElement active = Locator.tagWithClass("div", "list-group-item")
                 .withClass("active")
@@ -268,7 +267,7 @@ public class FieldSelectionDialog extends ModalDialog
 
         if(active.isDisplayed())
         {
-            return Locator.tagWithClass("div", "field-name").findElement(active).getText();
+            return getTextContent(Locator.tagWithClass("div", "field-caption").findElement(active));
         }
         else
         {
@@ -408,7 +407,7 @@ public class FieldSelectionDialog extends ModalDialog
         if (removedAll)
         {
             WebDriverWrapper.sleep(500);
-            WebDriverWrapper.waitFor(() -> getSelectedFields().isEmpty(), "Did not remove all of the selected fields.", 1_500);
+            WebDriverWrapper.waitFor(() -> getSelectedFieldLabels().isEmpty(), "Did not remove all of the selected fields.", 1_500);
         }
 
         return this;
@@ -417,33 +416,30 @@ public class FieldSelectionDialog extends ModalDialog
     /**
      * Update the given field label to a new value.
      *
-     * @param currentFieldLabel The field to be updated.
+     * @param fieldName The field to be updated.
      * @param newFieldLabel The new value to set the label to.
      * @return This dialog.
      */
-    public FieldSelectionDialog setFieldLabel(String currentFieldLabel, String newFieldLabel)
+    public FieldSelectionDialog setFieldLabel(String fieldName, String newFieldLabel)
     {
-        return setFieldLabel(currentFieldLabel, 0, newFieldLabel);
+        return setFieldLabel(FieldKey.fromParts(fieldName), newFieldLabel);
     }
 
     /**
-     * Update the given field to a new label. If there are multiple fields with the same label in the list the index
-     * parameter identifies which one to update.
+     * Update the given field to a new label.
      *
-     * @param currentFieldLabel The field to be updated.
-     * @param index If multiple fields have the save label this identifies which one in the list to update.
+     * @param fieldKey The field to be updated.
      * @param newFieldLabel The new value to set the label to.
      * @return This dialog.
      */
-    public FieldSelectionDialog setFieldLabel(String currentFieldLabel, int index, String newFieldLabel)
+    public FieldSelectionDialog setFieldLabel(FieldKey fieldKey, String newFieldLabel)
     {
-
-        WebElement listItem = getSelectedListItems(currentFieldLabel).get(index);
+        WebElement listItem = elementCache().findSelectedField(fieldKey);
         WebElement updateIcon = Locator.tagWithClass("span", "edit-inline-field__toggle").findWhenNeeded(listItem);
         updateIcon.click();
 
         WebDriverWrapper.waitFor(()->elementCache().fieldLabelEdit.isDisplayed(),
-                String.format("Input for field '%s' was not shown.", currentFieldLabel), 1_500);
+                String.format("Input for field '%s' was not shown.", fieldKey), 1_500);
 
         // Unfortunately using setFormElement doesn't work in this case. That method calls WebElement.clear which clears
         // the current text but also causes the focus to the input control to be lost. When the focus is lost the input
@@ -456,9 +452,11 @@ public class FieldSelectionDialog extends ModalDialog
                 .sendKeys(Keys.TAB)
                 .perform();
 
-        WebDriverWrapper.waitFor(()->!elementCache().fieldLabelEdit.isDisplayed() &&
-                        elementCache().getListItemElement(elementCache().selectedFieldsPanel, newFieldLabel).isDisplayed(),
+        getWrapper().mouseOver(elementCache().title); // Dismiss tooltip
+
+        WebDriverWrapper.waitFor(()->!elementCache().fieldLabelEdit.isDisplayed(),
                 String.format("New field label '%s' is not in the list.", newFieldLabel), 500);
+        Assert.assertEquals("Label after update", normalizeSpace(newFieldLabel), elementCache().getFieldLabel(fieldKey));
 
         return this;
     }
@@ -506,10 +504,10 @@ public class FieldSelectionDialog extends ModalDialog
      * @param beforeTarget Will the field being moved go before (above) or after (below) the target field.
      * @return This dialog.
      */
-    public FieldSelectionDialog repositionField(String fieldToMove, String targetField, boolean beforeTarget)
+    public FieldSelectionDialog repositionField(FieldKey fieldToMove, FieldKey targetField, boolean beforeTarget)
     {
-        WebElement elementToMove = elementCache().getListItemElement(elementCache().selectedFieldsPanel, fieldToMove);
-        WebElement elementTarget = elementCache().getListItemElement(elementCache().selectedFieldsPanel, targetField);
+        WebElement elementToMove = elementCache().findSelectedField(fieldToMove);
+        WebElement elementTarget = elementCache().findSelectedField(targetField);
 
         int yBefore =  elementToMove.getRect().getY();
 
@@ -564,6 +562,12 @@ public class FieldSelectionDialog extends ModalDialog
         });
     }
 
+    public void clickCancel()
+    {
+        elementCache().cancelButton.click();
+        waitForClose();
+    }
+
     /**
      * Is the 'Update Grid' button enabled.
      *
@@ -603,7 +607,7 @@ public class FieldSelectionDialog extends ModalDialog
         protected WebElement selectedFieldsPanel = contentPanelLocator.index(1).findWhenNeeded(this);
 
         // This is present to items in both panels.
-        protected final Locator listItemName = Locator.tagWithClass("div", "field-name");
+        protected final Locator listItemName = Locator.tagWithClass("div", "field-caption");
 
         protected final WebElement undoEditsButton = Locator.tagWithText("span", "Undo edits")
                 .refindWhenNeeded(this);
@@ -615,40 +619,43 @@ public class FieldSelectionDialog extends ModalDialog
         protected final WebElement updateGridButton = Locator.button("Update Grid")
                 .findWhenNeeded(this);
 
+        protected final WebElement cancelButton = Locator.button("Cancel")
+                .findWhenNeeded(this);
+
         // The 'pencil' to edit a field label. Only in the Shown in Grid panel.
         protected final WebElement fieldLabelEdit = Locator.tagWithClass("input", "form-control")
                 .refindWhenNeeded(selectedFieldsPanel);
 
-        // Will get all the list items that match the fieldName.
-        protected List<WebElement> getListItemElements(WebElement panel, String fieldName)
+        // Will get all the list items that match the fieldLabel.
+        protected List<WebElement> getListItemElements(WebElement panel, String fieldLabel)
         {
             return Locator.tagWithClass("div", "list-group-item")
-                    .withDescendant(Locator.tagWithClass("div", "field-name").withText(fieldName))
+                    .withDescendant(Locator.tagWithClass("div", "field-caption").withText(fieldLabel))
                     .findElements(panel);
         }
 
-        // Will get the first list item that matches the fieldName.
-        protected WebElement getListItemElement(WebElement panel, String fieldName)
+        protected String getFieldLabel(FieldKey fieldKey)
         {
-            return Locator.tagWithClass("div", "list-group-item")
-                    .withDescendant(Locator.tagWithClass("div", "field-name").withText(fieldName))
-                    .findElement(panel);
+            return Locator.tagWithClass("div", "field-caption")
+                .findElement(findFieldRow(fieldKey, selectedFieldsPanel))
+                .getText();
         }
 
-        // The data-fieldkey attribute is only present in items in the Available Fields panel.
-        // Similar value to field-name (no spaces, but casing is the same). For child fields it will contain the parent path.
-        protected WebElement getListItemElementByFieldKey(String fieldKey)
+        protected WebElement findSelectedField(FieldKey fieldKey)
         {
-            return Locator.tagWithClass("div", "list-group-item")
-                    .withAttributeIgnoreCase("data-fieldkey", fieldKey)
-                    .findElement(availableFieldsPanel);
+            return findFieldRow(fieldKey, selectedFieldsPanel);
         }
 
-        protected WebElement getListItemElementByFieldKeyOrNull(String fieldKey)
+        protected WebElement findAvailableField(FieldKey fieldKey)
+        {
+            return findFieldRow(fieldKey, availableFieldsPanel);
+        }
+
+        protected WebElement findFieldRow(FieldKey fieldKey, WebElement panel)
         {
             return Locator.tagWithClass("div", "list-group-item")
-                    .withAttributeIgnoreCase("data-fieldkey", fieldKey)
-                    .findElementOrNull(availableFieldsPanel);
+                .withAttributeIgnoreCase("data-fieldkey", fieldKey.toString())
+                .findElement(panel);
         }
 
         // Get the displayed names/labels of list items in the given panel.

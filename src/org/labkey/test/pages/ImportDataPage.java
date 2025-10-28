@@ -222,7 +222,7 @@ public class ImportDataPage extends LabKeyPage<ImportDataPage.ElementCache>
     {
         TSV("Tab-separated text (tsv)"), CSV("Comma-separated text (csv)");
 
-        private String format;
+        private final String format;
 
         public String getFormat()
         {

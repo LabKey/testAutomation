@@ -75,9 +75,8 @@ public abstract class AbstractDataLoaderFactory extends AbstractDocumentParser i
                 Object value = row.get(cd.name);
                 if (value != null)
                 {
-                    if (value instanceof String)
+                    if (value instanceof String str)
                     {
-                        String str = (String)value;
                         write(h, str);
                     }
                     else

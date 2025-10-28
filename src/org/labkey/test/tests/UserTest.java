@@ -35,6 +35,7 @@ import org.labkey.test.components.dumbster.EmailRecordTable;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.IssuesHelper;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.UIUserHelper;
@@ -49,8 +50,10 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
 
 @Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 9)
@@ -98,14 +101,14 @@ public class UserTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        UserTest init = (UserTest)getCurrentTest();
+        UserTest init = getCurrentTest();
         init.doSetup();
     }
 
     private void doSetup()
     {
         _containerHelper.createProject(getProjectName(), null);
-        _normalUserId = createUserWithPermissions(NORMAL_USER, getProjectName(), "Editor").getUserId();
+        _normalUserId = createUserWithPermissions(NORMAL_USER, getProjectName(), EDITOR_ROLE).getUserId();
     }
 
     @Override
@@ -222,14 +225,14 @@ public class UserTest extends BaseWebDriverTest
         goToHome();
 
         log("Validate that only the user who requested the change can use the link");
-        goToURL(resetUrl, 30000);
+        beginAt(resetUrl.toString(), 30000);
         assertTextPresent("The current user is not the same user that initiated this request. Please log in with the account you used to make this email change request.");
         goToHome();
 
         log("Again impersonate user " + SELF_SERVICE_EMAIL_USER + " to validate the confirmation link.");
         impersonate(SELF_SERVICE_EMAIL_USER);
 
-        goToURL(resetUrl, 30000);
+        beginAt(resetUrl.toString(), 30000);
 
         String tempStr = AFFIRM_CHANGE_MSG.replace("@1", SELF_SERVICE_EMAIL_USER);
         tempStr = tempStr.replace("@2", SELF_SERVICE_EMAIL_USER_CHANGED);
@@ -239,7 +242,7 @@ public class UserTest extends BaseWebDriverTest
         stopImpersonating();
 
         log("Go to dumpster and make sure the notification email was there.");
-        assertTrue(null != getEmailChangeMsgBody("Notification .* Web Site email has changed.*"));
+        assertNotNull(getEmailChangeMsgBody("Notification .* Web Site email has changed.*"));
 
         log("Validate that the old email address has been removed.");
 
@@ -251,7 +254,7 @@ public class UserTest extends BaseWebDriverTest
         impersonate(SELF_SERVICE_EMAIL_USER_CHANGED);
 
         log("Validate that trying to use the link from the email message again will result in an error.");
-        goToURL(resetUrl, 30000);
+        beginAt(resetUrl.toString(), 30000);
         assertTextPresent("Verification failed.");
         goToHome();
 
@@ -274,9 +277,14 @@ public class UserTest extends BaseWebDriverTest
         log("Adding the custom field to core.Users");
         DomainDesignerPage domainDesignerPage = new DomainDesignerPage(getDriver());
         DomainFormPanel domainFormPanel = domainDesignerPage.fieldsPanel();
-        domainFormPanel.addField("UID")
-                .setType(FieldDefinition.ColumnType.String);
-        domainDesignerPage.clickSave();
+        if (!domainFormPanel.fieldNames().contains("UID"))
+        {
+            domainFormPanel.addField("UID")
+                    .setType(FieldDefinition.ColumnType.String);
+            domainDesignerPage.clickSave();
+        }
+        else
+            domainDesignerPage.clickCancel();
 
         log("Adding value to the custom field");
         navigateToUserDetails(NORMAL_USER);
@@ -308,8 +316,7 @@ public class UserTest extends BaseWebDriverTest
 
     private String getEmailChangeMsgBody(String subjectRegex)
     {
-        EmailRecordTable ert = new EmailRecordTable(getDriver());
-        beginAt("/dumbster-begin.view");
+        EmailRecordTable ert = goToEmailRecord();
         EmailRecordTable.EmailMessage eMsg = ert.getMessageRegEx(subjectRegex);
         ert.clickMessage(eMsg);
         eMsg = ert.getMessageRegEx(subjectRegex);
@@ -343,7 +350,7 @@ public class UserTest extends BaseWebDriverTest
             }
         }
 
-        assertTrue("Could not find a url in the email to follow.", !urlString.isEmpty());
+        assertFalse("Could not find a url in the email to follow.", urlString.isEmpty());
         try
         {
             resetUrl = new URL(urlString);
@@ -359,7 +366,7 @@ public class UserTest extends BaseWebDriverTest
     @Test
     public void testDeactivatedUser()
     {
-        createUserWithPermissions(DEACTIVATED_USER, getProjectName(), "Editor");
+        createUserWithPermissions(DEACTIVATED_USER, getProjectName(), EDITOR_ROLE);
         goToSiteUsers();
         DataRegionTable usersTable = new DataRegionTable("Users", this);
         int row = usersTable.getRowIndex("Email", DEACTIVATED_USER);
@@ -401,7 +408,7 @@ public class UserTest extends BaseWebDriverTest
 
     private Locator createAssignedToOptionLocator(String username)
     {
-        return Locator.xpath("//select[@name='assignedTo']/option[@value='" + username +  "']");
+        return Locator.xpath("//select[@name='AssignedTo']/option[@value='" + username +  "']");
     }
 
     /**
@@ -476,7 +483,7 @@ public class UserTest extends BaseWebDriverTest
         clickAndWait(Locator.lkButton("Edit"));
         for (String field : REQUIRED_FIELDS)
         {
-            WebElement el = Locator.name("quf_" + field).waitForElement(new WebDriverWait(getDriver(), Duration.ofSeconds(5)));
+            WebElement el = Locator.name(EscapeUtil.getFormFieldName(field)).waitForElement(new WebDriverWait(getDriver(), Duration.ofSeconds(5)));
             if (getFormElement(el).isEmpty())
                 setFormElement(el, getDisplayName());
         }
@@ -498,8 +505,7 @@ public class UserTest extends BaseWebDriverTest
 
         StringBuilder sb = new StringBuilder();
         final int maxFieldLength = 64;
-        for (int i = 0; i < maxFieldLength + 1; i++)
-            sb.append("X");
+        sb.append("X".repeat(maxFieldLength + 1));
         String illegalLongProperty = sb.toString();
 
         log("Set illegal properties");

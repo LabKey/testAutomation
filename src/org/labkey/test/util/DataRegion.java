@@ -77,7 +77,7 @@ public abstract class DataRegion extends WebDriverComponent<DataRegion.ElementCa
     }
 
     /**
-     * @param regionName 'lk-region-name' of the table
+     * @param regionName 'data-region-name' of the table
      */
     protected DataRegion(String regionName, WebDriverWrapper driverWrapper)
     {
@@ -180,8 +180,8 @@ public abstract class DataRegion extends WebDriverComponent<DataRegion.ElementCa
     {
         if (_regionName == null)
         {
-            String regionName = StringUtils.trimToNull(getComponentElement().getAttribute("lk-region-form")); // new UI
-            _regionName = regionName != null ? regionName : getComponentElement().getAttribute("lk-region-name"); // old UI
+            String regionName = StringUtils.trimToNull(getComponentElement().getAttribute("data-region-form")); // new UI
+            _regionName = regionName != null ? regionName : getComponentElement().getAttribute("data-region-name"); // old UI
         }
         return _regionName;
     }
@@ -325,12 +325,12 @@ public abstract class DataRegion extends WebDriverComponent<DataRegion.ElementCa
     {
         public static Locator.XPathLocator form()
         {
-            return Locator.tag("form").withAttribute("lk-region-form");
+            return Locator.tag("form").withAttribute("data-region-form");
         }
 
         public static Locator.XPathLocator form(String regionName)
         {
-            return Locator.tagWithAttribute("form", "lk-region-form", regionName);
+            return Locator.tagWithAttribute("form", "data-region-form", regionName);
         }
     }
 

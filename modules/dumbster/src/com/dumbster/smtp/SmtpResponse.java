@@ -21,11 +21,11 @@ package com.dumbster.smtp;
  */
 public class SmtpResponse {
   /** Response code - see RFC-2821. */
-  private int code;
+  private final int code;
   /** Response message. */
-  private String message;
+  private final String message;
   /** New state of the SMTP server once the request has been executed. */
-  private SmtpState nextState;
+  private final SmtpState nextState;
 
   /**
    * Constructor.

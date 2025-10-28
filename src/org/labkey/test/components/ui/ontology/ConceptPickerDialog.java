@@ -74,7 +74,6 @@ public class ConceptPickerDialog extends ModalDialog
 
     /**
      * uses the treePanel control to expand the nodes in order
-     * @param pathToNode
      * @return the current dialog
      */
     public ConceptPickerDialog selectNodeFromPath(List<String> pathToNode)

@@ -37,13 +37,13 @@ public class AnnouncementsPermissionTest extends BaseWebDriverTest
     public static final String NOT_CONTRIBUTOR_ONLY_MESSAGE = "Not-Contributor-only message";
     private static final String CONTRIBUTOR = "contributor@messages.test";
     private static final String MSG5_TITLE = "test message 5";
-    private String TEST_GROUP = "contributorTestGroup";
-    private String PERMISSION = "Message Board Contributor";
+    private final String TEST_GROUP = "contributorTestGroup";
+    private final String PERMISSION = "Message Board Contributor";
 
     @BeforeClass
     public static void setupProject()
     {
-        AnnouncementsPermissionTest init = (AnnouncementsPermissionTest) getCurrentTest();
+        AnnouncementsPermissionTest init = getCurrentTest();
 
         init.doSetup();
     }

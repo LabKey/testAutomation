@@ -37,7 +37,7 @@ var testFunctions = [
 
     function() //testResults[1]
     {
-        testResults[testResults.length] = LABKEY.Query.selectRows({schemaName:schemaName, queryName:queryName, sort: "-Date", filterArray: filters});
+        testResults[testResults.length] = LABKEY.Query.selectRows({schemaName:schemaName, queryName:queryName, sort: "-Created", filterArray: filters});
         executeNext();
     },
 
@@ -49,7 +49,7 @@ var testFunctions = [
 
     function() //testResults[3]
     {
-        testResults[testResults.length] = LABKEY.Query.executeSql({schemaName: schemaName, sort: "Date", sql: "select audit.Date from audit"});
+        testResults[testResults.length] = LABKEY.Query.executeSql({schemaName: schemaName, sort: "Created", sql: "select Created from UserAuditEvent"});
         executeNext();
     },
 
@@ -100,7 +100,7 @@ var testFunctions = [
         if (!testResults[0].rowsAffected || testResults[0].rowsAffected != 1)
             errors[errors.length] = new Error("Query.insertRows() = "+Ext.util.JSON.encode(testResults[0]));
 
-        if (!testResults[1].rows || testResults[1].rows.length  != 1)
+        if (!testResults[1].rows || testResults[1].rows.length != 1)
             errors[errors.length] = new Error("Query.selectRows() = "+Ext.util.JSON.encode(testResults[1]));
 
         if (!testResults[2].exception)

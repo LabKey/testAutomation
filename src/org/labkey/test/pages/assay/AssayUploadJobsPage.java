@@ -5,10 +5,8 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.pages.pipeline.PipelineStatusDetailsPage;
-import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PipelineStatusTable;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 
 import java.util.Map;
 

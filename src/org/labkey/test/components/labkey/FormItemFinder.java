@@ -16,7 +16,6 @@
 package org.labkey.test.components.labkey;
 
 import org.jetbrains.annotations.NotNull;
-import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.html.FormItem;
@@ -34,7 +33,7 @@ public abstract class FormItemFinder<C> extends Component.ComponentFinder<Search
 
     public static FormItemFinder<FormItem> FormItem(WebDriver driver)
     {
-        return new FormItemFinder<FormItem>()
+        return new FormItemFinder<>()
         {
             @Override
             protected FormItem construct(WebElement el)

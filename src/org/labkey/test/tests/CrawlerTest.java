@@ -1,11 +1,13 @@
 package org.labkey.test.tests;
 
+import org.assertj.core.api.Assertions;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.SimpleGetCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
@@ -16,6 +18,7 @@ import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.Crawler;
 import org.labkey.test.util.CspLogUtil;
 import org.labkey.test.util.PermissionsHelper.MemberType;
+import org.labkey.test.util.core.admin.CspConfigHelper;
 import org.labkey.test.util.selenium.WebDriverUtils;
 import org.openqa.selenium.UnhandledAlertException;
 
@@ -24,13 +27,17 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import static org.labkey.test.util.PermissionsHelper.READER_ROLE;
+
 @Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 5)
 public class CrawlerTest extends BaseWebDriverTest
 {
 
     private static final String MODULE_NAME = "CrawlerTest";
-    private static final String USER = "injectiontester@labkey.injection.test";
+    private static final String USER = "injectiontester@labkey.injection.test"; // required by 'injectJsp' page
+
+    private final CspConfigHelper _cspConfigHelper = new CspConfigHelper(this);
 
     @Override
     protected void doCleanup(boolean afterTest)
@@ -42,16 +49,17 @@ public class CrawlerTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        CrawlerTest init = (CrawlerTest) getCurrentTest();
+        CrawlerTest init = getCurrentTest();
 
         init.doSetup();
     }
 
     private void doSetup()
     {
+        CspConfigHelper.debugCspWarnings();
         _containerHelper.createProject(getProjectName(), null);
         _userHelper.createUser(USER);
-        new ApiPermissionsHelper(this).addMemberToRole(USER, "Reader", MemberType.user, getProjectName());
+        new ApiPermissionsHelper(this).addMemberToRole(USER, READER_ROLE, MemberType.user, getProjectName());
     }
 
     /**
@@ -60,6 +68,8 @@ public class CrawlerTest extends BaseWebDriverTest
     @Test
     public void testCrawlerTest() throws Exception
     {
+        _cspConfigHelper.setEnforceCsp(false);
+
         String safeParam = "OK!";
 
         log("Verify vulnerable page requires specific user");
@@ -101,12 +111,35 @@ public class CrawlerTest extends BaseWebDriverTest
     }
 
     @Test (expected = CspLogUtil.CspWarningDetectedException.class)
-    public void testCspWarning()
+    public void testEnforceCsp() throws Exception
+    {
+        _cspConfigHelper.setEnforceCsp(true);
+
+        createDefaultConnection().impersonate(USER);
+
+        log("Verify that page is not vulnerable when CSP is enforced");
+        beginAt(getInjectUrl(Crawler.injectScriptBlock), 10_000);
+
+        log("Verify that enforced CSP is also reported");
+        CspLogUtil.checkNewCspWarnings(getArtifactCollector()); // throws CspWarningDetectedException
+    }
+
+    @Test (expected = CspLogUtil.CspWarningDetectedException.class)
+    public void testCspWarning() throws Exception
     {
         Assume.assumeFalse("Can't test for CSP report", TestProperties.isCspCheckSkipped());
 
-        beginAt(WebTestHelper.buildRelativeUrl(MODULE_NAME, getProjectName(), "cspWarning"));
-        CspLogUtil.checkNewCspWarnings(getArtifactCollector());
+        _cspConfigHelper.setEnforceCsp(false);
+
+        int initialLength = getCspReportLog().length();
+
+        String cspWarningUrl = WebTestHelper.buildRelativeUrl(MODULE_NAME, getProjectName(), "cspWarning");
+        beginAt(cspWarningUrl);
+
+        // 53261: Provide visibility into CSP reports for cloud clients
+        Assertions.assertThat(getCspReportLog().substring(initialLength)).as("CSP warning").contains(cspWarningUrl);
+
+        CspLogUtil.checkNewCspWarnings(getArtifactCollector()); // throws CspWarningDetectedException
     }
 
     // Crawler should flag external links without the correct 'rel' attribute
@@ -134,6 +167,8 @@ public class CrawlerTest extends BaseWebDriverTest
     @Test
     public void testCrawler() throws Exception
     {
+        _cspConfigHelper.setEnforceCsp(false);
+
         String safeParam = "OK!";
 
         createDefaultConnection().impersonate(USER);
@@ -162,6 +197,13 @@ public class CrawlerTest extends BaseWebDriverTest
     protected boolean cspFailFast()
     {
         return false;
+    }
+
+    public String getCspReportLog() throws Exception
+    {
+        return new SimpleGetCommand("admin", "showCspReportLog")
+            .execute(createDefaultConnection(), null)
+            .getText();
     }
 
     @After

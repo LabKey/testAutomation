@@ -10,6 +10,7 @@ import org.labkey.test.SortDirection;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.FileBrowser;
 import org.labkey.test.categories.Flow;
+import org.labkey.test.params.FieldKey;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PipelineStatusTable;
 
@@ -21,6 +22,7 @@ import java.util.Arrays;
 public class FlowDuplicateSamplesTest extends BaseFlowTest
 {
 
+    @Override
     protected void importFCSFiles()
     {
         waitAndClickAndWait(Locator.linkWithText("Browse for FCS files to be imported"));
@@ -52,16 +54,19 @@ public class FlowDuplicateSamplesTest extends BaseFlowTest
 
         importAnalysis(getContainerPath(), "/flowjoquery/Workspaces/duplicate-samples.xml", SelectFCSFileOption.Previous, null, "dupes", false, true);
 
+        FieldKey fcsFileFk = FieldKey.fromParts("FCSFile");
+        FieldKey DTOTfk = fcsFileFk.child("Keyword", "$TOT");
+        FieldKey filePathFk = fcsFileFk.child("FilePath");
         // verify both samples "118795.fcs" were imported and associated with the correct FCS file
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.showHiddenItems();
-        _customizeViewsHelper.addColumn(new String[] { "FCSFile", "Keyword", "$DTOT"});
-        _customizeViewsHelper.addColumn(new String[] { "FCSFile", "FilePath"});
+        _customizeViewsHelper.addColumn(DTOTfk.toString());
+        _customizeViewsHelper.addColumn(filePathFk.toString());
         _customizeViewsHelper.addSort("Statistic/Count", SortDirection.ASC);
         _customizeViewsHelper.applyCustomView();
 
         var dr = new DataRegionTable("query", getDriver());
-        var rows = dr.getRows("Name", "Count", "$TOT", "FilePath");
+        var rows = dr.getRows("Name", "Count", DTOTfk, filePathFk);
         Assert.assertEquals(2, rows.size());
 
         var row0 = rows.get(0);

@@ -38,6 +38,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Daily;
+import org.labkey.test.components.assay.AssayConstants;
 import org.labkey.test.components.ext4.Checkbox;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.pages.admin.ExportFolderPage;
@@ -68,6 +69,10 @@ import static org.labkey.test.util.AbstractDataRegionExportOrSignHelper.XarLsidO
 @BaseWebDriverTest.ClassTimeout(minutes = 10)
 public class AssayExportImportTest extends BaseWebDriverTest
 {
+    public static final String INSTRUMENT_SETTING_FIELD_NAME = "instrumentSetting";
+    public static final String RUN_FILE_FIELD_NAME = "runFileField";
+    public static final String OPERATOR_EMAIL_FIELD_NAME = "operatorEmail";
+    public static final String INSTRUMENT_FIELD_NAME = "instrument";
     private final String ASSAY_PROJECT_FOR_EXPORT_01 = "Assay_Project_For_Export_ByFilesWebPart";
     private final String ASSAY_PROJECT_FOR_IMPORT_01 = "Assay_Project_For_Import_ByFilesWebPart";
     private final String ASSAY_PROJECT_FOR_EXPORT_02 = "Assay_Project_For_Export_ByFile";
@@ -132,7 +137,7 @@ public class AssayExportImportTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        AssayExportImportTest init = (AssayExportImportTest)getCurrentTest();
+        AssayExportImportTest init = getCurrentTest();
         init.doSetup();
     }
 
@@ -170,16 +175,16 @@ public class AssayExportImportTest extends BaseWebDriverTest
         protocol.getDomains().forEach(domain -> domains.put(domain.getName(), domain));
 
         Domain batchDomain = domains.get("Batch Fields");
-        batchDomain.getFields().add(new FieldDefinition("operatorEmail", ColumnType.String));
-        batchDomain.getFields().add(new FieldDefinition("instrument", ColumnType.String)
+        batchDomain.getFields().add(new FieldDefinition(OPERATOR_EMAIL_FIELD_NAME, ColumnType.String));
+        batchDomain.getFields().add(new FieldDefinition(INSTRUMENT_FIELD_NAME, ColumnType.String)
                 .setDescription("The diagnostic test instrument."));
 
         Domain runDomain = domains.get("Run Fields");
         List<PropertyDescriptor>  runFields = runDomain.getFields();
-        runFields.add(new FieldDefinition("instrumentSetting", ColumnType.Integer)
+        runFields.add(new FieldDefinition(INSTRUMENT_SETTING_FIELD_NAME, ColumnType.Integer)
                 .setDescription("The configuration setting on the instrument."));
         if (hasRunFileField)
-            runFields.add(new FieldDefinition("runFileField", ColumnType.File)
+            runFields.add(new FieldDefinition(RUN_FILE_FIELD_NAME, ColumnType.File)
                 .setDescription("File for the run."));
         domains.get("Run Fields").setFields(runFields);
 
@@ -236,7 +241,7 @@ public class AssayExportImportTest extends BaseWebDriverTest
             clickAndWait(Locator.lkButton("Import Data"));
         }
 
-        waitForElement(Locator.tagWithName("select", "targetStudy"));
+        waitForElement(AssayConstants.TARGET_STUDY_FIELD_LOCATOR);
 
         if(null != batchProperties)
         {
@@ -267,7 +272,7 @@ public class AssayExportImportTest extends BaseWebDriverTest
                 if (fileIndex < runProperties.size())
                 {
                     clickAndWait(Locator.lkButton("Save and Import Another Run"));
-                    waitForElement(Locator.tagWithName("input", "instrumentSetting"));
+                    waitForElement(Locator.tagWithName("input", INSTRUMENT_SETTING_FIELD_NAME));
                 }
 
             }
@@ -276,7 +281,7 @@ public class AssayExportImportTest extends BaseWebDriverTest
                 if (isElementPresent(Locator.lkButton("Save and Import Another Run")))
                 {
                     clickAndWait(Locator.lkButton("Save and Import Another Run"));
-                    waitForElement(Locator.tagWithName("input", "instrumentSetting"));
+                    waitForElement(Locator.tagWithName("input", INSTRUMENT_SETTING_FIELD_NAME));
                 }
             }
 
@@ -383,14 +388,14 @@ public class AssayExportImportTest extends BaseWebDriverTest
                 RUN04_FILE);
 
         Map<String, String> batchProperties = new HashMap<>();
-        batchProperties.put("operatorEmail", OPERATOR_EMAIL_01);
-        batchProperties.put("instrument", INSTRUMENT_NAME_01);
+        batchProperties.put(OPERATOR_EMAIL_FIELD_NAME, OPERATOR_EMAIL_01);
+        batchProperties.put(INSTRUMENT_FIELD_NAME, INSTRUMENT_NAME_01);
 
         List<Map<String, String>> runProperties = new ArrayList<>();
-        runProperties.add(Maps.of("name", RUN01_NAME, "comments", COMMENT_BASIC_01 + RUN01_NAME, "instrumentSetting", INSTRUMENT_SETTING_01));
-        runProperties.add(Maps.of("name", RUN02_NAME, "comments", COMMENT_BASIC_01 + RUN02_NAME, "instrumentSetting", INSTRUMENT_SETTING_01));
-        runProperties.add(Maps.of("name", RUN03_NAME, "comments", COMMENT_BASIC_01 + RUN03_NAME, "instrumentSetting", INSTRUMENT_SETTING_01));
-        runProperties.add(Maps.of("name", RUN04_NAME, "comments", COMMENT_BASIC_01 + RUN04_NAME, "instrumentSetting", INSTRUMENT_SETTING_01));
+        runProperties.add(Maps.of("Name", RUN01_NAME, "Comments", COMMENT_BASIC_01 + RUN01_NAME, INSTRUMENT_SETTING_FIELD_NAME, INSTRUMENT_SETTING_01));
+        runProperties.add(Maps.of("Name", RUN02_NAME, "Comments", COMMENT_BASIC_01 + RUN02_NAME, INSTRUMENT_SETTING_FIELD_NAME, INSTRUMENT_SETTING_01));
+        runProperties.add(Maps.of("Name", RUN03_NAME, "Comments", COMMENT_BASIC_01 + RUN03_NAME, INSTRUMENT_SETTING_FIELD_NAME, INSTRUMENT_SETTING_01));
+        runProperties.add(Maps.of("Name", RUN04_NAME, "Comments", COMMENT_BASIC_01 + RUN04_NAME, INSTRUMENT_SETTING_FIELD_NAME, INSTRUMENT_SETTING_01));
 
         log("Populate the assay '" + SIMPLE_ASSAY_FOR_EXPORT + "' by using files in the Files WebPart.");
         populateAssay(ASSAY_PROJECT_FOR_EXPORT_01, SIMPLE_ASSAY_FOR_EXPORT, true, runFiles, batchProperties, runProperties, SAMPLE_TXT_FILE);
@@ -478,14 +483,14 @@ public class AssayExportImportTest extends BaseWebDriverTest
                 RUN04_FILE);
 
         Map<String, String> batchProperties = new HashMap<>();
-        batchProperties.put("operatorEmail", OPERATOR_EMAIL_02);
-        batchProperties.put("instrument", INSTRUMENT_NAME_02);
+        batchProperties.put(OPERATOR_EMAIL_FIELD_NAME, OPERATOR_EMAIL_02);
+        batchProperties.put(INSTRUMENT_FIELD_NAME, INSTRUMENT_NAME_02);
 
         List<Map<String, String>> runProperties = new ArrayList<>();
-        runProperties.add(Maps.of("name", RUN01_NAME, "comments", COMMENT_BASIC_02 + RUN01_NAME, "instrumentSetting", INSTRUMENT_SETTING_02));
-        runProperties.add(Maps.of("name", RUN02_NAME, "comments", COMMENT_BASIC_02 + RUN02_NAME, "instrumentSetting", INSTRUMENT_SETTING_02));
-        runProperties.add(Maps.of("name", RUN03_NAME, "comments", COMMENT_BASIC_02 + RUN03_NAME, "instrumentSetting", INSTRUMENT_SETTING_02));
-        runProperties.add(Maps.of("name", RUN04_NAME, "comments", COMMENT_BASIC_02 + RUN04_NAME, "instrumentSetting", INSTRUMENT_SETTING_02));
+        runProperties.add(Maps.of("Name", RUN01_NAME, "Comments", COMMENT_BASIC_02 + RUN01_NAME, INSTRUMENT_SETTING_FIELD_NAME, INSTRUMENT_SETTING_02));
+        runProperties.add(Maps.of("Name", RUN02_NAME, "Comments", COMMENT_BASIC_02 + RUN02_NAME, INSTRUMENT_SETTING_FIELD_NAME, INSTRUMENT_SETTING_02));
+        runProperties.add(Maps.of("Name", RUN03_NAME, "Comments", COMMENT_BASIC_02 + RUN03_NAME, INSTRUMENT_SETTING_FIELD_NAME, INSTRUMENT_SETTING_02));
+        runProperties.add(Maps.of("Name", RUN04_NAME, "Comments", COMMENT_BASIC_02 + RUN04_NAME, INSTRUMENT_SETTING_FIELD_NAME, INSTRUMENT_SETTING_02));
 
         log("Populate the assay '" + SIMPLE_ASSAY_FOR_EXPORT + "' by importing the file through the 'Run Properties'.");
         populateAssay(ASSAY_PROJECT_FOR_EXPORT_02, SIMPLE_ASSAY_FOR_EXPORT, false, runFiles, batchProperties, runProperties, null);
@@ -583,8 +588,8 @@ public class AssayExportImportTest extends BaseWebDriverTest
         ReactAssayDesignerPage assayDesignerPage = _assayHelper.createAssayDesign("General", assayName);
 
         log("Remove the batch fields we don't care about.");
-        assayDesignerPage.goToBatchFields().removeField("ParticipantVisitResolver")
-                .removeField("TargetStudy");
+        assayDesignerPage.goToBatchFields().removeField(AssayConstants.PARTICIPANT_VISIT_RESOLVER_FIELD_NAME)
+                .removeField(AssayConstants.TARGET_STUDY_FIELD_NAME);
 
         assayDesignerPage.goToResultsFields()
                 .removeAllFields(false)
@@ -665,25 +670,25 @@ public class AssayExportImportTest extends BaseWebDriverTest
         ImportRunCommand run1 = new ImportRunCommand(assayId, RUN01_FILE);
         run1.setName(RUN01_NAME);
         run1.setComment(commentPrefix + RUN01_NAME);
-        run1.setProperties(Maps.of("instrumentSetting", instrumentSetting));
+        run1.setProperties(Maps.of(INSTRUMENT_SETTING_FIELD_NAME, instrumentSetting));
         run1.execute(cn, exportProject);
 
         ImportRunCommand run2 = new ImportRunCommand(assayId, RUN02_FILE);
         run2.setName(RUN02_NAME);
         run2.setComment(commentPrefix + RUN02_NAME);
-        run2.setProperties(Maps.of("instrumentSetting", instrumentSetting));
+        run2.setProperties(Maps.of(INSTRUMENT_SETTING_FIELD_NAME, instrumentSetting));
         run2.execute(cn, exportProject);
 
         ImportRunCommand run3 = new ImportRunCommand(assayId, RUN03_FILE);
         run3.setName(RUN03_NAME);
         run3.setComment(commentPrefix + RUN03_NAME);
-        run3.setProperties(Maps.of("instrumentSetting", instrumentSetting));
+        run3.setProperties(Maps.of(INSTRUMENT_SETTING_FIELD_NAME, instrumentSetting));
         run3.execute(cn, exportProject);
 
         ImportRunCommand run4 = new ImportRunCommand(assayId, RUN04_XLSX_FILE);
         run4.setName(RUN04_NAME);
         run4.setComment(commentPrefix + RUN04_NAME);
-        run4.setProperties(Maps.of("instrumentSetting", instrumentSetting));
+        run4.setProperties(Maps.of(INSTRUMENT_SETTING_FIELD_NAME, instrumentSetting));
         run4.execute(cn, exportProject);
 
         List<String> runColumns = Arrays.asList("adjustedM1", "M2");

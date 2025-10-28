@@ -26,7 +26,6 @@ import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Reports;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.util.LogMethod;
-import org.labkey.test.util.OptionalFeatureHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelper;
 import org.labkey.test.util.ext4cmp.Ext4FileFieldRef;
@@ -34,8 +33,9 @@ import org.labkey.test.util.ext4cmp.Ext4FileFieldRef;
 import java.io.File;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
+import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
 
 @Category({Daily.class, Reports.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 6)
@@ -50,11 +50,6 @@ public class NonStudyReportsTest extends ReportTest
     private static final String UPDATE_ATTACHMENT_REPORT = "Update Attachment Report";
     private static final String ATTACHMENT_REPORT2_DESCRIPTION = BaseWebDriverTest.INJECT_CHARS_2;
     private static final File ATTACHMENT_REPORT2_FILE = TestFileUtils.getSampleData("Microarray/test2.jpg"); // arbitrary image file
-    private static final String DISCUSSED_REPORT = "Blank R Report";
-    private static final String DISCUSSION_BODY_1 = "Starting a discussion";
-    private static final String DISCUSSION_TITLE_1 = "Discussion about R report";
-    private static final String DISCUSSION_BODY_2 = "Responding to a discussion";
-    private static final String DISCUSSION_BODY_3 = "Editing a discussion response";
     private static final String LINK_REPORT1_NAME = "Link report 1" + BaseWebDriverTest.INJECT_CHARS_2;
     private static final String LINK_REPORT1_DESCRIPTION = "Link report 1" + BaseWebDriverTest.INJECT_CHARS_2;
     private static final String LINK_REPORT1_URL = "/home/project-begin.view";
@@ -66,7 +61,6 @@ public class NonStudyReportsTest extends ReportTest
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         _userHelper.deleteUsers(false, ATTACHMENT_USER);
-        OptionalFeatureHelper.disableOptionalFeature(createDefaultConnection(), "deprecatedObjectLevelDiscussions");
         super.doCleanup(afterTest);
     }
 
@@ -89,7 +83,6 @@ public class NonStudyReportsTest extends ReportTest
         doAttachmentReportTest();
         doLinkReportTest();
         doThumbnailChangeTest();
-        doReportDiscussionTest();
     }
 
     @LogMethod
@@ -168,7 +161,7 @@ public class NonStudyReportsTest extends ReportTest
         _userHelper.createUser(ATTACHMENT_USER);
         clickProject(getProjectName());
         _permissionsHelper.enterPermissionsUI();
-        _permissionsHelper.setUserPermissions(ATTACHMENT_USER, "Editor");
+        _permissionsHelper.setUserPermissions(ATTACHMENT_USER, EDITOR_ROLE);
         impersonate(ATTACHMENT_USER);
         clickProject(getProjectName());
 
@@ -228,7 +221,7 @@ public class NonStudyReportsTest extends ReportTest
         // verify we can set a property
         clickAndWait(Locator.linkContainingText("Edit Report"));
         waitForText(UPDATE_ATTACHMENT_REPORT);
-        assertFalse("Locked".equals(getFormElement(statusElement)));
+        assertNotEquals("Locked", getFormElement(statusElement));
         setFormElement(Locator.name("status"), "Locked");
         clickButton("Save");
         waitForText(ATTACHMENT_REPORT3_NAME);
@@ -255,47 +248,6 @@ public class NonStudyReportsTest extends ReportTest
         _ext4Helper.waitForMaskToDisappear();
 
         //no way to verify, unfortunately
-    }
-
-    @LogMethod
-    private void doReportDiscussionTest()
-    {
-        // Issue 51620: Remove the UI for Object-level discussions
-        OptionalFeatureHelper.enableOptionalFeature(createDefaultConnection(), "deprecatedObjectLevelDiscussions");
-
-        clickProject(getProjectName());
-
-        goToManageViews();
-        BootstrapMenu.find(getDriver(), "Add Report").clickSubMenu(true, "R Report");
-        RReportHelper RReportHelper = new RReportHelper(this);
-        RReportHelper.executeScript("# Placeholder script for discussion", "");
-        click(Locator.linkWithText("Source"));
-        RReportHelper.saveReport(DISCUSSED_REPORT);
-        clickReportGridLink(DISCUSSED_REPORT);
-
-        clickMenuButton(true, Locator.tagWithClass("div", "discussion-toggle").findElement(getDriver()), false, "Start new discussion");
-        waitForElement(Locator.id("title"), WAIT_FOR_JAVASCRIPT);
-        setFormElement(Locator.id("title"), DISCUSSION_TITLE_1);
-        setFormElement(Locator.id("body"), DISCUSSION_BODY_1);
-        clickButton("Submit");
-
-        clickMenuButton(true, Locator.tagWithClass("div", "discussion-toggle").findElement(getDriver()), false, DISCUSSION_TITLE_1);
-        waitForText(DISCUSSION_TITLE_1);
-        assertTextPresent(DISCUSSION_BODY_1);
-
-        clickButton("Respond");
-        waitForElement(Locator.id("body"));
-        setFormElement(Locator.id("body"), DISCUSSION_BODY_2);
-        clickButton("Submit");
-
-        assertTextPresent(DISCUSSION_BODY_2);
-
-        clickAndWait(Locator.linkContainingText("edit"));
-        waitForElement(Locator.id("body"));
-        setFormElement(Locator.id("body"), DISCUSSION_BODY_3);
-        clickButton("Submit");
-
-        assertTextPresent(DISCUSSION_BODY_3);
     }
 
     @LogMethod

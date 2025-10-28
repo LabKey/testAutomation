@@ -11,8 +11,8 @@ public class CreatePlateParams
     private String _assayType; // blank or Standard
     private List<Map<String, Object>> _data = new ArrayList<>();
     private String _description;
-    private String _name;
-    private Integer _plateSetId;
+    private final String _name;
+    private final Integer _plateSetId;
     private Integer _plateType; // 1- 3x4(12), 2- 4x6(24), 3-6x8(48), 4-8x12(96), 5-16x24(384)
     private boolean _template;
 
@@ -55,8 +55,6 @@ public class CreatePlateParams
     /**
      * Sets the plate type for plate creation
      * // 1- 3x4(12), 2- 4x6(24), 3-6x8(48), 4-8x12(96), 5-16x24(384)
-     * @param plateType
-     * @return
      */
     public CreatePlateParams setPlateType(PlateTypes plateType)
     {

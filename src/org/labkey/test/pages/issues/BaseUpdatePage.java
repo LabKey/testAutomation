@@ -110,8 +110,8 @@ public abstract class BaseUpdatePage<EC extends BaseUpdatePage.ElementCache> ext
     {
         protected ElementCache()
         {
-            assignedTo = getSelect("assignedTo");
-            priority = getSelect("priority");
+            assignedTo = getSelect("AssignedTo");
+            priority = getSelect("Priority");
             related = getInput("related");
             notifyList = getInput("notifyList");
         }

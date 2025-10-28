@@ -37,6 +37,8 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
+import static org.labkey.test.util.PermissionsHelper.READER_ROLE;
 
 @Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 7)
@@ -84,7 +86,7 @@ public class SurveyTest extends BaseWebDriverTest
     @LogMethod
     public static void doSetup()
     {
-        SurveyTest initTest = (SurveyTest)getCurrentTest();
+        SurveyTest initTest = getCurrentTest();
         initTest.setupProject();
     }
 
@@ -121,6 +123,7 @@ public class SurveyTest extends BaseWebDriverTest
         final String dateSurveyDesign = "My extDate Survey Design";
 
         File metadata = TestFileUtils.getSampleData("survey/DateAndDateTimeSurvey.json");
+        navigateToFolder(getProjectName(), FOLDER_NAME);
         createSurveyDesign(getProjectName(), null, null, dateSurveyDesign, null, LIST_SCHEMA, LIST_NAME, metadata);
 
         clickProject(getProjectName());
@@ -249,11 +252,11 @@ public class SurveyTest extends BaseWebDriverTest
         _userHelper.createUser(EDITOR);
         clickProject(getProjectName());
         _permissionsHelper.enterPermissionsUI();
-        _permissionsHelper.setUserPermissions(EDITOR, "Reader");
+        _permissionsHelper.setUserPermissions(EDITOR, READER_ROLE);
         clickButton("Save and Finish");
         clickFolder(FOLDER_NAME);
         _permissionsHelper.enterPermissionsUI();
-        _permissionsHelper.setUserPermissions(EDITOR, "Editor");
+        _permissionsHelper.setUserPermissions(EDITOR, EDITOR_ROLE);
         clickButton("Save and Finish");
     }
 

@@ -27,7 +27,7 @@ import org.labkey.remoteapi.di.UpdateTransformConfigurationCommand;
 import org.labkey.remoteapi.di.UpdateTransformConfigurationResponse;
 import org.labkey.remoteapi.query.ExecuteSqlCommand;
 import org.labkey.remoteapi.query.InsertRowsCommand;
-import org.labkey.remoteapi.query.SaveRowsResponse;
+import org.labkey.remoteapi.query.RowsResponse;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
@@ -50,9 +50,9 @@ import static org.junit.Assert.assertTrue;
 public class DataIntegrationHelper
 {
     private String _baseUrl = WebTestHelper.getBaseURL();
-    private String _username = PasswordUtil.getUsername();
-    private String _password = PasswordUtil.getPassword();
-    private String _folderPath;
+    private final String _username = PasswordUtil.getUsername();
+    private final String _password = PasswordUtil.getPassword();
+    private final String _folderPath;
     public final static String DI_SCHEMA = "dataintegration";
 
     public DataIntegrationHelper(String folderPath)
@@ -68,7 +68,7 @@ public class DataIntegrationHelper
 
     public SelectRowsResponse selectRows(String folderPath, String schemaName, String queryName) throws IOException, CommandException
     {
-        SelectRowsResponse rsp = null;
+        SelectRowsResponse rsp;
         Connection cn = new Connection(_baseUrl, _username, _password);
         SelectRowsCommand cmd = new SelectRowsCommand(schemaName, queryName);
         rsp = cmd.execute(cn, folderPath);
@@ -77,16 +77,16 @@ public class DataIntegrationHelper
 
     public SelectRowsResponse executeQuery(String folderPath, String schemaName, String queryStatement) throws IOException, CommandException
     {
-        SelectRowsResponse exRsp = null;
+        SelectRowsResponse exRsp;
         Connection cn = new Connection(_baseUrl, _username, _password);
         ExecuteSqlCommand exCmd = new ExecuteSqlCommand(schemaName, queryStatement);
         exRsp = exCmd.execute(cn, folderPath);
         return exRsp;
     }
 
-    public SaveRowsResponse executeInsert(String folderPath, String schemaName, String tableName, Map<String,Object> rows) throws Exception
+    public RowsResponse executeInsert(String folderPath, String schemaName, String tableName, Map<String,Object> rows) throws Exception
     {
-        SaveRowsResponse response = null;
+        RowsResponse response;
         Connection cn = new Connection(_baseUrl, _username, _password);
         InsertRowsCommand insCmd = new InsertRowsCommand(schemaName, tableName);
         insCmd.addRow(rows);

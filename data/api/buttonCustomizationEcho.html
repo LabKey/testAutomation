@@ -3,10 +3,11 @@
 <script type="text/javascript">
     var html = "";
     var parameters = LABKEY.ActionURL.getParameters();
+    let paramsEl = document.getElementById("params");
     for (var p in parameters) {
         if (parameters.hasOwnProperty(p)) {
-            html += p + ": " + parameters[p] + "<br>";
+            paramsEl.append(document.createTextNode(p + ": " + parameters[p]));
+            paramsEl.append(document.createElement("br"));
         }
     }
-    document.getElementById("params").innerHTML = html;
 </script>

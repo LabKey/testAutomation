@@ -19,15 +19,13 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.pages.LabKeyPage;
-import org.labkey.test.selenium.LazyWebElement;
 import org.labkey.test.util.FileBrowserHelper;
-import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 public class FileContentPage extends LabKeyPage<FileContentPage.ElementCache>
 {
-    private FileBrowserHelper _fileBrowserHelper;
+    private final FileBrowserHelper _fileBrowserHelper;
 
     public FileContentPage(WebDriver driver)
     {

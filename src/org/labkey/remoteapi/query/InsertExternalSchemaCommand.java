@@ -75,9 +75,9 @@ public class InsertExternalSchemaCommand extends PostCommand<CommandResponse>
         private List<String> tables = new ArrayList<>();
         private String dataSource = "labkeyDataSource";
         private boolean includeSystem = true;
-        private boolean editable = false;
+        private final boolean editable = false;
         private boolean indexable = true;
-        private boolean fastCacheRefresh = true; // Enable fast refresh by default for tests
+        private final boolean fastCacheRefresh = true; // Enable fast refresh by default for tests
         private String metaData = "";
 
         public Params(String userSchemaName, String sourceSchemaName)

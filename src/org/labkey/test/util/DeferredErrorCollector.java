@@ -4,6 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.awaitility.core.ConditionTimeoutException;
 import org.hamcrest.Matcher;
 import org.hamcrest.MatcherAssert;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.labkey.junit.LabKeyAssert;
@@ -224,6 +225,15 @@ public class DeferredErrorCollector
                         .untilAsserted(wrappedAssertion::run));
     }
 
+    public final boolean verifyEqualsIgnoreWhiteSpaces(String message, Object expected, Object actual)
+    {
+        if (expected instanceof String expectedStr && actual instanceof String actualStr)
+        {
+            return wrapAssertion(() -> Assert.assertEquals(message, expectedStr.replaceAll("\\s", "").trim(), actualStr.replaceAll("\\s", "").trim()));
+        }
+        return wrapAssertion(() -> Assert.assertEquals(message, expected, actual));
+    }
+
     /**
      * Record an error if the two objects are not equal.
      *
@@ -274,6 +284,7 @@ public class DeferredErrorCollector
      * @see Assert#assertTrue(String, boolean)
      * @return <code>true</code> if condition is true
      */
+    @Contract("_, true -> true; _, false -> false")
     public final boolean verifyTrue(String message, boolean condition)
     {
         return wrapAssertion(() -> Assert.assertTrue(message, condition));
@@ -287,6 +298,7 @@ public class DeferredErrorCollector
      * @see Assert#assertFalse(String, boolean)
      * @return <code>true</code> if condition is false
      */
+    @Contract("_, false -> true; _, true -> false")
     public final boolean verifyFalse(String message, boolean condition)
     {
         return wrapAssertion(() -> Assert.assertFalse(message, condition));
@@ -300,6 +312,7 @@ public class DeferredErrorCollector
      * @see Assert#assertNull(String, Object)
      * @return <code>true</code> if object is null
      */
+    @Contract("_, null -> true; _, !null -> false")
     public final boolean verifyNull(String message, Object object)
     {
         return wrapAssertion(() -> Assert.assertNull(message, object));
@@ -313,6 +326,7 @@ public class DeferredErrorCollector
      * @see Assert#assertNotNull(String, Object)
      * @return <code>true</code> if object is not null
      */
+    @Contract("_, !null -> true; _, null -> false")
     public final boolean verifyNotNull(String message, Object object)
     {
         return wrapAssertion(() -> Assert.assertNotNull(message, object));
@@ -340,6 +354,7 @@ public class DeferredErrorCollector
      * @see Assert#fail()
      * @return Always returns <code>false</code>
      */
+    @Contract("_ -> false")
     public final boolean error(String message)
     {
         return wrapAssertion(() -> Assert.fail(message));

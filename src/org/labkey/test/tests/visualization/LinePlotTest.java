@@ -39,6 +39,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
 
 @Category({Daily.class, Reports.class, Charting.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 10)
@@ -76,6 +77,7 @@ public class LinePlotTest extends GenericChartsTest
     private static final String LINE_PLOT_MV_2 = "60\n70\n80\n90\n100\n110\n32.0\n33.0\n34.0\n35.0\n36.0\n37.0\n38.0\n39.0\n40.0\nTestTitle\nTestXAxis\nTestYAxis";
     private static final String LINE_PLOT_MULTI_YAXIS_1 = "60\n80\n100\n120\n140\n160\n180\n200\n10\n20\n30\n40\n50\n60\n70\n80\n90\n100\n110APX-1: Abbreviated Physical Exam\n1. Weight\n4. Pulse, 5. Respirations\n4. Pulse\n5. Respirations";
     private static final String LINE_PLOT_MULTI_YAXIS_2 = "60\n80\n100\n120\n140\n160\n180\n200\n60\n65\n70\n75\n80\n85\n90\n95\n100\n105\n110\n115\n6\n8\n10\n12\n14\n16\n18APX-1: Abbreviated Physical Exam\n1. Weight\n4. Pulse\n5. Respirations\n4. Pulse\n5. Respirations";
+    private static final String LINE_PLOT_MULTI_YAXIS_3 = "60\n80\n100\n120\n140\n160\n180\n200\n60\n65\n70\n75\n80\n85\n90\n95\n100\n105\n110\n115APX-1: Abbreviated Physical Exam\n1. Weight\n4. Pulse";
     private static final String LINE_PLOT_NAME_MV = "ManageViewsLinePlot";
     private static final String LINE_PLOT_DESC_MV = "This line plot was created through the manage views UI";
     private static final String LINE_PLOT_MULTI_YAXIS_NAME = "LinePlotMultiYAxis";
@@ -198,6 +200,49 @@ public class LinePlotTest extends GenericChartsTest
         waitForElement(Locator.linkWithText(LINE_PLOT_MULTI_YAXIS_NAME));
         clickAndWait(Locator.linkWithText(LINE_PLOT_MULTI_YAXIS_NAME), WAIT_FOR_PAGE);
         export(EXPORTED_SCRIPT_CHECK_TYPE, MEASURE_1_WEIGHT, MEASURE_5_RESPIRATIONS);
+
+        log("verify aggregate and error bar options are hidden for multi chart");
+        chartWizard = openSavedPlotInEditMode(LINE_PLOT_MULTI_YAXIS_NAME);
+        chartLayoutDialog = clickChartLayoutButton();
+        chartLayoutDialog.clickYAxisTabRight();
+        checker().verifyFalse("Aggregate method should not be visible for multiple y axis line plot", chartLayoutDialog.isYAxisAggregateMethodVisible());
+        checker().verifyFalse("Error Bars should not be visible for multiple y axis line plot", chartLayoutDialog.isYAxisErrorBarsMethodVisible());
+        chartLayoutDialog.clickYAxisTabLeft();
+        checker().verifyFalse("Aggregate method should not be visible for multiple y axis line plot", chartLayoutDialog.isYAxisAggregateMethodVisible());
+        checker().verifyFalse("Error Bars should not be visible for multiple y axis line plot", chartLayoutDialog.isYAxisErrorBarsMethodVisible());
+        chartLayoutDialog.clickCancel();
+        log("verify aggregate and error bar options are hidden for right chart");
+        chartTypeDialog = chartWizard.clickChartTypeButton();
+        chartWizard = chartTypeDialog
+                .removeYAxis()
+                .removeYAxis()
+                .setYAxis(MEASURE_4_PULSE)
+                .setYAxisSide(0,ChartTypeDialog.YAxisSide.Right)
+                .clickApply();
+        chartLayoutDialog = clickChartLayoutButton();
+        click(Locator.xpath("//div[contains(@class, 'item')][text()='Y-Axis']").index(1)); // click the right y-axis tab
+        checker().verifyFalse("Aggregate method should not be visible for multiple y axis line plot", chartLayoutDialog.isYAxisAggregateMethodVisible());
+        checker().verifyFalse("Error Bars should not be visible for multiple y axis line plot", chartLayoutDialog.isYAxisErrorBarsMethodVisible());
+        chartLayoutDialog.clickCancel();
+        log("change back to y-axis left and verify aggregate and error bar options");
+        chartTypeDialog = chartWizard.clickChartTypeButton();
+        chartWizard = chartTypeDialog.setYAxisSide(0, ChartTypeDialog.YAxisSide.Left).clickApply();
+        assertSVG(LINE_PLOT_MULTI_YAXIS_3);
+        checker().verifyEquals("Point count in line plot not as expected", 33, Locator.css("svg g a path").findElements(getDriver()).size());
+        chartLayoutDialog = clickChartLayoutButton();
+        chartLayoutDialog.clickYAxisTab();
+        checker().verifyTrue("Aggregate method should not be visible for multiple y axis line plot", chartLayoutDialog.isYAxisAggregateMethodVisible());
+        checker().verifyTrue("Error Bars should not be visible for multiple y axis line plot", chartLayoutDialog.isYAxisErrorBarsMethodVisible());
+        chartLayoutDialog.setYAxisAggregateMethod("Mean").clickApply();
+        assertSVG(LINE_PLOT_MULTI_YAXIS_3);
+        checker().verifyEquals("Point count in line plot not as expected", 19, Locator.css("svg g a path").findElements(getDriver()).size());
+        checker().verifyEquals("Point count in line plot not as expected", 0, Locator.css("svg g.error-bar").findElements(getDriver()).size());
+        chartLayoutDialog = clickChartLayoutButton();
+        chartLayoutDialog.clickYAxisTab();
+        chartLayoutDialog.setYAxisErrorBarsMethod("Standard Deviation").clickApply();
+        assertSVG(LINE_PLOT_MULTI_YAXIS_3);
+        checker().verifyEquals("Point count in line plot not as expected", 19, Locator.css("svg g a path").findElements(getDriver()).size());
+        checker().verifyEquals("Point count in line plot not as expected", 19, Locator.css("svg g.error-bar").findElements(getDriver()).size());
     }
 
     private static final String LINE_PLOT_DR_1 = "60\n65\n70\n75\n80\n85\n90\n50\n55\n60\n65\n70\n75\n80\n85\n90\n95\n100\n105\n110\nAPX-1: Abbreviated Physical Exam\n4. Pulse\n1. Weight";
@@ -391,7 +436,7 @@ public class LinePlotTest extends GenericChartsTest
         _userHelper.createUser(DEVELOPER_USER);
         clickProject(getProjectName());
         _permissionsHelper.enterPermissionsUI();
-        _permissionsHelper.setUserPermissions(DEVELOPER_USER, "Editor");
+        _permissionsHelper.setUserPermissions(DEVELOPER_USER, EDITOR_ROLE);
         impersonate(DEVELOPER_USER);
         navigateToFolder(getProjectName(), getFolderName());
         clickAndWait(Locator.linkWithText(LINE_PLOT_NAME_MV + " PointClickFn"));

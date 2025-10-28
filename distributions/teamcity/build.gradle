@@ -12,7 +12,7 @@ plugins {
 if (!BuildUtils.isOpenSource(project))
     apply plugin: 'org.labkey.build.applyLicenses'
 
-dist.description = "Distribution that includes all modules, for use in the continuous integration LabKey Server instance"
+description = "Distribution that includes all modules, for use in the continuous integration LabKey Server instance"
 
 project.tasks.register("distribution", ModuleDistribution) {
     ModuleDistribution dist ->

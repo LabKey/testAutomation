@@ -47,8 +47,6 @@ public class RReportHelper
 
     public enum ReportOption implements ScriptReportPage.ReportOption
     {
-        @Deprecated (since = "22.7")
-        shareReport(ScriptReportPage.StandardReportOption.shareReport),
         knitrNone("None" + Locator.NBSP, "Knitr Options", false),
         knitrHtml("Html" + Locator.NBSP, "Knitr Options", false),
         knitrMarkdown("Markdown" + Locator.NBSP, "Knitr Options", false);
@@ -237,7 +235,7 @@ public class RReportHelper
 
         _test.log("Check if R already is configured");
 
-        String rVersion = null;
+        String rVersion;
         if (useDocker)
         {
             rVersion = RDOCKER;
@@ -417,7 +415,7 @@ public class RReportHelper
         }
         catch(IOException ex)
         {
-            if (versionOutput.length() > 0)
+            if (!versionOutput.isEmpty())
                 _test.log("R --version > " + versionOutput);
             throw new RuntimeException("Unable to determine R version: " + r.getAbsolutePath(), ex);
         }
@@ -517,9 +515,6 @@ public class RReportHelper
 
     /**
      * pre-condition: at folder that the report is to be created from
-     * @param reportName
-     * @param reportSource
-     * @param shareView
      * @return labkey-output content of report
      */
     public String createAndRunRReport(String reportName, String reportSource, boolean shareView)

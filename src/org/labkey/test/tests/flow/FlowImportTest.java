@@ -54,8 +54,8 @@ public class FlowImportTest extends BaseFlowTest
         importAnalysis(getContainerPath(), workspacePath, SelectFCSFileOption.None, null, analysisFolder, false, true);
         beginAt(WebTestHelper.getContextPath() + "/query" + getContainerPath() + "/executeQuery.view?query.queryName=Runs&schemaName=flow");
         DataRegionTable table = new DataRegionTable("query", this);
-        assertEquals("Expected a single run", table.getDataRowCount(), 1);
-        assertEquals("Expected an Analysis run", table.getDataAsText(0, "Protocol Step"), "Analysis");
+        assertEquals("Expected a single run", 1, table.getDataRowCount());
+        assertEquals("Expected an Analysis run", "Analysis", table.getDataAsText(0, "Protocol Step"));
 
         log("** import same FlowJo workspace again, with FCS files");
         importAnalysis_begin(getContainerPath());
@@ -78,11 +78,11 @@ public class FlowImportTest extends BaseFlowTest
         // assert one keyword run created, one additional analysis run created
         beginAt(WebTestHelper.getContextPath() + "/query" + getContainerPath() + "/executeQuery.view?query.queryName=Runs&schemaName=flow");
         table = new DataRegionTable("query", this);
-        assertEquals("Expected three runs", table.getDataRowCount(), 3);
+        assertEquals("Expected three runs", 3, table.getDataRowCount());
         table.setSort("ProtocolStep", SortDirection.DESC);
-        assertEquals("Expected a Keywords run", table.getDataAsText(0, "Protocol Step"), "Keywords");
-        assertEquals("Expected an Analysis run", table.getDataAsText(1, "Protocol Step"), "Analysis");
-        assertEquals("Expected an Analysis run", table.getDataAsText(2, "Protocol Step"), "Analysis");
+        assertEquals("Expected a Keywords run", "Keywords", table.getDataAsText(0, "Protocol Step"));
+        assertEquals("Expected an Analysis run", "Analysis", table.getDataAsText(1, "Protocol Step"));
+        assertEquals("Expected an Analysis run", "Analysis", table.getDataAsText(2, "Protocol Step"));
         // UNDONE: Check Runs.Workspace column
 
         // check for flow.FCSFiles has a FileDate column and verify the values
@@ -124,6 +124,6 @@ public class FlowImportTest extends BaseFlowTest
 
         beginAt(WebTestHelper.getContextPath() + "/query" + getContainerPath() + "/executeQuery.view?query.queryName=Runs&schemaName=flow");
         table = new DataRegionTable("query", this);
-        assertEquals("Expected four runs", table.getDataRowCount(), 4);
+        assertEquals("Expected four runs", 4, table.getDataRowCount());
     }
 }

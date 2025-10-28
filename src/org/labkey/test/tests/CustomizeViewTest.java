@@ -85,7 +85,7 @@ public class CustomizeViewTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject() throws Exception
     {
-        CustomizeViewTest init = (CustomizeViewTest) getCurrentTest();
+        CustomizeViewTest init = getCurrentTest();
         init.doSetup();
     }
 
@@ -300,16 +300,16 @@ public class CustomizeViewTest extends BaseWebDriverTest
     @Test
     public void saveFilterTest()
     {
-        String fieldKey = FieldKey.fromParts(LAST_NAME_COLUMN).toString();
+        FieldKey fieldKey = FieldKey.fromParts(LAST_NAME_COLUMN);
         String op = "Starts With";
         String value = "J";
         String[] viewNames = {TRICKY_CHARACTERS + "view", "AAC", "aaa", "aad", "zzz"};
 
-        setColumns(fieldKey);
+        setColumns(LAST_NAME_COLUMN);
         for(String name : viewNames)
         {
             _customizeViewsHelper.openCustomizeViewPanel();
-            _customizeViewsHelper.addFilter(fieldKey, fieldKey, op, value);
+            _customizeViewsHelper.addFilter(fieldKey, op, value);
             _customizeViewsHelper.saveCustomView(name);
         }
 
@@ -350,7 +350,7 @@ public class CustomizeViewTest extends BaseWebDriverTest
     private void addFilter(String columnName, String op, String value)
     {
         _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.addFilter(FieldKey.fromParts(columnName).toString(), columnName, op, value);
+        _customizeViewsHelper.addFilter(FieldKey.fromParts(columnName).toString(), op, value);
         _customizeViewsHelper.applyCustomView();
     }
 

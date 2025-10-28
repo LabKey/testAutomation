@@ -15,12 +15,15 @@
  */
 package org.labkey.test.tests;
 
+import org.assertj.core.api.Assertions;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.UIContainerHelper;
@@ -43,6 +46,19 @@ public class MenuBarTest extends BaseWebDriverTest
     private static final File STUDY_ZIP = TestFileUtils.getSampleData("studies/LabkeyDemoStudy.zip");
     private static final String DEM_STUDY_FOLDER = "DemStudyFolder";
     private static final String STUDY_FOLDER = "StudyFolder";
+
+   @BeforeClass
+    public static void setupProject() throws Exception
+    {
+         MenuBarTest initTest = getCurrentTest();
+         initTest.doSetup();
+    }
+
+    protected void doSetup()
+    {
+        log("Open new project");
+        _containerHelper.createProject(PROJECT_NAME, "Collaboration");
+    }
 
     @Override
     public List<String> getAssociatedModules()
@@ -67,13 +83,11 @@ public class MenuBarTest extends BaseWebDriverTest
         PortalHelper portalHelper = new PortalHelper(this);
         WikiHelper wikiHelper = new WikiHelper(this);
 
-        log("Open new project");
-        _containerHelper.createProject(PROJECT_NAME, "Collaboration");
+        goToProjectHome();
         goToProjectSettings();
         clickAndWait(Locator.linkWithText("Menu Bar"));
 
         log("Add menu bar webparts");
-        portalHelper.addWebPart("AssayList2");
         portalHelper.addWebPart("Study List");
         portalHelper.addWebPart("Wiki Menu");
 
@@ -99,7 +113,6 @@ public class MenuBarTest extends BaseWebDriverTest
 
         //Make sure that the menus are shown, but the content is not yet loaded.
         assertElementPresent(Locator.tagWithClass("div", "navbar-header"));
-        assertElementPresent(menuBarItem("Assays"));
         assertElementPresent(menuBarItem("Studies"));
         assertElementPresent(menuBarItem(WIKI_PAGE_TITLE));
 
@@ -110,15 +123,6 @@ public class MenuBarTest extends BaseWebDriverTest
 
         openMenu(WIKI_PAGE_TITLE);
         waitForElement(Locator.xpath("//div").withClass("labkey-wiki").withText(WIKI_PAGE_CONTENT));
-        openMenu("Assays");
-        waitForElement(Locator.lkButton("Manage Assays"), 3000);
-
-        _assayHelper.uploadXarFileAsAssayDesign(TestFileUtils.getSampleData("menubar/Test Assay.xar"), 1);
-        clickProject(PROJECT_NAME);
-
-        assertTextNotPresent("Test Assay");
-        openMenu("Assays");
-        waitForElement(Locator.linkWithText("Test Assay"));
 
         _containerHelper.createSubfolder(PROJECT_NAME, PROJECT_NAME, "StudyFolder", "Study", null);
         createDefaultStudy();
@@ -203,12 +207,54 @@ public class MenuBarTest extends BaseWebDriverTest
         // Issue 47841: verify that menu config comes through with folder export/import (via create from template)
         UIContainerHelper uiContainerHelper = new UIContainerHelper(this);
         uiContainerHelper.createProjectFromTemplate(getAltProjectName(), "/" + getProjectName());
-        openMenu("Assays");
         openMenu("Studies");
         openMenu(WIKI_PAGE_TITLE);
         openMenu("Wiki Render Types");
         openMenu("Participant Reports");
         openMenu("Folders");
+    }
+
+    // Issue 52171: All menus that link to absolute URLs are broken
+    @Test
+    public void testDocumentationMenuLinks()
+    {
+        goToProjectHome();
+        clickUserMenuItem(false,"LabKey Documentation");    // expect documentation to pop in another window
+        switchToWindow(1);
+        checker().withScreenshot("unexpected_destination")
+                .wrapAssertion(()-> Assertions.assertThat(getURL().toString())
+                        .as("expect navigation to labkey.org /documentation")
+                        .contains("labkey.org/Documentation"));
+        switchToMainWindow();
+        closeExtraWindows();
+
+        goToProjectHome();
+        clickUserMenuItem(true,"Support");
+        checker().withScreenshot("unexpected_destination")
+                .verifyEquals("Support menu destination",
+                        WebTestHelper.buildURL("project", "home/support", "begin"),
+                        getDriver().getCurrentUrl());
+
+        goToProjectHome();
+        clickAdminMenuItem("Developer Links", "JavaScript API Reference");
+        checker().withScreenshot("unexpected_destination")
+                .wrapAssertion(()-> Assertions.assertThat(getURL().toString())
+                        .as("expect navigation to labkey.org /download/clientapi_docs")
+                        .endsWith("labkey.org/download/clientapi_docs/javascript-api/"));
+
+        goToProjectHome();
+        clickAdminMenuItem("Developer Links", "SQL Reference");
+        checker().withScreenshot("unexpected_destination")
+                .wrapAssertion(()-> Assertions.assertThat(getURL().toString())
+                        .as("expect navigation to labkey.org /documentation")
+                        .contains("labkey.org/Documentation"));
+
+        goToProjectHome();
+        clickAdminMenuItem("Developer Links", "XML Schema Reference");
+        checker().withScreenshot("unexpected_destination")
+                .wrapAssertion(()-> Assertions.assertThat(getURL().toString())
+                        .as("expect navigation to labkey.org schema docs")
+                        .endsWith("labkey.org/download/schema-docs/xml-schemas/"));
     }
 
     protected WebElement openMenu(String menuText)

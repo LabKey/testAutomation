@@ -20,6 +20,7 @@ import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.test.components.html.Checkbox;
+import org.labkey.test.pages.core.admin.AllowedFileExtensionAdminPage;
 import org.labkey.test.pages.core.admin.BaseSettingsPage;
 import org.labkey.test.pages.core.admin.ConfigureFileSystemAccessPage;
 import org.labkey.test.pages.core.admin.LimitActiveUserPage;
@@ -134,6 +135,15 @@ public class TestScrubber extends ExtraSiteWrapper
 
         try
         {
+            AllowedFileExtensionAdminPage.deleteAllAllowedFileExtension(createDefaultConnection());
+        }
+        catch (Exception e)
+        {
+            TestLogger.error("Failed to remove list of allowed file extensions.", e);
+        }
+
+        try
+        {
             LimitActiveUserPage.resetUserLimits(connection);
         }
         catch (IOException | CommandException e)
@@ -213,4 +223,5 @@ public class TestScrubber extends ExtraSiteWrapper
             }
         }
     }
+
 }

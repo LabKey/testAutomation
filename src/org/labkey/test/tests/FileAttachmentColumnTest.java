@@ -20,8 +20,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.labkey.api.util.FileUtil;
-import org.labkey.api.util.Path;
 import org.labkey.remoteapi.assay.ImportRunCommand;
 import org.labkey.remoteapi.assay.Protocol;
 import org.labkey.remoteapi.domain.CreateDomainCommand;
@@ -31,12 +29,14 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Daily;
+import org.labkey.test.components.assay.AssayConstants;
 import org.labkey.test.pages.admin.FolderManagementPage;
 import org.labkey.test.pages.assay.AssayRunsPage;
 import org.labkey.test.pages.files.FileContentPage;
 import org.labkey.test.pages.study.CreateStudyPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldDefinition.ColumnType;
+import org.labkey.test.params.FieldInfo;
 import org.labkey.test.params.assay.GeneralAssayDesign;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.DataRegionTable;
@@ -44,7 +44,7 @@ import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
 import org.labkey.test.util.StudyHelper;
-import org.labkey.test.util.TestDataUtils;
+import org.labkey.test.util.TestDataGenerator;
 import org.labkey.test.util.core.webdav.WebDavUploadHelper;
 import org.labkey.test.util.exp.SampleTypeAPIHelper;
 import org.openqa.selenium.By;
@@ -93,6 +93,7 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
     private final String RESULT_FILE_COL = "resultFile";
     private final String OTHER_RESULT_FILE_COL = "otherResultFile";
     private final String STUDY_DATASET_NAME = "ogreSpiteLevels";
+    private static final FieldInfo LIST_ATTACHMENT_FIELD = new FieldInfo(TestDataGenerator.randomFieldName("File / Attachment"), ColumnType.Attachment);
 
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
@@ -104,7 +105,7 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject() throws Exception
     {
-        FileAttachmentColumnTest init = (FileAttachmentColumnTest)getCurrentTest();
+        FileAttachmentColumnTest init = getCurrentTest();
         init.doSetup();
     }
 
@@ -183,8 +184,8 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
         for (File testFile : downloadTestFiles)
         {
             int rowIndex = testListRegion.getRowIndex("Name", testFile.getName());
-            var downloadLink = testListRegion.link(rowIndex, "File");
-            doAndWaitForDownload(()-> downloadLink.click());
+            var downloadLink = testListRegion.link(rowIndex, LIST_ATTACHMENT_FIELD.getName());
+            doAndWaitForDownload(downloadLink::click);
         }
 
         // verify popup/sprite for jpeg
@@ -285,7 +286,7 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
         clickButton("Next");    // batch properties
 
         // run properties
-        setFormElement(Locator.input("name"), runName);
+        setFormElement(AssayConstants.ASSAY_NAME_FIELD_LOCATOR, runName);
         setFormElement(Locator.input(RUN_TXT_COL), "run text");
         setFormElement(Locator.input(RUN_FILE_COL), runFileFieldFile);
         checkRadioButton(Locator.inputById("Fileupload"));
@@ -431,13 +432,13 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
         String LIST_KEY = "TestListId";
         listHelper.createList(getProjectName() + "/" + EXPORT_FOLDER_NAME, LIST_NAME, LIST_KEY,
                 new FieldDefinition("Name", ColumnType.String),
-                new FieldDefinition("File", ColumnType.Attachment));
+                LIST_ATTACHMENT_FIELD.getFieldDefinition());
         goToManageLists();
         listHelper.click(Locator.linkContainingText(LIST_NAME));
 
         for (File file : SAMPLE_FILES)
         {
-            Map<String, String> fileRow = Map.of("Name", file.getName(), "File", file.getAbsolutePath());
+            Map<String, String> fileRow = Map.of("Name", file.getName(), LIST_ATTACHMENT_FIELD.getName(), file.getAbsolutePath());
             listHelper.insertNewRow(fileRow, false);
         }
     }
@@ -451,7 +452,7 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
         for (File file : files)
         {
             sampleFileData.add(Map.of("Name", file.getName(), "Color", "green",
-                    "File", file.getName()));
+                    "file", file.getName()));
         }
         helper.bulkImport(sampleFileData);
     }
@@ -459,15 +460,12 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
     private Protocol makeGeneralAssay(String assayName, List<PropertyDescriptor> runFields, List<PropertyDescriptor> dataFields,
                                       String folderPath) throws Exception
     {
-        var assayDesign =  new GeneralAssayDesign(assayName)
+        return new GeneralAssayDesign(assayName)
                 .setBatchFields(List.of(new FieldDefinition("batchData", FieldDefinition.ColumnType.String)), false)
                 .setRunFields(runFields, false)
-                .setDataFields(dataFields, false);
-
-
-        var protocol = assayDesign.createAssay(folderPath, createDefaultConnection());
-        var updateProtocol = protocol.setEditableRuns(true).setEditableResults(true);
-        return assayDesign.updateProtocol(folderPath, createDefaultConnection(), updateProtocol);
+                .setDataFields(dataFields, false)
+                .addProtocolTransformer(protocol -> protocol.setEditableRuns(true).setEditableResults(true))
+                .createAssay(folderPath, createDefaultConnection());
     }
 
     private void addRunData(Integer protocolId, String folderPath) throws Exception
@@ -519,7 +517,7 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
             else
             {
                 int rowIndex = testListRegion.getRowIndex("Name", testFile.getName());
-                var downloadLink = testListRegion.link(rowIndex, "File");
+                var downloadLink = testListRegion.link(rowIndex, LIST_ATTACHMENT_FIELD.getName());
                 doAndWaitForDownload(() -> downloadLink.click());
             }
         }
@@ -556,9 +554,9 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
                  {
                      // verify fie download behavior
                      File downloadedFile = doAndWaitForDownload(() -> optionalFileLink.get().click());
-                     checker().wrapAssertion(() -> Assertions.assertThat(TestFileUtils.getFileContents(downloadedFile))
+                     checker().wrapAssertion(() -> Assertions.assertThat(downloadedFile)
                              .as("expect the downloaded file to be the expected file")
-                             .isEqualTo(TestFileUtils.getFileContents(file)));   // guard against renames like file2.xyz
+                             .hasSameBinaryContentAs(file));   // guard against renames like file2.xyz
                  }
             }
         }
@@ -582,9 +580,9 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
         if (optionalFileLink.isPresent())
         {
             var file = doAndWaitForDownload(()-> optionalFileLink.get().click());
-            checker().wrapAssertion(()-> Assertions.assertThat(TestFileUtils.getFileContents(file))
+            checker().wrapAssertion(()-> Assertions.assertThat(file)
                     .as("expect the downloaded file to have equivalent content")
-                    .isEqualTo(TestFileUtils.getFileContents(runFile)));
+                    .hasSameBinaryContentAs(runFile));
         }
 
         var resultsPage = runsPage.clickAssayIdLink(runName);
@@ -615,7 +613,7 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
         checker().withScreenshot("unexpected_run_file_links")
                 .wrapAssertion(()-> Assertions.assertThat(runFileTexts.stream().map(String::trim).toList())
                         .as("expect complete run files")
-                        .containsOnly(String.format("assaydata%s%s", File.separatorChar, runFile.getName()))
+                        .containsOnly(runFile.getName())
                         .hasSize(5));
     }
 
@@ -639,7 +637,7 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
             }
             else
             {
-                Optional<WebElement> optionalFileLink = Locator.linkContainingText(String.format("datasetdata%s%s", File.separatorChar, file.getName()))
+                Optional<WebElement> optionalFileLink = Locator.linkContainingText(file.getName())
                         .findOptionalElement(dataRegionTable);
                 checker().withScreenshot("unexpected_file_state")
                         .awaiting(Duration.ofSeconds(2),
@@ -650,9 +648,9 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
                 {
                     // verify fie download behavior
                     File downloadedFile = doAndWaitForDownload(() -> optionalFileLink.get().click());
-                    checker().wrapAssertion(() -> Assertions.assertThat(TestFileUtils.getFileContents(downloadedFile))
+                    checker().wrapAssertion(() -> Assertions.assertThat(downloadedFile)
                             .as("expect the downloaded file to be the expected file")
-                            .isEqualTo(TestFileUtils.getFileContents(file)));   // guard against renames like file2.xyz
+                            .hasSameBinaryContentAs(file));   // guard against renames like file2.xyz
                 }
             }
         }

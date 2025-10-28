@@ -43,7 +43,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
-import static org.labkey.test.util.PasswordUtil.getUsername;
+import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
 
 @Category({Issues.class, Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 5)
@@ -58,13 +58,13 @@ public class IssuesAdminTest extends BaseWebDriverTest
     private static final String PROJECT2 = "IssuesAdminWithoutModule";
     private static final String PROJECT3 = "CustomIssueName Project";
 
-    private IssuesHelper _issuesHelper = new IssuesHelper(this);
-    private ApiPermissionsHelper _permissionsHelper = new ApiPermissionsHelper(this);
+    private final IssuesHelper _issuesHelper = new IssuesHelper(this);
+    private final ApiPermissionsHelper _permissionsHelper = new ApiPermissionsHelper(this);
 
     @BeforeClass
     public static void setupProject()
     {
-        IssuesAdminTest init = (IssuesAdminTest) getCurrentTest();
+        IssuesAdminTest init = getCurrentTest();
         init.doSetup();
     }
 
@@ -84,7 +84,7 @@ public class IssuesAdminTest extends BaseWebDriverTest
         _userHelper.createUser(TEST_USER);
         _permissionsHelper.createPermissionsGroup(TEST_GROUP);
         _permissionsHelper.assertPermissionSetting(TEST_GROUP, "No Permissions");
-        _permissionsHelper.setPermissions(TEST_GROUP, "Editor");
+        _permissionsHelper.setPermissions(TEST_GROUP, EDITOR_ROLE);
 
         _issuesHelper.createNewIssuesList(ISSUE_LIST_NAME, _containerHelper);
         IssuesAdminPage adminPage = IssuesAdminPage.beginAt(this, getProjectName(), ISSUE_LIST_NAME);
@@ -199,11 +199,11 @@ public class IssuesAdminTest extends BaseWebDriverTest
 
         DetailsPage detailsPage = _issuesHelper.addIssue(
                 Maps.of("title", mainTitle,
-                        "assignedTo", TEST_USER_DISPLAY_NAME,
+                        "AssignedTo", TEST_USER_DISPLAY_NAME,
                         "comment", "Main issue Comment"));
 
         Map<String, String> relatedIssueData = Maps.of("title", relatedIssueTitle,
-                "assignedTo", TEST_USER_DISPLAY_NAME,
+                "AssignedTo", TEST_USER_DISPLAY_NAME,
                 "comment", "Related issue Comment");
         InsertPage relatedIssuePage = detailsPage.clickCreateRelatedIssue(getProjectName(), ISSUE_LIST_NAME.toLowerCase());
         for (Map.Entry<String, String> field : relatedIssueData.entrySet())

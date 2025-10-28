@@ -66,16 +66,20 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
         return Locator.buttonContainingText("Add Parent").findElement(this).isEnabled();
     }
 
+    /**
+     * Get 'Add Parent' menu for passive inspection. Use {@link EntityInsertPanel#addParent(String)} to actually add
+     * parents to the entity
+     */
     public MultiMenu getAddParentMenu()
     {
-        return elementCache().addParent;
+        return new ReadOnlyMenu(elementCache().addParent, "Parent");
     }
 
     public EntityInsertPanel addParent(String parentType)
     {
         Assert.assertTrue("Add Parent menu not present", isAddParentMenuPresent());
         getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().addParent.getComponentElement()));
-        getAddParentMenu().doMenuAction(parentType);
+        getEditableGrid().doAndWaitForColumnUpdate(() -> elementCache().addParent.doMenuAction(parentType));
         return this;
     }
 
@@ -89,23 +93,31 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
         return Locator.buttonContainingText("Add Source").findElement(this).isEnabled();
     }
 
+    /**
+     * Get 'Add Source' menu for passive inspection. Use {@link EntityInsertPanel#addSource(String)} to actually add
+     * sources to the entity
+     */
     public MultiMenu getAddSourceMenu()
     {
-        return elementCache().addSource;
+        return new ReadOnlyMenu(elementCache().addSource, "Source");
     }
 
     public EntityInsertPanel addSource(String sourceType)
     {
         Assert.assertTrue("Add Source menu not present", isAddSourceMenuPresent());
         getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().addSource.getComponentElement()));
-        getAddSourceMenu().doMenuAction(sourceType);
+        getEditableGrid().doAndWaitForColumnUpdate(() -> elementCache().addSource.doMenuAction(sourceType));
         return this;
     }
 
-    public EntityInsertPanel removeColumn(String columnName)
+    /**
+     * @param columnIdentifier fieldKey, name, or label
+     * @return this component
+     */
+    public EntityInsertPanel removeColumn(CharSequence columnIdentifier)
     {
         showGrid();
-        elementCache().grid.removeColumn(columnName);
+        elementCache().grid.removeColumn(columnIdentifier);
         return this;
     }
 
@@ -200,12 +212,12 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
 
     public List<String> getColumnHeaders()
     {
-        return getEditableGrid().getColumnNames();
+        return getEditableGrid().getColumnLabels();
     }
 
     public List<Map<String, String>> getGridData()
     {
-        return getEditableGrid().getGridData();
+        return getEditableGrid().getGridDataByLabel();
     }
 
     public boolean isGridVisible()
@@ -317,7 +329,7 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
             WebDriverWrapper.waitFor(this::isGridVisible,
                     "the grid did bot become visible", 2000);
         }
-        elementCache().grid.waitForLoaded();
+        elementCache().grid.waitForReady();
         return this;
     }
     public ResponsiveGrid uploadFileExpectingPreview(File file)
@@ -386,8 +398,6 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
 
     /**
      * finds the mode select tabs, to switch between grid input and file upload
-     * @param containsText
-     * @return
      */
     private Locator.XPathLocator modeSelectListItem(String containsText)
     {
@@ -407,14 +417,14 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
         WebElement targetTab = navTab.findWhenNeeded(this);
 
         MultiMenu addParent = new MultiMenu.MultiMenuFinder(getDriver()).containsText("Add Parent")
-                .timeout(WAIT_FOR_JAVASCRIPT).refindWhenNeeded();
+                .timeout(WAIT_FOR_JAVASCRIPT).refindWhenNeeded(this);
         MultiMenu addSource = new MultiMenu.MultiMenuFinder(getDriver()).containsText("Add Source")
-                .timeout(WAIT_FOR_JAVASCRIPT).refindWhenNeeded();
+                .timeout(WAIT_FOR_JAVASCRIPT).refindWhenNeeded(this);
 
         RadioButton allowMergeRadio = RadioButton.RadioButton(Locator.radioButtonByNameAndValue("insertOption", "true")).findWhenNeeded(this);
         RadioButton notAllowMergeRadio = RadioButton.RadioButton(Locator.radioButtonByNameAndValue("insertOption", "false")).findWhenNeeded(this);
 
-        EditableGrid grid = new EditableGrid.EditableGridFinder(_driver).timeout(WAIT_FOR_JAVASCRIPT).findWhenNeeded();
+        EditableGrid grid = new EditableGrid.EditableGridFinder(_driver).timeout(WAIT_FOR_JAVASCRIPT).findWhenNeeded(this);
 
         private Optional<EditableGrid> optionalGrid()
         {
@@ -423,7 +433,7 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
 
         private Optional<FileUploadPanel> optionalFileUploadPanel()
         {
-            return new FileUploadPanel.FileUploadPanelFinder(getDriver()).findOptional();
+            return new FileUploadPanel.FileUploadPanelFinder(getDriver()).findOptional(this);
         }
 
         protected FileUploadPanel fileUploadPanel()
@@ -436,7 +446,7 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
 
         public boolean hasTabs()
         {
-            return Locator.tagWithClassContaining("ul", "list-group").existsIn(elementCache());
+            return Locator.tagWithClassContaining("ul", "list-group").existsIn(this);
         }
     }
 
@@ -461,5 +471,32 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
         {
             return _locator;
         }
+    }
+}
+
+/**
+ * Provides read-only access to parent and source menus
+ * Prevents tests from using them to add parents or sources without proper grid synchronization
+ */
+class ReadOnlyMenu extends MultiMenu
+{
+    private final String _entityType;
+
+    ReadOnlyMenu(MultiMenu menu, String entityType)
+    {
+        super(menu.getComponentElement(), menu.getWrapper().getDriver());
+        _entityType = entityType;
+    }
+
+    @Override
+    public void doMenuAction(String toggleText, String menuAction)
+    {
+        throw new UnsupportedOperationException("Use add%s()".formatted(_entityType));
+    }
+
+    @Override
+    public void doMenuAction(String menuAction)
+    {
+        throw new UnsupportedOperationException("Use add%s()".formatted(_entityType));
     }
 }

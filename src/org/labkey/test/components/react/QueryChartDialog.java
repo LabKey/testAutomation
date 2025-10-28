@@ -98,10 +98,9 @@ public class QueryChartDialog extends ModalDialog
         return elementCache().fieldOptionIconByLabel(label) != null;
     }
 
-    private QueryChartDialog clickAxisFieldOptions(String label)
+    private void clickFieldOptions(String label)
     {
         elementCache().fieldOptionIconByLabel(label).click();
-        return this;
     }
 
     /**
@@ -112,23 +111,23 @@ public class QueryChartDialog extends ModalDialog
      */
     public QueryChartDialog setAxisScaleType(String label, String value)
     {
-        clickAxisFieldOptions(label); // open the popover
+        clickFieldOptions(label); // open the popover
         if ("linear".equalsIgnoreCase(value))
             elementCache().scaleLinearRadio.check();
         else if ("log".equalsIgnoreCase(value))
             elementCache().scaleLogRadio.check();
         else
             throw new IllegalArgumentException("Invalid scale value: " + value);
-        clickAxisFieldOptions(label); // close the popover
+        clickFieldOptions(label); // close the popover
         return this;
     }
 
     public boolean isAxisScaleTypeSelected(String label, String value)
     {
-        clickAxisFieldOptions(label); // open the popover
+        clickFieldOptions(label); // open the popover
         boolean selected = "linear".equalsIgnoreCase(value) ? elementCache().scaleLinearRadio.isChecked() :
                 "log".equalsIgnoreCase(value) && elementCache().scaleLogRadio.isChecked();
-        clickAxisFieldOptions(label); // close the popover
+        clickFieldOptions(label); // close the popover
         return selected;
     }
 
@@ -140,51 +139,51 @@ public class QueryChartDialog extends ModalDialog
      */
     public QueryChartDialog setAxisRangeType(String label, String value)
     {
-        clickAxisFieldOptions(label); // open the popover
+        clickFieldOptions(label); // open the popover
         if ("automatic".equalsIgnoreCase(value))
             elementCache().scaleAutomaticRadio.check();
         else if ("manual".equalsIgnoreCase(value))
             elementCache().scaleManualRadio.check();
         else
             throw new IllegalArgumentException("Invalid range value: " + value);
-        clickAxisFieldOptions(label); // close the popover
+        clickFieldOptions(label); // close the popover
         return this;
     }
 
     public boolean isAxisRangeTypeSelected(String label, String value)
     {
-        clickAxisFieldOptions(label); // open the popover
+        clickFieldOptions(label); // open the popover
         boolean selected = "automatic".equalsIgnoreCase(value) ? elementCache().scaleAutomaticRadio.isChecked() :
                 "manual".equalsIgnoreCase(value) && elementCache().scaleManualRadio.isChecked();
-        clickAxisFieldOptions(label); // close the popover
+        clickFieldOptions(label); // close the popover
         return selected;
     }
 
     public QueryChartDialog setAxisRange(String label, String min, String max)
     {
-        clickAxisFieldOptions(label); // open the popover
+        clickFieldOptions(label); // open the popover
         if (elementCache().scaleManualRadio.isChecked())
         {
             elementCache().scaleRangeMinInput.set(min);
             elementCache().scaleRangeMaxInput.set(max);
         }
-        clickAxisFieldOptions(label); // close the popover
+        clickFieldOptions(label); // close the popover
         return this;
     }
 
     public String getAxisRangeMin(String label)
     {
-        clickAxisFieldOptions(label); // open the popover
+        clickFieldOptions(label); // open the popover
         String min = elementCache().scaleRangeMinInput.get();
-        clickAxisFieldOptions(label); // close the popover
+        clickFieldOptions(label); // close the popover
         return min;
     }
 
     public String getAxisRangeMax(String label)
     {
-        clickAxisFieldOptions(label); // open the popover
+        clickFieldOptions(label); // open the popover
         String max = elementCache().scaleRangeMaxInput.get();
-        clickAxisFieldOptions(label); // close the popover
+        clickFieldOptions(label); // close the popover
         return max;
     }
 
@@ -207,18 +206,57 @@ public class QueryChartDialog extends ModalDialog
         return elementCache().reactSelectByLabel("Y Axis").getOptions();
     }
 
-    /*
-        Y Axis Aggregate Method is an option for bar chart
-     */
     public QueryChartDialog selectYAxisAggregateMethod(String option)
     {
-        elementCache().reactSelectByLabel("Y Axis Aggregate Method").select(option);
+        clickFieldOptions("Y Axis"); // open the popover
+        getAggregateMethodSelect().select(option);
+        Locator.tagWithText("label", "Name *").findElement(this).click(); // close the popover
         return this;
+    }
+
+    public List<String> getYAxisAggregateMethodOptions()
+    {
+        clickFieldOptions("Y Axis"); // open the popover
+        List<String> options = getAggregateMethodSelect().getOptions();
+        Locator.tagWithText("label", "Name *").findElement(this).click(); // close the popover
+        return options;
     }
 
     public String getYAxisAggregateMethod()
     {
-        return elementCache().reactSelectByLabel("Y Axis Aggregate Method").getValue();
+        clickFieldOptions("Y Axis"); // open the popover
+        String value = getAggregateMethodSelect().getValue();
+        Locator.tagWithText("label", "Name *").findElement(this).click(); // close the popover
+        return value;
+    }
+
+    private ReactSelect getAggregateMethodSelect()
+    {
+        // can't use elementCache() because the popover is outside the dialog
+        Locator loc = Locator.tag("div").withChild(Locator.tagContainingText("label", "Aggregate Method"));
+        return ReactSelect.finder(getDriver()).find(loc.waitForElement(getDriver(), 1500));
+    }
+
+    private RadioButton getErrorBarsRadio(String value)
+    {
+        // can't use elementCache() because the popover is outside the dialog
+        return RadioButton.RadioButton(Locator.radioButtonByNameAndValue("error-bar-method", value)).find(getDriver());
+    }
+
+    public QueryChartDialog selectYAxisErrorBar(String value)
+    {
+        clickFieldOptions("Y Axis"); // open the popover
+        getErrorBarsRadio(value).check();
+        Locator.tagWithText("label", "Name *").findElement(this).click(); // close the popover
+        return this;
+    }
+
+    public boolean isYAxisErrorBarOptionEnabled(String value)
+    {
+        clickFieldOptions("Y Axis"); // open the popover
+        boolean enabled = getErrorBarsRadio(value).isEnabled();
+        Locator.tagWithText("label", "Name *").findElement(this).click(); // close the popover
+        return enabled;
     }
 
     /*
@@ -394,8 +432,9 @@ public class QueryChartDialog extends ModalDialog
     {
         WebDriverWrapper.waitFor(this::isCreateChartButtonEnabled,
                 "the create chart button did not become enabled", 2000);
+        String name = getName();
         dismiss("Create Chart");
-        return _queryGrid.getChartPanel();
+        return _queryGrid.getChartPanel(name);
     }
 
     /*
@@ -403,10 +442,17 @@ public class QueryChartDialog extends ModalDialog
      */
     public QueryChartPanel clickSaveChart()
     {
+        return clickSaveChart(getName());
+    }
+    public QueryChartPanel clickSaveChart(String previousChartName)
+    {
+        String name = getName();
+        WebElement prevChart = _queryGrid.getChartPanel(previousChartName).getSvgChart();
         WebDriverWrapper.waitFor(this::isSaveChartButtonEnabled,
                 "the Save chart button did not become enabled", 2000);
         dismiss("Save Chart");
-        return _queryGrid.getChartPanel();
+        getWrapper().shortWait().until(ExpectedConditions.stalenessOf(prevChart));
+        return _queryGrid.getChartPanel(name);
     }
 
     /*
@@ -476,7 +522,7 @@ public class QueryChartDialog extends ModalDialog
             Locator loc = Locator.tag("div").withChild(Locator.tagContainingText("label", label));
             return Locator.tagWithClass("div", "field-option-icon").descendant("span").findElementOrNull(loc.findElement(this));
         }
-        private Locator.XPathLocator previewContainerLoc = Locator.tag("div").withChild(Locator.tagWithText("label", "Preview"));
+        private final Locator.XPathLocator previewContainerLoc = Locator.tag("div").withChild(Locator.tagWithText("label", "Preview"));
         public WebElement previewContainer()
         {
             return previewContainerLoc.waitForElement(this, 1500);
@@ -486,8 +532,8 @@ public class QueryChartDialog extends ModalDialog
             return Locator.tagWithClass("div", "gray-text").waitForElement(previewContainer(), 1500).getText();
         }
 
-        private Locator previewBodyLoc = Locator.tagWithClass("div", "chart-builder-preview-body");
-        private Locator svgLoc = Locator.tagWithClass("div", "svg-chart__chart");
+        private final Locator previewBodyLoc = Locator.tagWithClass("div", "chart-builder-preview-body");
+        private final Locator svgLoc = Locator.tagWithClass("div", "svg-chart__chart").childTag("svg");
 
         public WebElement svg()
         {
@@ -515,7 +561,7 @@ public class QueryChartDialog extends ModalDialog
         }
 
         static {
-            Map<String,CHART_TYPE> map = new HashMap<String,CHART_TYPE>();
+            Map<String,CHART_TYPE> map = new HashMap<>();
             for(CHART_TYPE instance : CHART_TYPE.values())
             {
                 map.put(instance.getChartType(), instance);

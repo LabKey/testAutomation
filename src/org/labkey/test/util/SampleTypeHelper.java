@@ -23,12 +23,14 @@ import org.labkey.remoteapi.query.InsertRowsCommand;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.components.assay.AssayConstants;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.pages.ImportDataPage;
 import org.labkey.test.pages.experiment.CreateSampleTypePage;
 import org.labkey.test.pages.experiment.UpdateSampleTypePage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
+import org.labkey.test.util.data.TestDataUtils;
 import org.openqa.selenium.WebDriver;
 
 import java.io.File;
@@ -80,18 +82,8 @@ public class SampleTypeHelper extends WebDriverWrapper
     @NotNull
     private static String convertMapToTsv(@NotNull List<Map<String, String>> data)
     {
-        // first the header
-        List<String> rows = new ArrayList<>();
-        rows.add(String.join("\t", data.get(0).keySet()));
-        data.forEach(dataMap -> {
-            StringBuilder row = new StringBuilder();
-            data.get(0).keySet().forEach(key -> {
-                row.append(dataMap.get(key));
-                row.append("\t");
-            });
-            rows.add(row.substring(0, row.lastIndexOf("\t")));
-        });
-        return String.join("\n", rows);
+        List<String> headers = new ArrayList<>(data.get(0).keySet());
+        return TestDataUtils.tsvStringFromRowMaps(data, headers, true);
     }
 
     @Override
@@ -184,7 +176,7 @@ public class SampleTypeHelper extends WebDriverWrapper
 
     public DataRegionTable getSampleTypesList()
     {
-        return new DataRegionTable.DataRegionFinder(getDriver()).withName(SAMPLE_TYPE_DATA_REGION_NAME).find();
+        return new DataRegionTable.DataRegionFinder(getDriver()).withName(SAMPLE_TYPE_DATA_REGION_NAME).waitFor();
     }
 
     public DataRegionTable getSamplesDataRegionTable()
@@ -206,6 +198,17 @@ public class SampleTypeHelper extends WebDriverWrapper
     {
         getSamplesDataRegionTable()
                 .clickInsertNewRow();
+        for (Map.Entry<String, String> fieldValue : fieldValues.entrySet())
+        {
+            setFormElement(Locator.name(EscapeUtil.getFormFieldName(fieldValue.getKey())), fieldValue.getValue());
+        }
+        clickButton("Submit");
+    }
+
+    public void updateRow(int rowIndex, Map<String, String> fieldValues)
+    {
+        DataRegionTable drt = getSamplesDataRegionTable();
+        drt.clickEditRow(rowIndex);
         for (Map.Entry<String, String> fieldValue : fieldValues.entrySet())
         {
             setFormElement(Locator.name("quf_" + fieldValue.getKey()), fieldValue.getValue());
@@ -248,27 +251,27 @@ public class SampleTypeHelper extends WebDriverWrapper
                 .submit();
     }
 
-    public void bulkImport(List<Map<String, String>> data)
+    public ImportDataPage bulkImport(List<Map<String, String>> data)
     {
-        startTsvImport(data, IMPORT_OPTION)
+        return startTsvImport(data, IMPORT_OPTION)
                 .submit();
     }
 
-    public void bulkImportExpectingError(List<Map<String, String>> data, String importOption)
+    public String bulkImportExpectingError(List<Map<String, String>> data, String importOption)
     {
-        startTsvImport(data, importOption)
+        return startTsvImport(data, importOption)
                 .submitExpectingError();
     }
 
-    public void mergeImport(List<Map<String, String>> data)
+    public ImportDataPage mergeImport(List<Map<String, String>> data)
     {
-        startTsvImport(data, SampleTypeHelper.MERGE_OPTION)
+        return startTsvImport(data, SampleTypeHelper.MERGE_OPTION)
                 .submit();
     }
 
-    public void mergeImportExpectingError(List<Map<String, String>> data)
+    public String mergeImportExpectingError(List<Map<String, String>> data)
     {
-        startTsvImport(data, SampleTypeHelper.MERGE_OPTION)
+        return startTsvImport(data, SampleTypeHelper.MERGE_OPTION)
                 .submitExpectingError();
     }
 
@@ -378,7 +381,7 @@ public class SampleTypeHelper extends WebDriverWrapper
         samplesTable.clickHeaderButtonAndWait("Link to Study");
 
         log("Link to study: Choose target");
-        selectOptionByText(Locator.id("targetStudy"), "/" + targetStudy + " (" + targetStudy + " Study)");
+        selectOptionByText(AssayConstants.TARGET_STUDY_FIELD_LOCATOR, "/" + targetStudy + " (" + targetStudy + " Study)");
         if (categoryName != null)
             setFormElement(Locator.name("autoLinkCategory"), categoryName);
         clickButton("Next");

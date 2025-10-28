@@ -9,7 +9,7 @@ import java.util.List;
 
 public class RangeValidatorDialog extends ModalDialog
 {
-    private DomainFieldRow _row;
+    private final DomainFieldRow _row;
 
     public RangeValidatorDialog(DomainFieldRow row, ModalDialogFinder finder)
     {

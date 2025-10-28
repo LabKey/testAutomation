@@ -16,6 +16,7 @@ import org.labkey.test.pages.query.UpdateQueryRowPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldDefinition.ColumnType;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
+import org.labkey.test.util.AuditLogHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
@@ -35,6 +36,7 @@ import java.util.stream.Collectors;
 @Category({Daily.class})
 public class TextChoiceSampleTypeTest extends BaseWebDriverTest
 {
+    private final AuditLogHelper _auditLogHelper = new AuditLogHelper(this);
 
     @Override
     public BrowserType bestBrowser()
@@ -57,7 +59,7 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        TextChoiceSampleTypeTest init = (TextChoiceSampleTypeTest) getCurrentTest();
+        TextChoiceSampleTypeTest init = getCurrentTest();
         init.doSetup();
     }
 
@@ -105,8 +107,8 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
         expectedValues.add("C");
         expectedValues.add("A");
         expectedValues.add("\u00DC");
-        expectedValues.add("XYZ");
-        expectedValues.add("A string with spaces.");
+        expectedValues.add("|X|Y|Z|withPipeChars");
+        expectedValues.add("A string with \"spaces\" and backslash at end.\\");
         expectedValues.add("B");
 
         // Identify a couple of TextChoice values that will be used in samples.
@@ -119,6 +121,7 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
         String searchValue = "A";
         List<String> searchValuesExpected = new ArrayList<>();
         searchValuesExpected.add(expectedValues.get(1));
+        searchValuesExpected.add(expectedValues.get(3));
         searchValuesExpected.add(expectedValues.get(4));
 
         log(String.format("Create a new sample type named '%s'.", sampleTypeName));
@@ -161,7 +164,7 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
 
         checker().screenShotIfNewError("ST_Designer_Initial_Values_Not_Correct");
 
-        List<String> expectedConvertedValues = List.of("Apple", "Banana");
+        List<String> expectedConvertedValues = List.of("Apple", "Ba|na|na");
         log("Add some samples to the sample type and set the TextChoice field for some of the samples.");
         sampleTypeHelper.goToSampleType(sampleTypeName);
         List<Map<String, String>> samples = new ArrayList<>();
@@ -193,12 +196,14 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
         newValues.add("Q");
         newValues.add("R");
         newValues.add("S");
-        newValues.add(duplicateValue);
+        newValues.add("    "); // empty value should be removed/ignored
+        newValues.add("   " + duplicateValue + "   "); // make sure value is trimmed
 
         fieldRow.setTextChoiceValues(newValues);
 
-        // Remove the duplicate value from the list.
-        newValues.remove(duplicateValue);
+        // Remove the duplicate value from the list and the empty value.
+        newValues.remove(4);
+        newValues.remove(3);
 
         expectedValues.addAll(newValues);
 
@@ -312,7 +317,7 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
 
         // Some TextChoice values.
         List<String> expectedUnLockedValues = new ArrayList<>();
-        expectedUnLockedValues.add("\u00C5\u00C5");
+        expectedUnLockedValues.add("\u00C5|\u00C5");
         expectedUnLockedValues.add("BB");
         expectedUnLockedValues.add("CC");
         expectedUnLockedValues.add("DD");
@@ -336,7 +341,7 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
         Map<String, String> samplesWithTC = new HashMap<>();
 
         int index = 0;
-        for(int i = 1; i <= 20; i++)
+        for (int i = 1; i <= 20; i++)
         {
 
             String sampleName = String.format("%s%d", namePrefix, i);
@@ -346,10 +351,10 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
             String strFieldValue;
 
             // Give a TextChoice value to every other sample.
-            if(i%2 == 0)
+            if (i%2 == 0)
             {
 
-                if(index >= expectedLockedValues.size())
+                if (index >= expectedLockedValues.size())
                     index = 0;
 
                 String tcValue = expectedLockedValues.get(index);
@@ -402,7 +407,7 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
         value = expectedUnLockedValues.get(0);
         fieldRow.selectTextChoiceValue(value);
 
-        if(checker().verifyTrue(String.format("Delete button is not enabled for value '%s', it should be.", value),
+        if (checker().verifyTrue(String.format("Delete button is not enabled for value '%s', it should be.", value),
                 fieldRow.isTextChoiceDeleteButtonEnabled()))
         {
             fieldRow.deleteTextChoiceValue(value);
@@ -444,16 +449,49 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
 
         updatePage.clickSave();
 
+        log("Validate that the expected rows after the update are in the log.");
+        String fieldSharedValues = AuditLogHelper.encodeValues(
+            "Name", textChoiceFieldName,
+            "Type", "String",
+            "Scale", "4000",
+            "PHI", "Not PHI",
+            "DefaultScale", "Linear",
+            "Required", "false",
+            "Hidden", "false",
+            "MvEnabled", "false",
+            "Measure", "false",
+            "Dimension", "false",
+            "ShownInInsert", "true",
+            "ShownInDetails", "true",
+            "ShownInUpdate", "true",
+            "ShownInLookupView", "false",
+            "RecommendedVariable", "false",
+            "ExcludedFromShifting", "false",
+            "Scannable", "false",
+            "DefaultValueType", "Editable default");
+        String fieldOldValues = fieldSharedValues + "&" + AuditLogHelper.encodeValues(
+            "Validator", "Text Choice Validator, \u00C5\\|\u00C5|BB|CC|DD|E E E|\u0083\u0083|GG|H, Text Choice Validator");
+        String fieldUpdateValues = fieldSharedValues + "&" + AuditLogHelper.encodeValues(
+            "Validator", "Text Choice Validator, BB|CC and here is an update|E E E|GG|H|\u0083\u0083 updated|\u00C5\\|\u00C5, Text Choice Validator");
+        AuditLogHelper.DetailedAuditEventRow fieldEvent = new AuditLogHelper.DetailedAuditEventRow(null, textChoiceFieldName, "Modified",
+                "The following property was updated: Validator", "", fieldOldValues, fieldUpdateValues, null);
+        AuditLogHelper.DetailedAuditEventRow expectedDomainEvent = new AuditLogHelper.DetailedAuditEventRow(null, sampleTypeName, null,
+                "The column(s) of domain " + sampleTypeName + " were modified.",
+                "", null, null, null);
+        boolean pass = _auditLogHelper.validateLastDomainAuditEvents(sampleTypeName, getProjectName(), expectedDomainEvent, Map.of(textChoiceFieldName, fieldEvent));
+        checker().verifyTrue("Audit event is not as expected after text choice after", pass);
+
+
         // Construct a list of samples that have TextChoice set and what they are expected to be.
         List<Map<String, String>> expectedSamples = new ArrayList<>();
 
-        for(Map.Entry<String, String> entry : samplesWithTC.entrySet())
+        for (Map.Entry<String, String> entry : samplesWithTC.entrySet())
         {
             String sampleId = entry.getKey();
 
             // Need to special case for the TC value that was just updated.
             String sampleValue;
-            if(entry.getValue().equals(valueToUpdate))
+            if (entry.getValue().equals(valueToUpdate))
             {
                 sampleValue = updatedValue;
             }
@@ -493,7 +531,7 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
         log("Click save, there should be no errors.");
         updatePage.clickSave();
 
-        log("Finally update a value and click the save button for the sample type without clicking 'Apply'.");
+        log("Next update a value and click the save button for the sample type without clicking 'Apply'.");
 
         waitAndClickAndWait(Locator.lkButton("Edit Type"));
         updatePage = new UpdateSampleTypePage(getDriver());
@@ -522,7 +560,20 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
         checker().verifyTrue(String.format("Expected value '%s' is not in the list of values.", valueToUpdate),
                 actualValues.contains(valueToUpdate));
 
+        log("Finally update a value and click the save button for the sample type and clicking 'Apply'.");
+        fieldRow.updateTextChoiceValue(valueToUpdate, updatedValue);
+        updatePage.clickSave();
+
+        log("Validate that the expected rows after the update are in the log.");
+        String fieldUpdateValues2 = fieldSharedValues + "&" + AuditLogHelper.encodeValues(
+            "Validator", "Text Choice Validator, BB|CC and here is an update|E E E|GG|H no change|\u0083\u0083 updated|\u00C5\\|\u00C5, Text Choice Validator");
+        fieldEvent = new AuditLogHelper.DetailedAuditEventRow(null, textChoiceFieldName, "Modified",
+                "The following property was updated: Validator", "", fieldUpdateValues, fieldUpdateValues2, null);
+        pass = _auditLogHelper.validateLastDomainAuditEvents(sampleTypeName, getProjectName(), expectedDomainEvent, Map.of(textChoiceFieldName, fieldEvent));
+        checker().verifyTrue("Audit event is not as expected", pass);
+
     }
+
 
     /**
      * <p>
@@ -551,17 +602,33 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
 
         // Some TextChoice values.
         List<String> tcValues = new ArrayList<>();
-        tcValues.add("\u00C6\u00C6");
+        tcValues.add("\u00C6||\u00C6");
         tcValues.add("BB");
-        tcValues.add("CC");
+        tcValues.add("C||C");
 
         TestDataGenerator dataGenerator = createSampleType(sampleTypeName, namePrefix, textChoiceFieldName, tcValues);
+
+        // audit log for creating new sample type
+        String fieldValueMap = "Name=TextChoice_Field&Type=String&Scale=4000&PHI=Not%20PHI&DefaultScale=Linear&Required=false&Hidden=false&MvEnabled=false" +
+                "&Measure=false&Dimension=false&ShownInInsert=true&ShownInDetails=true&ShownInUpdate=true&ShownInLookupView=false&RecommendedVariable=false" +
+                "&ExcludedFromShifting=false&Scannable=false&DefaultValueType=Editable%20default" +
+                "&Validator=Text%20Choice%20Validator%2C%20%C3%86%5C%7C%5C%7C%C3%86%7CBB%7CC%5C%7C%5C%7CC%2C%20Text%20Choice%20Validator";
+        AuditLogHelper.DetailedAuditEventRow expectedDomainEvent = new AuditLogHelper.DetailedAuditEventRow(null, sampleTypeName, null,
+                "The domain " + sampleTypeName + " was created. The column(s) of domain " + sampleTypeName + " were modified.",
+                null, null, "NameExpression=TCSM_%24%7BgenId%7D", null);
+        AuditLogHelper.DetailedAuditEventRow field1ExpectedEvent = new AuditLogHelper.DetailedAuditEventRow(null, textChoiceFieldName, "Created",
+                null, null, null, fieldValueMap, null);
+        boolean pass = _auditLogHelper.validateLastDomainAuditEvents(sampleTypeName, getProjectName(), expectedDomainEvent,
+                Map.of(textChoiceFieldName, field1ExpectedEvent,
+                        "Str", new AuditLogHelper.DetailedAuditEventRow(null, "Str", "Created",
+                                null, null, null, null, null)));
+        checker().verifyTrue("Audit log not as expected for creating a new sample type with text choice field.", pass);
 
         log("Create some samples int the sample type. None of the samples will have a TextChoice value.");
 
         List<String> availableSamples = new ArrayList<>();
 
-        for(int i = 1; i <= 5; i++)
+        for (int i = 1; i <= 5; i++)
         {
             Map<String, Object> sample = new HashMap<>();
             String sampleName = String.format("%s%d", namePrefix, i);

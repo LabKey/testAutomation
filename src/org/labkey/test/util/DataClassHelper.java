@@ -18,7 +18,6 @@ package org.labkey.test.util;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.components.ext4.Window;
 import org.labkey.test.pages.ImportDataPage;
 import org.labkey.test.pages.experiment.CreateDataClassPage;
 import org.labkey.test.params.FieldDefinition;
@@ -34,7 +33,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 import static org.labkey.test.util.exp.DataClassAPIHelper.DATA_CLASS_DATA_REGION_NAME;
 
 /**
@@ -145,7 +143,7 @@ public class DataClassHelper extends WebDriverWrapper
                 .clickInsertNewRow();
         for (Map.Entry<String, String> fieldValue : fieldValues.entrySet())
         {
-            setFormElement(Locator.name("quf_" + fieldValue.getKey()), fieldValue.getValue());
+            setFormElement(Locator.name(EscapeUtil.getFormFieldName(fieldValue.getKey())), fieldValue.getValue());
         }
         clickButton("Submit");
     }

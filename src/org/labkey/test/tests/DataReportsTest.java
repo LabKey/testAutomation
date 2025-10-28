@@ -42,6 +42,10 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.labkey.test.util.PermissionsHelper.AUTHOR_ROLE;
+import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
+import static org.labkey.test.util.PermissionsHelper.PROJECT_ADMIN_ROLE;
+import static org.labkey.test.util.PermissionsHelper.READER_ROLE;
 
 @Category({Daily.class, Reports.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 15)
@@ -136,7 +140,7 @@ public class DataReportsTest extends ReportTest
     @BeforeClass
     public static void doSetup()
     {
-        DataReportsTest initTest = (DataReportsTest)getCurrentTest();
+        DataReportsTest initTest = getCurrentTest();
 
         // fail fast if R is not configured
         initTest._rReportHelper.ensureRConfig();
@@ -148,18 +152,6 @@ public class DataReportsTest extends ReportTest
         // need this to turn off the demographic bit in the DEM-1 dataset
         initTest.clickFolder(initTest.getFolderName());
         initTest.setDemographicsBit("DEM-1: Demographics", false);
-
-        // Make sure the Developers group has the Platform Developer role.
-        initTest.addDeveloperGroupToPlatformDeveloperRole();
-    }
-
-    private void addDeveloperGroupToPlatformDeveloperRole()
-    {
-        goToHome();
-
-        ApiPermissionsHelper apiPermissionsHelper = new ApiPermissionsHelper(this);
-
-        apiPermissionsHelper.addMemberToRole("Developers", "Platform Developer", ApiPermissionsHelper.MemberType.siteGroup, "/");
     }
 
     @Before
@@ -203,7 +195,7 @@ public class DataReportsTest extends ReportTest
         clickAndWait(Locator.linkWithText("AE-1:(VTN) AE Log"));
         DataRegionTable dataSetTable = new DataRegionTable("Dataset", getDriver());
         dataSetTable.openCustomizeGrid();
-        _customizeViewsHelper.addFilter("MouseId", "Mouse Id", "Equals One Of", String.join(";", PTIDS_FOR_CUSTOM_VIEW));
+        _customizeViewsHelper.addFilter("MouseId", "Equals One Of", String.join(";", PTIDS_FOR_CUSTOM_VIEW));
         _customizeViewsHelper.saveCustomView(QUERY_REPORT_VIEW_NAME_2);
 
         goToManageViews().clickAddReport("Query Report");
@@ -256,7 +248,8 @@ public class DataReportsTest extends ReportTest
     @Test
     public void doCrosstabViewTest()
     {
-        String reportName = "TestReport";
+        String reportName = "TestReport" + TRICKY_CHARACTERS;
+        String reportName2 = "ATotallyDifferentReport" + TRICKY_CHARACTERS;
 
         clickAndWait(Locator.linkWithText("DEM-1: Demographics"));
 
@@ -266,19 +259,40 @@ public class DataReportsTest extends ReportTest
         selectOptionByText(Locator.name("statField"), "Visit");
         clickButton("Submit");
 
-        String[] row3 = new String[] {"Male", "2", "9", "3", "14"};
-        assertTableRowsEqual("report", 3, new String[][] {row3});
+        assertTableRowsEqual("report", 3, new String[][] {new String[] {"Male", "2", "9", "3", "14"}});
 
         setFormElement(Locator.name("label"), reportName);
         clickButton("Save");
 
+        // Now visit the report and check that it renders correctly
         clickFolder("My Study");
-        assertTextPresent(reportName);
         clickAndWait(Locator.linkWithText(reportName));
-
         assertTableCellTextEquals("report", 2, 0, "Female");
 
+        clickFolder("My Study");
+        clickAndWait(Locator.linkWithText("DEM-1: Demographics"));
+        DataRegionTable.DataRegion(getDriver()).find().goToReport("Create Crosstab Report");
+        // Test rendering of date values, both in headers and in cells
+        selectOptionByValue(Locator.name("rowField"), "DEMdt");
+        selectOptionByValue(Locator.name("colField"), "DEMhisp");
+        selectOptionByText(Locator.name("statField"), "1.Date of Birth");
+        clickButton("Submit");
+
+        // Try saving with a duplicate name
+        setFormElement(Locator.name("label"), reportName);
+        clickButton("Save");
+        assertTextPresent("There is already a report with the name of");
+        setFormElement(Locator.name("label"), reportName2);
+        clickButton("Save");
+
+        // Now visit the second report and check that it renders correctly
+        clickFolder("My Study");
+        clickAndWait(Locator.linkWithText(reportName2));
+        assertTableRowsEqual("report", 3, new String[][] {new String[] {"2006-01-01 00:00:00.0", "1", "0", "1"}});
+        assertTableRowsEqual("report", 14, new String[][] {new String[] {"2006-02-01 00:00:00.0", "3", "1", "4"}});
+
         deleteReport(reportName);
+        deleteReport(reportName2);
     }
 
     @Test
@@ -327,8 +341,8 @@ public class DataReportsTest extends ReportTest
         DataRegionTable dataSetTable = new DataRegionTable("Dataset", getDriver());
         dataSetTable.openCustomizeGrid();
         _customizeViewsHelper.removeColumn(R_REMCOL);
-        _customizeViewsHelper.addFilter("DEMhisp", "3.Latino\\a or Hispanic?", "Does Not Equal", "Yes");
-        _customizeViewsHelper.addSort(R_SORT, "2.What is your sex?", SortDirection.DESC);
+        _customizeViewsHelper.addFilter("DEMhisp", "Does Not Equal", "Yes");
+        _customizeViewsHelper.addSort(R_SORT, SortDirection.DESC);
         _customizeViewsHelper.saveCustomView("Custom Query View");
 
         log("Check that customize view worked");
@@ -362,7 +376,7 @@ public class DataReportsTest extends ReportTest
         if (!TestProperties.isPrimaryUserAppAdmin())
         {
             log("Test user permissions");
-            createSiteDeveloper(AUTHOR_USER).addMemberToRole(AUTHOR_USER, "Author", PermissionsHelper.MemberType.user, getProjectName());
+            createSiteDeveloper(AUTHOR_USER).addMemberToRole(AUTHOR_USER, AUTHOR_ROLE, PermissionsHelper.MemberType.user, getProjectName());
             impersonate(AUTHOR_USER);
         }
         else
@@ -396,7 +410,7 @@ public class DataReportsTest extends ReportTest
 
         _userHelper.createUser(R_USER);
         _apiPermissionsHelper.addUserToProjGroup(R_USER, getProjectName(), "Users");
-        _apiPermissionsHelper.addMemberToRole("Users", "Editor", PermissionsHelper.MemberType.group, getProjectName());
+        _apiPermissionsHelper.addMemberToRole("Users", EDITOR_ROLE, PermissionsHelper.MemberType.group, getProjectName());
 
         //create R report with dev
         impersonate(R_USER);
@@ -414,7 +428,7 @@ public class DataReportsTest extends ReportTest
         stopImpersonating();
 
         log("Change user permission");
-        _apiPermissionsHelper.addMemberToRole("Users", "Project Administrator", PermissionsHelper.MemberType.group, getProjectName());
+        _apiPermissionsHelper.addMemberToRole("Users", PROJECT_ADMIN_ROLE, PermissionsHelper.MemberType.group, getProjectName());
 
         log("Create a new R script that uses other R scripts");
         navigateToFolder(getProjectName(), getFolderName());
@@ -485,7 +499,7 @@ public class DataReportsTest extends ReportTest
         log("Test showing the source tab to all users");
         createRReport(reportName, R_SCRIPT, true, true, new String[0]);
 
-        impersonateRole("Reader");
+        impersonateRole(READER_ROLE);
         clickFolder(getFolderName());
         scrollIntoView(Locator.linkWithText(DATA_SET_APX1));
         clickAndWait(Locator.linkWithText(DATA_SET_APX1));
@@ -505,7 +519,7 @@ public class DataReportsTest extends ReportTest
         _rReportHelper.clearOption(ScriptReportPage.StandardReportOption.showSourceTab);
         resaveReport();
 
-        impersonateRole("Reader");
+        impersonateRole(READER_ROLE);
 
         navigateToFolder(getProjectName(), getFolderName());
         scrollIntoView(Locator.linkWithText(DATA_SET_APX1));

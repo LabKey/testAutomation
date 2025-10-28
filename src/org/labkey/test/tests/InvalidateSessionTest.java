@@ -10,6 +10,7 @@ import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
+import org.labkey.remoteapi.security.CreateUserResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.util.ApiPermissionsHelper;
@@ -23,6 +24,7 @@ import java.util.List;
 import java.util.Set;
 
 import static org.junit.Assert.fail;
+import static org.labkey.test.util.PermissionsHelper.FOLDER_ADMIN_ROLE;
 
 @Category({Daily.class})
 public class InvalidateSessionTest extends BaseWebDriverTest
@@ -50,11 +52,10 @@ public class InvalidateSessionTest extends BaseWebDriverTest
 
     private void doSetup()
     {
-        _userHelper.createUser(USER);
-
+        CreateUserResponse response = _userHelper.createUser(USER);
         ApiPermissionsHelper permissionsHelper = new ApiPermissionsHelper(this);
-        permissionsHelper.addMemberToRole(USER, "Folder Administrator", PermissionsHelper.MemberType.user);
-        setInitialPassword(USER);
+        permissionsHelper.addMemberToRole(USER, FOLDER_ADMIN_ROLE, PermissionsHelper.MemberType.user);
+        setInitialPassword(response.getUserId());
     }
 
     /*

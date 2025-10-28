@@ -72,13 +72,13 @@ public class AssayScheduleWebpart extends BodyWebPart<AssayScheduleWebpart.Eleme
 
     public class ElementCache extends BodyWebPart.ElementCache
     {
-        private int wait = BaseWebDriverTest.WAIT_FOR_JAVASCRIPT;
-        private Locator.XPathLocator tableOuterLoc = Locator.tagWithClass("table", "outer");
-        private Locator.XPathLocator tableRowLoc = Locator.tagWithClass("tr", "row-outer");
-        private Locator.XPathLocator cellDisplayLoc = Locator.tagWithClass("td", "cell-display");
-        private Locator.XPathLocator emptyLoc = Locator.tagWithClassContaining("td", "empty").withText("No data to show.");
-        private Locator.XPathLocator assaysLoc = Locator.tagWithClass("div", "vaccine-design-assays");
-        private Locator.XPathLocator assayPlanLoc = Locator.tag("p").withAttribute("data-index", "AssayPlan");
+        private final int wait = BaseWebDriverTest.WAIT_FOR_JAVASCRIPT;
+        private final Locator.XPathLocator tableOuterLoc = Locator.tagWithClass("table", "outer");
+        private final Locator.XPathLocator tableRowLoc = Locator.tagWithClass("tr", "row-outer");
+        private final Locator.XPathLocator cellDisplayLoc = Locator.tagWithClass("td", "cell-display");
+        private final Locator.XPathLocator emptyLoc = Locator.tagWithClassContaining("td", "empty").withText("No data to show.");
+        private final Locator.XPathLocator assaysLoc = Locator.tagWithClass("div", "vaccine-design-assays");
+        private final Locator.XPathLocator assayPlanLoc = Locator.tag("p").withAttribute("data-index", "AssayPlan");
 
         WebElement assaysTable = assaysLoc.append(tableOuterLoc).findWhenNeeded(this).withTimeout(wait);
         WebElement assayPlan = assayPlanLoc.findWhenNeeded(this).withTimeout(wait);

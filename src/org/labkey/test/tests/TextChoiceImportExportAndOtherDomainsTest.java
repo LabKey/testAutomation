@@ -39,13 +39,13 @@ public class TextChoiceImportExportAndOtherDomainsTest extends TextChoiceTest
     private static final String LIST_NAME = "Simple_TC_List";
     private static final String LIST_TC_FIELD = "LTC_Field";
     private static final String LIST_TEXT_FIELD = "Str";
-    private static final List<String> LIST_VALUES = Arrays.asList("L1", "L2", "L3", "L4");
-    private static List<Map<String, String>> listData = new ArrayList<>();
+    private static final List<String> LIST_VALUES = Arrays.asList("L1", "L2|withPipes|", "L3", "L4");
+    private static final List<Map<String, String>> listData = new ArrayList<>();
 
     // Issue names, etc...
     private static final String ISSUE_DESIGN_NAME = "Simple_TC_Issue";
     private static final String ISSUE_TC_FIELD = "Issue_TC_Field";
-    private static final List<String> ISSUE_FIELD_VALUES = List.of("I1", "I2", "I3", "I4");
+    private static final List<String> ISSUE_FIELD_VALUES = List.of("I1", "I2|withPipes|", "I3", "I4");
     private static final String ISSUE_TITLE = "Issue to validate TextChoice fields";
     private static final String ISSUE_VALUE = ISSUE_FIELD_VALUES.get(2);
 
@@ -65,7 +65,7 @@ public class TextChoiceImportExportAndOtherDomainsTest extends TextChoiceTest
     @BeforeClass
     public static void setupProject()
     {
-        TextChoiceImportExportAndOtherDomainsTest init = (TextChoiceImportExportAndOtherDomainsTest) getCurrentTest();
+        TextChoiceImportExportAndOtherDomainsTest init = getCurrentTest();
         init.doSetup();
     }
 
@@ -168,19 +168,7 @@ public class TextChoiceImportExportAndOtherDomainsTest extends TextChoiceTest
         log("Validate that a new issue can be inserted that uses the TextChoice field.");
         IssuesHelper issuesHelper = new IssuesHelper(getDriver());
 
-        String tcFieldName;
-
-        // Looks like field name is cased differently in MSSQL.
-        if (WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.PostgreSQL)
-        {
-            tcFieldName = ISSUE_TC_FIELD.toLowerCase();
-        }
-        else
-        {
-            tcFieldName = getSelectControlName(ISSUE_TC_FIELD);
-        }
-
-        Map<String, String> issueDetails = Map.of("title", ISSUE_TITLE, "assignedTo", getDisplayName(), tcFieldName, ISSUE_VALUE);
+        Map<String, String> issueDetails = Map.of("title", ISSUE_TITLE, "AssignedTo", getDisplayName(), ISSUE_TC_FIELD, ISSUE_VALUE);
 
         issuesHelper.addIssue(issueDetails);
 

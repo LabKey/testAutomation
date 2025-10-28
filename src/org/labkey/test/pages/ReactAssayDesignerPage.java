@@ -29,6 +29,7 @@ import org.labkey.test.components.html.OptionSelect;
 import org.labkey.test.components.ui.files.AttachmentCard;
 import org.labkey.test.pages.assay.plate.PlateTemplateListPage;
 import org.labkey.test.util.Maps;
+import org.labkey.test.util.selenium.WebElementUtils;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
@@ -237,7 +238,7 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
     public List<String> getHitCriteria()
     {
         expandPropertiesPanel();
-        return getWrapper().getTexts(elementCache().hitSelectionCriteriaLoc.findElements(elementCache().propertiesPanel));
+        return elementCache().hitSelectionCriteriaLoc.findElements(elementCache().propertiesPanel).stream().map(WebElementUtils::getTextContent).toList();
     }
 
     public ReactAssayDesignerPage setStatus(boolean checked)
@@ -344,7 +345,7 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
 
     public DomainFormPanel goToResultsFields()
     {
-        return expandFieldsPanel("Results");
+        return expandFieldsPanel("Result");
     }
 
     protected void expandPropertiesPanel()

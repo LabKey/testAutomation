@@ -27,7 +27,7 @@ public class ListMissingValuesTest extends MissingValueIndicatorsTest
     @BeforeClass
     public static void beforeTestClass()
     {
-        ListMissingValuesTest init = (ListMissingValuesTest)getCurrentTest();
+        ListMissingValuesTest init = getCurrentTest();
 
         init.setupProject();
     }

@@ -56,7 +56,7 @@ public class FileSelectTree extends WebDriverComponent<FileSelectTree.ElementCac
 
     public FileSelectTree waitForLoadingFileTree()
     {
-        WebDriverWrapper.waitFor(()-> (this.findElements(By.xpath("//span[contains(text(), 'Loading...')]")).size() < 1),
+        WebDriverWrapper.waitFor(()-> (this.findElements(By.xpath("//span[contains(text(), 'Loading...')]")).isEmpty()),
                 "File tree loading too long", 4000);
 
         return this;

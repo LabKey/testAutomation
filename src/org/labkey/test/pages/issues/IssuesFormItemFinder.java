@@ -15,7 +15,6 @@
  */
 package org.labkey.test.pages.issues;
 
-import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
 import org.labkey.test.components.html.FormItem;
 import org.labkey.test.components.labkey.FormItemFinder;
@@ -33,7 +32,7 @@ public abstract class IssuesFormItemFinder<C> extends org.labkey.test.components
 {
     public static FormItemFinder<FormItem> IssueFormItem(WebDriver driver)
     {
-        return new IssuesFormItemFinder<FormItem>()
+        return new IssuesFormItemFinder<>()
         {
             @Override
             protected FormItem construct(WebElement el)

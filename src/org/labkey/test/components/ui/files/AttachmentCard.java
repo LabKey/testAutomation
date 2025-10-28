@@ -84,7 +84,7 @@ public class AttachmentCard extends WebDriverComponent<AttachmentCard.ElementCac
     public File clickDownload()
     {
         if (!elementCache().menu.isPresent())
-            throw new IllegalStateException("Unable to download attachment/file");;
+            throw new IllegalStateException("Unable to download attachment/file");
         return getWrapper().doAndWaitForDownload(()->
                 elementCache().menu.get().clickSubMenu(false, DOWNLOAD_ATTACHMENT));
     }

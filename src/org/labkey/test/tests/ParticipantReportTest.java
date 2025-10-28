@@ -22,6 +22,7 @@ import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Reports;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.components.html.BootstrapMenu;
+import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -262,10 +263,11 @@ public class ParticipantReportTest extends ReportTest
         waitForElementToDisappear(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT);
         click(Locator.xpath("//img[@data-qtip = 'Delete']")); // Delete 'Severity Grade' column.
         clickButton("Save As", 0);
-        _extHelper.waitForExtDialog("Save As");
+        Window<?> saveAsDialog = new Window.WindowFinder(getDriver()).withTitle("Save As").waitFor();
         _extHelper.setExtFormElementByLabel("Save As", "Report Name", PARTICIPANT_REPORT2_NAME);
         _extHelper.setExtFormElementByLabel("Save As", "Report Description", PARTICIPANT_REPORT2_DESCRIPTION);
-        clickButtonByIndex("Save", 1, 0);
+        Ext4Helper.Locators.ext4ButtonEnabled("Save").waitForElement(saveAsDialog, 2_000).click();
+        saveAsDialog.waitForClose();
         _ext4Helper.waitForComponentNotDirty("participant-report-panel-1");
         waitForTextToDisappear("Severity Grade");
 
@@ -273,14 +275,16 @@ public class ParticipantReportTest extends ReportTest
         click(Locator.xpath("//a[./span[@title = 'Edit']]"));
         waitForElementToDisappear(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT);
         clickButton("Save As", 0);
-        _extHelper.waitForExtDialog("Save As");
+        saveAsDialog = new Window.WindowFinder(getDriver()).withTitle("Save As").waitFor();
         _extHelper.setExtFormElementByLabel("Save As", "Report Name", PARTICIPANT_REPORT_NAME);
         _extHelper.setExtFormElementByLabel("Save As", "Report Description", PARTICIPANT_REPORT2_DESCRIPTION);
-        clickButtonByIndex("Save", 1, 0);
-        _extHelper.waitForExtDialog("Failure");
+        Ext4Helper.Locators.ext4ButtonEnabled("Save").waitForElement(saveAsDialog, 2_000).click();
+        Window<?> failureDialog = new Window.WindowFinder(getDriver()).withTitle("Failure").waitFor();
         assertTextPresent("Another report with the same name already exists.");
         clickButton("OK", 0);
+        failureDialog.waitForClose();
         clickButton("Cancel", 0); // Verify cancel button.
+        saveAsDialog.waitForClose();
         waitForElement(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT); // Edit panel should be hidden
 
 
@@ -350,12 +354,12 @@ public class ParticipantReportTest extends ReportTest
         {
             assertTextPresent(ptid);
 
-            String base = "//td//a[text()='" + ptid + "']/../../..//td[contains(text(), 'Groups:')]/following-sibling::td[contains(normalize-space(), '";
-            waitForElement(Locator.xpath(base + PARTICIPANT_GROUP_ONE + "')]"));
+            Locator.XPathLocator base = Locator.xpath("//td//a[text()='" + ptid + "']/../../..//td[contains(text(), 'Groups:')]/following-sibling::td");
+            waitForElement(base.containing(PARTICIPANT_GROUP_ONE));
 
             if (ptid_list2.contains(ptid))
             {
-                assertElementPresent(Locator.xpath(base + PARTICIPANT_GROUP_TWO + "')]"));
+                assertElementPresent(base.containing(PARTICIPANT_GROUP_TWO));
             }
 
         }

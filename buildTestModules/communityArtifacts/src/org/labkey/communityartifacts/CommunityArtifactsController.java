@@ -40,7 +40,7 @@ public class CommunityArtifactsController extends SpringActionController
     {
         public ModelAndView getView(Object o, BindException errors)
         {
-            return new JspView("/org/labkey/communityartifacts/view/hello.jsp");
+            return new JspView<>("/org/labkey/communityartifacts/view/hello.jsp");
         }
 
         @Override

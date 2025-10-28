@@ -34,6 +34,7 @@ import org.apache.hc.client5.http.io.HttpClientConnectionManager;
 import org.apache.hc.client5.http.protocol.HttpClientContext;
 import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory;
 import org.apache.hc.client5.http.ssl.TrustSelfSignedStrategy;
+import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.core5.http.HttpHost;
 import org.apache.hc.core5.http.config.CharCodingConfig;
 import org.apache.hc.core5.ssl.SSLContextBuilder;
@@ -49,7 +50,7 @@ import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.remoteapi.query.DeleteRowsCommand;
 import org.labkey.remoteapi.query.Filter;
-import org.labkey.remoteapi.query.SaveRowsResponse;
+import org.labkey.remoteapi.query.RowsResponse;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.serverapi.reader.Readers;
 import org.labkey.test.util.InstallCert;
@@ -200,7 +201,7 @@ public class WebTestHelper
                 {
                     DeleteRowsCommand deleteRowsCommand = new DeleteRowsCommand("core", "apiKeys");
                     deleteRowsCommand.setRows(rows);
-                    SaveRowsResponse response = deleteRowsCommand.execute(connection, null);
+                    RowsResponse response = deleteRowsCommand.execute(connection, null);
                     savedApiKeys.remove(apiKey);
                     deletedApiKeys.add(apiKey);
                     Assert.assertEquals("Wrong number of rows affected by apiKey deletion", 1, response.getRowsAffected());
@@ -353,6 +354,29 @@ public class WebTestHelper
             }
         }
         return StringUtils.stripStart(url, "/");
+    }
+
+    /**
+     * Append the test server's base URL to the front of a relative URL. Absolute URLs will be returned unchanged.
+     * @param url Absolute or relative URL
+     * @return Absolute URL
+     */
+    public static String makeAbsoluteUrl(String url)
+    {
+        if (isAbsoluteUrl(url))
+        {
+            return url;
+        }
+        else
+        {
+            StringBuilder sb = new StringBuilder(getBaseURL());
+            if (!url.startsWith("/"))
+            {
+                sb.append("/");
+            }
+            sb.append(url);
+            return sb.toString();
+        }
     }
 
     public static boolean isAbsoluteUrl(String url)
@@ -561,13 +585,7 @@ public class WebTestHelper
 
     public static Connection getRemoteApiConnection(boolean includeCookiesFromPrimaryUser)
     {
-        String username = PasswordUtil.getUsername();
-        Connection connection = new Connection(getBaseURL(), username, PasswordUtil.getPassword());
-
-        if (includeCookiesFromPrimaryUser)
-            addCachedCookies(connection, username);
-
-        return connection;
+        return getRemoteApiConnection(PasswordUtil.getUsername(), includeCookiesFromPrimaryUser);
     }
 
     public static Connection getRemoteApiConnection(String username, boolean includeCookies)
@@ -791,7 +809,7 @@ public class WebTestHelper
         return localcontext;
     }
 
-    public static String getHttpResponseBody(CloseableHttpResponse response)
+    public static String getHttpResponseBody(ClassicHttpResponse response)
     {
         StringBuilder builder = new StringBuilder();
         try

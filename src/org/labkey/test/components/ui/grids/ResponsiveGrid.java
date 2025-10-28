@@ -14,9 +14,11 @@ import org.labkey.test.components.UpdatingComponent;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.components.react.ReactCheckBox;
+import org.labkey.test.components.ui.grids.FieldReferenceManager.FieldReference;
 import org.labkey.test.components.ui.search.FilterExpressionPanel;
+import org.labkey.test.params.FieldKey;
+import org.labkey.test.util.selenium.WebElementUtils;
 import org.openqa.selenium.Keys;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.NotFoundException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
@@ -25,8 +27,9 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -37,7 +40,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.labkey.test.WebDriverWrapper.waitFor;
 
-public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent<ResponsiveGrid<T>.ElementCache> implements UpdatingComponent
+public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverComponent<ResponsiveGrid<T>.ElementCache> implements UpdatingComponent
 {
     final WebElement _gridElement;
     final WebDriver _driver;
@@ -63,10 +66,10 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
     public Boolean isLoaded()
     {
         return getComponentElement().isDisplayed() &&
-                (!Locators.loadingGrid.existsIn(this) &&
+                !Locators.loadingGrid.existsIn(this) &&
                 !Locators.spinner.existsIn(this) &&
-                Locator.tag("td").existsIn(this)) ||
-                getGridEmptyMessage().isPresent();
+            (Locator.tag("td").existsIn(this) ||
+                getGridEmptyMessage().isPresent());
     }
 
     protected void waitForLoaded()
@@ -98,7 +101,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
     {
         return Locator.tagWithClass("div", "grid-panel__grid")
                 .findElement(getComponentElement())
-                .getAttribute("class").contains("grid-panel__lock-left");
+                .getDomAttribute("class").contains("grid-panel__lock-left");
     }
 
     /**
@@ -112,39 +115,49 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
 
     /**
      * Sorts from the grid header menu
-     * @param columnLabel column header for
+     * @param columnIdentifier fieldKey, name, or label of column
      * @return this grid
      */
-    public T sortColumnAscending(String columnLabel)
+    public T sortColumnAscending(CharSequence columnIdentifier)
     {
-        sortColumn(columnLabel, SortDirection.ASC);
+        sortColumn(columnIdentifier, SortDirection.ASC);
         return getThis();
     }
 
     /**
      * Sorts from the grid header menu
-     * @param columnLabel Text of column
+     * @param columnIdentifier fieldKey, name, or label of column
      * @return this grid
      */
-    public T sortColumnDescending(String columnLabel)
+    public T sortColumnDescending(CharSequence columnIdentifier)
     {
-        sortColumn(columnLabel, SortDirection.DESC);
+        sortColumn(columnIdentifier, SortDirection.DESC);
         return getThis();
     }
 
-    public void sortColumn(String columnLabel, SortDirection direction)
+    /**
+     * Sorts from the grid header menu
+     * @param columnIdentifier fieldKey, name, or label of column
+     */
+    public void sortColumn(CharSequence columnIdentifier, SortDirection direction)
     {
-        clickColumnMenuItem(columnLabel, direction.equals(SortDirection.DESC) ? "Sort descending" : "Sort ascending", true);
+        clickColumnMenuItem(columnIdentifier, direction.equals(SortDirection.DESC) ? "Sort descending" : "Sort ascending", true);
     }
 
-    public void clearSort(String columnLabel)
+    /**
+     * @param columnIdentifier fieldKey, name, or label of column
+     */
+    public void clearSort(CharSequence columnIdentifier)
     {
-        clickColumnMenuItem(columnLabel, "Clear sort", true);
+        clickColumnMenuItem(columnIdentifier, "Clear sort", true);
     }
 
-    public boolean hasColumnSortIcon(String columnLabel)
+    /**
+     * @param columnIdentifier fieldKey, name, or label of column
+     */
+    public boolean hasColumnSortIcon(CharSequence columnIdentifier)
     {
-        WebElement headerCell = elementCache().getColumnHeaderCell(columnLabel);
+        WebElement headerCell = elementCache().getColumnHeaderCell(columnIdentifier);
         Optional<WebElement> colHeaderIcon = Locator.XPathLocator.union(
                 Locator.tagWithClass("span", "grid-panel__col-header-icon").withClass("fa-sort-amount-asc"),
                 Locator.tagWithClass("span", "grid-panel__col-header-icon").withClass("fa-sort-amount-desc")
@@ -153,23 +166,32 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
 
     }
 
-    public T filterColumn(String columnLabel, Filter.Operator operator)
+    /**
+     * @param columnIdentifier fieldKey, name, or label of column
+     */
+    public T filterColumn(CharSequence columnIdentifier, Filter.Operator operator)
     {
-        return filterColumn(columnLabel, operator, null);
+        return filterColumn(columnIdentifier, operator, null);
     }
 
-    public T filterColumn(String columnLabel, Filter.Operator operator, Object value)
+    /**
+     * @param columnIdentifier fieldKey, name, or label of column
+     */
+    public T filterColumn(CharSequence columnIdentifier, Filter.Operator operator, Object value)
     {
         T _this = getThis();
-        doAndWaitForUpdate(()->initFilterColumn(columnLabel, operator, value).confirm());
+        doAndWaitForUpdate(()->initFilterColumn(columnIdentifier, operator, value).confirm());
         return _this;
     }
 
-    public T filterColumn(String columnLabel, Filter.Operator operator1, Object value1, Filter.Operator operator2, Object value2)
+    /**
+     * @param columnIdentifier fieldKey, name, or label of column
+     */
+    public T filterColumn(CharSequence columnIdentifier, Filter.Operator operator1, Object value1, Filter.Operator operator2, Object value2)
     {
         T _this = getThis();
         doAndWaitForUpdate(()-> {
-            GridFilterModal filterModal = initFilterColumn(columnLabel, null, null);
+            GridFilterModal filterModal = initFilterColumn(columnIdentifier, null, null);
             filterModal.selectExpressionTab().setFilters(
                     new FilterExpressionPanel.Expression(operator1, value1),
                     new FilterExpressionPanel.Expression(operator2, value2)
@@ -180,11 +202,14 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
         return _this;
     }
 
-    public T filterBooleanColumn(String columnLabel, boolean value)
+    /**
+     * @param columnIdentifier fieldKey, name, or label of column
+     */
+    public T filterBooleanColumn(CharSequence columnIdentifier, boolean value)
     {
         T _this = getThis();
         doAndWaitForUpdate(() -> {
-            clickColumnMenuItem(columnLabel, "Filter...", false);
+            clickColumnMenuItem(columnIdentifier, "Filter...", false);
             GridFilterModal filterModal = new GridFilterModal(getDriver(), this);
             new RadioButton.RadioButtonFinder().withNameAndValue("field-value-bool-0", value?"true":"false").find(filterModal).set(true);
             filterModal.confirm();
@@ -192,32 +217,50 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
         return _this;
     }
 
-    public String filterColumnExpectingError(String columnLabel, Filter.Operator operator, Object value)
+    /**
+     * @param columnIdentifier fieldKey, name, or label of column
+     */
+    public String filterColumnExpectingError(CharSequence columnIdentifier, Filter.Operator operator, Object value)
     {
-        GridFilterModal filterModal = initFilterColumn(columnLabel, operator, value);
+        GridFilterModal filterModal = initFilterColumn(columnIdentifier, operator, value);
         String errorMsg = filterModal.confirmExpectingError();
         filterModal.cancel();
         return errorMsg;
     }
 
-    private GridFilterModal initFilterColumn(String columnLabel, Filter.Operator operator, Object value)
+    private GridFilterModal initFilterColumn(CharSequence columnIdentifier, Filter.Operator operator, Object value)
     {
-        clickColumnMenuItem(columnLabel, "Filter...", false);
+        clickColumnMenuItem(columnIdentifier, "Filter...", false);
         GridFilterModal filterModal = new GridFilterModal(getDriver(), this);
         if (operator != null)
-            filterModal.selectExpressionTab().setFilter(new FilterExpressionPanel.Expression(operator, value));
+        {
+            if (operator.equals(Filter.Operator.IN) && value instanceof List<?>)
+            {
+                List<String> values = (List<String>) value;
+                filterModal.selectFacetTab().selectValue(values.get(0));
+                filterModal.selectFacetTab().checkValues(values.toArray(String[]::new));
+            }
+            else
+                filterModal.selectExpressionTab().setFilter(new FilterExpressionPanel.Expression(operator, value));
+        }
         return filterModal;
     }
 
-    public T removeColumnFilter(String columnLabel)
+    /**
+     * @param columnIdentifier fieldKey, name, or label of column
+     */
+    public T removeColumnFilter(CharSequence columnIdentifier)
     {
-        clickColumnMenuItem(columnLabel, "Remove filter", true);
+        clickColumnMenuItem(columnIdentifier, "Remove filter", true);
         return getThis();
     }
 
-    public boolean hasColumnFilterIcon(String columnLabel)
+    /**
+     * @param columnIdentifier fieldKey, name, or label of column
+     */
+    public boolean hasColumnFilterIcon(CharSequence columnIdentifier)
     {
-        WebElement headerCell = elementCache().getColumnHeaderCell(columnLabel);
+        WebElement headerCell = elementCache().getColumnHeaderCell(columnIdentifier);
         Optional<WebElement> colHeaderIcon = Locator.tagWithClass("span", "grid-panel__col-header-icon")
                 .withClass("fa-filter")
                 .findOptionalElement(headerCell);
@@ -228,13 +271,13 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
     /**
      * use the column menu to hide the given column.
      *
-     * @param columnLabel Column to hide.
+     * @param columnIdentifier fieldKey, name, or label of column
      * @return This grid.
      */
-    public T hideColumn(String columnLabel)
+    public T hideColumn(CharSequence columnIdentifier)
     {
         // Because this will remove the column wait for the grid to update.
-        clickColumnMenuItem(columnLabel, "Hide Column", true);
+        clickColumnMenuItem(columnIdentifier, "Hide Column", true);
         return getThis();
     }
 
@@ -245,24 +288,24 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
      */
     public FieldSelectionDialog insertColumn()
     {
-        return insertColumn(getColumnNames().get(0));
+        return insertColumn(getHeaders().get(0).getFieldKey().toString());
     }
 
     /**
      * Use the column menu to show a Field Selection dialog {@link FieldSelectionDialog}. This will use the given column to
      * get the menu. This should insert the column after (to the right) of this column.
      *
-     * @param columnLabel The column to get the menu from.
+     * @param columnIdentifier fieldKey, name, or label of column
      * @return A {@link FieldSelectionDialog}
      */
-    public FieldSelectionDialog insertColumn(String columnLabel)
+    public FieldSelectionDialog insertColumn(CharSequence columnIdentifier)
     {
         // Because this is going to show the customize grid dialog don't wait for a grid update. the dialog will wait for the update.
-        clickColumnMenuItem(columnLabel, "Insert Column", false);
+        clickColumnMenuItem(columnIdentifier, "Insert Column", false);
         return new FieldSelectionDialog(getDriver(), this);
     }
 
-    protected void clickColumnMenuItem(String columnLabel, String menuText, boolean waitForUpdate)
+    public void clickColumnMenuItem(CharSequence columnIdentifier, String menuText, boolean waitForUpdate)
     {
 
         if(hasLockedColumn())
@@ -270,7 +313,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
             scrollToOrigin();
         }
 
-        WebElement headerCell = elementCache().getColumnHeaderCell(columnLabel);
+        WebElement headerCell = elementCache().getColumnHeaderCell(columnIdentifier);
         // Scroll to middle in order to make room for the dropdown menu
         getWrapper().scrollToMiddle(headerCell);
 
@@ -291,13 +334,17 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
         waitFor(()-> !menuItem.isDisplayed(), 1000);
     }
 
-    public void editColumnLabel(String columnLabel, String newColumnLabel)
+    /**
+     * @param columnIdentifier fieldKey, name, or label of column
+     * @param newColumnLabel new label for the column
+     */
+    public void editColumnLabel(CharSequence columnIdentifier, String newColumnLabel)
     {
         // Get the column header.
-        WebElement headerCell = elementCache().getColumnHeaderCell(columnLabel);
+        WebElement headerCell = elementCache().getColumnHeaderCell(columnIdentifier);
 
         // Select the edit menu.
-        clickColumnMenuItem(columnLabel, "Edit Label", false);
+        clickColumnMenuItem(columnIdentifier, "Edit Label", false);
 
         // Get the textbox.
         WebElement textEdit = Locator.tag("input").findWhenNeeded(headerCell);
@@ -318,7 +365,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
                 .until(ExpectedConditions.stalenessOf(textEdit));
 
         doAndWaitForUpdate(()->
-                WebDriverWrapper.waitFor(()->headerCell.getText().equals(newColumnLabel),
+                WebDriverWrapper.waitFor(()-> WebElementUtils.getTextContent(headerCell).equals(newColumnLabel),
                         "Column header not updated.", 1_000)
         );
         waitForLoaded();
@@ -340,7 +387,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
 
     /**
      * Finds the first row with the specified texts in the specified columns, and sets its checkbox
-     * @param partialMap    key-column, value-text in that column
+     * @param partialMap    key-column (fieldKey, name, or label), value-text in that column
      * @param checked       the desired checkbox state
      * @return this grid
      */
@@ -355,16 +402,16 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
 
     /**
      * Finds the first row with the specified text in the specified column and sets its checkbox
-     * @param columnLabel    header text of the specified column
+     * @param columnIdentifier fieldKey, name, or label of column
      * @param text          Text to be found in the specified column
      * @param checked       true for checked, false for unchecked
      * @return this grid
      */
-    public ResponsiveGrid<?> selectRow(String columnLabel, String text, boolean checked)
+    public ResponsiveGrid<?> selectRow(CharSequence columnIdentifier, String text, boolean checked)
     {
-        GridRow row = getRow(columnLabel, text);
+        GridRow row = getRow(columnIdentifier, text);
         selectRowAndVerifyCheckedCounts(row, checked);
-        getWrapper().log("Row at column ["+columnLabel+"] with text ["+text+"] selection state set to + ["+row.isSelected()+"]");
+        getWrapper().log("Row at column ["+columnIdentifier+"] with text ["+text+"] selection state set to + ["+row.isSelected()+"]");
 
         return getThis();
     }
@@ -389,18 +436,29 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
 
     /**
      * Sets the specified rows' selector checkboxes to the requested select state
-     * @param columnLabel    Header text of the column to search
+     * @param columnIdentifier fieldKey, name, or label of column
      * @param texts         Text to search for in the specified column
      * @param checked       True for checked, false for unchecked
      * @return this grid
      */
-    public T selectRows(String columnLabel, Collection<String> texts, boolean checked)
+    public T selectRows(CharSequence columnIdentifier, Collection<String> texts, boolean checked)
     {
         for (String text : texts)
         {
-            selectRow(columnLabel, text, checked);
+            selectRow(columnIdentifier, text, checked);
         }
         return getThis();
+    }
+
+    /**
+     * Checks the specified rows' selector checkboxes
+     * @param columnIdentifier fieldKey, name, or label of column
+     * @param texts         Text to search for in the specified column
+     * @return this grid
+     */
+    public T selectRows(CharSequence columnIdentifier, String... texts)
+    {
+        return selectRows(columnIdentifier, Arrays.asList(texts), true);
     }
 
     /**
@@ -411,29 +469,6 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
     public boolean isRowSelected(int index)
     {
        return new GridRow.GridRowFinder(this).index(index).find(this).isSelected();
-    }
-
-    /**
-     * finds the first row containing the specified text and returns the checked state
-     * @param text  A value in the row, used to identify the row.  (preferably a key)
-     * @return  whether or not the selector checkbox is checked
-     */
-    public boolean isRowSelected(String text)
-    {
-        return new GridRow.GridRowFinder(this).withCellWithText(text)
-                .find(this).isSelected();
-    }
-
-    /**
-     * finds the first row containing the specified text in the specified column and returns the checked state
-     * @param columnLabel    the text in the column to search
-     * @param text  the value in the row to find
-     * @return  true if the checkbox is checked, otherwise false
-     */
-    public boolean isRowSelected(String columnLabel, String text)
-    {
-        return new GridRow.GridRowFinder(this).withTextAtColumn(text, getColumnIndex(columnLabel))
-                .find(this).isSelected();
     }
 
     protected ReactCheckBox selectAllBox()
@@ -498,7 +533,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
      */
     public List<GridRow> getSelectedRows()
     {
-        elementCache().getColumnNames();     // force-initialize the element cache, wait for loaded
+        elementCache().getColumnLabels();     // force-initialize the element cache, wait for loaded
         return new GridRow.GridRowFinder(this).findAll(this)
                 .stream().filter(GridRow::isSelected).collect(Collectors.toList());
     }
@@ -530,29 +565,29 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
 
     /**
      * Returns the first row with matching text in the specified column
-     * @param columnLabel The exact text of the column header
+     * @param columnIdentifier fieldKey, name, or label of column to search
      * @param text The full text of the cell to match
      * @return  the first row that matches
      */
-    public GridRow getRow(String columnLabel, String text)
+    public GridRow getRow(CharSequence columnIdentifier, String text)
     {
-        return elementCache().getRow(columnLabel, text);
+        return elementCache().getRow(columnIdentifier, text);
     }
 
     /**
      * Returns the first row with matching text in the specified column
-     * @param columnLabel  the column to search
+     * @param columnIdentifier fieldKey, name, or label of column of the column to search
      * @param text  exact text to match in that column
      * @return  the first row matching the search criteria
      */
-    public Optional<GridRow> getOptionalRow(String columnLabel, String text)
+    public Optional<GridRow> getOptionalRow(CharSequence columnIdentifier, String text)
     {
-        return elementCache().getOptionalRow(columnLabel, text);
+        return elementCache().getOptionalRow(columnIdentifier, text);
     }
 
     /**
      * Returns the first row with matching text in the specified columns
-     * @param partialMap Map of key (column), value (text)
+     * @param partialMap Map of key (fieldKey, name, or label of column), value (text)
      * @return  the first row with matching column/text for all of the supplied key/value pairs, or NotFoundException
      */
     public GridRow getRow(Map<String, String> partialMap)
@@ -579,12 +614,15 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
         return elementCache().getRows();
     }
 
-    public List<String> getColumnDataAsText(String columnLabel)
+    /**
+     * @param columnIdentifier fieldKey, name, or label of column
+     */
+    public List<String> getColumnDataAsText(CharSequence columnIdentifier)
     {
         List<String> columnData = new ArrayList<>();
         for (GridRow row : getRows())
         {
-            columnData.add(row.getText(columnLabel));
+            columnData.add(row.getText(columnIdentifier));
         }
         return columnData;
     }
@@ -599,22 +637,39 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
     }
 
     /**
-     * used to find the raw index of a given column as rendered in the dom.
-     * To get the normalized index (which excludes selector rows if present) use
-     * elementCache().indexes.get(column).getNormalizedIndex()
+     * @param columnIdentifier fieldKey, name, or label of column
+     * @return the DOM index of the specified column (e.g. '0' for the row selection column)
      */
-    protected Integer getColumnIndex(String columnLabel)
+    protected Integer getColumnIndex(CharSequence columnIdentifier)
     {
-        return elementCache().getColumnIndex(columnLabel);
+        return elementCache().getColumnIndex(columnIdentifier);
     }
 
     /**
      *
      * @return a List&#60;String&#62; containing the text of each column header
      */
+    public List<String> getColumnLabels()
+    {
+        return elementCache().getColumnLabels();
+    }
+
+    /**
+     *
+     * @return a List&#60;String&#62; containing the names of the fields for each column header
+     */
     public List<String> getColumnNames()
     {
         return elementCache().getColumnNames();
+    }
+
+    /**
+     *
+     * @return a List&#60;FieldKey&#62; containing the fieldKeys for each column header
+     */
+    public List<FieldKey> getColumnFieldKeys()
+    {
+        return elementCache().getColumnFieldKeys();
     }
 
     /**
@@ -636,30 +691,42 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
      * @param rowIndex  the index of the desired row
      * @return  A Map containing column/value pairs for the specified row
      */
-    public Map<String, String> getRowMap(int rowIndex)
+    public Map<String, String> getRowMapByLabel(int rowIndex)
     {
-        return getRow(rowIndex).getRowMap();
+        return getRow(rowIndex).getRowMapByLabel();
     }
 
     /**
      * Get text from the specified column in the specified row
+     * @param columnIdentifier fieldKey, name, or label of column
      */
-    public String getCellText(int rowIndex, String columnLabel)
+    public String getCellText(int rowIndex, CharSequence columnIdentifier)
     {
-        return getRow(rowIndex).getText(columnLabel);
+        return getRow(rowIndex).getText(columnIdentifier);
     }
 
     /**
-     *
      * @return a list of Map&#60;String, String&#62; containing keys and values for each row
      */
-    public List<Map<String, String>> getRowMaps()
+    public List<Map<String, String>> getRowMapsByLabel()
     {
-        if(null == elementCache().mapList)
-        {
-            elementCache().mapList = elementCache()._initGridData();
-        }
-        return elementCache().mapList;
+        return elementCache().getRows().stream().map(GridRow::getRowMapByLabel).toList();
+    }
+
+    /**
+     * @return a list of Map&#60;String, String&#62; containing keys and values for each row
+     */
+    public List<Map<String, String>> getRowMapsByName()
+    {
+        return elementCache().getRows().stream().map(GridRow::getRowMapByName).toList();
+    }
+
+    /**
+     * @return a list of Map&#60;String, String&#62; containing keys and values for each row
+     */
+    public List<Map<FieldKey, String>> getRowMapsByFieldKey()
+    {
+        return elementCache().getRows().stream().map(GridRow::getRowMapByFieldKey).toList();
     }
 
     /**
@@ -673,12 +740,12 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
 
     /**
      * locates the first link in the specified column, clicks it, and waits for the URL to update
-     * @param columnLabel    column in which to search
+     * @param columnIdentifier fieldKey, name, or label of column
      * @param text  text for link to match
      */
-    public void clickLink(String columnLabel, String text)
+    public void clickLink(CharSequence columnIdentifier, String text)
     {
-        getRow(columnLabel, text).clickLink(text);
+        getRow(columnIdentifier, text).clickLink(text);
     }
 
     public boolean gridMessagePresent()
@@ -706,25 +773,13 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
 
     /** The responsiveGrid now supports redacting fields
      *
-     * @param columnText the column name.  (uses starts-with matching)
+     * @param columnIdentifier fieldKey, name, or label of column
      * @return  true if the specified grid header cell has the 'phi-protected' class on it
      */
-    public boolean getColumnPHIProtected(String columnText)
+    public boolean getColumnPHIProtected(CharSequence columnIdentifier)
     {
-        WebElement columnHeader = Locator.tagWithClass("th", "grid-header-cell")
-                .withDescendant(Locators.headerCellBody(columnText)).findElement(this);
-        return columnHeader.getAttribute("class").contains("phi-protected");
-    }
-
-    /**
-     *  Gets the title attribute of the column header cell, if it has one
-     * @param columnText The text with which to find the cell (uses startswith matching)
-     * @return  the contents of the 'title' attribute of the cell, or null if the attribute is
-     * not present.
-     */
-    public String getColumnTitleAttribute(String columnText)
-    {
-        return elementCache().getColumnHeaderCell(columnText).getAttribute("title");
+        WebElement columnHeader = elementCache().getColumnHeaderCell(columnIdentifier);
+        return columnHeader.getDomAttribute("class").contains("phi-protected");
     }
 
     public Optional<String> getGridEmptyMessage()
@@ -733,7 +788,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
 
         try
         {
-            WebElement tr = Locator.tagWithClass("tr", "grid-empty").refindWhenNeeded(this);
+            WebElement tr = Locator.tagWithClass("tr", "grid-empty").findWhenNeeded(this);
             if (tr.isDisplayed())
             {
                 msg = Optional.of(Locator.tag("td").findElement(tr).getText());
@@ -748,6 +803,11 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
         return msg;
     }
 
+    public List<FieldReference> getHeaders()
+    {
+        return Collections.unmodifiableList(elementCache().findHeaders());
+    }
+
     /**
      * supports chaining between base and derived instances
      * @return  magic
@@ -755,22 +815,6 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
     protected T getThis()
     {
         return (T) this;
-    }
-
-    /**
-     * Call this function to force a re-initialization of the internal data representation of the grid data.
-     * When trying to be more efficient the grid data is stored in an internal variable (so this is a stateful object).
-     * On creates the internal grid data is initialize by calling waitForLoaded. The waitForLoaded function  is also
-     * called when the page/grid is navigated, but it is not when a search, or ordering is done. As a temporary work
-     * around this function is made public so the calling function can update the data.
-     *
-     * The real fix would be to add an event listener to the grid and reinitialize the internal data when it detects a change.
-     *
-     */
-    public void initGridData()
-    {
-        waitForLoaded();
-        elementCache().mapList = elementCache()._initGridData();
     }
 
     @Override
@@ -805,74 +849,61 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
             }
         };
 
-        private final Map<String, WebElement> headerCells = new HashMap<>();
-        protected final WebElement getColumnHeaderCell(String headerText)
+        protected final WebElement getColumnHeaderCell(CharSequence columnIdentifier)
         {
-            if (!headerCells.containsKey(headerText))
-            {
-                WebElement headerCell = Locators.headerCellBody(headerText).findElement(this);
-                headerCells.put(headerText, headerCell);
-            }
-            return headerCells.get(headerText);
+            return findColumnHeader(columnIdentifier).getElement();
         }
 
-        protected List<String> columnNames;
-        protected Map<String, ColumnIndex> indexes;
-        protected Map<String, ColumnIndex> initColumnsAndIndices()
+        private FieldReferenceManager _fieldReferenceManager;
+        protected FieldReferenceManager getGridHeaderManager()
         {
-            if (columnNames == null || indexes == null)
+            if (_fieldReferenceManager == null)
             {
+                List<FieldReference> fieldReferences = new ArrayList<>();
                 List<WebElement> headerCellElements = Locators.headerCells.findElements(this);
-                int offset = 0;
-                if (hasSelectColumn())
+                for (int domIndex = hasSelectColumn() ? 1 : 0; domIndex < headerCellElements.size(); domIndex++)
                 {
-                    headerCellElements.remove(0);
-                    offset = 1;
+                    fieldReferences.add(new FieldReference(headerCellElements.get(domIndex), domIndex));
                 }
-                columnNames = getWrapper().getTexts(headerCellElements);
-                indexes = new HashMap<>();
-                for (int i = 0; i < headerCellElements.size(); i++)
-                {
-                    headerCells.put(columnNames.get(i), headerCellElements.get(i)); // Fill out the headerCells Map since we have them all
-                    indexes.put(columnNames.get(i), new ColumnIndex(columnNames.get(i), i+offset, i));
-                }
+
+                _fieldReferenceManager = new FieldReferenceManager(fieldReferences);
             }
-            return indexes;
+            return _fieldReferenceManager;
         }
 
-        protected int getColumnIndex(String columnLabel)
+        protected List<FieldReferenceManager.FieldReference> findHeaders()
         {
-            final ColumnIndex columnIndex = initColumnsAndIndices().get(columnLabel);
-            if (columnIndex == null)
-            {
-                throw new NoSuchElementException(String.format("Column not found: '%s'.\nKnown columns: %s",
-                        columnLabel, String.join(", ", initColumnsAndIndices().keySet())));
-            }
-            return columnIndex.getRawIndex();
+            return getGridHeaderManager().getColumnHeaders();
+        }
+
+        protected FieldReference findColumnHeader(CharSequence columnIdentifier)
+        {
+            return getGridHeaderManager().findFieldReference(columnIdentifier);
+        }
+
+        protected int getColumnIndex(CharSequence columnIdentifier)
+        {
+            return findColumnHeader(columnIdentifier).getDomIndex();
+        }
+
+        protected List<String> getColumnLabels()
+        {
+            return findHeaders().stream().map(FieldReferenceManager.FieldReference::getLabel).collect(Collectors.toList());
         }
 
         protected List<String> getColumnNames()
         {
-            initColumnsAndIndices();
-            return columnNames;
+            return findHeaders().stream().map(FieldReferenceManager.FieldReference::getName).collect(Collectors.toList());
         }
 
-        protected List<Map<String, String>> mapList;
-        protected List<GridRow> gridRows;
-        private List<Map<String, String>> _initGridData()
+        protected List<FieldKey> getColumnFieldKeys()
         {
-            List<Map<String, String>> rowMaps = new ArrayList<>();
-            gridRows = getRows();
-            for(GridRow row : gridRows)
-            {
-                rowMaps.add(row.getRowMap());
-            }
-            return rowMaps;
+            return findHeaders().stream().map(FieldReferenceManager.FieldReference::getFieldKey).collect(Collectors.toList());
         }
 
         protected GridRow getRow(int index)
         {
-            return new GridRow.GridRowFinder(ResponsiveGrid.this).index(index).find(this);
+            return getRows().get(index);
         }
 
         protected GridRow getRow(String text)
@@ -885,18 +916,16 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
             return new GridRow.GridRowFinder(ResponsiveGrid.this).withCellWithText(text).findOptional(this);
         }
 
-        protected GridRow getRow(String columnHeader, String text)
+        protected GridRow getRow(CharSequence columnIdentifier, String text)
         {
-            // try to normalize column index to start at 0, excluding row selector column
-            Integer columnIndex = getColumnIndex(columnHeader);
+            int columnIndex = getColumnIndex(columnIdentifier);
             return new GridRow.GridRowFinder(ResponsiveGrid.this).withTextAtColumn(text, columnIndex)
                     .find(this);
         }
 
-        protected Optional<GridRow> getOptionalRow(String columnHeader, String text)
+        protected Optional<GridRow> getOptionalRow(CharSequence columnIdentifier, String text)
         {
-            // try to normalize column index to start at 0, excluding row selector column
-            Integer columnIndex = getColumnIndex(columnHeader);
+            int columnIndex = getColumnIndex(columnIdentifier);
             return new GridRow.GridRowFinder(ResponsiveGrid.this).withTextAtColumn(text, columnIndex)
                     .findOptional(this);
         }
@@ -913,9 +942,14 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
             return new GridRow.GridRowFinder(ResponsiveGrid.this).withDescendant(containing).find();
         }
 
+        private List<GridRow> gridRows;
         protected List<GridRow> getRows()
         {
-            return new GridRow.GridRowFinder(ResponsiveGrid.this).findAll(getComponentElement());
+            if (gridRows == null)
+            {
+                gridRows = new GridRow.GridRowFinder(ResponsiveGrid.this).findAll(this);
+            }
+            return gridRows;
         }
     }
 
@@ -938,12 +972,12 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
 
         static final Locator loadingGrid = Locator.css("tbody tr.grid-loading");
         static final Locator emptyGrid = Locator.css("tbody tr.grid-empty");
-        static final Locator spinner = Locator.css("span i.fa-spinner");
+        static final Locator spinner = Locator.byClass("fa-spinner");
         static final Locator headerCells = Locator.tagWithClass("th", "grid-header-cell");
-        static public Locator.XPathLocator headerCellBody(String headerText)
+        static public Locator.XPathLocator headerCellBody(String label)
         {
             return Locator.tagWithClass("div", "grid-header-cell__body")
-                    .withChild(Locator.tag("span").startsWith(headerText));
+                    .withChild(Locator.tag("span").startsWith(label));
         }
     }
 
@@ -988,36 +1022,3 @@ public class ResponsiveGrid<T extends ResponsiveGrid> extends WebDriverComponent
         }
     }
 }
-
-    class ColumnIndex
-    {
-        private final Integer _rawIndex;
-        private final Integer _normalizedIndex;
-        private final String _columnText;
-
-        /**
-         * Helper to
-         * @param columnText    text of the column header
-         * @param rawIndex      dom-oriented index of the column
-         * @param normalizedIndex   index of the list of columns
-         */
-        public ColumnIndex(String columnText, int rawIndex, int normalizedIndex)
-        {
-            _columnText = columnText;
-            _rawIndex = rawIndex;
-            _normalizedIndex = normalizedIndex;
-        }
-
-        public String getColumnText()
-        {
-            return _columnText;
-        }
-        public Integer getRawIndex()
-        {
-            return _rawIndex;
-        }
-        public Integer getNormalizedIndex()
-        {
-            return _normalizedIndex;
-        }
-    }

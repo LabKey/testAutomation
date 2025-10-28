@@ -16,7 +16,6 @@
 package org.labkey.test.tests;
 
 import org.apache.hc.core5.http.HttpStatus;
-import org.assertj.core.api.Assertions;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Assume;
 import org.junit.Test;
@@ -195,7 +194,7 @@ public class KnitrReportTest extends AbstractKnitrReportTest
         setPandocEnabled(true);
 
         // just do a sanity check of the report's contents.  If the dependencies aren't loaded then we'll throw an alert
-        Locator[] reportContains = {Locator.id("mtcars_table_wrapper"), Locator.css("h1").withText("jQuery DataTables")};
+        Locator[] reportContains = {Locator.id("mtcars_table"), Locator.css("h1").withText("jQuery DataTables")};
         String[] reportNotContains = {"```", "{r",};
 
         createKnitrReport(rmdDependenciesReport, RReportHelper.ReportOption.knitrMarkdown);
@@ -203,8 +202,6 @@ public class KnitrReportTest extends AbstractKnitrReportTest
         _rReportHelper.clickReportTab();
         waitForElement(Locator.id("mtcars_table"));
         assertElementNotPresent(Locator.id("mtcars_table_wrapper")); // Created by jQuery
-        Assertions.assertThat(getServerErrors()).as("Server errors").contains("$(...).dataTable is not a function");
-        checkExpectedErrors(1); // JavaScript error: "$(...).dataTable is not a function"
 
         // now set the dependencies
         _rReportHelper.clickSourceTab();

@@ -1,6 +1,7 @@
 package org.labkey.test.tests;
 
 import org.jetbrains.annotations.Nullable;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -12,6 +13,7 @@ import org.labkey.test.SortDirection;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.CustomizeView;
+import org.labkey.test.components.assay.AssayConstants;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.pages.ImportDataPage;
@@ -24,12 +26,10 @@ import org.labkey.test.pages.study.ManageVisitPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
 import org.labkey.test.util.StudyHelper;
 import org.labkey.test.util.TestDataGenerator;
-import org.openqa.selenium.WebElement;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,6 +40,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static org.labkey.test.util.PermissionsHelper.READER_ROLE;
 
 @Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 15)
@@ -53,6 +55,7 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
     final static String SAMPLE_TYPE2 = "Sample type 2";
     private final static String visitLabel1 = "Screening";
     private final static String visitLabel2 = "Baseline";
+    private static final String READER_USER = "reader_user@user.test";
 
     protected DateTimeFormatter _dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     protected String now = LocalDateTime.now().format(_dateTimeFormatter);
@@ -60,7 +63,7 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject() throws IOException, CommandException
     {
-        SampleTypeLinkToStudyTest init = (SampleTypeLinkToStudyTest) getCurrentTest();
+        SampleTypeLinkToStudyTest init = getCurrentTest();
         init.doSetup();
     }
 
@@ -71,6 +74,7 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         _studyHelper.startCreateStudy()
                 .setTimepointType(StudyHelper.TimepointType.VISIT)
                 .createStudy();
+        createUserWithPermissions(READER_USER, VISIT_BASED_STUDY, READER_ROLE);
 
         _containerHelper.createProject(DATE_BASED_STUDY, "Study");
         _studyHelper.startCreateStudy()
@@ -137,6 +141,21 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         checker().verifyEquals("Incorrect number of rows linked", numOfRowsLinked, table.getDataRowCount());
         checker().verifyEquals("Incorrect Participant ID's", Arrays.asList("P3", "P4"), table.getColumnDataAsText("ParticipantId"));
         checker().verifyEquals("Incorrect category for the dataset(Uncategorized case)", " ", getCategory(VISIT_BASED_STUDY, SAMPLE_TYPE1));
+
+        // issue 53194
+        impersonate(READER_USER);
+        log("Verifying the linked sample type in study");
+        goToProjectHome(VISIT_BASED_STUDY);
+        clickAndWait(Locator.linkWithText(SAMPLE_TYPE1));
+
+        // verify that the isPlated field renders correctly
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.addColumn("IsPlated");
+        _customizeViewsHelper.applyCustomView();
+        table = new DataRegionTable("Dataset", getDriver());
+        List<String> values = table.getColumnDataAsText("IsPlated");
+        Assert.assertEquals("Invalid isPlated row values", List.of("Not Plated", "Not Plated"), values);
+        stopImpersonating();
 
         log("Verifying log entries");
         goToProjectHome(SAMPLE_TYPE_PROJECT);
@@ -303,8 +322,8 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         samplesTable.clickHeaderButtonAndWait("Derive Samples");
         selectOptionByText(Locator.name("targetSampleTypeId"), "Plasma in /" + SAMPLE_TYPE_PROJECT);
         clickButton("Next");
-        setFormElement(Locator.name("outputSample1_Name"), derivedSampleName);
-        setFormElement(Locator.name("outputSample1_Volume"), "1");
+        setFormElement(Locator.name("Output Sample 1_Name"), derivedSampleName);
+        setFormElement(Locator.name("Output Sample 1_Volume"), "1");
         clickButton("Submit");
 
         goToProjectHome(SAMPLE_TYPE_PROJECT);
@@ -321,7 +340,7 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         samplesTable.clickHeaderButtonAndWait("Link to Study");
 
         log("Link to study: Choose target");
-        selectOptionByText(Locator.id("targetStudy"), "/" + DATE_BASED_STUDY + " (" + DATE_BASED_STUDY + " Study)");
+        selectOptionByText(AssayConstants.TARGET_STUDY_FIELD_LOCATOR, "/" + DATE_BASED_STUDY + " (" + DATE_BASED_STUDY + " Study)");
         clickButton("Next");
         new DataRegionTable("query", getDriver()).clickHeaderButtonAndWait("Link to Study");
 
@@ -352,8 +371,8 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         DataRegionTable table = new DataRegionTable("Runs", getDriver());
         table.clickHeaderButton("Import Data");
         clickButton("Next");
-        setFormElement(Locator.name("name"), runName);
-        setFormElement(Locator.name("TextAreaDataCollector.textArea"), importData);
+        setFormElement(AssayConstants.ASSAY_NAME_FIELD_LOCATOR, runName);
+        setFormElement(AssayConstants.TEXT_AREA_DATA_COLLECTOR_LOCATOR, importData);
         clickButton("Save and Finish");
 
         clickAndWait(Locator.linkWithText(runName));
@@ -367,7 +386,7 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
 
         table.checkCheckbox(0);
         table.clickHeaderButtonAndWait("Link to Study");
-        selectOptionByText(Locator.id("targetStudy"), "/" + DATE_BASED_STUDY + " (" + DATE_BASED_STUDY + " Study)");
+        selectOptionByText(AssayConstants.TARGET_STUDY_FIELD_LOCATOR, "/" + DATE_BASED_STUDY + " (" + DATE_BASED_STUDY + " Study)");
         clickButton("Next");
 
         checker().verifyEquals("Incorrect Participant ID deduced", "P4", Locator.name("participantId").findElement(getDriver()).getAttribute("value"));
@@ -654,7 +673,7 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         samplesTable.clickHeaderButtonAndWait("Derive Samples");
         selectOptionByText(Locator.name("targetSampleTypeId"), childSampleType + " in /" + getProjectName());
         clickButton("Next");
-        setFormElement(Locator.name("outputSample1_Name"), "derivedChildSample");
+        setFormElement(Locator.name("Output Sample 1_Name"), "derivedChildSample");
         clickButton("Submit");
 
         log("Verifying the auto link to study by deriving single samples from parent sample");
@@ -764,17 +783,7 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
     private void createDatasetCategory(String projectName, String name)
     {
         goToProjectHome(projectName);
-        goToManageViews();
-        Locator.linkWithText("Manage Categories").findElement(getDriver()).click();
-        _extHelper.waitForExtDialog("Manage Categories");
-        Window<?> categoryWindow = new Window.WindowFinder(getDriver()).withTitle("Manage Categories").waitFor();
-        categoryWindow.clickButton("New Category", 0);
-        WebElement newCategoryField = Locator.input("label").withAttributeContaining("id", "textfield").notHidden().waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
-        setFormElementJS(newCategoryField, name);
-        fireEvent(newCategoryField, SeleniumEvent.blur);
-        waitForElement(Ext4Helper.Locators.window("Manage Categories").append("//div").withText(name));
-        clickButton("Done", 0);
-        _extHelper.waitForExtDialogToDisappear("Manage Categories");
+        goToManageViews().createCategory(name);
     }
 
     private String getCategory(String projectName, String datasetName)
@@ -852,10 +861,11 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        _containerHelper.deleteProject(SAMPLE_TYPE_PROJECT, afterTest);
-        _containerHelper.deleteProject(VISIT_BASED_STUDY, afterTest);
-        _containerHelper.deleteProject(DATE_BASED_STUDY, afterTest);
-        _containerHelper.deleteProject(SAMPLE_TYPE_PROJECT + " Study 1", afterTest);
-        _containerHelper.deleteProject(SAMPLE_TYPE_PROJECT + " Study 2", afterTest);
+        _userHelper.deleteUsers(false, READER_USER);
+        _containerHelper.deleteProject(SAMPLE_TYPE_PROJECT, false);
+        _containerHelper.deleteProject(VISIT_BASED_STUDY, false);
+        _containerHelper.deleteProject(DATE_BASED_STUDY, false);
+        _containerHelper.deleteProject(SAMPLE_TYPE_PROJECT + " Study 1", false);
+        _containerHelper.deleteProject(SAMPLE_TYPE_PROJECT + " Study 2", false);
     }
 }

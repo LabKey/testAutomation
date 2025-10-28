@@ -27,7 +27,7 @@ import java.util.HashMap;
 @Aspect
 public class TestPerfAspect
 {
-    private static HashMap<String, HashMap<TestSection, Long>> _testClassMethodPerfStats = new HashMap<>();
+    private static final HashMap<String, HashMap<TestSection, Long>> _testClassMethodPerfStats = new HashMap<>();
 
     private static long _startTime;
     private static TestSection _currentSection = null;

@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.junit.Assert.fail;
 
@@ -38,6 +39,19 @@ public abstract class PermissionsHelper
     public static final String APP_ADMIN_ROLE = "Application Admin";
     public static final String DEVELOPER_ROLE = "Platform Developer";
     public static final String IMP_TROUBLESHOOTER_ROLE = "Impersonating Troubleshooter";
+    public static final String PROJECT_ADMIN_ROLE = "Project Administrator";
+    public static final String FOLDER_ADMIN_ROLE = "Folder Administrator";
+    public static final String READER_ROLE = "Reader";
+    public static final String EDITOR_ROLE = "Editor";
+    public static final String AUTHOR_ROLE = "Author";
+    public static final String SUBMITTER_ROLE = "Submitter";
+
+    public static final Set<String> AUDIT_LOG_VIEWER_ROLES = Set.of(SITE_ADMIN_ROLE, APP_ADMIN_ROLE, PROJECT_ADMIN_ROLE, FOLDER_ADMIN_ROLE);
+
+    public static boolean canSeeAuditLogs(String roleName)
+    {
+        return AUDIT_LOG_VIEWER_ROLES.contains(roleName);
+    }
 
     public static String toRole(final String name)
     {
@@ -100,43 +114,43 @@ public abstract class PermissionsHelper
     {user, group, siteGroup}
 
     @LogMethod
-    public void setPermissions(@LoggedParam String groupName, @LoggedParam String roleClass)
+    public void setPermissions(@LoggedParam String groupName, @LoggedParam String roleName)
     {
-        addMemberToRole(groupName, roleClass, MemberType.group);
+        addMemberToRole(groupName, roleName, MemberType.group);
     }
 
     @LogMethod
-    public void setSiteGroupPermissions(@LoggedParam String groupName, @LoggedParam String roleClass)
+    public void setSiteGroupPermissions(@LoggedParam String groupName, @LoggedParam String roleName)
     {
-        addMemberToRole(groupName, roleClass, MemberType.siteGroup);
+        addMemberToRole(groupName, roleName, MemberType.siteGroup);
     }
 
     @LogMethod
-    public void setUserPermissions(@LoggedParam String userName, @LoggedParam String roleClass)
+    public void setUserPermissions(@LoggedParam String userName, @LoggedParam String roleName)
     {
-        addMemberToRole(userName, roleClass, MemberType.user);
+        addMemberToRole(userName, roleName, MemberType.user);
     }
 
     @LogMethod
-    public abstract void setSiteAdminRoleUserPermissions(@LoggedParam String userName, @LoggedParam String permissionString);
-    protected abstract void addMemberToRole(String userOrGroupName, String permissionString, MemberType memberType);
+    public abstract void setSiteRoleUserPermissions(@LoggedParam String userName, @LoggedParam String roleName);
+    protected abstract void addMemberToRole(String userOrGroupName, String roleName, MemberType memberType);
 
-    public void removeSiteGroupPermission(String groupName, String permissionString)
+    public void removeSiteGroupPermission(String groupName, String roleName)
     {
-        removeRoleAssignment(groupName, permissionString, MemberType.siteGroup);
+        removeRoleAssignment(groupName, roleName, MemberType.siteGroup);
     }
 
-    public void removePermission(String groupName, String permissionString)
+    public void removePermission(String groupName, String roleName)
     {
-        removeRoleAssignment(groupName, permissionString, MemberType.group);
+        removeRoleAssignment(groupName, roleName, MemberType.group);
     }
 
-    public void removeUserRole(String groupName, String permissionString)
+    public void removeUserRole(String groupName, String roleName)
     {
-        removeRoleAssignment(groupName, permissionString, MemberType.user);
+        removeRoleAssignment(groupName, roleName, MemberType.user);
     }
 
-    protected abstract void removeRoleAssignment(String groupName, String permissionString, MemberType memberType);
+    protected abstract void removeRoleAssignment(String groupName, String roleName, MemberType memberType);
     public abstract void addUserToSiteGroup(String userName, String groupName);
 
     /**

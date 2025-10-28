@@ -223,7 +223,7 @@ public class AdvancedListSettingsDialog extends ModalDialog
         DataOnly("Include data only"),
         MetadataOnly("Include metadata only (name and description of list and fields)");
 
-        private String _labelText;
+        private final String _labelText;
 
         SearchIncludeOptions(String labelText)
         {
@@ -242,7 +242,7 @@ public class AdvancedListSettingsDialog extends ModalDialog
         NonPhiFields("Index all non-PHI fields (text, number, date, and boolean)"),
         CustomTemplate("Index using custom template");
 
-        private String _labelText;
+        private final String _labelText;
 
         SearchIndexOptions(String labelText)
         {

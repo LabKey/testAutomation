@@ -24,7 +24,6 @@ import org.labkey.test.util.ext4cmp.Ext4CmpRef;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.Date;
@@ -74,6 +73,17 @@ public class UIPermissionsHelper extends PermissionsHelper
     }
 
     @LogMethod
+    public void deleteGlobalGroupFromDetailsPage(@LoggedParam String groupName)
+    {
+        goToSiteGroupScreen(groupName);
+        Locator.XPathLocator deleteButton = Locator.lkButton("Delete Empty Group");
+        _driver.waitForElement(deleteButton);
+        _driver.click(deleteButton);
+        _driver.assertAlert("Permanently delete group /" + groupName + "?");
+        _driver.waitForElement(Ext4Helper.Locators.ext4Button("Save and Finish"));
+    }
+
+    @LogMethod
     public Integer createGlobalPermissionsGroup(@LoggedParam String groupName, boolean failIfAlreadyExists, @LoggedParam String... users)
     {
         startCreateGlobalPermissionsGroup(groupName, failIfAlreadyExists);
@@ -84,7 +94,7 @@ public class UIPermissionsHelper extends PermissionsHelper
             namesList.append(member).append("\n");
         }
 
-        _driver.log("Adding [" + namesList.toString() + "] to group " + groupName + "...");
+        _driver.log("Adding [" + namesList + "] to group " + groupName + "...");
         _driver.waitAndClickAndWait(Locator.tagContainingText("a", "manage group"));
         _driver.waitForElement(Locator.name("names"));
         _driver.uncheckCheckbox(Locator.name("sendEmail"));
@@ -134,9 +144,9 @@ public class UIPermissionsHelper extends PermissionsHelper
 
         if ("org.labkey.api.security.roles.NoPermissionsRole".equals(role))
         {
-            assertNoPermission(userOrGroupName, "Reader");
-            assertNoPermission(userOrGroupName, "Editor");
-            assertNoPermission(userOrGroupName, "Project Administrator");
+            assertNoPermission(userOrGroupName, READER_ROLE);
+            assertNoPermission(userOrGroupName, EDITOR_ROLE);
+            assertNoPermission(userOrGroupName, PROJECT_ADMIN_ROLE);
             return;
         }
         _driver.waitForElement(Locator.permissionRendered(), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
@@ -179,20 +189,18 @@ public class UIPermissionsHelper extends PermissionsHelper
 
     @Override
     @LogMethod
-    public void setSiteAdminRoleUserPermissions(@LoggedParam String userName, @LoggedParam String permissionString)
+    public void setSiteRoleUserPermissions(@LoggedParam String userName, @LoggedParam String roleName)
     {
         _driver.log(new Date().toString());
-        _driver.goToSiteAdmins();
-        _driver.clickAndWait(Locator.tag("ol").append(Locator.linkContainingText("Permissions")));
-        _driver._ext4Helper.clickTabContainingText("Permissions");
-        _selectPermission(userName, userName, permissionString);
+        PermissionsPage.beginAt(_driver, "/");
+        _selectPermission(userName, userName, roleName);
         _driver.log(new Date().toString());
     }
 
     @Override
-    protected void addMemberToRole(String userOrGroupName, String permissionString, MemberType memberType)
+    protected void addMemberToRole(String userOrGroupName, String roleName, MemberType memberType)
     {
-        String role = toRole(permissionString);
+        String role = toRole(roleName);
         if ("org.labkey.api.security.roles.NoPermissionsRole".equals(role))
         {
             throw new IllegalArgumentException("Can't set NoPermissionRole; call removePermission()");
@@ -207,56 +215,51 @@ public class UIPermissionsHelper extends PermissionsHelper
             String group = userOrGroupName;
             if (memberType == MemberType.siteGroup)
                 group = "Site: " + group;
-            _selectPermission(userOrGroupName, group, permissionString);
+            _selectPermission(userOrGroupName, group, roleName);
         }
     }
 
-    private void _selectPermission(String userOrGroupName, String group, String permissionString)
+    private void _selectPermission(String userOrGroupName, String group, String roleName)
     {
-        Locator.XPathLocator roleCombo = Locator.xpath("//div[contains(@class, 'rolepanel')][.//h3[text()='" + permissionString + "']]");
+        Locator.XPathLocator roleCombo = Locator.xpath("//div[contains(@class, 'rolepanel')][.//h3[text()='" + roleName + "']]");
         _driver.waitForElement(roleCombo);
         _driver.scrollIntoView(roleCombo);
         _driver._ext4Helper.selectComboBoxItem(roleCombo, Ext4Helper.TextMatchTechnique.STARTS_WITH, group);
-        _driver.waitForElement(Locator.permissionButton(userOrGroupName, permissionString));
-        String oldId = _driver.getAttribute(Locator.permissionButton(userOrGroupName, permissionString), "id");
+        _driver.waitForElement(Locator.permissionButton(userOrGroupName, roleName));
+        String oldId = _driver.getAttribute(Locator.permissionButton(userOrGroupName, roleName), "id");
         savePermissions();
         _driver._ext4Helper.waitForMaskToDisappear();
         _driver.waitForElementToDisappear(Locator.id(oldId), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT); // Elements get new ids after save
-        assertPermissionSetting(userOrGroupName, permissionString);
+        assertPermissionSetting(userOrGroupName, roleName);
     }
 
     @Override
     public void addUserToSiteGroup(String userName, String groupName)
     {
-        _driver.ensureAdminMode();
-        switch (groupName)
-        {
-            case "Administrators":
-                _driver.goToSiteAdmins();
-                break;
-            case "Developers":
-                _driver.goToSiteDevelopers();
-                break;
-            default:
-                _driver.goToSiteGroups();
-                Locator.XPathLocator groupLoc = Locator.tagWithText("div", groupName);
-                _driver.waitForElement(groupLoc, _driver.defaultWaitForPage);
-                _driver.click(groupLoc);
-                _driver.clickAndWait(Locator.linkContainingText("manage group"));
-        }
+        goToSiteGroupScreen(groupName);
         addUserToGroupFromGroupScreen(userName);
     }
 
-    @Override
-    protected void removeRoleAssignment(String groupName, String permissionString, MemberType memberType)
+    public void goToSiteGroupScreen(String groupName)
     {
-        Locator close = Locator.closePermissionButton(groupName,permissionString);
+        _driver.ensureAdminMode();
+        _driver.goToSiteGroups();
+        Locator.XPathLocator groupLoc = Locator.tagWithText("div", groupName);
+        _driver.waitForElement(groupLoc, _driver.defaultWaitForPage);
+        _driver.click(groupLoc);
+        _driver.clickAndWait(Locator.linkContainingText("manage group"));
+    }
+
+    @Override
+    protected void removeRoleAssignment(String groupName, String roleName, MemberType memberType)
+    {
+        Locator close = Locator.closePermissionButton(groupName, roleName);
         if (_driver.isElementPresent(close))
         {
             _driver.click(close);
             _driver.waitForElementToDisappear(close);
             savePermissions();
-            assertNoPermission(groupName, permissionString);
+            assertNoPermission(groupName, roleName);
         }
     }
 
@@ -395,7 +398,7 @@ public class UIPermissionsHelper extends PermissionsHelper
             namesList.append(member).append("\n");
         }
 
-        _driver.log("Adding [" + namesList.toString() + "] to group " + groupName + "...");
+        _driver.log("Adding [" + namesList + "] to group " + groupName + "...");
         addUserToGroupFromGroupScreen(namesList.toString());
 
         enterPermissionsUI();
@@ -421,47 +424,11 @@ public class UIPermissionsHelper extends PermissionsHelper
         _driver.waitForElement(loc);
     }
 
-    public void clickManageSiteGroup(String groupName, BaseWebDriverTest _test)
-    {
-        _driver._ext4Helper.clickTabContainingText("Site Groups");
-        // warning Administrators can appear multiple times
-        List<Ext4CmpRef> refs = _driver._ext4Helper.componentQuery("grid", Ext4CmpRef.class);
-        Ext4CmpRef ref = refs.get(0);
-        Long idx = (Long)ref.getEval("getStore().find(\"name\", \"" + groupName + "\")");
-        assertFalse("Unable to locate group: \"" + groupName + "\"", idx < 0);
-        ref.eval("getSelectionModel().select(" + idx + ")");
-        _driver.waitAndClickAndWait(Locator.tagContainingText("a", "manage group"));
-        _driver.waitForElement(Locator.name("names"));
-    }
-
-    @LogMethod(quiet = true)
-    public void dragGroupToRole(@LoggedParam String group, @LoggedParam String srcRole, @LoggedParam String destRole, BaseWebDriverTest _test)
-    {
-        Actions builder = new Actions(_driver.getDriver());
-        builder
-                .clickAndHold(Locator.permissionButton(group, srcRole).findElement(_driver.getDriver()))
-                .moveToElement(Locator.xpath("//div[contains(@class, 'rolepanel')][.//h3[text()='" + destRole + "']]/div/div").findElement(_driver.getDriver()))
-                .release()
-                .build().perform();
-
-        _driver.waitForElementToDisappear(Locator.permissionButton(group, srcRole), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        _driver.waitForElement(Locator.permissionButton(group, destRole));
-    }
-
     public void addUserToGroupFromGroupScreen(String userName)
     {
         _driver.waitForElement(Locator.name("names"));
         _driver.uncheckCheckbox(Locator.name("sendEmail"));
         _driver.setFormElement(Locator.name("names"), userName);
         _driver.clickButton("Update Group Membership");
-    }
-
-    public void removeUserFromGroupFromGroupScreen(String userName)
-    {
-        _driver.checkCheckbox(Locator.checkboxByNameAndValue("delete", userName));
-        _driver.doAndWaitForPageToLoad(() -> {
-            _driver.clickButton("Update Group Membership", 0);
-            _driver.assertAlert("Are you sure you want to permanently remove the selected user from this group?");
-        }, BaseWebDriverTest.WAIT_FOR_PAGE);
     }
 }

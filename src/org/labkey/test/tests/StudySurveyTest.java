@@ -21,13 +21,13 @@ import java.util.List;
 public class StudySurveyTest extends BaseWebDriverTest
 {
     PortalHelper portalHelper = new PortalHelper(this);
-    private String datasetName = "SampleDataset";
-    private String surveyDesignName = "Dataset Survey Design";
+    private final String datasetName = "SampleDataset";
+    private final String surveyDesignName = "Dataset Survey Design";
 
     @BeforeClass
     public static void doSetup()
     {
-        StudySurveyTest initTest = (StudySurveyTest) getCurrentTest();
+        StudySurveyTest initTest = getCurrentTest();
         initTest.setupProject();
     }
 

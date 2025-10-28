@@ -1,7 +1,7 @@
 <ApiTests xmlns="http://labkey.org/query/xml">
 
     <test name="get group permissions" type="get">
-        <url>Security%20API%20Test%20Project/security-getGroupPerms.view?</url>
+        <url>Security%20API%20Test%20Project/security-getGroupPerms.api</url>
         <response>
             {"container":
                 {
@@ -10,26 +10,6 @@
                     "path": "/Security API Test Project",
                     "isInheritingPerms": false,
                     "groups": [
-                        {
-                            "id": -1,
-                            "name": "Site Administrators",
-                            "roles": [],
-                            "isSystemGroup": true,
-                            "isProjectGroup": false,
-                            "type": "g",
-                            "effectivePermissions": [],
-                            "groups": []
-                        },
-                        {
-                            "isSystemGroup": true,
-                            "roles": [],
-                            "name": "Developers",
-                            "effectivePermissions": [],
-                            "groups": [],
-                            "id": -4,
-                            "type": "g",
-                            "isProjectGroup": false,
-                        },
                         {
                             "id": -3,
                             "name": "Guests",
@@ -113,8 +93,71 @@
         </response>
     </test>
 
+    <test name="get group permissions excluding groups without effective permissions" type="get">
+        <url>Security%20API%20Test%20Project/security-getGroupPerms.api?includeEmptyPermGroups=false</url>
+        <response>
+            {"container":
+                {
+                    "id": "THIS CONTAINER GUID FIELD IS IGNORED IN JSON CHECK",
+                    "name": "Security API Test Project",
+                    "path": "/Security API Test Project",
+                    "isInheritingPerms": false,
+                    "groups": [
+                        {
+                            "id": 1672,
+                            "name": "testgroup1",
+                            "roles": ["org.labkey.api.security.roles.EditorRole"],
+                            "isSystemGroup": false,
+                            "isProjectGroup": true,
+                            "type": "g",
+                            "effectivePermissions": [
+                                "org.labkey.api.security.permissions.InsertPermission",
+                                "org.labkey.api.security.permissions.DeletePermission",
+                                "org.labkey.api.security.permissions.EditSharedViewPermission",
+                                "org.labkey.api.reports.permissions.EditSharedReportPermission",
+                                "org.labkey.api.security.permissions.ReadPermission",
+                                "org.labkey.api.reports.permissions.ShareReportPermission",
+                                "org.labkey.api.study.permissions.SharedParticipantGroupPermission",
+                                "org.labkey.announcements.model.SecureMessageBoardRespondPermission",
+                                "org.labkey.api.security.permissions.ReadSomePermission",
+                                "org.labkey.api.lists.permissions.ManagePicklistsPermission",
+                                "org.labkey.api.security.permissions.UpdatePermission",
+                                "org.labkey.announcements.model.SecureMessageBoardReadPermission",
+                                "org.labkey.api.security.permissions.SampleWorkflowDeletePermission",
+                                "org.labkey.api.security.permissions.SampleWorkflowJobPermission",
+                                "org.labkey.api.security.permissions.AssayReadPermission",
+                                "org.labkey.api.security.permissions.NotebookReadPermission",
+                                "org.labkey.api.security.permissions.DataClassReadPermission",
+                                "org.labkey.api.security.permissions.MediaReadPermission",
+                                "org.labkey.api.security.permissions.MoveEntitiesPermission",
+                            ],
+                            "groups": []
+                        },
+                        {
+                            "id": 1673,
+                            "name": "testgroup2",
+                            "roles": ["org.labkey.api.security.roles.ReaderRole"],
+                            "isSystemGroup": false,
+                            "isProjectGroup": true,
+                            "type": "g",
+                            "effectivePermissions": [
+                                "org.labkey.api.security.permissions.ReadPermission",
+                                "org.labkey.api.security.permissions.ReadSomePermission",
+                                "org.labkey.api.security.permissions.AssayReadPermission",
+                                "org.labkey.api.security.permissions.DataClassReadPermission",
+                                "org.labkey.api.security.permissions.NotebookReadPermission",
+                                "org.labkey.api.security.permissions.MediaReadPermission"
+                            ],
+                            "groups": []
+                        }
+                    ]
+                }
+            }
+        </response>
+    </test>
+
     <test name="groups for current user" type="get">
-        <url>Security%20Api%20Test%20Project/security-getGroupsForCurrentUser.view?</url>
+        <url>Security%20Api%20Test%20Project/security-getGroupsForCurrentUser.api</url>
         <response>
             {"groups": [
                     {
@@ -128,12 +171,6 @@
                         "name": "All Site Users",
                         "isSystemGroup": true,
                         "isProjectGroup": false
-                    },
-                    {
-                        "id": -1,
-                        "name": "Site Administrators",
-                        "isSystemGroup": true,
-                        "isProjectGroup": false
                     }
                 ]
             }
@@ -141,7 +178,7 @@
     </test>
 
     <test name="ensure login" type="get">
-        <url>Security%20Api%20Test%20Project/security-ensureLogin.view?</url>
+        <url>Security%20Api%20Test%20Project/security-ensureLogin.api</url>
         <response>
             {"currentUser":
                 {

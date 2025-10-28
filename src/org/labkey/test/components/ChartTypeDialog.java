@@ -72,7 +72,7 @@ public class ChartTypeDialog extends ChartWizardDialog<ChartTypeDialog.ElementCa
 
     public boolean isChartTypeEnabled(ChartType chartType)
     {
-        String classValue = "";
+        String classValue;
 
         switch(chartType)
         {
@@ -411,7 +411,7 @@ public class ChartTypeDialog extends ChartWizardDialog<ChartTypeDialog.ElementCa
         String text;
         text = fieldElement.getText();
 
-        if(text.length() == 0)
+        if(text.isEmpty())
         {
             // If the length is 0 see if the drag and drop text is visible.
             if(dragAndDropElement.isDisplayed())

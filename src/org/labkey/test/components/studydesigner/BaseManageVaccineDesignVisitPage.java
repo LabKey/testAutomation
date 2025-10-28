@@ -108,10 +108,10 @@ public class BaseManageVaccineDesignVisitPage extends BaseManageVaccineDesignPag
 
     protected class BaseVisitElements extends BaseElements
     {
-        private Locator.XPathLocator newVisitRadioLoc = Ext4Helper.Locators.radiobutton(_test, "Create a new study visit:");
-        private Locator.XPathLocator newVisitLabelLoc = Locator.tagWithName("input", "newVisitLabel");
-        private Locator.XPathLocator newVisitMinLoc = Locator.tagWithName("input", "newVisitRangeMin");
-        private Locator.XPathLocator newVisitMaxLoc = Locator.tagWithName("input", "newVisitRangeMax");
+        private final Locator.XPathLocator newVisitRadioLoc = Ext4Helper.Locators.radiobutton(_test, "Create a new study visit:");
+        private final Locator.XPathLocator newVisitLabelLoc = Locator.tagWithName("input", "newVisitLabel");
+        private final Locator.XPathLocator newVisitMinLoc = Locator.tagWithName("input", "newVisitRangeMin");
+        private final Locator.XPathLocator newVisitMaxLoc = Locator.tagWithName("input", "newVisitRangeMax");
 
         Locator.XPathLocator existingVisitLoc = Locator.tagWithClass("table", "x4-field").withDescendant(Locator.tagWithName("input", "existingVisit"));
         Locator.XPathLocator addVisitIconLoc = Locator.tagWithClass("i", "add-visit-column");
@@ -145,7 +145,7 @@ public class BaseManageVaccineDesignVisitPage extends BaseManageVaccineDesignPag
     public static class Visit
     {
         private Integer _rowId;
-        private String _label;
+        private final String _label;
         private Double _rangeMin;
         private Double _rangeMax;
 

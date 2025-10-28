@@ -5,11 +5,8 @@ import org.jetbrains.annotations.Nullable;
 import org.labkey.test.WebTestHelper;
 
 import java.nio.charset.Charset;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import static org.labkey.test.WebTestHelper.getBaseURL;
 
@@ -55,7 +52,7 @@ public class URLBuilder
     private Map<String, ?> _secondaryQuery;
 
     /**
-     * Intialize a URLBuilder for a LabKey URL
+     * Initialize a URLBuilder for a LabKey URL
      * @param controller the controller name (e.g. "login" for "LoginController")
      * @param action the action name (e.g. "whoami" for "WhoAmIAction")
      *              The action type will be assumed to be ".view" if not specified.
@@ -105,10 +102,7 @@ public class URLBuilder
      */
     public URLBuilder setAppResourcePath(Object... pathParts)
     {
-        List<String> encodedParts = Arrays.stream(pathParts).map(Objects::requireNonNull).map(String::valueOf)
-                .map(s -> EscapeUtil.encode(s).replace("+", " ")).collect(Collectors.toList());
-        setFragment("/" + String.join("/", encodedParts));
-        return this;
+        return setFragment(EscapeUtil.encodeAppResourcePath(pathParts));
     }
 
     /**

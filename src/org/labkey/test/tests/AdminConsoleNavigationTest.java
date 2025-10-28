@@ -1,5 +1,6 @@
 package org.labkey.test.tests;
 
+import org.assertj.core.api.Assertions;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -18,7 +19,6 @@ import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.Crawler;
 import org.labkey.test.util.PermissionsHelper;
 import org.labkey.test.util.TestLogger;
-import org.openqa.selenium.JavascriptException;
 import org.openqa.selenium.WebElement;
 
 import java.io.IOException;
@@ -46,7 +46,7 @@ public class AdminConsoleNavigationTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        AdminConsoleNavigationTest init = (AdminConsoleNavigationTest) getCurrentTest();
+        AdminConsoleNavigationTest init = getCurrentTest();
         init.doSetup();
     }
 
@@ -56,7 +56,6 @@ public class AdminConsoleNavigationTest extends BaseWebDriverTest
         _apiPermissionsHelper.addMemberToRole(TROUBLESHOOTER, "Troubleshooter", PermissionsHelper.MemberType.user, "/");
 
         _userHelper.createUser(NON_ADMIN);
-        _apiPermissionsHelper.setUserPermissions(NON_ADMIN, "Reader");
     }
 
     @Override
@@ -77,6 +76,7 @@ public class AdminConsoleNavigationTest extends BaseWebDriverTest
                 "Memory Usage",                     // Slow to load
                 "View All Site Errors",             // No nav trail
                 "View All Site Errors Since Reset", // No nav trail
+                "View CSP Report Log File",         // No nav trail
                 "View Primary Site Log File"        // No nav trail
         ));
         List<WebElement> adminLinks = ShowAdminPage.beginAt(this).getAllAdminConsoleLinks();
@@ -87,6 +87,7 @@ public class AdminConsoleNavigationTest extends BaseWebDriverTest
         {
             linkHrefs.put(link.getText(), link.getAttribute("href"));
         }
+        Assertions.assertThat(linkHrefs.keySet()).as("Expected links").containsAll(ignoredLinks.stream().map(String::toUpperCase).toList());
 
         List<String> pagesMissingNavTrail = new ArrayList<>();
 
@@ -122,6 +123,7 @@ public class AdminConsoleNavigationTest extends BaseWebDriverTest
         impersonate(TROUBLESHOOTER);
         Map<String, String> linkHrefs = new LinkedHashMap<>();
         List<WebElement> troubleshooterLinks = adminConsole.getAllAdminConsoleLinks();
+        assertTrue(String.format("Failed sanity check. Only found %s admin links. There should be more.", troubleshooterLinks.size()), troubleshooterLinks.size() > 10);
         for (WebElement link : troubleshooterLinks)
             linkHrefs.put(link.getText(), link.getAttribute("href"));
 
@@ -156,6 +158,7 @@ public class AdminConsoleNavigationTest extends BaseWebDriverTest
         ));
         ShowAdminPage adminConsole = goToAdminConsole();
         List<WebElement> adminLinks = adminConsole.getAllAdminConsoleLinks();
+        assertTrue(String.format("Failed sanity check. Only found %s admin links. There should be more.", adminLinks.size()), adminLinks.size() > 10);
         Map<String, String> linkHrefs = new LinkedHashMap<>();
         for (WebElement link : adminLinks)
             linkHrefs.put(link.getText(), link.getAttribute("href"));

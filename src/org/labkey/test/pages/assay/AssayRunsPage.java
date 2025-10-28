@@ -21,6 +21,7 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.labkey.LabKeyAlert;
+import org.labkey.test.components.react.MultiMenu;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExperimentRunTable;
@@ -107,6 +108,11 @@ public class AssayRunsPage extends LabKeyPage<AssayRunsPage.ElementCache>
         return updatePage.clickUpdate();
     }
 
+    public void clickEditAssayDesign()
+    {
+        elementCache().manageMenu.doMenuAction("Edit Assay Design");
+    }
+
     @Override
     protected ElementCache newElementCache()
     {
@@ -115,6 +121,7 @@ public class AssayRunsPage extends LabKeyPage<AssayRunsPage.ElementCache>
 
     protected class ElementCache extends LabKeyPage.ElementCache
     {
-
+        MultiMenu manageMenu = new MultiMenu.MultiMenuFinder(getDriver()).withText("Manage")
+                .timeout(WAIT_FOR_JAVASCRIPT).findWhenNeeded(getDriver());
     }
 }

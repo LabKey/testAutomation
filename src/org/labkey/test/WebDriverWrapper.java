@@ -18,7 +18,6 @@ package org.labkey.test;
 import org.apache.commons.collections4.MultiValuedMap;
 import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -53,6 +52,7 @@ import org.labkey.test.util.Crawler;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.ExtHelper;
+import org.labkey.test.util.HtmlFragmentSelection;
 import org.labkey.test.util.LabKeyExpectedConditions;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
@@ -61,6 +61,7 @@ import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.RelativeUrl;
 import org.labkey.test.util.TestLogger;
 import org.labkey.test.util.TextSearcher;
+import org.labkey.test.util.TextSearcher.TextTransformers;
 import org.labkey.test.util.Timer;
 import org.labkey.test.util.selenium.ScrollUtils;
 import org.labkey.test.util.selenium.WebDriverUtils;
@@ -75,6 +76,7 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.NoSuchWindowException;
 import org.openqa.selenium.ScriptTimeoutException;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.StaleElementReferenceException;
@@ -84,6 +86,7 @@ import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.WindowType;
 import org.openqa.selenium.WrapsDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeDriverService;
@@ -105,13 +108,17 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -121,18 +128,21 @@ import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.Stack;
+import java.util.TimeZone;
 import java.util.WeakHashMap;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -140,6 +150,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -159,6 +170,7 @@ import static org.labkey.test.TestProperties.isScriptCheckEnabled;
 import static org.labkey.test.TestProperties.isWebDriverLoggingEnabled;
 import static org.labkey.test.WebTestHelper.makeRelativeUrl;
 import static org.labkey.test.components.html.RadioButton.RadioButton;
+import static org.labkey.test.util.LabKeyExpectedConditions.windowIsPresent;
 import static org.openqa.selenium.chrome.ChromeDriverService.CHROME_DRIVER_LOG_PROPERTY;
 import static org.openqa.selenium.chrome.ChromeDriverService.CHROME_DRIVER_VERBOSE_LOG_PROPERTY;
 import static org.openqa.selenium.firefox.GeckoDriverService.GECKO_DRIVER_LOG_PROPERTY;
@@ -176,6 +188,8 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     private final Stack<String> _locationStack = new Stack<>();
     private String _savedLocation = null;
+
+    private static final Set<String> _controllerFirstUrls = new HashSet<>();
 
     static
     {
@@ -228,6 +242,14 @@ public abstract class WebDriverWrapper implements WrapsDriver
     public int getRelativeTimeZoneOffset()
     {
         return -(ZoneId.systemDefault().getRules().getOffset(Instant.now()).getTotalSeconds() / 60 + getWebDriverTimeZoneOffset());
+    }
+
+    /**
+     * Get an unnamed time zone with the browser's offset
+     */
+    public TimeZone getClientTimeZone()
+    {
+        return TimeZone.getTimeZone(ZoneOffset.ofTotalSeconds(-getWebDriverTimeZoneOffset() * 60));
     }
 
     /**
@@ -456,6 +478,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         String browserVersion = caps.getBrowserVersion();
         log("Browser: " + browserName + " " + browserVersion);
         log("Started browser with TZ = " + targetBrowserTimeZone + (targetBrowserTimeZone != ZoneId.systemDefault() ? "" : " (system default)"));
+        log(String.format("charset is %s", Charset.defaultCharset().displayName()));
 
         return result;
     }
@@ -526,7 +549,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
      * Wrapper for synchronous execution of asynchronous JavaScript. This wrapper extracts the 'callback' from the argument list
      * See {@link JavascriptExecutor#executeAsyncScript(java.lang.String, java.lang.Object...)} for details
      */
-    public Object executeAsyncScript(@Language("XPath") String script, Object... arguments)
+    public Object executeAsyncScript(@Language("JavaScript") String script, Object... arguments)
     {
         script = "var callback = arguments[arguments.length - 1];\n" + // See WebDriver documentation for details on injected callback
                 "try {" +
@@ -535,7 +558,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return ((JavascriptExecutor) getDriver()).executeAsyncScript(script, arguments);
     }
 
-    public <T> T executeAsyncScript(String script, Class<T> expectedResultType, Object... arguments)
+    public <T> T executeAsyncScript(@Language("JavaScript") String script, Class<T> expectedResultType, Object... arguments)
     {
         Object o = executeAsyncScript(script, arguments);
         if (o != null && !expectedResultType.isAssignableFrom(o.getClass()))
@@ -753,20 +776,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return (List<String>) executeScript(js);
     }
 
-    public String getCurrentRelativeURL()
-    {
-        return getCurrentRelativeURL(true);
-    }
-
     /**
      * Get the relative URL for the current page. The host, port, and context path are removed.
-     * Trailing '?' will be removed (optionally) to make comparisons more consistent when enabling the 'noQuestionMarkUrl' experimental feature.
-     * Leaving the trailing question mark can be useful when comparing to a URL generated by 'URLBuilder' because it
-     * knows about the experimental feature.
-     * @param stripTrailingQuestionMark false to leave it if it exists.
      * @return The relative URL or 'null' if the browser is not currently showing the server under test.
      */
-    public String getCurrentRelativeURL(boolean stripTrailingQuestionMark)
+    public String getCurrentRelativeURL()
     {
         URL url = getURL();
         String urlString = getDriver().getCurrentUrl();
@@ -781,18 +795,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
         {
             TestLogger.warn("Expected URL to begin with " + baseURL + ", but found " + urlString);
             return null;
-        }
-        if (stripTrailingQuestionMark)
-        {
-            // Strip '?' if no query
-            if (urlString.contains("#"))
-            {
-                urlString = urlString.replace("?#", "#");
-            }
-            else
-            {
-                urlString = StringUtils.stripEnd(urlString, "?");
-            }
         }
         return urlString.substring(baseURL.length());
     }
@@ -993,23 +995,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
             clickAdminMenuItem("Site", "Site Permissions");
     }
 
-    public void goToSiteDevelopers()
-    {
-        if (!isElementPresent(Locator.id("labkey-nav-trail-current-page").withText("Developers Group")))
-        {
-            clickAdminMenuItem("Site", "Site Developers");
-            waitForElement(Locator.name("names"));
-        }
-    }
-
-    public void goToSiteAdmins()
-    {
-        if (!isElementPresent(Locator.id("labkey-nav-trail-current-page").withText("Administrators Group")))
-        {
-            clickAdminMenuItem("Site", "Site Admins");
-        }
-    }
-
     public ManageViewsPage goToManageViews()
     {
         clickAdminMenuItem("Manage Views");
@@ -1097,11 +1082,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
         //IE and Firefox have different notions of empty.
         //IE returns html for all pages even empty text...
         String text = getHtmlSource();
-        if (null == text || text.trim().length() == 0)
+        if (null == text || text.trim().isEmpty())
             return true;
 
         text = getBodyText();
-        return null == text || text.trim().length() == 0;
+        return null == text || text.trim().isEmpty();
     }
 
     /**
@@ -1145,6 +1130,12 @@ public abstract class WebDriverWrapper implements WrapsDriver
                 return getDriver().getPageSource(); // probably viewing a tsv or text file
             }
         }
+    }
+
+    @Contract(pure = true)
+    public WebDriverWait quickWait()
+    {
+        return new WebDriverWait(getDriver(), Duration.ofSeconds(1));
     }
 
     @Contract(pure = true)
@@ -1210,12 +1201,32 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
         try
         {
-            if (relativeURL.length() == 0)
+            if (relativeURL.isEmpty())
                 logMessage = "Navigating to root";
             else
             {
                 relativeURL = "/" + relativeURL;
                 logMessage = "Navigating to " + relativeURL;
+            }
+
+            if (WebTestHelper.isUseContainerRelativeUrl())
+            {
+                try
+                {
+                    if (new Crawler.ControllerActionId(relativeURL).isControllerFirstUrl() && !_controllerFirstUrls.contains(url))
+                    {
+                        _controllerFirstUrls.add(url);
+                        RuntimeException ex = new RuntimeException("Controller-first url used: " + relativeURL);
+                        if (TestProperties.isControllerFirstUrlFatal())
+                            throw ex;
+                        else
+                            TestLogger.log().warn(ex.getMessage(), ex);
+                    }
+                }
+                catch (IllegalArgumentException e)
+                {
+                    TestLogger.warn("Unable to parse URL: " + relativeURL, e);
+                }
             }
 
             final String fullURL = WebTestHelper.getBaseURL() + relativeURL;
@@ -1224,6 +1235,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
             long elapsedTime = doAndWaitForPageToLoad(() -> {
                 try
                 {
+                    mouseOut();
                     getDriver().navigate().to(fullURL);
                 }
                 catch (TimeoutException ex)
@@ -1322,6 +1334,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return (String)executeScript("return LABKEY.container.id;");
     }
 
+    public String getCurrentContainer()
+    {
+        return (String)executeScript("return LABKEY.container.name;");
+    }
+
     public String getContainerId(String url)
     {
         pushLocation();
@@ -1373,6 +1390,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
     public String getDisplayName()
     {
         return whoAmI().getDisplayName();
+    }
+
+    public int getCurrentUserId()
+    {
+        return whoAmI().getUserId().intValue();
     }
 
     public String getCurrentDateTimeFormatString()
@@ -1631,31 +1653,27 @@ public abstract class WebDriverWrapper implements WrapsDriver
         fail("No errors found");
     }
 
-    public static String encodeText(String unencodedText)
-    {
-        return unencodedText
-                .replace("&", "&amp;")
-                .replace("<", "&lt;")
-                .replace(">", "&gt;");
-    }
-
+    /**
+     * Check whether all the specified text is present on the page
+     * @param texts un-encoded text to search for
+     * @return true if all the specified texts are present on the page
+     */
     public boolean isTextPresent(String... texts)
     {
-        final MutableBoolean present = new MutableBoolean(true);
+        return new TextSearcher(this).areAllTextsPresent(texts);
+    }
 
-        TextSearcher.TextHandler handler = (htmlSource, text) -> {
-            // Not found... stop enumerating and return false
-            if (htmlSource == null || !htmlSource.contains(text))
-                present.setFalse();
-
-            return present.getValue();
-        };
+    /**
+     * Check whether the HTML-encoded text is in the page source
+     * @param htmlFragments encoded html fragments to search for
+     * @return true if all the specified texts are present on the page
+     */
+    public boolean isHtmlPresent(String... htmlFragments)
+    {
         TextSearcher searcher = new TextSearcher(this);
-        searcher.setSearchTransformer(TextSearcher.TextTransformers.IDENTITY);
-        searcher.setSourceTransformer(TextSearcher.TextTransformers.IDENTITY);
-        searcher.searchForTexts(handler, Arrays.asList(texts));
+        searcher.setSearchTransformer(TextTransformers.IDENTITY);
 
-        return present.getValue();
+        return searcher.areAllTextsPresent(htmlFragments);
     }
 
     public List<String> getTextOrder(TextSearcher searcher, String... texts)
@@ -1676,11 +1694,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
                 .forEachOrdered((pair) -> orderedTexts.add(pair.getKey()));
 
         return orderedTexts;
-    }
-
-    public List<String> getMissingTexts(TextSearcher searcher, String... texts)
-    {
-        return searcher.getMissingTexts(Arrays.asList(texts));
     }
 
     public String getText(Locator elementLocator)
@@ -1711,7 +1724,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public void assertTextPresent(TextSearcher searcher, String... texts)
     {
-        List<String> missingTexts = getMissingTexts(searcher, texts);
+        List<String> missingTexts = searcher.getMissingTexts(texts);
 
         if (!missingTexts.isEmpty())
         {
@@ -1728,7 +1741,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         TextSearcher searcher = new TextSearcher(this);
 
-        searcher.setSearchTransformer((text) -> encodeText(text).toLowerCase());
+        searcher.setSearchTransformer(TextTransformers.ENCODE_HTML.andThen(String::toLowerCase));
 
         searcher.setSourceTransformer(String::toLowerCase);
 
@@ -1740,18 +1753,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
      */
     public boolean isAnyTextPresent(String... texts)
     {
-        final MutableBoolean found = new MutableBoolean(false);
-
-        TextSearcher.TextHandler handler = (htmlSource, text) -> {
-            if (htmlSource.contains(text))
-                found.setTrue();
-
-            return !found.getValue(); // stop searching if any value is found
-        };
-        TextSearcher searcher = new TextSearcher(this);
-        searcher.searchForTexts(handler, Arrays.asList(texts));
-
-        return found.getValue();
+        return new TextSearcher(this).isAnyTextPresent(texts);
     }
 
     /**
@@ -1911,7 +1913,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
     public void assertTextNotPresent(String... texts)
     {
         TextSearcher searcher = new TextSearcher(this);
-        searcher.setSearchTransformer((text) -> encodeText(text).replace("&nbsp;", " "));
+        searcher.setSearchTransformer(TextTransformers.ENCODE_HTML.andThen(t -> t.replace("&nbsp;", " ")));
 
         assertTextNotPresent(searcher, texts);
     }
@@ -2149,6 +2151,42 @@ public abstract class WebDriverWrapper implements WrapsDriver
         }
 
         return loadTimer.elapsed().toMillis();
+    }
+
+    public void doAndWaitForNewWindow(Runnable action)
+    {
+        Set<String> windows = getDriver().getWindowHandles();
+        action.run();
+        switchToWindow(windows.size());
+        waitForDocument();
+    }
+
+    public long doAndWaitForWindow(Runnable action, String windowName)
+    {
+        String initialWindow = getDriver().getWindowHandle();
+        AtomicBoolean targetWindowExists = new AtomicBoolean(false);
+        try
+        {
+            getDriver().switchTo().window(windowName);
+            targetWindowExists.set(true);
+        }
+        catch (NoSuchWindowException e)
+        {
+            targetWindowExists.set(false);
+        }
+
+        // Call doAndMaybeWaitForPageToLoad with target window in focus (if present)
+        // Then it will correctly detect the page load in that window
+        return doAndMaybeWaitForPageToLoad(10_000, () -> {
+            if (targetWindowExists.get())
+                getDriver().switchTo().window(initialWindow);
+
+            action.run();
+
+            new WebDriverWait(getDriver(), Duration.ofSeconds(5)).until(windowIsPresent(windowName));
+
+            return targetWindowExists.get();
+        });
     }
 
     public long doAndAcceptUnloadAlert(Runnable func, String partialAlertText)
@@ -2429,11 +2467,17 @@ public abstract class WebDriverWrapper implements WrapsDriver
                 },
                 "File(s) did not appear in download dir: " + downloadDir.toString(), WAIT_FOR_PAGE);
 
+        List<File> tempFiles = new ArrayList<>();
         waitFor(() -> {
                     final File[] files = downloadDir.listFiles(tempFilesFilter);
+                    tempFiles.clear();
+                    if (files != null)
+                    {
+                        tempFiles.addAll(Arrays.asList(files));
+                    }
                     return files != null && files.length == 0;
                 },
-                "Temp files remain in download dir: " + downloadDir, WAIT_FOR_PAGE);
+            () -> "Temp files remain in download dir: " + downloadDir + ": " + tempFiles.stream().map(File::getName).collect(Collectors.joining(", ")), WAIT_FOR_PAGE);
 
         MutableInt downloadSize = new MutableInt(-1);
         MutableInt stabilityDuration = new MutableInt(0);
@@ -2651,7 +2695,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public boolean isElementPresent(Locator loc)
     {
-        return loc.findElements(getDriver()).size() > 0;
+        return !loc.findElements(getDriver()).isEmpty();
     }
 
     public boolean isElementVisible(Locator loc)
@@ -2726,15 +2770,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
     }
 
     /**
-     * @deprecated Use {@link org.junit.Assert#assertEquals(String, Object, Object) and {@link #getFormElement(Locator)}}
-     */
-    @Deprecated
-    public void assertFormElementEquals(Locator loc, String value)
-    {
-        assertEquals(value, getFormElement(loc));
-    }
-
-    /**
      * @deprecated Use {@link org.junit.Assert#assertEquals(String, Object, Object)} and
      * {@link #getSelectedOptionText(Locator)}
      */
@@ -2753,6 +2788,12 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         Select select = new Select(el);
         return select.getFirstSelectedOption().getText();
+    }
+
+    public List<String> getSelectedOptionTexts(Locator loc)
+    {
+        Select select = new Select(loc.findElement(getDriver()));
+        return select.getAllSelectedOptions().stream().map(WebElement::getText).collect(Collectors.toList());
     }
 
     public String getSelectedOptionValue(Locator loc)
@@ -2966,17 +3007,16 @@ public abstract class WebDriverWrapper implements WrapsDriver
         try
         {
             scrollToTop();
-            WebElement root = Locators.documentRoot.findElement(getDriver());
-            final Dimension rootSize = root.getSize();
-            new Actions(getDriver()).moveToElement(root, - (rootSize.getWidth() / 2), - (rootSize.getHeight() / 2)).perform();
+            new Actions(getDriver()).moveToLocation(0, 0).perform();
         }
         catch (WebDriverException ignore) { }
     }
 
-    public void mouseOver(Locator l)
+    public WebElement mouseOver(Locator l)
     {
         WebElement el = l.findElement(getDriver());
         mouseOver(el);
+        return el;
     }
 
     public void mouseOver(WebElement el)
@@ -3430,7 +3470,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
      */
     public void setFormElement(WebElement el, String text)
     {
-        String inputType = el.getAttribute("type");
+        String inputType = el.getDomAttribute("type");
 
         if ("file".equals(inputType))
         {
@@ -3471,7 +3511,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         else if (text.length() < 1000 && !text.contains("\n") && !text.contains("\t"))
         {
             input.clear();
-            if (!waitFor(()-> getFormElement(input).length() == 0, 500))
+            if (!waitFor(()-> getFormElement(input).isEmpty(), 500))
             {
                 TestLogger.warn("Failed to clear input: " + input);
             }
@@ -3517,18 +3557,14 @@ public abstract class WebDriverWrapper implements WrapsDriver
     }
 
     /**
-     *  puts the specified text into the clipboard, then pastes it into the specified element,
+     *  puts the specified text and html into the clipboard, then pastes it into the specified element,
      *  or whatever has focus at the moment.
-     * @param input
-     * @param text
      */
-    public void actionPaste(WebElement input, String text)
+    public void actionPaste(WebElement input, String text, boolean isHtml)
     {
         Keys cmdKey = WebDriverUtils.MODIFIER_KEY;
 
-        Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
-        StringSelection sel = new StringSelection(text);
-        c.setContents(sel, sel);
+        setClipboardContent(text, isHtml);
 
         if (input == null)
         {
@@ -3547,6 +3583,103 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     .keyUp(cmdKey)
                     .perform();
         }
+    }
+
+    /**
+     *  puts the specified text into the clipboard, then pastes it into the specified element,
+     *  or whatever has focus at the moment.
+     */
+    public void actionPaste(WebElement input, String text)
+    {
+        actionPaste(input, text, false);
+    }
+
+    public void clearClipboardContent()
+    {
+        setClipboardContent(" ");
+    }
+
+    protected void setClipboardContent(String text, boolean isHtml)
+    {
+        Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
+        Transferable sel;
+
+        if (isHtml)
+        {
+            sel = new HtmlFragmentSelection(text);
+        }
+        else
+        {
+            sel = new StringSelection(text);
+        }
+
+        c.setContents(sel, null);
+    }
+
+    protected void setClipboardContent(String text)
+    {
+        setClipboardContent(text, false);
+    }
+
+    public String getClipboardContent() throws IOException, UnsupportedFlavorException
+    {
+        Transferable t = Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null);
+
+        if (t != null)
+        {
+            DataFlavor[] flavors = t.getTransferDataFlavors();
+
+            TestLogger.debug("Available clipboard flavors: " + Arrays.asList(flavors));
+            TestLogger.debug("Best clipboard flavor: " + DataFlavor.selectBestTextFlavor(flavors));
+
+            if (flavors.length > 0)
+            {
+                return (String) t.getTransferData(DataFlavor.selectBestTextFlavor(flavors));
+            }
+            else
+            {
+                // No available flavors, try pasting into a new input.
+                String value = doInNewTab(() -> {
+                    String inputId = "testClipboardInput";
+                    executeScript("""
+                        let input = document.createElement('input');
+                        input.id = arguments[0];
+                        document.getElementsByTagName('body')[0].appendChild(input);""", inputId);
+
+                    WebElement inputElement = Locator.id(inputId).findElement(getDriver());
+                    new Actions(getDriver())
+                        .keyDown(WebDriverUtils.MODIFIER_KEY)
+                        .sendKeys(inputElement, "v")
+                        .keyUp(WebDriverUtils.MODIFIER_KEY)
+                        .perform();
+
+                    return inputElement.getDomProperty("value");
+                });
+                if (StringUtils.isEmpty(value))
+                {
+                    throw new UnsupportedFlavorException(null);
+                }
+                return value;
+            }
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    @Nullable
+    public <T> T doInNewTab(Supplier<T> supplier)
+    {
+        String initialWindow = getDriver().getWindowHandle();
+        getDriver().switchTo().newWindow(WindowType.TAB);
+
+        T result = supplier.get();
+
+        getDriver().close();
+        getDriver().switchTo().window(initialWindow);
+
+        return result;
     }
 
     private static final List<String> html5InputTypes = Arrays.asList("color", "date", "datetime-local", "email", "month", "number", "range", "search", "tel", "time", "url", "week");

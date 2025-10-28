@@ -17,19 +17,23 @@
 package org.labkey.test.tests;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Data;
+import org.labkey.test.components.ChartTypeDialog;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldDefinition.ColumnType;
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
+import org.labkey.test.util.selenium.WebDriverUtils;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -39,6 +43,8 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.labkey.test.params.FieldDefinition.DOMAIN_TRICKY_CHARACTERS;
 
 @Category({Daily.class, Data.class})
@@ -139,10 +145,32 @@ public class DataRegionTest extends AbstractQWPTest
         clickAndWait(Locator.linkWithText(LIST_NAME));
         URL url = getURL();
         dataRegionTest(url, INJECT_CHARS_1);
-        dataRegionTest(url, INJECT_CHARS_2);
+        DataRegionTable dataRegionTable = dataRegionTest(url, INJECT_CHARS_2);
+        testOpenMenuItemInNewTab(dataRegionTable);
         exportLoggingTest();
 
         testQWPDemoPage();
+    }
+
+    /**
+     * Regression coverage for Issue 53629: NavMenu doesn't open in new tab correctly
+     */
+    private void testOpenMenuItemInNewTab(DataRegionTable dataRegionTable)
+    {
+        WebElement createChartMenuItem = dataRegionTable
+                .getReportMenu()
+                .openMenuTo("Create Chart");
+        doAndWaitForNewWindow(() ->
+                new Actions(getDriver())
+                        .keyDown(WebDriverUtils.MODIFIER_KEY)
+                        .click(createChartMenuItem)
+                        .perform());
+        ChartTypeDialog chartTypeDialog = new ChartTypeDialog(getDriver());
+        Assertions.assertThat(chartTypeDialog.getColumnList())
+                .as("List should be pre-selected for chart")
+                .containsExactlyInAnyOrder(LIST_KEY_NAME, NAME_COLUMN.getName(), HEX_COLUMN.getName());
+        getDriver().close();
+        switchToMainWindow();
     }
 
     @Override
@@ -186,7 +214,7 @@ public class DataRegionTest extends AbstractQWPTest
         _listHelper.uploadData(LIST_DATA);
     }
 
-    private void dataRegionTest(URL url, String dataRegionName) throws MalformedURLException
+    private DataRegionTable dataRegionTest(URL url, String dataRegionName) throws MalformedURLException
     {
         log("** Beginning test for dataRegionName: " + dataRegionName);
 
@@ -199,13 +227,13 @@ public class DataRegionTest extends AbstractQWPTest
         assertEquals(TOTAL_ROWS, table.getDataRowCount());
         assertEquals("aqua", table.getDataAsText(0, "Name"));
         assertEquals("#FFFF00", table.getDataAsText(15, "Hex"));
-        assertEquals(false, table.getPagingWidget().hasPagingButton(true));
-        assertEquals(false, table.getPagingWidget().hasPagingButton(false));
+        assertFalse(table.getPagingWidget().hasPagingButton(true));
+        assertFalse(table.getPagingWidget().hasPagingButton(false));
 
         log("Test 3 per page");
         table.setMaxRows(3);
-        assertEquals(true, table.getPagingWidget().hasPagingButton(true));
-        assertEquals(true, table.getPagingWidget().hasPagingButton(false));
+        assertTrue(table.getPagingWidget().hasPagingButton(true));
+        assertTrue(table.getPagingWidget().hasPagingButton(false));
         table.getPagingWidget().viewPagingOptions();
         assertElementPresent(Locator.linkWithText("3 per page").notHidden().append(Locator.tagWithClass("i", "fa-check-square-o")));
         assertElementPresent(Locator.linkWithText("20 per page").notHidden());
@@ -221,40 +249,40 @@ public class DataRegionTest extends AbstractQWPTest
         table.assertPaginationText(1, 5, 16);
         assertEquals(5, table.getDataRowCount());
         assertEquals("aqua", table.getDataAsText(0, "Name"));
-        assertEquals(false, table.getPagingWidget().menuOptionEnabled("Show first", "Show first"));
-        assertEquals(true, table.getPagingWidget().menuOptionEnabled("Show last", "Show last"));
-        assertEquals(false, table.getPagingWidget().pagingButtonEnabled(true));
-        assertEquals(true, table.getPagingWidget().pagingButtonEnabled(false));
+        assertFalse(table.getPagingWidget().menuOptionEnabled("Show first", "Show first"));
+        assertTrue(table.getPagingWidget().menuOptionEnabled("Show last", "Show last"));
+        assertFalse(table.getPagingWidget().pagingButtonEnabled(true));
+        assertTrue(table.getPagingWidget().pagingButtonEnabled(false));
 
         log("Next Page");
         table.pageNext();
         table.assertPaginationText(6, 10, 16);
         assertEquals(5, table.getDataRowCount());
         assertEquals("grey", table.getDataAsText(0, "Name"));
-        assertEquals(true, table.getPagingWidget().menuOptionEnabled("Show first", "Show first"));
-        assertEquals(true, table.getPagingWidget().menuOptionEnabled("Show last", "Show last"));
-        assertEquals(true, table.getPagingWidget().pagingButtonEnabled(true));
-        assertEquals(true, table.getPagingWidget().pagingButtonEnabled(false));
+        assertTrue(table.getPagingWidget().menuOptionEnabled("Show first", "Show first"));
+        assertTrue(table.getPagingWidget().menuOptionEnabled("Show last", "Show last"));
+        assertTrue(table.getPagingWidget().pagingButtonEnabled(true));
+        assertTrue(table.getPagingWidget().pagingButtonEnabled(false));
 
         log("Last Page");
         table.pageLast();
         table.assertPaginationText(16, 16, 16);
         assertEquals(1, table.getDataRowCount());
         assertEquals("yellow", table.getDataAsText(0, "Name"));
-        assertEquals(true, table.getPagingWidget().menuOptionEnabled("Show first", "Show first"));
-        assertEquals(false, table.getPagingWidget().menuOptionEnabled("Show last", "Show last"));
-        assertEquals(true, table.getPagingWidget().pagingButtonEnabled(true));
-        assertEquals(false, table.getPagingWidget().pagingButtonEnabled(false));
+        assertTrue(table.getPagingWidget().menuOptionEnabled("Show first", "Show first"));
+        assertFalse(table.getPagingWidget().menuOptionEnabled("Show last", "Show last"));
+        assertTrue(table.getPagingWidget().pagingButtonEnabled(true));
+        assertFalse(table.getPagingWidget().pagingButtonEnabled(false));
 
         log("Previous Page");
         table.pagePrev();
         table.assertPaginationText(11, 15, 16);
         assertEquals(5, table.getDataRowCount());
         assertEquals("purple", table.getDataAsText(0, "Name"));
-        assertEquals(true, table.getPagingWidget().menuOptionEnabled("Show first", "Show first"));
-        assertEquals(true, table.getPagingWidget().menuOptionEnabled("Show last", "Show last"));
-        assertEquals(true, table.getPagingWidget().pagingButtonEnabled(true));
-        assertEquals(true, table.getPagingWidget().pagingButtonEnabled(false));
+        assertTrue(table.getPagingWidget().menuOptionEnabled("Show first", "Show first"));
+        assertTrue(table.getPagingWidget().menuOptionEnabled("Show last", "Show last"));
+        assertTrue(table.getPagingWidget().pagingButtonEnabled(true));
+        assertTrue(table.getPagingWidget().pagingButtonEnabled(false));
 
         log("Setting a filter should go back to first page");
         table.setFilter(NAME_COLUMN.getName(), "Does Not Equal", "aqua");
@@ -266,7 +294,7 @@ public class DataRegionTest extends AbstractQWPTest
         Locator.XPathLocator selectionPart = Locator.tagWithAttribute("div", "data-msgpart", "selection");
         waitForElement(selectionPart);
         WebElement msgDiv = selectionPart.findElement(getDriver());
-        assertEquals(true, msgDiv.getText().contains("Selected 5 of 15 rows."));
+        assertTrue(msgDiv.getText().contains("Selected 5 of 15 rows."));
 
         assertElementPresent(selectionPart.append(Locator.tagWithClass("span", "select-all")));
         assertElementPresent(selectionPart.append(Locator.tagWithClass("span", "select-none")));
@@ -277,14 +305,16 @@ public class DataRegionTest extends AbstractQWPTest
         clickAndWait(selectionPart.append(Locator.tagWithClass("span", "show-selected")));
         assertEquals(5, table.getDataRowCount());
 
-        table.showAll();
+        table.rowSelector().showAll();
         assertEquals(15, table.getDataRowCount());
+
+        return table;
     }
 
     private void enableComplianceIfInstalled()
     {
         // Make sure it works with Compliance on (which enables Elec Sign control)
-        // Have to do what enableModule does in order to check if it's installed
+        // Have to do what enableModule does to check if it's installed
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Folder Type"));
 

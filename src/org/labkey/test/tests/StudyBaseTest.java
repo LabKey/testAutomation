@@ -31,6 +31,7 @@ import org.labkey.test.pages.compliance.FolderManagementComplianceTab;
 import org.labkey.test.params.FieldDefinition.PhiSelectType;
 import org.labkey.test.util.APITestHelper;
 import org.labkey.test.util.ApiPermissionsHelper;
+import org.labkey.test.util.AuditLogHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.StudyHelper;
@@ -72,6 +73,8 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
     {
         new SpecimenHelper(this).setupRequestStatuses();
     }
+
+    protected final AuditLogHelper _auditLogHelper = new AuditLogHelper(this);
 
     @Override
     public List<String> getAssociatedModules()

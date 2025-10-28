@@ -17,11 +17,12 @@ package org.labkey.test.util;
 
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.components.assay.AssayConstants;
 
 public class AssayImporter
 {
-    private BaseWebDriverTest test;
-    private AssayImportOptions options;
+    private final BaseWebDriverTest test;
+    private final AssayImportOptions options;
 
     public AssayImporter(BaseWebDriverTest test, AssayImportOptions options)
     {
@@ -41,30 +42,30 @@ public class AssayImporter
         {
             if (options.getVisitResolver() == AssayImportOptions.VisitResolverType.SpecimenIDParticipantVisit)
             {
-                test.checkRadioButton(Locator.radioButtonByNameAndValue("participantVisitResolver", AssayImportOptions.VisitResolverType.SpecimenID.name()));
+                test.checkRadioButton(Locator.radioButtonByNameAndValue(AssayConstants.PARTICIPANT_VISIT_RESOLVER_FIELD_NAME, AssayImportOptions.VisitResolverType.SpecimenID.name()));
                 Locator checkBox = Locator.checkboxByName("includeParticipantAndVisit");
                 test.waitForElement(checkBox);
                 test.checkCheckbox(checkBox);
             }
             else
-                test.checkRadioButton(Locator.radioButtonByNameAndValue("participantVisitResolver", options.getVisitResolver().name()));
+                test.checkRadioButton(Locator.radioButtonByNameAndValue(AssayConstants.PARTICIPANT_VISIT_RESOLVER_FIELD_NAME, options.getVisitResolver().name()));
         }
         else
         {
             switch (options.getVisitResolver())
             {
                 case LookupList:
-                    test.assertChecked(Locator.radioButtonByNameAndValue("ThawListType", "List"));
+                    test.assertChecked(Locator.radioButtonByNameAndValue(AssayConstants.THAW_LIST_TYPE_FIELD_NAME, "List"));
                     test.waitForFormElementToNotEqual(Locator.name("ThawListList-QueryName"), "");
                     break;
                 case LookupText:
-                    test.assertChecked(Locator.radioButtonByNameAndValue("ThawListType", "Text"));
+                    test.assertChecked(Locator.radioButtonByNameAndValue(AssayConstants.THAW_LIST_TYPE_FIELD_NAME, "Text"));
                     break;
                 case SpecimenIDParticipantVisit:
-                    test.assertChecked(Locator.radioButtonByNameAndValue("participantVisitResolver", AssayImportOptions.VisitResolverType.SpecimenID.name()));
+                    test.assertChecked(Locator.radioButtonByNameAndValue(AssayConstants.PARTICIPANT_VISIT_RESOLVER_FIELD_NAME, AssayImportOptions.VisitResolverType.SpecimenID.name()));
                     break;
                 default:
-                    test.assertChecked(Locator.radioButtonByNameAndValue("participantVisitResolver", options.getVisitResolver().name()));
+                    test.assertChecked(Locator.radioButtonByNameAndValue(AssayConstants.PARTICIPANT_VISIT_RESOLVER_FIELD_NAME, options.getVisitResolver().name()));
             }
         }
 
@@ -77,57 +78,57 @@ public class AssayImporter
         test.clickButton("Next");
 
         if (options.getAssayId() != null)
-            test.setFormElement(Locator.name("name"), options.getAssayId());
+            test.setFormElement(AssayConstants.ASSAY_NAME_FIELD_LOCATOR, options.getAssayId());
 
-        test.setFormElement(Locator.name("cutoff1"), options.getCutoff1());
+        test.setFormElement(Locator.name("Cutoff1"), options.getCutoff1());
         if (options.getCutoff2() != null)
-            test.setFormElement(Locator.name("cutoff2"), options.getCutoff2());
+            test.setFormElement(Locator.name("Cutoff2"), options.getCutoff2());
         if (options.getCutoff3() != null)
-            test.setFormElement(Locator.name("cutoff3"), options.getCutoff3());
+            test.setFormElement(Locator.name("Cutoff3"), options.getCutoff3());
 
         if (options.getVirusName() != null)
-            test.setFormElement(Locator.name("virusName"), options.getVirusName());
+            test.setFormElement(Locator.name("VirusName"), options.getVirusName());
         if (options.getVirusId() != null)
-            test.setFormElement(Locator.name("virusID"), options.getVirusId());
+            test.setFormElement(Locator.name("VirusID"), options.getVirusId());
 
-        test.selectOptionByText(Locator.name("curveFitMethod"), options.getCurveFitMethod());
+        test.selectOptionByText(Locator.name("CurveFitMethod"), options.getCurveFitMethod());
 
         if (options.getMetadataFile() == null)
         {
             // populate the sample well group information
             for (int i = 0; i < options.getPtids().length; i++)
             {
-                test.setFormElement(Locator.name("specimen" + (i + 1) + "_ParticipantID"), options.getPtids()[i]);
+                test.setFormElement(Locator.name("Specimen " + (i + 1) + "_ParticipantID"), options.getPtids()[i]);
             }
 
             for (int i = 0; i < options.getVisits().length; i++)
             {
-                test.setFormElement(Locator.name("specimen" + (i + 1) + "_VisitID"), options.getVisits()[i]);
+                test.setFormElement(Locator.name("Specimen " + (i + 1) + "_VisitID"), options.getVisits()[i]);
             }
 
             for (int i = 0; i < options.getInitialDilutions().length; i++)
             {
-                test.setFormElement(Locator.name("specimen" + (i + 1) + "_InitialDilution"), options.getInitialDilutions()[i]);
+                test.setFormElement(Locator.name("Specimen " + (i + 1) + "_InitialDilution"), options.getInitialDilutions()[i]);
             }
 
             for (int i = 0; i < options.getDilutionFactors().length; i++)
             {
-                test.setFormElement(Locator.name("specimen" + (i + 1) + "_Factor"), options.getDilutionFactors()[i]);
+                test.setFormElement(Locator.name("Specimen " + (i + 1) + "_Factor"), options.getDilutionFactors()[i]);
             }
 
             for (int i = 0; i < options.getMethods().length; i++)
             {
-                test.selectOptionByText(Locator.name("specimen" + (i + 1) + "_Method"), options.getMethods()[i]);
+                test.selectOptionByText(Locator.name("Specimen " + (i + 1) + "_Method"), options.getMethods()[i]);
             }
 
             for (int i = 0; i < options.getDates().length; i++)
             {
-                test.setFormElement(Locator.name("specimen" + (i + 1) + "_Date"), options.getDates()[i]);
+                test.setFormElement(Locator.name("Specimen " + (i + 1) + "_Date"), options.getDates()[i]);
             }
 
             for (int i = 0; i < options.getSampleIds().length; i++)
             {
-                test.setFormElement(Locator.name("specimen" + (i + 1) + "_SpecimenID"), options.getSampleIds()[i]);
+                test.setFormElement(Locator.name("Specimen " + (i + 1) + "_SpecimenID"), options.getSampleIds()[i]);
             }
         }
         else

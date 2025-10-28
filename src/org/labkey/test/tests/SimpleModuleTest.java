@@ -15,9 +15,12 @@
  */
 package org.labkey.test.tests;
 
-import org.apache.commons.text.similarity.LevenshteinDistance;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.hc.core5.http.HttpStatus;
+import org.assertj.core.api.Assertions;
+import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.Nullable;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -29,7 +32,7 @@ import org.labkey.remoteapi.query.DeleteRowsCommand;
 import org.labkey.remoteapi.query.InsertRowsCommand;
 import org.labkey.remoteapi.query.Row;
 import org.labkey.remoteapi.query.RowMap;
-import org.labkey.remoteapi.query.SaveRowsResponse;
+import org.labkey.remoteapi.query.RowsResponse;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.remoteapi.query.UpdateRowsCommand;
@@ -48,16 +51,20 @@ import org.labkey.test.components.html.SiteNavBar;
 import org.labkey.test.pages.core.admin.BaseSettingsPage;
 import org.labkey.test.pages.core.admin.LookAndFeelSettingsPage;
 import org.labkey.test.pages.core.admin.ProjectSettingsPage;
+import org.labkey.test.pages.query.ExecuteQueryPage;
 import org.labkey.test.pages.study.DatasetDesignerPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.list.IntListDefinition;
 import org.labkey.test.params.list.ListDefinition;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.LabKeyExpectedConditions;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelper;
+import org.labkey.test.util.SimpleHttpRequest;
+import org.labkey.test.util.TestLogger;
 import org.labkey.test.util.WikiHelper;
 import org.labkey.test.util.ext4cmp.Ext4FieldRef;
 import org.openqa.selenium.By;
@@ -76,6 +83,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -83,6 +92,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.labkey.test.TestFileUtils.getDefaultFileRoot;
+import static org.labkey.test.WebTestHelper.buildURL;
+import static org.labkey.test.util.PermissionsHelper.FOLDER_ADMIN_ROLE;
+import static org.labkey.test.util.PermissionsHelper.READER_ROLE;
 
 /**
 * Tests the simple module and file-based resources introduced in version 9.1
@@ -202,10 +214,10 @@ public class SimpleModuleTest extends BaseWebDriverTest
     @LogMethod
     public static void initTest()
     {
-        SimpleModuleTest init = (SimpleModuleTest) getCurrentTest();
+        SimpleModuleTest init = getCurrentTest();
         init.doSetup();
     }
-    
+
     protected void doSetup()
     {
         assertModuleDeployed(MODULE_NAME);
@@ -228,8 +240,6 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
         goToProjectHome();
         portalHelper.addWebPart("Data Views");
-        for (int i = 0; i < 5; i ++)
-            portalHelper.moveWebPart("Data Views", PortalHelper.Direction.UP);
 
         ProjectSettingsPage projectSettingsPage = goToProjectSettings();
         projectSettingsPage.setDefaultDateTimeDisplayInherited(false);
@@ -366,7 +376,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         Map<String, Object> rowMapM = new HashMap<>();
         rowMapM.put("Name", "TestManufacturer");
         insertCmdM.addRow(rowMapM);
-        SaveRowsResponse respM = insertCmdM.execute(createDefaultConnection(), getProjectName());
+        RowsResponse respM = insertCmdM.execute(createDefaultConnection(), getProjectName());
         Object manufacturerId = respM.getRows().get(0).get("RowId");
 
         //This table has one validator defined in the schema XML and one in query XML.  First do insert that should fail schema validator:
@@ -394,7 +404,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         rowMap.put("ManufacturerId", manufacturerId);
         rowMap.put("InitialReleaseYear", 2000);
         insertCmd.addRow(rowMap);
-        SaveRowsResponse resp = insertCmd.execute(createDefaultConnection(), getProjectName());
+        RowsResponse resp = insertCmd.execute(createDefaultConnection(), getProjectName());
         Object rowId = resp.getRows().get(0).get("RowId");
 
         //now try to update it:
@@ -436,7 +446,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         deleteCmd.execute(createDefaultConnection(), getProjectName());
     }
 
-    private void submitAndTestExpectedFailure(Command cmd, String expectedError) throws Exception
+    private void submitAndTestExpectedFailure(Command<?, ?> cmd, String expectedError) throws Exception
     {
         try
         {
@@ -461,12 +471,14 @@ public class SimpleModuleTest extends BaseWebDriverTest
     @LogMethod
     private void doTestCustomFolder()
     {
-        clickProject(getProjectName());
+        goToProjectHome();
         PortalHelper portalHelper = new PortalHelper(this);
 
         assertTextPresentInThisOrder("A customized web part", "Data Pipeline", "Experiment Runs", "Sample Type", "Assay List");
         assertTextPresent("Run Groups");
         assertElementNotPresent(Locator.linkWithText("Create Run Group")); // Not in small Run Groups web-part.
+        // ensure the mouse isn't inadvertently hovering something else, causing obscuring popup
+        mouseOver(Locator.tagWithClass("a", "brand-logo"));
         portalHelper.checkWebpartPermission("A customized web part", "Read", null);
         portalHelper.checkWebpartPermission("Data Pipeline", "Read", null);
     }
@@ -475,7 +487,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
     private void doTestSchemas() throws Exception
     {
         log("** Testing schemas in modules...");
-        beginAt("/query/" + getProjectName() + "/begin.view?schemaName=" + VEHICLE_SCHEMA);
+        beginAt(buildURL("query", getProjectName(), "begin", Map.of("schemaName", VEHICLE_SCHEMA)));
 
         Connection cn = WebTestHelper.getRemoteApiConnection();
 
@@ -486,7 +498,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
                 Maps.of("Name", "Toyota"),
                 Maps.of("Name", "Honda")
         ));
-        SaveRowsResponse insertResp = insertCmd.execute(cn, getProjectName());
+        RowsResponse insertResp = insertCmd.execute(cn, getProjectName());
         assertEquals("Expected to insert 3 rows.", 3, insertResp.getRowsAffected().intValue());
 
         Integer fordId = null;
@@ -591,13 +603,15 @@ public class SimpleModuleTest extends BaseWebDriverTest
         updateCmd.execute(cn, getProjectName());
 
         log("** Testing vehicle.Manufacturers default queryDetailsRow.view url link...");
-        beginAt("/query/" + getProjectName() + "/executeQuery.view?schemaName=" + VEHICLE_SCHEMA + "&query.queryName=Manufacturers&query.Name~eq=Toyota");
+        ExecuteQueryPage.getPageFactory(VEHICLE_SCHEMA, "Manufacturers")
+                .addParameter("query.Name~eq", "Toyota")
+                .navigate(this, getProjectName());
         DataRegionTable table = new DataRegionTable("query", getDriver());
         clickAndWait(table.detailsLink(0));
         assertTextPresent("Name", "Toyota");
 
         log("** Testing vehicle.Model RowId url link...");
-        beginAt(getProjectName() + "/query-begin.view");
+        beginAt(buildURL("query", getProjectName(), "begin"));
         viewQueryData(VEHICLE_SCHEMA, "Models");
         clickAndWait(Locator.linkWithText("Prius"));
         assertTextPresent("Hooray!");
@@ -607,7 +621,9 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
 
         log("** Testing url expression null behavior for null InitialReleaseYear...");
-        beginAt("/query/" + getProjectName() + "/executeQuery.view?schemaName=vehicle&query.queryName=Models&query.InitialReleaseYear~isblank=");
+        ExecuteQueryPage.getPageFactory("vehicle", "Models")
+                .addParameter("query.InitialReleaseYear~isblank", "")
+                .navigate(this, getProjectName());
         DataRegionTable modelsGrid = new DataRegionTable("query", this);
 
         // URLs with a bad (missing) column should result in no URL being rendered
@@ -639,7 +655,9 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
 
         log("** Testing url expression null behavior for non-null InitialReleaseYear...");
-        beginAt("/query/" + getProjectName() + "/executeQuery.view?schemaName=vehicle&query.queryName=Models&query.InitialReleaseYear~isnonblank=");
+        ExecuteQueryPage.getPageFactory("vehicle", "Models")
+                .addParameter("query.InitialReleaseYear~isnonblank", "")
+                .navigate(this, getProjectName());
         modelsGrid = new DataRegionTable("query", this);
 
         href = modelsGrid.getHref(0, "urlNullableColumnWithDefaultBehavior");
@@ -723,7 +741,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         ));
         try
         {
-            SaveRowsResponse updateRows = updateCmd.execute(cn, getProjectName() + "/" + FOLDER_NAME);
+            updateCmd.execute(cn, getProjectName() + "/" + FOLDER_NAME);
             fail("Expected to throw CommandException");
         }
         catch (CommandException ex)
@@ -735,7 +753,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         // Make sure that the schema isn't resolved if the module is not enabled in the container
         try
         {
-            SaveRowsResponse updateRows = updateCmd.execute(cn, "Shared");
+            updateCmd.execute(cn, "Shared");
             fail("Expected to throw CommandException");
         }
         catch (CommandException ex)
@@ -744,13 +762,13 @@ public class SimpleModuleTest extends BaseWebDriverTest
         }
 
         log("** Updating vehicles...");
-        SaveRowsResponse updateRows = updateCmd.execute(cn, getProjectName());
+        RowsResponse updateRows = updateCmd.execute(cn, getProjectName());
         assertEquals("Expected to update 1 row.", 1, updateRows.getRowsAffected().intValue());
         assertEquals(4, ((Number) (updateRows.getRows().get(0).get("Milage"))).intValue());
 
 
         log("** Testing vehicle.Vehicles details url link...");
-        beginAt("/query/" + getProjectName() + "/schema.view?schemaName=" + VEHICLE_SCHEMA);
+        beginAt(buildURL("query", getProjectName(), "schema", Map.of("schemaName", VEHICLE_SCHEMA)));
         viewQueryData(VEHICLE_SCHEMA, "Vehicles");
         DataRegionTable vehicles = new DataRegionTable("query", getDriver());
         clickAndWait(vehicles.detailsLink(0));
@@ -807,7 +825,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         try
         {
             log("** Trying to delete Vehicles from a different container");
-            SaveRowsResponse deleteResp = deleteCmd.execute(cn, getProjectName() + "/" + FOLDER_NAME);
+            deleteCmd.execute(cn, getProjectName() + "/" + FOLDER_NAME);
             fail("Expected to throw CommandException");
         }
         catch (CommandException ex)
@@ -843,7 +861,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
             Locator popup = Locator.tag("div").withAttribute("id", "helpDiv").descendant("img").withAttributeContaining("src", popupImage).
                     withAttributeContaining("style", popupWidth != null ? "width:" + popupWidth : "max-width:300px");
             shortWait().until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("#helpDiv")));
-            String src = popup.findElement(getDriver()).getAttribute("src");
+            String src = StringUtils.trimToEmpty(popup.findElement(getDriver()).getDomProperty("src"));
 
             fireEvent(thumbnail, SeleniumEvent.mouseout);
             Locator.tagWithClass("th", "labkey-selectors").findElement(getDriver()).click(); // safe out-click in the first header cell
@@ -855,34 +873,34 @@ public class SimpleModuleTest extends BaseWebDriverTest
         else
         {
             Locator popup = Locator.tag("div").withAttribute("id", "helpDiv").descendant("img").withAttributeContaining("src", popupImage);
-            assertTrue("Popup should not be present", !popup.existsIn(getDriver()));
+            assertFalse("Popup should not be present", popup.existsIn(getDriver()));
         }
     }
 
     @LogMethod
     private void doTestViewEditing()
     {
-        beginAt("/" + getProjectName() + "/query-executeQuery.view?schemaName=" + VEHICLE_SCHEMA + "&query.queryName=Vehicles");
+        ExecuteQueryPage page = ExecuteQueryPage.beginAt(this, getProjectName(), VEHICLE_SCHEMA, "Vehicles");
 
-        DataRegionTable dr = new DataRegionTable("query", this);
+        DataRegionTable dr = page.getDataRegion();
 
         log("** Try to edit file-based default view");
-        _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.removeColumn("Color");
-        CustomizeView.SaveWindow saveWindow = _customizeViewsHelper.clickSave();
+        CustomizeView customizeView = dr.openCustomizeGrid();
+        customizeView.removeColumn("Color");
+        CustomizeView.SaveWindow saveWindow = customizeView.clickSave();
         assertFalse("should not be able to select default view", saveWindow.defaultViewRadio.isEnabled());
         saveWindow.cancel();
 
         dr.goToView("EditableFileBasedView");
 
         log("** Try to edit overridable file-based view");
-        _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.addColumn("Color");
-        saveWindow = _customizeViewsHelper.clickSave();
+        customizeView = dr.openCustomizeGrid();
+        customizeView.addColumn("Color");
+        saveWindow = customizeView.clickSave();
 
         assertTrue("should be able to select default view", saveWindow.defaultViewRadio.isEnabled());
         saveWindow.defaultViewRadio.check();
-        Window saveError = saveWindow.saveError();
+        Window<?> saveError = saveWindow.saveError();
         saveError.clickButton("OK", 0);
         saveError.waitForClose();
 
@@ -1002,10 +1020,8 @@ public class SimpleModuleTest extends BaseWebDriverTest
                     Object value = convertedRow.getValue(keyField);
                     newRow.put(keyField, value);
 
-                    List<Map<String, Object>> rows = rowsByContainer.get(container);
-                    if (rows == null)
-                        rowsByContainer.put(container, rows = new ArrayList<>());
-                    rows.add(newRow);
+                    rowsByContainer.computeIfAbsent(container, k -> new ArrayList<>())
+                            .add(newRow);
                 }
 
                 for (String container : rowsByContainer.keySet())
@@ -1017,7 +1033,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
                     deleteCmd.setRows(rows);
                     deleteCmd.execute(cn, c);
                 }
-                
+
                 assertEquals("Expected no rows remaining", 0, selectCmd.execute(cn, "Home").getRowCount().intValue());
             }
         }
@@ -1026,8 +1042,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
             // Don't log project not found error
             if (e.getStatusCode() != 404)
             {
-                log("** Error during cleanupTable:");
-                e.printStackTrace(System.out);
+                TestLogger.info("** Error during cleanupTable:", e);
             }
         }
     }
@@ -1050,7 +1065,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
     {
         log("Testing web parts in modules...");
         //go to project portal
-        clickProject(getProjectName());
+        goToProjectHome();
 
         //add Simple Module Web Part
         new PortalHelper(this).addWebPart("Simple Module Web Part");
@@ -1064,7 +1079,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
     protected void createList() throws Exception
     {
         //create a list for our query
-        clickProject(getProjectName());
+        goToProjectHome();
         new PortalHelper(this).addWebPart("Lists");
 
         log("Creating list for query/view/report test...");
@@ -1074,14 +1089,10 @@ public class SimpleModuleTest extends BaseWebDriverTest
                 new FieldDefinition("Age", FieldDefinition.ColumnType.Integer).setDescription("Age"),
                 new FieldDefinition("Crazy", FieldDefinition.ColumnType.Boolean).setDescription("Crazy?")
         ));
-        listDef.create(createDefaultConnection(), getProjectName());
-
-        log("Importing some data...");
-        goToManageLists();
-        _listHelper.goToList(LIST_NAME);
-        _listHelper.clickImportData()
-                .setText(LIST_DATA)
-                .submit();
+        Connection connection = createDefaultConnection();
+        listDef.create(connection, getProjectName())
+                .getQueryHelper(connection)
+                .importData(LIST_DATA);
     }
 
     @LogMethod
@@ -1090,7 +1101,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         log("Testing queries in modules...");
 
         //go to query module portal
-        clickProject(getProjectName());
+        goToProjectHome();
         goToModule("Query");
         viewQueryData("lists", "TestQuery");
 
@@ -1102,7 +1113,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
     private void doTestQueryViews()
     {
         log("Testing module-based custom query views...");
-        clickProject(getProjectName());
+        goToProjectHome();
         clickAndWait(Locator.linkWithText(LIST_NAME));
 
         DataRegionTable table = new DataRegionTable("query", getDriver());
@@ -1125,7 +1136,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
     }
 
     @LogMethod
-    private void doTestReports()
+    private void doTestReports() throws IOException
     {
         RReportHelper _rReportHelper = new RReportHelper(this);
         WikiHelper wikiHelper = new WikiHelper(this);
@@ -1133,13 +1144,13 @@ public class SimpleModuleTest extends BaseWebDriverTest
         _rReportHelper.ensureRConfig();
 
         log("Testing module-based JS reports...");
-        clickProject(getProjectName());
+        goToProjectHome();
         clickAndWait(Locator.linkWithText(LIST_NAME));
         DataRegionTable table = new DataRegionTable("query", getDriver());
         table.goToReport("Want To Be Cool");
         waitForText(WAIT_FOR_JAVASCRIPT, "Less cool than expected. Loaded dependent scripts.");
 
-        clickProject(getProjectName());
+        goToProjectHome();
         portalHelper.addWebPart("Report");
         setFormElement(Locator.name("title"), "Report Tester Part");
         selectOptionByValue(Locator.name("reportId"), "module:simpletest/reports/schemas/lists/People/Less Cool JS Report.js");
@@ -1177,7 +1188,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
     }
 
     @LogMethod
-    private void doTestReportThumbnails()
+    private void doTestReportThumbnails() throws IOException
     {
         goToProjectHome();
         log("Verify custom module report thumbnail images");
@@ -1187,61 +1198,59 @@ public class SimpleModuleTest extends BaseWebDriverTest
     }
 
     @LogMethod
-    private void doTestReportIcon()
+    private void doTestReportIcon() throws IOException
     {
         log("Verify custom module report icon image");
         setFormElement(Locator.xpath("//table[contains(@class, 'dataset-search')]//input"), KNITR_PEOPLE);
         waitForElementToDisappear(Locator.tag("tr").withClass("x4-grid-row").containing(WANT_TO_BE_COOL).notHidden());
 
         File expectedIconFile = TestFileUtils.getSampleData(THUMBNAIL_FOLDER + KNITR_PEOPLE + ICON_FILENAME);
-        String expectedIcon = TestFileUtils.getFileContents(expectedIconFile);
 
-        String iconStyle = waitForElement(Locator.tag("img").withClass("dataview-icon").withoutClass("x4-tree-icon-parent").notHidden()).getAttribute("style");
-        assertTrue("Module report icon style is not as expected", iconStyle.indexOf("background-image") == 0);
-        String iconSrc = iconStyle.replace("background-image:url(\"", "").replace("background-image: url(\"", "").replace("\");", "");
+        WebElement img = waitForElement(Locator.tag("img").withClass("dataview-icon").withoutClass("x4-tree-icon-parent").notHidden());
+        String backgroundImage = StringUtils.trimToEmpty(img.getCssValue("background-image"));
+        Matcher matcher = Pattern.compile("^url\\(\"(.+)\"\\)$").matcher(backgroundImage);
+        if (!matcher.find())
+        {
+            Assert.fail("Module report icon style is not as expected: " + img.getDomAttribute("style"));
+        }
+        String iconUrl = matcher.group(1);
+        File downloadedIcon = new SimpleHttpRequest(iconUrl).getResponseAsFile(TestFileUtils.ensureTestTempFile(KNITR_PEOPLE + ICON_FILENAME));
 
-        String portPortion = 80 == WebTestHelper.getWebPort() ? "" : ":" + WebTestHelper.getWebPort();
-        String protocol = WebTestHelper.getTargetServer() + portPortion;
-        String iconData = WebTestHelper.getHttpResponse(protocol + iconSrc).getResponseBody();
-
-        int lengthToCompare = 3000;
-        int diff = new LevenshteinDistance().apply(expectedIcon.substring(0, lengthToCompare), iconData.substring(0, lengthToCompare));
-        assertTrue("Module report icon is not as expected, diff is " + diff, expectedIcon.equals(iconData) ||
-                diff  <= lengthToCompare * 0.03); // Might be slightly different due to indentations, etc
+        Assertions.assertThat(downloadedIcon).as("Module report icon is not as expected")
+                .hasSameBinaryContentAs(expectedIconFile);
     }
 
     @LogMethod
     private void doTestReportCreatedDate()
     {
         log("Verify module report \"created\" date");
-        click(Locator.tag("span").withClass("fa-list-ul").notHidden());
+        WebElement detailsLink = Locator.tag("span").withClass("fa-list-ul").notHidden().findElement(getDriver());
+        doAndWaitForPageToLoad(() -> shortWait().until(LabKeyExpectedConditions.clickUntilStale(detailsLink)));
         waitForText("August 01 2015");
     }
 
     @LogMethod
-    private void verifyReportThumbnail(@LoggedParam String reportTitle)
+    private void verifyReportThumbnail(@LoggedParam String reportTitle) throws IOException
     {
         File expectedThumbnailFile = TestFileUtils.getSampleData(THUMBNAIL_FOLDER + reportTitle + THUMBNAIL_FILENAME);
-        String expectedThumbnail = TestFileUtils.getFileContents(expectedThumbnailFile);
 
         WebElement reportLink = waitForElement(Locator.xpath("//a[text()='" + reportTitle + "']"));
         mouseOver(reportLink);
         WebElement thumbnail = waitForElement(Locator.xpath("//div[@class='thumbnail']/img").notHidden());
-        String thumbnailData = WebTestHelper.getHttpResponse(thumbnail.getAttribute("src")).getResponseBody();
+        File downloadedThumbnail = new SimpleHttpRequest(thumbnail.getDomProperty("src"))
+                .getResponseAsFile(TestFileUtils.ensureTestTempFile(reportTitle + THUMBNAIL_FILENAME));
 
-        int lengthToCompare = 5000;
-        int diff = new LevenshteinDistance().apply(expectedThumbnail.substring(0, lengthToCompare), thumbnailData.substring(0, lengthToCompare));
-        assertTrue("Module report thumbnail is not as expected, diff is " + diff, expectedThumbnail.equals(thumbnailData) ||
-                diff  <= lengthToCompare * 0.03); // Might be slightly different due to indentations, etc
+        Assertions.assertThat(downloadedThumbnail).as("Module report thumbnail is not as expected")
+                .hasSameBinaryContentAs(expectedThumbnailFile);
     }
 
     @LogMethod
-    private void doTestImportTemplates() throws Exception
+    private void doTestImportTemplates()
     {
         log("Testing import templates...");
 
         //go to query module portal
-        clickProject(getProjectName());
+        goToProjectHome();
         goToModule("Query");
         viewQueryData(VEHICLE_SCHEMA, "Vehicles");
         DataRegionTable table = new DataRegionTable("query", getDriver());
@@ -1249,7 +1258,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         assertTrue("Import message not present", isTextPresent("Please read this before you import data"));
 
         Locator l = Locator.xpath("//select[@id='importTemplate']//option");
-        assertTrue("Wrong number of templates found", getElementCount(l) == 2);
+        assertEquals("Wrong number of templates found", 2, l.findElements(getDriver()).size());
     }
 
     @LogMethod
@@ -1286,7 +1295,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
     @LogMethod
     private void doTestRowLevelContainerPath()
     {
-        beginAt("/simpletest/" + getProjectName() + "/workbookTest.view");
+        beginAt(buildURL("simpletest", getProjectName(), "workbookTest"));
 
         clickButton("RunContainerPathTest", 0);
 
@@ -1399,7 +1408,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         selectResp = selectCmd.execute(cn, getProjectName());
         assertEquals("Expected first row to be 2001.", 2001, selectResp.getRows().get(0).get("ModelYear"));
         assertEquals("Expected first row to be 2000.", 2000, selectResp.getRows().get(1).get("ModelYear"));
-        assertTrue("Expected the column 'ModelId/ManufacturerId/Name' to be included based on the default view", selectResp.getColumnModel("ModelId/ManufacturerId/Name") != null);
+        assertNotNull("Expected the column 'ModelId/ManufacturerId/Name' to be included based on the default view", selectResp.getColumnModel("ModelId/ManufacturerId/Name"));
         assertEquals("Expected to return 6 columns, based on the default view", 6, selectResp.getColumnModel().size());
     }
 
@@ -1447,37 +1456,37 @@ public class SimpleModuleTest extends BaseWebDriverTest
             labkey.ensureRLibPath <- function(append=FALSE)
             {
               propValue <- labkey.getModuleProperty(baseUrl, folderPath, moduleName, propName)
-             \s
+
               splits <- strsplit(propValue, '\\r\\n|\\n|\\r')
               paths <- splits[[1]]
-             \s
+
               if (append == TRUE)
-              \t.libPaths(c(paths, .libPaths()))
+                .libPaths(c(paths, .libPaths()))
               else
-              \t.libPaths(c(paths[1], paths[2]))
-             \s
+                .libPaths(c(paths[1], paths[2]))
+
               .libPaths()
             }
-                \s
+
             folderPath = "SimpleModuleTest Project/subfolder"
             print("BEGIN-FIRST-CALL")
-            labkey.ensureRLibPath() \s
+            labkey.ensureRLibPath()
             print("END-FIRST-CALL")
-                \s
-            folderPath = "SimpleModuleTest Project/subfolder2" \s
+
+            folderPath = "SimpleModuleTest Project/subfolder2"
             print("BEGIN-SECOND-CALL")
             labkey.ensureRLibPath()
-            print("END-SECOND-CALL")    \s
+            print("END-SECOND-CALL")
 
-            folderPath = "SimpleModuleTest Project/subfolder" \s
+            folderPath = "SimpleModuleTest Project/subfolder"
             print("BEGIN-THIRD-CALL")
             labkey.ensureRLibPath(append=TRUE)
             print("END-THIRD-CALL")
-             \s""";
+            """;
 
     @LogMethod
     @Test
-    public void testModuleProperties() throws Exception
+    public void testModuleProperties()
     {
         RReportHelper rReportHelper = new RReportHelper(this);
         rReportHelper.ensureRConfig(false);
@@ -1703,6 +1712,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         clickButton("Save & Finish");
     }
 
+    @Language("JavaScript")
     private static final String vehicleMetadataJsQuery = """
             function onFailure(errorInfo, options, responseObj)
             {
@@ -1791,7 +1801,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         Map result = (Map)executeAsyncScript(vehicleMetadataJsQuery);
         Map colorColumnFields = ((List<Map>)(((Map)result.get("metaData")).get("fields"))).get(0);
 
-        assertEquals("Column fields for column 'Color' in vehicle.Vehicles query not found!", colorColumnFields.get("name"), "Color");
+        assertEquals("Column fields for column 'Color' in vehicle.Vehicles query not found!", "Color", colorColumnFields.get("name"));
 
         return (Map)((List)((Map)colorColumnFields.get("lookup")).get("filterGroups")).get(0);
     }
@@ -1805,9 +1815,8 @@ public class SimpleModuleTest extends BaseWebDriverTest
         lookAndFeelSettingsPage.setAltLoginPage("simpletest-testCustomLogin");
         lookAndFeelSettingsPage.save();
         signOut();
-        ensureSignedOut();
 
-        beginAt(WebTestHelper.buildURL("login", "login"));
+        beginAt(buildURL("login", "login"));
         waitForAnyElement("Should be on login or Home portal", Locator.id("email"), SiteNavBar.Locators.userMenu);
         assertElementPresent(Locator.tagWithText("p", "SimpleTest Module Custom Sign In"));
         signIn();
@@ -1819,9 +1828,8 @@ public class SimpleModuleTest extends BaseWebDriverTest
         lookAndFeelSettingsPage.setAltLoginPage("simpletest-testCustomLoginWithReturnUrl");
         lookAndFeelSettingsPage.save();
         signOut();
-        ensureSignedOut();
 
-        beginAt(WebTestHelper.buildURL("login", "login"));
+        beginAt(buildURL("login", "login"));
         waitForAnyElement("Should be on login or Home portal", Locator.id("email"), SiteNavBar.Locators.userMenu);
         assertElementPresent(Locator.tagWithText("p", "SimpleTest Module Custom Sign In With Custom ReturnUrl"));
         signIn();
@@ -1833,7 +1841,6 @@ public class SimpleModuleTest extends BaseWebDriverTest
         lookAndFeelSettingsPage.setAltLoginPage("");
         lookAndFeelSettingsPage.save();
         signOut();
-        ensureSignedOut();
         signIn();
 
         log("restore original login page");
@@ -1848,7 +1855,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
     private void doTestRestrictedModule()
     {
         log("Create folder with restricted");
-        clickProject(getProjectName());
+        goToProjectHome();
         _containerHelper.createSubfolder(getProjectName(), RESTRICTED_FOLDER_NAME, RESTRICTED_FOLDER_TYPE);
         PortalHelper portalHelper = new PortalHelper(this);
         portalHelper.addWebPart("Restricted Module Web Part");
@@ -1857,12 +1864,12 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
         log("folder admin without restricted permission can still see existing restricted folder, web parts");
         navigateToFolder(getProjectName(), RESTRICTED_FOLDER_NAME);
-        impersonateRole("Reader");
+        impersonateRole(READER_ROLE);
         assertTextPresent("This is a web part view in the restricted module.");     // Can still see web part
         stopImpersonating();
-        clickProject(getProjectName());
+        goToProjectHome();
         navigateToFolder(getProjectName(), RESTRICTED_FOLDER_NAME);
-        impersonateRole("Folder Administrator");
+        impersonateRole(FOLDER_ADMIN_ROLE);
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Folder Type"));
         // Shouldn't see folder type, module name

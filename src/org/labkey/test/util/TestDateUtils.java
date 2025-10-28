@@ -1,5 +1,7 @@
 package org.labkey.test.util;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -10,6 +12,9 @@ public class TestDateUtils
 {
     // Stash a consistent "today" date to allow tests to work when spanning midnight
     private static final Date TODAY = Calendar.getInstance().getTime();
+
+    // Match the DateUtil.ISO_DATE_TIME_FORMAT_STRING defined on the server
+    private static final SimpleDateFormat ISO_DATE_TIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 
     private TestDateUtils()
     {
@@ -79,5 +84,15 @@ public class TestDateUtils
     public static String dateTimeFileName()
     {
         return fileDateFormat.format(LocalDateTime.now());
+    }
+
+    public static String formatISODateTime(Date date)
+    {
+        return ISO_DATE_TIME_FORMAT.format(date);
+    }
+
+    public static Date parseISODateTime(String s) throws ParseException
+    {
+        return ISO_DATE_TIME_FORMAT.parse(s);
     }
 }

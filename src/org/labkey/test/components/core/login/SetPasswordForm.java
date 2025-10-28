@@ -113,7 +113,9 @@ public class SetPasswordForm extends WebDriverComponent<SetPasswordForm.ElementC
 
     private void assertGuidanceMessage(String expectedGuidance)
     {
-        Awaitility.await().atMost(Duration.ofSeconds(2)).untilAsserted(() ->
+        // Though it's usually quite fast, sometimes the password scoring API takes ~4 sec on TeamCity, so give it
+        // enough time to refresh
+        Awaitility.await().atMost(Duration.ofSeconds(10)).untilAsserted(() ->
                 assertEquals("Strength guidance for password", expectedGuidance, elementCache().strengthGuidance.getText()));
     }
 

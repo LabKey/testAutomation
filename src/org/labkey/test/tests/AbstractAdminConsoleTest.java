@@ -24,10 +24,7 @@ import org.labkey.test.util.PermissionsHelper;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.labkey.test.util.PermissionsHelper.APP_ADMIN_ROLE;
 
 public abstract class AbstractAdminConsoleTest extends BaseWebDriverTest
 {
@@ -78,7 +75,7 @@ public abstract class AbstractAdminConsoleTest extends BaseWebDriverTest
 
         int appAdminId = _userHelper.createUser(APP_ADMIN_USER, true, false).getUserId();
         setInitialPassword(appAdminId);
-        apiPermissionsHelper.addMemberToRole(APP_ADMIN_USER, "Application Admin", PermissionsHelper.MemberType.user, "/");
+        apiPermissionsHelper.addMemberToRole(APP_ADMIN_USER, APP_ADMIN_ROLE, PermissionsHelper.MemberType.user, "/");
 
         int troubleshooterId = _userHelper.createUser(TROUBLESHOOTER_USER, true, false).getUserId();
         setInitialPassword(troubleshooterId);

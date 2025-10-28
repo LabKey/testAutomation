@@ -3,15 +3,11 @@ package org.labkey.test.components.domain;
 import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
-import org.labkey.test.components.html.Input;
 import org.labkey.test.components.ui.grids.DetailTable;
-import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.util.Map;
-
-import static org.labkey.test.components.html.Input.Input;
 
 public class DetailPopover extends WebDriverComponent<DetailPopover.ElementCache>
 {
@@ -47,7 +43,7 @@ public class DetailPopover extends WebDriverComponent<DetailPopover.ElementCache
 
     public Map<String, String> getTableData()
     {
-        return getDetailTable().getTableData();
+        return getDetailTable().getTableDataByLabel();
     }
 
     public void clickTableLink(String fieldKey)
@@ -71,12 +67,6 @@ public class DetailPopover extends WebDriverComponent<DetailPopover.ElementCache
     protected ElementCache newElementCache()
     {
         return new ElementCache();
-    }
-
-    @Override
-    protected ElementCache elementCache()
-    {
-        return (ElementCache) super.elementCache();
     }
 
     protected class ElementCache extends Component<?>.ElementCache

@@ -18,10 +18,13 @@ package org.labkey.test.pages;
 import org.apache.tika.utils.StringUtils;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
+import org.labkey.test.util.EscapeUtil;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.util.Map;
+
+import static org.labkey.test.util.EscapeUtil.FORM_FIELD_PREFIX;
 
 public class DatasetInsertPage extends InsertPage
 {
@@ -39,7 +42,7 @@ public class DatasetInsertPage extends InsertPage
     protected void waitForReady()
     {
         super.waitForReady();
-        waitForElement(Locator.tag("*").attributeStartsWith("name", "quf_"));
+        waitForElement(Locator.tag("*").attributeStartsWith("name", FORM_FIELD_PREFIX));
     }
 
     public void insert(Map<String, String> values)
@@ -79,7 +82,7 @@ public class DatasetInsertPage extends InsertPage
     {
         for (Map.Entry<String, String> entry : values.entrySet())
         {
-            WebElement fieldInput = Locator.name("quf_" + entry.getKey()).findElement(getDriver());
+            WebElement fieldInput = Locator.name(EscapeUtil.getFormFieldName(entry.getKey())).findElement(getDriver());
             String type = fieldInput.getAttribute("type");
             switch (type)
             {

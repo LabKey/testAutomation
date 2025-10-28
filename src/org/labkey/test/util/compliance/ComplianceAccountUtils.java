@@ -27,7 +27,7 @@ public class ComplianceAccountUtils
         _test.clickAndWait(Locator.linkWithText("include inactive users"));
         usersTable = new DataRegionTable("Users", _test);
         int countOfAllUsers = usersTable.getDataRowCount();
-        usersTable.checkAll();
+        usersTable.checkAllOnPage();
 
         _test.log("Number of active users: " + countOfActiveUsers + " Number of total users: " + countOfAllUsers);
 

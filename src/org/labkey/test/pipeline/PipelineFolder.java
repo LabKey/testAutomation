@@ -131,7 +131,7 @@ public class PipelineFolder
 
     public static class MailSettings
     {
-        private PipelineWebTestBase _test;
+        private final PipelineWebTestBase _test;
         private boolean _notifyOnSuccess;
         private boolean _notifyOwnerOnSuccess;
         private String[] _notifyUsersOnSuccess = new String[0];

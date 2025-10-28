@@ -25,7 +25,7 @@ import java.util.List;
 //TODO: Move domain helpers that aren't list-specific from ListHelper
 public class MetadataEditorHelper
 {
-    private BaseWebDriverTest _test;
+    private final BaseWebDriverTest _test;
 
     public MetadataEditorHelper(BaseWebDriverTest test)
     {

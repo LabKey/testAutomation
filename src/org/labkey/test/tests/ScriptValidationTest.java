@@ -30,7 +30,7 @@ import org.labkey.remoteapi.PostCommand;
 import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.InsertRowsCommand;
-import org.labkey.remoteapi.query.SaveRowsResponse;
+import org.labkey.remoteapi.query.RowsResponse;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.remoteapi.query.Sort;
@@ -93,7 +93,7 @@ public class ScriptValidationTest extends BaseWebDriverTest
     @BeforeClass
     public static void initTest() throws Exception
     {
-        ScriptValidationTest init = (ScriptValidationTest) getCurrentTest();
+        ScriptValidationTest init = getCurrentTest();
         init.doSetup();
     }
 
@@ -539,7 +539,7 @@ public class ScriptValidationTest extends BaseWebDriverTest
         InsertRowsCommand cmd = new InsertRowsCommand(VEHICLE_SCHEMA, "Colors");
         cmd.getRows().addAll(list);
         cmd.setExtraContext(extraContext);
-        SaveRowsResponse response = cmd.execute(cn, getProjectName());
+        RowsResponse response = cmd.execute(cn, getProjectName());
         assertEquals("Expected to insert " + colors.size() + " rows.", colors.size(), response.getRowsAffected().intValue());
 
         ArrayList<ColorRecord> results = new ArrayList<>();
@@ -564,7 +564,7 @@ public class ScriptValidationTest extends BaseWebDriverTest
         UpdateRowsCommand cmd = new UpdateRowsCommand(VEHICLE_SCHEMA, "Colors");
         cmd.getRows().addAll(list);
         cmd.setExtraContext(extraContext);
-        SaveRowsResponse response = cmd.execute(cn, getProjectName());
+        RowsResponse response = cmd.execute(cn, getProjectName());
         assertEquals("Expected to update " + colors.size() + " rows.", colors.size(), response.getRowsAffected().intValue());
 
         ArrayList<ColorRecord> results = new ArrayList<>();

@@ -16,7 +16,6 @@
 package org.labkey.test.tests;
 
 import org.junit.Ignore;
-import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -67,7 +66,7 @@ public class TabTest extends SimpleModuleTest
         navigateToFolder(getProjectName(), FOLDER_NAME);
 
         // Move tabs
-        portalHelper.enableTabEditMode();
+        portalHelper.enterAdminMode();
         portalHelper.moveTab("Tab 1", PortalHelper.Direction.LEFT); // Nothing should happen.
         portalHelper.moveTab("Tab 1", PortalHelper.Direction.RIGHT);
         List<PortalTab> tabs = PortalTab.findTabs(getDriver());
@@ -116,7 +115,7 @@ public class TabTest extends SimpleModuleTest
         String tab2Delete = "RENAMED TAB 1";
         portalHelper.activateTab(tab2Delete);
         portalHelper.deleteTab("Test Tab 2");
-        WebDriverWrapper.waitFor(()-> portalHelper.getBodyWebParts().size() > 0,
+        WebDriverWrapper.waitFor(()-> !portalHelper.getBodyWebParts().isEmpty(),
                 "Webparts failed to load after tab delete while on page", 2000);
         WebDriverWrapper.waitFor(()-> {
                     try
@@ -131,7 +130,7 @@ public class TabTest extends SimpleModuleTest
 
         //Delete tab while on the Tab
         portalHelper.deleteTab(tab2Delete);
-        WebDriverWrapper.waitFor(()-> portalHelper.getBodyWebParts().size() > 0,
+        WebDriverWrapper.waitFor(()-> !portalHelper.getBodyWebParts().isEmpty(),
                 "Webparts failed to load after tab delete while on page", 2000);
     }
 

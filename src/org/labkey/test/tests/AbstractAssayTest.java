@@ -34,6 +34,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.labkey.test.params.FieldDefinition.DOMAIN_TRICKY_CHARACTERS;
+import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
+import static org.labkey.test.util.PermissionsHelper.READER_ROLE;
 
 /**
  * @deprecated TODO: Move shared functionality to a Helper class
@@ -42,8 +44,6 @@ import static org.labkey.test.params.FieldDefinition.DOMAIN_TRICKY_CHARACTERS;
 public abstract class AbstractAssayTest extends BaseWebDriverTest
 {
     //constants added for security tests
-    protected final static String TEST_ASSAY_PERMS_READER = "Reader";                 //name of built-in reader role
-    private final static String TEST_ASSAY_PERMS_EDITOR = "Editor";                 //name of built-in editor role
     private final static String TEST_ASSAY_PERMS_NONE = "No Permissions";           //name of built-in no perms role
 
     private final static String TEST_ASSAY_GRP_USERS = "Users";                     //name of built-in Users group
@@ -202,15 +202,15 @@ public abstract class AbstractAssayTest extends BaseWebDriverTest
         //we should now be sitting on the new project security page
         //create a group in the project for PIs and make them readers by default
         permissionsHelper.createPermissionsGroup(TEST_ASSAY_GRP_PIS);
-        permissionsHelper.setPermissions(TEST_ASSAY_GRP_PIS, TEST_ASSAY_PERMS_READER);
+        permissionsHelper.setPermissions(TEST_ASSAY_GRP_PIS, READER_ROLE);
 
         //set Users group to be Readers by default
-        permissionsHelper.setPermissions(TEST_ASSAY_GRP_USERS, TEST_ASSAY_PERMS_READER);
+        permissionsHelper.setPermissions(TEST_ASSAY_GRP_USERS, READER_ROLE);
 
         //add a PI user to that group
         permissionsHelper.addUserToProjGroup(TEST_ASSAY_USR_PI1, getProjectName(), TEST_ASSAY_GRP_PIS);
         // give the PI user "CanSeeAuditLog" permission
-        permissionsHelper.setSiteAdminRoleUserPermissions(TEST_ASSAY_USR_PI1, "See Audit Log Events");
+        permissionsHelper.setSiteRoleUserPermissions(TEST_ASSAY_USR_PI1, "See Audit Log Events");
 
         //add a lab tech user to the Users group
         permissionsHelper.addUserToProjGroup(TEST_ASSAY_USR_TECH1, getProjectName(), TEST_ASSAY_GRP_USERS);
@@ -238,9 +238,9 @@ public abstract class AbstractAssayTest extends BaseWebDriverTest
         //setup security on sub-folders:
         // PIs should be Editors on Lab1 and Study1, but not Study2 or Study3
         // Users should be Editors on Lab1, readers on Study2, and nothing on Study3
-        setSubfolderSecurity(getProjectName(), TEST_ASSAY_FLDR_LAB1, TEST_ASSAY_GRP_PIS, TEST_ASSAY_PERMS_EDITOR);
-        setSubfolderSecurity(getProjectName(), TEST_ASSAY_FLDR_LAB1, TEST_ASSAY_GRP_USERS, TEST_ASSAY_PERMS_EDITOR);
-        setSubfolderSecurity(getProjectName(), TEST_ASSAY_FLDR_STUDY1, TEST_ASSAY_GRP_PIS, TEST_ASSAY_PERMS_EDITOR);
+        setSubfolderSecurity(getProjectName(), TEST_ASSAY_FLDR_LAB1, TEST_ASSAY_GRP_PIS, EDITOR_ROLE);
+        setSubfolderSecurity(getProjectName(), TEST_ASSAY_FLDR_LAB1, TEST_ASSAY_GRP_USERS, EDITOR_ROLE);
+        setSubfolderSecurity(getProjectName(), TEST_ASSAY_FLDR_STUDY1, TEST_ASSAY_GRP_PIS, EDITOR_ROLE);
         setSubfolderSecurity(getProjectName(), TEST_ASSAY_FLDR_STUDY3, TEST_ASSAY_GRP_USERS, TEST_ASSAY_PERMS_NONE);
 
         //setup study-level security:
@@ -287,11 +287,11 @@ public abstract class AbstractAssayTest extends BaseWebDriverTest
         waitForElement(Locator.permissionRendered());
         if (TEST_ASSAY_PERMS_NONE.equals(perms))
         {
-            _permissionsHelper.removePermission(group, "Editor");
-            _permissionsHelper.removePermission(group, "Reader");
+            _permissionsHelper.removePermission(group, EDITOR_ROLE);
+            _permissionsHelper.removePermission(group, READER_ROLE);
         }
         else
-            _securityHelper.setProjectPerm(group, perms);
+            _permissionsHelper.setPermissions(group, perms);
     }
 
     /**

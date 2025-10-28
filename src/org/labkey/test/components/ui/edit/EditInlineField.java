@@ -33,14 +33,25 @@ public class EditInlineField extends WebDriverComponent<EditInlineField.ElementC
         return _driver;
     }
 
-    public void setValue(String value)
+    public void setValue(String value, boolean skipEnter)
     {
         open();
         WebElement input = elementCache().input;
         // 'setFormElement' calls 'WebElement.clear()' which can close the edit-in-place input
         getWrapper().actionClear(input);
-        input.sendKeys(value, Keys.ENTER);
-        getWrapper().shortWait().until(ExpectedConditions.stalenessOf(input));
+
+        if (skipEnter)
+            input.sendKeys(value);
+        else
+        {
+            input.sendKeys(value, Keys.ENTER);
+            getWrapper().shortWait().until(ExpectedConditions.stalenessOf(input));
+        }
+    }
+
+    public void setValue(String value)
+    {
+        setValue(value, false);
     }
 
     public String getLabel()
@@ -59,21 +70,29 @@ public class EditInlineField extends WebDriverComponent<EditInlineField.ElementC
                 elementCache().input.isDisplayed();
     }
 
-    private void open()
+    public void open()
     {
         if (!isOpen())
         {
             WebElement toggle = elementCache().toggle();
             getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(toggle));
 
-            try {
-                toggle.click();
-            }
-            catch (ElementNotInteractableException e)
+            if (Locator.tag("a").findElementOrNull(toggle) != null)
             {
-                // If the EditInlineField has showToggle set to true then we need to click the pencil icon, not the
-                // toggle element.
+                // if value is link, click pencil instead of value
                 elementCache().pencil().click();
+            }
+            else
+            {
+                try {
+                    toggle.click();
+                }
+                catch (ElementNotInteractableException e)
+                {
+                    // If the EditInlineField has showToggle set to true then we need to click the pencil icon, not the
+                    // toggle element.
+                    elementCache().pencil().click();
+                }
             }
 
             WebDriverWrapper.waitFor(this::isOpen,
@@ -92,8 +111,8 @@ public class EditInlineField extends WebDriverComponent<EditInlineField.ElementC
         final WebElement label = Locator.tagWithClass("span", "edit-inline-field__label")
                 .refindWhenNeeded(this);
         final Locator toggleLoc = Locator.tagWithClass("span", "edit-inline-field__toggle");
-        final Locator pencilLoc = Locator.tagWithClass("span", "fa-pencil");
-        final WebElement input = Locator.css("input.form-control, textarea.form-control").refindWhenNeeded(this);
+        final Locator pencilLoc = Locator.tagWithClass("i", "fa-pencil");
+        final WebElement input = Locator.css("input.form-control, input.select-input__input, textarea.form-control").refindWhenNeeded(this);
 
         WebElement placeholderElement()
         {

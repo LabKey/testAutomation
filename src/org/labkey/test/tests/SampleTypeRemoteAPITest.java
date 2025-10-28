@@ -29,7 +29,7 @@ import org.labkey.remoteapi.assay.Run;
 import org.labkey.remoteapi.assay.SaveAssayBatchCommand;
 import org.labkey.remoteapi.assay.SaveAssayBatchResponse;
 import org.labkey.remoteapi.domain.PropertyDescriptor;
-import org.labkey.remoteapi.query.SaveRowsResponse;
+import org.labkey.remoteapi.query.RowsResponse;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -45,6 +45,7 @@ import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.AbstractDataRegionExportOrSignHelper;
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.TestDataGenerator;
 import org.labkey.test.util.TestDataValidator;
@@ -83,7 +84,7 @@ public class SampleTypeRemoteAPITest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        SampleTypeRemoteAPITest init = (SampleTypeRemoteAPITest) getCurrentTest();
+        SampleTypeRemoteAPITest init = getCurrentTest();
 
         init.doSetup();
     }
@@ -113,8 +114,6 @@ public class SampleTypeRemoteAPITest extends BaseWebDriverTest
 
     /**
      * regression coverage for Issue 37514 - sample type lookup to exp.Files crashes when viewing the sample type
-     * @throws IOException
-     * @throws CommandException
      */
     @Test
     public void samplesWithLookupsToExpFilesTest() throws IOException, CommandException
@@ -146,8 +145,6 @@ public class SampleTypeRemoteAPITest extends BaseWebDriverTest
 
     /**
      * generates a small sample type, pastes data into it via the UI, including "Q" and "N" missing value indicators
-     * @throws IOException
-     * @throws CommandException
      */
     @Test
     public void importMissingValueSampleType() throws IOException, CommandException
@@ -173,7 +170,7 @@ public class SampleTypeRemoteAPITest extends BaseWebDriverTest
         dgen.addCustomRow(Map.of("name", "Eighth","mvStringData", "ActualData", "volume", 17.5));
 
         // write the domain data into TSV format, for import via the UI
-        String importTsv = dgen.writeTsvContents();
+        String importTsv = dgen.getDataAsTsv();
 
         refresh();
         DataRegionTable sampleTypeList =  DataRegionTable.DataRegion(getDriver()).withName(SAMPLE_TYPE_DATA_REGION_NAME).waitFor();
@@ -234,7 +231,7 @@ public class SampleTypeRemoteAPITest extends BaseWebDriverTest
         dgen.addCustomRow(Map.of("name", "G","mvStringData", "ValidValue", "volume", 17.5));
         dgen.addCustomRow(Map.of("name", "H","mvStringData", "ActualData", "volume", 17.5));
 
-        SaveRowsResponse insertResponse = dgen.insertRows(createDefaultConnection(), dgen.getRows());
+        RowsResponse insertResponse = dgen.insertRows(createDefaultConnection(), dgen.getRows());
 
         refresh();
         DataRegionTable sampleTypeList =  DataRegionTable.DataRegion(getDriver()).withName(SAMPLE_TYPE_DATA_REGION_NAME).waitFor();
@@ -255,7 +252,7 @@ public class SampleTypeRemoteAPITest extends BaseWebDriverTest
         rowD.put("mvstringdatamvindicator", null);
         rowD.put("mvStringData", "updatedValue");
 
-        SaveRowsResponse updateResponse = dgen.updateRows(createDefaultConnection(), Arrays.asList(rowD, rowE));
+        RowsResponse updateResponse = dgen.updateRows(createDefaultConnection(), Arrays.asList(rowD, rowE));
 
         // get a look at the result
         refresh();
@@ -276,7 +273,7 @@ public class SampleTypeRemoteAPITest extends BaseWebDriverTest
         String mvIndicatorColName = "mvStringDataMVIndicator";
         materialsList.updateRow(dIndex, Map.of("mvStringData", "reallyUpdatedValue", mvIndicatorColName, "Q"));  // update the underlying value but set it mv-Q
         materialsList.clickEditRow(eIndex);
-        selectOptionByText(Locator.name("quf_"+mvIndicatorColName), "");    // clear the mv value, reveal underlying value
+        selectOptionByText(Locator.name(EscapeUtil.getFormFieldName(mvIndicatorColName)), "");    // clear the mv value, reveal underlying value
         clickButton("Submit");
 
         eIndex = materialsList.getRowIndex("Name", "E");
@@ -339,8 +336,6 @@ public class SampleTypeRemoteAPITest extends BaseWebDriverTest
 
     /**
      * regression for https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=38436
-     * @throws CommandException
-     * @throws IOException
      */
     @Test
     @Ignore("ignoring result until issue 38436 can be resolved.")
@@ -365,7 +360,7 @@ public class SampleTypeRemoteAPITest extends BaseWebDriverTest
         dgen.insertRows(createDefaultConnection(), dgen.getRows());     // insert data via API rather than UI
 
         // prepare expected values-
-        String expectedTSVData = dgen.writeTsvContents();
+        String expectedTSVData = dgen.getDataAsTsv();
         String[] tsvRows = expectedTSVData.split("\n");
         List<String> dataRows = new ArrayList();
         for (int i=1; i < tsvRows.length; i++) // don't validate columns; we expect labels instead of column names
@@ -461,8 +456,7 @@ public class SampleTypeRemoteAPITest extends BaseWebDriverTest
         String assaySubfolder = "TestAssayFolder";
         String assayName = "AssayForSampleDerivation";
         generateAssay(assaySubfolder, assayName);
-        List<TestDataGenerator> dataGenerators = generateAssayData(new FieldDefinition.LookupInfo(getProjectName() + "/" + assaySubfolder,
-                "assay.General.AssayForSampleDerivation_assay", "Runs"));
+        List<TestDataGenerator> dataGenerators = generateAssayData("assay.General.AssayForSampleDerivation_assay", "Runs", getProjectName() + "/" + assaySubfolder);
         insertAssayData(assayName, dataGenerators);
 
         // get the sampleID, it will be needed later
@@ -597,8 +591,7 @@ public class SampleTypeRemoteAPITest extends BaseWebDriverTest
         String assaySubfolder = "DeriveAssayFolder";
         String assayName = "AssayForSaveBatchDerivation";
         generateAssay(assaySubfolder, assayName);
-        List<TestDataGenerator> dataGenerators = generateAssayData(new FieldDefinition.LookupInfo(getProjectName() + "/" + assaySubfolder,
-                "assay.General.AssayForSaveBatchDerivation_assay", "Runs"));
+        List<TestDataGenerator> dataGenerators = generateAssayData("assay.General.AssayForSaveBatchDerivation_assay", "Runs", getProjectName() + "/" + assaySubfolder);
         insertAssayData(assayName, dataGenerators);
 
         // get the sampleID, it will be needed later
@@ -688,7 +681,7 @@ public class SampleTypeRemoteAPITest extends BaseWebDriverTest
         SaveAssayBatchCommand saveAssayBatchCommand = new SaveAssayBatchCommand(SaveAssayBatchCommand.SAMPLE_DERIVATION_PROTOCOL, batch);
         //saveAssayBatchCommand.setAssayId(Integer.parseInt(assayIdStringValue));
         SaveAssayBatchResponse saveAssayBatchResponse;
-        saveAssayBatchResponse = saveAssayBatchCommand.execute(createDefaultConnection(), getProjectName() + "/" + samplesFolder);
+        saveAssayBatchCommand.execute(createDefaultConnection(), getProjectName() + "/" + samplesFolder);
 
         refresh();
         // add a bodyWebPart here to make viewing the sampleset easier while debugging
@@ -726,9 +719,8 @@ public class SampleTypeRemoteAPITest extends BaseWebDriverTest
     /**
      * generates data (runs) for the gpat assay used by tests in this class.
      * @param assayLookup : specifies the container, schema, name of the assay's run table
-     * @return
      */
-    private List<TestDataGenerator> generateAssayData(FieldDefinition.LookupInfo assayLookup)
+    private List<TestDataGenerator> generateAssayData(String schema, String table, String containerPath)
     {
         List<PropertyDescriptor> resultsFieldset = List.of(
                 new FieldDefinition("ParticipantID",FieldDefinition.ColumnType.String),
@@ -736,21 +728,21 @@ public class SampleTypeRemoteAPITest extends BaseWebDriverTest
                 new FieldDefinition("SampleName", FieldDefinition.ColumnType.String),
                 new FieldDefinition("SampleVolume", FieldDefinition.ColumnType.DateAndTime));
 
-        TestDataGenerator dgen1 = new TestDataGenerator(assayLookup)
+        TestDataGenerator dgen1 = new TestDataGenerator(schema, table, containerPath)
                 .withColumns(resultsFieldset)
                 .addCustomRow(Map.of("ParticipantID", "Jeff", "Date", "11/11/2018", "SampleName", "Green", "SampleVolume", 12.5))
                 .addCustomRow(Map.of("ParticipantID", "Jim", "Date", "11/12/2018", "SampleName", "Red", "SampleVolume", 14.5))
                 .addCustomRow(Map.of("ParticipantID", "Billy", "Date", "11/13/2018", "SampleName", "Yellow", "SampleVolume", 17.5))
                 .addCustomRow(Map.of("ParticipantID", "Michael", "Date", "11/14/2018", "SampleName", "Orange", "SampleVolume", 11.5));
 
-        TestDataGenerator dgen2 = new TestDataGenerator(assayLookup)
+        TestDataGenerator dgen2 = new TestDataGenerator(schema, table, containerPath)
                 .withColumns(resultsFieldset)
                 .addCustomRow(Map.of("ParticipantID", "Harry", "Date", "10/11/2018", "SampleName", "Green", "SampleVolume", 12.5))
                 .addCustomRow(Map.of("ParticipantID", "William", "Date", "10/12/2018", "SampleName", "Red", "SampleVolume", 14.5))
                 .addCustomRow(Map.of("ParticipantID", "Jenny", "Date", "10/13/2018", "SampleName", "Yellow", "SampleVolume", 17.5))
                 .addCustomRow(Map.of("ParticipantID", "Hermione", "Date", "10/14/2018", "SampleName", "Orange", "SampleVolume", 11.5));
 
-        TestDataGenerator dgen3 = new TestDataGenerator(assayLookup)
+        TestDataGenerator dgen3 = new TestDataGenerator(schema, table, containerPath)
                 .withColumns(resultsFieldset)
                 .addCustomRow(Map.of("ParticipantID", "George", "Date", "10/11/2018", "SampleName", "Green", "SampleVolume", 12.5))
                 .addCustomRow(Map.of("ParticipantID", "Arthur", "Date", "10/12/2018", "SampleName", "Red", "SampleVolume", 14.5))
@@ -775,7 +767,7 @@ public class SampleTypeRemoteAPITest extends BaseWebDriverTest
         {
             AssayImportPage page = new AssayImportPage(getDriver())
                     .setNamedTextAreaValue("TextAreaDataCollector.textArea",
-                    dataGen.writeTsvContents());
+                    dataGen.getDataAsTsv());
             imported++;
 
             if(imported < limit)

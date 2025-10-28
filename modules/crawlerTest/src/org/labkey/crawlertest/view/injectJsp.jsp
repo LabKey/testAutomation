@@ -19,7 +19,8 @@
 <%@ page extends="org.labkey.api.jsp.JspBase" %>
 
 <%
-    String inject = ((HttpView<String>) HttpView.currentView()).getModelBean();
+    HttpView<String> view = HttpView.currentView();
+    String inject = view.getModelBean();
 %>
 <span>Param:</span>
 <div id="crawlerTestDiv"><%=unsafe(inject)%></div>

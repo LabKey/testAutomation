@@ -35,12 +35,17 @@ import org.labkey.remoteapi.query.DeleteRowsCommand;
 import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.InsertRowsCommand;
 import org.labkey.remoteapi.query.SaveRowsResponse;
+import org.labkey.remoteapi.query.BaseRowsCommand;
+import org.labkey.remoteapi.query.RowsResponse;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.remoteapi.query.Sort;
 import org.labkey.remoteapi.query.TruncateTableCommand;
 import org.labkey.remoteapi.query.TruncateTableResponse;
 import org.labkey.remoteapi.query.UpdateRowsCommand;
+import org.labkey.remoteapi.query.SaveRowsCommand;
+import org.labkey.remoteapi.query.SaveRowsCommand.Command;
+import org.labkey.remoteapi.query.SaveRowsCommand.CommandType;
 import org.labkey.remoteapi.security.AddGroupMembersCommand;
 import org.labkey.remoteapi.security.CreateGroupCommand;
 import org.labkey.remoteapi.security.CreateGroupResponse;
@@ -82,18 +87,18 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
 
 /**
- * Test for the Java Client API library. This test is written in
- * Selenium because we don't yet have a way to create a list via
- * the API, so this test will set up a list and then use the Java
- * client API library to insert, read, update, and delete from that list
+ * Tests for the Java Client API library.
  */
 @Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 4)
 public class JavaClientApiTest extends BaseWebDriverTest
 {
     public static final String PROJECT_NAME = JavaClientApiTest.class.getSimpleName() + " Project " + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
+    private static final String SUB_FOLDER_NAME = "Folder " + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
+    private static final String SUB_FOLDER_PATH = PROJECT_NAME + "/" + SUB_FOLDER_NAME;
     public static final String LIST_NAME = "People" + FieldDefinition.DOMAIN_TRICKY_CHARACTERS;
     public static final String LAST_NAME = "LastName" + FieldDefinition.TRICKY_CHARACTERS;
     public static final String USER_NAME = "user1@javaclientapi.test";
@@ -106,14 +111,15 @@ public class JavaClientApiTest extends BaseWebDriverTest
     @LogMethod
     public static void doSetup() throws Exception
     {
-        JavaClientApiTest initTest = (JavaClientApiTest)getCurrentTest();
+        JavaClientApiTest initTest = getCurrentTest();
         initTest.setupProject();
     }
 
     @LogMethod
     private void setupProject() throws Exception
     {
-        _containerHelper.createProject(getProjectName(), null);
+        _containerHelper.createProject(getProjectName());
+        _containerHelper.createSubfolder(getProjectName(), SUB_FOLDER_NAME);
 
         clickProject(PROJECT_NAME);
         PortalHelper portalHelper = new PortalHelper(this);
@@ -187,7 +193,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
 
         log("Setting permissions...");
         clickProject(PROJECT_NAME);
-        _permissionsHelper.setSiteGroupPermissions("Guests", "Editor");
+        _permissionsHelper.setSiteGroupPermissions("Guests", EDITOR_ROLE);
 
         clickProject(PROJECT_NAME);
         clickAndWait(Locator.linkWithText(LIST_NAME));
@@ -216,7 +222,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
         rowMap.put("GooAmount", 4.2);
         rowMap.put("Crazy", true);
         insertCmd.addRow(rowMap);
-        SaveRowsResponse saveResp = insertCmd.execute(cn, PROJECT_NAME);
+        RowsResponse saveResp = insertCmd.execute(cn, PROJECT_NAME);
         assertEquals(1, saveResp.getRowsAffected().intValue());
 
         //get new key value
@@ -536,7 +542,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
         // grant edit permission
         int userId = ensureUser(cn, USER2_NAME);
         ApiPermissionsHelper permHelper = new ApiPermissionsHelper(this);
-        permHelper.setUserPermissions(USER2_NAME, "Editor");
+        permHelper.setUserPermissions(USER2_NAME, EDITOR_ROLE);
 
         // check whoami
         WhoAmIResponse who = new WhoAmICommand().execute(cn, PROJECT_NAME);
@@ -558,7 +564,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
         Map<String, Object> rowMap = new HashMap<>();
         rowMap.put("FirstName", "inserted by impersonated user");
         insertCmd.addRow(rowMap);
-        SaveRowsResponse saveResp = insertCmd.execute(cn, PROJECT_NAME);
+        RowsResponse saveResp = insertCmd.execute(cn, PROJECT_NAME);
         assertEquals(1, saveResp.getRowsAffected().intValue());
 
         // stop impersonation
@@ -589,7 +595,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
         // grant edit permission
         int userId = ensureUser(createDefaultConnection(), USER2_NAME);
         ApiPermissionsHelper permHelper = new ApiPermissionsHelper(this);
-        permHelper.setUserPermissions(USER2_NAME, "Editor");
+        permHelper.setUserPermissions(USER2_NAME, EDITOR_ROLE);
 
         Connection cn = new Connection(WebTestHelper.getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword())
                 .impersonate(USER2_NAME, PROJECT_NAME);
@@ -600,6 +606,173 @@ public class JavaClientApiTest extends BaseWebDriverTest
         assertTrue(who.isImpersonated());
 
         cn.stopImpersonating();
+    }
+
+    @Test
+    public void testSaveRowsApiCommand() throws Exception
+    {
+        // Arrange
+        String schemaName = "lists";
+        String playersListName = "Players " + FieldDefinition.DOMAIN_TRICKY_CHARACTERS;
+        Connection conn = createDefaultConnection();
+
+        String teamsListName = "Teams " + FieldDefinition.DOMAIN_TRICKY_CHARACTERS;
+
+        // Create lists
+        {
+            CreateDomainCommand createdListCmd = new CreateDomainCommand("IntList", playersListName);
+            createdListCmd.setOptions(Map.of("keyName", "JerseyNumber", "keyType", "Integer"));
+
+            Domain domain = createdListCmd.getDomainDesign();
+            domain.setFields(List.of(
+                new PropertyDescriptor("FirstName", "First Name", "string"),
+                new PropertyDescriptor("LastName", "Last Name", "string"),
+                new PropertyDescriptor("Team", null, "string")
+            ));
+
+            createdListCmd.execute(conn, PROJECT_NAME);
+
+            createdListCmd = new CreateDomainCommand("VarList", teamsListName);
+            createdListCmd.setOptions(Map.of("keyName", "Team"));
+
+            domain = createdListCmd.getDomainDesign();
+            domain.setFields(List.of(
+                new PropertyDescriptor("City", null, "string"),
+                new PropertyDescriptor("Team", "Team Name", "string")
+            ));
+
+            createdListCmd.execute(conn, SUB_FOLDER_PATH);
+        }
+
+        // Add some initial data
+        {
+            InsertRowsCommand insertCmd = new InsertRowsCommand(schemaName, playersListName);
+            insertCmd.addRow(Map.of("FirstName", "Alvin", "LastName", "David", "JerseyNumber", 21, "Team", "Seattle Mariners"));
+            insertCmd.addRow(Map.of("FirstName", "Jay", "LastName", "Buhner", "JerseyNumber", 19, "Team", "New York Yankees"));
+            insertCmd.addRow(Map.of("FirstName", "Ken", "LastName", "Phelps", "JerseyNumber", 44, "Team", "Seattle Mariners"));
+
+            insertCmd.execute(conn, PROJECT_NAME);
+
+            insertCmd = new InsertRowsCommand(schemaName, teamsListName);
+            insertCmd.addRow(Map.of("City", "New York", "Team", "Yankees"));
+            insertCmd.addRow(Map.of("City", "New York", "Team", "Giants"));
+            insertCmd.addRow(Map.of("City", "Brooklyn", "Team", "Dodgers"));
+            insertCmd.addRow(Map.of("City", "Montreal", "Team", "Expos"));
+            insertCmd.addRow(Map.of("City", "Seattle", "Team", "Pilots"));
+
+            insertCmd.execute(conn, SUB_FOLDER_PATH);
+        }
+
+        SaveRowsCommand saveCmd = new SaveRowsCommand();
+
+        // Draft Ken Griffey Jr.
+        saveCmd.addCommands(new Command(CommandType.Insert, schemaName, playersListName, List.of(
+            Map.of("FirstName", "Ken", "LastName", "Griffey Jr.", "JerseyNumber", 24, "Team", "Seattle Mariners")
+        )));
+
+        // Trade for Jay Buhner
+        List<Map<String, Object>> rows = List.of(
+            Map.of("JerseyNumber", 19, "Team", "Seattle Mariners"),
+            Map.of("JerseyNumber", 44, "Team", "New York Yankees")
+        );
+        Command command = new Command(CommandType.Update, schemaName, playersListName, rows)
+                .setAuditBehavior(BaseRowsCommand.AuditBehavior.DETAILED)
+                .setAuditUserComment("Traded Jay Buhner for Ken Phelps on July 21, 1988");
+        saveCmd.addCommands(command);
+
+        // Alvin Davis retires
+        saveCmd.addCommands(new Command(CommandType.Delete, schemaName, playersListName, List.of(Map.of("JerseyNumber", 21))));
+
+        // Teams move west
+        rows = List.of(
+            Map.of("Team", "Dodgers", "City", "Los Angeles"),
+            Map.of("Team", "Giants", "City", "San Francisco")
+        );
+        command = new Command(CommandType.Update, schemaName, teamsListName, rows)
+                .setContainerPath(SUB_FOLDER_PATH)
+                .setSkipReselectRows(true);
+        saveCmd.addCommands(command);
+
+        // Some teams are relegated to history
+        rows = List.of(Map.of("Team", "Expos"), Map.of("Team", "Pilots"));
+        command = new Command(CommandType.Delete, schemaName, teamsListName, rows)
+                .setContainerPath(SUB_FOLDER_PATH)
+                .setAuditBehavior(BaseRowsCommand.AuditBehavior.DETAILED)
+                .setAuditUserComment("Expos and Pilots no longer play ball");
+        saveCmd.addCommands(command);
+
+        // Act
+        // Execute multiple query operations using a saveRows command
+        SaveRowsResponse response = saveCmd.execute(conn, PROJECT_NAME);
+
+        // Assert
+        assertEquals(200, response.getStatusCode());
+        assertEquals(0, response.getErrorCount());
+        assertEquals(5, response.getResults().size());
+
+        // Verify saveRows results per command
+        {
+            var result = response.getResults().get(0);
+            assertEquals("insert", result.getCommand());
+            assertEquals(1, result.getRowsAffected());
+            assertEquals(0, result.getTransactionAuditId());
+
+            result = response.getResults().get(1);
+            assertEquals("update", result.getCommand());
+            assertEquals(2, result.getRowsAffected());
+            assertTrue("Expected a transaction auditId to be provided", result.getTransactionAuditId() > 0);
+
+            result = response.getResults().get(2);
+            assertEquals("delete", result.getCommand());
+            assertEquals(1, result.getRowsAffected());
+            assertEquals(0, result.getTransactionAuditId());
+
+            result = response.getResults().get(3);
+            assertEquals("update", result.getCommand());
+            assertEquals(2, result.getRowsAffected());
+            assertEquals(0, result.getTransactionAuditId());
+
+            result = response.getResults().get(4);
+            assertEquals("delete", result.getCommand());
+            assertEquals(2, result.getRowsAffected());
+            assertTrue("Expected a transaction auditId to be provided", result.getTransactionAuditId() > 0);
+        }
+
+        // Verify players list after operations
+        {
+            var selectRowsCommand = new SelectRowsCommand(schemaName, playersListName);
+            selectRowsCommand.addSort(new Sort("JerseyNumber", Sort.Direction.ASCENDING));
+
+            var resp = selectRowsCommand.execute(conn, PROJECT_NAME);
+            assertEquals(3, resp.getRowCount());
+
+            var players = resp.getRows();
+            assertEquals(19, players.get(0).get("jerseyNumber")); // verify case-insensitive
+            assertEquals("Seattle Mariners", players.get(0).get("Team"));
+            assertEquals(24, players.get(1).get("Jerseynumber")); // verify case-insensitive
+            assertEquals("Seattle Mariners", players.get(1).get("Team"));
+            assertEquals(44, players.get(2).get("JerseyNumber"));
+            assertEquals("New York Yankees", players.get(2).get("Team"));
+        }
+
+        // Verify teams list after operations
+        {
+            var selectRowsCommand = new SelectRowsCommand(schemaName, teamsListName);
+            selectRowsCommand.addSort(new Sort("City", Sort.Direction.ASCENDING));
+
+            var resp = selectRowsCommand.execute(conn, SUB_FOLDER_PATH);
+            assertEquals(3, resp.getRowCount());
+
+            var teams = resp.getRows();
+            assertEquals("Los Angeles", teams.get(0).get("City"));
+            assertEquals("Dodgers", teams.get(0).get("Team"));
+
+            assertEquals("New York", teams.get(1).get("City"));
+            assertEquals("Yankees", teams.get(1).get("Team"));
+
+            assertEquals("San Francisco", teams.get(2).get("City"));
+            assertEquals("Giants", teams.get(2).get("Team"));
+        }
     }
 
     @Override

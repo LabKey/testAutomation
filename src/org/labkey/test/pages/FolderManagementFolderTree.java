@@ -31,8 +31,8 @@ import java.util.List;
  */
 public class FolderManagementFolderTree
 {
-    private BaseWebDriverTest _test;
-    private String _projectName;
+    private final BaseWebDriverTest _test;
+    private final String _projectName;
 
     public FolderManagementFolderTree(BaseWebDriverTest test, String projectName)
     {
@@ -182,7 +182,7 @@ public class FolderManagementFolderTree
     {
         WebElement fromEl = from.findElement(_test.getDriver());
         WebElement toEl = to.findElement(_test.getDriver());
-        int offset = 0;
+        int offset;
         int y;
         switch (pos)
         {
@@ -199,7 +199,7 @@ public class FolderManagementFolderTree
                 offset = -1 * (Integer.parseInt(toEl.getAttribute("height")) / 2 + 1);
                 break;
             default:
-                throw new IllegalArgumentException("Unexpected position: " + pos.toString());
+                throw new IllegalArgumentException("Unexpected position: " + pos);
         }
 
         Locator.XPathLocator dragBubble = Locator.byClass("x4-grid-dd-wrap");
@@ -238,7 +238,7 @@ public class FolderManagementFolderTree
 
     public void reorderFolder(String folder, String targetFolder, Reorder order, boolean successExpected)
     {
-        _test.log("Reorder folder: '" + folder + "' " + toString() + " '" + targetFolder + "'");
+        _test.log("Reorder folder: '" + folder + "' " + this + " '" + targetFolder + "'");
         _test.waitForElement(Locator.xpath("//tr/td/div/span[text()='" + folder +"']/../img[contains(@class,'x4-tree-icon-parent')]"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         _test.sleep(1000); //TODO: Figure out what to wait for
         _test._ext4Helper.waitForMaskToDisappear();

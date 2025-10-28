@@ -255,6 +255,21 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
         return elementCache().optionalWarningAlert();
     }
 
+    public void setActionComment(String comment)
+    {
+        elementCache().commentInput.sendKeys(comment);
+    }
+
+    public void clearActionComment()
+    {
+        elementCache().commentInput.clear();
+    }
+
+    public boolean isCommentInputPresent()
+    {
+        return elementCache().commentInputLocator.findOptionalElement(getDriver()).isPresent();
+    }
+
 
     /**
      * Dialog that allows the user to set the genId value.
@@ -339,7 +354,7 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
     public String getParentAlias(int index)
     {
         expandPropertiesPanel();
-        WebDriverWrapper.waitFor(()->elementCache().parentAliases().size() > 0,
+        WebDriverWrapper.waitFor(()-> !elementCache().parentAliases().isEmpty(),
                 "There are no parent aliases visible.", 2_500);
         return elementCache().parentAlias(index).get();
     }
@@ -350,14 +365,27 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
         return elementCache().parentAliasSelect(index).getOptions();
     }
 
-    public T setParentAlias(int index, @Nullable String alias, @Nullable String optionDisplayText)
+    public T setParentAlias(int index, @Nullable String alias, @Nullable String dataType)
+    {
+        return setParentAlias(index, alias, dataType, false);
+    }
+
+    public T setParentAlias(int index, @Nullable String alias, @Nullable String dataType, boolean isRequired)
     {
         expandPropertiesPanel();
         elementCache().parentAlias(index).setValue(alias);
-        if (optionDisplayText != null)
+        if (dataType != null)
         {
-            elementCache().parentAliasSelect(index).select(optionDisplayText);
+            elementCache().parentAliasSelect(index).select(dataType);
         }
+
+        // The "Required" checkbox is not presented outside of the apps. Only a test running in the app could set
+        // this parent field to being required.
+        if (isRequired)
+        {
+            getWrapper().setCheckbox(elementCache().parentAliasRequiredCheckbox(index), isRequired);
+        }
+
         return getThis();
     }
 
@@ -419,6 +447,9 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
 
         final Locator uniqueIdMsgLoc = Locator.tagWithClass("div", "uniqueid-msg");
 
+        public Locator.XPathLocator commentInputLocator = Locator.tagWithId("textarea", "actionComments");
+        public WebElement commentInput = commentInputLocator.refindWhenNeeded(getDriver());
+
         public List<Input> parentAliases()
         {
             return Input.Input(Locator.name("alias"), getDriver()).findAll(propertiesPanel);
@@ -427,6 +458,12 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
         public Input parentAlias(int index)
         {
             return parentAliases().get(index);
+        }
+
+        public WebElement parentAliasRequiredCheckbox(int index)
+        {
+            return Locator.tagWithName("input","required").withAttribute("type", "checkbox")
+                    .findElements(propertiesPanel).get(index);
         }
 
         public WebElement removeParentAliasIcon(int index)

@@ -20,14 +20,19 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Flow;
 import org.labkey.test.categories.Specimen;
+import org.labkey.test.components.assay.AssayConstants;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PipelineStatusTable;
 
+import java.util.Map;
+
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -50,7 +55,7 @@ public class FlowSpecimenTest extends BaseFlowTest
     @BeforeClass
     public static void initFlowFolders()
     {
-        FlowSpecimenTest initTest = (FlowSpecimenTest)getCurrentTest();
+        FlowSpecimenTest initTest = getCurrentTest();
         initTest.initializeStudyFolder();
     }
 
@@ -133,7 +138,7 @@ public class FlowSpecimenTest extends BaseFlowTest
         assertTextPresent("Confirm Deletion");
         assertTextNotPresent("One dataset(s) have one or more rows which will also be deleted", String.format("/%1$s/%2$s", getProjectName(), STUDY_FOLDER), fcsAnalysisName);
         clickAndWait(Locator.lkButton("Confirm Delete"));
-        beginAt("/study/" + getProjectName() + "/" + STUDY_FOLDER + "/dataset.view?datasetId=5001");
+        beginAt(WebTestHelper.buildURL("study", getProjectName() + "/" + STUDY_FOLDER, "dataset", Map.of("datasetId", "5001")));
         DataRegionTable table = new DataRegionTable(getDriver().getCurrentUrl().contains("dataset.view") ? "Dataset" : "query", this);
         assertEquals("Dataset data not as expected after FCSFile delete", 2, table.getDataRowCount());
         log("Non-Study data delete successful");
@@ -147,7 +152,7 @@ public class FlowSpecimenTest extends BaseFlowTest
         assertTextPresent("Confirm Deletion", "One dataset(s) have one or more rows which will also be deleted", String.format("/%1$s/%2$s", getProjectName(), STUDY_FOLDER));
         clickAndWait(Locator.lkButton("Confirm Delete"));
         assertTextPresent("No data to show.");
-        beginAt("/study/" + getProjectName() + "/" + STUDY_FOLDER + "/dataset.view?datasetId=5001");
+        beginAt(WebTestHelper.buildURL("study", getProjectName() + "/" + STUDY_FOLDER, "dataset", Map.of("datasetId", "5001")));
         assertTextPresent("No data to show.");
         log("Study linked data delete successful");
     }
@@ -161,12 +166,12 @@ public class FlowSpecimenTest extends BaseFlowTest
         clickAndWait(Locator.linkWithText("Browse for more FCS files to be imported"));
         _fileBrowserHelper.selectFileBrowserItem("flowjoquery/microFCS");
         _fileBrowserHelper.selectImportDataAction("Import Directory of FCS Files");
-        selectOptionByText(Locator.id("targetStudy"), "/" + getProjectName() + "/" + STUDY_FOLDER + " (" + STUDY_FOLDER + " Study)");
+        selectOptionByText(AssayConstants.TARGET_STUDY_FIELD_LOCATOR, "/" + getProjectName() + "/" + STUDY_FOLDER + " (" + STUDY_FOLDER + " Study)");
         clickButton("Import Selected Runs");
         waitForPipelineComplete();
 
         log("** Verify Target Study is set on FCSFile run");
-        beginAt("/flow-run/" + getContainerPath() + "/showRuns.view");
+        beginAt(WebTestHelper.buildURL("flow-run", getContainerPath(), "showRuns"));
         DataRegionTable table = new DataRegionTable("query", this);
         assertEquals(STUDY_FOLDER + " Study", table.getDataAsText(0, "Target Study"));
         table.clickRowDetails(0);
@@ -220,10 +225,11 @@ public class FlowSpecimenTest extends BaseFlowTest
     private void linkFlowResultsToStudy()
     {
         // Link the sample wells to the STUDY_FOLDER
-        beginAt("/flow" + getContainerPath() + "/query.view?schemaName=flow&query.queryName=FCSAnalyses");
+        beginAt(WebTestHelper.buildURL("flow", getContainerPath(), "query", Map.of("schemaName", "flow", "query.queryName", "FCSAnalyses")));
         click(Locator.checkboxByName(".toggle"));
         clickButton("Link to Study");
-        selectOptionByText(Locator.name("targetStudy"), "/" + getProjectName() + "/" + STUDY_FOLDER + " (" + STUDY_FOLDER + " Study)");
+        // Target study is fixed
+        assertFalse("Target study selector visibility", AssayConstants.TARGET_STUDY_FIELD_LOCATOR.findElement(getDriver()).isDisplayed());
         clickButton("Next");
         assertTitleContains("Link to " + STUDY_FOLDER + " Study: Verify Results");
         // verify specimen information is filled in for '118795.fcs' FCS file
@@ -241,7 +247,7 @@ public class FlowSpecimenTest extends BaseFlowTest
     protected void verifyFCSFileSpecimenFK()
     {
         log("** Verify specimen FK from flow.FCSFile table");
-        beginAt("/flow" + getContainerPath() + "/query.view?schemaName=flow&query.queryName=FCSFiles");
+        beginAt(WebTestHelper.buildURL("flow", getContainerPath(), "query", Map.of("schemaName", "flow", "query.queryName", "FCSFiles")));
         verifySpecimenFK("");
     }
 
@@ -249,7 +255,7 @@ public class FlowSpecimenTest extends BaseFlowTest
     protected void verifyFCSAnalysisSpecimenFK()
     {
         log("** Verify specimen FK from flow.FCSAnalysis table");
-        beginAt("/flow" + getContainerPath() + "/query.view?schemaName=flow&query.queryName=FCSAnalyses");
+        beginAt(WebTestHelper.buildURL("flow", getContainerPath(), "query", Map.of("schemaName", "flow", "query.queryName", "FCSAnalyses")));
         verifySpecimenFK("FCSFile/");
     }
 
@@ -257,7 +263,7 @@ public class FlowSpecimenTest extends BaseFlowTest
     protected void verifyFlowDatasetSpecimenFK()
     {
         log("** Verify specimen FK from flow dataset");
-        beginAt("/study/" + getProjectName() + "/" + STUDY_FOLDER + "/dataset.view?datasetId=5001");
+        beginAt(WebTestHelper.buildURL("study", getProjectName() + "/" + STUDY_FOLDER, "dataset", Map.of("datasetId", "5001")));
         verifySpecimenFK("FCSFile/");
     }
 

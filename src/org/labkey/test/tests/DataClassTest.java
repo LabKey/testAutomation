@@ -65,7 +65,7 @@ public class DataClassTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        DataClassTest init = (DataClassTest) getCurrentTest();
+        DataClassTest init = getCurrentTest();
         init.doSetup();
     }
 

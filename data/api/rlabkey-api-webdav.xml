@@ -35,6 +35,23 @@
              ]]>
         </response>
     </test>
+    <test name="webdav.get showProgressBar=TRUE" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+                c("file.exists", file.exists("%downloadDir%/testFile.txt"))
+                c("webdav.get", labkey.webdav.get(baseUrl=labkey.url.base, folderPath="%projectName%", remoteFilePath="remote/readChecks/getMe.txt", localFilePath="%downloadDir%/testFile.txt", showProgressBar=TRUE))
+                c("final size", file.info("%downloadDir%/testFile.txt")$size)
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                [1] "file.exists" "FALSE"
+                [1] "webdav.get" "TRUE"
+                [1] "final size" "5"
+             ]]>
+        </response>
+    </test>
     <test name="webdav.get overwrite=FALSE" type="post">
         <url>
             <![CDATA[

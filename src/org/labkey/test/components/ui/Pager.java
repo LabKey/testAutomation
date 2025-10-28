@@ -63,28 +63,40 @@ public class Pager extends WebDriverComponent<Pager.ElementCache>
 
     public Pager selectPageSize(String pageSize)    // only works on GridPanel
     {
-        int currentPageSize = getPageSize();
-        if(currentPageSize != Integer.parseInt(pageSize))
-        {
-            _pagedComponent.doAndWaitForUpdate(() -> elementCache().jumpToDropdown.clickSubMenu(false, pageSize));
-        }
+        pageSize(pageSize);
         return this;
     }
 
     public int getPageSize()                // only works on GridPanel
     {
-        // Changing the jumpToDropdown button from the deprecated DropdownButtonGroup class to a MultiMenu type has changed
-        // the way that various text from the control is gathered. Getting the current page size now requires that the dropdown
+        return pageSize(null);
+    }
+
+    /**
+     * Sets the page size if required (pageSize is specified and doesn't match the current page size)
+     * @return returns the initial page size
+     */
+    private int pageSize(String pageSize) // only works on GridPanel
+    {
+        // Getting the current page size requires that the dropdown
         // be expanded and the selected page size found in the list.
         elementCache().jumpToDropdown.expand();
 
         // Find the selected li element in the page size list
         WebElement activeLi = Locator.byClass("active").findElement(elementCache().jumpToDropdown);
 
-        int size = Integer.parseInt(activeLi.getText());
-        elementCache().jumpToDropdown.collapse();
+        int initialSize = Integer.parseInt(activeLi.getText());
 
-        return size;
+        if (pageSize != null && initialSize != Integer.parseInt(pageSize))
+        {
+            _pagedComponent.doAndWaitForUpdate(() -> elementCache().jumpToDropdown.clickSubMenu(false, pageSize));
+        }
+        else
+        {
+            elementCache().jumpToDropdown.collapse();
+        }
+
+        return initialSize;
     }
 
     /**

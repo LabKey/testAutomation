@@ -45,7 +45,7 @@ public class GetRolesResponse extends CommandResponse
         return _roles;
     }
 
-    public class Role extends ResponseObject
+    public static class Role extends ResponseObject
     {
         String _uniqueName;
         String _name;

@@ -3,12 +3,8 @@ package org.labkey.test.components.react;
 import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
-import org.labkey.test.components.html.Input;
-import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-
-import static org.labkey.test.components.html.Input.Input;
 
 /**
  * automates shared component implemented by /internal/components/base/Cards.tsx
@@ -38,7 +34,6 @@ public class Card extends WebDriverComponent<Card.ElementCache>
 
     /**
      * returns the text of the 'title' tag in the content block
-     * @return
      */
     public String getTitle()
     {
@@ -47,7 +42,6 @@ public class Card extends WebDriverComponent<Card.ElementCache>
 
     /**
      * returns the URL to which the user will go if the component is clicked
-     * @return
      */
     public String getLinkHref()
     {

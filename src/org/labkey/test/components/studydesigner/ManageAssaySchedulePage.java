@@ -121,8 +121,8 @@ public class ManageAssaySchedulePage extends BaseManageVaccineDesignVisitPage
 
     protected class Elements extends BaseElements
     {
-        private Locator.XPathLocator assayPlanLoc = Locator.tagWithName("textarea", "assayPlan");
-        private Locator.XPathLocator checkbox = Locator.tagWithClass("input", "x4-form-checkbox");
+        private final Locator.XPathLocator assayPlanLoc = Locator.tagWithName("textarea", "assayPlan");
+        private final Locator.XPathLocator checkbox = Locator.tagWithClass("input", "x4-form-checkbox");
 
         Locator.XPathLocator assaysLoc = Locator.tagWithClass("div", "vaccine-design-assays");
 

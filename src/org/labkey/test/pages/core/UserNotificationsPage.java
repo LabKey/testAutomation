@@ -106,7 +106,7 @@ public class UserNotificationsPage extends LabKeyPage
 
     public List<NotificationItem> getNotificationsOfType(NotificationTypes notificationType)
     {
-        List<WebElement> panels = new ArrayList<>();
+        List<WebElement> panels;
         WebElement targetPanel = null;
         List<NotificationItem> notifications = new ArrayList<>();
 
@@ -137,7 +137,7 @@ public class UserNotificationsPage extends LabKeyPage
     {
         int noticeIndex;
         boolean noticeFound;
-        List<NotificationItem> notificationItemList = new ArrayList<>();
+        List<NotificationItem> notificationItemList;
 
         if(notificationType == null)
         {

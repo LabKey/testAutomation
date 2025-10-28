@@ -23,6 +23,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Daily;
+import org.labkey.test.components.assay.AssayConstants;
 import org.labkey.test.util.DataRegionTable;
 
 import java.io.File;
@@ -44,7 +45,7 @@ public class MultiplePKUploadAssayTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        MultiplePKUploadAssayTest init = (MultiplePKUploadAssayTest) getCurrentTest();
+        MultiplePKUploadAssayTest init = getCurrentTest();
         init.doSetup();
     }
 
@@ -98,12 +99,12 @@ public class MultiplePKUploadAssayTest extends BaseWebDriverTest
 
         log("Specifying the specimenID");
         assertTitleContains("Data Import: Run Properties and Data File");
-        setFormElement(Locator.name("name"), "First run");
-        setFormElement(Locator.id("TextAreaDataCollector.textArea"), "SpecimenID\nS17\nS22");
+        setFormElement(AssayConstants.ASSAY_NAME_FIELD_LOCATOR, "First run");
+        setFormElement(AssayConstants.TEXT_AREA_DATA_COLLECTOR_LOCATOR, "SpecimenID\nS17\nS22");
         clickButton("Save and Finish");
         assertElementPresent(Locator.css(".labkey-error").withText("Can not resolve thaw list entry for specimenId: S22"));
 
-        setFormElement(Locator.id("TextAreaDataCollector.textArea"), "SpecimenID\nS17");
+        setFormElement(AssayConstants.TEXT_AREA_DATA_COLLECTOR_LOCATOR, "SpecimenID\nS17");
         clickButton("Save and Finish");
         log("Verifying the visit ID");
 

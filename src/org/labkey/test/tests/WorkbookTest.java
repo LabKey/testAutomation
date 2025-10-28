@@ -180,7 +180,7 @@ public class WorkbookTest extends BaseWebDriverTest
         _containerHelper.createProject(PROJECT_NAME2, null);
         portalHelper.addWebPart("Workbooks");
         int id = workbookHelper.createWorkbook(PROJECT_NAME2, FILE_WORKBOOK_NAME, FILE_WORKBOOK_DESCRIPTION, WorkbookFolderType.FILE_WORKBOOK);
-        assertEquals("workbook added to new project did not have id=1", id, 1);
+        assertEquals("workbook added to new project did not have id=1", 1, id);
     }
 
     private List<Integer> createWorkbooks(String projectName, String fileWorkbookName, String fileWorkbookDescription,

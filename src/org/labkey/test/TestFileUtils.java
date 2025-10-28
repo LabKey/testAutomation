@@ -15,7 +15,6 @@
  */
 package org.labkey.test;
 
-import org.apache.commons.compress.archivers.ArchiveException;
 import org.apache.commons.compress.archivers.ArchiveStreamFactory;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
@@ -27,8 +26,6 @@ import org.apache.logging.log4j.Logger;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
-import org.apache.poi.xssf.streaming.SXSSFRow;
-import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openpgp.PGPCompressedData;
 import org.bouncycastle.openpgp.PGPEncryptedDataList;
@@ -41,8 +38,7 @@ import org.bouncycastle.openpgp.operator.jcajce.JcaPGPDigestCalculatorProviderBu
 import org.bouncycastle.openpgp.operator.jcajce.JcePBEDataDecryptorFactoryBuilder;
 import org.bouncycastle.util.io.Streams;
 import org.jetbrains.annotations.NotNull;
-import org.labkey.serverapi.reader.Readers;
-import org.labkey.serverapi.writer.PrintWriters;
+import org.jetbrains.annotations.Nullable;
 import org.openqa.selenium.NotFoundException;
 
 import java.io.BufferedInputStream;
@@ -52,9 +48,11 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -75,6 +73,10 @@ import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+
+import static org.labkey.test.util.TestDataGenerator.CHARSET_STRING;
+import static org.labkey.test.util.TestDataGenerator.randomInt;
+import static org.labkey.test.util.TestDataGenerator.randomName;
 
 /**
  * Static methods for finding and reading test-related files
@@ -105,15 +107,28 @@ public abstract class TestFileUtils
         return getFileContents(path);
     }
 
+    /**
+     * Get text content of a file. Will throw an error for non-text files (e.g. PDF).
+     */
     public static String getFileContents(Path path)
     {
         try
         {
-            return new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
+            return Files.readString(path);
         }
         catch (IOException fail)
         {
             throw new RuntimeException(fail);
+        }
+    }
+
+    public static long getFileRowCount(final File file) throws IOException
+    {
+        try (BufferedReader reader = new BufferedReader(new FileReader(file)))
+        {
+            long lines = 0;
+            while (reader.readLine() != null) lines++;
+            return lines;
         }
     }
 
@@ -213,11 +228,11 @@ public abstract class TestFileUtils
     {
         if (_modulesDir == null)
         {
-            _modulesDir = new File(getDefaultDeployDir(), "modules");
+            // Module root when deploying from embedded distribution
+            _modulesDir =  new File(getDefaultDeployDir(), "embedded/modules");
             if (!_modulesDir.isDirectory())
             {
-                // Module root when deploying from embedded distribution
-                _modulesDir = new File(getDefaultDeployDir(), "embedded/modules");
+                _modulesDir = new File(getDefaultDeployDir(), "modules");
             }
         }
         return _modulesDir;
@@ -306,7 +321,7 @@ public abstract class TestFileUtils
             if (sampledataDirsFile.exists())
             {
                 String path = getFileContents(sampledataDirsFile);
-                _sampledataDirs.addAll(Arrays.stream(path.split(";")).map(File::new).collect(Collectors.toList()));
+                _sampledataDirs.addAll(Arrays.stream(path.split(";")).map(File::new).toList());
             }
             else
             {
@@ -317,7 +332,7 @@ public abstract class TestFileUtils
                     // We know where the modules live; no reason to insist that sampledata.dirs exists.
                     Files.walkFileTree(modulesDir, Collections.emptySet(), 2, new SimpleFileVisitor<>(){
                         @Override
-                        public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException
+                        public @NotNull FileVisitResult preVisitDirectory(@NotNull Path dir, @NotNull BasicFileAttributes attrs)
                         {
                             if (dir.equals(modulesDir))
                             {
@@ -352,10 +367,46 @@ public abstract class TestFileUtils
         return new File(buildDir, "testTemp");
     }
 
-    public static File ensureTestTempDir() throws IOException
+    /**
+     * Creates a directory under the 'testTemp' directory: 'build/testTemp/[children]'
+     * @param children will be appended to the testTemp path
+     * @return A file pointer to the specified directory. The directory will exist
+     * @throws IOException if the directories were not created
+     */
+    public static File ensureTestTempDir(String... children) throws IOException
     {
         File file = getTestTempDir();
+        for (String child : children)
+        {
+            file = new File(file, child);
+        }
+
         FileUtils.forceMkdir(file);
+
+        return file;
+    }
+
+    /**
+     * Creates a directory under the 'testTemp' directory to contain the specified file. 'build/testTemp[/children]/lastChild'
+     * @param children will be appended to the testTemp path to construct the desired file's path
+     * @return A file pointer to the specified file. The file's parents will exist but the file might not
+     * @throws IOException if the parent directories were not created
+     */
+    public static File ensureTestTempFile(String... children) throws IOException
+    {
+        File file = getTestTempDir();
+
+        for (String child : children)
+        {
+            file = new File(file, child);
+        }
+
+        if (file.toString().length() == getTestTempDir().toString().length())
+        {
+            throw new IllegalArgumentException("No valid children were provided: " + Arrays.toString(children));
+        }
+        FileUtils.forceMkdirParent(file);
+
         return file;
     }
 
@@ -470,7 +521,12 @@ public abstract class TestFileUtils
      */
     public static File writeFile(File file, String contents) throws IOException
     {
-        try (Writer writer = PrintWriters.getPrintWriter(file))
+        return writeFile(file, contents, false);
+    }
+
+    public static File writeFile(File file, String contents, boolean append) throws IOException
+    {
+        try (Writer writer = new OutputStreamWriter(new FileOutputStream(file, append), StandardCharsets.UTF_8))
         {
             writer.write(contents);
             return file;
@@ -574,16 +630,22 @@ public abstract class TestFileUtils
      * The output file is created in the output folder, having the same name
      * as the input file, minus the '.tar' extension.
      */
-    private static List<File> unTar(final File inputFile, final File outputDir) throws IOException, ArchiveException
+    private static List<File> unTar(final File inputFile, final File outputDir) throws IOException
     {
         final List<File> untaredFiles = new ArrayList<>();
         try (InputStream is = new FileInputStream(inputFile);
-             TarArchiveInputStream inputStream = (TarArchiveInputStream) new ArchiveStreamFactory().createArchiveInputStream("tar", is))
+             TarArchiveInputStream inputStream = new ArchiveStreamFactory().createArchiveInputStream("tar", is))
         {
             TarArchiveEntry entry;
-            while ((entry = (TarArchiveEntry) inputStream.getNextEntry()) != null)
+            Path normalizedOutputPath = outputDir.toPath().normalize();
+
+            while ((entry = inputStream.getNextEntry()) != null)
             {
                 final File outputFile = new File(outputDir, entry.getName());
+
+                if (!outputFile.toPath().normalize().startsWith(normalizedOutputPath))
+                    throw new IOException("Bad zip entry (" + entry.getName() + ") in " + inputFile.getAbsolutePath());
+
                 if (entry.isDirectory())
                 {
                     if (!outputFile.exists())
@@ -598,7 +660,7 @@ public abstract class TestFileUtils
                 {
                     try (OutputStream outputFileStream = new FileOutputStream(outputFile))
                     {
-                        org.apache.commons.compress.utils.IOUtils.copy(inputStream, outputFileStream);
+                        IOUtils.copy(inputStream, outputFileStream);
                     }
                 }
                 untaredFiles.add(outputFile);
@@ -624,7 +686,7 @@ public abstract class TestFileUtils
         return outputFile;
     }
 
-    public static List<File> extractTarGz(File archive, File destDir) throws IOException, ArchiveException
+    public static List<File> extractTarGz(File archive, File destDir) throws IOException
     {
         destDir.mkdirs();
         return unTar(unGzip(archive, destDir), destDir);
@@ -663,34 +725,80 @@ public abstract class TestFileUtils
         return Streams.readAll(ld.getInputStream());
     }
 
+    // NOTE: These constants are copied from FileUtil.java and should be kept in sync.
+    private static final char[] ILLEGAL_CHARS = {'/','\\',':','?','<','>','*','|','"','^', '\n', '\r', '\''};
+    public static final String ILLEGAL_CHARS_STRING = new String(ILLEGAL_CHARS);
 
-    public static File convertTabularToXlsx(File tabularFile, String delimiter, String sheetName, String xlsxFileName) throws IOException, PGPException
+    /**
+     * Determining expected file names for downloaded files that are named according to some
+     * value that might include characters that are not legal for files.
+     * NOTE: This implementation is expected to exactly match FileUtil.makeLegalName(String name) defined on the server.
+     */
+    public static String makeLegalFileName(String name)
     {
-        File excelFile = new File(getTestTempDir(), xlsxFileName);
-        FileUtils.forceMkdirParent(excelFile);
-
-        try(SXSSFWorkbook workBook = new SXSSFWorkbook(1000); // holds 1000 rows at a time
-            BufferedReader br = Readers.getReader(tabularFile);
-            FileOutputStream out =  new FileOutputStream(excelFile))
+        if (name == null)
         {
-            var sheet = workBook.createSheet(sheetName);
-
-            String currentLine;
-            int rowNum=0;
-
-            while ((currentLine = br.readLine()) != null)
-            {
-                String str[] = currentLine.split(delimiter);
-                SXSSFRow currentRow = sheet.createRow(rowNum);
-                for (int i = 0; i < str.length; i++)
-                {
-                    currentRow.createCell(i).setCellValue(str[i]);
-                }
-                rowNum++;
-            }
-            workBook.write(out);    // flush remaining rows
+            return "__null__";
         }
 
-        return excelFile;
+        if (name.isEmpty())
+        {
+            return "__empty__";
+        }
+
+        //limit to 255 chars (FAT and OS X)
+        //replace illegal chars
+        char[] ret = new char[Math.min(255, name.length())];
+        for(int idx = 0; idx < ret.length; ++idx)
+        {
+            char ch = name.charAt(idx);
+            // Reject characters that are illegal anywhere
+            if (StringUtils.contains(ILLEGAL_CHARS_STRING, ch) ||
+                    // Or characters that are illegal starts to a file name
+                    (idx == 0 && (ch == '-' || ch == '$')))
+            {
+                ch = '_';
+            }
+            else if (ch == '-' &&
+                    idx > 0 &&
+                    name.charAt(idx - 1) == ' ')
+            {
+                int i = idx + 1;
+                // Skip through as many consecutive '-' as there might be
+                while (i < name.length() && name.charAt(i) == '-')
+                {
+                    i++;
+                }
+                // If the next character after the '-' isn't a space, transform the leading '-' in the sequence
+                if (i < name.length() && name.charAt(i) != ' ')
+                {
+                    ch = '_';
+                }
+            }
+
+            ret[idx] = ch;
+        }
+
+        //can't end with space (windows)
+        //can't end with period (windows)
+        int lastIndex = ret.length - 1;
+        char ch = ret[lastIndex];
+        if (ch == ' ' || ch == '.')
+            ret[lastIndex] = '_';
+
+        return new String(ret);
+    }
+
+    public static String randomFileName(@NotNull String part, @Nullable String extension)
+    {
+        return randomFileName(part, extension, null, null);
+    }
+
+    public static String randomFileName(@NotNull String part, @Nullable String extension, @Nullable Integer numStartChars, @Nullable Integer numEndChars)
+    {
+        String baseName = makeLegalFileName(randomName(part, numStartChars == null ? randomInt(0, 5) : numStartChars, numEndChars == null ? randomInt(0, 5) : numEndChars, CHARSET_STRING, null).name());
+        if (extension != null)
+            return baseName + extension;
+        return baseName;
     }
 }

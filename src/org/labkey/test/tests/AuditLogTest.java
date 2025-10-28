@@ -18,18 +18,14 @@ package org.labkey.test.tests;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
-import org.json.JSONException;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
-import org.labkey.remoteapi.query.ContainerFilter;
-import org.labkey.remoteapi.query.Filter;
+import org.labkey.remoteapi.query.BaseRowsCommand;
 import org.labkey.remoteapi.query.InsertRowsCommand;
-import org.labkey.remoteapi.query.SaveRowsResponse;
-import org.labkey.remoteapi.query.SelectRowsCommand;
-import org.labkey.remoteapi.query.SelectRowsResponse;
+import org.labkey.remoteapi.query.RowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
@@ -42,13 +38,13 @@ import org.labkey.test.components.domain.DomainFieldRow;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.pages.core.admin.logger.ManagerPage.LoggingLevel;
 import org.labkey.test.pages.list.EditListDefinitionPage;
+import org.labkey.test.pages.query.ExecuteQueryPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldDefinition.ColumnType;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.AuditLogHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Log4jUtils;
-import org.labkey.test.util.Maps;
 import org.labkey.test.util.PermissionsHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.UIUserHelper;
@@ -68,6 +64,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.labkey.test.util.PermissionsHelper.AUTHOR_ROLE;
+import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
+import static org.labkey.test.util.PermissionsHelper.FOLDER_ADMIN_ROLE;
+import static org.labkey.test.util.PermissionsHelper.PROJECT_ADMIN_ROLE;
 import static org.labkey.test.util.PasswordUtil.getUsername;
 
 @Category({Daily.class, Hosting.class})
@@ -86,17 +86,17 @@ public class AuditLogTest extends BaseWebDriverTest
 
     private static final String AUDIT_SECURITY_GROUP = "Testers";
 
-    private static final String PROJECT_ADMIN_ROLE = "Project Administrator";
-    private static final String AUTHOR_ROLE = "Author";
-
     private static final String AUDIT_TEST_PROJECT = "AuditVerifyTest";
     private static final String AUDIT_DETAILED_TEST_PROJECT = "AuditDetailedLogTest";
     private static final String AUDIT_TEST_SUBFOLDER = "AuditVerifyTest_Subfolder";
     private static final String AUDIT_PROPERTY_EVENTS_PROJECT = "AuditDomainPropertyEvents";
 
+    final String DOMAIN_PROPERTY_LOG_NAME = "Domain property events";
+
     public static final String COMMENT_COLUMN = "Comment";
 
     private final ApiPermissionsHelper permissionsHelper = new ApiPermissionsHelper(this);
+    private final AuditLogHelper _auditLogHelper = new AuditLogHelper(this);
 
     @Override
     public List<String> getAssociatedModules()
@@ -211,7 +211,7 @@ public class AuditLogTest extends BaseWebDriverTest
             pass = false;
         }
 
-        // Check to see if all of the expected values did show up.
+        // Check to see if all the expected values did show up.
         for (String expectedValue : expectedValues)
         {
             log("Searching Audit Log file for entry: '" + expectedValue + "'.");
@@ -237,7 +237,7 @@ public class AuditLogTest extends BaseWebDriverTest
         }
 
         // If there is anything left in the list it means there was an log message recorded that we weren't expecting.
-        if (diff.size() > 0)
+        if (!diff.isEmpty())
         {
             pass = false;
             for (String extraLog : diff)
@@ -283,12 +283,12 @@ public class AuditLogTest extends BaseWebDriverTest
         stopImpersonating();
         expectedLogValues.add(getUsername() + " stopped impersonating roles: " + PROJECT_ADMIN_ROLE + ", " + AUTHOR_ROLE);
 
-        String adminGroup = "Administrator";
-        impersonateGroup(adminGroup, true);
-        expectedLogValues.add(getUsername() + " impersonated group: " + adminGroup);
+        String usersGroup = "Users";
+        impersonateGroup(usersGroup, true);
+        expectedLogValues.add(getUsername() + " impersonated group: " + usersGroup);
 
         stopImpersonating();
-        expectedLogValues.add(getUsername() + " stopped impersonating group: " + adminGroup);
+        expectedLogValues.add(getUsername() + " stopped impersonating group: " + usersGroup);
 
         navBar().userMenu().signOut();
         expectedLogValues.add(getUsername() + " logged out.");
@@ -329,7 +329,7 @@ public class AuditLogTest extends BaseWebDriverTest
 
         _containerHelper.createProject(AUDIT_TEST_PROJECT, null);
         permissionsHelper.createPermissionsGroup(AUDIT_SECURITY_GROUP);
-        permissionsHelper.setPermissions(AUDIT_SECURITY_GROUP, "Editor");
+        permissionsHelper.setPermissions(AUDIT_SECURITY_GROUP, EDITOR_ROLE);
         _userHelper.createUser(AUDIT_TEST_USER, false, true);
         permissionsHelper.addUserToProjGroup(AUDIT_TEST_USER, getProjectName(), AUDIT_SECURITY_GROUP);
         _userHelper.deleteUsers(true, AUDIT_TEST_USER);
@@ -346,10 +346,13 @@ public class AuditLogTest extends BaseWebDriverTest
         expectedLogValues.add("Project /" + AUDIT_TEST_PROJECT + " was deleted");
         expectedLogValues.add("A new security policy was established for " + AUDIT_TEST_PROJECT + ". It will no longer inherit permissions from /");
         expectedLogValues.add("The group Guests was assigned to the security role No Permissions.");
+        expectedLogValues.add("A new security group named Users was created.");
+        expectedLogValues.add("The security group named Users was deleted.");
+        expectedLogValues.add("The security group named Testers was deleted.");
 
-        verifyAuditEvent(this, GROUP_AUDIT_EVENT, COMMENT_COLUMN, expectedLogValues.get(1), 10);
-        verifyAuditEvent(this, GROUP_AUDIT_EVENT, COMMENT_COLUMN, expectedLogValues.get(3), 10);
-        verifyAuditEvent(this, GROUP_AUDIT_EVENT, COMMENT_COLUMN, expectedLogValues.get(5), 10);
+        verifyAuditEvent(this, GROUP_AUDIT_EVENT, COMMENT_COLUMN, expectedLogValues.get(1), expectedLogValues.size());
+        verifyAuditEvent(this, GROUP_AUDIT_EVENT, COMMENT_COLUMN, expectedLogValues.get(3), expectedLogValues.size());
+        verifyAuditEvent(this, GROUP_AUDIT_EVENT, COMMENT_COLUMN, expectedLogValues.get(5), expectedLogValues.size());
         verifyAuditEvent(this, USER_AUDIT_EVENT, COMMENT_COLUMN, expectedLogValues.get(6), 10);
 
         log("testing project audit events");
@@ -371,8 +374,8 @@ public class AuditLogTest extends BaseWebDriverTest
         createList(AUDIT_TEST_PROJECT, "Parent List", "Name\nData", new FieldDefinition("Name", ColumnType.String).setDescription("Name") );
         createList(AUDIT_TEST_PROJECT + "/" + AUDIT_TEST_SUBFOLDER, "Child List", "Name\nData", new FieldDefinition("Name", ColumnType.String).setDescription("Name"));
 
-        createUserWithPermissions(AUDIT_TEST_USER, AUDIT_TEST_PROJECT, "Editor");
-        createUserWithPermissions(AUDIT_TEST_USER2, AUDIT_TEST_PROJECT, "Project Administrator");
+        createUserWithPermissions(AUDIT_TEST_USER, AUDIT_TEST_PROJECT, EDITOR_ROLE);
+        createUserWithPermissions(AUDIT_TEST_USER2, AUDIT_TEST_PROJECT, PROJECT_ADMIN_ROLE);
 
         // signed in as an admin so we should see rows here
         verifyAuditQueries(true);
@@ -384,7 +387,7 @@ public class AuditLogTest extends BaseWebDriverTest
 
         // now grant CanSeeAuditLog permission to our audit user and verify
         // we see audit information
-        permissionsHelper.setSiteAdminRoleUserPermissions(AUDIT_TEST_USER, "See Audit Log Events");
+        permissionsHelper.setSiteRoleUserPermissions(AUDIT_TEST_USER, "See Audit Log Events");
         impersonate(AUDIT_TEST_USER);
         verifyAuditQueries(true);
 
@@ -400,15 +403,17 @@ public class AuditLogTest extends BaseWebDriverTest
         stopImpersonating();
         // now give access to the sub-folder
         navigateToFolder(AUDIT_TEST_PROJECT, AUDIT_TEST_SUBFOLDER);
-        _securityHelper.setProjectPerm(AUDIT_TEST_USER2, "Folder Administrator");
+
+        ApiPermissionsHelper ph = new ApiPermissionsHelper(this);
+        ph.addMemberToRole(AUDIT_TEST_USER2,FOLDER_ADMIN_ROLE, PermissionsHelper.MemberType.user);
         impersonate(AUDIT_TEST_USER2);
         verifyListAuditLogQueries(Visibility.All);
         stopImpersonating();
 
         // verify issue 19832 - opposite of above.  Ensure that user who has access to child folder but not parent folder can still see
         // audit log events from the child forder if using a CurrentAndSubFolders container filter
-        createUserWithPermissions(AUDIT_TEST_USER3, AUDIT_TEST_PROJECT, "Editor");
-        permissionsHelper.addMemberToRole(AUDIT_TEST_USER3, "Folder Administrator", PermissionsHelper.MemberType.user, AUDIT_TEST_PROJECT + "/" + AUDIT_TEST_SUBFOLDER);
+        createUserWithPermissions(AUDIT_TEST_USER3, AUDIT_TEST_PROJECT, EDITOR_ROLE);
+        permissionsHelper.addMemberToRole(AUDIT_TEST_USER3, FOLDER_ADMIN_ROLE, PermissionsHelper.MemberType.user, AUDIT_TEST_PROJECT + "/" + AUDIT_TEST_SUBFOLDER);
         impersonate(AUDIT_TEST_USER3);
         verifyListAuditLogQueries(Visibility.ChildFolder);
         stopImpersonating();
@@ -426,7 +431,7 @@ public class AuditLogTest extends BaseWebDriverTest
         {
             _containerHelper.createProject(AUDIT_DETAILED_TEST_PROJECT, "Custom");
             _containerHelper.enableModule("simpletest");
-            goToProjectHome();
+            goToProjectHome(AUDIT_DETAILED_TEST_PROJECT);
 
             Connection cn = WebTestHelper.getRemoteApiConnection();
 
@@ -435,10 +440,44 @@ public class AuditLogTest extends BaseWebDriverTest
             Map<String, Object> rowMap = new HashMap<>();
             rowMap.put("name", "Kia");
             insertCmd.addRow(rowMap);
-            SaveRowsResponse resp1 = insertCmd.execute(cn, AUDIT_DETAILED_TEST_PROJECT);
+            RowsResponse resp1 = insertCmd.execute(cn, AUDIT_DETAILED_TEST_PROJECT);
+
+            Integer transactionId = _auditLogHelper.checkAuditEventDiffCountForLastTransaction(AUDIT_DETAILED_TEST_PROJECT, AuditLogHelper.AuditEvent.QUERY_UPDATE_AUDIT_EVENT, 0, 1);
+            Map<String, Object> expectedValues = new HashMap<>();
+            expectedValues.put("Comment", "1 row(s) were inserted.");
+            _auditLogHelper.checkAuditEventValuesForTransactionId(AUDIT_DETAILED_TEST_PROJECT, AuditLogHelper.AuditEvent.QUERY_UPDATE_AUDIT_EVENT, transactionId, 1, expectedValues);
+            goToProjectHome(AUDIT_DETAILED_TEST_PROJECT);
 
             Map<String, String> auditLog = getAuditLogRow(this, "Query update events", "Query Name", "Manufacturers");
             assertEquals("Did not find expected audit log for summary log level", "1 row(s) were inserted.", auditLog.get("Comment"));
+
+            // create manufacturer (which has summary audit log level) with api audit override to detail
+            insertCmd = new InsertRowsCommand("vehicle", "manufacturers");
+            insertCmd.setAuditBehavior(BaseRowsCommand.AuditBehavior.DETAILED);
+            rowMap = new HashMap<>();
+            rowMap.put("name", "Kia_ev");
+            insertCmd.addRow(rowMap);
+            insertCmd.execute(cn, AUDIT_DETAILED_TEST_PROJECT);
+
+            goToProjectHome(AUDIT_DETAILED_TEST_PROJECT);
+            transactionId = _auditLogHelper.checkAuditEventDiffCountForLastTransaction(AUDIT_DETAILED_TEST_PROJECT, AuditLogHelper.AuditEvent.QUERY_UPDATE_AUDIT_EVENT, 7, 1);
+            expectedValues = new HashMap<>();
+            expectedValues.put("Comment", "A row was inserted.");
+            _auditLogHelper.checkAuditEventValuesForTransactionId(AUDIT_DETAILED_TEST_PROJECT, AuditLogHelper.AuditEvent.QUERY_UPDATE_AUDIT_EVENT, transactionId, 1, expectedValues);
+
+            // create manufacturer (which has summary audit log level) with api audit override to NONE. The override should be ignored
+            insertCmd = new InsertRowsCommand("vehicle", "manufacturers");
+            insertCmd.setAuditBehavior(BaseRowsCommand.AuditBehavior.NONE);
+            rowMap = new HashMap<>();
+            rowMap.put("name", "Kia_hybrid");
+            insertCmd.addRow(rowMap);
+            insertCmd.execute(cn, AUDIT_DETAILED_TEST_PROJECT);
+
+            goToProjectHome(AUDIT_DETAILED_TEST_PROJECT);
+            transactionId = _auditLogHelper.checkAuditEventDiffCountForLastTransaction(AUDIT_DETAILED_TEST_PROJECT, AuditLogHelper.AuditEvent.QUERY_UPDATE_AUDIT_EVENT, 0, 1);
+            expectedValues = new HashMap<>();
+            expectedValues.put("Comment", "1 row(s) were inserted.");
+            _auditLogHelper.checkAuditEventValuesForTransactionId(AUDIT_DETAILED_TEST_PROJECT, AuditLogHelper.AuditEvent.QUERY_UPDATE_AUDIT_EVENT, transactionId, 1, expectedValues);
 
             //then create model (which has detailed audit log level)
             InsertRowsCommand insertCmd2 = new InsertRowsCommand("vehicle", "models");
@@ -451,6 +490,20 @@ public class AuditLogTest extends BaseWebDriverTest
             refresh();
             auditLog = getAuditLogRow(this, "Query update events", "Query Name", "Models");
             assertEquals("Did not find expected audit log for detailed log level", "A row was inserted.", auditLog.get("Comment"));
+            goToProjectHome(AUDIT_DETAILED_TEST_PROJECT);
+
+            // create model (which has detailed audit log level), with API audit SUMMARY, effective audit should be detailed
+            rowMap.put("name", "Carnival");
+            insertCmd2 = new InsertRowsCommand("vehicle", "models");
+            insertCmd2.setAuditBehavior(BaseRowsCommand.AuditBehavior.SUMMARY);
+            insertCmd2.addRow(rowMap);
+            insertCmd2.execute(cn, AUDIT_DETAILED_TEST_PROJECT);
+
+            transactionId = _auditLogHelper.checkAuditEventDiffCountForLastTransaction(AUDIT_DETAILED_TEST_PROJECT, AuditLogHelper.AuditEvent.QUERY_UPDATE_AUDIT_EVENT, 8, 1);
+            expectedValues = new HashMap<>();
+            expectedValues.put("Comment", "A row was inserted.");
+            _auditLogHelper.checkAuditEventValuesForTransactionId(AUDIT_DETAILED_TEST_PROJECT, AuditLogHelper.AuditEvent.QUERY_UPDATE_AUDIT_EVENT, transactionId, 1, expectedValues);
+
             _containerHelper.deleteProject(AUDIT_DETAILED_TEST_PROJECT, false);
         }
         else
@@ -475,20 +528,22 @@ public class AuditLogTest extends BaseWebDriverTest
 
     protected void verifyListAuditLogQueries(Visibility v)
     {
-        beginAt("/query/" + getProjectName() + "/executeQuery.view?schemaName=auditLog&query.queryName=ListAuditEvent&query.containerFilterName=CurrentAndSubfolders");
+        ExecuteQueryPage.getPageFactory("auditLog", "ListAuditEvent")
+                .addParameter("query.containerFilterName", "CurrentAndSubfolders")
+                .navigate(this, getProjectName());
         verifyAuditQueryEvent(this, "List", "Parent List", 1, canSeeParent(v));
         verifyAuditQueryEvent(this, "List", "Child List", 1, canSeeChild(v));
     }
 
     protected void verifyAuditQueries(boolean canSeeAuditLog)
     {
-        beginAt("/query/" + getProjectName() + "/executeQuery.view?schemaName=auditLog&query.queryName=ContainerAuditEvent");
+        ExecuteQueryPage.beginAt(this, getProjectName(), "auditLog", "ContainerAuditEvent");
         if (canSeeAuditLog)
             verifyAuditQueryEvent(this, COMMENT_COLUMN, AUDIT_TEST_PROJECT + " was created", 1);
         else
             assertTextPresent("No data to show.");
 
-        beginAt("/query/" + getProjectName() + "/executeQuery.view?schemaName=auditLog&query.queryName=GroupAuditEvent");
+        ExecuteQueryPage.beginAt(this, getProjectName(), "auditLog", "GroupAuditEvent");
         if (canSeeAuditLog)
             verifyAuditQueryEvent(this, COMMENT_COLUMN, "The user " + AUDIT_TEST_USER + " was assigned to the security role Editor.", 1);
         else
@@ -571,9 +626,6 @@ public class AuditLogTest extends BaseWebDriverTest
 
         final String FIELD03_NAME = "Field03";
         final String FIELD03_LABEL = "Field 03 Lookup";
-        final ColumnType FIELD03_TYPE = ColumnType.Integer;
-
-        final String DOMAIN_PROPERTY_LOG_NAME = "Domain property events";
 
         _containerHelper.createProject(AUDIT_PROPERTY_EVENTS_PROJECT, null);
 
@@ -596,35 +648,30 @@ public class AuditLogTest extends BaseWebDriverTest
 
         createList(AUDIT_PROPERTY_EVENTS_PROJECT, LIST_CHECK_LOG, null, listColumns);
 
-        List<Map<String, Object>> domainPropertyEventRows = getDomainPropertyEventsFromDomainEvents(AUDIT_PROPERTY_EVENTS_PROJECT, LIST_CHECK_LOG, null);
-
-        // Add the list of the event ids to an ignore list so future tests don't look at them again.
-        List<String> ignoreIds = new ArrayList<>();
-        ignoreIds.addAll(getDomainEventIdsFromPropertyEvents(domainPropertyEventRows));
-
-        if(domainPropertyEventRows.size() != 3)
-        {
-            // We are going to fail, so navigate to the Domain Property Events Audit Log so the screen shot shows the log.
-            // I do the navigation because the log validation is happening by the API, so if there is a failure in the log
-            // we may be on a page that will add no value to the screen shot artifact.
-            goToAuditEventView(this, DOMAIN_PROPERTY_LOG_NAME);
-            Assert.assertEquals("The number of entries in the domain audit log were not as expected.", 3, domainPropertyEventRows.size());
-        }
-
         log("Validate that the expected rows are there.");
-        Map<String, String> field01ExpectedColumns = Maps.of("action", "Created");
-        Map<String, String> field01ExpectedComment = Maps.of("Name", FIELD01_NAME,"Label", FIELD01_LABEL,"Type", "String","Description", FIELD01_DESCRIPTION);
-        boolean pass = validateExpectedRowInDomainPropertyAuditLog(domainPropertyEventRows, FIELD01_NAME, field01ExpectedColumns, field01ExpectedComment);
 
-        Map<String, String> field02ExpectedColumns = Maps.of("action", "Created");
-        Map<String, String> field02ExpectedComment = Maps.of("Name", FIELD02_NAME,"Label", FIELD02_LABEL,"Type", FIELD02_TYPE.getLabel(),"Description", FIELD02_DESCRIPTION);
-        pass = validateExpectedRowInDomainPropertyAuditLog(domainPropertyEventRows, FIELD02_NAME, field02ExpectedColumns, field02ExpectedComment) && pass;
+        String eventInitValue = "Name=ChangeMyColumns&AllowDelete=true&AllowUpload=true&AllowExport=true&EntireListIndexSetting=0" +
+                "&EntireListBodySetting=0&EachItemBodySetting=0&EntireListIndex=false&EachItemIndex=false&FileAttachmentIndex=false";
+        AuditLogHelper.DetailedAuditEventRow expectedDomainEvent = new AuditLogHelper.DetailedAuditEventRow(null, LIST_CHECK_LOG, null,
+                "The domain " + LIST_CHECK_LOG + " was created. The column(s) of domain " + LIST_CHECK_LOG + " were modified.",
+                null, null, eventInitValue, null);
+        String field1InitValue = "Name=Field01&Label=This%20is%20Field%2001&Type=String&Scale=4000&Description=Simple%20String%20field." +
+                "&PHI=Not%20PHI&DefaultScale=Linear&Required=false&Hidden=false&MvEnabled=false&Measure=false&Dimension=false" +
+                "&ShownInInsert=true&ShownInDetails=true&ShownInUpdate=true&ShownInLookupView=false" +
+                "&RecommendedVariable=false&ExcludedFromShifting=false&Scannable=false&DefaultValueType=Editable%20default";
+        AuditLogHelper.DetailedAuditEventRow field1ExpectedEvent = new AuditLogHelper.DetailedAuditEventRow(null, FIELD01_NAME, "Created",
+                null, null, null, field1InitValue, null);
 
-        // We are going to fail, so navigate to the Domain Property Events Audit Log.
-        if(!pass)
-            goToAuditEventView(this, DOMAIN_PROPERTY_LOG_NAME);
+        String field2InitValue = "Name=Field02&Label=This%20is%20Field%2002&Type=Integer&Description=Simple%20Integer%20field." +
+                "&PHI=Not%20PHI&DefaultScale=Linear&Required=false&Hidden=false&MvEnabled=false&Measure=true&Dimension=false" +
+                "&ShownInInsert=true&ShownInDetails=true&ShownInUpdate=true&ShownInLookupView=false&RecommendedVariable=false" +
+                "&ExcludedFromShifting=false&Scannable=false&DefaultValueType=Editable%20default";
+        AuditLogHelper.DetailedAuditEventRow field2ExpectedEvent = new AuditLogHelper.DetailedAuditEventRow(null, FIELD02_NAME, "Created",
+                null, null, null, field2InitValue, null);
 
-        Assert.assertTrue("The values logged for the 'Created' events were not as expected. See log for details.", pass);
+        AuditLogHelper.DetailedAuditEventRow keyFieldExpectedEvent = new AuditLogHelper.DetailedAuditEventRow(null, "Key", "Created",
+                null, null, null, null, null);
+        validateLastDomainAuditEvents(LIST_CHECK_LOG, "The values logged for the 'Created' events were not as expected.", expectedDomainEvent, Map.of("Key", keyFieldExpectedEvent, FIELD01_NAME, field1ExpectedEvent, FIELD02_NAME, field2ExpectedEvent));
 
         log("Looks like the created events were as expected. Now modify some column/field attributes.");
         goToProjectHome(AUDIT_PROPERTY_EVENTS_PROJECT);
@@ -649,37 +696,23 @@ public class AuditLogTest extends BaseWebDriverTest
 
         listDefinitionPage.clickSave();
 
-        log("Get a list of ids from the Domain Events Audit Log again but this time remove from the list the ids from the created events.");
-        domainPropertyEventRows = getDomainPropertyEventsFromDomainEvents(AUDIT_PROPERTY_EVENTS_PROJECT, LIST_CHECK_LOG, ignoreIds);
+        expectedDomainEvent = new AuditLogHelper.DetailedAuditEventRow(null, LIST_CHECK_LOG, null,
+                "The column(s) of domain " + LIST_CHECK_LOG + " were modified.",
+                "", eventInitValue, eventInitValue, null);
 
-        // Add the list of the event ids to an ignore list so future tests don't look at them again.
-        ignoreIds.addAll(getDomainEventIdsFromPropertyEvents(domainPropertyEventRows));
-
-        if(domainPropertyEventRows.size() != 2)
-        {
-            // We are going to fail, so navigate to the Domain Property Events Audit Log.
-            goToAuditEventView(this, DOMAIN_PROPERTY_LOG_NAME);
-            Assert.assertEquals("The number of entries in the domain audit log were not as expected.", 2, domainPropertyEventRows.size());
-        }
+        String field1UpdateValue = "Name=Field01&Label=This%20is%20Update%20Label%20for%20Field%2001&Type=String&Scale=4000&Description=This%20should%20be%20a%20new%20description%20for%20the%20field." +
+                "&PHI=Restricted%20PHI&DefaultScale=Linear&Required=true&Hidden=false&MvEnabled=false&Measure=false&Dimension=false&ShownInInsert=true&ShownInDetails=true&ShownInUpdate=true" +
+                "&ShownInLookupView=false&RecommendedVariable=false&ExcludedFromShifting=false&Scannable=false&DefaultValueType=Editable%20default";
+        field1ExpectedEvent = new AuditLogHelper.DetailedAuditEventRow(null, FIELD01_NAME, "Modified",
+                "The following properties were updated: Label, Description, PHI, Required", "", field1InitValue, field1UpdateValue, null);
+        String field2UpdateValue = "Name=Field02&Label=This%20is%20Field%2002&Type=Integer&Description=Simple%20Integer%20field.&Format=%23!&PHI=Not%20PHI" +
+                "&DefaultScale=Log&Required=false&Hidden=false&MvEnabled=false&Measure=true&Dimension=false&ShownInInsert=true&ShownInDetails=true&ShownInUpdate=true" +
+                "&ShownInLookupView=false&RecommendedVariable=false&ExcludedFromShifting=false&Scannable=false&DefaultValueType=Editable%20default&ConditionalFormat=format.column~eq%3D5%3A%20";
+        field2ExpectedEvent = new AuditLogHelper.DetailedAuditEventRow(null, FIELD02_NAME, "Modified",
+                "The following properties were updated: DefaultScale, Format, ConditionalFormat", "", field2InitValue, field2UpdateValue, null);
 
         log("Validate that the expected rows after the update are in the log.");
-        field01ExpectedColumns = Maps.of("action", "Modified");
-        field01ExpectedComment = Maps.of("Label", FIELD01_LABEL + " -> " + FIELD01_UPDATED_LABEL,
-                "Description", FIELD01_DESCRIPTION + " -> " + FIELD01_UPDATED_DESCRIPTION,
-                "PHI", "Not PHI -> Restricted PHI",
-                "Required", "false -> true");
-        pass = validateExpectedRowInDomainPropertyAuditLog(domainPropertyEventRows, FIELD01_NAME, field01ExpectedColumns, field01ExpectedComment);
-
-        field02ExpectedColumns = Maps.of("action", "Modified");
-        field02ExpectedComment = Maps.of("ConditionalFormats", "old: <none>, new: 1",
-                "DefaultScale", "Linear -> Log");
-        pass = validateExpectedRowInDomainPropertyAuditLog(domainPropertyEventRows, FIELD02_NAME, field02ExpectedColumns, field02ExpectedComment) && pass;
-
-        // We are going to fail, so navigate to the Domain Property Events Audit Log.
-        if(!pass)
-            goToAuditEventView(this, DOMAIN_PROPERTY_LOG_NAME);
-
-        Assert.assertTrue("The values logged for the 'Modified' events were not as expected. See log for details.", pass);
+        validateLastDomainAuditEvents(LIST_CHECK_LOG, "The values logged for the 'Modified' events were not as expected.", expectedDomainEvent, Map.of(FIELD01_NAME, field1ExpectedEvent, FIELD02_NAME, field2ExpectedEvent));
 
         log("The modified events were logged as expected. Now add a lookup field.");
         goToProjectHome(AUDIT_PROPERTY_EVENTS_PROJECT);
@@ -687,37 +720,18 @@ public class AuditLogTest extends BaseWebDriverTest
         listDefinitionPage = _listHelper.goToEditDesign(LIST_CHECK_LOG);
         listDefinitionPage.getFieldsPanel()
                 .addField(new FieldDefinition(FIELD03_NAME,
-                        new FieldDefinition.LookupInfo(null, "lists", LOOK_UP_LIST01)
-                                .setTableType(ColumnType.Integer))
+                        new FieldDefinition.IntLookup(null, "lists", LOOK_UP_LIST01))
                         .setLabel(FIELD03_LABEL));
         listDefinitionPage.clickSave();
 
-        log("Validate that a 'Create' event was logged for the new filed.");
-        domainPropertyEventRows = getDomainPropertyEventsFromDomainEvents(AUDIT_PROPERTY_EVENTS_PROJECT, LIST_CHECK_LOG, ignoreIds);
+        String field3CreateValue = "Name=Field03&Label=Field%2003%20Lookup&Type=Integer&PHI=Not%20PHI&DefaultScale=Linear&Required=false&Hidden=false&MvEnabled=false" +
+                "&Measure=false&Dimension=true&ShownInInsert=true&ShownInDetails=true&ShownInUpdate=true&ShownInLookupView=false&RecommendedVariable=false&ExcludedFromShifting=false&Scannable=false" +
+                "&DefaultValueType=Editable%20default&Lookup=%7B%22queryName%22%3A%22LookUp01%22%2C%22schemaName%22%3A%22lists%22%7D";
+        AuditLogHelper.DetailedAuditEventRow field3ExpectedEvent = new AuditLogHelper.DetailedAuditEventRow(null, FIELD03_NAME, "Created",
+                null, "", null, field3CreateValue, null);
 
-        // Add the list of the event ids to an ignore list so future tests don't look at them again.
-        ignoreIds.addAll(getDomainEventIdsFromPropertyEvents(domainPropertyEventRows));
-
-        if(domainPropertyEventRows.size() != 1)
-        {
-            // We are going to fail, so navigate to the Domain Property Events Audit Log.
-            goToAuditEventView(this, DOMAIN_PROPERTY_LOG_NAME);
-            Assert.assertEquals("The number of entries in the domain audit log were not as expected.", 1, domainPropertyEventRows.size());
-        }
-
-        log("Validate that the expected row is there for the newly created field.");
-        Map<String, String> field03ExpectedColumns = Maps.of("action", "Created");
-        Map<String, String> field03ExpectedComment = Maps.of("Name", FIELD03_NAME,
-                "Label", FIELD03_LABEL,
-                "Type", FIELD03_TYPE.getLabel(),
-                "Lookup", "[Schema: lists, Query: " + LOOK_UP_LIST01 + "]");
-        pass = validateExpectedRowInDomainPropertyAuditLog(domainPropertyEventRows, FIELD03_NAME, field03ExpectedColumns, field03ExpectedComment);
-
-        // We are going to fail, so navigate to the Domain Property Events Audit Log.
-        if(!pass)
-            goToAuditEventView(this, DOMAIN_PROPERTY_LOG_NAME);
-
-        Assert.assertTrue("The values logged for the 'Created' event for the lookup field were not as expected. See log for details.", pass);
+        log("Validate that the expected rows after the update are in the log.");
+        validateLastDomainAuditEvents(LIST_CHECK_LOG, "The values logged for the 'Created' event for the lookup field were not as expected.", expectedDomainEvent, Map.of(FIELD03_NAME, field3ExpectedEvent));
 
         log("The 'Created' event was logged as expected. Now modify the field to point to a new list in the lookup field.");
         goToProjectHome(AUDIT_PROPERTY_EVENTS_PROJECT);
@@ -730,17 +744,13 @@ public class AuditLogTest extends BaseWebDriverTest
                 .setLookup(new FieldDefinition.IntLookup(null, "lists", LOOK_UP_LIST02));
         listDefinitionPage.clickSave();
 
-        log("Validate that the expected row is there for the after modifying the Lookup field.");
-        field03ExpectedColumns = Maps.of("action", "Modified");
-        field03ExpectedComment = Maps.of("Lookup", "[Query: old: " + LOOK_UP_LIST01 + ", new: " + LOOK_UP_LIST02 + "]");
-
-        log("Get a list of ids from the Domain Events Audit Log again but remove from the list the ids from all of the previous events.");
-        domainPropertyEventRows = getDomainPropertyEventsFromDomainEvents(AUDIT_PROPERTY_EVENTS_PROJECT, LIST_CHECK_LOG, ignoreIds);
-
-        // Add the list of the event ids to an ignore list so future tests don't look at them again.
-        ignoreIds.addAll(getDomainEventIdsFromPropertyEvents(domainPropertyEventRows));
-
-        pass = validateExpectedRowInDomainPropertyAuditLog(domainPropertyEventRows, FIELD03_NAME, field03ExpectedColumns, field03ExpectedComment);
+        log("Validate that the expected rows after the update are in the log.");
+        String field3UpdateValue = "Name=Field03&Label=Field%2003%20Lookup&Type=Integer&PHI=Not%20PHI&DefaultScale=Linear&Required=false&Hidden=false&MvEnabled=false" +
+                "&Measure=false&Dimension=true&ShownInInsert=true&ShownInDetails=true&ShownInUpdate=true&ShownInLookupView=false&RecommendedVariable=false&ExcludedFromShifting=false" +
+                "&Scannable=false&DefaultValueType=Editable%20default&Lookup=%7B%22queryName%22%3A%22LookUp02%22%2C%22schemaName%22%3A%22lists%22%7D";
+        field3ExpectedEvent = new AuditLogHelper.DetailedAuditEventRow(null, FIELD03_NAME, "Modified",
+                "The following property was updated: Lookup", "", field3CreateValue, field3UpdateValue, null);
+        boolean pass = _auditLogHelper.validateLastDomainAuditEvents(LIST_CHECK_LOG, AUDIT_PROPERTY_EVENTS_PROJECT, expectedDomainEvent, Map.of(FIELD03_NAME, field3ExpectedEvent));
 
         // We are going to fail, so navigate to the Domain Property Events Audit Log.
         if(!pass)
@@ -755,221 +765,19 @@ public class AuditLogTest extends BaseWebDriverTest
         listDefinitionPage.getFieldsPanel().getField(3).clickRemoveField(true);
         listDefinitionPage.clickSave();
 
-        log("Validate that the expected row is there after deleting the Lookup field.");
-        field03ExpectedColumns = Maps.of("action", "Deleted");
-
-        log("Get a list of ids from the Domain Events Audit Log again but remove from the list the ids from all of the previous events.");
-        domainPropertyEventRows = getDomainPropertyEventsFromDomainEvents(AUDIT_PROPERTY_EVENTS_PROJECT, LIST_CHECK_LOG, ignoreIds);
-
-        pass = validateExpectedRowInDomainPropertyAuditLog(domainPropertyEventRows, FIELD03_NAME, field03ExpectedColumns, null);
-
-        // We are going to fail, so navigate to the Domain Property Events Audit Log.
-        if(!pass)
-            goToAuditEventView(this, DOMAIN_PROPERTY_LOG_NAME);
-
-        Assert.assertTrue("The values logged for the 'Deleted' events for the lookup field were not as expected. See log for details.", pass);
+        field3ExpectedEvent = new AuditLogHelper.DetailedAuditEventRow(null, FIELD03_NAME, "Deleted",
+                "", "", null, null, null);
+        validateLastDomainAuditEvents(LIST_CHECK_LOG, "The values logged for the 'Deleted' events for the lookup field were not as expected.", expectedDomainEvent, Map.of(FIELD03_NAME, field3ExpectedEvent));
 
         log("Ok, it looks like everything was logged as expected. Yipeee!");
     }
 
-    private boolean validateExpectedRowInDomainPropertyAuditLog(List<Map<String, Object>> domainPropertyEventRows, String propertyName, Map<String, String> expectedColumns, @Nullable Map<String, String> expectedComment)
+    private void validateLastDomainAuditEvents(String domainName, String failComment, AuditLogHelper.DetailedAuditEventRow domainEvent, Map<String, AuditLogHelper.DetailedAuditEventRow> propertyEvents)
     {
-        boolean pass = true;
+        boolean pass = _auditLogHelper.validateLastDomainAuditEvents(domainName, AUDIT_PROPERTY_EVENTS_PROJECT, domainEvent, propertyEvents);
+        if(!pass)
+            goToAuditEventView(this, DOMAIN_PROPERTY_LOG_NAME);
 
-        for(Map<String, Object> row : domainPropertyEventRows)
-        {
-
-            if(getLogColumnValue(row, "propertyname").equals(propertyName))
-            {
-                log("Validate the columns for property '" + propertyName + "'.");
-                for(String fieldName : expectedColumns.keySet())
-                {
-                    if(!getLogColumnValue(row, fieldName).equals(expectedColumns.get(fieldName)))
-                    {
-                        pass = false;
-                        log("************** For field '" + fieldName + "' expected value '" + expectedColumns.get(fieldName) + "' found '" + row.get(fieldName) + "' **************");
-                    }
-                }
-
-                if(null != expectedComment)
-                {
-                    log("Validate that the Comment field is as expected.");
-                    Map<String, String> commentFieldValues = getDomainPropertyEventComment(row);
-                    pass = validateCommentHasExpectedValues(commentFieldValues, expectedComment) && pass;
-                }
-            }
-
-        }
-
-        return pass;
-    }
-
-    private boolean validateCommentHasExpectedValues(Map<String, String> comment, Map<String, String> expected)
-    {
-        boolean pass = true;
-
-        for(String key : expected.keySet())
-        {
-            if(!expected.get(key).equals(comment.get(key)))
-            {
-                log("************** Comment value does not contain expected value for field '" + key + "'. Expected '" + expected.get(key) + "' found '" + comment.get(key) + "'.  **************");
-                pass = false;
-            }
-        }
-
-        return pass;
-    }
-
-    private List<Map<String, Object>> getDomainPropertyEventsFromDomainEvents(String projectName, String domainName, @Nullable List<String> ignoreIds)
-    {
-        List<String> domainEventIds = getDomainEventIds(projectName, domainName);
-
-        if(null != ignoreIds)
-        {
-            log("Removing the ignore ids from the list.");
-            domainEventIds.removeAll(ignoreIds);
-        }
-
-        log("Get all of the Domain Property Events for '" + domainName + "' that are linked to the domain events.");
-        List<Map<String, Object>> domainPropertyEventRows = getDomainPropertyEventLog(domainName, domainEventIds);
-        log("Number of 'Domain Property Event' log entries: " + domainPropertyEventRows.size());
-
-        return domainPropertyEventRows;
-    }
-
-    private List<String> getDomainEventIds(String projectName, String domainName)
-    {
-        log("Get a list of the Domain Events for project '" + projectName + "'. ");
-        List<Map<String, Object>> domainAuditEventAllRows = getDomainEventLog(projectName);
-        log("Number of 'Domain Event' log entries for '" + projectName + "': " + domainAuditEventAllRows.size());
-
-        log("Filter the list to look only at '" + domainName + "'.");
-        List<Map<String, Object>> domainAuditEventRows = new ArrayList<>();
-
-        for(Map<String, Object> row : domainAuditEventAllRows)
-        {
-            if(getLogColumnValue(row, "domainname").toLowerCase().trim().equals(domainName.toLowerCase().trim()))
-                domainAuditEventRows.add(row);
-        }
-
-        List<String> domainEventIds = new ArrayList<>();
-        domainAuditEventRows.forEach((event)->domainEventIds.add(getLogColumnValue(event, "rowid")));
-
-        log("Number of 'Domain Event' log entries for '" + domainName + "': " + domainEventIds.size());
-
-        return domainEventIds;
-    }
-
-    private List<String> getDomainEventIdsFromPropertyEvents(List<Map<String, Object>> domainPropertyEventRows)
-    {
-        List<String> domainEventIds = new ArrayList<>();
-
-        for(Map<String, Object> row : domainPropertyEventRows)
-        {
-            domainEventIds.add(getLogColumnValue(row, "domaineventid"));
-        }
-
-        return domainEventIds;
-    }
-
-    private List<Map<String, Object>> getDomainEventLog(String projectName)
-    {
-        Connection cn = WebTestHelper.getRemoteApiConnection();
-        SelectRowsCommand cmd = new SelectRowsCommand("auditLog", "DomainAuditEvent");
-        cmd.setRequiredVersion(9.1);
-        cmd.setColumns(Arrays.asList("rowid", "created", "createdby", "impersonatedby", "projectid", "domainuri", "domainname", "comment"));
-        cmd.addFilter("projectid/DisplayName", projectName, Filter.Operator.EQUAL);
-        cmd.setContainerFilter(ContainerFilter.AllFolders);
-
-        return executeSelectCommand(cn, cmd);
-    }
-
-    private List<Map<String, Object>> getDomainPropertyEventLog(String domainName, @Nullable List<String> eventIds)
-    {
-        Connection cn = WebTestHelper.getRemoteApiConnection();
-        SelectRowsCommand cmd = new SelectRowsCommand("auditLog", "DomainPropertyAuditEvent");
-        cmd.setRequiredVersion(9.1);
-        cmd.setColumns(Arrays.asList("Created", "CreatedBy", "ImpersonatedBy", "propertyname", "action", "domainname", "domaineventid", "Comment"));
-        cmd.addFilter("domainname", domainName, Filter.Operator.EQUAL);
-
-        if(null != eventIds)
-        {
-            StringBuilder stringBuilder = new StringBuilder();
-            eventIds.forEach((id)->{
-                if(stringBuilder.length() != 0)
-                    stringBuilder.append(";");
-                stringBuilder.append(id);
-            });
-            cmd.addFilter("domaineventid/rowid", stringBuilder, Filter.Operator.IN);
-        }
-
-        cmd.setContainerFilter(ContainerFilter.AllFolders);
-
-        return executeSelectCommand(cn, cmd);
-    }
-
-    private List<Map<String, Object>> executeSelectCommand(Connection cn, SelectRowsCommand cmd)
-    {
-        List<Map<String, Object>> rowsReturned = new ArrayList<>();
-        try
-        {
-            SelectRowsResponse response = cmd.execute(cn, "/");
-            log("Number of rows: " + response.getRowCount());
-            rowsReturned.addAll(response.getRows());
-        }
-        catch(IOException | CommandException ex)
-        {
-            // Just fail here, don't toss the exception up the stack.
-            Assert.assertTrue("There was a command exception when getting the log: " + ex.toString(), false);
-        }
-
-        return rowsReturned;
-    }
-
-    private Map<String, String> getDomainPropertyEventComment(Map<String, Object> row)
-    {
-        String comment = getLogColumnValue(row, "Comment");
-
-        String[] commentAsArray = comment.split(";");
-
-        Map<String, String> fieldComments = new HashMap<>();
-
-        for (String s : commentAsArray)
-        {
-            String[] fieldValue = s.split(":");
-
-            // If the split on the ':' produced more than two entries in the array it most likely means that the
-            // comment for that property had a : in it. So treat the first entry as the field name and then concat the
-            // other fields together.
-            // For example the ConditionalFormats field will log the following during an update:
-            // ConditionalFormats: old: <none>, new: 1;
-            // And a create of a Lookup will log as:
-            // Lookup: [Schema: lists, Query: LookUp01];
-            StringBuilder sb = new StringBuilder();
-            sb.append(fieldValue[1].trim());
-
-            for (int j = 2; j < fieldValue.length; j++)
-            {
-                sb.append(":");
-                sb.append(fieldValue[j]);
-            }
-
-            fieldComments.put(fieldValue[0].trim(), sb.toString());
-        }
-
-        return fieldComments;
-    }
-
-    private String getLogColumnValue(Map<String, Object> rowEntry, String columnName)
-    {
-        try
-        {
-            return ((Map<String, Object>) rowEntry.get(columnName)).get("value").toString();
-        }
-        catch(JSONException je)
-        {
-            // Just fail here, don't toss the exception up the stack.
-            throw new IllegalArgumentException(je);
-        }
+        Assert.assertTrue(failComment + " See log for details.", pass);
     }
 }

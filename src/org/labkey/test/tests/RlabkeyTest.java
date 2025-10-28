@@ -54,6 +54,7 @@ import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
 
 @Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 8)
@@ -84,7 +85,7 @@ public class RlabkeyTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        RlabkeyTest init = (RlabkeyTest)getCurrentTest();
+        RlabkeyTest init = getCurrentTest();
         init.doInit();
     }
 
@@ -112,9 +113,9 @@ public class RlabkeyTest extends BaseWebDriverTest
         _userHelper.createUser(USER);
         ApiPermissionsHelper apiPermissionsHelper = new ApiPermissionsHelper(this);
         apiPermissionsHelper.addUserToProjGroup(USER, PROJECT_NAME_2, "Users");
-        apiPermissionsHelper.addMemberToRole("Users", "Editor", PermissionsHelper.MemberType.group, PROJECT_NAME_2);
+        apiPermissionsHelper.addMemberToRole("Users", EDITOR_ROLE, PermissionsHelper.MemberType.group, PROJECT_NAME_2);
         apiPermissionsHelper.addUserToProjGroup(USER, PROJECT_NAME, "Users");
-        apiPermissionsHelper.addMemberToRole("Users", "Editor", PermissionsHelper.MemberType.group, PROJECT_NAME);
+        apiPermissionsHelper.addMemberToRole("Users", EDITOR_ROLE, PermissionsHelper.MemberType.group, PROJECT_NAME);
         IssuesHelper issuesHelper = new IssuesHelper(this);
 
         // create an site wide issues list
@@ -123,15 +124,15 @@ public class RlabkeyTest extends BaseWebDriverTest
 
         clickProject(PROJECT_NAME);
         createNewIssueList(issuesHelper, ISSUE_LIST_NAME);
-        issuesHelper.addIssue(Maps.of("assignedTo", _userHelper.getDisplayNameForEmail(USER), "title", ISSUE_TITLE_0));
+        issuesHelper.addIssue(Maps.of("AssignedTo", _userHelper.getDisplayNameForEmail(USER), "title", ISSUE_TITLE_0));
 
         clickFolder(FOLDER_NAME);
         createNewIssueList(issuesHelper, ISSUE_LIST_NAME);
-        issuesHelper.addIssue(Maps.of("assignedTo", _userHelper.getDisplayNameForEmail(USER), "title", ISSUE_TITLE_1));
+        issuesHelper.addIssue(Maps.of("AssignedTo", _userHelper.getDisplayNameForEmail(USER), "title", ISSUE_TITLE_1));
 
         clickProject(PROJECT_NAME_2);
         createNewIssueList(issuesHelper, ISSUE_LIST_NAME);
-        issuesHelper.addIssue(Maps.of("assignedTo", _userHelper.getDisplayNameForEmail(USER), "title", ISSUE_TITLE_2));
+        issuesHelper.addIssue(Maps.of("AssignedTo", _userHelper.getDisplayNameForEmail(USER), "title", ISSUE_TITLE_2));
     }
 
     /**
@@ -306,7 +307,7 @@ public class RlabkeyTest extends BaseWebDriverTest
                 if (!success)
                 {
                     TestLogger.error("Expected results for test case: " + test.getName() + ":\n" + expectedOutput);
-                    TestLogger.error("Script for failed test case: " + test.getName() + ":\n" + sb.toString());
+                    TestLogger.error("Script for failed test case: " + test.getName() + ":\n" + sb);
                     checker().withScreenshot(testData.getName()).error(test.getName());
                 }
                 else if ("DEBUG".equalsIgnoreCase(test.getType()))

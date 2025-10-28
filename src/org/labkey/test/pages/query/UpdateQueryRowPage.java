@@ -9,8 +9,10 @@ import org.labkey.test.Locators;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.html.Checkbox;
+import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.OptionSelect;
 import org.labkey.test.pages.LabKeyPage;
+import org.labkey.test.util.EscapeUtil;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -47,6 +49,13 @@ public class UpdateQueryRowPage extends LabKeyPage<UpdateQueryRowPage.ElementCac
         return new UpdateQueryRowPage(webDriverWrapper.getDriver());
     }
 
+    public static UpdateQueryRowPage beginAtInsertRowPage(WebDriverWrapper webDriverWrapper, String containerPath, String schemaName, String queryName)
+    {
+        webDriverWrapper.beginAt(WebTestHelper.buildURL("query", containerPath, "insertQueryRow",
+            Map.of("schemaName", schemaName, "query.queryName", queryName)));
+        return new UpdateQueryRowPage(webDriverWrapper.getDriver());
+    }
+
     public void update(Map<String, ?> fields)
     {
         setFields(fields);
@@ -58,21 +67,25 @@ public class UpdateQueryRowPage extends LabKeyPage<UpdateQueryRowPage.ElementCac
         for (Map.Entry<String, ?> entry : fields.entrySet())
         {
             Object value = entry.getValue();
-            if (value instanceof String)
+            if (value instanceof String s)
             {
-                setField(entry.getKey(), (String) value);
+                setField(entry.getKey(), s);
             }
-            else if (value instanceof Boolean)
+            else if (value instanceof Boolean b)
             {
-                setField(entry.getKey(), (Boolean) value);
+                setField(entry.getKey(), b);
             }
-            else if (value instanceof Integer)
+            else if (value instanceof Integer i)
             {
-                setField(entry.getKey(), (Integer) value);
+                setField(entry.getKey(), i);
             }
-            else if (value instanceof File)
+            else if (value instanceof Long l)
             {
-                setField(entry.getKey(), (File) value);
+                setField(entry.getKey(), l);
+            }
+            else if (value instanceof File f)
+            {
+                setField(entry.getKey(), f);
             }
             else
             {
@@ -106,6 +119,11 @@ public class UpdateQueryRowPage extends LabKeyPage<UpdateQueryRowPage.ElementCac
         return setField(fieldName, String.valueOf(value));
     }
 
+    public UpdateQueryRowPage setField(String fieldName, Long value)
+    {
+        return setField(fieldName, String.valueOf(value));
+    }
+
     public UpdateQueryRowPage setField(String fieldName, File file)
     {
         setFormElement(elementCache().findField(fieldName), file);
@@ -116,6 +134,12 @@ public class UpdateQueryRowPage extends LabKeyPage<UpdateQueryRowPage.ElementCac
     {
         new OptionSelect<>(elementCache().findField(fieldName)).selectOption(option);
         return this;
+    }
+
+    public String getTextInputValue(String fieldName)
+    {
+        var input = new Input(elementCache().findField(fieldName), getDriver());
+        return input.getValue();
     }
 
     public void submit()
@@ -162,7 +186,7 @@ public class UpdateQueryRowPage extends LabKeyPage<UpdateQueryRowPage.ElementCac
         {
             if (!fieldMap.containsKey(name))
             {
-                fieldMap.put(name, Locator.name("quf_" + name).findElement(this));
+                fieldMap.put(name, Locator.name(EscapeUtil.getFormFieldName(name)).findElement(this));
             }
             return fieldMap.get(name);
         }

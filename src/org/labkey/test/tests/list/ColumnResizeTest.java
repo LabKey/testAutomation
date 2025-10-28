@@ -113,7 +113,7 @@ public class ColumnResizeTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        ColumnResizeTest init = (ColumnResizeTest)getCurrentTest();
+        ColumnResizeTest init = getCurrentTest();
         init._containerHelper.createProject(PROJECT_NAME, null);
     }
 

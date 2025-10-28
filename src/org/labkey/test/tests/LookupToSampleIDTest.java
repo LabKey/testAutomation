@@ -62,7 +62,7 @@ public class LookupToSampleIDTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        LookupToSampleIDTest init = (LookupToSampleIDTest) getCurrentTest();
+        LookupToSampleIDTest init = getCurrentTest();
 
         init.doSetup();
     }

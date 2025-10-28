@@ -80,23 +80,19 @@ function doTest()
         containerPath: containerPath
     });
 
-    if (!result.groups || result.groups.length < 3) // User should be in at least 3 groups (id): Guests (-3), All Site Users (-2), and Site Administrators (-1)
+    if (!result.groups || result.groups.length < 2) // User should be in at least two groups (id): Guests (-3) and All Site Users (-2)
         errors[errors.length] = new Error("Security.getGroupsForCurrentUser() = " + Ext.util.JSON.encode(result));
     else
     {
         var success = false;
         var g = result.groups.shift();
-        if (g.id === -4) // Developers group is fine, but optional... skip to Guests
-            g = result.groups.shift();
 
         if (g.id === -3 && g.name === 'Guests')
         {
             g = result.groups.shift();
             if (g.id === -2 && g.name === 'All Site Users')
             {
-                g = result.groups.shift();
-                if (g.id === -1 && g.name === 'Site Administrators')
-                    success = true;
+                success = true;
             }
         }
 

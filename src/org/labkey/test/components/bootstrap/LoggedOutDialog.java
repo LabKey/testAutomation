@@ -87,8 +87,6 @@ public class LoggedOutDialog extends ModalDialog
     /**
      * Use this to check expected top-level elements' presence in tests before subsequently calling isContentBlurred
      * to measure whether they are blurred or not
-     * @param test
-     * @param expectedElements  Locators for the top-level elements we expect; either for LKS or for apps
      */
     static public void verifyExpectedElements(WebDriverWrapper test, List<Locator> expectedElements)
     {

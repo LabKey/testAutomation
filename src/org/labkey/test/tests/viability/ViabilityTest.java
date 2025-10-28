@@ -23,7 +23,9 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.Daily;
+import org.labkey.test.components.assay.AssayConstants;
 import org.labkey.test.pages.ReactAssayDesignerPage;
+import org.labkey.test.pages.query.ExecuteQueryPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.QCAssayScriptHelper;
@@ -85,13 +87,13 @@ public class ViabilityTest extends AbstractViabilityTest
         uploadViabilityRun(TestFileUtils.getSampleData("viability/small.VIA.csv"), true);
 
         log("** Check form field values");
-        assertEquals("160450533", getFormElement(Locator.name("_pool_1604505335_0_ParticipantID")));
-        assertEquals("5.0", getFormElement(Locator.name("_pool_1604505335_0_VisitID")));
-        assertEquals("3.700E7", getFormElement(Locator.name("_pool_1604505335_0_TotalCells")));
-        assertEquals("3.127E7", getFormElement(Locator.name("_pool_1604505335_0_ViableCells")));
-        assertEquals("84.5%", getFormElement(Locator.name("_pool_1604505335_0_Viability")));
-        assertNotChecked(Locator.checkboxByName("_pool_1604505335_0_Unreliable"));
-        assertEquals("", getFormElement(Locator.name("_pool_1604505335_0_IntValue")));
+        assertEquals("160450533", getFormElement(Locator.name("_pool_160450533-5_0_ParticipantID")));
+        assertEquals("5.0", getFormElement(Locator.name("_pool_160450533-5_0_VisitID")));
+        assertEquals("3.700E7", getFormElement(Locator.name("_pool_160450533-5_0_TotalCells")));
+        assertEquals("3.127E7", getFormElement(Locator.name("_pool_160450533-5_0_ViableCells")));
+        assertEquals("84.5%", getFormElement(Locator.name("_pool_160450533-5_0_Viability")));
+        assertNotChecked(Locator.checkboxByName("_pool_160450533-5_0_Unreliable"));
+        assertEquals("", getFormElement(Locator.name("_pool_160450533-5_0_IntValue")));
 
         sleep(500);
         clickButton(SAVE_AND_FINISH, 0);
@@ -105,15 +107,15 @@ public class ViabilityTest extends AbstractViabilityTest
         assertElementNotPresent(Locator.lkButtonDisabled(SAVE_AND_IMPORT));
 
         log("** Insert specimen IDs");
-        addSpecimenIds("_pool_1604505335_0_SpecimenIDs", "vial2", "vial3", "vial1", "foobar");
-        addSpecimenIds("_pool_1594020325_1_SpecimenIDs", "vial1");
-        addSpecimenIds("_pool_161400006105_2_SpecimenIDs", "vial2");
-        addSpecimenIds("_pool_161400006115_3_SpecimenIDs", "vial3");
-        addSpecimenIds("_pool_1614016435_4_SpecimenIDs", "xyzzy");
+        addSpecimenIds("_pool_160450533-5_0_SpecimenIDs", "vial2", "vial3", "vial1", "foobar");
+        addSpecimenIds("_pool_159402032-5_1_SpecimenIDs", "vial1");
+        addSpecimenIds("_pool_161400006.10-5_2_SpecimenIDs", "vial2");
+        addSpecimenIds("_pool_161400006.11-5_3_SpecimenIDs", "vial3");
+        addSpecimenIds("_pool_161401643-5_4_SpecimenIDs", "xyzzy");
 
         log("** Set Unreliable flag and IntValue");
-        checkCheckbox(Locator.checkboxByName("_pool_1604505335_0_Unreliable"));
-        setFormElement(Locator.xpath("//input[@name='_pool_1604505335_0_IntValue'][1]"), "300");
+        checkCheckbox(Locator.checkboxByName("_pool_160450533-5_0_Unreliable"));
+        setFormElement(Locator.xpath("//input[@name='_pool_160450533-5_0_IntValue'][1]"), "300");
 
         doAndWaitForPageToLoad(() ->
         {
@@ -184,14 +186,14 @@ public class ViabilityTest extends AbstractViabilityTest
 
         // Check the 'SpecimenIDs' and 'IntValue' field is copied on re-run
         assertEquals("Specimen IDs for 160450533-5", List.of("foobar", "vial1", "vial2", "vial3"),
-                getValues("_pool_1604505335_0_SpecimenIDs"));
+                getValues("_pool_160450533-5_0_SpecimenIDs"));
         assertEquals("Specimen IDs for 161401643-5", List.of("xyzzy"),
-                getValues("_pool_1614016435_4_SpecimenIDs"));
+                getValues("_pool_161401643-5_4_SpecimenIDs"));
         assertEquals("IntValue for 160450533-5", List.of("300"),
-                getValues("_pool_1604505335_0_IntValue"));
+                getValues("_pool_160450533-5_0_IntValue"));
 
         // Check the 'Unreliable' field isn't copied on re-run
-        assertNotChecked(Locator.checkboxByName("_pool_1604505335_0_Unreliable"));
+        assertNotChecked(Locator.checkboxByName("_pool_160450533-5_0_Unreliable"));
 
         doAndWaitForPageToLoad(() ->
         {
@@ -225,8 +227,8 @@ public class ViabilityTest extends AbstractViabilityTest
     protected void runResultSpecimenLookupTest()
     {
         log("** Checking ResultSpecimens lookups");
-        beginAt("/" + getProjectName() + "/" + getFolderName() + "/query-executeQuery.view?schemaName=assay&query.queryName=" + getAssayName() + " ResultSpecimens");
-        DataRegionTable table = new DataRegionTable("query", this);
+        ExecuteQueryPage page = ExecuteQueryPage.beginAt(this, getProjectName() + "/" + getFolderName(), "assay", getAssayName() + " ResultSpecimens");
+        DataRegionTable table = page.getDataRegion();
         assertTextPresent(new TextSearcher(table.getComponentElement()::getText), "foobar", "vial1", "xyzzy", "160450533-5", "161400006.11-5");
 
         setSelectedFields("/" + getProjectName() + "/" + getFolderName(), "assay", getAssayName() + " ResultSpecimens", null,
@@ -253,18 +255,18 @@ public class ViabilityTest extends AbstractViabilityTest
         uploadViabilityRun(TestFileUtils.getSampleData("viability/small.VIA.csv"), runName, false);
 
         log("** Check form field values");
-        assertEquals("160450533", getFormElement(Locator.name("_pool_1604505335_0_ParticipantID")));
-        assertEquals("5.0", getFormElement(Locator.name("_pool_1604505335_0_VisitID")));
-        assertEquals("3.700E7", getFormElement(Locator.name("_pool_1604505335_0_TotalCells")));
-        assertEquals("3.127E7", getFormElement(Locator.name("_pool_1604505335_0_ViableCells")));
-        assertEquals("84.5%", getFormElement(Locator.name("_pool_1604505335_0_Viability")));
+        assertEquals("160450533", getFormElement(Locator.name("_pool_160450533-5_0_ParticipantID")));
+        assertEquals("5.0", getFormElement(Locator.name("_pool_160450533-5_0_VisitID")));
+        assertEquals("3.700E7", getFormElement(Locator.name("_pool_160450533-5_0_TotalCells")));
+        assertEquals("3.127E7", getFormElement(Locator.name("_pool_160450533-5_0_ViableCells")));
+        assertEquals("84.5%", getFormElement(Locator.name("_pool_160450533-5_0_Viability")));
 
         log("** Insert specimen IDs");
-        addSpecimenIds("_pool_1604505335_0_SpecimenIDs", "vial2", "vial3", "vial1", "foobar");
-        addSpecimenIds("_pool_1594020325_1_SpecimenIDs", "vial1");
-        addSpecimenIds("_pool_161400006105_2_SpecimenIDs", "vial2");
-        addSpecimenIds("_pool_161400006115_3_SpecimenIDs", "vial3");
-        addSpecimenIds("_pool_1614016435_4_SpecimenIDs", "xyzzy");
+        addSpecimenIds("_pool_160450533-5_0_SpecimenIDs", "vial2", "vial3", "vial1", "foobar");
+        addSpecimenIds("_pool_159402032-5_1_SpecimenIDs", "vial1");
+        addSpecimenIds("_pool_161400006.10-5_2_SpecimenIDs", "vial2");
+        addSpecimenIds("_pool_161400006.11-5_3_SpecimenIDs", "vial3");
+        addSpecimenIds("_pool_161401643-5_4_SpecimenIDs", "xyzzy");
 
         doAndWaitForPageToLoad(() ->
         {
@@ -302,8 +304,8 @@ public class ViabilityTest extends AbstractViabilityTest
         ReactAssayDesignerPage assayDesignerPage = _assayHelper.clickEditAssayDesign(true);
 
         // remove TargetStudy field from the Batch domain and add it to the Result domain.
-        assayDesignerPage.expandFieldsPanel("Batch").removeField("TargetStudy", true);
-        assayDesignerPage.expandFieldsPanel("Result").addField(new FieldDefinition("TargetStudy", FieldDefinition.ColumnType.String).setLabel("Target Study"));
+        assayDesignerPage.expandFieldsPanel("Batch").removeField(AssayConstants.TARGET_STUDY_FIELD_NAME, true);
+        assayDesignerPage.expandFieldsPanel("Result").addField(new FieldDefinition(AssayConstants.TARGET_STUDY_FIELD_NAME, FieldDefinition.ColumnType.String).setLabel("Target Study"));
         assayDesignerPage.clickFinish();
 
         navigateToFolder(getProjectName(), getFolderName());
@@ -315,28 +317,28 @@ public class ViabilityTest extends AbstractViabilityTest
 
         log("** Test 'same' checkbox for TargetStudy");
         String targetStudyOptionText = "/" + getProjectName() + "/" + getFolderName() + " (" + getFolderName() + " Study)";
-        selectOptionByText(Locator.name("_pool_1604505335_0_TargetStudy"), targetStudyOptionText);
-        assertEquals("[None]", getSelectedOptionText(Locator.name("_pool_1594020325_1_TargetStudy")));
+        selectOptionByText(Locator.name("_pool_160450533-5_0_TargetStudy"), targetStudyOptionText);
+        assertEquals("[None]", getSelectedOptionText(Locator.name("_pool_159402032-5_1_TargetStudy")));
         checkCheckbox(Locator.checkboxById("_pool_1604505335_0_TargetStudyCheckBox"));
         assertEquals("Target study didn't propagate with 'Same' checkbox.",
-                getSelectedOptionValue(Locator.name("_pool_1604505335_0_TargetStudy")),
-                getSelectedOptionValue(Locator.name("_pool_1594020325_1_TargetStudy")));
+                getSelectedOptionValue(Locator.name("_pool_160450533-5_0_TargetStudy")),
+                getSelectedOptionValue(Locator.name("_pool_159402032-5_1_TargetStudy")));
         assertEquals("Target study didn't propagate with 'Same' checkbox.",
-                getSelectedOptionValue(Locator.name("_pool_1604505335_0_TargetStudy")),
-                getSelectedOptionValue(Locator.name("_pool_161400006115_3_TargetStudy")));
+                getSelectedOptionValue(Locator.name("_pool_160450533-5_0_TargetStudy")),
+                getSelectedOptionValue(Locator.name("_pool_161400006.11-5_3_TargetStudy")));
         uncheckCheckbox(Locator.checkboxById("_pool_1604505335_0_TargetStudyCheckBox"));
 
         // clear TargetStudy for 'vial2' and set the TargetStudy for 'vial3' and 'xyzzy'
-        selectOptionByText(Locator.name("_pool_161400006105_2_TargetStudy"), "[None]");
-        selectOptionByText(Locator.name("_pool_161400006115_3_TargetStudy"), "/" + getProjectName() + "/" + STUDY2_NAME + " (" + STUDY2_NAME + " Study)");
-        selectOptionByText(Locator.name("_pool_1614016435_4_TargetStudy"), "/" + getProjectName() + "/" + STUDY2_NAME + " (" + STUDY2_NAME + " Study)");
+        selectOptionByText(Locator.name("_pool_161400006.10-5_2_TargetStudy"), "[None]");
+        selectOptionByText(Locator.name("_pool_161400006.11-5_3_TargetStudy"), "/" + getProjectName() + "/" + STUDY2_NAME + " (" + STUDY2_NAME + " Study)");
+        selectOptionByText(Locator.name("_pool_161401643-5_4_TargetStudy"), "/" + getProjectName() + "/" + STUDY2_NAME + " (" + STUDY2_NAME + " Study)");
 
         log("** Insert specimen IDs");
-        addSpecimenIds("_pool_1604505335_0_SpecimenIDs", "vial2", "vial3", "vial1", "foobar");
-        addSpecimenIds("_pool_1594020325_1_SpecimenIDs", "vial1");
-        addSpecimenIds("_pool_161400006105_2_SpecimenIDs", "vial2");
-        addSpecimenIds("_pool_161400006115_3_SpecimenIDs", "vial3");
-        addSpecimenIds("_pool_1614016435_4_SpecimenIDs", "xyzzy");
+        addSpecimenIds("_pool_160450533-5_0_SpecimenIDs", "vial2", "vial3", "vial1", "foobar");
+        addSpecimenIds("_pool_159402032-5_1_SpecimenIDs", "vial1");
+        addSpecimenIds("_pool_161400006.10-5_2_SpecimenIDs", "vial2");
+        addSpecimenIds("_pool_161400006.11-5_3_SpecimenIDs", "vial3");
+        addSpecimenIds("_pool_161401643-5_4_SpecimenIDs", "xyzzy");
 
         doAndWaitForPageToLoad(() ->
         {
@@ -348,7 +350,7 @@ public class ViabilityTest extends AbstractViabilityTest
         clickAndWait(Locator.linkWithText(runName));
 
         _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.addColumn("TargetStudy", "Target Study");
+        _customizeViewsHelper.addColumn(AssayConstants.TARGET_STUDY_FIELD_NAME);
         _customizeViewsHelper.saveDefaultView();
 
         DataRegionTable table = new DataRegionTable("Data", this);
@@ -356,25 +358,25 @@ public class ViabilityTest extends AbstractViabilityTest
         assertEquals("4", table.getDataAsText(0, "SpecimenCount"));
         assertEquals("3", table.getDataAsText(0, "SpecimenMatchCount"));
         assertEquals("52.11%", table.getDataAsText(0, "Recovery"));
-        assertEquals(getFolderName() + " Study", table.getDataAsText(0, "TargetStudy"));
+        assertEquals(getFolderName() + " Study", table.getDataAsText(0, AssayConstants.TARGET_STUDY_FIELD_NAME));
 
         assertEquals("vial2", table.getDataAsText(2, "Specimen IDs"));
         assertEquals("1", table.getDataAsText(2, "SpecimenCount"));
         assertEquals("0", table.getDataAsText(2, "SpecimenMatchCount"));
         assertEquals(" ", table.getDataAsText(2, "Recovery"));
-        assertEquals(" ", table.getDataAsText(2, "TargetStudy"));
+        assertEquals(" ", table.getDataAsText(2, AssayConstants.TARGET_STUDY_FIELD_NAME));
 
         assertEquals("vial3", table.getDataAsText(3, "Specimen IDs"));
         assertEquals("1", table.getDataAsText(3, "SpecimenCount"));
         assertEquals("0", table.getDataAsText(3, "SpecimenMatchCount"));
         assertEquals(" ", table.getDataAsText(3, "Recovery"));
-        assertEquals(STUDY2_NAME + " Study", table.getDataAsText(3, "TargetStudy"));
+        assertEquals(STUDY2_NAME + " Study", table.getDataAsText(3, AssayConstants.TARGET_STUDY_FIELD_NAME));
 
         assertEquals("xyzzy", table.getDataAsText(4, "Specimen IDs"));
         assertEquals("1", table.getDataAsText(4, "SpecimenCount"));
         assertEquals("1", table.getDataAsText(4, "SpecimenMatchCount"));
         assertEquals("88.88%", table.getDataAsText(4, "Recovery"));
-        assertEquals(STUDY2_NAME + " Study", table.getDataAsText(4, "TargetStudy"));
+        assertEquals(STUDY2_NAME + " Study", table.getDataAsText(4, AssayConstants.TARGET_STUDY_FIELD_NAME));
 
         // UNDONE: participant/visit resolver test
         // UNDONE: link to study

@@ -161,7 +161,7 @@ public class StatusPage extends LabKeyPage<LabKeyPage<?>.ElementCache>
         STATUS("Status"),
         INFO("Info");
 
-        private String value;
+        private final String value;
 
         StatusInfo(String value)
         {

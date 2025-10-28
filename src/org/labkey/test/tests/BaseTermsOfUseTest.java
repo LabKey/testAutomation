@@ -19,12 +19,17 @@ import org.junit.BeforeClass;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.WikiHelper;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+
+import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
+import static org.labkey.test.util.PermissionsHelper.READER_ROLE;
 
 public class BaseTermsOfUseTest extends BaseWebDriverTest
 {
@@ -58,7 +63,7 @@ public class BaseTermsOfUseTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        BaseTermsOfUseTest init = (BaseTermsOfUseTest) getCurrentTest();
+        BaseTermsOfUseTest init = getCurrentTest();
 
         init.doSetup();
     }
@@ -78,9 +83,9 @@ public class BaseTermsOfUseTest extends BaseWebDriverTest
     {
         log("Create public project " + projectName);
         _containerHelper.createProject(projectName, null);
-        _permissionsHelper.setPermissions(USERS_GROUP, "Editor");
-        _permissionsHelper.setSiteGroupPermissions("All Site Users", "Reader");
-        _permissionsHelper.setSiteGroupPermissions("Guests", "Reader");
+        _permissionsHelper.setPermissions(USERS_GROUP, EDITOR_ROLE);
+        _permissionsHelper.setSiteGroupPermissions("All Site Users", READER_ROLE);
+        _permissionsHelper.setSiteGroupPermissions("Guests", READER_ROLE);
     }
 
     protected void createWikiTabForProject(String projectName)
@@ -100,16 +105,16 @@ public class BaseTermsOfUseTest extends BaseWebDriverTest
         log("Create project " + name);
         _containerHelper.createProject(name, null);
         createTermsOfUsePage(name, termsText);
-        _permissionsHelper.setSiteGroupPermissions("All Site Users", "Reader");
+        _permissionsHelper.setSiteGroupPermissions("All Site Users", READER_ROLE);
         if (isPublic)
         {
-            _permissionsHelper.setSiteGroupPermissions("Guests", "Reader");
+            _permissionsHelper.setSiteGroupPermissions("Guests", READER_ROLE);
         }
     }
 
     protected void createTermsOfUsePage(String projectName, String body)
     {
-        String message = null;
+        String message;
         if (null != projectName)
         {
             message = "Create terms of use page for project " + projectName;
@@ -119,7 +124,7 @@ public class BaseTermsOfUseTest extends BaseWebDriverTest
         else // site-wide terms of use page
         {
             message = "Create site-wide terms of use page";
-            beginAt("/wiki/page.view?name=_termsOfUse");
+            beginAt(WebTestHelper.buildURL("wiki", "page", Map.of("name", TERMS_OF_USE_NAME)));
         }
         if (isElementPresent(Locator.linkContainingText("add a new page")))
         {

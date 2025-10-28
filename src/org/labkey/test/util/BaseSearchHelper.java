@@ -50,7 +50,6 @@ public abstract class BaseSearchHelper<H extends BaseSearchHelper<H, SearchResul
     public void initialize()
     {
         clearSearchQueue();
-        SearchAdminAPIHelper.deleteIndex(getDriver());
     }
 
     public void clearSearchQueue()
@@ -115,7 +114,7 @@ public abstract class BaseSearchHelper<H extends BaseSearchHelper<H, SearchResul
 
             if (!lastTry)
             {
-                TestLogger.log(String.format("Bad search results for %s. Waiting %d seconds before trying again...", notFound.toString(), i*5));
+                TestLogger.log(String.format("Bad search results for %s. Waiting %d seconds before trying again...", notFound, i*5));
                 WebDriverWrapper.sleep(i*5000);
             }
         }

@@ -152,7 +152,7 @@ public class SearchResultsPage extends LabKeyPage<SearchResultsPage.Elements> im
             return Locator.tagWithClass("div", "labkey-search-result").findElements(this);
         }
 
-        private WebElement searchResultsPanel = Locator.byClass("labkey-search-results").findWhenNeeded(this);
+        private final WebElement searchResultsPanel = Locator.byClass("labkey-search-results").findWhenNeeded(this);
 
         public Optional<WebElement> getSearchResultsPanel()
         {

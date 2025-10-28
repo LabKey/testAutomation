@@ -11,11 +11,14 @@ import org.labkey.test.components.ext4.Window;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.util.CodeMirrorHelper;
 import org.labkey.test.util.Ext4Helper;
+import org.labkey.test.util.PipelineStatusTable;
 import org.labkey.test.util.TestLogger;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Optional;
 
@@ -79,6 +82,7 @@ public class ScriptReportPage extends LabKeyPage<ScriptReportPage.ElementCache>
 
     public String saveReport(String name, boolean isSaveAs, int wait)
     {
+        String reportIdBeforeSave = getReportId();
         WebElement saveButton = Ext4Helper.Locators.ext4Button(isSaveAs ? "Save As" : "Save").findElement(getDriver());
         scrollIntoView(saveButton, true);
         clickAndWait(saveButton, wait);
@@ -86,7 +90,25 @@ public class ScriptReportPage extends LabKeyPage<ScriptReportPage.ElementCache>
         {
             saveReportWithName(name, isSaveAs);
         }
-        return getUrlParam("reportId", true);
+        String reportIdAfterSave = getReportId();
+        return reportIdAfterSave == null ? reportIdBeforeSave : reportIdAfterSave;
+    }
+
+    public String getReportId()
+    {
+        String paramName = "reportId";
+
+        Map<String, String> params = WebTestHelper.parseUrlQuery(getURL());
+        String paramValue = params.get(paramName);
+
+        if (paramValue == null)
+        {
+            paramValue = params.entrySet().stream()
+                    .filter(entry -> entry.getKey().endsWith("." + paramName))
+                    .map(Map.Entry::getValue).findFirst().orElse(null);
+        }
+
+        return paramValue == null ? null : URLDecoder.decode(paramValue, StandardCharsets.UTF_8);
     }
 
     /**
@@ -141,6 +163,7 @@ public class ScriptReportPage extends LabKeyPage<ScriptReportPage.ElementCache>
 
     private void _selectOption(ReportOption option, boolean checked)
     {
+        clickSourceTab();
         ensureFieldSetExpanded(option.getSection());
         Checkbox checkbox;
         if (option.isCheckbox())
@@ -200,6 +223,17 @@ public class ScriptReportPage extends LabKeyPage<ScriptReportPage.ElementCache>
     {
         clickReportTab();
         return Locator.byClass("reportView").findElement(getDriver());
+    }
+
+    public void startPipelineJobAndWait()
+    {
+        clickReportTab();
+
+        waitAndClick(Locator.lkButton("Start Job"));
+        waitAndClickAndWait(Locator.linkWithText("click here"));
+        new PipelineStatusTable(this)
+            .clickStatusLink(0)
+            .waitForComplete();
     }
 
     @Override

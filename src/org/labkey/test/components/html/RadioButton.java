@@ -47,7 +47,7 @@ public class RadioButton extends Checkbox
 
     public static class RadioButtonFinder extends ComponentFinder<SearchContext, RadioButton, RadioButtonFinder>
     {
-        private Locator loc = Locator.radioButton();
+        private final Locator loc = Locator.radioButton();
 
         public SimpleComponentFinder<RadioButton> withName(String name)
         {

@@ -7,6 +7,9 @@ import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.react.Tabs;
 import org.labkey.test.components.ui.search.FilterExpressionPanel;
 import org.labkey.test.components.ui.search.FilterFacetedPanel;
+import org.labkey.test.params.WrapsFieldKey;
+import org.labkey.test.util.selenium.WebElementUtils;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -35,12 +38,14 @@ public class GridFilterModal extends ModalDialog
 
     /**
      * Select field to configure filters for
-     * @param fieldLabel Field's label
+     * @param fieldIdentifier fieldKey or field label
      * @return this component
      */
-    public GridFilterModal selectField(String fieldLabel)
+    public GridFilterModal selectField(CharSequence fieldIdentifier)
     {
-        WebElement fieldItem = elementCache().findFieldOption(fieldLabel);
+        WebElement fieldItem = elementCache().findFieldOption(fieldIdentifier);
+        getWrapper().scrollIntoView(fieldItem);
+        String fieldLabel = WebElementUtils.getTextContent(fieldItem);
         fieldItem.click();
         Locator.byClass("field-modal__col-sub-title").withText("Find values for " + fieldLabel)
                 .waitForElement(elementCache().filterPanel, 10_000);
@@ -65,18 +70,18 @@ public class GridFilterModal extends ModalDialog
      * Get fields for currently selected query
      * @return visible field labels
      */
-    public List<String> getAvailableFields()
+    public List<String> getAvailableFieldLabels()
     {
-        return getWrapper().getTexts(elementCache().findFieldOptions());
+        return elementCache().findFieldOptions().stream().map(WebElementUtils::getTextContent).collect(Collectors.toList());
     }
 
-    public List<String> getFilteredFields()
+    public List<String> getFilteredFieldLabels()
     {
         List<WebElement> filteredElements = Locator.byClass("list-group-item").withChild(
                 Locator.tagWithClass("span", "field-modal__field_dot"))
                 .findElements(elementCache().fieldsSelectionPanel);
 
-        return filteredElements.stream().map(WebElement::getText).collect(Collectors.toList());
+        return filteredElements.stream().map(WebElementUtils::getTextContent).collect(Collectors.toList());
     }
 
     /**
@@ -181,15 +186,25 @@ public class GridFilterModal extends ModalDialog
 
     protected class ElementCache extends ModalDialog.ElementCache
     {
-        public final Locator listItemLoc = Locator.byClass("list-group-item");
+        public final Locator.XPathLocator listItemLoc = Locator.byClass("list-group-item");
 
         // Fields column
         public final WebElement fieldsSelectionPanel = Locator.byClass("filter-modal__col_fields")
                 .findWhenNeeded(this);
 
-        protected WebElement findFieldOption(String queryName)
+        protected WebElement findFieldOption(CharSequence queryName)
         {
-            return listItemLoc.withText(queryName).findElement(elementCache().fieldsSelectionPanel);
+            try
+            {
+                return listItemLoc.withChild(Locator.tagWithAttribute("span", "data-fieldkey", queryName.toString())).findElement(fieldsSelectionPanel);
+            }
+            catch (NoSuchElementException nse)
+            {
+                if (!(queryName instanceof WrapsFieldKey))
+                    return listItemLoc.withText(queryName.toString()).findElement(elementCache().fieldsSelectionPanel);
+                else
+                    throw nse;
+            }
         }
         protected List<WebElement> findFieldOptions()
         {

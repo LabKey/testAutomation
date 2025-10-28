@@ -71,12 +71,12 @@ public class FlowJoQueryTest extends BaseFlowTest
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.clearColumns();
         _customizeViewsHelper.addColumn("Name");
-        _customizeViewsHelper.addColumn("AnalysisScript", "Analysis Script");
-        _customizeViewsHelper.addColumn("FCSFile/Keyword/Comp", "Comp");
-        _customizeViewsHelper.addColumn("FCSFile/Keyword/Stim", "Stim");
-        _customizeViewsHelper.addColumn("FCSFile/Keyword/Sample Order", "Sample Order");
-        _customizeViewsHelper.addColumn("Statistic/S$SLv$SL$S3+$S4+:Count", "4+:Count");
-        _customizeViewsHelper.addColumn("Statistic/S$SLv$SL$S3+$S8+:Count", "8+:Count");
+        _customizeViewsHelper.addColumn("AnalysisScript");
+        _customizeViewsHelper.addColumn("FCSFile/Keyword/Comp");
+        _customizeViewsHelper.addColumn("FCSFile/Keyword/Stim");
+        _customizeViewsHelper.addColumn("FCSFile/Keyword/Sample Order");
+        _customizeViewsHelper.addColumn("Statistic/S$SLv$SL$S3+$S4+:Count");
+        _customizeViewsHelper.addColumn("Statistic/S$SLv$SL$S3+$S8+:Count");
         _customizeViewsHelper.applyCustomView();
 
         clickProject(getProjectName());

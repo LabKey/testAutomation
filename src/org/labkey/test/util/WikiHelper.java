@@ -28,7 +28,7 @@ import java.io.File;
 
 public class WikiHelper
 {
-    private BaseWebDriverTest _test;
+    private final BaseWebDriverTest _test;
     
     public WikiHelper(BaseWebDriverTest test)
     {
@@ -125,6 +125,19 @@ public class WikiHelper
         _test.setFormElement(Locator.name("body"), srcFragment);
     }
 
+    /** For customizing wiki web parts */
+    public void clickChooseAPage()
+    {
+        _test.waitAndClickAndWait(Locator.linkWithText("Choose an existing page to display"));
+    }
+
+    /** For customizing wiki web parts */
+    public void saveChosenPage()
+    {
+        _test.waitAndClickAndWait(Locator.id("btnSubmit"));
+    }
+
+
     public void saveWikiPage()
     {
         saveWikiPage(true);
@@ -133,7 +146,7 @@ public class WikiHelper
     public void saveWikiPage(boolean expectSuccess)
     {
         String title = Locator.id("wiki-input-title").findElement(_test.getDriver()).getText();
-        if (title.equals("")) title = Locator.id("wiki-input-name").findElement(_test.getDriver()).getText();
+        if (title.isEmpty()) title = Locator.id("wiki-input-name").findElement(_test.getDriver()).getText();
         if (expectSuccess)
         {
             _test.clickButton("Save & Close");
@@ -262,36 +275,12 @@ public class WikiHelper
      */
     public void switchWikiToSourceView()
     {
-        String curFormat = (String) _test.executeScript("return LABKEY._wiki.getProps().rendererType;");
-        if (curFormat.equalsIgnoreCase("HTML"))
-        {
-            if (_test.isElementPresent(Locator.css("#wiki-tab-source.labkey-tab-inactive")))
-            {
-                Locator tab = Locator.css("#wiki-tab-source > a");
-                _test.waitForElementToBeVisible(tab);
-                _test.click(tab);
-                _test.waitForElement(Locator.css("#wiki-tab-source.labkey-tab-active"));
-            }
-        }
+        new EditPage(_test.getDriver()).switchWikiToSourceView();
     }
 
     public void switchWikiToVisualView()
     {
-        String curFormat = (String) _test.executeScript("return LABKEY._wiki.getProps().rendererType;");
-        if (curFormat.equalsIgnoreCase("HTML"))
-        {
-            if (_test.isElementPresent(Locator.css("#wiki-tab-visual.labkey-tab-inactive")))
-            {
-                Locator tab = Locator.css("#wiki-tab-visual > a");
-                _test.waitForElementToBeVisible(tab);
-                _test.click(tab);
-
-                Locator yesButton = Locator.tagWithText("span","Yes");
-                _test.waitForElementToBeVisible(yesButton);
-                _test.waitAndClick(yesButton);
-                _test.waitForElement(Locator.css("#wiki-tab-visual.labkey-tab-active"));
-            }
-        }
+        new EditPage(_test.getDriver()).switchWikiToVisualView();
     }
 
     // need to be on a wiki page in the source container, and destinationFolder needs to be a unique link on the page

@@ -61,6 +61,12 @@ public class ImportsPage extends LabKeyPage<LabKeyPage<?>.ElementCache>
         return grid;
     }
 
+    public ImportsPage clickCancel()
+    {
+        elementCache().cancelButton.click();
+        return new ImportsPage(this);
+    }
+
     @Override
     protected ElementCache elementCache()
     {
@@ -82,6 +88,8 @@ public class ImportsPage extends LabKeyPage<LabKeyPage<?>.ElementCache>
                     .child(Locator.tagWithClass("h2", "no-margin-top"))
                     .findWhenNeeded(this);
         }
+
+        final WebElement cancelButton = Locator.button("Cancel").findWhenNeeded(this);
 
         final QueryGrid pipelineJobsGrid()
         {

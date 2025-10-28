@@ -27,6 +27,7 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
+import static org.labkey.test.WebDriverWrapper.waitFor;
 
 /**
  * Automates the LabKey ui component defined in: packages/components/src/components/domainproperties/DomainForm.tsx
@@ -41,6 +42,12 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
     private DomainFormPanel(WebElement element, WebDriver driver)
     {
         super(element, driver);
+    }
+
+    @Override
+    protected void waitForReady()
+    {
+        waitFor(() -> !BootstrapLocators.loadingSpinner.existsIn(this), "Loading spinner still present", 2_000);
     }
 
     public static List<AdvancedFieldSetting> advancedSettingsFromFieldDefinition(FieldDefinition def)
@@ -256,8 +263,8 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
      */
     public DomainFormPanel clickManuallyDefineFields()
     {
-        getWrapper().scrollIntoView(elementCache().manuallyDefineButton, true);
         getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().manuallyDefineButton)); // give modal dialogs time to disappear
+        getWrapper().scrollIntoView(elementCache().manuallyDefineButton, true);
         elementCache().manuallyDefineButton.click();
 
         return this;
@@ -280,7 +287,7 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
 
     public boolean isManuallyDefineFieldsPresent()
     {
-        return getThis().findElements(elementCache().manuallyDefineFieldsLoc).size() > 0;
+        return !getThis().findElements(elementCache().manuallyDefineFieldsLoc).isEmpty();
     }
 
     /**
@@ -496,7 +503,7 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
 
     public List<String> getSummaryModeColumns()
     {
-        var rawColumns = getSummaryModeGrid().getColumnNames();
+        var rawColumns = getSummaryModeGrid().getColumnLabels();
         return rawColumns.subList(1, rawColumns.size());    // omit the 'select' column, it is an empty value
     }
 
@@ -525,7 +532,7 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
     public DomainFormPanel setInferFieldFile(File file)
     {
         getWrapper().setFormElement(elementCache().fileUploadInput, file);
-        getWrapper().waitFor(()-> elementCache().findFieldRows().size() > 0,
+        getWrapper().waitFor(()-> !elementCache().findFieldRows().isEmpty(),
                 "fields were not inferred from file in time", WAIT_FOR_JAVASCRIPT);
         return this;
     }

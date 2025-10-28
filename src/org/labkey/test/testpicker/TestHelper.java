@@ -58,15 +58,15 @@ public class TestHelper
     public static final String DEFAULT_ROOT = TestFileUtils.getLabKeyRoot();
 
     private static Thread awtThread = null;
-    private static String _saveFileName = "savedConfigs.idx";
-    private static String _prevTestConfig = "previous_config";
+    private static final String _saveFileName = "savedConfigs.idx";
+    private static final String _prevTestConfig = "previous_config";
 
     private File _saveFile;
     private List<TestConfig> _savedConfigs;
     private JFrame _window;
     private CheckNode _treeRoot;
     private CheckRenderer _renderer;
-    private String _rootName = "Test Suites";
+    private final String _rootName = "Test Suites";
     private JCheckBox _clean;
     private JCheckBox _linkCheck;
     private JCheckBox _memCheck;
@@ -344,7 +344,7 @@ public class TestHelper
             public void actionPerformed(ActionEvent e)
             {
                 String name = (String) _configDropDown.getSelectedItem();
-                if (!name.equals(""))
+                if (!name.isEmpty())
                 {
                     deleteTestConfig(name);
                     _configDropDown.removeItem(name);
@@ -392,7 +392,7 @@ public class TestHelper
             @Override
             public void actionPerformed(ActionEvent e)
             {
-                setResult(SuiteFactory.getInstance().getTestSet(Continue.class.getSimpleName()), new ArrayList<String>());
+                setResult(SuiteFactory.getInstance().getTestSet(Continue.class.getSimpleName()), new ArrayList<>());
                 _window.dispose();
             }
         });
@@ -513,7 +513,7 @@ public class TestHelper
 
     private boolean validate(String name)
     {
-        if (name == null || name.equals(""))
+        if (name == null || name.isEmpty())
         {
             JOptionPane.showMessageDialog(_window, "You did not enter a name. The test configuration was not saved.");
             return false;
@@ -536,7 +536,7 @@ public class TestHelper
      */
     private List<TestConfig> deleteTestConfigFromList(String name, List<TestConfig> list)
     {
-        if (list.size() > 0)
+        if (!list.isEmpty())
         {
             for (TestConfig config : list)
             {
@@ -580,7 +580,7 @@ public class TestHelper
      */
     private void loadTestConfig(String name)
     {
-        if (name == null || name.equals(""))
+        if (name == null || name.isEmpty())
         {
             reloadPage(new TestConfig());
         }
@@ -656,13 +656,13 @@ public class TestHelper
         _memCheck.setSelected(Boolean.valueOf(System.getProperty("memCheck")));
         _haltOnError.setSelected(Boolean.valueOf(System.getProperty("haltOnError")));
         String port = System.getProperty("labkey.port");
-        if (port != null && !port.equals(""))
+        if (port != null && !port.isEmpty())
             _port.setText(port);
         String contextPath = System.getProperty("labkey.contextpath");
-        if (contextPath != null && !contextPath.equals(""))
+        if (contextPath != null && !contextPath.isEmpty())
             _contextPath.setText(contextPath);
         String server = System.getProperty("labkey.server");
-        if (server != null && !server.equals(""))
+        if (server != null && !server.isEmpty())
             _server.setText(server);
     }
 
@@ -707,7 +707,6 @@ public class TestHelper
 
     /**
      * Expands the path of a node.
-     * @param path
      */
     private void expandNode(TreeNode[] path)
     {
@@ -829,7 +828,7 @@ public class TestHelper
             }
             saveTestConfig(_prevTestConfig);
 
-            if (selectedTests.size() != 0 )
+            if (!selectedTests.isEmpty())
             {
                 setResult(SuiteFactory.getInstance().getTestSet(Test.class.getSimpleName()), selectedTests);
             }
@@ -841,7 +840,7 @@ public class TestHelper
      * A checkbox that has another checkbox that must be selected if this checkbox is. Disables and checks
      * dependent checkbox if selected.
      */
-    private class DependentCheckBox extends JCheckBox
+    private static class DependentCheckBox extends JCheckBox
     {
         JCheckBox _dependentCheckBox;
 

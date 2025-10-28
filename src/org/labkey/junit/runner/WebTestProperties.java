@@ -30,8 +30,8 @@ import java.util.List;
 
 public abstract class WebTestProperties
 {
-    private static TestMap associatedTests = new TestMap(); // Stores Tests, keyed by associated module.
-    private static ModuleMap associatedModules = new ModuleMap();
+    private static final TestMap associatedTests = new TestMap(); // Stores Tests, keyed by associated module.
+    private static final ModuleMap associatedModules = new ModuleMap();
     private static final List<String> installedModules = getInstalledModules();
 
     private static void loadTestProperties(Class<?> testClass)

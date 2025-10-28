@@ -11,7 +11,9 @@ import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.Daily;
+import org.labkey.test.components.assay.AssayConstants;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.FieldKey;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.RelativeUrl;
 
@@ -20,8 +22,8 @@ import java.util.List;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 @Category({Assays.class, Daily.class})
@@ -68,7 +70,7 @@ public class FlagColumnTest extends BaseWebDriverTest
     @BeforeClass
     public static void initTest()
     {
-        FlagColumnTest init = (FlagColumnTest)getCurrentTest();
+        FlagColumnTest init = getCurrentTest();
         init.doInit();
     }
 
@@ -100,15 +102,15 @@ public class FlagColumnTest extends BaseWebDriverTest
         clickButton("Import Data");
 
         log("Import run1...");
-        setFormElement(Locator.name("name"), "Run01");
-        setFormElement(Locator.id("TextAreaDataCollector.textArea"),
+        setFormElement(AssayConstants.ASSAY_NAME_FIELD_LOCATOR, "Run01");
+        setFormElement(AssayConstants.TEXT_AREA_DATA_COLLECTOR_LOCATOR,
             "SomeData\nrun1-data1\nrun1-data2");
         clickButton("Save and Import Another Run");
 
         log("Import run2...");
-        setFormElement(Locator.name("name"), "Run02");
-        setFormElement(Locator.name("anotherRunFlag"), "run has flag");
-        setFormElement(Locator.id("TextAreaDataCollector.textArea"),
+        setFormElement(AssayConstants.ASSAY_NAME_FIELD_LOCATOR, "Run02");
+        setFormElement(Locator.name("AnotherRunFlag"), "run has flag");
+        setFormElement(AssayConstants.TEXT_AREA_DATA_COLLECTOR_LOCATOR,
                 "SomeData\nrun2-data1\nrun2-data2");
         clickButton("Save and Finish");
 
@@ -116,15 +118,15 @@ public class FlagColumnTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("view results"));
         var customizeView = _customizeViewsHelper.openCustomizeViewPanel();
         customizeView.showHiddenItems();
-        customizeView.addColumn(new String[] { "Run" });
-        customizeView.addColumn(new String[] { "Run", RUN_FLAG});
-        customizeView.addColumn(new String[] { "Run", "AnotherRunFlag" });
+        customizeView.addColumn(FieldKey.fromParts("Run"));
+        customizeView.addColumn(FieldKey.fromParts("Run", RUN_FLAG));
+        customizeView.addColumn(FieldKey.fromParts("Run", "AnotherRunFlag"));
         customizeView.addSort("RowId", SortDirection.ASC);
         customizeView.saveCustomView();
 
         // verify expected rows and columns are present
         DataRegionTable grid = new DataRegionTable("Data", getDriver());
-        assertThat(grid.getColumnNames(), hasItems(RESULT_SOME_DATA, RESULT_FLAG_A, RESULT_FLAG_B, "Run/AnotherRunFlag", RESULT_RUN_FLAG));
+        assertThat(grid.getFieldKeyStrings(), hasItems(RESULT_SOME_DATA, RESULT_FLAG_A, RESULT_FLAG_B, "Run/AnotherRunFlag", RESULT_RUN_FLAG));
         assertEquals("run1-data1", grid.getDataAsText(0, RESULT_SOME_DATA));
         assertEquals("run1-data2", grid.getDataAsText(1, RESULT_SOME_DATA));
         assertEquals("run2-data1", grid.getDataAsText(2, RESULT_SOME_DATA));

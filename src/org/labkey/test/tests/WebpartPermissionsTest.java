@@ -22,13 +22,17 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Daily;
+import org.labkey.test.util.ApiPermissionsHelper;
+import org.labkey.test.util.PermissionsHelper;
 import org.labkey.test.util.PortalHelper;
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.fail;
+import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
+import static org.labkey.test.util.PermissionsHelper.PROJECT_ADMIN_ROLE;
+import static org.labkey.test.util.PermissionsHelper.READER_ROLE;
 
 @Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 6)
@@ -73,8 +77,6 @@ public class WebpartPermissionsTest extends BaseWebDriverTest
             fail("Unable to delete dummy project");
         }
         assertTextNotPresent("Flow Script");
-
-
     }
 
     private void changeWebpartPermAndVerify()
@@ -103,7 +105,6 @@ public class WebpartPermissionsTest extends BaseWebDriverTest
         goToProjectHome();
         assertTextPresent(changedWebPart);
         stopImpersonating();
-
     }
 
     private void verifyCorrectWebpartsVisible()
@@ -127,10 +128,11 @@ public class WebpartPermissionsTest extends BaseWebDriverTest
 
     private void setPermissionsOnDummyFolder()
     {
-        clickProject(DUMMY_PROJECT_NAME);
-        _securityHelper.setProjectPerm(users[0], DUMMY_PROJECT_NAME, "Reader");
-        _securityHelper.setProjectPerm(users[1], "Editor");
-        _securityHelper.setProjectPerm(users[2], "Project Administrator");
+        // Target permissions operations at non-default project
+        PermissionsHelper helper = new ApiPermissionsHelper(DUMMY_PROJECT_NAME);
+        helper.setUserPermissions(users[0], READER_ROLE);
+        helper.setUserPermissions(users[1], EDITOR_ROLE);
+        helper.setUserPermissions(users[2], PROJECT_ADMIN_ROLE);
     }
 
     private void verifyNoWebpartsVisible()
@@ -147,16 +149,16 @@ public class WebpartPermissionsTest extends BaseWebDriverTest
 
     private void setUpFocusFolder()
     {
-        /**
-         * this folder has three parts, with permissions set (dependent on DUMMY_PROJECT
-         * Flow Experiment managagement = Administrate
-         * Flow Analyses = Edit
-         * Flow Script = Read
+        /*
+          this folder has three parts, with permissions set (dependent on DUMMY_PROJECT
+          Flow Experiment management = Administrate
+          Flow Analyses = Edit
+          Flow Script = Read
          */
         _containerHelper.createProject(getProjectName(), "Collaboration");
         importFolderFromZip(TestFileUtils.getSampleData("webpartPerm/webPerms.folder.zip"));
         //set all users to Reader so they have access to the folder
-        _securityHelper.setSiteGroupPermissions("All Site Users", "Reader");
+        _permissionsHelper.setSiteGroupPermissions("All Site Users", READER_ROLE);
     }
 
     //This folder contains no data, but will create users and set them with specific permissions

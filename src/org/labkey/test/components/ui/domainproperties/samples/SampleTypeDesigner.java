@@ -41,7 +41,12 @@ public abstract class SampleTypeDesigner<T extends SampleTypeDesigner<T>> extend
         return addParentAlias(alias, null);
     }
 
-    public T addParentAlias(String alias, @Nullable String optionDisplayText)
+    public T addParentAlias(String alias, @Nullable String dataType)
+    {
+        return addParentAlias(alias, dataType, false);
+    }
+
+    public T addParentAlias(String alias, @Nullable String dataType, boolean isRequired)
     {
         expandPropertiesPanel();
 
@@ -50,11 +55,11 @@ public abstract class SampleTypeDesigner<T extends SampleTypeDesigner<T>> extend
 
         elementCache().addParentAliasButton.click();
         int initialCount = findEmptyAlias();
-        if (optionDisplayText == null)
+        if (dataType == null)
         {
-            optionDisplayText = CURRENT_SAMPLE_TYPE;
+            dataType = CURRENT_SAMPLE_TYPE;
         }
-        setParentAlias(initialCount, alias, optionDisplayText);
+        setParentAlias(initialCount, alias, dataType, isRequired);
         return getThis();
     }
 

@@ -1,10 +1,10 @@
 package org.labkey.test.params.list;
 
 import org.jetbrains.annotations.NotNull;
+import org.labkey.test.util.DomainUtils.DomainKind;
 
 public class VarListDefinition extends ListDefinition
 {
-    private static final String DOMAIN_KIND = "VarList";
 
     public VarListDefinition(String name)
     {
@@ -15,7 +15,7 @@ public class VarListDefinition extends ListDefinition
     @Override
     protected String getKind()
     {
-        return DOMAIN_KIND;
+        return DomainKind.VarList.name();
     }
 
     @Override

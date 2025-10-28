@@ -26,7 +26,6 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Wiki;
 import org.labkey.test.pages.LabkeyErrorPage;
-import org.labkey.test.util.OptionalFeatureHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.WikiHelper;
 import org.openqa.selenium.WebElement;
@@ -38,6 +37,9 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
+import static org.labkey.test.util.PermissionsHelper.PROJECT_ADMIN_ROLE;
+import static org.labkey.test.util.PermissionsHelper.READER_ROLE;
 
 @Category({Daily.class, Wiki.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 11)
@@ -64,8 +66,6 @@ public class WikiLongTest extends BaseWebDriverTest
     private static final String WIKI_PAGE8_NAME= "Page 8 Name For Delete Subtree Test " + BaseWebDriverTest.INJECT_CHARS_1;
     private static final String WIKI_PAGE9_NAME= "Page 9 _blank " + BaseWebDriverTest.INJECT_CHARS_1;
 
-    private static final String DISC1_TITLE = "Let's Talk";
-    private static final String DISC1_BODY = "I don't know how normal this wiki is";
     private static final String RESP1_TITLE = "Let's Keep Talking";
     private static final String RESP1_BODY = "I disagree";
     private static final String USER1 = "wikilong_user1@wikilong.test";
@@ -78,8 +78,9 @@ public class WikiLongTest extends BaseWebDriverTest
     private static final String WIKI_INDEX_EDIT_CHECKBOX = "wiki-input-shouldIndex";
     private static final String WIKI_INDEX_MANAGE_CHECKBOX = "shouldIndex";
     private static final String WIKI_DELETE_SUBTREE_CHECKBOX = "isDeletingSubtree";
+
     private final PortalHelper _portalHelper = new PortalHelper(this);
-    private WikiHelper _wikiHelper = new WikiHelper(this);
+    private final WikiHelper _wikiHelper = new WikiHelper(this);
 
     private static final String WIKI_PAGE1_CONTENT =
             "1 Title\n" +
@@ -145,8 +146,18 @@ public class WikiLongTest extends BaseWebDriverTest
                     {labkey:tree|name=core.siteAdmin}
                     """;
 
-    private static final String HEADER_CONTENT =
-            "Yo! This is the header!";
+    private static final String HEADER_CONTENT = "Yo! This is the header!";
+
+    private static final String RADEOX_LINK_NAME = "radeox";
+    private static final String RADEOX_LINK_TITLE = "Test Radeox links";
+    private static final String RADEOX_LINK_CONTENT = """
+        You want to click on {link:Menu > Storage|/home/project-begin.view}
+        
+        Isn't this (font)awesome? {link:{span:class=fa fa-sitemap}{span} Sample Finder|/home/project-begin.view}
+        
+        Consider {link:using <isHidden>true</isHidden> in the XML metadata|/home/project-begin.view}
+        """;
+    private static final String RADEOX_HTML_CONTENT = "<div class=\"labkey-wiki\">You want to click on <span class=\"nobr\"><a href=\"/home/project-begin.view\">Menu &gt; Storage</a></span><p class=\"paragraph\">Isn't this (font)awesome? <span class=\"nobr\"><a href=\"/home/project-begin.view\"><span class=\"fa fa-sitemap\"></span> Sample Finder</a></span></p><p class=\"paragraph\">Consider <span class=\"nobr\"><a href=\"/home/project-begin.view\">using &lt;isHidden&gt;true&lt;/isHidden&gt; in the XML metadata</a></span></p></div>";
 
     @Override
     public List<String> getAssociatedModules()
@@ -163,19 +174,16 @@ public class WikiLongTest extends BaseWebDriverTest
     @Test
     public void testSteps()
     {
-        // Issue 51620: Remove the UI for Object-level discussions
-        OptionalFeatureHelper.enableOptionalFeature(createDefaultConnection(), "deprecatedObjectLevelDiscussions");
-
         enableEmailRecorder();
         _containerHelper.createProject(PROJECT2_NAME, null);
         _containerHelper.enableModule(PROJECT2_NAME, "MS2");
-        _securityHelper.setProjectPerm(USERS_GROUP, "Editor");
+        _permissionsHelper.setPermissions(USERS_GROUP, EDITOR_ROLE);
         clickButton("Save and Finish");
         _containerHelper.createProject(PROJECT_NAME, null);
         _containerHelper.enableModule(PROJECT_NAME, "MS2");
         _permissionsHelper.createPermissionsGroup("testers");
-        _securityHelper.setProjectPerm("testers", "Editor");
-        _securityHelper.setProjectPerm(USERS_GROUP, "Editor");
+        _permissionsHelper.setPermissions("testers", EDITOR_ROLE);
+        _permissionsHelper.setPermissions(USERS_GROUP, EDITOR_ROLE);
         clickButton("Save and Finish");
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Folder Type"));
@@ -338,33 +346,6 @@ public class WikiLongTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("next"));
         assertTextPresent("Some HTML content");
 
-        log("Check that discussion board works");
-        clickAndWait(Locator.linkWithText(WIKI_PAGE1_TITLE));
-        _ext4Helper.waitForOnReady();
-        click(Locator.linkWithText("discussions"));
-        waitForElement(Locator.linkWithText("Start new discussion"), defaultWaitForPage);
-        clickAndWait(Locator.linkWithText("Start new discussion"));
-        _wikiHelper.setWikiTitle(DISC1_TITLE);
-        setFormElement(Locator.id("body"), DISC1_BODY);
-        submit();
-        _ext4Helper.waitForOnReady();
-        clickMenuButton(true, Locator.linkWithText("discussions")
-                .findElement(getDriver()), false, DISC1_TITLE);
-
-        assertTextPresent(DISC1_TITLE,
-                DISC1_BODY);
-
-        log("Check response on discussion board works");
-        clickButton("Respond");
-        _wikiHelper.setWikiTitle(RESP1_TITLE);
-        setFormElement(Locator.id("body"), RESP1_BODY);
-        submit();
-        assertTextPresent(RESP1_TITLE,
-                RESP1_BODY);
-        clickButton("Delete Message");
-        clickButton("Delete");
-        assertTextNotPresent(DISC1_TITLE, DISC1_BODY);
-
         log("test navTree and header");
         _wikiHelper.createNewWikiPage("RADEOX");
         _wikiHelper.setWikiName("_navTree");
@@ -410,9 +391,7 @@ public class WikiLongTest extends BaseWebDriverTest
         assertTextPresent("6");
         clickAndWait(Locator.linkWithText(WIKI_PAGE1_TITLE));
         clickAndWait(Locator.linkWithText("next"));
-        assertTextPresent("More HTML content",
-                WIKI_PAGE3_ALTTITLE);
-
+        assertTextPresent("More HTML content", WIKI_PAGE3_ALTTITLE);
 
         log("test copy wiki");
         portalHelper.clickWebpartMenuItem("Pages", true, "Copy");
@@ -451,7 +430,7 @@ public class WikiLongTest extends BaseWebDriverTest
 
         log("Check if permissions work");
         _permissionsHelper.enterPermissionsUI();
-        _permissionsHelper.setPermissions(USERS_GROUP, "Reader");
+        _permissionsHelper.setPermissions(USERS_GROUP, READER_ROLE);
         clickButton("Save and Finish");
         impersonate(USER1);
         clickProject(PROJECT2_NAME);
@@ -462,10 +441,10 @@ public class WikiLongTest extends BaseWebDriverTest
         stopImpersonating();
         clickProject(PROJECT2_NAME);
         _permissionsHelper.enterPermissionsUI();
-        _permissionsHelper.removePermission(USERS_GROUP, "Editor");
+        _permissionsHelper.removePermission(USERS_GROUP, EDITOR_ROLE);
         clickButton("Save and Finish");
         _permissionsHelper.enterPermissionsUI();
-        _permissionsHelper.removePermission(USERS_GROUP, "Reader");
+        _permissionsHelper.removePermission(USERS_GROUP, READER_ROLE);
         clickButton("Save and Finish");
         impersonate(USER1);
         assertElementNotPresent(Locator.linkWithText(PROJECT2_NAME));     // Project should not be visible
@@ -486,7 +465,7 @@ public class WikiLongTest extends BaseWebDriverTest
         submit();
         assertTextPresent(WIKI_PAGE2_TITLE);
         _permissionsHelper.enterPermissionsUI();
-        _permissionsHelper.setPermissions(USERS_GROUP, "Project Administrator");
+        _permissionsHelper.setPermissions(USERS_GROUP, PROJECT_ADMIN_ROLE);
         clickButton("Save and Finish");
         impersonate(USER1);
         clickProject(PROJECT2_NAME);
@@ -513,7 +492,7 @@ public class WikiLongTest extends BaseWebDriverTest
         stopImpersonating();
         clickProject(PROJECT_NAME);
         _permissionsHelper.enterPermissionsUI();
-        _permissionsHelper.setPermissions(USERS_GROUP, "Project Administrator");
+        _permissionsHelper.setPermissions(USERS_GROUP, PROJECT_ADMIN_ROLE);
         clickButtonContainingText("Save and Finish");
 
         log("make sure the changes went through");
@@ -607,9 +586,11 @@ public class WikiLongTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("Edit"));
         deleteWikiPage(true);
         clickAndWait(Locator.linkWithText(WIKI_PAGE1_TITLE));
-        assertElementPresent(Locator.linkWithText(WIKI_PAGE1_TITLE), 1);
+        assertElementPresent(Locator.linkWithText(WIKI_PAGE1_TITLE), 2);
         assertElementNotPresent(Locator.linkWithText(WIKI_PAGE3_ALTTITLE));
         assertElementNotPresent(Locator.linkWithText(WIKI_PAGE8_TITLE));
+
+        testRadeoxLinkEncoding();
 
         //extended wiki test -- generate 2000 pages
 //        clickProject(PROJECT_NAME);
@@ -630,6 +611,20 @@ public class WikiLongTest extends BaseWebDriverTest
 //            setFormElement("body", "Page" + Integer.toString(i));
 //            submit();
 //        }
+    }
+
+    // Regression test for Issue 51488
+    private void testRadeoxLinkEncoding()
+    {
+        log("Test Radeox link encoding");
+        _wikiHelper.createNewWikiPage("RADEOX");
+
+        _wikiHelper.setWikiName(RADEOX_LINK_NAME);
+        _wikiHelper.setWikiTitle(RADEOX_LINK_TITLE);
+        _wikiHelper.setWikiBody(RADEOX_LINK_CONTENT);
+        _wikiHelper.saveWikiPage();
+        // Ensure link content is properly encoded (but not double encoded)
+        assertTrue(getHtmlSource().contains(RADEOX_HTML_CONTENT));
     }
 
     private void deleteWikiPage(boolean isDeletingSubtree)
@@ -792,7 +787,6 @@ public class WikiLongTest extends BaseWebDriverTest
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        OptionalFeatureHelper.disableOptionalFeature(createDefaultConnection(), "deprecatedObjectLevelDiscussions");
         deleteUsersIfPresent(USER1);
         _containerHelper.deleteProject(PROJECT2_NAME, afterTest);
         _containerHelper.deleteProject(PROJECT_NAME, afterTest);

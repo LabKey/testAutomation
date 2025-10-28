@@ -70,7 +70,7 @@ public class FolderTypePages extends LabKeyPage<FolderTypePages.ElementCache>
 
     public boolean isEnabled(String value)
     {
-        return elementCache().enableTypeCheckbox.withAttribute("name", value).withAttribute("checked").findElements(getDriver()).size() > 0;
+        return !elementCache().enableTypeCheckbox.withAttribute("name", value).withAttribute("checked").findElements(getDriver()).isEmpty();
     }
 
     @Override

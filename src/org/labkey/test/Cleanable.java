@@ -18,5 +18,5 @@ package org.labkey.test;
 
 public interface Cleanable
 {
-    public void cleanup() throws Exception;
+    void cleanup() throws Exception;
 }

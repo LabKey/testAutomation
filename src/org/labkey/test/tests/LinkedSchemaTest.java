@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.assertj.core.api.Assertions;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -24,32 +25,45 @@ import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Data;
 import org.labkey.test.components.CustomizeView;
+import org.labkey.test.pages.list.BeginPage;
 import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.pages.list.GridPage;
 import org.labkey.test.pages.query.QueryMetadataEditorPage;
+import org.labkey.test.pages.query.SourceQueryPage;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.FieldInfo;
+import org.labkey.test.params.experiment.DataClassDefinition;
+import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.params.list.IntListDefinition;
 import org.labkey.test.params.list.ListDefinition;
 import org.labkey.test.params.list.VarListDefinition;
+import org.labkey.test.util.APIContainerHelper;
 import org.labkey.test.util.ApiPermissionsHelper;
+import org.labkey.test.util.AuditLogHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.SchemaHelper;
+import org.labkey.test.util.TestDataGenerator;
+import org.labkey.test.util.exp.DataClassAPIHelper;
+import org.labkey.test.util.exp.SampleTypeAPIHelper;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.labkey.test.util.PermissionsHelper.READER_ROLE;
 
 /**
  * This test created linked schemas from a source container in a target container.
@@ -100,7 +114,7 @@ import static org.junit.Assert.assertTrue;
 @BaseWebDriverTest.ClassTimeout(minutes = 11)
 public class LinkedSchemaTest extends BaseWebDriverTest
 {
-    private SchemaHelper _schemaHelper = new SchemaHelper(this);
+    private final SchemaHelper _schemaHelper = new SchemaHelper(this);
     private static final String PROJECT_NAME = LinkedSchemaTest.class.getSimpleName() + "Project";
     private static final String SOURCE_FOLDER = "SourceFolder";
     private static final String TARGET_FOLDER = "TargetFolder";
@@ -108,6 +122,8 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     private static final String STUDY_FOLDER = "StudyFolder"; // Folder used to validate fix for issues 32454 & 32456
     private static final String MOTHER = "Mother";
     private static final String READER_USER = "reader@linkedschema.test";
+    private static final String EXTERNAL_SCHEMA_USER = "external@linkedschema.test";
+    private final AuditLogHelper _auditLogHelper = new AuditLogHelper(this);
 
     public static final String LIST_NAME = "LinkedSchemaTestPeople";
     public static final String LIST_DATA = "Name\tAge\tCrazy\tP\tQ\tR\tS\tT\tU\tV\tW\tX\tY\tZ\n" +
@@ -396,12 +412,13 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     {
         super.doCleanup(afterTest);
         _userHelper.deleteUsers(false, READER_USER);
+        _userHelper.deleteUsers(false, EXTERNAL_SCHEMA_USER);
     }
 
     @BeforeClass
     public static void doSetup() throws Exception
     {
-        LinkedSchemaTest initTest = (LinkedSchemaTest)getCurrentTest();
+        LinkedSchemaTest initTest = getCurrentTest();
 
         initTest.setupProject();
         initTest.createList();
@@ -425,7 +442,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     }
 
     @Test
-    public void lookupTest()
+    public void lookupTest() throws CommandException
     {
         String sourceContainerPath = "/" + getProjectName() + "/" + SOURCE_FOLDER;
         _schemaHelper.createLinkedSchema(getProjectName() + "/" + TARGET_FOLDER, "BasicLinkedSchema", sourceContainerPath, null, "lists", "NIMHDemographics,NIMHPortions", null);
@@ -440,11 +457,23 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         //Make sure that the lookup columns propagated properly into the linked schema
         assertLookupsWorking(TARGET_FOLDER, "BasicLinkedSchema", "NIMHDemographics", true, "Mother", "Father");
 
+        String sourceFolderId = ((APIContainerHelper) _containerHelper).getContainerId(getProjectName() + "/" + SOURCE_FOLDER);
+        String otherFolderId = ((APIContainerHelper) _containerHelper).getContainerId(getProjectName() + "/" + OTHER_FOLDER);
+
         // Linked schemas disallow lookups to other folders outside of the current folder.
         //Change the Mother column lookup to point to the other folder, then ensure that the mother lookup is no longer propagating
-        changelistLookup(SOURCE_FOLDER, "NIMHDemographics", MOTHER,
+        String fieldOldValues = "Name=Mother&Label=Mother&Type=Integer&PHI=Not%20PHI&DefaultScale=Linear&Required=false&Hidden=false&MvEnabled=false&Measure=false&Dimension=false" +
+                "&ShownInInsert=true&ShownInDetails=true&ShownInUpdate=true&ShownInLookupView=false&RecommendedVariable=false&ExcludedFromShifting=false&Scannable=false" +
+                "&Lookup=%7B%22queryName%22%3A%22NIMHDemographics%22%2C%22schemaName%22%3A%22lists%22%7D";
+        String fieldUpdateValues = "Name=Mother&Label=Mother&Type=Integer&PHI=Not%20PHI&DefaultScale=Linear&Required=false&Hidden=false&MvEnabled=false&Measure=false&Dimension=false" +
+                "&ShownInInsert=true&ShownInDetails=true&ShownInUpdate=true&ShownInLookupView=false&RecommendedVariable=false&ExcludedFromShifting=false&Scannable=false" +
+                "&Lookup=%7B%22queryName%22%3A%22NIMHDemographics%22%2C%22schemaName%22%3A%22lists%22%2C%22containerId%22%3A%22" +
+                otherFolderId + "%22%7D";
+
+        changelistLookup(
                 new FieldDefinition.LookupInfo("/" + PROJECT_NAME + "/" + OTHER_FOLDER, "lists", "NIMHDemographics")
-                        .setTableType(FieldDefinition.ColumnType.Integer));
+                        .setTableType(FieldDefinition.ColumnType.Integer),
+                fieldOldValues, fieldUpdateValues);
         assertLookupsWorking(TARGET_FOLDER, "BasicLinkedSchema", "NIMHDemographics", true, "Father");
         assertLookupsWorking(TARGET_FOLDER, "BasicLinkedSchema", "NIMHDemographics", false, "Mother");
 
@@ -456,10 +485,14 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         assertLookupsWorking(TARGET_FOLDER, "QueryLinkedSchema", "QueryOverLookup", true, "Father");
         assertLookupsWorking(TARGET_FOLDER, "QueryLinkedSchema", "QueryOverLookup", false, "Mother");
 
+        String fieldUpdateValues2 = "Name=Mother&Label=Mother&Type=Integer&PHI=Not%20PHI&DefaultScale=Linear&Required=false&Hidden=false&MvEnabled=false&Measure=false&Dimension=false&ShownInInsert=true" +
+                "&ShownInDetails=true&ShownInUpdate=true&ShownInLookupView=false&RecommendedVariable=false&ExcludedFromShifting=false&Scannable=false&Lookup=%7B%22queryName%22%3A%22QueryOverLookup%22%2C%22schemaName%22%3A%22lists%22%2C%22containerId%22%3A%22" +
+                sourceFolderId + "%22%7D";
         //Change the Mother column lookup to point to the query, and then make sure that the table has lookups appropriately.
-        changelistLookup(SOURCE_FOLDER, "NIMHDemographics", MOTHER,
+        changelistLookup(
                 new FieldDefinition.LookupInfo("/" + PROJECT_NAME + "/" + SOURCE_FOLDER, "lists", "QueryOverLookup")
-                .setTableType(FieldDefinition.ColumnType.Integer));
+                .setTableType(FieldDefinition.ColumnType.Integer),
+                fieldUpdateValues, fieldUpdateValues2);
         assertLookupsWorking(TARGET_FOLDER, "QueryLinkedSchema", "NIMHDemographics", true, "Mother", "Father");
     }
 
@@ -560,7 +593,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
 
         if((expectedUsersCount > 0) && (null != studyName))
         {
-            if (!table.getColumnNames().contains("ParticipantId/Study"))
+            if (!table.getFieldKeyStrings().contains("ParticipantId/Study"))
             {
                 CustomizeView cv = table.openCustomizeGrid();
                 cv.addColumn("ParticipantId/Study");
@@ -611,14 +644,16 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     {
         ApiPermissionsHelper apiPermissionsHelper = new ApiPermissionsHelper(this);
         _userHelper.createUser(READER_USER);
+        _userHelper.createUser(EXTERNAL_SCHEMA_USER);
 
         _containerHelper.createProject(getProjectName(), null);
+        apiPermissionsHelper.setUserPermissions(EXTERNAL_SCHEMA_USER, READER_ROLE);
         _containerHelper.createSubfolder(getProjectName(), SOURCE_FOLDER);
         // Enable linkedschematest in source folder so the "BPeopleTemplate" is visible.
         _containerHelper.enableModule("linkedschematest");
 
         _containerHelper.createSubfolder(getProjectName(), TARGET_FOLDER);
-        apiPermissionsHelper.setUserPermissions(READER_USER, "Reader");
+        apiPermissionsHelper.setUserPermissions(READER_USER, READER_ROLE);
 
         // Create a study folder.
         _containerHelper.createSubfolder(getProjectName(), STUDY_FOLDER, "Study");
@@ -647,18 +682,16 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         listDef.getCreateCommand().execute(createDefaultConnection(), getProjectName() + "/" + SOURCE_FOLDER);
 
         log("** Importing some data...");
-        beginAt("/" + PROJECT_NAME + "/" + SOURCE_FOLDER + "/list-begin.view");
+        BeginPage.beginAt(this, PROJECT_NAME + "/" + SOURCE_FOLDER);
         _listHelper.goToList(LIST_NAME);
         _listHelper.clickImportData()
                 .setText(LIST_DATA)
                 .submit();
 
         log("** Applying metadata xml override to list...");
-        beginAt("/query/" + PROJECT_NAME + "/" + SOURCE_FOLDER + "/sourceQuery.view?schemaName=lists&query.queryName=" + LIST_NAME + "#metadata");
-        setCodeEditorValue("metadataText", LIST_METADATA_OVERRIDE);
-        clickButton("Save", 0);
-        waitForElement(Locator.id("status").withText("Saved"), WAIT_FOR_JAVASCRIPT);
-        waitForElementToDisappear(Locator.id("status").withText("Saved"), WAIT_FOR_JAVASCRIPT);
+        SourceQueryPage page = SourceQueryPage.beginAt(this, PROJECT_NAME + "/" + SOURCE_FOLDER, "lists", LIST_NAME);
+        page.setMetadataXml(LIST_METADATA_OVERRIDE);
+        page.clickSaveAndFinish();
     }
 
     @LogMethod
@@ -680,20 +713,15 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         _schemaHelper.createLinkedSchema(getProjectName() + "/" + TARGET_FOLDER, A_PEOPLE_SCHEMA_NAME, sourceContainerPath, null, "lists", LIST_NAME + "," + QUERY_NAME, A_PEOPLE_METADATA);
 
         log("** Applying metadata to " + LIST_NAME + " in linked schema container");
-        beginAt("/query/" + PROJECT_NAME + "/" + TARGET_FOLDER + "/sourceQuery.view?schemaName=" + A_PEOPLE_SCHEMA_NAME + "&query.queryName=" + LIST_NAME + "#metadata");
-        setCodeEditorValue("metadataText", A_PEOPLE_LIST_METADATA_OVERRIDE);
-        clickButton("Save", 0);
-        waitForElement(Locator.id("status").withText("Saved"), WAIT_FOR_JAVASCRIPT);
-        waitForElementToDisappear(Locator.id("status").withText("Saved"), WAIT_FOR_JAVASCRIPT);
+        SourceQueryPage sourceQueryPage = SourceQueryPage.beginAt(this, PROJECT_NAME + "/" + TARGET_FOLDER, A_PEOPLE_SCHEMA_NAME, LIST_NAME);
+        sourceQueryPage.setMetadataXml(A_PEOPLE_LIST_METADATA_OVERRIDE);
+        sourceQueryPage.clickSaveAndFinish();
 
         log("** Applying metadata to " + QUERY_NAME + " in linked schema container");
-        beginAt("/query/" + PROJECT_NAME + "/" + TARGET_FOLDER + "/sourceQuery.view?schemaName=" + A_PEOPLE_SCHEMA_NAME + "&queryName=" + QUERY_NAME);
+        sourceQueryPage = SourceQueryPage.beginAt(this, PROJECT_NAME + "/" + TARGET_FOLDER, A_PEOPLE_SCHEMA_NAME, QUERY_NAME);
         assertElementPresent(Locator.tagWithClass("div", "labkey-customview-message").withText("This query is not editable"));
-        _ext4Helper.clickExt4Tab("XML Metadata");
-        setCodeEditorValue("metadataText", A_PEOPLE_QUERY_METADATA_OVERRIDE);
-        clickButton("Save", 0);
-        waitForElement(Locator.id("status").withText("Saved"), WAIT_FOR_JAVASCRIPT);
-        waitForElementToDisappear(Locator.id("status").withText("Saved"), WAIT_FOR_JAVASCRIPT);
+        sourceQueryPage.setMetadataXml(A_PEOPLE_QUERY_METADATA_OVERRIDE);
+        sourceQueryPage.clickSaveAndFinish();
     }
 
     @LogMethod
@@ -825,6 +853,257 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         assertEquals("Dave", table.getDataAsText(1, "Crazy " + D_PEOPLE_METADATA_TITLE));
     }
 
+    @Test
+    public void testCoreLinkedSchema()
+    {
+        // Coverage for Issue 52417: StackOverflowError trying to analyze queries in container with linked schema over Core
+        String linkedSchemaName = "linkedCore";
+        String sourceContainerPath = "/" + getProjectName() + "/" + STUDY_FOLDER;
+
+        log("Create the linked schema on core");
+        _schemaHelper.createLinkedSchema(sourceContainerPath, linkedSchemaName, sourceContainerPath, null, "core", null, null);
+
+        goToSchemaBrowser();
+        DataRegionTable table = viewQueryData(linkedSchemaName, "Modules");
+        List<String> colNames = table.getColumnNames();
+        assertTrue("Columns should have included 'Name': " + colNames, colNames.contains("Name"));
+    }
+
+    // coverage for Issue 50516: NPE from LinkedSchema$XmlFilterWhereClauseSource.getWhereClauses() when linked schema XML references bogus column
+    @Test
+    public void testCoreLinkedSchemaFilters()
+    {
+        String linkedSchemaName = "linkedCoreFilter";
+        String sourceContainerPath = "/" + getProjectName() + "/" + STUDY_FOLDER;
+
+        String badFilter = """
+                <tables xmlns="http://labkey.org/data/xml" xmlns:cv="http://labkey.org/data/xml/queryCustomView">
+                  <filters name="bad-filter">
+                    <cv:filter column="no_such_column" operator="in" value="1;2"/>
+                  </filters>
+                  <table tableName="containers" tableDbType="NOT_IN_DB">
+                    <filters ref="bad-filter"/>
+                  </table>
+                </tables>
+                """;
+        String goodFilter = """
+                <tables xmlns="http://labkey.org/data/xml" xmlns:cv="http://labkey.org/data/xml/queryCustomView">
+                  <filters name="good-filter">
+                    <cv:filter column="searchable" operator="eq" value="true"/>
+                  </filters>
+                  <table tableName="containers" tableDbType="NOT_IN_DB">
+                    <filters ref="good-filter"/>
+                  </table>
+                </tables>
+                """;
+
+        log("Create the linked schema on core with a filter referencing a non-existent column");
+        _schemaHelper.createLinkedSchema(sourceContainerPath, linkedSchemaName, sourceContainerPath, null, "core", null, badFilter);
+
+        // browse to containers in the linked schema and verify the expected error
+        log("Verify the bogus filter gets an appropriate error");
+        goToSchemaBrowser();
+        selectQuery(linkedSchemaName, "containers");
+        // Issue 50516: NPE from LinkedSchema$XmlFilterWhereClauseSource.getWhereClauses() when linked schema XML references bogus column
+        waitForText("Error creating linked schema table 'containers': Filter column 'no_such_column' not found.");
+
+        // update the linked schema to use a good filter
+        _schemaHelper.updateLinkedSchema(sourceContainerPath, linkedSchemaName, sourceContainerPath, null, "core", null, goodFilter);
+
+        // browse to containers in the linked schema and view data in the containers table
+        log("Verify container is visible via linked schema via 'searchable=true' filter");
+        goToSchemaBrowser();
+        // finding the dataRegion here is already success
+        DataRegionTable table = viewQueryData(linkedSchemaName, "containers");
+        // ensure that the current container appears here as expected
+        checker().withScreenshot("current_container_not_present")
+                .wrapAssertion(()-> Assertions.assertThat(table.getRowIndex("Name", STUDY_FOLDER))
+                .as("container name not present in table")
+                .isGreaterThan(-1));
+
+        // clean up after ourselves
+        _schemaHelper.deleteSchema(sourceContainerPath, linkedSchemaName);
+    }
+
+    // Issue 53421: linked schemas can't use sample type as a source in a container different from where the type is defined
+    @Test
+    public void testLinkedSchemaToExternalSubfolder() throws IOException, CommandException
+    {
+
+        String externalProject = "Linked Schema Other Project" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
+
+        log(String.format("Create a separate project %s.",
+                externalProject));
+
+        // Delete the external project if it already exists.
+        _containerHelper.deleteProject(externalProject, false);
+        _containerHelper.createProject(externalProject, null);
+
+        // Add the Experiment module to test schemas linked to exp.
+        _containerHelper.enableModule("Experiment");
+
+        validateExternalLinkedSampleType(externalProject);
+        validateExternalLinkedExperiment(externalProject);
+        validateExternalLinkedDataclass(externalProject);
+    }
+
+    private void validateExternalLinkedSampleType(String externalProject) throws IOException, CommandException
+    {
+        String subFolder = "Sub Folder " + TRICKY_CHARACTERS_FOR_PROJECT_NAMES + " Sample Type";
+        String subFolderPath = externalProject + "/" + subFolder;
+
+        String sampleType = TestDataGenerator.randomDomainName("Linked Schema Test");
+        String strField = TestDataGenerator.randomFieldName("Str");
+
+        log(String.format("Create sub-folder %s for the sample type test.", subFolderPath));
+        _containerHelper.createSubfolder(externalProject, subFolder);
+
+        List<String> expectedValues = populateDomain(externalProject, subFolder, true, sampleType, strField);
+
+        String linkedSampleTypeSchema = "External_Sample_Type_Schema";
+        validateExternalLinkedSchema(linkedSampleTypeSchema, subFolderPath, "samples", sampleType, strField, expectedValues);
+
+    }
+
+    private void validateExternalLinkedExperiment(String externalProject)
+    {
+        String subFolder = "Sub Folder " + TRICKY_CHARACTERS_FOR_PROJECT_NAMES + " Experiment";
+        String subfolderPath = externalProject + "/" + subFolder;
+
+        String subFolderRunGroup = "SubFolder Run Group";
+        createExperiment(externalProject, subFolder, subFolderRunGroup);
+
+        List<String> expectedValues = List.of(subFolderRunGroup);
+        String linkedExpRunSchema = "External_Exp_Run_Schema";
+
+        validateExternalLinkedSchema(linkedExpRunSchema, subfolderPath, "exp", "RunGroups", "Name", expectedValues);
+
+    }
+
+    private void validateExternalLinkedDataclass(String externalProject) throws IOException, CommandException
+    {
+
+        String subFolder = "Sub Folder " + TRICKY_CHARACTERS_FOR_PROJECT_NAMES + " DataClass";
+        String subfolderPath = externalProject + "/" + subFolder;
+
+        String dataClassName = TestDataGenerator.randomDomainName("Export data class");
+
+        // This is the last sscenario to run. Adding this check here will allow the other scenarios to run before the test fails.
+        //Issue 53784: Field name with a quote causes a "QueryParseException: syntax error" when creating a linked schema.
+        String strField = TestDataGenerator.randomFieldName("Str \" ");
+
+        log(String.format("Create sub-folder %s for the data classs test.", subfolderPath));
+        _containerHelper.createSubfolder(externalProject, subFolder);
+
+        List<String> expectedValues = populateDomain(externalProject, subFolder, false, dataClassName, strField);
+
+        String linkedDataclassSchema = "External_Dataclass_Schema";
+        validateExternalLinkedSchema(linkedDataclassSchema, subfolderPath, "exp.data", dataClassName, strField, expectedValues);
+
+    }
+
+    // Populating a sample type and a data class is very similar.
+    private List<String> populateDomain(String externalProject, String subFolder, boolean isSampleType, String query, String fieldName) throws IOException, CommandException
+    {
+
+        TestDataGenerator testDataGenerator;
+        FieldDefinition field = new FieldDefinition(fieldName);
+        String subFolderPath = externalProject + "/" + subFolder;
+        String schema;
+
+        if (isSampleType)
+        {
+            schema = "samples";
+            SampleTypeDefinition sampleTypeDefinition = new SampleTypeDefinition(query);
+            sampleTypeDefinition.setNameExpression("External ${genId}");
+            sampleTypeDefinition.addField(field);
+            testDataGenerator = SampleTypeAPIHelper.createEmptySampleType(externalProject, sampleTypeDefinition);
+        }
+        else
+        {
+            schema = "exp.data";
+            DataClassDefinition dataClassDefinition = new DataClassDefinition(query);
+            dataClassDefinition.setNameExpression("DC - ${genId}");
+            dataClassDefinition.addField(field);
+            testDataGenerator = DataClassAPIHelper.createEmptyDataClass(externalProject, dataClassDefinition);
+        }
+
+        for (String value : List.of("A", "B", "C", "D"))
+        {
+            testDataGenerator.addCustomRow(Map.of(fieldName, value));
+        }
+        testDataGenerator.insertRows(WebTestHelper.getRemoteApiConnection(), testDataGenerator.getRows());
+
+        // Add entries in the subfolder. Send these back as values to check.
+        List<String> subFolderValues = List.of("W", "X", "Y", "Z");
+        testDataGenerator = new TestDataGenerator(schema, query, subFolderPath);
+        for (String value : subFolderValues)
+        {
+            testDataGenerator.addCustomRow(Map.of(fieldName, value));
+        }
+        testDataGenerator.insertRows(WebTestHelper.getRemoteApiConnection(), testDataGenerator.getRows());
+
+        return subFolderValues;
+    }
+
+    private void createExperiment(String externalProject, String subFolder, String subFolderRunGroup)
+    {
+        // Create a RunGroup in the parent folder.
+        goToProjectHome(externalProject);
+        clickTab("Experiment");
+        waitAndClickAndWait(Locator.linkContainingText("Create Run Group"));
+        setFormElement(Locator.name("Name"), "Parent Run Group");
+        clickButton("Submit");
+
+        _containerHelper.createSubfolder(externalProject, subFolder);
+
+        // Create a RunGroup in the subfolder.
+        clickTab("Experiment");
+        waitAndClickAndWait(Locator.linkContainingText("Create Run Group"));
+        setFormElement(Locator.name("Name"), subFolderRunGroup);
+        clickButton("Submit");
+
+    }
+
+    private void validateExternalLinkedSchema(String linkedSchemaName, String sourceSubFolderPath, String sourceSchemaName, String sourceQueryName, String fieldName, List<String> expectedValues)
+    {
+        goToProjectHome();
+
+        log(String.format("Create a linked schema named %s that looks at %s.",
+                linkedSchemaName, sourceSubFolderPath));
+
+        _schemaHelper.createLinkedSchema(getProjectName(), linkedSchemaName, sourceSubFolderPath, null, sourceSchemaName, null, null);
+
+        goToProjectHome();
+
+        validateExternalLinkedData(linkedSchemaName, sourceQueryName, fieldName,
+                expectedValues, String.format("Data displayed for linked schema '%s' not as expected.", linkedSchemaName));
+
+        log("Impersonate a user, with no permissions in the external source project, and validate.");
+        goToProjectHome();
+        impersonate(EXTERNAL_SCHEMA_USER);
+        validateExternalLinkedData(linkedSchemaName, sourceQueryName, fieldName,
+                expectedValues, String.format("User with no permissions did not see the expected data for the linked schema '%s'.", linkedSchemaName));
+        stopImpersonating();
+    }
+
+    private void validateExternalLinkedData(String linkedSchemaName, String query, String fieldName, List<String> expectedValues, String errorMsg)
+    {
+
+        // Use a FieldInfo object to deal with any tricky characters.
+        FieldInfo fieldInfo = new FieldInfo(fieldName, FieldDefinition.ColumnType.String);
+        String url = WebTestHelper.buildURL("query", getProjectName(), "begin.view");
+        beginAt(url);
+        viewQueryData(linkedSchemaName, query);
+        DataRegionTable table = new DataRegionTable("query", getDriver());
+        List<String> actualValues = table.getColumnDataAsText(fieldInfo);
+
+        // Using a sort list to validate because the list should be equal and I don't want to worry about the order.
+        checker().withScreenshot().verifyEqualsSorted(errorMsg,
+                expectedValues, actualValues);
+
+    }
+
     /*
         Test coverage : Issue 45347: Audit table data not available in linked schema
      */
@@ -850,7 +1129,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
 
         goToSchemaBrowser();
         table = viewQueryData(linkedSchemaName, "DomainAuditEvent");
-        checker().verifyEquals("Incorrect number of rows in DomainAuditEvent", 33, table.getDataRowCount());
+        checker().verifyEquals("Incorrect number of rows in DomainAuditEvent", 23, table.getDataRowCount());
     }
 
     protected void goToSchemaBrowserTable(String schemaName, String tableName)
@@ -918,16 +1197,26 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         }
     }
 
-    protected void changelistLookup(String sourceFolder, String tableName, String fieldName, FieldDefinition.LookupInfo info)
+    protected void changelistLookup(FieldDefinition.LookupInfo info, String fieldOldValues, String fieldUpdateValues)
     {
-        clickFolder(sourceFolder);
+        clickFolder(LinkedSchemaTest.SOURCE_FOLDER);
 
         goToManageLists();
 
-        EditListDefinitionPage listDefinitionPage = _listHelper.goToEditDesign(tableName);
+        EditListDefinitionPage listDefinitionPage = _listHelper.goToEditDesign("NIMHDemographics");
         listDefinitionPage.getFieldsPanel()
-                .getField(fieldName).setLookup(info);
+                .getField(LinkedSchemaTest.MOTHER).setLookup(info);
         listDefinitionPage.clickSave();
+
+
+        log("Validate domain and domain property audit log.");
+        AuditLogHelper.DetailedAuditEventRow fieldEvent = new AuditLogHelper.DetailedAuditEventRow(null, LinkedSchemaTest.MOTHER, "Modified",
+                "The following property was updated: Lookup", "", fieldOldValues, fieldUpdateValues, null);
+        AuditLogHelper.DetailedAuditEventRow expectedDomainEvent = new AuditLogHelper.DetailedAuditEventRow(null, "NIMHDemographics", null,
+                "The column(s) of domain " + "NIMHDemographics" + " were modified.",
+                "", null, null, null);
+        boolean pass = _auditLogHelper.validateLastDomainAuditEvents("NIMHDemographics", getProjectName(), expectedDomainEvent, Map.of(LinkedSchemaTest.MOTHER, fieldEvent));
+        checker().verifyTrue("Domain audit long not as expected after changing lookup expected", pass);
     }
 
     protected void createLinkedSchemaQuery(String sourceFolder, String schemaName, String queryName, String tableName)

@@ -49,12 +49,14 @@ import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.components.core.ProjectMenu;
 import org.labkey.test.components.core.login.SetPasswordForm;
 import org.labkey.test.components.dumbster.EmailRecordTable;
+import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.components.html.SiteNavBar;
 import org.labkey.test.components.ui.navigation.UserMenu;
 import org.labkey.test.pages.core.admin.CustomizeSitePage;
 import org.labkey.test.pages.core.admin.ShowAdminPage;
 import org.labkey.test.pages.user.UserDetailsPage;
 import org.labkey.test.util.APIUserHelper;
+import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LabKeyExpectedConditions;
 import org.labkey.test.util.LogMethod;
@@ -96,7 +98,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.labkey.test.TestProperties.isDevModeEnabled;
 import static org.labkey.test.WebTestHelper.buildURL;
-import static org.labkey.test.WebTestHelper.getBaseURL;
 import static org.labkey.test.WebTestHelper.getHttpClientBuilder;
 import static org.labkey.test.WebTestHelper.getHttpResponse;
 import static org.labkey.test.WebTestHelper.getRemoteApiConnection;
@@ -111,6 +112,15 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     private static final int MAX_SERVER_STARTUP_WAIT_SECONDS = TestProperties.getServerStartupTimeout();
     private static final String CLIENT_SIDE_ERROR = "Client exception detected";
     public final APIUserHelper _userHelper = new APIUserHelper(this);
+
+    public enum ProductKey
+    {
+        sampleManagerStarter,
+        sampleManagerProfessional,
+        labkeyLims,
+        limsStarter,
+        limsEnterprise,
+    }
 
     public boolean isGuestModeTest()
     {
@@ -405,14 +415,25 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     public void signInShouldFail(String email, String password, String... expectedMessages)
     {
         attemptSignIn(email, password);
-        String errorText = waitForElement(Locator.id("errors").withText()).getText();
-        assertElementPresent(Locator.tagWithName("form", "login"));
 
-        List<String> missingErrors = getMissingTexts(new TextSearcher(errorText), expectedMessages);
+        WebElement element = waitForElement(Locator.tagWithClass("div", "auth-header"));
+        final String errorText;
+
+        // Could be on the "Sign In" page or the "Change Password" page
+        if (element.getText().equals("Sign In"))
+        {
+            errorText = getText(Locator.id("errors"));
+        }
+        else
+        {
+            assertEquals("Change Password", element.getText());
+            errorText = getText(Locator.tagWithClass("div", "auth-form-body").childTag("p"));
+        }
+
+        List<String> missingErrors = new TextSearcher(errorText).getMissingTexts(expectedMessages);
         assertTrue(String.format("Wrong errors.\nExpected: ['%s']\nActual: '%s'", String.join("',\n'", expectedMessages), errorText), missingErrors.isEmpty());
     }
 
-    @Deprecated // TODO: Call the variant that takes a userId instead
     protected String setInitialPassword(String email)
     {
         return setInitialPassword(_userHelper.getUserId(email));
@@ -762,6 +783,9 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                     // Note: leave the self-report setting unchanged
                     customizeSitePage.save();
                 }
+
+                verifySiteGroups();
+
                 /*
                     Waiting for search service to boot up
                     Issue 50601: PDF indexing is slow on first file after server startup on Windows
@@ -776,10 +800,12 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                     waitForElement(Locator.id("status-progress-bar").withText("Module startup complete"), WAIT_FOR_PAGE);
                     clickAndWait(Locator.lkButton("Next"));
                     Locator.lkButton("Next")
-                            .findOptionalElement(getDriver())
-                            .ifPresent(button ->
-                                    doAndWaitForPageToLoad(() ->
-                                            shortWait().until(LabKeyExpectedConditions.clickUntilStale(button))));
+                        .findOptionalElement(getDriver())
+                        .ifPresent(button ->
+                            doAndWaitForPageToLoad(() ->
+                                shortWait().until(LabKeyExpectedConditions.clickUntilStale(button))
+                            )
+                        );
                 }
                 else
                 {
@@ -825,9 +851,9 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         String initialText = "Welcome! We see that this is your first time logging in.";
 
         // These requests should redirect to the initial user page
-        beginAt("/login/resetPassword.view");
+        beginAt(WebTestHelper.buildURL("login", "resetPassword"));
         assertTextPresent(initialText);
-        beginAt("/admin/maintenance.view");
+        beginAt(WebTestHelper.buildURL("admin", "maintenance"));
         assertTextPresent(initialText);
     }
 
@@ -844,14 +870,14 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         {
             // These requests should NOT redirect to the upgrade page
 
-            method = new HttpGet(getBaseURL() + "/login/resetPassword.view");
+            method = new HttpGet(WebTestHelper.buildURL("login", "resetPassword"));
             response = client.execute(method, WebTestHelper.getBasicHttpContext());
             status = response.getCode();
             assertEquals("Unexpected response", HttpStatus.SC_OK, status);
             assertFalse("Upgrade text found", WebTestHelper.getHttpResponseBody(response).contains(upgradeText));
             EntityUtils.consume(response.getEntity());
 
-            method = new HttpGet(getBaseURL() + "/admin/maintenance.view");
+            method = new HttpGet(WebTestHelper.buildURL("admin", "maintenance"));
             response = client.execute(method, WebTestHelper.getBasicHttpContext());
             status = response.getCode();
             assertEquals("Unexpected response", HttpStatus.SC_OK, status);
@@ -913,7 +939,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                 loginParams.add(new BasicNameValuePair("password", PasswordUtil.getPassword()));
 
                 // Login to get CSRF token
-                HttpPost loginMethod = new HttpPost(getBaseURL() + "/login/loginApi.api");
+                HttpPost loginMethod = new HttpPost(WebTestHelper.buildURL("login", "loginApi.api"));
                 loginMethod.setEntity(new UrlEncodedFormEntity(loginParams));
                 HttpClientContext httpContext = WebTestHelper.getBasicHttpContext();
                 response = redirectClient.execute(loginMethod, httpContext);
@@ -925,7 +951,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                 Optional<Cookie> csrfToken = httpContext.getCookieStore().getCookies().stream().filter(c -> c.getName().equals(Connection.X_LABKEY_CSRF)).findAny();
                 csrfToken.ifPresent(cookie -> logoutParams.add(new BasicNameValuePair(Connection.X_LABKEY_CSRF, cookie.getValue())));
                 // Logout to verify redirect
-                HttpPost logoutMethod = new HttpPost(getBaseURL() + "/login/logout.view");
+                HttpPost logoutMethod = new HttpPost(WebTestHelper.buildURL("login", "logout"));
                 logoutMethod.setEntity(new UrlEncodedFormEntity(logoutParams));
                 response = redirectClient.execute(logoutMethod, httpContext);
                 status = response.getCode();
@@ -940,6 +966,23 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             if (null != response)
                 EntityUtils.consumeQuietly(response.getEntity());
         }
+    }
+
+    @LogMethod
+    private void verifySiteGroups()
+    {
+        // Simple verification of the site groups created at bootstrap time, Issue #52166
+        ApiPermissionsHelper helper = new ApiPermissionsHelper(this);
+        // Site groups are returned in known order: alphabetical by name, except that "Users" is replaced with
+        // "All Site Users" after sorting takes place
+        List<Map<String, Object>> siteGroups = helper.getSiteGroups();
+        assertEquals(2, siteGroups.size());
+        Map<String, Object> guests = siteGroups.get(0);
+        assertEquals("Guests", guests.get("name"));
+        assertEquals(-3, guests.get("id"));
+        Map<String, Object> users = siteGroups.get(1);
+        assertEquals("All Site Users", users.get("name"));
+        assertEquals(-2, users.get("id"));
     }
 
     public static final Pattern ERROR_PATTERN = Pattern.compile("^(ERROR|FATAL)", Pattern.MULTILINE);
@@ -972,7 +1015,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                 else if (currentError.size() == 1)
                 {
                     // Line after the ERROR usually has the exception type and error message
-                    TestLogger.error("    " + iterator.next());
+                    TestLogger.error("    " + line);
                 }
                 else if (line.startsWith("Caused by:"))
                 {
@@ -1051,7 +1094,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     {
         if ( isGuestModeTest() )
             return;
-        beginAt("/admin/customizeSite.view");
+        beginAt(WebTestHelper.buildURL("admin", "customizeSite"));
         click(Locator.radioButtonByNameAndValue("systemMaintenanceInterval", "never"));
         clickButton("Save");
     }
@@ -1378,11 +1421,6 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         projectMenu().navigateToFolder(project, folderName);
     }
 
-    public String getCurrentContainer()
-    {
-        return (String) executeScript( "return LABKEY.container.title;");
-    }
-
     public void impersonateGroup(String group, boolean isSiteGroup)
     {
         navBar().userMenu().impersonateGroup(group, isSiteGroup);
@@ -1492,7 +1530,6 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     protected SelectRowsResponse executeSelectRowCommand(String schemaName, String queryName, ContainerFilter containerFilter,
                                                          String path, @Nullable List<Filter> filters, @Nullable List<String> requestedColumns)
     {
-        Connection cn = createDefaultConnection();
         SelectRowsCommand selectCmd = new SelectRowsCommand(schemaName, queryName);
         selectCmd.setMaxRows(-1);
         selectCmd.setContainerFilter(containerFilter);
@@ -1500,18 +1537,19 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         if (filters != null)
             selectCmd.setFilters(filters);
 
-        SelectRowsResponse selectResp;
+        return executeSelectRowCommand(path, selectCmd);
+    }
 
+    protected SelectRowsResponse executeSelectRowCommand(String containerPath, SelectRowsCommand command)
+    {
         try
         {
-            selectResp = selectCmd.execute(cn, path);
+            return command.execute(createDefaultConnection(), containerPath);
         }
         catch (CommandException | IOException e)
         {
             throw new RuntimeException(e);
         }
-
-        return selectResp;
     }
 
     // Returns the text contents of every "Status" cell in the pipeline StatusFiles grid
@@ -1678,10 +1716,71 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         clickButton("Confirm Delete");
     }
 
-    // Note: Keep in sync with ConvertHelper.getStandardConversionErrorMessage()
-    // Example: "Could not convert value '2.34' (Double) for Boolean field 'Medical History.Dep Diagnosed in Last 18 Months'"
     public String getConversionErrorMessage(Object value, String fieldName, Class<?> targetClass)
     {
-        return "Could not convert value '" + value + "' (" + value.getClass().getSimpleName() + ") for " + targetClass.getSimpleName() + " field '" + fieldName + "'";
+        return getConversionErrorMessage(value, fieldName, targetClass, true);
+    }
+
+    // Note: Keep in sync with ConvertHelper.getStandardConversionErrorMessage()
+    // Example: "Could not convert value '2.34' (Double) for Boolean field 'Medical History.Dep Diagnosed in Last 18 Months'"
+    public String getConversionErrorMessage(Object value, String fieldName, Class<?> targetClass, boolean useUSDateParsing)
+    {
+        String fieldType = targetClass.getSimpleName();
+
+        // Issue 50768: Need a better error message if date value is not in the expected format.
+        if (fieldType.equalsIgnoreCase("date") || fieldType.equalsIgnoreCase("datetime") || fieldType.equalsIgnoreCase("timestamp"))
+        {
+            String parsingMode = useUSDateParsing ? "U.S. date parsing (MDY)" : "Non-U.S. date parsing (DMY)";
+            return "'" + value + "' is not a valid " + fieldType + " for " + fieldName + " using " + parsingMode;
+        }
+
+        return "Could not convert value '" + value + "' (" + value.getClass().getSimpleName() + ") for " + fieldType + " field '" + fieldName + "'" ;
+    }
+
+    private ProductKey getProductConfiguration() throws IOException, CommandException
+    {
+        SimpleGetCommand command = new SimpleGetCommand("admin", "productFeature");
+        var resp = command.execute(createDefaultConnection(), "/");
+        String keyString = resp.getProperty("productKey");
+        if (keyString == null)
+            return null;
+
+        return ProductKey.valueOf(keyString);
+    }
+
+    protected ProductKey setProductConfigurationViaApi(@Nullable ProductKey productKey) throws IOException, CommandException
+    {
+        ProductKey existing = getProductConfiguration();
+        log("Setting product key to " + (productKey == null ? "null" : productKey));
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("productKey", productKey == null ? null : productKey.toString());
+
+        SimplePostCommand command = new SimplePostCommand("admin", "productfeature");
+        command.setParameters(parameters);
+        var resp = command.execute(createDefaultConnection(), "/");
+        if (resp.getStatusCode() == 200)
+            log("Successfully updated product key.");
+        else
+            throw new CommandException("Failed to set product key.");
+        return existing;
+    }
+
+    /**
+     * Goes to the Admin / Product Configuration page and selects the designated product. Will navigate back to current URL.
+     *
+     */
+    protected void setProductConfiguration(ProductKey productKey)
+    {
+        if (productKey == null)
+            return;
+
+        String currentUrl = getCurrentRelativeURL();
+
+        goToAdminConsole();
+        clickAndWait(Locator.linkWithText("product configuration"));
+        RadioButton radioButton = new RadioButton.RadioButtonFinder().withValue(productKey.name()).find(getDriver());
+        radioButton.check();
+
+        beginAt(currentUrl);
     }
 }

@@ -29,6 +29,7 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.PlateGrid;
+import org.labkey.test.components.assay.AssayConstants;
 import org.labkey.test.components.labkey.LabKeyAlert;
 import org.labkey.test.pages.admin.PermissionsPage;
 import org.labkey.test.pages.assay.RunQCPage;
@@ -54,10 +55,12 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.labkey.test.util.PermissionsHelper.READER_ROLE;
 
 @Category({Daily.class, Assays.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 15)
@@ -124,7 +127,7 @@ public class NabAssayTest extends AbstractAssayTest
     @BeforeClass
     public static void setupProject() throws Exception
     {
-        NabAssayTest init = (NabAssayTest)getCurrentTest();
+        NabAssayTest init = getCurrentTest();
         init.doSetup();
     }
 
@@ -289,7 +292,7 @@ public class NabAssayTest extends AbstractAssayTest
                         runFile(TEST_ASSAY_NAB_FILE2).
                         build()).doImport();
 
-        assertElementPresent(Locators.labkeyError.containing("'bad-date’ is not a valid Date for Date using U.S. date parsing (MDY)."), 1);
+        assertElementPresent(Locators.labkeyError.containing("'bad-date' is not a valid Date for Date using U.S. date parsing (MDY)."), 1);
 //        These dates are SQL Server specific
 //        assertElementPresent(Locators.labkeyError.containing("Only dates between January 1, 1753 and December 31, 9999 are accepted."), 1);
         assertElementPresent(Locators.labkeyError.containing("Only dates between "), 1);
@@ -419,7 +422,7 @@ public class NabAssayTest extends AbstractAssayTest
             region.checkAllOnPage();
             region.clickHeaderButtonAndWait("Link to Study");
 
-            selectOptionByText(Locator.name("targetStudy"), "/" + TEST_ASSAY_PRJ_NAB + "/" + TEST_ASSAY_FLDR_STUDY1 + " (" + TEST_ASSAY_FLDR_STUDY1 + " Study)");
+            selectOptionByText(AssayConstants.TARGET_STUDY_FIELD_LOCATOR, "/" + TEST_ASSAY_PRJ_NAB + "/" + TEST_ASSAY_FLDR_STUDY1 + " (" + TEST_ASSAY_FLDR_STUDY1 + " Study)");
             clickButton("Next", 300_000); // Triggers a query that is, sometimes, very slow on SQL Server
 
             region = new DataRegionTable("Data", this);
@@ -454,7 +457,7 @@ public class NabAssayTest extends AbstractAssayTest
             pushLocation();  // Save our location because impersonated user won't have permission to project
             PermissionsPage permissionsPage = navBar().goToPermissionsPage();
             permissionsPage.createPermissionsGroup(TEST_ASSAY_GRP_NAB_READER, TEST_ASSAY_USR_NAB_READER);
-            setSubfolderSecurity(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_STUDY1, TEST_ASSAY_GRP_NAB_READER, TEST_ASSAY_PERMS_READER);
+            setSubfolderSecurity(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_STUDY1, TEST_ASSAY_GRP_NAB_READER, READER_ROLE);
             setStudyPerms(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_STUDY1, TEST_ASSAY_GRP_NAB_READER, TEST_ASSAY_PERMS_STUDY_READALL);
 
             // view dataset, click [assay] link, see assay details in subfolder
@@ -492,7 +495,9 @@ public class NabAssayTest extends AbstractAssayTest
     //Issue 17050: UnsupportedOperationException from org.labkey.nab.query.NabProtocolSchema$NabResultsQueryView.createDataView
     private void directBrowserQueryTest()
     {
-        beginAt("/query/Nab%20Test%20Verify%20Project/selectRows.api?schemaName=assay&queryName=TestAssayNab%20Data");
+        beginAt(WebTestHelper.buildURL("query", "Nab Test Verify Project", "selectRows.api", Map.of(
+                "schemaName", "assay",
+                "queryName", "TestAssayNab Data")));
         assertTextPresent("metaData");
     }
 
@@ -541,7 +546,7 @@ public class NabAssayTest extends AbstractAssayTest
         clickFolder(TEST_ASSAY_FLDR_NAB);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
         clickButton("Import Data");
-        checkRadioButton(Locator.radioButtonByNameAndValue("participantVisitResolver", "ParticipantVisitDate"));
+        checkRadioButton(Locator.radioButtonByNameAndValue(AssayConstants.PARTICIPANT_VISIT_RESOLVER_FIELD_NAME, "ParticipantVisitDate"));
         clickButton("Next");
 
         // verify that 'Participant ID', 'Visit ID', and 'Date' fields are included
@@ -621,18 +626,18 @@ public class NabAssayTest extends AbstractAssayTest
         log("Adding AUC columns to custom view");
         // add AUC columns. ORDER MATTERS!
         _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.addColumn("AUC_4pl", "AUC 4pl");
-        _customizeViewsHelper.addColumn("AUC_5pl", "AUC 5pl");
-        _customizeViewsHelper.addColumn("AUC_Poly", "AUC Poly");
-        _customizeViewsHelper.addColumn("Cutoff50/IC_4pl", "Curve IC50 4pl");
-        _customizeViewsHelper.addColumn("Cutoff50/IC_5pl", "Curve IC50 5pl");
-        _customizeViewsHelper.addColumn("Cutoff50/IC_Poly", "Curve IC50 Poly");
-        _customizeViewsHelper.addColumn("Cutoff70/IC_4pl", "Curve IC70 4pl");
-        _customizeViewsHelper.addColumn("Cutoff70/IC_5pl", "Curve IC70 5pl");
-        _customizeViewsHelper.addColumn("Cutoff70/IC_Poly", "Curve IC70 Poly");
-        _customizeViewsHelper.addColumn("Cutoff80/IC_4pl", "Curve IC80 4pl");
-        _customizeViewsHelper.addColumn("Cutoff80/IC_5pl", "Curve IC80 5pl");
-        _customizeViewsHelper.addColumn("Cutoff80/IC_Poly", "Curve IC80 Poly");
+        _customizeViewsHelper.addColumn("AUC_4pl");
+        _customizeViewsHelper.addColumn("AUC_5pl");
+        _customizeViewsHelper.addColumn("AUC_Poly");
+        _customizeViewsHelper.addColumn("Cutoff50/IC_4pl");
+        _customizeViewsHelper.addColumn("Cutoff50/IC_5pl");
+        _customizeViewsHelper.addColumn("Cutoff50/IC_Poly");
+        _customizeViewsHelper.addColumn("Cutoff70/IC_4pl");
+        _customizeViewsHelper.addColumn("Cutoff70/IC_5pl");
+        _customizeViewsHelper.addColumn("Cutoff70/IC_Poly");
+        _customizeViewsHelper.addColumn("Cutoff80/IC_4pl");
+        _customizeViewsHelper.addColumn("Cutoff80/IC_5pl");
+        _customizeViewsHelper.addColumn("Cutoff80/IC_Poly");
         _customizeViewsHelper.applyCustomView();
     }
 
@@ -672,13 +677,13 @@ public class NabAssayTest extends AbstractAssayTest
         DataRegionTable table = new DataRegionTable("Dataset", this);
         table.setSort("ParticipantId", SortDirection.ASC);
         _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.addColumn("AUC_Poly",        AUC_POLY_COL_TITLE);
-        _customizeViewsHelper.addColumn("AUC_4pl",         AUC_4PL_COL_TITLE);
-        _customizeViewsHelper.addColumn("AUC_5pl",         AUC_5PL_COL_TITLE);
-        _customizeViewsHelper.addColumn("Cutoff50/IC_Poly", CURVE_IC50_POLY_COL_TITLE);
-        _customizeViewsHelper.addColumn("Cutoff50/IC_4pl",  CURVE_IC50_4PL_COL_TITLE);
-        _customizeViewsHelper.addColumn("Cutoff70/IC_Poly", CURVE_IC70_POLY_COL_TITLE);
-        _customizeViewsHelper.addColumn("Cutoff80/IC_4pl",  CURVE_IC80_4PL_COL_TITLE);
+        _customizeViewsHelper.addColumn("AUC_Poly");
+        _customizeViewsHelper.addColumn("AUC_4pl");
+        _customizeViewsHelper.addColumn("AUC_5pl");
+        _customizeViewsHelper.addColumn("Cutoff50/IC_Poly");
+        _customizeViewsHelper.addColumn("Cutoff50/IC_4pl");
+        _customizeViewsHelper.addColumn("Cutoff70/IC_Poly");
+        _customizeViewsHelper.addColumn("Cutoff80/IC_4pl");
         _customizeViewsHelper.saveCustomView();
 
         table = new DataRegionTable("Dataset", this);
@@ -876,15 +881,14 @@ public class NabAssayTest extends AbstractAssayTest
         DilutionAssayHelper detailHelper = new DilutionAssayHelper(this);
         waitForText("View QC");
         detailHelper.clickDetailsLink("View QC", "Review/QC Data");
-        RunQCPage runQCPage = new RunQCPage(getDriver());
+        RunQCPage<?> runQCPage = new RunQCPage<>(getDriver());
 
         log("Select a few values to remove from 'Plate 1'.");
         List<String> valuesToIgnore = new ArrayList<>();
-        List<String> allIgnoredValues = new ArrayList<>();
         valuesToIgnore.add("115243");
         valuesToIgnore.add("910");
         runQCPage.selectPlateItemsToIgnore("Plate 1 Controls", valuesToIgnore);
-        allIgnoredValues.addAll(valuesToIgnore);
+        List<String> allIgnoredValues = new ArrayList<>(valuesToIgnore);
 
         log("Select data points to remove from 'Specimen 2'.");
         valuesToIgnore = new ArrayList<>();
@@ -966,6 +970,6 @@ public class NabAssayTest extends AbstractAssayTest
         mouseOver(summaryPlateGrid.getCellElement("A", "2"));
         sleep(500); // Wait for a moment to allow the tool tip to show up.
         String tipText = getText(Locator.xpath("//div[contains(@class, 'x4-tip-body')]//span//div"));
-        assertTrue("Tool tip comment not as expected. Expected: '" + COMMENT + "' Found: '" + tipText + "'.", tipText.equals(COMMENT));
+        assertEquals("Tool tip comment not as expected. Expected: '" + COMMENT + "' Found: '" + tipText + "'.", COMMENT, tipText);
     }
 }

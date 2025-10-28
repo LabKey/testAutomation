@@ -21,7 +21,7 @@ import org.openqa.selenium.WebElement;
 
 public class ReadOnlyFormItem extends Component implements FormItem<String>
 {
-    private WebElement _el;
+    private final WebElement _el;
 
     protected ReadOnlyFormItem(WebElement el)
     {
@@ -30,7 +30,7 @@ public class ReadOnlyFormItem extends Component implements FormItem<String>
 
     public static FormItemFinder<ReadOnlyFormItem> ReadOnlyFormItem()
     {
-        return new FormItemFinder<ReadOnlyFormItem>()
+        return new FormItemFinder<>()
         {
             @Override
             protected ReadOnlyFormItem construct(WebElement el)

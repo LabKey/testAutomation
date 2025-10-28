@@ -33,7 +33,7 @@ public class NAbResultCalcTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        NAbResultCalcTest init = (NAbResultCalcTest) getCurrentTest();
+        NAbResultCalcTest init = getCurrentTest();
         init.doSetup();
     }
 
@@ -72,8 +72,8 @@ public class NAbResultCalcTest extends BaseWebDriverTest
         waitAndClickAndWait(Locator.linkWithText("View Results"));
 
         _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.addColumn("PercentNeutralizationInitialDilution", "Percent Neutralization Initial Dilution");
-        _customizeViewsHelper.addColumn("PercentNeutralizationMax", "Percent Neutralization Max");
+        _customizeViewsHelper.addColumn("PercentNeutralizationInitialDilution");
+        _customizeViewsHelper.addColumn("PercentNeutralizationMax");
         _customizeViewsHelper.applyCustomView();
 
         DataRegionTable region = new DataRegionTable("Data", this);
@@ -103,8 +103,8 @@ public class NAbResultCalcTest extends BaseWebDriverTest
         waitAndClickAndWait(Locator.linkWithText("View Results"));
 
         _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.addColumn("PercentNeutralizationInitialDilution", "Percent Neutralization Initial Dilution");
-        _customizeViewsHelper.addColumn("PercentNeutralizationMax", "Percent Neutralization Max");
+        _customizeViewsHelper.addColumn("PercentNeutralizationInitialDilution");
+        _customizeViewsHelper.addColumn("PercentNeutralizationMax");
         _customizeViewsHelper.applyCustomView();
 
         DataRegionTable region = new DataRegionTable("Data", this);

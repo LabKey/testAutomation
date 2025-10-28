@@ -6,7 +6,7 @@ import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.html.FileInput;
 import org.labkey.test.components.html.Input;
-import org.labkey.test.components.react.MultiMenu;
+import org.labkey.test.components.react.TemplateDownloadButton;
 import org.openqa.selenium.ElementNotInteractableException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -78,27 +78,22 @@ public class FileUploadPanel extends WebDriverComponent<FileUploadPanel.ElementC
 
     public File downloadTemplate()
     {
-        if (!isTemplateDownloadDropdown())
-            return getWrapper().doAndWaitForDownload(()->elementCache().downloadTemplate.click());
-
-        return downloadTemplate("Default Template");
+        return elementCache().templateDownloadButton().downloadDefaultTemplate();
     }
 
     public File downloadTemplate(String templateName)
     {
-        return getWrapper().doAndWaitForDownload(()-> {
-            getTemplateDownloadDropdown().doMenuAction(templateName);
-        });
+        return elementCache().templateDownloadButton().downloadCustomTemplate(templateName);
     }
 
-    public MultiMenu getTemplateDownloadDropdown()
+    public void waitForTemplateDownloadDropdown()
     {
-        return new MultiMenu.MultiMenuFinder(getDriver()).withText("Template").findOrNull(getDriver());
+        elementCache().templateDownloadButton().expand();
     }
 
     public boolean isTemplateDownloadDropdown()
     {
-        return getTemplateDownloadDropdown() != null;
+        return elementCache().templateDownloadButton().isDropdown();
     }
 
     /*
@@ -128,7 +123,11 @@ public class FileUploadPanel extends WebDriverComponent<FileUploadPanel.ElementC
                 .withChild(Locator.tagWithClass("span", "fa-times-circle"));
         Locator.XPathLocator attachedFileContainerOld = Locator.tagWithClass("div", "attached-file--container")
                 .withChild(Locator.tagWithClass("span", "fa-times-circle"));
-        WebElement downloadTemplate = Locator.linkWithTitle("Download Template").findElementOrNull(getDriver());
+
+        TemplateDownloadButton templateDownloadButton()
+        {
+            return new TemplateDownloadButton.Finder(getDriver()).findWhenNeeded();
+        }
 
         Locator attachedFileContainer(String fileName)
         {

@@ -51,13 +51,13 @@ public class WebServicesUtil
                     comma = ", ";
                 }
             }
-            if (sb.length() > 0)
+            if (!sb.isEmpty())
             {
                 sb.insert(0, "Could not connect to port(s): ");
             }
         }
 
-        assertTrue(sb.toString(), sb.length() == 0);
+        assertTrue(sb.toString(), sb.isEmpty());
     }
 
     static public boolean isHostReachable(String hostIp)

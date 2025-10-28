@@ -56,7 +56,7 @@ public class IssuesAttachmentTest extends BaseWebDriverTest implements NonWindow
 
     public static final String LIST_DEF_NAME = "Issues";
 
-    private IssuesHelper issuesHelper = new IssuesHelper(this);
+    private final IssuesHelper issuesHelper = new IssuesHelper(this);
 
     @Override
     protected void doCleanup(boolean afterTest)
@@ -75,7 +75,7 @@ public class IssuesAttachmentTest extends BaseWebDriverTest implements NonWindow
     @BeforeClass
     public static void setupProject() throws Exception
     {
-        IssuesAttachmentTest init = (IssuesAttachmentTest) getCurrentTest();
+        IssuesAttachmentTest init = getCurrentTest();
 
         init.doSetup();
     }
@@ -91,10 +91,10 @@ public class IssuesAttachmentTest extends BaseWebDriverTest implements NonWindow
     }
 
     @Test
-    public void testAttachmentInjection() throws Exception
+    public void testAttachmentInjection()
     {
         goToProjectHome();
-        Map<String, String> issue = Maps.of("assignedTo", getDisplayName(), "title", "Attempt Issue Attachment Injection");
+        Map<String, String> issue = Maps.of("AssignedTo", getDisplayName(), "title", "Attempt Issue Attachment Injection");
         final DetailsPage detailsPage = issuesHelper.addIssue(issue, ALERT_FILE, ESCAPE_FILE);
         final String issueId = detailsPage.getIssueId();
 

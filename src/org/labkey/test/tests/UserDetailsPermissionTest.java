@@ -29,9 +29,10 @@ import org.labkey.test.categories.Daily;
 import org.labkey.test.components.DomainDesignerPage;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.pages.query.ExecuteQueryPage;
+import org.labkey.test.pages.user.UpdateUserDetailsPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.ApiPermissionsHelper;
-import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.DataRegionTable.DataRegionFinder;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
@@ -44,6 +45,8 @@ import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.labkey.test.util.PermissionsHelper.READER_ROLE;
+import static org.labkey.test.util.PermissionsHelper.SITE_ADMIN_ROLE;
 
 @Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 6)
@@ -82,7 +85,7 @@ public class UserDetailsPermissionTest extends BaseWebDriverTest
     @BeforeClass
     public static void setup()
     {
-        UserDetailsPermissionTest initTest = (UserDetailsPermissionTest) getCurrentTest();
+        UserDetailsPermissionTest initTest = getCurrentTest();
         initTest.doSetup();
     }
 
@@ -104,31 +107,29 @@ public class UserDetailsPermissionTest extends BaseWebDriverTest
 
         _containerHelper.createProject(getProjectName(), null);
 
-        new ApiPermissionsHelper(this).addUserToSiteGroup(ADMIN_USER, "Site Administrators");
+        new ApiPermissionsHelper(this).setSiteRoleUserPermissions(ADMIN_USER, SITE_ADMIN_ROLE);
         // Use created user to ensure we have a known 'Modified by' column for created users
         ApiPermissionsHelper apiPermissionsHelper = new ApiPermissionsHelper(this,
                 () -> new Connection(WebTestHelper.getBaseURL(), ADMIN_USER, PasswordUtil.getPassword()));
 
         apiPermissionsHelper.createPermissionsGroup(TEST_GROUP, USER_INFO_VIEWER, IMPERSONATED_USER, CHECKED_USER);
-        apiPermissionsHelper.setPermissions(TEST_GROUP, "Reader");
-        apiPermissionsHelper.setSiteAdminRoleUserPermissions(USER_INFO_VIEWER, "See User and Group Details");
+        apiPermissionsHelper.setPermissions(TEST_GROUP, READER_ROLE);
+        apiPermissionsHelper.setSiteRoleUserPermissions(USER_INFO_VIEWER, "See User and Group Details");
 
         impersonate(ADMIN_USER);
         {
-            goToMyAccount();
-            clickButton("Edit");
-            setFormElement(Locator.name("quf_Phone"), HIDDEN_STRING);
-            setFormElement(Locator.name("quf_" + CUSTOM_USER_COLUMN), HIDDEN_STRING);
-            clickButton("Submit");
+            UpdateUserDetailsPage page = goToMyAccount().clickEdit();
+            page.setField("Phone", HIDDEN_STRING);
+            page.setField(CUSTOM_USER_COLUMN, HIDDEN_STRING);
+            page.clickSubmit();
         }
         stopImpersonating();
         impersonate(CHECKED_USER);
         {
-            goToMyAccount();
-            clickButton("Edit");
-            setFormElement(Locator.name("quf_Phone"), HIDDEN_STRING);
-            setFormElement(Locator.name("quf_" + CUSTOM_USER_COLUMN), HIDDEN_STRING);
-            clickButton("Submit");
+            UpdateUserDetailsPage page = goToMyAccount().clickEdit();
+            page.setField("Phone", HIDDEN_STRING);
+            page.setField(CUSTOM_USER_COLUMN, HIDDEN_STRING);
+            page.clickSubmit();
         }
         stopImpersonating();
     }
@@ -145,7 +146,7 @@ public class UserDetailsPermissionTest extends BaseWebDriverTest
 
         log("Verify that emails cannot be seen in list via lookup");
         clickAndWait(Locator.linkWithText(EMAIL_TEST_LIST));
-        DataRegionTable.findDataRegion(this).goToView(HIDDEN_COL_VIEW);
+        new DataRegionFinder(getDriver()).find().goToView(HIDDEN_COL_VIEW);
         assertTextPresent(displayName);
         // This user does not have permission to see user details, so no link
         assertElementNotPresent(Locator.linkWithText(displayName));
@@ -157,7 +158,7 @@ public class UserDetailsPermissionTest extends BaseWebDriverTest
 
         log("Verify that user table info can be seen with permission");
         clickAndWait(Locator.linkWithText(EMAIL_TEST_LIST));
-        DataRegionTable.findDataRegion(this).goToView(HIDDEN_COL_VIEW);
+        new DataRegionFinder(getDriver()).find().goToView(HIDDEN_COL_VIEW);
         assertTextPresent(CHECKED_USER, ADMIN_USER, HIDDEN_STRING);
     }
 
@@ -171,7 +172,7 @@ public class UserDetailsPermissionTest extends BaseWebDriverTest
         ExecuteQueryPage.beginAt(this, "core", "Users");
 
         log("Verify that emails cannot be seen in query webpart");
-        DataRegionTable.findDataRegion(this).goToView(HIDDEN_COL_VIEW);
+        new DataRegionFinder(getDriver()).find().goToView(HIDDEN_COL_VIEW);
         assertElementPresent(Locator.linkWithText(displayName));
         assertTextNotPresent(CHECKED_USER, ADMIN_USER, HIDDEN_STRING);
 
@@ -180,7 +181,7 @@ public class UserDetailsPermissionTest extends BaseWebDriverTest
         ExecuteQueryPage.beginAt(this, "core", "Users");
 
         log("Verify that user table info can be seen with permission");
-        DataRegionTable.findDataRegion(this).goToView(HIDDEN_COL_VIEW);
+        new DataRegionFinder(getDriver()).find().goToView(HIDDEN_COL_VIEW);
         assertTextPresent(CHECKED_USER, ADMIN_USER, HIDDEN_STRING);
     }
 
@@ -249,19 +250,19 @@ public class UserDetailsPermissionTest extends BaseWebDriverTest
         _listHelper.createList(getProjectName(), EMAIL_TEST_LIST, "Key", userColumn);
         goToManageLists();
         clickAndWait(Locator.linkWithText(EMAIL_TEST_LIST));
-        DataRegionTable.findDataRegion(this).clickInsertNewRow();
+        new DataRegionFinder(getDriver()).find().clickInsertNewRow();
         selectOptionByText(Locator.name("quf_user"), _userHelper.getDisplayNameForEmail(CHECKED_USER));
         clickButton("Submit");
-        DataRegionTable.findDataRegion(this).clickInsertNewRow();
+        new DataRegionFinder(getDriver()).find().clickInsertNewRow();
         selectOptionByText(Locator.name("quf_user"), _userHelper.getDisplayNameForEmail(ADMIN_USER));
         clickButton("Submit");
         _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.addColumn("user/Phone", "Phone");
-        _customizeViewsHelper.addColumn("user/" + CUSTOM_USER_COLUMN, CUSTOM_USER_COLUMN);
-        _customizeViewsHelper.addColumn("user/Email", "Email");
-        _customizeViewsHelper.addColumn("user/ModifiedBy/Email", "Email");
-        _customizeViewsHelper.addColumn("user/ModifiedBy/ModifiedBy/Email", "Email");
-        _customizeViewsHelper.addColumn("ModifiedBy/Email", "Email");
+        _customizeViewsHelper.addColumn("user/Phone");
+        _customizeViewsHelper.addColumn("user/" + CUSTOM_USER_COLUMN);
+        _customizeViewsHelper.addColumn("user/Email");
+        _customizeViewsHelper.addColumn("user/ModifiedBy/Email");
+        _customizeViewsHelper.addColumn("user/ModifiedBy/ModifiedBy/Email");
+        _customizeViewsHelper.addColumn("ModifiedBy/Email");
         _customizeViewsHelper.saveCustomView(HIDDEN_COL_VIEW, true);
 
         assertTextPresent(CHECKED_USER, ADMIN_USER, HIDDEN_STRING); // Ensure subsequent check is valid
@@ -273,7 +274,7 @@ public class UserDetailsPermissionTest extends BaseWebDriverTest
     {
         ExecuteQueryPage.beginAt(this, "core", "Users");
         _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.addColumn("ModifiedBy/Email", "Email");
+        _customizeViewsHelper.addColumn("ModifiedBy/Email");
         _customizeViewsHelper.saveCustomView(HIDDEN_COL_VIEW, true);
 
         assertTextPresent(CHECKED_USER, ADMIN_USER, HIDDEN_STRING); // Ensure subsequent check is valid

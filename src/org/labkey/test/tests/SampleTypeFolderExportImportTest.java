@@ -43,7 +43,9 @@ import org.labkey.test.pages.admin.FolderManagementPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.DataClassDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
+import org.labkey.test.util.ArtifactCollector;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
@@ -99,7 +101,7 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        SampleTypeFolderExportImportTest init = (SampleTypeFolderExportImportTest) getCurrentTest();
+        SampleTypeFolderExportImportTest init = getCurrentTest();
         init.doSetup();
     }
 
@@ -150,13 +152,12 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
             {
                 if(logMismatch)
                 {
-                    StringBuilder errorMsg = new StringBuilder();
-                    errorMsg.append("\n*************** ERROR ***************");
-                    errorMsg.append("\nFound a mismatch in the lists.");
-                    errorMsg.append("\nlist01(" + i + "): " + list01.get(i));
-                    errorMsg.append("\nlist02(" + i + "): " + list02.get(i));
-                    errorMsg.append("\n*************** ERROR ***************");
-                    log(errorMsg.toString());
+                    String errorMsg = "\n*************** ERROR ***************" +
+                            "\nFound a mismatch in the lists." +
+                            "\nlist01(" + i + "): " + list01.get(i) +
+                            "\nlist02(" + i + "): " + list02.get(i) +
+                            "\n*************** ERROR ***************";
+                    log(errorMsg);
                 }
                 areEqual = false;
             }
@@ -321,9 +322,9 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
         clickButtonContainingText("Next");
 
         // TODO: Should validate that the Derive Samples action shows the various fields as expected. That is the required and missing value fields should have the correct input type. Will be fixed in 19.2.
-        setFormElement(Locator.tagWithName("input", "outputSample1_Name"), sampleNames[8]);
-        setFormElement(Locator.tagWithName("input", "outputSample1_" + REQUIRED_FIELD_NAME), "Required text for this field.");
-        setFormElement(Locator.tagWithName("input", "outputSample1_" + MISSING_FIELD_NAME), "Q");
+        setFormElement(Locator.tagWithName("input", "Output Sample 1_Name"), sampleNames[8]);
+        setFormElement(Locator.tagWithName("input", "Output Sample 1_" + REQUIRED_FIELD_NAME), "Required text for this field.");
+        setFormElement(Locator.tagWithName("input", "Output Sample 1_" + MISSING_FIELD_NAME), "Q");
         clickButtonContainingText("Submit");
 
         // TODO: There is a bug where derived values do not honor missing value fields (treat them as a text field). So the indicator field for this sample will be empty. Will be fixed in 19.2.
@@ -413,7 +414,7 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
         Assert.assertTrue("Imported Sample Type data not as expected.", areDataListEqual(resultsFromDB, expectedValuesInDB));
         */
 
-        if(errorLog.length() > 0)
+        if(!errorLog.isEmpty())
             Assert.fail(errorLog.toString());
 
         log("All done.");
@@ -436,40 +437,43 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
 
         // arrange - 2 sample types, one with samples derived from parents in the other (and also parents in the same one)
         List<FieldDefinition> testFields = SampleTypeAPIHelper.sampleTypeTestFields(false);
+        FieldDefinition intColumn = getFieldByNamePart(testFields, "int,./Column");
+        FieldDefinition stringColumn = getFieldByNamePart(testFields, "stringColumn");
+        FieldDefinition decimalColumn = getFieldByNamePart(testFields, "decimalColumn");
         DataClassDefinition dataClassType = new DataClassDefinition(dataClass).setFields(DataClassAPIHelper.dataClassTestFields());
         SampleTypeDefinition parentType = new SampleTypeDefinition(parentSampleType).setFields(testFields);
         SampleTypeDefinition testSampleType = new SampleTypeDefinition(testSamples).setFields(testFields)
-                .addParentAlias("Parent", parentSampleType) // to derive from parent sampleType
+                .addParentAlias("ParentAlias", parentSampleType) // to derive from parent sampleType
                 .addDataParentAlias("DataClassParent", dataClass)
                 .addParentAlias("SelfParent"); // to derive from samles in the current type
 
         TestDataGenerator dataClassDgen = DataClassAPIHelper.createEmptyDataClass(subfolderPath, dataClassType);
-        dataClassDgen.addCustomRow(Map.of("Name", "data1", "intColumn", 1, "stringColumn", "one"));
-        dataClassDgen.addCustomRow(Map.of("Name", "data2", "intColumn", 2, "stringColumn", "two"));
-        dataClassDgen.addCustomRow(Map.of("Name", "data3", "intColumn", 3, "stringColumn", "three"));
+        dataClassDgen.addCustomRow(Map.of("Name", "data1"));
+        dataClassDgen.addCustomRow(Map.of("Name", "data2"));
+        dataClassDgen.addCustomRow(Map.of("Name", "data3"));
         dataClassDgen.insertRows();
 
         TestDataGenerator parentDgen = SampleTypeAPIHelper.createEmptySampleType(subfolderPath, parentType);
-        parentDgen.addCustomRow(Map.of("Name", "Parent1", "intColumn", 1, "floatColumn", 1.1, "stringColumn", "one"));
-        parentDgen.addCustomRow(Map.of("Name", "Parent2", "intColumn", 2, "floatColumn", 2.2, "stringColumn", "two"));
-        parentDgen.addCustomRow(Map.of("Name", "Parent3", "intColumn", 3, "floatColumn", 3.3, "stringColumn", "three"));
+        parentDgen.addCustomRow(Map.of("Name", "Parent1", intColumn.getName(), 1, decimalColumn.getName(), 1.1, stringColumn.getName(), "one"));
+        parentDgen.addCustomRow(Map.of("Name", "Parent2", intColumn.getName(), 2, decimalColumn.getName(), 2.2, stringColumn.getName(), "two"));
+        parentDgen.addCustomRow(Map.of("Name", "Parent3", intColumn.getName(), 3, decimalColumn.getName(), 3.3, stringColumn.getName(), "three"));
         parentDgen.insertRows();
 
         TestDataGenerator testDgen = SampleTypeAPIHelper.createEmptySampleType(subfolderPath, testSampleType);
-        testDgen.addCustomRow(Map.of("Name", "Child1", "intColumn", 1, "decimalColumn", 1.1, "stringColumn", "one",
-                "Parent", "Parent1"));
-        testDgen.addCustomRow(Map.of("Name", "Child2", "intColumn", 2, "decimalColumn", 2.2, "stringColumn", "two",
-                "Parent", "Parent2"));
-        testDgen.addCustomRow(Map.of("Name", "Child3", "intColumn", 3, "decimalColumn", 3.3, "stringColumn", "three",
-                "Parent", "Parent3", "DataClassParent", "data1"));
-        testDgen.addCustomRow(Map.of("Name", "Child4", "intColumn", 4, "decimalColumn", 4.4, "stringColumn", "four",
-                "Parent", "Parent3, Parent2"));
-        testDgen.addCustomRow(Map.of("Name", "Child5", "intColumn", 5, "decimalColumn", 5.5, "stringColumn", "five",
-                "Parent", "Parent1, Parent2"));
-        testDgen.addCustomRow(Map.of("Name", "Child6", "intColumn", 6, "decimalColumn", 6.6, "stringColumn", "six",
-                "Parent", "Parent3, Parent2", "SelfParent", "Child5"));
-        testDgen.addCustomRow(Map.of("Name", "Child7", "intColumn", 7, "decimalColumn", 7.7, "stringColumn", "seven",
-                "Parent", "Parent3, Parent2", "SelfParent", "Child5", "DataClassParent", "data2, data3"));
+        testDgen.addCustomRow(Map.of("Name", "Child1", intColumn.getName(), 1, decimalColumn.getName(), 1.1, stringColumn.getName(), "one",
+                "ParentAlias", "Parent1"));
+        testDgen.addCustomRow(Map.of("Name", "Child2", intColumn.getName(), 2, decimalColumn.getName(), 2.2, stringColumn.getName(), "two",
+                "ParentAlias", "Parent2"));
+        testDgen.addCustomRow(Map.of("Name", "Child3", intColumn.getName(), 3, decimalColumn.getName(), 3.3, stringColumn.getName(), "three",
+                "ParentAlias", "Parent3", "DataClassParent", "data1"));
+        testDgen.addCustomRow(Map.of("Name", "Child4", intColumn.getName(), 4, decimalColumn.getName(), 4.4, stringColumn.getName(), "four",
+                "ParentAlias", "Parent3, Parent2"));
+        testDgen.addCustomRow(Map.of("Name", "Child5", intColumn.getName(), 5, decimalColumn.getName(), 5.5, stringColumn.getName(), "five",
+                "ParentAlias", "Parent1, Parent2"));
+        testDgen.addCustomRow(Map.of("Name", "Child6", intColumn.getName(), 6, decimalColumn.getName(), 6.6, stringColumn.getName(), "six",
+                "ParentAlias", "Parent3, Parent2", "SelfParent", "Child5"));
+        testDgen.addCustomRow(Map.of("Name", "Child7", intColumn.getName(), 7, decimalColumn.getName(), 7.7, stringColumn.getName(), "seven",
+                "ParentAlias", "Parent3, Parent2", "SelfParent", "Child5", "DataClassParent", "data2, data3"));
         testDgen.insertRows();
 
         PortalHelper portalHelper = new PortalHelper(this);
@@ -524,12 +528,18 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
                     .findFirst().orElse(null);
             assertNotNull("expect all matching rows to come through", matchingMap);
 
+            String intColFieldKey = EscapeUtil.fieldKeyEncodePart(intColumn.getName());
+            assertNotNull("expect intColumn to be present in exported row", exportedRow.get(intColFieldKey));
             assertThat("expect export and import values to be equivalent",
-                    exportedRow.get("intColumn"), equalTo(matchingMap.get("intColumn")));
+                    exportedRow.get(intColFieldKey), equalTo(matchingMap.get(intColFieldKey)));
+            String stringColFieldKey = EscapeUtil.fieldKeyEncodePart(stringColumn.getName());
+            assertNotNull("expect stringColumn to be present in exported row", exportedRow.get(stringColFieldKey));
             assertThat("expect export and import values to be equivalent",
-                    exportedRow.get("stringColumn"), equalTo(matchingMap.get("stringColumn")));
+                    exportedRow.get(stringColFieldKey), equalTo(matchingMap.get(stringColFieldKey)));
+            String decimalColFieldKey = EscapeUtil.fieldKeyEncodePart(decimalColumn.getName());
+            assertNotNull("expect decimalColumn to be present in exported row", exportedRow.get(decimalColFieldKey));
             assertThat("expect export and import values to be equivalent",
-                    exportedRow.get("decimalColumn"), equalTo(matchingMap.get("decimalColumn")));
+                    exportedRow.get(decimalColFieldKey), equalTo(matchingMap.get(decimalColFieldKey)));
 
             List<String> sourceParents = Arrays.asList(exportedRow.get("Inputs/Materials/parentSamples").toString()
                     .replace(" ", "").split(","));
@@ -547,7 +557,7 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
     {
         String subfolder = "samplesWithAssayRunsFolder";
         String subfolderPath = getProjectName() + "/" + subfolder;
-        String testSamples = "testSamples";
+        String testSamples = "testSamplesWithFiles";
         String assayName = "testAssay";
         String importFolder = "assaySamplesImportFolder";
 
@@ -557,13 +567,16 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
 
         // create a test sampleType
         List<FieldDefinition> testFields = SampleTypeAPIHelper.sampleTypeTestFields(true);
+        FieldDefinition intColumn = getFieldByNamePart(testFields, "int,./Column");
+        FieldDefinition stringColumn = getFieldByNamePart(testFields, "stringColumn");
+        FieldDefinition decimalColumn = getFieldByNamePart(testFields, "decimalColumn");
         SampleTypeDefinition testSampleType = new SampleTypeDefinition(testSamples).setFields(testFields)
-                .addParentAlias("SelfParent"); // to derive from samles in the current type
+                .addParentAlias("SelfParent"); // to derive from samples in the current type
 
         TestDataGenerator parentDgen = SampleTypeAPIHelper.createEmptySampleType(subfolderPath, testSampleType);
-        parentDgen.addCustomRow(Map.of("Name", "sample1", "intColumn", 1, "decimalColumn", 1.1, "stringColumn", "one"));
-        parentDgen.addCustomRow(Map.of("Name", "sample2", "intColumn", 2, "decimalColumn", 2.2, "stringColumn", "two"));
-        parentDgen.addCustomRow(Map.of("Name", "sample3", "intColumn", 3, "decimalColumn", 3.3, "stringColumn", "three"));
+        parentDgen.addCustomRow(Map.of("Name", "sample1", intColumn.getName(), 1, decimalColumn.getName(), 1.1, stringColumn.getName(), "one"));
+        parentDgen.addCustomRow(Map.of("Name", "sample2", intColumn.getName(), 2, decimalColumn.getName(), 2.2, stringColumn.getName(), "two"));
+        parentDgen.addCustomRow(Map.of("Name", "sample3", intColumn.getName(), 3, decimalColumn.getName(), 3.3, stringColumn.getName(), "three"));
         parentDgen.insertRows();
 
         goToProjectFolder(getProjectName(), subfolder);
@@ -573,13 +586,22 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
         portalHelper.addWebPart("Experiment Runs");
         portalHelper.addWebPart("Assay List");
 
-        // upload a file for a sample's file field
+        log(String.format("Upload a file '%s' to a sample's file field.", SAMPLE_TXT_FILE.getName()));
         clickAndWait(Locator.linkWithText(testSamples));
         DataRegionTable sourceSamplesTable = new SampleTypeHelper(this).getSamplesDataRegionTable();
         sourceSamplesTable.clickEditRow(1);
         waitForElementToBeVisible(Locator.tagWithAttribute("input", "type", "file"));
         setFormElement(Locator.tagWithAttribute("input", "type", "file"), SAMPLE_TXT_FILE);
+        // setFormElement doesn't check that the form element is set.
+        // Because this test uses random field names, we should validate that the file was actually uploaded. If the
+        // file is missing later in the test, we can be sure it was present at this point.
+        Assert.assertTrue("File not uploaded to 'add new' form.",
+                waitFor(()->!getFormElement(Locator.tagWithAttribute("input", "type", "file")).isEmpty(), 1_500));
         clickAndWait(Locator.lkButton("Submit"));
+
+        waitForElementToBeVisible(Locator.linkContainingText(SAMPLE_TXT_FILE.getName()));
+
+        new ArtifactCollector(this).dumpPageSnapshot("File_Attached_Proof");
 
         goToProjectFolder(getProjectName(), subfolder);
 
@@ -645,14 +667,26 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
             exportData.add(dataTable.getRowDataAsMap(i));
         }
 
-        // now export the current folder and import it to importProject
+        log("Now export the current folder and import it to importProject.");
         goToFolderManagement()
                 .goToExportTab();
 
-        Checkbox checkbox = new Checkbox(Locator.tagWithText("label", ExportFolderPage.EXPERIMENTS_AND_RUNS)
-                .precedingSibling("input").waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT));
-        new Checkbox(Locator.tagWithText("label", "Files").precedingSibling("input").findElement(getDriver())).check();
-        checkbox.check();
+        new Checkbox(Locator.tagWithText("label", ExportFolderPage.EXPERIMENTS_AND_RUNS)
+                .precedingSibling("input").waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT)).check();
+
+        new Checkbox(Locator.tagWithText("label", "Files")
+                .precedingSibling("input").waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT)).check();
+
+        Assert.assertTrue("Experiment and Runs not checked for export.",
+                new Checkbox(Locator.tagWithText("label", ExportFolderPage.EXPERIMENTS_AND_RUNS)
+                        .precedingSibling("input").waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT)).isChecked());
+
+        Assert.assertTrue("Files not checked for export.",
+                new Checkbox(Locator.tagWithText("label", "Files").precedingSibling("input").findElement(getDriver()))
+                        .isChecked());
+
+        log("'Experiment and Runs' & 'Files' are selected for export.");
+
         File exportedFolderFile = doAndWaitForDownload(()->findButton("Export").click());
 
         goToProjectFolder(IMPORT_PROJECT_NAME, importFolder);
@@ -686,8 +720,28 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
         File downloadedFile = doAndWaitForDownload(() -> waitAndClick(WAIT_FOR_JAVASCRIPT, Locator.tagWithAttribute("a", "title", "Download attached file"), 0));
         assertElementPresent("Did not find the expected number of icons for " + SAMPLE_TXT_FILE.getName() + " from the imported samples.", Locator.tagContainingText("a", "sample.txt"), 1);
         checker().verifyTrue("Incorrect file content for sample.txt after folder import", FileUtils.contentEquals(downloadedFile, SAMPLE_TXT_FILE));
+
+        // verify the other sample type data is round-tripped as expected
+        importedDataTable = DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
+        checker().verifyEquals("Name column data not as expected", List.of("sample3", "sample2", "sample1"),
+                importedDataTable.getColumnDataAsText("Name"));
+        checker().verifyEquals("intColumn column data not as expected", List.of("3", "2", "1"),
+                importedDataTable.getColumnDataAsText(intColumn.getName()));
+        checker().verifyEquals("decimalColumn column data not as expected", List.of("3.3", "2.2", "1.1"),
+                importedDataTable.getColumnDataAsText(decimalColumn.getName()));
+        checker().verifyEquals("stringColumn column data not as expected", List.of("three", "two", "one"),
+                importedDataTable.getColumnDataAsText(stringColumn.getName()));
     }
 
+    private FieldDefinition getFieldByNamePart(List<FieldDefinition> fields, String namePart)
+    {
+        for (FieldDefinition field : fields)
+        {
+            if (field.isNamePartMatch(namePart))
+                return field;
+        }
+        return null;
+    }
 
     private StringBuilder checkDisplayFields(String displayField, List<String> columnLabels)
     {

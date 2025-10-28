@@ -20,6 +20,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.components.html.Table;
 import org.labkey.test.selenium.RefindingWebElement;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -36,13 +37,11 @@ public class EmailRecordTable extends Table
 {
     private static final String RECORDER_CHECKBOX_NAME = "emailRecordOn";
     private static final String _regionName = "EmailRecord";
-    private static final Locator gridLocator = Locator.xpath("//table[@lk-region-name='"+ _regionName +"']");
-    private static final int _headerRows = 2;
-    private static final int _footerRows = 1;
+    private static final Locator gridLocator = Locator.tagWithAttributeContaining("table", "id", _regionName);
 
     public EmailRecordTable(WebDriver driver)
     {
-        super(driver, new RefindingWebElement(gridLocator, driver).withTimeout(WAIT_FOR_JAVASCRIPT));
+        super(driver, new RefindingWebElement(gridLocator, driver).withTimeout(WAIT_FOR_JAVASCRIPT), 0);
         ((RefindingWebElement) getComponentElement()).withRefindListener(el -> clearElementCache());
     }
 
@@ -67,14 +66,13 @@ public class EmailRecordTable extends Table
         }
         catch (IllegalArgumentException fallback)
         {
-            return super.getColumnIndex(headerLabel, _headerRows);
+            return super.getColumnIndex(headerLabel);
         }
     }
 
     public int getEmailCount()
     {
-        //3 rows in the table do not contain email messages
-        return getRowCount() - (_headerRows + _footerRows);
+        return getRowCount();
     }
 
     public void startRecording()
@@ -138,12 +136,12 @@ public class EmailRecordTable extends Table
     private List<EmailMessage> getMessages(Predicate<String> subjectFilter)
     {
         List<EmailMessage> messages = new ArrayList<>();
-        int rows = getRowCount() - _footerRows;
+        int rows = getRowCount();
 
         if (rows > 0)
         {
             int colMessage = getColumnIndex("Message");
-            for (int i = _headerRows + 1; i <= rows; i++)
+            for (int i = 1; i <= rows; i++)
             {
                 String message = getDataAsText(i, colMessage);
                 String[] lines = trimAll(StringUtils.split(message, "\n"));
@@ -171,12 +169,12 @@ public class EmailRecordTable extends Table
 
     public List<Integer> getTableIndexesWhereTextAppears(String header, String text)
     {
-        List<String> columnText = getColumnAsText(header, _headerRows);
+        List<String> columnText = getColumnAsText(header);
         List<Integer> colsWithString = new ArrayList<>();
         for(int i = 1; i <= columnText.size(); i++)
         {
             int arrayIndex = i-1;
-            if(columnText.get(arrayIndex).equals(text)){colsWithString.add(i + _headerRows);}
+            if(columnText.get(arrayIndex).equals(text)){colsWithString.add(i);}
         }
         return colsWithString;
     }
@@ -215,28 +213,34 @@ public class EmailRecordTable extends Table
     private void parseViewCell(EmailMessage emailMessage)
     {
         List<String> views = new ArrayList<>();
-        String view;
+        boolean done = false;
         int rowIndex = emailMessage.getRowIndex();
         int colIndex = EmailColumn.View.getIndex();
         do
         {
-            view = getDataAsText(rowIndex, colIndex++);
-            if (view != null && !view.isBlank())
+            try
             {
-                views.add(view.trim());
+                WebElement viewEl = getDataAsElement(rowIndex, colIndex++);
+                if (Locator.tag("a").existsIn(viewEl))
+                {
+                    String view = viewEl.getText();
+                    if (!view.isBlank())
+                    {
+                        views.add(view.trim());
+                    }
+                }
             }
-        } while (view != null);
+            catch (NoSuchElementException nse)
+            {
+                done = true;
+            }
+        } while (!done);
         emailMessage.setViews(views);
     }
 
     public List<String> getColumnDataAsText(String column)
     {
-        return getColumnAsText(column , _headerRows);
-    }
-
-    public int getHeaderRowCount()
-    {
-        return _headerRows;
+        return getColumnAsText(column);
     }
 
     public static class EmailMessage

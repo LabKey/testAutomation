@@ -26,6 +26,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.labkey.test.util.PermissionsHelper.READER_ROLE;
 
 @Category({Daily.class})
 public class AnnouncementAPITest extends BaseWebDriverTest
@@ -33,7 +34,7 @@ public class AnnouncementAPITest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        AnnouncementAPITest init = (AnnouncementAPITest) getCurrentTest();
+        AnnouncementAPITest init = getCurrentTest();
 
         init.doSetup();
     }
@@ -308,7 +309,7 @@ public class AnnouncementAPITest extends BaseWebDriverTest
         AnnouncementModel created = createThread(preThread);
 
         goToProjectHome(getProjectName());
-        impersonateRole("Reader");
+        impersonateRole(READER_ROLE);
 
         // Act and assert
         // as a Reader, attempt to do basic things that require permissions and confirm

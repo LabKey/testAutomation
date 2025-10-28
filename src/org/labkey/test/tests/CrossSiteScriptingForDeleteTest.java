@@ -25,7 +25,7 @@ public class CrossSiteScriptingForDeleteTest extends BaseWebDriverTest
     @BeforeClass
     public static void initTest()
     {
-        CrossSiteScriptingForDeleteTest init = (CrossSiteScriptingForDeleteTest) getCurrentTest();
+        CrossSiteScriptingForDeleteTest init = getCurrentTest();
         init.doSetup();
     }
 

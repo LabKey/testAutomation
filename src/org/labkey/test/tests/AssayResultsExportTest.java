@@ -129,7 +129,7 @@ public class AssayResultsExportTest extends AbstractExportTest
     @BeforeClass
     public static void doSetup() throws Exception
     {
-        AssayResultsExportTest initTest = (AssayResultsExportTest) getCurrentTest();
+        AssayResultsExportTest initTest = getCurrentTest();
         initTest.setupTestContainers();
     }
 

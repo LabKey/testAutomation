@@ -32,6 +32,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.assertTrue;
+import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
 
 @Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 6)
@@ -65,7 +66,7 @@ public class SubfolderWebPartTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        SubfolderWebPartTest init = (SubfolderWebPartTest) getCurrentTest();
+        SubfolderWebPartTest init = getCurrentTest();
 
         init.doSetup();
     }
@@ -97,9 +98,8 @@ public class SubfolderWebPartTest extends BaseWebDriverTest
 
             // give a user folder-specific role here
             projectMenu().navigateToFolder(otherProjectName, FOLDER_WITH_USERS);
-            navBar().goToPermissionsPage().setUserPermissions(TEST_USER, "Editor");
+            navBar().goToPermissionsPage().setUserPermissions(TEST_USER, EDITOR_ROLE);
         }
-
     }
 
     @Before
@@ -141,7 +141,7 @@ public class SubfolderWebPartTest extends BaseWebDriverTest
         homeWebPart.goToSubfolder(FOLDER_TWO_A);
         homeWebPart = SubfoldersWebPart.getWebPart(getDriver());
         homeWebPart.goToSubfolder(FOLDER_WITH_USERS);
-        boolean userRoleMigratedAsExpected = navBar().goToPermissionsPage().isUserInRole(TEST_USER, "Editor");
+        boolean userRoleMigratedAsExpected = navBar().goToPermissionsPage().isUserInRole(TEST_USER, EDITOR_ROLE);
         assertTrue("The user role did not migrate with folder import", userRoleMigratedAsExpected);
 
         // now validate files

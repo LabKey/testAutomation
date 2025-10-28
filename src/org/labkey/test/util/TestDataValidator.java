@@ -50,7 +50,7 @@ public class TestDataValidator
             // now find at least 1 row with matching value in this column
             List<Map<String, Object>> matchingRows = findRowsWithMatchingColumnValues(row, ignoreColumns);
 
-            if (matchingRows.size()==0)
+            if (matchingRows.isEmpty())
             {
                 for (Object key : row.keySet())
                 {

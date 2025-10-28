@@ -15,6 +15,7 @@
  */
 package org.labkey.test.util;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.format.CellGeneralFormatter;
 import org.apache.poi.ss.formula.FormulaParseException;
 import org.apache.poi.ss.usermodel.Cell;
@@ -28,12 +29,15 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.ss.util.WorkbookUtil;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -145,7 +149,24 @@ public abstract class ExcelHelper
                 return cell.getStringCellValue();
             }
             else if (isCellNumeric(cell) && DateUtil.isCellDateFormatted(cell) && cell.getDateCellValue() != null)
-                return DATE_TIME_FORMAT.format(cell.getDateCellValue());
+            {
+
+                // Dealing with Date and Time only fields in Excel is fun!
+                // If the time value of the cell is 00:00 assume it to be a Date only field.
+                // If the date value of the field is January 1, 1970 assume it to be a Time only field.
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(cell.getDateCellValue());
+                if ((cal.get(Calendar.HOUR_OF_DAY) == 0) && (cal.get(Calendar.MINUTE) == 0)||
+                        (cal.get(Calendar.YEAR) == 1970 && cal.get(Calendar.MONTH) == Calendar.JANUARY && cal.get(Calendar.DAY_OF_MONTH) == 1))
+                {
+                    return new SimpleDateFormat(cell.getCellStyle().getDataFormatString()).format(cell.getDateCellValue());
+                }
+                else
+                {
+                    return DATE_TIME_FORMAT.format(cell.getDateCellValue());
+                }
+
+            }
             else if (cell.getCellType() == CellType.FORMULA && cell.getCachedFormulaResultType() == CellType.STRING)
                 return cell.getStringCellValue();
             else
@@ -248,7 +269,7 @@ public abstract class ExcelHelper
     {
         try (Workbook workbook = ExcelHelper.create(file))
         {
-            Map<String, List<Map<String, String>>> allData = new LinkedHashMap<>();
+            Map<String, List<Map<String, String>>> allData = new WorsheetMap();
 
             for (int s = 0; s < workbook.getNumberOfSheets(); s++)
             {
@@ -273,11 +294,35 @@ public abstract class ExcelHelper
                 allData.put(sheet.getSheetName(), rowMaps);
             }
 
-            return allData;
+            return Collections.unmodifiableMap(allData);
         }
         catch (IOException e)
         {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * Truncate and make safe a proposed Excel sheet name
+     * @see org.labkey.api.data.ExcelWriter#cleanSheetName(String)
+     */
+    public static String sheetName(String sheetName)
+    {
+        return WorkbookUtil.createSafeSheetName(StringUtils.truncate(sheetName, 31), '_');
+    }
+}
+
+class WorsheetMap extends LinkedHashMap<String, List<Map<String, String>>>
+{
+    @Override
+    public List<Map<String, String>> get(Object key)
+    {
+        return super.get(ExcelHelper.sheetName((String) key));
+    }
+
+    @Override
+    public List<Map<String, String>> getOrDefault(Object key, List<Map<String, String>> defaultValue)
+    {
+        return super.getOrDefault(ExcelHelper.sheetName((String) key), defaultValue);
     }
 }

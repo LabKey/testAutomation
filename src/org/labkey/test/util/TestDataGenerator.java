@@ -15,51 +15,61 @@
  */
 package org.labkey.test.util;
 
-import org.apache.commons.io.FileUtils;
+import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
-import org.apache.poi.xssf.streaming.SXSSFRow;
-import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.junit.Assert;
 import org.labkey.api.collections.CaseInsensitiveLinkedHashMap;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
 import org.labkey.remoteapi.domain.CreateDomainCommand;
 import org.labkey.remoteapi.domain.DomainResponse;
 import org.labkey.remoteapi.domain.PropertyDescriptor;
 import org.labkey.remoteapi.query.Filter;
-import org.labkey.remoteapi.query.SaveRowsResponse;
+import org.labkey.remoteapi.query.ImportDataResponse;
+import org.labkey.remoteapi.query.RowsResponse;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.remoteapi.query.Sort;
 import org.labkey.serverapi.reader.TabLoader;
-import org.labkey.serverapi.writer.PrintWriters;
-import org.labkey.test.TestFileUtils;
+import org.labkey.test.TestProperties;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.util.DomainUtils.DomainKind;
+import org.labkey.test.util.data.ColumnNameMapper;
+import org.labkey.test.util.data.RecordIterator;
+import org.labkey.test.util.data.TestDataUtils;
 import org.labkey.test.util.query.QueryApiHelper;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
 import static org.labkey.test.BaseWebDriverTest.ALL_ILLEGAL_QUERY_KEY_CHARACTERS;
+import static org.labkey.test.util.data.TestDataUtils.REALISTIC_ASSAY_FIELDS;
+import static org.labkey.test.util.data.TestDataUtils.REALISTIC_SAMPLE_FIELDS;
+import static org.labkey.test.util.data.TestDataUtils.REALISTIC_SOURCE_FIELDS;
 
 
 /**
@@ -67,11 +77,23 @@ import static org.labkey.test.BaseWebDriverTest.ALL_ILLEGAL_QUERY_KEY_CHARACTERS
  */
 public class TestDataGenerator
 {
-    // chose a Character random from this String
-    public static final String CHARSET_STRING = "ABCDEFG01234abcdefvxyz~!@#$%^&*()-+=_{}[]|:;\"',.<>";
+    public static final String WIDE_CHAR = "\uD83D\uDC7E"; // 👾
+    public static final char WIDE_PLACEHOLDER = '\u03A0'; // 'Π' - Wide character can't be picked from the string with 'charAt'
+    public static final char REPEAT_PLACEHOLDER = '\u22EF'; // '⋯' - Used to indicate that the char will be repeated
+    public static final char ALL_CHARS_PLACEHOLDER = '\u2211'; // '∑' - Used to indicate that all characters from the charset should be used
+    public static final String NON_LATIN_STRING = "\u0438\u0418\uC548\u306F"; // "иИ안は"
+    public static final String CHARSET_STRING = "ABCDEFG01234abcdefvxyz~!@#$%^&*()-+=_{}[]|\\:;\"',.<>" + NON_LATIN_STRING + WIDE_PLACEHOLDER;
     public static final String ALPHANUMERIC_STRING = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvxyz";
     public static final String DOMAIN_SPECIAL_STRING =  "+- _.:&()/";
     public static final String ILLEGAL_DOMAIN_NAME_CHARSET = "<>[]{};,`\"~!@#$%^*=|?\\";
+    private static final int MAX_RANDOM_TRIES = 100;
+    // Used to set value of date pickers
+    public static final Supplier<SimpleDateFormat> INPUT_DATE_FORMAT = () -> new SimpleDateFormat("MM/dd/yyyy");
+    public static final Supplier<SimpleDateFormat> INPUT_DATETIME_FORMAT = () -> new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+    // Default display format
+    public static final Supplier<SimpleDateFormat> UI_DATE_FORMAT = () -> new SimpleDateFormat("yyyy-MM-dd");
+    public static final Supplier<SimpleDateFormat> UI_DATE_TIME_FORMAT = () -> new SimpleDateFormat("yyyy-MM-dd HH:mm");
+    public static final Supplier<SimpleDateFormat> TIME_FORMAT = () -> new SimpleDateFormat("HH:mm:ss");
 
     private final Map<String, PropertyDescriptor> _columns = new CaseInsensitiveLinkedHashMap<>();
     private final Map<String, Supplier<Object>> _dataSuppliers = new CaseInsensitiveHashMap<>();
@@ -86,7 +108,6 @@ public class TestDataGenerator
     private final String _containerPath;
     private String _excludedChars;
     private boolean _alphaNumericStr;
-    private final TestDataUtils.TsvQuoter _tsvQuoter = new TestDataUtils.TsvQuoter(',');
 
     /**
      *  use TestDataGenerator to generate data to a specific fieldSet
@@ -98,13 +119,136 @@ public class TestDataGenerator
         _containerPath = containerPath;
     }
 
-    /**
-     * @deprecated This isn't actually a lookup
-     */
-    @Deprecated (since = "22.4")
-    public TestDataGenerator(FieldDefinition.LookupInfo lookupInfo)
+    public static <T> File writeCsvFile(List<FieldDefinition> fields, List<Map<String, T>> entityData, String fileName) throws IOException
     {
-        this(lookupInfo.getSchema(), lookupInfo.getTable(), lookupInfo.getFolder());
+        List<List<String>> rows = TestDataUtils.replaceColumnHeaders(
+            TestDataUtils.rowListsFromMaps(entityData), ColumnNameMapper.labelToName(fields)); // Use field names
+
+        return TestDataUtils.writeRowsToCsv(fileName, rows);
+    }
+
+    public static List<Map<String, Object>> generateEntityData(List<FieldDefinition> fields, String nameField, String namePrefix, int startingCount, int size, boolean addLineage, boolean includeAliquots, String queryName, boolean forGridInsert)
+    {
+        // Hard to deal with plain PropertyDescriptors and we're unlikely to need to
+        List<FieldDefinition> populatableFields = new ArrayList<>(fields);
+
+        populatableFields.removeIf(field -> field.getLookup() != null);
+
+        List<Map<String, Object>> allEntityData = new ArrayList<>();
+        for (int i = startingCount; i < (size + startingCount); i++)
+        {
+            Map<String, Object> entityData = new HashMap<>();
+
+            // Since this will be using the api to populate the sample type need to pass in the column name
+            // as it appears in the schema, for example COL_STR_NAME.
+            if (nameField != null)
+                entityData.put(nameField, namePrefix + i);
+
+            for (FieldDefinition fieldDefinition : populatableFields)
+            {
+                if (!fieldDefinition.getName().equalsIgnoreCase(nameField)) // Name already set
+                {
+                    String key = fieldDefinition.getEffectiveLabel();
+                    if (fieldDefinition.getType().equals(FieldDefinition.ColumnType.Date))
+                        entityData.put(key, UI_DATE_FORMAT.get().format(TestDateUtils.diffFromTodaysDate(Calendar.HOUR, i * 24)));
+                    else if (fieldDefinition.getType().equals(FieldDefinition.ColumnType.DateAndTime))
+                        entityData.put(key, UI_DATE_TIME_FORMAT.get().format(TestDateUtils.diffFromTodaysDate(Calendar.HOUR, i * 24)));
+                    else if (fieldDefinition.getType().equals(FieldDefinition.ColumnType.Time))
+                        entityData.put(key, TIME_FORMAT.get().format(TestDateUtils.diffFromTodaysDate(Calendar.HOUR, i * 24)));
+                    else if (fieldDefinition.getType().equals(FieldDefinition.ColumnType.Integer))
+                    {
+                        entityData.put(key, i);
+                    }
+                    else if (fieldDefinition.getType().equals(FieldDefinition.ColumnType.Decimal))
+                    {
+                        entityData.put(key, (i + (i * .10)));
+                    }
+                    else if (fieldDefinition.getType().equals(FieldDefinition.ColumnType.Boolean))
+                    {
+                        entityData.put(key, i % 2 == 0);
+                    }
+                    else if (fieldDefinition.getType().equals(FieldDefinition.ColumnType.String))
+                    {
+                        entityData.put(key, "Entity " + i + randomString(5).trim());
+                    }
+                    else if (fieldDefinition.getType().equals(FieldDefinition.ColumnType.TextChoice))
+                    {
+                        FieldDefinition.TextChoiceValidator validator =
+                                (FieldDefinition.TextChoiceValidator) fieldDefinition.getValidators().get(0);
+                        List<String> textChoices = validator.getValues();
+                        int textChoiceIndex = i % textChoices.size();
+                        if (forGridInsert)
+                            entityData.put(key, List.of(textChoices.get(textChoiceIndex)));
+                        else
+                            entityData.put(key, textChoices.get(textChoiceIndex));
+                    }
+                }
+            }
+
+            // Caution if you change this code. There are one or two places in the test code that are expecting lineage
+            // or aliquots based on this calculation.
+            if (addLineage && (i > (size / 2)))
+            {
+                if (i < size * 0.9 || !includeAliquots)
+                {
+                    entityData.put("materialInputs/" + queryName, namePrefix + (i - (size / 3)));
+                }
+                else
+                {
+                    entityData.put("AliquotedFrom", namePrefix + (i >= size * 0.95 ? 1 : 0));
+                }
+            }
+            allEntityData.add(entityData);
+        }
+        return allEntityData;
+    }
+
+    public static List<FieldDefinition> createSourceTypeFieldList(int numFields, int minNumRandomFields)
+    {
+        return createFieldList(numFields, minNumRandomFields, REALISTIC_SOURCE_FIELDS);
+    }
+
+    public static List<FieldDefinition> createSampleTypeFieldList(int numFields, int minNumRandomFields)
+    {
+        return createFieldList(numFields, minNumRandomFields, REALISTIC_SAMPLE_FIELDS);
+    }
+
+    public static List<FieldDefinition> createAssayDataFieldList(int numFields, int minNumRandomFields)
+    {
+        return createFieldList(numFields, minNumRandomFields, REALISTIC_ASSAY_FIELDS);
+    }
+
+    public static List<FieldDefinition> createFieldList(int numFields, int minNumRandomFields, List<Supplier<
+    FieldDefinition>> fieldChoices)
+    {
+        // first choose numFields - numRandomFields from given field choices
+        List<FieldDefinition> fields = new ArrayList<>(shuffleSelect(fieldChoices, Math.min(numFields - minNumRandomFields, fieldChoices.size())).stream().map(Supplier::get).toList());
+        // fill in the rest with random field names
+        for (int i = 0; i < Math.max(minNumRandomFields, numFields - fields.size()); i++)
+        {
+            String randomField = randomFieldName(String.format(" random %d ", i + 1));
+
+            FieldDefinition fieldDefinition;
+            if (i % 5 == 0)
+                fieldDefinition = new FieldDefinition(randomField, FieldDefinition.ColumnType.Decimal);
+            else if (i % 5 == 1)
+                fieldDefinition = new FieldDefinition(randomField, FieldDefinition.ColumnType.Time);
+            else if (i % 5 == 2)
+                fieldDefinition = new FieldDefinition(randomField, FieldDefinition.ColumnType.Date);
+            else if (i % 5 == 3)
+                fieldDefinition = new FieldDefinition(randomField, FieldDefinition.ColumnType.DateAndTime);
+            else
+                fieldDefinition = new FieldDefinition(randomField, FieldDefinition.ColumnType.Integer);
+
+            fields.add(fieldDefinition);
+        }
+        Collections.shuffle(fields);
+
+        TestLogger.log("Creating fields: ");
+        fields.forEach(obj -> {
+            TestLogger.log(obj.getName() + " : " + obj.getType().getLabel());
+        });
+        return fields;
     }
 
     public String getSchema()
@@ -115,6 +259,11 @@ public class TestDataGenerator
     public String getQueryName()
     {
         return _queryName;
+    }
+
+    public String getContainerPath()
+    {
+        return _containerPath;
     }
 
     public void setExcludedChars(String excludedChars)
@@ -153,12 +302,12 @@ public class TestDataGenerator
         return this;
     }
 
+    /**
+     * Clear any existing generated rows and add new ones
+     */
     public TestDataGenerator withGeneratedRows(int desiredRowCount)
     {
-        if (getRowCount() > 0)
-        {
-            throw new IllegalStateException("Rows have already been generated");
-        }
+        _rows.clear();
 
         generateRows(desiredRowCount);
 
@@ -167,7 +316,7 @@ public class TestDataGenerator
 
     public TestDataGenerator addDataSupplier(String columnName, Supplier<Object> supplier)
     {
-        _dataSuppliers.put(columnName, ()-> supplier.get());
+        _dataSuppliers.put(columnName, supplier);
         return this;
     }
 
@@ -254,7 +403,7 @@ public class TestDataGenerator
 
     public void generateRows(int numberOfRowsToGenerate)
     {
-        if (_columns.keySet().size() == 0)
+        if (_columns.isEmpty())
             throw new IllegalStateException("can't generate row data without column definitions");
 
         for (int i= 0; i < numberOfRowsToGenerate; i++)
@@ -271,7 +420,7 @@ public class TestDataGenerator
         {
             if (!_dataSuppliers.containsKey(columnName))
             {
-                _dataSuppliers.put(columnName, getDefaultDataSupplier(_columns.get(columnName).getRangeURI()));
+                _dataSuppliers.put(columnName, getDefaultDataSupplier(_columns.get(columnName)));
             }
 
             if (_autoGeneratedFields.contains(columnName))
@@ -285,25 +434,54 @@ public class TestDataGenerator
         return newRow;
     }
 
-    private Supplier<Object> getDefaultDataSupplier(String columnType)
+    private Supplier<Object> getDefaultDataSupplier(PropertyDescriptor propertyDescriptor)
     {
-        switch (columnType.substring(columnType.indexOf('#') + 1).toLowerCase())
+        Map<String, Object> allProperties = Objects.requireNonNullElse(propertyDescriptor.getAllProperties(), Collections.emptyMap());
+        Function<String, String> getType = s -> s == null ? "" : s.substring(s.indexOf('#') + 1).toLowerCase().trim();
+        String conceptUriName = getType.apply((String) allProperties.get("conceptURI"));
+        String rangeUriName = getType.apply(propertyDescriptor.getRangeURI());
+
+        switch (conceptUriName)
         {
-            case "string":
-                return ()-> randomString(20, _excludedChars, _alphaNumericStr ? ALPHANUMERIC_STRING : CHARSET_STRING);
-            case "int":
-                return ()-> randomInt(0, 20);
-            case "float":
-                return ()-> randomFloat(0, 20);
-            case "double":
-                return ()-> randomDouble(0, 20);
-            case "boolean":
-                return ()-> randomBoolean();
-            case "date":
-            case "datetime":
-                return ()-> randomDateString(DateUtils.addWeeks(new Date(), -39), new Date());
+            case "textchoice":
+                List<String> textChoices = ((FieldDefinition) propertyDescriptor)
+                        .getValidators().stream()
+                        .map(v -> {
+                            if (v instanceof FieldDefinition.TextChoiceValidator tcv && !tcv.getValues().isEmpty())
+                                return tcv.getValues();
+                            else
+                                return null;
+                        })
+                        .filter(Objects::nonNull)
+                        .findFirst()
+                        .orElseThrow(() -> new IllegalStateException("No choices defined for textChoice field : " + propertyDescriptor.getName()));
+
+                return () -> randomChoice(textChoices);
             default:
-                throw new IllegalArgumentException("ColumnType " + columnType + " isn't implemented yet");
+                switch (rangeUriName)
+                {
+                    case "string":
+                        return () -> randomString(20, _excludedChars, _alphaNumericStr ? ALPHANUMERIC_STRING : CHARSET_STRING);
+                    case "int":
+                        return () -> randomInt(0, 20);
+                    case "float":
+                        return () -> randomFloat(0, 20);
+                    case "double":
+                        return () -> randomDouble(0, 20);
+                    case "boolean":
+                        return this::randomBoolean;
+                    case "date":
+                    case "datetime":
+                        return () -> randomDateString(DateUtils.addWeeks(new Date(), -39), new Date());
+                    case "time":
+                        return () ->
+                                randomInt(0, 23) + ":" + // hour
+                                        StringUtils.leftPad(String.valueOf(randomInt(0, 59)), 2, "0") + ":" + // minute
+                                        StringUtils.leftPad(String.valueOf(randomInt(0, 59)), 2, "0") + "." + // second
+                                        StringUtils.leftPad(String.valueOf(randomInt(0, 999)), 3, "0"); // millisecond
+                    default:
+                        throw new IllegalArgumentException("ColumnType " + conceptUriName + " isn't implemented yet");
+                }
         }
     }
 
@@ -327,72 +505,281 @@ public class TestDataGenerator
         for (int i=0; i<size; i++)
         {
             int randIndex = (int)(charSetFrom.length() * Math.random());
-            val.append(charSetFrom.charAt(randIndex));
+            char c = charSetFrom.charAt(randIndex);
+            if (c == REPEAT_PLACEHOLDER)
+            {
+                randIndex = (int)(charSetFrom.length() * Math.random());
+                c = charSetFrom.charAt(randIndex);
+                int repeatCount = randomInt(2, 50); // repeat between 2 and 50 times
+                val.append(StringUtils.repeat(c, repeatCount));
+            }
+            else if (c == ALL_CHARS_PLACEHOLDER)
+                val.append(charSetFrom);
+            else if (c == WIDE_PLACEHOLDER)
+                val.append(WIDE_CHAR);
+            else
+                val.append(c);
         }
         return val.toString();
     }
 
+    public static String randomMultiLineString(int size)
+    {
+        return randomMultiLineString(size, null);
+    }
+
+    public static String randomMultiLineString(int size, @Nullable String exclusion)
+    {
+        return randomString(size, exclusion, CHARSET_STRING + "\t\n\n\n");
+    }
+
+    /**
+     * Creates a String containing the given part with random characters from charSet surrounding it. The name
+     * will have leading and trailing spaces removed and multiple internal spaces collapsed to a single space
+     * in order to be compatible with UI display. Because of this space treatment, there may be fewer than the
+     * specified number of characters before and after the given part.
+     *
+     * @param part          the part that is to be included between random strings
+     * @param numStartChars maximum number of random characters from charSet
+     * @param numEndChars   maximum number of random characters from charSet at the end of the string
+     * @param charSet       the set of characters to draw randomly from
+     * @param exclusions    characters that are to be excluded from the random parts of the name
+     * @return a name with given characters that will be displayed as returned in the UI.
+     */
+    public static RandomName randomName(@NotNull String part, int numStartChars, int numEndChars, String charSet, @Nullable String exclusions)
+    {
+        return new RandomName(part, (randomString(numStartChars, exclusions, charSet) + part + randomString(numEndChars, exclusions, charSet)).trim());
+    }
+
     public static String randomDomainName()
     {
-        return randomDomainName(10);
+        return randomDomainName(null);
     }
 
-    public static String randomInvalidDomainName(int size)
+    public static String randomDomainName(@Nullable String part)
     {
-        return randomString(size, null, ILLEGAL_DOMAIN_NAME_CHARSET);
+        return randomDomainName(part, null);
     }
 
-    public static String randomDomainName(int size)
+    public static String randomInvalidDomainName(@Nullable String namePart, int numStartChars, int numEndChars)
     {
-        String domainName = "";
-        do
-        {
-            String prefix = randomString(1, null, ALPHANUMERIC_STRING); // domain needs to start with alphanumeric char
-            final String charset = ALPHANUMERIC_STRING + DOMAIN_SPECIAL_STRING;
-            domainName = prefix + randomString(size - 1, null, charset);
-            domainName = domainName.trim();
-        }
-        while (domainName.length() < size || Pattern.matches("(.*\\s--[^ ].*)|(.*\\s-[^- ].*)", domainName)); // domain name must not contain space followed by dash. (command like: Issue 49161)
-
+        String domainName = randomName(namePart == null ? "" : namePart, numStartChars, numEndChars, ILLEGAL_DOMAIN_NAME_CHARSET, null).name();
+        TestLogger.log("Generated random invalid domain name: " + domainName);
         return domainName;
+    }
+
+    public static String randomDomainName(@Nullable String namePart, @Nullable DomainKind domainKind)
+    {
+        return randomDomainName(namePart, null, null, domainKind);
+    }
+
+    /**
+     * Generate a random domain name of the specified size.
+     *
+     * @param namePart    If a namePart is provided, the domain name will contain it. Pass null to generate a random alphanumeric single character for the prefix.
+     * @param numStartChars Number of random characters at end of name
+     * @param numEndChars Number of random characters at end of name
+     * @return name containing the given name part and appended random characters that should be a valid domain name
+     */
+    public static String randomDomainName(@Nullable String namePart, @Nullable Integer numStartChars, @Nullable Integer numEndChars, @Nullable DomainKind domainKind)
+    {
+        namePart = namePart == null ? "" : namePart;
+        DomainKind _domainKind = domainKind == null ? DomainKind.SampleSet : domainKind;
+        String charSet = ALPHANUMERIC_STRING + DOMAIN_SPECIAL_STRING;
+        int currentTries = 0;
+        RandomName randomName = randomName(namePart, getNumChars(numStartChars, 5), getNumChars(numEndChars, 50), charSet, null);
+        while (isDomainAndFieldNameInvalid(_domainKind, randomName, null))
+        {
+            randomName = randomName(namePart, getNumChars(numStartChars, 5), getNumChars(numEndChars, 50), charSet, null);
+            if (++currentTries >= MAX_RANDOM_TRIES)
+                throw new IllegalStateException("Failed to generate a valid domain name after " + MAX_RANDOM_TRIES + " tries. Last generated name: " + randomName);
+        }
+
+        // Multiple spaces in the UI are collapsed into a single space. If we need to test for handling of multiple spaces, we'll not use this generator
+        String domainName = randomName.name().replaceAll("\\s+", " ");
+
+        TestLogger.log("Generated random domain name for domainKind " + _domainKind + ": " + domainName);
+        return domainName;
+    }
+
+    private static int getNumChars(Integer val, int max)
+    {
+        return val != null ? val : randomInt(0, max);
     }
 
     public static String randomFieldName(String part)
     {
-        return randomFieldName(part, randomInt(0, 5), randomInt(0, 5));
+        return randomFieldName(part, null);
     }
-    public static String randomFieldName(String part, int numStartChars, int numEndChars)
+
+    public static String randomFieldName(String part, int maxLength)
     {
+        return randomFieldName(part, null, null, null, null, maxLength);
+    }
+
+    public static String randomFieldName(String part, @Nullable DomainKind domainKind, Integer maxLength)
+    {
+        return randomFieldName(part, null, null, null, domainKind, maxLength);
+    }
+
+    public static String randomFieldName(String part, @Nullable String exclusion)
+    {
+        return randomFieldName(part, exclusion, null);
+    }
+
+    public static String randomFieldName(String part, @Nullable String exclusion, DomainKind domainKind)
+    {
+        return randomFieldName(part, null, null, exclusion, domainKind);
+    }
+
+    public static String randomFieldName(@NotNull String part, @Nullable Integer numStartChars, @Nullable Integer numEndChars, @Nullable String exclusion, @Nullable DomainKind domainKind)
+    {
+        return randomFieldName(part, numStartChars, numEndChars, exclusion, domainKind, null);
+    }
+
+    public static String randomFieldName(@NotNull String part, @Nullable Integer numStartChars, @Nullable Integer numEndChars, @Nullable String exclusion, @Nullable DomainKind domainKind, @Nullable Integer maxLength)
+    {
+        DomainKind _domainKind = domainKind == null ? DomainKind.SampleSet : domainKind;
+
         // use the characters that we know are encoded in fieldKeys plus characters that we know clients are using
-        String chars = ALL_ILLEGAL_QUERY_KEY_CHARACTERS + " %()=+-[]_|*`'\":;<>?!@#^";
-        String randomFieldName = (randomString(numStartChars, null, chars) + part + randomString(numEndChars, null, chars)).trim();
-        TestLogger.log("Generated random field name: " + randomFieldName);
-        return randomFieldName;
+        // Issue 53197: Field name with double byte character can cause client side exception in Firefox when trying to customize grid view.
+        String chars = ALL_ILLEGAL_QUERY_KEY_CHARACTERS + " %()=+-[]_|*`'\":;\\<>?!@#^" + NON_LATIN_STRING
+                + WIDE_PLACEHOLDER + REPEAT_PLACEHOLDER + ALL_CHARS_PLACEHOLDER;
+
+        int currentTries = 0;
+        RandomName randomFieldName = randomName(part, getNumChars(numStartChars, 5), getNumChars(numEndChars, 50), chars, exclusion);
+        while ((maxLength != null && randomFieldName.name().length() > maxLength) || isDomainAndFieldNameInvalid(_domainKind, null, randomFieldName))
+        {
+            randomFieldName = randomName(part, getNumChars(numStartChars, 5), getNumChars(numEndChars, 50), chars, exclusion);
+            if (++currentTries >= MAX_RANDOM_TRIES)
+                throw new IllegalStateException("Failed to generate a valid field name after " + MAX_RANDOM_TRIES + " tries. Last generated name: " + randomFieldName);
+        }
+
+        TestLogger.log("Generated random field name for domainKind " + _domainKind + ": " + randomFieldName);
+        return randomFieldName.name();
+    }
+
+    private static boolean isDomainAndFieldNameInvalid(DomainKind domainKind, @Nullable RandomName domainName, @Nullable RandomName fieldName)
+    {
+        if (TestProperties.isRemoteNameValidationEnabled())
+        {
+            return isNameInvalidRemote(domainKind, domainName, fieldName);
+        }
+        else
+        {
+            return isNameInvalidLocal(domainKind, domainName, fieldName);
+        }
+    }
+
+    private static boolean isNameInvalidRemote(DomainKind domainKind, @Nullable RandomName domainName, @Nullable RandomName fieldName)
+    {
+        SimplePostCommand command = new SimplePostCommand("property", "validateDomainAndFieldNames");
+        JSONObject domainDesign = new JSONObject();
+        if (domainName != null)
+        {
+            domainDesign.put("name", domainName);
+        }
+        if (fieldName != null)
+        {
+            JSONArray fields = new JSONArray();
+            fields.put(new JSONObject(Map.of("name", fieldName)));
+            domainDesign.put("fields", fields);
+        }
+        JSONObject json = new JSONObject();
+        json.put("kind", domainKind);
+        json.put("domainDesign", domainDesign);
+        command.setJsonObject(json);
+
+        try
+        {
+            CommandResponse response = command.execute(WebTestHelper.getRemoteApiConnection(), "/home");
+            if (response.getParsedData() == null)
+            {
+                if (response.getText().contains("Register First User"))
+                    throw new RuntimeException("Unable to validate domain/field name. Server not initialized.");
+                else
+                    throw new RuntimeException("Failed to parse response for command: " + response.getText());
+            }
+            return response.getParsedData().containsKey("errors");
+        }
+        catch (CommandException | IOException e)
+        {
+            throw new RuntimeException("Failed to validate domain field name: %s.".formatted(fieldName), e);
+        }
+    }
+
+    private static final Pattern COLON_NAME_PATTERN = Pattern.compile(":[a-zA-Z]{3}"); // Avoid illegal patterns like ":Date"
+    private static final Set<String> ILLEGAL_PROPERTY_NAMES = Set.of("*"); // Issue 53416
+    private static boolean isNameInvalidLocal(DomainKind domainKind, @Nullable RandomName domainName, @Nullable RandomName fieldName)
+    {
+        if (domainName != null)
+        {
+            if (domainName.name().isBlank())
+                return true;
+            if (!Character.isLetterOrDigit(domainName.name().charAt(0)))
+                return true; // domain needs to start with alphanumeric char
+            if (Pattern.matches("(.*\\s--[^ ].*)|(.*\\s-.*)", domainName.name()))
+                return true; // domain name must not contain space followed by dash. (command like: Issue 49161)
+
+            int maxLength = switch (domainKind)
+            {
+                case Assay -> 150; // Make room for "{$domainName} Batch Fields" domain
+                case SampleSet -> 100;
+                default -> 200; // Sources, lists, and datasets allow 200 character names
+            };
+            if (domainName.name().length() > maxLength)
+                return true;
+            if (COLON_NAME_PATTERN.matcher(domainName.name())
+                    .results().map(mr -> mr.group(0))
+                    .anyMatch(s -> !domainName.part().contains(s))) // Only check random portion of the name
+                return true;
+        }
+        if (fieldName != null)
+        {
+            if (fieldName.name().isBlank())
+                return true;
+            if (fieldName.name().length() > 200)
+                return true;
+            if (ILLEGAL_PROPERTY_NAMES.contains(fieldName.name()))
+                return true;
+            if (COLON_NAME_PATTERN.matcher(fieldName.name())
+                    .results().map(mr -> mr.group(0))
+                    .anyMatch(s -> !fieldName.part().contains(s))) // Only check the random portions of the name
+                return true;
+        }
+
+        return false;
+    }
+
+    public static <T> T randomChoice(List<T> choices)
+    {
+        return choices.get(randomInt(0, choices.size() - 1));
     }
 
     public static int randomInt(int min, int max)
     {
-        if (min >= max)
+        if (min > max)
             throw new IllegalArgumentException("min must be less than max");
 
-        Random r = new Random();
-        return r.nextInt((max - min) + 1) + min;
+        if (min == max)
+            return min;
+        return ThreadLocalRandom.current().nextInt((max - min) + 1) + min;
     }
 
     public float randomFloat(float min, float max)
     {
         if (min >= max)
             throw new IllegalArgumentException("min must be less than max");
-        Random r = new Random();
-        return  min + r.nextFloat() * (max - min);
+
+        return  min + ThreadLocalRandom.current().nextFloat() * (max - min);
     }
 
     public Double randomDouble(double min, double max)
     {
         if (min >= max)
             throw new IllegalArgumentException("min must be less than max");
-        Random r = new Random();
-        return  min + r.nextDouble() * (max - min);
+
+        return  min + ThreadLocalRandom.current().nextDouble() * (max - min);
     }
 
     public String randomDateString(Date min, Date max)
@@ -415,151 +802,75 @@ public class TestDataGenerator
         return ThreadLocalRandom.current().nextBoolean();
     }
 
-    public StringBuilder writeTsvHeaders()
+    private @NotNull List<String> getFieldsForFile()
     {
-        StringBuilder builder = new StringBuilder();
         List<String> fieldNames = new ArrayList<>(_columns.keySet());
         fieldNames.removeAll(_autoGeneratedFields);
-
-        builder.append(String.join("\t", fieldNames));
-        builder.append("\n");
-
-        return builder;
+        return fieldNames;
     }
 
-    public static String getTsvQuotedValue(Object value, TestDataUtils.TsvQuoter tsvQuoter)
-    {
-        String strVal;
-        if (value instanceof String s)
-            strVal = tsvQuoter.quoteValue(s);
-        else
-            strVal = value != null ? String.valueOf(value) : "";
-
-        return strVal;
-    }
-
+    /**
+     * Get generated data for the specified column.
+     * Values will be quoted appropriately for pasting into editable grid lookups.
+     */
     public List<String> getPasteColumnValues(String fieldName)
     {
         List<String> values = new ArrayList<>();
         for (Map<String, Object> row : _rows)
         {
             Object value = row.get(fieldName);
-            String strVal = getTsvQuotedValue(value, _tsvQuoter);
+            String strVal = CSVFormat.DEFAULT.format(value); // Just quote commas
             values.add(strVal);
         }
         return values;
     }
 
-    public String rowToString(List<String> fieldNames, Map<String, Object> row)
-    {
-        StringBuilder builder = new StringBuilder();
-        List<String> values = new ArrayList<>();
-        String firstField = fieldNames.get(0);
-        for (String fieldName : fieldNames)
-        {
-            Object value = row.get(fieldName);
-            String strVal = getTsvQuotedValue(value, _tsvQuoter);
-
-            if (strVal.startsWith("#") && fieldName.equals(firstField)) // don't generate comment lines
-                strVal = "\"" + strVal + "\"";
-
-            values.add(strVal);
-        }
-        builder.append(String.join("\t", values));
-        builder.append("\n");
-
-        return builder.toString();
-    }
-
     /**
      * generates tsv-formatted content using the rows in the current instance;
-     * @return TSV formatted representation of generated rows
+     * @return TSV formatted representation of generated data
      */
-    public String writeTsvContents()
+    public String getDataAsTsv()
     {
-        List<String> fieldNames = new ArrayList<>(_columns.keySet());
-        fieldNames.removeAll(_autoGeneratedFields);
-        StringBuilder builder = writeTsvHeaders();
-
-        for (Map<String, Object> row : _rows)
-        {
-            builder.append(rowToString(fieldNames, row));
-        }
-        return builder.toString();
-    }
-
-    public File writeGeneratedDataToFile(int numberOfRowsToGenerate, String fileName) throws IOException
-    {
-        String headers = writeTsvHeaders().toString();
-        File file = new File(TestFileUtils.getTestTempDir(), fileName);
-        FileUtils.forceMkdirParent(file);
-
-        try(PrintWriter stream = PrintWriters.getPrintWriter(file))
-        {
-            List<String> fieldNames = new ArrayList<>(_columns.keySet());
-            fieldNames.removeAll(_autoGeneratedFields);
-            stream.write(headers);
-
-            for (int i = 0; i < numberOfRowsToGenerate; i++)
-            {
-                Map<String, Object> newRow = generateRow();
-                var rowMapString = rowToString(fieldNames, newRow);
-                stream.write(rowMapString);
-            }
-        }
-        return file;
-    }
-
-    public File writeGeneratedDataToExcel(int numberOfRowsToGenerate, String sheetName, String fileName) throws IOException
-    {
-        File file = new File(TestFileUtils.getTestTempDir(), fileName);
-        FileUtils.forceMkdirParent(file);
-
-        try(SXSSFWorkbook workbook = new SXSSFWorkbook(1000); // only holds 1000 rows in memory
-            FileOutputStream out = new FileOutputStream(file))
-        {
-            var sheet = workbook.createSheet(sheetName);
-
-            // write headers as row 0
-            String[] columnNames = _columns.keySet().toArray(new String[0]);
-            var headerRow = sheet.createRow(0);
-            for (int i = 0; i < columnNames.length; i++)
-            {
-                headerRow.createCell(i).setCellValue(columnNames[i]);
-            }
-
-            // write content
-            for (int i = 1; i < numberOfRowsToGenerate +1; i++)
-            {
-                Map<String, Object> row = generateRow();
-                SXSSFRow currentRow = sheet.createRow(i);
-                for (int j = 0; j < columnNames.length; j++)
-                {
-                    currentRow.createCell(j).setCellValue(row.get(columnNames[j]).toString());
-                }
-            }
-            workbook.write(out);
-        }
-
-        return file;
+        return TestDataUtils.stringFromRowMaps(_rows, getFieldsForFile(), true, CSVFormat.TDF);
     }
 
     /**
-     * Creates a file containing the contents of the current rows, formatted in TSV.
+     * Creates a file containing the contents of the current rows, formatted in TSV, CSV, or xlsx.
      * The file is written to the test temp dir
      * @param fileName  the name of the file, e.g. 'testDataFileForMyTest.tsv'
-     * @return File object pointing at created TSV
+     * @return File object pointing at created file
      */
     public File writeData(String fileName)
     {
+        return writeData(fileName, new RecordIterator(getFieldsForFile(), _rows));
+    }
+
+    /**
+     * Generate rows and write to file without saving in data generator
+     * @param fileName the name of the file, e.g. 'testDataFileForMyTest.tsv'
+     * @param numRows the number of rows to generate
+     * @return object pointing at created file
+     */
+    public File writeData(String fileName, int numRows)
+    {
+        return writeData(fileName, new RecordIterator(getFieldsForFile(), this::generateRow, numRows));
+    }
+
+    /**
+     * Creates a file containing the contents of the current rows, formatted in TSV, CSV, or xlsx.
+     * The file is written to the test temp dir
+     * @param fileName  the name of the file, e.g. 'testDataFileForMyTest.tsv'
+     * @return File object pointing at created file
+     */
+    public File writeData(String fileName, Iterator<List<Object>> rowIterator)
+    {
         try
         {
-            return TestFileUtils.writeTempFile(fileName, writeTsvContents());
+            return TestDataUtils.writeRowsToFile(fileName, rowIterator);
         }
         catch (IOException e)
         {
-            e.printStackTrace();
-            return null;
+            throw new RuntimeException(e);
         }
     }
 
@@ -605,51 +916,68 @@ public class TestDataGenerator
         return getQueryHelper(cn).deleteDomain();
     }
 
-    public SaveRowsResponse insertRows() throws IOException, CommandException
+    public RowsResponse insertRows() throws IOException, CommandException
     {
         return insertRows(WebTestHelper.getRemoteApiConnection());
     }
 
-    public SaveRowsResponse insertRows(Connection cn) throws IOException, CommandException
+    public RowsResponse insertRows(Connection cn) throws IOException, CommandException
     {
         return insertRows(cn, getRows());
     }
 
-    public SaveRowsResponse insertRows(Connection cn, List<Map<String, Object>> rows) throws IOException, CommandException
+    public RowsResponse insertRows(Connection cn, String containerPath) throws IOException, CommandException
+    {
+        return getQueryHelper(cn, containerPath).insertRows(getRows());
+    }
+
+    public RowsResponse insertRows(Connection cn, List<Map<String, Object>> rows) throws IOException, CommandException
     {
         return getQueryHelper(cn).insertRows(rows);
     }
 
-    public static <T> List<T> shuffleSelect(List<T> allFields, int selectCount)
+    public ImportDataResponse importRows() throws IOException, CommandException
     {
-        return shuffleSelect(allFields, selectCount, false);
+        return importRows(false);
     }
 
-    public static <T> List<T> shuffleSelect(List<T> allFields, int selectCount, boolean canRepeat)
+    public ImportDataResponse importRows(boolean lookupByAlternateKey) throws IOException, CommandException
     {
-        if (!canRepeat)
-        {
-            List<T> shuffled = new ArrayList<>(allFields);
-            Collections.shuffle(shuffled);
-            return shuffled.subList(0, selectCount - 1);
-        }
-        else
-        {
-            List<T> selected = new ArrayList<>();
-            for (int i = 0; i < selectCount; i++)
-            {
-                selected.add(allFields.get(randomInt(0, allFields.size())));
-            }
-            return selected;
-        }
+        return importRows(WebTestHelper.getRemoteApiConnection(), lookupByAlternateKey);
+    }
 
+    public ImportDataResponse importRows(Connection cn, boolean lookupByAlternateKey) throws IOException, CommandException
+    {
+        return importRows(cn, getRows(), lookupByAlternateKey);
+    }
+
+    public ImportDataResponse importRows(Connection cn, List<Map<String, Object>> rows, boolean lookupByAlternateKey) throws IOException, CommandException
+    {
+        return getQueryHelper(cn).importData(TestDataUtils.stringFromRows(TestDataUtils.rowListsFromMaps(rows)), lookupByAlternateKey);
+    }
+
+    public static <T> List<T> shuffleSelect(List<T> allFields, int selectCount)
+    {
+        List<T> shuffled = new ArrayList<>(allFields);
+        Collections.shuffle(shuffled);
+        return shuffled.subList(0, selectCount);
+    }
+
+    public static <T> List<T> randomSelect(List<T> allOptions, int selectCount)
+    {
+        List<T> selected = new ArrayList<>();
+        for (int i = 0; i < selectCount; i++)
+        {
+            selected.add(allOptions.get(randomInt(0, allOptions.size())));
+        }
+        return selected;
     }
 
     /**
      * @deprecated Use {@link QueryApiHelper}
      */
     @Deprecated(since = "22.4")
-    public SaveRowsResponse updateRows(Connection cn, List<Map<String, Object>> rows) throws IOException, CommandException
+    public RowsResponse updateRows(Connection cn, List<Map<String, Object>> rows) throws IOException, CommandException
     {
         return getQueryHelper(cn).updateRows(rows);
     }
@@ -694,14 +1022,19 @@ public class TestDataGenerator
      * @deprecated Use {@link QueryApiHelper}
      */
     @Deprecated(since = "22.4")
-    public SaveRowsResponse deleteRows(Connection cn, List<Map<String,Object>> rowsToDelete) throws IOException, CommandException
+    public RowsResponse deleteRows(Connection cn, List<Map<String,Object>> rowsToDelete) throws IOException, CommandException
     {
         return getQueryHelper(cn).deleteRows(rowsToDelete);
     }
 
+    public QueryApiHelper getQueryHelper(Connection connection, String containerPath)
+    {
+        return new QueryApiHelper(connection, containerPath, _schemaName, _queryName);
+    }
+
     public QueryApiHelper getQueryHelper(Connection connection)
     {
-        return new QueryApiHelper(connection, _containerPath, _schemaName, _queryName);
+        return getQueryHelper(connection, _containerPath);
     }
 
     public TestDataValidator getValidator()

@@ -24,6 +24,7 @@ import org.labkey.remoteapi.security.BulkUpdateGroupCommand;
 import org.labkey.remoteapi.security.BulkUpdateGroupResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.tests.AuditLogTest;
 import org.labkey.test.util.APIUserHelper;
@@ -39,6 +40,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -60,7 +62,6 @@ public class BulkUpdateGroupApiTest extends BaseWebDriverTest
     private static Integer group1Id;
     private static Integer group2Id;
     private static final String siteGroup = "createdSiteGroup";
-    private static Integer siteGroupId;
 
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
@@ -75,12 +76,15 @@ public class BulkUpdateGroupApiTest extends BaseWebDriverTest
         if (suffix.length() < 10)
             throw new IllegalArgumentException("Use a longer suffix for test user emails.");
 
-        beginAt("user/showUsers.view?inactive=true&Users.showRows=all&Users.Email~contains=" + suffix);
+        beginAt(WebTestHelper.buildURL("user", "showUsers", Map.of(
+            "inactive", "true",
+            "Users.showRows", "all",
+            "Users.Email~contains", suffix)));
         DataRegionTable usersTable = new DataRegionTable("Users", this);
 
         if (usersTable.getDataRowCount() > 0)
         {
-            usersTable.checkAll();
+            usersTable.checkAllOnPage();
             clickButton("Delete");
             clickButton("Permanently Delete");
         }
@@ -89,7 +93,7 @@ public class BulkUpdateGroupApiTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        BulkUpdateGroupApiTest init = (BulkUpdateGroupApiTest) getCurrentTest();
+        BulkUpdateGroupApiTest init = getCurrentTest();
 
         init.doSetup();
     }
@@ -257,24 +261,22 @@ public class BulkUpdateGroupApiTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testAddToSystemGroup() throws Exception
+    public void testAddToSystemGroups() throws Exception
     {
-        String systemGroup = "Developers";
-        Integer systemGroupId = -4;
+        // Attempt to add members to "Site: All Site Users" and "Site: Guests"
+        for (int groupId : new int[]{-2, -3})
+        {
+            BulkUpdateGroupCommand command = new BulkUpdateGroupCommand(groupId);
+            command.addMemberUser(USER1);
+            Connection connection = createDefaultConnection();
 
-        BulkUpdateGroupCommand command = new BulkUpdateGroupCommand(systemGroupId);
-        command.addMemberUser(USER1);
-        command.addMemberGroup(group1Id);
-        Connection connection = createDefaultConnection();
+            BulkUpdateGroupResponse response = command.execute(connection, getProjectName());
 
-        BulkUpdateGroupResponse response = command.execute(connection, getProjectName());
-
-        List<String> errors = collectErrors(response);
-        assertEquals("Wrong errors adding group to system group",
-                Arrays.asList("Can't add a group to a system group"), errors);
-
-        _permissionsHelper.assertUserInGroup(USER1, systemGroup, "/", PrincipalType.USER);
-        _permissionsHelper.assertUserNotInGroup(GROUP1, systemGroup, "/", PrincipalType.GROUP);
+            List<String> errors = collectErrors(response);
+            assertEquals("Expected one error but errors were:\n" + String.join("\n", errors), 1, errors.size());
+            String error = errors.get(0);
+            assertTrue(error.startsWith("Can't add a member to the ") && error.endsWith(" group"));
+        }
     }
 
     @Test
@@ -290,7 +292,7 @@ public class BulkUpdateGroupApiTest extends BaseWebDriverTest
 
         BulkUpdateGroupResponse response = command.execute(connection, getProjectName());
         List<String> errors = collectErrors(response);
-        if (errors.size() > 0)
+        if (!errors.isEmpty())
             fail("Unexpected errors creating group:\n" + String.join("\n", errors));
 
         _permissionsHelper.assertGroupExists(groupName, getProjectName());
@@ -308,6 +310,8 @@ public class BulkUpdateGroupApiTest extends BaseWebDriverTest
         Connection connection = createDefaultConnection();
 
         BulkUpdateGroupResponse response = command.execute(connection, "/");
+        Integer siteGroupId = (Integer)response.getId();
+        assertNotNull("siteGroup ID was null!", siteGroupId);
         List<String> errors = collectErrors(response);
         assertEquals("Wrong errors creating site group", Arrays.asList("Can't add a project group to a site group"), errors);
 
@@ -330,8 +334,7 @@ public class BulkUpdateGroupApiTest extends BaseWebDriverTest
         command.setCreateGroup(true);
         command.addMemberGroup(id1);
         BulkUpdateGroupResponse response = command.execute(connection, getProjectName());
-        Integer id2 = response.getId().intValue();
-
+        int id2 = response.getId().intValue();
 
         command = new BulkUpdateGroupCommand(cGroup1);
         command.addMemberGroup(id2);
@@ -363,7 +366,7 @@ public class BulkUpdateGroupApiTest extends BaseWebDriverTest
         BulkUpdateGroupResponse response = command.execute(connection, getProjectName());
 
         List<String> errors = collectErrors(response);
-        if (errors.size() > 0)
+        if (!errors.isEmpty())
             fail("Unexpected errors creating group:\n" + String.join("\n", errors));
 
         _permissionsHelper.assertUserNotInGroup(USER1, groupName, getProjectName(), PrincipalType.USER);
@@ -389,7 +392,7 @@ public class BulkUpdateGroupApiTest extends BaseWebDriverTest
         BulkUpdateGroupResponse response = command.execute(connection, getProjectName());
 
         List<String> errors = collectErrors(response);
-        if (errors.size() > 0)
+        if (!errors.isEmpty())
             fail("Unexpected errors creating group:\n" + String.join("\n", errors));
 
         _permissionsHelper.assertUserNotInGroup(USER2, groupName, getProjectName(), PrincipalType.USER);
@@ -472,7 +475,7 @@ public class BulkUpdateGroupApiTest extends BaseWebDriverTest
         BulkUpdateGroupResponse response = command.execute(connection, getProjectName());
 
         List<String> errors = collectErrors(response);
-        if (errors.size() > 0)
+        if (!errors.isEmpty())
             fail("Unexpected bulk update error(s):\n" + String.join("\n", errors));
 
         _permissionsHelper.assertUserInGroup(newUser, GROUP1, getProjectName(), PrincipalType.USER);
@@ -491,7 +494,7 @@ public class BulkUpdateGroupApiTest extends BaseWebDriverTest
 
         BulkUpdateGroupResponse response = command.execute(connection, getProjectName());
         List<String> errors = collectErrors(response);
-        if (errors.size() > 0)
+        if (!errors.isEmpty())
             fail("Unexpected bulk update error(s):\n" + String.join("\n", errors));
 
         AuditLogTest.verifyAuditEvent(this, AuditLogTest.USER_AUDIT_EVENT, "Comment", email, 1);

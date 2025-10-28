@@ -91,7 +91,7 @@ public class NabMultiVirusPlateTest extends BaseWebDriverTest
     @BeforeClass
     public static void initProject()
     {
-        NabMultiVirusPlateTest init = (NabMultiVirusPlateTest)getCurrentTest();
+        NabMultiVirusPlateTest init = getCurrentTest();
 
         init.doCreateSteps();
     }
@@ -233,12 +233,12 @@ public class NabMultiVirusPlateTest extends BaseWebDriverTest
         clickButton("Import Data");
         clickButton("Next");
 
-        setFormElement(Locator.name("cutoff1"), "50");
-        setFormElement(Locator.name("cutoff2"), "70");
-        selectOptionByText(Locator.name("curveFitMethod"), curveFitMethod);
-        setFormElement(Locator.name("specimen01_InitialDilution"), "5");
-        setFormElement(Locator.name("specimen01_Factor"), "42");
-        selectOptionByText(Locator.name("specimen01_Method"), "Dilution");
+        setFormElement(Locator.name("Cutoff1"), "50");
+        setFormElement(Locator.name("Cutoff2"), "70");
+        selectOptionByText(Locator.name("CurveFitMethod"), curveFitMethod);
+        setFormElement(Locator.name("Specimen 01_InitialDilution"), "5");
+        setFormElement(Locator.name("Specimen 01_Factor"), "42");
+        selectOptionByText(Locator.name("Specimen 01_Method"), "Dilution");
         checkCheckbox(Locator.name("specimen01_InitialDilutionCheckBox"));
         checkCheckbox(Locator.name("specimen01_FactorCheckBox"));
         checkCheckbox(Locator.name("specimen01_MethodCheckBox"));

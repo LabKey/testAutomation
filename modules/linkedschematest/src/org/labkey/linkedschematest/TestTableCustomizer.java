@@ -23,7 +23,6 @@ import org.labkey.api.data.TableCustomizer;
 import org.labkey.api.data.TableInfo;
 
 import java.util.Collection;
-import java.util.List;
 
 public class TestTableCustomizer implements TableCustomizer
 {

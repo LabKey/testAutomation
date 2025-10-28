@@ -1,5 +1,6 @@
 package org.labkey.test.tests;
 
+import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -17,10 +18,12 @@ import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.TestDataGenerator;
 import org.labkey.test.util.exp.DataClassAPIHelper;
+import org.labkey.test.util.search.SearchAdminAPIHelper;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -42,7 +45,7 @@ public class DataClassFolderExportImportTest extends BaseWebDriverTest
     private final File SAMPLE_JPG = new File(DATAFILE_DIRECTORY, "jpg_sample.jpg");
     private final File SAMPLE_PDF = new File(DATAFILE_DIRECTORY, "pdf_sample.pdf");
     private final File SAMPLE_TIF = new File(DATAFILE_DIRECTORY, "tif_sample.tif");
-    private List<File> _attachments = List.of(SAMPLE_CSV, SAMPLE_JPG, SAMPLE_PDF, SAMPLE_TIF);
+    private final List<File> _attachments = List.of(SAMPLE_CSV, SAMPLE_JPG, SAMPLE_PDF, SAMPLE_TIF);
 
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
@@ -54,7 +57,7 @@ public class DataClassFolderExportImportTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        DataClassFolderExportImportTest init = (DataClassFolderExportImportTest) getCurrentTest();
+        DataClassFolderExportImportTest init = getCurrentTest();
         init.doSetup();
     }
 
@@ -96,14 +99,18 @@ public class DataClassFolderExportImportTest extends BaseWebDriverTest
         _containerHelper.createSubfolder(getProjectName(), subfolder);
 
         DataClassDefinition testType = new DataClassDefinition(testDataClass).setFields(DataClassAPIHelper.dataClassTestFields());
+        String intColumnName = testType.getFieldByNamePart("intColumn").getName();
+        String decimalColumnName = testType.getFieldByNamePart("decimalColumn").getName();
+        String stringColumnName = testType.getFieldByNamePart("stringColumn").getName();
+        String attachmentColumnName = testType.getFieldByNamePart("attachmentColumn").getName();
 
         TestDataGenerator testDgen = DataClassAPIHelper.createEmptyDataClass(subfolderPath, testType);
 
-        testDgen.addCustomRow(Map.of("Name", "class1", "intColumn", 1, "decimalColumn", 1.1, "stringColumn", "one"));
-        testDgen.addCustomRow(Map.of("Name", "class2", "intColumn", 2, "decimalColumn", 2.2, "stringColumn", "two"));
-        testDgen.addCustomRow(Map.of("Name", "class3", "intColumn", 3, "decimalColumn", 3.3, "stringColumn", "three"));
-        testDgen.addCustomRow(Map.of("Name", "class4", "intColumn", 4, "decimalColumn", 4.4, "stringColumn", "four"));
-        testDgen.addCustomRow(Map.of("Name", "class5", "intColumn", 5, "decimalColumn", 5.5, "stringColumn", "five"));
+        testDgen.addCustomRow(Map.of("Name", "class1", intColumnName, 7771, decimalColumnName, 1.1, stringColumnName, "one"));
+        testDgen.addCustomRow(Map.of("Name", "class2", intColumnName, 7772, decimalColumnName, 2.2, stringColumnName, "two"));
+        testDgen.addCustomRow(Map.of("Name", "class3", intColumnName, 7773, decimalColumnName, 3.3, stringColumnName, "three"));
+        testDgen.addCustomRow(Map.of("Name", "class4", intColumnName, 7774, decimalColumnName, 4.4, stringColumnName, "four"));
+        testDgen.addCustomRow(Map.of("Name", "class5", intColumnName, 7775, decimalColumnName, 5.5, stringColumnName, "five"));
         testDgen.insertRows();
 
         PortalHelper portalHelper = new PortalHelper(this);
@@ -117,13 +124,13 @@ public class DataClassFolderExportImportTest extends BaseWebDriverTest
 
         clickAndWait(Locator.linkWithText(testDataClass));
         DataRegionTable sourceTable = DataRegionTable.DataRegion(getDriver()).withName("query").waitFor();
-        for (int i=0; i<_attachments.size(); i++)
-        {                           // for the nonce, we cannot add file attachments to an attachment column via remoteAPI
-                                    // issue https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=42191 tracks this
-                                    // until it is fixed we will have to add attachments via the UI, like this
-            sourceTable.clickEditRow(i);
-            setFormElement(Locator.input("quf_attachmentColumn"), _attachments.get(i));
-            clickButton("Submit");
+        for (int i = 0; i < _attachments.size(); i++)
+        {
+            // For the nonce, we cannot add file attachments to an attachment column via remoteAPI
+            // Issue 42191 tracks this until it is fixed we will have to add attachments via the UI
+            sourceTable.clickEditRow(i)
+                    .setField(attachmentColumnName, _attachments.get(i))
+                    .submit();
         }
         List<Map<String, String>> sourceRowData = sourceTable.getTableData();
 
@@ -144,7 +151,7 @@ public class DataClassFolderExportImportTest extends BaseWebDriverTest
         }
 
         clickAndWait(Locator.linkWithText(testDataClass));
-        DataRegionTable destTable = DataRegionTable.DataRegion(getDriver()).withName("query").waitFor();;
+        DataRegionTable destTable = DataRegionTable.DataRegion(getDriver()).withName("query").waitFor();
 
         // capture the data in the exported sampleType
         List<Map<String, String>> destRowData = destTable.getTableData();
@@ -158,6 +165,14 @@ public class DataClassFolderExportImportTest extends BaseWebDriverTest
             assertNotNull("expect all matching rows to come through", matchingMap);
             assertEquals("Expect imported rows to be equivalent to exported ones", exportedRow, matchingMap);
         }
+
+        SearchAdminAPIHelper.waitForIndexer();
+
+        var searchResultPage = navBar().search("7774");
+        // Issue 52961: DataClass: Integer fields are not index for data class, unlike sample types
+        checker().withScreenshot("Search by int value after folder import").awaiting(Duration.ofSeconds(2),
+                ()-> Assertions.assertThat(searchResultPage.getResultCount() >= 2).isTrue());
+
     }
 
     @Test
@@ -291,7 +306,7 @@ public class DataClassFolderExportImportTest extends BaseWebDriverTest
             shortWait().until(ExpectedConditions.stalenessOf(deleteButton));
         }
 
-        for(int index = 0; index < missingValueIndicators.size(); index++)
+        for (int index = 0; index < missingValueIndicators.size(); index++)
         {
             clickButton("Add", 0);
             WebElement mvInd = Locator.css("#mvIndicatorsDiv input[name=mvIndicators]").index(index).waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);

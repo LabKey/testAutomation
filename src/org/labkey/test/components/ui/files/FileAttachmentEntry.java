@@ -65,12 +65,6 @@ public class FileAttachmentEntry extends WebDriverComponent<FileAttachmentEntry.
         return new ElementCache();
     }
 
-    @Override
-    protected ElementCache elementCache()
-    {
-        return (ElementCache) super.elementCache();
-    }
-
     protected class ElementCache extends Component<?>.ElementCache
     {
         public Locator removeIconLoc = Locator.byClass("attached-file__remove-icon");

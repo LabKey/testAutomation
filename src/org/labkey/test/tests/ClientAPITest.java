@@ -57,7 +57,8 @@ import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PermissionsHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.StudyHelper;
-import org.labkey.test.util.TestDataUtils;
+import org.labkey.test.util.TestDataGenerator;
+import org.labkey.test.util.data.TestDataUtils;
 import org.labkey.test.util.UIUserHelper;
 import org.labkey.test.util.WikiHelper;
 import org.labkey.test.util.query.QueryUtils;
@@ -77,12 +78,16 @@ import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.endsWith;
+import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.WebTestHelper.getHttpResponse;
 import static org.labkey.test.params.FieldDefinition.DOMAIN_TRICKY_CHARACTERS;
+import static org.labkey.test.util.PermissionsHelper.APP_ADMIN_ROLE;
 
 @Category({BVT.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 14)
@@ -93,8 +98,10 @@ public class ClientAPITest extends BaseWebDriverTest
 
     private static final String PROJECT_NAME = "ClientAPITestProject";
     private static final String OTHER_PROJECT = "OtherClientAPITestProject"; // for cross-project query test
-    protected static final String FOLDER_NAME = "api folder";
+    protected static final String API_FOLDER_NAME = "api folder";
+    private static final String API_FOLDER_PATH = PROJECT_NAME + "/" + API_FOLDER_NAME;
     private static final String SUBFOLDER_NAME = "subfolder";
+    private static final String SUBFOLDER_PATH = API_FOLDER_PATH + "/" + SUBFOLDER_NAME;
     private static final String TIME_STUDY_FOLDER = "timeStudyFolder";
     private static final String TIME_STUDY_NAME = "timeStudyName";
     private static final String VISIT_STUDY_FOLDER = "visitStudyFolder";
@@ -128,10 +135,6 @@ public class ClientAPITest extends BaseWebDriverTest
     private static final String WIKIPAGE_NAME = "ClientAPITestPage";
 
     public static final String TEST_DIV_NAME = "testDiv";
-
-    private static final String GRIDTEST_GRIDTITLE = "ClientAPITest Grid Title";
-
-    private static final int PAGE_SIZE = 4;
 
     public static final String SRC_PREFIX = "<script type=\"text/javascript\">\n" +
             "    LABKEY.requiresExt3ClientAPI(true /* left on purpose to test old signature */, function() {\n" +
@@ -200,20 +203,20 @@ public class ClientAPITest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject() throws Exception
     {
-        ClientAPITest init = (ClientAPITest)getCurrentTest();
+        ClientAPITest init = getCurrentTest();
         init._containerHelper.createProject(OTHER_PROJECT, null);
         init._containerHelper.createProject(PROJECT_NAME, null);
 
-        init._containerHelper.createSubfolder(PROJECT_NAME, FOLDER_NAME);
+        init._containerHelper.createSubfolder(PROJECT_NAME, API_FOLDER_NAME);
         init._containerHelper.createSubfolder(PROJECT_NAME, TIME_STUDY_FOLDER);
         init._containerHelper.createSubfolder(PROJECT_NAME, VISIT_STUDY_FOLDER);
         init._containerHelper.createSubfolder(PROJECT_NAME, ASSAY_STUDY_FOLDER);
 
-        init._containerHelper.createSubfolder(PROJECT_NAME, FOLDER_NAME, SUBFOLDER_NAME, "None", null);
+        init._containerHelper.createSubfolder(PROJECT_NAME, API_FOLDER_NAME, SUBFOLDER_NAME, "None", null);
 
         init.createStudies();
 
-        init.clickFolder(FOLDER_NAME);
+        init.clickFolder(API_FOLDER_NAME);
 
         init.createWiki();
 
@@ -229,10 +232,10 @@ public class ClientAPITest extends BaseWebDriverTest
     {
         if (dirtyList)
         {
-            refreshPeopleList(LIST_NAME, createDefaultConnection(), getProjectName() + "/" + FOLDER_NAME);
+            refreshPeopleList(LIST_NAME, createDefaultConnection(), API_FOLDER_PATH);
             dirtyList = false;
         }
-        navigateToFolder(getProjectName(), FOLDER_NAME);
+        navigateToFolder(getProjectName(), API_FOLDER_NAME);
     }
 
     @NotNull
@@ -247,7 +250,7 @@ public class ClientAPITest extends BaseWebDriverTest
     protected void checkLinks()
     {
         //delete the test page so the crawler doesn't refetch a test and cause errors
-        getHttpResponse(WebTestHelper.buildURL("wiki", getProjectName() + "/" + FOLDER_NAME, "delete", Maps.of("name", WIKIPAGE_NAME)), "POST");
+        getHttpResponse(WebTestHelper.buildURL("wiki", API_FOLDER_PATH, "delete", Maps.of("name", WIKIPAGE_NAME)), "POST");
         super.checkLinks();
     }
 
@@ -255,11 +258,11 @@ public class ClientAPITest extends BaseWebDriverTest
     private void createLists() throws Exception
     {
         Connection connection = createDefaultConnection();
-        createPeopleList(LIST_NAME, connection, PROJECT_NAME + "/" + FOLDER_NAME);
+        createPeopleList(LIST_NAME, connection, API_FOLDER_PATH);
         createLargePeopleList();
 
         // Create lists for cross-folder query test.
-        createPeopleList(SUBFOLDER_LIST, connection, PROJECT_NAME + "/" + FOLDER_NAME + "/" + SUBFOLDER_NAME);
+        createPeopleList(SUBFOLDER_LIST, connection, SUBFOLDER_PATH);
         createPeopleList(OTHER_PROJECT_LIST, connection, OTHER_PROJECT);
     }
 
@@ -283,7 +286,7 @@ public class ClientAPITest extends BaseWebDriverTest
     private void createLargePeopleList()
     {
         // Create Larger list for query test.
-        _listHelper.createListFromFile(getProjectName() + "/" + FOLDER_NAME, QUERY_LIST_NAME, TEST_XLS_DATA_FILE);
+        _listHelper.createListFromFile(API_FOLDER_PATH, QUERY_LIST_NAME, TEST_XLS_DATA_FILE);
         _listHelper.goToList(QUERY_LIST_NAME);
         waitForElement(Locator.linkWithText("Norbert"));
     }
@@ -300,7 +303,7 @@ public class ClientAPITest extends BaseWebDriverTest
     private void createStudies()
     {
         // create time-based study
-        projectMenu().navigateToFolder(getProjectName(), TIME_STUDY_FOLDER);
+        goToProjectFolder(getProjectName(), TIME_STUDY_FOLDER);
         navBar().goToModule("Study");
         CreateStudyPage createStudyPage = _studyHelper.startCreateStudy();
         createStudyPage.setLabel(TIME_STUDY_NAME)
@@ -308,7 +311,7 @@ public class ClientAPITest extends BaseWebDriverTest
                 .createStudy();
 
         // create a visit-based study in a different container
-        projectMenu().navigateToFolder(getProjectName(), VISIT_STUDY_FOLDER);
+        goToProjectFolder(getProjectName(), VISIT_STUDY_FOLDER);
         navBar().goToModule("Study");
         CreateStudyPage createVisitStudyPage = _studyHelper.startCreateStudy();
         createVisitStudyPage.setLabel(VISIT_STUDY_NAME)
@@ -324,7 +327,7 @@ public class ClientAPITest extends BaseWebDriverTest
     @LogMethod
     private void createWiki()
     {
-        beginAt(WebTestHelper.buildURL("wiki", getProjectName() + "/" + FOLDER_NAME, "edit"));
+        beginAt(WebTestHelper.buildURL("wiki", API_FOLDER_PATH, "edit"));
         setFormElement(Locator.name("name"), WIKIPAGE_NAME);
         setFormElement(Locator.name("title"), WIKIPAGE_NAME);
         _wikiHelper.setWikiBody("placeholder text");
@@ -964,7 +967,7 @@ public class ClientAPITest extends BaseWebDriverTest
 
         assertTextPresent("Webpart Title");
         for (FieldDefinition column : LIST_COLUMNS)
-            assertTextPresent(column.getLabel());
+            assertTextPresent(column.getEffectiveLabel());
     }
 
     @Test
@@ -1042,13 +1045,12 @@ public class ClientAPITest extends BaseWebDriverTest
     @LogMethod
     protected String setSource(String srcFragment, boolean excludeTags)
     {
-        beginAt(WebTestHelper.buildURL("wiki", getProjectName() + "/" + FOLDER_NAME, "edit", Maps.of("name", WIKIPAGE_NAME)));
+        beginAt(WebTestHelper.buildURL("wiki", API_FOLDER_PATH, "edit", Maps.of("name", WIKIPAGE_NAME)));
 
         String fullSource = srcFragment;
         if (!excludeTags)
             fullSource = getFullSource(srcFragment);
         log("Setting wiki page source:");
-//        log(fullSource);
         _wikiHelper.setWikiBody(fullSource);
         _wikiHelper.saveWikiPage();
         return waitForDivPopulation();
@@ -1113,7 +1115,7 @@ public class ClientAPITest extends BaseWebDriverTest
 
         enableEmailRecorder();
 
-        apiPermissionsHelper.addMemberToRole(EMAIL_SENDER, "Application Admin", PermissionsHelper.MemberType.user, "/");
+        apiPermissionsHelper.addMemberToRole(EMAIL_SENDER, APP_ADMIN_ROLE, PermissionsHelper.MemberType.user, "/");
 
         goToHome();
         impersonate(EMAIL_SENDER);
@@ -1264,8 +1266,8 @@ public class ClientAPITest extends BaseWebDriverTest
             contentStr.append("'),");
         }
 
-        String emailScript = String.format(emailScriptTemplate, from, StringUtils.trimToEmpty(subject), recipientStr.toString(),
-                contentStr.toString());
+        String emailScript = String.format(emailScriptTemplate, from, StringUtils.trimToEmpty(subject), recipientStr,
+                contentStr);
 
         return (String)((JavascriptExecutor) getDriver()).executeAsyncScript(emailScript);
     }
@@ -1295,7 +1297,7 @@ public class ClientAPITest extends BaseWebDriverTest
     public void webDavAPITestJS()
     {
         String script = TestFileUtils.getFileContents(TestFileUtils.getSampleData("api/webdavTest.js"));
-        String scriptResult = "";
+        String scriptResult;
         try
         {
             scriptResult = (String)((JavascriptExecutor) getDriver()).executeAsyncScript(script);
@@ -1530,21 +1532,64 @@ public class ClientAPITest extends BaseWebDriverTest
     {
         assumeTestModules();
 
-        final String PATH = getProjectName() + "/" + FOLDER_NAME;
         final String SCHEMA = "vehicle";
         final String QUERY = "UserDefinedEmissions";
-        beginAt(PATH);
+        beginAt(API_FOLDER_PATH);
         _containerHelper.enableModules(Collections.singletonList("simpletest"));
         Connection cn = getConnection(true);
 
         log("Verify default behavior to include suggested columns in details of user defined queries.");
-        List<GetQueryDetailsResponse.Column> columns = new GetQueryDetailsCommand(SCHEMA, QUERY).execute(cn, PATH).getColumns();
+        List<GetQueryDetailsResponse.Column> columns = new GetQueryDetailsCommand(SCHEMA, QUERY).execute(cn, API_FOLDER_PATH).getColumns();
         assertTrue("Suggested column 'Container' for user defined query was missing in response.",
                 columns.stream().anyMatch(col -> col.getName().equalsIgnoreCase("Container")));
         log("Verify optional behavior to exclude suggested columns from details of user defined queries.");
-        columns = new GetQueryDetailsCommand(SCHEMA, QUERY, false).execute(cn, PATH).getColumns();
+        columns = new GetQueryDetailsCommand(SCHEMA, QUERY, false).execute(cn, API_FOLDER_PATH).getColumns();
         assertTrue("Suggested column 'Container' for user defined query was included in response.",
                 columns.stream().noneMatch(col -> col.getName().equalsIgnoreCase("Container")));
+    }
+
+    @Test
+    public void testBootstrapButtonEncoding()
+    {
+        assumeTestModules();
+
+        beginAt(WebTestHelper.buildURL("simpletest", getProjectName(), "encodeButton"));
+        var buttonLocator = Locator.tagWithClass("button", "input-test");
+        waitForElement(buttonLocator);
+
+        // Prior to the patch for Issue 52402 clicking the button would result in a XSS injection
+        // which would result in an UnhandledAlertException.
+        click(buttonLocator);
+        waitForElement(Locator.buttonContainingText("<script>alert('XSS Input Success')</script><span>Loading XSS</span>"));
+    }
+
+    @Test // Issue 53699
+    public void testLargeMultibytePayload()
+    {
+        for (int i = 0; i < 10; i++)
+        {
+            // Arrange
+            int characterCount = 5_000;
+            // We had problems fetching the JSON content server-side due to Tomcat's InputBuffer not dealing with
+            // characters that span multiple "pages" of the byte buffer. Test with different numbers of single-byte
+            // UTF-8 characters before the 4-byte characters to ensure we get different boundary conditions
+            String tooManyMultibyteCharacters = "a".repeat(i) + "\uD83D\uDC7E".repeat(characterCount);
+
+            TestDataGenerator dataGenerator = new TestDataGenerator("lists", LIST_NAME, API_FOLDER_PATH)
+                    .addCustomRow(Map.of("FirstName", tooManyMultibyteCharacters, "LastName", "Chaplin", "Age", 42));
+
+            // Act
+            // Prior to fix for Issue 53699 this would throw a BufferUnderflowException when processing the JSON payload
+            Exception exception = assertThrows(Exception.class, dataGenerator::insertRows);
+
+            // Assert
+            // Prior to fix length validation incorrectly checked for string length rather than character code point length
+            String expectedPrefix = "Value is too long for column 'FirstName', a maximum length of 4000 is allowed.";
+            String expectedSuffix = String.format("was %d characters long.", characterCount + i);
+
+            assertThat(exception.getMessage(), startsWith(expectedPrefix));
+            assertThat(exception.getMessage(), endsWith(expectedSuffix));
+        }
     }
 
     @Override

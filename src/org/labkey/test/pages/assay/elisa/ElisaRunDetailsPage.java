@@ -112,8 +112,6 @@ public class ElisaRunDetailsPage extends LabKeyPage<ElisaRunDetailsPage.ElementC
 
     /**
      * to interact with the samples select, uncheck this box
-     * @param checked
-     * @return
      */
     public ElisaRunDetailsPage setShowAllSamples(boolean checked)
     {
@@ -124,8 +122,6 @@ public class ElisaRunDetailsPage extends LabKeyPage<ElisaRunDetailsPage.ElementC
 
     /**
      * to interact with the controls select, uncheck this box
-     * @param checked
-     * @return
      */
     public ElisaRunDetailsPage setShowAllControls(boolean checked)
     {

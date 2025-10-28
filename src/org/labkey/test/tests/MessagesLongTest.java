@@ -33,6 +33,7 @@ import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.components.html.SiteNavBar;
 import org.labkey.test.pages.admin.PermissionsPage;
 import org.labkey.test.pages.announcements.AdminPage;
+import org.labkey.test.pages.announcements.EmailPrefsPage;
 import org.labkey.test.pages.announcements.InsertPage;
 import org.labkey.test.pages.announcements.RespondPage;
 import org.labkey.test.util.ApiPermissionsHelper;
@@ -50,6 +51,10 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.Locator.NBSP;
+import static org.labkey.test.util.PermissionsHelper.AUTHOR_ROLE;
+import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
+import static org.labkey.test.util.PermissionsHelper.PROJECT_ADMIN_ROLE;
+import static org.labkey.test.util.PermissionsHelper.READER_ROLE;
 
 @Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 15)
@@ -118,10 +123,10 @@ public class MessagesLongTest extends BaseWebDriverTest
     {
         clickProject(PROJECT_NAME);
         PermissionsPage permissionsPage = navBar().goToPermissionsPage()
-            .removePermission("Users", "Reader")
-            .removePermission("Users","Reader")
-            .removePermission("Users","Author")
-            .removePermission("Users","Editor")
+            .removePermission("Users", READER_ROLE)
+            .removePermission("Users",READER_ROLE)
+            .removePermission("Users",AUTHOR_ROLE)
+            .removePermission("Users",EDITOR_ROLE)
             .setPermissions("Users", permission);
         permissionsPage.clickSaveAndFinish();
         impersonate(USER1);
@@ -155,7 +160,7 @@ public class MessagesLongTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        MessagesLongTest init = (MessagesLongTest) getCurrentTest();
+        MessagesLongTest init = getCurrentTest();
         init.doSetup();
     }
 
@@ -165,13 +170,11 @@ public class MessagesLongTest extends BaseWebDriverTest
         _containerHelper.createProject(PROJECT_NAME, "Collaboration");
         navBar().goToPermissionsPage()
                 .createPermissionsGroup("Administrators")
-                .setPermissions("Administrators", "Project Administrator")
+                .setPermissions("Administrators", PROJECT_ADMIN_ROLE)
                 .createPermissionsGroup("testers1")
                 .assertPermissionSetting("testers1", "No Permissions")
                 .clickSaveAndFinish();
         _containerHelper.enableModule(PROJECT_NAME, "Dumbster");
-
-
     }
 
     @Test
@@ -190,10 +193,37 @@ public class MessagesLongTest extends BaseWebDriverTest
 
         clickProject(PROJECT_NAME);
         log("Check email preferences");
+        // Unlike EmailPrefsPage.beginAt(), this ensures returnUrl is passed to the action
         _portalHelper.clickWebpartMenuItem("Messages", true, "Email Preferences");
-        checkCheckbox(Locator.radioButtonByName("emailPreference").index(2));
-        clickButton("Update");
-        clickButton("Done");
+        EmailPrefsPage prefsPage = new EmailPrefsPage(getDriver());
+        // Verify prefs are "Mine" (doTestEmailPrefsMine() sets this) and "Individual" (folder default)
+        assertTrue(prefsPage.isNotifyOnMineSelected());
+        assertTrue(prefsPage.isTypeIndividualSelected());
+
+        // Update to settings that differ from the folder default values to test "Reset to folder default setting", Issue 53387
+        prefsPage = prefsPage
+            .setNotifyOnAll()
+            .setTypeDigest()
+            .update();
+        assertTrue(prefsPage.isNotifyOnAllSelected());
+        assertTrue(prefsPage.isTypeDigestSelected());
+
+        // After clicking "Reset", all options should be disabled
+        prefsPage = prefsPage.reset(true);
+        assertTrue(prefsPage.isNotifyNoneDisabled());
+        assertTrue(prefsPage.isNotifyOnMineDisabled());
+        assertTrue(prefsPage.isNotifyOnAllDisabled());
+        assertTrue(prefsPage.isTypeIndividualDisabled());
+        assertTrue(prefsPage.isTypeDigestDisabled());
+
+        // Submit reset to folder default and verify
+        prefsPage = prefsPage.update();
+        assertTrue(prefsPage.isNotifyOnMineSelected());
+        assertTrue(prefsPage.isTypeIndividualSelected());
+
+        prefsPage = prefsPage.setNotifyOnAll().update();
+        assertTrue(prefsPage.isNotifyOnAllSelected());
+        prefsPage.done();
 
         SiteNavBar siteNavBar = new SiteNavBar(getDriver());
         siteNavBar.enterPageAdminMode();
@@ -225,7 +255,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         log("Create message using markdown");
         clickButton( "New");
         InsertPage markdownPage = new InsertPage(getDriver());
-        assertEquals("default selection should be 'Markdown'",markdownPage.getRenderAs(), WikiHelper.WikiRendererType.MARKDOWN);
+        assertEquals("default selection should be 'Markdown'", WikiHelper.WikiRendererType.MARKDOWN, markdownPage.getRenderAs());
         markdownPage.setTitle("Markdown is a thing now")
                 .setBody("""
                         # Holy Header, Batman!
@@ -317,8 +347,8 @@ public class MessagesLongTest extends BaseWebDriverTest
         clickButton("Update Group Membership");
 
         log("Check if permissions work without security");
-        permissionCheck("Reader", true);
-        permissionCheck("Editor", true);
+        permissionCheck(READER_ROLE, true);
+        permissionCheck(EDITOR_ROLE, true);
 
         log("Check with security");
         // TODO: Convert to test.pages.announcements.AdminPage
@@ -328,8 +358,8 @@ public class MessagesLongTest extends BaseWebDriverTest
         _portalHelper.clickWebpartMenuItem("Messages", true, "Admin");
         checkCheckbox(Locator.radioButtonByName("secure").index(1));
         clickButton("Save");
-        permissionCheck("Reader", false);
-        permissionCheck("Editor", true);
+        permissionCheck(READER_ROLE, false);
+        permissionCheck(EDITOR_ROLE, true);
 
         log("Check if the customized names work");
 
@@ -534,7 +564,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         clickButton("Yes");
 
         DataRegionTable dr = new DataRegionTable(usersDataRegion, getDriver());
-        assertEquals(dr.getDataAsText(_messageUserId, messageColumn), userSettingNew);
+        assertEquals(userSettingNew, dr.getDataAsText(_messageUserId, messageColumn));
      }
 
     private void testMemberLists()
@@ -543,8 +573,8 @@ public class MessagesLongTest extends BaseWebDriverTest
         // USER1 is now a reader
         log("Test notify list");
         navBar().goToPermissionsPage()
-            .removePermission("Users", "Editor")
-            .setPermissions("Users", "Reader")
+            .removePermission("Users", EDITOR_ROLE)
+            .setPermissions("Users", READER_ROLE)
             .clickSaveAndFinish();
 
         // USER2 is a nobody
@@ -596,7 +626,7 @@ public class MessagesLongTest extends BaseWebDriverTest
 
         log("Verify member list failed user lookup reports error");
         clickProject(PROJECT_NAME);
-        impersonateRole("Editor");
+        impersonateRole(EDITOR_ROLE);
         clickAndWait(Locator.linkWithText(MSG3_TITLE));
         clickRespondButton();
         // enter invalid username, ensure error appears
@@ -641,13 +671,16 @@ public class MessagesLongTest extends BaseWebDriverTest
         String _messageTitle = "Mine Message";
         String _messageBody = "test";
 
-        createUserWithPermissions(RESPONDER, PROJECT_NAME, "Editor");
+        createUserWithPermissions(RESPONDER, PROJECT_NAME, EDITOR_ROLE);
         goToProjectHome(PROJECT_NAME);
 
+        // Unlike EmailPrefsPage.beginAt(), this ensures returnUrl is passed to the action
         _portalHelper.clickWebpartMenuItem("Messages", true, "Email Preferences");
-        checkCheckbox(Locator.radioButtonByName("emailPreference").index(1));
-        clickButton("Update");
-        clickButton("Done");
+        EmailPrefsPage prefsPage = new EmailPrefsPage(getDriver())
+            .setNotifyOnMine()
+            .update();
+        assertTrue(prefsPage.isNotifyOnMineSelected());
+        prefsPage.done();
 
         createNewMessage(_messageTitle, _messageBody);
 
@@ -700,7 +733,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         goToProjectHome();
         navBar().goToPermissionsPage()
             .createPermissionsGroup(GROUP)
-            .setPermissions(GROUP, "Editor")
+            .setPermissions(GROUP, EDITOR_ROLE)
             .addUserToProjGroup(USER, getProjectName(), GROUP);
         goToProjectHome();
 
@@ -775,7 +808,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         log("test filtering of messages grid");
         clickAndWait(Locator.linkWithText("view list"));
         DataRegionTable region = new DataRegionTable("Announcements", getDriver());
-        region.setFilter("Title", "Equals", "foo", WAIT_FOR_PAGE);
+        region.setFilter("Title", "Equals", "foo");
 
         assertTextNotPresent(RESP1_TITLE);
     }
@@ -786,7 +819,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         selectCmd.setMaxRows(-1);
         selectCmd.setContainerFilter(ContainerFilter.CurrentAndSubfolders);
         selectCmd.setColumns(Arrays.asList("*"));
-        SelectRowsResponse selectResp = null;
+        SelectRowsResponse selectResp;
 
         String[] queries = {"Announcement", "AnnouncementSubscription", "EmailOption", "ForumSubscription"};
         int[] counts = {2, 0, 5, 1};

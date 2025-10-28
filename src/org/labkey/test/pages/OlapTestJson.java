@@ -18,6 +18,9 @@ package org.labkey.test.pages;
 import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.WebTestHelper;
+
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
@@ -26,7 +29,7 @@ import static org.junit.Assert.assertEquals;
  */
 public class OlapTestJson
 {
-    private BaseWebDriverTest _test;
+    private final BaseWebDriverTest _test;
 
     public OlapTestJson(BaseWebDriverTest test)
     {
@@ -35,7 +38,10 @@ public class OlapTestJson
 
     public void goToPage(String path, String configId, String schemaName, String cubeName)
     {
-        _test.beginAt("/olap/" + path + "/testJson.view?configId=" + configId + "&schemaName=" + schemaName + "&cubeName=" + cubeName);
+        _test.beginAt(WebTestHelper.buildURL("olap", path, "testJson", Map.of(
+                "configId", configId,
+                "schemaName", schemaName,
+                "cubeName", cubeName)));
     }
 
     public void submitQueryAsJson(String query)

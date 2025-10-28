@@ -50,7 +50,7 @@ public class LineageGraph extends WebDriverComponent<LineageGraph.ElementCache>
 
     public Map<String, String> getCurrentNodeData()
     {
-       return elementCache().detailTable().getTableData();
+       return elementCache().detailTable().getTableDataByLabel();
     }
 
     public WebElement getFocusedNodeImage()

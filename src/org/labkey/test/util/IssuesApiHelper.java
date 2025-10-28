@@ -34,9 +34,9 @@ public class IssuesApiHelper extends IssuesHelper
         issue.setAction(IssueModel.IssueAction.insert);
 
         // translate display name to userId
-        if (props.containsKey("assignedTo"))
+        if (props.containsKey("AssignedTo"))
         {
-            String displayName = props.get("assignedTo");
+            String displayName = props.get("AssignedTo");
             List<GetUsersResponse.UserInfo> user = _userHelper.getUsers().getUsersInfo().stream()
                     .filter(ui -> ui.getDisplayName().equals(displayName)).toList();
 
@@ -45,7 +45,7 @@ public class IssuesApiHelper extends IssuesHelper
                 issue.setAssignedTo(user.get(0).getUserId());
         }
 
-        if (!props.containsKey("priority"))
+        if (!props.containsKey("Priority"))
             issue.setPriority(_defaultPriority);
 
         try

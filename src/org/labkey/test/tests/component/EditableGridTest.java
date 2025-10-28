@@ -1,11 +1,14 @@
 package org.labkey.test.tests.component;
 
 import org.apache.commons.lang3.StringUtils;
+import org.json.JSONObject;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.remoteapi.query.InsertRowsCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -14,9 +17,13 @@ import org.labkey.test.categories.Daily;
 import org.labkey.test.components.ui.grids.EditableGrid;
 import org.labkey.test.pages.test.CoreComponentsTestPage;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.FieldDefinition.ColumnType;
+import org.labkey.test.params.FieldDefinition.IntLookup;
+import org.labkey.test.params.FieldInfo;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.params.list.IntListDefinition;
 import org.labkey.test.params.list.ListDefinition;
+import org.labkey.test.util.EscapeUtil;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
@@ -32,103 +39,73 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.everyItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
+import static org.labkey.test.util.TestDataGenerator.randomDomainName;
 
 @Category({Daily.class})
 public class EditableGridTest extends BaseWebDriverTest
 {
-    private static final String EXTRAPOLATING_SAMPLE_TYPE = "ExtrapolatingSampleType";
-    private static final String ASC_STRING = "Ascending String";
-    private static final String DESC_STRING = "Descending String";
-    private static final String ASC_INT = "Ascending Int";
-    private static final String DESC_INT = "Descending Int";
-    private static final String ASC_DATE = "Ascending Date";
-    private static final String DESC_DATE = "Descending Date";
+    private static final int MAX_LENGTH = 32; // Avoid excessively long field names to avoid blocking clicks
+    private static final String EXTRAPOLATING_SAMPLE_TYPE = randomDomainName("ExtrapolatingSampleType");
+    private static final FieldInfo ASC_STRING = FieldInfo.random("Ascending String", ColumnType.String, MAX_LENGTH);
+    private static final FieldInfo DESC_STRING = FieldInfo.random("Descending String", ColumnType.String, MAX_LENGTH);
+    private static final FieldInfo ASC_INT = FieldInfo.random("Ascending Int", ColumnType.Integer, MAX_LENGTH);
+    private static final FieldInfo DESC_INT = FieldInfo.random("Descending Int", ColumnType.Integer, MAX_LENGTH);
+    private static final FieldInfo ASC_DATE = FieldInfo.random("Ascending Date", ColumnType.DateAndTime, MAX_LENGTH);
+    private static final FieldInfo DESC_DATE = FieldInfo.random("Descending Date", ColumnType.DateAndTime, MAX_LENGTH);
 
-    private static final String FILLING_SAMPLE_TYPE = "FillingSampleType";
-    private static final String FILL_STRING = "Filling String";
-    private static final String FILL_MULTI_LINE = "Filling Multi Line";
-    private static final String FILL_INT = "Filling Int";
-    private static final String FILL_DATE = "Filling Date";
+    private static final String FILLING_SAMPLE_TYPE = randomDomainName("FillingSampleType");
+    private static final FieldInfo FILL_STRING = FieldInfo.random("Filling String", ColumnType.String, MAX_LENGTH);
+    private static final FieldInfo FILL_MULTI_LINE = FieldInfo.random("Filling Multi Line", ColumnType.MultiLine, MAX_LENGTH);
+    private static final FieldInfo FILL_INT = FieldInfo.random("Filling Int", ColumnType.Integer, MAX_LENGTH);
+    private static final FieldInfo FILL_DATE = FieldInfo.random("Filling Date", ColumnType.DateAndTime, MAX_LENGTH);
 
-    private static final String PASTING_SAMPLE_TYPE = "PastingSampleType";
-    private static final String PASTE_1 = "Paste Column 1";
-    private static final String PASTE_2 = "Paste Column 2";
-    private static final String PASTE_3 = "Paste Column 3";
-    private static final String PASTE_4 = "Paste Column 4";
-    private static final String PASTE_5 = "Paste Column 5";
-    private static final String PASTE_ML = "Paste Multi Line";
+    private static final String PASTING_SAMPLE_TYPE = randomDomainName("PastingSampleType");
+    private static final FieldInfo PASTE_1 = FieldInfo.random("Paste Column 1", ColumnType.String, MAX_LENGTH);
+    private static final FieldInfo PASTE_2 = FieldInfo.random("Paste Column 2", ColumnType.String, MAX_LENGTH);
+    private static final FieldInfo PASTE_3 = FieldInfo.random("Paste Column 3", ColumnType.String, MAX_LENGTH);
+    private static final FieldInfo PASTE_4 = FieldInfo.random("Paste Column 4", ColumnType.String, MAX_LENGTH);
+    private static final FieldInfo PASTE_5 = FieldInfo.random("Paste Column 5", ColumnType.String, MAX_LENGTH);
+    private static final FieldInfo PASTE_ML = FieldInfo.random("Paste Multi Line", ColumnType.MultiLine, MAX_LENGTH);
 
     private static final List<String> TEXT_CHOICES = Arrays.asList("red", "Orange", "YELLOW");
-    private static final String LOOKUP_LIST = "Fruits";
+    private static final String LOOKUP_LIST = randomDomainName("Fruits");
     private static final List<String> LOOKUP_CHOICES = Arrays.asList("apple", "Orange", "kiwi");
 
-    private static final String ALL_TYPE_SAMPLE_TYPE = "AllFieldsSampleType";
-    private static final String STR_FIELD_NAME = "Str Col";
-    private static final String REQ_STR_FIELD_NAME = "Str Col Req";
-    private static final String INT_FIELD_NAME = "Int Col";
-    private static final String REQ_INT_FIELD_NAME = "Int Col Req";
-    private static final String DATE_FIELD_NAME = "Date Col";
-    private static final String REQ_DATETIME_FIELD_NAME = "Datetime Col Req";
-    private static final String TIME_FIELD_NAME = "Time Col";
-    private static final String REQ_TIME_FIELD_NAME = "Time Col Req";
-    private static final String FLOAT_FIELD_NAME = "Float Col";
-    private static final String BOOL_FIELD_NAME = "Bool Col";
-    private static final String TEXTCHOICE_FIELD_NAME = "Textchoice Col";
-    private static final String REQ_TEXTCHOICE_FIELD_NAME = "Textchoice Col Req";
-    private static final String LOOKUP_FIELD_NAME = "Lookup Col";
-    private static final String REQ_LOOKUP_FIELD_NAME = "Lookup Col Req";
-    private static final FieldDefinition STR_FIELD;
-    private static final FieldDefinition REQ_STR_FIELD;
-    private static final FieldDefinition INT_FIELD;
-    private static final FieldDefinition REQ_INT_FIELD;
-    private static final FieldDefinition DATE_FIELD;
-    private static final FieldDefinition REQ_DATETTIME_FIELD;
-    private static final FieldDefinition TIME_FIELD;
-    private static final FieldDefinition REQ_TIME_FIELD;
-    private static final FieldDefinition BOOLEAN_FIELD;
-    private static final FieldDefinition FLOAT_FIELD;
-    private static final FieldDefinition TEXTCHOICE_FIELD;
-    private static final FieldDefinition REQ_TEXTCHOICE_FIELD;
-    private static final FieldDefinition LOOKUP_FIELD;
-    private static final FieldDefinition REQ_LOOKUP_FIELD;
+    private static final String ALL_TYPE_SAMPLE_TYPE = randomDomainName("AllFieldsSampleType");
 
-    final List<String> ALL_FIELD_NAMES = Arrays.asList(STR_FIELD_NAME, REQ_STR_FIELD_NAME, INT_FIELD_NAME, REQ_INT_FIELD_NAME,
-            DATE_FIELD_NAME, REQ_DATETIME_FIELD_NAME, TIME_FIELD_NAME, REQ_TIME_FIELD_NAME,
-            BOOL_FIELD_NAME, FLOAT_FIELD_NAME, TEXTCHOICE_FIELD_NAME, REQ_TEXTCHOICE_FIELD_NAME, LOOKUP_FIELD_NAME, REQ_LOOKUP_FIELD_NAME);
+    private static final FieldInfo STR_FIELD = FieldInfo.random("strCol", ColumnType.String, MAX_LENGTH)
+        .customizeFieldDefinition(fd -> fd.setScale(10));
+    private static final FieldInfo REQ_STR_FIELD = FieldInfo.random("strColReq", ColumnType.String, MAX_LENGTH)
+        .customizeFieldDefinition(fd -> fd.setScale(10).setRequired(true));
+    private static final FieldInfo INT_FIELD = FieldInfo.random("intCol", ColumnType.Integer, MAX_LENGTH);
+    private static final FieldInfo REQ_INT_FIELD = FieldInfo.random("intColReq", ColumnType.Integer, MAX_LENGTH)
+        .customizeFieldDefinition(fd -> fd.setRequired(true));
+    private static final FieldInfo DATE_FIELD = FieldInfo.random("dateCol", ColumnType.Date, MAX_LENGTH);
+    private static final FieldInfo REQ_DATETIME_FIELD = FieldInfo.random("datetimeColReq", ColumnType.DateAndTime, MAX_LENGTH)
+        .customizeFieldDefinition(fd -> fd.setRequired(true));
+    private static final FieldInfo TIME_FIELD = FieldInfo.random("timeCol", ColumnType.Time, MAX_LENGTH);
+    private static final FieldInfo REQ_TIME_FIELD = FieldInfo.random("timeColReq", ColumnType.Time, MAX_LENGTH)
+        .customizeFieldDefinition(fd -> fd.setRequired(true));
+    private static final FieldInfo BOOL_FIELD = FieldInfo.random("boolCol", ColumnType.Boolean, MAX_LENGTH);
+    private static final FieldInfo FLOAT_FIELD = FieldInfo.random("floatCol", ColumnType.Decimal, MAX_LENGTH);
+    private static final FieldInfo TEXTCHOICE_FIELD = FieldInfo.random("textchoiceCol", ColumnType.TextChoice, MAX_LENGTH)
+        .customizeFieldDefinition(fd -> fd.setTextChoiceValues(TEXT_CHOICES));
+    private static final FieldInfo REQ_TEXTCHOICE_FIELD = FieldInfo.random("textchoiceColReq", ColumnType.TextChoice, MAX_LENGTH)
+        .customizeFieldDefinition(fd -> fd.setRequired(true).setTextChoiceValues(TEXT_CHOICES));
+    private static final FieldInfo LOOKUP_FIELD = FieldInfo.random("lookupCol", new IntLookup(null, "lists", LOOKUP_LIST));
+    private static final FieldInfo REQ_LOOKUP_FIELD = FieldInfo.random("lookupColReq", new IntLookup(null, "lists", LOOKUP_LIST))
+        .customizeFieldDefinition(fd -> fd.setRequired(true));
 
-    static
-    {
-        STR_FIELD = new FieldDefinition(STR_FIELD_NAME, FieldDefinition.ColumnType.String);
-        STR_FIELD.setScale(10);
-        REQ_STR_FIELD = new FieldDefinition(REQ_STR_FIELD_NAME, FieldDefinition.ColumnType.String);
-        REQ_STR_FIELD.setScale(10);
-        REQ_STR_FIELD.setRequired(true);
-        INT_FIELD = new FieldDefinition(INT_FIELD_NAME, FieldDefinition.ColumnType.Integer);
-        REQ_INT_FIELD = new FieldDefinition(REQ_INT_FIELD_NAME, FieldDefinition.ColumnType.Integer);
-        REQ_INT_FIELD.setRequired(true);
-        DATE_FIELD = new FieldDefinition(DATE_FIELD_NAME, FieldDefinition.ColumnType.Date);
-        REQ_DATETTIME_FIELD = new FieldDefinition(REQ_DATETIME_FIELD_NAME, FieldDefinition.ColumnType.DateAndTime);
-        REQ_DATETTIME_FIELD.setRequired(true);
-        TIME_FIELD = new FieldDefinition(TIME_FIELD_NAME, FieldDefinition.ColumnType.Time);
-        REQ_TIME_FIELD = new FieldDefinition(REQ_TIME_FIELD_NAME, FieldDefinition.ColumnType.Time);
-        REQ_TIME_FIELD.setRequired(true);
-        FLOAT_FIELD = new FieldDefinition(FLOAT_FIELD_NAME, FieldDefinition.ColumnType.Decimal);
-        BOOLEAN_FIELD = new FieldDefinition(BOOL_FIELD_NAME, FieldDefinition.ColumnType.Boolean);
-        TEXTCHOICE_FIELD = new FieldDefinition(TEXTCHOICE_FIELD_NAME, FieldDefinition.ColumnType.TextChoice);
-        TEXTCHOICE_FIELD.setTextChoiceValues(TEXT_CHOICES);
-        REQ_TEXTCHOICE_FIELD = new FieldDefinition(REQ_TEXTCHOICE_FIELD_NAME, FieldDefinition.ColumnType.TextChoice);
-        REQ_TEXTCHOICE_FIELD.setTextChoiceValues(TEXT_CHOICES);
-        REQ_TEXTCHOICE_FIELD.setRequired(true);
-        LOOKUP_FIELD = new FieldDefinition(LOOKUP_FIELD_NAME, new FieldDefinition.IntLookup(null, "lists", LOOKUP_LIST));
-        REQ_LOOKUP_FIELD = new FieldDefinition(REQ_LOOKUP_FIELD_NAME, new FieldDefinition.IntLookup(null, "lists", LOOKUP_LIST));
-        REQ_LOOKUP_FIELD.setRequired(true);
-    }
+    final List<FieldInfo> ALL_FIELDS = Arrays.asList(STR_FIELD, REQ_STR_FIELD, INT_FIELD, REQ_INT_FIELD,
+        DATE_FIELD, REQ_DATETIME_FIELD, TIME_FIELD, REQ_TIME_FIELD,
+        BOOL_FIELD, FLOAT_FIELD, TEXTCHOICE_FIELD, REQ_TEXTCHOICE_FIELD, LOOKUP_FIELD, REQ_LOOKUP_FIELD);
 
     @BeforeClass
     public static void setupProject() throws Exception
@@ -139,7 +116,7 @@ public class EditableGridTest extends BaseWebDriverTest
     private void createLookupList(Connection connection) throws IOException, CommandException
     {
         ListDefinition listDef = new IntListDefinition(LOOKUP_LIST, "Key");
-        listDef.addField(new FieldDefinition("Name", FieldDefinition.ColumnType.String));
+        listDef.addField(new FieldDefinition("Name", ColumnType.String));
         listDef.create(connection, getProjectName());
         final List<Map<String, Object>> rows = new ArrayList<>();
         for (String value : LOOKUP_CHOICES)
@@ -158,42 +135,74 @@ public class EditableGridTest extends BaseWebDriverTest
         new SampleTypeDefinition(EXTRAPOLATING_SAMPLE_TYPE)
                 .setFields(
                         List.of(
-                                new FieldDefinition(ASC_STRING, FieldDefinition.ColumnType.String),
-                                new FieldDefinition(DESC_STRING, FieldDefinition.ColumnType.String),
-                                new FieldDefinition(ASC_INT, FieldDefinition.ColumnType.Integer),
-                                new FieldDefinition(DESC_INT, FieldDefinition.ColumnType.Integer),
-                                new FieldDefinition(ASC_DATE, FieldDefinition.ColumnType.DateAndTime),
-                                new FieldDefinition(DESC_DATE, FieldDefinition.ColumnType.DateAndTime)
+                                ASC_STRING.getFieldDefinition(),
+                                DESC_STRING.getFieldDefinition(),
+                                ASC_INT.getFieldDefinition(),
+                                DESC_INT.getFieldDefinition(),
+                                ASC_DATE.getFieldDefinition(),
+                                DESC_DATE.getFieldDefinition()
                         ))
                 .create(connection, getProjectName());
         new SampleTypeDefinition(FILLING_SAMPLE_TYPE)
                 .setFields(
                         List.of(
-                                new FieldDefinition(FILL_STRING, FieldDefinition.ColumnType.String),
-                                new FieldDefinition(FILL_MULTI_LINE, FieldDefinition.ColumnType.MultiLine),
-                                new FieldDefinition(FILL_INT, FieldDefinition.ColumnType.Integer),
-                                new FieldDefinition(FILL_DATE, FieldDefinition.ColumnType.DateAndTime)
+                                FILL_STRING.getFieldDefinition(),
+                                FILL_MULTI_LINE.getFieldDefinition(),
+                                FILL_INT.getFieldDefinition(),
+                                FILL_DATE.getFieldDefinition()
                         ))
                 .create(connection, getProjectName());
         new SampleTypeDefinition(PASTING_SAMPLE_TYPE)
                 .setFields(
                         List.of(
-                                new FieldDefinition(PASTE_1, FieldDefinition.ColumnType.String),
-                                new FieldDefinition(PASTE_2, FieldDefinition.ColumnType.String),
-                                new FieldDefinition(PASTE_3, FieldDefinition.ColumnType.String),
-                                new FieldDefinition(PASTE_4, FieldDefinition.ColumnType.String),
-                                new FieldDefinition(PASTE_5, FieldDefinition.ColumnType.String),
-                                new FieldDefinition(PASTE_ML, FieldDefinition.ColumnType.MultiLine)
+                                PASTE_1.getFieldDefinition(),
+                                PASTE_2.getFieldDefinition(),
+                                PASTE_3.getFieldDefinition(),
+                                PASTE_4.getFieldDefinition(),
+                                PASTE_5.getFieldDefinition(),
+                                PASTE_ML.getFieldDefinition()
                         ))
                 .create(connection, getProjectName());
 
         new SampleTypeDefinition(ALL_TYPE_SAMPLE_TYPE)
                 .setFields(
-                        List.of(
-                                STR_FIELD, REQ_STR_FIELD, INT_FIELD, REQ_INT_FIELD, DATE_FIELD, REQ_DATETTIME_FIELD, TIME_FIELD, REQ_TIME_FIELD,
-                                BOOLEAN_FIELD, FLOAT_FIELD, TEXTCHOICE_FIELD, REQ_TEXTCHOICE_FIELD, LOOKUP_FIELD, REQ_LOOKUP_FIELD
-                        ))
+                    ALL_FIELDS.stream().map(FieldInfo::getFieldDefinition).toList())
                 .create(connection, getProjectName());
+
+        for (String sampleType : List.of(EXTRAPOLATING_SAMPLE_TYPE, FILLING_SAMPLE_TYPE, PASTING_SAMPLE_TYPE, ALL_TYPE_SAMPLE_TYPE))
+        {
+            // Hide columns from editable grid so that test columns are in view
+            String metadataXml = """
+                <tables xmlns="http://labkey.org/data/xml">
+                  <table tableName="%s" tableDbType="NOT_IN_DB">
+                    <columns>
+                      <column columnName="Name">
+                        <shownInInsertView>false</shownInInsertView>
+                      </column>
+                      <column columnName="Alias">
+                        <shownInInsertView>false</shownInInsertView>
+                      </column>
+                      <column columnName="MaterialExpDate">
+                        <shownInInsertView>false</shownInInsertView>
+                      </column>
+                      <column columnName="Flag">
+                        <shownInInsertView>false</shownInInsertView>
+                      </column>
+                      <column columnName="SampleState">
+                        <shownInInsertView>false</shownInInsertView>
+                      </column>
+                    </columns>
+                  </table>
+                </tables>
+                """.formatted(EscapeUtil.getMarkupEscapedValue(sampleType));
+
+            SimplePostCommand postCommand = new SimplePostCommand("query", "saveSourceQuery");
+            postCommand.setJsonObject(new JSONObject());
+            postCommand.getJsonObject().put("ff_metadataText", metadataXml);
+            postCommand.getJsonObject().put("schemaName", "samples");
+            postCommand.getJsonObject().put("queryName", sampleType);
+            postCommand.execute(connection, getProjectName());
+        }
     }
 
     @Test
@@ -289,6 +298,7 @@ public class EditableGridTest extends BaseWebDriverTest
     }
 
     @Test
+    @Ignore  // Test disabled until Issue 52226, Issue 51927 are resolved
     public void testDragFillSingleRow()
     {
         final LocalDateTime now = LocalDate.of(2019, 1, 30).atTime(16, 30);
@@ -350,6 +360,7 @@ public class EditableGridTest extends BaseWebDriverTest
     }
 
     @Test
+    @Ignore  // Test disabled until Issue 52226, Issue 51927 are resolved
     public void testDragFillMultipleRows()
     {
         final LocalDateTime now = LocalDate.of(2019, 1, 30).atTime(14, 30);
@@ -456,15 +467,12 @@ public class EditableGridTest extends BaseWebDriverTest
         Locator boxes = Locator.tag("tr").child("td")
                 .child(Locator.tagWithAttribute("input", "type", "checkbox"));
         var checkBoxes = boxes.findElements(testGrid);
-        scrollIntoView(checkBoxes.get(0), true); // bring as much of the grid into view as possible
+        scrollIntoView(checkBoxes.get(2), false);
+        checkBoxes.get(2).click();
 
-        new Actions(getDriver())
-                .click(checkBoxes.get(2))
-                .keyDown(Keys.SHIFT)
-                .click(checkBoxes.get(5))
-                .click(checkBoxes.get(7))
-                .keyUp(Keys.SHIFT)
-                .perform();
+        shiftClickCheckbox(checkBoxes.get(5));
+
+        shiftClickCheckbox(checkBoxes.get(7));
 
         // make sure 2-7 are still selected
         for (int i=2; i<7; i++)
@@ -484,11 +492,8 @@ public class EditableGridTest extends BaseWebDriverTest
         checkBoxes = boxes.findElements(testGrid);
 
         // verify shift-select to another row does not select the range from the now-removed row
-        new Actions(getDriver())
-                .keyDown(Keys.SHIFT)
-                .click(checkBoxes.get(7))
-                .keyUp(Keys.SHIFT)
-                .perform();
+
+        shiftClickCheckbox(checkBoxes.get(7));
 
         for (int i=2; i<6; i++)
         {
@@ -496,6 +501,16 @@ public class EditableGridTest extends BaseWebDriverTest
         }
         checker().verifyTrue(String.format("row %d should be checked", 7), testGrid.isRowSelected(7));
         checker().screenShotIfNewError("unexpected_selection_range");
+    }
+
+    private void shiftClickCheckbox(WebElement el)
+    {
+        scrollIntoView(el, false);
+        new Actions(getDriver())
+            .keyDown(Keys.SHIFT)
+            .click(el)
+            .keyUp(Keys.SHIFT)
+            .perform();
     }
 
     @Test
@@ -508,6 +523,7 @@ public class EditableGridTest extends BaseWebDriverTest
         EditableGrid testGrid = goToEditableGrid(PASTING_SAMPLE_TYPE);
         testGrid.addRows(5);
 
+        scrollIntoView(testGrid.getCell(3, PASTE_4), false); // Get target area into view
         log("Test wide");
         testGrid.selectCellRange(testGrid.getCell(0, PASTE_1), testGrid.getCell(1, PASTE_4));
         actionPaste(null, rowsToString(clipRows));
@@ -674,8 +690,8 @@ public class EditableGridTest extends BaseWebDriverTest
         editableGrid.addRows(1);
 
         // Scroll the last column into view it will make any failure screenshots more useful.
-        String lastColumnName = editableGrid.getColumnNames().get(editableGrid.getColumnNames().size() - 1);
-        scrollIntoView(editableGrid.getCell(0, lastColumnName));
+        String lastColumn = editableGrid.getColumnLabels().get(editableGrid.getColumnLabels().size() - 1);
+        scrollIntoView(editableGrid.getCell(0, lastColumn));
 
         int emptyWidth = editableGrid.getCell(0, PASTE_ML).getSize().getWidth();
         int emptyHeight = editableGrid.getCell(0, PASTE_ML).getSize().getHeight();
@@ -740,7 +756,7 @@ public class EditableGridTest extends BaseWebDriverTest
                 .build()
                 .perform();
 
-        scrollIntoView(editableGrid.getCell(0, lastColumnName));
+        scrollIntoView(editableGrid.getCell(0, lastColumn));
 
         checker().verifyTrue("TextArea should have gone away after hitting <Enter>.",
                 shortWait().until(ExpectedConditions.stalenessOf(editCell)).booleanValue());
@@ -767,7 +783,7 @@ public class EditableGridTest extends BaseWebDriverTest
 
         log("Enter one long line.");
         editableGrid.addRows(1);
-        scrollIntoView(editableGrid.getCell(0, lastColumnName));
+        scrollIntoView(editableGrid.getCell(0, lastColumn));
 
         editCell = editableGrid.activateCellUsingDoubleClick(0, PASTE_ML);
 
@@ -777,7 +793,7 @@ public class EditableGridTest extends BaseWebDriverTest
                 .perform();
 
         // This should scroll the last cell into view.
-        editableGrid.getCell(0, lastColumnName).click();
+        editableGrid.getCell(0, lastColumn).click();
 
         checker().verifyTrue("TextArea should have gone away after clicking out of the edit cell.",
                 shortWait().until(ExpectedConditions.stalenessOf(editCell)).booleanValue());
@@ -805,7 +821,7 @@ public class EditableGridTest extends BaseWebDriverTest
 
         log("Enter many short lines.");
         editableGrid.addRows(1);
-        scrollIntoView(editableGrid.getCell(0, lastColumnName));
+        scrollIntoView(editableGrid.getCell(0, lastColumn));
 
         editCell = editableGrid.activateCellUsingDoubleClick(0, PASTE_ML);
 
@@ -829,7 +845,7 @@ public class EditableGridTest extends BaseWebDriverTest
         checker().verifyTrue("TextArea should have gone away after hitting <Enter>.",
                 shortWait().until(ExpectedConditions.stalenessOf(editCell)).booleanValue());
 
-        scrollIntoView(editableGrid.getCell(0, lastColumnName));
+        scrollIntoView(editableGrid.getCell(0, lastColumn));
 
         WebElement updatedGridCell03 = editableGrid.getCell(0, PASTE_ML);
         checker().verifyTrue("Cell not updated with many short lines.",
@@ -853,7 +869,7 @@ public class EditableGridTest extends BaseWebDriverTest
 
         log("Validate <esc> exits edit mode and does not save.");
         editableGrid.addRows(1);
-        scrollIntoView(editableGrid.getCell(0, lastColumnName));
+        scrollIntoView(editableGrid.getCell(0, lastColumn));
 
         editCell = editableGrid.activateCellUsingDoubleClick(0, PASTE_ML);
 
@@ -877,7 +893,7 @@ public class EditableGridTest extends BaseWebDriverTest
         checker().verifyTrue("TextArea should have gone away after hitting <Esc>.",
                 shortWait().until(ExpectedConditions.stalenessOf(editCell)).booleanValue());
 
-        scrollIntoView(editableGrid.getCell(0, lastColumnName));
+        scrollIntoView(editableGrid.getCell(0, lastColumn));
 
         WebElement updatedGridCell04 = editableGrid.getCell(0, PASTE_ML);
         checker().verifyTrue("Cell should not be updated after hitting <esc>.",
@@ -914,7 +930,7 @@ public class EditableGridTest extends BaseWebDriverTest
                 .verifyEquals("There should be no grid cells already selected. Fatal error.",
                         0, editableGrid.getSelectedCells().size());
 
-        List<String> columns = editableGrid.getColumnNames();
+        List<String> columns = editableGrid.getColumnLabels();
         int column = columns.size() / 2;
 
         int startRow = 4;
@@ -1027,11 +1043,10 @@ public class EditableGridTest extends BaseWebDriverTest
                 .verifyEquals("There should be no grid cells already selected. Fatal error.",
                         0, editableGrid.getSelectedCells().size());
 
-        List<String> columns = editableGrid.getColumnNames();
-        int startColumn = columns.indexOf(PASTE_1);
+        int startColumn = editableGrid.getColumnIndex(PASTE_3);
 
         int gridRow = 4;
-        WebElement startCell = editableGrid.getCell(gridRow, PASTE_1);
+        WebElement startCell = editableGrid.getCell(gridRow, PASTE_3);
         startCell.click();
 
         log("Select a few horizontal cells the the left in the grid.");
@@ -1128,11 +1143,11 @@ public class EditableGridTest extends BaseWebDriverTest
         checker().verifyEquals("Hitting <tab> should have removed the selection.",
                 0, editableGrid.getSelectedCells().size());
 
-        WebElement endCell = Locator.tag("div").findWhenNeeded(editableGrid.getCell(gridRow, PASTE_2));
+        WebElement endCell = Locator.tag("div").findWhenNeeded(editableGrid.getCell(gridRow, PASTE_4));
 
         checker().verifyTrue(String.format("The expected cell on row %d and column %s is not selected after hitting <tab>.",
-                        gridRow, PASTE_2),
-                endCell.getAttribute("class").toLowerCase().contains("cell-selected"));
+                        gridRow, PASTE_4),
+                Objects.requireNonNullElse(endCell.getAttribute("class"), "").toLowerCase().contains("cell-selected"));
 
         checker().screenShotIfNewError("TAB_ERROR");
     }
@@ -1165,8 +1180,8 @@ public class EditableGridTest extends BaseWebDriverTest
                 .verifyEquals("There should be no grid cells already selected. Fatal error.",
                         0, editableGrid.getSelectedCells().size());
 
-        List<String> columns = editableGrid.getColumnNames();
-        int startColumn = columns.indexOf("Description");
+        List<String> columns = editableGrid.getColumnLabels();
+        int startColumn = 4;
 
         int startRow = 5;
         WebElement startCell = editableGrid.getCell(startRow, columns.get(startColumn));
@@ -1275,15 +1290,15 @@ public class EditableGridTest extends BaseWebDriverTest
         checker().verifyEquals("Number of cells selected not as expected.",
                 expectedSelectedCount, selectedSizeAfter);
 
-        List<String> columnNames = editableGrid.getColumnNames();
+        List<String> columnNames = editableGrid.getColumnLabels();
 
         for(int colIndex = startCol; colIndex <= endCol; colIndex++)
         {
             for(int rowIndex = startRow; rowIndex <= endRow; rowIndex++)
             {
                 WebElement gridCell = Locator.tag("div").findElement(editableGrid.getCell(rowIndex, columnNames.get(colIndex)));
-                checker().verifyTrue(String.format("Cell (%s, %d) is not selected.",columnNames.get(colIndex), rowIndex),
-                        gridCell.getAttribute("class").toLowerCase().contains("cell-selection"));
+                checker().verifyTrue(String.format("Cell (%s, %d) is not selected.", columnNames.get(colIndex), rowIndex),
+                        Objects.requireNonNullElse(gridCell.getAttribute("class"), "").toLowerCase().contains("cell-selection"));
             }
         }
 
@@ -1291,8 +1306,7 @@ public class EditableGridTest extends BaseWebDriverTest
 
     private String getActualPaste(EditableGrid testGrid)
     {
-        List<Map<String, String>> gridData = testGrid.getGridData(PASTE_1, PASTE_2, PASTE_3, PASTE_4, PASTE_5);
-        List<List<String>> rows = gridData.stream().map(r -> List.of(r.get(PASTE_1), r.get(PASTE_2), r.get(PASTE_3), r.get(PASTE_4), r.get(PASTE_5))).toList();
+        List<List<String>> rows = testGrid.getGridData(PASTE_1, PASTE_2, PASTE_3, PASTE_4, PASTE_5);
         return rowsToString(rows);
     }
 
@@ -1347,10 +1361,10 @@ public class EditableGridTest extends BaseWebDriverTest
                 .collect(Collectors.joining("\n"));
     }
 
-    private static List<WebElement> setCellValues(EditableGrid testGrid, String ascString, Object... values)
+    private static List<WebElement> setCellValues(EditableGrid testGrid, CharSequence columnIdentifier, Object... values)
     {
         List<WebElement> cells = new ArrayList<>();
-        List.of(values).forEach(value -> cells.add(testGrid.setCellValue(cells.size(), ascString, value)));
+        List.of(values).forEach(value -> cells.add(testGrid.setCellValue(cells.size(), columnIdentifier, value)));
         return cells;
     }
 
@@ -1366,54 +1380,53 @@ public class EditableGridTest extends BaseWebDriverTest
         EditableGrid testGrid = goToEditableGrid(ALL_TYPE_SAMPLE_TYPE);
         testGrid.addRows(2);
 
-        log("Verify no warnings when page first load");
-        checker().verifyEquals("Cell warning should be absent when a row is added on page load",
-                0, Locator.tagWithClass("div", "cell-warning").findElements(testGrid).size());
+        log("Verify no cell errors when page first load");
+        checker().verifyEquals("Cell error should be absent when a row is added on page load", 0, testGrid.getCellErrors().size());
 
         log("Input empty string for required field should trigger cell warning.");
-        testGrid.setCellValue(1, REQ_STR_FIELD_NAME + " *", " ");
-        checker().verifyEquals("Cell warning status not as expected at row " + 1 + " for col " + REQ_STR_FIELD_NAME, true, testGrid.hasCellWarning(1, REQ_STR_FIELD_NAME + " *"));
-        checker().verifyEquals("Cell warning msg not as expected at row " + 1 + " for col " + REQ_STR_FIELD_NAME, REQ_STR_FIELD_NAME + " is required.", testGrid.getCellPopoverText(1, REQ_STR_FIELD_NAME + " *"));
+        testGrid.setCellValue(1, REQ_STR_FIELD, " ");
+        checker().verifyEquals("Cell warning status not as expected at row " + 1 + " for col " + REQ_STR_FIELD.getLabel(), true, testGrid.hasCellError(1, REQ_STR_FIELD));
+        checker().verifyEquals("Cell warning msg not as expected at row " + 1 + " for col " + REQ_STR_FIELD.getLabel(), REQ_STR_FIELD.getUiLabel() + " is required.", testGrid.getCellPopoverText(1, REQ_STR_FIELD));
         mouseOver(testGrid.getCell(0, "Row")); // dismiss warning popup
-        testGrid.setCellValue(1, REQ_INT_FIELD_NAME + " *", " ");
-        checker().verifyEquals("Cell warning status not as expected at row " + 1 + " for col " + REQ_INT_FIELD_NAME, true, testGrid.hasCellWarning(1, REQ_INT_FIELD_NAME + " *"));
-        checker().verifyEquals("Cell warning msg not as expected at row " + 1 + " for col " + REQ_INT_FIELD_NAME, REQ_INT_FIELD_NAME + " is required.", testGrid.getCellPopoverText(1, REQ_INT_FIELD_NAME + " *"));
+        testGrid.setCellValue(1, REQ_INT_FIELD, " ");
+        checker().verifyEquals("Cell warning status not as expected at row " + 1 + " for col " + REQ_INT_FIELD.getLabel(), true, testGrid.hasCellError(1, REQ_INT_FIELD));
+        checker().verifyEquals("Cell warning msg not as expected at row " + 1 + " for col " + REQ_INT_FIELD.getLabel(), REQ_INT_FIELD.getUiLabel() + " is required.", testGrid.getCellPopoverText(1, REQ_INT_FIELD));
 
         log("Correct values should remove cell warning, keep entering wrong values should update warning");
         mouseOver(testGrid.getCell(0, "Row")); // dismiss warning popup
-        testGrid.setCellValue(0, STR_FIELD_NAME, "");
+        testGrid.setCellValue(0, STR_FIELD, "");
         mouseOver(testGrid.getCell(0, "Row"));
-        testGrid.setCellValue(1, STR_FIELD_NAME, "This value is too long");
+        testGrid.setCellValue(1, STR_FIELD, "This value is too long");
         mouseOver(testGrid.getCell(0, "Row"));
-        testGrid.setCellValue(0, REQ_STR_FIELD_NAME + " *", "good");
+        testGrid.setCellValue(0, REQ_STR_FIELD, "good");
         mouseOver(testGrid.getCell(0, "Row"));
-        testGrid.setCellValue(1, REQ_STR_FIELD_NAME + " *", "This value is too long");
-        checker().verifyEquals("Cell warning status not as expected at row " + 0 + " for col " + STR_FIELD_NAME, false, testGrid.hasCellWarning(0, STR_FIELD_NAME));
-        checker().verifyEquals("Cell warning msg not as expected at row " + 1 + " for col " + STR_FIELD_NAME, "22/10 characters", testGrid.getCellPopoverText(1, STR_FIELD_NAME));
-        checker().verifyEquals("Cell warning status not as expected at row " + 0 + " for col " + REQ_STR_FIELD_NAME, false, testGrid.hasCellWarning(0, REQ_STR_FIELD_NAME + " *"));
-        checker().verifyEquals("Cell warning msg not as expected at row " + 1 + " for col " + REQ_STR_FIELD_NAME, "22/10 characters", testGrid.getCellPopoverText(1, REQ_STR_FIELD_NAME + " *"));
+        testGrid.setCellValue(1, REQ_STR_FIELD, "This value is too long");
+        checker().verifyEquals("Cell warning status not as expected at row " + 0 + " for col " + STR_FIELD.getLabel(), false, testGrid.hasCellError(0, STR_FIELD));
+        checker().verifyEquals("Cell warning msg not as expected at row " + 1 + " for col " + STR_FIELD.getLabel(), "22/10 characters", testGrid.getCellPopoverText(1, STR_FIELD));
+        checker().verifyEquals("Cell warning status not as expected at row " + 0 + " for col " + REQ_STR_FIELD.getLabel(), false, testGrid.hasCellError(0, REQ_STR_FIELD));
+        checker().verifyEquals("Cell warning msg not as expected at row " + 1 + " for col " + REQ_STR_FIELD.getLabel(), "22/10 characters", testGrid.getCellPopoverText(1, REQ_STR_FIELD));
 
         log("Input invalid data type value should trigger cell warnings.");
         mouseOver(testGrid.getCell(0, "Row")); // dismiss warning popup
-        testGrid.setCellValue(0, INT_FIELD_NAME, "1.23");
+        testGrid.setCellValue(0, INT_FIELD, "1.23");
         mouseOver(testGrid.getCell(0, "Row")); // dismiss warning popup
-        testGrid.setCellValue(0, FLOAT_FIELD_NAME, "not float");
+        testGrid.setCellValue(0, FLOAT_FIELD, "not float");
         mouseOver(testGrid.getCell(0, "Row")); // dismiss warning popup
-        testGrid.setCellValue(0, BOOL_FIELD_NAME, "not bool");
-        checker().verifyEquals("Cell warning msg not as expected at row " + 0 + " for col " + INT_FIELD_NAME, "Invalid integer", testGrid.getCellPopoverText(0, INT_FIELD_NAME));
-        checker().verifyEquals("Cell warning msg not as expected at row " + 0 + " for col " + FLOAT_FIELD_NAME, "Invalid decimal", testGrid.getCellPopoverText(0, FLOAT_FIELD_NAME));
-        checker().verifyEquals("Cell warning msg not as expected at row " + 0 + " for col " + BOOL_FIELD_NAME, "Invalid boolean", testGrid.getCellPopoverText(0, BOOL_FIELD_NAME));
+        testGrid.setCellValue(0, BOOL_FIELD, "not bool");
+        checker().verifyEquals("Cell warning msg not as expected at row " + 0 + " for col " + INT_FIELD.getLabel(), "Invalid integer", testGrid.getCellPopoverText(0, INT_FIELD));
+        checker().verifyEquals("Cell warning msg not as expected at row " + 0 + " for col " + FLOAT_FIELD.getLabel(), "Invalid decimal", testGrid.getCellPopoverText(0, FLOAT_FIELD));
+        checker().verifyEquals("Cell warning msg not as expected at row " + 0 + " for col " + BOOL_FIELD.getLabel(), "Invalid boolean", testGrid.getCellPopoverText(0, BOOL_FIELD));
 
         log("Correct values should remove data type warning.");
         mouseOver(testGrid.getCell(0, "Row")); // dismiss warning popup
-        testGrid.setCellValue(0, INT_FIELD_NAME, "123");
-        checker().verifyFalse("Cell warning should disappear after correcting value", testGrid.hasCellWarning(0, INT_FIELD_NAME));
+        testGrid.setCellValue(0, INT_FIELD, "123");
+        checker().verifyFalse("Cell warning should disappear after correcting value", testGrid.hasCellError(0, INT_FIELD));
 
         log("Required value warning should be absent before the cell is acted on");
-        checker().verifyFalse("Required value warning should not be present on page init", testGrid.hasCellWarning(0, REQ_STR_FIELD_NAME + " *"));
+        checker().verifyFalse("Required value warning should not be present on page init", testGrid.hasCellError(0, REQ_STR_FIELD));
         mouseOver(testGrid.getCell(0, "Row")); // dismiss warning popup
-        testGrid.clearCellValue(1, REQ_STR_FIELD_NAME + " *");
-        checker().verifyTrue("Required value warning should show up after removing a value from cell", testGrid.hasCellWarning(1, REQ_STR_FIELD_NAME + " *"));
+        testGrid.clearCellValue(1, REQ_STR_FIELD);
+        checker().verifyTrue("Required value warning should show up after removing a value from cell", testGrid.hasCellError(1, REQ_STR_FIELD));
     }
 
     @Test
@@ -1430,12 +1443,11 @@ public class EditableGridTest extends BaseWebDriverTest
         testGrid.addRows(3);
 
         log("Pasting invalid values");
-        testGrid.selectCell(0, STR_FIELD_NAME);
+        testGrid.pasteFromCell(0, STR_FIELD, rowsToString(clipRows), false);
 
-        actionPaste(null, rowsToString(clipRows));
         List<List<String>> expectedCellWarnings = List.of(
                 Arrays.asList(null, null, null, null, null, null, null, null, null, null, null, null, null, null),
-                Arrays.asList(null, REQ_STR_FIELD_NAME + " is required.", null, REQ_INT_FIELD_NAME + " is required.", null, REQ_DATETIME_FIELD_NAME + " is required.", null, REQ_TIME_FIELD_NAME + " is required.", null, null, null, REQ_TEXTCHOICE_FIELD_NAME + " is required.", null, REQ_LOOKUP_FIELD_NAME + " is required."),
+                Arrays.asList(null, REQ_STR_FIELD.getLabel() + " is required.", null, REQ_INT_FIELD.getLabel() + " is required.", null, REQ_DATETIME_FIELD.getLabel() + " is required.", null, REQ_TIME_FIELD.getLabel() + " is required.", null, null, null, REQ_TEXTCHOICE_FIELD.getLabel() + " is required.", null, REQ_LOOKUP_FIELD.getLabel() + " is required."),
                 Arrays.asList("22/10 characters", "22/10 characters", "Invalid integer", "Invalid integer", "Invalid date, use format yyyy-MM-dd", "Invalid date time, use format yyyy-MM-dd HH:mm", "Invalid time", "Invalid time", "Invalid boolean", "Invalid decimal", "'wrong text choice' is not a valid choice", "'bad choice' is not a valid choice", "Could not find \"bad lookup\"", "Could not find \"bad lookup\"")
         );
 
@@ -1453,77 +1465,65 @@ public class EditableGridTest extends BaseWebDriverTest
                 "Bad value popup did not go away.", 500);
 
         log("Correct missing required fields should remove corresponding cell warnings");
-        testGrid.setCellValue(1, REQ_STR_FIELD_NAME + " *", " ");
-        checker().verifyTrue("Cell warning should be present after setting another invalid value", testGrid.hasCellWarning(1, REQ_STR_FIELD_NAME + " *"));
-        mouseOver(testGrid.getCell(0, STR_FIELD_NAME)); // dismiss warning popup
-        testGrid.setCellValue(1, REQ_INT_FIELD_NAME + " *", "2");
-        mouseOver(testGrid.getCell(0, STR_FIELD_NAME)); // dismiss warning popup
-        testGrid.setCellValue(1, REQ_TEXTCHOICE_FIELD_NAME + " *", List.of("Orange"));
-        mouseOver(testGrid.getCell(0, STR_FIELD_NAME)); // dismiss warning popup
-        testGrid.setCellValue(1, REQ_LOOKUP_FIELD_NAME + " *", List.of("Orange"));
-        mouseOver(testGrid.getCell(0, STR_FIELD_NAME)); // dismiss warning popup
-        testGrid.setCellValue(1, REQ_STR_FIELD_NAME + " *", "not empty");
-        mouseOver(testGrid.getCell(0, STR_FIELD_NAME)); // dismiss warning popup
-        testGrid.setCellValue(1, REQ_DATETIME_FIELD_NAME + " *", LocalDateTime.of(2024, 7, 7, 10, 30));
-        mouseOver(testGrid.getCell(0, STR_FIELD_NAME)); // dismiss warning popup
-        testGrid.setCellValue(1, REQ_TIME_FIELD_NAME + " *", LocalTime.of(2, 30));
+        testGrid.setCellValue(1, REQ_STR_FIELD, " ");
+        checker().verifyTrue("Cell warning should be present after setting another invalid value", testGrid.hasCellError(1, REQ_STR_FIELD));
+        mouseOver(testGrid.getCell(0, STR_FIELD)); // dismiss warning popup
+        testGrid.setCellValue(1, REQ_INT_FIELD, "2");
+        mouseOver(testGrid.getCell(0, STR_FIELD)); // dismiss warning popup
+        testGrid.setCellValue(1, REQ_TEXTCHOICE_FIELD, List.of("Orange"));
+        mouseOver(testGrid.getCell(0, STR_FIELD)); // dismiss warning popup
+        testGrid.setCellValue(1, REQ_LOOKUP_FIELD, List.of("Orange"));
+        mouseOver(testGrid.getCell(0, STR_FIELD)); // dismiss warning popup
+        testGrid.setCellValue(1, REQ_STR_FIELD, "not empty");
+        mouseOver(testGrid.getCell(0, STR_FIELD)); // dismiss warning popup
+        testGrid.setCellValue(1, REQ_DATETIME_FIELD, LocalDateTime.of(2024, 7, 7, 10, 30));
+        mouseOver(testGrid.getCell(0, STR_FIELD)); // dismiss warning popup
+        testGrid.setCellValue(1, REQ_TIME_FIELD, LocalTime.of(2, 30));
 
-        for (int col = 0; col < ALL_FIELD_NAMES.size(); col++)
+        for (FieldInfo field : ALL_FIELDS)
         {
-            String colName = ALL_FIELD_NAMES.get(col);
-            if (colName.endsWith(" Req"))
-                colName += " *";
-
-            checker().verifyFalse("Cell warning be absent after required values are provided: " + colName, testGrid.hasCellWarning(1, colName));
+            checker().verifyFalse("Cell warning be absent after required values are provided: " + field.getLabel(), testGrid.hasCellError(1, field));
         }
 
         log("Enter another bad value should retain cell warning");
-        testGrid.setCellValue(2, INT_FIELD_NAME, "bad");
-        checker().verifyTrue("Cell warning should be present after setting another invalid value", testGrid.hasCellWarning(2, INT_FIELD_NAME));
+        testGrid.setCellValue(2, INT_FIELD, "bad");
+        checker().verifyTrue("Cell warning should be present after setting another invalid value", testGrid.hasCellError(2, INT_FIELD));
         checker().screenShotIfNewError("after required value correction error");
 
         log("Correct bad data type values should remove paste data warnings");
-        testGrid.setCellValue(2, STR_FIELD_NAME, "good");
-        testGrid.setCellValue(2, REQ_STR_FIELD_NAME + " *", "good");
-        testGrid.setCellValue(2, INT_FIELD_NAME, "1");
-        testGrid.setCellValue(2, REQ_INT_FIELD_NAME + " *", "134");
-        testGrid.setCellValue(2, BOOL_FIELD_NAME, "on");
-        testGrid.setCellValue(2, FLOAT_FIELD_NAME, "1.23");
-        testGrid.setCellValue(2, TEXTCHOICE_FIELD_NAME, List.of("red"));
-        testGrid.setCellValue(2, REQ_TEXTCHOICE_FIELD_NAME + " *", List.of("red"));
-        testGrid.setCellValue(2, LOOKUP_FIELD_NAME, List.of("kiwi"));
-        testGrid.setCellValue(2, REQ_LOOKUP_FIELD_NAME + " *", List.of("kiwi"));
-        testGrid.setCellValue(2, DATE_FIELD_NAME, LocalDate.of(2024, 7, 7));
-        testGrid.setCellValue(2, TIME_FIELD_NAME, LocalTime.of(2, 30));
-        testGrid.setCellValue(2, REQ_DATETIME_FIELD_NAME + " *", LocalDateTime.of(2024, 7, 7, 10, 30));
-        testGrid.setCellValue(2, REQ_TIME_FIELD_NAME + " *", LocalTime.of(2, 30));
+        testGrid.setCellValue(2, STR_FIELD, "good");
+        testGrid.setCellValue(2, REQ_STR_FIELD, "good");
+        testGrid.setCellValue(2, INT_FIELD, "1");
+        testGrid.setCellValue(2, REQ_INT_FIELD, "134");
+        testGrid.setCellValue(2, BOOL_FIELD, "on");
+        testGrid.setCellValue(2, FLOAT_FIELD, "1.23");
+        testGrid.setCellValue(2, TEXTCHOICE_FIELD, List.of("red"));
+        testGrid.setCellValue(2, REQ_TEXTCHOICE_FIELD, List.of("red"));
+        testGrid.setCellValue(2, LOOKUP_FIELD, List.of("kiwi"));
+        testGrid.setCellValue(2, REQ_LOOKUP_FIELD, List.of("kiwi"));
+        testGrid.setCellValue(2, DATE_FIELD, LocalDate.of(2024, 7, 7));
+        testGrid.setCellValue(2, TIME_FIELD, LocalTime.of(2, 30));
+        testGrid.setCellValue(2, REQ_DATETIME_FIELD, LocalDateTime.of(2024, 7, 7, 10, 30));
+        testGrid.setCellValue(2, REQ_TIME_FIELD, LocalTime.of(2, 30));
 
-        for (int col = 0; col < ALL_FIELD_NAMES.size(); col++)
+        for (FieldInfo field : ALL_FIELDS)
         {
-            String colName = ALL_FIELD_NAMES.get(col);
-            if (colName.endsWith(" Req"))
-                colName += " *";
-
-            checker().verifyFalse("Cell warning should be absent after correct values are provided: " + colName, testGrid.hasCellWarning(2, colName));
+            checker().verifyFalse("Cell warning should be absent after correct values are provided: " + field.getLabel(), testGrid.hasCellError(2, field));
         }
         checker().screenShotIfNewError("after data correction error");
 
         log("Issue 46767: start date before 1000-01-01");
-        for (int col = 0; col < ALL_FIELD_NAMES.size(); col++)
+        for (FieldInfo field : ALL_FIELDS)
         {
-            String colName = ALL_FIELD_NAMES.get(col);
-            if (colName.endsWith(" Req"))
-                colName += " *";
-
             // start date before year 1000 shouldn't trigger warning
-            checker().verifyFalse("Cell warning should not be present for: " + colName, testGrid.hasCellWarning(0, colName));
+            checker().verifyFalse("Cell warning should not be present for: " + field.getLabel(), testGrid.hasCellError(0, field));
         }
 
         log("Verify UI is interactable with values before 1000-01-01");
-        testGrid.setCellValue(3, DATE_FIELD_NAME, LocalDate.of(2024, 7, 7));
-        testGrid.setCellValue(3, TIME_FIELD_NAME, LocalTime.of(2, 30));
-        testGrid.setCellValue(3, REQ_DATETIME_FIELD_NAME + " *", LocalDate.of(2024, 7, 7));
-        testGrid.setCellValue(3, REQ_TIME_FIELD_NAME + " *", LocalTime.of(2, 30));
+        testGrid.setCellValue(3, DATE_FIELD, LocalDate.of(2024, 7, 7));
+        testGrid.setCellValue(3, TIME_FIELD, LocalTime.of(2, 30));
+        testGrid.setCellValue(3, REQ_DATETIME_FIELD, LocalDate.of(2024, 7, 7));
+        testGrid.setCellValue(3, REQ_TIME_FIELD, LocalTime.of(2, 30));
 
         checker().screenShotIfNewError("Issue 46767");
 
@@ -1533,16 +1533,14 @@ public class EditableGridTest extends BaseWebDriverTest
 
     private void verifyCellWarning(EditableGrid testGrid, List<String> expectedWarnings, int rowId)
     {
-        for (int col = 0; col < ALL_FIELD_NAMES.size(); col++)
+        for (int col = 0; col < ALL_FIELDS.size(); col++)
         {
             String expectedWarning = expectedWarnings.get(col);
-            String colName = ALL_FIELD_NAMES.get(col);
-            if (colName.endsWith(" Req"))
-                colName += " *";
+            FieldInfo field = ALL_FIELDS.get(col);
 
-            checker().verifyEquals("Cell warning status not as expected at row " + rowId + " for col " + colName, !StringUtils.isEmpty(expectedWarning), testGrid.hasCellWarning(rowId, colName));
+            checker().verifyEquals("Cell warning status not as expected at row " + rowId + " for col " + field.getLabel(), !StringUtils.isEmpty(expectedWarning), testGrid.hasCellError(rowId, field));
             if (!StringUtils.isEmpty(expectedWarning))
-                checker().verifyEquals("Cell warning msg not as expected at row " + rowId + " for col " + colName, expectedWarning, testGrid.getCellPopoverText(rowId, colName));
+                checker().verifyEqualsIgnoreWhiteSpaces("Cell warning msg not as expected at row " + rowId + " for col " + field.getLabel(), expectedWarning, testGrid.getCellPopoverText(rowId, field));
         }
     }
 
@@ -1557,20 +1555,19 @@ public class EditableGridTest extends BaseWebDriverTest
         testGrid.addRows(3);
 
         log("Start with pasting invalid values, so we can fill down invalid values for dropdowns and data/time inputs");
-        testGrid.selectCell(0, STR_FIELD_NAME);
-        actionPaste(null, rowsToString(clipRows));
+        testGrid.pasteFromCell(0, STR_FIELD, rowsToString(clipRows), false);
 
-        // Scroll one column to the right into view, this will help ensure the REQ_LOOKUP_FIELD_NAME is within the viewport.
-        var index = testGrid.getColumnNames().indexOf(REQ_LOOKUP_FIELD_NAME + " *") + 1;
-        scrollIntoView(testGrid.getCell(0, testGrid.getColumnNames().get(index)));
+        // Scroll one column to the right into view, this will help ensure the REQ_LOOKUP_FIELD is within the viewport.
+        var index = testGrid.getColumnLabels().indexOf(REQ_LOOKUP_FIELD.getLabel() + " *") + 1;
+        scrollIntoView(testGrid.getCell(0, testGrid.getColumnLabels().get(index)));
 
-        WebElement fillFrom = testGrid.getCell(0, REQ_LOOKUP_FIELD_NAME + " *");
-        WebElement fillTo = testGrid.getCell(2, REQ_LOOKUP_FIELD_NAME + " *");
+        WebElement fillFrom = testGrid.getCell(0, REQ_LOOKUP_FIELD);
+        WebElement fillTo = testGrid.getCell(2, REQ_LOOKUP_FIELD);
         testGrid.dragFill(fillFrom, fillTo);
 
-        List<String> expectedWarnings = Arrays.asList("22/10 characters", REQ_STR_FIELD_NAME + " is required.", "Invalid integer", "Invalid integer",
-                "Invalid date, use format yyyy-MM-dd", REQ_DATETIME_FIELD_NAME + " is required.", "Invalid time", REQ_TIME_FIELD_NAME + " is required.",
-                "Invalid boolean", "Invalid decimal", "'wrong text choice' is not a valid choice", "'bad choice' is not a valid choice", "Could not find \"bad lookup\"", REQ_LOOKUP_FIELD_NAME + " is required.");
+        List<String> expectedWarnings = Arrays.asList("22/10 characters", REQ_STR_FIELD.getLabel() + " is required.", "Invalid integer", "Invalid integer",
+                "Invalid date, use format yyyy-MM-dd", REQ_DATETIME_FIELD.getLabel() + " is required.", "Invalid time", REQ_TIME_FIELD.getLabel() + " is required.",
+                "Invalid boolean", "Invalid decimal", "'wrong text choice' is not a valid choice", "'bad choice' is not a valid choice", "Could not find \"bad lookup\"", REQ_LOOKUP_FIELD.getLabel() + " is required.");
 
         log("Verify filled down cells have warnings");
         for (int i = 0; i < 3; i++)

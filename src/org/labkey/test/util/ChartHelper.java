@@ -15,7 +15,6 @@
  */
 package org.labkey.test.util;
 
-import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 
 import java.util.Map;

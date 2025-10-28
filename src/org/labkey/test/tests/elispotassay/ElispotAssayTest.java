@@ -17,6 +17,7 @@
 package org.labkey.test.tests.elispotassay;
 
 import org.apache.commons.lang3.math.NumberUtils;
+import org.assertj.core.api.Assertions;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -30,6 +31,7 @@ import org.labkey.test.categories.Daily;
 import org.labkey.test.components.CrosstabDataRegion;
 import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.PlateSummary;
+import org.labkey.test.components.assay.AssayConstants;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.pages.assay.plate.PlateDesignerPage;
 import org.labkey.test.tests.AbstractAssayTest;
@@ -82,6 +84,7 @@ public class ElispotAssayTest extends AbstractAssayTest
     private static final String FLUOROSPOT_DETECTION_METHOD = "fluorescent";
 
     public static final String FLUOROSPOT_FOLDER = "Fluorospot";
+    public static final Locator.XPathLocator PLATE_READER_LOCATOR = Locator.name("PlateReader");
 
     @Override
     public List<String> getAssociatedModules()
@@ -104,7 +107,7 @@ public class ElispotAssayTest extends AbstractAssayTest
     @BeforeClass
     public static void initProject() throws Exception
     {
-        ElispotAssayTest init = (ElispotAssayTest)getCurrentTest();
+        ElispotAssayTest init = getCurrentTest();
         init.setupFolder();
     }
 
@@ -136,15 +139,15 @@ public class ElispotAssayTest extends AbstractAssayTest
         clickButton("Import Data");
         clickButton("Next");
 
-        selectOptionByText(Locator.name("plateReader"), "Cellular Technology Ltd. (CTL)");
+        selectOptionByText(PLATE_READER_LOCATOR, "Cellular Technology Ltd. (CTL)");
         uploadFile(TEST_ASSAY_ELISPOT_FILE1, "A", "Save and Import Another Run", false);
         assertTextPresent("Upload successful.");
 
-        selectOptionByText(Locator.name("plateReader"), "AID");
+        selectOptionByText(PLATE_READER_LOCATOR, "AID");
         uploadFile(TEST_ASSAY_ELISPOT_FILE2, "B", "Save and Import Another Run", false);
         assertTextPresent("Upload successful.");
 
-        selectOptionByText(Locator.name("plateReader"), "Zeiss");
+        selectOptionByText(PLATE_READER_LOCATOR, "Zeiss");
         uploadFile(TEST_ASSAY_ELISPOT_FILE3, "C", "Save and Finish", false);
 
         assertElispotData();
@@ -176,11 +179,11 @@ public class ElispotAssayTest extends AbstractAssayTest
         log("Uploading Fluorospot Runs");
         clickButton("Import Data");
         clickButton("Next");
-        selectOptionByText(Locator.name("plateReader"), "AID");
+        selectOptionByText(PLATE_READER_LOCATOR, "AID");
         uploadFluorospotFile(TEST_ASSAY_FLUOROSPOT_FILE1, "F1", "Save and Import Another Run");
         assertTextPresent("Upload successful.");
 
-        selectOptionByText(Locator.name("plateReader"), "AID");
+        selectOptionByText(PLATE_READER_LOCATOR, "AID");
         uploadFluorospotFile(TEST_ASSAY_FLUOROSPOT_FILE2, "F2", "Save and Finish");
 
         clickAndWait(Locator.linkContainingText("AID_fluoro2"));
@@ -210,8 +213,8 @@ public class ElispotAssayTest extends AbstractAssayTest
         clickAndWait(Locator.linkWithText("view runs"));
         waitAndClick(Locator.linkWithText("view results"));
         DataRegionTable results = new DataRegionTable("Data", this);
-        results.ensureColumnsPresent("Wellgroup Name", "Antigen Wellgroup Name", "Antigen Name", "Cells per Well", "Wellgroup Location", "Spot Count", "Normalized Spot Count", "Spot Size", "Analyte", "Cytokine", "Activity", "Intensity", "Specimen ID", "Participant ID", "Visit ID", "Date", "Sample Description", "ProtocolName", "Plate Reader");
-        assertEquals(Arrays.asList("Specimen 4", "Antigen 6", "atg_6F2", "150", "(7, 8)", "0.0", "0.0", " ", "FITC+Cy5", " ", " ", " ", " ", "ptid 4 F2", "4.0", " ", "blood", " ", "AID", " "), results.getRowDataAsText(0));
+        Assertions.assertThat(results.getColumnLabels()).as("Wrong columns").containsExactly("Wellgroup Name", "Antigen Wellgroup Name", "Antigen Name", "Cells per Well", "Wellgroup Location", "Spot Count", "Normalized Spot Count", "Spot Size", "Analyte", "Cytokine", "Activity", "Intensity", "Specimen ID", "Participant ID", "Visit ID", "Date", "Sample Description", "ProtocolName", "Plate Reader", "Target Study");
+        Assertions.assertThat(results.getRowDataAsText(0)).as("row data").containsExactly("Specimen 4", "Antigen 6", "atg_6F2", "150", "(7, 8)", "0.0", "0.0", " ", "FITC+Cy5", " ", " ", " ", " ", "ptid 4 F2", "4.0", " ", "blood", " ", "AID", " ");
     }
 
     private void verifyDataRegion(DataRegionTable table, SortDirection sortDir, List<String> expectedSpotCount, List<String> expectedActivity, List<String> expectedIntensity, List<String> expectedCytokine)
@@ -226,9 +229,9 @@ public class ElispotAssayTest extends AbstractAssayTest
         cvHelper.removeSort("Analyte");
         cvHelper.removeSort("WellgroupLocation");
 
-        cvHelper.addSort("AntigenLsid/AntigenName", "AntigenName", sortDir);
-        cvHelper.addSort("Analyte", "Analyte", sortDir);
-        cvHelper.addSort("WellgroupLocation", "WellgroupLocation", sortDir);
+        cvHelper.addSort("AntigenLsid/AntigenName", sortDir);
+        cvHelper.addSort("Analyte", sortDir);
+        cvHelper.addSort("WellgroupLocation", sortDir);
         cvHelper.applyCustomView();
 
         pushLocation();
@@ -293,18 +296,18 @@ public class ElispotAssayTest extends AbstractAssayTest
     protected void uploadFile(File file, String uniqueifier, String finalButton, boolean testPrepopulation, boolean subtractBackground, boolean fluorospot)
     {
         if (subtractBackground)
-            checkCheckbox(Locator.checkboxByName("subtractBackground"));
+            checkCheckbox(Locator.checkboxByName("SubtractBackground"));
         for (int i = 0; i < 4; i++)
         {
-            Locator specimenLocator = Locator.name("specimen" + (i + 1) + "_ParticipantID");
+            Locator specimenLocator = Locator.name("Specimen " + (i + 1) + "_ParticipantID");
 
             // test for prepopulation of specimen form element values
             if (testPrepopulation)
-                assertFormElementEquals(specimenLocator, "Specimen " + (i+1));
+                assertEquals("Specimen " + (i+1), getFormElement(specimenLocator));
             setFormElement(specimenLocator, "ptid " + (i + 1) + " " + uniqueifier);
 
-            setFormElement(Locator.name("specimen" + (i + 1) + "_VisitID"), "" + (i + 1));
-            setFormElement(Locator.name("specimen" + (i + 1) + "_SampleDescription"), "blood");
+            setFormElement(Locator.name("Specimen " + (i + 1) + "_VisitID"), "" + (i + 1));
+            setFormElement(Locator.name("Specimen " + (i + 1) + "_SampleDescription"), "blood");
         }
 
         setFormElement(Locator.name("__primaryFile__"), file);
@@ -312,24 +315,24 @@ public class ElispotAssayTest extends AbstractAssayTest
 
         for (int i = 0; i < 6; i++)
         {
-            setFormElement(Locator.name("antigen" + (i + 1) + "_AntigenID"), "" + (i + 1));
+            setFormElement(Locator.name("Antigen " + (i + 1) + "_AntigenID"), "" + (i + 1));
 
-            Locator antigenLocator = Locator.name("antigen" + (i + 1) + "_AntigenName");
+            Locator antigenLocator = Locator.name("Antigen " + (i + 1) + "_AntigenName");
 
             // test for prepopulation of antigen element values
             if (testPrepopulation)
-                assertFormElementEquals(antigenLocator, "Antigen " + (i+1));
+                assertEquals("Antigen " + (i+1), getFormElement(antigenLocator));
 
             setFormElement(antigenLocator, "atg_" + (i + 1) + uniqueifier);
-            setFormElement(Locator.name("antigen" + (i + 1) + "_CellWell"), "150");
+            setFormElement(Locator.name("Antigen " + (i + 1) + "_CellWell"), "150");
         }
 
         if (fluorospot)
         {
             clickButton("Next");
-            setFormElement(Locator.input("cy3_CytokineName"), "Cytokine 1");
+            setFormElement(Locator.input("Cy3_CytokineName"), "Cytokine 1");
             setFormElement(Locator.input("FITC_CytokineName"), "Cytokine 2");
-            setFormElement(Locator.input("FITCCy3_CytokineName"), "Cytokine 3");
+            setFormElement(Locator.input("FITC+Cy3_CytokineName"), "Cytokine 3");
         }
         clickButton(finalButton);
     }
@@ -359,14 +362,14 @@ public class ElispotAssayTest extends AbstractAssayTest
         for (int i = 0; i < cellWell.size(); i++)
         {
             int cpw = NumberUtils.toInt(cellWell.get(i), 0);
-            Float sc = NumberUtils.toFloat(spotCount.get(i));
-            Float nsc = NumberUtils.toFloat(normalizedSpotCount.get(i));
-            Float computed = sc;
+            float sc = NumberUtils.toFloat(spotCount.get(i));
+            float nsc = NumberUtils.toFloat(normalizedSpotCount.get(i));
+            float computed = sc;
 
             if (cpw != 0)
                 computed = sc / cpw * 1000000;
 
-            assertEquals(computed.intValue(), nsc.intValue());
+            assertEquals((int) computed, (int) nsc);
         }
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.revertUnsavedView();
@@ -506,8 +509,8 @@ public class ElispotAssayTest extends AbstractAssayTest
         clickButton("Import Data");
         clickButton("Next");
 
-        setFormElement(Locator.name("name"), "transformed assayId");
-        selectOptionByText(Locator.name("plateReader"), "AID");
+        setFormElement(AssayConstants.ASSAY_NAME_FIELD_LOCATOR, "transformed assayId");
+        selectOptionByText(PLATE_READER_LOCATOR, "AID");
         uploadFile(TEST_ASSAY_ELISPOT_FILE4, "D", "Save and Finish", false);
 
         // verify there is a spot count value of 747.747 and a custom column added by the transform
@@ -592,7 +595,7 @@ public class ElispotAssayTest extends AbstractAssayTest
         clickButton("Import Data");
         clickButton("Next");
 
-        selectOptionByText(Locator.name("plateReader"), "AID");
+        selectOptionByText(PLATE_READER_LOCATOR, "AID");
         uploadFile(TEST_ASSAY_ELISPOT_FILE5, "E", "Save and Finish", false, true);
         DataRegionTable runTable = new DataRegionTable("Runs", this);
         assertTextPresent("AID_0161456 W8");
@@ -632,7 +635,7 @@ public class ElispotAssayTest extends AbstractAssayTest
         clickButton("Import Data");
         clickButton("Next");
 
-        selectOptionByText(Locator.name("plateReader"), "AID");
+        selectOptionByText(PLATE_READER_LOCATOR, "AID");
         uploadFile(TEST_ASSAY_ELISPOT_FILE6, "F", "Save and Finish", false);
 
         testMeanAndMedian();
@@ -656,14 +659,14 @@ public class ElispotAssayTest extends AbstractAssayTest
             if (!"TNTC".equals(spotCount.get(i)))
             {
                 int cpw = NumberUtils.toInt(cellWell.get(i), 0);
-                Float sc = NumberUtils.toFloat(spotCount.get(i));
-                Float nsc = NumberUtils.toFloat(normalizedSpotCount.get(i));
-                Float computed = sc;
+                float sc = NumberUtils.toFloat(spotCount.get(i));
+                float nsc = NumberUtils.toFloat(normalizedSpotCount.get(i));
+                float computed = sc;
 
                 if (cpw != 0)
                     computed = sc / cpw * 1000000;
 
-                assertEquals(computed.intValue(), nsc.intValue());
+                assertEquals((int) computed, (int) nsc);
             }
             else
             {

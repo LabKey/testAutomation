@@ -30,12 +30,12 @@ import java.util.Map;
  */
 public class OlapHelper
 {
-    private String _baseUrl = WebTestHelper.getBaseURL();
-    private String _username = PasswordUtil.getUsername();
-    private String _password = PasswordUtil.getPassword();
+    private final String _baseUrl = WebTestHelper.getBaseURL();
+    private final String _username = PasswordUtil.getUsername();
+    private final String _password = PasswordUtil.getPassword();
     private String _configId;
     private String _schemaName;
-    private String _folderPath;
+    private final String _folderPath;
 
     public OlapHelper(String configId, String schemaName, String folderPath)
     {
@@ -46,9 +46,6 @@ public class OlapHelper
 
     /**
      * Execute an MDX query and return the full response
-     * @param query
-     * @return
-     * @throws Exception
      */
     public MdxResponse executeMdx(String query) throws Exception
     {

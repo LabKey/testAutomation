@@ -42,10 +42,20 @@ abstract class BaseUpdatePage<PAGE> extends LabKeyPage<BaseUpdatePage.ElementCac
         return getThis();
     }
 
+    public String getTitle()
+    {
+        return elementCache().titleInput.get();
+    }
+
     public PAGE setBody(String body)
     {
         elementCache().bodyInput.set(body);
         return getThis();
+    }
+
+    public String getBody()
+    {
+        return elementCache().bodyInput.get();
     }
 
     public PAGE setRenderAs(WikiRendererType renderAs)

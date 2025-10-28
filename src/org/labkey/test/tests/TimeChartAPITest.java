@@ -25,6 +25,7 @@ import org.labkey.test.categories.Charting;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Reports;
 import org.labkey.test.tests.visualization.TimeChartTest;
+import org.labkey.test.util.CachingSupplier;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
@@ -71,7 +72,8 @@ public class TimeChartAPITest extends TimeChartTest
         33
     };
 
-    private static final List<Pair<String, List<Object>>> GETDATA_API_TEST_MEASURES = new ArrayList<Pair<String, List<Object>>>(){{
+    private static final List<Pair<String, List<Object>>> GETDATA_API_TEST_MEASURES = new ArrayList<>()
+    {{
         add(Pair.of("study_Lab Results_CD4", Arrays.asList(543.0, 520.0, 420.0, 185.0, 261.0, 308.0, 177.0, 144.0, 167.0, 154.0)));
         add(Pair.of("study_Lab Results_Hemoglobin", Arrays.asList(14.5, 16.0, 12.2, 15.5, 13.9, 13.7, 12.9, 11.1, 13.2, 16.1)));
         add(Pair.of("study_Physical Exam_Weight_kg", Arrays.asList(86.0, 84.0, 83.0, 80.0, 79.0, 79.0, 79.0, 78.0, 77.0, 75.0)));
@@ -80,7 +82,7 @@ public class TimeChartAPITest extends TimeChartTest
         add(Pair.of("study_LuminexAssay_ObsConc", Arrays.asList(35.87, 40.07, 52.74, 13.68, 28.35, 42.38, 2.82, 5.19, 7.99, 5.12, 6.69, 32.33, 3.09, 5.76, 12.49)));
         add(Pair.of("IL-10 (23)::study_LuminexAssay_ObsConc_MAX", Arrays.asList(40.07, 42.38, 7.99, 32.33, 12.49)));
         add(Pair.of("IL-10 (23)::study_LuminexAssay_ObsConc_MAX", Arrays.asList(40.07, 42.38, 7.99, 32.33, 12.49)));
-        add(Pair.of("M1", Arrays.asList(520.0, 543.0)));
+        add(Pair.of("study_GenericAssay_M1", Arrays.asList(520.0, 543.0)));
         add(Pair.of("IL-10 (23)::study_LuminexAssay_ObsConc_MAX", Arrays.asList(40.07, 42.38, 7.99, 32.33, 12.49)));
     }};
 
@@ -115,7 +117,8 @@ public class TimeChartAPITest extends TimeChartTest
                 {"study_Lab Results_date", "study_Lab Results_CD4", "study_Lab Results_ParticipantVisit_VisitDate", "IL-10 (23)::study_LuminexAssay_ObsConc_MAX", "IL-2 (3)::study_LuminexAssay_ObsConc_MAX", "TNF-alpha (40)::study_LuminexAssay_ObsConc_MAX", "IL-10 (23)::study_LuminexAssay_FI_MAX", "IL-2 (3)::study_LuminexAssay_FI_MAX", "TNF-alpha (40)::study_LuminexAssay_FI_MAX", "Days"}
         };
 
-        final List<Pair<String, List<Object>>> GETDATA_API_TEST_DAYS = new ArrayList<Pair<String, List<Object>>>() {{
+        final List<Pair<String, List<Object>>> GETDATA_API_TEST_DAYS = new ArrayList<>()
+        {{
             add(Pair.of("Days", Arrays.asList(44.0, 79.0, 108.0, 190.0, 246.0, 276.0, 303.0, 335.0, 364.0, 394.0)));
             add(Pair.of("Days", Arrays.asList(44.0, 79.0, 108.0, 190.0, 246.0, 276.0, 303.0, 335.0, 364.0, 394.0)));
             add(Pair.of("Days", Arrays.asList(44.0, 79.0, 108.0, 190.0, 246.0, 276.0, 303.0, 335.0, 364.0, 394.0)));
@@ -147,17 +150,18 @@ public class TimeChartAPITest extends TimeChartTest
                 {"study_Lab Results_ParticipantVisit_sequencenum", "study_Lab Results_CD4", "study_Lab Results_ParticipantVisit_Visit_Label", "study_Lab Results_ParticipantVisit_Visit_DisplayOrder", "study_Lab Results_ParticipantVisit_VisitDate", "IL-10 (23)::study_LuminexAssay_ObsConc_MAX", "IL-2 (3)::study_LuminexAssay_ObsConc_MAX", "TNF-alpha (40)::study_LuminexAssay_ObsConc_MAX", "IL-10 (23)::study_LuminexAssay_FI_MAX", "IL-2 (3)::study_LuminexAssay_FI_MAX", "TNF-alpha (40)::study_LuminexAssay_FI_MAX"}
         };
 
-        final List<Pair<String, List<Object>>> GETDATA_API_TEST_VISITLABEL = new ArrayList<Pair<String, List<Object>>>() {{
-            add(Pair.of("VisitLabel", Arrays.asList("Month 2", "Month 3", "Month 4", "Month 7", "Month 9", "Month 10", "Month 10", "Month 11", "Month 12", "Month 13")));
-            add(Pair.of("VisitLabel", Arrays.asList("Month 2", "Month 3", "Month 4", "Month 7", "Month 9", "Month 10", "Month 10", "Month 11", "Month 12", "Month 13")));
+        final List<Pair<String, List<Object>>> GETDATA_API_TEST_VISITLABEL = new ArrayList<>()
+        {{
             add(Pair.of("study_Lab Results_ParticipantVisit_Visit_Label", Arrays.asList("Month 2", "Month 3", "Month 4", "Month 7", "Month 9", "Month 10", "Month 10", "Month 11", "Month 12", "Month 13")));
             add(Pair.of("study_Lab Results_ParticipantVisit_Visit_Label", Arrays.asList("Month 2", "Month 3", "Month 4", "Month 7", "Month 9", "Month 10", "Month 10", "Month 11", "Month 12", "Month 13")));
-            add(Pair.of("VisitLabel", Arrays.asList("Month 2", "Month 2", "Month 2", "Month 3", "Month 3", "Month 3", "Month 4", "Month 4", "Month 4", "Month 7", "Month 7", "Month 7", "Month 9", "Month 9", "Month 9")));
+            add(Pair.of("study_Lab Results_ParticipantVisit_Visit_Label", Arrays.asList("Month 2", "Month 3", "Month 4", "Month 7", "Month 9", "Month 10", "Month 10", "Month 11", "Month 12", "Month 13")));
+            add(Pair.of("study_Lab Results_ParticipantVisit_Visit_Label", Arrays.asList("Month 2", "Month 3", "Month 4", "Month 7", "Month 9", "Month 10", "Month 10", "Month 11", "Month 12", "Month 13")));
+            add(Pair.of("study_Lab Results_ParticipantVisit_Visit_Label", Arrays.asList("Month 2", "Month 2", "Month 2", "Month 3", "Month 3", "Month 3", "Month 4", "Month 4", "Month 4", "Month 7", "Month 7", "Month 7", "Month 9", "Month 9", "Month 9")));
             add(Pair.of("study_Lab Results_ParticipantVisit_Visit_Label", Arrays.asList("Month 2", "Month 2", "Month 2", "Month 3", "Month 3", "Month 3", "Month 4", "Month 4", "Month 4", "Month 7", "Month 7", "Month 7", "Month 9", "Month 9", "Month 9", "Month 10", "Month 10", "Month 11", "Month 12", "Month 13")));
-            add(Pair.of("VisitLabel", Arrays.asList("Month 2", "Month 3", "Month 4", "Month 7", "Month 9")));
+            add(Pair.of("study_Lab Results_ParticipantVisit_Visit_Label", Arrays.asList("Month 2", "Month 3", "Month 4", "Month 7", "Month 9")));
             add(Pair.of("study_Lab Results_ParticipantVisit_Visit_Label", Arrays.asList("Month 2", "Month 3", "Month 4", "Month 7", "Month 9", "Month 10", "Month 10", "Month 11", "Month 12", "Month 13")));
-            add(Pair.of("VisitLabel", Arrays.asList("Month 2", "Month 2", "Month 2", "Month 3", "Month 4", "Month 7", "Month 9", "Month 10", "Month 10", "Month 11", "Month 12", "Month 13")));
-            add(Pair.of("VisitLabel", Arrays.asList("Month 2", "Month 3", "Month 4", "Month 7", "Month 9", "Month 10", "Month 10", "Month 11", "Month 12", "Month 13")));
+            add(Pair.of("study_Lab Results_ParticipantVisit_Visit_Label", Arrays.asList("Month 2", "Month 2", "Month 2", "Month 3", "Month 4", "Month 7", "Month 9", "Month 10", "Month 10", "Month 11", "Month 12", "Month 13")));
+            add(Pair.of("study_Lab Results_ParticipantVisit_Visit_Label", Arrays.asList("Month 2", "Month 3", "Month 4", "Month 7", "Month 9", "Month 10", "Month 10", "Month 11", "Month 12", "Month 13")));
         }};
 
         testVisApi(TestFileUtils.getSampleData("api/getDataVisitTest.html"), GETDATA_API_TEST_TITLES, GETDATA_API_TEST_NUMROWS, GETDATA_API_VISITTEST_COLNAMES, null, GETDATA_API_TEST_VISITLABEL,
@@ -308,11 +312,11 @@ public class TimeChartAPITest extends TimeChartTest
                 waitForElement(Locator.paginationText(testRowCounts[testIndex]), WAIT_FOR_JAVASCRIPT);
             }
 
-            DataRegionTable table = null;
+            DataRegionTable table = new DataRegionTable.DataRegionFinder(getDriver())
+                .withName("apiTestDataRegion").findWhenNeeded();
 
             if (testColumnNames != null)
             {
-                if (null == table) table = new DataRegionTable("apiTestDataRegion", this);
                 List<String> expectedColumnNames = Arrays.asList(testColumnNames[testIndex]);
                 List<String> columnNames = new ArrayList<>(table.getColumnNames());
 
@@ -325,33 +329,28 @@ public class TimeChartAPITest extends TimeChartTest
                 }
             }
 
-            if (colsForAllTests.length > 0)
+            for (List<Pair<String, List<Object>>> expectedColForAllTests : colsForAllTests)
             {
-                if (null == table) table = new DataRegionTable("apiTestDataRegion", this);
+                Pair<String, List<Object>> expectedColumn = expectedColForAllTests.get(testIndex);
+                String columnName = expectedColumn.getKey();
+                int columnIndex = table.getColumnIndexStrict(columnName);
+                List<Object> expectedValues = expectedColumn.getValue();
+                List<Object> actualValues = new ArrayList<>();
+                boolean isNumberCol = expectedValues.get(0) instanceof Number;
 
-                for (List<Pair<String, List<Object>>> expectedColForAllTests : colsForAllTests)
+                for (int i = 0; i < table.getDataRowCount() && actualValues.size() < expectedValues.size() && columnIndex >= 0; i++)
                 {
-                    Pair<String, List<Object>> expectedColumn = expectedColForAllTests.get(testIndex);
-                    String columnName = expectedColumn.getKey();
-                    int columnIndex = table.getColumnIndex(columnName);
-                    List<Object> expectedValues = expectedColumn.getValue();
-                    List<Object> actualValues = new ArrayList<>();
-                    boolean isNumberCol = expectedValues.get(0) instanceof Number;
-
-                    for (int i = 0; i < table.getDataRowCount() && actualValues.size() < expectedValues.size() && columnIndex >= 0; i++)
-                    {
-                        String value = table.getDataAsText(i, columnIndex).trim();
-                        if (!value.isEmpty())
-                            actualValues.add(isNumberCol ? Double.parseDouble(value) : value);
-                    }
-
-                    if (!expectedValues.equals(actualValues))
-                    {
-                        TestLogger.log("expected values for " + columnName + " -- " + String.join(", ", expectedValues.toString()));
-                        TestLogger.log("actual values for " + columnName + " -- " + String.join(", ", actualValues.toString()));
-                    }
-                    assertEquals("Wrong values for column " + columnName, expectedValues, actualValues);
+                    String value = table.getDataAsText(i, columnIndex).trim();
+                    if (!value.isEmpty())
+                        actualValues.add(isNumberCol ? Double.parseDouble(value) : value);
                 }
+
+                if (!expectedValues.equals(actualValues))
+                {
+                    TestLogger.log("expected values for " + columnName + " -- " + String.join(", ", expectedValues.toString()));
+                    TestLogger.log("actual values for " + columnName + " -- " + String.join(", ", actualValues.toString()));
+                }
+                assertEquals("Wrong values for column " + columnName, expectedValues, actualValues);
             }
 
             if (testOutputTexts != null)

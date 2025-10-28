@@ -74,7 +74,7 @@ public class DomainDesignerPage extends BaseDomainDesigner<DomainDesignerPage.El
      */
     public List<String> getPanelTitles()
     {
-        waitFor(() -> getPanels().size() > 0, "No form panels found on page.", WAIT_FOR_JAVASCRIPT);
+        waitFor(() -> !getPanels().isEmpty(), "No form panels found on page.", WAIT_FOR_JAVASCRIPT);
         List<String> titles = new ArrayList<>();
         for(DomainPanel<?,?> formPanel : getPanels())
         {

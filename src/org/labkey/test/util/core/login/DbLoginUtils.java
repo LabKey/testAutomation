@@ -36,8 +36,9 @@ public class DbLoginUtils
         {
             CommandResponse response = postCommand.execute(connection, "/");
             dbLoginProperties = new DbLoginProperties(
-                    PasswordStrength.valueOf(response.getProperty("currentSettings.strength")),
-                    PasswordExpiration.valueOf(response.getProperty("currentSettings.expiration")));
+                PasswordStrength.valueOf(response.getProperty("currentSettings.strength")),
+                PasswordExpiration.valueOf(response.getProperty("currentSettings.expiration"))
+            );
         }
         catch (IOException | CommandException e)
         {
@@ -45,6 +46,12 @@ public class DbLoginUtils
         }
 
         return dbLoginProperties;
+    }
+
+    @LogMethod
+    public static void setDbLoginConfig(Connection connection, DbLoginProperties dbLoginProperties)
+    {
+        setDbLoginConfig(connection, dbLoginProperties.strength(), dbLoginProperties.expiration());
     }
 
     @LogMethod
@@ -74,7 +81,7 @@ public class DbLoginUtils
     {
         if (initialLoginProperties != null)
         {
-            setDbLoginConfig(connection, initialLoginProperties.strength, initialLoginProperties.expiration);
+            setDbLoginConfig(connection, initialLoginProperties);
             initialLoginProperties = null;
         }
     }

@@ -237,7 +237,7 @@ public class StartImportPage extends LabKeyPage<StartImportPage.ElementCache>
         WebpartPropertiesAndLayout("Webpart properties and layout"),
         WikisAndTheirAttachments("Wikis and their attachments");
 
-        private String value;
+        private final String value;
 
         AdvancedOptionsCheckBoxes(String value)
         {

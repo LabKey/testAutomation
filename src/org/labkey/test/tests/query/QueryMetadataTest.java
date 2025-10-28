@@ -9,6 +9,7 @@ import org.labkey.test.categories.Daily;
 import org.labkey.test.components.domain.DomainFieldRow;
 import org.labkey.test.pages.core.admin.BaseSettingsPage.DATE_FORMAT;
 import org.labkey.test.pages.query.QueryMetadataEditorPage;
+import org.labkey.test.pages.query.SourceQueryPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.params.list.IntListDefinition;
@@ -35,7 +36,7 @@ public class QueryMetadataTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject() throws Exception
     {
-        QueryMetadataTest init = (QueryMetadataTest) getCurrentTest();
+        QueryMetadataTest init = getCurrentTest();
 
         init.doSetup();
     }
@@ -286,6 +287,39 @@ public class QueryMetadataTest extends BaseWebDriverTest
         assertThat(queryXmlPage.getMetadataXml())
                 .as("metadata overrides should not be cleared on second save")
                 .contains(expectedColumnXml);
+    }
+
+    /**
+     * Validation for issue : 51695
+     */
+    @Test
+    public void testMultiValueJunctionType()
+    {
+        QueryMetadataEditorPage page = QueryMetadataEditorPage.beginAt(this, getProjectName(), "assay.General." + TEST_ASSAY, "Data");
+        page.resetToDefault();
+
+        SourceQueryPage sourcePage = page.clickEditSource();
+        // introduce a MVFK with an unsupported multi-value type, this should fail to save
+        String xml = "<tables xmlns=\"http://labkey.org/data/xml\">\n" +
+                "  <table tableName=\"Data\" tableDbType=\"NOT_IN_DB\">\n" +
+                "    <columns>\n" +
+                "      <column columnName=\"fakeMVFK\" wrappedColumnName=\"LSID\">\n" +
+                "        <fk>\n" +
+                "          <fkDbSchema>lists</fkDbSchema>\n" +
+                "          <fkTable>queryMetadataTestList</fkTable>\n" +
+                "          <fkColumnName>key</fkColumnName>\n" +
+                "          <fkMultiValued>unsupported</fkMultiValued>\n" +
+                "          <fkJunctionLookup>entityId</fkJunctionLookup>\n" +
+                "        </fk>\n" +
+                "      </column>\n" +
+                "    </columns>\n" +
+                "  </table>\n" +
+                "</tables>";
+
+        sourcePage.setMetadataXml(xml);
+        checker().withScreenshot("validation-error")
+                .verifyEquals("expecting a validation error for the unsupported multi value type",
+                        "Failed to Save: Column : \"fakeMVFK\" has an invalid fkMultiValued value : \"unsupported\" is not supported.", sourcePage.clickSaveExpectingError());
     }
 
     @Override

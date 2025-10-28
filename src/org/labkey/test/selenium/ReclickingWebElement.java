@@ -49,7 +49,7 @@ import java.util.stream.Collectors;
 public class ReclickingWebElement extends WebElementDecorator
 {
     // Extract the element info from ElementClickInterceptedException message.
-    private static final Pattern interceptingElPattern = Pattern.compile("Element .* is not clickable .*<(?<tag>[a-zA-Z]+) (?<attributes>.+)> obscures it");
+    private static final Pattern interceptingElPattern = Pattern.compile("Element .* is not clickable .*<(?<tag>[a-zA-Z0-9]+) (?<attributes>.+)> obscures it");
     private static final Pattern elAttributePattern = Pattern.compile("(?<name>[a-zA-Z-]+)=\"(?<value>[^\"]+)\"");
 
     public ReclickingWebElement(@NotNull WebElement decoratedElement)
@@ -153,9 +153,9 @@ public class ReclickingWebElement extends WebElementDecorator
     private Point getAreaCenter()
     {
         List<Integer> coords = Arrays.stream(getWrappedElement().getAttribute("coords").split(",")).map(Integer::parseInt).collect(Collectors.toList());
-        Integer minX = Integer.MAX_VALUE;
+        int minX = Integer.MAX_VALUE;
         Integer maxX = 0;
-        Integer minY = Integer.MAX_VALUE;
+        int minY = Integer.MAX_VALUE;
         Integer maxY = 0;
         for (int i = 0; i + 1 < coords.size(); i = i + 2)
         {
@@ -178,7 +178,7 @@ public class ReclickingWebElement extends WebElementDecorator
      */
     private boolean clickRowInFirefox()
     {
-        TestLogger.warn("Don't click 'tr' elements directly, use a specific child 'td': " + toString());
+        TestLogger.warn("Don't click 'tr' elements directly, use a specific child 'td': " + this);
         List<WebElement> cells = getWrappedElement().findElements(By.xpath("./td"));
         for (WebElement cell : cells)
         {
@@ -211,11 +211,15 @@ public class ReclickingWebElement extends WebElementDecorator
 
         if (!blockResolved)
         {
+            // Move mouse to corner to dismiss tooltips
+            new Actions(getDriver()).moveToLocation(0,0).perform();
+
             Locator.XPathLocator interceptingElLoc = parseInterceptingElementLoc(shortMessage);
             if (interceptingElLoc != null)
             {
                 List<WebElement> interceptingElements = interceptingElLoc.findElements(getDriver());
                 TestLogger.debug("Found %s element(s) matching extracted locator: %s".formatted(interceptingElements.size(), shortMessage));
+
                 if (interceptingElements.size() == 1)
                 {
                     //noinspection ResultOfMethodCallIgnored

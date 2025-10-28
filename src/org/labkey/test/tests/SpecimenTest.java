@@ -825,7 +825,7 @@ public class SpecimenTest extends SpecimenBaseTest
         waitForElement(Locators.bodyTitle().withText("New Specimen Request"));
         int expectedLocationCount = StudyLocationType.untypedSites();
 
-        long additionalLocations = Math.round(Math.pow(2, StudyLocationType.values().length - 1));
+        int additionalLocations = (int) Math.round(Math.pow(2, StudyLocationType.values().length - 1));
 
         for (StudyLocationType type : StudyLocationType.values())
         {
@@ -891,8 +891,8 @@ public class SpecimenTest extends SpecimenBaseTest
         SAL("Site Affiliated Lab", 8),
         ENDPOINT("Endpoint Lab", 8);
 
-        private String _type;
-        private int _count;
+        private final String _type;
+        private final int _count;
 
         StudyLocationType(String type, int count)
         {

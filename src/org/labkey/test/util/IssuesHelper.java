@@ -143,7 +143,7 @@ public class IssuesHelper extends WebDriverWrapper
             DataRegionTable table = new DataRegionTable("IssueListDef", getDriver());
             if (table.getDataRowCount() > 0)
             {
-                table.checkAll();
+                table.checkAllOnPage();
                 table.clickHeaderButton("Delete");
                 // delete confirmation for issues-deleteIssueList action
                 clickButton("Delete");
@@ -188,7 +188,7 @@ public class IssuesHelper extends WebDriverWrapper
     {
         Map<String, String> fields = new TreeMap<>();
         fields.put("title", title);
-        fields.put("assignedTo", assignedTo);
+        fields.put("AssignedTo", assignedTo);
         fields.putAll(extraFields);
         return addIssue(fields, attachments);
     }

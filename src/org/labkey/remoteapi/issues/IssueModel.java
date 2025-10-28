@@ -1,6 +1,7 @@
 package org.labkey.remoteapi.issues;
 
 import org.json.JSONObject;
+import org.json.JSONParserConfiguration;
 import org.labkey.api.collections.CaseInsensitiveHashMap;
 
 import java.io.File;
@@ -27,7 +28,8 @@ public class IssueModel
 
     public JSONObject toJSON()
     {
-        var json = new JSONObject(_properties);
+        // Ensure that null values are sent instead of omitted
+        var json = new JSONObject(_properties, new JSONParserConfiguration().withUseNativeNulls(true));
 
         // handle attachments
         if (!_attachments.isEmpty())
@@ -81,8 +83,6 @@ public class IssueModel
 
     /**
      * when notify is just 1 user, you can provide their email
-     * @param notify
-     * @return
      */
     public IssueModel setNotify(String notify)
     {

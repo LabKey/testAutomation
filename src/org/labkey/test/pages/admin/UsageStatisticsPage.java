@@ -6,7 +6,6 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.pages.LabKeyPage;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
@@ -67,7 +66,6 @@ public class UsageStatisticsPage extends LabKeyPage<UsageStatisticsPage.ElementC
 
     /**
      * gets the value of the content element, which will be json if not at the end of a key-path, otherwise the value
-     * @return
      */
     public String getValue()
     {

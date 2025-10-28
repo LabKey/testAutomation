@@ -1,6 +1,5 @@
 package org.labkey.test.components.ui.entities;
 
-import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
@@ -10,15 +9,24 @@ import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.components.react.FilteringReactSelect;
 import org.labkey.test.components.react.ReactDateTimePicker;
+import org.labkey.test.components.ui.files.FileAttachmentContainer;
+import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.FieldKey;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
+/**
+ * `fieldIdentifier` arguments accept field names or {@link FieldKey}s
+ */
 public class EntityBulkInsertDialog extends ModalDialog
 {
     public EntityBulkInsertDialog(WebDriver driver)
@@ -26,7 +34,7 @@ public class EntityBulkInsertDialog extends ModalDialog
         this(new ModalDialogFinder(driver).withTitle("Bulk Add"));
     }
 
-    private EntityBulkInsertDialog(ModalDialogFinder finder)
+    protected EntityBulkInsertDialog(ModalDialogFinder finder)
     {
         super(finder);
     }
@@ -88,11 +96,11 @@ public class EntityBulkInsertDialog extends ModalDialog
         {
             if(elementCache().derivativesOption.isChecked())
             {
-                option = elementCache().derivativesOption.getComponentElement().getAttribute("value");
+                option = elementCache().derivativesOption.getComponentElement().getDomAttribute("value");
             }
             else
             {
-                option = elementCache().poolOption.getComponentElement().getAttribute("value");
+                option = elementCache().poolOption.getComponentElement().getDomAttribute("value");
             }
         }
 
@@ -101,12 +109,7 @@ public class EntityBulkInsertDialog extends ModalDialog
 
     public EntityBulkInsertDialog setQuantity(int quantity)
     {
-        return setQuantity(Integer.toString(quantity));
-    }
-
-    public EntityBulkInsertDialog setQuantity(String quantity)
-    {
-        getWrapper().setFormElement(elementCache().quantity, quantity);
+        getWrapper().setFormElement(elementCache().quantity, Integer.toString(quantity));
         return this;
     }
 
@@ -121,20 +124,20 @@ public class EntityBulkInsertDialog extends ModalDialog
      *
      * @return A list of the fields for the entity.
      */
-    public List<String> getDisplayedFieldNames()
+    public List<String> getDisplayedFieldLabels()
     {
         // Could be shortened to do something like this, but wanted to clean up the values returned.
-        // return elementCache().fieldNames().stream().map(el -> el.getText().trim()).collect(Collectors.toList());
+        // return elementCache().fieldLabels().stream().map(el -> el.getText().trim()).collect(Collectors.toList());
 
-        List<String> fieldNames = new ArrayList<>();
+        List<String> fieldLabels = new ArrayList<>();
 
-        for(WebElement el : elementCache().fieldNames())
+        for(WebElement el : elementCache().fieldLabels())
         {
             String temp = el.getText();
-            fieldNames.add(temp.replace("*", "").trim());
+            fieldLabels.add(temp.replace("*", "").trim());
         }
 
-        return fieldNames;
+        return fieldLabels;
     }
 
     /**
@@ -158,63 +161,130 @@ public class EntityBulkInsertDialog extends ModalDialog
         return getWrapper().getFormElement(elementCache().description);
     }
 
-    public EntityBulkInsertDialog setTextField(String fieldKey, String value)
+    /**
+     * @param fieldIdentifier Identifier for the field; name ({@link String}) or fieldKey ({@link FieldKey})
+     * @param value value to set
+     * @return this component
+     */
+    public EntityBulkInsertDialog setTextArea(CharSequence fieldIdentifier, String value)
     {
-        elementCache().textInput(fieldKey).set(value);
+        elementCache().textArea(fieldIdentifier).set(value);
         return this;
     }
 
-    public String getTextField(String fieldKey)
+    /**
+     * @param fieldIdentifier Identifier for the field; name ({@link String}) or fieldKey ({@link FieldKey})
+     * @return current value of the specified field
+     */
+    public String getTextArea(CharSequence fieldIdentifier)
     {
-        return elementCache().textInput(fieldKey).get();
+        return elementCache().textArea(fieldIdentifier).get();
     }
 
-    public EntityBulkInsertDialog setNumericField(String fieldKey, String value)
+    /**
+     * @param fieldIdentifier Identifier for the field; name ({@link String}) or fieldKey ({@link FieldKey})
+     * @param value value to set
+     * @return this component
+     */
+    public EntityBulkInsertDialog setTextField(CharSequence fieldIdentifier, String value)
     {
-        elementCache().numericInput(fieldKey).set(value);
+        elementCache().textInput(fieldIdentifier).set(value);
         return this;
     }
 
-    public String getNumericField(String fieldKey)
+    /**
+     * @param fieldIdentifier Identifier for the field; name ({@link String}) or fieldKey ({@link FieldKey})
+     * @return current value of the specified field
+     */
+    public String getTextField(CharSequence fieldIdentifier)
     {
-        return elementCache().numericInput(fieldKey).get();
+        return elementCache().textInput(fieldIdentifier).get();
     }
 
-    public EntityBulkInsertDialog setSelectionField(String fieldCaption, List<String> selectValues)
+    /**
+     * @param fieldIdentifier Identifier for the field; name ({@link String}) or fieldKey ({@link FieldKey})
+     * @param value value to set
+     * @return this component
+     */
+    public EntityBulkInsertDialog setNumericField(CharSequence fieldIdentifier, String value)
     {
-        FilteringReactSelect reactSelect = elementCache().selectionField(fieldCaption);
+        elementCache().textInput(fieldIdentifier).set(value);
+        return this;
+    }
+
+    /**
+     * @param fieldIdentifier Identifier for the field; name ({@link String}) or fieldKey ({@link FieldKey})
+     * @return current value of the specified field
+     */
+    public String getNumericField(CharSequence fieldIdentifier)
+    {
+        return elementCache().textInput(fieldIdentifier).get();
+    }
+
+    /**
+     * @param fieldIdentifier Identifier for the field; name ({@link String}) or fieldKey ({@link FieldKey})
+     * @param selectValues values to select
+     * @return this component
+     */
+    public EntityBulkInsertDialog setSelectionField(CharSequence fieldIdentifier, List<String> selectValues)
+    {
+        FilteringReactSelect reactSelect = elementCache().selectionField(fieldIdentifier);
         selectValues.forEach(reactSelect::filterSelect);
         return this;
     }
 
-    public List<String> getSelectionField(String fieldCaption)
+    /**
+     * @param fieldIdentifier Identifier for the field; name ({@link String}) or fieldKey ({@link FieldKey})
+     * @return current value of the specified field
+     */
+    public List<String> getSelectionField(CharSequence fieldIdentifier)
     {
-        FilteringReactSelect reactSelect = elementCache().selectionField(fieldCaption);
+        FilteringReactSelect reactSelect = elementCache().selectionField(fieldIdentifier);
         return reactSelect.getSelections();
     }
 
     /**
      * Clear the value(s) from a field that is a drop down selection field.
      *
-     * @param fieldCaption Caption for the field.
+     * @param fieldIdentifier Identifier for the field; name ({@link String}) or fieldKey ({@link FieldKey})
      * @return This insert dialog.
      */
-    public EntityBulkInsertDialog clearSelectionField(String fieldCaption)
+    public EntityBulkInsertDialog clearSelectionField(CharSequence fieldIdentifier)
     {
-        FilteringReactSelect reactSelect = elementCache().selectionField(fieldCaption);
+        FilteringReactSelect reactSelect = elementCache().selectionField(fieldIdentifier);
         reactSelect.clearSelection();
         return this;
     }
 
-    public EntityBulkInsertDialog setFieldWithId(String id, String value)
+    // For use when the field is of an unknown type, as can occur in fuzz tests
+    public void setValue(FieldDefinition field, Object newValue)
     {
-        getWrapper().setFormElement(Locator.tagWithId("input", id), value);
-        return this;
+        if (field.getType() == FieldDefinition.ColumnType.TextChoice || field.getLookup() != null)
+            setSelectionField(field.getName(), newValue instanceof String ? List.of((String) newValue) : (List<String>) newValue);
+        else if (field.getType() == FieldDefinition.ColumnType.Integer || field.getType() == FieldDefinition.ColumnType.Decimal || field.getType() == FieldDefinition.ColumnType.Double)
+            setNumericField(field.getName(), String.valueOf(newValue));
+        else if (field.getType() == FieldDefinition.ColumnType.Date || field.getType() == FieldDefinition.ColumnType.DateAndTime || field.getType() == FieldDefinition.ColumnType.Time)
+            setDateTimeField(field.getName(), newValue);
+        else if (field.getType() == FieldDefinition.ColumnType.Boolean)
+            setBooleanField(field.getName(), (Boolean) newValue);
+        else if (field.getType() == FieldDefinition.ColumnType.MultiLine)
+            setTextArea(field.getName(), (String) newValue);
+        else if (field.getType() == FieldDefinition.ColumnType.File)
+            attachFile(field.getName(), (File) newValue);
+        else
+            setTextField(field.getName(), (String) newValue);
     }
 
-    public String getFieldWithId(String id)
+    public void setInsertFieldValues(List<FieldDefinition> fields, Map<String, Object> data)
     {
-        return getWrapper().getFormElement(Locator.tagWithId("input", id));
+        for (FieldDefinition field : fields)
+        {
+            Object value = data.get(field.getEffectiveLabel());
+            if (value == null)
+                continue;
+
+            setValue(field, value);
+        }
     }
 
     /**
@@ -222,36 +292,66 @@ public class EntityBulkInsertDialog extends ModalDialog
      * object to use the picker to set the field. If a text value is passed in it is used as a literal and jut typed
      * into the textbox.
      *
-     * @param fieldName Field to update.
+     * @param fieldIdentifier Identifier for the field; name ({@link String}) or fieldKey ({@link FieldKey})
      * @param dateTime A LocalDateTime, LocalDate, LocalTime or String.
      * @return A reference to this page.
      */
-    public EntityBulkInsertDialog setDateTimeField(String fieldName, Object dateTime)
+    public EntityBulkInsertDialog setDateTimeField(CharSequence fieldIdentifier, Object dateTime)
     {
-        return setDateTimeField(fieldName, dateTime, null);
-    }
-    public EntityBulkInsertDialog setDateTimeField(String fieldName, Object dateTime, @Nullable String fieldKey)
-    {
-        ReactDateTimePicker dateTimePicker = elementCache().dateInput(fieldName, fieldKey);
+        ReactDateTimePicker dateTimePicker = elementCache().dateInput(fieldIdentifier);
         dateTimePicker.select(dateTime);
         return this;
     }
 
-    public String getDateTimeField(String fieldName, @Nullable String fieldKey)
+    /**
+     * @param fieldIdentifier Identifier for the field; name ({@link String}) or fieldKey ({@link FieldKey})
+     * @return current value of the specified field
+     */
+    public String getDateTimeField(CharSequence fieldIdentifier)
     {
-        return elementCache().dateInput(fieldName, fieldKey).get();
+        return elementCache().dateInput(fieldIdentifier).get();
     }
 
-    public EntityBulkInsertDialog setBooleanField(String fieldKey, boolean checked)
+    /**
+     * @param fieldIdentifier Identifier for the field; name ({@link String}) or fieldKey ({@link FieldKey})
+     * @param checked value to set
+     * @return this component
+     */
+    public EntityBulkInsertDialog setBooleanField(CharSequence fieldIdentifier, boolean checked)
     {
-        Checkbox box = elementCache().checkBox(fieldKey);
+        Checkbox box = elementCache().checkBox(fieldIdentifier);
         box.set(checked);
         return this;
     }
 
-    public boolean getBooleanField(String fieldKey)
+    /**
+     * @param fieldIdentifier Identifier for the field; name ({@link String}) or fieldKey ({@link FieldKey})
+     * @return current value of the specified field
+     */
+    public boolean getBooleanField(CharSequence fieldIdentifier)
     {
-        return elementCache().checkBox(fieldKey).get();
+        return elementCache().checkBox(fieldIdentifier).get();
+    }
+
+    /**
+     * @param fieldIdentifier Identifier for the field; name ({@link String}) or fieldKey ({@link FieldKey})
+     * @param file file to attach
+     * @return this component
+     */
+    public EntityBulkInsertDialog attachFile(CharSequence fieldIdentifier, File file)
+    {
+        elementCache().fileUploadField(fieldIdentifier).attachFile(file);
+        return this;
+    }
+
+    /**
+     * @param fieldIdentifier Identifier for the field; name ({@link String}) or fieldKey ({@link FieldKey})
+     * @return this component
+     */
+    public EntityBulkInsertDialog removeFile(CharSequence fieldIdentifier)
+    {
+        elementCache().fileUploadField(fieldIdentifier).removeFile();
+        return this;
     }
 
     /**
@@ -354,48 +454,54 @@ public class EntityBulkInsertDialog extends ModalDialog
 
     protected class ElementCache extends ModalDialog.ElementCache
     {
-        public Locator validationMessage = Locator.tagWithClass("span", "validation-message");
+        public final Locator validationMessage = Locator.tagWithClass("span", "validation-message");
 
-        public WebElement formRow(String fieldKey)
+        private final Map<String, WebElement> _rows = new HashMap<>();
+
+        public WebElement formRow(CharSequence fieldIdentifier)
         {
-            return Locator.tagWithClass("div", "row")
-                    .withChild(Locator.tagWithAttribute("label", "for", fieldKey))
-                    .findElement(this);
+            String fieldKey = FieldKey.fromName(fieldIdentifier).toString();
+            return _rows.computeIfAbsent(fieldKey, fk ->
+                Locator.tagWithClass("div", "row")
+                    // TODO: Shouldn't need to be case-insensitive. Parent/source lookups have weird casing
+                    .withChild(Locator.tagWithAttributeIgnoreCase("label", "for", fieldKey))
+                    .findElement(this));
         }
 
-        public FilteringReactSelect selectionField(String fieldCaption)
+        public FilteringReactSelect selectionField(CharSequence fieldIdentifier)
         {
-            return FilteringReactSelect.finder(getDriver()).followingLabelWithSpan(fieldCaption).find(this);
+            return new FilteringReactSelect(formRow(fieldIdentifier), getDriver());
         }
 
-        public Checkbox checkBox(String fieldKey)
+        public Checkbox checkBox(CharSequence fieldIdentifier)
         {
-            WebElement row = elementCache().formRow(fieldKey);
+            WebElement row = formRow(fieldIdentifier);
             return new Checkbox(checkBoxLoc.findElement(row));
         }
 
-        public Input textInput(String fieldKey)
+        public Input textInput(CharSequence fieldIdentifier)
         {
-            WebElement inputEl = textInputLoc.findElement(elementCache().formRow(fieldKey));
+            WebElement inputEl = textInputLoc.findElement(formRow(fieldIdentifier));
             return new Input(inputEl, getDriver());
         }
 
-        public Input numericInput(String fieldKey)
+        public Input textArea(CharSequence fieldIdentifier)
         {
-            WebElement inputEl = numberInputLoc.findElement(formRow(fieldKey));
+            WebElement inputEl = Locator.tag("textarea").findElement(formRow(fieldIdentifier));
             return new Input(inputEl, getDriver());
         }
 
-        public ReactDateTimePicker dateInput(String fieldName, @Nullable String fieldKey)
+        public ReactDateTimePicker dateInput(CharSequence fieldIdentifier)
         {
-            if (fieldKey == null)
-                fieldKey = fieldName;
-
-            return new ReactDateTimePicker.ReactDateTimeInputFinder(getDriver())
-                    .withInputId(fieldKey).find(formRow(fieldName));
+            return new ReactDateTimePicker.ReactDateTimeInputFinder(getDriver()).find(formRow(fieldIdentifier));
         }
 
-        public List<WebElement> fieldNames()
+        public FileAttachmentContainer fileUploadField(CharSequence fieldIdentifier)
+        {
+            return new FileAttachmentContainer(formRow(fieldIdentifier), getDriver());
+        }
+
+        public List<WebElement> fieldLabels()
         {
             return fieldLabels.findElements(this);
         }
@@ -428,7 +534,6 @@ public class EntityBulkInsertDialog extends ModalDialog
                 .findWhenNeeded(getComponentElement());
 
         final Locator textInputLoc = Locator.tagWithAttribute("input", "type", "text");
-        final Locator numberInputLoc = Locator.tagWithAttribute("input", "type", "number");
         final Locator checkBoxLoc = Locator.tagWithAttribute("input", "type", "checkbox");
         final Locator fieldLabels = Locator.tag("hr").followingSibling("div").childTag("label");
     }

@@ -28,7 +28,7 @@ public class IssuesReadOnlyFormItem extends ReadOnlyFormItem
 
     public static FormItemFinder<IssuesReadOnlyFormItem> IssueReadOnlyFormItem()
     {
-        return new IssuesFormItemFinder<IssuesReadOnlyFormItem>()
+        return new IssuesFormItemFinder<>()
         {
             @Override
             protected IssuesReadOnlyFormItem construct(WebElement el)

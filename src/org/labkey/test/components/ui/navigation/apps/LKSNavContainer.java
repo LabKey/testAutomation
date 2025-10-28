@@ -32,7 +32,7 @@ public class LKSNavContainer extends BaseNavContainer
 
     public boolean hasTabs()
     {
-        return tabLinks().size() > 0;
+        return !tabLinks().isEmpty();
     }
 
     public boolean hasEmptyTabNotification()

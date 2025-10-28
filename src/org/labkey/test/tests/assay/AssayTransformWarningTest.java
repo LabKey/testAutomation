@@ -32,7 +32,6 @@ import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.QCAssayScriptHelper;
 import org.labkey.test.util.RReportHelper;
-import org.labkey.test.util.core.webdav.WebDavUtils;
 
 import java.io.File;
 import java.util.Arrays;
@@ -42,6 +41,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.pages.ReactAssayDesignerPage.ScriptFileEvent.Edit;
 import static org.labkey.test.pages.ReactAssayDesignerPage.ScriptFileEvent.Import;
+import static org.labkey.test.util.PermissionsHelper.FOLDER_ADMIN_ROLE;
 
 @Category({Assays.class, Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 4)
@@ -51,6 +51,7 @@ public class AssayTransformWarningTest extends BaseWebDriverTest
     public static final File R_TRANSFORM_SCRIPT = TestFileUtils.getSampleData("qc/assayTransformWarning.R");
     public static final File R_TRANSFORM_ERROR_SCRIPT = TestFileUtils.getSampleData("qc/assayTransformError.R");
     public static final File JAVA_INVALID_TRANSFORM_SCRIPT = TestFileUtils.getSampleData("qc/src/org/labkey/AssayTransformNoOp.java");
+    public static final Locator.XPathLocator ASSAY_NAME_FIELD_LOCATOR = Locator.name("Name");
 
     @Override
     public List<String> getAssociatedModules()
@@ -85,7 +86,7 @@ public class AssayTransformWarningTest extends BaseWebDriverTest
     @BeforeClass
     public static void initTest()
     {
-        AssayTransformWarningTest init = (AssayTransformWarningTest)getCurrentTest();
+        AssayTransformWarningTest init = getCurrentTest();
         init.doInit();
     }
 
@@ -111,7 +112,7 @@ public class AssayTransformWarningTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(assayName));
         clickButton("Import Data");
         clickButton("Next");
-        setFormElement(Locator.name("name"), runName);
+        setFormElement(ASSAY_NAME_FIELD_LOCATOR, runName);
         setFormElement(Locator.name("TextAreaDataCollector.textArea"), importData);
 
         clickButton("Save and Finish");
@@ -151,7 +152,7 @@ public class AssayTransformWarningTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(assayName));
         clickButton("Import Data");
         clickButton("Next");
-        setFormElement(Locator.name("name"), runName);
+        setFormElement(ASSAY_NAME_FIELD_LOCATOR, runName);
 
         // Use this file as a sample upload file parameter
         setFormElement(Locator.name("myFile"), JAVA_TRANSFORM_SCRIPT);
@@ -181,7 +182,7 @@ public class AssayTransformWarningTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(runName), longWaitForPage);
 
         // Verify file uploaded
-        assertTextPresent("assaydata" + File.separator + JAVA_TRANSFORM_SCRIPT.getName(), 1);
+        assertTextPresent(JAVA_TRANSFORM_SCRIPT.getName(), 1);
 
         DataRegionTable table = new DataRegionTable("Data", this);
         assertEquals(1, table.getDataRowCount());
@@ -214,7 +215,7 @@ public class AssayTransformWarningTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(assayName));
         clickButton("Import Data");
         clickButton("Next");
-        setFormElement(Locator.name("name"), runName);
+        setFormElement(ASSAY_NAME_FIELD_LOCATOR, runName);
         setFormElement(Locator.name("TextAreaDataCollector.textArea"), importData);
         clickButton("Save and Finish");
 
@@ -248,7 +249,7 @@ public class AssayTransformWarningTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(assayName));
         clickButton("Import Data");
         clickButton("Next");
-        setFormElement(Locator.name("name"), runName);
+        setFormElement(ASSAY_NAME_FIELD_LOCATOR, runName);
 
         setFormElement(Locator.name("TextAreaDataCollector.textArea"), importData);
 
@@ -285,7 +286,7 @@ public class AssayTransformWarningTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(assayName));
         clickButton("Import Data");
         clickButton("Next");
-        setFormElement(Locator.name("name"), runName);
+        setFormElement(ASSAY_NAME_FIELD_LOCATOR, runName);
         setFormElement(Locator.name("TextAreaDataCollector.textArea"), importData);
 
         clickButton("Save and Finish");
@@ -322,7 +323,7 @@ public class AssayTransformWarningTest extends BaseWebDriverTest
 
         // verify file exists in @scripts dir via webdav page
         goToProjectHome();
-        impersonateRole("Folder Administrator");
+        impersonateRole(FOLDER_ADMIN_ROLE);
         WebDavPage.beginAt(this, getProjectName() + "/@scripts");
         waitForElement(Locators.labkeyErrorHeading.withText("/_webdav/" + getProjectName() + "/@scripts"));
         stopImpersonatingHTTP();

@@ -15,13 +15,15 @@
  */
 package org.labkey.test.util;
 
-import org.labkey.test.BaseWebDriverTest;
+import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebDriverWrapper;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -59,10 +61,7 @@ public class TextSearcher
 
     public final TextSearcher setSourceTransformer(Function<String, String> sourceTransformer)
     {
-        if (sourceTransformer == null)
-            this.sourceTransformer = TextTransformers.IDENTITY;
-        else
-            this.sourceTransformer = sourceTransformer;
+        this.sourceTransformer = Objects.requireNonNullElse(sourceTransformer, TextTransformers.IDENTITY);
         return this;
     }
 
@@ -73,10 +72,7 @@ public class TextSearcher
 
     public final TextSearcher setSearchTransformer(Function<String, String> searchTransformer)
     {
-        if (searchTransformer == null)
-            this.searchTransformer = TextTransformers.IDENTITY;
-        else
-            this.searchTransformer = searchTransformer;
+        this.searchTransformer = Objects.requireNonNullElse(searchTransformer, TextTransformers.IDENTITY);
         return this;
     }
 
@@ -103,6 +99,11 @@ public class TextSearcher
         }
     }
 
+    public List<String> getMissingTexts(String... texts)
+    {
+        return getMissingTexts(Arrays.asList(texts));
+    }
+
     public List<String> getMissingTexts(List<String> texts)
     {
         final List<String> missingTexts = new ArrayList<>();
@@ -116,6 +117,46 @@ public class TextSearcher
         searchForTexts(handler, texts);
 
         return missingTexts;
+    }
+
+    /**
+     * Checks whether any of the texts are present
+     * @return true if any of the specified text is found
+     */
+    public boolean isAnyTextPresent(String... texts)
+    {
+        final MutableBoolean found = new MutableBoolean(false);
+
+        TextSearcher.TextHandler handler = (htmlSource, text) -> {
+            if (htmlSource.contains(text))
+                found.setTrue();
+
+            return !found.get(); // stop searching if any value is found
+        };
+        searchForTexts(handler, Arrays.asList(texts));
+
+        return found.get();
+    }
+
+    /**
+     * Checks whether all the specified texts are present
+     * @return true if all the specified texts are present on the page
+     */
+    public boolean areAllTextsPresent(String... texts)
+    {
+        final MutableBoolean present = new MutableBoolean(true);
+
+        TextSearcher.TextHandler handler = (htmlSource, text) -> {
+            // Not found... stop enumerating and return false
+            if (htmlSource == null || !htmlSource.contains(text))
+                present.setFalse();
+
+            return present.get();
+        };
+
+        searchForTexts(handler, Arrays.asList(texts));
+
+        return present.get();
     }
 
     /**
@@ -134,7 +175,10 @@ public class TextSearcher
 
     public static abstract class TextTransformers
     {
-        public static final Function<String, String> ENCODE_HTML = BaseWebDriverTest::encodeText;
+        public static final Function<String, String> ENCODE_HTML = t -> t
+                .replace("&", "&amp;")
+                .replace("<", "&lt;")
+                .replace(">", "&gt;");
         public static final Function<String, String> IDENTITY = text -> text;
 
         //Inserts spaces between camel-cased words

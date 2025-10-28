@@ -21,15 +21,18 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldDefinition.ColumnType;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.DataRegionTable.DataRegionFinder;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.WikiHelper;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertTrue;
 
@@ -101,15 +104,13 @@ public class ButtonCustomizationTest extends BaseWebDriverTest
         goToManageLists();
         clickAndWait(Locator.linkWithText(LIST_NAME));
         assertButtonNotPresent(METADATA_OVERRIDE_BUTTON);
-        DataRegionTable.findDataRegion(this).clickInsertNewRow();
-        setFormElement(Locator.name("quf_name"), "Seattle");
-        clickButton("Submit");
-        DataRegionTable.findDataRegion(this).clickInsertNewRow();
-        setFormElement(Locator.name("quf_name"), "Portland");
-        clickButton("Submit");
-        
+        new DataRegionFinder(getDriver()).find().clickInsertNewRow()
+            .update(Map.of("name", "Seattle"));
+        new DataRegionFinder(getDriver()).find().clickInsertNewRow()
+            .update(Map.of("name", "Portland"));
+
         // assert custom buttons can be added to the standard set:
-        beginAt("/query/" + PROJECT_NAME + "/schema.view?schemaName=lists");
+        beginAt(WebTestHelper.buildURL("query", PROJECT_NAME, "schema", Map.of("schemaName", "lists")));
         selectQuery("lists", "Cities");
         waitForText(10000, "edit metadata");
         clickAndWait(Locator.linkWithText("edit metadata"));
@@ -131,7 +132,7 @@ public class ButtonCustomizationTest extends BaseWebDriverTest
         assertElementPresent(Locator.tagWithAttribute("a", "data-original-title","Insert data"));
 
         // assert custom buttons can REPLACE the standard set:
-        beginAt("/query/" + PROJECT_NAME + "/schema.view?schemaName=lists");
+        beginAt(WebTestHelper.buildURL("query", PROJECT_NAME, "schema", Map.of("schemaName", "lists")));
         selectQuery("lists", "Cities");
         waitForText(10000, "edit metadata");
         clickAndWait(Locator.linkWithText("edit metadata"));
@@ -188,17 +189,17 @@ public class ButtonCustomizationTest extends BaseWebDriverTest
                 Locator.lkButton(METADATA_LINK_BUTTON).waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT)
                         .getAttribute("class").contains("labkey-disabled-button"));
 
-        buttonRegion.checkCheckbox(buttonRegion.getIndexWhereDataAppears("Portland", "Name"));
+        buttonRegion.checkCheckbox(buttonRegion.getRowIndex("Name", "Portland"));
         // wait for the button to enable:
         waitForElement(Locator.lkButton(METADATA_LINK_BUTTON), 10000);
 
         // Verify that link buttons don't send parameters at all:
         clickButton(METADATA_LINK_BUTTON);
-        assertElementNotPresent(Locator.id("params").containing(".select"));
+        assertElementNotPresent(Locator.id("params").withText());
 
         // wait for the button to enable:
         waitForElement(Locator.lkButton(METADATA_GET_BUTTON), 10000);
-        
+
         // Verify that GET buttons to send form values as GET parameters:
         clickButton(METADATA_GET_BUTTON);
         assertElementPresent(Locator.id("params").containing(".select: 2"));

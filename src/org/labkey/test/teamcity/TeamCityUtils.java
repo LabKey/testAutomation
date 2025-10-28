@@ -165,7 +165,7 @@ public class TeamCityUtils
             }
         }
         messageBuilder.append("]");
-        System.out.println(messageBuilder.toString());
+        System.out.println(messageBuilder);
     }
 
     public static void serviceMessage(String messageName, String value)

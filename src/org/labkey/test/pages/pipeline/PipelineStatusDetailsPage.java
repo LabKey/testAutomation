@@ -385,7 +385,6 @@ public class PipelineStatusDetailsPage extends LabKeyPage<PipelineStatusDetailsP
 
     /**
      * Click the run link with the given name.
-     * @param runName
      */
     @LogMethod
     public void clickRunLink(@Nullable String runName)
@@ -422,14 +421,14 @@ public class PipelineStatusDetailsPage extends LabKeyPage<PipelineStatusDetailsP
     @LogMethod
     public PipelineStatusDetailsPage clickRetry()
     {
-        clickAndWait(elementCache().retryButton);
+        waitAndClickAndWait(Locator.id("retry-btn"));
         return new PipelineStatusDetailsPage(getDriver());
     }
 
     @LogMethod
     public PipelineStatusDetailsPage clickCancel()
     {
-        clickAndWait(elementCache().cancelButton);
+        waitAndClickAndWait(Locator.id("cancel-btn"));
         waitForLogText("Attempting to cancel");
         waitForCancelled();
         return this;
@@ -460,8 +459,6 @@ public class PipelineStatusDetailsPage extends LabKeyPage<PipelineStatusDetailsP
         protected final WebElement showGridButton = Locator.lkButton("Show Grid").findWhenNeeded(this);
         protected final WebElement showDataButton = Locator.id("show-data-btn").findWhenNeeded(this);
         protected final WebElement browseFilesButton = Locator.lkButton("Browse Files").findWhenNeeded(this);
-        protected final WebElement cancelButton = Locator.id("cancel-btn").findWhenNeeded(this);
-        protected final WebElement retryButton = Locator.id("retry-btn").findWhenNeeded(this);
 
         protected final WebElement showFullLogLink = Locator.id("show-full-log").findWhenNeeded(this);
         protected final WebElement logContainer = Locator.id("log-container").findWhenNeeded(this);

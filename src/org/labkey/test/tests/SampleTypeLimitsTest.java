@@ -9,7 +9,7 @@ import org.labkey.remoteapi.experiment.LineageCommand;
 import org.labkey.remoteapi.experiment.LineageNode;
 import org.labkey.remoteapi.experiment.LineageResponse;
 import org.labkey.remoteapi.query.Filter;
-import org.labkey.remoteapi.query.SaveRowsResponse;
+import org.labkey.remoteapi.query.RowsResponse;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
@@ -62,7 +62,7 @@ public class SampleTypeLimitsTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        SampleTypeLimitsTest init = (SampleTypeLimitsTest) getCurrentTest();
+        SampleTypeLimitsTest init = getCurrentTest();
         init.doSetup();
     }
 
@@ -77,8 +77,7 @@ public class SampleTypeLimitsTest extends BaseWebDriverTest
         log("Creating the sample type of 10000 samples");
         try
         {
-            FieldDefinition.LookupInfo lookupInfo = new FieldDefinition.LookupInfo(getProjectName(), "exp.materials", SAMPLE_TYPE_NAME);
-            TestDataGenerator dgen = new TestDataGenerator(lookupInfo)
+            TestDataGenerator dgen = new TestDataGenerator("exp.materials", SAMPLE_TYPE_NAME, getProjectName())
                     .withColumns(List.of(
                             TestDataGenerator.simpleFieldDef("name", FieldDefinition.ColumnType.String),
                             TestDataGenerator.simpleFieldDef("label", FieldDefinition.ColumnType.String)));
@@ -86,8 +85,8 @@ public class SampleTypeLimitsTest extends BaseWebDriverTest
             dgen.addDataSupplier("label", () -> TestDataGenerator.randomString(10, null, ALPHANUMERIC_STRING))
                     .withGeneratedRows(10000);
             dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
-            SaveRowsResponse saveRowsResponse = dgen.insertRows(createDefaultConnection(), dgen.getRows());
-            log("Successfully  inserted " + saveRowsResponse.getRowsAffected());
+            RowsResponse rowsResponse = dgen.insertRows(createDefaultConnection(), dgen.getRows());
+            log("Successfully  inserted " + rowsResponse.getRowsAffected());
 
             log("Waiting for the sample data to get generated");
             goToProjectHome();
@@ -200,17 +199,17 @@ public class SampleTypeLimitsTest extends BaseWebDriverTest
 
         log("Attempt Derive Samples with invalid lookup value");
         initDeriveSamplesForm(sampleTypeName, "Derivative1");
-        verifyInvalidLookupSample("outputSample1_lookUpField", "Sample3", "Could not convert value 'Sample3' (String) for Integer field 'lookUpField'.");
+        verifyInvalidLookupSample("Output Sample 1_lookUpField", "Sample3", "Could not convert value 'Sample3' (String) for Integer field 'lookUpField'.");
 
         log("Insert Derive Samples with valid lookup display value");
-        verifyValidLookupSample("outputSample1_lookUpField", "Sample2", "Sample2", "Material", true);
+        verifyValidLookupSample("Output Sample 1_lookUpField", "Sample2", "Sample2", "Material", true);
 
         log("Insert Derive Samples with valid lookup to sample RowId");
         initDeriveSamplesForm(sampleTypeName, "Derivative2");
         SelectRowsCommand command = new SelectRowsCommand("samples", SAMPLE_TYPE_NAME);
         command.setFilters(Arrays.asList(new Filter("Name", "Sample1")));
         SelectRowsResponse response = command.execute(createDefaultConnection(), getProjectName());
-        verifyValidLookupSample("outputSample1_lookUpField", response.getRows().get(0).get("RowId").toString(), "Sample1", "Material", true);
+        verifyValidLookupSample("Output Sample 1_lookUpField", response.getRows().get(0).get("RowId").toString(), "Sample1", "Material", true);
     }
 
     private void initDeriveSamplesForm(String sampleTypeName, String sampleName)
@@ -221,7 +220,7 @@ public class SampleTypeLimitsTest extends BaseWebDriverTest
         samplesTable.clickHeaderButtonAndWait("Derive Samples");
         selectOptionByText(Locator.name("targetSampleTypeId"), sampleTypeName + " in /" + getProjectName());
         clickButton("Next");
-        setFormElement(Locator.name("outputSample1_Name"), sampleName);
+        setFormElement(Locator.name("Output Sample 1_Name"), sampleName);
     }
 
     @Test
@@ -238,7 +237,7 @@ public class SampleTypeLimitsTest extends BaseWebDriverTest
         dgen.setAlphaNumericStr(true);
         dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
         Map indexRow = Map.of("name", "seed", "data", TestDataGenerator.randomInt(3, 2000), "testIndex", 0); // create the first seed in the lineage
-        SaveRowsResponse seedInsert = dgen.insertRows(createDefaultConnection(), List.of(indexRow));
+        RowsResponse seedInsert = dgen.insertRows(createDefaultConnection(), List.of(indexRow));
         SelectRowsResponse seedSelect = dgen.getRowsFromServer(createDefaultConnection(),
                 List.of("lsid", "name", "parent", "data", "testIndex"));
 
@@ -272,7 +271,7 @@ public class SampleTypeLimitsTest extends BaseWebDriverTest
         LineageResponse linResponse = linCmd.execute(createDefaultConnection(), getCurrentContainerPath());
         LineageNode node = linResponse.getSeed();
         int generationDepth = 0;
-        while(node.getChildren().size()>0)  // walk the node depth until the end
+        while(!node.getChildren().isEmpty())  // walk the node depth until the end
         {
             node = node.getChildren().get(0).getNode();
             generationDepth++;

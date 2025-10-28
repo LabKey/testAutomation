@@ -34,6 +34,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
+import static org.junit.Assert.assertEquals;
+
 /**
  * TODO: Move appropriate functionality into {@link org.labkey.test.pages.PortalBodyPanel} and {@link org.labkey.test.components.WebPart}
  */
@@ -60,16 +62,6 @@ public class PortalHelper extends WebDriverWrapper
     public WebDriver getWrappedDriver()
     {
         return _driverWrapper.getWrappedDriver();
-    }
-
-    public void enableTabEditMode()
-    {
-        new SiteNavBar(getDriver()).enterPageAdminMode();
-    }
-
-    public void disableTabEditMode()
-    {
-        new SiteNavBar(getDriver()).exitPageAdminMode();
     }
 
     public PortalTab activateTab(String tabText)
@@ -124,18 +116,18 @@ public class PortalHelper extends WebDriverWrapper
     {
         PortalTab.find(tabText, getDriver()).hide();
 
-        disableTabEditMode();
+        exitAdminMode();
         assertElementNotPresent(Locator.xpath("//div[@class='lk-nav-tabs-ct']//ul//li//a[text()='" + tabText +"']"));
-        enableTabEditMode();
+        enterAdminMode();
     }
 
     @LogMethod(quiet = true)
     public void showTab(@LoggedParam String tabText)
     {
         PortalTab.find(tabText, getDriver()).show();
-        disableTabEditMode();
+        exitAdminMode();
         assertElementVisible(Locator.xpath("//div[@class='lk-nav-tabs-ct']//ul//li//a[contains(text(),'" + tabText +"')]"));
-        enableTabEditMode();
+        enterAdminMode();
     }
 
     @LogMethod(quiet = true)
@@ -252,7 +244,6 @@ public class PortalHelper extends WebDriverWrapper
     /**
      * Allows test code to navigate to a Webpart Ext-based navigation menu.
      * @param webPartTitle title (not name) of webpart to be clicked.  Multiple web parts with the same title not supported.
-     * @param items
      */
     public void clickWebpartMenuItem(String webPartTitle, String... items)
     {
@@ -436,9 +427,6 @@ public class PortalHelper extends WebDriverWrapper
     }
 
     /**
-     * @param webpart
-     * @param permission
-     * @param folder null=current folder
      */
     public void setWebpartPermission(String webpart, String permission, String folder)
     {
@@ -460,8 +448,6 @@ public class PortalHelper extends WebDriverWrapper
     }
 
     /**
-     * @param webpart
-     * @param expectedPermission The permission that is expected to be set.
      * @param expectedFolder The folder that is expected to be selected, null=current folder
      */
     public void checkWebpartPermission(String webpart, String expectedPermission, String expectedFolder)
@@ -469,15 +455,18 @@ public class PortalHelper extends WebDriverWrapper
         doInAdminMode(() -> {
             openWebpartPermissionWindow(webpart);
 
-            assertFormElementEquals(Locator.name("permission"), expectedPermission);
+            Locator loc1 = Locator.name("permission");
+            assertEquals(expectedPermission, getFormElement(loc1));
 
             if (expectedFolder == null)
             {
-                assertFormElementEquals(Locator.name("permissionContainer"), "");
+                Locator loc = Locator.name("permissionContainer");
+                assertEquals("", getFormElement(loc));
             }
             else
             {
-                assertFormElementEquals(Locator.name("permissionContainer"), expectedFolder);
+                Locator loc = Locator.name("permissionContainer");
+                assertEquals(expectedFolder, getFormElement(loc));
             }
 
             click(Locator.tagWithText("span", "Cancel"));
@@ -492,8 +481,8 @@ public class PortalHelper extends WebDriverWrapper
         LEFT("Left", Axis.HORIZONTAL),
         RIGHT("Right", Axis.HORIZONTAL);
 
-        private String _dir;
-        private Axis _axis;
+        private final String _dir;
+        private final Axis _axis;
 
         Direction (String dir, Axis axis)
         {

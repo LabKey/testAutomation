@@ -11,12 +11,26 @@ if (extraContext)
 
 var LABKEY = require("labkey");
 
+// Issue 52098 - do custom parsing to validate trigger script gets a chance to do type conversion
+function stripPrefix(row)
+{
+    if (row.Age && row.Age.toString().indexOf("RemoveMe") === 0)
+    {
+        row.Age = row.Age.substring("RemoveMe".length);
+    }
+    if (row.FavoriteDateTime && row.FavoriteDateTime.toString().indexOf("RemoveMe") === 0)
+    {
+        row.FavoriteDateTime = row.FavoriteDateTime.substring("RemoveMe".length);
+    }
+}
+
 function beforeInsert(row, errors)
 {
     // Test row map is case-insensitive
     if (row.Name != row.nAmE)
         throw new Error("beforeInsert row properties must be case-insensitive.");
 
+    stripPrefix(row);
 
 //    var result = LABKEY.Query.deleteRows({
 //        schemaName: "lists",
@@ -42,6 +56,8 @@ function beforeUpdate(row, oldRow, errors)
     // Test oldRow map is case-insensitive
     if (oldRow.Name != oldRow.nAmE)
         throw new Error("beforeUpdate oldRow properties must be case-insensitive.");
+
+    stripPrefix(row);
 }
 
 function afterUpdate(row, oldRow, errors)

@@ -122,7 +122,7 @@ public class ModuleAssayTest extends AbstractAssayTest
     @BeforeClass
     public static void setupStuff() throws Exception
     {
-        ModuleAssayTest init = (ModuleAssayTest)getCurrentTest();
+        ModuleAssayTest init = getCurrentTest();
         assertNotNull(init._useTransform);
         init.doSetup();
     }
@@ -462,7 +462,7 @@ public class ModuleAssayTest extends AbstractAssayTest
             {
                 sleep(1500);
                 String runCountStr = getText(Locator.id("batch_runCount_div"));
-                if (runCountStr != null && !runCountStr.equals("") && Integer.parseInt(runCountStr) == i+1)
+                if (runCountStr != null && !runCountStr.isEmpty() && Integer.parseInt(runCountStr) == i+1)
                     break;
             } while (--count > 0);
             assertElementContains(Locator.id("batch_runCount_div"), String.valueOf(i+1));

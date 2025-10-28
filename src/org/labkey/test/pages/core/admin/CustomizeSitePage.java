@@ -47,7 +47,7 @@ public class CustomizeSitePage extends LabKeyPage<CustomizeSitePage.ElementCache
 
     public ShowAdminPage save()
     {
-        clickAndWait(elementCache().saveButton);
+        clickAndWait(scrollIntoView(elementCache().saveButton));
 
         return new ShowAdminPage(getDriver());
     }
@@ -73,12 +73,6 @@ public class CustomizeSitePage extends LabKeyPage<CustomizeSitePage.ElementCache
     public String getBaseServerUrl()
     {
         return elementCache().baseServerUrl.get();
-    }
-
-    public CustomizeSitePage setContainerRelativeUrl(boolean enable)
-    {
-        elementCache().containerRelativeUrl.set(enable);
-        return this;
     }
 
     public CustomizeSitePage setUsageReportingLevel(ReportingLevel level)
@@ -108,6 +102,12 @@ public class CustomizeSitePage extends LabKeyPage<CustomizeSitePage.ElementCache
     public CustomizeSitePage setMaxBLOBSize(String value)
     {
         elementCache().maxBLOBSize.set(value);
+        return this;
+    }
+
+    public CustomizeSitePage setReadOnlyHttpRequestTimeout(String value)
+    {
+        elementCache().readOnlyHttpRequestTimeout.set(value);
         return this;
     }
 
@@ -217,7 +217,7 @@ public class CustomizeSitePage extends LabKeyPage<CustomizeSitePage.ElementCache
         return new ElementCache();
     }
 
-    protected class ElementCache extends LabKeyPage.ElementCache
+    protected class ElementCache extends LabKeyPage<?>.ElementCache
     {
         protected final WebElement saveButton = Locator.lkButton("Save").findWhenNeeded(this);
 
@@ -227,7 +227,6 @@ public class CustomizeSitePage extends LabKeyPage<CustomizeSitePage.ElementCache
         // Site URLs
         protected final Input defaultDomain = Input(Locator.id("defaultDomain"), getDriver()).findWhenNeeded(this);
         protected final Input baseServerUrl = Input(Locator.id("baseServerURL"), getDriver()).findWhenNeeded(this);
-        protected final Checkbox containerRelativeUrl = Checkbox(Locator.id("useContainerRelativeURL")).findWhenNeeded(this);
 
         // Usage Reporting
         protected RadioButton usageReportingLevel(ReportingLevel level)
@@ -247,6 +246,7 @@ public class CustomizeSitePage extends LabKeyPage<CustomizeSitePage.ElementCache
         // System Properties
         protected final Input memoryUsageDumpInterval = Input(Locator.id("memoryUsageDumpInterval"), getDriver()).findWhenNeeded(this);
         protected final Input maxBLOBSize = Input(Locator.id("maxBLOBSize"), getDriver()).findWhenNeeded(this);
+        protected final Input readOnlyHttpRequestTimeout = Input(Locator.id("readOnlyHttpRequestTimeout"), getDriver()).findWhenNeeded(this);
         protected final Checkbox ext3Required = Checkbox(Locator.id("ext3Required")).findWhenNeeded(this);
         protected final Checkbox ext3APIRequired = Checkbox(Locator.id("ext3APIRequired")).findWhenNeeded(this);
 

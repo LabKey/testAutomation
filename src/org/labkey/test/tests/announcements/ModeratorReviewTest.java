@@ -38,6 +38,9 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static org.labkey.test.util.PermissionsHelper.AUTHOR_ROLE;
+import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
+
 @Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 5)
 public class ModeratorReviewTest extends BaseWebDriverTest
@@ -86,9 +89,9 @@ public class ModeratorReviewTest extends BaseWebDriverTest
         _userHelper.createUser(SPAM_USER);
         _userHelper.createUser(EDITOR_USER);
         ApiPermissionsHelper apiPermissionsHelper = new ApiPermissionsHelper(this);
-        apiPermissionsHelper.addMemberToRole(APPROVED_USER, "Author", PermissionsHelper.MemberType.user);
-        apiPermissionsHelper.addMemberToRole(SPAM_USER, "Author", PermissionsHelper.MemberType.user);
-        apiPermissionsHelper.addMemberToRole(EDITOR_USER, "Editor", PermissionsHelper.MemberType.user);
+        apiPermissionsHelper.addMemberToRole(APPROVED_USER, AUTHOR_ROLE, PermissionsHelper.MemberType.user);
+        apiPermissionsHelper.addMemberToRole(SPAM_USER, AUTHOR_ROLE, PermissionsHelper.MemberType.user);
+        apiPermissionsHelper.addMemberToRole(EDITOR_USER, EDITOR_ROLE, PermissionsHelper.MemberType.user);
     }
 
     @Before
@@ -163,7 +166,7 @@ public class ModeratorReviewTest extends BaseWebDriverTest
 
         // commonmark-java auto-linking turns all email addresses into mailto: links
         String formattedResponse = replaceEmailAddressesWithMailToLinks(response);
-        boolean responseAdded = isTextPresent(formattedResponse);
+        boolean responseAdded = isHtmlPresent(formattedResponse);
         if (expectAutoApproved && !responseAdded)
         {
             checker().fatal().error(String.format("Expected response '%s' was not present on the thread page.", formattedResponse));

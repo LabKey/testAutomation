@@ -15,6 +15,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.Daily;
+import org.labkey.test.components.assay.AssayConstants;
 import org.labkey.test.pages.assay.AssayDataPage;
 import org.labkey.test.pages.assay.AssayRunsPage;
 import org.labkey.test.pages.assay.elisa.ElisaRunDetailsPage;
@@ -51,7 +52,7 @@ public class ElisaMultiPlateAssayTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        ElisaMultiPlateAssayTest init = (ElisaMultiPlateAssayTest) getCurrentTest();
+        ElisaMultiPlateAssayTest init = getCurrentTest();
 
         init.doSetup();
     }
@@ -239,8 +240,8 @@ public class ElisaMultiPlateAssayTest extends BaseWebDriverTest
         clickButton("Import Data");
         clickButton("Next");
 
-        setFormElement(Locator.name("name"), runName);
-        setFormElement(Locator.name("curveFitMethod"), curveFitMethod);
+        setFormElement(AssayConstants.ASSAY_NAME_FIELD_LOCATOR, runName);
+        setFormElement(Locator.name("CurveFitMethod"), curveFitMethod);
         setFormElement(Locator.name("__primaryFile__"), file);
         clickButton("Save and Finish", 180000); // 3 minutes wait if need
         return new AssayRunsPage(getDriver());
@@ -254,24 +255,24 @@ public class ElisaMultiPlateAssayTest extends BaseWebDriverTest
 
         for (int i = startSpecimen; i <= lastSpecimen; i++)
         {
-            Locator specimenLocator = Locator.name("specimen" + (i) + "_SpecimenID");
-            Locator participantLocator = Locator.name("specimen" + (i) + "_ParticipantID");
+            Locator specimenLocator = Locator.name("Specimen " + (i) + "_SpecimenID");
+            Locator participantLocator = Locator.name("Specimen " + (i) + "_ParticipantID");
 
             setFormElement(specimenLocator, "specimen " + (i) + " " + uniqueifier);
             setFormElement(participantLocator, "ptid " + (i) + " " + uniqueifier);
 
-            setFormElement(Locator.name("specimen" + (i) + "_VisitID"), "" + (i));
+            setFormElement(Locator.name("Specimen " + (i) + "_VisitID"), "" + (i));
         }
 
-        setFormElement(Locator.name("name"), runName);
-        setFormElement(Locator.name("curveFitMethod"), curveFitMethod);
+        setFormElement(AssayConstants.ASSAY_NAME_FIELD_LOCATOR, runName);
+        setFormElement(Locator.name("CurveFitMethod"), curveFitMethod);
         setFormElement(Locator.name("__primaryFile__"), file);
         clickButton("Next");
 
         String[] letters = {"A","B","C","D","E","F","G","H"};
         for (int i = 0; i <= 5; i++)
         {
-            setFormElement(Locator.name(letters[i].toLowerCase()+"1"+letters[i]+"2_Concentration"), "" + (i + 1));
+            setFormElement(Locator.name(letters[i]+"1-"+letters[i]+"2_Concentration"), "" + (i + 1));
         }
 
         clickButton("Save and Finish");

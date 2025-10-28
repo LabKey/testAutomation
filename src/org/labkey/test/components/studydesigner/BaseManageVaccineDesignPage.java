@@ -124,10 +124,10 @@ public class BaseManageVaccineDesignPage extends LabKeyPage
 
     protected class BaseElements
     {
-        private Locator.XPathLocator tableOuterLoc = Locator.tagWithClass("table", "outer");
-        private Locator.XPathLocator cellValueLoc = Locator.tagWithClass("td", "cell-value");
-        private Locator.XPathLocator cellDisplayLoc = Locator.tagWithClass("td", "cell-display");
-        private Locator.XPathLocator addRowIconLoc = Locator.tagWithClass("i", "add-new-row");
+        private final Locator.XPathLocator tableOuterLoc = Locator.tagWithClass("table", "outer");
+        private final Locator.XPathLocator cellValueLoc = Locator.tagWithClass("td", "cell-value");
+        private final Locator.XPathLocator cellDisplayLoc = Locator.tagWithClass("td", "cell-display");
+        private final Locator.XPathLocator addRowIconLoc = Locator.tagWithClass("i", "add-new-row");
 
         protected int wait = BaseWebDriverTest.WAIT_FOR_JAVASCRIPT;
         protected Locator.XPathLocator tableRowLoc = Locator.tagWithClass("tr", "row-outer");

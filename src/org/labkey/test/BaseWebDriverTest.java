@@ -17,7 +17,6 @@
 package org.labkey.test;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.commons.lang3.time.FastDateFormat;
@@ -40,7 +39,6 @@ import org.junit.runner.Description;
 import org.junit.runners.model.MultipleFailureException;
 import org.junit.runners.model.Statement;
 import org.junit.runners.model.TestTimedOutException;
-import org.labkey.api.query.QueryKey;
 import org.labkey.junit.rules.TestWatcher;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
@@ -65,20 +63,26 @@ import org.labkey.test.pages.core.admin.logger.ManagerPage;
 import org.labkey.test.pages.query.NewQueryPage;
 import org.labkey.test.pages.query.SourceQueryPage;
 import org.labkey.test.pages.search.SearchResultsPage;
+import org.labkey.test.params.ContainerInfo;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.FieldKey;
+import org.labkey.test.params.SchemaKey;
 import org.labkey.test.teamcity.TeamCityUtils;
 import org.labkey.test.util.APIAssayHelper;
 import org.labkey.test.util.APIContainerHelper;
+import org.labkey.test.util.APITestHelper;
 import org.labkey.test.util.AbstractAssayHelper;
 import org.labkey.test.util.AbstractContainerHelper;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.ArtifactCollector;
+import org.labkey.test.util.AuditLogHelper;
 import org.labkey.test.util.ComponentQuery;
 import org.labkey.test.util.Crawler;
 import org.labkey.test.util.CspLogUtil;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.DebugUtils;
 import org.labkey.test.util.DeferredErrorCollector;
+import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.FileBrowserHelper;
 import org.labkey.test.util.ListHelper;
@@ -88,7 +92,6 @@ import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.PermissionsHelper;
 import org.labkey.test.util.PipelineToolsHelper;
 import org.labkey.test.util.ReadOnlyTest;
-import org.labkey.test.util.SecurityHelper;
 import org.labkey.test.util.SimpleHttpResponse;
 import org.labkey.test.util.StudyHelper;
 import org.labkey.test.util.TestLogger;
@@ -96,7 +99,6 @@ import org.labkey.test.util.UIPermissionsHelper;
 import org.labkey.test.util.core.webdav.WebDavUploadHelper;
 import org.labkey.test.util.ext4cmp.Ext4FieldRef;
 import org.labkey.test.util.query.QueryUtils;
-import org.labkey.test.util.search.SearchAdminAPIHelper;
 import org.labkey.test.util.selenium.WebDriverUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.ElementClickInterceptedException;
@@ -106,7 +108,6 @@ import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.html5.WebStorage;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.UnreachableBrowserException;
 import org.openqa.selenium.remote.service.DriverService;
@@ -137,6 +138,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -147,6 +149,7 @@ import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.labkey.test.TestProperties.isHeapDumpCollectionEnabled;
@@ -209,8 +212,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     public StudyHelper _studyHelper = new StudyHelper(this);
     public final ListHelper _listHelper;
     public AbstractAssayHelper _assayHelper = new APIAssayHelper(this);
-    @Deprecated // Redundant class. Use ApiPermissionsHelper or UiPermissionsHelper
-    public SecurityHelper _securityHelper = new SecurityHelper(this);
     public FileBrowserHelper _fileBrowserHelper = new FileBrowserHelper(this);
     @Deprecated // Use ApiPermissionsHelper unless UI testing is necessary
     public UIPermissionsHelper _permissionsHelper = new UIPermissionsHelper(this);
@@ -219,103 +220,16 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     public static final double DELTA = 10E-10;
 
-    public static final String[] ILLEGAL_QUERY_KEY_CHARACTERS = QueryKey.ILLEGAL;
-    public static final String ALL_ILLEGAL_QUERY_KEY_CHARACTERS = StringUtils.join(ILLEGAL_QUERY_KEY_CHARACTERS, "");
-    // See TSVWriter.shouldQuote. Generally we are not able to use the tab and new line characters when creating field names in the UI, but including here for completeness
+    public static final String ALL_ILLEGAL_QUERY_KEY_CHARACTERS = StringUtils.join(FieldKey.getIllegalChars(), "");
+    // See TSVWriter.shouldQuote. Generally, we are not able to use the tab and new line characters when creating field names in the UI, but including here for completeness
     public static final String[] TRICKY_IMPORT_FIELD_CHARACTERS = {"\\", "\"", "\\t", ",", "\\n", "\\r"};
 
     public static final String TRICKY_CHARACTERS = "><&/%\\' \"1\u00E4\u00F6\u00FC\u00C5";
     public static final String TRICKY_CHARACTERS_NO_QUOTES = "></% 1\u00E4\u00F6\u00FC\u00C5";
-    public static final String TRICKY_CHARACTERS_FOR_PROJECT_NAMES = "\u2603~!@$&()_+{}-=[],.#\u00E4\u00F6\u00FC\u00C5"; // No slash or space
-    // TODO using </script> breaks CustomizeViewTest because of the '/'
+    public static final String TRICKY_CHARACTERS_FOR_PROJECT_NAMES = ContainerInfo.TRICKY_CHARACTERS;
+    public static final String LONG_NON_ASCII_STRING = StringUtils.repeat(FieldDefinition.SNOWMAN, 22); // "☃" See Issue 52714
     public static final String INJECT_CHARS_1 = Crawler.injectScriptBlock;
     public static final String INJECT_CHARS_2 = Crawler.injectAttributeScript;
-
-    public static final List<FieldDefinition> REALISTIC_ASSAY_FIELDS = List.of(
-            new FieldDefinition("Addition or Removal (0= addition, 1=removal)", FieldDefinition.ColumnType.Integer),
-            new FieldDefinition("Source (0=external, 1 = internal to system)", FieldDefinition.ColumnType.Integer),
-            new FieldDefinition("Raw Sample [Al] g/L", FieldDefinition.ColumnType.Decimal),
-            new FieldDefinition("Raw Sample [H+] g/L or %", FieldDefinition.ColumnType.Decimal),
-            new FieldDefinition("KJ/Day", FieldDefinition.ColumnType.Decimal),
-            new FieldDefinition("EE KCal/kg0.75", FieldDefinition.ColumnType.Decimal),
-            new FieldDefinition("Ratio EE in Kcal/Day to Lean Mass", FieldDefinition.ColumnType.Decimal),
-            new FieldDefinition("Feed %", FieldDefinition.ColumnType.Decimal),
-            new FieldDefinition("Consumption Rate, Glucose", FieldDefinition.ColumnType.Decimal),
-            new FieldDefinition("Measurement Date/Time", FieldDefinition.ColumnType.DateAndTime),
-            new FieldDefinition("A260/A280", FieldDefinition.ColumnType.Decimal),
-            new FieldDefinition("Nucleic Acid (ng/uL)", FieldDefinition.ColumnType.Decimal),
-            new FieldDefinition("Concentration (by Qubit ng/uL)", FieldDefinition.ColumnType.Decimal),
-            new FieldDefinition("Dead (cells/ml)", FieldDefinition.ColumnType.Decimal),
-            new FieldDefinition("PDGF-AA/BB", FieldDefinition.ColumnType.Decimal),
-            new FieldDefinition("Run End Data/Time", FieldDefinition.ColumnType.DateAndTime),
-            new FieldDefinition("Run Start Date/Time", FieldDefinition.ColumnType.DateAndTime),
-            new FieldDefinition("Algorithm Parameter: Calc. Top", FieldDefinition.ColumnType.Integer),
-            new FieldDefinition("1.0", FieldDefinition.ColumnType.Integer),
-            new FieldDefinition("2.0"),
-            new FieldDefinition("12.0"),
-            new FieldDefinition("FAM-Lambda..cp.Rxn."),
-            new FieldDefinition("VIC-Precision...1"),
-            new FieldDefinition("Product.Type"),
-            new FieldDefinition("Weight.Balance_%", FieldDefinition.ColumnType.Decimal),
-            new FieldDefinition("Cumulative.Yield.DCW/Glucose.Consumed_g/g", FieldDefinition.ColumnType.Decimal),
-            new FieldDefinition("Average.Volume.Productivity_g/L/day", FieldDefinition.ColumnType.Decimal),
-            new FieldDefinition("Cmol.Biomass/Cmol.Glucose.Consumed_%", FieldDefinition.ColumnType.Decimal)
-    );
-
-    public static final List<FieldDefinition> REALISTIC_SAMPLE_FIELDS = List.of(
-            new FieldDefinition("MW (g/mol)", FieldDefinition.ColumnType.Decimal),
-            new FieldDefinition("Batch FW (g/mol)", FieldDefinition.ColumnType.Decimal),
-            new FieldDefinition("Sequence (5'-3')"),
-            new FieldDefinition("Tumor%", FieldDefinition.ColumnType.Decimal),
-            new FieldDefinition("Viable_cells%", FieldDefinition.ColumnType.Decimal),
-            new FieldDefinition("Sample no."),
-            new FieldDefinition("Pass/Fail" , FieldDefinition.ColumnType.TextChoice).setTextChoiceValues(List.of("Pass", "Fail")),
-            new FieldDefinition("Final Positivity %", FieldDefinition.ColumnType.Decimal),
-            new FieldDefinition("Optimised Yes/No", FieldDefinition.ColumnType.Boolean),
-            new FieldDefinition("G-Band Pass/Fail", FieldDefinition.ColumnType.Boolean),
-            new FieldDefinition("Positivity/negativity notes"),
-            new FieldDefinition("Useful for R&D/Production ?", FieldDefinition.ColumnType.Boolean),
-            new FieldDefinition("NaCl Lot Number (External), 0.9% NaCl Expiry (In-House)"),
-            new FieldDefinition("'GURR' 6.8 buffer tablets Lot number (External)"),
-            new FieldDefinition("Giemsa Stain Lot number, Expiry"),
-            new FieldDefinition("Trypsin 2.5% Lot number (External), Expiry"),
-            new FieldDefinition("Lot No.", FieldDefinition.ColumnType.Integer),
-            new FieldDefinition("Sample Origin / Owner"),
-            new FieldDefinition("PSS Tracking No."),
-            new FieldDefinition("Product/bottle size", FieldDefinition.ColumnType.Decimal),
-            new FieldDefinition("Time point / Pull Date", FieldDefinition.ColumnType.DateAndTime),
-            new FieldDefinition("Cell Type (Epz, Spz, PS)"),
-            new FieldDefinition("Concentration (ng/uL)", FieldDefinition.ColumnType.Decimal),
-            new FieldDefinition("Lot no. (Replacement tube) 1"),
-            new FieldDefinition("Date of Collection (DD/MMM/YYY)", FieldDefinition.ColumnType.Date),
-            new FieldDefinition("Freezer/Fridge ID"),
-            new FieldDefinition( "X Position (i.e., box row)", FieldDefinition.ColumnType.Integer),
-            new FieldDefinition("[Analysis 2] 2. Time In (Fridge)", FieldDefinition.ColumnType.Time),
-            new FieldDefinition("Aliquot_No._/_ID"),
-            new FieldDefinition("VIAL_ID/BARCODE/ACCESSION_No."),
-            new FieldDefinition("No.=_464"),
-            new FieldDefinition("Specimen_condition_(Hämolyse/insufficient_volume/…)", FieldDefinition.ColumnType.Decimal),
-            new FieldDefinition("CHECKOUT_(x),_Removed_(1)"),
-            new FieldDefinition("Age <18 years of age or >65 years of age.", FieldDefinition.ColumnType.Boolean),
-            new FieldDefinition("CTS&L_LLS_Visit_Code_"),
-            new FieldDefinition("Collection Tube Type & Volume 1"),
-            new FieldDefinition("Row_&_Col"),
-            new FieldDefinition("The participant has received any investigational compound from a different trial within 30 days or 5 half-lives (whichever is greater)."),
-            new FieldDefinition("Barcode e.g FG30000A001"),
-            new FieldDefinition("Information pertaining to patient recruitment e.g advertisements, bulletins and information placed on the internet - TMAR"),
-            new FieldDefinition("Data Collection Tools (CRF's, Info Sheets, etc.)")
-    );
-
-    public static final List<FieldDefinition> REALISTIC_SOURCE_FIELDS = List.of(
-            new FieldDefinition("Patient Race / Ethnicity", FieldDefinition.ColumnType.TextChoice).setTextChoiceValues(List.of("American Indian or Alaska Native", "Asian",  "Black", "Native Hawaiian or Pacific Islander", "White", "Other", "Unknown" )),
-            new FieldDefinition("Tumor%", FieldDefinition.ColumnType.Decimal),
-            new FieldDefinition("Viable_cells%", FieldDefinition.ColumnType.Decimal),
-            new FieldDefinition("Гемоглобін тех.", FieldDefinition.ColumnType.Date),
-            new FieldDefinition("Disposition (per SOW/MTA)", FieldDefinition.ColumnType.String),
-            new FieldDefinition("~ Height (T to B) (mm)", FieldDefinition.ColumnType.Integer),
-            new FieldDefinition("OD/DCW factor", FieldDefinition.ColumnType.String),
-            new FieldDefinition("Age (years)", FieldDefinition.ColumnType.Integer)
-    );
 
     /** Have we already done a memory leak and error check in this test harness VM instance? */
     protected static boolean _checkedLeaksAndErrors = false;
@@ -388,7 +302,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         return SingletonWebDriver.getInstance().getWebDriver();
     }
 
-    protected abstract @Nullable String getProjectName();
+    protected abstract String getProjectName();
 
     public final @Nullable String getPrimaryTestProject()
     {
@@ -627,7 +541,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 else
                     minutes = ClassTimeout.DEFAULT;
 
-                minutes *= timeoutMultiplier;
+                minutes = Math.round(minutes * timeoutMultiplier);
 
                 if (minutes == 0)
                     minutes = 1;
@@ -864,12 +778,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             {
                 // Clears browser localStorage. Needed in order to reset some state such as grid filters/sorts/etc.
                 // which are sticky, but can interfere with what tests expect.
-                WebDriver driver = getDriver();
-
-                if (driver instanceof WebStorage webStorage)
-                {
-                    webStorage.getLocalStorage().clear();
-                }
+                executeScript("window.localStorage.clear();");
+                executeScript("window.sessionStorage.clear();");
             }
 
             @Override
@@ -1405,8 +1315,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         if (pendingRequestCount.getValue() < 0)
             TestLogger.log("Unable to fetch pending request count" + msWait + "ms");
 
-        if (_containerHelper.getAllModules().contains("Search"))
-            SearchAdminAPIHelper.waitForIndexerBackground();
     }
 
     private int getPendingRequestCount(Connection connection)
@@ -1423,11 +1331,16 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         }
     }
 
+    protected boolean skipCleanup(boolean afterTest)
+    {
+        return false;
+    }
+
     private void cleanup(boolean afterTest)
     {
         ensureSignedInAsPrimaryTestUser();
 
-        if (!ClassUtils.getAllInterfaces(getClass()).contains(ReadOnlyTest.class) || ((ReadOnlyTest) this).needsSetup())
+        if (!skipCleanup(afterTest) && (!(this instanceof ReadOnlyTest readOnlyTest) || readOnlyTest.needsSetup()))
         {
             if (afterTest)
                 waitForPendingRequests(WAIT_FOR_PAGE);
@@ -1501,7 +1414,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 }
             }
             msSinceTestStart = System.currentTimeMillis() - previousLeakCheck;
-            beginAt("/admin/memTracker.view?gc=1&clearCaches=1", 120000);
+            beginAt(WebTestHelper.buildURL("admin", "memTracker", Map.of("gc", 1, "clearCaches", 1)), 120000);
             if (!isTextPresent("In-Use Objects"))
                 throw new IllegalStateException("Asserts must be enabled to track memory leaks; add -ea to your server VM params and restart or add -DmemCheck=false to your test VM params.");
             leakCount = getImageWithAltTextCount("expand/collapse");
@@ -1695,7 +1608,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         int rowCount, coveredActions, totalActions;
         double actionCoveragePercent;
         String actionCoveragePercentString;
-        beginAt("/admin/actions.view");
+        beginAt(WebTestHelper.buildURL("admin", "actions"));
 
         rowCount = getTableRowCount(ACTION_SUMMARY_TABLE_NAME);
         if (getTableCellText(Locator.id(ACTION_SUMMARY_TABLE_NAME), rowCount - 1, 0).equals("Total"))
@@ -1772,7 +1685,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     protected void setSelectedFields(String containerPath, String schema, String query, String viewName, String[] fields)
     {
         pushLocation();
-        beginAt("/query" + containerPath + "/internalNewView.view");
+        beginAt(WebTestHelper.buildURL("query", containerPath, "internalNewView"));
         setFormElement(Locator.name("ff_schemaName"), schema);
         setFormElement(Locator.name("ff_queryName"), query);
         if (viewName != null)
@@ -1790,14 +1703,14 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     }
 
     @LogMethod
-    private ExportFolderPage prepareForFolderExport(@Nullable String folderName, boolean exportSecurityGroups, boolean exportRoleAssignments, boolean includeSubfolders, boolean includeFiles, boolean exportETLDefination)
+    private ExportFolderPage prepareForFolderExport(@Nullable String folderName, boolean exportSecurityGroups, boolean exportRoleAssignments, boolean includeSubfolders, boolean includeFiles, boolean exportETLDefinition)
     {
         if (folderName != null)
             clickFolder(folderName);
         ExportFolderPage exportFolderPage = goToFolderManagement().goToExportTab();
 
-        if (exportETLDefination)
-            exportFolderPage.includeETLDefintions(exportETLDefination);
+        if (exportETLDefinition)
+            exportFolderPage.includeETLDefinitions(exportETLDefinition);
 
         if (exportSecurityGroups)
             exportFolderPage.includeSecurityGroups(exportSecurityGroups);
@@ -1992,7 +1905,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         {
             _setPipelineRoot(rootPath, inherit);
 
-            waitForElement(Locators.labkeyMessage.withText("The pipeline root was set to '" + Paths.get(rootPath).normalize() + "'"));
+            waitForElement(Locators.labkeyMessage.withTextIgnoreCase("The pipeline root was set to '" + Paths.get(rootPath).normalize() + "'"));
 
             getArtifactCollector().addArtifactLocation(new File(rootPath));
 
@@ -2070,7 +1983,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         }
         else
         {
-            apiPermissionsHelper.addUserToSiteGroup(userEmail, "Developers");
+            apiPermissionsHelper.setSiteRoleUserPermissions(userEmail, PermissionsHelper.DEVELOPER_ROLE);
         }
 
         return apiPermissionsHelper;
@@ -2272,32 +2185,38 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             assertTextPresent(searchFor);
         }
     }
-    public void selectSchema(String schemaName)
+
+    /**
+     * @param schemaKey encoded schema key
+     */
+    public void selectSchema(String schemaKey)
     {
-        String[] schemaParts = schemaName.split("\\.");
-        selectSchema(schemaParts);
+        selectSchema(SchemaKey.parse(schemaKey));
     }
-    // Helper methods for interacting with the query schema browser
+
     public void selectSchema(String[] schemaParts)
     {
-        StringBuilder schemaWithParents = new StringBuilder();
-        String separator = "";
-        for (String schemaPart : schemaParts)
-        {
-            schemaWithParents.append(separator).append(schemaPart);
-            separator = ".";
+        selectSchema(SchemaKey.fromParts(schemaParts));
+    }
 
-            Locator.XPathLocator loc = Locator.tag("tr").withClass("x4-grid-row").append("/td/div/span").withText(schemaPart).precedingSibling("img").withClass("x4-tree-icon");
+    public void selectSchema(SchemaKey schemaKey)
+    {
+        Iterator<SchemaKey> iterator = schemaKey.getIterator();
+        while (iterator.hasNext())
+        {
+            schemaKey = iterator.next();
+
+            Locator.XPathLocator loc = Locator.tag("tr").withClass("x4-grid-row").append("/td/div/span").withText(schemaKey.getName()).precedingSibling("img").withClass("x4-tree-icon");
 
             //first load of schemas might a few seconds
             shortWait().until(ExpectedConditions.elementToBeClickable(loc));
-            Locator.XPathLocator selectedSchema = Locator.xpath("//tr").withClass("x4-grid-row-selected").append("/td/div/span").withText(schemaPart);
+            Locator.XPathLocator selectedSchema = Locator.xpath("//tr").withClass("x4-grid-row-selected").append("/td/div/span").withText(schemaKey.getName());
 
-            if (getDriver().getCurrentUrl().endsWith("schemaName=" + schemaPart))
+            if (getDriver().getCurrentUrl().endsWith("schemaName=" + EscapeUtil.encode(schemaKey.toString())))
                 waitForElement(selectedSchema);
             if (isElementPresent(selectedSchema))
                 continue; // already selected
-            log("Selecting schema " + schemaWithParents + " in the schema browser...");
+            log("Selecting schema " + schemaKey.getFullName() + " in the schema browser...");
             waitForElementToDisappear(Locator.xpath("//tbody[starts-with(@id, 'treeview')]/tr[not(starts-with(@id, 'treeview'))]"));
             // select/expand tree node
             try
@@ -2328,19 +2247,23 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     public void selectQuery(String schemaName, String queryName)
     {
-        selectQuery(schemaName.split("\\."), queryName);
+        selectQuery(SchemaKey.parse(schemaName), queryName);
     }
 
-    public void selectQuery(String[] schemaPart, String queryName)
+    public void selectQuery(String[] schemaParts, String queryName)
     {
-        String schemaName = StringUtils.join(schemaPart, ".");
-        log("Selecting query " + schemaName + "." + queryName + " in the schema browser...");
-        selectSchema(schemaPart);
+        selectQuery(SchemaKey.fromParts(schemaParts), queryName);
+    }
+
+    public void selectQuery(SchemaKey schemaKey, String queryName)
+    {
+        log("Selecting query " + schemaKey.getFullName() + "." + queryName + " in the schema browser...");
+        selectSchema(schemaKey);
         mouseOver(Locator.byClass(".x4-tab-button")); // Move away from schema tree to dismiss tooltip
-        waitAndClick(Ext4Helper.Locators.tab(schemaName)); // Click schema tab to make sure query list is visible
+        waitAndClick(Ext4Helper.Locators.tab(schemaKey.getFullName())); // Click schema tab to make sure query list is visible
         WebElement queryLink = Locator.tagWithClass("table", "lk-qd-coltable").append(Locator.tagWithClass("span", "labkey-link")).withText(queryName).notHidden().waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
         queryLink.click();
-        waitForElement(Locator.tagWithClass("div", "lk-qd-name").startsWith(schemaName + "." + queryName), 30000);
+        waitForElement(Locator.tagWithClass("div", "lk-qd-name").startsWith(schemaKey.getFullName() + "." + queryName), 30000);
     }
 
     public DataRegionTable viewQueryData(String schemaName, String queryName)
@@ -2362,12 +2285,17 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         return new DataRegionTable("query", this);
     }
 
-    public void editQueryProperties(String schemaName, String queryName)
+    public SourceQueryPage editQuerySource(String schemaName, String queryName)
     {
         selectQuery(schemaName, queryName);
-        Locator loc = Locator.tagWithText("a", "edit properties");
-        waitForElement(loc, WAIT_FOR_JAVASCRIPT);
-        clickAndWait(loc);
+        clickAndWait(Locator.linkContainingText("edit source"));
+        return new SourceQueryPage(getDriver());
+    }
+
+    public void editQueryProperties(String schemaName, String queryName)
+    {
+        String url = WebTestHelper.buildRelativeUrl("query", getCurrentContainerPath(), "propertiesQuery", Map.of("schemaName", schemaName, "query.queryName", queryName));
+        beginAt(url);
     }
 
     public void createNewQuery(String schemaName)
@@ -2387,8 +2315,12 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         return new NewQueryPage(getDriver());
     }
 
-
     protected void createQuery(String container, String name, String schemaName, String sql, String xml, boolean inheritable)
+    {
+        createQuery(container, name, schemaName, sql, xml, inheritable, null);
+    }
+
+    protected void createQuery(String container, String name, String schemaName, String sql, String xml, boolean inheritable, @Nullable String description)
     {
         SourceQueryPage sourcePage = createQuery(container, name, schemaName);
         sourcePage.setSource(sql);
@@ -2397,13 +2329,16 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         {
             sourcePage.setMetadataXml(xml);
         }
-        sourcePage.clickSave();
-        if (inheritable)
+        sourcePage.clickSave(); // This seems very slow... maybe clickSaveAndFinish() instead?
+        if (inheritable || !StringUtils.isEmpty(description))
         {
-            String queryURL = "query/" + container + "/begin.view?schemaName=" + schemaName;
+            String queryURL = buildURL("query", getProjectName(), "begin",  Map.of("schemaName", schemaName));
             beginAt(queryURL);
             editQueryProperties(schemaName, name);
-            selectOptionByValue(Locator.name("inheritable"), "true");
+            if (inheritable)
+                selectOptionByValue(Locator.name("inheritable"), "true");
+            if (description != null)
+                setFormElement(Locator.tagWithName("textarea", "description"), description);
             clickButton("Save");
         }
     }
@@ -2562,12 +2497,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         }
     }
 
-    public void ensureSignedOut()
-    {
-        if(isElementPresent(Locator.id("userMenuPopupLink")))
-            signOut();
-    }
-
     protected void reloadStudyFromZip(File folderArchive)
     {
         reloadStudyFromZip(folderArchive, true, 2);
@@ -2688,7 +2617,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             if (isElementPresent(Locator.id(testDivId)))
             {
                 String divHtml = (String)executeScript("return document.getElementById('" + testDivId + "').innerHTML;");
-                if (divHtml.length() > 0)
+                if (!divHtml.isEmpty())
                     return divHtml;
             }
             sleep(1000);
@@ -2826,6 +2755,77 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             executeScript("localStorage.setItem('" + dismissBannerKey + "', 'true')");
         else
             executeScript("localStorage.removeItem('" + dismissBannerKey + "')");
+    }
+
+    protected void verifyQueryAPI(String schema, String dataType, Map<String, Object> row, boolean isInsert, String... errorMsg)
+    {
+        verifyQueryAPI(schema, dataType, null, row, isInsert, errorMsg);
+    }
+
+    protected void verifyQueryAPI(String schema, String dataType, @Nullable AuditLogHelper.AuditBehaviorType auditBehavior, Map<String, Object> row, boolean isInsert, String... errorMsg)
+    {
+        String action = isInsert ? "insertRows" : "updateRows";
+        String updateScript = "LABKEY.Query." + action + "({ schemaName: \"" + schema + "\", "+
+                "queryName: " + EscapeUtil.toJSONStr(dataType) + ", " +
+                (auditBehavior == null ? "" : ("auditBehavior: " + EscapeUtil.toJSONStr(auditBehavior.name())) + ", ") +
+                "success: callback," +
+                "failure: callback," +
+                "rows: [" + EscapeUtil.toJSONRow(row) + "]" +
+                "})";
+        log(updateScript);
+        executeAndVerifyScript(updateScript, errorMsg);
+    }
+
+    protected void verifyQueryAPI(String schema, String dataType, @Nullable AuditLogHelper.AuditBehaviorType auditBehavior, List<Map<String, Object>> rows, boolean isInsert, String... errorMsg)
+    {
+        String action = isInsert ? "insertRows" : "updateRows";
+        String updateScript = "LABKEY.Query." + action + "({ schemaName: \"" + schema + "\", "+
+                "queryName: " + EscapeUtil.toJSONStr(dataType) + ", " +
+                (auditBehavior == null ? "" : ("auditBehavior: " + EscapeUtil.toJSONStr(auditBehavior.name())) + ", ") +
+                "success: callback," +
+                "failure: callback," +
+                "rows: [" + EscapeUtil.toJSONRow(rows) + "]" +
+                "})";
+        log(updateScript);
+        executeAndVerifyScript(updateScript, errorMsg);
+    }
+
+    protected void executeAndVerifyScript(String script, @Nullable String... altErrors)
+    {
+        List<String> errors = new ArrayList<>();
+        if (altErrors != null)
+            errors = Arrays.stream(altErrors).filter(Objects::nonNull).toList();
+
+        Map<String, Object> result = (Map<String, Object>)executeAsyncScript(script);
+
+        String failureResult = APITestHelper.parseScriptResult(result);
+
+        if (altErrors == null || errors.isEmpty())
+        {
+            assertNull(failureResult);  // null here means there was an unhandled server-side exception
+            checker().verifyNull("Unexpected error message", result.get("exception"));
+        }
+        else
+        {
+            Object exception = result.get("exception");
+            checker().verifyNotNull("Error is empty", exception);
+
+            if (exception instanceof String exceptionStr)
+            {
+                if (errors.size() == 1)
+                    checker().verifyEquals("Unexpected error message", errors.get(0), exception);
+                else
+                {
+                    for (String error : altErrors)
+                    {
+                        if (exceptionStr.equals(error))
+                            return;
+
+                    }
+                    checker().error("Unexpected error message: " + exception);
+                }
+            }
+        }
     }
 
     @Target(ElementType.TYPE)

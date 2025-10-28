@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.assertj.core.api.Assertions;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
 import org.junit.Before;
@@ -25,8 +26,9 @@ import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.DeleteRowsCommand;
 import org.labkey.remoteapi.query.InsertRowsCommand;
-import org.labkey.remoteapi.query.SaveRowsCommand;
-import org.labkey.remoteapi.query.SaveRowsResponse;
+import org.labkey.remoteapi.query.BaseRowsCommand;
+import org.labkey.remoteapi.query.MoveRowsCommand;
+import org.labkey.remoteapi.query.RowsResponse;
 import org.labkey.remoteapi.query.UpdateRowsCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -34,15 +36,19 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Data;
+import org.labkey.test.components.html.SiteNavBar;
 import org.labkey.test.pages.ImportDataPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldDefinition.ColumnType;
 import org.labkey.test.params.experiment.DataClassDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
+import org.labkey.test.params.list.IntListDefinition;
+import org.labkey.test.params.list.ListDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.exp.SampleTypeAPIHelper;
+import org.labkey.test.util.search.SearchAdminAPIHelper;
 import org.openqa.selenium.Alert;
 
 import java.io.IOException;
@@ -59,6 +65,10 @@ import java.util.Map;
 @BaseWebDriverTest.ClassTimeout(minutes = 8)
 public class TriggerScriptTest extends BaseWebDriverTest
 {
+    private static final String PROJECT_NAME = "Test Trigger Script Project";
+    private static final String SUBFOLDER_NAME = "SubfolderA";
+    private static final String SUBFOLDER_PATH = "/" + PROJECT_NAME + "/" + SUBFOLDER_NAME;
+
     //List constants
     private static final String TRIGGER_MODULE = "triggerTestModule";
     private static final String SIMPLE_MODULE = "simpletest";
@@ -85,8 +95,10 @@ public class TriggerScriptTest extends BaseWebDriverTest
 
     private static final String COMMENTS_FIELD = "Comments";
     private static final String COUNTRY_FIELD = "Country";
+    public static final String PEOPLE_LIST_NAME = "People";
 
     protected final PortalHelper _portalHelper = new PortalHelper(this);
+    private static ListDefinition EMPLOYEE_LIST;
 
     @Override
     public List<String> getAssociatedModules()
@@ -98,7 +110,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
     @Override
     protected String getProjectName()
     {
-        return "Test Trigger Script Project";
+        return PROJECT_NAME;
     }
 
     @Override
@@ -164,34 +176,42 @@ public class TriggerScriptTest extends BaseWebDriverTest
     }
 
     @BeforeClass
-    public static void projectSetup()
+    public static void projectSetup() throws Exception
     {
-        TriggerScriptTest init = (TriggerScriptTest) getCurrentTest();
+        TriggerScriptTest init = getCurrentTest();
         init.doSetup();
     }
 
-    protected void doSetup()
+    protected void doSetup() throws Exception
     {
         _containerHelper.createProject(getProjectName(), null);
+        _containerHelper.createSubfolder(getProjectName(), SUBFOLDER_NAME);
         _containerHelper.enableModule(getProjectName(), "Query");
         _containerHelper.enableModule(getProjectName(), SIMPLE_MODULE);
         _containerHelper.enableModule(getProjectName(), TRIGGER_MODULE);
 
-        //create List
-        FieldDefinition[] columns = new FieldDefinition[] {
+        // Create lists
+        {
+            List<FieldDefinition> fields = List.of(
                 new FieldDefinition("name", ColumnType.String).setLabel("Name"),
                 new FieldDefinition("ssn", ColumnType.String).setLabel("SSN"),
                 new FieldDefinition("company", ColumnType.String).setLabel("Company")
+            );
 
-        };
+            EMPLOYEE_LIST = new IntListDefinition(LIST_NAME, "Key").setFields(fields);
+            EMPLOYEE_LIST.create(createDefaultConnection(), getProjectName());
 
-        _listHelper.createList(getProjectName(), LIST_NAME, "Key", columns);
-
-        log("Create list in subfolder to prevent query validation failure");
-        _listHelper.createList(getProjectName(), "People", "Key",
+            fields = List.of(
                 new FieldDefinition("Name", ColumnType.String).setDescription("Name"),
                 new FieldDefinition("Age", ColumnType.Integer).setDescription("Age"),
-                new FieldDefinition("Crazy", ColumnType.Boolean).setDescription("Crazy?"));
+                new FieldDefinition("FavoriteDateTime", ColumnType.DateAndTime).setDescription("Favorite date time. Who doesn't have one?"),
+                new FieldDefinition("Crazy", ColumnType.Boolean).setDescription("Crazy?")
+            );
+
+            new IntListDefinition(PEOPLE_LIST_NAME, "Key")
+                    .setFields(fields)
+                    .create(createDefaultConnection(), getProjectName());
+        }
 
         importFolderFromZip(TestFileUtils.getSampleData("studies/LabkeyDemoStudy.zip"));
 
@@ -212,6 +232,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
     @Test
     public void testListIndividualTriggers()
     {
+        cleanUpListRows();
         EmployeeRecord caughtAfter = new EmployeeRecord("Emp 1", "1112223333", "Test"),
                 changedBefore = new EmployeeRecord("Emp 2", "2223334444", "Some Other");
 
@@ -262,12 +283,12 @@ public class TriggerScriptTest extends BaseWebDriverTest
         clickButton("Back");
         //Verify validation error prevented delete
         waitForElement(Locator.tagWithText("td", "Emp 3"));
-        cleanUpListRows();
     }
 
     @Test
     public void testListImportTriggers()
     {
+        cleanUpListRows();
         goToManagedList(LIST_NAME);
         _listHelper.clickImportData();
 
@@ -297,12 +318,64 @@ public class TriggerScriptTest extends BaseWebDriverTest
         importDataPage.submit();
 
         waitForElement(Locator.tagWithText("td","Importing TSV"));
+    }
+
+    @Test
+    public void testListMoveTriggers() throws Exception
+    {
         cleanUpListRows();
+
+        RowsResponse response = EMPLOYEE_LIST.getTestDataGenerator(getProjectName())
+            .addCustomRow(Map.of("name", "Emp 11", "ssn", "123-45-6789", "company", "LK"))
+            .insertRows();
+
+        List<EmployeeRecord> records = response.getRows().stream().map(EmployeeRecord::fromMap).toList();
+
+        openServerJavaScriptConsole();
+
+        MoveRowsCommand command = new MoveRowsCommand(SUBFOLDER_PATH, LIST_SCHEMA, LIST_NAME);
+        command.setRows(List.of(Map.of("Key", records.get(0).key)));
+        command.execute(createDefaultConnection(), getProjectName());
+        waitForConsole("init got triggered with event: move", "complete got triggered with event: move");
+
+        closeServerJavaScriptConsole();
+    }
+
+    /** Issue 52098 - ensure trigger scripts have a chance to do custom type conversion with the incoming row */
+    @Test
+    public void testListAPITriggerTypeConversion() throws Exception
+    {
+        Connection cn = WebTestHelper.getRemoteApiConnection();
+
+        // Insert a row with a value that can only be handled by the trigger script to make sure it gets a chance
+        // to do the conversion. People.js should strip the "RemoveMe" prefix from Age and FavoriteDateTime
+        InsertRowsCommand insCmd = new InsertRowsCommand(LIST_SCHEMA, PEOPLE_LIST_NAME);
+        insCmd.addRow(Map.of("Name", "Jimbo", "Age", "RemoveMe25", "FavoriteDateTime", "RemoveMe2025-06-11 11:42", "Crazy", "true"));
+        RowsResponse insResp = insCmd.execute(cn, getProjectName());
+        List<Map<String, Object>> insertedRows = insResp.getRows();
+        Assert.assertEquals(1, insertedRows.size());
+
+        Map<String, Object> insertedRow = insertedRows.get(0);
+        Assert.assertEquals("Jimbo", insertedRow.get("Name"));
+        Assert.assertEquals(25, insertedRow.get("Age"));
+        Assert.assertEquals("2025-06-11 11:42:00.000", insertedRow.get("FavoriteDateTime"));
+
+        // Validate update too
+        UpdateRowsCommand upCmd = new UpdateRowsCommand(LIST_SCHEMA, PEOPLE_LIST_NAME);
+        insertedRow.put("Age", "RemoveMe26");
+        upCmd.addRow(insertedRow);
+        RowsResponse upResp = upCmd.execute(cn, getProjectName());
+        List<Map<String, Object>> updatedRows = upResp.getRows();
+        Assert.assertEquals(1, updatedRows.size());
+
+        Map<String, Object> updatedRow = updatedRows.get(0);
+        Assert.assertEquals(26, updatedRow.get("Age"));
     }
 
     @Test
     public void testListAPITriggers() throws Exception
     {
+        cleanUpListRows();
         String ssn1 = "111111112";
         String ssn2 = "222211111";
 
@@ -317,7 +390,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
 
         //Check After Insert Event
         InsertRowsCommand insCmd = new InsertRowsCommand(LIST_SCHEMA, LIST_NAME);
-        SaveRowsResponse resp;
+        RowsResponse resp;
 
         insCmd.addRow(row1.toMap()); //can add multiple rows to insert many at once
         insCmd.addRow(row2.toMap());
@@ -372,8 +445,6 @@ public class TriggerScriptTest extends BaseWebDriverTest
         delCmd = new DeleteRowsCommand(LIST_SCHEMA, LIST_NAME);
         delCmd.addRow(row3.toMap());
         assertAPIErrorMessage(delCmd, BEFORE_DELETE_ERROR, cn);
-
-        cleanUpListRows();
     }
 
     /********************************
@@ -388,7 +459,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
         doIndividualTriggerTest("Dataset", goToDataset, "ParticipantId", true, "Confirm Delete", true);
 
         //For some reason these only get logged for datasets...
-        checkExpectedErrors(6);
+        checkExpectedErrors(4);
     }
 
     @Test
@@ -434,7 +505,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
     @Test
     public void testDatasetAPITriggers() throws Exception
     {
-        doAPITriggerTest(STUDY_SCHEMA,DATASET_NAME,"ParticipantId", true);
+        doAPITriggerTest(STUDY_SCHEMA, DATASET_NAME, "ParticipantId", true);
     }
 
     /********************************
@@ -448,7 +519,14 @@ public class TriggerScriptTest extends BaseWebDriverTest
         GoToDataUI goToDataClass = () -> goTo("Data Classes", DATA_CLASSES_NAME);
 
         setupDataClass();
+        openServerJavaScriptConsole();
+
         doIndividualTriggerTest("query", goToDataClass, "Name", false, "Yes, Delete", false);
+
+        waitForConsole("init got triggered with event: delete",
+                "exp.data: this is from the shared function",
+                "complete got triggered with event: delete");
+        closeServerJavaScriptConsole();
     }
 
 
@@ -531,9 +609,11 @@ public class TriggerScriptTest extends BaseWebDriverTest
 
         insCmd.addRow(row2);
         insCmd.addRow(row3);
-        SaveRowsResponse resp = insCmd.execute(cn, getProjectName());
+        RowsResponse resp = insCmd.execute(cn, getProjectName());
         row2 = resp.getRows().get(0);
         Assert.assertEquals("API BeforeInsert", row2.get(COUNTRY_FIELD));
+
+        SearchAdminAPIHelper.waitForIndexer();
 
         row3 = resp.getRows().get(1);
 
@@ -551,6 +631,8 @@ public class TriggerScriptTest extends BaseWebDriverTest
         Assert.assertEquals(BEFORE_UPDATE_COMPANY, updateCo.get(updateField));
         //Check update persisted
         Assert.assertEquals("BeforeUpdate", updateCo.get(flagField));
+
+        SearchAdminAPIHelper.waitForIndexer();
 
         //Check After Update Event
         step = "AfterUpdate";
@@ -664,7 +746,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
      * @param expected error message to check
      * @param cn connection object to run against
      */
-    private void assertAPIErrorMessage(SaveRowsCommand cmd, String expected, Connection cn) throws IOException
+    private void assertAPIErrorMessage(BaseRowsCommand cmd, String expected, Connection cn) throws IOException
     {
         try
         {
@@ -673,7 +755,9 @@ public class TriggerScriptTest extends BaseWebDriverTest
         }
         catch (CommandException e)
         {
-            Assert.assertTrue("Trigger script error message was wrong", e.getMessage().contains(expected));
+            Assertions.assertThat(e.getMessage())
+                    .as("Trigger script error should contain expected text")
+                    .contains(expected);
         }
     }
 
@@ -779,7 +863,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
     /**
      * Generate delimited string of keys from a map
      */
-    private String joinMapValues(Map<String,String> data, String delimiter )
+    private String joinMapValues(Map<String,String> data, String delimiter)
     {
         StringBuilder sb = new StringBuilder();
         data.values().forEach(val -> sb.append(val).append(delimiter));
@@ -789,7 +873,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
     /**
      * Generate delimited string of keys from a map
      */
-    private String joinMapKeys(Map<String,String> data, String delimiter )
+    private String joinMapKeys(Map<String,String> data, String delimiter)
     {
         StringBuilder sb = new StringBuilder();
         data.keySet().forEach(val -> sb.append(val).append(delimiter));
@@ -829,5 +913,28 @@ public class TriggerScriptTest extends BaseWebDriverTest
                         new FieldDefinition(COMMENTS_FIELD, ColumnType.String),
                         new FieldDefinition(COUNTRY_FIELD, ColumnType.String)));
         SampleTypeAPIHelper.createEmptySampleType(getProjectName(), sampleType);
+    }
+
+    private void closeServerJavaScriptConsole()
+    {
+        switchToWindow(1);
+        getDriver().close();
+        switchToMainWindow();
+    }
+
+    private void openServerJavaScriptConsole()
+    {
+        // Go to the log view to start capturing messages
+        new SiteNavBar(getDriver()).clickAdminMenuItem(false, "Developer Links", "Server JavaScript Console");
+        switchToWindow(1);
+        waitForText("Message");
+        switchToMainWindow();
+    }
+
+    private void waitForConsole(String... text)
+    {
+        switchToWindow(1);
+        waitForText(text);
+        switchToMainWindow();
     }
 }

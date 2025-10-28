@@ -26,8 +26,11 @@ import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Wiki;
+import org.labkey.test.pages.admin.ExternalSourcesPage;
+import org.labkey.test.pages.admin.ExternalSourcesPage.Directive;
 import org.labkey.test.pages.search.SearchResultsPage;
 import org.labkey.test.pages.wiki.EditPage;
 import org.labkey.test.util.DataRegionTable;
@@ -36,6 +39,8 @@ import org.labkey.test.util.WikiHelper;
 import org.labkey.test.util.search.SearchAdminAPIHelper;
 
 import java.io.File;
+import java.io.IOException;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 
@@ -44,6 +49,8 @@ import java.util.List;
 public class WikiTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = TRICKY_CHARACTERS_FOR_PROJECT_NAMES + "WikiVerifyProject";
+    private static final String SUBFOLDER_NAME = TRICKY_CHARACTERS_FOR_PROJECT_NAMES + "WikiVerifySubfolder";
+    private static final String SUBFOLDER_PATH = String.format("%s/%s", PROJECT_NAME, SUBFOLDER_NAME);
     private static final String WIKI_PAGE_ALTTITLE = "PageBBB has HTML";
     private static final String WIKI_PAGE_WEBPART_ID = "qwp999";
     private static final String WIKI_PAGE_TITLE = "_Test Wiki " + BaseWebDriverTest.INJECT_CHARS_1;
@@ -65,6 +72,8 @@ public class WikiTest extends BaseWebDriverTest
     private void doSetup()
     {
         _containerHelper.createProject(PROJECT_NAME, null);
+        _containerHelper.enableModules(Arrays.asList("Wiki"));
+        _containerHelper.createSubfolder(PROJECT_NAME, SUBFOLDER_NAME);
         _containerHelper.enableModules(Arrays.asList("Wiki"));
 
         SearchAdminAPIHelper.pauseCrawler(getDriver());
@@ -97,6 +106,8 @@ public class WikiTest extends BaseWebDriverTest
     @Test
     public void testSteps()
     {
+        goToProjectHome();
+
         log("test create new html page with a webpart");
         WikiHelper wikiHelper = new WikiHelper(this);
         wikiHelper.createNewWikiPage("HTML");
@@ -159,13 +170,17 @@ public class WikiTest extends BaseWebDriverTest
     @Test
     public void testEmbeddedVideoInWiki()
     {
+        String videoHost = "https://www.youtube.com";
+        String videoUrl = videoHost + "/embed/JEE4807UHN4";
         String wikiName = "Wiki with video";
         String wikiTitle = "Sample finder video";
         String wikiContent = """
                 Some random content start : Have fun watching video below
-                {video:https://www.youtube.com/embed/JEE4807UHN4|height:350|width:500}
+                {video:%s|height:350|width:500}
                 Hope you had fun watching the video..!
-                """;
+                """.formatted(videoUrl);
+
+        ExternalSourcesPage.beginAt(this).ensureHost(Directive.Frame, videoHost);
 
         goToProjectHome();
         log("Creating the wiki with video");
@@ -177,7 +192,7 @@ public class WikiTest extends BaseWebDriverTest
         wikiHelper.setWikiBody(wikiContent);
         wikiHelper.saveWikiPage();
 
-        Assert.assertEquals("Video is missing", "https://www.youtube.com/embed/JEE4807UHN4",
+        Assert.assertEquals("Video is missing", videoUrl,
                 getAttribute(Locator.tag("iframe"), "src"));
     }
 
@@ -225,6 +240,83 @@ public class WikiTest extends BaseWebDriverTest
 
         searchFor(PROJECT_NAME, "commas", 1, null);
         Assert.assertEquals("Incorrect result with comma", Arrays.asList(wikiTitle + "\n/" + getProjectName() + "\n" + wikiContent), getTexts(new SearchResultsPage(getDriver()).getResults()));
+    }
+
+    // Issue 49321
+    @Test
+    public void testDeleteUndeleteAttachment() throws IOException
+    {
+        String wikiName = "Wiki with attachments";
+        String wikiTitle = "Attach Delete Undelete file";
+        String wikiContent = "Lorem Ipsum something";
+        String fileName = "wiki_temp_file_attachment.txt";
+        File testAttachment = TestFileUtils.writeTempFile(fileName, "it was a dark and stormy night");
+        Locator wikiPageLinkLoc = Locator.linkWithText(wikiTitle);
+        Locator editLinkLoc = Locator.linkWithText("Edit");
+        Locator.XPathLocator attachmentParentLoc = Locator.id("wiki-ea-name-0");
+        Locator.XPathLocator removeLinkLoc = Locator.tag("td").child(Locator.linkContainingText("remove"));
+        Locator.XPathLocator deleteLinkLoc = Locator.tag("td").child(Locator.linkContainingText("delete"));
+        Locator undeleteLinkLoc = Locator.tag("td").child("a").child("span").containing("un-delete");
+        Locator filePickerLinkLoc = Locator.id("filePickerLink");
+        Locator fileInputLoc = Locator.tag("input").withAttribute("type", "file")
+                .withAttributeContaining("id", "formFile");
+
+        goToProjectHome();
+        log("Creating the wiki " + wikiTitle);
+        WikiHelper wikiHelper = new WikiHelper(this);
+        wikiHelper.createNewWikiPage("HTML");
+        wikiHelper.setWikiName(wikiName);
+        wikiHelper.setWikiTitle(wikiTitle);
+        wikiHelper.setWikiBody("<p>" + wikiContent + "</p>");
+        wikiHelper.saveWikiPage();
+        numberOfWikiCreated++;
+        waitAndClickAndWait(wikiPageLinkLoc);
+
+        log("adding an attachment");
+        waitAndClickAndWait(editLinkLoc);
+        click(filePickerLinkLoc);
+        setFormElement(fileInputLoc, testAttachment);
+        waitForElement(removeLinkLoc);  // when just attached, 'remove' will be an option but delete will not be
+        assertElementNotPresent(deleteLinkLoc);
+        click(removeLinkLoc);   // verify remove removes the file
+        waitForElementToDisappear(Locator.linkWithText(fileName));
+        click(filePickerLinkLoc);
+        setFormElement(fileInputLoc, testAttachment);
+        wikiHelper.saveWikiPage();  // save with the attachment
+        waitForElement(Locator.linkWithText(fileName));
+        clickAndWait(wikiPageLinkLoc);
+
+        log("Deleting attachment");
+        waitAndClickAndWait(editLinkLoc);
+        click(deleteLinkLoc);
+        waitForElement(attachmentParentLoc.withAttributeContaining("style", "text-decoration: line-through"));
+        wikiHelper.saveWikiPage();
+        // verify save while in deleted state actually deletes the attachment
+        assertElementNotPresent(Locator.linkWithText(fileName));
+        clickAndWait(wikiPageLinkLoc);
+
+        log("prepare to delete/undelete attachment");
+        // re-attach the file and save
+        waitAndClickAndWait(editLinkLoc);
+        click(filePickerLinkLoc);
+        setFormElement(fileInputLoc, testAttachment);
+        wikiHelper.saveWikiPage();
+        clickAndWait(wikiPageLinkLoc);
+
+        log("Un-Deleting attachment");
+        waitAndClickAndWait(editLinkLoc);
+        click(deleteLinkLoc);   // delete
+        waitForElement(attachmentParentLoc.withAttributeContaining("style", "text-decoration: line-through"));
+        waitAndClick(undeleteLinkLoc);
+        checker().awaiting(Duration.ofMillis(500), ()-> Assertions.assertThat(attachmentParentLoc.findElement(getDriver()).getAttribute("style"))
+                .as("expect strikethrough style not to be present")
+                .doesNotContain("text-decoration: line-through"));
+        wikiHelper.saveWikiPage();
+        // note: attaching the file and leaving it there will create a search result, so increment wikiCreated count here
+        numberOfWikiCreated++;
+
+        // verify save after undelete persists the attachment
+        assertElementPresent(Locator.linkWithText(fileName));
     }
 
     // Issue 51382
@@ -300,7 +392,6 @@ public class WikiTest extends BaseWebDriverTest
         var createResponse = createCmd.execute(cn, getProjectName());
         var createResponseJson = new JSONObject(createResponse.getParsedData());
         var wikiProps = createResponseJson.getJSONObject("wikiProps");
-        SearchAdminAPIHelper.waitForIndexer();
 
         // now, update the wiki with hostile inputs, expecting error/failure
         var updateJson = new JSONObject();
@@ -336,7 +427,64 @@ public class WikiTest extends BaseWebDriverTest
                     .as("expect title field to be the source of the error")
                     .isEqualTo("title"));
         }
-}
+    }
+
+    // Issue 52729 Wiki webpart doesn't resolve after wiki rename with alias
+    @Test
+    public void testRenameWebPartWiki() throws Exception
+    {
+        var newLine = '\u0081';
+        var stringTerminator = '\u009c';
+        String wikiContent = "<p>This is my content " + stringTerminator + TRICKY_CHARACTERS + newLine + "</p>";
+        String wikiName = "webPartWiki";
+        String wikiTitle = "wikiRenameWebPart";
+        var cn = createDefaultConnection();
+
+        // first, create a straightforward wiki
+        var createCmd = new SimplePostCommand("wiki", "saveWiki");
+        JSONObject createJson = new JSONObject();
+        createJson.put("name", wikiName);
+        createJson.put("title", wikiTitle);
+        createJson.put("rendererType", "HTML");
+        createJson.put("body", "<p>content for wiki webpart rename</p>");
+        createJson.put("pageVersionId", -1);
+        createCmd.setJsonObject(createJson);
+        createCmd.execute(cn, SUBFOLDER_PATH);
+
+        // give the folder a wikiWebPart
+        goToProjectFolder(PROJECT_NAME, SUBFOLDER_NAME);
+        var wikiHelper = new WikiHelper(this);
+        new PortalHelper(this).addWebPart("Wiki");
+        Locator wikiWebPartLoc  = Locator.tagWithClass("div", "panel-portal")
+                .withDescendant(Locator.tagWithAttribute("h3", "title", wikiTitle))
+                .descendant(Locator.tagWithText("p", "content for wiki webpart rename"));
+
+        // configure the webPart to use the wiki created above
+        wikiHelper.clickChooseAPage();
+        var selectedPageOption = getSelectedOptionText(Locator.name("name"));
+        checker().withScreenshot("unexpected_selected_page")
+                        .wrapAssertion(()-> Assertions.assertThat(selectedPageOption)
+                                .as("expect our wiki to be selected")
+                                .startsWith(wikiName));
+        wikiHelper.saveChosenPage();
+
+        // verify the webpart's content is our expected content
+        checker().withScreenshot("unexpected_wiki_content")
+                .awaiting(Duration.ofSeconds(1), ()-> Assertions.assertThat(wikiWebPartLoc.existsIn(getDriver()))
+                        .as("expect our wiki content to be present")
+                        .isTrue());
+
+        // Now edit the wiki, give it a new name, with an alias
+        var wikiConfigPage = wikiHelper.manageWikiConfiguration();
+        wikiConfigPage.rename("webPartNewWikiName", true)
+                        .save();
+
+        // verify the expected content is still present
+        checker().withScreenshot("unexpected_wiki_content_after_rename")
+                .awaiting(Duration.ofSeconds(1), ()-> Assertions.assertThat(wikiWebPartLoc.existsIn(getDriver()))
+                        .as("expect our wiki content to be present")
+                        .isTrue());
+    }
 
     protected void verifyWikiPagePresent()
     {

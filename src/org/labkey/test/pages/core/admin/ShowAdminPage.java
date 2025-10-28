@@ -21,15 +21,18 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.DomainDesignerPage;
 import org.labkey.test.pages.ConfigureReportsAndScriptsPage;
 import org.labkey.test.pages.LabKeyPage;
+import org.labkey.test.pages.admin.ConfigureSystemMaintenancePage;
+import org.labkey.test.pages.admin.ExternalSourcesPage;
 import org.labkey.test.pages.compliance.ComplianceSettingsAccountsPage;
 import org.labkey.test.pages.core.login.LoginConfigurePage;
 import org.labkey.test.util.OptionalFeatureHelper;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.List;
+import java.util.function.Function;
 
-// TODO: Missing lots of functionality
 public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
 {
     public ShowAdminPage(WebDriver driver)
@@ -46,90 +49,105 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
     public ShowAdminPage goToServerInformationSection()
     {
         elementCache().sectionServerInfo.click();
+        shortWait().until(ExpectedConditions.visibilityOf(elementCache().serverInfoPanel));
         return this;
     }
 
     public ShowAdminPage goToSettingsSection()
     {
         elementCache().sectionSettingsLinks.click();
+        shortWait().until(ExpectedConditions.visibilityOf(elementCache().settingsPanel));
         return this;
     }
 
     public ShowAdminPage goToModuleInformationSection()
     {
         elementCache().sectionModuleInfo.click();
+        shortWait().until(ExpectedConditions.visibilityOf(elementCache().moduleInfoPanel));
         return this;
     }
 
-    public ShowAdminPage goToActiveUsersSection()
+    public ShowAdminPage goToRecentUsersSection()
     {
         elementCache().sectionActiveUsers.click();
+        shortWait().until(ExpectedConditions.visibilityOf(elementCache().recentUsersPanel));
         return this;
     }
 
-    public List<String> getActiveUsers()
+    public void clickSettingsLink(String settingsLink)
     {
-        goToActiveUsersSection();
-        return getTexts(elementCache().findActiveUsers());
+        goToSettingsSection();
+        clickAndWait(Locator.linkWithText(settingsLink).findElement(elementCache().settingsPanel));
+    }
+
+    public <T> T clickSettingsLink(String settingsLink, Function<WebDriver, T> pageFactory)
+    {
+        clickSettingsLink(settingsLink);
+        return pageFactory.apply(getDriver());
+    }
+
+    public List<String> getRecentUsers()
+    {
+        goToRecentUsersSection();
+        return getTexts(elementCache().findRecentUsers());
     }
 
     public String getServerGUID()
     {
         goToServerInformationSection();
-        return elementCache().findServerGUID().getText();
+        return elementCache().serverGuidEl.getText();
     }
 
     public void clickAnalyticsSettings()
     {
-        goToSettingsSection();
-        clickAndWait(elementCache().analyticsSettingsLink);
+        clickSettingsLink("analytics settings");
     }
 
     public void clickAllowedExternalRedirectHosts()
     {
-        goToSettingsSection();
-        clickAndWait(elementCache().externalRedirectHostLink);
+        clickSettingsLink("allowed external redirect hosts");
         Locator.waitForAnyElement(shortWait(), Locator.tagWithText("span", "Done"), Locator.tagWithText("span", "Save"));
     }
 
     public ShowAuditLogPage clickAuditLog()
     {
-        goToSettingsSection();
-        clickAndWait(elementCache().auditLogLink);
-        return new ShowAuditLogPage(getDriver());
+        return clickSettingsLink("audit log", ShowAuditLogPage::new);
+    }
+
+    public ExternalSourcesPage clickAllowedExternalResourceHosts()
+    {
+        return clickSettingsLink("allowed external resource hosts", ExternalSourcesPage::new);
+    }
+
+    public AllowedFileExtensionAdminPage clickAllowedFileExtensions()
+    {
+        return clickSettingsLink("allowed file extensions", AllowedFileExtensionAdminPage::new);
     }
 
     public void clickAuditLogMaintenance()
     {
-        goToSettingsSection();
-        clickAndWait(elementCache().auditLogMaintenanceLink);
+        clickSettingsLink("Audit Log Maintenance");
     }
+
     public LoginConfigurePage clickAuthentication()
     {
-        goToSettingsSection();
-        clickAndWait(elementCache().authenticationLink);
-        return new LoginConfigurePage(getDriver());
+        return clickSettingsLink("authentication", LoginConfigurePage::new);
     }
 
     public void clickConfigurePageElements()
     {
-        goToSettingsSection();
-        clickAndWait(elementCache().configurePageElements);
+        clickSettingsLink("configure page elements");
         Locator.waitForAnyElement(shortWait(), Locator.tagWithText("span", "Done"), Locator.tagWithText("span", "Save"));
     }
 
     public ComplianceSettingsAccountsPage clickComplianceSettings()
     {
-        goToSettingsSection();
-        clickAndWait(elementCache().complianceSettings);
-        return new ComplianceSettingsAccountsPage(getDriver());
+        return clickSettingsLink("Compliance Settings", ComplianceSettingsAccountsPage::new);
     }
 
     public DomainDesignerPage clickChangeUserProperties()
     {
-        goToSettingsSection();
-        clickAndWait(elementCache().changeUserPropertiesLink);
-        return new DomainDesignerPage(getDriver());
+        return clickSettingsLink("change user properties", DomainDesignerPage::new);
     }
 
     public void clickDeprecatedFeatures()
@@ -140,123 +158,103 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
 
     public void clickEmailCustomization()
     {
-        goToSettingsSection();
-        clickAndWait(elementCache().emailCustomizationLink);
+        clickSettingsLink("email customization");
     }
 
     public void clickNotificationServiceAdmin()
     {
-        goToSettingsSection();
-        clickAndWait(elementCache().notificationServiceAdminLink);
+        clickSettingsLink("notification service admin");
     }
 
     public ConfigureFileSystemAccessPage clickFiles()
     {
-        goToSettingsSection();
-        clickAndWait(elementCache().filesLink);
-        return new ConfigureFileSystemAccessPage(getDriver());
+        return clickSettingsLink("files", ConfigureFileSystemAccessPage::new);
     }
 
     public void clickFullTextSearch()
     {
-        goToSettingsSection();
-        clickAndWait(elementCache().fullTextSearchLink);
+        clickSettingsLink("full-text search");
     }
 
     public FolderTypePages clickFolderType()
     {
-        goToSettingsSection();
-        clickAndWait(elementCache().folderTypeLink);
-        return new FolderTypePages(getDriver());
+        return clickSettingsLink("folder types", FolderTypePages::new);
     }
 
     public SiteValidationPage clickSiteValidation()
     {
-        goToSettingsSection();
-        clickAndWait(elementCache().siteValidationLink);
-        return new SiteValidationPage(getDriver());
+        return clickSettingsLink("site validation", SiteValidationPage::new);
     }
 
     public LookAndFeelSettingsPage clickLookAndFeelSettings()
     {
-        goToSettingsSection();
-        clickAndWait(elementCache().lookAndFeelSettingsLink);
-        return new LookAndFeelSettingsPage(getDriver());
+        return clickSettingsLink("look and feel settings", LookAndFeelSettingsPage::new);
     }
 
     public void clickMasterPatientIndex()
     {
-        goToSettingsSection();
-        clickAndWait(elementCache().masterPatientIndex);
+        clickSettingsLink("Master Patient Index");
     }
 
     public void clickProfiler()
     {
-        goToSettingsSection();
-        clickAndWait(elementCache().profilerLink);
+        clickSettingsLink("profiler");
     }
 
     public void clickRunningThreads()
     {
-        goToSettingsSection();
-        clickAndWait(elementCache().runningThreadsLink);
+        clickSettingsLink("running threads");
     }
 
     public CustomizeSitePage clickSiteSettings()
     {
-        goToSettingsSection();
-        clickAndWait(elementCache().siteSettingsLink);
-        return new CustomizeSitePage(getDriver());
+        return clickSettingsLink("site settings", CustomizeSitePage::new);
     }
 
     public void clickSiteWideTerms()
     {
-        goToSettingsSection();
-        clickAndWait(elementCache().siteWideTermsLink);
+        clickSettingsLink("site-wide terms of use");
     }
 
-    public void clickSystemMaintenance()
+    public ConfigureSystemMaintenancePage clickSystemMaintenance()
     {
-        goToSettingsSection();
-        clickAndWait(elementCache().systemMaintenanceLink);
+        return clickSettingsLink("system maintenance", ConfigureSystemMaintenancePage::new);
     }
 
     public void clickSystemProperties()
     {
-        goToSettingsSection();
-        clickAndWait(elementCache().systemPropertiesLink);
+        clickSettingsLink("system properties");
     }
 
     public ConfigureReportsAndScriptsPage clickViewsAndScripting()
     {
-        goToSettingsSection();
-        clickAndWait(elementCache().viewsAndScriptingLink);
-        return new ConfigureReportsAndScriptsPage(this);
+        return clickSettingsLink("views and scripting", ConfigureReportsAndScriptsPage::new);
     }
 
     public void clickCredits()
     {
-        goToSettingsSection();
-        clickAndWait(elementCache().creditsLink);
+        clickSettingsLink("credits");
+    }
+
+    public void clickViewPrimarySiteLogFile()
+    {
+        clickSettingsLink("view primary site log file");
     }
 
     public void clickPostgresActivity()
     {
-        goToSettingsSection();
-        clickAndWait(elementCache().postgresActivityLink);
+        clickSettingsLink("postgres activity");
     }
 
     public void clickPostgresLocks()
     {
-        goToSettingsSection();
-        clickAndWait(elementCache().postgresLocksLink);
+        clickSettingsLink("postgres locks");
     }
 
     public List<WebElement> getAllAdminConsoleLinks()
     {
         goToSettingsSection();
-        WebElement adminLinksContainer = Locator.id("links").findElement(getDriver());
-        return Locator.tag("a").findElements(adminLinksContainer);
+        return Locator.tag("a").findElements(elementCache().settingsPanel);
     }
 
     @Override
@@ -265,49 +263,24 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
         return new ElementCache();
     }
 
-    protected class ElementCache extends LabKeyPage.ElementCache
+    protected class ElementCache extends LabKeyPage<ShowAdminPage.ElementCache>.ElementCache
     {
-        protected WebElement sectionServerInfo = Locator.linkWithText("Server Information").findWhenNeeded(this);
-        protected WebElement sectionSettingsLinks = Locator.linkWithText("Settings").findWhenNeeded(this);
-        protected WebElement sectionModuleInfo = Locator.linkWithText("Module Information").findWhenNeeded(this);
-        protected WebElement sectionActiveUsers = Locator.linkWithText("Active Users").findWhenNeeded(this);
+        private final WebElement adminNavPanel = Locator.id("lk-admin-nav").findWhenNeeded(this);
+        private final WebElement sectionServerInfo = Locator.linkWithText("Server Information").findWhenNeeded(adminNavPanel);
+        private final WebElement sectionSettingsLinks = Locator.linkWithText("Settings").findWhenNeeded(adminNavPanel);
+        private final WebElement sectionModuleInfo = Locator.linkWithText("Module Information").findWhenNeeded(adminNavPanel);
+        private final WebElement sectionActiveUsers = Locator.linkWithText("Active Users").findWhenNeeded(adminNavPanel);
 
-        protected WebElement analyticsSettingsLink = Locator.linkWithText("analytics settings").findWhenNeeded(this);
-        protected WebElement externalRedirectHostLink = Locator.linkWithText("allowed external redirect hosts").findElement(this);
-        protected WebElement auditLogLink = Locator.linkWithText("audit log").findWhenNeeded(this);
-        protected WebElement auditLogMaintenanceLink = Locator.linkWithText("Audit Log Maintenance").findWhenNeeded(this);
-        protected WebElement authenticationLink = Locator.linkWithText("authentication").findWhenNeeded(this);
-        protected WebElement configurePageElements = Locator.linkWithText("configure page elements").findWhenNeeded(this);
-        protected WebElement complianceSettings = Locator.linkWithText("Compliance Settings").findWhenNeeded(this);
-        protected WebElement changeUserPropertiesLink = Locator.linkWithText("change user properties").findWhenNeeded(this);
-        protected WebElement emailCustomizationLink = Locator.linkWithText("email customization").findWhenNeeded(this);
-        protected WebElement notificationServiceAdminLink = Locator.linkWithText("notification service admin").findWhenNeeded(this);
-        protected WebElement filesLink = Locator.linkWithText("files").findWhenNeeded(this);
-        protected WebElement fullTextSearchLink = Locator.linkWithText("full-text search").findWhenNeeded(this);
-        protected WebElement folderTypeLink = Locator.linkWithText("folder types").findWhenNeeded(this);
-        protected WebElement siteValidationLink = Locator.linkWithText("site validation").findWhenNeeded(this);
-        protected WebElement lookAndFeelSettingsLink = Locator.linkWithText("look and feel settings").findWhenNeeded(this);
-        protected WebElement masterPatientIndex = Locator.linkWithText("Master Patient Index").findWhenNeeded(this);
-        protected WebElement profilerLink = Locator.linkWithText("profiler").findWhenNeeded(this);
-        protected WebElement runningThreadsLink = Locator.linkWithText("running threads").findWhenNeeded(this);
-        protected WebElement siteSettingsLink = Locator.linkWithText("site settings").findWhenNeeded(this);
-        protected WebElement siteWideTermsLink = Locator.linkContainingText("site-wide terms of use").findWhenNeeded(this);
-        protected WebElement systemMaintenanceLink = Locator.linkWithText("system maintenance").findWhenNeeded(this);
-        protected WebElement systemPropertiesLink = Locator.linkContainingText("system properties").findWhenNeeded(this);
-        protected WebElement viewsAndScriptingLink = Locator.linkWithText("views and scripting").findWhenNeeded(this);
-        protected WebElement creditsLink = Locator.linkWithText("credits").findWhenNeeded(this);
+        private final WebElement serverInfoPanel = Locator.id("info").withClass("lk-admin-section").findWhenNeeded(this);
+        private final WebElement settingsPanel = Locator.id("links").withClass("lk-admin-section").findWhenNeeded(this);
+        private final WebElement moduleInfoPanel = Locator.id("modules").withClass("lk-admin-section").findWhenNeeded(this);
+        private final WebElement recentUsersPanel = Locator.id("users").withClass("lk-admin-section").findWhenNeeded(this);
 
-        protected WebElement postgresActivityLink = Locator.linkWithText("postgres activity").findWhenNeeded(this);
-        protected WebElement postgresLocksLink = Locator.linkWithText("postgres locks").findWhenNeeded(this);
-
-        protected List<WebElement> findActiveUsers()
+        private List<WebElement> findRecentUsers()
         {
-            return Locator.tagWithName("table", "activeUsers").append(Locator.tag("td").position(1)).findElements(this);
+            return Locator.tagWithName("table", "activeUsers").append(Locator.tag("td").position(1)).findElements(recentUsersPanel);
         }
 
-        protected WebElement findServerGUID()
-        {
-            return Locator.tagWithText("td", "Server GUID").followingSibling("td").findElement(this);
-        }
+        private final WebElement serverGuidEl =  Locator.tagWithText("td", "Server GUID").followingSibling("td").findWhenNeeded(serverInfoPanel);
     }
 }

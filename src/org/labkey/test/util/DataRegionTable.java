@@ -15,6 +15,7 @@
  */
 package org.labkey.test.util;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
@@ -34,9 +35,13 @@ import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.labkey.LabKeyAlert;
 import org.labkey.test.components.study.DatasetFacetPanel;
 import org.labkey.test.components.study.ViewPreferencesPage;
+import org.labkey.test.components.ui.grids.FieldReferenceManager;
+import org.labkey.test.components.ui.grids.FieldReferenceManager.FieldReference;
 import org.labkey.test.pages.ImportDataPage;
 import org.labkey.test.pages.TimeChartWizard;
 import org.labkey.test.pages.query.UpdateQueryRowPage;
+import org.labkey.test.pages.reports.ManageViewsPage;
+import org.labkey.test.params.FieldKey;
 import org.labkey.test.selenium.LazyWebElement;
 import org.labkey.test.selenium.RefindingWebElement;
 import org.labkey.test.selenium.WebElementDecorator;
@@ -49,9 +54,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -74,14 +79,11 @@ public class DataRegionTable extends DataRegion
     private CustomizeView _customizeView;
     private DataRegionExportHelper _exportHelper;
     private PagingWidget _pagingWidget;
-    private final List<String> _columnLabels = new ArrayList<>();
-    private final List<String> _columnNames = new ArrayList<>();
-    private final Map<String, Integer> _columnIndexMap = new CaseInsensitiveHashMap<>();
     private final Map<String, Integer> _mapRows = new HashMap<>();
-    private final Map<Integer, Map<Integer, String>> _dataCache = new TreeMap<>();
+    private final Map<Integer, Map<Integer, String>> _dataCache = new LinkedHashMap<>();
 
     /**
-     * @param regionName 'lk-region-name' of the table
+     * @param regionName 'data-region-name' of the table
      */
     public DataRegionTable(String regionName, WebDriverWrapper driverWrapper)
     {
@@ -118,9 +120,6 @@ public class DataRegionTable extends DataRegion
         _pagingWidget = null;
         _customizeView = null;
         _exportHelper = null;
-        _columnLabels.clear();
-        _columnNames.clear();
-        _columnIndexMap.clear();
         _mapRows.clear();
         _dataCache.clear();
     }
@@ -166,6 +165,12 @@ public class DataRegionTable extends DataRegion
                     DataRegion.PANEL_SHOW_SIGNAL);
         }
         return getCustomizeView();
+    }
+
+    public ManageViewsPage openManageViews()
+    {
+        getViewsMenu().clickSubMenu(false, "Manage Views");
+        return new ManageViewsPage(getDriver());
     }
 
     protected DataRegionExportHelper getExportPanel()
@@ -241,12 +246,12 @@ public class DataRegionTable extends DataRegion
 
     public int getColumnCount()
     {
-        return elementCache().getColumnHeaders().size() - (hasSelectors() ? 1 : 0);
+        return elementCache().getColumnHeaders().size();
     }
 
     public boolean hasSummaryStatisticRow()
     {
-        return Locator.css("tr.labkey-col-total").findElements(elementCache()).size() > 0;
+        return !Locator.css("tr.labkey-col-total").findElements(elementCache()).isEmpty();
     }
 
     /**
@@ -274,7 +279,7 @@ public class DataRegionTable extends DataRegion
     }
 
     /**
-     * @deprecated Renamed. Use {@link #getRowIndex(String, String)}
+     * @deprecated Renamed. Use {@link #getRowIndex(CharSequence, String)}
      */
     @Deprecated
     public int getRow(String columnLabel, String value)
@@ -282,9 +287,9 @@ public class DataRegionTable extends DataRegion
         return getRowIndex(columnLabel, value);
     }
 
-    public int getRowIndex(String columnLabel, String value)
+    public int getRowIndex(CharSequence columnIdentifier, String value)
     {
-        return getRowIndex(getColumnIndexStrict(columnLabel), value);
+        return getRowIndex(getColumnIndexStrict(columnIdentifier), value);
     }
 
     public int getRowIndex(int columnIndex, String value)
@@ -298,11 +303,11 @@ public class DataRegionTable extends DataRegion
         return -1;
     }
 
-    public int getRowIndexStrict(String columnLabel, String value)
+    public int getRowIndexStrict(CharSequence columnIdentifier, String value)
     {
-        int rowIndex = getRowIndex(columnLabel, value);
+        int rowIndex = getRowIndex(columnIdentifier, value);
         if (rowIndex < 0)
-            throw new NoSuchElementException("No row where: " + columnLabel + "=" + value);
+            throw new NoSuchElementException("No row where: " + columnIdentifier + "=" + value);
         return rowIndex;
     }
 
@@ -310,49 +315,50 @@ public class DataRegionTable extends DataRegion
     {
         int rowIndex = getRowIndex(columnIndex, value);
         if (rowIndex < 0)
-            throw new NoSuchElementException("No row where: " + elementCache().getColumnHeaders().get(columnIndex).getText() + " = " + value);
+            throw new NoSuchElementException("No row where: " + elementCache().getColumnHeaderManager().getColumnHeader(columnIndex).getLabel() + " = " + value);
         return rowIndex;
     }
 
-    public String getSummaryStatFooterText(String columnLabel)
+    public String getSummaryStatFooterText(CharSequence columnIdentifier)
     {
-        return getSummaryStatFooterText(getColumnIndexStrict(columnLabel));
+        return getSummaryStatFooterText(getColumnIndexStrict(columnIdentifier));
     }
 
     public String getSummaryStatFooterText(int columnIndex)
     {
         columnIndex += hasSelectors() ? 1 : 0;
         String footerText = elementCache().getSummaryStatisticCells().get(columnIndex).getText();
-        return footerText != null ? footerText.replaceAll("\\?", "") : null;
+        return footerText.replaceAll("\\?", "");
     }
 
     /**
      * do nothing if column is already present, add it if it is not
-     * @param columnName   name of column to add, if necessary
+     * @param fieldKey   fieldKey of column to add, if necessary
      */
-    public void ensureColumnPresent(String columnName)
+    public void ensureColumnPresent(CharSequence fieldKey)
     {
-        ensureColumnsPresent(columnName);
+        ensureColumnsPresent(fieldKey);
     }
 
     /**
      * check for presence of columns, add them if they are not already present
      * requires columns actually exist
-     * @param names names of columns to add
+     * @param fieldKeys fieldKeys of columns to add
      */
-    public void ensureColumnsPresent(String... names)
+    public void ensureColumnsPresent(CharSequence... fieldKeys)
     {
         boolean opened = false;
-        for (String name: names)
+        for (CharSequence fieldKey: fieldKeys)
         {
-            if (getColumnIndex(name) == -1)
+            fieldKey = FieldKey.fromFieldKey(fieldKey);
+            if (getColumnIndex(fieldKey) == -1)
             {
                 if (!opened)
                 {
                     getCustomizeView().openCustomizeViewPanel();
                     opened = true;
                 }
-                getCustomizeView().addColumn(name);
+                getCustomizeView().addColumn(fieldKey.toString());
             }
         }
         if (opened)
@@ -362,12 +368,12 @@ public class DataRegionTable extends DataRegion
     /**
      * returns index of the row of the first appearance of the specified data, in the specified column
      *
-     * @deprecated Use {@link #getRowIndex(String, String)} or {@link #getRowIndexStrict(String, String)}
+     * @deprecated Use {@link #getRowIndex(CharSequence, String)} or {@link #getRowIndexStrict(CharSequence, String)}
      */
     @Deprecated
-    public int getIndexWhereDataAppears(String data, String column)
+    public int getIndexWhereDataAppears(String data, CharSequence columnIdentifier)
     {
-        return getRowIndex(column, data);
+        return getRowIndex(columnIdentifier, data);
     }
 
     public static Locator.XPathLocator detailsLinkLocator()
@@ -412,99 +418,66 @@ public class DataRegionTable extends DataRegion
         };
     }
 
-    public WebElement link(int row, String columnName)
+    public WebElement link(int row, CharSequence columnIdentifier)
     {
-        return link(row, getColumnIndexStrict(columnName));
+        return link(row, getColumnIndexStrict(columnIdentifier));
     }
 
-    protected int getColumnIndexStrict(String name)
+    public int getColumnIndexStrict(CharSequence columnIdentifier)
     {
-        int columnIndex = getColumnIndex(name);
-        if (columnIndex < 0)
-            throw new NoSuchElementException("No column: " + name);
-        return columnIndex;
+        return elementCache().getColumnIndex(columnIdentifier).getDomIndex();
     }
 
     /**
      * Get column index for
-     * @param name or label for desired column
+     * @param columnIdentifier fieldKey, name, or label for desired column
      * @return column index or -1 if column isn't present
      */
-    public int getColumnIndex(String name)
+    public int getColumnIndex(CharSequence columnIdentifier)
     {
-        if (_columnIndexMap.isEmpty())
+        try
         {
-            final var columnNames = getColumnNames();
-            for (int j = 0; j < columnNames.size(); j++)
-            {
-                _columnIndexMap.put(columnNames.get(j), j);
-            }
+            return getColumnIndexStrict(columnIdentifier);
         }
-        int i = _columnIndexMap.getOrDefault(name, -1);
-
-        // Try removing spaces from column name
-        if (i < 0)
+        catch (NoSuchElementException e1)
         {
-            i = _columnIndexMap.getOrDefault(name.replace(" ", ""), -1);
-            if (i >= 0)
-            {
-                TestLogger.warn(String.format("Unnecessary space in requested column name. " +
-                        "Requested: \"%s\" Found: \"%s\"", name, getColumnNames().get(i)));
-            }
+            return -1;
         }
-
-        // Try matching column label
-        if (i < 0)
-        {
-            List<String> columnLabelsWithoutSpaces = new ArrayList<>(getColumnLabels().size());
-            getColumnLabels().stream().forEach(s -> columnLabelsWithoutSpaces.add(s.replace(" ", "")));
-            i = columnLabelsWithoutSpaces.indexOf(name.replace(" ", ""));
-            if (i >= 0)
-            {
-                TestLogger.warn(String.format("Please reference columns by name instead of label. " +
-                        "Requested column with label: \"%s\" Found column with name: \"%s\"", name, getColumnNames().get(i)));
-            }
-        }
-
-        return i;
     }
 
     public List<String> getColumnLabels()
     {
         getComponentElement().isEnabled(); // validate cached element
 
-        if (_columnLabels.isEmpty())
-        {
-            _columnLabels.addAll(getWrapper().getTexts(elementCache().getColumnHeaders()));
-            if (hasSelectors())
-                _columnLabels.remove(0);
-        }
-
-        return new ArrayList<>(_columnLabels);
+        return elementCache().getColumnHeaderManager().getColumnHeaders().stream()
+            .map(FieldReference::getLabel).toList();
     }
 
     public List<String> getColumnNames()
     {
         getComponentElement().isEnabled(); // validate cached element
 
-        if (_columnNames.isEmpty())
-        {
-            List<WebElement> columnHeaders = elementCache().getColumnHeaders();
-            for (int i = hasSelectors() ? 1 : 0; i < columnHeaders.size(); i++)
-            {
-                String columnName = columnHeaders.get(i).getAttribute("column-name");
-                if (columnName.startsWith(getDataRegionName() + ":"))
-                    columnName = columnName.substring(getDataRegionName().length() + 1);
-                _columnNames.add(columnName);
-            }
-        }
-
-        return new ArrayList<>(_columnNames);
+        return elementCache().getColumnHeaderManager().getColumnHeaders().stream()
+            .map(FieldReference::getName).toList();
     }
 
-    public String getColumnTitle(String columnName)
+    public List<String> getFieldKeyStrings()
     {
-        WebElement columnHeader = elementCache().getColumnHeader(columnName);
+        return getFieldKeys().stream()
+            .map(FieldKey::toString).toList();
+    }
+
+    public List<FieldKey> getFieldKeys()
+    {
+        getComponentElement().isEnabled(); // validate cached element
+
+        return elementCache().getColumnHeaderManager().getColumnHeaders().stream()
+            .map(FieldReference::getFieldKey).toList();
+    }
+
+    public String getColumnTitle(CharSequence columnIdentifier)
+    {
+        WebElement columnHeader = elementCache().getColumnHeader(columnIdentifier).getElement();
         return columnHeader.getAttribute("title");
     }
 
@@ -523,22 +496,22 @@ public class DataRegionTable extends DataRegion
         return columnText;
     }
 
-    public List<String> getColumnDataAsText(String name)
+    public List<String> getColumnDataAsText(CharSequence columnIdentifier)
     {
-        return getColumnDataAsText(getColumnIndexStrict(name));
+        return getColumnDataAsText(getColumnIndexStrict(columnIdentifier));
     }
 
-    public Map<String, String> getRowDataAsMap(String colName, String value)
+    public Map<String, String> getRowDataAsMap(CharSequence columnIdentifier, String value)
     {
-        return getRowDataAsMap(getRowIndexStrict(colName, value));
+        return getRowDataAsMap(getRowIndexStrict(columnIdentifier, value));
     }
 
     public Map<String, String> getRowDataAsMap(int row)
     {
         Map<String, String> rowMap = new CaseInsensitiveHashMap<>();
-        for (String colName : getColumnNames())
+        for (FieldKey fieldKey : getFieldKeys())
         {
-            rowMap.put(colName, getDataAsText(row, colName));
+            rowMap.put(fieldKey.toString(), getDataAsText(row, fieldKey));
         }
         return rowMap;
     }
@@ -566,10 +539,10 @@ public class DataRegionTable extends DataRegion
         return rowText;
     }
 
-    public List<String> getRowDataAsText(int row, String... columns)
+    public List<String> getRowDataAsText(int row, CharSequence... columnIdentifiers)
     {
         List<String> rowData = new ArrayList<>();
-        for (String column : columns)
+        for (CharSequence column : columnIdentifiers)
         {
             rowData.add(getDataAsText(row, column));
         }
@@ -581,19 +554,19 @@ public class DataRegionTable extends DataRegion
      * preconditions:  must be on start page of table
      * postconditions:  at start of table
      */
-    public List<List<String>> getFullColumnValues(String... columnNames)
+    public List<List<String>> getFullColumnValues(CharSequence... columnIdentifiers)
     {
         boolean moreThanOnePage = getWrapper().isElementPresent(Locator.linkWithText("Next"));
 
         if (moreThanOnePage)
         {
-            showAll();
+            rowSelector().showAll();
         }
 
         List<List<String>> columns = new ArrayList<>();
-        for (String columnName : columnNames)
+        for (CharSequence columnIdentifier : columnIdentifiers)
         {
-            columns.add(getColumnDataAsText(columnName));
+            columns.add(getColumnDataAsText(columnIdentifier));
         }
 
         if (moreThanOnePage)
@@ -604,14 +577,14 @@ public class DataRegionTable extends DataRegion
         return columns;
     }
 
-    public List<List<String>> getRows(String...columnNames)
+    public List<List<String>> getRows(CharSequence... columnIdentifiers)
     {
-        List<List<String>> fullColumnValues = getFullColumnValues(columnNames);
+        List<List<String>> fullColumnValues = getFullColumnValues(columnIdentifiers);
         return collateColumnsIntoRows(fullColumnValues);
     }
 
     @SafeVarargs
-    public static List<List<String>> collateColumnsIntoRows(List<String>...columns)
+    public static List<List<String>> collateColumnsIntoRows(List<String>... columns)
     {
         return collateColumnsIntoRows(Arrays.asList(columns));
     }
@@ -656,7 +629,7 @@ public class DataRegionTable extends DataRegion
         if (cached != null)
             return cached.intValue();
 
-        int row = 0;
+        int row = _mapRows.size();
         try
         {
             while (true)
@@ -684,9 +657,9 @@ public class DataRegionTable extends DataRegion
         return rowIndex;
     }
 
-    public WebElement findCell(int row, String column)
+    public WebElement findCell(int row, CharSequence columnIdentifier)
     {
-        return findCell(row, getColumnIndexStrict(column));
+        return findCell(row, getColumnIndexStrict(columnIdentifier));
     }
 
     public WebElement findCell(int row, int column)
@@ -699,22 +672,19 @@ public class DataRegionTable extends DataRegion
     {
         WebElement cell = findCell(row, column); // Will clear cache if needed
 
-        if (_dataCache.get(row) == null)
-            _dataCache.put(row, new TreeMap<>());
-        if (_dataCache.get(row).get(column) == null)
-            _dataCache.get(row).put(column, cell.getText());
-
-        return _dataCache.get(row).get(column);
+        return _dataCache
+            .computeIfAbsent(row, k -> new LinkedHashMap<>())
+            .computeIfAbsent(column, k -> cell.getText());
     }
 
-    public String getDataAsText(int row, String columnName)
+    public String getDataAsText(int row, CharSequence columnIdentifier)
     {
-        return getDataAsText(row, getColumnIndexStrict(columnName));
+        return getDataAsText(row, getColumnIndexStrict(columnIdentifier));
     }
 
-    public String getDataAsText(String pk, String columnName)
+    public String getDataAsText(String pk, CharSequence columnIdentifier)
     {
-        return getDataAsText(getRowIndexStrict(pk), getColumnIndexStrict(columnName));
+        return getDataAsText(getRowIndexStrict(pk), getColumnIndexStrict(columnIdentifier));
     }
 
     /* Key is the PK on the table, it is usually the contents of the 'value' attribute of the row selector checkbox  */
@@ -798,9 +768,9 @@ public class DataRegionTable extends DataRegion
         return link(row, column).getAttribute("href");
     }
 
-    public String getHref(int row, String columnName)
+    public String getHref(int row, CharSequence columnIdentifier)
     {
-        return getHref(row, getColumnIndexStrict(columnName));
+        return getHref(row, getColumnIndexStrict(columnIdentifier));
     }
 
     public boolean hasHref(int row, int column)
@@ -817,45 +787,45 @@ public class DataRegionTable extends DataRegion
         return !Locator.xpath("a").findElements(cell).isEmpty();
     }
 
-    public boolean hasHref(int row, String columnName)
+    public boolean hasHref(int row, CharSequence columnIdentifier)
     {
-        return hasHref(row, getColumnIndexStrict(columnName));
+        return hasHref(row, getColumnIndexStrict(columnIdentifier));
     }
 
-    public WebElement getFlag(int row, String columnName)
+    public WebElement getFlag(int row, CharSequence columnIdentifier)
     {
-        var cell = findCell(row, columnName);
-        return tagWithAttribute("i", "flagid").findElement(cell);
+        var cell = findCell(row, columnIdentifier);
+        return tagWithAttribute("i", "data-flagid").findElement(cell);
     }
 
-    public boolean isFlagEnabled(int row, String columnName)
+    public boolean isFlagEnabled(int row, CharSequence columnIdentifier)
     {
-        var flag = getFlag(row, columnName);
+        var flag = getFlag(row, columnIdentifier);
         return isFlagEnabled(flag);
     }
 
     private boolean isFlagEnabled(WebElement flag)
     {
-        return flag.getAttribute("class").contains("lk-flag-enabled");
+        return StringUtils.trimToEmpty(flag.getDomAttribute("class")).contains("lk-flag-enabled");
     }
 
-    public boolean isFlagDisabled(int row, String columnName)
+    public boolean isFlagDisabled(int row, CharSequence columnIdentifier)
     {
-        var flag = getFlag(row, columnName);
+        var flag = getFlag(row, columnIdentifier);
         return isFlagDisabled(flag);
     }
 
     private boolean isFlagDisabled(WebElement flag)
     {
-        return flag.getAttribute("class").contains("lk-flag-disabled");
+        return StringUtils.trimToEmpty(flag.getDomAttribute("class")).contains("lk-flag-disabled");
     }
 
     /**
      * Get the flag value for the column or <code>null</code> if unset.
      */
-    public String getFlagValue(int row, String columnName)
+    public String getFlagValue(int row, CharSequence columnIdentifier)
     {
-        var flag = getFlag(row, columnName);
+        var flag = getFlag(row, columnIdentifier);
         return getFlagValue(flag);
     }
 
@@ -868,18 +838,18 @@ public class DataRegionTable extends DataRegion
         }
         else if (isFlagDisabled(flag))
         {
-            assertEquals("Expect unset flag title to be 'Flag for review'", title, "Flag for review");
+            assertEquals("Expect unset flag title to be 'Flag for review'", "Flag for review", title);
             return null;
         }
         throw new AssertionError("Expected flag class to be either 'lk-flag-enabled' or 'lk-flag-disabled'");
     }
 
-    public void setFlagValueForSelectedRows(String columnName, String value)
+    public void setFlagValueForSelectedRows(CharSequence columnIdentifier, String value)
     {
         int checkedCount = getCheckedCount();
         assertTrue(checkedCount > 0);
 
-        var flag = getFlag(0, columnName);
+        var flag = getFlag(0, columnIdentifier);
         flag.click();
 
         var prompt = new MessagePrompt("Review", getDriver());
@@ -890,9 +860,9 @@ public class DataRegionTable extends DataRegion
     /**
      * Set the flag value for the column or <code>null</code> to clear the flag.
      */
-    public void setFlagValue(int row, String columnName, String value)
+    public void setFlagValue(int row, CharSequence columnIdentifier, String value)
     {
-        var flag = getFlag(row, columnName);
+        var flag = getFlag(row, columnIdentifier);
         setFlagValue(flag, value);
     }
 
@@ -903,9 +873,9 @@ public class DataRegionTable extends DataRegion
         assertEquals(value, getFlagValue(flag));
     }
 
-    public void clearFlagValue(int row, String columnName)
+    public void clearFlagValue(int row, CharSequence columnIdentifier)
     {
-        setFlagValue(row, columnName, null);
+        setFlagValue(row, columnIdentifier, null);
     }
 
     /**
@@ -913,7 +883,7 @@ public class DataRegionTable extends DataRegion
      */
     public void clearFlagValues()
     {
-        List<WebElement> allFlags = Locator.tagWithAttribute("i", "flagid").findElements(elementCache());
+        List<WebElement> allFlags = Locator.tagWithAttribute("i", "data-flagid").findElements(elementCache());
         for (WebElement flag : allFlags)
         {
             if (isFlagEnabled(flag))
@@ -921,28 +891,28 @@ public class DataRegionTable extends DataRegion
         }
     }
 
-    public ColumnChartRegion createBarChart(String columnName)
+    public ColumnChartRegion createBarChart(CharSequence columnIdentifier)
     {
-        return createColumnChart(columnName, "Bar Chart");
+        return createColumnChart(columnIdentifier, "Bar Chart");
     }
 
-    public ColumnChartRegion createPieChart(String columnName)
+    public ColumnChartRegion createPieChart(CharSequence columnIdentifier)
     {
-        return createColumnChart(columnName, "Pie Chart");
+        return createColumnChart(columnIdentifier, "Pie Chart");
     }
 
-    public ColumnChartRegion createBoxAndWhiskerChart(String columnName)
+    public ColumnChartRegion createBoxAndWhiskerChart(CharSequence columnIdentifier)
     {
-        return createColumnChart(columnName, "Box & Whisker");
+        return createColumnChart(columnIdentifier, "Box & Whisker");
     }
 
     @LogMethod
-    public ColumnChartRegion createColumnChart(String columnName, String chartType)
+    public ColumnChartRegion createColumnChart(CharSequence columnIdentifier, String chartType)
     {
         Locator cssPlotLocator = Locator.css("div.labkey-dataregion-msg-plot-analytic svg");
         int initialNumOfPlots = cssPlotLocator.findElements(this).size();
 
-        clickColumnMenu(columnName, false, chartType);
+        clickColumnMenu(columnIdentifier, false, chartType);
         cssPlotLocator.index(initialNumOfPlots).waitForElement(this, getUpdateTimeout());
 
         return new ColumnChartRegion(this);
@@ -953,27 +923,27 @@ public class DataRegionTable extends DataRegion
         return new ColumnChartRegion(this);
     }
 
-    public void setSort(String columnName, SortDirection direction)
+    public void setSort(CharSequence columnIdentifier, SortDirection direction)
     {
-        getWrapper().log("Setting sort in " + getDataRegionName() + " for " + columnName + " to " + direction.toString());
-        doAndWaitForUpdate(() -> clickColumnMenu(columnName, !isAsync(), "Sort " + (direction.equals(SortDirection.ASC) ? "Ascending" : "Descending")));
+        getWrapper().log("Setting sort in " + getDataRegionName() + " for " + columnIdentifier + " to " + direction.toString());
+        doAndWaitForUpdate(() -> clickColumnMenu(columnIdentifier, !isAsync(), "Sort " + (direction.equals(SortDirection.ASC) ? "Ascending" : "Descending")));
     }
 
-    public void setSummaryStatistic(String columnName, String stat, @Nullable String expectedValue)
+    public void setSummaryStatistic(CharSequence columnIdentifier, String stat, @Nullable String expectedValue)
     {
-        clickSummaryStatistic(columnName, stat, false, expectedValue);
+        clickSummaryStatistic(columnIdentifier, stat, false, expectedValue);
     }
 
-    public void clearSummaryStatistic(String columnName, String stat, @Nullable String expectedValue)
+    public void clearSummaryStatistic(CharSequence columnIdentifier, String stat, @Nullable String expectedValue)
     {
-        clickSummaryStatistic(columnName, stat, true, expectedValue);
+        clickSummaryStatistic(columnIdentifier, stat, true, expectedValue);
     }
 
-    private void clickSummaryStatistic(String columnName, String stat, boolean isExpectedToBeChecked, @Nullable String expectedValue)
+    private void clickSummaryStatistic(CharSequence columnIdentifier, String stat, boolean isExpectedToBeChecked, @Nullable String expectedValue)
     {
         String clearOrSet = isExpectedToBeChecked ? "Clearing" : "Setting";
-        TestLogger.log(clearOrSet + " the " + stat + " summary statistic in " + getDataRegionName() + " for " + columnName);
-        clickColumnMenu(columnName, false, "Summary Statistics...");
+        TestLogger.log(clearOrSet + " the " + stat + " summary statistic in " + getDataRegionName() + " for " + columnIdentifier);
+        clickColumnMenu(columnIdentifier, false, "Summary Statistics...");
 
         SummaryStatisticsDialog statsWindow = new SummaryStatisticsDialog(this);
 
@@ -988,23 +958,23 @@ public class DataRegionTable extends DataRegion
         statsWindow.apply();
     }
 
-    public void verifySummaryStatisticValue(String columnName, String stat, String expectedValue, String filterDescription)
+    public void verifySummaryStatisticValue(CharSequence columnIdentifier, String stat, String expectedValue, String filterDescription)
     {
-        clickColumnMenu(columnName, false, "Summary Statistics...");
+        clickColumnMenu(columnIdentifier, false, "Summary Statistics...");
         SummaryStatisticsDialog statsWindow = new SummaryStatisticsDialog(this);
         assertEquals("Stat value not as expected for " + stat + " with filter " + filterDescription, expectedValue, statsWindow.getValue(stat));
         statsWindow.cancel();
     }
 
-    public void removeColumn(String columnName)
+    public void removeColumn(CharSequence columnIdentifier)
     {
-        removeColumn(columnName, false);
+        removeColumn(columnIdentifier, false);
     }
 
-    public void removeColumn(String columnName, boolean errorExpected)
+    public void removeColumn(CharSequence columnIdentifier, boolean errorExpected)
     {
-        TestLogger.log("Removing column " + columnName + " in " + getDataRegionName());
-        clickColumnMenu(columnName, !errorExpected, "Remove Column");
+        TestLogger.log("Removing column " + columnIdentifier + " in " + getDataRegionName());
+        clickColumnMenu(columnIdentifier, !errorExpected, "Remove Column");
 
         if (errorExpected)
         {
@@ -1017,22 +987,22 @@ public class DataRegionTable extends DataRegion
             }
             else
             {
-                Window removeError = new Window("Error", getDriver());
+                Window<?> removeError = new Window<>("Error", getDriver());
                 assertTrue(removeError.getBody().contains("You must select at least one field to display in the grid."));
                 removeError.clickButton("OK", true);
             }
         }
     }
 
-    public void clearSort(String columnName)
+    public void clearSort(CharSequence columnIdentifier)
     {
-        doAndWaitForUpdate(() -> clickColumnMenu(columnName, !isAsync(), "Clear Sort"));
+        doAndWaitForUpdate(() -> clickColumnMenu(columnIdentifier, !isAsync(), "Clear Sort"));
     }
 
-    public WebElement openFilterDialog(String columnName)
+    public WebElement openFilterDialog(CharSequence columnIdentifier)
     {
-        String columnLabel = elementCache().getColumnHeader(columnName).getText();
-        clickColumnMenu(columnName, false, "Filter...");
+        String columnLabel = elementCache().getColumnHeader(columnIdentifier).getLabel();
+        clickColumnMenu(columnIdentifier, false, "Filter...");
 
         final Locator.XPathLocator filterDialog = ExtHelper.Locators.window("Show Rows Where " + columnLabel + "...");
         WebElement filterDialogElement = getWrapper().waitForElement(filterDialog);
@@ -1047,15 +1017,15 @@ public class DataRegionTable extends DataRegion
     }
 
     @LogMethod (quiet = true)
-    public void setFilter(@LoggedParam String columnName, @LoggedParam String filterType)
+    public void setFilter(@LoggedParam CharSequence columnIdentifier, @LoggedParam String filterType)
     {
-        setFilter(columnName, filterType, null);
+        setFilter(columnIdentifier, filterType, null);
     }
 
     @LogMethod (quiet = true)
-    public void setFilter(@LoggedParam String columnName, @LoggedParam String filterType, @Nullable @LoggedParam String filter)
+    public void setFilter(@LoggedParam CharSequence columnIdentifier, @LoggedParam String filterType, @Nullable @LoggedParam String filter)
     {
-        setUpFilter(columnName, filterType, filter);
+        setUpFilter(columnIdentifier, filterType, filter);
         doAndWaitForUpdate(() -> getWrapper().clickButton("OK", isAsync() ? 0 : getUpdateTimeout()));
     }
 
@@ -1064,41 +1034,41 @@ public class DataRegionTable extends DataRegion
      */
     @Deprecated
     @LogMethod (quiet = true)
-    public void setFilter(@LoggedParam String columnName, @LoggedParam String filterType, @Nullable @LoggedParam String filter, int waitMillis)
+    public void setFilter(@LoggedParam CharSequence columnIdentifier, @LoggedParam String filterType, @Nullable @LoggedParam String filter, int waitMillis)
     {
-        setUpFilter(columnName, filterType, filter);
+        setUpFilter(columnIdentifier, filterType, filter);
         doAndWaitForUpdate(() -> getWrapper().clickButton("OK", waitMillis));
     }
 
     @LogMethod (quiet = true)
-    public void setFilter(@LoggedParam String columnName, @LoggedParam String filterType, @Nullable @LoggedParam String filter, @Nullable @LoggedParam String filter2Type, @Nullable @LoggedParam String filter2)
+    public void setFilter(@LoggedParam CharSequence columnIdentifier, @LoggedParam String filterType, @Nullable @LoggedParam String filter, @Nullable @LoggedParam String filter2Type, @Nullable @LoggedParam String filter2)
     {
-        setUpFilter(columnName, filterType, filter, filter2Type, filter2);
+        setUpFilter(columnIdentifier, filterType, filter, filter2Type, filter2);
         doAndWaitForUpdate(() -> getWrapper().clickButton("OK", isAsync() ? 0 : getUpdateTimeout()));
     }
 
     @LogMethod (quiet = true)
-    public void setFacetedFilter(@LoggedParam String columnName, @LoggedParam String... values)
+    public void setFacetedFilter(@LoggedParam CharSequence columnIdentifier, @LoggedParam String... values)
     {
-        setUpFacetedFilter(columnName, values);
+        setUpFacetedFilter(columnIdentifier, values);
         doAndWaitForUpdate(() -> getWrapper().clickButton("OK", isAsync() ? 0 : getUpdateTimeout()));
     }
 
-    public void setUpFilter(String columnName, String filterType, String filter)
+    public void setUpFilter(CharSequence columnIdentifier, String filterType, String filter)
     {
-        setUpFilter(columnName, filterType, filter, null, null);
+        setUpFilter(columnIdentifier, filterType, filter, null, null);
     }
 
-    public void setUpFilter(String columnName, String filter1Type, @Nullable String filter1, @Nullable String filter2Type, @Nullable  String filter2)
+    public void setUpFilter(CharSequence columnIdentifier, String filter1Type, @Nullable String filter1, @Nullable String filter2Type, @Nullable  String filter2)
     {
-        String log = "Setting filter in " + getDataRegionName() + " for " + columnName + " to " + filter1Type.toLowerCase() + (filter1 != null ? " " + filter1 : "");
+        String log = "Setting filter in " + getDataRegionName() + " for " + columnIdentifier + " to " + filter1Type.toLowerCase() + (filter1 != null ? " " + filter1 : "");
         if (filter2Type != null)
         {
             log += " and " + filter2Type.toLowerCase() + (filter2 != null ? " " + filter2 : "");
         }
         TestLogger.log(log);
 
-        openFilterDialog(columnName);
+        openFilterDialog(columnIdentifier);
 
         if (getWrapper().isElementPresent(Locator.css("span.x-tab-strip-text").withText("Choose Values")))
         {
@@ -1128,25 +1098,24 @@ public class DataRegionTable extends DataRegion
         }
     }
 
-    public void setUpFacetedFilter(String columnName, String... values)
+    public void setUpFacetedFilter(CharSequence columnIdentifier, String... values)
     {
         if (values.length > 0)
         {
-            TestLogger.log("Setting filter in " + getDataRegionName() + " for " + columnName + " to one of: [" + String.join(", ", values) + "]");
+            TestLogger.log("Setting filter in " + getDataRegionName() + " for " + columnIdentifier + " to one of: [" + String.join(", ", values) + "]");
         }
         else
         {
-            TestLogger.log("Clear filter in " + getDataRegionName() + " for " + columnName);
+            TestLogger.log("Clear filter in " + getDataRegionName() + " for " + columnIdentifier);
         }
 
-        openFilterDialog(columnName);
-        String columnLabel = elementCache().getColumnHeader(columnName).getText();
+        WebElement filterDialog = openFilterDialog(columnIdentifier);
 
         sleep(500);
 
         // Clear selections.
         assertEquals("Faceted filter tab should be selected.", "Choose Values", getWrapper().getText(Locator.css(".x-tab-strip-active")));
-        if (!getWrapper().isElementPresent(Locator.xpath("//div[contains(@class, 'x-grid3-hd-checker-on')]")))
+        if (!Locator.xpath("//div[contains(@class, 'x-grid3-hd-checker-on')]").existsIn(filterDialog))
         {
             getWrapper().click(Locator.tagWithText("span","[All]"));
         }
@@ -1156,26 +1125,26 @@ public class DataRegionTable extends DataRegion
         {
             for (String v : values)
             {
-                getWrapper().click(Locator.xpath(getWrapper()._extHelper.getExtDialogXPath("Show Rows Where " + columnLabel + "...") +
-                        "//div[contains(@class,'x-grid3-row') and .//span[text()='" + v + "']]//div[@class='x-grid3-row-checker']"));
+                Locator.xpath("//div[contains(@class,'x-grid3-row') and .//span[text()='" + v + "']]//div[@class='x-grid3-row-checker']")
+                    .findElement(filterDialog).click();
             }
         }
         else if (values.length == 1)
         {
-            getWrapper().click(Locator.xpath(getWrapper()._extHelper.getExtDialogXPath("Show Rows Where " + columnLabel + "...")+
-                    "//div[contains(@class,'x-grid3-row')]//span[text()='" + values[0] + "']"));
+            Locator.xpath("//div[contains(@class,'x-grid3-row')]//span[text()='" + values[0] + "']")
+                .findElement(filterDialog).click();
         }
     }
 
-    public void clearFilter(String columnName)
+    public void clearFilter(CharSequence columnIdentifier)
     {
-        clearFilter(columnName, isAsync() ? 0 : BaseWebDriverTest.WAIT_FOR_PAGE);
+        clearFilter(columnIdentifier, isAsync() ? 0 : BaseWebDriverTest.WAIT_FOR_PAGE);
     }
 
-    public void clearFilter(String columnName, int waitMillis)
+    public void clearFilter(CharSequence columnIdentifier, int waitMillis)
     {
-        TestLogger.log("Clearing filter in " + getDataRegionName() + " for " + columnName);
-        doAndWaitForUpdate(() -> clickColumnMenu(columnName, waitMillis > 0, "Clear Filter"));
+        TestLogger.log("Clearing filter in " + getDataRegionName() + " for " + columnIdentifier);
+        doAndWaitForUpdate(() -> clickColumnMenu(columnIdentifier, waitMillis > 0, "Clear Filter"));
     }
 
     public void clearAllFilters()
@@ -1185,10 +1154,10 @@ public class DataRegionTable extends DataRegion
         api().expectingRefresh().executeScript("clearAllFilters()");
     }
 
-    public void clearAllFilters(String columnName)
+    public void clearAllFilters(CharSequence columnIdentifier)
     {
-        TestLogger.log("Clearing filter in " + getDataRegionName() + " for " + columnName);
-        openFilterDialog(columnName);
+        TestLogger.log("Clearing filter in " + getDataRegionName() + " for " + columnIdentifier);
+        openFilterDialog(columnIdentifier);
         doAndWaitForUpdate(() -> getWrapper().clickButton("Clear All Filters", isAsync() ? 0 : getUpdateTimeout()));
     }
 
@@ -1198,9 +1167,9 @@ public class DataRegionTable extends DataRegion
         doAndWaitForUpdate(()-> getWrapper().click(Locator.tagWithClass("span", "labkey-button ctx-clear-var")));
     }
 
-    public void clickColumnMenu(String columnName, boolean pageLoad, String... menuItems)
+    public void clickColumnMenu(CharSequence columnIdentifier, boolean pageLoad, String... menuItems)
     {
-        final WebElement menu = elementCache().getColumnHeader(columnName);
+        final WebElement menu = elementCache().getColumnHeader(columnIdentifier).getElement();
         getWrapper().scrollIntoView(menu);   // some columns will be scrolled out of view;
         new BootstrapMenu(getDriver(), menu)
                 .clickSubMenu(pageLoad ? getUpdateTimeout() : 0, menuItems);
@@ -1290,10 +1259,10 @@ public class DataRegionTable extends DataRegion
     }
 
     /**
-     * @deprecated Ambiguous. Use {@link #rowSelector()}.{@link SelectorMenu#showAll()}
+     * Show all rows using the row selector menu (actually maxRows=5000).
+     * For more precise control, use {@link #rowSelector()}.{@link SelectorMenu#showAll()}
      * or {@link #getPagingWidget()}.{@link PagingWidget#clickShowAll()}
      */
-    @Deprecated
     public void showAll()
     {
         rowSelector().showAll();
@@ -1348,9 +1317,9 @@ public class DataRegionTable extends DataRegion
     }
 
     @LogMethod
-    public TimeChartWizard createQuickChart(String columnName)
+    public TimeChartWizard createQuickChart(CharSequence columnIdentifier)
     {
-        clickColumnMenu(columnName, true, "Quick Chart");
+        clickColumnMenu(columnIdentifier, true, "Quick Chart");
         return new TimeChartWizard(getWrapper()).waitForReportRender();
     }
 
@@ -1375,9 +1344,9 @@ public class DataRegionTable extends DataRegion
         elementCache().getExportButton().click();
     }
 
-    public boolean columnHasChartOption(String columnName, String chartType)
+    public boolean columnHasChartOption(CharSequence columnIdentifier, String chartType)
     {
-        BootstrapMenu menu = new BootstrapMenu(getDriver(), elementCache().getColumnHeader(columnName));
+        BootstrapMenu menu = new BootstrapMenu(getDriver(), elementCache().getColumnHeader(columnIdentifier).getElement());
         menu.expand();
         return menu.findVisibleMenuItems()
                 .stream()
@@ -1471,7 +1440,7 @@ public class DataRegionTable extends DataRegion
 
         public static Locator.XPathLocator dataRegionTable()
         {
-            return form().withAttributeMatchingOtherElementAttribute("lk-region-form", Locator.xpath(".//table"), "lk-region-name");
+            return form().withAttributeMatchingOtherElementAttribute("data-region-form", Locator.xpath(".//table"), "data-region-name");
         }
 
         public static Locator.XPathLocator dataRegionTable(String regionName)
@@ -1481,19 +1450,19 @@ public class DataRegionTable extends DataRegion
 
         public static Locator.XPathLocator table()
         {
-            return Locator.tag("table").withAttribute("lk-region-name");
+            return Locator.tag("table").withAttribute("data-region-name");
         }
 
         public static Locator.XPathLocator table(String regionName)
         {
-            return Locator.tagWithAttribute("table", "lk-region-name", regionName);
+            return Locator.tagWithAttribute("table", "data-region-name", regionName);
         }
 
         public static Locator.XPathLocator facetRow(String category)
         {
             return Locator.xpath("//div").withClass("x4-grid-body")
-                    .withPredicate(Locator.xpath("//div").withClass("lk-filter-panel-label")
-                            .withText(category));
+                .withPredicate(Locator.xpath("//div").withClass("lk-filter-panel-label")
+                    .withText(category));
         }
 
         public static Locator.XPathLocator facetRowCheckbox(String category)
@@ -1503,7 +1472,7 @@ public class DataRegionTable extends DataRegion
 
         public static Locator.XPathLocator columnHeader(String regionName, String fieldName)
         {
-            return Locator.tagWithAttribute("th", "column-name", regionName + ":" + fieldName);
+            return Locator.tagWithAttribute("th", "data-column-name", regionName + ":" + fieldName);
         }
 
         public static Locator.XPathLocator floatingHeader()
@@ -1535,8 +1504,6 @@ public class DataRegionTable extends DataRegion
         }
 
         private final WebElement columnHeaderRow = Locator.id(getTableId() + "-column-header-row").findWhenNeeded(this);
-        private List<WebElement> columnHeaders;
-        private final Map<String, WebElement> columnHeadersByName = new CaseInsensitiveHashMap<>();
         private List<WebElement> rows;
         private Map<Integer, List<WebElement>> cells;
         private final WebElement summaryStatRow = Locator.css("#" + getTableId() + " > tbody > tr.labkey-col-total").findWhenNeeded(getDriver());
@@ -1544,6 +1511,75 @@ public class DataRegionTable extends DataRegion
         private final WebElement toggleHeaderCell = Locator.tag("th").withClasses("labkey-column-header", "labkey-selectors").findWhenNeeded(columnHeaderRow);
         private final WebElement toggleAllOnPage = Locator.input(".toggle").findWhenNeeded(toggleHeaderCell); // tri-state checkbox
         private final SelectorMenu selectionMenu = new SelectorMenu(toggleHeaderCell);
+
+        private FieldReferenceManager _fieldReferenceManager;
+        protected FieldReferenceManager getColumnHeaderManager()
+        {
+            if (_fieldReferenceManager == null)
+            {
+                List<DataRegionColumnHeader> columnHeaders = new ArrayList<>();
+                List<WebElement> headerCellElements = Locator.css("th.labkey-column-header").waitForElements(columnHeaderRow, WAIT_FOR_JAVASCRIPT);
+
+                headerCellElements = headerCellElements.subList(hasSelectors() ? 1 : 0, headerCellElements.size());
+
+                int domIndex = 0; // Not actually the DOM index but many usages don't include the selector column
+                for (; domIndex < headerCellElements.size(); domIndex++)
+                {
+                    columnHeaders.add(new DataRegionColumnHeader(headerCellElements.get(domIndex), domIndex));
+                }
+
+                _fieldReferenceManager = new FieldReferenceManager(columnHeaders);
+            }
+            return _fieldReferenceManager;
+        }
+
+        public @NotNull FieldReference getColumnIndex(@NotNull CharSequence columnIdentifier)
+        {
+            boolean foundWithLabel = false;
+            FieldReference fieldReference = elementCache().getColumnHeaderManager().findFieldReferenceOrNull(columnIdentifier);
+
+            if (fieldReference == null)
+            {
+                String noSpaces = columnIdentifier.toString().replace(" ", "");
+                if (!noSpaces.equals(columnIdentifier.toString()))
+                {
+                    fieldReference = elementCache().getColumnHeaderManager().findFieldReferenceOrNull(noSpaces);
+                    if (fieldReference != null)
+                    {
+                        TestLogger.warn("Unnecessary space in requested column name. " +
+                            "Requested: \"%s\" Found: \"%s\"".formatted(columnIdentifier, fieldReference.getFieldKey()));
+                    }
+                    else
+                    {
+                        Map<String, FieldReference> columnLabelsWithoutSpaces = new HashMap<>();
+                        getColumnHeaderManager().getColumnHeaders().forEach(fr -> columnLabelsWithoutSpaces.putIfAbsent(fr.getLabel().replace(" ", ""), fr));
+                        fieldReference = columnLabelsWithoutSpaces.get(noSpaces);
+                        if (fieldReference != null)
+                        {
+                            TestLogger.warn("Weird column label specified. Use actual label. " +
+                                "Requested: \"%s\" Found: \"%s\"".formatted(columnIdentifier, fieldReference.getLabel()));
+                            foundWithLabel = true;
+                        }
+                    }
+                }
+            }
+
+            if (fieldReference == null)
+            {
+                throw new NoSuchElementException("No column: " + columnIdentifier);
+            }
+
+            if (foundWithLabel ||
+                !columnIdentifier.equals(fieldReference.getFieldKey()) &&
+                    !columnIdentifier.toString().equals(fieldReference.getName()))
+            {
+                TestLogger.warn("Please reference columns by name/fieldKey instead of label. " +
+                    "Requested column with label: \"%s\" Found column with fieldKey: \"%s\""
+                        .formatted(columnIdentifier, fieldReference.getFieldKey()));
+            }
+
+            return fieldReference;
+        }
 
         protected List<WebElement> getDataRows()
         {
@@ -1584,7 +1620,7 @@ public class DataRegionTable extends DataRegion
                         }
                         catch (WebDriverException e)
                         {
-                            if (e.getMessage().contains("Other element would receive the click: <div class=\"labkey-button-bar\">"))
+                            if (StringUtils.trimToEmpty(e.getMessage()).contains("Other element would receive the click: <div class=\"labkey-button-bar\">"))
                             {
                                 // The checkbox obscured by the floating header
                                 getWrapper().scrollIntoView(getComponentElement());
@@ -1599,7 +1635,7 @@ public class DataRegionTable extends DataRegion
         protected List<WebElement> getCells(int row)
         {
             if (cells == null)
-                cells = new TreeMap<>();
+                cells = new LinkedHashMap<>();
             if (cells.get(row) == null)
                 cells.put(row, Collections.unmodifiableList(Locator.xpath("td").findElements(getDataRow(row))));
             return cells.get(row);
@@ -1626,22 +1662,14 @@ public class DataRegionTable extends DataRegion
             return summaryStatCells;
         }
 
-        protected WebElement getColumnHeader(String colName)
+        protected @NotNull FieldReference getColumnHeader(CharSequence columnIdentifier)
         {
-            if (!columnHeadersByName.containsKey(colName))
-            {
-                columnHeadersByName.put(colName, Locator.findAnyElement("Column header named " + colName, this,
-                        Locators.columnHeader(getDataRegionName(), colName),
-                        Locators.columnHeader(getDataRegionName(), colName.toLowerCase())));
-            }
-            return columnHeadersByName.get(colName);
+            return getColumnHeaderManager().findFieldReference(columnIdentifier);
         }
 
-        protected List<WebElement> getColumnHeaders()
+        protected List<FieldReference> getColumnHeaders()
         {
-            if (columnHeaders == null)
-                columnHeaders = Collections.unmodifiableList(Locator.css("th.labkey-column-header").findElements(columnHeaderRow));
-            return columnHeaders;
+            return getColumnHeaderManager().getColumnHeaders();
         }
 
         protected WebElement getExportButton()
@@ -1716,6 +1744,29 @@ public class DataRegionTable extends DataRegion
         public String getLabel()
         {
             return _label;
+        }
+    }
+
+    protected class DataRegionColumnHeader extends FieldReference
+    {
+        public DataRegionColumnHeader(WebElement element, int domIndex)
+        {
+            super(element, domIndex);
+        }
+
+        @Override
+        protected String labelSupplier()
+        {
+            return getElement().getText();
+        }
+
+        @Override
+        protected FieldKey fieldKeySupplier()
+        {
+            String columnNameAttribute = StringUtils.trimToEmpty(getElement().getDomAttribute("data-column-name"));
+            if (columnNameAttribute.startsWith(getDataRegionName() + ":"))
+                columnNameAttribute = columnNameAttribute.substring(getDataRegionName().length() + 1);
+            return FieldKey.fromFieldKey(columnNameAttribute);
         }
     }
 }

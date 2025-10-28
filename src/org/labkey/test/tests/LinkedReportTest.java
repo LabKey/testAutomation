@@ -33,7 +33,7 @@ public class LinkedReportTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        LinkedReportTest init = (LinkedReportTest) getCurrentTest();
+        LinkedReportTest init = getCurrentTest();
         init._containerHelper.createProject(init.getProjectName());
     }
 
@@ -46,6 +46,7 @@ public class LinkedReportTest extends BaseWebDriverTest
         goToManageViews().clickAddReport("Link Report");
         setFormElement(Locator.name("viewName"), REPORT_NAME);
         setFormElement(Locator.name("linkUrl"), LINK_REPORT_URL);
+        sleep(1000);  // Hack to prevent saving before the form is ready to submit, lacking a way to check before clicking
         clickButton("Save");
         waitForText("Manage Views");
 

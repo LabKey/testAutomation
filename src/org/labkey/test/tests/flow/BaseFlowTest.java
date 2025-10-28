@@ -26,6 +26,7 @@ import org.labkey.test.components.BodyWebPart;
 import org.labkey.test.pages.ImportDataPage;
 import org.labkey.test.pages.experiment.CreateSampleTypePage;
 import org.labkey.test.pages.pipeline.PipelineStatusDetailsPage;
+import org.labkey.test.pages.query.ExecuteQueryPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
@@ -81,13 +82,12 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        BaseFlowTest initTest = (BaseFlowTest)getCurrentTest();
+        BaseFlowTest initTest = getCurrentTest();
         initTest.init();
     }
 
     private void init()
     {
-        beginAt("/admin/begin.view");
         goToAdminConsole().goToSettingsSection();
         clickAndWait(Locator.linkWithText("flow cytometry"));
         getPipelineWorkDirectory().mkdir();
@@ -162,7 +162,7 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
         _containerHelper.deleteProject(getProjectName(), afterTest);
         try
         {
-            beginAt("/admin/begin.view");
+            goToAdminConsole();
             clickAndWait(Locator.linkWithText("flow cytometry"));
             setFormElement(Locator.id("workingDirectory"), "");
             clickButton("update");
@@ -179,8 +179,8 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
             return;
         }
 
-        beginAt("/query/" + getProjectName() + "/" + getFolderName() + "/executeQuery.view?schemaName=exp&query.queryName=Runs");
-        DataRegionTable table = new DataRegionTable("query", this);
+        DataRegionTable table = ExecuteQueryPage.beginAt(this, getContainerPath(), "exp", "Runs")
+            .getDataRegion();
         if (table.getDataRowCount() > 0)
         {
             // Delete all runs
@@ -189,11 +189,15 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
             assertEquals("Expected all experiment Runs to be deleted", 0, table.getDataRowCount());
 
             // Check all DataInputs were deleted
-            beginAt("/query/" + getProjectName() + "/" + getFolderName() + "/executeQuery.view?schemaName=exp&query.queryName=DataInputs");
+            table = ExecuteQueryPage.beginAt(this, getContainerPath(), "exp", "DataInputs")
+                .getDataRegion();
             assertEquals("Expected all experiment DataInputs to be deleted", 0, table.getDataRowCount());
 
             // Check all Datas were deleted except for flow analysis scripts (FlowDataType.Script)
-            beginAt("/query/" + getProjectName() + "/" + getFolderName() + "/executeQuery.view?schemaName=exp&query.queryName=Datas&query.LSID~doesnotcontain=Flow-AnalysisScript");
+            table = ExecuteQueryPage.getPageFactory("exp", "Datas")
+                .addParameter("query.LSID~doesnotcontain", "Flow-AnalysisScript")
+                .navigate(this)
+                .getDataRegion();
             assertEquals("Expected all experiment Datas to be deleted", 0, table.getDataRowCount());
         }
     }
@@ -279,12 +283,14 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
         if (setBackground)
         {
             // specify forground-background match columns
-            assertFormElementEquals(Locator.name("ff_matchColumn").index(0), "Run");
+            Locator loc1 = Locator.name("ff_matchColumn").index(0);
+            assertEquals("Run", getFormElement(loc1));
             selectOptionByText(Locator.name("ff_matchColumn").index(1), "Sample Sample Order");
 
             // specify background values
             selectOptionByText(Locator.name("ff_backgroundFilterField").index(0), "Sample Stim");
-            assertFormElementEquals(Locator.name("ff_backgroundFilterOp").index(0), "eq");
+            Locator loc = Locator.name("ff_backgroundFilterOp").index(0);
+            assertEquals("eq", getFormElement(loc));
             setFormElement(Locator.name("ff_backgroundFilterValue").index(0), "Neg Cont");
         }
 
@@ -339,7 +345,8 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
         if (!options.canAccelerateWizard())
         {
             importAnalysis_selectFCSFiles(options.getContainerPath(), options.getSelectFCSFilesOption(), options.getKeywordDirs());
-            assertFormElementEquals(Locator.name("selectFCSFilesOption"), options.getSelectFCSFilesOption().name());
+            Locator loc = Locator.name("selectFCSFilesOption");
+            assertEquals(options.getSelectFCSFilesOption().name(), getFormElement(loc));
 
             boolean resolving = options.getSelectFCSFilesOption() == SelectFCSFileOption.Previous;
             importAnalysis_reviewSamples(options.getContainerPath(), resolving, options.getSelectedGroupNames(), options.getSelectedSampleIds());
@@ -444,12 +451,12 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
             assertTextPresent("Matched");
         }
 
-        if (selectedGroupNames != null && selectedGroupNames.size() > 0)
+        if (selectedGroupNames != null && !selectedGroupNames.isEmpty())
         {
             selectOptionByValue(Locator.id("importGroupNames"), StringUtils.join(selectedGroupNames, ","));
             fireEvent(Locator.id("importGroupNames"), SeleniumEvent.change); // TODO: Workaround for reselection not changing checkboxes
         }
-        else if (selectedSampleIds != null && selectedSampleIds.size() > 0)
+        else if (selectedSampleIds != null && !selectedSampleIds.isEmpty())
         {
             // UNDONE: Select individual rows for import
         }
@@ -522,7 +529,7 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
     {
         private final String _containerPath;
         private final String _workspacePath;
-        private SelectFCSFileOption _selectFCSFilesOption;
+        private final SelectFCSFileOption _selectFCSFilesOption;
         private final List<String> _keywordDirs;
         private final List<String> _selectedGroupNames;
         private final List<String> _selectedSampleIds;

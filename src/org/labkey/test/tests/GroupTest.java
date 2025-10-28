@@ -19,6 +19,10 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.query.Filter;
+import org.labkey.remoteapi.query.SelectRowsCommand;
+import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
@@ -32,6 +36,7 @@ import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.WikiHelper;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -39,6 +44,9 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.labkey.test.util.PermissionsHelper.AUTHOR_ROLE;
+import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
+import static org.labkey.test.util.PermissionsHelper.READER_ROLE;
 
 @Category(Daily.class)
 @BaseWebDriverTest.ClassTimeout(minutes = 9)
@@ -48,6 +56,7 @@ public class GroupTest extends BaseWebDriverTest
     protected static final String COMPOUND_GROUP = "group2";
     protected static final String BAD_GROUP = "group3";
     protected static final String CHILD_GROUP = "group4";
+    protected static final String EMPTY_GROUP = "emptyGroupToDelete";
     protected static final String[] TEST_USERS_FOR_GROUP = {"user1_grouptest@" + SIMPLE_GROUP + ".group.test", "user2_grouptest@" + SIMPLE_GROUP + ".group.test", "user3_grouptest@" + COMPOUND_GROUP + ".group.test"};
     protected static final String[] TEST_DISPLAY_NAMES_FOR_GROUP = {"user1 grouptest", "user2 grouptest", "user3 grouptest"};
     protected static final String SITE_USER_IN_GROUP = "useringroup";
@@ -79,6 +88,7 @@ public class GroupTest extends BaseWebDriverTest
         permissionsHelper.deleteGroup(CHILD_GROUP);
         permissionsHelper.deleteGroup(SITE_USER_GROUP);
         permissionsHelper.deleteGroup(API_SITE_GROUP);
+        permissionsHelper.deleteGroup(EMPTY_GROUP);
         _userHelper.deleteUsers(false, TEST_USERS_FOR_GROUP);
         _userHelper.deleteUsers(false, SITE_USER_EMAILS);
         _containerHelper.deleteProject(getProjectName(), afterTest);
@@ -93,7 +103,7 @@ public class GroupTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testSteps()
+    public void testSteps() throws IOException, CommandException
     {
         for (String user : TEST_USERS_FOR_GROUP)
         {
@@ -103,13 +113,14 @@ public class GroupTest extends BaseWebDriverTest
         //double check that user can't see the project yet- otherwise our later check will be invalid
 
         impersonate(TEST_USERS_FOR_GROUP[0]);
-        openProjectMenu();
+        projectMenu().open();
         assertElementNotPresent(Locator.linkWithText(getProjectName()));
         stopImpersonating();
         //create users
 
         _permissionsHelper.createGlobalPermissionsGroup(SIMPLE_GROUP, TEST_USERS_FOR_GROUP[0], TEST_USERS_FOR_GROUP[1]);
         _permissionsHelper.createGlobalPermissionsGroup(COMPOUND_GROUP, SIMPLE_GROUP,  TEST_USERS_FOR_GROUP[2]);
+        _permissionsHelper.createGlobalPermissionsGroup(EMPTY_GROUP);
 
         verifyExportFunction();
 
@@ -121,9 +132,9 @@ public class GroupTest extends BaseWebDriverTest
         _permissionsHelper.enterPermissionsUI();
         waitForText("Author");
 
-        _securityHelper.setSiteGroupPermissions(COMPOUND_GROUP, "Author");
-        _securityHelper.setSiteGroupPermissions(COMPOUND_GROUP, "Reader");
-        _securityHelper.setSiteGroupPermissions(SIMPLE_GROUP, "Editor");
+        _permissionsHelper.setSiteGroupPermissions(COMPOUND_GROUP, AUTHOR_ROLE);
+        _permissionsHelper.setSiteGroupPermissions(COMPOUND_GROUP, READER_ROLE);
+        _permissionsHelper.setSiteGroupPermissions(SIMPLE_GROUP, EDITOR_ROLE);
         clickButton("Save and Finish");
         assertUserCanSeeProject(TEST_USERS_FOR_GROUP[0], getProjectName());
         //can't add built in group to regular group
@@ -133,9 +144,15 @@ public class GroupTest extends BaseWebDriverTest
         clickProject(getProjectName());
         _permissionsHelper.enterPermissionsUI();
         waitForText("Author");
-        _securityHelper.setSiteGroupPermissions("All Site Users", "Author");
-
+        _permissionsHelper.setSiteGroupPermissions("All Site Users", AUTHOR_ROLE);
         permissionsReportTest();
+
+        // Ensure that deleting from the group's page works too. Issue 52614
+        _permissionsHelper.deleteGlobalGroupFromDetailsPage(EMPTY_GROUP);
+        SelectRowsCommand selectRowsCommand = new SelectRowsCommand("core", "Groups");
+        selectRowsCommand.setFilters(List.of(new Filter("Name", EMPTY_GROUP)));
+        SelectRowsResponse response = selectRowsCommand.execute(createDefaultConnection(), "/");
+        assertEquals(EMPTY_GROUP + " should have been deleted", 0, response.getRows().size());
 
         goToProjectHome();
 
@@ -164,7 +181,7 @@ public class GroupTest extends BaseWebDriverTest
         String displayName = _userHelper.getDisplayNameForEmail(TEST_USERS_FOR_GROUP[0]);
         int rowIndex = access.getRowIndex(userColumn, displayName) - headerIndex;
         assertTrue("Unable to find user: " + displayName, rowIndex >= 0);
-        List<String> expectedGroups = Arrays.asList("Author", "Reader", "Editor");
+        List<String> expectedGroups = Arrays.asList(AUTHOR_ROLE, READER_ROLE, EDITOR_ROLE);
         List<String> groupsForUser = Arrays.asList(access.getDataAsText(rowIndex + headerIndex, accessColumn).replace(" ", "").split(","));
 
         //confirm correct perms
@@ -191,7 +208,7 @@ public class GroupTest extends BaseWebDriverTest
         WikiHelper wikiHelper = new WikiHelper(this);
 
         //set simple group as editor
-        _securityHelper.setSiteGroupPermissions(SIMPLE_GROUP, "Editor");
+        _permissionsHelper.setSiteGroupPermissions(SIMPLE_GROUP, EDITOR_ROLE);
 
         //impersonate user 1, make several wiki edits
         impersonate(TEST_USERS_FOR_GROUP[0]);
@@ -215,11 +232,11 @@ public class GroupTest extends BaseWebDriverTest
         verifyAuthorPermission(nameTitleBody);
         stopImpersonating();
 
-        impersonateRoles("Author");
+        impersonateRoles(AUTHOR_ROLE);
         verifyAuthorPermission(nameTitleBody);
         stopImpersonating();
 
-        impersonateRoles("Editor");
+        impersonateRoles(EDITOR_ROLE);
         verifyEditorPermission(nameTitleBody);
         stopImpersonating();
 

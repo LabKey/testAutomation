@@ -15,30 +15,39 @@
  */
 package org.labkey.test.tests;
 
-import org.junit.BeforeClass;
+import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.SimpleGetCommand;
+import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.util.OptionalFeatureHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.pages.core.admin.CustomizeSitePage;
+import org.labkey.test.pages.core.admin.OptionalFeaturesPage;
 import org.labkey.test.pages.core.login.LoginConfigRow;
 import org.labkey.test.pages.core.login.LoginConfigurePage;
 import org.labkey.test.util.LogMethod;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.labkey.test.util.PermissionsHelper.APP_ADMIN_ROLE;
+import static org.labkey.test.util.PermissionsHelper.READER_ROLE;
 
 @Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 3)
@@ -106,6 +115,33 @@ public class AdminConsoleTest extends AbstractAdminConsoleTest
             throw new RuntimeException("Failed to get Server HTTP response header", e);
         }
     }
+
+    @Test
+    public void testBogusSiteSettings()
+    {
+        // Issue 53562: Cap max BLOB size
+        CustomizeSitePage customizeSitePage = goToAdminConsole().clickSiteSettings();
+        customizeSitePage.setMaxBLOBSize(Integer.toString(200 * 1024 * 1024 + 1));
+        customizeSitePage.setSslPort("-4");
+        customizeSitePage.setMemoryUsageDumpInterval("-3");
+        customizeSitePage.setReadOnlyHttpRequestTimeout("-1");
+        customizeSitePage.save();
+        assertTextPresent(
+            "Maximum BLOB size cannot be set higher than 209715200 bytes",
+            "HTTPS port must be between 1 and 65,535",
+            "Memory logging frequency must be non-negative",
+            "HTTP timeout must be non-negative"
+        );
+
+        customizeSitePage = new CustomizeSitePage(getDriver());
+        customizeSitePage.setMaxBLOBSize("-10");
+        customizeSitePage.setSslPort(Integer.toString(256 * 256)); // 2^16
+        customizeSitePage.save();
+        assertTextPresent(
+            "Maximum BLOB size cannot be negative",
+            "HTTPS port must be between 1 and 65,535"
+        );
+    }
     
     @Test
     public void testRibbonBar()
@@ -141,7 +177,7 @@ public class AdminConsoleTest extends AbstractAdminConsoleTest
         assertEquals("Incorrect URL", expected, href);
 
         goToHome();
-        impersonateRole("Reader");
+        impersonateRole(READER_ROLE);
         assertElementPresent(ribbon);
         assertElementPresent(ribbonLink);
         stopImpersonating();
@@ -150,6 +186,97 @@ public class AdminConsoleTest extends AbstractAdminConsoleTest
         customizeSitePage.setShowRibbonMessage(false).save();
         assertElementNotPresent(ribbon);
         assertElementNotPresent(ribbonLink);
+    }
+
+    // Issue 51843  allow site banner configuration via api
+    @Test
+    public void testSiteBannerAPIConfiguration() throws Exception
+    {
+        goToAdminConsole();
+
+        String bannerMessage = "test banner message" + TRICKY_CHARACTERS;
+        Locator bannerLoc = Locator.tagWithClass("div", "lk-dismissable-warn")
+                .containing("test banner message" + TRICKY_CHARACTERS);
+
+        //As site admin
+        // set the message and show it
+        var showBannerCmd = new SimplePostCommand("admin", "setRibbonMessage.api");
+        showBannerCmd.setParameters(Map.of("message", bannerMessage,
+                "show", true));
+        showBannerCmd.execute(createDefaultConnection(), "/");
+        refresh();
+        // verify it is shown
+        WebDriverWrapper.waitFor(()-> bannerLoc.isDisplayed(getDriver()), 1000);
+        if (checker().withScreenshot("banner not shown or not as expected")
+                .verifyTrue("expect banner to be shown", bannerLoc.isDisplayed(getDriver())))
+        {
+            // hide the banner
+            var hideBannerCmd = new SimplePostCommand("admin", "setRibbonMessage.api");
+            hideBannerCmd.setParameters(Map.of("show", false));
+            hideBannerCmd.execute(createDefaultConnection(), "/");
+            refresh();
+            WebDriverWrapper.waitFor(()-> !bannerLoc.isDisplayed(getDriver()), 1000);
+            // verify it is hidden
+            checker().withScreenshot("banner is shown when not expected")
+                    .verifyFalse("expect banner not to be shown", bannerLoc.isDisplayed(getDriver()));
+        }
+
+        // restore it with the previous banner value
+        var restoreBannerCmd = new SimplePostCommand("admin", "setRibbonMessage.api");
+        restoreBannerCmd.setParameters(Map.of("show", true));
+        restoreBannerCmd.execute(createDefaultConnection(), "/");
+        refresh();
+        // verify it is restored with the previous value
+        checker().withScreenshot("banner not shown or not as expected")
+                .verifyTrue("expect banner to be shown", bannerLoc.isDisplayed(getDriver()));
+
+        // as app admin
+        impersonateRole(APP_ADMIN_ROLE);
+        var reHideBannerCmd = new SimplePostCommand("admin", "setRibbonMessage.api");
+        reHideBannerCmd.setParameters(Map.of("show", false));
+        try
+        {
+            reHideBannerCmd.execute(createDefaultConnection(), "/");
+            fail("expect exception trying to call this API as app admin");
+        }
+        catch (CommandException e)
+        {
+            // success, caller with app admin failed to hit this api
+        }
+        refresh();
+        // verify it remains shown
+        checker().withScreenshot("banner is hidden when not expected")
+                .verifyTrue("expect banner to be shown", bannerLoc.isDisplayed(getDriver()));
+
+        stopImpersonating();
+
+        // clean up after ourselves as site admin
+        var clearAndHideBannerCmd = new SimplePostCommand("admin", "setRibbonMessage.api");
+        clearAndHideBannerCmd.setParameters(Map.of("show", false, "message", ""));
+        clearAndHideBannerCmd.execute(createDefaultConnection(), "/");
+        refresh();
+        checker().withScreenshot("banner is shown when not expected")
+                .verifyFalse("expect banner not to be shown", bannerLoc.isDisplayed(getDriver()));
+    }
+
+    @Test
+    public void testUIOptionalFeatures()
+    {
+        goToAdminConsole();
+
+        var featureIds = List.of("extendedMetrics", "StageFileUploads");
+
+        verifyOptionalFeatures("optional features", featureIds, OptionalFeaturesPage.OptionalFeatureType.Optional);
+    }
+
+    @Test
+    public void testUIExperimentalFeatures()
+    {
+        goToAdminConsole();
+
+        var featureIds = List.of("queryBasedDatasets", "LinkedDatasetCheck", "blockMaliciousClients");
+
+        verifyOptionalFeatures("experimental features", featureIds, OptionalFeaturesPage.OptionalFeatureType.Experimental);
     }
 
     @Test
@@ -257,19 +384,19 @@ public class AdminConsoleTest extends AbstractAdminConsoleTest
 
         log("Verifying host cannot be blank ");
         clickButton("Save");
-        assertElementPresent(Locator.css(".labkey-error").withText("External host name must not be blank."));
+        assertElementPresent(Locator.css(".labkey-error").withText("Redirect host name must not be blank."));
 
         log("Setting the host URL");
-        setFormElement(Locator.name("newExternalHost"), host);
+        setFormElement(Locator.name("newValue"), host);
         clickButton("Save");
 
         log("Verifying url got added correctly");
-        assertEquals(host, getFormElement(Locator.name("existingExternalHost1")));
+        assertEquals(host, getFormElement(Locator.name("existingValue1")));
 
         log("Verifying cannot be duplicate");
-        setFormElement(Locator.name("newExternalHost"), host);
+        setFormElement(Locator.name("newValue"), host);
         clickButton("Save");
-        assertElementPresent(Locator.css(".labkey-error").withText("'" + host + "' already exists. Duplicate hosts not allowed."));
+        assertElementPresent(Locator.css(".labkey-error").withText("'" + host + "' already exists. Duplicate values not allowed."));
     }
 
     /*
@@ -282,5 +409,42 @@ public class AdminConsoleTest extends AbstractAdminConsoleTest
         goToAdminConsole().clickCredits();
         log("Verifying the page is properly loaded");
         assertTextPresent("JAR Files Distributed with the API Module");
+    }
+
+    private void verifyOptionalFeatures(String linkText, List<String> featureIds, OptionalFeaturesPage.OptionalFeatureType optionalFeatureType)
+    {
+        waitAndClickAndWait(Locator.linkWithText(linkText));
+        var optionalFeaturesPage = new OptionalFeaturesPage(getDriver());
+        var cn = createDefaultConnection();
+
+        for (String testId : featureIds) {
+            // capture initial state
+            boolean initialState = OptionalFeatureHelper.isOptionalFeatureEnabled(cn, testId);
+
+            // ensure the UI reflects the same state
+            boolean initialUIState = optionalFeaturesPage.getFeatureStatus(testId);
+            checker().withScreenshot("initial state not as expected")
+                    .wrapAssertion(()-> Assertions.assertThat(initialUIState)
+                            .as("expect ui to align with API initial state")
+                            .isEqualTo(initialState));
+
+            // toggle it the other way
+            optionalFeaturesPage.setFeatureStatus(testId, !initialState);
+            checker().withScreenshot("toggled state not as expected")
+                    .awaiting(Duration.ofMillis(500), ()-> Assertions.assertThat(OptionalFeatureHelper.isOptionalFeatureEnabled(cn, testId))
+                            .as("expect toggling the UI to update the server status for the feature")
+                            .isEqualTo(!initialState));
+
+            // use the API to restore the initial state
+            OptionalFeatureHelper.setOptionalFeature(cn, testId, initialState);
+            optionalFeaturesPage.goToAdminConsole();
+
+            optionalFeaturesPage = OptionalFeaturesPage.beginAt(this, optionalFeatureType);
+
+            // verify the page state reflects the API change after a reload
+            checker().withScreenshot("state not as expected after api set and refresh")
+                    .verifyEquals("expect page to reflect state after api config",
+                            initialState, optionalFeaturesPage.getFeatureStatus(testId));
+        }
     }
 }

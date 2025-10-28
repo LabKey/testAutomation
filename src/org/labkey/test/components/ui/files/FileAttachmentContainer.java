@@ -6,6 +6,7 @@ import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.html.FileInput;
 import org.labkey.test.components.html.Input;
+import org.labkey.test.params.FieldKey;
 import org.openqa.selenium.ElementNotInteractableException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -44,12 +45,6 @@ public class FileAttachmentContainer extends WebDriverComponent<FileAttachmentCo
     protected ElementCache newElementCache()
     {
         return new ElementCache();
-    }
-
-    @Override
-    protected ElementCache elementCache()
-    {
-        return (ElementCache) super.elementCache();
     }
 
     public boolean isMulti()
@@ -111,7 +106,7 @@ public class FileAttachmentContainer extends WebDriverComponent<FileAttachmentCo
     /**
      * Returns true if there is a file with that name in the current instance
      */
-    private boolean hasFile(String fileName)
+    public boolean hasFile(String fileName)
     {
         return new FileAttachmentEntry.FileAttachmentEntryFinder(getDriver())
                 .withTitle(fileName).findOptional(this).isPresent();
@@ -201,6 +196,15 @@ public class FileAttachmentContainer extends WebDriverComponent<FileAttachmentCo
         public Locator fileUploadScrollFooterLoc = Locator.tagWithClass("div", "file-upload__scroll-footer");
     }
 
+    /**
+     * File upload fields append "-fileUpload" to the field's fieldKey
+     * @param fieldIdentifier Identifier for the field; name ({@link String}) or fieldKey ({@link FieldKey})
+     * @return FieldKey with expected suffix
+     */
+    public static FieldKey fileUploadFieldKey(CharSequence fieldIdentifier)
+    {
+        return FieldKey.fromFieldKey(FieldKey.fromName(fieldIdentifier) + "-fileUpload"); // Issue 53394
+    }
 
     public static class FileAttachmentContainerFinder extends WebDriverComponentFinder<FileAttachmentContainer, FileAttachmentContainerFinder>
     {

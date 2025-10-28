@@ -10,7 +10,6 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BaseWebDriverTest;
-import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebTestHelper;
@@ -27,6 +26,7 @@ import org.labkey.test.pages.core.admin.BaseSettingsPage.TIME_FORMAT;
 import org.labkey.test.pages.core.admin.LookAndFeelSettingsPage;
 import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.util.AuditLogHelper;
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExcelHelper;
@@ -44,11 +44,12 @@ import java.util.Map;
 @Category({Daily.class, Data.class, Hosting.class})
 public class ListDateAndTimeTest extends BaseWebDriverTest
 {
-
     private static final String PROJECT_NAME = "List Date And Time Test";
     private static SimpleDateFormat _defaultDateFormat = null;
     private static SimpleDateFormat _defaultTimeFormat = null;
     private static SimpleDateFormat _defaultDateTimeFormat = null;
+
+    private final AuditLogHelper _auditLogHelper = new AuditLogHelper(this);
 
     @Override
     public List<String> getAssociatedModules()
@@ -65,7 +66,7 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject() throws IOException, CommandException
     {
-        ListDateAndTimeTest init = (ListDateAndTimeTest)getCurrentTest();
+        ListDateAndTimeTest init = getCurrentTest();
         init.doSetup();
     }
 
@@ -114,16 +115,16 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
                 expectedData.size(), table.getDataRowCount());
 
         int rowIndex = 0;
-        for(Map<String, String> expectedRowMap : expectedData)
+        for (Map<String, String> expectedRowMap : expectedData)
         {
             // Protect against the table having fewer rows than expected (index out of bounds error).
-            if(rowIndex < table.getDataRowCount())
+            if (rowIndex < table.getDataRowCount())
             {
                 Map<String, String> tableRowMap = table.getRowDataAsMap(rowIndex);
 
-                for(Map.Entry<String, String> expectedEntry : expectedRowMap.entrySet())
+                for (Map.Entry<String, String> expectedEntry : expectedRowMap.entrySet())
                 {
-                    if(checker().verifyTrue(String.format("Could not find column '%s' in rowmap for row %d", expectedEntry.getKey(), rowIndex),
+                    if (checker().verifyTrue(String.format("Could not find column '%s' in rowmap for row %d", expectedEntry.getKey(), rowIndex),
                             tableRowMap.containsKey(expectedEntry.getKey())))
                     {
                         checker().verifyEquals(String.format("For row %d column %s not as expected.", rowIndex, expectedEntry.getKey()),
@@ -152,7 +153,7 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
      * </p>
      */
     @Test
-    public void testDateAndTimeColumnsInsert() throws IOException, CommandException
+    public void testDateAndTimeColumnsInsert()
     {
 
         SimpleDateFormat variantDateFormat = new SimpleDateFormat("MMMM dd, yyyy");
@@ -219,7 +220,7 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
 
         _listHelper.importDataFromFile(excelDateTimeFile);
 
-        // Note, the month is zero based. The value of the month here is one less than what is seen in the file.
+        // Note, the month is zero-based. The value of the month here is one less than what is seen in the file.
         // Also of note the xlsx used has a column formatted as time and another as date. Excel does not have a DateTime specific format.
         testDate01 = new Calendar.Builder()
                 .setDate(2024, 1, 29)
@@ -298,9 +299,8 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testExcelImportExport() throws IOException, CommandException
+    public void testExcelImportExport() throws IOException
     {
-
         String listName = "Date and Time Export List";
         String dateCol = "Date";
         String timeCol = "Time";
@@ -403,12 +403,12 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
 
         File exportedFile = exportHelper.exportExcel(DataRegionExportHelper.ExcelFileType.XLSX);
 
-        try(Workbook workbook = ExcelHelper.create(exportedFile))
+        try (Workbook workbook = ExcelHelper.create(exportedFile))
         {
             Sheet sheet = workbook.getSheetAt(workbook.getActiveSheetIndex());
 
             int row = 1;
-            for(List<Date> expectedDate : expectedExportedData)
+            for (List<Date> expectedDate : expectedExportedData)
             {
 
                 for (int column = 0; column < 3; column++)
@@ -517,11 +517,9 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
      * <p>
      *     Test will sort different values, that include duplicates, blanks and dates in the future.
      * </p>
-     * @throws IOException Can be thrown by helper that checks if the list already exists.
-     * @throws CommandException Can be thrown by helper that checks if the list already exists.
      */
     @Test
-    public void testDateAndTimeColumnSorting() throws IOException, CommandException
+    public void testDateAndTimeColumnSorting()
     {
 
         String listName = "Date and Time Sort List";
@@ -559,15 +557,15 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
         StringBuilder bulkInsertText = new StringBuilder();
         bulkInsertText.append(String.format("%s\t%s\n", dateCol, timeCol));
 
-        for(Date date : dates)
+        for (Date date : dates)
         {
 
-            if(date.equals(dateUseDateOnly))
+            if (date.equals(dateUseDateOnly))
             {
                 // Add a line with only a date.
                 bulkInsertText.append(String.format("%s\t\n", _defaultDateFormat.format(date)));
             }
-            else if(date.equals(dateUseTimeOnly))
+            else if (date.equals(dateUseTimeOnly))
             {
                 // Add a line with only a time.
                 bulkInsertText.append(String.format("\t%s\n", _defaultTimeFormat.format(date)));
@@ -726,22 +724,24 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
 
     }
 
-    private void testFiltering(String column, String keyCol, List<String> expectedKeyCol,
-                               String filterType01, @Nullable String filter01,
-                               @Nullable String filterType02, @Nullable String filter02,
-                               String errorMsg, String screenshotName)
+    private void testFiltering(
+        String column,
+        String keyCol,
+        List<String> expectedKeyCol,
+        String filterType01,
+        @Nullable String filter01,
+        @Nullable String filterType02,
+        @Nullable String filter02,
+        String errorMsg,
+        String screenshotName
+    )
     {
         DataRegionTable table = new DataRegionTable("query", getDriver());
 
-        if(null == filter01)
-        {
+        if (null == filter01)
             table.setFilter(column, filterType01);
-        }
         else
-        {
             table.setFilter(column, filterType01, filter01, filterType02, filter02);
-        }
-
 
         List<String> actualKeyCol = table.getColumnDataAsText(keyCol);
 
@@ -750,7 +750,6 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
                         expectedKeyCol, actualKeyCol);
 
         table.clearFilter(column);
-
     }
 
     /**
@@ -767,13 +766,10 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
      *         <li>Filtering time-only column also validates when the value given as the filter has only hh:mm (no seconds)</li>
      *     </ul>
      * </p>
-     * @throws IOException Can be thrown by helper that checks if the list already exists.
-     * @throws CommandException Can be thrown by helper that checks if the list already exists.
      */
     @Test
-    public void testDateAndTimeColumnFiltering() throws IOException, CommandException
+    public void testDateAndTimeColumnFiltering()
     {
-
         String listName = "Date and Time Filter List";
         String dateCol = "Date";
         String timeCol = "Time";
@@ -799,15 +795,15 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
         StringBuilder bulkInsertText = new StringBuilder();
         bulkInsertText.append(String.format("%s\t%s\n", dateCol, timeCol));
 
-        for(Date date : dates)
+        for (Date date : dates)
         {
 
-            if(date.equals(dateUseDateOnlyKey10))
+            if (date.equals(dateUseDateOnlyKey10))
             {
                 // Add a line with only a date.
                 bulkInsertText.append(String.format("%s\t\n", _defaultDateFormat.format(date)));
             }
-            else if(date.equals(dateUseTimeOnlyKey11))
+            else if (date.equals(dateUseTimeOnlyKey11))
             {
                 // Add a line with only a time.
                 bulkInsertText.append(String.format("\t%s\n", _defaultTimeFormat.format(date)));
@@ -817,7 +813,6 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
                 bulkInsertText.append(String.format("%s\t%s\n",
                         _defaultDateFormat.format(date), _defaultTimeFormat.format(date)));
             }
-
         }
 
         log("Use bulk insert to populate the list.");
@@ -858,7 +853,6 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
                 String.format("Filtering date-only column to equal '%s' (duplicate values) not as expected.", filterValue01),
                 "Error_Date_Filter_Equals_Duplicates");
 
-
         Date filterDate01 = new Calendar.Builder()
                 .setDate(2010, 1, 1)
                 .build().getTime();
@@ -874,7 +868,6 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
                 null, null,
                 String.format("Filtering date-only column greater than or equal to '%s' not as expected.", filterValue01),
                 "Error_Date_Filter_Greater");
-
 
         // Filter between two dates.
         filterDate01 = new Calendar.Builder()
@@ -900,7 +893,6 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
                 String.format("Filtering date-only column between '%s' and '%s' not as expected.", filterValue01, filterValue02),
                 "Error_Date_Filter_Between");
 
-
         log("Filter the date-only is blank.");
 
         expectedKeyCol = new ArrayList<>();
@@ -911,7 +903,6 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
                 null, null,
                 "Filtering date-only to 'Is Blank' not as expected.",
                 "Error_Date_Filter_Blank");
-
 
         log("Now filter the time-only field.");
 
@@ -939,7 +930,6 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
                 String.format("Filtering time-only column to equal '%s' (no seconds) not as expected.", filterValue01),
                 "Error_Time_Filter_No_Seconds");
 
-
         filterValue01 = _defaultTimeFormat.format(dateDuplicate);
         log(String.format("Filter the time-only field equals '%s' which has duplicates.", filterValue01));
         expectedKeyCol = new ArrayList<>();
@@ -951,7 +941,6 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
                 null, null,
                 String.format("Filtering time-only column to equal '%s' (duplicate values) not as expected.", filterValue01),
                 "Error_Time_Filter_Equals_Duplicates");
-
 
         filterDate01 = new Calendar.Builder()
                 .setTimeOfDay(14, 0, 0)
@@ -970,7 +959,6 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
                 null, null,
                 String.format("Filtering time-only column greater than or equal to '%s' not as expected.", filterValue01),
                 "Error_Time_Filter_Greater");
-
 
         filterDate01 = new Calendar.Builder()
                 .setTimeOfDay(9, 0, 0)
@@ -999,7 +987,6 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
                 String.format("Filtering time-only column between '%s' and '%s' not as expected.", filterValue01, filterValue02),
                 "Error_Time_Filter_Between");
 
-
         log("Filter the time-only is blank.");
         expectedKeyCol = new ArrayList<>();
         expectedKeyCol.add("10"); // 1989-08-12 (empty)
@@ -1009,7 +996,6 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
                 null, null,
                 "Filtering time-only to 'Is Blank' not as expected.",
                 "Error_Time_Filter_Blank");
-
     }
 
     /**
@@ -1017,13 +1003,10 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
      *     Validate error messages are expected for invalid values in date-only, time-only and DateTime fields.
      *     Validates bulk import, file (xlsx) and UI.
      * </p>
-     * @throws IOException Can be thrown by helper that checks if the list already exists.
-     * @throws CommandException Can be thrown by helper that checks if the list already exists.
      */
     @Test
-    public void testInvalidDateAndTimeInsert() throws IOException, CommandException
+    public void testInvalidDateAndTimeInsert()
     {
-
         String listName = "Date and Time Invalid Insert List";
         String dateCol = "Date";
         String timeCol = "Time";
@@ -1039,7 +1022,7 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
 
         log("Validate adding entries in bulk will give a meaningful error with a bad format.");
 
-        String expectedDateErrorMsgFormat = "'%s’ is not a valid %s for %s using U.S. date parsing (MDY)";
+        String expectedDateErrorMsgFormat = "'%s' is not a valid %s for %s using U.S. date parsing (MDY)";
         String expectedTimeErrorMsgFormat = "Could not convert value '%s' (String) for %s field '%s'";
         String badDate = "45/93/2001";
         String nonLeapDay = "2/29/2023";
@@ -1047,7 +1030,6 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
         String badDateTime = "1/1/22 4:55 pm And Some Text";
 
         ImportDataPage importPage = _listHelper.clickImportData();
-
 
         String bulkImportText = String.format("%s\t\n%s", dateCol, badDate);
         importPage.setText(bulkImportText);
@@ -1096,18 +1078,17 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
 
         _listHelper.beginAtList(getProjectName(), listName);
 
-        DataRegionTable regionTable = new DataRegionTable("query", getDriver());
-        regionTable.clickInsertNewRow();
-        setFormElement(Locator.name("quf_" + timeCol), badTime);
-        setFormElement(Locator.name("quf_" + dateCol), badDate);
-        setFormElement(Locator.name("quf_" + dateTimeCol), badDateTime);
-        clickButton("Submit");
+        new DataRegionTable("query", getDriver())
+                .clickInsertNewRow()
+                .setField(timeCol, badTime)
+                .setField(dateCol, badDate)
+                .setField(dateTimeCol, badDateTime)
+                .submit();
 
         checker().verifyTrue("Bad value error message in UI not as expected.",
                 isTextPresent(String.format("Could not convert value: %s", badTime),
                         String.format("Could not convert value: %s", badDate),
                         String.format("Could not convert value: %s", badDateTime)));
-
     }
 
     /**
@@ -1177,7 +1158,7 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
         SimpleDateFormat inputTimeFormatter = new SimpleDateFormat("hh:mm:ss aa");
         SimpleDateFormat inputDateTimeFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-        for(Date date : dates)
+        for (Date date : dates)
         {
             bulkImportText.append(String.format("%s\t%s\t%s\n",
                     inputDateFormatter.format(date), inputTimeFormatter.format(date), inputDateTimeFormatter.format(date)
@@ -1190,7 +1171,7 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
 
         List<Map<String, String>> expectedData = new ArrayList<>();
 
-        for(Date date : dates)
+        for (Date date : dates)
         {
             expectedData.add(
                     Map.of(
@@ -1222,9 +1203,19 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
 
         listDefinitionPage.clickSave();
 
+        AuditLogHelper.DetailedAuditEventRow expectedDomainEvent = new AuditLogHelper.DetailedAuditEventRow(null, listName, null,
+                "The column(s) of domain " + listName + " were modified.",
+                "", null, null, null);
+        boolean pass = _auditLogHelper.validateLastDomainAuditEvents(listName, PROJECT_NAME, expectedDomainEvent,
+                    Map.of(timeCol, new AuditLogHelper.DetailedAuditEventRow(null, timeCol, "Modified","The following property was updated: Format",null, null, null, "Format: hh:mm a > HH:mm:ss"),
+                            dateCol, new AuditLogHelper.DetailedAuditEventRow(null, dateCol, "Modified","The following property was updated: Format",null, null, null, "Format: yyyy-MM-dd > ddMMMyy"),
+                            dateTimeCol, new AuditLogHelper.DetailedAuditEventRow(null, dateTimeCol, "Modified","The following property was updated: Format",null, null, null, "Format: yyyy-MM-dd hh:mm a > dd-MMM-yyyy HH:mm:ss"))
+                );
+        checker().verifyTrue("Domain audit log not as expected after updating formats", pass);
+
         expectedData = new ArrayList<>();
 
-        for(Date date : dates)
+        for (Date date : dates)
         {
             expectedData.add(
                     Map.of(
@@ -1243,13 +1234,10 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
      *     Test converting a DateTime filed to a date-only and time-only field. Test also validates that a date-only
      *     field can be converted to a DateTime field, but a time-only field can not.
      * </p>
-     * @throws IOException Can be thrown by helper that checks if the list already exists.
-     * @throws CommandException Can be thrown by helper that checks if the list already exists.
      */
     @Test
-    public void testConvertDateTimeField() throws IOException, CommandException
+    public void testConvertDateTimeField()
     {
-
         String listName = "Convert DateTime Field List";
         String dateTimeToTimeCol = "DT_To_Time";
         String dateTimeToDateCol = "DT_To_Date";
@@ -1308,7 +1296,7 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
 
         bulkImportText.append(String.format("%s\t%s\n", dateTimeToDateCol, dateTimeToTimeCol));
 
-        for(Date date : dates)
+        for (Date date : dates)
         {
             bulkImportText.append(String.format("%s\t%s\n",
                     _defaultDateTimeFormat.format(date), formatterFormatTime.format(date)
@@ -1350,6 +1338,15 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
 
         listDefinitionPage.clickSave();
 
+        AuditLogHelper.DetailedAuditEventRow expectedDomainEvent = new AuditLogHelper.DetailedAuditEventRow(null, listName, null,
+                "The column(s) of domain " + listName + " were modified.",
+                "", null, null, null);
+        boolean pass = _auditLogHelper.validateLastDomainAuditEvents(listName, PROJECT_NAME, expectedDomainEvent,
+                Map.of(dateTimeToDateCol, new AuditLogHelper.DetailedAuditEventRow(null, dateTimeToDateCol, "Modified","The following properties were updated: Type, Format",null, null, null, "Type: DateTime > Date\nFormat: MMMM dd yyyy HH:mm > "),
+                        dateTimeToTimeCol, new AuditLogHelper.DetailedAuditEventRow(null, dateTimeToTimeCol, "Modified","The following properties were updated: Type, Format",null, null, null, "Type: DateTime > Time\nFormat: yyyy-MMM-dd HH:mm:ss > "))
+        );
+        checker().verifyTrue("Domain audit log not as expected after changing data type", pass);
+
         // Update default format after changing the types.
         DATE_FORMAT dateFormat = DATE_FORMAT.Default;
         TIME_FORMAT timeFormat = TIME_FORMAT.Default;
@@ -1359,7 +1356,7 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
 
         List<Map<String, String>> expectedData = new ArrayList<>();
 
-        for(Date date : dates)
+        for (Date date : dates)
         {
             expectedData.add(
                     Map.of(
@@ -1407,7 +1404,7 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
 
         expectedData = new ArrayList<>();
 
-        for(Date date : dates)
+        for (Date date : dates)
         {
             expectedData.add(
                     Map.of(
@@ -1420,7 +1417,5 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
 
         validateListDataInUI(table, expectedData);
         checker().screenShotIfNewError("Convert_To_DateTime_Error");
-
     }
-
 }

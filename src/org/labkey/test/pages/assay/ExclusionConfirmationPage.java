@@ -24,7 +24,7 @@ import org.openqa.selenium.WebElement;
 
 public class ExclusionConfirmationPage extends LabKeyPage
 {
-    private DataRegionTable excludedRowsDataGrid = null;
+    private DataRegionTable excludedRowsDataGrid;
 
     public ExclusionConfirmationPage(WebDriver driver)
     {

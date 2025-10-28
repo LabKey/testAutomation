@@ -23,6 +23,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
@@ -114,7 +115,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
 
     public boolean isDisabled()
     {
-        return hasClass("select-input__control--is-disabled");
+        return hasClass("select-input__control--is-disabled") || hasClass("select-input--is-disabled");
     }
 
     public boolean isEnabled()
@@ -153,6 +154,22 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
     {
         var placeholder = Locators.placeholder.findElementOrNull(getComponentElement());
         return placeholder != null && placeholder.isDisplayed();
+    }
+
+    public @Nullable String getHelpBlockText()
+    {
+        waitForReady();
+
+        if (!isHelpBlockVisible())
+            return null;
+
+        return Locators.helpBlock.findElement(getComponentElement()).getText().trim();
+    }
+
+    public boolean isHelpBlockVisible()
+    {
+        var helpBlock = Locators.helpBlock.findElementOrNull(getComponentElement());
+        return helpBlock != null && helpBlock.isDisplayed();
     }
 
     public String getValue()
@@ -365,7 +382,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
      *
      * @return List of strings for the values in the list.
      */
-    public List<String> getOptions()
+    public List<String> getOptions(Function<WebElement, String> optionMapper)
     {
 
         boolean alreadyOpened = isExpanded();
@@ -374,16 +391,20 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
         if (!alreadyOpened)
             open();
 
-        List<WebElement> selectedItems = Locators.listItems.findElements(getComponentElement());
-        List<String> rawItems = getWrapper().getTexts(selectedItems);
+        List<WebElement> optionElements = Locators.listItems.findElements(getComponentElement());
+        List<String> rawItems = optionElements.stream().map(optionMapper).toList();
 
         // If it wasn't open before close it, otherwise leave it in the open state.
         if (!alreadyOpened)
             close();
 
-        return rawItems.stream().map(String::trim).collect(Collectors.toList());
+        return rawItems;
     }
 
+    public List<String> getOptions()
+    {
+        return getOptions(el -> el.getText().trim());
+    }
 
     public String getName()
     {
@@ -494,6 +515,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
         public static final Locator.XPathLocator singleValueLabel = Locator.tagWithClass("div", "select-input__single-value");
         public static final Locator loadingSpinner = Locator.tagWithClass("span", "select-input__loading-indicator");
         public static final Locator listItems = Locator.tagWithClass("div", "select-input__option");
+        public static final Locator.XPathLocator helpBlock = Locator.tagWithClass("span", "help-block");
 
         public static Locator.XPathLocator selectContainer()
         {
@@ -621,6 +643,13 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
             _locator = Locator.tagWithClass("div", "form-group")
                     .withChild(Locator.tag("label").withPredicate("text() = " + Locator.xq(labelText)))
                     .descendant(Locators.selectContainer());
+            return this;
+        }
+
+        public BaseReactSelectFinder<Select> withinFormGroupSkipSelect(String labelText)
+        {
+            _locator = Locator.tagWithClass("div", "form-group")
+                    .withChild(Locator.tag("label").withChild(Locator.tagWithText("span", labelText)));
             return this;
         }
 

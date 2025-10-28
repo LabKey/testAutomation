@@ -143,13 +143,13 @@ public class ArrayListMap<K, V> extends AbstractMap<K, V> implements Serializabl
 
     public ArrayListMap()
     {
-        this(new FindMap<>(new HashMap<K, Integer>()), new ArrayList<V>());
+        this(new FindMap<>(new HashMap<>()), new ArrayList<>());
     }
 
 
     public ArrayListMap(int columnCount)
     {
-        this(new FindMap<>(new HashMap<K, Integer>(columnCount * 2)), new ArrayList<V>(columnCount));
+        this(new FindMap<>(new HashMap<>(columnCount * 2)), new ArrayList<>(columnCount));
     }
 
 
@@ -161,7 +161,7 @@ public class ArrayListMap<K, V> extends AbstractMap<K, V> implements Serializabl
 
     public ArrayListMap(FindMap<K> findMap)
     {
-        this(findMap, new ArrayList<V>(findMap.size()));
+        this(findMap, new ArrayList<>(findMap.size()));
     }
 
 
@@ -378,14 +378,14 @@ public class ArrayListMap<K, V> extends AbstractMap<K, V> implements Serializabl
             a.put("C", "three");
             a.put("D", "four");
 
-            ArrayListMap<String,String> b = new ArrayListMap<>(a, new ArrayList<String>());
+            ArrayListMap<String,String> b = new ArrayListMap<>(a, new ArrayList<>());
             b.put("A", "ONE");
             b.put("E", "FIVE");
             a.put("F", "six");
             b.put("G", "SEVEN");
 
-            assertEquals(a.get("A"), "one");
-            assertEquals(b.get("A"), "ONE");
+            assertEquals("one", a.get("A"));
+            assertEquals("ONE", b.get("A"));
 
             assertTrue(a.containsKey("E"));
             assertNull(a.get("E"));

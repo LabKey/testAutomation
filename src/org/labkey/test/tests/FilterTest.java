@@ -48,7 +48,7 @@ import java.util.Map;
 import static org.junit.Assert.assertEquals;
 import static org.labkey.test.params.FieldDefinition.ColumnType;
 import static org.labkey.test.params.FieldDefinition.DOMAIN_TRICKY_CHARACTERS;
-import static org.labkey.test.params.FieldDefinition.LookupInfo;
+import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
 import static org.labkey.test.util.PermissionsHelper.MemberType;
 
 @Category({Daily.class, Data.class})
@@ -80,7 +80,7 @@ public class FilterTest extends BaseWebDriverTest
     protected final static String[] CONVERTED_MONTHS = { "2000-01-01", "2000-04-04", "2000-03-03", "2000-02-02" };
 
     protected final FieldDefinition _list2ColKey = new FieldDefinition("Car", ColumnType.String);
-    protected final FieldDefinition _list2Col1 = new FieldDefinition(LIST_KEY_NAME2, new LookupInfo(null, "lists", LIST_NAME_COLORS).setTableType(ColumnType.String)).setDescription("The color of the car");
+    protected final FieldDefinition _list2Col1 = new FieldDefinition(LIST_KEY_NAME2, new FieldDefinition.StringLookup(null, "lists", LIST_NAME_COLORS)).setDescription("The color of the car");
     protected final FieldDefinition _list2ColYear = new FieldDefinition("year", ColumnType.Integer).setLabel("year");
 
     @Override
@@ -105,7 +105,7 @@ public class FilterTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject() throws Exception
     {
-        FilterTest init = (FilterTest)getCurrentTest();
+        FilterTest init = getCurrentTest();
         init.doSetup();
     }
 
@@ -116,8 +116,8 @@ public class FilterTest extends BaseWebDriverTest
         _userHelper.createUser(EDITOR1);
         _userHelper.createUser(EDITOR2);
         ApiPermissionsHelper apiPermissionsHelper = new ApiPermissionsHelper(this);
-        apiPermissionsHelper.addMemberToRole(EDITOR1, "Editor", MemberType.user, getProjectName());
-        apiPermissionsHelper.addMemberToRole(EDITOR2, "Editor", MemberType.user, getProjectName());
+        apiPermissionsHelper.addMemberToRole(EDITOR1, EDITOR_ROLE, MemberType.user, getProjectName());
+        apiPermissionsHelper.addMemberToRole(EDITOR2, EDITOR_ROLE, MemberType.user, getProjectName());
 
         createList();
         createList2();
@@ -278,21 +278,21 @@ public class FilterTest extends BaseWebDriverTest
         issuesHelper.createNewIssuesList("issues", getContainerHelper());
         goToModule("Issues");
         issuesHelper.goToAdmin()
-                .setAssignedTo("Site: Administrators")
+                .setAssignedTo("Site: Users")
                 .clickSave();
         IssuesTest.addLookupValues(getProjectName(), "issues", "Type", Arrays.asList("typea", "typeb"));
 
         HashMap<String, String> projectIssue = new HashMap<>();
         projectIssue.put("title", "project issue1");
-        projectIssue.put("assignedTo", getDisplayName());
-        projectIssue.put("type", "typea");
-        projectIssue.put("priority", "1");
+        projectIssue.put("AssignedTo", getDisplayName());
+        projectIssue.put("Type", "typea");
+        projectIssue.put("Priority", "1");
         issuesHelper.addIssue(projectIssue);
         HashMap<String, String> projectIssue2 = new HashMap<>();
         projectIssue2.put("title", "project issue2");
-        projectIssue2.put("assignedTo", getDisplayName());
-        projectIssue2.put("type", "typeb");
-        projectIssue2.put("priority", "2");
+        projectIssue2.put("AssignedTo", getDisplayName());
+        projectIssue2.put("Type", "typeb");
+        projectIssue2.put("Priority", "2");
         issuesHelper.addIssue(projectIssue2);
 
         _containerHelper.createSubfolder(getProjectName(), "subfolder");
@@ -301,7 +301,7 @@ public class FilterTest extends BaseWebDriverTest
         issuesHelper.createNewIssuesList("issues", getContainerHelper());
         goToModule("Issues");
         issuesHelper.goToAdmin();
-        issuesHelper.setIssueAssignmentList("Site: Administrators");
+        issuesHelper.setIssueAssignmentList("Site: Users");
         clickButton("Save");
 
         IssuesTest.addLookupValues(getProjectName(), "issues", "Type", Arrays.asList("typed", "typee"));
@@ -310,15 +310,15 @@ public class FilterTest extends BaseWebDriverTest
 
         HashMap<String, String> subfolderIssue = new HashMap<>();
         subfolderIssue.put("title", "subfolder issue1");
-        subfolderIssue.put("assignedTo", getDisplayName());
-        subfolderIssue.put("type", "typed");
-        subfolderIssue.put("priority", "3");
+        subfolderIssue.put("AssignedTo", getDisplayName());
+        subfolderIssue.put("Type", "typed");
+        subfolderIssue.put("Priority", "3");
         issuesHelper.addIssue(subfolderIssue);
         HashMap<String, String> subfolderIssue2 = new HashMap<>();
         subfolderIssue2.put("title", "subfolder issue2");
-        subfolderIssue2.put("assignedTo", getDisplayName());
-        subfolderIssue2.put("type", "typee");
-        subfolderIssue2.put("priority", "4");
+        subfolderIssue2.put("AssignedTo", getDisplayName());
+        subfolderIssue2.put("Type", "typee");
+        subfolderIssue2.put("Priority", "4");
         issuesHelper.addIssue(subfolderIssue2);
 
         goToProjectHome();
@@ -337,26 +337,26 @@ public class FilterTest extends BaseWebDriverTest
         assertElementPresent(Locator.linkWithText(subfolderIssue2.get("title")));
 
         verifyFacetOptions(region, "Type",
-                projectIssue.get("type"),
-                projectIssue2.get("type"),
-                subfolderIssue.get("type"),
-                subfolderIssue2.get("type"));
+                projectIssue.get("Type"),
+                projectIssue2.get("Type"),
+                subfolderIssue.get("Type"),
+                subfolderIssue2.get("Type"));
 
         verifyFacetOptions(region, "Priority",
-                projectIssue.get("priority"),
-                projectIssue2.get("priority"),
-                subfolderIssue.get("priority"),
-                subfolderIssue2.get("priority"));
+                projectIssue.get("Priority"),
+                projectIssue2.get("Priority"),
+                subfolderIssue.get("Priority"),
+                subfolderIssue2.get("Priority"));
 
-        region.setFacetedFilter("Priority", projectIssue2.get("priority"), subfolderIssue.get("priority"));
+        region.setFacetedFilter("Priority", projectIssue2.get("Priority"), subfolderIssue.get("Priority"));
         assertElementNotPresent(Locator.linkWithText(projectIssue.get("title")));
         assertElementPresent(Locator.linkWithText(projectIssue2.get("title")));
         assertElementPresent(Locator.linkWithText(subfolderIssue.get("title")));
         assertElementNotPresent(Locator.linkWithText(subfolderIssue2.get("title")));
 
         verifyFacetOptions(region, "Type",
-                projectIssue2.get("type"),
-                subfolderIssue.get("type"));
+                projectIssue2.get("Type"),
+                subfolderIssue.get("Type"));
     }
 
     private void verifyFacetOptions(DataRegionTable dataRegion, String column, String... options)
@@ -485,7 +485,6 @@ public class FilterTest extends BaseWebDriverTest
         return _listCol3.getName();
     }
 
-
     private String getDateColumnName()
     {
         return _listCol2.getName();
@@ -502,21 +501,13 @@ public class FilterTest extends BaseWebDriverTest
         generateValidFilterArgsAndResponses().forEach(this::validFilterGeneratesCorrectResultsTest);
     }
 
-    private static class FilterArgs
+    private record FilterArgs(FieldDefinition columnDef, String filter1Type, String filter1Value, String filter2Type,
+                              String filter2Value, String[] present, String[] notPresent)
     {
-        public final FieldDefinition columnDef;
-        public final String filter1Type;
-        public final String filter1Value;
-        public final String filter2Type;
-        public final String filter2Value;
-
-        public final String[] present;
-        public final String[] notPresent;
-
-        public FilterArgs(FieldDefinition columnDef,
-                          String filter1Type, @Nullable String filter1Value,
-                          @Nullable String filter2Type, @Nullable String filter2Value,
-                          String[] present, String[] notPresent)
+        private FilterArgs(FieldDefinition columnDef,
+                           String filter1Type, @Nullable String filter1Value,
+                           @Nullable String filter2Type, @Nullable String filter2Value,
+                           String[] present, String[] notPresent)
         {
             this.columnDef = columnDef;
             this.filter1Type = filter1Type;
@@ -528,7 +519,7 @@ public class FilterTest extends BaseWebDriverTest
         }
     }
 
-    public static FilterArgs createFilterArgs(FieldDefinition columnDef,
+    private static FilterArgs createFilterArgs(FieldDefinition columnDef,
                                               String filter1Type, @Nullable String filter1Value,
                                               @Nullable String filter2Type, @Nullable String filter2Value,
                                               String[] present, String[] notPresent)
@@ -537,31 +528,31 @@ public class FilterTest extends BaseWebDriverTest
     }
 
     private List<FilterArgs> generateValidFilterArgsAndResponses()
-        {
-            return Arrays.asList(
-                    //String columnName, String filter1Type, String filter1, String filter2Type, String filter2, String[] textPresentAfterFilter, String[] textNotPresentAfterFilter,
-                    //Issue 12197
-                    createFilterArgs(_listCol4, "Equals One Of", TEST_DATA[4][3] + ";" + TEST_DATA[4][2], null, null, new String[]{TEST_DATA[1][2], TEST_DATA[1][3]}, new String[]{TEST_DATA[1][0], TEST_DATA[1][1]}),
-                    createFilterArgs(_listCol1, "Equals", TEST_DATA[1][0], null, null, new String[]{TEST_DATA[1][0]}, new String[]{TEST_DATA[1][2], TEST_DATA[1][1], TEST_DATA[1][3]}),
-                    createFilterArgs(_listCol1, "Starts With", "Z", null, null, new String[]{TEST_DATA[1][3]}, new String[]{TEST_DATA[1][0], TEST_DATA[1][1], TEST_DATA[1][2]}),
-                    createFilterArgs(_listCol1, "Does Not Start With", "Z", null, null, new String[]{TEST_DATA[1][2], TEST_DATA[1][1], TEST_DATA[1][0]}, new String[]{TEST_DATA[1][3]}),
-                    //can't check for the absence of thing you're excluding, since it will be present in the filter text
-                    createFilterArgs(_listCol1, "Does Not Equal", TEST_DATA[1][0], null, null, new String[]{TEST_DATA[1][2], TEST_DATA[1][1], TEST_DATA[1][3]}, new String[]{TEST_DATA[5][0]}),
-                    createFilterArgs(_listCol1, "Does Not Equal Any Of", TEST_DATA[1][0] + ";" + TEST_DATA[1][1], null, null, new String[]{TEST_DATA[1][2], TEST_DATA[1][3]}, new String[]{TEST_DATA[5][0], TEST_DATA[5][1]}),
-                    createFilterArgs(_listCol3, "Equals", "true", null, null, new String[]{TEST_DATA[1][0], TEST_DATA[1][2]}, new String[]{TEST_DATA[1][1], TEST_DATA[1][3]}),
-                    createFilterArgs(_listCol3, "Does Not Equal", "false", null, null, new String[]{TEST_DATA[1][0], TEST_DATA[1][2]}, new String[]{TEST_DATA[1][1], TEST_DATA[1][3]}),
-                    //filter is case insensitive
-                    createFilterArgs(_listCol6, "Contains", "e", "Contains", "r", new String[]{TEST_DATA[5][2], TEST_DATA[5][0], TEST_DATA[5][1]}, new String[]{TEST_DATA[1][3]}),
-                    createFilterArgs(_listCol4, "Is Greater Than or Equal To", "9", null, null, new String[]{TEST_DATA[1][0], TEST_DATA[1][1]}, new String[]{TEST_DATA[1][2], TEST_DATA[1][3]}),
-                    createFilterArgs(_listCol4, "Is Greater Than", "9", null, null, new String[]{TEST_DATA[1][0]}, new String[]{TEST_DATA[1][2], TEST_DATA[1][3], TEST_DATA[1][1]}),
-                    createFilterArgs(_listCol4, "Is Blank", null, null, null, new String[]{}, new String[]{TEST_DATA[1][2], TEST_DATA[1][3], TEST_DATA[1][1], TEST_DATA[1][0]}),
-                    //new filters for faceted filtering
-                    createFilterArgs(_listCol6, "Contains One Of", TEST_DATA[5][1] + ";" + TEST_DATA[5][3], null, null, new String[]{TEST_DATA[5][1]}, new String[]{TEST_DATA[1][0], TEST_DATA[1][2]}),
-                    createFilterArgs(_listCol1, "Does Not Contain Any Of", TEST_DATA[1][3] + ";" + TEST_DATA[1][1], null, null, new String[]{TEST_DATA[1][0], TEST_DATA[1][2]}, new String[]{TEST_DATA[0][1], TEST_DATA[0][3]}),
-                    createFilterArgs(_listCol6, "Is Blank", null, null, null, new String[]{TEST_DATA[1][3]}, new String[]{TEST_DATA[1][1], TEST_DATA[1][2], TEST_DATA[1][0]}),
-                    createFilterArgs(_listCol6, "Is Not Blank", null, null, null, new String[]{TEST_DATA[1][1], TEST_DATA[1][2], TEST_DATA[1][0]}, new String[]{TEST_DATA[1][3]})
-            );
-        }
+    {
+        return Arrays.asList(
+                //String columnName, String filter1Type, String filter1, String filter2Type, String filter2, String[] textPresentAfterFilter, String[] textNotPresentAfterFilter,
+                //Issue 12197
+                createFilterArgs(_listCol4, "Equals One Of", TEST_DATA[4][3] + ";" + TEST_DATA[4][2], null, null, new String[]{TEST_DATA[1][2], TEST_DATA[1][3]}, new String[]{TEST_DATA[1][0], TEST_DATA[1][1]}),
+                createFilterArgs(_listCol1, "Equals", TEST_DATA[1][0], null, null, new String[]{TEST_DATA[1][0]}, new String[]{TEST_DATA[1][2], TEST_DATA[1][1], TEST_DATA[1][3]}),
+                createFilterArgs(_listCol1, "Starts With", "Z", null, null, new String[]{TEST_DATA[1][3]}, new String[]{TEST_DATA[1][0], TEST_DATA[1][1], TEST_DATA[1][2]}),
+                createFilterArgs(_listCol1, "Does Not Start With", "Z", null, null, new String[]{TEST_DATA[1][2], TEST_DATA[1][1], TEST_DATA[1][0]}, new String[]{TEST_DATA[1][3]}),
+                //can't check for the absence of thing you're excluding, since it will be present in the filter text
+                createFilterArgs(_listCol1, "Does Not Equal", TEST_DATA[1][0], null, null, new String[]{TEST_DATA[1][2], TEST_DATA[1][1], TEST_DATA[1][3]}, new String[]{TEST_DATA[5][0]}),
+                createFilterArgs(_listCol1, "Does Not Equal Any Of", TEST_DATA[1][0] + ";" + TEST_DATA[1][1], null, null, new String[]{TEST_DATA[1][2], TEST_DATA[1][3]}, new String[]{TEST_DATA[5][0], TEST_DATA[5][1]}),
+                createFilterArgs(_listCol3, "Equals", "true", null, null, new String[]{TEST_DATA[1][0], TEST_DATA[1][2]}, new String[]{TEST_DATA[1][1], TEST_DATA[1][3]}),
+                createFilterArgs(_listCol3, "Does Not Equal", "false", null, null, new String[]{TEST_DATA[1][0], TEST_DATA[1][2]}, new String[]{TEST_DATA[1][1], TEST_DATA[1][3]}),
+                //filter is case insensitive
+                createFilterArgs(_listCol6, "Contains", "e", "Contains", "r", new String[]{TEST_DATA[5][2], TEST_DATA[5][0], TEST_DATA[5][1]}, new String[]{TEST_DATA[1][3]}),
+                createFilterArgs(_listCol4, "Is Greater Than or Equal To", "9", null, null, new String[]{TEST_DATA[1][0], TEST_DATA[1][1]}, new String[]{TEST_DATA[1][2], TEST_DATA[1][3]}),
+                createFilterArgs(_listCol4, "Is Greater Than", "9", null, null, new String[]{TEST_DATA[1][0]}, new String[]{TEST_DATA[1][2], TEST_DATA[1][3], TEST_DATA[1][1]}),
+                createFilterArgs(_listCol4, "Is Blank", null, null, null, new String[]{}, new String[]{TEST_DATA[1][2], TEST_DATA[1][3], TEST_DATA[1][1], TEST_DATA[1][0]}),
+                //new filters for faceted filtering
+                createFilterArgs(_listCol6, "Contains One Of", TEST_DATA[5][1] + ";" + TEST_DATA[5][3], null, null, new String[]{TEST_DATA[5][1]}, new String[]{TEST_DATA[1][0], TEST_DATA[1][2]}),
+                createFilterArgs(_listCol1, "Does Not Contain Any Of", TEST_DATA[1][3] + ";" + TEST_DATA[1][1], null, null, new String[]{TEST_DATA[1][0], TEST_DATA[1][2]}, new String[]{TEST_DATA[0][1], TEST_DATA[0][3]}),
+                createFilterArgs(_listCol6, "Is Blank", null, null, null, new String[]{TEST_DATA[1][3]}, new String[]{TEST_DATA[1][1], TEST_DATA[1][2], TEST_DATA[1][0]}),
+                createFilterArgs(_listCol6, "Is Not Blank", null, null, null, new String[]{TEST_DATA[1][1], TEST_DATA[1][2], TEST_DATA[1][0]}, new String[]{TEST_DATA[1][3]})
+        );
+    }
 
     //Issue 12787: Canceling filter dialog requires two clicks
     @LogMethod
@@ -577,10 +568,11 @@ public class FilterTest extends BaseWebDriverTest
     private void validFilterGeneratesCorrectResultsTest(FilterArgs a)
     {
             validFilterGeneratesCorrectResultsTest(
-                    a.columnDef,
-                    a.filter1Type, a.filter1Value,
-                    a.filter2Type, a.filter2Value,
-                    a.present, a.notPresent.clone());
+                a.columnDef,
+                a.filter1Type, a.filter1Value,
+                a.filter2Type, a.filter2Value,
+                a.present, a.notPresent.clone()
+            );
     }
 
     @LogMethod
@@ -588,74 +580,72 @@ public class FilterTest extends BaseWebDriverTest
             String[] textPresentAfterFilter, String[] textNotPresentAfterFilter)
     {
         String fieldKey = EscapeUtil.fieldKeyEncodePart(columnDef.getName());
+        log("** Filtering " + columnDef.getName() + " with filter type: " + filter1Type + ", value: " + filter1);
+        if (null != filter2Type)
+            log("** Second filter: " + filter2Type + ".  value:" + filter2);
+        DataRegionTable region = new DataRegionTable(TABLE_NAME, this);
+        region.setFilter(fieldKey, filter1Type, filter1, filter2Type, filter2);
+
+        checkFilterWasApplied(textPresentAfterFilter, textNotPresentAfterFilter, columnDef.getEffectiveLabel(), filter1Type, filter1, filter2Type, filter2);
+
+        log("** Checking filter present in R view");
+        region.goToReport(R_VIEW);
+        Locator.tagWithClass("table", "labkey-r-tsvout").waitForElement(getDriver(), 10000);
+        checkFilterWasApplied(textPresentAfterFilter, textNotPresentAfterFilter, columnDef.getName(), filter1Type, filter1, filter2Type, filter2);
+        new ReportDataRegion(TABLE_NAME, this).goToView("Default");
+
+        log("** Checking filter values in filter dialog");
+        region = new DataRegionTable(TABLE_NAME, this);
+        region.openFilterDialog(fieldKey);
+        _extHelper.clickExtTab("Choose Filters");
+        String id = (filter1Type.matches("Contains One Of|Does Not Contain Any Of|Equals One Of|Does Not Equal Any Of")) ? "value_1-1" : "value_1";
+        shortWait().until(ExpectedConditions.visibilityOf(Locator.id(id).findElement(getDriver())));
+
+        if (filter1 != null)
         {
-            log("** Filtering " + columnDef.getName() + " with filter type: " + filter1Type + ", value: " + filter1);
-            if (null != filter2Type)
-                log("** Second filter: " + filter2Type + ".  value:" + filter2);
-            DataRegionTable region = new DataRegionTable(TABLE_NAME, this);
-            region.setFilter(fieldKey, filter1Type, filter1, filter2Type, filter2);
+            // When we first load the filter panel, we convert single-value filters into a multi-value filter if possible,
+            // then we invert negative filters ("Does Not Equal" becomes "In") and invert the values.
+            // When switching to the 'Choose Filters' tab, we may invert again (if more than half of the values are selected)
+            // and we may change a multi-value filter into a singular filter if only one value is selected.
 
-            checkFilterWasApplied(textPresentAfterFilter, textNotPresentAfterFilter, columnDef.getLabel(), filter1Type, filter1, filter2Type, filter2);
-
-            log("** Checking filter present in R view");
-            region.goToReport(R_VIEW);
-            Locator.tagWithClass("table", "labkey-r-tsvout").waitForElement(getDriver(), 10000);
-            checkFilterWasApplied(textPresentAfterFilter, textNotPresentAfterFilter, columnDef.getName(), filter1Type, filter1, filter2Type, filter2);
-            new ReportDataRegion(TABLE_NAME, this).goToView("Default");
-
-            log("** Checking filter values in filter dialog");
-            region = new DataRegionTable(TABLE_NAME, this);
-            region.openFilterDialog(fieldKey);
-            _extHelper.clickExtTab("Choose Filters");
-            String id = (filter1Type.matches("Contains One Of|Does Not Contain Any Of|Equals One Of|Does Not Equal Any Of")) ? "value_1-1" : "value_1";
-            shortWait().until(ExpectedConditions.visibilityOf(Locator.id(id).findElement(getDriver())));
-
-            if (filter1 != null)
+            if (filter1Type.equals("Does Not Equal") && "Light".equals(filter1))
             {
-                // When we first load the filter panel, we convert single-value filters into a multi-value filter if possible,
-                // then we invert negative filters ("Does Not Equal" becomes "In") and invert the values.
-                // When switching to the 'Choose Filters' tab, we may invert again (if more than half of the values are selected)
-                // and we may change a multi-value filter into a singular filter if only one value is selected.
-
-                if (filter1Type.equals("Does Not Equal") && "Light".equals(filter1))
-                {
-                    // In this test case, "Does Not Equal" and "Light" are the initial filter type and value.
-                    // When showing the dialog, "Does Not Equal" is first converted into "Not In" since "Does Not Equal" is a single value filter.
-                    // Next, it is inverted from "Not In" to "In" and "Mellow;Robust;ZanzibarMasinginiTanzaniaAfrica" are selected.
-                    // When switching tabs, the number of selected values (1) is less than half of the available values (4),
-                    // so the filter is inverted again from "Not In" to "Does Not Equal Any Of" and "Light" is selected.
-                    waitForFormElementToEqual(Locator.name("value_1"), "Light");
-                }
-                else if (filter1Type.equals("Does Not Equal Any Of") && "Light;Mellow".equals(filter1))
-                {
-                    // In this test case, "Does Not Equal Any Of" and "Light;Mellow" are the initial filter type and value.
-                    // When showing the dialog, "Does Not Equal Any Of" is inverted to "In" and "Robust;ZanzibarMasinginiTanzaniaAfrica" are selected.
-                    // When switching tabs, nothing changes.
-                    waitForFormElementToEqual(Locator.name("value_1-1"), "Light\nMellow");
-                }
-                else if (filter1Type.equals("Does Not Equal") && "false".equals(filter1))
-                {
-                    // In this test case, "Does Not Equal" and "false" are the initial filter type and value.
-                    // When showing the dialog "Does Not Equal" is inverted as "In" and "true" is selected.
-                    // When switching tabs, the filter is simplified from "In" to "Equal" because only a single value, "true", is selected.
-                    if (getFormElement(Locator.name("filterType_1")).equals("Equals"))
-                        assertEquals("true", getFormElement(Locator.id("value_1")));
-                    else
-                        assertEquals(filter1, getFormElement(Locator.id("value_1")));
-                }
-                else
-                {
-                    assertEquals(filter1.replaceAll(";", "\n"), getFormElement(Locator.id(id)));
-                }
+                // In this test case, "Does Not Equal" and "Light" are the initial filter type and value.
+                // When showing the dialog, "Does Not Equal" is first converted into "Not In" since "Does Not Equal" is a single value filter.
+                // Next, it is inverted from "Not In" to "In" and "Mellow;Robust;ZanzibarMasinginiTanzaniaAfrica" are selected.
+                // When switching tabs, the number of selected values (1) is less than half of the available values (4),
+                // so the filter is inverted again from "Not In" to "Does Not Equal Any Of" and "Light" is selected.
+                waitForFormElementToEqual(Locator.name("value_1"), "Light");
             }
-
-            if (filter2 != null)
-                assertEquals(filter2, getFormElement(Locator.id("value_2")));
+            else if (filter1Type.equals("Does Not Equal Any Of") && "Light;Mellow".equals(filter1))
+            {
+                // In this test case, "Does Not Equal Any Of" and "Light;Mellow" are the initial filter type and value.
+                // When showing the dialog, "Does Not Equal Any Of" is inverted to "In" and "Robust;ZanzibarMasinginiTanzaniaAfrica" are selected.
+                // When switching tabs, nothing changes.
+                waitForFormElementToEqual(Locator.name("value_1-1"), "Light\nMellow");
+            }
+            else if (filter1Type.equals("Does Not Equal") && "false".equals(filter1))
+            {
+                // In this test case, "Does Not Equal" and "false" are the initial filter type and value.
+                // When showing the dialog "Does Not Equal" is inverted as "In" and "true" is selected.
+                // When switching tabs, the filter is simplified from "In" to "Equal" because only a single value, "true", is selected.
+                if (getFormElement(Locator.name("filterType_1")).equals("Equals"))
+                    assertEquals("true", getFormElement(Locator.id("value_1")));
+                else
+                    assertEquals(filter1, getFormElement(Locator.id("value_1")));
+            }
             else
-                assertEquals("No Other Filter", getFormElement(Locator.name("filterType_2")));
-
-            clickButtonContainingText("Cancel", 0);
+            {
+                assertEquals(filter1.replaceAll(";", "\n"), getFormElement(Locator.id(id)));
+            }
         }
+
+        if (filter2 != null)
+            assertEquals(filter2, getFormElement(Locator.id("value_2")));
+        else
+            assertEquals("No Other Filter", getFormElement(Locator.name("filterType_2")));
+
+        clickButtonContainingText("Cancel", 0);
 
         DataRegionTable table = new DataRegionTable(TABLE_NAME, this.getDriver());
         table.clearAllFilters();

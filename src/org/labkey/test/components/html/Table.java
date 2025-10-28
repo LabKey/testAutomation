@@ -34,11 +34,18 @@ public class Table extends WebDriverComponent<Table.Elements>
 {
     private final WebDriver _driver;
     private final WebElement _componentElement;
+    private final int _bodyHeaderRowIndex; // '0' indicates that the table uses a 'thead'
 
-    public Table(WebDriver driver, WebElement componentElement)
+    public Table(WebDriver driver, WebElement componentElement, int headerIndex)
     {
         _componentElement = componentElement;
         _driver = driver;
+        _bodyHeaderRowIndex = headerIndex;
+    }
+
+    public Table(WebDriver driver, WebElement componentElement)
+    {
+        this(driver, componentElement, 1);
     }
 
     public Table(WebDriverWrapper driverWrapper, WebElement componentElement)
@@ -79,6 +86,11 @@ public class Table extends WebDriverComponent<Table.Elements>
     public int getRowCount()
     {
         return elementCache().getRows().size();
+    }
+
+    public List<WebElement> getRows()
+    {
+        return elementCache().getRows();
     }
 
     /**
@@ -141,14 +153,14 @@ public class Table extends WebDriverComponent<Table.Elements>
     {
         List<String> columnData = new ArrayList<>();
         int columnIndex = getTableHeaderIndex(headerText);
-        for(int i = 1; i <= getRowCount(); i++)
+        for(int i = _bodyHeaderRowIndex; i <= getRowCount(); i++)
             columnData.add(Locator.xpath("//tbody//tr[" + i + "]/td[" + columnIndex + "]").findElement(getDriver()).getText());
         return columnData;
     }
 
-    public List<String> getColumnHeaders(int headerRow)
+    public List<String> getColumnHeaders()
     {
-        List<WebElement> headerEls = getColumnHeaderElements(headerRow);
+        List<WebElement> headerEls = getColumnHeaderElements();
         List<String> columnHeaders = new ArrayList<>();
         for(WebElement headerEl : headerEls){columnHeaders.add(headerEl.getText());}
         return columnHeaders;
@@ -156,14 +168,9 @@ public class Table extends WebDriverComponent<Table.Elements>
 
     // TODO: This finder makes an assumption that the column headers will be in a tr in the tbody, that is not always the case.
     // Maybe a possible solution would be to remove "./tbody" from the locator, but that is a thread I am not willing to pull at this time.
-    private List<WebElement> getColumnHeaderElements(int headerRow)
-    {
-        return getComponentElement().findElements(By.xpath("./tbody/tr["+ headerRow +"]/*[(name()='TH' or name()='TD' or name()='th' or name()='td')]"));
-    }
-
     public List<WebElement> getColumnHeaderElements()
     {
-        return getColumnHeaderElements(1);
+        return getComponentElement().findElements(By.xpath("./tbody/tr["+ _bodyHeaderRowIndex +"]/*[(name()='TH' or name()='TD' or name()='th' or name()='td')]"));
     }
 
     public List<WebElement> getColumnHeaderElementsByTag()
@@ -171,15 +178,10 @@ public class Table extends WebDriverComponent<Table.Elements>
         return getComponentElement().findElements(By.xpath(".//tr/th"));
     }
 
-    protected int getColumnIndex(String headerLabel, int headerIndex)
-    {
-        //List is zero based, locators that are going to depend on this are 1
-        return getColumnHeaders(headerIndex).indexOf(headerLabel) + 1;
-    }
-
     public int getColumnIndex(String headerLabel)
     {
-        return getColumnIndex(headerLabel, 1);
+        //List is zero based, locators that are going to depend on this are 1
+        return getColumnHeaders().indexOf(headerLabel) + 1;
     }
 
     public String getDataAsText(int row, int col)
@@ -215,12 +217,12 @@ public class Table extends WebDriverComponent<Table.Elements>
         return  _getDataAsElement(row, column);
     }
 
-    public List<String> getColumnAsText(int col, int headerIndex)
+    public List<String> getColumnAsText(int col)
     {
-        List<WebElement> columnElements = getColumnAsElement(col, headerIndex);
+        List<WebElement> columnElements = getColumnAsElement(col);
         List<String> columnText = new ArrayList<>();
 
-        if (columnElements.size() > 0)
+        if (!columnElements.isEmpty())
         {
             for (WebElement columnElement : columnElements)
             {
@@ -233,12 +235,7 @@ public class Table extends WebDriverComponent<Table.Elements>
 
     public List<String> getColumnAsText(String col)
     {
-        return getColumnAsText(getColumnIndex(col), 1);
-    }
-
-    public List<String> getColumnAsText(String col, int colIndex)
-    {
-        return getColumnAsText(getColumnIndex(col, colIndex), colIndex);
+        return getColumnAsText(getColumnIndex(col));
     }
 
     public List<String> getRowAsText(int row)
@@ -247,40 +244,19 @@ public class Table extends WebDriverComponent<Table.Elements>
         return getWrapper().getTexts(cells);
     }
 
-    public List<WebElement> getColumnAsElement(String name, int columnIndex)
-    {
-        int col = getColumnIndex(name, columnIndex);
-        return getColumnAsElement(col);
-    }
-
-    public List<WebElement> getColumnAsElement(String name)
-    {
-        return getColumnAsElement(name, 1);
-    }
-
     public List<WebElement> getColumnAsElement(int col)
-    {
-        return getColumnAsElement(col,1);
-    }
-
-    public List<WebElement> getColumnAsElement(int col, int headerIndex)
     {
         int rowCount = getRowCount();
         List<WebElement> columnElements = new ArrayList<>();
         if (rowCount > 0)
         {
-            for (int row = headerIndex + 1; row < rowCount; row++)
+            for (int row = _bodyHeaderRowIndex + 1; row <= rowCount; row++)
             {
                 columnElements.add(getDataAsElement(row, col));
             }
         }
 
         return columnElements;
-    }
-
-    public int getRowIndex(String columnLabel, String value, int headerIndex)
-    {
-        return getRowIndex(getColumnIndex(columnLabel, headerIndex), value);
     }
 
     public int getRowIndex(String columnLabel, String value)

@@ -1,23 +1,30 @@
 package org.labkey.test.tests.assay;
 
 import org.assertj.core.api.Assertions;
+import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.pages.admin.UsageStatisticsPage;
 import org.labkey.test.pages.assay.AssayImportPage;
 import org.labkey.test.pages.assay.AssayRunsPage;
+import org.labkey.test.pages.core.admin.ShowAdminPage;
+import org.labkey.test.pages.pipeline.PipelineStatusDetailsPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.assay.GeneralAssayDesign;
+import org.labkey.test.util.PipelineStatusTable;
 import org.labkey.test.util.RReportHelper;
 
 import java.io.File;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 
@@ -125,7 +132,7 @@ public class AssayTransformImportUpdateTest extends BaseWebDriverTest
         new AssayRunsPage(getDriver()).getTable().clickHeaderButton("Import Data");
         clickButton("Next");
         var importPage = new AssayImportPage(getDriver());
-        importPage.setNamedInputText("name", "transformTestImport");
+        importPage.setNamedInputText("Name", "transformTestImport");
         importPage.setNamedTextAreaValue("TextAreaDataCollector.textArea", importData);
         importPage.clickSaveAndFinish();
 
@@ -162,7 +169,7 @@ public class AssayTransformImportUpdateTest extends BaseWebDriverTest
         new AssayRunsPage(getDriver()).getTable().clickHeaderButton("Import Data");
         clickButton("Next");
         importPage = new AssayImportPage(getDriver());
-        importPage.setNamedInputText("name", "non_transform_import");
+        importPage.setNamedInputText("Name", "non_transform_import");
         importPage.setNamedTextAreaValue("TextAreaDataCollector.textArea", importData);
         importPage.clickSaveAndFinish();
 
@@ -217,6 +224,92 @@ public class AssayTransformImportUpdateTest extends BaseWebDriverTest
         int assaysWithTransformScripts = Integer.parseInt(metricsPage.getValue());
         checker().verifyTrue("expect protocolsWithTransformScriptCount to have value >0",
                 assaysWithTransformScripts > 0);
+    }
+
+    // Issue 50774
+    @Test
+    public void testCancelAsyncAssayTransformJob() throws Exception
+    {
+        Assume.assumeTrue("Issue 53240: User cannot cancel pipeline job on SQL",
+                WebTestHelper.getDatabaseType() != WebTestHelper.DatabaseType.MicrosoftSQLServer);
+
+        String transformCancelFile = "importCancelTransform.R";
+        String importCancelTransformAssay = "importCancelTransformAssay";
+        String transformContent = """
+                library(Rlabkey);
+                
+                run.props = labkey.transform.readRunPropertiesFile("${runInfo}");
+                
+                run.data.file = labkey.transform.getRunPropertyValue(run.props, "runDataFile");
+                run.output.file = run.props$val3[run.props$name == "runDataFile"];
+                error.file = labkey.transform.getRunPropertyValue(run.props, "errorsFile");
+                
+                # sleep a bit before writing the table, give the test time to cancel the job before it is complete
+                labkey.setDebugMode(TRUE);
+                print("before");
+                Sys.sleep(30);
+                print("after");
+                labkey.setDebugMode(FALSE);
+
+                if (file.exists(run.data.file)) {
+                    run.data = read.delim(run.data.file, header=TRUE, sep="\\t", check.names = FALSE);
+                    run.data$M2 = 111;
+                    run.data$TransformType = "${transformOperation} testing";
+                    write.table(run.data, file=run.output.file, sep="\\t", na="", row.names=FALSE, quote=FALSE);
+                }
+                
+                """;
+        File transformFile = TestFileUtils.writeTempFile(transformCancelFile, transformContent);
+        var protocolResponse = new GeneralAssayDesign(importCancelTransformAssay)
+                .setDataFields(List.of(new FieldDefinition("M2", FieldDefinition.ColumnType.Decimal),
+                        new FieldDefinition("TransformType", FieldDefinition.ColumnType.String),
+                        new FieldDefinition("Comment", FieldDefinition.ColumnType.String)), true)
+                .createAssay(getProjectName(), createDefaultConnection());
+        goToProjectHome();
+
+        var assayDesignerPage = ReactAssayDesignerPage.beginAt(this, getProjectName(), protocolResponse.getProtocolId(),
+                "general", getURL().toString());
+        assayDesignerPage.addTransformScript(transformFile, true);
+        assayDesignerPage.setBackgroundImport(true);
+        assayDesignerPage.clickSave();
+
+        StringBuilder importDataBuilder = new StringBuilder("VisitID\tParticipantID\tComment\n");
+        for (int i=1; i<=10; i++)
+            importDataBuilder.append(String.format("%d\t%d\tComment-%d\n", i, i, i));
+
+        clickAndWait(Locator.linkWithText(importCancelTransformAssay));
+        new AssayRunsPage(getDriver()).getTable().clickHeaderButton("Import Data");
+        clickButton("Next");
+        var importPage = new AssayImportPage(getDriver());
+        importPage.setNamedInputText("Name", "cancelTransformTestImport");
+        importPage.setNamedTextAreaValue("TextAreaDataCollector.textArea", importDataBuilder.toString());
+        Instant before = Instant.now();
+        importPage.clickSaveAndFinish();
+
+        waitAndClick(WAIT_FOR_JAVASCRIPT, Locator.linkWithText("Assay upload RUNNING"), WAIT_FOR_JAVASCRIPT);
+        PipelineStatusDetailsPage pipelineStatusDetailsPage = new PipelineStatusDetailsPage(getDriver());
+        pipelineStatusDetailsPage.clickCancel();
+
+        pipelineStatusDetailsPage.showLogDetails();
+        pipelineStatusDetailsPage.assertLogTextContains("INFO : Attempting to cancel as requested",
+                "INFO : Interrupting job by sending interrupt request.",
+                "ERROR: The following error was generated by the assay upload",
+                "INFO : Failed to complete task 'org.labkey.api.assay.pipeline.AssayUploadPipelineTask'");
+        Instant after = Instant.now();
+        Duration duration = Duration.between(before, after);
+        log(String.format("duration of pipeline run from start to cancel is %d seconds", duration.getSeconds()));
+        checker().withScreenshot("unexpected duration")
+                    .wrapAssertion(()-> Assertions.assertThat(duration.getSeconds())
+                            .as("expect cancel to interrupt the sleep in the transform script")
+                            .isLessThan(20));
+
+        // verify in the server log the process termination logging
+        ShowAdminPage adminPage = goToAdminConsole();
+        adminPage.clickViewPrimarySiteLogFile();
+        assertTextPresent("Attempting to kill forked process gracefully",
+                "Finished dealing with forked process");
+
+        resetErrors();
     }
 
     @Override

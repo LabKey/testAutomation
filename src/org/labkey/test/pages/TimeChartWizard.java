@@ -141,7 +141,7 @@ public class TimeChartWizard extends LabKeyPage
         List<WebElement> svgs = Locator.css("div.x4-container svg").findElements(getDriver());
         waitForElement(Ext4Helper.Locators.getGridRow(label));
         _ext4Helper.checkGridRowCheckbox(label);
-        if (svgs.size() > 0)
+        if (!svgs.isEmpty())
         {
             shortWait().until(ExpectedConditions.stalenessOf(svgs.get(0)));
         }
@@ -153,7 +153,7 @@ public class TimeChartWizard extends LabKeyPage
         List<WebElement> svgs = Locator.css("svg").findElements(getDriver());
         waitForElement(Ext4Helper.Locators.getGridRow(label));
         _ext4Helper.uncheckGridRowCheckbox(label);
-        if (svgs.size() > 0)
+        if (!svgs.isEmpty())
         {
             shortWait().until(ExpectedConditions.stalenessOf(svgs.get(0)));
         }

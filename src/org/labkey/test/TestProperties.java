@@ -16,7 +16,9 @@
 package org.labkey.test;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.labkey.serverapi.reader.Readers;
+import org.labkey.test.util.CspLogUtil;
 import org.labkey.test.util.TestLogger;
 import org.openqa.selenium.Dimension;
 
@@ -29,6 +31,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -77,6 +80,7 @@ public abstract class TestProperties
     public static void load()
     {
         /* Force static block to run */
+        CspLogUtil.init();
     }
 
     public static boolean isTestCleanupSkipped()
@@ -128,7 +132,7 @@ public abstract class TestProperties
 
     public static boolean isCspCheckSkipped()
     {
-        return !getBooleanProperty("webtest.cspCheck", false);
+        return !getBooleanProperty("webtest.cspCheck", true);
     }
 
     public static boolean isNewWebDriverForEachTest()
@@ -171,7 +175,8 @@ public abstract class TestProperties
         if (browserZoneId == null)
         {
             String tz = StringUtils.trimToNull(System.getProperty("webtest.browser.tz"));
-            if (tz != null)
+            // TZ environment variable doesn't work on Windows
+            if (tz != null && !SystemUtils.IS_OS_WINDOWS)
             {
                 String[] split = tz.split("[,\\s]+");
                 tz = split[LocalDateTime.now().getDayOfMonth() % split.length];
@@ -252,9 +257,19 @@ public abstract class TestProperties
         return getBooleanProperty("webtest.server.trial", false);
     }
 
+    public static boolean isRemoteNameValidationEnabled()
+    {
+        return getBooleanProperty("webtest.remote.domain.validation", false);
+    }
+
     public static boolean isCheckerFatal()
     {
         return "true".equals(System.getProperty("webtest.checker.fatal"));
+    }
+
+    public static boolean isControllerFirstUrlFatal()
+    {
+        return getBooleanProperty("webtest.fatalControllerFirstUrl", false);
     }
 
     public static boolean isAssayProductFeatureAvailable()
@@ -262,6 +277,10 @@ public abstract class TestProperties
         return isProductFeatureAvailable("assay");
     }
 
+    /**
+     * Product features are assumed to be available unless the test environment (usually TeamCity) explicitly specifies
+     * that it is not.
+     */
     public static boolean isProductFeatureAvailable(String feature)
     {
         return "true".equals(System.getProperty("webtest.productFeature." + feature.toLowerCase(), "true"));
@@ -274,7 +293,7 @@ public abstract class TestProperties
 
     /**
      * Parses system property 'webtest.server.startup.timeout' to determine maximum allowed server startup time.
-     * If property is not defined or is not an integer, it defaults to 60 seconds.
+     * If property is not defined or is not an integer, it defaults to 120 seconds.
      * @return Maximum number of seconds to wait for server startup
      */
     public static int getServerStartupTimeout()
@@ -287,34 +306,48 @@ public abstract class TestProperties
         return System.getProperty("additional.pipeline.tools");
     }
 
+    private static Map<String, Boolean> _optionalFeatures = null;
     public static Map<String, Boolean> getOptionalFeatures()
     {
-        Map<String, Boolean> features = new HashMap<>();
-
-        Properties props = System.getProperties();
-        for (Map.Entry<Object, Object> entry : props.entrySet())
+        if (_optionalFeatures == null)
         {
-            String key = String.valueOf(entry.getKey());
-            Boolean value = (entry.getValue() instanceof Boolean)
-                    ? (Boolean)entry.getValue()
-                    : Boolean.valueOf(String.valueOf(entry.getValue()));
+            Map<String, Boolean> features = new HashMap<>();
 
-            String prefix = "webtest.experimental."; // Can be used with any optional feature flags; "experimental" is used for backward-compatibility purposes.
-            if (key.startsWith(prefix))
+            Properties props = System.getProperties();
+            for (Map.Entry<Object, Object> entry : props.entrySet())
             {
-                String feature = key.substring(prefix.length());
-                features.put(feature, value);
-            }
-        }
+                String key = String.valueOf(entry.getKey());
 
-        return features;
+                String expPrefix = "webtest.experimental."; // "experimental" is accepted for backward-compatibility purposes.
+                String optPrefix = "webtest.optional."; // Preferred prefix
+                for (String prefix : List.of(expPrefix, optPrefix))
+                {
+                    if (key.startsWith(prefix))
+                    {
+                        Boolean value = (entry.getValue() instanceof Boolean)
+                            ? (Boolean) entry.getValue()
+                            : Boolean.valueOf(String.valueOf(entry.getValue()));
+                        String feature = key.substring(prefix.length());
+                        features.put(feature, value);
+                    }
+                }
+            }
+
+            _optionalFeatures = Collections.unmodifiableMap(features);
+        }
+        return _optionalFeatures;
     }
 
+    private static List<String> debugLoggingPackages = null;
     public static List<String> getDebugLoggingPackages()
     {
-        String prop = System.getProperty("webtest.debug.server.packages", "");
-        String[] packages = prop.split("\\s*,\\s*");
-        return Arrays.stream(packages).map(String::trim).filter(s -> !s.isEmpty()).collect(Collectors.toList());
+        if (debugLoggingPackages == null)
+        {
+            String prop = System.getProperty("webtest.debug.server.packages", "");
+            String[] packages = prop.split(",");
+            debugLoggingPackages = Arrays.stream(packages).map(String::trim).filter(s -> !s.isEmpty()).collect(Collectors.toList());
+        }
+        return debugLoggingPackages;
     }
 
     private static File dumpDir = null;
@@ -350,7 +383,7 @@ public abstract class TestProperties
      * @param def Default value
      * @return value of the specified property
      */
-    private static boolean getBooleanProperty(String key, boolean def)
+    public static boolean getBooleanProperty(String key, boolean def)
     {
         String prop = System.getProperty(key);
         if (!StringUtils.isBlank(prop))
@@ -370,7 +403,7 @@ public abstract class TestProperties
      * @param def Default value
      * @return value of the specified property
      */
-    private static int getIntegerProperty(String key, int def)
+    public static int getIntegerProperty(String key, int def)
     {
         String prop = System.getProperty(key);
         if (!StringUtils.isBlank(prop))
@@ -394,7 +427,7 @@ public abstract class TestProperties
      * @param def Default value
      * @return value of the specified property
      */
-    private static double getDoubleProperty(String key, double def)
+    public static double getDoubleProperty(String key, double def)
     {
         String prop = System.getProperty(key);
         if (!StringUtils.isBlank(prop))

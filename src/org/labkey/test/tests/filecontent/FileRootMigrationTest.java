@@ -47,8 +47,8 @@ public class FileRootMigrationTest extends BaseWebDriverTest
 {
     private static final String FOLDER = "subfolder";
     private final File targetFileRoot = new File(TestFileUtils.getTestTempDir(), "target");
-    private File defaultProjectFileRoot = TestFileUtils.getDefaultFileRoot(getProjectName());
-    private File defaultFolderFileRoot = TestFileUtils.getDefaultFileRoot(getProjectName() + "/" + FOLDER);
+    private final File defaultProjectFileRoot = TestFileUtils.getDefaultFileRoot(getProjectName());
+    private final File defaultFolderFileRoot = TestFileUtils.getDefaultFileRoot(getProjectName() + "/" + FOLDER);
 
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
@@ -59,7 +59,7 @@ public class FileRootMigrationTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        FileRootMigrationTest init = (FileRootMigrationTest) getCurrentTest();
+        FileRootMigrationTest init = getCurrentTest();
 
         init.doSetup();
     }
@@ -77,7 +77,7 @@ public class FileRootMigrationTest extends BaseWebDriverTest
     public void cleanFiles() throws IOException
     {
         FileUtils.deleteDirectory(targetFileRoot);
-        targetFileRoot.mkdirs();
+        FileUtils.forceMkdir(targetFileRoot);
         FileRootsManagementPage.beginAt(this, getProjectName())
                 .useDefaultFileRoot()
                 .clickSave();
@@ -101,7 +101,7 @@ public class FileRootMigrationTest extends BaseWebDriverTest
         final File folderFile2 = TestFileUtils.getSampleData("fileTypes/cmd_sample.cmd");
         List<File> sourceFiles = new ArrayList<>();
 
-        String folderName = "folder \u2603";// + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
+        String folderName = "folder " + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
 
         log("Upload files to project");
         goToProjectHome();
@@ -165,7 +165,7 @@ public class FileRootMigrationTest extends BaseWebDriverTest
         File folderFile2 = TestFileUtils.getSampleData("fileTypes/cmd_sample.cmd");
         List<File> sourceFiles = new ArrayList<>();
 
-        String folderName = "folder \u2603";// + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
+        String folderName = "folder " + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
 
         log("Upload files to project");
         goToProjectHome();
@@ -238,7 +238,7 @@ public class FileRootMigrationTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testMigratingProjectWithNonInheritingSubfolder()
+    public void testMigratingProjectWithNonInheritingSubfolder() throws IOException
     {
         final File projFile1 = TestFileUtils.getSampleData("fileTypes/sample.txt");
         final File projFile2 = TestFileUtils.getSampleData("fileTypes/rtf_sample.rtf");
@@ -247,9 +247,9 @@ public class FileRootMigrationTest extends BaseWebDriverTest
         List<File> sourceFiles = new ArrayList<>();
         File nonInheritingFileRoot = new File(TestFileUtils.getTestTempDir(), "custom");
         TestFileUtils.deleteDir(nonInheritingFileRoot);
-        nonInheritingFileRoot.mkdirs();
+        FileUtils.forceMkdir(nonInheritingFileRoot);
 
-        String folderName = "folder \u2603";// + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
+        String folderName = "folder " + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
 
         log("Upload files to project");
         goToProjectHome();

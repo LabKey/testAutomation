@@ -18,13 +18,18 @@ package org.labkey.test.util;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.commons.lang3.mutable.MutableObject;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
+import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.query.Filter;
+import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.TestProperties;
 import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.DomainDesignerPage;
 import org.labkey.test.components.ext4.Checkbox;
 import org.labkey.test.components.ext4.RadioButton;
@@ -40,13 +45,16 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Collections.emptyList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -197,9 +205,10 @@ public class FileBrowserHelper extends WebDriverWrapper
         }
         else if (!folderTreeNode.getAttribute("class").contains("x4-grid-row-selected"))
         {
+            WebElement folderIcon = Locator.byClass("x4-tree-icon").findElement(folderTreeNode);
             // Scroll bars get in the way sometimes, need to scroll folder tree manually
-            scrollIntoView(folderTreeNode);
-            doAndWaitForFileListRefresh(folderTreeNode::click);
+            scrollIntoView(folderIcon);
+            doAndWaitForFileListRefresh(folderIcon::click);
         }
     }
 
@@ -550,14 +559,7 @@ public class FileBrowserHelper extends WebDriverWrapper
     {
         int initialCount = waitForFileGridReady();
 
-        openUploadPanel();
-
-        waitFor(() -> getFormElement(Locator.xpath("//label[text() = 'Choose a File:']/../..//input[contains(@class, 'x4-form-field')]")).isEmpty(),
-                "Upload field did not clear after upload.", WAIT_FOR_JAVASCRIPT);
-
-        setFormElement(Locator.css(".single-upload-panel input:last-of-type[type=file]"), file);
-        waitFor(() -> getFormElement(Locator.xpath("//label[text() = 'Choose a File:']/../..//input[contains(@class, 'x4-form-field')]")).contains(file.getName()),
-                "Upload field was not set to '" + file.getName() + "'.", WAIT_FOR_JAVASCRIPT);
+        setChooseAFile(file);
 
         if (description != null)
             setFormElement(Locator.name("description"), description);
@@ -600,6 +602,25 @@ public class FileBrowserHelper extends WebDriverWrapper
 
         // verify that the description field is empty
         assertEquals("Description didn't clear after upload", "", getFormElement(Locator.name("description")));
+    }
+
+    @LogMethod
+    public Window uploadFileExpectingError(File file)
+    {
+        waitForFileGridReady();
+        setChooseAFile(file);
+        clickButton("Upload", WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
+        return new Window.WindowFinder(getDriver()).withTitle("Error").waitFor();
+    }
+
+    private void setChooseAFile(File file)
+    {
+        openUploadPanel();
+        waitFor(() -> getFormElement(Locator.xpath("//label[text() = 'Choose a File:']/../..//input[contains(@class, 'x4-form-field')]")).isEmpty(),
+                "Upload field did not clear after upload.", WAIT_FOR_JAVASCRIPT);
+        setFormElement(Locator.css(".single-upload-panel input:last-of-type[type=file]"), file);
+        waitFor(() -> getFormElement(Locator.xpath("//label[text() = 'Choose a File:']/../..//input[contains(@class, 'x4-form-field')]")).contains(file.getName()),
+                "Upload field was not set to '" + file.getName() + "'.", WAIT_FOR_JAVASCRIPT);
     }
 
     private void dragAndDropFileInDropZone(File file)
@@ -859,6 +880,102 @@ public class FileBrowserHelper extends WebDriverWrapper
             shortWait().until(ExpectedConditions.stalenessOf(rootNode));
             waitForElementToDisappear(Locator.xpath("//tbody[starts-with(@id, 'treeview')]/tr[not(starts-with(@id, 'treeview'))]")); // temoporary row exists during expansion animation
         }
+    }
+
+    private static String stringOrNull(Object value)
+    {
+        if (value == null)
+            return null;
+        return (String) value;
+    }
+
+    public record FileDetailInfo(String fileName, String absoluteFilePath, String dataFileUrl, String relativeFolder, String webDavUrl, String webDavUrlRelative)
+    {
+    }
+
+    /**
+     * Queries the "exp"."files" table to gather metadata about a specific file.
+     *
+     * @param containerPath The container path in which to make the request.
+     * @param fileName The name of the file to find.
+     */
+    public static @Nullable FileDetailInfo getFileDetailInfo(String containerPath, String fileName)
+    {
+        return getFileDetailInfo(containerPath, fileName, null);
+    }
+
+    /**
+     * Queries the "exp"."files" table to gather metadata about a specific file. Optionally, a relativeFolder can be
+     * supplied to match against the "RelativeFolder" column. This is useful when looking for files in a specific
+     * subdirectory.
+     *
+     * @param containerPath  The container path in which to make the request.
+     * @param fileName       The name of the file to find.
+     * @param relativeFolder The expected value of the "RelativeFolder" column. If null, the column is not checked.
+     */
+    public static @Nullable FileDetailInfo getFileDetailInfo(String containerPath, String fileName, @Nullable String relativeFolder)
+    {
+        var fileInfos = getFileDetailInfos(containerPath, List.of(new Filter("Name", fileName)));
+
+        // "RelativeFolder" is not a filterable column on the query table
+        if (relativeFolder != null)
+            fileInfos = fileInfos.stream().filter(f -> relativeFolder.equals(f.relativeFolder)).toList();
+
+        if (fileInfos.size() > 1)
+        {
+            String message = String.format("%d files found with name \"%s\"", fileInfos.size(), fileName);
+            if (relativeFolder != null)
+                message += String.format(" in relative folder \"%s\"", relativeFolder);
+            message += ". Expected 0 or 1 files with that name.";
+
+            throw new AssertionError(message);
+        }
+
+        return fileInfos.isEmpty() ? null : fileInfos.get(0);
+    }
+
+    private static @NotNull List<FileDetailInfo> getFileDetailInfos(String containerPath, @Nullable Collection<Filter> filters)
+    {
+        try
+        {
+            var cmd = new SelectRowsCommand("exp", "files");
+            cmd.setColumns(List.of("AbsoluteFilePath", "DataFileUrl", "FileExists", "Name", "RelativeFolder", "WebDavUrl", "WebDavUrlRelative"));
+
+            if (filters != null)
+            {
+                for (var filter : filters)
+                    cmd.addFilter(filter);
+            }
+
+            var response = cmd.execute(WebTestHelper.getRemoteApiConnection(), "/" + containerPath);
+
+            var files = new ArrayList<FileDetailInfo>();
+            for (var row : response.getRows())
+            {
+                if (!(Boolean) row.get("FileExists"))
+                    continue;
+                String fileName = stringOrNull(row.get("Name"));
+                String absoluteFilePath = stringOrNull(row.get("AbsoluteFilePath"));
+                String dataFileUrl = stringOrNull(row.get("DataFileUrl"));
+                String relativeFolder = stringOrNull(row.get("RelativeFolder"));
+                String webDavUrl = stringOrNull(row.get("WebDavUrl"));
+                String webDavUrlRelative = stringOrNull(row.get("WebDavUrlRelative"));
+                files.add(new FileDetailInfo(fileName, absoluteFilePath, dataFileUrl, relativeFolder, webDavUrl, webDavUrlRelative));
+            }
+
+            return files;
+        }
+        catch (CommandException ce)
+        {
+            if (ce.getStatusCode() != 404)
+                throw new RuntimeException(ce);
+        }
+        catch (IOException ioe)
+        {
+            throw new RuntimeException(ioe);
+        }
+
+        return emptyList();
     }
 
     // See PageFlowUtil.encodeURIComponent()

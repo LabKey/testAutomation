@@ -110,7 +110,7 @@ public class ProductsNavContainer extends BaseNavContainer
         {
             _name = name;
         }
-        private String _name;
+        private final String _name;
 
         public String getName()
         {

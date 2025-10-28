@@ -9,6 +9,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Daily;
+import org.labkey.test.components.assay.AssayConstants;
 import org.labkey.test.pages.admin.ExportFolderPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.assay.GeneralAssayDesign;
@@ -39,7 +40,7 @@ public class AssayMissingValuesTest extends MissingValueIndicatorsTest
     @BeforeClass
     public static void beforeTestClass()
     {
-        AssayMissingValuesTest init = (AssayMissingValuesTest)getCurrentTest();
+        AssayMissingValuesTest init = getCurrentTest();
 
         init.setupProject();
     }
@@ -60,25 +61,29 @@ public class AssayMissingValuesTest extends MissingValueIndicatorsTest
         final String ASSAY_EXCEL_RUN_SINGLE_COLUMN = "MVAssayExcelRunSingleColumn";
         final String ASSAY_EXCEL_RUN_TWO_COLUMN = "MVAssayExcelRunTwoColumn";
         final String TEST_DATA_SINGLE_COLUMN_ASSAY =
-                "SpecimenID\tParticipantID\tVisitID\tDate\tage\tsex\n" +
-                        "1\tTed\t1\t01-Jan-09\tN\tmale\n" +
-                        "2\tAlice\t1\t01-Jan-09\t17\tfemale\n" +
-                        "3\tBob\t1\t01-Jan-09\tQ\tN";
+                """
+                        SpecimenID\tParticipantID\tVisitID\tDate\tage\tsex
+                        1\tTed\t1\t01-Jan-09\tN\tmale
+                        2\tAlice\t1\t01-Jan-09\t17\tfemale
+                        3\tBob\t1\t01-Jan-09\tQ\tN""";
         final String TEST_DATA_TWO_COLUMN_ASSAY =
-                "SpecimenID\tParticipantID\tVisitID\tDate\tage\tageMVIndicator\tsex\tsexMVIndicator\n" +
-                        "1\tFranny\t1\t01-Jan-09\t\tN\tmale\t\n" +
-                        "2\tZoe\t1\t01-Jan-09\t25\tQ\tfemale\t\n" +
-                        "3\tJ.D.\t1\t01-Jan-09\t50\t\tmale\tQ";
+                """
+                        SpecimenID\tParticipantID\tVisitID\tDate\tage\tageMVIndicator\tsex\tsexMVIndicator
+                        1\tFranny\t1\t01-Jan-09\t\tN\tmale\t
+                        2\tZoe\t1\t01-Jan-09\t25\tQ\tfemale\t
+                        3\tJ.D.\t1\t01-Jan-09\t50\t\tmale\tQ""";
         final String TEST_DATA_SINGLE_COLUMN_ASSAY_BAD =
-                "SpecimenID\tParticipantID\tVisitID\tDate\tage\tsex\n" +
-                        "1\tTed\t1\t01-Jan-09\t.N\tmale\n" +
-                        "2\tAlice\t1\t01-Jan-09\t17\tfemale\n" +
-                        "3\tBob\t1\t01-Jan-09\tQ\tN";
+                """
+                        SpecimenID\tParticipantID\tVisitID\tDate\tage\tsex
+                        1\tTed\t1\t01-Jan-09\t.N\tmale
+                        2\tAlice\t1\t01-Jan-09\t17\tfemale
+                        3\tBob\t1\t01-Jan-09\tQ\tN""";
         final String TEST_DATA_TWO_COLUMN_ASSAY_BAD =
-                "SpecimenID\tParticipantID\tVisitID\tDate\tage\tageMVIndicator\tsex\tsexMVIndicator\n" +
-                        "1\tFranny\t1\t01-Jan-09\t\tN\tmale\t\n" +
-                        "2\tZoe\t1\t01-Jan-09\t25\tQ\tfemale\t\n" +
-                        "3\tJ.D.\t1\t01-Jan-09\t50\t\tmale\t.Q";
+                """
+                        SpecimenID\tParticipantID\tVisitID\tDate\tage\tageMVIndicator\tsex\tsexMVIndicator
+                        1\tFranny\t1\t01-Jan-09\t\tN\tmale\t
+                        2\tZoe\t1\t01-Jan-09\t25\tQ\tfemale\t
+                        3\tJ.D.\t1\t01-Jan-09\t50\t\tmale\t.Q""";
         final File ASSAY_SINGLE_COLUMN_EXCEL_FILE = TestFileUtils.getSampleData("mvIndicators/assay_single_column.xls");
         final File ASSAY_TWO_COLUMN_EXCEL_FILE = TestFileUtils.getSampleData("mvIndicators/assay_two_column.xls");
         final File ASSAY_SINGLE_COLUMN_EXCEL_FILE_BAD = TestFileUtils.getSampleData("mvIndicators/assay_single_column_bad.xls");
@@ -89,14 +94,14 @@ public class AssayMissingValuesTest extends MissingValueIndicatorsTest
         waitAndClickAndWait(Locator.linkWithText(ASSAY_NAME));
         clickButton("Import Data");
         clickButton("Next");
-        setFormElement(Locator.name("name"), ASSAY_RUN_SINGLE_COLUMN);
-        click(Locator.xpath("//input[@value='textAreaDataProvider']"));
+        setFormElement(AssayConstants.ASSAY_NAME_FIELD_LOCATOR, ASSAY_RUN_SINGLE_COLUMN);
+        click(AssayConstants.TEXT_AREA_DATA_PROVIDER_LOCATOR);
 
         setFormElement(Locator.name("TextAreaDataCollector.textArea"), TEST_DATA_SINGLE_COLUMN_ASSAY_BAD);
         clickButton("Save and Finish");
         assertLabKeyErrorPresent();
 
-        click(Locator.xpath("//input[@value='textAreaDataProvider']"));
+        click(AssayConstants.TEXT_AREA_DATA_PROVIDER_LOCATOR);
         setFormElement(Locator.name("TextAreaDataCollector.textArea"), TEST_DATA_SINGLE_COLUMN_ASSAY);
         clickButton("Save and Finish");
         assertNoLabKeyErrors();
@@ -122,15 +127,15 @@ public class AssayMissingValuesTest extends MissingValueIndicatorsTest
         clickAndWait(Locator.linkWithText(ASSAY_NAME));
         clickButton("Import Data");
         clickButton("Next");
-        setFormElement(Locator.name("name"), ASSAY_RUN_TWO_COLUMN);
+        setFormElement(AssayConstants.ASSAY_NAME_FIELD_LOCATOR, ASSAY_RUN_TWO_COLUMN);
 
-        click(Locator.xpath("//input[@value='textAreaDataProvider']"));
-        setFormElement(Locator.name("TextAreaDataCollector.textArea"), TEST_DATA_TWO_COLUMN_ASSAY_BAD);
+        click(AssayConstants.TEXT_AREA_DATA_PROVIDER_LOCATOR);
+        setFormElement(AssayConstants.TEXT_AREA_DATA_COLLECTOR_LOCATOR, TEST_DATA_TWO_COLUMN_ASSAY_BAD);
         clickButton("Save and Finish");
         assertLabKeyErrorPresent();
 
-        click(Locator.xpath("//input[@value='textAreaDataProvider']"));
-        setFormElement(Locator.name("TextAreaDataCollector.textArea"), TEST_DATA_TWO_COLUMN_ASSAY);
+        click(AssayConstants.TEXT_AREA_DATA_PROVIDER_LOCATOR);
+        setFormElement(AssayConstants.TEXT_AREA_DATA_COLLECTOR_LOCATOR, TEST_DATA_TWO_COLUMN_ASSAY);
         clickButton("Save and Finish");
         assertNoLabKeyErrors();
         clickAndWait(Locator.linkWithText(ASSAY_RUN_TWO_COLUMN));
@@ -158,7 +163,7 @@ public class AssayMissingValuesTest extends MissingValueIndicatorsTest
         clickAndWait(Locator.linkWithText(ASSAY_NAME));
         clickButton("Import Data");
         clickButton("Next");
-        setFormElement(Locator.name("name"), ASSAY_EXCEL_RUN_SINGLE_COLUMN);
+        setFormElement(AssayConstants.ASSAY_NAME_FIELD_LOCATOR, ASSAY_EXCEL_RUN_SINGLE_COLUMN);
         checkCheckbox(Locator.radioButtonByNameAndValue("dataCollectorName", "File upload"));
 
         setFormElement(Locator.name("__primaryFile__"), ASSAY_SINGLE_COLUMN_EXCEL_FILE_BAD);
@@ -183,7 +188,7 @@ public class AssayMissingValuesTest extends MissingValueIndicatorsTest
         clickAndWait(Locator.linkWithText(ASSAY_NAME));
         clickButton("Import Data");
         clickButton("Next");
-        setFormElement(Locator.name("name"), ASSAY_EXCEL_RUN_TWO_COLUMN);
+        setFormElement(AssayConstants.ASSAY_NAME_FIELD_LOCATOR, ASSAY_EXCEL_RUN_TWO_COLUMN);
         checkCheckbox(Locator.radioButtonByNameAndValue("dataCollectorName", "File upload"));
         setFormElement(Locator.name("__primaryFile__"), ASSAY_TWO_COLUMN_EXCEL_FILE_BAD);
         clickButton("Save and Finish");
@@ -263,10 +268,17 @@ public class AssayMissingValuesTest extends MissingValueIndicatorsTest
         clickAndWait(Locator.linkWithText("view results"));
         var dataRegion = DataRegionTable.DataRegion(getDriver()).waitFor();
 
+        // if the test gets to the dataregion before the data is there, refresh and re-check
+        waitFor(()-> {
+            sleep(500);
+            refresh();
+            return dataRegion.getDataRowCount() > 0;
+        }, "Data did not appear in dataregion in time", 2000);
+
         // expect 3 rows in this assay, p2 and p3 should get mv indicators in the count column
         Map<String, List<String>> expectedData = new HashMap<>();
-        expectedData.put("Participant ID", List.of("p1", "p2", "p3"));
-        expectedData.put("Visit ID", List.of("1", "1", "1"));
+        expectedData.put("ParticipantID", List.of("p1", "p2", "p3"));
+        expectedData.put("VisitId", List.of("1", "1", "1"));
         expectedData.put("Count", List.of("4", "N", "Q"));
         checkDataregionData(dataRegion, expectedData);
 

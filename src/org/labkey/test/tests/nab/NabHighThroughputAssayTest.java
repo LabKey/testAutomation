@@ -25,6 +25,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.Daily;
+import org.labkey.test.components.assay.AssayConstants;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.pages.assay.plate.PlateDesignerPage;
 import org.labkey.test.pages.assay.plate.PlateTemplateListPage;
@@ -68,7 +69,7 @@ public class NabHighThroughputAssayTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        NabHighThroughputAssayTest init = (NabHighThroughputAssayTest)getCurrentTest();
+        NabHighThroughputAssayTest init = getCurrentTest();
         init.doInit();
     }
 
@@ -197,9 +198,9 @@ public class NabHighThroughputAssayTest extends BaseWebDriverTest
         clickButton("Import Data");
         clickButton("Next");
 
-        setFormElement(Locator.name("cutoff1"), "50");
-        setFormElement(Locator.name("cutoff2"), "70");
-        selectOptionByText(Locator.name("curveFitMethod"), "Polynomial");
+        setFormElement(Locator.name("Cutoff1"), "50");
+        setFormElement(Locator.name("Cutoff2"), "70");
+        selectOptionByText(Locator.name("CurveFitMethod"), "Polynomial");
 
         if (metadataFile != null)
         {
@@ -322,7 +323,7 @@ public class NabHighThroughputAssayTest extends BaseWebDriverTest
     {
         // high throughput Nab assays should not contain the Participant, Visit, Date resolver type
         clickAndWait(Locator.linkWithText("Import Data"));
-        assertElementNotPresent(Locator.radioButtonByNameAndValue("participantVisitResolver", "ParticipantVisitDate"));
+        assertElementNotPresent(Locator.radioButtonByNameAndValue(AssayConstants.PARTICIPANT_VISIT_RESOLVER_FIELD_NAME, "ParticipantVisitDate"));
         clickButton("Cancel");
     }
 

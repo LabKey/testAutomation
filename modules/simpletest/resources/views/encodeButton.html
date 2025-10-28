@@ -1,0 +1,15 @@
+<input id="firstName" type="text" value="<script>alert('XSS Input Success')</script><span>Loading XSS</span>" />
+<button class="btn btn-primary input-test" data-loading-text="<span>I'm Loading</span>" type="button">
+    Attempt XSS injection
+</button>
+<script type="text/javascript" nonce="<%=scriptNonce%>">
+    // Issue 52402: Verify the "loadingText" attribute for a bootstrap button() is properly encoded.
+    // See ClientAPITest.testBootstrapButtonEncoding
+    $(function () {
+        $('.input-test').click(function () {
+            let inputValue = $('#firstName').val();
+            $(this).data('loadingText', inputValue);
+            $(this).button('loading', inputValue);
+        });
+    });
+</script>

@@ -1,5 +1,6 @@
 package org.labkey.test.tests.component;
 
+import org.assertj.core.api.Assertions;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -19,6 +20,7 @@ import org.labkey.test.components.ui.grids.SaveViewDialog;
 import org.labkey.test.components.ui.search.FilterExpressionPanel;
 import org.labkey.test.components.ui.search.FilterFacetedPanel;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.FieldKey;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.APIUserHelper;
 import org.labkey.test.util.ApiPermissionsHelper;
@@ -33,9 +35,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static org.labkey.test.util.PermissionsHelper.FOLDER_ADMIN_ROLE;
 
 @Category({Daily.class})
 public class GridPanelViewTest extends GridPanelBaseTest
@@ -75,7 +80,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
     private static final String UPDATED_ALERT = "UPDATED";
 
     // Keep track of any custom views that may have been created.
-    private static List<String> savedViewsForDefaultSampleType = new ArrayList<>();
+    private static final List<String> savedViewsForDefaultSampleType = new ArrayList<>();
 
     // Using the core-components.view adds 'GridPanel - ' to the panel header. Need to take that into account .
     private static final String PANEL_VIEW_NAME_PREFIX = "GridPanel - %s";
@@ -101,7 +106,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
     @BeforeClass
     public static void setupProject() throws IOException, CommandException
     {
-        GridPanelViewTest init = (GridPanelViewTest) getCurrentTest();
+        GridPanelViewTest init = getCurrentTest();
 
         init.doSetup();
     }
@@ -127,7 +132,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
         createSampleType(DEFAULT_VIEW_SAMPLE_TYPE, DEFAULT_VIEW_SAMPLE_PREFIX, DEFAULT_VIEW_SAMPLE_TYPE_SIZE, fields);
 
         _userHelper.createUser(OTHER_USER, true,false);
-        new ApiPermissionsHelper(this).addMemberToRole(OTHER_USER, "Folder Administrator", PermissionsHelper.MemberType.user, getProjectName());
+        new ApiPermissionsHelper(this).addMemberToRole(OTHER_USER, FOLDER_ADMIN_ROLE, PermissionsHelper.MemberType.user, getProjectName());
 
     }
 
@@ -890,10 +895,10 @@ public class GridPanelViewTest extends GridPanelBaseTest
         log("Validate that the 'Available Fields' and 'Shown in Grid' panels are as expected.");
 
         checker().verifyEquals(String.format("Column '%s' should be selected in the dialog, it is not.", selectedColumn),
-                selectedColumn, customizeModal.getActiveSelectedField());
+                selectedColumn, customizeModal.getActiveSelectedFieldLabel());
 
         checker().verifyEqualsSorted("Field displayed in 'Show in Grid' panel not as expected.",
-                expectedFields, customizeModal.getSelectedFields());
+                expectedFields, customizeModal.getSelectedFieldLabels());
 
         for (String field : expectedFields)
         {
@@ -913,13 +918,13 @@ public class GridPanelViewTest extends GridPanelBaseTest
         log("Validate that the order of the fields in the 'Shown in Grid' column are as expected.");
         expectedFields = List.of(COL_NAME, COL_STRING1, COL_STRING2, COL_INT, COL_BOOL);
         checker().verifyEquals(String.format("After adding '%s' fields displayed in 'Show in Grid' panel not as expected.", columnToAdd),
-                expectedFields, customizeModal.getSelectedFields());
+                expectedFields, customizeModal.getSelectedFieldLabels());
 
         checker().screenShotIfNewError("InsertionOrder_Customize_Dialog_Error");
         customizeModal.clickUpdateGrid();
 
         log(String.format("Validate that the order of the fields in the grid, specifically that '%s' is after '%s'.", columnToAdd, selectedColumn));
-        List<String> columns = grid.getColumnNames();
+        List<String> columns = grid.getColumnLabels();
         checker().verifyTrue("Order of column headers in grid is not as expected.",
                 Collections.indexOfSubList(columns, Arrays.asList(selectedColumn, columnToAdd)) >= 0);
 
@@ -958,8 +963,8 @@ public class GridPanelViewTest extends GridPanelBaseTest
                 customizeModal.isUndoEditsEnabled());
 
         log("Validate that using the menu to open the dialog results in no fields being selected in the 'Shown in Grid' panel.");
-        checker().verifyTrue(String.format("Field '%s' is selected in the 'Shown in Grid' panel, there should be no selected fields.", customizeModal.getActiveSelectedField()),
-                customizeModal.getActiveSelectedField().isEmpty());
+        checker().verifyTrue(String.format("Field '%s' is selected in the 'Shown in Grid' panel, there should be no selected fields.", customizeModal.getActiveSelectedFieldLabel()),
+                customizeModal.getActiveSelectedFieldLabel().isEmpty());
 
         if (!checker().verifyFalse("The 'Show all system and user-defined fields' should not be checked.",
                 customizeModal.isShowAllChecked()))
@@ -972,7 +977,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
         String materialIDFieldName = "Material Source Id";
         log(String.format("Validate that field '%s' is not visible before checking 'Show all'.", materialIDField));
 
-        List<String> actualFields = customizeModal.getAvailableFields();
+        List<String> actualFields = customizeModal.getAvailableFieldLabels();
 
         checker().fatal()
                 .verifyFalse(String.format("Field '%s' is already present in 'Available Fields' panel. Fatal error.", materialIDField),
@@ -982,7 +987,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
 
         customizeModal.setShowAll(true);
 
-        actualFields = customizeModal.getAvailableFields();
+        actualFields = customizeModal.getAvailableFieldLabels();
 
         checker().verifyTrue(String.format("Field '%s' is not present in 'Available Fields' panel, it should be.", materialIDFieldName),
                 actualFields.contains(materialIDFieldName));
@@ -996,7 +1001,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
 
         log("Because no fields should be selected validate this field is added to the end of the list.");
         checker().verifyEquals(String.format("Position of field '%s' is not as expected in the dialog.", materialNameField),
-                expectedFields, customizeModal.getSelectedFields());
+                expectedFields, customizeModal.getSelectedFieldLabels());
 
         checker().screenShotIfNewError("ShowAll_Label_Edit_Dialog_Error");
 
@@ -1006,7 +1011,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
             customizeModal.clickUndoEdits();
             expectedFields = new ArrayList<>(DEFAULT_COLUMNS);
             if(checker().verifyEquals("After clicking 'Undo edits' fields in 'Shown in Grid' dialog not as expected.",
-                    expectedFields, customizeModal.getSelectedFields()))
+                    expectedFields, customizeModal.getSelectedFieldLabels()))
             {
                 log(String.format("Add field '%s / %s' back.", materialIDField, materialNameField));
                 customizeModal.selectAvailableField(materialIDField, materialNameField);
@@ -1022,7 +1027,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
         log(String.format("Change the label of the field '%s' to '%s'.", materialNameField, newFieldLabel));
 
         // Adding the 'Material Source Id / Name' field creates two fields with the label 'Name' in the 'Shown in Grid' panel, make sure the expected one is updated.
-        customizeModal.setFieldLabel(materialNameField, 1, newFieldLabel);
+        customizeModal.setFieldLabel(FieldKey.fromParts(materialIDField, materialNameField), newFieldLabel);
 
         checker().fatal().verifyTrue("'Update' button is not enabled, cannot save changes. Fatal error.",
                 customizeModal.isUpdateGridEnabled());
@@ -1032,7 +1037,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
         log("Validate that the grid shows the new field with the updated label.");
 
         checker().verifyTrue(String.format("Did not find the field labeled '%s' in the grid.", newFieldLabel),
-                grid.getColumnNames().contains(newFieldLabel));
+                grid.getColumnLabels().contains(newFieldLabel));
 
     }
 
@@ -1256,8 +1261,60 @@ public class GridPanelViewTest extends GridPanelBaseTest
                 .clickUpdateGrid();
 
         checker().verifyEquals("Grid columns not as expected after removing all, and adding back a field.",
-                List.of(COL_STRING1), grid.getColumnNames());
+                List.of(COL_STRING1), grid.getColumnLabels());
 
+    }
+
+    // Issue 52661 Saved grid view with an invalid date filter can't be edited or deleted
+    @Test
+    public void testWarningOnInvalidDateFilter()
+    {
+        String viewName = "broken view";
+        goToProjectHome();
+
+        resetDefaultView(VIEW_DIALOG_ST, DEFAULT_COLUMNS);
+
+        QueryGrid grid = beginAtQueryGrid(VIEW_DIALOG_ST);
+
+        log("Save a view, call it 'broken view'");
+        grid.saveView()
+                .setViewName(viewName)
+                .setMakeShared(false)
+                .saveView();
+
+        log("add created column so we can filter on it");
+        grid.customizeView()
+                .selectAvailableField("Created")
+                .clickUpdateGrid();
+
+        log("filter on a valid date");
+        grid.filterColumn("Created", Filter.Operator.GT, new FilterExpressionPanel.DateString("May 27, 2024"));
+        var filterStatuses = grid.getFilterStatusValues();
+        checker().withScreenshot("Filter_Texts_Error")
+                .wrapAssertion(()-> Assertions.assertThat(filterStatuses)
+                        .hasSize(1)
+                        .filteredOn(a-> a.getText().equals("Created > 2024-05-27"))
+                                .isNotEmpty());
+        grid.saveView().saveView();
+
+        log("try to filter on an invalid date");
+        grid.filterColumn("Created", Filter.Operator.GT, new FilterExpressionPanel.DateString("05/37/2024"));
+        // don't expect the parser to get the invalid date right; current behavior won't do that
+        // also add a bogus filter on int column, verify it refuses to do it
+        var err = grid.filterColumnExpectingError("Int", Filter.Operator.GT, "XYZ");
+        checker().verifyEquals("expect error when trying to configure invalid filter",
+                "Missing filter values for: Int.", err);
+        grid.saveView().saveView();
+
+        log("ensure the view can be edited after");
+        grid.filterColumn("Created", Filter.Operator.LTE, new Date());  // filter on right now
+        grid.saveView().saveView();
+
+        grid.manageViews()      // ensure the view can be deleted now
+                .revertDefaultView()
+                .deleteView(viewName)
+                .confirmDelete()
+                .dismiss("Done");
     }
 
     /**
@@ -1291,7 +1348,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
     {
         checker().setErrorMark();
 
-        List<String> actualColumns = grid.getColumnNames();
+        List<String> actualColumns = grid.getColumnLabels();
 
         checker().verifyEqualsSorted("Grid columns not as expected.",
                 expectedColumns.keySet(), actualColumns);

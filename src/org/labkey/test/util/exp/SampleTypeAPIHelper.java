@@ -9,18 +9,23 @@ import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.remoteapi.query.Sort;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.FieldInfo;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.DomainUtils;
+import org.labkey.test.util.DomainUtils.DomainKind;
+import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.TestDataGenerator;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 public class SampleTypeAPIHelper
 {
@@ -28,7 +33,7 @@ public class SampleTypeAPIHelper
     public static final String SCHEMA_NAME = "exp.materials";
 
     // Global constants to ease migration from "Sample Set" to "Sample Type"
-    public static final String SAMPLE_TYPE_DOMAIN_KIND = "SampleSet";
+    public static final String SAMPLE_TYPE_DOMAIN_KIND = DomainKind.SampleSet.name();
     public static final String SAMPLE_TYPE_DATA_REGION_NAME = "SampleSet";
     public static final String SAMPLE_TYPE_COLUMN_NAME = "Sample Set";
     public static final String SAMPLE_NAME_EXPRESSION = "S-${now:date}-${dailySampleCount}";
@@ -49,24 +54,23 @@ public class SampleTypeAPIHelper
         }
         catch (CommandException | IOException e)
         {
-            throw new RuntimeException("Failed to create sample type.", e);
+            throw new RuntimeException(String.format("Failed to create sample type. %s", e.getMessage()), e);
         }
     }
 
     /**
      * A set of FieldDefinition provided for convenience
-     * @return
      */
     public static List<FieldDefinition> sampleTypeTestFields(boolean withFileField)
     {
         List<FieldDefinition> fields = new ArrayList<>(Arrays.asList(
-                new FieldDefinition("intColumn", FieldDefinition.ColumnType.Integer),
-                new FieldDefinition("decimalColumn", FieldDefinition.ColumnType.Decimal),
-                new FieldDefinition("stringColumn", FieldDefinition.ColumnType.String),
-                new FieldDefinition("sampleDate", FieldDefinition.ColumnType.DateAndTime),
-                new FieldDefinition("boolColumn", FieldDefinition.ColumnType.Boolean)));
+                FieldInfo.random("int,./Column", FieldDefinition.ColumnType.Integer).getFieldDefinition(), // Issue 53431: include special chars that are fieldKey encoded
+                FieldInfo.random("decimalColumn", FieldDefinition.ColumnType.Decimal).getFieldDefinition(),
+                FieldInfo.random("stringColumn", FieldDefinition.ColumnType.String).getFieldDefinition(),
+                FieldInfo.random("sampleDate", FieldDefinition.ColumnType.DateAndTime).getFieldDefinition(),
+                FieldInfo.random("boolColumn", FieldDefinition.ColumnType.Boolean).getFieldDefinition()));
         if (withFileField)
-            fields.add(new FieldDefinition("fileColumn", FieldDefinition.ColumnType.File));
+            fields.add(FieldInfo.random("file,./Column", FieldDefinition.ColumnType.File).getFieldDefinition());
         return fields;
     }
 
@@ -127,15 +131,29 @@ public class SampleTypeAPIHelper
      * @param sampleTypeName The name of the sample type.
      * @param sampleNames A list of sample name you want to get the id's for.
      * @return A map of containing sample names and their corresponding row ids.
-     * @throws Exception Because this uses the Select Rows Command it can throw a few different type of exceptions.
      */
     public static Map<String, Integer> getRowIdsForSamples(String containerPath, String sampleTypeName, List<String> sampleNames) throws IOException, CommandException
     {
 
+        // Use json for the value parameter of the filter. This allows for tricky characters like ";" to be passed to the API.
+        StringBuilder json = new StringBuilder("{json:[");
+
+        Iterator<String> iterator = sampleNames.iterator();
+
+        while (iterator.hasNext()) {
+            String sampleName = iterator.next();
+            json.append(EscapeUtil.toJSONStr(sampleName));
+            if (iterator.hasNext()) {
+                json.append(", ");
+            } else {
+                json.append("]}");
+            }
+        }
+
         Connection connection = WebTestHelper.getRemoteApiConnection();
         SelectRowsCommand cmd = new SelectRowsCommand("samples", sampleTypeName);
         cmd.setColumns(Arrays.asList("RowId", "Name"));
-        cmd.addFilter("Name", String.join(";", sampleNames), Filter.Operator.IN);
+        cmd.addFilter("Name", json, Filter.Operator.IN);
 
         SelectRowsResponse response = cmd.execute(connection, containerPath);
 
@@ -180,13 +198,31 @@ public class SampleTypeAPIHelper
     }
 
     /**
-     * This method has a misleading name. "Name" and "Sample ID" refer to the same column. This is actually fetching
-     * row IDs of the specified samples.
-     * @deprecated Use {@link #getRowIdsForSamples(String, String, List)}
+     * Get sample state IDs defined in the specified project/folder. Useful for updating sample status via API
+     * @param containerPath Path to the project/folder where the sample statuses are defined (typically project)
+     * @return Map of
      */
-    @Deprecated(since = "22.4")
-    public static Map<String, Integer> getSampleIdFromName(String folder, String sampleTypeName, List<String> sampleNames) throws IOException, CommandException
+    public static Map<String, Integer> getSampleStateIds(String containerPath) throws IOException, CommandException
     {
-        return getRowIdsForSamples(folder, sampleTypeName, sampleNames);
+        Connection cn = WebTestHelper.getRemoteApiConnection();
+        SelectRowsCommand insertCmd = new SelectRowsCommand("core", "DataStates");
+        return insertCmd.execute(cn, containerPath).getRows().stream().collect(Collectors.toMap(row ->
+            (String) row.get("label"), row -> (Integer) row.get("rowId")));
     }
+
+    /**
+     * Get sample state ID defined in the specified project/folder. Useful for updating sample status via API
+     * @param label Label of the sample state (typically "Available", "Locked", or "Consumed")
+     * @param containerPath Path to the project/folder where the sample statuses are defined (typically project)
+     * @return rowId for the specified state
+     */
+    public static Integer getSampleStateId(String label, String containerPath) throws IOException, CommandException
+    {
+        Map<String, Integer> sampleStateIds = getSampleStateIds(containerPath);
+        if(sampleStateIds.containsKey(label))
+            return sampleStateIds.get(label);
+        else
+            throw new NoSuchElementException("Sample state '%s' not defined in '%s': %s".formatted(label, containerPath, sampleStateIds.keySet()));
+    }
+
 }

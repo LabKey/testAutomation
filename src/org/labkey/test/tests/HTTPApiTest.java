@@ -81,7 +81,7 @@ public class HTTPApiTest extends BaseWebDriverTest
     @BeforeClass
     public static void initTest() throws Exception
     {
-        HTTPApiTest init = (HTTPApiTest)getCurrentTest();
+        HTTPApiTest init = getCurrentTest();
         init.createTestData();
     }
 

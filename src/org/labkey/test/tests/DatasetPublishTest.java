@@ -29,6 +29,7 @@ import org.labkey.test.util.LoggedParam;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 @Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 6)
@@ -90,12 +91,12 @@ public class DatasetPublishTest extends BaseWebDriverTest
     {
         goToProjectHome();
         goToDataset("Demographics");
-        DataRegionTable.findDataRegion(this).clickInsertNewRow();
-        waitForElement(Locator.name("quf_ParticipantId"));
-        setFormElement(Locator.name("quf_ParticipantId"), "addedParticipant67676");
-        setFormElement(Locator.name("quf_date"), "1/1/2001");
-        setFormElement(Locator.name("quf_Comments"), "Comment on added participant");
-        clickButton("Submit");
+        new DataRegionTable.DataRegionFinder(getDriver()).find()
+            .clickInsertNewRow()
+            .update(Map.of(
+                "ParticipantId", "addedParticipant67676",
+                "date", "1/1/2001",
+                "Comments", "Comment on added participant"));
     }
 
     @LogMethod

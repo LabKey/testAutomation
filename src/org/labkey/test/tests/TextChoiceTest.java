@@ -4,6 +4,7 @@ import org.labkey.junit.LabKeyAssert;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.components.assay.AssayConstants;
 import org.labkey.test.components.domain.DomainFieldRow;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.html.OptionSelect;
@@ -139,8 +140,8 @@ public abstract class TextChoiceTest extends BaseWebDriverTest
         fieldRow.setTextChoiceValues(BATCH_FIELD_VALUES);
 
         log("Remove the default batch fields.");
-        domainFormPanel.removeField("ParticipantVisitResolver");
-        domainFormPanel.removeField("TargetStudy");
+        domainFormPanel.removeField(AssayConstants.PARTICIPANT_VISIT_RESOLVER_FIELD_NAME);
+        domainFormPanel.removeField(AssayConstants.TARGET_STUDY_FIELD_NAME);
 
         log(String.format("Add a TextChoice field named '%s' to the run properties.", RUN_TC_FIELD));
         fieldRow = assayDesignerPage.goToRunFields().addField(RUN_TC_FIELD);
@@ -177,7 +178,7 @@ public abstract class TextChoiceTest extends BaseWebDriverTest
         DataRegionTable runTable = new DataRegionTable("Runs", getDriver());
         runTable.clickHeaderButtonAndWait("Import Data");
 
-        Locator batchLocator = Locator.name(getSelectControlName(BATCH_TC_FIELD));
+        Locator batchLocator = Locator.name(BATCH_TC_FIELD);
         assertSelectOptions(batchLocator, BATCH_FIELD_VALUES,
                 String.format("Options for the batch field '%s' are not as expected. Fatal error.", BATCH_TC_FIELD));
 
@@ -189,9 +190,9 @@ public abstract class TextChoiceTest extends BaseWebDriverTest
 
         log(String.format("Set the Assay ID to '%s'.", ASSAY_RUN_ID));
 
-        setFormElement(Locator.tagWithName("input", "name"), ASSAY_RUN_ID);
+        setFormElement(AssayConstants.ASSAY_NAME_FIELD_LOCATOR, ASSAY_RUN_ID);
 
-        Locator runLocator = Locator.name(getSelectControlName(RUN_TC_FIELD));
+        Locator runLocator = Locator.name(RUN_TC_FIELD);
         assertSelectOptions(runLocator, RUN_FIELD_VALUES,
                 String.format("Options for the '%s' field not as expected. Fatal error.", RUN_TC_FIELD));
 
@@ -221,7 +222,7 @@ public abstract class TextChoiceTest extends BaseWebDriverTest
 
         log("Paste in the results and save.");
 
-        setFormElement(Locator.id("TextAreaDataCollector.textArea"), resultsPasteText.toString());
+        setFormElement(AssayConstants.TEXT_AREA_DATA_COLLECTOR_LOCATOR, resultsPasteText.toString());
 
         clickButton("Save and Finish");
 
@@ -276,17 +277,4 @@ public abstract class TextChoiceTest extends BaseWebDriverTest
         LabKeyAssert.assertEqualsSorted(failureMsg, expectedOptions, selectOptions);
 
     }
-
-    /**
-     * Simple helper to identify the name of the control on a page based on the field name. The name of the
-     * control is the field but the first letter is lower case. This lets the test not worry about that.
-     *
-     * @param tcFieldName The TextChoice field name.
-     * @return The field name with the first letter lower case.
-     */
-    protected String getSelectControlName(String tcFieldName)
-    {
-        return Character.toLowerCase(tcFieldName.charAt(0)) + tcFieldName.substring(1);
-    }
-
 }

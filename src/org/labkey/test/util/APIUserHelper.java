@@ -15,6 +15,7 @@
  */
 package org.labkey.test.util;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
 import org.apache.hc.core5.http.message.BasicNameValuePair;
@@ -27,9 +28,9 @@ import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.PostCommand;
 import org.labkey.remoteapi.SimpleGetCommand;
+import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.remoteapi.security.CreateUserCommand;
 import org.labkey.remoteapi.security.CreateUserResponse;
-import org.labkey.remoteapi.security.DeleteUserCommand;
 import org.labkey.remoteapi.security.GetUsersCommand;
 import org.labkey.remoteapi.security.GetUsersResponse;
 import org.labkey.remoteapi.security.GetUsersResponse.UserInfo;
@@ -52,11 +53,11 @@ import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public class APIUserHelper extends AbstractUserHelper
 {
     private final Supplier<Connection> connectionSupplier;
+
     public APIUserHelper(Supplier<Connection> connectionSupplier)
     {
         super(null);
@@ -216,40 +217,43 @@ public class APIUserHelper extends AbstractUserHelper
         return getUserIds(Arrays.asList(userEmail)).get(userEmail);
     }
 
+    public int getUserIdStrict(String userEmail)
+    {
+        Integer userId = getUserId(userEmail);
+        if (userId == null)
+            throw new IllegalStateException("No user with email " + userEmail + " found.");
+        return userId;
+    }
+
     @Override
     protected void _deleteUser(String userEmail)
     {
         deleteUsers(false, userEmail);
     }
 
-    private void deleteUser(@NotNull Integer userId)
-    {
-        DeleteUserCommand command = new DeleteUserCommand(userId);
-        try
-        {
-            command.execute(connectionSupplier.get(), "/");
-        }
-        catch (IOException|CommandException e)
-        {
-            throw new RuntimeException(e);
-        }
-    }
-
     @Override
     protected void _deleteUsers(boolean failIfNotFound, String... userEmails)
     {
         Map<String, Integer> userIds = getUserIds(Arrays.asList(userEmails), true);
+        List<Integer> validUserIds = new ArrayList<>();
         for (String userEmail : new HashSet<>(Arrays.asList(userEmails)))
         {
             Integer userId = userIds.get(userEmail);
             if (failIfNotFound)
-                assertTrue(userEmail + " was not present", userId != null);
+                assertNotNull(userEmail + " was not present", userId);
             if (userId != null)
-                deleteUser(userId);
+                validUserIds.add(userId);
         }
+        if (!validUserIds.isEmpty())
+            deleteUsers(ArrayUtils.toPrimitive(validUserIds.toArray(new Integer[0])));
     }
 
     private static final Pattern regEmailVerification = Pattern.compile("verification=([A-Za-z0-9]+)");
+
+    public String setInitialPassword(String email)
+    {
+        return setInitialPassword(getUserIdStrict(email));
+    }
 
     @Override
     public String setInitialPassword(int userId)
@@ -283,6 +287,35 @@ public class APIUserHelper extends AbstractUserHelper
             String password = PasswordUtil.getPassword();
             new SetPasswordCommand(password, verification).execute(connectionSupplier.get(), null);
             return password;
+        }
+        catch (IOException | CommandException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void deleteUsers(int... userIds)
+    {
+        updateUsersState(false, true, userIds);
+    }
+
+    public void deactivateUsers(int... userIds)
+    {
+        updateUsersState(false, false, userIds);
+    }
+
+    public void activateUsers(int... userIds)
+    {
+        updateUsersState(true, false, userIds);
+    }
+
+    private void updateUsersState(boolean activate, boolean delete, int... userIds)
+    {
+        SimplePostCommand updateUsers = new SimplePostCommand("user", "updateUsersStateApi");
+        updateUsers.setJsonObject(new JSONObject(Map.of("userId", userIds, "activate", activate, "delete", delete)));
+        try
+        {
+            updateUsers.execute(connectionSupplier.get(), null);
         }
         catch (IOException | CommandException e)
         {

@@ -81,6 +81,12 @@ public class ManageSampleStatusesPanel extends WebDriverComponent<ManageSampleSt
         return selectStatus(name, null);
     }
 
+    public boolean isStatusLocked(String name)
+    {
+        selectStatus(name);
+        return isLocked();
+    }
+
     public SampleStatus selectStatus(String name, SampleTypeHelper.StatusType statusType)
     {
         elementCache().statusItem(name).click();
@@ -152,7 +158,7 @@ public class ManageSampleStatusesPanel extends WebDriverComponent<ManageSampleSt
     public List<String> getStatusNames()
     {
         return elementCache().statusItems
-                .findElements(this)
+                .waitForElements(this, 2_000)
                 .stream()
                 .map(WebElement::getText)
                 .collect(Collectors.toList());

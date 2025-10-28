@@ -25,7 +25,7 @@ import org.labkey.test.components.html.BootstrapMenu;
  */
 public class DilutionAssayHelper
 {
-    private BaseWebDriverTest _test;
+    private final BaseWebDriverTest _test;
 
     public DilutionAssayHelper(BaseWebDriverTest test)
     {

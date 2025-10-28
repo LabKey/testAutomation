@@ -28,12 +28,18 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
+import org.labkey.test.components.list.ManageListsGrid;
+import org.labkey.test.pages.ImportDataPage;
+import org.labkey.test.pages.list.BeginPage;
 import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldDefinition.ColumnType;
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.DomainUtils;
 import org.labkey.test.util.ExcelHelper;
+import org.labkey.test.util.TestDataGenerator;
+import org.labkey.test.util.data.TestDataUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
@@ -43,23 +49,31 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.labkey.test.util.TestDataGenerator.ALL_CHARS_PLACEHOLDER;
+import static org.labkey.test.util.TestDataGenerator.REPEAT_PLACEHOLDER;
 
 @Category(Daily.class)
 @BaseWebDriverTest.ClassTimeout(minutes = 5)
 public class InlineImagesListTest extends BaseWebDriverTest
 {
-    protected final static String LIST_NAME = "InlineImagesList";
-    protected final static String LIST_KEY_NAME = "Key";
+
+    private final static String PROJECT_NAME = "Inline Images List Test Project";
+    private final static String IMPORT_PROJECT_NAME = "Inline Images List Import Test Project";
+
+    protected final static String LIST_NAME = TestDataGenerator.randomDomainName("InlineImagesList", DomainUtils.DomainKind.IntList);
+    // list key name has a smaller max length than other field names, so we use a constant numEndChars and exclude the repeat and all chars placeholders
+    protected final static String LIST_KEY_NAME = TestDataGenerator.randomFieldName("Key" + ALL_CHARS_PLACEHOLDER, 0, 5, "" + ALL_CHARS_PLACEHOLDER + REPEAT_PLACEHOLDER, DomainUtils.DomainKind.IntList);
     protected final static ColumnType LIST_KEY_TYPE = ColumnType.Integer;
 
-    protected final static String LIST_ATTACHMENT01_NAME = "Attachment01";
+    protected final static String LIST_ATTACHMENT01_NAME = TestDataGenerator.randomFieldName("Attachment01", null, DomainUtils.DomainKind.IntList);
     protected final static String LIST_ATTACHMENT01_LABEL = "Attachment Column 01";
     protected final static String LIST_ATTACHMENT01_DESC = "An 1st attachment column.";
 
-    protected final static String LIST_ATTACHMENT02_NAME = "Attachment02";
+    protected final static String LIST_ATTACHMENT02_NAME = TestDataGenerator.randomFieldName("Attachment02", null, DomainUtils.DomainKind.IntList);
     protected final static String LIST_ATTACHMENT02_LABEL = "Attachment Column 02";
     protected final static String LIST_ATTACHMENT02_DESC = "An 2nd attachment column.";
 
@@ -98,7 +112,7 @@ public class InlineImagesListTest extends BaseWebDriverTest
     @Override
     protected String getProjectName()
     {
-        return "InlineImagesListTestProject";
+        return PROJECT_NAME;
     }
 
     @Override
@@ -110,7 +124,8 @@ public class InlineImagesListTest extends BaseWebDriverTest
     @Override
     public void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        _containerHelper.deleteProject(getProjectName(), afterTest);
+        _containerHelper.deleteProject(PROJECT_NAME, afterTest);
+        _containerHelper.deleteProject(IMPORT_PROJECT_NAME, afterTest);
     }
 
     @Before
@@ -122,7 +137,7 @@ public class InlineImagesListTest extends BaseWebDriverTest
     @BeforeClass
     public static void initTest()
     {
-        InlineImagesListTest init = (InlineImagesListTest)getCurrentTest();
+        InlineImagesListTest init = getCurrentTest();
         init.doInit();
     }
 
@@ -132,7 +147,7 @@ public class InlineImagesListTest extends BaseWebDriverTest
     }
 
     @Test
-    public final void ListTest() throws Exception
+    public final void testList() throws Exception
     {
         DataRegionTable list;
         DataRegionExportHelper exportHelper;
@@ -325,6 +340,69 @@ public class InlineImagesListTest extends BaseWebDriverTest
             assertTrue("Height of row 1 not in expected range (" + ROW_HEIGHT_LARGE_LBOUND + " to " + ROW_HEIGHT_LARGE_UBOUND + "). Actual height: " + sheet.getRow(1).getHeight(), (sheet.getRow(1).getHeight() > ROW_HEIGHT_LARGE_LBOUND) && (sheet.getRow(1).getHeight() < ROW_HEIGHT_LARGE_UBOUND));
             assertTrue("Height of row 2 not in expected range (" + ROW_HEIGHT_SMALL_LBOUND + " to " + ROW_HEIGHT_SMALL_UBOUND + "). Actual height: " + sheet.getRow(2).getHeight(), (sheet.getRow(2).getHeight() > ROW_HEIGHT_SMALL_LBOUND) && (sheet.getRow(2).getHeight() < ROW_HEIGHT_SMALL_UBOUND));
             assertTrue("Height of row 3 not in expected range (" + ROW_HEIGHT_TEXT_LBOUND + " to " + ROW_HEIGHT_TEXT_UBOUND + "). Actual height: " + sheet.getRow(3).getHeight(), (sheet.getRow(3).getHeight() > ROW_HEIGHT_TEXT_LBOUND) && (sheet.getRow(3).getHeight() < ROW_HEIGHT_TEXT_UBOUND));
+        }
+
+        log("Verify list archive export/import can round trip attachment successfully");
+        ManageListsGrid listsGrid = BeginPage.beginAt(this, getProjectName()).getGrid();
+        listsGrid.checkAllOnPage();
+        File listArchive = listsGrid.exportSelectedLists();
+
+        _containerHelper.createProject(IMPORT_PROJECT_NAME);
+
+        BeginPage.beginAt(this, IMPORT_PROJECT_NAME).importListArchive(listArchive);
+        _listHelper.goToList(LIST_NAME);
+
+        // Validate that list is imported as expected with attachments
+        assertElementPresent("Did not find the expected number of icons for images for " + LRG_PNG_FILE.getName(), Locator.xpath("//img[contains(@title, '" + LRG_PNG_FILE.getName() + "')]"), 1);
+        assertElementPresent("Did not find the expected number of icons for images for " + JPG01_FILE.getName(), Locator.xpath("//img[contains(@title, '" + JPG01_FILE.getName() + "')]"), 1);
+        assertElementPresent("Did not find the expected number of icons for images for " + PDF_FILE.getName(), Locator.xpath("//img[contains(@src, 'pdf.gif')]"), 1);
+        assertElementPresent("Did not find the expected text for " + PDF_FILE.getName(), Locator.xpath("//a[contains(text(), '" + PDF_FILE.getName() + "')]"), 1);
+
+        // Issue 53498: reject string attachment values for import
+        ImportDataPage listImportPage = _listHelper.clickImportData();
+        importFilePathError(listImportPage, "5", "absent.txt");
+        importFilePathError(listImportPage, "5", PDF_FILE.getName());
+        importFilePathError(listImportPage, "5", "123");
+        listImportPage.setCopyPasteMerge(false, true);
+        importFilePathError(listImportPage, "1", "absent.txt");
+        importFilePathError(listImportPage, "1", PDF_FILE.getName());
+        importFilePathError(listImportPage, "1", "true");
+        listImportPage.setCopyPasteMerge(true, true);
+        importFilePathError(listImportPage, "1", "absent.txt");
+        importFilePathError(listImportPage, "1", PDF_FILE.getName());
+        importFilePathError(listImportPage, "5", PDF_FILE.getName());
+
+        String attachmentError = "Can't upload '%s' to field %s with type Attachment.";
+        String attachmentPdfError = String.format(attachmentError, PDF_FILE.getName(), LIST_ATTACHMENT01_NAME);
+        String attachmentAbsentError = String.format(attachmentError, "Absent.txt", LIST_ATTACHMENT01_NAME);
+        verifyQueryAPI("lists", LIST_NAME, Map.of(LIST_KEY_NAME, 5, LIST_ATTACHMENT01_NAME, PDF_FILE.getName()), true, "Row 1: " + attachmentPdfError);
+        verifyQueryAPI("lists", LIST_NAME, Map.of(LIST_KEY_NAME, 5, LIST_ATTACHMENT01_NAME, "Absent.txt"), true, "Row 1: " + attachmentAbsentError);
+        verifyQueryAPI("lists", LIST_NAME, Map.of(LIST_KEY_NAME, 5, LIST_ATTACHMENT01_NAME, 123), true, "Row 1: " + String.format(attachmentError, "123", LIST_ATTACHMENT01_NAME));
+        verifyQueryAPI("lists", LIST_NAME, Map.of(LIST_KEY_NAME, 5, LIST_ATTACHMENT01_NAME, 123.456), true, "Row 1: " + String.format(attachmentError, "123.456", LIST_ATTACHMENT01_NAME));
+        verifyQueryAPI("lists", LIST_NAME, Map.of(LIST_KEY_NAME, 5, LIST_ATTACHMENT01_NAME, true), true, "Row 1: " + String.format(attachmentError, "true", LIST_ATTACHMENT01_NAME));
+        verifyQueryAPI("lists", LIST_NAME, Map.of(LIST_KEY_NAME, 1, LIST_ATTACHMENT01_NAME, PDF_FILE.getName()), false, attachmentPdfError);
+        verifyQueryAPI("lists", LIST_NAME, Map.of(LIST_KEY_NAME, 1, LIST_ATTACHMENT01_NAME, "Absent.txt"), false, attachmentAbsentError);
+        verifyQueryAPI("lists", LIST_NAME, Map.of(LIST_KEY_NAME, 1, LIST_ATTACHMENT01_NAME, 123), false, String.format(attachmentError, "123", LIST_ATTACHMENT01_NAME));
+        verifyQueryAPI("lists", LIST_NAME, Map.of(LIST_KEY_NAME, 1, LIST_ATTACHMENT01_NAME, 123.456), false, String.format(attachmentError, "123.456", LIST_ATTACHMENT01_NAME));
+        verifyQueryAPI("lists", LIST_NAME, Map.of(LIST_KEY_NAME, 1, LIST_ATTACHMENT01_NAME, true), false, String.format(attachmentError, "true", LIST_ATTACHMENT01_NAME));
+        verifyQueryAPI("lists", LIST_NAME, Map.of(LIST_KEY_NAME, 1, LIST_ATTACHMENT01_NAME, ""/*can remove attachment*/), false);
+    }
+
+    private void importFilePathError(ImportDataPage listImportPage, String key, String attachmentValue)
+    {
+        String pasteData = TestDataUtils.tsvStringFromRowMaps(List.of(Map.of(LIST_KEY_NAME, key, LIST_ATTACHMENT01_NAME, attachmentValue)),
+                List.of(LIST_KEY_NAME, LIST_ATTACHMENT01_NAME), true);
+        log(pasteData);
+        listImportPage.setText(pasteData);
+        listImportPage.submitExpectingError();
+        try
+        {
+            String expectedError = "Row 1: Can't upload '" + attachmentValue + "' to field " + LIST_ATTACHMENT01_NAME + " with type Attachment.";
+            checker().withScreenshot("import_error").verifyTrue("Invalid attachment error not as expected", isElementPresent(Locator.tagWithClass("div", "labkey-error").withText(expectedError)));
+        }
+        catch(NoSuchElementException nse)
+        {
+            checker().error("Invalid attachment error not present.");
         }
     }
 }

@@ -33,8 +33,8 @@ public class PasswordUtil
 
     private static class Credentials
     {
-        private String _username;
-        private String _password;
+        private final String _username;
+        private final String _password;
         public Credentials(String username, String password)
         {
             _username = username;

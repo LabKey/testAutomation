@@ -1,11 +1,13 @@
 package org.labkey.test.tests;
 
+import org.assertj.core.api.Assertions;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.ChartTypeDialog;
 import org.labkey.test.components.CustomizeView;
@@ -18,9 +20,11 @@ import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
 import org.labkey.test.util.TestDataGenerator;
 import org.labkey.test.util.exp.SampleTypeAPIHelper;
+import org.labkey.test.util.search.SearchAdminAPIHelper;
 import org.openqa.selenium.WebElement;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -58,7 +62,7 @@ public class SampleTypeRenameTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject() throws IOException, CommandException
     {
-        SampleTypeRenameTest init = (SampleTypeRenameTest) getCurrentTest();
+        SampleTypeRenameTest init = getCurrentTest();
         init.doSetup();
     }
 
@@ -81,6 +85,58 @@ public class SampleTypeRenameTest extends BaseWebDriverTest
         testDataGenerator.addCustomRow(Map.of(FIELD_STR, "B", FIELD_INT, 25));
         testDataGenerator.addCustomRow(Map.of(FIELD_STR, "C", FIELD_INT, 30));
         testDataGenerator.insertRows();
+    }
+
+    // Issue 51979: BadSqlGrammarException indexing sample types immediately after a field rename
+    @Test
+    public void testSampleTypeFieldRename() throws IOException, CommandException
+    {
+        final String sampleTypeName = "SampleTypeWithFieldRename" + FieldDefinition.DOMAIN_TRICKY_CHARACTERS;
+        SampleTypeDefinition sampleTypeDefinition = new SampleTypeDefinition(sampleTypeName);
+        sampleTypeDefinition.setNameExpression("S-FieldRename-${int}");
+        sampleTypeDefinition.addField(new FieldDefinition(FIELD_INT, FieldDefinition.ColumnType.Integer));
+
+        log("Give the sample type some data, will be used to create a chart.");
+        TestDataGenerator testDataGenerator = SampleTypeAPIHelper.createEmptySampleType(getCurrentContainerPath(), sampleTypeDefinition);
+        int intVal = 1000;
+        for (int i = 0; i < 1000; i++)
+            testDataGenerator.addCustomRow(Map.of(FIELD_INT, intVal++));
+        testDataGenerator.insertRows();
+
+        SearchAdminAPIHelper.waitForIndexer();
+
+        goToProjectHome();
+        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
+        UpdateSampleTypePage updatePage = sampleHelper.goToEditSampleType(sampleTypeName);
+        updatePage.getFieldsPanel().getField(FIELD_INT).setName(FIELD_INT + " Updated");
+        updatePage.setNameExpression("S-${genId}");
+        updatePage.clickSave();
+
+        //Issue 51979: BadSqlGrammarException indexing sample types immediately after a field rename
+        // This issue has been fixed in Postgres but continues to fail in MSSQL. Many attempts were made to fix in
+        // MSSQL, but it was decided not to spend any more time on it (for MSSQL).
+        // Only do these other "rapid fire" updates if on Postgre.
+        if (WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.PostgreSQL)
+        {
+            goToProjectHome();
+            updatePage = sampleHelper.goToEditSampleType(sampleTypeName);
+            updatePage.getFieldsPanel().getField(FIELD_INT + " Updated").setName(FIELD_INT + " 2nd update");
+            updatePage.clickSave();
+            goToProjectHome();
+            updatePage = sampleHelper.goToEditSampleType(sampleTypeName);
+            updatePage.getFieldsPanel().getField(FIELD_INT + " 2nd update").setName(FIELD_INT + " 3rd");
+            updatePage.clickSave();
+        }
+
+        SearchAdminAPIHelper.waitForIndexer();
+
+        var searchResultPage = navBar().search("S-FieldRename-1999");
+        checker().withScreenshot("Search by sample name after field renaming").awaiting(Duration.ofSeconds(2),
+                ()-> Assertions.assertThat(searchResultPage.hasResultLocatedBy(Locator.linkWithText("Sample - S-FieldRename-1999"))).isTrue());
+
+        var searchResultPage2 = navBar().search("1599");
+        checker().withScreenshot("Search by int value after field renaming").awaiting(Duration.ofSeconds(2),
+                ()-> Assertions.assertThat(searchResultPage2.hasResultLocatedBy(Locator.linkWithText("Sample - S-FieldRename-1599"))).isTrue());
     }
 
     @Test

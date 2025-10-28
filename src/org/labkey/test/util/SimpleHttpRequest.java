@@ -19,6 +19,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.labkey.remoteapi.Connection;
+import org.labkey.test.TestFileUtils;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.WebDriver;
 
@@ -219,18 +220,23 @@ public class SimpleHttpRequest
         }
     }
 
+    public File getResponseAsFile() throws IOException
+    {
+        return getResponseAsFile(TestFileUtils.ensureTestTempDir());
+    }
+
     private void useCopiedSession(HttpURLConnection con)
     {
         StringBuilder cookieString = new StringBuilder();
-        for (Map.Entry cookie : _cookies.entrySet())
+        for (Map.Entry<String, String> cookie : _cookies.entrySet())
         {
             if (cookie.getKey().equals(Connection.X_LABKEY_CSRF))
-                con.setRequestProperty((String)cookie.getKey(), (String)cookie.getValue());
+                con.setRequestProperty(cookie.getKey(), cookie.getValue());
 
             if (cookie.getKey().equals(Connection.JSESSIONID))
-                con.setRequestProperty((String)cookie.getKey(), (String)cookie.getValue());
+                con.setRequestProperty(cookie.getKey(), cookie.getValue());
 
-            if (cookieString.length() > 0)
+            if (!cookieString.isEmpty())
                 cookieString.append("; ");
 
             cookieString.append(cookie.getKey());

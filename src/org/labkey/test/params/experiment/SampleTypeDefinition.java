@@ -6,6 +6,7 @@ import org.labkey.remoteapi.domain.PropertyDescriptor;
 import org.labkey.test.components.ui.domainproperties.samples.SampleTypeDesigner;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.property.DomainProps;
+import org.labkey.test.util.DomainUtils.DomainKind;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,8 +14,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import static org.labkey.test.util.exp.SampleTypeAPIHelper.SAMPLE_TYPE_DOMAIN_KIND;
 
 /**
  * Defines a Sample Type. Suitable for use with UI and API helpers.
@@ -30,10 +29,10 @@ public class SampleTypeDefinition extends DomainProps
     private List<FieldDefinition> _fields = new ArrayList<>();
     private Map<String, String> _parentAliases = new HashMap<>();
     // Indicates which parent aliases reference 'exp.dataInputs' instead of 'exp.materialInputs'
-    private Set<String> _dataParentAliases = new HashSet<>();
+    private final Set<String> _dataParentAliases = new HashSet<>();
 
     // Currently, these values are only used by the SampleManager module.
-    private MetricUnit _inventoryMetricUnit;
+    private InventoryMetricUnit _inventoryMetricUnit;
     private String _labelColor;
     private String _aliquotNameExpression;
 
@@ -97,12 +96,12 @@ public class SampleTypeDefinition extends DomainProps
         return this;
     }
 
-    protected MetricUnit getInventoryMetricUnit()
+    protected InventoryMetricUnit getInventoryMetricUnit()
     {
         return _inventoryMetricUnit;
     }
 
-    protected SampleTypeDefinition setInventoryMetricUnit(MetricUnit inventoryMetricUnit)
+    public SampleTypeDefinition setInventoryMetricUnit(InventoryMetricUnit inventoryMetricUnit)
     {
         _inventoryMetricUnit = inventoryMetricUnit;
         return this;
@@ -186,6 +185,17 @@ public class SampleTypeDefinition extends DomainProps
         return addParentAlias(columnName, SampleTypeDesigner.CURRENT_SAMPLE_TYPE);
     }
 
+
+    public FieldDefinition getFieldByNamePart(String namePart)
+    {
+        for (FieldDefinition field : _fields)
+        {
+            if (field.isNamePartMatch(namePart))
+                return field;
+        }
+        throw new IllegalArgumentException("No field found with name part: " + namePart);
+    }
+
     /*
     DomainProps
      */
@@ -206,7 +216,7 @@ public class SampleTypeDefinition extends DomainProps
     @Override
     protected String getKind()
     {
-        return SAMPLE_TYPE_DOMAIN_KIND;
+        return DomainKind.SampleSet.name();
     }
 
     @NotNull

@@ -252,36 +252,6 @@ public class BaseSettingsPage extends LabKeyPage<BaseSettingsPage.ElementCache>
         setFormElement(elementCache().defaultNumberFormat, numberFormat);
     }
 
-    public String getAdditionalParsingPatternDates()
-    {
-        return getFormElement(elementCache().additionalParsingPatternDates);
-    }
-
-    public void setAdditionalParsingPatternDates(String pattern)
-    {
-        setFormElement(elementCache().additionalParsingPatternDates, pattern);
-    }
-
-    public String getAdditionalParsingPatternDateAndTime()
-    {
-        return getFormElement(elementCache().additionalParsingPatternDateAndTime);
-    }
-
-    public void setAdditionalParsingPatternDateAndTime(String pattern)
-    {
-        setFormElement(elementCache().additionalParsingPatternDateAndTime, pattern);
-    }
-
-    public String getAdditionalParsingPatternTimes()
-    {
-        return getFormElement(elementCache().additionalParsingPatternTimes);
-    }
-
-    public void setAdditionalParsingPatternTimes(String pattern)
-    {
-        setFormElement(elementCache().additionalParsingPatternTimes, pattern);
-    }
-
     public void setRestrictChartingCols(boolean restrict)
     {
         if (restrict)
@@ -374,13 +344,6 @@ public class BaseSettingsPage extends LabKeyPage<BaseSettingsPage.ElementCache>
         }
 
         WebElement defaultNumberFormat = Locator.inputByNameContaining("defaultNumberFormat").findWhenNeeded(this);
-        // TODO: remove the next three (additionalParsingPattern*) once feature is removed.
-        // They are used only by ParsingPatternForDateTest.
-        // Until then these will only appear on the page if the "extraDateTimeParsingPatterns" deprecated feature is enabled.
-        WebElement additionalParsingPatternDates = Locator.inputByNameContaining("extraDateParsingPattern").findWhenNeeded(this);
-        WebElement additionalParsingPatternTimes = Locator.inputByNameContaining("extraTimeParsingPattern").findWhenNeeded(this);
-        WebElement additionalParsingPatternDateAndTime = Locator.inputByNameContaining("extraDateTimeParsingPattern").findWhenNeeded(this);
-
         WebElement restrictChartingColsChk = Locator.checkboxByName("restrictedColumnsEnabled").findWhenNeeded(this);
         WebElement altLoginPageTxt = Locator.inputById("customLogin").findWhenNeeded(this);
         WebElement saveBtn = Locator.lkButton("Save").findWhenNeeded(this);

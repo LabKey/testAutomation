@@ -176,7 +176,6 @@ public abstract class DataLoader implements Iterable<Map<String, Object>>, Loade
      * Most useful if maps are being returned, otherwise use inferColumnInfo(reader, clazz) to
      * use properties of a bean instead.
      *
-     * @throws java.io.IOException
      */
     @SuppressWarnings({"ConstantConditions"})
     private void inferColumnInfo() throws IOException
@@ -321,7 +320,7 @@ public abstract class DataLoader implements Iterable<Map<String, Object>>, Loade
 
         private Object[] _fields = null;
         private Map<String, Object> _values = null;
-        private int _lineNum = 0;
+        private int _lineNum;
         private boolean _closed = false;
 
 
@@ -337,7 +336,7 @@ public abstract class DataLoader implements Iterable<Map<String, Object>>, Loade
                 if (column.load)
                     active.add(column);
 
-            _activeColumns = active.toArray(new ColumnDescriptor[active.size()]);
+            _activeColumns = active.toArray(new ColumnDescriptor[0]);
             ArrayListMap.FindMap<String> colMap = new ArrayListMap.FindMap<>(new CaseInsensitiveHashMap<>());
 
             for (int i = 0; i < _activeColumns.length; i++)
