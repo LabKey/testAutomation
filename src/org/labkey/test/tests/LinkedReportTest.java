@@ -8,6 +8,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.Daily;
+import org.labkey.test.util.WebServicesUtil;
 
 import java.util.List;
 
@@ -53,7 +54,10 @@ public class LinkedReportTest extends BaseWebDriverTest
         waitAndClick(Locator.linkWithText(REPORT_NAME));
         switchToWindow(1);
 
-        waitForElement(Locator.linkWithText("Get a Demo"));
+        if (!WebServicesUtil.isLabKeyDotOrgMaintenance(getDriver()))
+        {
+            waitForElement(Locator.linkWithText("Get a Demo"));
+        }
         Assert.assertEquals("Linked report navigated to incorrect external link", LINK_REPORT_URL, getDriver().getCurrentUrl());
     }
 }
