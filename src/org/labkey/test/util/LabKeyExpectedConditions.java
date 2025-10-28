@@ -23,6 +23,7 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.NoSuchWindowException;
 import org.openqa.selenium.Point;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -178,6 +179,42 @@ public class LabKeyExpectedConditions
             public String toString()
             {
                 return staleCheck + " after clicking";
+            }
+        };
+    }
+
+    /**
+     * An expectation for checking child WebElement as a part of parent element to be visible
+     *
+     * @param childLocator used to find the child element. For example, {@code Locator.css("tr > td")}
+     * @param context      used as the search context. For example, table with {@code Locator.tag("table")}
+     * @return visible sub-element
+     */
+    public static ExpectedCondition<WebElement> visibilityOf(By childLocator, SearchContext context)
+    {
+        return new ExpectedCondition<>()
+        {
+            @Override
+            public WebElement apply(WebDriver webDriver)
+            {
+                try
+                {
+                    WebElement element = context.findElement(childLocator);
+                    if (element.isDisplayed())
+                        return element;
+                    else
+                        return null;
+                }
+                catch (NoSuchElementException | StaleElementReferenceException ex)
+                {
+                    return null;
+                }
+            }
+
+            @Override
+            public String toString()
+            {
+                return "visibility of element located by %s -> %s".formatted(context, childLocator);
             }
         };
     }

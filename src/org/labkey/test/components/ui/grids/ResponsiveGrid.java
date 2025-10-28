@@ -4,6 +4,7 @@
  */
 package org.labkey.test.components.ui.grids;
 
+import org.awaitility.Awaitility;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.remoteapi.query.Filter;
 import org.labkey.test.Locator;
@@ -17,6 +18,7 @@ import org.labkey.test.components.react.ReactCheckBox;
 import org.labkey.test.components.ui.grids.FieldReferenceManager.FieldReference;
 import org.labkey.test.components.ui.search.FilterExpressionPanel;
 import org.labkey.test.params.FieldKey;
+import org.labkey.test.util.LabKeyExpectedConditions;
 import org.labkey.test.util.selenium.WebElementUtils;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NotFoundException;
@@ -26,6 +28,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -325,13 +328,13 @@ public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverCompon
         // Use getDriver() because the grid menus are rendered in a "react portal" at the end of the HTML body, so they
         // are totally detached from the rest of the grid.
         WebElement menu = Locator.css("ul.grid-header-cell__dropdown-menu.open").findWhenNeeded(getDriver());
-        WebElement menuItem = Locator.css("li > a").containing(menuText).findWhenNeeded(menu);
-        waitFor(menuItem::isDisplayed, 1000);
+        WebElement menuItem = getWrapper().quickWait().until(LabKeyExpectedConditions
+            .visibilityOf(Locator.css("li > a").containing(menuText), menu));
         if (waitForUpdate)
             doAndWaitForUpdate(menuItem::click);
         else
             menuItem.click();
-        waitFor(()-> !menuItem.isDisplayed(), 1000);
+        getWrapper().quickWait().until(ExpectedConditions.invisibilityOf(menuItem));
     }
 
     /**
@@ -357,20 +360,16 @@ public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverCompon
                 .keyUp(Keys.SHIFT)
                 .perform();
 
-        // Enter the new text.
-        textEdit.sendKeys(newColumnLabel, Keys.RETURN);
+        doAndWaitForUpdate(()-> {
+            textEdit.sendKeys(newColumnLabel, Keys.RETURN);
 
-        getWrapper().shortWait()
+            getWrapper().shortWait()
                 .withMessage("Column label edit text box did not go away.")
                 .until(ExpectedConditions.stalenessOf(textEdit));
 
-        doAndWaitForUpdate(()->
-                WebDriverWrapper.waitFor(()-> WebElementUtils.getTextContent(headerCell).equals(newColumnLabel),
-                        "Column header not updated.", 1_000)
-        );
-        waitForLoaded();
-        clearElementCache();
-
+            Awaitility.await().atMost(Duration.ofSeconds(1)).untilAsserted(() -> assertEquals("Column label",
+                newColumnLabel, WebElementUtils.getTextContent(headerCell)));
+        });
     }
 
     /**
