@@ -6,4 +6,4 @@ run.output.file = runDataFile.props[4];
 
 run.data = read.delim(run.data.file, header=TRUE, sep="\t", quote="", check.names=FALSE);
 run.data$TransformType = "${transformOperation}";
-write.table(run.data, file=run.output.file, sep="\t", na="", row.names=FALSE, quote=FALSE);
+write.table(run.data, file=run.output.file, sep="\t", na="", row.names=FALSE, quote=TRUE, qmethod="double");
