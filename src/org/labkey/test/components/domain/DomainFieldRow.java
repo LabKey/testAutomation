@@ -1252,6 +1252,12 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         return this;
     }
 
+    public List<String> getAvailableSampleTypes()
+    {
+        expand();
+        return elementCache().getLookupSampleTypeSelect().getOptions().stream().map(WebElement::getText).collect(Collectors.toList());
+    }
+
     public DomainFieldRow setAliquotOption(ExpSchema.DerivationDataScopeType option)
     {
         expand();
