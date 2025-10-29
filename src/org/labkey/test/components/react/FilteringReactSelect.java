@@ -53,7 +53,7 @@ public class FilteringReactSelect extends BaseReactSelect<FilteringReactSelect>
         scrollIntoView();
         open();
 
-        var elementToClick = ReactSelect.Locators.options.containing(optionText);
+        var elementToClick = Locators.option.containing(optionText);
         var elementToWaitFor = getValueLabelLocator().containing(selectedOptionLabel);
 
         List<WebElement> options = setFilter(value);
@@ -121,43 +121,34 @@ public class FilteringReactSelect extends BaseReactSelect<FilteringReactSelect>
     {
         waitForReady();
         scrollIntoView();
-        WebElement success = null;
-        int tryCount = 0;
-        while (null == success && tryCount < 6)
-        {
-            tryCount++;
-            open();
+        open();
 
-            if (isMulti() || hasValue())
+        if (isMulti() || hasValue())
+            sleep(250);
+        setFilter(value);
+
+        WebElement elemToClick = Locator.waitForAnyElement(getWrapper().shortWait(),
+            Locators.option.withDescendant(Locator.tagWithText("strong", value)), // Exact match
+            Locators.option.containing(value));
+
+        log("clicking item with value [" + value + "]");
+        getWrapper().scrollIntoView(elemToClick);
+
+        WebDriverWrapper.waitFor(() -> {
+            try
+            {
+                if (isExpanded())
+                    elemToClick.click();
                 sleep(250);
-            setFilter(value);
+                return !isExpanded();
+            }
+            catch (StaleElementReferenceException retry)
+            {
+                return false;
+            }
+        }, "failed to select item " + elemToClick.getAttribute("class") + " by clicking", WAIT_FOR_JAVASCRIPT);
 
-            WebElement elemToClick = Locator.waitForAnyElement(
-                    new FluentWait<SearchContext>(getComponentElement()).withTimeout(Duration.ofMillis(WAIT_FOR_JAVASCRIPT)),
-                    Locators.options.containing(value));
-
-            log("clicking item with value [" +value+"]");
-            getWrapper().scrollIntoView(elemToClick);
-
-            WebDriverWrapper.waitFor(()-> {
-                try
-                {
-                    if (isExpanded())
-                        elemToClick.click();
-                    sleep(250);
-                    return !isExpanded();
-                }
-                catch (StaleElementReferenceException retry)
-                {
-                    return false;
-                }
-            },"failed to select item "+ elemToClick.getAttribute("class")  +" by clicking", WAIT_FOR_JAVASCRIPT);
-
-            success = elementToWaitFor.findElement(getComponentElement());
-        }
-
-        if (success == null)
-            log("Expected selection was not found. Selected value(s) are:" + getSelections());
+        elementToWaitFor.findElement(getComponentElement());
 
         close();
         return this;
