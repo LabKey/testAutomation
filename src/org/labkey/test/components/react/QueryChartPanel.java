@@ -5,6 +5,7 @@ import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.components.ui.grids.QueryGrid;
+import org.labkey.test.components.ui.grids.ResponsiveGrid;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -53,6 +54,13 @@ public class QueryChartPanel extends WebDriverComponent<QueryChartPanel.ElementC
     public WebElement getSvgChart()
     {
         return Locator.byClass("svg-chart__chart").childTag("svg").waitForElement(this, WAIT_FOR_JAVASCRIPT);
+    }
+
+    public ResponsiveGrid<?> getCurveStatsGrid()
+    {
+        return new ResponsiveGrid.ResponsiveGridFinder(getDriver())
+                .inParentWithClass("curve-fit-statistics")
+                .waitFor(this);
     }
 
     public QueryGrid clickClose()
