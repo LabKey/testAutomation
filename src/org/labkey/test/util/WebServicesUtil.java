@@ -15,10 +15,14 @@
  */
 package org.labkey.test.util;
 
+import org.openqa.selenium.WebDriver;
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.URL;
+import java.util.Objects;
 
 import static org.junit.Assert.assertTrue;
 
@@ -90,5 +94,28 @@ public class WebServicesUtil
         Socket socket = new Socket();
         socket.connect(new InetSocketAddress(hostIp, port), 2000);
         return socket;
+    }
+
+    /**
+     * Checks whether the current page is the maintenance page for labkey.org.
+     * This is usually indicated by a {@code 502}-{@code 504} status code.
+     * Allows tests that check links to labkey.org to not fail during maintenance periods.
+     *
+     * @param driver The WebDriver instance to check
+     * @return true if the current page is the maintenance page for labkey.org, false otherwise.
+     */
+    public static boolean isLabKeyDotOrgMaintenance(WebDriver driver)
+    {
+        try
+        {
+            URL url = new URL(Objects.requireNonNull(driver.getCurrentUrl()));
+            String title = driver.getTitle();
+            int responseCode = Integer.parseInt(Objects.requireNonNull(title).substring(0, 3));
+            return url.getHost().endsWith("labkey.org") && 502 <= responseCode && responseCode <= 504;
+        }
+        catch (Exception e)
+        {
+            return false;
+        }
     }
 }

@@ -32,6 +32,7 @@ import org.labkey.test.util.APIContainerHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.URLBuilder;
+import org.labkey.test.util.WebServicesUtil;
 import org.openqa.selenium.WebElement;
 
 import java.io.IOException;
@@ -764,6 +765,7 @@ public class NonStandardDateAndTimeFormatTest extends BaseWebDriverTest
                 WebElement banner = Locator.tagWithText("h3", "Date & Number Display Formats").refindWhenNeeded(getDriver());
                 checker().withScreenshot()
                         .verifyTrue("'Click here' link did not navigate as expected.",
+                            WebServicesUtil.isLabKeyDotOrgMaintenance(getDriver()) ||
                                 waitFor(banner::isDisplayed, 1_000));
                 closeExtraWindows();
             }
