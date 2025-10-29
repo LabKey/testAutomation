@@ -4,17 +4,15 @@
  */
 package org.labkey.test.components.react;
 
+import org.jetbrains.annotations.Nullable;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.FluentWait;
 
-import java.time.Duration;
 import java.util.List;
 
 import static org.labkey.test.BaseWebDriverTest.WAIT_FOR_JAVASCRIPT;
@@ -117,7 +115,7 @@ public class FilteringReactSelect extends BaseReactSelect<FilteringReactSelect>
 
     /* for use with editable instances of a reactSelect, where the options aren't shown
        unless type-ahead filter information is keyed in first */
-    public FilteringReactSelect filterSelect(String value, Locator elementToWaitFor)
+    public FilteringReactSelect filterSelect(String value, @Nullable Locator elementToWaitFor)
     {
         waitForReady();
         scrollIntoView();
@@ -148,7 +146,8 @@ public class FilteringReactSelect extends BaseReactSelect<FilteringReactSelect>
             }
         }, "failed to select item " + elemToClick.getAttribute("class") + " by clicking", WAIT_FOR_JAVASCRIPT);
 
-        elementToWaitFor.findElement(getComponentElement());
+        if (elementToWaitFor != null)
+            elementToWaitFor.findElement(getComponentElement());
 
         close();
         return this;
