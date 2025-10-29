@@ -100,6 +100,7 @@ public class AuditLogHelper
         PLATE_DATA_AUDIT_EVENT("PlateDataAuditEvent"), // available in Biologics module
         PLATE_SET_AUDIT_EVENT("PlateSetEvent"), // available in Biologics module
         QUERY_UPDATE_AUDIT_EVENT("QueryUpdateAuditEvent"),
+        SAMPLE_SET_AUDIT_EVENT("SampleSetAuditEvent"),
         SAMPLE_TIMELINE_EVENT("SampleTimelineEvent"),
         SAMPLE_WORKFLOW_AUDIT_EVENT("SamplesWorkflowAuditEvent"),
         SOURCES_AUDIT_EVENT("SourcesAuditEvent"),
