@@ -98,7 +98,7 @@ public class WebServicesUtil
 
     /**
      * Checks whether the current page is the maintenance page for labkey.org.
-     * This is usually indicated by a 502 response code but we will accept any 5xx response.
+     * This is usually indicated by a {@code 502}-{@code 504} status code.
      * Allows tests that check links to labkey.org to not fail during maintenance periods.
      *
      * @param driver The WebDriver instance to check
@@ -111,7 +111,7 @@ public class WebServicesUtil
             URL url = new URL(Objects.requireNonNull(driver.getCurrentUrl()));
             String title = driver.getTitle();
             int responseCode = Integer.parseInt(Objects.requireNonNull(title).substring(0, 3));
-            return url.getHost().endsWith("labkey.org") && responseCode >= 500 && responseCode < 600;
+            return url.getHost().endsWith("labkey.org") && 502 <= responseCode && responseCode <= 504;
         }
         catch (Exception e)
         {
