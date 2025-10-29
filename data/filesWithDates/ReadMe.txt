@@ -1,0 +1,2 @@
+Files in this directory have dates that are of interest to DayLight Savings Time and British Summer Time (BST).
+I'm not sure that this will work as hoped but want to start collecting files while in DST / BST.

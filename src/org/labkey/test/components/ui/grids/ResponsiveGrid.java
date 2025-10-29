@@ -4,6 +4,7 @@
  */
 package org.labkey.test.components.ui.grids;
 
+import org.awaitility.Awaitility;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.remoteapi.query.Filter;
 import org.labkey.test.Locator;
@@ -26,6 +27,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -66,10 +68,10 @@ public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverCompon
     public Boolean isLoaded()
     {
         return getComponentElement().isDisplayed() &&
-                (!Locators.loadingGrid.existsIn(this) &&
+                !Locators.loadingGrid.existsIn(this) &&
                 !Locators.spinner.existsIn(this) &&
-                Locator.tag("td").existsIn(this)) ||
-                getGridEmptyMessage().isPresent();
+            (Locator.tag("td").existsIn(this) ||
+                getGridEmptyMessage().isPresent());
     }
 
     protected void waitForLoaded()
@@ -357,20 +359,16 @@ public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverCompon
                 .keyUp(Keys.SHIFT)
                 .perform();
 
-        // Enter the new text.
-        textEdit.sendKeys(newColumnLabel, Keys.RETURN);
+        doAndWaitForUpdate(()-> {
+            textEdit.sendKeys(newColumnLabel, Keys.RETURN);
 
-        getWrapper().shortWait()
+            getWrapper().shortWait()
                 .withMessage("Column label edit text box did not go away.")
                 .until(ExpectedConditions.stalenessOf(textEdit));
 
-        doAndWaitForUpdate(()->
-                WebDriverWrapper.waitFor(()-> WebElementUtils.getTextContent(headerCell).equals(newColumnLabel),
-                        "Column header not updated.", 1_000)
-        );
-        waitForLoaded();
-        clearElementCache();
-
+            Awaitility.await().atMost(Duration.ofSeconds(1)).untilAsserted(() -> assertEquals("Column label",
+                newColumnLabel, WebElementUtils.getTextContent(headerCell)));
+        });
     }
 
     /**
@@ -788,7 +786,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverCompon
 
         try
         {
-            WebElement tr = Locator.tagWithClass("tr", "grid-empty").refindWhenNeeded(this);
+            WebElement tr = Locator.tagWithClass("tr", "grid-empty").findWhenNeeded(this);
             if (tr.isDisplayed())
             {
                 msg = Optional.of(Locator.tag("td").findElement(tr).getText());

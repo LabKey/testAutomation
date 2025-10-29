@@ -165,7 +165,7 @@ public class GridPanelTest extends GridPanelBaseTest
                             FILTER_INT_COL.getName(), TestDataGenerator.randomInt(1, INT_MAX),
                             FILTER_STRING_COL.getName(), stringSets.get(setIndex++),
                             FILTER_DATE_COL.getName(), sampleSetDataGenerator.randomDateString(DateUtils.addWeeks(new Date(), -25), new Date()),
-                            FILTER_BOOL_COL.getName(), sampleSetDataGenerator.randomBoolean())
+                            FILTER_BOOL_COL.getName(), TestDataGenerator.randomBoolean())
             );
         }
 
