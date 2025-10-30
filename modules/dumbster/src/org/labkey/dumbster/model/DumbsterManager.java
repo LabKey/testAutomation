@@ -60,53 +60,53 @@ public class DumbsterManager implements ShutdownListener
 
     public boolean start()
     {
-//        if (_server != null && !_server.isStopped())
-//        {
-//            // We're already running, no need to spin up another, but reset the list of messages
-//            _server.clearEmails();
-//            return true;
-//        }
-//
-//        int port;
-//        ServerSocket socket = null;
-//        try
-//        {
-//            socket = new ServerSocket(0);
-//            port = socket.getLocalPort();
-//        }
-//        catch (IOException e)
-//        {
-//            _log.error("Failed to open a server socket", e);
-//            return false;
-//        }
-//        finally
-//        {
-//            try
-//            {
-//                if (socket != null)
-//                    socket.close();
-//            }
-//            catch (IOException ignored) {}
-//        }
-//
-//        Properties props = new Properties();
-//        props.setProperty("mail.smtp.host", "localhost");
-//        props.setProperty("mail.smtp.user", "Anonymous");
-//        props.setProperty("mail.smtp.port", Integer.toString(port));
-//        Session session = Session.getInstance(props);
-//
-//        _log.info("Switching MailHelper to use port " + port);
-//        MailHelper.setSession(session);
-//
-//        _log.info("Connecting mail recorder to port " + port);
-//        _server = SimpleSmtpServer.start(port);
-//        if (_server.isStopped())
-//        {
-//            _log.error("Failed to connect mail recorder. Port " + port + " may be in use.");
-//            _server = null;
-//            return false;
-//        }
-//        ContextListener.addShutdownListener(this);
+        if (_server != null && !_server.isStopped())
+        {
+            // We're already running, no need to spin up another, but reset the list of messages
+            _server.clearEmails();
+            return true;
+        }
+
+        int port;
+        ServerSocket socket = null;
+        try
+        {
+            socket = new ServerSocket(0);
+            port = socket.getLocalPort();
+        }
+        catch (IOException e)
+        {
+            _log.error("Failed to open a server socket", e);
+            return false;
+        }
+        finally
+        {
+            try
+            {
+                if (socket != null)
+                    socket.close();
+            }
+            catch (IOException ignored) {}
+        }
+
+        Properties props = new Properties();
+        props.setProperty("mail.smtp.host", "localhost");
+        props.setProperty("mail.smtp.user", "Anonymous");
+        props.setProperty("mail.smtp.port", Integer.toString(port));
+        Session session = Session.getInstance(props);
+
+        _log.info("Switching MailHelper to use port " + port);
+        MailHelper.setSession(session);
+
+        _log.info("Connecting mail recorder to port " + port);
+        _server = SimpleSmtpServer.start(port);
+        if (_server.isStopped())
+        {
+            _log.error("Failed to connect mail recorder. Port " + port + " may be in use.");
+            _server = null;
+            return false;
+        }
+        ContextListener.addShutdownListener(this);
         return true;
     }
 
