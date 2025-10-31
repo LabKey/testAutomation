@@ -52,8 +52,6 @@ public class EditableModuleModule extends CodeOnlyModule
     @Override
     public void doStartup(ModuleContext moduleContext)
     {
-        // add a container listener so we'll know when our container is deleted:
-        ContainerManager.addContainerListener(new EditableModuleContainerListener());
     }
 
     @Override
