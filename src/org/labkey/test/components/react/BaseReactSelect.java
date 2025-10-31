@@ -191,7 +191,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
         elementCache().input.sendKeys(value);
         try
         {
-            var optionElement = ReactSelect.Locators.options.containing(value);
+            var optionElement = Locators.option.containing(value);
             optionElement.waitForElement(elementCache().selectMenu, 4000);
             elementCache().input.clear();
             return true;
@@ -374,7 +374,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
         // Can only get the list of items once the list has been opened.
         if (!alreadyOpened)
             open();
-        return Locators.listItems.findElements(getComponentElement());
+        return Locators.option.findElements(getComponentElement());
     }
 
     /**
@@ -391,7 +391,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
         if (!alreadyOpened)
             open();
 
-        List<WebElement> optionElements = Locators.listItems.findElements(getComponentElement());
+        List<WebElement> optionElements = Locators.option.findElements(getComponentElement());
         List<String> rawItems = optionElements.stream().map(optionMapper).toList();
 
         // If it wasn't open before close it, otherwise leave it in the open state.
@@ -486,13 +486,13 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
 
         List<WebElement> getOptions()
         {
-            return Locators.options.findElements(selectMenu);
+            return Locators.option.findElements(selectMenu);
         }
 
         @NotNull
         WebElement findOption(String option)
         {
-            return Locators.options.withText(option).findElement(selectMenu);
+            return Locators.option.withText(option).findElement(selectMenu);
         }
     }
 
@@ -504,7 +504,6 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
         }
 
         public static final Locator.XPathLocator option = Locator.tagWithClass("div", "select-input__option");
-        public static final Locator options = Locator.tagWithClass("div", "select-input__option");
         public static final Locator placeholder = Locator.tagWithClass("div", "select-input__placeholder");
         public static final Locator clear = Locator.tagWithClass("div","select-input__clear-indicator");
         public static final Locator arrow = Locator.tagWithClass("div","select-input__dropdown-indicator");
@@ -514,7 +513,6 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
         public static final Locator.XPathLocator multiValueRemove = Locator.tagWithClass("div", "select-input__multi-value__remove");
         public static final Locator.XPathLocator singleValueLabel = Locator.tagWithClass("div", "select-input__single-value");
         public static final Locator loadingSpinner = Locator.tagWithClass("span", "select-input__loading-indicator");
-        public static final Locator listItems = Locator.tagWithClass("div", "select-input__option");
         public static final Locator.XPathLocator helpBlock = Locator.tagWithClass("span", "help-block");
 
         public static Locator.XPathLocator selectContainer()
