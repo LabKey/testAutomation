@@ -103,8 +103,8 @@ public class AuditLogHelper
         SAMPLE_SET_AUDIT_EVENT("SampleSetAuditEvent"),
         SAMPLE_TIMELINE_EVENT("SampleTimelineEvent"),
         SAMPLE_WORKFLOW_AUDIT_EVENT("SamplesWorkflowAuditEvent"),
-        SOURCES_AUDIT_EVENT("SourcesAuditEvent"),
-        TRANSACTION_AUDIT_EVENT("TransactionAuditEvent"); // available with SampleManagement module
+        SOURCES_AUDIT_EVENT("SourcesAuditEvent"), // available with SampleManagement module
+        TRANSACTION_AUDIT_EVENT("TransactionAuditEvent");
 
         private final String _name;
 
