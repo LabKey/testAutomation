@@ -121,8 +121,8 @@ public class AuditLogHelper
 
     public enum TransactionDetail
     {
-        AuditEvents(),
-        ImportFileName(),
+        AuditEvents,
+        ImportFileName,
         ClientLibrary,
         Product,
         Action,
