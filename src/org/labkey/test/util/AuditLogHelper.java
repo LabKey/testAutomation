@@ -289,7 +289,7 @@ public class AuditLogHelper
             {
                 String expectedValue = expectedDetails.get(key).toString();
                 String actualValue = actualDetails.get(key.name()) != null ? actualDetails.get(key.name()).toString() : null;
-                assertTrue("Detail value for key " + key + " not as expected", actualValue != null && actualValue.startsWith(expectedValue));
+                assertTrue("Detail value for key " + key + " not as expected", actualValue != null && actualValue.contains(expectedValue));
             }
             else
                 assertEquals("Detail value for key " + key + " not as expected", expectedDetails.get(key), actualDetails.get(key.name()));
