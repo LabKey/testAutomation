@@ -126,7 +126,6 @@ public class ImportFolderPage extends LabKeyPage<ImportFolderPage.ElementCache> 
         RadioButton localZipRadio = new RadioButton.RadioButtonFinder().withLabel("Local zip archive").findWhenNeeded(this);
         RadioButton existingFolderRadio = new RadioButton.RadioButtonFinder().withLabel("Existing folder").findWhenNeeded(this);
         Checkbox validateQueriesCheckbox = Checkbox.Checkbox(Locator.input("validateQueries")).findWhenNeeded(this);
-        Checkbox advancedOptionsCheckbox = Checkbox.Checkbox(Locator.input("advancedImportOptions")).findWhenNeeded(this);
         Checkbox createSharedDatasetsCheckbox = Checkbox.Checkbox(Locator.input("createSharedDatasets")).findWhenNeeded(this);
         ComboBox sourceFolderCombo = new ComboBox.ComboBoxFinder(getDriver()).withInputNamed("sourceTemplateFolder").findWhenNeeded(this);
 

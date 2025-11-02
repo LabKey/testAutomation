@@ -24,7 +24,7 @@ import static org.labkey.test.WebDriverWrapper.waitFor;
 
 public class ReactSelect extends BaseReactSelect<ReactSelect>
 {
-    private Function<String, Locator> _optionLocFactory = Locators.options::withText;
+    private Function<String, Locator> _optionLocFactory = Locators.option::withText;
 
     public ReactSelect(WebElement element, WebDriver driver)
     {
@@ -34,6 +34,7 @@ public class ReactSelect extends BaseReactSelect<ReactSelect>
     public ReactSelect(ReactSelect wrapped)
     {
         this(wrapped.getComponentElement(), wrapped.getDriver());
+        setOptionLocator(wrapped._optionLocFactory);
     }
 
     public static ReactSelectFinder finder(WebDriver driver)
