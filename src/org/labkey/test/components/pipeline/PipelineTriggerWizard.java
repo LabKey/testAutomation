@@ -16,6 +16,10 @@
 package org.labkey.test.components.pipeline;
 
 import org.jetbrains.annotations.NotNull;
+import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.query.ContainerFilter;
+import org.labkey.remoteapi.query.Filter;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
@@ -24,11 +28,14 @@ import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.OptionSelect;
+import org.labkey.test.util.query.QueryApiHelper;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
+import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertTrue;
@@ -59,6 +66,18 @@ public class PipelineTriggerWizard extends WebDriverComponent<PipelineTriggerWiz
     {
         driver.beginAt(WebTestHelper.buildURL("pipeline", containerPath, "createPipelineTrigger", Map.of("pipelineTask", pipelineTask)));
         return new PipelineTriggerWizard(driver.getDriver());
+    }
+
+    public static void disableAllPipelineTriggers(Connection connection) throws IOException, CommandException
+    {
+        QueryApiHelper queryApiHelper = new QueryApiHelper(connection, "/", "pipeline", "TriggerConfigurations");
+        List<Map<String, Object>> triggers = queryApiHelper.selectRows(List.of("rowId", "enabled"),
+            List.of(new Filter("enabled", true)), List.of(), ContainerFilter.AllFolders).getRows();
+        if (!triggers.isEmpty())
+        {
+            triggers.forEach(trigger -> trigger.put("enabled", false));
+            queryApiHelper.updateRows(triggers);
+        }
     }
 
     @Override

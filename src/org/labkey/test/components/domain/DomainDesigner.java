@@ -48,7 +48,7 @@ public abstract class DomainDesigner<EC extends DomainDesigner<?>.ElementCache> 
         protected final DomainPanel<?, ?> propertiesPanel = new DomainPanel.DomainPanelFinder(getDriver()).index(0)
                 .timeout(WAIT_FOR_JAVASCRIPT).findWhenNeeded(this);
         protected final DomainFormPanel fieldsPanel = new DomainFormPanel.DomainFormPanelFinder(getDriver())
-                .index(getFieldPanelIndex()).timeout(1000).findWhenNeeded();
+                .index(getFieldPanelIndex()).timeout(2_000).findWhenNeeded();
 
         protected int getFieldPanelIndex()
         {

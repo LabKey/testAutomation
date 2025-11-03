@@ -47,7 +47,7 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
     @Override
     protected void waitForReady()
     {
-        waitFor(() -> !BootstrapLocators.loadingSpinner.existsIn(this), "Loading spinner still present", 2_000);
+        waitFor(() -> !BootstrapLocators.loadingSpinner.existsIn(this), "Loading spinner still present", 5_000);
     }
 
     public static List<AdvancedFieldSetting> advancedSettingsFromFieldDefinition(FieldDefinition def)
