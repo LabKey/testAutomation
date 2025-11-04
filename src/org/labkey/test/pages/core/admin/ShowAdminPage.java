@@ -251,6 +251,11 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
         clickSettingsLink("postgres locks");
     }
 
+    public void clickPostgresTableSizes()
+    {
+        clickSettingsLink("postgres table sizes");
+    }
+
     public List<WebElement> getAllAdminConsoleLinks()
     {
         goToSettingsSection();
