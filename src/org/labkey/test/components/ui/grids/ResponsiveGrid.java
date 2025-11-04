@@ -824,7 +824,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverCompon
             WebDriverWrapper.waitFor(this::isLoaded, "Grid still loading", 30000);
         }
 
-        public Boolean isLoaded()
+        protected Boolean isLoaded()
         {
             return getComponentElement().isDisplayed() &&
                 !Locators.loadingGrid.existsIn(this) &&
@@ -843,7 +843,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverCompon
             return hasSelectColumn;
         }
 
-        ReactCheckBox selectAllCheckbox = new ReactCheckBox(Locator.xpath("//th/input[@type='checkbox']").findWhenNeeded(this))
+        final ReactCheckBox selectAllCheckbox = new ReactCheckBox(Locator.xpath("//th/input[@type='checkbox']").findWhenNeeded(this))
         {
             @Override
             public void toggle()

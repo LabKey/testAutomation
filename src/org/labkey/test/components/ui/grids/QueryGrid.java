@@ -805,7 +805,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
 
         private boolean isSelectionLoaded()
         {
-            return Locators.selectionStatusContainerLoc.isDisplayed(this);
+            return !hasSelectColumn() || Locators.selectionStatusContainerLoc.existsIn(this);
         }
 
         final GridBar gridBar = new GridBar.GridBarFinder().findWhenNeeded(QueryGrid.this);
