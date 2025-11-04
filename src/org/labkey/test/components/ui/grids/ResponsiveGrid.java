@@ -67,16 +67,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverCompon
 
     public Boolean isLoaded()
     {
-        return getComponentElement().isDisplayed() &&
-                !Locators.loadingGrid.existsIn(this) &&
-                !Locators.spinner.existsIn(this) &&
-            (Locator.tag("td").existsIn(this) ||
-                getGridEmptyMessage().isPresent());
-    }
-
-    protected void waitForLoaded()
-    {
-        WebDriverWrapper.waitFor(this::isLoaded, "Grid still loading", 30000);
+        return elementCache().isLoaded();
     }
 
     @Override
@@ -85,7 +76,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverCompon
         // Look at WebDriverWrapper.doAndWaitForElementToRefresh for an example.
         func.run();
 
-        waitForLoaded();
+        elementCache().waitForLoaded();
         clearElementCache();
     }
 
@@ -826,6 +817,20 @@ public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverCompon
         public ElementCache()
         {
             waitForLoaded();
+        }
+
+        protected void waitForLoaded()
+        {
+            WebDriverWrapper.waitFor(this::isLoaded, "Grid still loading", 30000);
+        }
+
+        public Boolean isLoaded()
+        {
+            return getComponentElement().isDisplayed() &&
+                !Locators.loadingGrid.existsIn(this) &&
+                !Locators.spinner.existsIn(this) &&
+                (Locator.tag("td").existsIn(this) ||
+                    getGridEmptyMessage().isPresent());
         }
 
         private Boolean hasSelectColumn = null;
