@@ -1,4 +1,3 @@
-AdvancedImportOptionsTest
 AssayExportImportTest
 AssayTransformWarningTest
 AssayTransformImportUpdateTest

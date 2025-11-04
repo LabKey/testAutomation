@@ -88,7 +88,7 @@ public class DumbsterManager implements ShutdownListener
             }
             catch (IOException ignored) {}
         }
-        
+
         Properties props = new Properties();
         props.setProperty("mail.smtp.host", "localhost");
         props.setProperty("mail.smtp.user", "Anonymous");
@@ -98,7 +98,7 @@ public class DumbsterManager implements ShutdownListener
         _log.info("Switching MailHelper to use port " + port);
         MailHelper.setSession(session);
 
-        _log.info("Connecting mail recorder to port " + port);        
+        _log.info("Connecting mail recorder to port " + port);
         _server = SimpleSmtpServer.start(port);
         if (_server.isStopped())
         {
