@@ -3,8 +3,8 @@ package org.labkey.test.components.react;
 import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
-import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.components.ui.grids.QueryGrid;
+import org.labkey.test.components.ui.grids.ResponsiveGrid;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -38,11 +38,7 @@ public class QueryChartPanel extends WebDriverComponent<QueryChartPanel.ElementC
 
     public File clickExport(String subMenuText)
     {
-        elementCache().exportMenu.expand();
-        return getWrapper().doAndWaitForDownload(() ->
-                Locator.tagWithClass("li", "lk-menu-item")
-                    .descendant(Locator.tagContainingText("a", subMenuText))
-                    .findElement(elementCache().headingEl).click());
+        return getWrapper().doAndWaitForDownload(() -> elementCache().exportMenu.doMenuAction(subMenuText));
     }
 
     public String getTitle()
@@ -55,13 +51,27 @@ public class QueryChartPanel extends WebDriverComponent<QueryChartPanel.ElementC
         return Locator.byClass("svg-chart__chart").childTag("svg").waitForElement(this, WAIT_FOR_JAVASCRIPT);
     }
 
-    public QueryGrid clickClose()
+    public ResponsiveGrid<?> getCurveStatsGrid()
+    {
+        return new ResponsiveGrid.ResponsiveGridFinder(getDriver()).waitFor(elementCache().curveStatsPanel);
+    }
+
+    public boolean isCurveStatsPanelPresent()
+    {
+        return ElementCache.curveStatsPanelLoc.findOptionalElement(this).isPresent();
+    }
+
+    public File exportCurveStats(String type)
+    {
+        return getWrapper().doAndWaitForDownload(() -> elementCache().exportStatsMenu.doMenuAction(type));
+    }
+
+    public void clickClose()
     {
         var btn = elementCache().closeButton;
         getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(btn));
         btn.click();
         getWrapper().shortWait().until(ExpectedConditions.stalenessOf(btn));
-        return _queryGrid;
     }
 
     @Override
@@ -88,11 +98,17 @@ public class QueryChartPanel extends WebDriverComponent<QueryChartPanel.ElementC
                 .findWhenNeeded(this).withTimeout(2000);
         public final WebElement editButton = Locator.tagWithAttribute("button", "title", "Edit chart")
                 .findWhenNeeded(headingEl);
-        public final BootstrapMenu exportMenu = new MultiMenu.MultiMenuFinder(getDriver()).withButtonClass("chart-panel-export-btn").findWhenNeeded(headingEl);
+        public final MultiMenu exportMenu = new MultiMenu.MultiMenuFinder(getDriver())
+                .withButtonClass("chart-panel-export-btn")
+                .findWhenNeeded(headingEl);
         public final WebElement closeButton = Locator.tagWithAttribute("button", "title", "Hide chart")
                 .findWhenNeeded(headingEl);
         public final WebElement titleElement= Locator.tagWithClass("div", "chart-panel__heading-title")
                 .findWhenNeeded(headingEl);
+        public static final Locator curveStatsPanelLoc = Locator.byClass("curve-fit-statistics");
+        public final WebElement curveStatsPanel = curveStatsPanelLoc.findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
+        public final WebElement curveStatsHeader = Locator.byClass("curve-fit-statistics__header").findWhenNeeded(curveStatsPanel);
+        public final MultiMenu exportStatsMenu = new MultiMenu.MultiMenuFinder(getDriver()).findWhenNeeded(curveStatsHeader);
     }
 
 

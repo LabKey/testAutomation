@@ -1000,6 +1000,12 @@ public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverCompon
             return this;
         }
 
+        public ResponsiveGridFinder inParentWithClass(String className)
+        {
+            _locator = Locator.byClass(className).child(Locators.responsiveGrid());
+            return this;
+        }
+
         public ResponsiveGridFinder withGridId(String id)
         {
             _locator = Locators.responsiveGrid(id);
