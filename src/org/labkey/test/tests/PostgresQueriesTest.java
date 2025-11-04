@@ -66,6 +66,9 @@ public class PostgresQueriesTest extends AbstractAdminConsoleTest implements Pos
         goToAdminConsole().clickPostgresLocks();
         verifyLocksGrid();
 
+        // Verify locks grid as site admin
+        goToAdminConsole().clickPostgresTableSizes();
+        verifyTableSizesGrid();
 
         // Verify project admin gets a 401 for locks grid
         pushLocation();
@@ -148,6 +151,17 @@ public class PostgresQueriesTest extends AbstractAdminConsoleTest implements Pos
         DataRegionTable table = new DataRegionTable("query", this);
         List<String> cols = table.getColumnLabels();
         Assertions.assertThat(cols).as("pg_locks columns").contains("Locktype", "Virtualtransaction");
+    }
+
+    private void verifyTableSizesGrid()
+    {
+        assertTextPresent("pg_tablesizes");
+        DataRegionTable table = new DataRegionTable("query", this);
+        List<String> cols = table.getColumnLabels();
+        Assertions.assertThat(cols).as("pg_tablesizes columns").contains("Table Schema", "Table Name", "Table Size", "Index Size", "Total Size");
+        // Check a couple of expected tables
+        table.setFilter("table_schema", "Equals", "audit");
+        assertTextPresent("queryupdateauditdomain", "userauditdomain");
     }
 
     private void verifyActivityGrid(boolean expectDelete)
