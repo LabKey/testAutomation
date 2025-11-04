@@ -37,6 +37,7 @@ import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
 
@@ -190,7 +191,7 @@ public abstract class DataRegion extends WebDriverComponent<DataRegion.ElementCa
     {
         if (_tableId == null)
         {
-            String id = _el.getAttribute("id");
+            String id = Objects.requireNonNull(_el.getAttribute("id"), "Table has no ID");
             if (id.endsWith("-form"))
                 _tableId = id.replace("-form", "");
             else
@@ -334,7 +335,7 @@ public abstract class DataRegion extends WebDriverComponent<DataRegion.ElementCa
         }
     }
 
-    public class ElementCache extends Component.ElementCache
+    public class ElementCache extends Component<DataRegion.ElementCache>.ElementCache
     {
         protected ElementCache()
         {
@@ -418,7 +419,7 @@ public abstract class DataRegion extends WebDriverComponent<DataRegion.ElementCa
 
     private abstract class BaseDataRegionApi
     {
-        final String regionJS = "LABKEY.DataRegions['" + getDataRegionName().replaceAll("'", "\\\\'") + "']";
+        final CachingSupplier<String> regionJS = new CachingSupplier<>(() -> "LABKEY.DataRegions['" + getDataRegionName().replaceAll("'", "\\\\'") + "']");
 
         public void executeScript(String methodWithArgs, Object... args)
         {
@@ -427,7 +428,7 @@ public abstract class DataRegion extends WebDriverComponent<DataRegion.ElementCa
 
         public <T> T executeScript(String methodWithArgs, Class<T> expectedResultType, Object... args)
         {
-            return getWrapper().executeScript((expectedResultType != null ? "return " : "") + regionJS + "." + methodWithArgs, expectedResultType, args);
+            return getWrapper().executeScript((expectedResultType != null ? "return " : "") + regionJS.get() + "." + methodWithArgs, expectedResultType, args);
         }
 
         public void callMethod(String apiMethodName, Object... args)
@@ -465,7 +466,7 @@ public abstract class DataRegion extends WebDriverComponent<DataRegion.ElementCa
         {
             MutableObject<T> result = new MutableObject<>();
             doAndWaitForUpdate(() -> result.setValue(super.executeScript(methodWithArgs, expectedResultType, args)));
-            return result.getValue();
+            return result.get();
         }
     }
 }
