@@ -3007,7 +3007,12 @@ public abstract class WebDriverWrapper implements WrapsDriver
         try
         {
             scrollToTop();
-            new Actions(getDriver()).moveToLocation(0, 0).perform();
+            new Actions(getDriver())
+                    .moveToLocation(0, 0)
+                    // Add a little wiggle to make sure tooltips notice
+                    .moveByOffset(4, 4)
+                    .moveByOffset(-2, -2)
+                    .perform();
         }
         catch (WebDriverException ignore) { }
     }
