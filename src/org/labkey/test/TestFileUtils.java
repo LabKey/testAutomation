@@ -564,7 +564,7 @@ public abstract class TestFileUtils
 
             while (null != (entry = zis.getNextEntry()))
             {
-                File destFile = FileUtil.appendName(unzipDir, entry.getName());
+                File destFile = FileUtil.appendPath(unzipDir, org.labkey.api.util.Path.parse(entry.getName()));
 
                 if (!destFile.getCanonicalPath().startsWith(unzipDir.getCanonicalPath() + File.separator)) {
                     throw new IOException("Zip entry is outside of the target dir: " + entry.getName());
