@@ -3709,6 +3709,9 @@ public abstract class WebDriverWrapper implements WrapsDriver
             case "date":
                 setHtml5DateInput(input, value);
                 break;
+            case "datetime-local":
+                setHtml5DateTimeInput(input, value);
+                break;
             case "password":
             case "search":
                 setInput(input, value); // These don't require special handling, don't output warning
@@ -3737,10 +3740,37 @@ public abstract class WebDriverWrapper implements WrapsDriver
         }
     }
 
+    private void setHtml5DateTimeInput(WebElement el, String text)
+    {
+        String inputFormat = "yyyy-MM-dd'T'HH:mm";
+        SimpleDateFormat inputFormatter = new SimpleDateFormat(inputFormat);
+
+        try
+        {
+            setHtml5DateTimeInput(el, inputFormatter.parse(text));
+        }
+        catch (ParseException e)
+        {
+            throw new IllegalArgumentException("Unable to parse date " + text + ". Format should be " + inputFormat);
+        }
+    }
+
     private void setHtml5DateInput(WebElement el, Date date)
     {
         // Firefox requires ISO date format (yyyy-MM-dd)
         String formFormat = isFirefox() ? "yyyy-MM-dd" : "MMddyyyy";
+        SimpleDateFormat formFormatter = new SimpleDateFormat(formFormat);
+        String formDate = formFormatter.format(date);
+
+        fireEvent(el, SeleniumEvent.focus);
+        executeScript("arguments[0].value = ''", el);
+        el.sendKeys(formDate);
+    }
+
+    private void setHtml5DateTimeInput(WebElement el, Date date)
+    {
+        // Firefox and Chrome want different formats, neither of which align with all online guidance to use ISO-style
+        String formFormat = isFirefox() ? "MMddyyyy hh:mm a" : "MM-dd-yyyy'\t'hh:mma";
         SimpleDateFormat formFormatter = new SimpleDateFormat(formFormat);
         String formDate = formFormatter.format(date);
 
