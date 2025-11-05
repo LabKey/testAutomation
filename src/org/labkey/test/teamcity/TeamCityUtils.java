@@ -117,7 +117,7 @@ public class TeamCityUtils
     {
         if (file != null && file.exists())
         {
-            String labkeyRoot = new File(TestFileUtils.getLabKeyRoot()).getAbsolutePath();
+            String labkeyRoot = TestFileUtils.getLabKeyRoot().getAbsolutePath();
             String filePath = file.getAbsoluteFile().toPath().normalize().toString();
             if (filePath.startsWith(labkeyRoot))
             {

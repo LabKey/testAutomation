@@ -55,7 +55,7 @@ public class TestHelper
     public static final String DEFAULT_PORT = WebTestHelper.getWebPort().toString();
     public static final String DEFAULT_CONTEXT_PATH = WebTestHelper.getContextPath();
     public static final String DEFAULT_SERVER = WebTestHelper.getTargetServer();
-    public static final String DEFAULT_ROOT = TestFileUtils.getLabKeyRoot();
+    public static final String DEFAULT_ROOT = TestFileUtils.getLabKeyRoot().toString();
 
     private static Thread awtThread = null;
     private static final String _saveFileName = "savedConfigs.idx";

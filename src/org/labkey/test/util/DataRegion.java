@@ -229,12 +229,6 @@ public abstract class DataRegion extends WebDriverComponent<DataRegion.ElementCa
         return url.getFile();
     }
 
-    @Deprecated
-    public void clickHeaderButtonByText(String buttonText)
-    {
-        clickHeaderButton(buttonText);
-    }
-
     public void clickHeaderButtonAndWait(String buttonText)
     {
         getWrapper().clickAndWait(elementCache().getHeaderButton(buttonText));

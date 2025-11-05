@@ -211,7 +211,7 @@ public class RlabkeyTest extends BaseWebDriverTest
         // verify the expected pipeline jobs where run and completed
         goToProjectHome();
         PipelineStatusTable pipelineStatusTable = goToDataPipeline();
-        assertEquals("COMPLETE", pipelineStatusTable.getJobStatus("@files/sample (Rlabkey RCopy Test 1) (sample.txt)"));
+        assertEquals("COMPLETE", pipelineStatusTable.getJobStatus("sample (Rlabkey RCopy Test 1) (sample.txt)"));
         assertEquals("COMPLETE", pipelineStatusTable.getJobStatus("test pipe desc"));
     }
 

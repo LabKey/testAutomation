@@ -38,6 +38,7 @@ import org.bouncycastle.openpgp.operator.jcajce.JcaPGPDigestCalculatorProviderBu
 import org.bouncycastle.openpgp.operator.jcajce.JcePBEDataDecryptorFactoryBuilder;
 import org.bouncycastle.util.io.Streams;
 import org.jetbrains.annotations.NotNull;
+import org.labkey.api.util.FileUtil;
 import org.jetbrains.annotations.Nullable;
 import org.openqa.selenium.NotFoundException;
 
@@ -97,7 +98,7 @@ public abstract class TestFileUtils
 
     public static String getFileContents(String rootRelativePath)
     {
-        return getFileContents(Paths.get(getLabKeyRoot(), rootRelativePath));
+        return getFileContents(getLabKeyRoot().toPath().resolve(rootRelativePath));
     }
 
     public static String getFileContents(final File file)
@@ -137,7 +138,7 @@ public abstract class TestFileUtils
         return StringUtils.join(IOUtils.readLines(is, Charset.defaultCharset()).toArray(), System.lineSeparator());
     }
 
-    public static String getLabKeyRoot()
+    public static File getLabKeyRoot()
     {
         if (_labkeyRoot == null)
         {
@@ -151,7 +152,7 @@ public abstract class TestFileUtils
                 {
                     throw new IllegalStateException("Specified LabKey root does not exist [" + _labkeyRoot + "]. Configure this by passing VM arg labkey.root={yourroot}");
                 }
-                if (!new File(_labkeyRoot, "server").exists())
+                if (!FileUtil.appendName(_labkeyRoot, "server").exists())
                 {
                     throw new IllegalStateException("Specified LabKey root exists [" + _labkeyRoot + "] but isn't the root of a LabKey enlistment. Configure this by passing VM arg labkey.root={yourroot}");
                 }
@@ -167,25 +168,25 @@ public abstract class TestFileUtils
                     _labkeyRoot = _labkeyRoot.getParentFile().getParentFile(); // Working directory is in '{labkey.root}/server'; otherwise is in enlistment root
                 else if (_labkeyRoot.getName().equals("server"))
                     _labkeyRoot = _labkeyRoot.getParentFile(); // Working directory is in '{labkey.root}/server'; otherwise is in enlistment root
-                else if (!new File(_labkeyRoot, "server").exists())
+                else if (!FileUtil.appendName(_labkeyRoot, "server").exists())
                 {
                     throw new IllegalStateException("Unable to locate enlistment. Working directory [" + _labkeyRoot + "] isn't a recognized location. Configure manually with passing VM arg labkey.root={yourroot}");
                 }
             }
         }
-        return _labkeyRoot.toString();
+        return _labkeyRoot;
     }
 
     public static File getServerLogDir()
     {
-        return new File(getDefaultDeployDir(), "embedded/logs");
+        return FileUtil.appendName(FileUtil.appendName(getDefaultDeployDir(), "embedded"), "logs");
     }
 
     public static File getTestRoot()
     {
         if (_testRoot == null)
         {
-            _testRoot = new File(getLabKeyRoot(), "server/testAutomation");
+            _testRoot = FileUtil.appendName(FileUtil.appendName(getLabKeyRoot(), "server"), "testAutomation");
         }
         return _testRoot;
     }
@@ -199,7 +200,7 @@ public abstract class TestFileUtils
     {
         if (_buildDir == null)
         {
-            _buildDir = new File(getLabKeyRoot(), "build/modules/" + getTestProjectName()); // Gradle
+            _buildDir = FileUtil.appendPath(getLabKeyRoot(), org.labkey.api.util.Path.parse("build/modules/" + getTestProjectName())); // Gradle
         }
         return _buildDir;
     }
@@ -207,12 +208,12 @@ public abstract class TestFileUtils
     public static File getBaseFileRoot()
     {
         // Files are a sibling of the modules directory
-        return new File(getModulesDir().getParentFile(), "files");
+        return FileUtil.appendName(getModulesDir().getParentFile(), "files");
     }
 
     public static File getGradleReportDir()
     {
-        return new File(getTestBuildDir(), "test/logs/reports");
+        return FileUtil.appendPath(getTestBuildDir(), org.labkey.api.util.Path.parse("test/logs/reports"));
     }
 
     /**
@@ -221,7 +222,7 @@ public abstract class TestFileUtils
      */
     static File getDefaultDeployDir()
     {
-        return new File(getLabKeyRoot(), "build/deploy");
+        return FileUtil.appendPath(getLabKeyRoot(), org.labkey.api.util.Path.parse("build/deploy"));
     }
 
     public static File getModulesDir()
@@ -229,10 +230,10 @@ public abstract class TestFileUtils
         if (_modulesDir == null)
         {
             // Module root when deploying from embedded distribution
-            _modulesDir =  new File(getDefaultDeployDir(), "embedded/modules");
+            _modulesDir =  FileUtil.appendPath(getDefaultDeployDir(), org.labkey.api.util.Path.parse("embedded/modules"));
             if (!_modulesDir.isDirectory())
             {
-                _modulesDir = new File(getDefaultDeployDir(), "modules");
+                _modulesDir = FileUtil.appendName(getDefaultDeployDir(), "modules");
             }
         }
         return _modulesDir;
@@ -240,16 +241,16 @@ public abstract class TestFileUtils
 
     public static File getDefaultFileRoot(String containerPath)
     {
-        return new File(getBaseFileRoot(), containerPath + "/@files");
+        return FileUtil.appendPath(getBaseFileRoot(), org.labkey.api.util.Path.parse(containerPath + "/@files"));
     }
 
     public static String getDefaultWebAppRoot()
     {
-        File path = new File(getModulesDir().getParentFile(), "labkeyWebapp");
+        File path = FileUtil.appendName(getModulesDir().getParentFile(), "labkeyWebapp");
         if (!path.isDirectory())
         {
             // Casing is different when deployed from an embedded distribution
-            path = new File(getModulesDir().getParentFile(), "labkeywebapp");
+            path = FileUtil.appendName(getModulesDir().getParentFile(), "labkeywebapp");
         }
         return path.toString();
     }
@@ -300,7 +301,7 @@ public abstract class TestFileUtils
 
         for (File sampledataDir : sampledataDirs)
         {
-            File checkFile = new File(sampledataDir, relativePath);
+            File checkFile = FileUtil.appendPath(sampledataDir, org.labkey.api.util.Path.parse(relativePath));
             if (checkFile.exists())
             {
                 foundFiles.add(checkFile);
@@ -317,7 +318,7 @@ public abstract class TestFileUtils
         {
             _sampledataDirs = new TreeSet<>();
 
-            File sampledataDirsFile = new File(getTestBuildDir(), "sampledata.dirs");
+            File sampledataDirsFile = FileUtil.appendName(getTestBuildDir(), "sampledata.dirs");
             if (sampledataDirsFile.exists())
             {
                 String path = getFileContents(sampledataDirsFile);
@@ -325,8 +326,8 @@ public abstract class TestFileUtils
             }
             else
             {
-                _sampledataDirs.add(new File(getTestRoot(), "data"));
-                Path modulesDir = new File(getLabKeyRoot(), "server/modules").toPath();
+                _sampledataDirs.add(FileUtil.appendName(getTestRoot(), "data"));
+                Path modulesDir = FileUtil.appendPath(getLabKeyRoot(), org.labkey.api.util.Path.parse("server/modules")).toPath();
                 try
                 {
                     // We know where the modules live; no reason to insist that sampledata.dirs exists.
@@ -363,8 +364,8 @@ public abstract class TestFileUtils
 
     public static File getTestTempDir()
     {
-        File buildDir = new File(getLabKeyRoot(), "build");
-        return new File(buildDir, "testTemp");
+        File buildDir = FileUtil.appendName(getLabKeyRoot(), "build");
+        return FileUtil.appendName(buildDir, "testTemp");
     }
 
     /**
@@ -378,7 +379,7 @@ public abstract class TestFileUtils
         File file = getTestTempDir();
         for (String child : children)
         {
-            file = new File(file, child);
+            file = FileUtil.appendName(file, child);
         }
 
         FileUtils.forceMkdir(file);
@@ -398,7 +399,7 @@ public abstract class TestFileUtils
 
         for (String child : children)
         {
-            file = new File(file, child);
+            file = FileUtil.appendName(file, child);
         }
 
         if (file.toString().length() == getTestTempDir().toString().length())
@@ -448,37 +449,13 @@ public abstract class TestFileUtils
     {
         try
         {
-            if (!FileUtils.directoryContains(new File(getLabKeyRoot()), file))
+            if (!FileUtils.directoryContains(getLabKeyRoot(), file))
             {
                 // TODO: Consider throwing IllegalArgumentException
                 LOG.info("DEBUG: Attempting to delete a file outside of test enlistment: " + getLabKeyRoot());
             }
         }
         catch (IOException ignore) { }
-    }
-
-    /**
-     *
-     * @param dir Location to create new file
-     * @param fileName Name of file to be created
-     * @param contents Text contents of file
-     * @return File object pointing to new file
-     * @deprecated Use {@link #writeFile(File, String)} or {@link #writeTempFile(String, String)}
-     */
-    @Deprecated
-    public static File saveFile(File dir, String fileName, String contents)
-    {
-        File tsvFile = new File(dir, fileName);
-
-        try
-        {
-            return writeFile(tsvFile, contents);
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace(System.err);
-            return null;
-        }
     }
 
     /**
@@ -490,7 +467,7 @@ public abstract class TestFileUtils
      */
     public static File writeTempFile(String name, InputStream contents) throws IOException
     {
-        File file = new File(getTestTempDir(), name);
+        File file = FileUtil.appendPath(getTestTempDir(), org.labkey.api.util.Path.parse(name));
         FileUtils.forceMkdirParent(file);
 
         FileUtils.copyInputStreamToFile(contents, file);
@@ -506,7 +483,7 @@ public abstract class TestFileUtils
      */
     public static File writeTempFile(String name, String contents) throws IOException
     {
-        File file = new File(getTestTempDir(), name);
+        File file = FileUtil.appendPath(getTestTempDir(), org.labkey.api.util.Path.parse(name));
         FileUtils.forceMkdirParent(file);
 
         return writeFile(file, contents);
@@ -587,7 +564,7 @@ public abstract class TestFileUtils
 
             while (null != (entry = zis.getNextEntry()))
             {
-                File destFile = new File(unzipDir, entry.getName());
+                File destFile = FileUtil.appendName(unzipDir, entry.getName());
 
                 if (!destFile.getCanonicalPath().startsWith(unzipDir.getCanonicalPath() + File.separator)) {
                     throw new IOException("Zip entry is outside of the target dir: " + entry.getName());
@@ -641,7 +618,7 @@ public abstract class TestFileUtils
 
             while ((entry = inputStream.getNextEntry()) != null)
             {
-                final File outputFile = new File(outputDir, entry.getName());
+                final File outputFile = FileUtil.appendPath(outputDir, org.labkey.api.util.Path.parse(entry.getName()));
 
                 if (!outputFile.toPath().normalize().startsWith(normalizedOutputPath))
                     throw new IOException("Bad zip entry (" + entry.getName() + ") in " + inputFile.getAbsolutePath());
@@ -675,7 +652,7 @@ public abstract class TestFileUtils
      */
     private static File unGzip(final File inputFile, final File outputDir) throws IOException
     {
-        final File outputFile = new File(outputDir, inputFile.getName().substring(0, inputFile.getName().length() - 3));
+        final File outputFile = FileUtil.appendName(outputDir, inputFile.getName().substring(0, inputFile.getName().length() - 3));
 
         try (GZIPInputStream in = new GZIPInputStream(new FileInputStream(inputFile));
              FileOutputStream out = new FileOutputStream(outputFile))

@@ -12,5 +12,6 @@ public class AssayConstants
     public static final Locator COMMENTS_FIELD_LOCATOR = Locator.name("Comments");
     public static final Locator TARGET_STUDY_FIELD_LOCATOR = Locator.name(TARGET_STUDY_FIELD_NAME);
     public static final Locator TEXT_AREA_DATA_PROVIDER_LOCATOR = Locator.xpath("//input[@value='textAreaDataProvider']");
-    public static final Locator TEXT_AREA_DATA_COLLECTOR_LOCATOR = Locator.textarea("TextAreaDataCollector.textArea");
+    public static final String TEXT_AREA_DATA_COLLECTOR_TEXT_AREA_NAME = "TextAreaDataCollector.textArea";
+    public static final Locator TEXT_AREA_DATA_COLLECTOR_LOCATOR = Locator.textarea(TEXT_AREA_DATA_COLLECTOR_TEXT_AREA_NAME);
 }

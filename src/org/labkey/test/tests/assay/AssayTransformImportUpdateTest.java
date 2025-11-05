@@ -2,7 +2,6 @@ package org.labkey.test.tests.assay;
 
 import org.assertj.core.api.Assertions;
 import org.junit.Assume;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
@@ -11,6 +10,7 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.Daily;
+import org.labkey.test.components.assay.AssayConstants;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.pages.admin.UsageStatisticsPage;
 import org.labkey.test.pages.assay.AssayImportPage;
@@ -19,13 +19,10 @@ import org.labkey.test.pages.core.admin.ShowAdminPage;
 import org.labkey.test.pages.pipeline.PipelineStatusDetailsPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.assay.GeneralAssayDesign;
-import org.labkey.test.util.PipelineStatusTable;
-import org.labkey.test.util.RReportHelper;
 
 import java.io.File;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Arrays;
 import java.util.List;
 
 import static org.labkey.test.pages.ReactAssayDesignerPage.ScriptFileEvent.Edit;
@@ -34,29 +31,8 @@ import static org.labkey.test.pages.ReactAssayDesignerPage.ScriptFileEvent.Impor
 
 @Category({Assays.class, Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 4)
-public class AssayTransformImportUpdateTest extends BaseWebDriverTest
+public class AssayTransformImportUpdateTest extends AbstractAssayTransformTest
 {
-
-    @Override
-    protected void doCleanup(boolean afterTest)
-    {
-        _containerHelper.deleteProject(getProjectName(), afterTest);
-    }
-
-    @BeforeClass
-    public static void setupProject()
-    {
-        AssayTransformImportUpdateTest init = getCurrentTest();
-
-        init.doSetup();
-    }
-
-    private void doSetup()
-    {
-        new RReportHelper(this).ensureRConfig();
-        _containerHelper.createProject(getProjectName(), "Assay");
-    }
-
     @Test
     public void testEnableTransformForUpdate() throws Exception
     {
@@ -89,6 +65,7 @@ public class AssayTransformImportUpdateTest extends BaseWebDriverTest
         var assayDesignerPage = ReactAssayDesignerPage.beginAt(this, getProjectName(), protocolResponse.getProtocolId(),
                 "general", getURL().toString());
         assayDesignerPage.addTransformScript(transformFile, true);
+        assayDesignerPage.goToBatchFields().removeAllFields(true);
 
         checker().verifyTrue("expect run on import to be enabled by default",
                 assayDesignerPage.isScriptActionCheckboxEnabled(insertOrUpdateTransform, Import));
@@ -129,11 +106,10 @@ public class AssayTransformImportUpdateTest extends BaseWebDriverTest
                 """;
 
         clickAndWait(Locator.linkWithText(insertOrUpdateTransformAssay));
-        new AssayRunsPage(getDriver()).getTable().clickHeaderButton("Import Data");
-        clickButton("Next");
+        new AssayRunsPage(getDriver()).getTable().clickHeaderButtonAndWait("Import Data");
         var importPage = new AssayImportPage(getDriver());
         importPage.setNamedInputText("Name", "transformTestImport");
-        importPage.setNamedTextAreaValue("TextAreaDataCollector.textArea", importData);
+        importPage.setNamedTextAreaValue(AssayConstants.TEXT_AREA_DATA_COLLECTOR_TEXT_AREA_NAME, importData);
         importPage.clickSaveAndFinish();
 
         var assayDataPage = new AssayRunsPage(getDriver()).clickAssayIdLink("transformTestImport");
@@ -166,11 +142,10 @@ public class AssayTransformImportUpdateTest extends BaseWebDriverTest
         // now import some data to a new run called non_transform_import
         goToProjectHome();
         clickAndWait(Locator.linkWithText(insertOrUpdateTransformAssay));
-        new AssayRunsPage(getDriver()).getTable().clickHeaderButton("Import Data");
-        clickButton("Next");
+        new AssayRunsPage(getDriver()).getTable().clickHeaderButtonAndWait("Import Data");
         importPage = new AssayImportPage(getDriver());
         importPage.setNamedInputText("Name", "non_transform_import");
-        importPage.setNamedTextAreaValue("TextAreaDataCollector.textArea", importData);
+        importPage.setNamedTextAreaValue(AssayConstants.TEXT_AREA_DATA_COLLECTOR_TEXT_AREA_NAME, importData);
         importPage.clickSaveAndFinish();
 
         var assayDataPage2 = new AssayRunsPage(getDriver()).clickAssayIdLink("non_transform_import");
@@ -270,6 +245,7 @@ public class AssayTransformImportUpdateTest extends BaseWebDriverTest
         var assayDesignerPage = ReactAssayDesignerPage.beginAt(this, getProjectName(), protocolResponse.getProtocolId(),
                 "general", getURL().toString());
         assayDesignerPage.addTransformScript(transformFile, true);
+        assayDesignerPage.goToBatchFields().removeAllFields(true);
         assayDesignerPage.setBackgroundImport(true);
         assayDesignerPage.clickSave();
 
@@ -278,11 +254,10 @@ public class AssayTransformImportUpdateTest extends BaseWebDriverTest
             importDataBuilder.append(String.format("%d\t%d\tComment-%d\n", i, i, i));
 
         clickAndWait(Locator.linkWithText(importCancelTransformAssay));
-        new AssayRunsPage(getDriver()).getTable().clickHeaderButton("Import Data");
-        clickButton("Next");
+        new AssayRunsPage(getDriver()).getTable().clickHeaderButtonAndWait("Import Data");
         var importPage = new AssayImportPage(getDriver());
         importPage.setNamedInputText("Name", "cancelTransformTestImport");
-        importPage.setNamedTextAreaValue("TextAreaDataCollector.textArea", importDataBuilder.toString());
+        importPage.setNamedTextAreaValue(AssayConstants.TEXT_AREA_DATA_COLLECTOR_TEXT_AREA_NAME, importDataBuilder.toString());
         Instant before = Instant.now();
         importPage.clickSaveAndFinish();
 
@@ -310,17 +285,5 @@ public class AssayTransformImportUpdateTest extends BaseWebDriverTest
                 "Finished dealing with forked process");
 
         resetErrors();
-    }
-
-    @Override
-    protected String getProjectName()
-    {
-        return "AssayTransformImportUpdateTest Project";
-    }
-
-    @Override
-    public List<String> getAssociatedModules()
-    {
-        return Arrays.asList();
     }
 }

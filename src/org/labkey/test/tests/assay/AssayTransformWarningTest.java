@@ -26,6 +26,7 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.Daily;
+import org.labkey.test.components.assay.AssayConstants;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.pages.files.WebDavPage;
 import org.labkey.test.params.FieldDefinition;
@@ -113,7 +114,7 @@ public class AssayTransformWarningTest extends BaseWebDriverTest
         clickButton("Import Data");
         clickButton("Next");
         setFormElement(ASSAY_NAME_FIELD_LOCATOR, runName);
-        setFormElement(Locator.name("TextAreaDataCollector.textArea"), importData);
+        setFormElement(AssayConstants.TEXT_AREA_DATA_COLLECTOR_LOCATOR, importData);
 
         clickButton("Save and Finish");
         assertElementPresent(Locators.labkeyError.containing("Inline warning from Java transform."));
@@ -156,7 +157,7 @@ public class AssayTransformWarningTest extends BaseWebDriverTest
 
         // Use this file as a sample upload file parameter
         setFormElement(Locator.name("myFile"), JAVA_TRANSFORM_SCRIPT);
-        setFormElement(Locator.name("TextAreaDataCollector.textArea"), importData);
+        setFormElement(AssayConstants.TEXT_AREA_DATA_COLLECTOR_LOCATOR, importData);
 
         clickButton("Save and Finish");
         assertElementPresent(Locators.labkeyError.containing("Inline warning from R transform."));
@@ -216,7 +217,7 @@ public class AssayTransformWarningTest extends BaseWebDriverTest
         clickButton("Import Data");
         clickButton("Next");
         setFormElement(ASSAY_NAME_FIELD_LOCATOR, runName);
-        setFormElement(Locator.name("TextAreaDataCollector.textArea"), importData);
+        setFormElement(AssayConstants.TEXT_AREA_DATA_COLLECTOR_LOCATOR, importData);
         clickButton("Save and Finish");
 
         // edit the result, expect warning
@@ -251,7 +252,7 @@ public class AssayTransformWarningTest extends BaseWebDriverTest
         clickButton("Next");
         setFormElement(ASSAY_NAME_FIELD_LOCATOR, runName);
 
-        setFormElement(Locator.name("TextAreaDataCollector.textArea"), importData);
+        setFormElement(AssayConstants.TEXT_AREA_DATA_COLLECTOR_LOCATOR, importData);
 
         clickButton("Save and Finish");
         assertTextPresent("There are errors in the input file");
@@ -287,7 +288,7 @@ public class AssayTransformWarningTest extends BaseWebDriverTest
         clickButton("Import Data");
         clickButton("Next");
         setFormElement(ASSAY_NAME_FIELD_LOCATOR, runName);
-        setFormElement(Locator.name("TextAreaDataCollector.textArea"), importData);
+        setFormElement(AssayConstants.TEXT_AREA_DATA_COLLECTOR_LOCATOR, importData);
 
         clickButton("Save and Finish");
 

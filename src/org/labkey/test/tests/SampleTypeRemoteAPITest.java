@@ -37,6 +37,7 @@ import org.labkey.test.SortDirection;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.CustomizeView;
+import org.labkey.test.components.assay.AssayConstants;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.pages.assay.AssayImportPage;
@@ -766,7 +767,7 @@ public class SampleTypeRemoteAPITest extends BaseWebDriverTest
         for(TestDataGenerator dataGen : dataGenerators)
         {
             AssayImportPage page = new AssayImportPage(getDriver())
-                    .setNamedTextAreaValue("TextAreaDataCollector.textArea",
+                    .setNamedTextAreaValue(AssayConstants.TEXT_AREA_DATA_COLLECTOR_TEXT_AREA_NAME,
                     dataGen.getDataAsTsv());
             imported++;
 
