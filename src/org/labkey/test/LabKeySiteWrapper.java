@@ -1593,7 +1593,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
      * @param timeoutMilliseconds Maximum time to wait for pipeline jobs to finish (default 10 minutes)
      */
     @LogMethod
-    public void waitForPipelineJobsToComplete(@LoggedParam final int finishedJobsExpected, @LoggedParam final String description, final boolean expectError, int timeoutMilliseconds)
+    public void waitForPipelineJobsToComplete(@LoggedParam final int finishedJobsExpected, @LoggedParam final String description, final boolean expectError, long timeoutMilliseconds)
     {
         final List<String> statusValues = waitForPipelineJobsToFinish(finishedJobsExpected, Duration.ofMillis(timeoutMilliseconds));
 
