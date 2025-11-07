@@ -15,7 +15,10 @@
  */
 package org.labkey.test.pages.assay;
 
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
 import org.labkey.test.Locator;
+import org.labkey.test.components.assay.AssayConstants;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.components.html.OptionSelect;
@@ -25,7 +28,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.io.File;
-
 
 public class AssayImportPage extends LabKeyPage<AssayImportPage.Elements>
 {
@@ -50,16 +52,21 @@ public class AssayImportPage extends LabKeyPage<AssayImportPage.Elements>
 
     public AssayImportPage setNamedTextAreaValue(String name, String text)
     {
-        WebElement input = Locator.xpath("//textarea[@name='" + name +"']").findElement(getDriver());
+        WebElement input = Locator.textarea(name).findElement(getDriver());
         setFormElement(input, text);
+        return this;
+    }
+
+    public AssayImportPage setFileField(String name, File file)
+    {
+        setFormElement(Locator.input(name), file);
         return this;
     }
 
     public AssayImportPage setDataText(String text)
     {
         selectTSVRadioButton();
-        setTextInputField(text);
-        return this;
+        return setTextInputField(text);
     }
 
     private void selectTSVRadioButton()
@@ -67,26 +74,61 @@ public class AssayImportPage extends LabKeyPage<AssayImportPage.Elements>
         elementCache().pasteTSVButton.check();
     }
 
-    private void setTextInputField(String text)
+    private AssayImportPage setTextInputField(String text)
     {
         elementCache().inputRunDataField.setValue(text);
+        return this;
     }
 
-    public void setDataFile(File uploadFile)
+    public AssayImportPage setDataFile(File uploadFile)
     {
         selectUploadFileRadioButton();
         setFormElement(Locator.name("__primaryFile__"), uploadFile);
+        return this;
     }
 
-    private void selectUploadFileRadioButton()
+    public AssayImportPage selectUploadFileRadioButton()
     {
         elementCache().uploadFileButton.check();
+        return this;
     }
 
+    /**
+     * Retrieves the file name for a field if it has been previously uploaded. In this case the server
+     * will display a file name with an icon and a "[remove]" link. If a value has not been previously uploaded,
+     * then this will look for a file input and return the value of that field.
+     *
+     * @param fieldName the name of the field for which the value should be retrieved
+     * @return the value associated with the specified file field, or null if no value is found
+     */
+    public @Nullable String getFileFieldValue(String fieldName)
+    {
+        var removeFileLink = Locator.tagWithClass("div", "lk-remove-file")
+                .withAttribute("data-fieldname", fieldName);
+
+        if (isElementPresent(removeFileLink))
+        {
+            var text = removeFileLink.findElement(getDriver()).getText();
+            return StringUtils.trimToNull(text.replace("[remove]", ""));
+        }
+
+        var fileInput = Locator.input(fieldName);
+        if (isElementPresent(fileInput))
+            return getFormElement(fileInput);
+
+        return null;
+    }
 
     /* button actions */
+    public AssayImportPage clickNext()
+    {
+        doAndWaitForPageToLoad(()-> elementCache().nextButton.click());
+        return new AssayImportPage(getDriver());
+    }
+
     public void clickSaveAndFinish()
     {
+        scrollIntoView(elementCache().saveAndFinishButton, true);
         doAndWaitForPageToLoad(()-> elementCache().saveAndFinishButton.click());
     }
 
@@ -115,16 +157,17 @@ public class AssayImportPage extends LabKeyPage<AssayImportPage.Elements>
     public class Elements extends LabKeyPage.ElementCache
     {
         final RadioButton pasteTSVButton = new RadioButton(
-                new LazyWebElement(Locator.radioButtonById("textAreaDataProvider"), this));
+                new LazyWebElement<>(Locator.radioButtonById("textAreaDataProvider"), this));
         final RadioButton uploadFileButton = new RadioButton(
-                new LazyWebElement(Locator.radioButtonById("FileUpload"), this));
+                new LazyWebElement<>(Locator.radioButtonById("Fileupload"), this));
         final Input inputRunDataField = new Input(
-                new LazyWebElement(Locator.xpath(".//textarea[@id='TextAreaDataCollector.textArea']"), this),
+                new LazyWebElement<>(AssayConstants.TEXT_AREA_DATA_COLLECTOR_LOCATOR, this),
                 getDriver());
 
-        final WebElement saveAndFinishButton = new LazyWebElement(Locator.lkButton("Save and Finish"), this);
-        final WebElement saveAndImportAnotherButton = new LazyWebElement(Locator.lkButton("Save and Import Another Run"), this);
-        final WebElement resetDefaultValuesButton = new LazyWebElement(Locator.lkButton("Reset Default Values"), this);
-        final WebElement cancelButton = new LazyWebElement(Locator.lkButton("Cancel"), this);
+        final WebElement nextButton = new LazyWebElement<>(Locator.lkButton("Next"), this);
+        final WebElement saveAndFinishButton = new LazyWebElement<>(Locator.lkButton("Save and Finish"), this);
+        final WebElement saveAndImportAnotherButton = new LazyWebElement<>(Locator.lkButton("Save and Import Another Run"), this);
+        final WebElement resetDefaultValuesButton = new LazyWebElement<>(Locator.lkButton("Reset Default Values"), this);
+        final WebElement cancelButton = new LazyWebElement<>(Locator.lkButton("Cancel"), this);
     }
 }
