@@ -221,18 +221,18 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     @Override
     public void doAndWaitForUpdate(Runnable func)
     {
-        WebElement status = hasSelectColumn() ? Locators.selectionStatusContainerLoc.waitForElement(this, 5_000) : null;
-
-        func.run();
-
-        if (status != null)
+        super.doAndWaitForUpdate(() ->
         {
-            getWrapper().shortWait().until(ExpectedConditions.stalenessOf(status));
-            Locators.selectionStatusContainerLoc.waitForElement(this, 5_000);
-        }
+            WebElement status = hasSelectColumn() ? Locators.selectionStatusContainerLoc.waitForElement(this, 5_000) : null;
 
-        elementCache().waitForLoaded();
-        clearElementCache();
+            func.run();
+
+            if (status != null)
+            {
+                getWrapper().shortWait().until(ExpectedConditions.stalenessOf(status));
+                Locators.selectionStatusContainerLoc.waitForElement(this, 5_000);
+            }
+        });
     }
 
 
@@ -796,17 +796,6 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
 
     protected class ElementCache extends ResponsiveGrid<QueryGrid>.ElementCache
     {
-
-        @Override
-        public Boolean isLoaded()
-        {
-            return isSelectionLoaded() && super.isLoaded();
-        }
-
-        private boolean isSelectionLoaded()
-        {
-            return !hasSelectColumn() || Locators.selectionStatusContainerLoc.existsIn(this);
-        }
 
         final GridBar gridBar = new GridBar.GridBarFinder().findWhenNeeded(QueryGrid.this);
 
