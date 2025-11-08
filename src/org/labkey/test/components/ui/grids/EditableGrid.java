@@ -1172,7 +1172,9 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     public void dismissPopover()
     {
         Locators.popover.findOptionalElement(getDriver()).ifPresent(popover -> {
+            getWrapper().mouseOver(popover);
             getWrapper().mouseOut();
+            getWrapper().mouseOver(elementCache().getGridHeaderManager().getColumnHeader(0).getElement());
             getWrapper().shortWait().until(ExpectedConditions.invisibilityOf(popover));
         });
     }
