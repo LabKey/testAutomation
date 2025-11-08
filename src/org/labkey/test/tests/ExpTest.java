@@ -87,12 +87,12 @@ public class ExpTest extends BaseWebDriverTest
                 });
         clickButton("Setup");
         // Don't upload file. Uploading file creates 'exp.Data' entries that we don't want.
-        setPipelineRoot(TestFileUtils.getSampleData("xarfiles/expVerify").getAbsolutePath());
+        setPipelineRoot(TestFileUtils.getSampleData("xarfiles").getAbsolutePath());
         clickFolder(FOLDER_NAME);
 
         clickButton("Process and Import Data");
 
-        _fileBrowserHelper.importFile("experiment.xar.xml", "Import Experiment");
+        _fileBrowserHelper.importFile("/expVerify/experiment.xar.xml", "Import Experiment");
         Date importDate = new Date(); // Import timestamp will have various formats applied to it
         clickAndWait(Locator.linkWithText("Data Pipeline"));
         waitForPipelineJobsToComplete(1, false);
