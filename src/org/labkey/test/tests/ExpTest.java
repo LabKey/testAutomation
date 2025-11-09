@@ -87,7 +87,7 @@ public class ExpTest extends BaseWebDriverTest
                 });
         clickButton("Setup");
         // Don't upload file. Uploading file creates 'exp.Data' entries that we don't want.
-        setPipelineRoot(TestFileUtils.getSampleData("xarfiles").getAbsolutePath());
+        setPipelineRoot(TestFileUtils.getSampleData("xarfiles/expVerify").getParentFile().getAbsolutePath());
         clickFolder(FOLDER_NAME);
 
         clickButton("Process and Import Data");
