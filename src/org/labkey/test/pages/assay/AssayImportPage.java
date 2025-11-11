@@ -29,6 +29,8 @@ import org.openqa.selenium.WebElement;
 
 import java.io.File;
 
+import static org.labkey.test.util.EscapeUtil.getTableViewFormFieldName;
+
 public class AssayImportPage extends LabKeyPage<AssayImportPage.Elements>
 {
     public AssayImportPage(WebDriver driver)
@@ -38,28 +40,28 @@ public class AssayImportPage extends LabKeyPage<AssayImportPage.Elements>
 
     public AssayImportPage setNamedInputText(String name, String text)
     {
-        WebElement input = Locator.input(name).findElement(getDriver());
+        WebElement input = Locator.input(getTableViewFormFieldName(name)).findElement(getDriver());
         new Input(input, getDriver()).set(text);
         return this;
     }
 
     public AssayImportPage selectNamedFieldOption(String name, String text)
     {
-        WebElement input = Locator.xpath("//select[@name='" + name +"']").findElement(getDriver());
+        WebElement input = Locator.tagWithName("select", getTableViewFormFieldName(name)).findElement(getDriver());
         new OptionSelect(input).set(text);
         return this;
     }
 
     public AssayImportPage setNamedTextAreaValue(String name, String text)
     {
-        WebElement input = Locator.textarea(name).findElement(getDriver());
+        WebElement input = Locator.textarea(getTableViewFormFieldName(name)).findElement(getDriver());
         setFormElement(input, text);
         return this;
     }
 
     public AssayImportPage setFileField(String name, File file)
     {
-        setFormElement(Locator.input(name), file);
+        setFormElement(Locator.input(getTableViewFormFieldName(name)), file);
         return this;
     }
 
@@ -112,7 +114,7 @@ public class AssayImportPage extends LabKeyPage<AssayImportPage.Elements>
             return StringUtils.trimToNull(text.replace("[remove]", ""));
         }
 
-        var fileInput = Locator.input(fieldName);
+        var fileInput = Locator.input(getTableViewFormFieldName(fieldName));
         if (isElementPresent(fileInput))
             return getFormElement(fileInput);
 

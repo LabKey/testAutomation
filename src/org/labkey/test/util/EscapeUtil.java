@@ -266,6 +266,11 @@ public class EscapeUtil
         return getFormFieldName(columnName, FORM_FIELD_PREFIX);
     }
 
+    public static String getTableViewFormFieldName(String columnName)
+    {
+        return getFormFieldName(columnName, null);
+    }
+
     /**
      * Escapes special characters in a column name to be used as a form field name.
      * See associated {@link org.labkey.api.query.QueryUpdateForm#getFormFieldName}
