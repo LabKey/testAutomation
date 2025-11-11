@@ -36,10 +36,9 @@ public abstract class DomainProps
 
                 DomainResponse response = super.execute(connection, folderPath);
 
-                TestLogger.log("Successfully created domain, '%s':\n%s"
-                    .formatted(
-                        response.getDomain().getName(),
-                        response.getDomain().toJSONObject().toString(2)));
+                TestLogger.log().debug("Successfully created domain, '{}':\n{}",
+                        () -> response.getDomain().getName(),
+                        () -> response.getDomain().toJSONObject().toString(2));
 
                 return response;
             }
