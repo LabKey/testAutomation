@@ -405,11 +405,14 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         setFormElement(Locator.id("email"), email);
         setFormElement(Locator.id("password"), password);
         WebElement signInButton = Locator.lkButton("Sign In").findElement(getDriver());
-        signInButton.click();
-        shortWait().until(ExpectedConditions.invisibilityOfElementLocated(Locator.byClass("signing-in-msg")));
-        shortWait().until(ExpectedConditions.or(
-                ExpectedConditions.stalenessOf(signInButton), // Successful login
-                ExpectedConditions.presenceOfElementLocated(Locators.labkeyError.withText()))); // Error during sign-in
+        doAndMaybeWaitForPageToLoad(10_000, () -> {
+            signInButton.click();
+            shortWait().until(ExpectedConditions.invisibilityOfElementLocated(Locator.byClass("signing-in-msg")));
+            shortWait().until(ExpectedConditions.or(
+                    ExpectedConditions.stalenessOf(signInButton), // Successful login
+                    ExpectedConditions.presenceOfElementLocated(Locators.labkeyError.withText()))); // Error during sign-in
+            return ExpectedConditions.stalenessOf(signInButton).apply(null);
+        });
     }
 
     public void signInShouldFail(String email, String password, String... expectedMessages)

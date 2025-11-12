@@ -221,18 +221,18 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     @Override
     public void doAndWaitForUpdate(Runnable func)
     {
-        waitForLoaded();
-        Optional<WebElement> optionalStatus = elementCache().selectionStatusContainerLoc.findOptionalElement(elementCache());
+        super.doAndWaitForUpdate(() ->
+        {
+            WebElement status = hasSelectColumn() ? Locators.selectionStatusContainerLoc.waitForElement(this, 5_000) : null;
 
-        func.run();
+            func.run();
 
-        optionalStatus.ifPresent(el -> {
-            getWrapper().shortWait().until(ExpectedConditions.stalenessOf(el));
-            elementCache().selectionStatusContainerLoc.waitForElement(this, 5_000);
+            if (status != null)
+            {
+                getWrapper().shortWait().until(ExpectedConditions.stalenessOf(status));
+                Locators.selectionStatusContainerLoc.waitForElement(this, 5_000);
+            }
         });
-
-        waitForLoaded();
-        clearElementCache();
     }
 
 
@@ -789,19 +789,24 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         return (ElementCache) super.elementCache();
     }
 
+    protected static class Locators
+    {
+        static final Locator.XPathLocator selectionStatusContainerLoc = Locator.byClass("selection-status");
+    }
+
     protected class ElementCache extends ResponsiveGrid<QueryGrid>.ElementCache
     {
+
         final GridBar gridBar = new GridBar.GridBarFinder().findWhenNeeded(QueryGrid.this);
 
-        WebElement saveViewButton = Locator.button("Save").findWhenNeeded(getDriver());
+        final WebElement saveViewButton = Locator.button("Save").findWhenNeeded(getDriver());
 
         final BootstrapMenu viewMenu = new MultiMenu.MultiMenuFinder(getDriver()).withText("Views").findWhenNeeded(this);
 
-        final Locator.XPathLocator selectionStatusContainerLoc = Locator.tagWithClass("div", "selection-status");
-        final Locator selectAllBtnLoc = selectionStatusContainerLoc.append(Locator.tagWithClass("span", "selection-status__select-all")
-                .child(Locator.buttonContainingText("Select")));
-        final Locator clearBtnLoc = selectionStatusContainerLoc.append(Locator.byClass("selection-status__clear-all")
-                .child(Locator.tag("button")));
+        final Locator selectAllBtnLoc = Locators.selectionStatusContainerLoc.append(Locator.byClass("selection-status__select-all")
+            .childTag("button"));
+        final Locator clearBtnLoc = Locators.selectionStatusContainerLoc.append(Locator.byClass("selection-status__clear-all")
+            .childTag("button"));
 
         final WebElement filterStatusPanel = Locator.css("div.grid-panel__filter-status").findWhenNeeded(this);
 

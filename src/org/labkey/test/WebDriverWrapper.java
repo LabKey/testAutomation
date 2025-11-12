@@ -3000,14 +3000,17 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     /**
      * Move mouse to the upper left corner of the document to dismiss tooltips and the like
-     * Will scroll page if necessary
      */
     public void mouseOut()
     {
         try
         {
-            scrollToTop();
-            new Actions(getDriver()).moveToLocation(0, 0).perform();
+            new Actions(getDriver())
+                    .moveToLocation(0, 0)
+                    // Add a little wiggle to make sure tooltips notice
+                    .moveByOffset(4, 4)
+                    .moveByOffset(-2, -2)
+                    .perform();
         }
         catch (WebDriverException ignore) { }
     }

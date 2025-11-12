@@ -1,6 +1,8 @@
 package org.labkey.test.components.ui.lineage;
 
 import org.labkey.test.Locator;
+import org.labkey.test.Locators;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.react.Tabs;
@@ -46,6 +48,16 @@ public class LineageGraph extends WebDriverComponent<LineageGraph.ElementCache>
             webDriverWait.until(ExpectedConditions.visibilityOf(lineageGraph.getComponentElement()));
         }
         return lineageGraph;
+    }
+
+    @Override
+    protected void waitForReady()
+    {
+        WebDriverWrapper.waitFor(()->
+                        elementCache().visGraphContainer.isDisplayed() &&
+                        elementCache().nodeDetailContainer.isDisplayed() &&
+                        !Locators.loadingSpinner.existsIn(this),
+                "lineage graph did not load in time", 5_000);
     }
 
     public Map<String, String> getCurrentNodeData()
@@ -178,16 +190,16 @@ public class LineageGraph extends WebDriverComponent<LineageGraph.ElementCache>
         // container for the details of the currently-selected node
         final WebElement nodeDetailContainer = Locator.tagWithClass("div", "lineage-node-detail-container")
                 .findWhenNeeded(this).withTimeout(4000);
-        WebElement componentDetailImage = Locator.tagWithClass("i", "component-detail--child--img")
+        final WebElement componentDetailImage = Locator.tagWithClass("i", "component-detail--child--img")
                 .child(Locator.tag("img")).findWhenNeeded(nodeDetailContainer);
-        WebElement nodeDetailName = Locator.tagWithClass("h4", "lineage-name-data")
+        final WebElement nodeDetailName = Locator.tagWithClass("h4", "lineage-name-data")
                 .findWhenNeeded(nodeDetailContainer);
-        WebElement nodeDetailLinksContainer = Locator.tagWithClass("div", "lineage-node-detail")
+        final WebElement nodeDetailLinksContainer = Locator.tagWithClass("div", "lineage-node-detail")
                 .findWhenNeeded(nodeDetailContainer);
-        WebElement nodeOverviewLink = Locator.linkWithSpan("Overview").withClass("lineage-data-link--text")
+        final WebElement nodeOverviewLink = Locator.linkWithSpan("Overview").withClass("lineage-data-link--text")
                 .findWhenNeeded(nodeDetailLinksContainer);
-        Locator lineageLinkLoc = Locator.linkWithSpan("Lineage").withClass("lineage-data-link--text");
-        WebElement nodeLineageLink = lineageLinkLoc.findWhenNeeded(nodeDetailLinksContainer);
+        final Locator lineageLinkLoc = Locator.linkWithSpan("Lineage").withClass("lineage-data-link--text");
+        final WebElement nodeLineageLink = lineageLinkLoc.findWhenNeeded(nodeDetailLinksContainer);
         Tabs nodeDetailsTabs()
         {
             return new Tabs.TabsFinder(getDriver()).findWhenNeeded(nodeDetailContainer);
@@ -198,9 +210,9 @@ public class LineageGraph extends WebDriverComponent<LineageGraph.ElementCache>
             return new DetailTable.DetailTableFinder(getDriver()).waitFor(nodeDetailContainer);
         }
 
-        WebElement nodeDetails = Locator.tagWithClass("div", "lineage-node-detail")
+        final WebElement nodeDetails = Locator.tagWithClass("div", "lineage-node-detail")
                 .findWhenNeeded(nodeDetailContainer).withTimeout(3000);
-        WebElement nodeDetailsName = Locator.tagWithClass("div", "lineage-name-data")
+        final WebElement nodeDetailsName = Locator.tagWithClass("div", "lineage-name-data")
                 .findWhenNeeded(nodeDetails);
 
         NodeDetailGroup summaryList(String nodeLabel)
