@@ -1160,6 +1160,8 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
      */
     public String getCellPopoverText(int row, CharSequence columnIdentifier)
     {
+        dismissPopover(); // Other popovers can block the target cell
+        getWrapper().mouseOver(Locator.tag("td").findElement(getRow(row))); // Avoid passing over any header cells on the way to the target cell
         WebElement cellDiv = Locator.tagWithClass("div", "cellular-display").findElement(getCell(row, columnIdentifier));
         getWrapper().mouseOver(cellDiv);   // cause the tooltip to be present
         return Optional.ofNullable(WebDriverWrapper.waitFor(()-> Locators.popover.findElementOrNull(getDriver()), 1000))
@@ -1170,7 +1172,9 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     public void dismissPopover()
     {
         Locators.popover.findOptionalElement(getDriver()).ifPresent(popover -> {
+            getWrapper().mouseOver(popover);
             getWrapper().mouseOut();
+            getWrapper().mouseOver(elementCache().getGridHeaderManager().getColumnHeader(0).getElement());
             getWrapper().shortWait().until(ExpectedConditions.invisibilityOf(popover));
         });
     }

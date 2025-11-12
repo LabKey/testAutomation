@@ -21,7 +21,9 @@ function doTest()
 
     if (contextPath.length > 0) {
         var baseUrl = LABKEY.ActionURL.getBaseURL();
-        if (!baseUrl.endsWith(contextPath + "/"))
+        var suffix = contextPath + "/";
+        var idx = baseUrl.indexOf(suffix);
+        if (idx === -1 || idx !== baseUrl.length - suffix.length)
             errors[errors.length] = new Error("ActionURL.getBaseURL() = " + baseUrl);
     }
 

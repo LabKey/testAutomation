@@ -20,6 +20,7 @@ import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.test.components.html.Checkbox;
+import org.labkey.test.components.pipeline.PipelineTriggerWizard;
 import org.labkey.test.pages.core.admin.AllowedFileExtensionAdminPage;
 import org.labkey.test.pages.core.admin.BaseSettingsPage;
 import org.labkey.test.pages.core.admin.ConfigureFileSystemAccessPage;
@@ -158,6 +159,16 @@ public class TestScrubber extends ExtraSiteWrapper
         catch (IOException | CommandException e)
         {
             TestLogger.error("Failed to reset site look and feel properties after test.", e);
+        }
+
+        try
+        {
+            // Disable all pipeline triggers so that they don't show up as memory leaks in subsequent tests.
+            PipelineTriggerWizard.disableAllPipelineTriggers(createDefaultConnection());
+        }
+        catch (Exception e)
+        {
+            TestLogger.error("Failed to disable pipeline triggers after test", e);
         }
 
     }

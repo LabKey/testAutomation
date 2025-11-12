@@ -400,6 +400,7 @@ public class FieldSelectionDialog extends ModalDialog
                 continue;
             }
 
+            getWrapper().mouseOver(removeIcon);
             removeIcon.click();
         }
 

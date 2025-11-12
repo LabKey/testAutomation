@@ -70,8 +70,8 @@ public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverCompon
         return getComponentElement().isDisplayed() &&
                 !Locators.loadingGrid.existsIn(this) &&
                 !Locators.spinner.existsIn(this) &&
-            (Locator.tag("td").existsIn(this) ||
-                getGridEmptyMessage().isPresent());
+                (Locator.tag("td").existsIn(this) ||
+                        getGridEmptyMessage().isPresent());
     }
 
     protected void waitForLoaded()
@@ -82,6 +82,8 @@ public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverCompon
     @Override
     public void doAndWaitForUpdate(Runnable func)
     {
+        waitForLoaded();
+
         // Look at WebDriverWrapper.doAndWaitForElementToRefresh for an example.
         func.run();
 
@@ -838,7 +840,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverCompon
             return hasSelectColumn;
         }
 
-        ReactCheckBox selectAllCheckbox = new ReactCheckBox(Locator.xpath("//th/input[@type='checkbox']").findWhenNeeded(this))
+        final ReactCheckBox selectAllCheckbox = new ReactCheckBox(Locator.xpath("//th/input[@type='checkbox']").findWhenNeeded(this))
         {
             @Override
             public void toggle()
