@@ -95,6 +95,15 @@ public class AssayImportPage extends LabKeyPage<AssayImportPage.Elements>
         return this;
     }
 
+    public @Nullable String getFieldValue(String fieldName)
+    {
+        var input = Locator.input(getTableViewFormFieldName(fieldName));
+        if (isElementPresent(input))
+            return getFormElement(input);
+
+        return null;
+    }
+
     /**
      * Retrieves the file name for a field if it has been previously uploaded. In this case the server
      * will display a file name with an icon and a "[remove]" link. If a value has not been previously uploaded,
@@ -114,11 +123,17 @@ public class AssayImportPage extends LabKeyPage<AssayImportPage.Elements>
             return StringUtils.trimToNull(text.replace("[remove]", ""));
         }
 
-        var fileInput = Locator.input(getTableViewFormFieldName(fieldName));
-        if (isElementPresent(fileInput))
-            return getFormElement(fileInput);
+        return getFieldValue(fieldName);
+    }
 
-        return null;
+    public AssayImportPage removeFileValue(String fieldName)
+    {
+        var removeFileLink = Locator.tagWithClass("div", "lk-remove-file")
+                .withAttribute("data-fieldname", fieldName)
+                .child(Locator.tagWithText("a", "remove"));
+
+        removeFileLink.findElement(getDriver()).click();
+        return this;
     }
 
     /* button actions */
