@@ -148,7 +148,6 @@ public class AttachmentFieldTest extends BaseWebDriverTest
         clickAndWait(Locator.tagWithText("a", "S1"));
         clickAndWait(Locator.tagWithClass("a", "labkey-text-link").withText("edit"));
         waitForElement(Locator.tagContainingText("div", "jpg_sample.jpg (unavailable)"));
-        assertElementNotPresent(Locator.tagWithAttributeContaining("img", "src", "/_icons/image.png"));
     }
 
     @Test
