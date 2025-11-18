@@ -9,6 +9,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import java.io.File;
+import java.util.List;
 
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 
@@ -49,6 +50,13 @@ public class QueryChartPanel extends WebDriverComponent<QueryChartPanel.ElementC
     public WebElement getSvgChart()
     {
         return Locator.byClass("svg-chart__chart").childTag("svg").waitForElement(this, WAIT_FOR_JAVASCRIPT);
+    }
+
+    public List<String> getChartErrors()
+    {
+        getWrapper().shortWait().until(ExpectedConditions.visibilityOfAllElements(getSvgChart()));
+        return Locator.byClass("svg-chart__chart").childTag("div").findElements(this).stream()
+                .map(WebElement::getText).toList();
     }
 
     public ResponsiveGrid<?> getCurveStatsGrid()
