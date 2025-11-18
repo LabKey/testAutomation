@@ -68,7 +68,7 @@ public class DomainFieldTypeChangeTest extends BaseWebDriverTest
         FieldInfo integerField = FieldInfo.random("Test/Integer", FieldDefinition.ColumnType.Integer, DomainUtils.DomainKind.IntList);
         FieldInfo decimalField = FieldInfo.random("Test/Decimal", FieldDefinition.ColumnType.Decimal, DomainUtils.DomainKind.IntList);
         FieldInfo dateField = FieldInfo.random("Test/Date", FieldDefinition.ColumnType.DateAndTime, DomainUtils.DomainKind.IntList);
-        FieldInfo booleanField = FieldInfo.random("Test'/\"Boolean", FieldDefinition.ColumnType.Boolean, DomainUtils.DomainKind.IntList); // GH Issue #755
+        FieldInfo booleanField = FieldInfo.random("Test'/\"Boolean", FieldDefinition.ColumnType.Boolean, DomainUtils.DomainKind.IntList); // GH Issue #755 (https://github.com/LabKey/kanban/issues/755)
         TestDataGenerator dgen = new TestDataGenerator("lists", listName, getProjectName())
                 .withColumns(List.of(
                         stringField.getFieldDefinition(),
@@ -117,7 +117,7 @@ public class DomainFieldTypeChangeTest extends BaseWebDriverTest
         domainFormPanel.getField(integerField.getName()).setType(FieldDefinition.ColumnType.String, true);
         domainFormPanel.getField(decimalField.getName()).setType(FieldDefinition.ColumnType.String, true);
         domainFormPanel.getField(dateField.getName()).setType(FieldDefinition.ColumnType.String, true);
-        domainFormPanel.getField(booleanField.getName()).setType(FieldDefinition.ColumnType.String, true); // GH Issue #755
+        domainFormPanel.getField(booleanField.getName()).setType(FieldDefinition.ColumnType.String, true); // GH Issue #755 (https://github.com/LabKey/kanban/issues/755)
         domainDesignerPage.clickFinish();
 
         clickAndWait(Locator.linkWithText(listName));
