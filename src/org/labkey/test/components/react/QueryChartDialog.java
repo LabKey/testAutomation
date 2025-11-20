@@ -340,6 +340,32 @@ public class QueryChartDialog extends ModalDialog
         return this;
     }
 
+    public QueryChartDialog setTrendlineProvidedParameters(String field)
+    {
+        clickFieldOptions("Trendline"); // open the popover
+        if (field != null)
+            getTrendlineProvidedParametersSelect().select(field);
+        else
+            getTrendlineProvidedParametersSelect().clearSelection();
+        elementCache().title.click(); // close the popover
+        return this;
+    }
+
+    public List<String> getTrendlineProvidedParametersOptions()
+    {
+        clickFieldOptions("Trendline"); // open the popover
+        List<String> options = getTrendlineProvidedParametersSelect().getOptions();
+        elementCache().title.click(); // close the popover
+        return options;
+    }
+
+    private ReactSelect getTrendlineProvidedParametersSelect()
+    {
+        // can't use elementCache() because the popover is outside the dialog
+        Locator loc = Locator.tag("div").withChild(Locator.tagContainingText("label", "Provided Parameters"));
+        return ReactSelect.finder(getDriver()).find(loc.waitForElement(getDriver(), 1500));
+    }
+
     public String getSelectedSeries()
     {
         return elementCache().reactSelectByLabel("Series").getValue();
@@ -397,6 +423,12 @@ public class QueryChartDialog extends ModalDialog
     {
         return elementCache().previewBodyLoc.existsIn(elementCache().previewContainer()) &&
                 elementCache().svgLoc.existsIn(elementCache().previewContainer());
+    }
+
+    public List<String> getPreviewErrors()
+    {
+        return elementCache().svgErrorLoc.findElements(elementCache().previewContainer()).stream()
+                .map(WebElement::getText).toList();
     }
 
     public WebElement getSvgChart()
@@ -534,6 +566,7 @@ public class QueryChartDialog extends ModalDialog
 
         private final Locator previewBodyLoc = Locator.tagWithClass("div", "chart-builder-preview-body");
         private final Locator svgLoc = Locator.tagWithClass("div", "svg-chart__chart").childTag("svg");
+        private final Locator svgErrorLoc = Locator.tagWithClass("div", "svg-chart__chart").childTag("div");
 
         public WebElement svg()
         {
