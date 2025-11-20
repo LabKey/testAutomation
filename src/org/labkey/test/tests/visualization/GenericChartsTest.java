@@ -22,17 +22,22 @@ import org.labkey.test.Locator;
 import org.labkey.test.components.ChartLayoutDialog;
 import org.labkey.test.pages.TimeChartWizard;
 import org.labkey.test.tests.ReportTest;
+import org.labkey.test.util.CodeMirrorHelper;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.hamcrest.number.OrderingComparison.greaterThanOrEqualTo;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -158,11 +163,21 @@ public abstract class GenericChartsTest extends ReportTest
         log("Export as PNG");
         File png = clickExportPNGIcon("chart-render-div", 0);
         exported.put("png", png);
+        try
+        {
+            BufferedImage image = ImageIO.read(png);
+            // Issue 53390: Improve resolution of PNG exports
+            checker().verifyThat("Exported PNG height", image.getHeight(), greaterThanOrEqualTo(2000));
+        }
+        catch (IOException e)
+        {
+            checker().recordError(new RuntimeException("Failed to read exported PNG: " + png, e));
+        }
 
         log("Export to script.");
         Assert.assertEquals("Unexpected number of export script icons", 1, getExportScriptIconCount("chart-render-div"));
         clickExportScriptIcon("chart-render-div", 0);
-        String exportScript = _extHelper.getCodeMirrorValue("export-script-textarea");
+        String exportScript = new CodeMirrorHelper(this, "export-script-textarea").getCodeMirrorValue();
 
         log("Validate that the script is as expected.");
         assertTrue("Script did not contain expected text: '" + type + "' ", exportScript.toLowerCase().contains(type.toLowerCase()));

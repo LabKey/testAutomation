@@ -312,7 +312,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         domainDesignerPage.clickFinish();
     }
 
-    @Test // GitHub Issue 788
+    @Test // GitHub Issue #657
     public void testInvalidSampleFieldFromDelete() throws Exception
     {
         String listName = TestDataGenerator.randomDomainName("Sample Lookups List", DomainUtils.DomainKind.IntList);
@@ -349,7 +349,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
         validateListSampleLookupField(editListDefinitionPage, st2SamplesField.getName(), sampleType2 + " Error: Invalid sample type", "<Invalid sample type: " + sampleType2 + ">");
     }
 
-    @Test // GitHub Issue 788
+    @Test // GitHub Issue #657
     public void testInvalidSampleFieldFromJSON() throws Exception
     {
         File jsonFile = TestFileUtils.getSampleData("lists/BadSampleFieldLookup.fields.json");
