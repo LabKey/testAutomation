@@ -347,7 +347,7 @@ public class QueryChartDialog extends ModalDialog
             getTrendlineProvidedParametersSelect().select(field);
         else
             getTrendlineProvidedParametersSelect().clearSelection();
-        clickFieldOptions("Trendline"); // close the popover
+        elementCache().title.click(); // close the popover
         return this;
     }
 
@@ -355,7 +355,7 @@ public class QueryChartDialog extends ModalDialog
     {
         clickFieldOptions("Trendline"); // open the popover
         List<String> options = getTrendlineProvidedParametersSelect().getOptions();
-        clickFieldOptions("Trendline"); // close the popover
+        elementCache().title.click(); // close the popover
         return options;
     }
 
