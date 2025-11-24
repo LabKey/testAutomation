@@ -109,6 +109,19 @@ public class DetailTable extends WebDriverComponent<DetailTable.ElementCache>
         }
     }
 
+    public boolean hasField(String identifier)
+    {
+        try
+        {
+            getField(identifier);
+            return true;
+        }
+        catch (NoSuchElementException nse)
+        {
+            return false;
+        }
+    }
+
     public boolean fieldHasFormatPill(String identifier)
     {
         return Locator.tagWithClass("*", "status-pill").existsIn(getField(identifier));
