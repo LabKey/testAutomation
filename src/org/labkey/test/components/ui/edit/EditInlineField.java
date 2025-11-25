@@ -61,7 +61,9 @@ public class EditInlineField extends WebDriverComponent<EditInlineField.ElementC
 
     public String getValue()
     {
-        return elementCache().toggle().getText();
+        if (elementCache().hasToggle())
+            return elementCache().toggle().getText();
+        return getComponentElement().getText();
     }
 
     private boolean isOpen()
@@ -123,6 +125,11 @@ public class EditInlineField extends WebDriverComponent<EditInlineField.ElementC
         WebElement toggle()
         {
             return toggleLoc.waitForElement(this, 1_000);
+        }
+
+        boolean hasToggle()
+        {
+            return toggleLoc.existsIn(this);
         }
 
         WebElement pencil()
