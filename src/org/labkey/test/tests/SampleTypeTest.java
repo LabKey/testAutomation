@@ -2012,8 +2012,7 @@ public class SampleTypeTest extends BaseWebDriverTest
 
     private void verifyTableIndices(String prefix, List<String> indexSuffixes)
     {
-        List<String> suffixes  = new ArrayList<>();
-        suffixes.add("lsid");
+        List<String> suffixes = new ArrayList<>();
         suffixes.add("name");
         suffixes.addAll(indexSuffixes);
 
@@ -2062,7 +2061,6 @@ public class SampleTypeTest extends BaseWebDriverTest
             row++;
         }
     }
-
 
     @Override
     public BrowserType bestBrowser()
