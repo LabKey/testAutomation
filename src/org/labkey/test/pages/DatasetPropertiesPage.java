@@ -138,7 +138,6 @@ public class DatasetPropertiesPage extends LabKeyPage<DatasetPropertiesPage.Elem
         final WebElement manageDatasetsButton = Locator.lkButton("Manage Datasets").findWhenNeeded(this);
         final WebElement deleteDatasetButton = Locator.lkButton("Delete Dataset").findWhenNeeded(this);
         final WebElement deleteAllRowsButton = Locator.lkButton("Delete All Rows").findWhenNeeded(this);
-        final WebElement showImportHistoryButton = Locator.lkButton("Show Import History").findWhenNeeded(this);
         final WebElement editDefinitionButton = Locator.lkButton("Edit Definition").findWhenNeeded(this);
     }
 }
