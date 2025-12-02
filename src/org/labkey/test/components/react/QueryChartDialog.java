@@ -58,6 +58,31 @@ public class QueryChartDialog extends ModalDialog
         return this;
     }
 
+    public QueryChartDialog setHeight(String value)
+    {
+        elementCache().heightInput.set(value);
+        elementCache().title.click(); // blur the element
+        return this;
+    }
+
+    public QueryChartDialog setWidth(String value)
+    {
+        elementCache().widthInput.set(value);
+        elementCache().title.click(); // blur the element
+        return this;
+    }
+
+    public QueryChartDialog setUseFullWidth(boolean checked)
+    {
+        elementCache().fullWidthCheckbox.set(checked);
+        return this;
+    }
+
+    public boolean getUseFullWidth()
+    {
+        return elementCache().sharedCheckbox.get();
+    }
+
     public QueryChartDialog setShared(boolean checked)
     {
         elementCache().sharedCheckbox.set(checked);
@@ -571,8 +596,11 @@ public class QueryChartDialog extends ModalDialog
         final Input nameInput = Input(Locator.input("name"), getDriver()).findWhenNeeded(settingsPanel);
         final Input titleInput = Input(Locator.input("main-label"), getDriver()).findWhenNeeded(settingsPanel);
         final Input subtitleInput = Input(Locator.input("subtitle-label"), getDriver()).findWhenNeeded(settingsPanel);
+        final Input heightInput = Input(Locator.input("height"), getDriver()).findWhenNeeded(settingsPanel);
+        final Input widthInput = Input(Locator.input("width"), getDriver()).findWhenNeeded(settingsPanel);
         final Checkbox sharedCheckbox = Checkbox.Checkbox(Locator.input("shared")).findWhenNeeded(settingsPanel);
         final Checkbox inheritableCheckbox = Checkbox.Checkbox(Locator.input("inheritable")).findWhenNeeded(settingsPanel);
+        final Checkbox fullWidthCheckbox = Checkbox.Checkbox(Locator.input("use-full-width")).findWhenNeeded(settingsPanel);
 
         public ReactSelect reactSelectByLabel(String label)
         {
