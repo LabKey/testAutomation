@@ -23,7 +23,9 @@ public class VersionRange
 
     public static VersionRange versionRange(String earliestVersion, String latestVersion)
     {
-        return new VersionRange(new Version(earliestVersion), new Version(latestVersion));
+        Version earliest = earliestVersion == null ? null : new Version(earliestVersion);
+        Version latest = latestVersion == null ? null : new Version(latestVersion);
+        return new VersionRange(earliest, latest);
     }
 
     public boolean contains(Version version)

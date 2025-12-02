@@ -36,7 +36,7 @@ public abstract class BaseUpgradeTest extends BaseWebDriverTest
 
     protected static final boolean isUpgradeSetupPhase = TestProperties.getBooleanProperty("webtest.upgradeSetup", true);
     protected static final Version previousVersion = Optional.ofNullable(trimToNull(System.getProperty("webtest.upgradePreviousVersion")))
-        .map(Version::new).orElse(null);
+        .map(Version::new).orElse(TestProperties.getProductVersion());
 
     @Override
     protected boolean skipCleanup(boolean afterTest)
@@ -114,7 +114,7 @@ public abstract class BaseUpgradeTest extends BaseWebDriverTest
                 @Override
                 public void evaluate() throws Throwable
                 {
-                    Assume.assumeTrue("Test doesn't support upgrading from version: " + previousVersion,
+                    Assume.assumeTrue("Test not valid when upgrading from version: " + previousVersion,
                         VersionRange.versionRange(earliestVersion, latestVersion).contains(previousVersion)
                     );
                     base.evaluate();

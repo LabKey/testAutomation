@@ -15,14 +15,22 @@ public class Version implements Comparable<Version>
 {
     private final List<Integer> _version;
 
-    public Version(Integer... version)
+    private Version(List<Integer> version)
     {
         _version = validate(version);
     }
 
+    public Version(Integer... version)
+    {
+        this(List.of(version));
+    }
+
     public Version(String version)
     {
-        this(Arrays.stream(version.split("\\.")).map(Integer::parseInt).toArray(Integer[]::new));
+        this(Arrays.stream(version
+                .split("-", 2)[0] // Remove snapshot suffix
+                .split("\\.")) // Split the version into major, minor, patch, etc. parts
+                .map(Integer::parseInt).toList());
     }
 
     public Version(Double version)
@@ -30,9 +38,9 @@ public class Version implements Comparable<Version>
         this(version.toString());
     }
 
-    private static List<Integer> validate(Integer... versionParts)
+    private static List<Integer> validate(List<Integer> versionParts)
     {
-        List<Integer> partList = List.of(versionParts);
+        List<Integer> partList = List.copyOf(versionParts);
         if (partList.isEmpty())
         {
             throw new IllegalArgumentException("Version must have at least one part");
@@ -45,6 +53,19 @@ public class Version implements Comparable<Version>
             }
         }
         return partList;
+    }
+
+    public Version trim(int maxParts)
+    {
+        if (maxParts == _version.size())
+            return this;
+        else
+            return new Version(_version.subList(0, maxParts));
+    }
+
+    public int size()
+    {
+        return _version.size();
     }
 
     @Override
