@@ -45,6 +45,19 @@ public class QueryChartDialog extends ModalDialog
         return elementCache().nameInput.get();
     }
 
+    public QueryChartDialog setTitle(String value) {
+        elementCache().titleInput.set(value);
+        elementCache().title.click(); // blur the element
+        return this;
+    }
+
+    public QueryChartDialog setSubtitle(String value)
+    {
+        elementCache().subtitleInput.set(value);
+        elementCache().title.click(); // blur the element
+        return this;
+    }
+
     public QueryChartDialog setShared(boolean checked)
     {
         elementCache().sharedCheckbox.set(checked);
@@ -264,6 +277,22 @@ public class QueryChartDialog extends ModalDialog
         boolean enabled = getErrorBarsRadio(value).isEnabled();
         Locator.tagWithText("label", "Name *").findElement(this).click(); // close the popover
         return enabled;
+    }
+
+    public QueryChartDialog setXAxisLabel(String value)
+    {
+        clickFieldOptions("X Axis");
+        elementCache().xLabelInput.set(value);
+        Locator.tagWithText("label", "Name *").findElement(this).click(); // close the popover
+        return this;
+    }
+
+    public QueryChartDialog setYAxisLabel(String value)
+    {
+        clickFieldOptions("Y Axis");
+        elementCache().yLabelInput.set(value);
+        Locator.tagWithText("label", "Name *").findElement(this).click(); // close the popover
+        return this;
     }
 
     /*
@@ -537,13 +566,13 @@ public class QueryChartDialog extends ModalDialog
 
     protected class ElementCache extends ModalDialog.ElementCache
     {
-        final Input nameInput = Input(Locator.input("name"), getDriver()).findWhenNeeded(this);
-        final Checkbox sharedCheckbox = Checkbox.Checkbox(Locator.input("shared")).findWhenNeeded(this);
-        final Checkbox inheritableCheckbox = Checkbox.Checkbox(Locator.input("inheritable")).findWhenNeeded(this);
         Locator.XPathLocator settingsPanelLoc = Locator.byClass("chart-builder-modal__settings-panel");
         final WebElement settingsPanel = settingsPanelLoc.findWhenNeeded(this);
-
-        Locator.XPathLocator chartBuilderType = Locator.tagWithClass("div", "chart-builder-type");
+        final Input nameInput = Input(Locator.input("name"), getDriver()).findWhenNeeded(settingsPanel);
+        final Input titleInput = Input(Locator.input("main-label"), getDriver()).findWhenNeeded(settingsPanel);
+        final Input subtitleInput = Input(Locator.input("subtitle-label"), getDriver()).findWhenNeeded(settingsPanel);
+        final Checkbox sharedCheckbox = Checkbox.Checkbox(Locator.input("shared")).findWhenNeeded(settingsPanel);
+        final Checkbox inheritableCheckbox = Checkbox.Checkbox(Locator.input("inheritable")).findWhenNeeded(settingsPanel);
 
         public ReactSelect reactSelectByLabel(String label)
         {
@@ -564,7 +593,7 @@ public class QueryChartDialog extends ModalDialog
             Locator loc = Locator.tag("div").withChild(Locator.tagContainingText("label", label));
             return Locator.tagWithClass("div", "field-option-icon").descendant("span").findElementOrNull(loc.findElement(this));
         }
-        private final Locator.XPathLocator previewContainerLoc = Locator.tag("div").withChild(Locator.tagWithText("label", "Preview"));
+        private final Locator.XPathLocator previewContainerLoc = Locator.tag("div").withChild(Locator.tagWithText("h4", "Preview"));
         public WebElement previewContainer()
         {
             return previewContainerLoc.waitForElement(this, 1500);
@@ -590,6 +619,8 @@ public class QueryChartDialog extends ModalDialog
         public RadioButton scaleManualRadio = RadioButton.RadioButton(Locator.radioButtonByNameAndValue("scaleType", "manual")).refindWhenNeeded(fieldOptionPopover);
         public Input scaleRangeMinInput = Input(Locator.input("scaleMin"), getDriver()).refindWhenNeeded(fieldOptionPopover);
         public Input scaleRangeMaxInput = Input(Locator.input("scaleMax"), getDriver()).refindWhenNeeded(fieldOptionPopover);
+        public Input yLabelInput = Input(Locator.input("y-label"), getDriver()).refindWhenNeeded(fieldOptionPopover);
+        public Input xLabelInput = Input(Locator.input("x-label"), getDriver()).refindWhenNeeded(fieldOptionPopover);
 
         final Locator.XPathLocator radioGroupLoc = Locator.byClass("field-option-radio-group");
 
