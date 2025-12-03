@@ -17,7 +17,6 @@ public enum InventoryMetricUnit
     KG("kg", "kg (kilograms)"),
     UG("ug", "ug (micrograms)"),
     NG("ng", "ng (nanograms)"),
-    PG("pg", "pg (picograms)"),
     ML("mL", "mL (milliliters)"),
     UL("uL", "uL (microliters)"),
     L("L", "L (liters)"),
@@ -58,7 +57,7 @@ public enum InventoryMetricUnit
     public static List<InventoryMetricUnit> getAllSampleTypeUnits()
     {
         return Arrays.asList(InventoryMetricUnit.G, InventoryMetricUnit.MG, InventoryMetricUnit.KG,
-                InventoryMetricUnit.UG, InventoryMetricUnit.NG, InventoryMetricUnit.PG,
+                InventoryMetricUnit.UG, InventoryMetricUnit.NG,
                 InventoryMetricUnit.ML, InventoryMetricUnit.UL, InventoryMetricUnit.L,
                 InventoryMetricUnit.UNIT);
     }
@@ -89,7 +88,7 @@ public enum InventoryMetricUnit
     public static List<InventoryMetricUnit> getMassSampleUnits()
     {
         return Arrays.asList(InventoryMetricUnit.G, InventoryMetricUnit.MG, InventoryMetricUnit.KG,
-                InventoryMetricUnit.UG, InventoryMetricUnit.NG, InventoryMetricUnit.PG);
+                InventoryMetricUnit.UG, InventoryMetricUnit.NG);
     }
 
     public static List<String> getMassSampleUnitNames()
