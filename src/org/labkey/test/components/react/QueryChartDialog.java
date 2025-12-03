@@ -591,7 +591,7 @@ public class QueryChartDialog extends ModalDialog
 
     protected class ElementCache extends ModalDialog.ElementCache
     {
-        Locator.XPathLocator settingsPanelLoc = Locator.byClass("chart-builder-modal__settings-panel");
+        Locator.XPathLocator settingsPanelLoc = Locator.byClass("chart-settings");
         final WebElement settingsPanel = settingsPanelLoc.findWhenNeeded(this);
         final Input nameInput = Input(Locator.input("name"), getDriver()).findWhenNeeded(settingsPanel);
         final Input titleInput = Input(Locator.input("main-label"), getDriver()).findWhenNeeded(settingsPanel);
