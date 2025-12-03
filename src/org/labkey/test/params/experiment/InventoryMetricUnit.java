@@ -2,6 +2,10 @@ package org.labkey.test.params.experiment;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Enum of the various storage amount types.
  */
@@ -11,6 +15,9 @@ public enum InventoryMetricUnit
     G("g", "g (grams)"),
     MG("mg", "mg (milligrams)"),
     KG("kg", "kg (kilograms)"),
+    UG("ug", "ug (micrograms)"),
+    NG("ng", "ng (nanograms)"),
+    PG("pg", "pg (picograms)"),
     ML("mL", "mL (milliliters)"),
     UL("uL", "uL (microliters)"),
     L("L", "L (liters)"),
@@ -46,5 +53,47 @@ public enum InventoryMetricUnit
                 return unit.getValue();
         }
         return unitString;
+    }
+
+    public static List<InventoryMetricUnit> getAllSampleTypeUnits()
+    {
+        return Arrays.asList(InventoryMetricUnit.G, InventoryMetricUnit.MG, InventoryMetricUnit.KG,
+                InventoryMetricUnit.UG, InventoryMetricUnit.NG, InventoryMetricUnit.PG,
+                InventoryMetricUnit.ML, InventoryMetricUnit.UL, InventoryMetricUnit.L,
+                InventoryMetricUnit.UNIT);
+    }
+
+    public static List<String> getAllSampleTypeUnitNames()
+    {
+        return getAllSampleTypeUnits().stream().map(InventoryMetricUnit::getValue).toList();
+    }
+
+    public static List<String> getAllSampleTypeUnitLabels()
+    {
+        return getAllSampleTypeUnits().stream().map(InventoryMetricUnit::getLabel).toList();
+    }
+
+    public static List<String> getAllSampleUnits()
+    {
+        List<String> allUnits = new ArrayList<>();
+        allUnits.addAll(getAllSampleTypeUnitNames());
+        allUnits.addAll(Arrays.asList("blocks", "bottle", "box", "cells", "kit", "pack", "pcs", "slides", "tests"));
+        return allUnits;
+    }
+
+    public static List<InventoryMetricUnit> getMassSampleUnits()
+    {
+        return Arrays.asList(InventoryMetricUnit.G, InventoryMetricUnit.MG, InventoryMetricUnit.KG,
+                InventoryMetricUnit.UG, InventoryMetricUnit.NG, InventoryMetricUnit.PG);
+    }
+
+    public static List<String> getMassSampleUnitNames()
+    {
+        return getMassSampleUnits().stream().map(InventoryMetricUnit::getValue).toList();
+    }
+
+    public static List<String> getMassSampleUnitLabels()
+    {
+        return getMassSampleUnits().stream().map(InventoryMetricUnit::getLabel).toList();
     }
 }
