@@ -189,9 +189,15 @@ public class AuditLogHelper
     public SelectRowsResponse getAuditLogsFromLKS(String containerPath, AuditEvent auditEventName, List<String> columnNames,
                                                         @Nullable List<Filter> filters, @Nullable Integer maxRows, @Nullable ContainerFilter containerFilter) throws IOException, CommandException
     {
+        return getAuditLogsFromLKS(containerPath, _wrapper.getCurrentProject(), auditEventName, columnNames, filters, maxRows, containerFilter);
+    }
+
+    public SelectRowsResponse getAuditLogsFromLKS(String containerPath, @NotNull String projectName, AuditEvent auditEventName, List<String> columnNames,
+                                                  @Nullable List<Filter> filters, @Nullable Integer maxRows, @Nullable ContainerFilter containerFilter) throws IOException, CommandException
+    {
         SelectRowsCommand cmd = new SelectRowsCommand("auditLog", auditEventName.getName());
         cmd.setColumns(columnNames);
-        cmd.addFilter("ProjectId/Name", _wrapper.getCurrentProject(), Filter.Operator.EQUAL);
+        cmd.addFilter("ProjectId/Name", projectName, Filter.Operator.EQUAL);
         if (filters != null)
             filters.forEach(cmd::addFilter);
         if (maxRows != null)
@@ -208,7 +214,7 @@ public class AuditLogHelper
     }
 
     public List<Map<String, Object>> getAuditLogsForTransactionId(String containerPath, AuditEvent auditEventName, List<String> columnNames,
-                                                         Integer transactionId, List<Filter> eventFilters, @Nullable ContainerFilter containerFilter) throws IOException, CommandException
+                                                         Integer transactionId, @Nullable List<Filter> eventFilters, @Nullable ContainerFilter containerFilter) throws IOException, CommandException
     {
         List<Filter> transactionFilter = new ArrayList<>();
         if (transactionId != null)
@@ -216,6 +222,22 @@ public class AuditLogHelper
         if (eventFilters != null && !eventFilters.isEmpty())
             transactionFilter.addAll(eventFilters);
         return getAuditLogsFromLKS(containerPath, auditEventName, columnNames, transactionFilter, null, containerFilter).getRows();
+    }
+
+    public List<Map<String, Object>> getAuditLogsForTransactionId(String containerPath,
+                                                                  AuditEvent auditEventName,
+                                                                  List<String> columnNames,
+                                                                  String projectName,
+                                                                  Integer transactionId,
+                                                                  List<Filter> eventFilters,
+                                                                  @Nullable ContainerFilter containerFilter) throws IOException, CommandException
+    {
+        List<Filter> transactionFilter = new ArrayList<>();
+        if (transactionId != null)
+            transactionFilter.add(new Filter("TransactionId", transactionId, Filter.Operator.EQUAL));
+        if (eventFilters != null && !eventFilters.isEmpty())
+            transactionFilter.addAll(eventFilters);
+        return getAuditLogsFromLKS(containerPath, projectName, auditEventName, columnNames, transactionFilter, null, containerFilter).getRows();
     }
 
     public void checkAuditEventValuesForTransactionId(String containerPath, AuditEvent auditEventName, Integer transactionId, int rowCount, Map<String, Object> expectedValues) throws IOException, CommandException
