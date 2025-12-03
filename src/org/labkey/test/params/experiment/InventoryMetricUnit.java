@@ -81,6 +81,11 @@ public enum InventoryMetricUnit
         return allUnits;
     }
 
+    public static List<String> getAllCountUnits()
+    {
+        return Arrays.asList("unit", "blocks", "bottle", "box", "cells", "kit", "pack", "pcs", "slides", "tests");
+    }
+
     public static List<InventoryMetricUnit> getMassSampleUnits()
     {
         return Arrays.asList(InventoryMetricUnit.G, InventoryMetricUnit.MG, InventoryMetricUnit.KG,
