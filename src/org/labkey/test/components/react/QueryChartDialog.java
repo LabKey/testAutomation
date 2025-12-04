@@ -14,6 +14,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.labkey.test.components.html.Input.Input;
 
@@ -42,6 +43,44 @@ public class QueryChartDialog extends ModalDialog
     public String getName()
     {
         return elementCache().nameInput.get();
+    }
+
+    public QueryChartDialog setTitle(String value) {
+        elementCache().titleInput.set(value);
+        elementCache().title.click(); // blur the element
+        return this;
+    }
+
+    public QueryChartDialog setSubtitle(String value)
+    {
+        elementCache().subtitleInput.set(value);
+        elementCache().title.click(); // blur the element
+        return this;
+    }
+
+    public QueryChartDialog setHeight(String value)
+    {
+        elementCache().heightInput.set(value);
+        elementCache().title.click(); // blur the element
+        return this;
+    }
+
+    public QueryChartDialog setWidth(String value)
+    {
+        elementCache().widthInput.set(value);
+        elementCache().title.click(); // blur the element
+        return this;
+    }
+
+    public QueryChartDialog setUseFullWidth(boolean checked)
+    {
+        elementCache().fullWidthCheckbox.set(checked);
+        return this;
+    }
+
+    public boolean getUseFullWidth()
+    {
+        return elementCache().sharedCheckbox.get();
     }
 
     public QueryChartDialog setShared(boolean checked)
@@ -129,6 +168,12 @@ public class QueryChartDialog extends ModalDialog
                 "log".equalsIgnoreCase(value) && elementCache().scaleLogRadio.isChecked();
         clickFieldOptions(label); // close the popover
         return selected;
+    }
+
+    public boolean isAxisScaleTypeAvailable(String label)
+    {
+        clickFieldOptions(label);
+        return elementCache().radioGroupWithLabel("Scale").isPresent();
     }
 
     /**
@@ -257,6 +302,22 @@ public class QueryChartDialog extends ModalDialog
         boolean enabled = getErrorBarsRadio(value).isEnabled();
         Locator.tagWithText("label", "Name *").findElement(this).click(); // close the popover
         return enabled;
+    }
+
+    public QueryChartDialog setXAxisLabel(String value)
+    {
+        clickFieldOptions("X Axis");
+        elementCache().xLabelInput.set(value);
+        Locator.tagWithText("label", "Name *").findElement(this).click(); // close the popover
+        return this;
+    }
+
+    public QueryChartDialog setYAxisLabel(String value)
+    {
+        clickFieldOptions("Y Axis");
+        elementCache().yLabelInput.set(value);
+        Locator.tagWithText("label", "Name *").findElement(this).click(); // close the popover
+        return this;
     }
 
     /*
@@ -401,10 +462,10 @@ public class QueryChartDialog extends ModalDialog
         if (getSelectedChartType().equals(chartType))
             return this;
 
-        var el = elementCache().chartBuilderType.withAttribute("data-name", chartType.getChartType())
-                .waitForElement(this, 1500);
-        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(el));
-        el.click();
+        var chartTypeDropdown = elementCache().reactSelectByLabel("Chart Type");
+        // ChartTypeDropdown component uses a custom option renderer
+        chartTypeDropdown.setOptionLocator((String type) -> Locator.byClass("chart-builder-type-option").withAttribute("data-chart-type", type));
+        chartTypeDropdown.select(chartType.getChartType());
         WebDriverWrapper.waitFor(()-> getSelectedChartType().equals(chartType),
                 "The requested chart type did not become selected", 2000);
 
@@ -413,10 +474,11 @@ public class QueryChartDialog extends ModalDialog
 
     public CHART_TYPE getSelectedChartType()
     {
-        var selectedEl = elementCache().chartBuilderType.withAttributeContaining("class", "selected")
-                .waitForElement(this, 1500);
-        String dataName = selectedEl.getAttribute("data-name");
-        return CHART_TYPE.fromChartType(dataName);
+        var chartTypeDropdown = elementCache().reactSelectByLabel("Chart Type");
+        // The ChartTypeDropdown component has a custom value renderer, so we need to find that manually because
+        // chartTypeDropdown.getValue will throw an exception
+        WebElement selectedOption = Locator.byClass("chart-builder-type-option--value").findElement(chartTypeDropdown);
+        return CHART_TYPE.fromChartType(selectedOption.getAttribute("data-chart-type"));
     }
 
     public boolean isPreviewPresent()
@@ -529,11 +591,16 @@ public class QueryChartDialog extends ModalDialog
 
     protected class ElementCache extends ModalDialog.ElementCache
     {
-        final Input nameInput = Input(Locator.input("name"), getDriver()).findWhenNeeded(this);
-        final Checkbox sharedCheckbox = Checkbox.Checkbox(Locator.input("shared")).findWhenNeeded(this);
-        final Checkbox inheritableCheckbox = Checkbox.Checkbox(Locator.input("inheritable")).findWhenNeeded(this);
-
-        Locator.XPathLocator chartBuilderType = Locator.tagWithClass("div", "chart-builder-type");
+        Locator.XPathLocator settingsPanelLoc = Locator.byClass("chart-settings");
+        final WebElement settingsPanel = settingsPanelLoc.findWhenNeeded(this);
+        final Input nameInput = Input(Locator.input("name"), getDriver()).findWhenNeeded(settingsPanel);
+        final Input titleInput = Input(Locator.input("main-label"), getDriver()).findWhenNeeded(settingsPanel);
+        final Input subtitleInput = Input(Locator.input("subtitle-label"), getDriver()).findWhenNeeded(settingsPanel);
+        final Input heightInput = Input(Locator.input("height"), getDriver()).findWhenNeeded(settingsPanel);
+        final Input widthInput = Input(Locator.input("width"), getDriver()).findWhenNeeded(settingsPanel);
+        final Checkbox sharedCheckbox = Checkbox.Checkbox(Locator.input("shared")).findWhenNeeded(settingsPanel);
+        final Checkbox inheritableCheckbox = Checkbox.Checkbox(Locator.input("inheritable")).findWhenNeeded(settingsPanel);
+        final Checkbox fullWidthCheckbox = Checkbox.Checkbox(Locator.input("use-full-width")).findWhenNeeded(settingsPanel);
 
         public ReactSelect reactSelectByLabel(String label)
         {
@@ -543,10 +610,10 @@ public class QueryChartDialog extends ModalDialog
         public ReactSelect reactSelectByLabel(String label, boolean allowNull)
         {
             Locator loc = Locator.tag("div").withChild(Locator.tagContainingText("label", label));
-            if (allowNull && loc.findElementOrNull(this) == null)
+            if (allowNull && loc.findElementOrNull(settingsPanel) == null)
                 return null;
             else
-                return ReactSelect.finder(getDriver()).find(loc.waitForElement(this, 1500));
+                return ReactSelect.finder(getDriver()).find(loc.waitForElement(settingsPanel, 1500));
         }
 
         public WebElement fieldOptionIconByLabel(String label)
@@ -554,7 +621,7 @@ public class QueryChartDialog extends ModalDialog
             Locator loc = Locator.tag("div").withChild(Locator.tagContainingText("label", label));
             return Locator.tagWithClass("div", "field-option-icon").descendant("span").findElementOrNull(loc.findElement(this));
         }
-        private final Locator.XPathLocator previewContainerLoc = Locator.tag("div").withChild(Locator.tagWithText("label", "Preview"));
+        private final Locator.XPathLocator previewContainerLoc = Locator.tag("div").withChild(Locator.tagWithText("h4", "Preview"));
         public WebElement previewContainer()
         {
             return previewContainerLoc.waitForElement(this, 1500);
@@ -580,6 +647,16 @@ public class QueryChartDialog extends ModalDialog
         public RadioButton scaleManualRadio = RadioButton.RadioButton(Locator.radioButtonByNameAndValue("scaleType", "manual")).refindWhenNeeded(fieldOptionPopover);
         public Input scaleRangeMinInput = Input(Locator.input("scaleMin"), getDriver()).refindWhenNeeded(fieldOptionPopover);
         public Input scaleRangeMaxInput = Input(Locator.input("scaleMax"), getDriver()).refindWhenNeeded(fieldOptionPopover);
+        public Input yLabelInput = Input(Locator.input("y-label"), getDriver()).refindWhenNeeded(fieldOptionPopover);
+        public Input xLabelInput = Input(Locator.input("x-label"), getDriver()).refindWhenNeeded(fieldOptionPopover);
+
+        final Locator.XPathLocator radioGroupLoc = Locator.byClass("field-option-radio-group");
+
+        public Optional<WebElement> radioGroupWithLabel(String label)
+        {
+            Locator.XPathLocator labelLoc = Locator.tagWithText("label", label);
+            return radioGroupLoc.withChild(labelLoc).findOptionalElement(fieldOptionPopover);
+        }
     }
 
     public enum CHART_TYPE{
