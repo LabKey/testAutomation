@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static org.labkey.test.WebDriverWrapper.sleep;
 
@@ -302,7 +303,7 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
     public void setAliquotView(AliquotViewOptions view)
     {
         // Need to identify where we are. The menu text is contextual to the page.
-        String url = getDriver().getCurrentUrl().toLowerCase();
+        String url = Objects.requireNonNull(getDriver().getCurrentUrl()).toLowerCase();
         boolean onSourcesPage = url.contains("#/sources/");
         boolean onSamplePage = url.contains("#/samples/");
 
@@ -356,8 +357,12 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
                 break;
         }
 
-        doMenuAction(currentButtonText, Arrays.asList(menuChoice));
+        // Do nothing if currently on the requested menu item.
+        if (currentButtonText.equals(menuChoice))
+            return;
 
+        String finalMenuChoice = menuChoice;
+        _queryGrid.doAndWaitForUpdate(()->doMenuAction(currentButtonText, Arrays.asList(finalMenuChoice)));
     }
 
     public GridBar searchFor(String searchStr)
