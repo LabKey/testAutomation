@@ -69,15 +69,16 @@ public class AdminConsoleNavigationTest extends BaseWebDriverTest
     {
         Set<String> ignoredLinks = Collections.newSetFromMap(new CaseInsensitiveHashMap<>());
         ignoredLinks.addAll(List.of(
-                "Authentication",                   // Slow to load
-                "Change User Properties",           // Generic domain action -- difficult to customize navtrail
-                "Dump Heap",                        // Undesired consequences
-                "Reset Site Errors",                // No nav trail
-                "Memory Usage",                     // Slow to load
-                "View All Site Errors",             // No nav trail
-                "View All Site Errors Since Reset", // No nav trail
-                "View CSP Report Log File",         // No nav trail
-                "View Primary Site Log File"        // No nav trail
+            "Attachments",                      // Just query-execute.view, so no Admin Console navtrail
+            "Authentication",                   // Slow to load
+            "Change User Properties",           // Generic domain action -- difficult to customize navtrail
+            "Dump Heap",                        // Undesired consequences
+            "Reset Site Errors",                // No nav trail
+            "Memory Usage",                     // Slow to load
+            "View All Site Errors",             // No nav trail
+            "View All Site Errors Since Reset", // No nav trail
+            "View CSP Report Log File",         // No nav trail
+            "View Primary Site Log File"        // No nav trail
         ));
         List<WebElement> adminLinks = ShowAdminPage.beginAt(this).getAllAdminConsoleLinks();
         assertTrue(String.format("Failed sanity check. Only found %s admin links. There should be more.", adminLinks.size()), adminLinks.size() > 10);
