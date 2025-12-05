@@ -74,15 +74,15 @@ public enum InventoryMetricUnit
 
     public static List<String> getAllSampleUnits()
     {
-        List<String> allUnits = new ArrayList<>();
-        allUnits.addAll(getAllSampleTypeUnitNames());
-        allUnits.addAll(Arrays.asList("blocks", "bottle", "box", "cells", "kit", "pack", "pcs", "slides", "tests"));
+        List<String> allUnits = new ArrayList<>(getAllSampleTypeUnitNames());
+        allUnits.remove(InventoryMetricUnit.UNIT.name());
+        allUnits.addAll(getAllCountUnits());
         return allUnits;
     }
 
     public static List<String> getAllCountUnits()
     {
-        return Arrays.asList("unit", "blocks", "bottle", "box", "cells", "kit", "pack", "pcs", "slides", "tests");
+        return Arrays.asList("blocks", "bottles", "boxes", "cells", "kits", "packs", "pieces", "slides", "tests", "units");
     }
 
     public static List<InventoryMetricUnit> getMassSampleUnits()
