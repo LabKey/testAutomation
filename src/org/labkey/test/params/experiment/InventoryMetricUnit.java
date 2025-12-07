@@ -75,7 +75,7 @@ public enum InventoryMetricUnit
     public static List<String> getAllSampleUnits()
     {
         List<String> allUnits = new ArrayList<>(getAllSampleTypeUnitNames());
-        allUnits.remove(InventoryMetricUnit.UNIT.name());
+        allUnits.remove(InventoryMetricUnit.UNIT.getLabel());
         allUnits.addAll(getAllCountUnits());
         return allUnits;
     }
