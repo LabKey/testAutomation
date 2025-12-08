@@ -302,6 +302,11 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
      */
     public void setAliquotView(AliquotViewOptions view)
     {
+
+        // Do nothing if currently on the requested menu item.
+        if (getCurrentAliquotView().equals(view))
+            return;
+
         // Need to identify where we are. The menu text is contextual to the page.
         String url = Objects.requireNonNull(getDriver().getCurrentUrl()).toLowerCase();
         boolean onSourcesPage = url.contains("#/sources/");
@@ -356,10 +361,6 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
                 menuChoice = "Aliquots Only";
                 break;
         }
-
-        // Do nothing if currently on the requested menu item.
-        if (currentButtonText.equals(menuChoice))
-            return;
 
         String finalMenuChoice = menuChoice;
         _queryGrid.doAndWaitForUpdate(()->doMenuAction(currentButtonText, Arrays.asList(finalMenuChoice)));
