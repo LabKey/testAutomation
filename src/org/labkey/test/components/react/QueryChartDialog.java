@@ -628,6 +628,22 @@ public class QueryChartDialog extends ModalDialog
         return this;
     }
 
+    public boolean hasLineColorAndStyleSelectOption()
+    {
+        return elementCache().reactSelectByLabel("Line Color and Style", true) != null;
+    }
+
+    public QueryChartDialog selectLineColorAndStyleOption(String option, String hexColor)
+    {
+        var seriesDropdown = elementCache().reactSelectByLabel("Line Color and Style");
+        // series select component uses a custom option renderer
+        seriesDropdown.setOptionLocator((String type) -> Locator.byClass("chart-builder-type-option").withAttribute("data-series-shape", type));
+        seriesDropdown.select(option);
+        if (hexColor != null)
+            setColor(elementCache().seriesColorPicker, hexColor);
+        return this;
+    }
+
     @Override
     protected ElementCache newElementCache()
     {
@@ -656,6 +672,7 @@ public class QueryChartDialog extends ModalDialog
         final WebElement fillColorPicker = Locator.byClass("color-picker").withAttribute("data-name", "boxFillColor").refindWhenNeeded(settingsPanel);
         final WebElement lineColorPicker = Locator.byClass("color-picker").withAttribute("data-name", "lineColor").refindWhenNeeded(settingsPanel);
         final WebElement pointColorPicker = Locator.byClass("color-picker").withAttribute("data-name", "pointFillColor").refindWhenNeeded(settingsPanel);
+        final WebElement seriesColorPicker = Locator.byClass("color-picker").withAttribute("data-name", "seriesColor").refindWhenNeeded(settingsPanel);
 
         public ReactSelect reactSelectByLabel(String label)
         {
