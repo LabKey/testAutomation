@@ -2,6 +2,7 @@ package org.labkey.test.components.react;
 
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.components.ColorPickerInput;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
@@ -577,6 +578,56 @@ public class QueryChartDialog extends ModalDialog
         }
     }
 
+    public boolean hasFillColorOption()
+    {
+        return elementCache().fillColorPicker.isDisplayed();
+    }
+
+    public QueryChartDialog setFillColor(String hexColor)
+    {
+        return setColor(elementCache().fillColorPicker, hexColor);
+    }
+
+    public boolean hasLineColorOption()
+    {
+        return elementCache().lineColorPicker.isDisplayed();
+    }
+
+    public QueryChartDialog setLineColor(String hexColor)
+    {
+        return setColor(elementCache().lineColorPicker, hexColor);
+    }
+
+    public boolean hasPointColorOption()
+    {
+        return elementCache().pointColorPicker.isDisplayed();
+    }
+
+    public QueryChartDialog setPointColor(String hexColor)
+    {
+        return setColor(elementCache().pointColorPicker, hexColor);
+    }
+
+    private QueryChartDialog setColor(WebElement colorPickerContainer, String hexColor)
+    {
+        Locator.tagWithClassContaining("button", "color-picker__button").findElement(colorPickerContainer).click();
+        ColorPickerInput colorInput = new ColorPickerInput.ColorPickerInputFinder(getDriver()).findWhenNeeded();
+        colorInput.setHexValue(hexColor);
+        colorPickerContainer.click(); // need to click outside the color picker to close it
+        return this;
+    }
+
+    public boolean hasColorPaletteOption()
+    {
+        return elementCache().reactSelectByLabel("Color Palette", true) != null;
+    }
+
+    public QueryChartDialog selectColorPalette(String option)
+    {
+        elementCache().reactSelectByLabel("Color Palette").select(option);
+        return this;
+    }
+
     @Override
     protected ElementCache newElementCache()
     {
@@ -601,6 +652,10 @@ public class QueryChartDialog extends ModalDialog
         final Checkbox sharedCheckbox = Checkbox.Checkbox(Locator.input("shared")).findWhenNeeded(settingsPanel);
         final Checkbox inheritableCheckbox = Checkbox.Checkbox(Locator.input("inheritable")).findWhenNeeded(settingsPanel);
         final Checkbox fullWidthCheckbox = Checkbox.Checkbox(Locator.input("use-full-width")).findWhenNeeded(settingsPanel);
+
+        final WebElement fillColorPicker = Locator.byClass("color-picker").withAttribute("data-name", "boxFillColor").refindWhenNeeded(settingsPanel);
+        final WebElement lineColorPicker = Locator.byClass("color-picker").withAttribute("data-name", "lineColor").refindWhenNeeded(settingsPanel);
+        final WebElement pointColorPicker = Locator.byClass("color-picker").withAttribute("data-name", "pointFillColor").refindWhenNeeded(settingsPanel);
 
         public ReactSelect reactSelectByLabel(String label)
         {
