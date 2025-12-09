@@ -180,7 +180,7 @@ public class SampleTypeRenameTest extends BaseWebDriverTest
                 menuItems.contains(customViewName));
 
         // Dismiss the menu so it doesn't get in the way.
-        menu.findVisibleMenuItems().get(0).sendKeys(Keys.ESCAPE);
+        menu.collapse();
 
         log(String.format("Rename the sample type to '%s'.", SAMPLE_TYPE_NAME_UPDATED));
 
