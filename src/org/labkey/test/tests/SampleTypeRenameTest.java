@@ -21,6 +21,7 @@ import org.labkey.test.util.SampleTypeHelper;
 import org.labkey.test.util.TestDataGenerator;
 import org.labkey.test.util.exp.SampleTypeAPIHelper;
 import org.labkey.test.util.search.SearchAdminAPIHelper;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 
 import java.io.IOException;
@@ -106,6 +107,11 @@ public class SampleTypeRenameTest extends BaseWebDriverTest
         SearchAdminAPIHelper.waitForIndexer();
 
         goToProjectHome();
+
+        // Sometimes sample types created by the API don't immediately show up in the UI, a refresh helps.
+        refresh();
+        waitForElement(Locator.linkContainingText(sampleTypeName));
+
         SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
         UpdateSampleTypePage updatePage = sampleHelper.goToEditSampleType(sampleTypeName);
         updatePage.getFieldsPanel().getField(FIELD_INT).setName(FIELD_INT + " Updated");
@@ -172,6 +178,9 @@ public class SampleTypeRenameTest extends BaseWebDriverTest
         checker().fatal()
                 .verifyTrue(String.format("Doesn't look like custom view '%s' was saved. Fatal error.", customViewName),
                 menuItems.contains(customViewName));
+
+        // Dismiss the menu so it doesn't get in the way.
+        menu.collapse();
 
         log(String.format("Rename the sample type to '%s'.", SAMPLE_TYPE_NAME_UPDATED));
 
