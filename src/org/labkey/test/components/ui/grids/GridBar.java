@@ -313,7 +313,7 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
         boolean onSamplePage = url.contains("#/samples/");
 
         String currentButtonText = currentAliquotViewText();
-        String menuChoice = "";
+        final String menuChoice;
 
         switch (view)
         {
@@ -360,10 +360,11 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
             case ALIQUOTS:
                 menuChoice = "Aliquots Only";
                 break;
+            default:
+                menuChoice = "";
         }
 
-        String finalMenuChoice = menuChoice;
-        _queryGrid.doAndWaitForUpdate(()->doMenuAction(currentButtonText, Arrays.asList(finalMenuChoice)));
+        _queryGrid.doAndWaitForUpdate(()->doMenuAction(currentButtonText, Arrays.asList(menuChoice)));
     }
 
     public GridBar searchFor(String searchStr)
