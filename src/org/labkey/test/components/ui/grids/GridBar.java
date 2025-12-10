@@ -364,7 +364,9 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
                 menuChoice = "";
         }
 
-        _queryGrid.doAndWaitForUpdate(()->doMenuAction(currentButtonText, Arrays.asList(menuChoice)));
+        // Ideally should call _queryGrid.doAndWaitForUpdate(... but that causes the grid to go stale and is tricky to
+        // get a recover the reference to it.
+        doMenuAction(currentButtonText, Arrays.asList(menuChoice));
     }
 
     public GridBar searchFor(String searchStr)
