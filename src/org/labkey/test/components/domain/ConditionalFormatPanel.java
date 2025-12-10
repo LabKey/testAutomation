@@ -3,6 +3,7 @@ package org.labkey.test.components.domain;
 import org.labkey.remoteapi.domain.ConditionalFormat;
 import org.labkey.remoteapi.query.Filter;
 import org.labkey.test.Locator;
+import org.labkey.test.components.ColorPickerInput;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
@@ -134,31 +135,37 @@ public class ConditionalFormatPanel extends WebDriverComponent<ConditionalFormat
     public ConditionalFormatPanel setTextColor(String colorHex)
     {
         expand();
-        elementCache().textColor.click();
-        getWrapper().click(Locator.tagWithAttribute("div", "title", colorHex));
-        getWrapper().click(Locator.tagWithClass("div", "domain-validator-color-cover")); // click elsewhere on the dialog to close the color picker
+        setColor(elementCache().textColorPicker, colorHex);
         return this;
     }
 
     public String getTextStyle()
     {
         expand();
-        return elementCache().textColorPreview.getAttribute("style");
+        return Locator.byClass("color-picker__chip").findElement(elementCache().textColorPicker)
+                .getAttribute("style");
     }
 
     public ConditionalFormatPanel setFillColor(String colorHex)
     {
         expand();
-        elementCache().fillColor.click();
-        getWrapper().click(Locator.tagWithAttribute("div", "title", colorHex));
-        getWrapper().actionClick(elementCache().fillColor); // close the color picker
+        setColor(elementCache().fillColorPicker, colorHex);
         return this;
+    }
+
+    private void setColor(WebElement colorPickerContainer, String colorHex)
+    {
+        Locator.tagWithClassContaining("button", "color-picker__button").findElement(colorPickerContainer).click();
+        ColorPickerInput colorInput = new ColorPickerInput.ColorPickerInputFinder(getDriver()).findWhenNeeded();
+        colorInput.setHexValue(colorHex);
+        colorPickerContainer.click(); // need to click outside the color picker to close it
     }
 
     public String getFillStyle()
     {
         expand();
-        return elementCache().fillColorPreview.getAttribute("style");
+        return Locator.byClass("color-picker__chip").findElement(elementCache().fillColorPicker)
+                .getAttribute("style");
     }
 
     public String getPreviewTextStyle()
@@ -250,10 +257,8 @@ public class ConditionalFormatPanel extends WebDriverComponent<ConditionalFormat
         }
 
         final Locator collapseIconLocator = Locator.tagWithClass("div", "domain-validator-collapse-icon");
-        final WebElement textColor = Locator.tagWithName("button", "domainpropertiesrow-textColor").findWhenNeeded(this);
-        final WebElement textColorPreview = Locator.tagWithClass("div", "domain-color-preview").index(0).findWhenNeeded(this);
-        final WebElement fillColor = Locator.tagWithName("button", "domainpropertiesrow-backgroundColor").findWhenNeeded(this);
-        final WebElement fillColorPreview = Locator.tagWithClass("div", "domain-color-preview").index(1).findWhenNeeded(this);
+        final WebElement textColorPicker = Locator.byClass("color-picker").withAttribute("data-name", "textColor").findWhenNeeded(this);
+        final WebElement fillColorPicker = Locator.byClass("color-picker").withAttribute("data-name", "backgroundColor").findWhenNeeded(this);
         final WebElement previewTextInput = Locator.tagWithAttribute("input", "value", "Preview Text").findWhenNeeded(this);
         final WebElement removeButton = Locator.button("Remove Formatting").findWhenNeeded(this);
     }
