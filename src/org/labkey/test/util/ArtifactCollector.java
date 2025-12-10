@@ -49,22 +49,18 @@ import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Base64;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.regex.Pattern;
 
 import static org.labkey.test.TestProperties.isTestRunningOnTeamCity;
 import static org.labkey.test.WebTestHelper.isLocalServer;
 
 public class ArtifactCollector
 {
-    private static final Map<String, AtomicInteger> _shotCounters = new HashMap<>();
-    private static final Pattern _illegalFileCharactersPattern = SystemUtils.IS_OS_WINDOWS
-            ? Pattern.compile("[\\\\/:*?|\"<>]")
-            : Pattern.compile("/");
+    private static final Map<String, AtomicInteger> _shotCounters = new ConcurrentHashMap<>();
 
     private final WebDriverWrapper _driver;
     private final String _dumpDirName;
@@ -172,7 +168,7 @@ public class ArtifactCollector
 
     private String buildBaseName(@NotNull String suffix)
     {
-        return getAndIncrementShotCounter() + "_" + _illegalFileCharactersPattern.matcher(suffix).replaceAll("_");
+        return TestFileUtils.makeLegalFileName(getAndIncrementShotCounter() + "_" + suffix);
     }
 
     private int getAndIncrementShotCounter()
