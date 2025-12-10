@@ -143,6 +143,34 @@ public class QueryChartDialog extends ModalDialog
         elementCache().fieldOptionIconByLabel(label).click();
     }
 
+    public QueryChartDialog setLegendPos(String legendPos)
+    {
+
+        if ("bottom".equals(legendPos))
+            elementCache().legendBottomRadio.check();
+        else if ("right".equals(legendPos))
+            elementCache().legendRightRadio.check();
+        else
+            throw new IllegalArgumentException("Invalid legend value: " + legendPos);
+
+        return this;
+    }
+
+    public String getLegendPos()
+    {
+        if (elementCache().legendBottomRadio.isChecked())
+            return "bottom";
+        else if (elementCache().legendRightRadio.isChecked())
+            return "right";
+
+        throw new IllegalStateException("Unexpected legend position");
+    }
+
+    public boolean isLegendPosVisible()
+    {
+        return elementCache().legendBottomRadio.isDisplayed() && elementCache().legendRightRadio.isDisplayed();
+    }
+
     /**
      * Set the axis scale to 'linear' or 'log' for the given axis
      * @param label the axis label
@@ -717,6 +745,8 @@ public class QueryChartDialog extends ModalDialog
         public RadioButton scaleLogRadio = RadioButton.RadioButton(Locator.radioButtonByNameAndValue("scaleTrans", "log")).refindWhenNeeded(fieldOptionPopover);
         public RadioButton scaleAutomaticRadio = RadioButton.RadioButton(Locator.radioButtonByNameAndValue("scaleType", "automatic")).refindWhenNeeded(fieldOptionPopover);
         public RadioButton scaleManualRadio = RadioButton.RadioButton(Locator.radioButtonByNameAndValue("scaleType", "manual")).refindWhenNeeded(fieldOptionPopover);
+        public RadioButton legendRightRadio = RadioButton.RadioButton(Locator.radioButtonByNameAndValue("legendPos", "right")).refindWhenNeeded(settingsPanel);
+        public RadioButton legendBottomRadio = RadioButton.RadioButton(Locator.radioButtonByNameAndValue("legendPos", "bottom")).refindWhenNeeded(settingsPanel);
         public Input scaleRangeMinInput = Input(Locator.input("scaleMin"), getDriver()).refindWhenNeeded(fieldOptionPopover);
         public Input scaleRangeMaxInput = Input(Locator.input("scaleMax"), getDriver()).refindWhenNeeded(fieldOptionPopover);
         public Input yLabelInput = Input(Locator.input("y-label"), getDriver()).refindWhenNeeded(fieldOptionPopover);
