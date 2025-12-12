@@ -220,6 +220,7 @@ public class Runner extends TestSuite
     @Override
     public synchronized void runTest(final Test test, final TestResult testResult)
     {
+        System.setProperty("java.awt.headless", "false"); // Prevent `java.awt.HeadlessException` on Windows on TeamCity
         long startTimeMs = System.currentTimeMillis();
         if (_cleanOnly)
         {
