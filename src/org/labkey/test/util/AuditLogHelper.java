@@ -127,6 +127,7 @@ public class AuditLogHelper
         Product,
         Action,
         QueryCommand,
+        DataIteratorPartitions,
         DataIteratorUsed,
         ImportOptions,
         EditMethod,
