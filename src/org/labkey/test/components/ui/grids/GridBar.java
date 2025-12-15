@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static org.labkey.test.WebDriverWrapper.sleep;
 
@@ -301,13 +302,18 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
      */
     public void setAliquotView(AliquotViewOptions view)
     {
+
+        // Do nothing if currently on the requested menu item.
+        if (getCurrentAliquotView().equals(view))
+            return;
+
         // Need to identify where we are. The menu text is contextual to the page.
-        String url = getDriver().getCurrentUrl().toLowerCase();
+        String url = Objects.requireNonNull(getDriver().getCurrentUrl()).toLowerCase();
         boolean onSourcesPage = url.contains("#/sources/");
         boolean onSamplePage = url.contains("#/samples/");
 
         String currentButtonText = currentAliquotViewText();
-        String menuChoice = "";
+        final String menuChoice;
 
         switch (view)
         {
@@ -354,10 +360,13 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
             case ALIQUOTS:
                 menuChoice = "Aliquots Only";
                 break;
+            default:
+                menuChoice = "";
         }
 
+        // Ideally should call _queryGrid.doAndWaitForUpdate(... but that causes the grid to go stale and is tricky to
+        // get a recover the reference to it.
         doMenuAction(currentButtonText, Arrays.asList(menuChoice));
-
     }
 
     public GridBar searchFor(String searchStr)

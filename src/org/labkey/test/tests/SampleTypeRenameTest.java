@@ -21,7 +21,6 @@ import org.labkey.test.util.SampleTypeHelper;
 import org.labkey.test.util.TestDataGenerator;
 import org.labkey.test.util.exp.SampleTypeAPIHelper;
 import org.labkey.test.util.search.SearchAdminAPIHelper;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 
 import java.io.IOException;

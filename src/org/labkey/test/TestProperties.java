@@ -20,6 +20,7 @@ import org.apache.commons.lang3.SystemUtils;
 import org.labkey.serverapi.reader.Readers;
 import org.labkey.test.util.CspLogUtil;
 import org.labkey.test.util.TestLogger;
+import org.labkey.test.util.Version;
 import org.openqa.selenium.Dimension;
 
 import java.io.File;
@@ -73,6 +74,31 @@ public abstract class TestProperties
             TestLogger.error("Failed to load " + propFile.getName() + " file. Running with hard-coded defaults");
             ioe.printStackTrace(System.err);
         }
+
+        final List<String> gradleProperties = List.of("labkeyVersion");
+        final File serverPropFile = new File(TestFileUtils.getLabKeyRoot(), "gradle.properties");
+        if (serverPropFile.exists())
+        {
+            try (Reader propReader = Readers.getReader(serverPropFile))
+            {
+                TestLogger.log("Loading properties from " + serverPropFile.getName());
+                Properties properties = new Properties();
+                properties.load(propReader);
+                for (String key : gradleProperties)
+                {
+                    if (properties.containsKey(key))
+                    {
+                        System.setProperty(key, properties.getProperty(key));
+                    }
+                }
+            }
+            catch (IOException ioe)
+            {
+                TestLogger.error("Failed to load " + serverPropFile.getName() + " file.");
+                ioe.printStackTrace(System.err);
+            }
+        }
+
     }
 
     private static ZoneId browserZoneId = null;
@@ -81,6 +107,19 @@ public abstract class TestProperties
     {
         /* Force static block to run */
         CspLogUtil.init();
+    }
+
+    /// Get the local enlistment version, stripping everything past the minor version.
+    /// - `"25.11.0"` -> `"25.11"`
+    /// - `"25.11-SNAPSHOT"` -> `"25.11"`
+    /// @return Enlistment Version or `null` if unable to determine
+    public static Version getProductVersion()
+    {
+        Version version = new Version(System.getProperty("labkeyVersion", "1"));
+        if (version.size() >= 2)
+            return version.trim(2);
+        else
+            return null;
     }
 
     public static boolean isTestCleanupSkipped()
