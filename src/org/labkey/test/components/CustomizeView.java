@@ -391,8 +391,6 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
         // Expand all nodes necessary to reveal the desired node.
         WebElement fieldRow = expandPivots(fieldKey);
         WebElement checkbox = Locator.css("input[type=button]").findElement(fieldRow);
-        WebElement rowLabel = Locator.byClass("x4-tree-node-text").findElement(fieldRow);
-        rowLabel.click();
         ScrollUtils.scrollIntoView(checkbox);
         new Checkbox(checkbox).check();
         itemXPath(type, fieldKey).waitForElement(this, 2_000);
