@@ -390,10 +390,17 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
 
         // Expand all nodes necessary to reveal the desired node.
         WebElement fieldRow = expandPivots(fieldKey);
-        // Just click the checkbox, don't need to click the row.
-        WebElement checkbox = Locator.css("input[type=button]").findElement(fieldRow);
+        WebElement checkbox = Locator.css("input[type=button]").refindWhenNeeded(fieldRow);
+
+        // In some situations calling Checkbox(checkbox).check() doesn't always check the checkbox. Verify that it has
+        // been checked, and if not try again.
         ScrollUtils.scrollIntoView(checkbox);
         new Checkbox(checkbox).check();
+        if (!new Checkbox(checkbox).isChecked())
+        {
+            new Checkbox(checkbox).check();
+        }
+
         itemXPath(type, fieldKey).waitForElement(this, 2_000);
     }
 
