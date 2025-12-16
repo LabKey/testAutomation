@@ -6,7 +6,6 @@ import org.jetbrains.annotations.Nullable;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.labkey.api.collections.CaseInsensitiveHashMap;
-import org.labkey.remoteapi.Command;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.ContainerFilter;
@@ -155,8 +154,6 @@ public class AuditLogHelper
         }
         return (Integer) rows.get(0).get(rowId);
     }
-
-
 
     public DataRegionTable beginAtAuditEventView(String auditTable, Integer rowIdCutoff)
     {
