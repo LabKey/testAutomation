@@ -171,6 +171,20 @@ public class QueryChartDialog extends ModalDialog
         return elementCache().legendBottomRadio.isDisplayed() && elementCache().legendRightRadio.isDisplayed();
     }
 
+    public QueryChartDialog setPointsHidden(boolean hidden)
+    {
+        if (hidden)
+            elementCache().pointsHideRadio.check();
+        else
+            elementCache().pointsShowRadio.check();
+        return this;
+    }
+
+    public boolean hasPointsHiddenOption()
+    {
+        return elementCache().pointsHideRadio.isDisplayed() && elementCache().pointsShowRadio.isDisplayed();
+    }
+
     /**
      * Set the axis scale to 'linear' or 'log' for the given axis
      * @param label the axis label
@@ -661,14 +675,24 @@ public class QueryChartDialog extends ModalDialog
         return elementCache().reactSelectByLabel("Line Color and Style", true) != null;
     }
 
-    public QueryChartDialog selectLineColorAndStyleOption(String option, String hexColor)
+    public QueryChartDialog selectLineColorAndStyleOption(String option, String hexColor, String lineType)
     {
         var seriesDropdown = elementCache().reactSelectByLabel("Line Color and Style");
         // series select component uses a custom option renderer
-        seriesDropdown.setOptionLocator((String type) -> Locator.byClass("chart-builder-type-option").withAttribute("data-series-shape", type));
+        seriesDropdown.setOptionLocator((String type) -> Locator.byClass("chart-builder-type-option").withAttribute("data-series-option", type));
         seriesDropdown.select(option);
+
         if (hexColor != null)
             setColor(elementCache().seriesColorPicker, hexColor);
+
+        // lineType component uses a custom option renderer
+        if (lineType != null)
+        {
+            var lineTypeDropdown = elementCache().reactSelectByLabel("Line Type");
+            lineTypeDropdown.setOptionLocator((String type) -> Locator.byClass("chart-builder-type-option").withAttribute("data-series-linetype", type));
+            lineTypeDropdown.select(lineType);
+        }
+
         return this;
     }
 
@@ -747,6 +771,8 @@ public class QueryChartDialog extends ModalDialog
         public RadioButton scaleManualRadio = RadioButton.RadioButton(Locator.radioButtonByNameAndValue("scaleType", "manual")).refindWhenNeeded(fieldOptionPopover);
         public RadioButton legendRightRadio = RadioButton.RadioButton(Locator.radioButtonByNameAndValue("legendPos", "right")).refindWhenNeeded(settingsPanel);
         public RadioButton legendBottomRadio = RadioButton.RadioButton(Locator.radioButtonByNameAndValue("legendPos", "bottom")).refindWhenNeeded(settingsPanel);
+        public RadioButton pointsShowRadio = RadioButton.RadioButton(Locator.radioButtonByNameAndValue("hideDataPoints", "false")).refindWhenNeeded(settingsPanel);
+        public RadioButton pointsHideRadio = RadioButton.RadioButton(Locator.radioButtonByNameAndValue("hideDataPoints", "true")).refindWhenNeeded(settingsPanel);
         public Input scaleRangeMinInput = Input(Locator.input("scaleMin"), getDriver()).refindWhenNeeded(fieldOptionPopover);
         public Input scaleRangeMaxInput = Input(Locator.input("scaleMax"), getDriver()).refindWhenNeeded(fieldOptionPopover);
         public Input yLabelInput = Input(Locator.input("y-label"), getDriver()).refindWhenNeeded(fieldOptionPopover);
