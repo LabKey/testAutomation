@@ -94,6 +94,14 @@ import static org.labkey.test.WebTestHelper.logToServer;
 
 public class Runner extends TestSuite
 {
+    static
+    {
+        // Prevent `java.awt.HeadlessException` on Windows on TeamCity
+        String headless = "java.awt.headless";
+        if (System.getProperty(headless) == null)
+            System.setProperty(headless, "false");
+    }
+
     private static final Logger LOG = LogManager.getLogger(Runner.class);
 
     private static final int DEFAULT_MAX_TEST_FAILURES = 10;
@@ -220,7 +228,6 @@ public class Runner extends TestSuite
     @Override
     public synchronized void runTest(final Test test, final TestResult testResult)
     {
-        System.setProperty("java.awt.headless", "false"); // Prevent `java.awt.HeadlessException` on Windows on TeamCity
         long startTimeMs = System.currentTimeMillis();
         if (_cleanOnly)
         {
