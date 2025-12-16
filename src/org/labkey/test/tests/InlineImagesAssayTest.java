@@ -207,7 +207,7 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
             log("Validate that the 'File' (last) column is as expected.");
             assertEquals("Values in 'File' column not exported as expected [" + exportedFile.getName() + "]",
                     Arrays.asList("Batch File Field", "assaydata" + File.separator + XLS_FILE.getName(), "assaydata" + File.separator + XLS_FILE.getName(), "assaydata" + File.separator + XLS_FILE.getName()),
-                    ExcelHelper.getColumnData(workbook.getSheetAt(workbook.getActiveSheetIndex()), 7));
+                    ExcelHelper.getColumnData(workbook.getSheetAt(workbook.getActiveSheetIndex()), 8));
         }
 
         log("Remove the 'File' (last) column from the batch and see that things still work.");

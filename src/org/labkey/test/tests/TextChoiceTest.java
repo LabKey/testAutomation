@@ -248,6 +248,7 @@ public abstract class TextChoiceTest extends BaseWebDriverTest
 
             Map<String, String> expectedData = Map.of(RESULT_SAMPLE_FIELD, entry.getKey(),
                     RESULT_TC_FIELD, entry.getValue(),
+                    "Run/Name", ASSAY_RUN_ID,
                     String.format("Run/Batch/%s", BATCH_TC_FIELD), BATCH_VALUE,
                     String.format("Run/%s", RUN_TC_FIELD), expectedRunValue);
 
