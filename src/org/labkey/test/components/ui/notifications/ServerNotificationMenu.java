@@ -198,7 +198,7 @@ public class ServerNotificationMenu extends WebDriverComponent<ServerNotificatio
 
         // Find the container again, don't return listContainer WebElement previously found. If the list was slow to
         // update with the most recent notification the old reference will be stale.
-        return notificationsContainerLocator.waitForElement(elementCache().menuContent, 1_000);
+        return notificationsContainerLocator.refindWhenNeeded((elementCache().menuContent));
     }
 
     /**
