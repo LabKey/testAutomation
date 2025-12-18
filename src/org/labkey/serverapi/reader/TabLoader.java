@@ -18,10 +18,9 @@ package org.labkey.serverapi.reader;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.CharSequenceReader;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.text.StringEscapeUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.labkey.test.util.TestLogger;
+import org.jspecify.annotations.NonNull;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -104,9 +103,7 @@ public class TabLoader extends DataLoader
         @Override
         public DataLoader createLoader(File file, boolean hasColumnHeaders) throws IOException
         {
-
-            DataLoader loader = super.createLoader(file, hasColumnHeaders);
-            return loader;
+            return super.createLoader(file, hasColumnHeaders);
         }
 
         @NotNull
@@ -114,14 +111,7 @@ public class TabLoader extends DataLoader
         // A DataLoader created with this constructor does NOT close the reader
         public DataLoader createLoader(InputStream is, boolean hasColumnHeaders) throws IOException
         {
-            DataLoader loader = super.createLoader(is, hasColumnHeaders);
-            return loader;
-        }
-
-        @Override
-        public @NotNull FileType getFileType()
-        {
-            return CSV_FILE_TYPE;
+            return super.createLoader(is, hasColumnHeaders);
         }
     }
 
@@ -135,13 +125,12 @@ public class TabLoader extends DataLoader
     private int _commentLines = 0;
     private final Map<String, String> _comments = new HashMap<>();
     private char _chDelimiter = '\t';
-    private String _strDelimiter = new String(new char[]{_chDelimiter});
+    private String _strDelimiter = String.valueOf(_chDelimiter);
     private String _lineDelimiter = null;
 
     private String _strQuote = null;
     private String _strQuoteQuote = null;
     private boolean _parseQuotes = true;
-    private final boolean _unescapeBackslashes = false;
     private Filter<Map<String, Object>> _mapFilter;
 
     // Infer whether there are headers
@@ -267,26 +256,6 @@ public class TabLoader extends DataLoader
         value = StringUtils.trimToEmpty(value);
         if ("\\N".equals(value))
             return _preserveEmptyString ? null : "";
-        if (_unescapeBackslashes)
-        {
-            try
-            {
-                return StringEscapeUtils.unescapeJava(value);
-            }
-            catch (IllegalArgumentException e)
-            {
-                // Issue 16691: OctalUnescaper or UnicodeUnescaper translators will throw NumberFormatException for illegal sequences such as '\' followed by octal '9' or unicode 'zzzz'.
-                // StringEscapeUtils can also throw IllegalArgumentException
-                String msg = "Error reading data. Can't unescape value '" + value + "'. ";
-                if (e instanceof NumberFormatException)
-                    msg += "Number format error ";
-                msg += e.getMessage();
-                if (isThrowOnErrors())
-                    throw new IllegalArgumentException(msg, e);
-                else
-                    TestLogger.warn(msg, e);
-            }
-        }
         return value;
     }
 
@@ -306,7 +275,7 @@ public class TabLoader extends DataLoader
             sb.append("\n");
             if (line.endsWith(_lineDelimiter))
             {
-                sb.append(line.substring(0, line.length() - _lineDelimiter.length()));
+                sb.append(line, 0, line.length() - _lineDelimiter.length());
                 return sb;
             }
             sb.append(line);
@@ -377,7 +346,7 @@ public class TabLoader extends DataLoader
             {
                 if (_strQuote == null)
                 {
-                    _strQuote = new String(new char[]{chQuote});
+                    _strQuote = String.valueOf(chQuote);
                     _strQuoteQuote = new String(new char[]{chQuote, chQuote});
                     _replaceDoubleQuotes = Pattern.compile("\\" + chQuote + "\\" + chQuote);
                 }
@@ -465,14 +434,8 @@ public class TabLoader extends DataLoader
         return listParse.toArray(new String[0]);
     }
 
-    @Deprecated // Just use a CloseableFilteredIterator.  TODO: Remove
-    public void setMapFilter(Filter<Map<String, Object>> mapFilter)
-    {
-        _mapFilter = mapFilter;
-    }
-
     @Override
-    public CloseableIterator<Map<String, Object>> iterator()
+    public @NonNull CloseableIterator<Map<String, Object>> iterator()
     {
         TabLoaderIterator iter;
         try
@@ -501,7 +464,7 @@ public class TabLoader extends DataLoader
     public void setDelimiterCharacter(char delimiter)
     {
         _chDelimiter = delimiter;
-        _strDelimiter = new String(new char[]{_chDelimiter});
+        _strDelimiter = String.valueOf(_chDelimiter);
     }
 
     public void setDelimiters(@NotNull String field, @Nullable String line)
