@@ -73,7 +73,12 @@ public abstract class Component<EC extends Component.ElementCache> implements Se
 
             _elementCache = Objects.requireNonNull(newElementCache());
             waitForReady();
-            Objects.requireNonNull(_elementCache, "waitForReady() cleared the element cache");
+            if (_elementCache == null)
+            {
+                // waitForReady triggered a cache clear -- either explicitly or due to a refind.
+                // It succeeded, so it should be safe to get a fresh `newElementCache`
+                _elementCache = Objects.requireNonNull(newElementCache());
+            }
         }
         return _elementCache;
     }
