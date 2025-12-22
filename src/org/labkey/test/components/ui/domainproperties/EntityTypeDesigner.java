@@ -42,7 +42,7 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
 
     public T setSystemFieldVisibility(String fieldName, boolean isVisible)
     {
-        var xpath = "//div[contains(@class, 'domain-system-fields__grid')]//td[text()='" + fieldName + "']/preceding-sibling::td//input";
+        var xpath = "//div[contains(@class, 'domain-system-fields__grid')]//td[.//div[text()='" + fieldName + "']]/preceding-sibling::td//input";
         var checkBox = Checkbox.Checkbox(Locator.xpath(xpath));
         var enabledCheckBox = checkBox.find(getFieldsPanel());
         enabledCheckBox.set(isVisible);
