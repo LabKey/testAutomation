@@ -82,15 +82,22 @@ public class APIAssayHelper extends AbstractAssayHelper
         return irc.execute(_test.createDefaultConnection(), projectPath);
     }
 
-    @LogMethod(quiet = true)
     public ImportRunResponse importAssay(int assayID, String runName, List<Map<String, Object>> dataRows, String projectPath,
                                          Map<String, Object> runProperties, Map<String, Object> batchProperties, String errorMsg) throws CommandException, IOException
+    {
+        return importAssay(assayID, runName, dataRows, projectPath, runProperties, batchProperties, errorMsg, null);
+    }
+
+    @LogMethod(quiet = true)
+    public ImportRunResponse importAssay(int assayID, String runName, List<Map<String, Object>> dataRows, String projectPath,
+                                         Map<String, Object> runProperties, Map<String, Object> batchProperties, String errorMsg, @Nullable Integer workflowTaskId) throws CommandException, IOException
     {
         ImportRunCommand  irc = new ImportRunCommand(assayID, dataRows);
         irc.setName(runName);
         irc.setProperties(runProperties);
         irc.setBatchProperties(batchProperties);
         irc.setTimeout(180000); // Wait 3 minutes for assay import
+        irc.setWorkflowTaskId(workflowTaskId);
         if (errorMsg != null)
         {
             try
@@ -121,7 +128,7 @@ public class APIAssayHelper extends AbstractAssayHelper
     public ImportRunResponse importAssay(int assayID, String runName, List<Map<String, Object>> dataRows, String projectPath,
                                          Map<String, Object> runProperties, Map<String, Object> batchProperties) throws CommandException, IOException
     {
-        return importAssay(assayID, runName, dataRows, projectPath, runProperties, batchProperties, null);
+        return importAssay(assayID, runName, dataRows, projectPath, runProperties, batchProperties, null, null);
     }
 
     @LogMethod(quiet = true)
