@@ -18,7 +18,9 @@ package org.labkey.test;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.labkey.serverapi.reader.Readers;
+import org.labkey.test.util.CachingSupplier;
 import org.labkey.test.util.CspLogUtil;
+import org.labkey.test.util.TestDataGenerator;
 import org.labkey.test.util.TestLogger;
 import org.labkey.test.util.Version;
 import org.openqa.selenium.Dimension;
@@ -37,8 +39,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -245,9 +249,27 @@ public abstract class TestProperties
         return getBooleanProperty("use.cloud.pipeline", false);
     }
 
+    private static final CachingSupplier<String> defaultBucketName = new CachingSupplier<>(() ->
+        TestDataGenerator.randomChoice(Stream.of(getCloudPipelineBucketNameWithSqs(), getCloudPipelineBucketNameWithoutSqs())
+            .filter(Objects::nonNull).toList()));
+    /**
+     * Get a pipeline bucket name for use with S3 testing. There are two buckets in different regions. This will
+     * randomly select one of them (and cache the result). If SQS is required, use
+     * {@link #getCloudPipelineBucketNameWithSqs()}
+     */
     public static String getCloudPipelineBucketName()
     {
+        return defaultBucketName.get();
+    }
+
+    public static String getCloudPipelineBucketNameWithSqs()
+    {
         return System.getProperty("cloud.pipeline.bucket");
+    }
+
+    public static String getCloudPipelineBucketNameWithoutSqs()
+    {
+        return System.getProperty("cloud.pipeline.bucket.nosqs");
     }
 
     public static Optional<Dimension> getWindowSize()
