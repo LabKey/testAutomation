@@ -54,6 +54,18 @@ public class GridFilterModal extends ModalDialog
     }
 
     /**
+     * Sets the 'All [sample type] samples` (used by workflow task filter)
+     * @param checked whether or not to check the box
+     * @return this component
+     */
+    public GridFilterModal checkAllDataCheckbox(boolean checked)
+    {
+        Checkbox noDataBox = Checkbox.Checkbox(Locator.input("field-value-allvalues-check"))
+                .waitFor(elementCache().fieldsSelectionPanel);
+        noDataBox.set(checked);
+        return this;
+    }
+    /**
      * Sets the 'Find Samples without [selected assay] results
      * @param checked whether or not to check the box
      * @return this component
