@@ -91,6 +91,28 @@ public class TabbedGridPanel extends WebDriverComponent<TabbedGridPanel.ElementC
         return tabClass != null && tabClass.toLowerCase().contains("active");
     }
 
+    public String getSelectedTab(boolean includeCounts)
+    {
+        List<String> tabs = getTabs();
+        String tabWithCount = null;
+        for (int i = 0; i < tabs.size(); i++)
+        {
+            String tabText = tabs.get(i);
+            if (isSelected(tabText))
+            {
+                tabWithCount = tabText;
+                break;
+            }
+        }
+        if (tabWithCount == null)
+            return null;
+
+        if (includeCounts)
+            return tabWithCount;
+
+        return tabWithCount.substring(0, tabWithCount.lastIndexOf(" ("));
+    }
+
     public QueryGrid selectGrid(String tabText)
     {
         QueryGrid grid = getSelectedGrid();
