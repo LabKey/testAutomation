@@ -20,7 +20,6 @@ import org.apache.commons.io.input.CharSequenceReader;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jspecify.annotations.NonNull;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -435,7 +434,7 @@ public class TabLoader extends DataLoader
     }
 
     @Override
-    public @NonNull CloseableIterator<Map<String, Object>> iterator()
+    public @NotNull CloseableIterator<Map<String, Object>> iterator()
     {
         TabLoaderIterator iter;
         try
