@@ -262,12 +262,12 @@ public class DataClassTest extends BaseWebDriverTest
         DomainFormPanel domainFormPanel = createPage.getDomainEditor();
         domainFormPanel.manuallyDefineFields(fieldName1)
                 .setType(FieldDefinition.ColumnType.Integer)
-                .expand().clickAdvancedSettings().setUniqueConstraint(true).apply();
-        log("Add another field with a unique constraint");
+                .expand().clickAdvancedSettings().setSingleFieldIndex("Unique").apply();
+        log("Add another field with a non-unique constraint");
         String fieldName2 = "fieldName_2";
         domainFormPanel.addField(fieldName2)
                 .setType(FieldDefinition.ColumnType.DateAndTime)
-                .expand().clickAdvancedSettings().setUniqueConstraint(true).apply();
+                .expand().clickAdvancedSettings().setSingleFieldIndex("Non-Unique").apply();
         log("Add another field which does not have a unique constraint");
         String fieldName3 = "FieldName@3";
         domainFormPanel.addField(fieldName3)
@@ -276,21 +276,26 @@ public class DataClassTest extends BaseWebDriverTest
 
         viewRawTableMetadata(dataClassName);
         verifyTableIndices("unique_constraint_test_", List.of("field_name1", "fieldname_2"));
+        assertTextNotPresent("unique_constraint_test_fieldname_3");
+        verifyTableIndexNonUnique("unique_constraint_test_", "field_name1", true);
+        verifyTableIndexNonUnique("unique_constraint_test_", "fieldname_2", false);
 
         log("Remove a field unique constraint and add a new one");
         goToProjectHome();
         CreateDataClassPage updatePage = goToDataClass(dataClassName);
         domainFormPanel = updatePage.getDomainEditor();
-        domainFormPanel.getField(fieldName2)
-                .expand().clickAdvancedSettings().setUniqueConstraint(false)
+        domainFormPanel.getField(fieldName1)
+                .expand().clickAdvancedSettings().setSingleFieldIndex(null)
                 .apply();
         domainFormPanel.getField(fieldName3)
-                .expand().clickAdvancedSettings().setUniqueConstraint(true)
+                .expand().clickAdvancedSettings().setSingleFieldIndex("Unique")
                 .apply();
         updatePage.clickSave();
         viewRawTableMetadata(dataClassName);
-        verifyTableIndices("unique_constraint_test_", List.of("field_name1", "fieldname_3"));
-        assertTextNotPresent("unique_constraint_test_fieldname_2");
+        verifyTableIndices("unique_constraint_test_", List.of("fieldname_2", "fieldname_3"));
+        assertTextNotPresent("unique_constraint_test_field_name1");
+        verifyTableIndexNonUnique("unique_constraint_test_", "fieldname_2", false);
+        verifyTableIndexNonUnique("unique_constraint_test_", "fieldname_3", true);
     }
 
     @Test
@@ -404,6 +409,12 @@ public class DataClassTest extends BaseWebDriverTest
 
         for (String suffix : suffixes)
             assertTextPresentCaseInsensitive(prefix + suffix);
+    }
+
+    private void verifyTableIndexNonUnique(String prefix, String suffix, boolean isUnique)
+    {
+        Locator locator = Locator.xpath("//td[contains(text(), '" + prefix + suffix + "')]/preceding-sibling::td[2][text()='" + !isUnique + "']");
+        checker().verifyTrue("Non_Unique value not as expected in metadata for locator: " + locator, locator.existsIn(getDriver()));
     }
 
     private CreateDataClassPage goToCreateNewDataClass()
