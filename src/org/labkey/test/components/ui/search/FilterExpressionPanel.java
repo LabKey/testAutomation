@@ -116,6 +116,8 @@ public class FilterExpressionPanel extends WebDriverComponent<FilterExpressionPa
             }
             else
             {
+                if (value1 instanceof List<?> list1)
+                    value1 = String.join(";", list1.stream().map(Object::toString).toList());
                 elementCache().textValuesFirst.get(index).set(value1.toString());
                 if (value2 != null)
                 {

@@ -64,6 +64,15 @@ public class FilterStatusValue extends WebDriverComponent<FilterStatusValue.Elem
                 , "The value item ["+originalText+"] did not disappear.", 1000);
     }
 
+    public void open()
+    {
+        getWrapper().mouseOver(getComponentElement());
+        getWrapper().mouseOver(elementCache().textSpan);
+        WebDriverWrapper.waitFor(()-> isActive() && isClose(),
+                "The filter status item with text ["+getText()+"] did not become active.", 500);
+        elementCache().textSpan.click();
+    }
+
     /**
      * A filter will be locked if it was applied by a view.
      *
