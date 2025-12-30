@@ -172,7 +172,7 @@ public class AdvancedSettingsDialog extends ModalDialog
 
     public AdvancedSettingsDialog setSingleFieldIndex(String type)
     {
-        if (type == null) type = "None";
+        if (type == null) type = "No Index";
         elementCache().indexSelect.selectByVisibleText(type);
         return this;
     }

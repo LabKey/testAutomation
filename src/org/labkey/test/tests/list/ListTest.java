@@ -1592,14 +1592,14 @@ public class ListTest extends BaseWebDriverTest
         // set fields to have constraints
         EditListDefinitionPage listDefinitionPage = _listHelper.goToEditDesign(listName);
         listDefinitionPage.getFieldsPanel()
-                .getField(fieldName1).expand().clickAdvancedSettings().setSingleFieldIndex("Unique")
+                .getField(fieldName1).expand().clickAdvancedSettings().setSingleFieldIndex("Index and require unique values")
                 .apply();
         listDefinitionPage.getFieldsPanel()
-                .getField(fieldName2).expand().clickAdvancedSettings().setSingleFieldIndex("Unique")
+                .getField(fieldName2).expand().clickAdvancedSettings().setSingleFieldIndex("Index and require unique values")
                 .apply();
         // set one field to have non-unique constraint
         listDefinitionPage.getFieldsPanel()
-                .getField(fieldName3).expand().clickAdvancedSettings().setSingleFieldIndex("Non-Unique")
+                .getField(fieldName3).expand().clickAdvancedSettings().setSingleFieldIndex("Index")
                 .apply();
         listDefinitionPage.clickSave();
 
@@ -1621,10 +1621,10 @@ public class ListTest extends BaseWebDriverTest
                 .getField(fieldName1).expand().clickAdvancedSettings().setSingleFieldIndex(null)
                 .apply();
         listDefinitionPage.getFieldsPanel()
-                .getField(fieldName2).expand().clickAdvancedSettings().setSingleFieldIndex("Non-Unique")
+                .getField(fieldName2).expand().clickAdvancedSettings().setSingleFieldIndex("Index")
                 .apply();
         listDefinitionPage.getFieldsPanel()
-                .getField(fieldName3).expand().clickAdvancedSettings().setSingleFieldIndex("Unique")
+                .getField(fieldName3).expand().clickAdvancedSettings().setSingleFieldIndex("Index and require unique values")
                 .apply();
         listDefinitionPage.clickSave();
 
