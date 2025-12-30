@@ -112,20 +112,6 @@ public class BaseSettingsPage extends LabKeyPage<BaseSettingsPage.ElementCache>
             uncheckCheckbox(elementCache().helpMenuEnabledChk);
     }
 
-    public boolean getObjectLevelDiscussions()
-    {
-
-        return new Checkbox(elementCache().discussionEnabledChk).isChecked();
-    }
-
-    public void setObjectLevelDiscussions(boolean enable)
-    {
-        if (enable)
-            checkCheckbox(elementCache().discussionEnabledChk);
-        else
-            uncheckCheckbox(elementCache().discussionEnabledChk);
-    }
-
     public String getLogoLink()
     {
         return getFormElement(elementCache().logoLinkTxt);
@@ -323,7 +309,6 @@ public class BaseSettingsPage extends LabKeyPage<BaseSettingsPage.ElementCache>
         WebElement showAppNavAlways = Locator.xpath("//input[@name='applicationMenuDisplayMode' and @value='ALWAYS']").findWhenNeeded(this);
         WebElement showAppNavForAdmin = Locator.xpath("//input[@name='applicationMenuDisplayMode' and @value='ADMIN']").findWhenNeeded(this);
         WebElement helpMenuEnabledChk = Locator.checkboxByName("helpMenuEnabled").findWhenNeeded(this);
-        WebElement discussionEnabledChk = Locator.checkboxByName("discussionEnabled").findWhenNeeded(this);
         WebElement logoLinkTxt = Locator.inputByNameContaining("logoHref").findWhenNeeded(this);
         WebElement supportLinkTxt = Locator.inputByNameContaining("reportAProblemPath").findWhenNeeded(this);
         WebElement supportEmailTxt = Locator.inputByNameContaining("supportEmail").findWhenNeeded(this);

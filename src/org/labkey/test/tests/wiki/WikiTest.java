@@ -51,14 +51,14 @@ public class WikiTest extends BaseWebDriverTest
     private static final String PROJECT_NAME = TRICKY_CHARACTERS_FOR_PROJECT_NAMES + "WikiVerifyProject";
     private static final String SUBFOLDER_NAME = TRICKY_CHARACTERS_FOR_PROJECT_NAMES + "WikiVerifySubfolder";
     private static final String SUBFOLDER_PATH = String.format("%s/%s", PROJECT_NAME, SUBFOLDER_NAME);
-    private static final String WIKI_PAGE_ALTTITLE = "PageBBB has HTML";
+    private static final String WIKI_PAGE_ALT_TITLE = "PageBBB has HTML";
     private static final String WIKI_PAGE_WEBPART_ID = "qwp999";
     private static final String WIKI_PAGE_TITLE = "_Test Wiki " + BaseWebDriverTest.INJECT_CHARS_1;
     private static final String WIKI_PAGE_NAME = "_Test Wiki Name " + BaseWebDriverTest.INJECT_CHARS_2;
     private static final String WIKI_PAGE_CONTENT =
-            "<b>Some HTML content</b>\n" +
-                    "<b>${labkey.webPart(partName='Query', title='My Users', schemaName='core', " +
-                    "queryName='Users', allowChooseQuery='true', allowChooseView='true', dataRegionName='" + WIKI_PAGE_WEBPART_ID + "')}</b>\n";
+        "<b>Some HTML content</b>\n" +
+        "<b>${labkey.webPart(partName='Query', title='My Users', schemaName='core', " +
+        "queryName='Users', allowChooseQuery='true', allowChooseView='true', dataRegionName='" + WIKI_PAGE_WEBPART_ID + "')}</b>\n";
     private static final String WIKI_CHECK_CONTENT = "More HTML content";
     private static int numberOfWikiCreated = 0;
 
@@ -133,7 +133,7 @@ public class WikiTest extends BaseWebDriverTest
 
         log("test edit wiki");
         clickAndWait(Locator.linkWithText("Edit"));
-        setFormElement(Locator.name("title"), WIKI_PAGE_ALTTITLE);
+        setFormElement(Locator.name("title"), WIKI_PAGE_ALT_TITLE);
         String wikiPageContentEdited =
                 "<b>Some HTML content</b><br>\n" +
                         "<b>" + WIKI_CHECK_CONTENT + "</b><br>\n";
@@ -150,21 +150,21 @@ public class WikiTest extends BaseWebDriverTest
         portalHelper.addWebPart("Wiki");
         portalHelper.clickWebpartMenuItem("Wiki", "Customize");
         selectOptionByText(Locator.name("webPartContainer"), "/" + getProjectName());
-        selectOptionByTextContaining(Locator.name("name").findElement(getDriver()), WIKI_PAGE_ALTTITLE);
+        selectOptionByTextContaining(Locator.name("name").findElement(getDriver()), WIKI_PAGE_ALT_TITLE);
         clickButton("Submit");
         verifyWikiPagePresent();
 
         log("test delete wiki");
         goToProjectHome();
-        clickAndWait(Locator.linkWithText(WIKI_PAGE_ALTTITLE));
+        clickAndWait(Locator.linkWithText(WIKI_PAGE_ALT_TITLE));
         clickAndWait(Locator.linkWithText("Edit"));
         clickButton("Delete Page");
         clickButton("Delete");
-        assertTextNotPresent(WIKI_PAGE_ALTTITLE);
+        assertTextNotPresent(WIKI_PAGE_ALT_TITLE);
 
         log("verify second wiki part pointing to first handled delete well");
         clickFolder(getSubfolderName());
-        assertTextNotPresent(WIKI_PAGE_ALTTITLE);
+        assertTextNotPresent(WIKI_PAGE_ALT_TITLE);
     }
 
     @Test
@@ -175,10 +175,10 @@ public class WikiTest extends BaseWebDriverTest
         String wikiName = "Wiki with video";
         String wikiTitle = "Sample finder video";
         String wikiContent = """
-                Some random content start : Have fun watching video below
-                {video:%s|height:350|width:500}
-                Hope you had fun watching the video..!
-                """.formatted(videoUrl);
+            Some random content start : Have fun watching video below
+            {video:%s|height:350|width:500}
+            Hope you had fun watching the video..!
+            """.formatted(videoUrl);
 
         ExternalSourcesPage.beginAt(this).ensureHost(Directive.Frame, videoHost);
 
@@ -259,7 +259,7 @@ public class WikiTest extends BaseWebDriverTest
         Locator undeleteLinkLoc = Locator.tag("td").child("a").child("span").containing("un-delete");
         Locator filePickerLinkLoc = Locator.id("filePickerLink");
         Locator fileInputLoc = Locator.tag("input").withAttribute("type", "file")
-                .withAttributeContaining("id", "formFile");
+            .withAttributeContaining("id", "formFile");
 
         goToProjectHome();
         log("Creating the wiki " + wikiTitle);
@@ -309,8 +309,9 @@ public class WikiTest extends BaseWebDriverTest
         waitForElement(attachmentParentLoc.withAttributeContaining("style", "text-decoration: line-through"));
         waitAndClick(undeleteLinkLoc);
         checker().awaiting(Duration.ofMillis(500), ()-> Assertions.assertThat(attachmentParentLoc.findElement(getDriver()).getAttribute("style"))
-                .as("expect strikethrough style not to be present")
-                .doesNotContain("text-decoration: line-through"));
+            .as("expect strikethrough style not to be present")
+            .doesNotContain("text-decoration: line-through")
+        );
         wikiHelper.saveWikiPage();
         // note: attaching the file and leaving it there will create a search result, so increment wikiCreated count here
         numberOfWikiCreated++;
@@ -346,24 +347,28 @@ public class WikiTest extends BaseWebDriverTest
         {
             log("Error creating wiki page: " + success.getMessage());
             checker().wrapAssertion(() -> Assertions.assertThat(success.getMessage())
-                    .as("expect error")
-                    .contains("Wiki name contains invalid characters"));
+                .as("expect error")
+                .contains("Wiki name contains invalid characters")
+            );
             checker().verifyEquals("expect 400 for bad request", 400, success.getStatusCode());
             var jsonProps = new JSONObject(success.getProperties());
             var errors = jsonProps.getJSONArray("errors");
 
             checker().wrapAssertion(() -> Assertions.assertThat(List.of(errors.getJSONObject(0), errors.getJSONObject(1)))
-                    .extracting(a -> a.get("msg"))
-                    .as("expect warnings for wiki name and title")
-                    .containsOnly("Wiki name contains invalid characters.", "Wiki title contains invalid characters."));
+                .extracting(a -> a.get("msg"))
+                .as("expect warnings for wiki name and title")
+                .containsOnly("Wiki name contains invalid characters.", "Wiki title contains invalid characters.")
+            );
             checker().wrapAssertion(() -> Assertions.assertThat(List.of(errors.getJSONObject(0), errors.getJSONObject(1)))
-                    .extracting(a -> a.get("severity"))
-                    .as("expect error severity")
-                    .containsOnly("Error"));
+                .extracting(a -> a.get("severity"))
+                .as("expect error severity")
+                .containsOnly("Error")
+            );
             checker().wrapAssertion(() -> Assertions.assertThat(List.of(errors.getJSONObject(0), errors.getJSONObject(1)))
-                    .extracting(a -> a.get("field"))
-                    .as("expect errors for name, title")
-                    .containsOnly("name", "title"));
+                .extracting(a -> a.get("field"))
+                .as("expect errors for name, title")
+                .containsOnly("name", "title")
+            );
         }
     }
 
@@ -408,24 +413,28 @@ public class WikiTest extends BaseWebDriverTest
         } catch (CommandException success)
         {
             checker().wrapAssertion(()-> Assertions.assertThat(success.getMessage())
-                    .as("expect error")
-                    .contains("Wiki title contains invalid characters"));
+                .as("expect error")
+                .contains("Wiki title contains invalid characters")
+            );
             checker().verifyEquals("expect 400 for bad request", 400, success.getStatusCode());
             var jsonProps =new JSONObject(success.getProperties());
             var error = jsonProps.getJSONArray("errors").getJSONObject(0);
 
             checker().wrapAssertion(()-> Assertions.assertThat(error)
-                    .extracting(a-> a.get("msg"))
-                    .as("expect warning for wiki title")
-                    .isEqualTo("Wiki title contains invalid characters."));
+                .extracting(a-> a.get("msg"))
+                .as("expect warning for wiki title")
+                .isEqualTo("Wiki title contains invalid characters.")
+            );
             checker().wrapAssertion(()-> Assertions.assertThat(error)
-                    .extracting(a-> a.get("severity"))
-                    .as("expect error severity")
-                    .isEqualTo("Error"));
+                .extracting(a-> a.get("severity"))
+                .as("expect error severity")
+                .isEqualTo("Error")
+            );
             checker().wrapAssertion(()-> Assertions.assertThat(error)
-                    .extracting(a-> a.get("field"))
-                    .as("expect title field to be the source of the error")
-                    .isEqualTo("title"));
+                .extracting(a-> a.get("field"))
+                .as("expect title field to be the source of the error")
+                .isEqualTo("title")
+            );
         }
     }
 
@@ -456,46 +465,49 @@ public class WikiTest extends BaseWebDriverTest
         var wikiHelper = new WikiHelper(this);
         new PortalHelper(this).addWebPart("Wiki");
         Locator wikiWebPartLoc  = Locator.tagWithClass("div", "panel-portal")
-                .withDescendant(Locator.tagWithAttribute("h3", "title", wikiTitle))
-                .descendant(Locator.tagWithText("p", "content for wiki webpart rename"));
+            .withDescendant(Locator.tagWithAttribute("h3", "title", wikiTitle))
+            .descendant(Locator.tagWithText("p", "content for wiki webpart rename"));
 
         // configure the webPart to use the wiki created above
         wikiHelper.clickChooseAPage();
         var selectedPageOption = getSelectedOptionText(Locator.name("name"));
         checker().withScreenshot("unexpected_selected_page")
-                        .wrapAssertion(()-> Assertions.assertThat(selectedPageOption)
-                                .as("expect our wiki to be selected")
-                                .startsWith(wikiName));
+            .wrapAssertion(()-> Assertions.assertThat(selectedPageOption)
+                .as("expect our wiki to be selected")
+                .startsWith(wikiName)
+            );
         wikiHelper.saveChosenPage();
 
         // verify the webpart's content is our expected content
         checker().withScreenshot("unexpected_wiki_content")
-                .awaiting(Duration.ofSeconds(1), ()-> Assertions.assertThat(wikiWebPartLoc.existsIn(getDriver()))
-                        .as("expect our wiki content to be present")
-                        .isTrue());
+            .awaiting(Duration.ofSeconds(1), ()-> Assertions.assertThat(wikiWebPartLoc.existsIn(getDriver()))
+                .as("expect our wiki content to be present")
+                .isTrue()
+            );
 
         // Now edit the wiki, give it a new name, with an alias
         var wikiConfigPage = wikiHelper.manageWikiConfiguration();
         wikiConfigPage.rename("webPartNewWikiName", true)
-                        .save();
+            .save();
 
         // verify the expected content is still present
         checker().withScreenshot("unexpected_wiki_content_after_rename")
-                .awaiting(Duration.ofSeconds(1), ()-> Assertions.assertThat(wikiWebPartLoc.existsIn(getDriver()))
-                        .as("expect our wiki content to be present")
-                        .isTrue());
+            .awaiting(Duration.ofSeconds(1), ()-> Assertions.assertThat(wikiWebPartLoc.existsIn(getDriver()))
+                .as("expect our wiki content to be present")
+                .isTrue()
+            );
     }
 
     protected void verifyWikiPagePresent()
     {
         waitForText(WIKI_CHECK_CONTENT);
-        assertTextPresent(WIKI_PAGE_ALTTITLE);
+        assertTextPresent(WIKI_PAGE_ALT_TITLE);
     }
 
     protected void doTestInlineEditor()
     {
         Locator.XPathLocator inlineEditor = Locator.xpath("//div[@class='labkey-inline-editor']")
-                .withDescendant(Locator.tagWithClassContaining("div", "tox-edit-area"));
+            .withDescendant(Locator.tagWithClassContaining("div", "tox-edit-area"));
 
         log("** test inline wiki webpart editor");
         goToProjectHome();
@@ -542,12 +554,13 @@ public class WikiTest extends BaseWebDriverTest
 
     protected void setInlineEditorContent(String editorId, String content)
     {
-        executeScript("if (!tinymce) {throw 'tinymce API is not available'}" +
-                "editor = tinymce.get(arguments[0]);" +
-                "if (!editor) {throw 'No tinymce instance: ' + arguments[0];}" +
-                "editor.setContent(arguments[1]);" +
-                "editor.setDirty(true);"         // Explicitly setDirty as the setContent doesn't by default
-                , editorId, content);
+        executeScript(
+            "if (!tinymce) {throw 'tinymce API is not available'}" +
+            "editor = tinymce.get(arguments[0]);" +
+            "if (!editor) {throw 'No tinymce instance: ' + arguments[0];}" +
+            "editor.setContent(arguments[1]);" +
+            "editor.setDirty(true);"         // Explicitly setDirty as the setContent doesn't by default
+            , editorId, content);
         log(String.format("Content [%1$s] set on editor: %2$s", content,  editorId));
     }
 
