@@ -1,6 +1,7 @@
 package org.labkey.test.tests.component;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.mutable.MutableInt;
 import org.json.JSONObject;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -314,8 +315,8 @@ public class EditableGridTest extends BaseWebDriverTest
         // Get the various row heights before adding a value to the multiLine field.
         WebElement gridRow = Locator.tag("tr").findElements(testGrid).get(1);
         int rowHeightBefore = gridRow.getSize().height;
-        var totalHeightBefore = new Object(){int size = 0; };
-        Locator.tag("tr").findElements(testGrid).forEach(gr -> totalHeightBefore.size = totalHeightBefore.size + gr.getSize().height);
+        var totalHeightBefore = new MutableInt(0);
+        Locator.tag("tr").findElements(testGrid).forEach(gr -> totalHeightBefore.add(gr.getSize().height));
         WebElement topLeft = testGrid.setCellValue(0, FILL_STRING, stringValue);
 
         testGrid.setCellValue(0, FILL_INT, intValue);
@@ -351,12 +352,12 @@ public class EditableGridTest extends BaseWebDriverTest
                 testGrid.getColumnData(FILL_DATE));
 
         // Check that pasting increased the size of all the rows.
-        var totalHeightAfter = new Object(){int size = 0; };
-        Locator.tag("tr").findElements(testGrid).forEach(gr -> totalHeightAfter.size = totalHeightAfter.size + gr.getSize().height);
+        var totalHeightAfter = new MutableInt(0);
+        Locator.tag("tr").findElements(testGrid).forEach(gr -> totalHeightAfter.add(gr.getSize().height));
 
         checker().withScreenshot()
                 .verifyTrue("The total height of all the rows should have increases after the paste.",
-                        totalHeightBefore.size + (3 * rowHeightBefore) >= totalHeightAfter.size);
+                        totalHeightBefore.intValue() + (3 * rowHeightBefore) >= totalHeightAfter.intValue());
     }
 
     @Test
