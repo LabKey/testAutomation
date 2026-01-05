@@ -70,6 +70,16 @@ public abstract class BaseUpgradeTest extends BaseWebDriverTest
         return Arrays.asList();
     }
 
+    protected boolean isUpgradingFromBefore(String version)
+    {
+        return !isUpgradingFrom(version, null);
+    }
+
+    protected boolean isUpgradingFrom(String earliestVersion, String latestVersion)
+    {
+        return previousVersion != null && VersionRange.versionRange(earliestVersion, latestVersion).contains(previousVersion);
+    }
+
     /**
      * Annotates test methods that should only run when upgrading from particular LabKey versions, as specified in
      * {@code webtest.upgradePreviousVersion}.<br>

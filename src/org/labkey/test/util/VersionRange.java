@@ -9,6 +9,12 @@ public class VersionRange
     {
         this.eariestVersion = eariestVersion;
         this.latestVersion = latestVersion;
+
+        if (eariestVersion == null && latestVersion == null)
+            throw new IllegalArgumentException("Version range requires at least one version");
+        if (eariestVersion != null && latestVersion != null && eariestVersion.compareTo(latestVersion) > 0)
+            throw new IllegalArgumentException("%s is after %s".formatted(eariestVersion, latestVersion));
+
     }
 
     public static VersionRange from(String version)
