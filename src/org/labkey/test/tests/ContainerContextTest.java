@@ -142,7 +142,8 @@ public class ContainerContextTest extends BaseWebDriverTest
         log("** Creating lookup target list in sub-folder");
         List<FieldDefinition> lookupTargetCols = List.of(
             new FieldDefinition("LookupName", FieldDefinition.ColumnType.String).setDescription("Lookup Name"),
-            new FieldDefinition("LookupAge", FieldDefinition.ColumnType.Integer).setDescription("Lookup Age").setURL("fake/action.view?key=${Key}")
+            new FieldDefinition("LookupAge", FieldDefinition.ColumnType.Integer).setDescription("Lookup Age")
+                    .setURL("fake/action.view?key=${Key}").setURLOpenNewTab(true)
         );
         String lookupTargetListName = SUB_FOLDER_A + "-LookupTarget-List";
         TestDataGenerator subfolderDgen = new IntListDefinition(lookupTargetListName, LIST_KEY_NAME).setFields(lookupTargetCols)
@@ -202,6 +203,8 @@ public class ContainerContextTest extends BaseWebDriverTest
         href = getAttribute(Locator.linkWithText("200"), "href");
         assertTrue("Expected ListLookup/LookupAge link to go to " + getProjectName() + "/" + SUB_FOLDER_A + " container, href=" + href,
                 href.contains(getProjectName() + "/" + SUB_FOLDER_A) && href.contains("fake") && href.contains("action.view?key=2"));
+
+        assertEquals("Expected LookupAge link target to be _blank", "_blank", getAttribute(Locator.linkWithText("200"), "target"));
     }
 
     // Issue 15751: Pipeline job list generates URLs without correct container
