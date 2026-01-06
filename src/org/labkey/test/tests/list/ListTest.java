@@ -38,6 +38,7 @@ import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Data;
 import org.labkey.test.categories.Hosting;
 import org.labkey.test.components.CustomizeView;
+import org.labkey.test.components.domain.AdvancedSettingsDialog;
 import org.labkey.test.components.domain.BaseDomainDesigner;
 import org.labkey.test.components.domain.ConditionalFormatDialog;
 import org.labkey.test.components.domain.DomainFieldRow;
@@ -101,6 +102,7 @@ public class ListTest extends BaseWebDriverTest
     protected final static String LIST_NAME_HTML_KEY = "A_HtmlKey_" + DOMAIN_TRICKY_CHARACTERS;
     protected final static ColumnType LIST_KEY_TYPE = ColumnType.String;
     protected final static String LIST_KEY_NAME = "Key";
+    boolean IS_POSTGRES = WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.PostgreSQL;
 
     protected final static String LIST_KEY_NAME2 = "Color \"`~!@#$%^&*()_-+={}[]|\\:;<>,.?/";
     protected final static String LIST_KEY_NAME2_BULK = "\"Color \"\"`~!@#$%^&*()_-+={}[]|\\:;<>,.?/\"";
@@ -1610,10 +1612,10 @@ public class ListTest extends BaseWebDriverTest
         checker().verifyTrue("Domain audit comment not as expected after updating field unique constraint", pass);
 
         viewRawTableMetadata(listName);
-        verifyTableIndices("unique_constraint_list_", List.of("field_name1", "fieldname_2", "fieldname_3"));
-        verifyTableIndexNonUnique("unique_constraint_list_", "field_name1", true);
-        verifyTableIndexNonUnique("unique_constraint_list_", "fieldname_2", true);
-        verifyTableIndexNonUnique("unique_constraint_list_", "fieldname_3", false);
+        verifyTableIndices("unique_constraint_list_", List.of("field_Name1", "fieldName_2", "FieldName_3"));
+        verifyTableIndexNonUnique("unique_constraint_list_", "field_Name1", true);
+        verifyTableIndexNonUnique("unique_constraint_list_", "fieldName_2", true);
+        verifyTableIndexNonUnique("unique_constraint_list_", "FieldName_3", false);
 
         // remove a field unique constraint, change a field from unique -> non-unique, and change one from non-unique -> unique
         listDefinitionPage = _listHelper.goToEditDesign(listName);
@@ -1628,17 +1630,19 @@ public class ListTest extends BaseWebDriverTest
                 .apply();
         listDefinitionPage.clickSave();
 
+        String expectedDataChanges = "Indices: [field name1, unique: true, fieldname@3, unique: false, fieldname_2, unique: true] > [FieldName@3, unique: true, fieldName_2, unique: false]";
+        if (!IS_POSTGRES) expectedDataChanges = "Indices: [FieldName@3, unique: false, field Name1, unique: true, fieldName_2, unique: true] > [FieldName@3, unique: true, fieldName_2, unique: false]";
         expectedDomainEvent = new AuditLogHelper.DetailedAuditEventRow(null, listName, null,
                 "The descriptor of domain " + listName + " was updated.",
-                "", null, null, "Indices: [field name1, unique: true, fieldname@3, unique: false, fieldname_2, unique: true] > [FieldName@3, unique: true, fieldName_2, unique: false]");
+                "", null, null, expectedDataChanges);
         pass = _auditLogHelper.validateLastDomainAuditEvents(listName, getProjectName(), expectedDomainEvent, Collections.emptyMap());
         checker().verifyTrue("Domain audit comment not as expected after updating field unique constraint", pass);
 
         viewRawTableMetadata(listName);
-        verifyTableIndices("unique_constraint_list_", List.of("fieldname_2", "fieldname_3"));
+        verifyTableIndices("unique_constraint_list_", List.of("fieldName_2", "FieldName_3"));
         assertTextNotPresent("unique_constraint_list_field_name1");
-        verifyTableIndexNonUnique("unique_constraint_list_", "fieldname_2", false);
-        verifyTableIndexNonUnique("unique_constraint_list_", "fieldname_3", true);
+        verifyTableIndexNonUnique("unique_constraint_list_", "fieldName_2", false);
+        verifyTableIndexNonUnique("unique_constraint_list_", "FieldName_3", true);
     }
 
     @Test // Issue 52247
@@ -1711,7 +1715,11 @@ public class ListTest extends BaseWebDriverTest
 
     private void verifyTableIndexNonUnique(String prefix, String suffix, boolean isUnique)
     {
-        Locator locator = Locator.xpath("//td[contains(text(), '" + prefix + suffix + "')]/preceding-sibling::td[2][text()='" + !isUnique + "']");
+        String boolDisplay = isUnique ? "0" : "1";
+        if (IS_POSTGRES) boolDisplay = isUnique ? "false" : "true";
+        String fieldKey = prefix + suffix;
+        if (IS_POSTGRES) fieldKey = fieldKey.toLowerCase();
+        Locator locator = Locator.xpath("//td[contains(text(), '" + fieldKey + "')]/preceding-sibling::td[2][text()='" + boolDisplay + "']");
         checker().verifyTrue("Non_Unique value not as expected in metadata for locator: " + locator, locator.existsIn(getDriver()));
     }
 

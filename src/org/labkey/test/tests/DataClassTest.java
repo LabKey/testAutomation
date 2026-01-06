@@ -24,6 +24,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
+import org.labkey.test.components.domain.AdvancedSettingsDialog;
 import org.labkey.test.components.domain.BaseDomainDesigner;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.pages.core.admin.BaseSettingsPage.DATE_FORMAT;
@@ -49,6 +50,7 @@ import static org.labkey.test.util.DataRegionTable.DataRegion;
 public class DataClassTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "DataClassTestProject";
+    boolean IS_POSTGRES = WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.PostgreSQL;
 
     @Override
     public List<String> getAssociatedModules()
@@ -275,10 +277,10 @@ public class DataClassTest extends BaseWebDriverTest
         createPage.clickSave();
 
         viewRawTableMetadata(dataClassName);
-        verifyTableIndices("unique_constraint_test_", List.of("field_name1", "fieldname_2"));
+        verifyTableIndices("unique_constraint_test_", List.of("field_Name1", "fieldName_2"));
         assertTextNotPresent("unique_constraint_test_fieldname_3");
-        verifyTableIndexNonUnique("unique_constraint_test_", "field_name1", true);
-        verifyTableIndexNonUnique("unique_constraint_test_", "fieldname_2", false);
+        verifyTableIndexNonUnique("unique_constraint_test_", "field_Name1", true);
+        verifyTableIndexNonUnique("unique_constraint_test_", "fieldName_2", false);
 
         log("Remove a field unique constraint and add a new one");
         goToProjectHome();
@@ -292,10 +294,10 @@ public class DataClassTest extends BaseWebDriverTest
                 .apply();
         updatePage.clickSave();
         viewRawTableMetadata(dataClassName);
-        verifyTableIndices("unique_constraint_test_", List.of("fieldname_2", "fieldname_3"));
+        verifyTableIndices("unique_constraint_test_", List.of("fieldName_2", "FieldName_3"));
         assertTextNotPresent("unique_constraint_test_field_name1");
-        verifyTableIndexNonUnique("unique_constraint_test_", "fieldname_2", false);
-        verifyTableIndexNonUnique("unique_constraint_test_", "fieldname_3", true);
+        verifyTableIndexNonUnique("unique_constraint_test_", "fieldName_2", false);
+        verifyTableIndexNonUnique("unique_constraint_test_", "FieldName_3", true);
     }
 
     @Test
@@ -413,7 +415,11 @@ public class DataClassTest extends BaseWebDriverTest
 
     private void verifyTableIndexNonUnique(String prefix, String suffix, boolean isUnique)
     {
-        Locator locator = Locator.xpath("//td[contains(text(), '" + prefix + suffix + "')]/preceding-sibling::td[2][text()='" + !isUnique + "']");
+        String boolDisplay = isUnique ? "0" : "1";
+        if (IS_POSTGRES) boolDisplay = isUnique ? "false" : "true";
+        String fieldKey = prefix + suffix;
+        if (IS_POSTGRES) fieldKey = fieldKey.toLowerCase();
+        Locator locator = Locator.xpath("//td[contains(text(), '" + fieldKey + "')]/preceding-sibling::td[2][text()='" + boolDisplay + "']");
         checker().verifyTrue("Non_Unique value not as expected in metadata for locator: " + locator, locator.existsIn(getDriver()));
     }
 
