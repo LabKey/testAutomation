@@ -170,10 +170,10 @@ public class AdvancedSettingsDialog extends ModalDialog
         return this;
     }
 
-    public AdvancedSettingsDialog setSingleFieldIndex(String type)
+    public AdvancedSettingsDialog setSingleFieldIndex(SingleFieldIndexType type)
     {
-        if (type == null) type = "No Index";
-        elementCache().indexSelect.selectByVisibleText(type);
+        if (type == null) type = SingleFieldIndexType.NO_INDEX;
+        elementCache().indexSelect.selectByVisibleText(type.getText());
         return this;
     }
 
@@ -206,6 +206,25 @@ public class AdvancedSettingsDialog extends ModalDialog
     {
         dismiss("Cancel");
         return _row;
+    }
+
+    public enum SingleFieldIndexType
+    {
+        NO_INDEX("No Index"),
+        INDEX("Index"),
+        UNIQUE_INDEX("Index and require unique values");
+
+        private final String _text;
+
+        SingleFieldIndexType(String text)
+        {
+            _text = text;
+        }
+
+        public String getText()
+        {
+            return _text;
+        }
     }
 
     @Override

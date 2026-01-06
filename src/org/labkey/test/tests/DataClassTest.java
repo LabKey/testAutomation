@@ -262,12 +262,12 @@ public class DataClassTest extends BaseWebDriverTest
         DomainFormPanel domainFormPanel = createPage.getDomainEditor();
         domainFormPanel.manuallyDefineFields(fieldName1)
                 .setType(FieldDefinition.ColumnType.Integer)
-                .expand().clickAdvancedSettings().setSingleFieldIndex("Index and require unique values").apply();
+                .expand().clickAdvancedSettings().setSingleFieldIndex(AdvancedSettingsDialog.SingleFieldIndexType.UNIQUE_INDEX).apply();
         log("Add another field with a non-unique constraint");
         String fieldName2 = "fieldName_2";
         domainFormPanel.addField(fieldName2)
                 .setType(FieldDefinition.ColumnType.DateAndTime)
-                .expand().clickAdvancedSettings().setSingleFieldIndex("Index").apply();
+                .expand().clickAdvancedSettings().setSingleFieldIndex(AdvancedSettingsDialog.SingleFieldIndexType.INDEX).apply();
         log("Add another field which does not have a unique constraint");
         String fieldName3 = "FieldName@3";
         domainFormPanel.addField(fieldName3)
@@ -288,7 +288,7 @@ public class DataClassTest extends BaseWebDriverTest
                 .expand().clickAdvancedSettings().setSingleFieldIndex(null)
                 .apply();
         domainFormPanel.getField(fieldName3)
-                .expand().clickAdvancedSettings().setSingleFieldIndex("Index and require unique values")
+                .expand().clickAdvancedSettings().setSingleFieldIndex(AdvancedSettingsDialog.SingleFieldIndexType.UNIQUE_INDEX)
                 .apply();
         updatePage.clickSave();
         viewRawTableMetadata(dataClassName);

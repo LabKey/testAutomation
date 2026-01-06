@@ -1830,12 +1830,12 @@ public class SampleTypeTest extends BaseWebDriverTest
         DomainFormPanel domainFormPanel = createPage.getFieldsPanel();
         domainFormPanel.manuallyDefineFields(fieldName1)
                 .setType(ColumnType.Integer)
-                .expand().clickAdvancedSettings().setSingleFieldIndex("Index").apply();
+                .expand().clickAdvancedSettings().setSingleFieldIndex(AdvancedSettingsDialog.SingleFieldIndexType.INDEX).apply();
         log("Add another field with a unique constraint");
         String fieldName2 = "fieldName_2";
         domainFormPanel.addField(fieldName2)
                 .setType(ColumnType.DateAndTime)
-                .expand().clickAdvancedSettings().setSingleFieldIndex("Index and require unique values").apply();
+                .expand().clickAdvancedSettings().setSingleFieldIndex(AdvancedSettingsDialog.SingleFieldIndexType.UNIQUE_INDEX).apply();
         log("Add another field which does not have a unique constraint");
         String fieldName3 = "FieldName@3";
         domainFormPanel.addField(fieldName3)
@@ -1853,10 +1853,10 @@ public class SampleTypeTest extends BaseWebDriverTest
         UpdateSampleTypePage updatePage = sampleHelper.goToEditSampleType(sampleTypeName);
         domainFormPanel = updatePage.getFieldsPanel();
         domainFormPanel.getField(fieldName2)
-                .expand().clickAdvancedSettings().setSingleFieldIndex("Index")
+                .expand().clickAdvancedSettings().setSingleFieldIndex(AdvancedSettingsDialog.SingleFieldIndexType.INDEX)
                 .apply();
         domainFormPanel.getField(fieldName3)
-                .expand().clickAdvancedSettings().setSingleFieldIndex("Index and require unique values")
+                .expand().clickAdvancedSettings().setSingleFieldIndex(AdvancedSettingsDialog.SingleFieldIndexType.UNIQUE_INDEX)
                 .apply();
         updatePage.clickSave();
         viewRawTableMetadata(sampleTypeName);
