@@ -292,6 +292,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
             "          <column columnName=\"R\">\n" +
             "            <columnTitle>A_People template Query R</columnTitle>\n" +
             "            <url>fake/a_template_metadata.view</url>\n" +
+            "            <urlTarget>_blank</urlTarget>\n" +
             "          </column>\n" +
             "        </columns>\n" +
             "    </table>\n" +
@@ -668,8 +669,8 @@ public class LinkedSchemaTest extends BaseWebDriverTest
                 .addField(new FieldDefinition("Name", FieldDefinition.ColumnType.String).setLabel("Name").setDescription("Name"))
                 .addField(new FieldDefinition("Age", FieldDefinition.ColumnType.Integer).setLabel("Age").setDescription("Age"))
                 .addField(new FieldDefinition("Crazy", FieldDefinition.ColumnType.Boolean).setLabel("Crazy").setDescription("Crazy?"))
-                .addField(new FieldDefinition("P", FieldDefinition.ColumnType.String).setLabel(LIST_DEF_TITLE + " P").setURL("fake/" + LIST_DEF_URL))
-                .addField(new FieldDefinition("Q", FieldDefinition.ColumnType.String).setLabel(LIST_DEF_TITLE + " Q").setURL("fake/" + LIST_DEF_URL))
+                .addField(new FieldDefinition("P", FieldDefinition.ColumnType.String).setLabel(LIST_DEF_TITLE + " P").setURL("fake/" + LIST_DEF_URL).setURLOpenNewTab(false))
+                .addField(new FieldDefinition("Q", FieldDefinition.ColumnType.String).setLabel(LIST_DEF_TITLE + " Q").setURL("fake/" + LIST_DEF_URL).setURLOpenNewTab(true))
                 .addField(new FieldDefinition("R", FieldDefinition.ColumnType.String).setLabel(LIST_DEF_TITLE + " R").setURL("fake/" + LIST_DEF_URL))
                 .addField(new FieldDefinition("S", FieldDefinition.ColumnType.String).setLabel(LIST_DEF_TITLE + " S").setURL("fake/" + LIST_DEF_URL))
                 .addField(new FieldDefinition("T", FieldDefinition.ColumnType.String).setLabel(LIST_DEF_TITLE + " T").setURL("fake/" + LIST_DEF_URL))
@@ -736,7 +737,9 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         assertEquals("Expected to filter table to only Adam", "Adam", table.getDataAsText(0, A_PEOPLE_METADATA_TITLE));
         log("** Verify table metadata overrides when simplemodule is not active in TargetFolder");
         assertHrefContains(table, "A_People db_metadata List P", "a_db_metadata.view");
+        assertEquals("P link target not as expected", "", table.getLinkAttribute(0, table.getColumnIndexStrict("A_People db_metadata List P"), "target"));
         assertHrefContains(table, "A_People db_metadata List Q", "a_db_metadata.view");
+        assertEquals("Q link target not as expected", "_blank", table.getLinkAttribute(0, table.getColumnIndexStrict("A_People db_metadata List Q"), "target"));
         assertHrefContains(table, "A_People db_metadata List R", "a_db_metadata.view");
         assertHrefContains(table, "A_People db_metadata List S", "a_db_metadata.view");
         assertHrefContains(table, "A_People template List T", "a_template_metadata.view");
@@ -779,7 +782,9 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         impersonate(READER_USER);
         assertHrefContains(table, "A_People db_metadata Query P", "a_db_metadata.view");
         assertHrefContains(table, "A_People file_metadata Query Q", "a_template_file_metadata.view");
+        assertEquals("Q link target not as expected", "_blank", table.getLinkAttribute(0, table.getColumnIndexStrict("A_People file_metadata Query Q"), "target"));
         assertHrefContains(table, "A_People template Query R", "a_template_metadata.view");
+        assertEquals("R link target not as expected", "_blank", table.getLinkAttribute(0, table.getColumnIndexStrict("A_People template Query R"), "target"));
         // Columns S-Z have their URL removed by the linked schema.
         assertHrefNotPresent(table, "file_metadata Query S");
         assertHrefNotPresent(table, "file_metadata Query T");

@@ -373,6 +373,19 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         return this;
     }
 
+    public boolean isUrlOpenNewTab()
+    {
+        expand();
+        return elementCache().urlTargetCheckbox.get();
+    }
+
+    public DomainFieldRow setUrlOpenNewTab(boolean checked)
+    {
+        expand();
+        elementCache().urlTargetCheckbox.set(checked);
+        return this;
+    }
+
     //
     // numeric field options.
 
@@ -1638,6 +1651,8 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
                 .refindWhenNeeded(this), getDriver());
         public final Input urlInput = new Input(Locator.tagWithAttributeContaining("input", "id", "domainpropertiesrow-URL-")
                 .refindWhenNeeded(this), getDriver());
+        protected final Locator urlTargetCheckboxLoc = Locator.input("domainpropertiesrow-isTargetBlank");
+        public final Checkbox urlTargetCheckbox = new Checkbox(urlTargetCheckboxLoc.refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT));
 
         // numeric field options
         public final Select defaultScaleTypeSelect = SelectWrapper.Select(Locator.name("domainpropertiesrow-defaultScale"))
