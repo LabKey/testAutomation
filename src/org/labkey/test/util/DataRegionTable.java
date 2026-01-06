@@ -765,7 +765,7 @@ public class DataRegionTable extends DataRegion
 
     private String _getHref(int row, int column)
     {
-        return link(row, column).getAttribute("href");
+        return getLinkAttribute(row, column, "href");
     }
 
     public String getHref(int row, CharSequence columnIdentifier)
@@ -790,6 +790,11 @@ public class DataRegionTable extends DataRegion
     public boolean hasHref(int row, CharSequence columnIdentifier)
     {
         return hasHref(row, getColumnIndexStrict(columnIdentifier));
+    }
+
+    public String getLinkAttribute(int row, int column, String attr)
+    {
+        return link(row, column).getAttribute(attr);
     }
 
     public WebElement getFlag(int row, CharSequence columnIdentifier)
