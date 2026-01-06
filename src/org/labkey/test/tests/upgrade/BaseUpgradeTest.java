@@ -35,8 +35,9 @@ public abstract class BaseUpgradeTest extends BaseWebDriverTest
 {
 
     protected static final boolean isUpgradeSetupPhase = TestProperties.getBooleanProperty("webtest.upgradeSetup", true);
-    protected static final Version previousVersion = Optional.ofNullable(trimToNull(System.getProperty("webtest.upgradePreviousVersion")))
-        .map(Version::new).orElse(TestProperties.getProductVersion());
+    protected static final Version setupVersion = isUpgradeSetupPhase ? TestProperties.getProductVersion() :
+        Optional.ofNullable(trimToNull(System.getProperty("webtest.upgradePreviousVersion"))).map(Version::new)
+            .orElse(TestProperties.getProductVersion());
 
     @Override
     protected boolean skipCleanup(boolean afterTest)
@@ -70,14 +71,27 @@ public abstract class BaseUpgradeTest extends BaseWebDriverTest
         return Arrays.asList();
     }
 
-    protected boolean isUpgradingFromBefore(String version)
+    /**
+     * Checks if the setup for the current test was performed in a version prior to the specified version.
+     *
+     * @param version The version to check against.
+     * @return {@code true} if the setup version is earlier than the specified version.
+     */
+    protected boolean wasSetupBefore(String version)
     {
-        return !isUpgradingFrom(version, null);
+        return !wasSetupWithin(version, null);
     }
 
-    protected boolean isUpgradingFrom(String earliestVersion, String latestVersion)
+    /**
+     * Checks if the setup for the current test was performed within the specified version range (inclusive).
+     *
+     * @param earliestVersion The earliest version in the range (inclusive).
+     * @param latestVersion The latest version in the range (inclusive).
+     * @return {@code true} if the setup version is within the specified range.
+     */
+    protected boolean wasSetupWithin(String earliestVersion, String latestVersion)
     {
-        return previousVersion != null && VersionRange.versionRange(earliestVersion, latestVersion).contains(previousVersion);
+        return VersionRange.versionRange(earliestVersion, latestVersion).contains(setupVersion);
     }
 
     /**
@@ -114,7 +128,7 @@ public abstract class BaseUpgradeTest extends BaseWebDriverTest
             String latestVersion = Optional.ofNullable(description.getAnnotation(LatestVersion.class))
                 .map(LatestVersion::value).orElse(null);
 
-            if (isUpgradeSetupPhase || previousVersion == null || (earliestVersion == null && latestVersion == null))
+            if (isUpgradeSetupPhase || setupVersion == null || (earliestVersion == null && latestVersion == null))
             {
                 return base; // Run the test normally
             }
@@ -124,8 +138,8 @@ public abstract class BaseUpgradeTest extends BaseWebDriverTest
                 @Override
                 public void evaluate() throws Throwable
                 {
-                    Assume.assumeTrue("Test not valid when upgrading from version: " + previousVersion,
-                        VersionRange.versionRange(earliestVersion, latestVersion).contains(previousVersion)
+                    Assume.assumeTrue("Test not valid when upgrading from version: " + setupVersion,
+                        VersionRange.versionRange(earliestVersion, latestVersion).contains(setupVersion)
                     );
                     base.evaluate();
                 }
