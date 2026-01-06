@@ -38,6 +38,7 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.assay.AssayConstants;
+import org.labkey.test.components.domain.AdvancedSettingsDialog;
 import org.labkey.test.components.domain.BaseDomainDesigner;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.ext4.Window;
@@ -105,6 +106,7 @@ public class SampleTypeTest extends BaseWebDriverTest
     private static final String LOWER_CASE_SAMPLE_TYPE = CASE_INSENSITIVE_SAMPLE_TYPE.toLowerCase();
     private static final String UPPER_CASE_SAMPLE_TYPE = CASE_INSENSITIVE_SAMPLE_TYPE.toUpperCase();
     private static final TestUser USER_FOR_FILTERTEST = new TestUser("filter_user@sampletypetest.test");
+    boolean IS_POSTGRES = WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.PostgreSQL;
 
     @Override
     public List<String> getAssociatedModules()
@@ -1825,17 +1827,17 @@ public class SampleTypeTest extends BaseWebDriverTest
                 .goToCreateNewSampleType()
                 .setName(sampleTypeName);
 
-        log("Add a field with a unique constraint");
+        log("Add a field with a non-unique constraint");
         String fieldName1 = "field Name1";
         DomainFormPanel domainFormPanel = createPage.getFieldsPanel();
         domainFormPanel.manuallyDefineFields(fieldName1)
                 .setType(ColumnType.Integer)
-                .expand().clickAdvancedSettings().setUniqueConstraint(true).apply();
+                .expand().clickAdvancedSettings().setSingleFieldIndex(AdvancedSettingsDialog.SingleFieldIndexType.INDEX).apply();
         log("Add another field with a unique constraint");
         String fieldName2 = "fieldName_2";
         domainFormPanel.addField(fieldName2)
                 .setType(ColumnType.DateAndTime)
-                .expand().clickAdvancedSettings().setUniqueConstraint(true).apply();
+                .expand().clickAdvancedSettings().setSingleFieldIndex(AdvancedSettingsDialog.SingleFieldIndexType.UNIQUE_INDEX).apply();
         log("Add another field which does not have a unique constraint");
         String fieldName3 = "FieldName@3";
         domainFormPanel.addField(fieldName3)
@@ -1843,22 +1845,27 @@ public class SampleTypeTest extends BaseWebDriverTest
         createPage.clickSave();
 
         viewRawTableMetadata(sampleTypeName);
-        verifyTableIndices("unique_constraint_test_", List.of("field_name1", "fieldname_2"));
+        verifyTableIndices("unique_constraint_test_", List.of("field_Name1", "fieldName_2"));
+        assertTextNotPresent("unique_constraint_test_fieldname_3");
+        verifyTableIndexNonUnique("unique_constraint_test_", "field_Name1", false);
+        verifyTableIndexNonUnique("unique_constraint_test_", "fieldName_2", true);
 
         log("Remove a field unique constraint and add a new one");
         goToProjectHome();
         UpdateSampleTypePage updatePage = sampleHelper.goToEditSampleType(sampleTypeName);
         domainFormPanel = updatePage.getFieldsPanel();
         domainFormPanel.getField(fieldName2)
-                .expand().clickAdvancedSettings().setUniqueConstraint(false)
+                .expand().clickAdvancedSettings().setSingleFieldIndex(AdvancedSettingsDialog.SingleFieldIndexType.INDEX)
                 .apply();
         domainFormPanel.getField(fieldName3)
-                .expand().clickAdvancedSettings().setUniqueConstraint(true)
+                .expand().clickAdvancedSettings().setSingleFieldIndex(AdvancedSettingsDialog.SingleFieldIndexType.UNIQUE_INDEX)
                 .apply();
         updatePage.clickSave();
         viewRawTableMetadata(sampleTypeName);
-        verifyTableIndices("unique_constraint_test_", List.of("field_name1", "fieldname_3"));
-        assertTextNotPresent("unique_constraint_test_fieldname_2");
+        verifyTableIndices("unique_constraint_test_", List.of("field_name1", "FieldName_3"));
+        verifyTableIndexNonUnique("unique_constraint_test_", "field_Name1", false);
+        verifyTableIndexNonUnique("unique_constraint_test_", "fieldName_2", false);
+        verifyTableIndexNonUnique("unique_constraint_test_", "FieldName_3", true);
     }
 
     @Test
@@ -2018,6 +2025,16 @@ public class SampleTypeTest extends BaseWebDriverTest
 
         for (String suffix : suffixes)
             assertTextPresentCaseInsensitive(prefix + suffix);
+    }
+
+    private void verifyTableIndexNonUnique(String prefix, String suffix, boolean isUnique)
+    {
+        String boolDisplay = isUnique ? "0" : "1";
+        if (IS_POSTGRES) boolDisplay = isUnique ? "false" : "true";
+        String fieldKey = prefix + suffix;
+        if (IS_POSTGRES) fieldKey = fieldKey.toLowerCase();
+        Locator locator = Locator.xpath("//td[contains(text(), '" + fieldKey + "')]/preceding-sibling::td[2][text()='" + boolDisplay + "']");
+        checker().verifyTrue("Non_Unique value not as expected in metadata for locator: " + locator, locator.existsIn(getDriver()));
     }
 
     private void setFileAttachment(int index, File attachment)
