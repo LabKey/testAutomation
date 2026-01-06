@@ -1651,7 +1651,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
                 .refindWhenNeeded(this), getDriver());
         public final Input urlInput = new Input(Locator.tagWithAttributeContaining("input", "id", "domainpropertiesrow-URL-")
                 .refindWhenNeeded(this), getDriver());
-        protected final Locator urlTargetCheckboxLoc = Locator.input("domainpropertiesrow-URLTarget");
+        protected final Locator urlTargetCheckboxLoc = Locator.input("domainpropertiesrow-isTargetBlank");
         public final Checkbox urlTargetCheckbox = new Checkbox(urlTargetCheckboxLoc.refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT));
 
         // numeric field options
