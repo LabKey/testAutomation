@@ -1676,6 +1676,11 @@ public class DomainDesignerTest extends BaseWebDriverTest
             verifyExpectedFieldProperties(createdField, exportedField);
         }
 
+        // verify URL settings for the boolean field
+        DomainFieldRow boolFieldRow = domainDesignerPage.fieldsPanel().getField("booleanField");
+        checker().verifyEquals("URL value not retained after import/export", "fake/list-def.url", boolFieldRow.getUrl());
+        checker().verifyEquals("URL open in new tab value not retained after import/export", true, boolFieldRow.isUrlOpenNewTab());
+
         // now create a list with the set of created Keys
         String roundTripList = "roundTripListNameCreatedFromJsonFields";
         EditListDefinitionPage listDefPage = _listHelper.beginCreateList(getProjectName(), roundTripList);
@@ -1746,6 +1751,11 @@ public class DomainDesignerTest extends BaseWebDriverTest
                     roundTrippedFields.get(i).getName(), is(uiFields.get(i)));
         }
         assertThat(exportedFields.keySet(), is(roundTrippedFields.keySet()));
+
+        // verify URL settings for the boolean field
+        DomainFieldRow boolFieldRow = sampleTypeDesignerPage.fieldsPanel().getField("booleanField");
+        checker().verifyEquals("URL value not retained after import/export", "fake/list-def.url", boolFieldRow.getUrl());
+        checker().verifyEquals("URL open in new tab value not retained after import/export", true, boolFieldRow.isUrlOpenNewTab());
     }
 
     @Test
@@ -1793,7 +1803,8 @@ public class DomainDesignerTest extends BaseWebDriverTest
         fields.add(new FieldDefinition("booleanField", FieldDefinition.ColumnType.Boolean)
                 .setLabel("Boolean Field")
                 .setRequired(true)
-                .setURL("fake/list-def.url"));
+                .setURL("fake/list-def.url")
+                .setURLOpenNewTab(true));
         fields.add(new FieldDefinition("attachmentField", FieldDefinition.ColumnType.Attachment)
                 .setHidden(true));
         fields.add(new FieldDefinition("decimalField", FieldDefinition.ColumnType.Decimal).

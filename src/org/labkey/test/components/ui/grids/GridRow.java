@@ -107,7 +107,7 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
     public String getCellStyle(CharSequence columnIdentifier)
     {
         var cell =  getCell(columnIdentifier);
-        return Locator.tagWithClass("span", "ws-pre-wrap").findElement(cell).getAttribute("style");
+        return Locator.byClass("table-cell-content").child(Locator.tag("span")).findElement(cell).getAttribute("style");
     }
 
     /**

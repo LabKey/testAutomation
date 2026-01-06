@@ -1252,7 +1252,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
         Checkbox getCheckbox(int rowIndex)
         {
-            return new Checkbox(Locator.css("td > input[type=checkbox]").findElement(getRow(rowIndex)));
+            return new Checkbox(Locator.css("td > .table-cell-content > input[type=checkbox]").findElement(getRow(rowIndex)));
         }
 
         protected WebElement getColumnHeaderCell(CharSequence columnIdentifier)

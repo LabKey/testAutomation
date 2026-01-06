@@ -31,6 +31,7 @@ public abstract class Locators
     public static final Locator.XPathLocator panelWebpartTitle = Locator.byClass("labkey-wp-title-text");
     public static final Locator.XPathLocator folderTitle = Locator.tagWithClass("a", "lk-body-title-folder");
     public static final Locator.XPathLocator loadingSpinner = Locator.byClass("fa-spinner");
+    public static final Locator.CssLocator floatingGridHeader = Locator.css(".grid-panel__grid .table-responsive thead, .editable-grid__container .table-responsive thead");
 
     public static Locator.XPathLocator headerContainer()
     {

@@ -7,6 +7,8 @@ import org.labkey.test.Locators;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.TestLogger;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Point;
+import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Locatable;
@@ -53,17 +55,15 @@ public class ScrollUtils
                 Locators.floatingHeaderContainer(),
                 Locators.appFloatingHeader(),
                 Locators.domainDesignerFloatingHeader(),
-                DataRegionTable.Locators.floatingHeader().notHidden());
+                DataRegionTable.Locators.floatingHeader().notHidden(),
+                Locators.floatingGridHeader);
 
-        int headerHeight = 0;
-        for (WebElement floatingHeader : floatingHeaders)
+        if (!floatingHeaders.isEmpty())
         {
-            headerHeight += floatingHeader.getSize().getHeight();
-        }
-        if (headerHeight > 0)
-        {
-            int elYInViewPort = webElement.getLocation().getY() - getWindowScrollY(webDriver).intValue();
-            if (headerHeight > elYInViewPort)
+            Rectangle rect = webElement.getRect();
+            Point elementCenter = new Point(rect.getX() + rect.getWidth()/2, rect.getY() + rect.getHeight()/2);
+
+            if (floatingHeaders.stream().anyMatch(el -> pointInRect(elementCenter, el.getRect())))
             {
                 TestLogger.debug("Scrolled under floating headers:\n" + floatingHeaders.stream().map(WebElement::toString).collect(Collectors.joining("\n")));
                 ((Locatable) webElement).getCoordinates().inViewPort(); // 'inViewPort()' will scroll element into view
@@ -71,6 +71,12 @@ public class ScrollUtils
             }
         }
         return false;
+    }
+
+    private static boolean pointInRect(Point point, Rectangle rect)
+    {
+        return rect.getX() <= point.getX() && point.getX() <= rect.getX() + rect.getWidth() &&
+            rect.getY() <= point.getY() && point.getY() <= rect.getY() + rect.getHeight();
     }
 
     public static Long getWindowScrollY(WebDriver webDriver)

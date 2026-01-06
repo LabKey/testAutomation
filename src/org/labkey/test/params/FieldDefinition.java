@@ -278,6 +278,18 @@ public class FieldDefinition extends PropertyDescriptor
         return this;
     }
 
+    public boolean isURLOpenNewTab()
+    {
+        Object val = getFieldProperty("URLTarget");
+        return "_blank".equals(val);
+    }
+
+    public FieldDefinition setURLOpenNewTab(boolean openNewTab)
+    {
+        setFieldProperty("URLTarget", openNewTab ? "_blank" : null);
+        return this;
+    }
+
     public String getImportAliases()
     {
         return (String) getFieldProperty("importAliases");
