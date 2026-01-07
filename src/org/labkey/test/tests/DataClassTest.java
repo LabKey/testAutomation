@@ -166,6 +166,20 @@ public class DataClassTest extends BaseWebDriverTest
                 "'name' is a reserved field name in 'Reserved Field Names Test'.",
                 "Please correct errors in Reserved Field Names Test before saving."),
                 createPage.clickSaveExpectingErrors());
+        domainFormPanel.removeAllFields(false);
+
+        domainFormPanel.manuallyDefineFields("protocol");
+        assertEquals("Data class reserved field name error", Arrays.asList(
+                        "'protocol' is a reserved field name in 'Reserved Field Names Test'.",
+                        "Please correct errors in Reserved Field Names Test before saving."),
+                createPage.clickSaveExpectingErrors());
+        domainFormPanel.removeAllFields(false);
+
+        domainFormPanel.manuallyDefineFields("Name Expression");
+        assertEquals("Data class reserved field name error", Arrays.asList(
+                        "'Name Expression' is a reserved field name in 'Reserved Field Names Test'.",
+                        "Please correct errors in Reserved Field Names Test before saving."),
+                createPage.clickSaveExpectingErrors());
 
         createPage.clickCancel();
     }
