@@ -170,16 +170,10 @@ public class AdvancedSettingsDialog extends ModalDialog
         return this;
     }
 
-    public boolean isUniqueConstraint()
+    public AdvancedSettingsDialog setSingleFieldIndex(SingleFieldIndexType type)
     {
-        return elementCache().uniqueConstraint.get();
-    }
-
-    public AdvancedSettingsDialog setUniqueConstraint(boolean checked)
-    {
-        elementCache().uniqueConstraint.set(checked);
-        getWrapper().waitFor(()-> elementCache().uniqueConstraint.get().equals(checked),
-                "uniqueConstraint checkbox was not set as expected", 1000);
+        if (type == null) type = SingleFieldIndexType.NO_INDEX;
+        elementCache().indexSelect.selectByVisibleText(type.getText());
         return this;
     }
 
@@ -212,6 +206,25 @@ public class AdvancedSettingsDialog extends ModalDialog
     {
         dismiss("Cancel");
         return _row;
+    }
+
+    public enum SingleFieldIndexType
+    {
+        NO_INDEX("No Index"),
+        INDEX("Index"),
+        UNIQUE_INDEX("Index and require unique values");
+
+        private final String _text;
+
+        SingleFieldIndexType(String text)
+        {
+            _text = text;
+        }
+
+        public String getText()
+        {
+            return _text;
+        }
     }
 
     @Override
@@ -256,8 +269,8 @@ public class AdvancedSettingsDialog extends ModalDialog
                 Locator.input("domainpropertiesrow-recommendedVariable").findWhenNeeded(this));
         public Checkbox enableMissingValues = new Checkbox(
                 Locator.input("domainpropertiesrow-mvEnabled").findWhenNeeded(this));
-        public Checkbox uniqueConstraint = new Checkbox(
-                Locator.input("domainpropertiesrow-uniqueConstraint").findWhenNeeded(this));
+        public Select indexSelect = SelectWrapper.Select(Locator.tagWithAttribute("select", "name", "domainpropertiesrow-singleFieldConstraint"))
+                .findWhenNeeded(this);
     }
 
 }
