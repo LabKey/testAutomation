@@ -215,6 +215,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
             throw new NoSuchElementException("there is no selection column for grid");
 
         var checkBoxes = Locator.tag("tr").child("td")
+                .child(Locator.byClass("table-cell-content"))
                 .child(Locator.tagWithAttribute("input", "type", "checkbox"))
                 .findElements(elementCache().table);
         getWrapper().scrollIntoView(checkBoxes.get(start)); // Make sure the header isn't in the way

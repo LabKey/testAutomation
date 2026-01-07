@@ -459,12 +459,13 @@ public class EditableGridTest extends BaseWebDriverTest
         Tests the scenario where a row is selected, then another, and another are shift-selected
         expects the range-bump to redefine the selected range
      */
-    @Test public void testShiftSelect_bumpSelect()
+    @Test public void testShiftSelectMultipleTimes()
     {
         EditableGrid testGrid = goToEditableGrid(PASTING_SAMPLE_TYPE);
         testGrid.addRows(15);
 
         Locator boxes = Locator.tag("tr").child("td")
+                .child(Locator.byClass("table-cell-content"))
                 .child(Locator.tagWithAttribute("input", "type", "checkbox"));
         var checkBoxes = boxes.findElements(testGrid);
         scrollIntoView(checkBoxes.get(2), false);
