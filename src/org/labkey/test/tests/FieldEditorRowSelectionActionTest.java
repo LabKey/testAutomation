@@ -33,11 +33,11 @@ public class FieldEditorRowSelectionActionTest extends BaseWebDriverTest
 {
     private final static String PROJECT_NAME = "Field Editor Row Selection Action Test";
     List<String> expectedHeaders = Arrays.asList("Name", "Range URI", "Required", "Lock Type", "Lookup Container", "Lookup Schema", "Lookup Query",
-            "Format", "Default Scale", "Concept URI", "Scale", "Description", "Label", "Import Aliases", "Url", "Conditional Formats", "Property Validators",
+            "Format", "Default Scale", "Concept URI", "Scale", "Description", "Label", "Import Aliases", "URL", "URL Target", "Conditional Formats", "Property Validators",
             "Hidden", "Shown In Update View", "Shown In Insert View", "Shown In Details View", "Default Value Type", "Default Value", "Default Display Value", "Phi",
             "Exclude From Shifting", "Measure", "Dimension", "Recommended Variable", "Mv Enabled");
     List<String> expectedListHeaders = Arrays.asList("Name", "Range URI", "Required", "Is Primary Key", "Lock Type", "Lookup Container", "Lookup Schema", "Lookup Query",
-            "Format", "Default Scale", "Concept URI", "Scale", "Description", "Label", "Import Aliases", "Url", "Conditional Formats", "Property Validators",
+            "Format", "Default Scale", "Concept URI", "Scale", "Description", "Label", "Import Aliases", "URL", "URL Target", "Conditional Formats", "Property Validators",
             "Hidden", "Shown In Update View", "Shown In Insert View", "Shown In Details View", "Default Value Type", "Default Value", "Default Display Value", "Phi",
             "Exclude From Shifting", "Measure", "Dimension", "Recommended Variable", "Mv Enabled");
 
