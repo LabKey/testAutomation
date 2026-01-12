@@ -28,6 +28,8 @@ import org.labkey.test.components.WebPart;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.components.html.SiteNavBar;
 import org.labkey.test.pages.search.SearchResultsPage;
+import org.labkey.test.params.FieldKey;
+import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 
@@ -35,6 +37,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -83,6 +87,8 @@ public class PortalTest extends BaseWebDriverTest
         // Verify that the asynchronous save worked by refreshing:
         assertTextBefore(WIKI_WEBPART_TEXT, MESSAGES_WEBPART_TEXT);
 
+        verifyWebPartsField(new Object[]{"Messages", "Wiki", "Wiki Table of Contents"});
+
         WebPart wikiWebPart = new BodyWebPart(getDriver(), "Wiki");
         wikiWebPart.remove();
 
@@ -101,6 +107,29 @@ public class PortalTest extends BaseWebDriverTest
         assertTextPresent("Customize");
         clickButton("Cancel");
         siteNavBar.exitPageAdminMode();
+
+        verifyWebPartsField(new Object[]{"Messages", "MS2 Runs", "Wiki Table of Contents"});
+    }
+
+    /**
+     * Validate the value of the WebParts field in the core.containers table
+     */
+    private void verifyWebPartsField(Object[] expectedWebParts)
+    {
+        pushLocation();
+        // verify webParts field in core.containers table
+        goToSchemaBrowser();
+        viewQueryData("core", "Containers");
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.addColumn(FieldKey.fromParts("WebParts"));
+        _customizeViewsHelper.clickViewGrid();
+
+        DataRegionTable containersTable = new DataRegionTable("query", this);
+        assertEquals(1, containersTable.getDataRowCount());
+        String value = containersTable.getDataAsText(0, "WebParts");
+        String[] webParts = value.split(", ");
+        assertArrayEquals(expectedWebParts, webParts);
+        popLocation();
     }
 
     @LogMethod
