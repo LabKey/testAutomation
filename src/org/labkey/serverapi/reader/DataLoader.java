@@ -483,13 +483,6 @@ public abstract class DataLoader implements Iterable<Map<String, Object>>, Loade
         {
             _closed = true;
         }
-
-        @Override
-        protected void finalize() throws Throwable
-        {
-            super.finalize();
-            // assert _closed;  TODO: Uncomment to force all callers to close iterator.
-        }
     }
 }
 
