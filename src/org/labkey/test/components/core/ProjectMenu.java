@@ -15,6 +15,7 @@
  */
 package org.labkey.test.components.core;
 
+import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
@@ -28,6 +29,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.List;
 
+import static org.labkey.test.Locators.loadingSpinner;
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 
 /**
@@ -68,20 +70,27 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
 
     private boolean isOpen()
     {
-        return elementCache().menuContainer.getAttribute("class").contains("open");
+        return StringUtils.trimToEmpty(elementCache().menuContainer.getAttribute("class")).contains("open") &&
+                !loadingSpinner.existsIn(elementCache().menuContainer);
     }
 
     public ProjectMenu open()
     {
         if (!isOpen())
         {
-            getWrapper().executeScript("window.scrollTo(0,0);");
-            if (getWrapper().isElementPresent(Locator.css("li.dropdown.open > .lk-custom-dropdown-menu")))
-                getWrapper().mouseOver(elementCache().menuToggle); // Just need to hover if another menu is already open
-            else
-                elementCache().menuToggle.click();
-            WebDriverWrapper.waitFor(this::isOpen, "Project menu didn't open", 2000);
-            getWrapper().waitForElement(Locator.tagWithClass("div", "folder-nav"));
+            Runnable openMenu = () -> {
+                getWrapper().executeScript("window.scrollTo(0,0);");
+                if (getWrapper().isElementPresent(Locator.css("li.dropdown.open > .lk-custom-dropdown-menu")))
+                    getWrapper().mouseOver(elementCache().menuToggle); // Just need to hover if another menu is already open
+                else
+                    elementCache().menuToggle.click();
+                WebDriverWrapper.waitFor(this::isOpen, "Project menu didn't open", 2000);
+            };
+            openMenu.run();
+            if (!Locator.tagWithClass("div", "folder-nav").existsIn(this))
+            {
+                openMenu.run(); // retry
+            }
         }
         return this;
     }
@@ -222,7 +231,7 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
         return new ElementCache();
     }
 
-    protected class ElementCache extends Component.ElementCache
+    protected class ElementCache extends Component<ElementCache>.ElementCache
     {
         final WebElement menuContainer = Locators.menuProjectNav.refindWhenNeeded(getComponentElement());
         final WebElement menuToggle = Locator.tagWithAttribute("a", "data-toggle", "dropdown").refindWhenNeeded(menuContainer);
