@@ -26,6 +26,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.NotFoundException;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
@@ -992,8 +993,12 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     private void dragToCell(WebElement elementToDrag, WebElement destinationCell)
     {
         var size = destinationCell.getSize();
+        Locator.XPathLocator selectionHandleLoc = Locator.byClass("no-margin-top detail__header--name");
+        WebElement title = selectionHandleLoc.findElement(getDriver());
 
         new Actions(getDriver())
+                // Action to avoid tooltip
+                .moveToElement(title)
                 // WebDriver doesn't calculate correct location to click the cell selection handle
                 .moveToElement(elementToDrag, 0, 7)
                 .clickAndHold()
