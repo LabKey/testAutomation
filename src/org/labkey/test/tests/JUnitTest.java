@@ -36,6 +36,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
@@ -69,6 +70,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 
 @Category({BVT.class, UnitTests.class})
@@ -318,6 +320,7 @@ public class JUnitTest extends TestSuite
                 boolean addedHeader = false;
                 for (String key : json.keySet())
                 {
+                    AtomicInteger ioeCounter = new AtomicInteger(0);
                     TestSuite testsuite = new TestSuite(key);
                     JSONArray testClassArray = json.getJSONArray(key);
                     // Individual tests include both the class name and the requested timeout
@@ -331,7 +334,7 @@ public class JUnitTest extends TestSuite
                             // Timeout is represented in seconds
                             int timeout = testClass.getInt("timeout");
                             if (accept.test(testClass.toMap()))
-                                testsuite.addTest(new RemoteTest(className, timeout));
+                                testsuite.addTest(new RemoteTest(className, timeout, ioeCounter));
                         }
 
                     }
@@ -370,23 +373,27 @@ public class JUnitTest extends TestSuite
     @SuppressWarnings("JUnitMalformedDeclaration")
     public static class RemoteTest extends TestCase
     {
-        String _remoteClass;
+        private final String _remoteClass;
         /** Timeout in seconds to wait for the whole testcase to finish on the server */
         private final int _timeout;
+        // Skip tests after a certain number of IOExceptions
+        private final AtomicInteger _ioeCounter;
 
         /** Stash and reuse so that we can keep using the same session instead of re-authenticating with every request */
         private static final Connection connection = WebTestHelper.getRemoteApiConnection();
 
-        public RemoteTest(String remoteClass, int timeout)
+        public RemoteTest(String remoteClass, int timeout, AtomicInteger ioeCounter)
         {
             super(remoteClass);
             _remoteClass = remoteClass;
             _timeout = timeout;
+            _ioeCounter = ioeCounter;
         }
 
         @Override
         protected void runTest()
         {
+            Assume.assumeTrue("Too many consecutive test timeouts", _ioeCounter.get() < 5);
             long startTime = System.currentTimeMillis();
             try
             {
@@ -405,9 +412,11 @@ public class JUnitTest extends TestSuite
                 WebTestHelper.logToServer(getLogTestString("successful", startTime) + ", " + dump(resultJson, false), connection);
                 LOG.info(getLogTestString("successful", startTime));
                 LOG.info(dump(resultJson, true));
+                _ioeCounter.set(0);
             }
             catch (SocketTimeoutException ste)
             {
+                _ioeCounter.incrementAndGet();
                 String timed_out = getLogTestString("timed out", startTime);
                 LOG.error(timed_out);
                 ArtifactCollector.dumpThreads();
@@ -415,6 +424,7 @@ public class JUnitTest extends TestSuite
             }
             catch (IOException ioe)
             {
+                _ioeCounter.incrementAndGet();
                 String message = getLogTestString("failed: " + ioe.getMessage(), startTime);
                 LOG.error(message);
                 throw new RuntimeException(message, ioe);

@@ -248,7 +248,7 @@ public class FileBrowserHelper extends WebDriverWrapper
         final Checkbox checkbox;
         try
         {
-            checkbox = Ext4Checkbox().locatedBy(Locators.gridRowCheckbox(fileName)).find(getDriver());
+            checkbox = Ext4Checkbox().locatedBy(Locators.gridRowCheckbox(fileName)).timeout(1_000).find(getDriver());
         }
         catch (NoSuchElementException nse)
         {
