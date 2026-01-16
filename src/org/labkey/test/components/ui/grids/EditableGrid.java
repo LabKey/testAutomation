@@ -992,6 +992,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     private void dragToCell(WebElement elementToDrag, WebElement destinationCell)
     {
         var size = destinationCell.getSize();
+        dismissPopover();
 
         new Actions(getDriver())
                 // WebDriver doesn't calculate correct location to click the cell selection handle
@@ -1172,6 +1173,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
     public void dismissPopover()
     {
+        getWrapper().mouseOut();
         Locators.popover.findOptionalElement(getDriver()).ifPresent(popover -> {
             getWrapper().mouseOver(popover);
             getWrapper().mouseOut();
