@@ -138,12 +138,12 @@ public class TestLogger
     }
 
     /**
-     * Format an elapsed time to be suitable for log messages.
-     * Over one minute:
-     *  " &lt;1m 25s&gt;"
-     * Over one minute:
-     *  " &lt;8.059s&gt;"
-     * Less than on second:
+     * Format an elapsed time to be suitable for log messages.<br>
+     * Over one minute:<br>
+     *  " &lt;1m 25s&gt;"<br>
+     * Over one second:<br>
+     *  " &lt;8.059s&gt;"<br>
+     * Less than one second:<br>
      *  " &lt;125ms&gt;"
      * @param milliseconds Elapsed time in milliseconds
      * @return Formatted time
