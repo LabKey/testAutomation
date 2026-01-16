@@ -122,6 +122,10 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
     {
         expandPropertiesPanel();
         elementCache().nameExpressionInput.set(nameExpression);
+        if (nameExpression.contains("${genId}"))
+        {
+            var _ = WebDriverWrapper.waitFor(this::isGenIdVisible, 2_000);
+        }
         return getThis();
     }
 
