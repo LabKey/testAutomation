@@ -992,12 +992,9 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     private void dragToCell(WebElement elementToDrag, WebElement destinationCell)
     {
         var size = destinationCell.getSize();
-        Locator.XPathLocator selectionHandleLoc = Locator.byClass("no-margin-top detail__header--name");
-        WebElement title = selectionHandleLoc.findElement(getDriver());
+        dismissPopover();
 
         new Actions(getDriver())
-                // Action to avoid tooltip
-                .moveToElement(title)
                 // WebDriver doesn't calculate correct location to click the cell selection handle
                 .moveToElement(elementToDrag, 0, 7)
                 .clickAndHold()
@@ -1176,6 +1173,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
     public void dismissPopover()
     {
+        getWrapper().mouseOut();
         Locators.popover.findOptionalElement(getDriver()).ifPresent(popover -> {
             getWrapper().mouseOver(popover);
             getWrapper().mouseOut();
