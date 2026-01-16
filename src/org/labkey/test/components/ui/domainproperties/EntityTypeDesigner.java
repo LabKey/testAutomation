@@ -124,7 +124,9 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
         elementCache().nameExpressionInput.set(nameExpression);
         if (nameExpression.contains("${genId}"))
         {
-            var _ = WebDriverWrapper.waitFor(this::isGenIdVisible, 2_000);
+            // Wait for genId banner to avoid interfering with subsequent steps by shifting the page layout
+            // Non-fatal to let specific tests check for this
+            var _ = WebDriverWrapper.waitFor(this::isGenIdVisible, 1_000);
         }
         return getThis();
     }
