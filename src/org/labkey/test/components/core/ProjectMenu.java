@@ -89,6 +89,8 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
             openMenu.run();
             if (!Locator.tagWithClass("div", "folder-nav").existsIn(this))
             {
+                // Menu opened but the folder list didn't load
+                close();
                 openMenu.run(); // retry
             }
         }
