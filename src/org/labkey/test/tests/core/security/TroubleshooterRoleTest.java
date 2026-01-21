@@ -12,21 +12,24 @@ import org.labkey.test.categories.Git;
 import org.labkey.test.pages.core.admin.ShowAdminPage;
 import org.labkey.test.pages.core.admin.ShowAuditLogPage;
 import org.labkey.test.params.list.IntListDefinition;
+import org.labkey.test.util.AbstractDataRegionExportOrSignHelper;
 import org.labkey.test.util.ApiPermissionsHelper;
+import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.PermissionsHelper;
+import org.labkey.test.util.SummaryStatisticsHelper;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.assertTrue;
+import static org.labkey.test.util.PermissionsHelper.TROUBLESHOOTER_ROLE;
 
 @Category({Git.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 4)
 public class TroubleshooterRoleTest extends BaseWebDriverTest
 {
-    protected static final String TROUBLESHOOTER = "troubleshooter@troubleshooter.test";
+    protected static final String TROUBLESHOOTER_USER = "troubleshooter@troubleshooter.test";
     protected int _troubleShooterId;
 
     @BeforeClass
@@ -39,30 +42,30 @@ public class TroubleshooterRoleTest extends BaseWebDriverTest
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        _userHelper.deleteUsers(false, TROUBLESHOOTER);
+        _userHelper.deleteUsers(false, TROUBLESHOOTER_USER);
         _containerHelper.deleteProject(getProjectName(), afterTest);
     }
 
     protected void doSetup()
     {
-        _troubleShooterId = _userHelper.createUser(TROUBLESHOOTER).getUserId();
+        _troubleShooterId = _userHelper.createUser(TROUBLESHOOTER_USER).getUserId();
         ApiPermissionsHelper apiPermissionsHelper = new ApiPermissionsHelper(this);
-        apiPermissionsHelper.addMemberToRole(TROUBLESHOOTER, getRole(), PermissionsHelper.MemberType.user,"/");
+        apiPermissionsHelper.addMemberToRole(_troubleShooterId, getRole(), "/");
         _containerHelper.createProject(getProjectName());
     }
 
     protected String getRole()
     {
-        return "Troubleshooter";
+        return TROUBLESHOOTER_ROLE;
     }
 
     @Test
     public void testAuditLogsIsAccessible() throws Exception
     {
-        // Ensure that there is at least on event to see
+        // Ensure that there is at least one event to see
         new IntListDefinition("AuditList", "id").create(createDefaultConnection(), getProjectName());
 
-        impersonate(TROUBLESHOOTER);
+        impersonate(TROUBLESHOOTER_USER);
         ShowAdminPage showAdminPage = goToAdminConsole().goToSettingsSection();
 
         log("Verifying audit log link is present");
@@ -82,7 +85,7 @@ public class TroubleshooterRoleTest extends BaseWebDriverTest
     @Test
     public void testAdminConsoleVisibility()
     {
-        impersonate(TROUBLESHOOTER);
+        impersonate(TROUBLESHOOTER_USER);
 
         log("Verify permissions from troubleshooter");
         verifySitePermissionSetting(false);
@@ -100,7 +103,7 @@ public class TroubleshooterRoleTest extends BaseWebDriverTest
     @Test
     public void testAllAuditTableVisibility()
     {
-        impersonate(TROUBLESHOOTER);
+        impersonate(TROUBLESHOOTER_USER);
         ShowAdminPage showAdminPage = goToAdminConsole().goToSettingsSection();
 
         log("Verify the export file is non empty");
@@ -130,6 +133,34 @@ public class TroubleshooterRoleTest extends BaseWebDriverTest
         goToAdminConsole().goToSettingsSection().clickAuthentication();
         checker().verifyEquals("Incorrect access for authentication", canSave,
                 isElementPresent(Locator.button("Save and Finish")));
+    }
+
+    // Verifications for GitHub Issue #785 - Troubleshooters should have read access in the root (but not elsewhere)
+    @Test
+    public void testQueryAccessInRoot()
+    {
+        goToAdminConsole();
+        impersonate(TROUBLESHOOTER_USER);
+
+        // Verify that Troubleshooters can access the schema browser and view an arbitrary query in the root
+        goToSchemaBrowser();
+        DataRegionTable dataRegionTable = viewQueryData("core", "Modules");
+        int rowCount = dataRegionTable.getDataRowCount();
+        assertTrue(rowCount > 6);
+
+        // Verify that basic summary statistics work
+        dataRegionTable.setSummaryStatistic("Name", SummaryStatisticsHelper.BASE_STAT_COUNT, String.valueOf(rowCount));
+
+        // Verify that exports using POST work
+        DataRegionExportHelper exportHelper = new DataRegionExportHelper(dataRegionTable);
+        exportHelper.exportExcel(AbstractDataRegionExportOrSignHelper.ExcelFileType.XLSX);
+        exportHelper.exportScript(DataRegionExportHelper.ScriptExportType.JAVA);
+
+        // Troubleshooters should NOT have read access outside the root
+        goToProjectHome();
+        assertTextPresent("User does not have permission to perform this operation.");
+        goToSchemaBrowser();
+        assertTextPresent("User does not have permission to perform this operation.");
     }
 
     @Override
