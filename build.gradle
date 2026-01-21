@@ -5,7 +5,7 @@ plugins {
     id 'maven-publish'
 }
 
-import org.labkey.gradle.task.RunUiTest
+import org.labkey.gradle.task.RunTestSuite
 import org.labkey.gradle.util.BuildUtils
 import org.labkey.gradle.util.GroupNames
 import org.labkey.gradle.util.PomFileHelper
@@ -177,8 +177,8 @@ project.tasks.named("uiTests").configure {
 project.parent.parent.tasks.named("ijConfigure").configure {
     dependsOn(initPropertiesTask)
 }
-project.tasks.withType(RunUiTest).configureEach { it ->
-    scanForTestClasses = true
+project.tasks.withType(RunTestSuite).configureEach { it ->
+    scanForTestClasses = true // Required for Gradle 9.3
 }
 
 if (project.hasProperty('doPublishing'))
