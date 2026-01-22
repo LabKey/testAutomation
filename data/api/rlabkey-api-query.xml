@@ -625,4 +625,47 @@
             ]]>
         </response>
     </test>
+    <test name="make filters" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+                makeFilter(
+                    c("foo/Reagent", "CONTAINS", "this or that"),
+                    c("Temp_C", "GREATER_THAN", "12"),
+                    c("SystolicBloodPressure", "MISSING", ""))
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                [1] "query.foo%2FReagent~contains=this%20or%20that"
+                [2] "query.Temp_C~gt=12"
+                [3] "query.SystolicBloodPressure~isblank="
+            ]]>
+        </response>
+    </test>
+<!--
+    Uncomment when Rlabkey 3.4.5 is available
+    <test name="make filters as list" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+                makeFilter(
+                    c("foo/Reagent", "CONTAINS", "this or that"),
+                    c("Temp_C", "GREATER_THAN", "12"),
+                    c("SystolicBloodPressure", "MISSING", ""), asList=TRUE)
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                $`query.foo/Reagent~contains`
+                [1] "this or that"
+
+                $`query.Temp_C~gt`
+                [1] "12"
+
+                $`query.SystolicBloodPressure~isblank`
+                [1] ""
+            ]]>
+        </response>
+    </test>-->
 </ApiTests>
