@@ -355,9 +355,9 @@ public class SimpleModuleTest extends BaseWebDriverTest
         rowMapM.put("Name", "I_Should_Not_Succeed");
         insertCmdM.addRow(rowMapM);
         insertCmdM.setExtraContext(Map.of("scriptTimeout", 3, "simulateScriptTimeout", true));
-        RowsResponse respM = insertCmdM.execute(createDefaultConnection(), getProjectName());
-
-        // TODO: test result
+        Assert.assertThrows(CommandException.class, () -> {
+                insertCmdM.execute(createDefaultConnection(), getProjectName());
+        });
     }
 
     private int getRowCount(String schemaName, String tableName)
