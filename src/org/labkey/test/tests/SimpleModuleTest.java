@@ -288,6 +288,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         doTestCustomLogin();
         doTestFkLookupFilter();
         doTestMetadataOverrideForCustomQuery();
+        doTestScriptTimeout();
     }
 
     @LogMethod
@@ -344,6 +345,19 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
         assertEquals("After Delete : Mismatch in row between custom query and hard table", getRowCount(VEHICLE_SCHEMA, customQueryName), getRowCount(VEHICLE_SCHEMA, "Colors"));
 
+    }
+
+    @LogMethod
+    public void doTestScriptTimeout() throws Exception
+    {
+        InsertRowsCommand insertCmdM = new InsertRowsCommand("vehicle", "Manufacturers");
+        Map<String, Object> rowMapM = new HashMap<>();
+        rowMapM.put("Name", "I_Should_Not_Succeed");
+        insertCmdM.addRow(rowMapM);
+        insertCmdM.setExtraContext(Map.of("scriptTimeout", 3, "simulateScriptTimeout", true));
+        RowsResponse respM = insertCmdM.execute(createDefaultConnection(), getProjectName());
+
+        // TODO: test result
     }
 
     private int getRowCount(String schemaName, String tableName)
