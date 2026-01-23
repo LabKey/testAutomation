@@ -470,6 +470,13 @@ public class FieldDefinition extends PropertyDescriptor
         return this;
     }
 
+    public FieldDefinition setMultiChoiceValues(List<String> values)
+    {
+        Assert.assertEquals("Invalid field type for text choice values.", ColumnType.MultiChoice, getType());
+        setValidators(List.of(new FieldDefinition.MultiChoiceValidator(values)));
+        return this;
+    }
+
     public ExpSchema.DerivationDataScopeType getAliquotOption()
     {
         return _aliquotOption;
@@ -606,6 +613,7 @@ public class FieldDefinition extends PropertyDescriptor
         ColumnType Sample = new ColumnTypeImpl("Sample", "int", "http://www.labkey.org/exp/xml#sample", new IntLookup( "exp", "Materials"));
         ColumnType Barcode = new ColumnTypeImpl("Unique ID", "string", "http://www.labkey.org/types#storageUniqueId", null);
         ColumnType TextChoice = new ColumnTypeImpl("Text Choice", "string", "http://www.labkey.org/types#textChoice", null);
+        ColumnType MultiChoice = new ColumnTypeImpl("Multi Choice", "string", "http://www.labkey.org/types#multiChoice", null);
         ColumnType SMILES = new ColumnTypeImpl("SMILES", "string", "http://www.labkey.org/exp/xml#smiles", null);
         ColumnType Calculation = new ColumnTypeImpl("Calculation", null, "http://www.labkey.org/exp/xml#calculated", null);
         /**
@@ -1125,6 +1133,43 @@ public class FieldDefinition extends PropertyDescriptor
         protected String getType()
         {
             return "TextChoice";
+        }
+
+        @Override
+        protected String getExpression()
+        {
+            return EscapeUtil.getTextChoiceValidatorExpression(_values);
+        }
+
+        public List<String> getValues()
+        {
+            return _values;
+        }
+
+    }
+
+    public static class MultiChoiceValidator extends FieldValidator<MultiChoiceValidator>
+    {
+        private final List<String> _values;
+
+        public MultiChoiceValidator(List<String> values)
+        {
+            // The TextChoice validator only has a name and no description or message.
+            // And the name is generated (not user defined).
+            super("Text Choice Validator", "", "");
+            _values = Collections.unmodifiableList(values);
+        }
+
+        @Override
+        protected MultiChoiceValidator getThis()
+        {
+            return this;
+        }
+
+        @Override
+        protected String getType()
+        {
+            return "MultiChoice";
         }
 
         @Override

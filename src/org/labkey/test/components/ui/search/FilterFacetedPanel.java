@@ -6,6 +6,7 @@ import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
+import org.labkey.test.components.react.ReactSelect;
 import org.labkey.test.components.ui.FilterStatusValue;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -46,6 +47,15 @@ public class FilterFacetedPanel extends WebDriverComponent<FilterFacetedPanel.El
     public void selectValue(String value)
     {
         elementCache().findCheckboxLabel(value).click();
+    }
+
+    /**
+     * Select a single facet value by clicking its label. Should replace all existing selections.
+     * @param value desired value
+     */
+    public void selectFilter(String value)
+    {
+        elementCache().filterTypeSelects.select(value);
     }
 
     /**
@@ -123,6 +133,8 @@ public class FilterFacetedPanel extends WebDriverComponent<FilterFacetedPanel.El
     {
         protected final Input filterInput =
                 Input(Locator.id("filter-faceted__typeahead-input"), getDriver()).findWhenNeeded(this);
+        protected final ReactSelect filterTypeSelects =
+                new ReactSelect.ReactSelectFinder(getDriver()).index(0).findWhenNeeded(this);
         protected final WebElement checkboxSection =
                 Locator.byClass("labkey-wizard-pills").index(0).refindWhenNeeded(this);
         protected final Locator.XPathLocator checkboxLabelLoc

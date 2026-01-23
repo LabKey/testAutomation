@@ -40,6 +40,12 @@ import java.util.stream.Collectors;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
+import static org.labkey.remoteapi.query.Filter.Operator.CONTAINS_ALL;
+import static org.labkey.remoteapi.query.Filter.Operator.CONTAINS_ANY;
+import static org.labkey.remoteapi.query.Filter.Operator.CONTAINS_EXACTLY;
+import static org.labkey.remoteapi.query.Filter.Operator.CONTAINS_NONE;
+import static org.labkey.remoteapi.query.Filter.Operator.DOES_NOT_CONTAIN_EXACTLY;
+import static org.labkey.remoteapi.query.Filter.Operator.IN;
 import static org.labkey.test.WebDriverWrapper.waitFor;
 
 public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverComponent<ResponsiveGrid<T>.ElementCache> implements UpdatingComponent
@@ -234,15 +240,18 @@ public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverCompon
 
     private GridFilterModal initFilterColumn(CharSequence columnIdentifier, Filter.Operator operator, Object value)
     {
+        List<Filter.Operator> listOperators = List.of(IN, CONTAINS_ALL, CONTAINS_ANY, CONTAINS_EXACTLY, CONTAINS_NONE,
+                DOES_NOT_CONTAIN_EXACTLY);
         clickColumnMenuItem(columnIdentifier, "Filter...", false);
         GridFilterModal filterModal = new GridFilterModal(getDriver(), this);
         if (operator != null)
         {
-            if (operator.equals(Filter.Operator.IN) && value instanceof List<?>)
+            if (listOperators.contains(operator) && value instanceof List<?>)
             {
                 List<String> values = (List<String>) value;
                 filterModal.selectFacetTab().selectValue(values.get(0));
                 filterModal.selectFacetTab().checkValues(values.toArray(String[]::new));
+                filterModal.selectFacetTab().selectFilter(operator.getDisplayValue());
             }
             else
                 filterModal.selectExpressionTab().setFilter(new FilterExpressionPanel.Expression(operator, value));

@@ -935,6 +935,11 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         return alert.getText();
     }
 
+    public void updateMultiChoiceValue(String originalValue, String newValue)
+    {
+        updateValue(originalValue, newValue, true);
+    }
+
     /**
      * Select a TextChoice value and check if the edit field is enabled.
      *

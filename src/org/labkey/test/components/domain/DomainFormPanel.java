@@ -235,6 +235,16 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
                     }
                     fieldRow.setTextChoiceValues(textChoiceValidator.getValues());
                 }
+                else if (validator instanceof FieldDefinition.MultiChoiceValidator textChoiceValidator)
+                {
+                    if(!fieldRow.isExpanded()) fieldRow.expand();
+                    // TextChoice is a field type; implemented using a special validator. TextChoice field cannot have other validators.
+                    if (validators.size() > 1)
+                    {
+                        throw new IllegalArgumentException("TextChoice fields cannot have additional validators.");
+                    }
+                    fieldRow.setTextChoiceValues(textChoiceValidator.getValues());
+                }
                 else
                 {
                     throw new IllegalArgumentException("Validator not supported: " + validator.getClass().getName());
