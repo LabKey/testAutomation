@@ -1734,10 +1734,10 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         if (fieldType.equalsIgnoreCase("date") || fieldType.equalsIgnoreCase("datetime") || fieldType.equalsIgnoreCase("timestamp"))
         {
             String parsingMode = useUSDateParsing ? "U.S. date parsing (MDY)" : "Non-U.S. date parsing (DMY)";
-            return "'" + value + "' is not a valid " + fieldType + " for " + fieldName + " using " + parsingMode;
+            return value + " is not a valid " + fieldType + " for " + fieldName + " using " + parsingMode;
         }
 
-        return "Could not convert value '" + value + "' (" + value.getClass().getSimpleName() + ") for " + fieldType + " field '" + fieldName + "'" ;
+        return "Could not convert value " + value + " (" + value.getClass().getSimpleName() + ") for " + fieldType + " field " + fieldName;
     }
 
     private ProductKey getProductConfiguration() throws IOException, CommandException
