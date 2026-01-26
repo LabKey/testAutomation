@@ -2,12 +2,15 @@ package org.labkey.test.tests.core.security;
 
 import org.apache.commons.collections4.IteratorUtils;
 import org.apache.commons.io.FileUtils;
+import org.jetbrains.annotations.Nullable;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.Locators;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Git;
 import org.labkey.test.pages.core.admin.ShowAdminPage;
 import org.labkey.test.pages.core.admin.ShowAuditLogPage;
@@ -17,6 +20,8 @@ import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.SummaryStatisticsHelper;
+import org.openqa.selenium.By;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
 import java.util.Arrays;
@@ -141,9 +146,19 @@ public class TroubleshooterRoleTest extends BaseWebDriverTest
     {
         goToAdminConsole();
         impersonate(TROUBLESHOOTER_USER);
+        testQueryAccess();
+        stopImpersonating();
 
+        goToAdminConsole();
+        impersonateRole(TROUBLESHOOTER_ROLE);
+        testQueryAccess();
+        stopImpersonating();
+    }
+
+    private void testQueryAccess()
+    {
         // Verify that Troubleshooters can access the schema browser and view an arbitrary query in the root
-        goToSchemaBrowser();
+        goToSchemaBrowser(null, false);
         DataRegionTable dataRegionTable = viewQueryData("core", "Modules");
         int rowCount = dataRegionTable.getDataRowCount();
         assertTrue(rowCount > 6);
@@ -159,8 +174,23 @@ public class TroubleshooterRoleTest extends BaseWebDriverTest
         // Troubleshooters should NOT have read access outside the root
         goToProjectHome();
         assertTextPresent("User does not have permission to perform this operation.");
-        goToSchemaBrowser();
-        assertTextPresent("User does not have permission to perform this operation.");
+        goToSchemaBrowser(getProjectName(), true);
+    }
+
+    // Troubleshooters don't get the "Go To Module" menu item, so can't use goToSchemaBrowser()
+    public void goToSchemaBrowser(@Nullable String container, boolean expectPermissionError)
+    {
+        beginAt(WebTestHelper.buildRelativeUrl("query", container,"begin"));
+
+        if (expectPermissionError)
+        {
+            assertTextPresent("User does not have permission to perform this operation.");
+        }
+        else
+        {
+            shortWait().until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("div.lk-sb-instructions")));
+            waitForElement(Locators.pageSignal("queryTreeRendered"));
+        }
     }
 
     @Override
