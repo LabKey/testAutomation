@@ -767,6 +767,11 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     // behind the scenes. Because of that the validator aspect of the TextChoice field is hidden from the user (just like
     // it is in the product).
 
+    public void setAllowMultipleSelections(Boolean allowMultipleSelections)
+    {
+        elementCache().allowMultipleSelectionsCheckbox.set(allowMultipleSelections);
+    }
+
     /**
      * Set the list of allowed values for a TextChoice field.
      *
@@ -780,6 +785,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
 
         TextChoiceValueDialog addValuesDialog = new TextChoiceValueDialog(this);
         addValuesDialog.addValues(values);
+
         return addValuesDialog.clickApply();
     }
 
@@ -933,11 +939,6 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         updateValue(originalValue, newValue, true);
         WebElement alert = BootstrapLocators.infoBanner.waitForElement(this, 1_000);
         return alert.getText();
-    }
-
-    public void updateMultiChoiceValue(String originalValue, String newValue)
-    {
-        updateValue(originalValue, newValue, true);
     }
 
     /**
@@ -1706,6 +1707,10 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
                 .descendant("div[contains(@class,'select-input__single-value--is-disabled')]").findWhenNeeded(this);
         public final WebElement domainWarningIcon = Locator.tagWithClass("span", "domain-warning-icon")
                 .findWhenNeeded(this);
+
+        // text choice field option
+        public final Checkbox allowMultipleSelectionsCheckbox = new Checkbox(Locator.inputById("domainpropertiesrow-textChoiceAllowMulti-0-0")
+                .refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT));
 
         // lookup field options
         public final Select lookupContainerSelect = SelectWrapper.Select(Locator.name("domainpropertiesrow-lookupContainer"))
