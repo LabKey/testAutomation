@@ -101,20 +101,19 @@ public class TroubleshooterRoleTest extends BaseWebDriverTest
         verifySitePermissionSetting(true);
     }
 
-    /**
-     * Issue 47508: auditLog table visibility is inconsistent
-     * Assert broken behavior to prompt a test update once issue is fixed.
-     */
+    // Verify fix for Issue 47508 / GitHub Issue #26: auditLog table visibility is inconsistent
     @Test
     public void testAllAuditTableVisibility()
     {
         impersonate(TROUBLESHOOTER_USER);
         ShowAdminPage showAdminPage = goToAdminConsole().goToSettingsSection();
 
-        log("Verify the export file is non empty");
+        log("Verify \"Group and role\" audit event table is viewable");
         ShowAuditLogPage auditLogPage = showAdminPage.clickAuditLog();
         auditLogPage.selectView("Group and role events");
-        assertTextPresent("You do not have permission to see this data.");
+        assertTextNotPresent("You do not have permission to see this data.");
+        DataRegionTable logTable = auditLogPage.getLogTable();
+        assertTrue(logTable.getDataRowCount() > 0);
     }
 
     protected void verifySitePermissionSetting(boolean canSave)
