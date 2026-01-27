@@ -159,6 +159,7 @@ public class TroubleshooterRoleTest extends BaseWebDriverTest
         // Verify that Troubleshooters can access the schema browser and view an arbitrary query in the root
         goToSchemaBrowser(null, false);
         DataRegionTable dataRegionTable = viewQueryData("core", "Modules");
+        dataRegionTable.showAll();
         int rowCount = dataRegionTable.getDataRowCount();
         assertTrue(rowCount > 6);
 
