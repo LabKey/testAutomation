@@ -41,9 +41,11 @@ import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Ignore;
 import org.junit.runner.Description;
+import org.junit.runner.RunWith;
 import org.junit.runner.manipulation.Filter;
 import org.junit.runner.manipulation.Filterable;
 import org.junit.runner.manipulation.NoTestsRemainException;
+import org.junit.runners.AllTests;
 import org.labkey.junit.runner.WebTestProperties;
 import org.labkey.serverapi.reader.Readers;
 import org.labkey.serverapi.writer.PrintWriters;
@@ -92,6 +94,7 @@ import java.util.stream.Collectors;
 
 import static org.labkey.test.WebTestHelper.logToServer;
 
+@RunWith(AllTests.class)
 public class Runner extends TestSuite
 {
     static

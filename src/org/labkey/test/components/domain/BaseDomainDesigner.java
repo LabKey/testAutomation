@@ -4,6 +4,7 @@ import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
+import org.labkey.test.util.selenium.ScrollUtils;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -66,7 +67,8 @@ public abstract class BaseDomainDesigner<EC extends BaseDomainDesigner.ElementCa
      */
     public Object clickSave()
     {
-        getWrapper().clickAndWait(elementCache().saveButton);
+        // Selenium sometimes doesn't think the save button needs to be scrolled into view but the click does nothing.
+        getWrapper().clickAndWait(ScrollUtils.scrollIntoView(elementCache().saveButton));
         return null;
     }
 
