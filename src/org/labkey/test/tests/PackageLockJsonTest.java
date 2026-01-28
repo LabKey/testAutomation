@@ -45,7 +45,8 @@ public class PackageLockJsonTest
     }
 
     @Parameterized.Parameters(name = "{1}")
-    public static Collection<Object[]> data() {
+    public static Collection<Object[]> data()
+    {
         List<File> allModules = new ArrayList<>();
 
         File modulesDir = new File(TestFileUtils.getLabKeyRoot(), "server/modules");
