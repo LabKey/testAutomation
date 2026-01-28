@@ -1688,6 +1688,39 @@ public class ListTest extends BaseWebDriverTest
         _listHelper.deleteList();
     }
 
+    @Test
+    public void testMultiChoiceValues()
+    {
+        // setup a list with an auto-increment key that we need to make sure is encoded in the form input
+        String encodedListName = "multiChoiceList";
+        String keyName = "'><script>alert(\":(\")</script>'";
+        List<String> tcValues = List.of("0", "1", "2");
+        _listHelper.createList(PROJECT_VERIFY, encodedListName, keyName, col("MCF", ColumnType.TextChoice)
+                .setMultiChoiceValues(tcValues));
+        _listHelper.goToList(encodedListName);
+
+        DataRegionTable table = new DataRegionTable("query", getDriver());
+        table.clickInsertNewRow();
+        List<String> valuesToChoose = List.of("0", "1");
+        Locator loc = Locator.tag("select").append(Locator.tag("option"));
+        setListElement(loc, valuesToChoose);
+
+        clickButton("Submit");
+        table = new DataRegionTable("query", getDriver());
+        checker().verifyEquals("Name value not as expected", String.join(" ", valuesToChoose), table.getDataAsText(0, "MCF"));
+
+        table.clickEditRow(0);
+        valuesToChoose = List.of("1", "2");
+        setListElement(loc, valuesToChoose);
+        clickButton("Submit");
+
+        // verify the name value is persisted
+        table = new DataRegionTable("query", getDriver());
+        checker().verifyEquals("Name value not as expected", String.join(" ", valuesToChoose), table.getDataAsText(0, "MCF"));
+
+        _listHelper.deleteList();
+    }
+
     private List<String> getQueryFormFieldNames()
     {
         return Locator.tag("input").attributeStartsWith("name", "quf_")

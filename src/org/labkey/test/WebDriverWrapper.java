@@ -3465,6 +3465,14 @@ public abstract class WebDriverWrapper implements WrapsDriver
         setFormElement(el, text);
     }
 
+    public void setListElement(Locator l, List<String> text)
+    {
+        List<WebElement> elems = l.waitForElements(new WebDriverWait(getDriver(), Duration.ofMillis(WAIT_FOR_JAVASCRIPT)));
+        elems.forEach(element->{
+            if(text.contains(element.getAttribute("value")) ^ element.isSelected()) element.click();
+        });
+    }
+
     /**
      * Clears and sets the text of the specified input element.
      * Warning: Clear unfocuses the element which causes some inputs to disappear.

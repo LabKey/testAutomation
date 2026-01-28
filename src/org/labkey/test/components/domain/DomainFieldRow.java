@@ -1709,7 +1709,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
                 .findWhenNeeded(this);
 
         // text choice field option
-        public final Checkbox allowMultipleSelectionsCheckbox = new Checkbox(Locator.inputById("domainpropertiesrow-textChoiceAllowMulti-0-0")
+        public final Checkbox allowMultipleSelectionsCheckbox = new Checkbox(Locator.tagWithClass("input", "domain-text-choice-multi")
                 .refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT));
 
         // lookup field options
