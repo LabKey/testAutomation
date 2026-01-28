@@ -30,7 +30,7 @@
         <url>
             <![CDATA[
                 library(Rlabkey)
-                print(labkey.getFolders(labkey.url.base, "/%projectName%", includeEffectivePermissions=FALSE))
+                print(labkey.getFolders(labkey.url.base, "/%projectName%", includeEffectivePermissions=FALSE, includeSubfolders=TRUE))
             ]]>
         </url>
         <response>
