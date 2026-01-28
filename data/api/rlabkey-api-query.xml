@@ -643,8 +643,6 @@
             ]]>
         </response>
     </test>
-<!--
-    Uncomment when Rlabkey 3.4.5 is available
     <test name="make filters as list" type="post">
         <url>
             <![CDATA[
@@ -667,5 +665,5 @@
                 [1] ""
             ]]>
         </response>
-    </test>-->
+    </test>
 </ApiTests>
