@@ -1,7 +1,6 @@
 package org.labkey.test.tests;
 
 import org.apache.commons.lang3.CharUtils;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.junit.Assert;
@@ -20,12 +19,9 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @Category({})
 @RunWith(Parameterized.class)
@@ -35,7 +31,6 @@ public class PackageLockJsonTest
     // Allow-list of '@isaacs/cliui' dependencies
     private static final Set<String> ALLOWED_NONSTANDARD_VERSIONS = Set.of("npm:string-width@^4.2.0", "npm:strip-ansi@^6.0.1", "npm:wrap-ansi@^7.0.0");
 
-    private final Map<String, AtomicInteger> depCounts = new HashMap<>();
     private final List<String> errors = new ArrayList<>();
     private final File moduleDir;
 
@@ -78,16 +73,10 @@ public class PackageLockJsonTest
     @Test
     public void testPackageLock() throws Exception
     {
-        testModule(moduleDir);
-        Assert.assertTrue("Bad sources: " + errors, errors.isEmpty());
-    }
+        File packageLock = new File(moduleDir, "package-lock.json");
+        Assert.assertTrue("No package-lock.json found in module: " + moduleDir.getAbsolutePath(), packageLock.isFile());
 
-    private void testModule(File module) throws Exception
-    {
-        File packageLock = new File(module, "package-lock.json");
-        Assert.assertTrue("No package-lock.json found in module: " + module.getAbsolutePath(), packageLock.isFile()); // Should be unfailable
-
-        TestLogger.log("Testing module: " + module.getAbsolutePath());
+        TestLogger.log("Testing module: " + moduleDir.getAbsolutePath());
 
         JSONObject packages;
         try (Reader reader = Readers.getReader(packageLock))
@@ -96,11 +85,6 @@ public class PackageLockJsonTest
             packages = jsonObject.optJSONObject("packages");
             if (packages == null)
                 packages = jsonObject.getJSONObject("dependencies"); // old lockfile version
-        }
-        catch (JSONException e)
-        {
-            TestLogger.error("Testing module: " + module.getName() + " failed to parse package-lock.json: " + e.getMessage());
-            return;
         }
 
         for (String packageName : packages.keySet())
@@ -111,9 +95,13 @@ public class PackageLockJsonTest
                 verifyPackage(packageName, packageJson, packageLock);
             }
         }
+
+        Assert.assertTrue("Bad sources: " + errors, errors.isEmpty());
     }
 
-    private void verifyPackage(String packageName, JSONObject packageJson, File packageLockFile) throws URISyntaxException
+    /// Verify that a package reference in a package-lock.json file only resolves to known hosts and has a valid version
+    /// Also checks sub-dependencies
+    private void verifyPackage(String packageName, JSONObject packageJson, File packageLockFile)
     {
         String resolved = packageJson.optString("resolved");
         if (resolved.isBlank())
@@ -122,15 +110,23 @@ public class PackageLockJsonTest
         }
         else
         {
-            URI resolvedURL = new URI(resolved);
-            String host = resolvedURL.getHost();
-            if (!ALLOWED_SOURCES.contains(host))
+            try
             {
-                String message = "Package " + packageName + " resolved to unrecognized host " + host + " in " + packageLockFile.getAbsolutePath();
+                URI resolvedURL = new URI(resolved);
+                String host = resolvedURL.getHost();
+                if (!ALLOWED_SOURCES.contains(host))
+                {
+                    String message = "Package " + packageName + " resolved to unrecognized host [" + host + "] in " + packageLockFile.getAbsolutePath();
+                    errors.add(message);
+                    TestLogger.error(message);
+                }
+            }
+            catch (URISyntaxException e)
+            {
+                String message = "Package " + packageName + " resolved to an invalid location [" + resolved + "] in " + packageLockFile.getAbsolutePath();
                 errors.add(message);
                 TestLogger.error(message);
             }
-            depCounts.computeIfAbsent(host, _ -> new AtomicInteger()).incrementAndGet();
         }
 
         String version = packageJson.optString("version");
