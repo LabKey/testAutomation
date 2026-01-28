@@ -34,9 +34,9 @@ public class PackageLockJsonTest
     private static final Set<String> ALLOWED_SOURCES = Set.of("registry.npmjs.org", "labkey.jfrog.io");
     // Allow-list of '@isaacs/cliui' dependencies
     private static final Set<String> ALLOWED_NONSTANDARD_VERSIONS = Set.of("npm:string-width@^4.2.0", "npm:strip-ansi@^6.0.1", "npm:wrap-ansi@^7.0.0");
+
     private final Map<String, AtomicInteger> depCounts = new HashMap<>();
     private final List<String> errors = new ArrayList<>();
-
     private final File moduleDir;
 
     public PackageLockJsonTest(File moduleDir, String name)
@@ -112,13 +112,12 @@ public class PackageLockJsonTest
         }
     }
 
-    private void verifyPackage(String packageName, JSONObject packageJson, File packageLock) throws URISyntaxException
+    private void verifyPackage(String packageName, JSONObject packageJson, File packageLockFile) throws URISyntaxException
     {
         String resolved = packageJson.optString("resolved");
         if (resolved.isBlank())
         {
-            TestLogger.debug("Resolved field is blank for package " + packageName + " in " + packageLock.getAbsolutePath());
-
+            TestLogger.debug("Resolved field is blank for package " + packageName + " in " + packageLockFile.getAbsolutePath());
         }
         else
         {
@@ -126,7 +125,7 @@ public class PackageLockJsonTest
             String host = resolvedURL.getHost();
             if (!ALLOWED_SOURCES.contains(host))
             {
-                String message = "Package " + packageName + " resolved to unrecognized host " + host + " in " + packageLock.getAbsolutePath();
+                String message = "Package " + packageName + " resolved to unrecognized host " + host + " in " + packageLockFile.getAbsolutePath();
                 errors.add(message);
                 TestLogger.error(message);
             }
@@ -136,7 +135,7 @@ public class PackageLockJsonTest
         String version = packageJson.optString("version");
         if (version.isBlank() || !CharUtils.isAsciiNumeric(version.charAt(0)))
         {
-            String message = "Package " + packageName + " has bad version [" + version + "] in " + packageLock.getAbsolutePath();
+            String message = "Package " + packageName + " has bad version [" + version + "] in " + packageLockFile.getAbsolutePath();
             errors.add(message);
             TestLogger.error(message);
         }
@@ -147,14 +146,14 @@ public class PackageLockJsonTest
             JSONObject packageJsonDep = transitiveDeps.optJSONObject(tDep);
             if (packageJsonDep != null)
             {
-                verifyPackage(tDep, packageJsonDep, packageLock); // belt and suspenders
+                verifyPackage(tDep, packageJsonDep, packageLockFile); // belt and suspenders
             }
             else
             {
                 String tVer = transitiveDeps.optString(tDep);
                 if (tVer == null || tVer.contains(":") && !ALLOWED_NONSTANDARD_VERSIONS.contains(tVer)) // URL, file, or workspace dependency
                 {
-                    String message = "Package " + packageName + " has bad transitive dependency [" + tVer + "] in " + packageLock.getAbsolutePath();
+                    String message = "Package " + packageName + " has bad transitive dependency [" + tVer + "] in " + packageLockFile.getAbsolutePath();
                     errors.add(message);
                     TestLogger.error(message);
                 }
