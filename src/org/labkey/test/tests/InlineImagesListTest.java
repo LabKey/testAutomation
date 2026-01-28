@@ -372,7 +372,7 @@ public class InlineImagesListTest extends BaseWebDriverTest
         importFilePathError(listImportPage, "1", PDF_FILE.getName());
         importFilePathError(listImportPage, "5", PDF_FILE.getName());
 
-        String attachmentError = "Can't upload '%s' to field %s with type Attachment.";
+        String attachmentError = "Cannot upload '%s' to Attachment type field '%s'.";
         String attachmentPdfError = String.format(attachmentError, PDF_FILE.getName(), LIST_ATTACHMENT01_NAME);
         String attachmentAbsentError = String.format(attachmentError, "Absent.txt", LIST_ATTACHMENT01_NAME);
         verifyQueryAPI("lists", LIST_NAME, Map.of(LIST_KEY_NAME, 5, LIST_ATTACHMENT01_NAME, PDF_FILE.getName()), true, "Row 1: " + attachmentPdfError);
@@ -397,7 +397,7 @@ public class InlineImagesListTest extends BaseWebDriverTest
         listImportPage.submitExpectingError();
         try
         {
-            String expectedError = "Row 1: Can't upload '" + attachmentValue + "' to field " + LIST_ATTACHMENT01_NAME + " with type Attachment.";
+            String expectedError = "Row 1: Cannot upload '" + attachmentValue + "' to Attachment type field '" + LIST_ATTACHMENT01_NAME + "'.";
             checker().withScreenshot("import_error").verifyTrue("Invalid attachment error not as expected", isElementPresent(Locator.tagWithClass("div", "labkey-error").withText(expectedError)));
         }
         catch(NoSuchElementException nse)
