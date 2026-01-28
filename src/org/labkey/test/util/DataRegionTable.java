@@ -279,6 +279,20 @@ public class DataRegionTable extends DataRegion
     }
 
     /**
+     * Assert that a Data Region has expected selection text (e.g. "Selected 100,000 of 1,234,567")
+     * @param selectedRows number of selected rows
+     * @param totalRows total number of rows in data behind the dataregion
+     */
+    public void assertSelectionText(int selectedRows, int totalRows)
+    {
+        String expected = "Selected " + String.format("%,d", selectedRows) + " of " + String.format("%,d", totalRows) + " rows.";
+        String fullSelectionText = Locator.tagWithAttribute("div", "data-msgpart", "selection")
+                .findElement(this).getText();
+
+        assertTrue("Expected text to start with: " + expected + " Full text: " + fullSelectionText, fullSelectionText.startsWith(expected));
+    }
+
+    /**
      * @deprecated Renamed. Use {@link #getRowIndex(CharSequence, String)}
      */
     @Deprecated
