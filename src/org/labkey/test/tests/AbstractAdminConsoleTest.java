@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.labkey.test.util.PermissionsHelper.APP_ADMIN_ROLE;
+import static org.labkey.test.util.PermissionsHelper.TROUBLESHOOTER_ROLE;
 
 public abstract class AbstractAdminConsoleTest extends BaseWebDriverTest
 {
@@ -79,7 +80,7 @@ public abstract class AbstractAdminConsoleTest extends BaseWebDriverTest
 
         int troubleshooterId = _userHelper.createUser(TROUBLESHOOTER_USER, true, false).getUserId();
         setInitialPassword(troubleshooterId);
-        apiPermissionsHelper.addMemberToRole(TROUBLESHOOTER_USER, "Troubleshooter", PermissionsHelper.MemberType.user, "/");
+        apiPermissionsHelper.addMemberToRole(TROUBLESHOOTER_USER, TROUBLESHOOTER_ROLE, PermissionsHelper.MemberType.user, "/");
     }
 
     @Override
