@@ -49,10 +49,14 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.IOException;
+import java.io.StringReader;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
@@ -120,6 +124,28 @@ public class SecurityTest extends BaseWebDriverTest
         Connection cn = createDefaultConnection();
         OptionalFeatureHelper.setOptionalFeature(cn, "disableGuestAccount", false);
         DbLoginUtils.resetDbLoginConfig(cn);
+    }
+
+    @Test
+    public void testSecurityTxt() throws IOException
+    {
+        getDriver().navigate().to(WebTestHelper.getBaseURL() + "/.well-known/security.txt");
+
+        String body = getBodyText();
+
+        Properties props = new Properties();
+        props.load(new StringReader(body));
+
+        assertTrue("security.txt missing Contact", props.containsKey("Contact"));
+        assertTrue("security.txt missing Policy", props.containsKey("Policy"));
+        assertTrue("security.txt missing Expires", props.containsKey("Expires"));
+
+        String expiresStr = props.getProperty("Expires");
+        ZonedDateTime expires = ZonedDateTime.parse(expiresStr, DateTimeFormatter.ISO_INSTANT.withZone(java.time.ZoneId.of("UTC")));
+        ZonedDateTime nextYear = ZonedDateTime.now(java.time.ZoneId.of("UTC")).plusYears(1);
+
+        // If this assert fails, edit security.txt to use something more than a year in the future
+        assertTrue("security.txt 'Expires' value should be more than a year in the future: " + expiresStr, expires.isAfter(nextYear));
     }
 
     @Test
