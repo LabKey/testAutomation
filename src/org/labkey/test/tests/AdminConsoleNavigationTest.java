@@ -33,12 +33,13 @@ import java.util.Set;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.labkey.test.util.PermissionsHelper.TROUBLESHOOTER_ROLE;
 
 @Category({Git.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 6)
 public class AdminConsoleNavigationTest extends BaseWebDriverTest
 {
-    private static final String TROUBLESHOOTER = "troubleshooter@adminconsolelinks.test";
+    private static final String TROUBLESHOOTER_USER = "troubleshooter@adminconsolelinks.test";
     private static final String NON_ADMIN = "nonadmin@adminconsolelinks.test";
 
     public ApiPermissionsHelper _apiPermissionsHelper = new ApiPermissionsHelper(this);
@@ -52,8 +53,8 @@ public class AdminConsoleNavigationTest extends BaseWebDriverTest
 
     private void doSetup()
     {
-        _userHelper.createUser(TROUBLESHOOTER);
-        _apiPermissionsHelper.addMemberToRole(TROUBLESHOOTER, "Troubleshooter", PermissionsHelper.MemberType.user, "/");
+        _userHelper.createUser(TROUBLESHOOTER_USER);
+        _apiPermissionsHelper.addMemberToRole(TROUBLESHOOTER_USER, TROUBLESHOOTER_ROLE, PermissionsHelper.MemberType.user, "/");
 
         _userHelper.createUser(NON_ADMIN);
     }
@@ -61,7 +62,7 @@ public class AdminConsoleNavigationTest extends BaseWebDriverTest
     @Override
     protected void doCleanup(boolean afterTest)
     {
-        _userHelper.deleteUsers(false, TROUBLESHOOTER, NON_ADMIN);
+        _userHelper.deleteUsers(false, TROUBLESHOOTER_USER, NON_ADMIN);
     }
 
     @Test
@@ -120,7 +121,7 @@ public class AdminConsoleNavigationTest extends BaseWebDriverTest
                 "Profiler"                  //Profiler can be edited by the troubleshooter
         ));
         ShowAdminPage adminConsole = goToAdminConsole();
-        impersonate(TROUBLESHOOTER);
+        impersonate(TROUBLESHOOTER_USER);
         Map<String, String> linkHrefs = new LinkedHashMap<>();
         List<WebElement> troubleshooterLinks = adminConsole.getAllAdminConsoleLinks();
         assertTrue(String.format("Failed sanity check. Only found %s admin links. There should be more.", troubleshooterLinks.size()), troubleshooterLinks.size() > 10);
