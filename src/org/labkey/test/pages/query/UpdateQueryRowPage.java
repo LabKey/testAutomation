@@ -18,6 +18,7 @@ import org.openqa.selenium.WebElement;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class UpdateQueryRowPage extends LabKeyPage<UpdateQueryRowPage.ElementCache>
@@ -99,7 +100,7 @@ public class UpdateQueryRowPage extends LabKeyPage<UpdateQueryRowPage.ElementCac
         WebElement field = elementCache().findField(fieldName);
         if (field.getTagName().equals("select"))
         {
-            setField(fieldName, OptionSelect.SelectOption.textOption(value));
+            selectOptionByText(field, value);
         }
         else
         {
@@ -186,7 +187,7 @@ public class UpdateQueryRowPage extends LabKeyPage<UpdateQueryRowPage.ElementCac
         {
             if (!fieldMap.containsKey(name))
             {
-                fieldMap.put(name, Locator.name(EscapeUtil.getFormFieldName(name)).findElement(this));
+                fieldMap.put(name, Locator.nameContaining(EscapeUtil.getFormFieldName(name)).findElement(this));
             }
             return fieldMap.get(name);
         }

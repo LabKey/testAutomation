@@ -23,6 +23,8 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
 import static org.labkey.test.util.EscapeUtil.FORM_FIELD_PREFIX;
 
@@ -82,7 +84,7 @@ public class DatasetInsertPage extends InsertPage
     {
         for (Map.Entry<String, String> entry : values.entrySet())
         {
-            WebElement fieldInput = Locator.name(EscapeUtil.getFormFieldName(entry.getKey())).findElement(getDriver());
+            WebElement fieldInput = Locator.nameContaining(EscapeUtil.getFormFieldName(entry.getKey())).findElement(getDriver());
             String type = fieldInput.getAttribute("type");
             switch (type)
             {

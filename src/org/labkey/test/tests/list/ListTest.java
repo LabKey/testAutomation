@@ -84,6 +84,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -1691,32 +1692,35 @@ public class ListTest extends BaseWebDriverTest
     @Test
     public void testMultiChoiceValues()
     {
-        // setup a list with an auto-increment key that we need to make sure is encoded in the form input
+        // setup a list with an auto-increment key and multi text choice field
         String encodedListName = "multiChoiceList";
         String keyName = "'><script>alert(\":(\")</script>'";
-        List<String> tcValues = List.of("0", "1", "2");
-        _listHelper.createList(PROJECT_VERIFY, encodedListName, keyName, col("MCF", ColumnType.TextChoice)
+        String columnName = "MultiChoiceField";
+        List<String> tcValues = List.of("~`!@#$%^&*()_+=[]{}\\|';:\"<>?,./", "1", "2");
+        _listHelper.createList(PROJECT_VERIFY, encodedListName, keyName, col(columnName, ColumnType.TextChoice)
                 .setMultiChoiceValues(tcValues));
         _listHelper.goToList(encodedListName);
 
         DataRegionTable table = new DataRegionTable("query", getDriver());
         table.clickInsertNewRow();
-        List<String> valuesToChoose = List.of("0", "1");
-        Locator loc = Locator.tag("select").append(Locator.tag("option"));
-        setListElement(loc, valuesToChoose);
+        String valuesToChoose = tcValues.subList(1, 3).stream()
+                .sorted()
+                .collect(Collectors.joining(" "));
+        Locator loc = Locator.nameContaining(EscapeUtil.getFormFieldName(columnName));
+        selectOptionByText(loc, valuesToChoose);
 
         clickButton("Submit");
-        table = new DataRegionTable("query", getDriver());
-        checker().verifyEquals("Name value not as expected", String.join(" ", valuesToChoose), table.getDataAsText(0, "MCF"));
+        checker().verifyEquals("Multi choice value not as expected", valuesToChoose, table.getDataAsText(0, columnName));
 
         table.clickEditRow(0);
-        valuesToChoose = List.of("1", "2");
-        setListElement(loc, valuesToChoose);
+        valuesToChoose = tcValues.subList(1, 3).stream()
+                .sorted()
+                .collect(Collectors.joining(" "));
+        selectOptionByText(loc, valuesToChoose);
         clickButton("Submit");
 
-        // verify the name value is persisted
-        table = new DataRegionTable("query", getDriver());
-        checker().verifyEquals("Name value not as expected", String.join(" ", valuesToChoose), table.getDataAsText(0, "MCF"));
+        // verify the multi choice value is persisted
+        checker().verifyEquals("Multi choice value not as expected", valuesToChoose, table.getDataAsText(0, columnName));
 
         _listHelper.deleteList();
     }

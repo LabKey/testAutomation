@@ -507,10 +507,13 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
         if (value instanceof List)
         {
+
             // If this is a list assume that it will need a lookup.
             List<String> values = (List) value;
 
             ReactSelect lookupSelect = elementCache().lookupSelect(gridCell);
+
+            lookupSelect.clearSelection();
 
             lookupSelect.open();
 

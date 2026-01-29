@@ -785,7 +785,6 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
 
         TextChoiceValueDialog addValuesDialog = new TextChoiceValueDialog(this);
         addValuesDialog.addValues(values);
-
         return addValuesDialog.clickApply();
     }
 
