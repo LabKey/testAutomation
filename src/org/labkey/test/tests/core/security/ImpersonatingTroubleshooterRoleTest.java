@@ -70,7 +70,7 @@ public class ImpersonatingTroubleshooterRoleTest extends TroubleshooterRoleTest
     public void testAdminConsoleVisibility()
     {
         signOut();
-        signIn(TROUBLESHOOTER);
+        signIn(TROUBLESHOOTER_USER);
         log("Verify permissions from troubleshooter");
         verifySitePermissionSetting(false);
 
@@ -81,12 +81,12 @@ public class ImpersonatingTroubleshooterRoleTest extends TroubleshooterRoleTest
 
     private ApiPermissionsHelper apiAsTroubleshooter()
     {
-        return new ApiPermissionsHelper(this, () -> new Connection(WebTestHelper.getBaseURL(), TROUBLESHOOTER, PasswordUtil.getPassword()));
+        return new ApiPermissionsHelper(this, () -> new Connection(WebTestHelper.getBaseURL(), TROUBLESHOOTER_USER, PasswordUtil.getPassword()));
     }
 
     private ApiPermissionsHelper apiAsImpersonatingSiteAdmin() throws IOException, CommandException
     {
-        Connection connection = new Connection(WebTestHelper.getBaseURL(), TROUBLESHOOTER, PasswordUtil.getPassword());
+        Connection connection = new Connection(WebTestHelper.getBaseURL(), TROUBLESHOOTER_USER, PasswordUtil.getPassword());
         new ImpersonateRolesCommand(toRole(SITE_ADMIN_ROLE)).execute(connection, "/");
         return new ApiPermissionsHelper(this, () -> connection);
     }

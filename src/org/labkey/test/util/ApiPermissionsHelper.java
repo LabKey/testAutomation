@@ -445,10 +445,15 @@ public class ApiPermissionsHelper extends PermissionsHelper
 
     public void addMemberToRole(String userOrGroupName, String roleName, MemberType memberType, String container)
     {
+        Integer principalId = getPrincipalId(userOrGroupName, memberType, container);
+        addMemberToRole(principalId, roleName, container);
+    }
+
+    public void addMemberToRole(Integer principalId, String roleName, String container)
+    {
         AddAssignmentCommand command = new AddAssignmentCommand();
         Connection connection = getConnection();
 
-        Integer principalId = getPrincipalId(userOrGroupName, memberType, container);
         command.setPrincipalId(principalId);
         command.setRoleClassName(toRole(roleName));
 
@@ -464,22 +469,17 @@ public class ApiPermissionsHelper extends PermissionsHelper
 
     public void addMemberToRoles(String userOrGroupName, List<String> roleNames, MemberType memberType)
     {
-        roleNames.forEach(roleName -> {addMemberToRole(userOrGroupName, roleName, memberType);});
+        roleNames.forEach(roleName -> addMemberToRole(userOrGroupName, roleName, memberType));
     }
 
     protected Integer getPrincipalId(String userOrGroupName, MemberType principalType, String project)
     {
-        switch (principalType)
+        return switch (principalType)
         {
-            case user:
-                return getUserId(userOrGroupName);
-            case group:
-                return getProjectGroupId(userOrGroupName, project);
-            case siteGroup:
-                return getSiteGroupId(userOrGroupName);
-            default:
-                throw new IllegalArgumentException("Unknown principal type: " + principalType);
-        }
+            case user -> getUserId(userOrGroupName);
+            case group -> getProjectGroupId(userOrGroupName, project);
+            case siteGroup -> getSiteGroupId(userOrGroupName);
+        };
     }
 
     @Override
