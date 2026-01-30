@@ -173,7 +173,7 @@ public class TroubleshooterRoleTest extends BaseWebDriverTest
 
         // Troubleshooters should NOT have read access outside the root
         goToProjectHome();
-        assertTextPresent("User does not have permission to perform this operation.");
+        waitForText("User does not have permission to perform this operation.");
         goToSchemaBrowser(getProjectName(), true);
     }
 
@@ -184,7 +184,7 @@ public class TroubleshooterRoleTest extends BaseWebDriverTest
 
         if (expectPermissionError)
         {
-            assertTextPresent("User does not have permission to perform this operation.");
+            waitForText("User does not have permission to perform this operation.");
         }
         else
         {
