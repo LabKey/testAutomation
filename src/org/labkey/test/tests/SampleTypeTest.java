@@ -38,6 +38,7 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.assay.AssayConstants;
+import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.domain.AdvancedSettingsDialog;
 import org.labkey.test.components.domain.BaseDomainDesigner;
 import org.labkey.test.components.domain.DomainFormPanel;
@@ -69,6 +70,7 @@ import org.labkey.test.util.TestDataGenerator;
 import org.labkey.test.util.TestUser;
 import org.labkey.test.util.data.TestDataUtils;
 import org.labkey.test.util.exp.SampleTypeAPIHelper;
+import org.labkey.test.util.query.QueryApiHelper;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -83,6 +85,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 
 import static org.hamcrest.CoreMatchers.containsString;
@@ -2010,6 +2013,77 @@ public class SampleTypeTest extends BaseWebDriverTest
         checker().verifyEquals("StoredAmount value not as expected for sample " + name, expectedAmount, drt.getDataAsText(0, "StoredAmount"));
         checker().verifyEquals("Units value not as expected for sample " + name, expectedUnits, drt.getDataAsText(0, "Units"));
         drt.clearAllFilters();
+    }
+
+    // Testing https://github.com/LabKey/internal-issues/issues/783
+    @Test
+    public void testDomainDesignerDeadlock() throws IOException, CommandException
+    {
+        goToProjectHome();
+
+        final String sampleTypeName = "DomainDesignerStress"; // + DOMAIN_TRICKY_CHARACTERS;
+
+        List<FieldDefinition> fields = new ArrayList<>();
+
+        int numOfFields = 20;
+
+        for (int i = 1; i <= numOfFields; i++)
+        {
+            fields.add(new FieldInfo(String.format("Date%02d", i), ColumnType.Date).getFieldDefinition());
+        }
+
+        SampleTypeDefinition sampleTypeDefinition = new SampleTypeDefinition(sampleTypeName).setFields(fields);
+        sampleTypeDefinition.setNameExpression("DDStress ${genId}");
+
+        SampleTypeAPIHelper.createEmptySampleType(getProjectName(), sampleTypeDefinition);
+
+        Random randomMonth = new Random();
+        Random randomDay = new Random();
+        Random randomYear = new Random();
+
+        List<Map<String, Object>> sampleRows = new ArrayList<>();
+
+        for (int i = 0; i < 1_000; i++)
+        {
+            Map<String, Object> rowMap = new HashMap<>();
+            for (FieldDefinition fd : fields)
+            {
+                rowMap.put(fd.getName(), String.format("%02d/%02d/%d",
+                        randomMonth.nextInt(1, 12),
+                        randomDay.nextInt(1, 28),
+                        randomYear.nextInt(2000, 2026)));
+            }
+            sampleRows.add(rowMap);
+        }
+
+        QueryApiHelper queryApiHelper = new QueryApiHelper(createDefaultConnection(), getProjectName(), "exp.materials", sampleTypeName);
+        queryApiHelper.insertRows(sampleRows);
+
+        refresh();
+
+        SampleTypeHelper sampleTypeHelper = new SampleTypeHelper(getDriver());
+        ColumnType columnType = ColumnType.DateAndTime;
+
+        sampleTypeHelper.goToSampleType(sampleTypeName);
+
+        for (int i = 0; i < 5; i++)
+        {
+            waitAndClickAndWait(Locator.lkButton("Edit Type"));
+            UpdateSampleTypePage domainDesignerPage = new UpdateSampleTypePage(getDriver());
+            DomainFormPanel fieldsPanel = domainDesignerPage.getFieldsPanel();
+
+            for (FieldDefinition fd : fields)
+            {
+                fieldsPanel.getField(fd.getName()).setType(columnType);
+                ModalDialog dialog = new ModalDialog.ModalDialogFinder(getDriver()).withTitle("Confirm Data Type Change").waitFor();
+                dialog.dismiss("Yes, Change Data Type");
+            }
+
+            domainDesignerPage.clickSave();
+
+            columnType = columnType.equals(ColumnType.DateAndTime) ? ColumnType.Date : ColumnType.DateAndTime;
+        }
+
     }
 
     private void viewRawTableMetadata(String sampleTypeName)
