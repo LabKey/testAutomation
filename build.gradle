@@ -6,6 +6,7 @@ plugins {
 }
 
 import org.labkey.gradle.task.RunTestSuite
+import org.labkey.gradle.task.RunUiTest
 import org.labkey.gradle.util.BuildUtils
 import org.labkey.gradle.util.GroupNames
 import org.labkey.gradle.util.PomFileHelper
@@ -169,6 +170,10 @@ project.tasks.register("convertHarToStressXml", JavaExec) {
                 throw new IllegalArgumentException("Specify input file for " + task.name + ". -PharInFile=<file>")
             }
         }
+}
+
+project.tasks.register("testPackageLockJson", RunUiTest) {
+    include "org/labkey/test/tests/PackageLockJsonTest.class"
 }
 
 project.tasks.named("uiTests").configure {
