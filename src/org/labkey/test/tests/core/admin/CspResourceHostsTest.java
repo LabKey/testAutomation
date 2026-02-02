@@ -27,19 +27,20 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.labkey.test.util.PermissionsHelper.MemberType.user;
+import static org.labkey.test.util.PermissionsHelper.TROUBLESHOOTER_ROLE;
 
 @Category({Daily.class})
 public class CspResourceHostsTest extends BaseWebDriverTest
 {
     private static final String APP_ADMIN = "csp_app_admin@cspresourcehoststest.test";
-    private static final String TROUBLESHOOTER = "csp_troubleshooter@cspresourcehoststest.test";
+    private static final String TROUBLESHOOTER_USER = "csp_troubleshooter@cspresourcehoststest.test";
 
     private final CspConfigHelper _cspConfigHelper = new CspConfigHelper(this);
 
     @Override
     protected void doCleanup(boolean afterTest)
     {
-        _userHelper.deleteUsers(afterTest, APP_ADMIN, TROUBLESHOOTER);
+        _userHelper.deleteUsers(afterTest, APP_ADMIN, TROUBLESHOOTER_USER);
     }
 
     @BeforeClass
@@ -53,10 +54,10 @@ public class CspResourceHostsTest extends BaseWebDriverTest
     private void doSetup()
     {
         _userHelper.createUser(APP_ADMIN);
-        _userHelper.createUser(TROUBLESHOOTER);
+        _userHelper.createUser(TROUBLESHOOTER_USER);
         ApiPermissionsHelper apiPermissionsHelper = new ApiPermissionsHelper(this);
         apiPermissionsHelper.addUserAsAppAdmin(APP_ADMIN);
-        apiPermissionsHelper.addMemberToRole(TROUBLESHOOTER, "Troubleshooter", user, null);
+        apiPermissionsHelper.addMemberToRole(TROUBLESHOOTER_USER, TROUBLESHOOTER_ROLE, user, null);
     }
 
     @Before
@@ -84,7 +85,7 @@ public class CspResourceHostsTest extends BaseWebDriverTest
         checker().verifyEquals("Defined directives", expectedHosts, externalSourcesPage.getExistingHosts());
         checker().screenShotIfNewError("site_admin_csp");
 
-        impersonate(TROUBLESHOOTER);
+        impersonate(TROUBLESHOOTER_USER);
         externalSourcesPage = ShowAdminPage.beginAt(this).clickAllowedExternalResourceHosts();
 
         buttons = getTexts(Locator.lkButton().findElements(getDriver()));

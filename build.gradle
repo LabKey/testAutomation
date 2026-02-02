@@ -5,6 +5,8 @@ plugins {
     id 'maven-publish'
 }
 
+import org.labkey.gradle.task.RunTestSuite
+import org.labkey.gradle.task.RunUiTest
 import org.labkey.gradle.util.BuildUtils
 import org.labkey.gradle.util.GroupNames
 import org.labkey.gradle.util.PomFileHelper
@@ -170,8 +172,19 @@ project.tasks.register("convertHarToStressXml", JavaExec) {
         }
 }
 
-project.tasks.uiTests.dependsOn(initPropertiesTask)
-project.parent.parent.tasks.ijConfigure.dependsOn(initPropertiesTask)
+project.tasks.register("testPackageLockJson", RunUiTest) {
+    include "org/labkey/test/tests/PackageLockJsonTest.class"
+}
+
+project.tasks.named("uiTests").configure {
+    dependsOn(initPropertiesTask)
+}
+project.parent.parent.tasks.named("ijConfigure").configure {
+    dependsOn(initPropertiesTask)
+}
+project.tasks.withType(RunTestSuite).configureEach { it ->
+    scanForTestClasses = true // Required for Gradle 9.3
+}
 
 if (project.hasProperty('doPublishing'))
 {
