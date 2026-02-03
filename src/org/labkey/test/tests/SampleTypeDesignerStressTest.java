@@ -81,7 +81,7 @@ public class SampleTypeDesignerStressTest extends BaseWebDriverTest implements P
      * Operations such as add/drop column requires ACCESS EXCLUSIVE lock on the table. If another transaction performed
      * a SELECT on a provisioned table, adding/dropping columns from the provisioned table would have to wait until the
      * other transaction to complete. If the other transaction happened to be waiting for the add/drop column transaction
-     * (in this case, updating exp.dataclass table), the two would dead lock.
+     * (in this case, updating exp.dataclass table), the two would deadlock.
      * </p>
      *
      */
@@ -90,13 +90,13 @@ public class SampleTypeDesignerStressTest extends BaseWebDriverTest implements P
     {
         goToProjectHome();
 
+        // Intentionally not using fuzz values for this test. Want to keep it focused on stress.
         final String sampleTypeName = "DomainDesignerStress";
 
         List<FieldDefinition> fields = new ArrayList<>();
 
         int numOfFields = 10;
-
-        log("Create a sample type with 10 Int fields.");
+        log(String.format("Create a sample type with %d Int fields.", numOfFields));
         for (int i = 1; i <= numOfFields; i++)
         {
             fields.add(new FieldInfo(String.format("Int%02d", i), FieldDefinition.ColumnType.Integer).getFieldDefinition());
@@ -111,8 +111,9 @@ public class SampleTypeDesignerStressTest extends BaseWebDriverTest implements P
 
         List<Map<String, Object>> sampleRows = new ArrayList<>();
 
-        log("Add 2,000 rows with data to the sample type.");
-        for (int i = 0; i < 2_000; i++)
+        int numOfRows = 2_000;
+        log(String.format("Add %,d rows with data to the sample type.", numOfRows));
+        for (int i = 0; i < numOfRows; i++)
         {
             Map<String, Object> rowMap = new HashMap<>();
             for (FieldDefinition fd : fields)
