@@ -21,7 +21,9 @@ import java.util.List;
 @BaseWebDriverTest.ClassTimeout(minutes = 2)
 public class WikiCspTest extends BaseWebDriverTest
 {
-    private static final String PROJECT_NAME = TRICKY_CHARACTERS_FOR_PROJECT_NAMES + "WikiCspTest";
+    // Add something unique to make sure log de-duping doesn't suppress the logging. Otherwise, running the test multiple
+    // times against the same server won't actually log the CSP error after the first hit
+    private static final String PROJECT_NAME = TRICKY_CHARACTERS_FOR_PROJECT_NAMES + "WikiCspTest" + System.currentTimeMillis();
     private static final String WIKI_PAGE_TITLE = "TOC_with_inline";
     private static final String WIKI_PAGE_BODY =
         // Issue 52483: HTML substitution patterns can throw errors during wiki validation
@@ -76,13 +78,18 @@ public class WikiCspTest extends BaseWebDriverTest
 
         waitForText("Click me");
 
-        try
+        waitFor(() ->
         {
-            CspLogUtil.checkNewCspWarnings(getArtifactCollector());
-        }
-        catch (CspLogUtil.CspWarningDetectedException ignore) {}
-
-        goToAdminConsole().goToSettingsSection();
+            try
+            {
+                CspLogUtil.checkNewCspWarnings(getArtifactCollector());
+                return false;
+            }
+            catch (CspLogUtil.CspWarningDetectedException ignore)
+            {
+                return true;
+            }
+        }, "Should have triggered a CSP error", WAIT_FOR_PAGE);
 
         SiteValidationPage validationPage = goToAdminConsole().clickSiteValidation();
         validationPage.setAllValidators(false);
