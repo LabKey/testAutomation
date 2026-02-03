@@ -216,7 +216,6 @@ public class Crawler
             new ControllerActionId("biologics", "begin"),
             new ControllerActionId("datafinder", "begin"),
             new ControllerActionId("ehr_compliancedb", "requirementDetails"),
-            new ControllerActionId("hdrl", "begin"),
             new ControllerActionId("onprc_billingpublic", "begin"),
             new ControllerActionId("reagent", "begin")
         );
