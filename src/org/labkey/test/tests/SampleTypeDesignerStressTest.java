@@ -140,9 +140,7 @@ public class SampleTypeDesignerStressTest extends BaseWebDriverTest implements P
         for (int i = 1; i <= numOfFields; i++)
         {
 
-            // Make each of the new fields a calculation based on an existing field. Adds a little complexity to the scenario.
-            FieldDefinition fd = new FieldDefinition(String.format("Half%02d", i), FieldDefinition.ColumnType.Calculation);
-            fd.setValueExpression(String.format("Int%02d / 2", i));
+            FieldDefinition fd = new FieldDefinition(String.format("New Text %02d", i), FieldDefinition.ColumnType.String);
             waitAndClickAndWait(Locator.lkButton("Edit Type"));
             UpdateSampleTypePage domainDesignerPage = new UpdateSampleTypePage(getDriver());
             domainDesignerPage.addField(fd);
