@@ -602,7 +602,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
             getWrapper().scrollIntoView(elementCache().lookupContainerSelect.getWrappedElement(), true);
             elementCache().lookupContainerSelect.selectByValue(containerPath);
             getWrapper().shortWait().withMessage("Schema select didn't clear after selecting lookup container")
-                    .until(ExpectedConditions.attributeToBe(elementCache().getLookupSchemaSelect().getWrappedElement(), "value", ""));
+                    .until(ExpectedConditions.domPropertyToBe(elementCache().getLookupSchemaSelect().getWrappedElement(), "value", ""));
         }
 
         return this;
@@ -625,7 +625,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
             getWrapper().scrollIntoView(elementCache().getLookupSchemaSelect().getWrappedElement(), true);
             elementCache().getLookupSchemaSelect().selectByVisibleText(schemaName);
             getWrapper().shortWait().withMessage("Query select didn't update after selecting lookup schema")
-                    .until(ExpectedConditions.attributeToBe(elementCache().getLookupQuerySelect().getWrappedElement(), "value", ""));
+                    .until(ExpectedConditions.domPropertyToBe(elementCache().getLookupQuerySelect().getWrappedElement(), "value", ""));
         }
         return this;
     }
