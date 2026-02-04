@@ -13,6 +13,7 @@ import org.labkey.test.pages.pipeline.PipelineStatusDetailsPage;
 import org.labkey.test.util.CspLogUtil;
 import org.labkey.test.util.TextSearcher;
 import org.labkey.test.util.WikiHelper;
+import org.labkey.test.util.core.admin.CspConfigHelper;
 
 import java.util.Arrays;
 import java.util.List;
@@ -21,9 +22,7 @@ import java.util.List;
 @BaseWebDriverTest.ClassTimeout(minutes = 2)
 public class WikiCspTest extends BaseWebDriverTest
 {
-    // Add something unique to make sure log de-duping doesn't suppress the logging. Otherwise, running the test multiple
-    // times against the same server won't actually log the CSP error after the first hit
-    private static final String PROJECT_NAME = TRICKY_CHARACTERS_FOR_PROJECT_NAMES + "WikiCspTest" + System.currentTimeMillis();
+    private static final String PROJECT_NAME = TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
     private static final String WIKI_PAGE_TITLE = "TOC_with_inline";
     private static final String WIKI_PAGE_BODY =
         // Issue 52483: HTML substitution patterns can throw errors during wiki validation
@@ -55,6 +54,17 @@ public class WikiCspTest extends BaseWebDriverTest
         _containerHelper.createProject(PROJECT_NAME, null);
         _containerHelper.enableModules(Arrays.asList("Wiki"));
         goToProjectHome();
+        CspConfigHelper.debugCspWarnings();  // Ensure that CSP violation logs aren't suppressed by de-duping efforts
+    }
+
+    @Override
+    protected void doCleanup(boolean afterTest)
+    {
+        super.doCleanup(afterTest);
+        if (afterTest)
+        {
+            CspConfigHelper.infoCspWarnings();
+        }
     }
 
     @Override
