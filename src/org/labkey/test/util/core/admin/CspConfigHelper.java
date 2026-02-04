@@ -75,6 +75,11 @@ public class CspConfigHelper
         Log4jUtils.setLogLevel("org.labkey.core.admin.AdminController.ContentSecurityPolicyReportAction", ManagerPage.LoggingLevel.DEBUG);
     }
 
+    public static void infoCspWarnings()
+    {
+        Log4jUtils.setLogLevel("org.labkey.core.admin.AdminController.ContentSecurityPolicyReportAction", ManagerPage.LoggingLevel.INFO);
+    }
+
     public static class AllowedHost
     {
         private final Directive _directive;
