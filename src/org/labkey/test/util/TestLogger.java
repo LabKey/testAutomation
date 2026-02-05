@@ -19,15 +19,23 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.ThreadContext;
+import org.apache.logging.log4j.core.config.Configurator;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.labkey.test.TestProperties;
 
 import java.util.concurrent.TimeUnit;
 
 public class TestLogger
 {
     private static final Logger LOG = LogManager.getLogger(TestLogger.class);
-    private static final Logger NO_OP = LogManager.getLogger("NoOpLogger");
+    private static final Logger NO_OP;
+
+    static
+    {
+        Configurator.setLevel(LOG, TestProperties.getTestLogLevel());
+        NO_OP = LOG.isDebugEnabled() ? LOG : LogManager.getLogger("NoOpLogger");
+    }
 
     private static final int indentStep = 2;
     private static final int MAX_INDENT = 20;
