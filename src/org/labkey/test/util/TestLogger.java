@@ -16,6 +16,7 @@
 package org.labkey.test.util;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.ThreadContext;
@@ -29,8 +30,14 @@ import static org.labkey.test.TestProperties.getTestLogLevel;
 
 public class TestLogger
 {
-    private static final Logger LOG = Configurator.setLevel(LogManager.getLogger(TestLogger.class), getTestLogLevel());
+    private static final Logger LOG = LogManager.getLogger(TestLogger.class);
     private static final Logger NO_OP = LogManager.getLogger("NoOpLogger");
+
+    static
+    {
+        if (getTestLogLevel() != null)
+            Configurator.setLevel(LOG, Level.toLevel(getTestLogLevel()));
+    }
 
     private static final int indentStep = 2;
     private static final int MAX_INDENT = 20;

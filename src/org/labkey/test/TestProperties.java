@@ -17,7 +17,6 @@ package org.labkey.test;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.labkey.serverapi.reader.Readers;
@@ -299,9 +298,9 @@ public abstract class TestProperties
         return getBooleanProperty("webtest.troubleshooting.stacktraces", false);
     }
 
-    public static Level getTestLogLevel()
+    public static String getTestLogLevel()
     {
-        return Level.toLevel(System.getProperty("webtest.log.level"), Level.INFO);
+        return System.getProperty("webtest.log.level");
     }
 
     public static boolean isPrimaryUserAppAdmin()
