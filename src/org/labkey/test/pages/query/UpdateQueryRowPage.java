@@ -15,7 +15,6 @@ import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.util.EscapeUtil;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-Ï
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
