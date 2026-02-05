@@ -72,7 +72,7 @@ public class MethodLoggingAspect
 
         String argsString = getArgsString(loggedParameters);
 
-        if (logMethod.quiet())
+        if (logMethod.quiet() && !TestLogger.log().isDebugEnabled())
         {
             TestLogger.suppressLogging(true);
             quietMethods.add(method);
@@ -108,7 +108,7 @@ public class MethodLoggingAspect
 
         String argString = " done";
 
-        if (logMethod.quiet())
+        if (logMethod.quiet() && !TestLogger.log().isDebugEnabled())
         {
             quietMethods.pop();
             argString = quietMethodsArgStrings.pop();
