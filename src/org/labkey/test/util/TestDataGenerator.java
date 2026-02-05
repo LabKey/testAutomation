@@ -60,6 +60,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
@@ -954,6 +955,12 @@ public class TestDataGenerator
     public ImportDataResponse importRows(Connection cn, List<Map<String, Object>> rows, boolean lookupByAlternateKey) throws IOException, CommandException
     {
         return getQueryHelper(cn).importData(TestDataUtils.stringFromRows(TestDataUtils.rowListsFromMaps(rows)), lookupByAlternateKey);
+    }
+
+    public static <T> List<T> shuffleSelect(List<T> allFields)
+    {
+        int randomSize = new Random().nextInt(allFields.size()) + 1;
+        return shuffleSelect(allFields, randomSize);
     }
 
     public static <T> List<T> shuffleSelect(List<T> allFields, int selectCount)
