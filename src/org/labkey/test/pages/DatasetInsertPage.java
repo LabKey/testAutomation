@@ -23,8 +23,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
 
 import static org.labkey.test.util.EscapeUtil.FORM_FIELD_PREFIX;
 
