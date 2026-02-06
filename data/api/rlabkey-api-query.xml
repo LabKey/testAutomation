@@ -629,10 +629,10 @@
         <url>
             <![CDATA[
                 library(Rlabkey)
-                makeFilter(
+                print(makeFilter(
                     c("foo/Reagent", "CONTAINS", "this or that"),
                     c("Temp_C", "GREATER_THAN", "12"),
-                    c("SystolicBloodPressure", "MISSING", ""))
+                    c("SystolicBloodPressure", "MISSING", "")))
             ]]>
         </url>
         <response>
@@ -647,10 +647,10 @@
         <url>
             <![CDATA[
                 library(Rlabkey)
-                makeFilter(
+                print(makeFilter(
                     c("foo/Reagent", "CONTAINS", "this or that"),
                     c("Temp_C", "GREATER_THAN", "12"),
-                    c("SystolicBloodPressure", "MISSING", ""), asList=TRUE)
+                    c("SystolicBloodPressure", "MISSING", ""), asList=TRUE))
             ]]>
         </url>
         <response>

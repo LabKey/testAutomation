@@ -1883,11 +1883,11 @@ public class SampleTypeTest extends BaseWebDriverTest
 
         log("verify error when inserting a row with an amount but no unit");
         sampleHelper.insertRow(Map.of("Name", "AU-ERR-1", "StoredAmount", "0.0"));
-        assertTextPresent("No Units value provided for Amount 0.0.");
+        assertTextPresent("No 'Units' value provided for Amount '0.0'.");
         clickButton("Cancel");
         log("verify error when inserting a row with a unit but no amount");
         sampleHelper.insertRow(Map.of("Name", "AU-ERR-2", "Units", "mL"));
-        assertTextPresent("No Amount value provided for Units mL.");
+        assertTextPresent("No 'Amount' value provided for Units 'mL'.");
         clickButton("Cancel");
 
         log("verify error when inserting a row with incompatible units");
@@ -1962,11 +1962,11 @@ public class SampleTypeTest extends BaseWebDriverTest
         log("verify that inserting a row with an amount or unit requires both fields to be filled in");
         // insert row with amount but not unit (error expected)
         sampleHelper.insertRow(Map.of("Name", "AU-ERR-1", "StoredAmount", "5.0"));
-        assertTextPresent("No Units value provided for Amount 5.0.");
+        assertTextPresent("No 'Units' value provided for Amount '5.0'.");
         clickButton("Cancel");
         // insert row with unit but not amount (error expected)
         sampleHelper.insertRow(Map.of("Name", "AU-ERR-2", "Units", "mg"));
-        assertTextPresent("No Amount value provided for Units mg.");
+        assertTextPresent("No 'Amount' value provided for Units 'mg'.");
         clickButton("Cancel");
         // insert row with both amount and unit (success)
         sampleHelper.insertRow(Map.of("Name", "AU-SUCCESS-1", "StoredAmount", "5.0", "Units", "mg"));
@@ -1975,11 +1975,11 @@ public class SampleTypeTest extends BaseWebDriverTest
         log("verify that updating a row with an amount or unit requires both fields to be filled in");
         // update row with amount but not unit (error expected)
         sampleHelper.updateRow(0, Map.of("Units", ""));
-        assertTextPresent("No Units value provided for Amount 5.0.");
+        assertTextPresent("No 'Units' value provided for Amount '5.0'.");
         clickButton("Cancel");
         // update row with unit but not amount (error expected)
         sampleHelper.updateRow(0, Map.of("StoredAmount", ""));
-        assertTextPresent("No Amount value provided for Units mg.");
+        assertTextPresent("No 'Amount' value provided for Units 'mg'.");
         clickButton("Cancel");
         // update row with both amount and unit (success)
         sampleHelper.updateRow(0, Map.of("StoredAmount", "10.0123", "Units", "g"));
@@ -1988,11 +1988,11 @@ public class SampleTypeTest extends BaseWebDriverTest
         log("verify that bulk import with an amount or unit requires both fields to be filled in");
         // bulk import with amount but not unit (error expected)
         sampleHelper.bulkImportExpectingError(List.of(Map.of("Name", "AU-BULK-ERR-1", "StoredAmount", "0")), SampleTypeHelper.IMPORT_OPTION);
-        assertTextPresent("A Units value must be provided when Amounts are provided");
+        assertTextPresent("A 'Units' value must be provided when 'Amounts' are provided");
         clickButton("Cancel");
         // bulk import with unit but not amount (error expected)
         sampleHelper.bulkImportExpectingError(List.of(Map.of("Name", "AU-BULK-ERR-2", "Units", "mL")), SampleTypeHelper.IMPORT_OPTION);
-        assertTextPresent("An Amount value must be provided when Units are provided.");
+        assertTextPresent("An 'Amount' value must be provided when 'Units' are provided.");
         clickButton("Cancel");
         // bulk import with both amount and unit (success expected)
         sampleHelper.bulkImport(List.of(Map.of("Name", "AU-BULK-SUCCESS-1", "StoredAmount", "0", "Units", "L")));
