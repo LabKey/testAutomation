@@ -1022,7 +1022,7 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
 
         log("Validate adding entries in bulk will give a meaningful error with a bad format.");
 
-        String expectedDateErrorMsgFormat = "'%s' is not a valid %s for %s using U.S. date parsing (MDY)";
+        String expectedDateErrorMsgFormat = "'%s' is not a valid %s for '%s' using U.S. date parsing (MDY)";
         String expectedTimeErrorMsgFormat = "Could not convert value '%s' (String) for %s field '%s'";
         String badDate = "45/93/2001";
         String nonLeapDay = "2/29/2023";
