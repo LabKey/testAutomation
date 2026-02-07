@@ -337,6 +337,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverCompon
         WebElement menu = Locator.css("ul.grid-header-cell__dropdown-menu.open").findWhenNeeded(getDriver());
         WebElement menuItem = Locator.css("li > a").containing(menuText).findWhenNeeded(menu);
         waitFor(menuItem::isDisplayed, 1000);
+        dismissPopover();
         if (waitForUpdate)
             doAndWaitForUpdate(menuItem::click);
         else
@@ -809,6 +810,17 @@ public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverCompon
         return msg;
     }
 
+    public void dismissPopover()
+    {
+        getWrapper().mouseOut();
+        Locators.popover.findOptionalElement(getDriver()).ifPresent(popover -> {
+            getWrapper().mouseOver(popover);
+            getWrapper().mouseOut();
+            getWrapper().mouseOver(elementCache().getGridHeaderManager().getColumnHeader(0).getElement());
+            getWrapper().shortWait().until(ExpectedConditions.invisibilityOf(popover));
+        });
+    }
+
     public List<FieldReference> getHeaders()
     {
         return Collections.unmodifiableList(elementCache().findHeaders());
@@ -980,6 +992,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverCompon
         static final Locator emptyGrid = Locator.css("tbody tr.grid-empty");
         static final Locator spinner = Locator.byClass("fa-spinner");
         static final Locator headerCells = Locator.tagWithClass("th", "grid-header-cell");
+        static final Locator popover = Locator.byClass("popover");
         static public Locator.XPathLocator headerCellBody(String label)
         {
             return Locator.tagWithClass("div", "grid-header-cell__body")
