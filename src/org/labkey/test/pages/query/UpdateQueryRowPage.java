@@ -136,6 +136,12 @@ public class UpdateQueryRowPage extends LabKeyPage<UpdateQueryRowPage.ElementCac
         return this;
     }
 
+    public UpdateQueryRowPage setMultiValueField(String fieldName, OptionSelect.SelectOption option)
+    {
+        new OptionSelect<>(elementCache().findField(fieldName, true)).selectOption(option);
+        return this;
+    }
+
     public String getTextInputValue(String fieldName)
     {
         var input = new Input(elementCache().findField(fieldName), getDriver());
@@ -182,13 +188,18 @@ public class UpdateQueryRowPage extends LabKeyPage<UpdateQueryRowPage.ElementCac
     {
         private final Map<String, WebElement> fieldMap = new HashMap<>();
 
-        WebElement findField(String name)
+        WebElement findField(String name, boolean multiValue)
         {
             if (!fieldMap.containsKey(name))
             {
-                fieldMap.put(name, Locator.name(EscapeUtil.getFormFieldName(name)).findElement(this));
+                fieldMap.put(name, Locator.name(EscapeUtil.getFormFieldName(name, multiValue)).findElement(this));
             }
             return fieldMap.get(name);
+        }
+
+        WebElement findField(String name)
+        {
+            return findField(name, false);
         }
 
         final WebElement submitButton = Locator.lkButton("Submit").findWhenNeeded(this);
