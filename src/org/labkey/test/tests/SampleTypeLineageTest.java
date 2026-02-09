@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -311,7 +312,7 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
 
         log("Again check that data validation works as expected.");
         checker().verifyTrue("Expected error message 'is not a valid Date' is not present.",
-                isTextPresent("'BadDate' is not a valid Date for 'DateCol' "));
+                isTextPresent(getConversionErrorMessage("BadDate", "DateCol", Date.class)));
         setFormElement(Locator.name("Output Sample 1_DateCol"), "1/1/2007");
         clickButton("Submit");
 
