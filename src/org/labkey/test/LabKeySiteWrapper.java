@@ -1736,7 +1736,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         if (fieldType.equalsIgnoreCase("date") || fieldType.equalsIgnoreCase("datetime") || fieldType.equalsIgnoreCase("timestamp"))
         {
             String parsingMode = useUSDateParsing ? "U.S. date parsing (MDY)" : "Non-U.S. date parsing (DMY)";
-            errorMessage = quote + value + quote + " is not a valid " + fieldType + " for " + fieldName + " using " + parsingMode;
+            errorMessage = quote + value + quote + " is not a valid " + fieldType + " for " + quote + fieldName + quote + " using " + parsingMode;
         }
         else
         {
