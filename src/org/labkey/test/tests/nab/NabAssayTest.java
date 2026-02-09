@@ -54,6 +54,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -292,7 +293,7 @@ public class NabAssayTest extends AbstractAssayTest
                         runFile(TEST_ASSAY_NAB_FILE2).
                         build()).doImport();
 
-        assertElementPresent(Locators.labkeyError.containing("'bad-date' is not a valid Date for Date using U.S. date parsing (MDY)."), 1);
+        assertElementPresent(Locators.labkeyError.containing(getConversionErrorMessage("bad-date", "Date", Date.class)), 1);
 //        These dates are SQL Server specific
 //        assertElementPresent(Locators.labkeyError.containing("Only dates between January 1, 1753 and December 31, 9999 are accepted."), 1);
         assertElementPresent(Locators.labkeyError.containing("Only dates between "), 1);
