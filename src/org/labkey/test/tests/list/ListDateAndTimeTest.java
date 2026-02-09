@@ -3,7 +3,6 @@ package org.labkey.test.tests.list;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.jetbrains.annotations.Nullable;
-import org.joda.time.DateTime;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -43,8 +42,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
-import static org.labkey.test.util.samplemanagement.SMTestUtils.COL_DATETIME_NAME;
 
 @Category({Daily.class, Data.class, Hosting.class})
 public class ListDateAndTimeTest extends BaseWebDriverTest
