@@ -355,6 +355,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     profile.setPreference("extensions.update.enabled", false);
                     profile.setPreference("dom.max_script_run_time", 0);
                     profile.setPreference("dom.max_chrome_script_run_time", 0);
+                    //profile.setPreference("dom.reporting.enabled", true); // Enable support for CSP report-to
 
                     // Prevent crawler from hanging on '_print=1' pages
                     profile.setPreference("print.always_print_silent", true);
@@ -1997,18 +1998,17 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         try
         {
-            toBeStale.isEnabled();
             new WebDriverWait(getDriver(), timer.timeRemaining())
                     .withMessage("waiting for browser to navigate")
                     .until(ExpectedConditions.stalenessOf(toBeStale));
         }
-        catch (StaleElementReferenceException | NoSuchElementException | NullPointerException ignore)
-        {
-            // `ExpectedConditions.stalenessOf(toBeStale)` sometimes chokes when coming from a blank page (about:blank)
-        }
         catch (TimeoutException ex)
         {
             throw new TestTimeoutException(ex); // Triggers thread dump.
+        }
+        catch (WebDriverException | NullPointerException ignore)
+        {
+            // `ExpectedConditions.stalenessOf(toBeStale)` sometimes chokes when coming from a blank page (about:blank)
         }
 
         // WebDriver usually does this automatically, but not always.

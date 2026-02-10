@@ -17,11 +17,12 @@ package org.labkey.test;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.labkey.serverapi.reader.Readers;
 import org.labkey.test.util.CachingSupplier;
 import org.labkey.test.util.CspLogUtil;
 import org.labkey.test.util.TestDataGenerator;
-import org.labkey.test.util.TestLogger;
 import org.labkey.test.util.Version;
 import org.openqa.selenium.Dimension;
 
@@ -42,19 +43,20 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
-import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public abstract class TestProperties
 {
+    private static final Logger LOG = LogManager.getLogger(TestProperties.class);
+
     static
     {
         final File propFile = new File(TestFileUtils.getTestRoot(), "test.properties");
         final File propFileTemplate = new File(TestFileUtils.getTestRoot(), "test.properties.template");
         if (!propFile.exists())
         {
-            TestLogger.log(String.format("'%s' does not exist. Creating default from '%s'", propFile.getName(), propFileTemplate.getName()));
+            LOG.info("'{}' does not exist. Creating default from '{}'", propFile.getName(), propFileTemplate.getName());
             try (Stream<String> propStream = Files.lines(propFileTemplate.toPath()))
             {
                 final Iterator<String> iterator = propStream.filter(line -> !line.startsWith("#!!")).iterator();
@@ -62,12 +64,12 @@ public abstract class TestProperties
             }
             catch (IOException e)
             {
-                TestLogger.error(e.getMessage());
+                LOG.error(e.getMessage(), e);
             }
         }
         try (Reader propReader = Readers.getReader(propFile))
         {
-            TestLogger.log("Loading properties from " + propFile.getName());
+            LOG.info("Loading properties from {}", propFile.getName());
             Properties properties = new Properties();
             properties.load(propReader);
             properties.putAll(System.getProperties());
@@ -75,8 +77,7 @@ public abstract class TestProperties
         }
         catch (IOException ioe)
         {
-            TestLogger.error("Failed to load " + propFile.getName() + " file. Running with hard-coded defaults");
-            ioe.printStackTrace(System.err);
+            LOG.error("Failed to load {} file. Running with hard-coded defaults", propFile.getName(), ioe);
         }
 
         final List<String> gradleProperties = List.of("labkeyVersion");
@@ -85,7 +86,7 @@ public abstract class TestProperties
         {
             try (Reader propReader = Readers.getReader(serverPropFile))
             {
-                TestLogger.log("Loading properties from " + serverPropFile.getName());
+                LOG.info("Loading properties from {}", serverPropFile.getName());
                 Properties properties = new Properties();
                 properties.load(propReader);
                 for (String key : gradleProperties)
@@ -98,8 +99,7 @@ public abstract class TestProperties
             }
             catch (IOException ioe)
             {
-                TestLogger.error("Failed to load " + serverPropFile.getName() + " file.");
-                ioe.printStackTrace(System.err);
+                LOG.error("Failed to load {} file.", serverPropFile.getName(), ioe);
             }
         }
 
@@ -298,9 +298,9 @@ public abstract class TestProperties
         return getBooleanProperty("webtest.troubleshooting.stacktraces", false);
     }
 
-    public static boolean isDebugLoggingEnabled()
+    public static String getTestLogLevel()
     {
-        return getBooleanProperty("webtest.logging.debug", false);
+        return System.getProperty("webtest.log.level");
     }
 
     public static boolean isPrimaryUserAppAdmin()
@@ -432,7 +432,7 @@ public abstract class TestProperties
                         "Tried system properties failure.output.dir and java.io.tmpdir");
             }
 
-            TestLogger.log("Using " + dumpDir + " to store test output");
+            LOG.info("Using {} to store test output", dumpDir);
         }
         return dumpDir;
     }
@@ -475,7 +475,7 @@ public abstract class TestProperties
             }
             catch (NumberFormatException e)
             {
-                TestLogger.warn("Invalid value for property %s: '%s'".formatted(key, prop), e);
+                LOG.warn("Invalid value for property {}: '{}'", key, prop, e);
             }
         }
         return def;
@@ -499,7 +499,7 @@ public abstract class TestProperties
             }
             catch (NumberFormatException e)
             {
-                TestLogger.warn("Invalid value for property %s: '%s'".formatted(key, prop), e);
+                LOG.warn("Invalid value for property {}: '{}'", key, prop, e);
             }
         }
         return def;

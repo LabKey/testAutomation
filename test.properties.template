@@ -64,6 +64,10 @@ test.credentials.file=
 webtest.timeout.multiplier=1.0
 ## Runs just the cleanup steps of the specified tests/suites
 cleanOnly=false
+## Set logging level for Selenium tests (default: INFO)
+#webtest.log.level=DEBUG
+## Set whether DeferredErrorCollector should fail immediately when errors are encountered (default: false)
+#webtest.checker.fatal=true
 
 
 #==============================================================================
@@ -131,7 +135,7 @@ labkey.contextpath=
 #==============================================================================
 # Server configuration properties
 #
-# These define certain Tomcat startup properties. Mostly only used by TeamCity
+# These inform tests of certain LabKey startup properties. Mostly only used by TeamCity
 #==============================================================================
 disableAssertions=false
 devMode=true
