@@ -109,9 +109,9 @@ public class SampleFinder extends WebDriverComponent<SampleFinder.ElementCache>
         elementCache().findFilterCard(queryName).clickRemove();
     }
 
-    public EntityFieldFilterModal editSearchCard()
+    public EntityFieldFilterModal editSearchCard(String queryName)
     {
-        return elementCache().findFilterCards().getFirst().clickEdit();
+        return elementCache().findFilterCard(queryName).clickEdit();
     }
 
     /**
