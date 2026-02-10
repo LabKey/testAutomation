@@ -109,6 +109,11 @@ public class SampleFinder extends WebDriverComponent<SampleFinder.ElementCache>
         elementCache().findFilterCard(queryName).clickRemove();
     }
 
+    public EntityFieldFilterModal editSearchCard(String queryName)
+    {
+        return elementCache().findFilterCard(queryName).clickEdit();
+    }
+
     /**
      * Reset the sample finder to its initial state, with no search criteria
      */
