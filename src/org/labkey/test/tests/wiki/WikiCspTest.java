@@ -13,6 +13,7 @@ import org.labkey.test.pages.pipeline.PipelineStatusDetailsPage;
 import org.labkey.test.util.CspLogUtil;
 import org.labkey.test.util.TextSearcher;
 import org.labkey.test.util.WikiHelper;
+import org.labkey.test.util.core.admin.CspConfigHelper;
 
 import java.util.Arrays;
 import java.util.List;
@@ -21,7 +22,7 @@ import java.util.List;
 @BaseWebDriverTest.ClassTimeout(minutes = 2)
 public class WikiCspTest extends BaseWebDriverTest
 {
-    private static final String PROJECT_NAME = TRICKY_CHARACTERS_FOR_PROJECT_NAMES + "WikiCspTest";
+    private static final String PROJECT_NAME = TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
     private static final String WIKI_PAGE_TITLE = "TOC_with_inline";
     private static final String WIKI_PAGE_BODY =
         // Issue 52483: HTML substitution patterns can throw errors during wiki validation
@@ -53,6 +54,17 @@ public class WikiCspTest extends BaseWebDriverTest
         _containerHelper.createProject(PROJECT_NAME, null);
         _containerHelper.enableModules(Arrays.asList("Wiki"));
         goToProjectHome();
+        CspConfigHelper.debugCspWarnings();  // Ensure that CSP violation logs aren't suppressed by de-duping efforts
+    }
+
+    @Override
+    protected void doCleanup(boolean afterTest)
+    {
+        super.doCleanup(afterTest);
+        if (afterTest)
+        {
+            CspConfigHelper.infoCspWarnings();
+        }
     }
 
     @Override
@@ -76,13 +88,18 @@ public class WikiCspTest extends BaseWebDriverTest
 
         waitForText("Click me");
 
-        try
+        waitFor(() ->
         {
-            CspLogUtil.checkNewCspWarnings(getArtifactCollector());
-        }
-        catch (CspLogUtil.CspWarningDetectedException ignore) {}
-
-        goToAdminConsole().goToSettingsSection();
+            try
+            {
+                CspLogUtil.checkNewCspWarnings(getArtifactCollector());
+                return false;
+            }
+            catch (CspLogUtil.CspWarningDetectedException ignore)
+            {
+                return true;
+            }
+        }, "Should have triggered a CSP error", WAIT_FOR_PAGE);
 
         SiteValidationPage validationPage = goToAdminConsole().clickSiteValidation();
         validationPage.setAllValidators(false);
