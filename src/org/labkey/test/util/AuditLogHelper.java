@@ -293,6 +293,17 @@ public class AuditLogHelper
         return new JSONObject(detailJSON).toMap();
     }
 
+    public static String getExpectedAuditDataChange(String field, Object oldValue, Object newValue)
+    {
+        String dataChangeString = field + ": ";
+        if (oldValue != null)
+            dataChangeString += oldValue;
+        if (newValue != null)
+            dataChangeString +=  " > " + newValue;
+        return dataChangeString;
+    }
+
+
     public void checkLastTransactionAuditLogDetails(String containerPath, Map<TransactionDetail, Object> expectedDetails)
     {
         Integer transactionAuditId = getLastTransactionId(containerPath);
