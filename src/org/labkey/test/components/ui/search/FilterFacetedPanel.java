@@ -8,6 +8,7 @@ import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.react.ReactSelect;
 import org.labkey.test.components.ui.FilterStatusValue;
+import org.labkey.remoteapi.query.Filter;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -15,7 +16,9 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static org.labkey.test.WebDriverWrapper.waitFor;
 import static org.labkey.test.components.html.Input.Input;
+import static org.labkey.test.util.samplemanagement.SMTestUtils.isVisible;
 
 public class FilterFacetedPanel extends WebDriverComponent<FilterFacetedPanel.ElementCache>
 {
@@ -50,12 +53,20 @@ public class FilterFacetedPanel extends WebDriverComponent<FilterFacetedPanel.El
     }
 
     /**
-     * Select a single facet value by clicking its label. Should replace all existing selections.
-     * @param value desired value
+     * Check that filter choosing option exists on the page.
      */
-    public void selectFilter(String value)
+    public boolean isFiltersPresented()
     {
-        elementCache().filterTypeSelects.select(value);
+        return waitFor(() -> isVisible(elementCache().filterTypeSelects), 1000);
+    }
+
+    /**
+     * Select a filer by clicking its label. Right now this method relevant only for multi-value text choice.
+     * @param operator desired filter value
+     */
+    public void selectFilter(Filter.Operator operator)
+    {
+        elementCache().filterTypeSelects.select(operator.getDisplayValue());
     }
 
     /**

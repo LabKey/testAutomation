@@ -17,6 +17,7 @@ import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.components.react.ReactCheckBox;
 import org.labkey.test.components.ui.grids.FieldReferenceManager.FieldReference;
 import org.labkey.test.components.ui.search.FilterExpressionPanel;
+import org.labkey.test.components.ui.search.FilterFacetedPanel;
 import org.labkey.test.params.FieldKey;
 import org.labkey.test.util.selenium.WebElementUtils;
 import org.openqa.selenium.Keys;
@@ -46,6 +47,8 @@ import static org.labkey.remoteapi.query.Filter.Operator.CONTAINS_EXACTLY;
 import static org.labkey.remoteapi.query.Filter.Operator.CONTAINS_NONE;
 import static org.labkey.remoteapi.query.Filter.Operator.DOES_NOT_CONTAIN_EXACTLY;
 import static org.labkey.remoteapi.query.Filter.Operator.IN;
+import static org.labkey.remoteapi.query.Filter.Operator.IS_EMPTY;
+import static org.labkey.remoteapi.query.Filter.Operator.IS_NOT_EMPTY;
 import static org.labkey.test.WebDriverWrapper.waitFor;
 
 public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverComponent<ResponsiveGrid<T>.ElementCache> implements UpdatingComponent
@@ -241,7 +244,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverCompon
     private GridFilterModal initFilterColumn(CharSequence columnIdentifier, Filter.Operator operator, Object value)
     {
         List<Filter.Operator> listOperators = List.of(IN, CONTAINS_ALL, CONTAINS_ANY, CONTAINS_EXACTLY, CONTAINS_NONE,
-                DOES_NOT_CONTAIN_EXACTLY);
+                DOES_NOT_CONTAIN_EXACTLY, IS_EMPTY, IS_NOT_EMPTY);
         clickColumnMenuItem(columnIdentifier, "Filter...", false);
         GridFilterModal filterModal = new GridFilterModal(getDriver(), this);
         if (operator != null)
@@ -249,9 +252,13 @@ public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverCompon
             if (listOperators.contains(operator) && value instanceof List<?>)
             {
                 List<String> values = (List<String>) value;
-                filterModal.selectFacetTab().selectValue(values.get(0));
-                filterModal.selectFacetTab().checkValues(values.toArray(String[]::new));
-                filterModal.selectFacetTab().selectFilter(operator.getDisplayValue());
+                FilterFacetedPanel filterPanel = filterModal.selectFacetTab();
+                filterPanel.selectValue(values.get(0));
+                filterPanel.checkValues(values.toArray(String[]::new));
+                if (filterPanel.isFiltersPresented())
+                {
+                    filterPanel.selectFilter(operator);
+                }
             }
             else
                 filterModal.selectExpressionTab().setFilter(new FilterExpressionPanel.Expression(operator, value));
@@ -394,15 +401,16 @@ public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverCompon
 
     /**
      * Finds the first row with the specified texts in the specified columns, and sets its checkbox
-     * @param partialMap    key-column (fieldKey, name, or label), value-text in that column
-     * @param checked       the desired checkbox state
+     *
+     * @param partialMap key-column (fieldKey, name, or label), value-text in that column
+     * @param checked    the desired checkbox state
      * @return this grid
      */
     public T selectRow(Map<String, String> partialMap, boolean checked)
     {
         GridRow row = getRow(partialMap);
         selectRowAndVerifyCheckedCounts(row, checked);
-        getWrapper().log("Row described by map ["+partialMap+"] selection state set to + ["+row.isSelected()+"]");
+        getWrapper().log("Row described by map [" + partialMap + "] selection state set to + [" + row.isSelected() + "]");
 
         return getThis();
     }
