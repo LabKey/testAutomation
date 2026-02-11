@@ -185,7 +185,8 @@ public class UpdateQueryRowPage extends LabKeyPage<UpdateQueryRowPage.ElementCac
         {
             if (!fieldMap.containsKey(name))
             {
-                fieldMap.put(name, Locator.nameContaining(EscapeUtil.getFormFieldName(name)).findElement(this));
+                // Multi-value text choice fields are prepended with "[]"
+                fieldMap.put(name, Locator.tag("*").attributeStartsWith("name", EscapeUtil.getFormFieldName(name)).findElement(this));
             }
             return fieldMap.get(name);
         }
