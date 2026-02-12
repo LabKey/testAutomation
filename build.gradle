@@ -20,6 +20,18 @@ project.configurations {
 
 project.dependencies {
 
+    // Source: https://mvnrepository.com/artifact/ai.djl/api
+    implementation("ai.djl:api:0.36.0")
+
+    // Source: https://mvnrepository.com/artifact/ai.djl/model-zoo
+    implementation("ai.djl:model-zoo:0.36.0")
+
+    // Source: https://mvnrepository.com/artifact/ai.djl.huggingface/tokenizers
+    implementation("ai.djl.huggingface:tokenizers:0.36.0")
+
+    // Source: https://mvnrepository.com/artifact/ai.djl.pytorch/pytorch-engine
+    implementation("ai.djl.pytorch:pytorch-engine:0.36.0")
+
     implementation "org.xerial:sqlite-jdbc:${sqliteJdbcVersion}" // declaring SQLite here to be used in TargetedMS test
     api("junit:junit:${junitVersion}")
     api("org.seleniumhq.selenium:selenium-api:${seleniumVersion}")
