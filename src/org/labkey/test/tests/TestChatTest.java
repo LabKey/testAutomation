@@ -73,12 +73,13 @@ public class TestChatTest extends BaseWebDriverTest
             0.1324919f, 0.050239515f, -0.06295673f, 0.01697682f, 0.010819006f, 0.12522274f, 0.017968038f, -0.00625929f, -0.08564173f};
 
     // Alternatively, the average could be a vector generated from a single string used as the expected result.
-    static final String chatBaselineString = "LabKey Sample Manager is a sample management application designed to be easy-to-use while providing powerful lab sample tracking and workflow features.\n" +
-            "Based on the available documentation, here are some key details:\n" +
-            "Core Functionality: It offers powerful lab sample tracking and workflow capabilities.\n" +
-            "Availability: It is a Premium Feature available with all Premium Editions of LabKey Server.\n" +
-            "Integration: It can be used within a project and integrates with LabKey Studies and other resources. For example, when used with Panorama, it simplifies associating sample metadata with results data (such as targeted mass spectrometry data).\n" +
-            "For more detailed information, you can view the Sample Manager documentation or the guide on Using Sample Manager with LabKey Server.";
+    static final String chatBaselineString = """
+            LabKey Sample Manager is a sample management application designed to be easy-to-use while providing powerful lab sample tracking and workflow features.
+            Based on the available documentation, here are some key details:
+            Core Functionality: It offers powerful lab sample tracking and workflow capabilities.
+            Availability: It is a Premium Feature available with all Premium Editions of LabKey Server.
+            Integration: It can be used within a project and integrates with LabKey Studies and other resources. For example, when used with Panorama, it simplifies associating sample metadata with results data (such as targeted mass spectrometry data).
+            For more detailed information, you can view the Sample Manager documentation or the guide on Using Sample Manager with LabKey Server.""";
 
     Criteria<String, float[]> _criteria = null;
     // Loading the model is expensive. Could / should pool it.
@@ -95,7 +96,7 @@ public class TestChatTest extends BaseWebDriverTest
     @Override
     public List<String> getAssociatedModules()
     {
-        return Arrays.asList("experiment", "issues");
+        return Arrays.asList("experiment");
     }
     @Override
     protected String getProjectName()
@@ -188,7 +189,7 @@ public class TestChatTest extends BaseWebDriverTest
         StringBuilder sbLog = new StringBuilder();
         sbLog.append(printHeader());
 
-        log("Test the chat app.");
+        log("Test the chat page.");
 
         TestChatPage testChatPage = TestChatPage.beginAt(this);
         testChatPage.enterPrompt(AGENT_PROMPT);
@@ -290,7 +291,7 @@ public class TestChatTest extends BaseWebDriverTest
             normB += vectorB[i] * vectorB[i];
         }
 
-        // Project against a divide by zero.
+        // Protect against a divide by zero.
         double magnitude = (Math.sqrt(normA) * Math.sqrt(normB));
         if (magnitude == 0.0)
         {
@@ -298,7 +299,7 @@ public class TestChatTest extends BaseWebDriverTest
         }
 
         // Cosine Similarity Formula.
-        // Measures the cosine of the angle between two vectors (the text responses converted into numbers).
+        // Measures the cosine of the angle between two vectors.
         // dot(A, B) / (||A|| * ||B||)
         // Dot Product of A & B divided by the magnitude, Euclidean Norms (lengths) of the vectors multiplied together.
         // Range from -1 to 1. 1.0 means identical, 0.0 unrelated, negative is opposite.
@@ -353,7 +354,7 @@ public class TestChatTest extends BaseWebDriverTest
         }
 
         float[] baseLineVector = calculateAverageVector(vectors);
-        log("Baseline Vector: " + baseLineVector);
+        log("Baseline Vector: " + Arrays.toString(baseLineVector));
     }
 
     private float[] calculateAverageVector(List<float[]> vectors) {
