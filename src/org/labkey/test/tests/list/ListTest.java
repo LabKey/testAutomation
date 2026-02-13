@@ -1692,6 +1692,7 @@ public class ListTest extends BaseWebDriverTest
     @Test
     public void testMultiChoiceValues()
     {
+        Assume.assumeTrue("Multi-choice text fields are only supported on PostgreSQL", WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.PostgreSQL);
         // setup a list with an auto-increment key and multi text choice field
         String encodedListName = "multiChoiceList";
         String keyName = "'><script>alert(\":(\")</script>'";
