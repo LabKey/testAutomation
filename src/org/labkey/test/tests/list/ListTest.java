@@ -1694,9 +1694,9 @@ public class ListTest extends BaseWebDriverTest
     {
         Assume.assumeTrue("Multi-choice text fields are only supported on PostgreSQL", WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.PostgreSQL);
         // setup a list with an auto-increment key and multi text choice field
-        String encodedListName = "multiChoiceList";
-        String keyName = "'><script>alert(\":(\")</script>'";
-        String columnName = "MultiChoiceField";
+        String encodedListName = TestDataGenerator.randomDomainName("multiChoiceList", DomainUtils.DomainKind.IntList);
+        String keyName = TestDataGenerator.randomFieldName("'><script>alert(\":(\")</script>'");
+        String columnName = TestDataGenerator.randomFieldName("MultiChoiceField");
         List<String> tcValues = List.of("~`!@#$%^&*()_+=[]{}\\|';:\"<>?,./", "1", "2");
         _listHelper.createList(PROJECT_VERIFY, encodedListName, keyName, col(columnName, ColumnType.TextChoice)
                 .setMultiChoiceValues(tcValues));
@@ -1711,7 +1711,7 @@ public class ListTest extends BaseWebDriverTest
         selectOptionByText(loc, valuesToChoose);
 
         clickButton("Submit");
-        checker().verifyEquals("Multi choice value not as expected", valuesToChoose, table.getDataAsText(0, columnName));
+        checker().withScreenshot().verifyEquals("Multi choice value not as expected", valuesToChoose, table.getDataAsText(0, columnName));
 
         table.clickEditRow(0);
         valuesToChoose = tcValues.subList(1, 3).stream()
@@ -1721,7 +1721,7 @@ public class ListTest extends BaseWebDriverTest
         clickButton("Submit");
 
         // verify the multi choice value is persisted
-        checker().verifyEquals("Multi choice value not as expected", valuesToChoose, table.getDataAsText(0, columnName));
+        checker().withScreenshot().verifyEquals("Multi choice value not as expected", valuesToChoose, table.getDataAsText(0, columnName));
 
         _listHelper.deleteList();
     }
