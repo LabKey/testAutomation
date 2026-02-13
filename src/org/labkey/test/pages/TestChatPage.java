@@ -58,7 +58,6 @@ public class TestChatPage extends LabKeyPage<TestChatPage.ElementCache>
 
         _numOfResponses = Locator.tagWithClass("div", "genaiResponse")
                 .findElements(getDriver()).size();
-        log("enterPrompt: Num of responses: " + _numOfResponses);
 
         elementCache().chatPrompt.click();
 
@@ -72,8 +71,6 @@ public class TestChatPage extends LabKeyPage<TestChatPage.ElementCache>
                 .perform();
 
         sleep(500);
-
-        log("enterPrompt: Num of responses: " + _numOfResponses);
 
     }
 
