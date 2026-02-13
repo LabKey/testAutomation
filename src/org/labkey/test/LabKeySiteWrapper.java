@@ -1721,23 +1721,29 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
     public String getConversionErrorMessage(Object value, String fieldName, Class<?> targetClass)
     {
-        return getConversionErrorMessage(value, fieldName, targetClass, true);
+        return getConversionErrorMessage(value, fieldName, targetClass, true, false);
     }
 
     // Note: Keep in sync with ConvertHelper.getStandardConversionErrorMessage()
     // Example: "Could not convert value '2.34' (Double) for Boolean field 'Medical History.Dep Diagnosed in Last 18 Months'"
-    public String getConversionErrorMessage(Object value, String fieldName, Class<?> targetClass, boolean useUSDateParsing)
+    public String getConversionErrorMessage(Object value, String fieldName, Class<?> targetClass, boolean useUSDateParsing, boolean withoutSingleQuotes)
     {
+        String errorMessage;
         String fieldType = targetClass.getSimpleName();
+        String quote = withoutSingleQuotes ? "" : "'";
 
         // Issue 50768: Need a better error message if date value is not in the expected format.
         if (fieldType.equalsIgnoreCase("date") || fieldType.equalsIgnoreCase("datetime") || fieldType.equalsIgnoreCase("timestamp"))
         {
             String parsingMode = useUSDateParsing ? "U.S. date parsing (MDY)" : "Non-U.S. date parsing (DMY)";
-            return "'" + value + "' is not a valid " + fieldType + " for " + fieldName + " using " + parsingMode;
+            errorMessage = quote + value + quote + " is not a valid " + fieldType + " for " + quote + fieldName + quote + " using " + parsingMode;
+        }
+        else
+        {
+            errorMessage = "Could not convert value " + quote + value + quote + " (" + value.getClass().getSimpleName() + ") for " + fieldType + " field " + quote + fieldName + quote;
         }
 
-        return "Could not convert value '" + value + "' (" + value.getClass().getSimpleName() + ") for " + fieldType + " field '" + fieldName + "'" ;
+        return errorMessage;
     }
 
     private ProductKey getProductConfiguration() throws IOException, CommandException

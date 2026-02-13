@@ -33,6 +33,8 @@ import org.labkey.test.util.ExcelHelper;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1022,8 +1024,6 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
 
         log("Validate adding entries in bulk will give a meaningful error with a bad format.");
 
-        String expectedDateErrorMsgFormat = "'%s' is not a valid %s for %s using U.S. date parsing (MDY)";
-        String expectedTimeErrorMsgFormat = "Could not convert value '%s' (String) for %s field '%s'";
         String badDate = "45/93/2001";
         String nonLeapDay = "2/29/2023";
         String badTime = "26:abc:604";
@@ -1037,7 +1037,7 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
 
         checker().withScreenshot()
                 .verifyEquals("Error message for a bad date value not as expected.",
-                        String.format(expectedDateErrorMsgFormat, badDate, "Date", dateCol), actualErrorMsg);
+                        getConversionErrorMessage(badDate, dateCol, Date.class), actualErrorMsg);
 
         // Not a leap year.
         bulkImportText = String.format("%s\t\n%s", dateCol, nonLeapDay);
@@ -1046,7 +1046,7 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
 
         checker().withScreenshot()
                 .verifyEquals("Error message for invalid leap day not as expected.",
-                        String.format(expectedDateErrorMsgFormat, nonLeapDay, "Date", dateCol), actualErrorMsg);
+                        getConversionErrorMessage(nonLeapDay, dateCol, Date.class), actualErrorMsg);
 
         bulkImportText = String.format("%s\t\n%s", timeCol, badTime);
         importPage.setText(bulkImportText);
@@ -1054,7 +1054,7 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
 
         checker().withScreenshot()
                 .verifyEquals("Error message for a bad time value not as expected.",
-                        String.format(expectedTimeErrorMsgFormat, badTime, "Time", timeCol), actualErrorMsg);
+                        getConversionErrorMessage(badTime, timeCol, Time.class), actualErrorMsg);
 
         bulkImportText = String.format("%s\t\n%s", dateTimeCol, badDateTime);
         importPage.setText(bulkImportText);
@@ -1062,7 +1062,7 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
 
         checker().withScreenshot()
                 .verifyEquals("Error message for a bad DateTime value not as expected.",
-                        String.format(expectedDateErrorMsgFormat, badDateTime, "Timestamp", dateTimeCol), actualErrorMsg);
+                        getConversionErrorMessage(badDateTime, dateTimeCol, Timestamp.class), actualErrorMsg);
 
         File excelDateTimeFile = TestFileUtils.getSampleData("lists/Bad_Date_And_Time_Values.xlsx");
         importPage = importPage.selectUpload();
@@ -1071,9 +1071,9 @@ public class ListDateAndTimeTest extends BaseWebDriverTest
 
         checker().withScreenshot()
                 .verifyTrue("Error message for bad file import not as expected.",
-                        actualErrorMsg.contains(String.format(expectedTimeErrorMsgFormat, badTime, "Time", timeCol)) &&
-                                actualErrorMsg.contains(String.format(expectedDateErrorMsgFormat, nonLeapDay, "Date", dateCol)) &&
-                                actualErrorMsg.contains(String.format(expectedDateErrorMsgFormat, badDateTime, "Timestamp", dateTimeCol))
+                        actualErrorMsg.contains(getConversionErrorMessage(badTime, timeCol, Time.class)) &&
+                                actualErrorMsg.contains(getConversionErrorMessage(nonLeapDay, dateCol, Date.class)) &&
+                                actualErrorMsg.contains(getConversionErrorMessage(badDateTime, dateTimeCol, Timestamp.class))
                 );
 
         _listHelper.beginAtList(getProjectName(), listName);
