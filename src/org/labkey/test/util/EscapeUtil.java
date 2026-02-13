@@ -266,6 +266,11 @@ public class EscapeUtil
         return getFormFieldName(columnName, FORM_FIELD_PREFIX);
     }
 
+    public static String getFormFieldName(String columnName, boolean multiValue)
+    {
+        return getFormFieldName(columnName, (multiValue ? "[]" : "") + FORM_FIELD_PREFIX);
+    }
+
     /**
      * Escapes special characters in a column name to be used as a form field name.
      * See associated {@link org.labkey.api.query.QueryUpdateForm#getFormFieldName}
