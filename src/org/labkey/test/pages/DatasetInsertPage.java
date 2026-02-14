@@ -82,7 +82,7 @@ public class DatasetInsertPage extends InsertPage
     {
         for (Map.Entry<String, String> entry : values.entrySet())
         {
-            WebElement fieldInput = Locator.nameContaining(EscapeUtil.getFormFieldName(entry.getKey())).findElement(getDriver());
+            WebElement fieldInput =  Locator.tag("*").attributeEndsWith("name", EscapeUtil.getFormFieldName(entry.getKey())).findElement(getDriver());
             String type = fieldInput.getAttribute("type");
             switch (type)
             {

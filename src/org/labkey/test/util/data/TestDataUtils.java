@@ -24,6 +24,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -574,6 +575,20 @@ public class TestDataUtils
             CSVParser parser = CSVParser.builder().setFormat(format).setReader(in).get();
             List<CSVRecord> records = parser.getRecords();
             return records.stream().map(CSVRecord::toList).toList();
+        }
+    }
+
+    public static List<String> parseMultiValueText(String multiValueString) throws IOException
+    {
+        CSVFormat format = CSVFormat.RFC4180.builder()
+                .setIgnoreSurroundingSpaces(true).get();
+        try (CSVParser parser = format.parse(new StringReader(multiValueString)))
+        {
+            List<CSVRecord> records = parser.getRecords();
+            List<List<String>> list = records.stream().map(CSVRecord::toList).toList();
+            if (list.size() != 1)
+                throw new IllegalArgumentException("Invalid multi-value text string: " + multiValueString);
+            return list.getFirst();
         }
     }
 

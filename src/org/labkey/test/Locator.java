@@ -606,11 +606,6 @@ public abstract class Locator extends By
         return tag("*").withAttribute("name", name);
     }
 
-    public static XPathLocator nameContaining(String name)
-    {
-        return tag("*").withAttributeContaining("name", name);
-    }
-
     public static CssLocator css(String selector)
     {
         return new CssLocator(selector);

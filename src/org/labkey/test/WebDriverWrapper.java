@@ -4059,13 +4059,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public void selectOptionByText(WebElement selectElement, String value)
     {
-        if(Boolean.parseBoolean(selectElement.getAttribute("multiple"))) {
-            List<WebElement> elems = selectElement.findElements(Locator.tag("option"));
-            elems.forEach(element->{
-                if(value.contains(element.getAttribute("value")) ^ element.isSelected()) element.click();
-            });
-            return;
-        }
         Select select = new Select(selectElement);
         select.selectByVisibleText(value);
     }

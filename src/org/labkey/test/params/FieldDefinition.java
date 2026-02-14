@@ -477,8 +477,8 @@ public class FieldDefinition extends PropertyDescriptor
 
     public FieldDefinition setMultiChoiceValues(List<String> values)
     {
-        Assert.assertEquals("Invalid field type for text choice values.", ColumnType.TextChoice, getType());
-        setValidators(List.of(new FieldDefinition.TextChoiceValidator(values).setMultipleSelections()));
+        Assert.assertEquals("Invalid field type for text choice values.", ColumnType.MultiValueTextChoice, getType());
+        setValidators(List.of(new FieldDefinition.MultiValueTextChoiceValidator(values)));
         return this;
     }
 
@@ -618,6 +618,7 @@ public class FieldDefinition extends PropertyDescriptor
         ColumnType Sample = new ColumnTypeImpl("Sample", "int", "http://www.labkey.org/exp/xml#sample", new IntLookup( "exp", "Materials"));
         ColumnType Barcode = new ColumnTypeImpl("Unique ID", "string", "http://www.labkey.org/types#storageUniqueId", null);
         ColumnType TextChoice = new ColumnTypeImpl("Text Choice", "string", "http://www.labkey.org/types#textChoice", null);
+        ColumnType MultiValueTextChoice = new ColumnTypeImpl("Text Choice", "string", "http://cpas.fhcrc.org/exp/xml#multiChoice", null);
         ColumnType SMILES = new ColumnTypeImpl("SMILES", "string", "http://www.labkey.org/exp/xml#smiles", null);
         ColumnType Calculation = new ColumnTypeImpl("Calculation", null, "http://www.labkey.org/exp/xml#calculated", null);
         /**
@@ -1119,8 +1120,6 @@ public class FieldDefinition extends PropertyDescriptor
     {
         private final List<String> _values;
 
-        private Boolean multipleSelections = false;
-
         public TextChoiceValidator(List<String> values)
         {
             // The TextChoice validator only has a name and no description or message.
@@ -1152,15 +1151,47 @@ public class FieldDefinition extends PropertyDescriptor
             return _values;
         }
 
-        public TextChoiceValidator setMultipleSelections()
+    }
+
+    /**
+     * TextChoice is implemented using a validator, however it is more 'limited' in scope. The user does not name a TextChoice
+     * validator or add a description or error message. A TextChoice is a lot like a look-up field, but it is not linked
+     * to an external data source. The user only provides the list of (string) values that the field will display in the dropdown.
+     * Another difference is that there can only be one TextChoice on a field, whereas you can have multiple validators on a field.
+     */
+    public static class MultiValueTextChoiceValidator extends FieldValidator<MultiValueTextChoiceValidator>
+    {
+        private final List<String> _values;
+
+        public MultiValueTextChoiceValidator(List<String> values)
         {
-            this.multipleSelections = true;
+            // The TextChoice validator only has a name and no description or message.
+            // And the name is generated (not user defined).
+            super("Text Choice Validator", "", "");
+            _values = Collections.unmodifiableList(values);
+        }
+
+        @Override
+        protected MultiValueTextChoiceValidator getThis()
+        {
             return this;
         }
 
-        public Boolean getMultipleSelections()
+        @Override
+        protected String getType()
         {
-            return this.multipleSelections;
+            return "TextChoice";
+        }
+
+        @Override
+        protected String getExpression()
+        {
+            return EscapeUtil.getTextChoiceValidatorExpression(_values);
+        }
+
+        public List<String> getValues()
+        {
+            return _values;
         }
 
     }

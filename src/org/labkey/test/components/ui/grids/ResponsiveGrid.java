@@ -244,7 +244,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverCompon
     private GridFilterModal initFilterColumn(CharSequence columnIdentifier, Filter.Operator operator, Object value)
     {
         List<Filter.Operator> listOperators = List.of(IN, CONTAINS_ALL, CONTAINS_ANY, CONTAINS_EXACTLY, CONTAINS_NONE,
-                DOES_NOT_CONTAIN_EXACTLY, IS_EMPTY, IS_NOT_EMPTY);
+                DOES_NOT_CONTAIN_EXACTLY);
         clickColumnMenuItem(columnIdentifier, "Filter...", false);
         GridFilterModal filterModal = new GridFilterModal(getDriver(), this);
         if (operator != null)
@@ -260,8 +260,14 @@ public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverCompon
                     filterPanel.selectFilter(operator);
                 }
             }
+            else if (value == null)
+            {
+                filterModal.selectFacetTab().selectFilter(operator);
+            }
             else
+            {
                 filterModal.selectExpressionTab().setFilter(new FilterExpressionPanel.Expression(operator, value));
+            }
         }
         return filterModal;
     }

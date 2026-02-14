@@ -18,6 +18,7 @@ package org.labkey.test.tests.list;
 
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.MatcherAssert;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -84,7 +85,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -1698,30 +1698,28 @@ public class ListTest extends BaseWebDriverTest
         String keyName = TestDataGenerator.randomFieldName("'><script>alert(\":(\")</script>'");
         String columnName = TestDataGenerator.randomFieldName("MultiChoiceField");
         List<String> tcValues = List.of("~`!@#$%^&*()_+=[]{}\\|';:\"<>?,./", "1", "2");
-        _listHelper.createList(PROJECT_VERIFY, encodedListName, keyName, col(columnName, ColumnType.TextChoice)
+        _listHelper.createList(PROJECT_VERIFY, encodedListName, keyName, col(columnName, ColumnType.MultiValueTextChoice)
                 .setMultiChoiceValues(tcValues));
         _listHelper.goToList(encodedListName);
 
         DataRegionTable table = new DataRegionTable("query", getDriver());
-        table.clickInsertNewRow();
-        String valuesToChoose = tcValues.subList(1, 3).stream()
-                .sorted()
-                .collect(Collectors.joining(" "));
-        Locator loc = Locator.nameContaining(EscapeUtil.getFormFieldName(columnName));
-        selectOptionByText(loc, valuesToChoose);
+        UpdateQueryRowPage insertNewRow = table.clickInsertNewRow();
+        List<String> valuesToChoose = tcValues.subList(1, 3);
+        valuesToChoose.forEach(value->{
+            insertNewRow.setField(columnName, value);
+        });
+        insertNewRow.submit();
+        checker().withScreenshot().verifyEquals("Multi choice value not as expected", String.join(" ", valuesToChoose), table.getDataAsText(0, columnName));
 
-        clickButton("Submit");
-        checker().withScreenshot().verifyEquals("Multi choice value not as expected", valuesToChoose, table.getDataAsText(0, columnName));
-
-        table.clickEditRow(0);
-        valuesToChoose = tcValues.subList(1, 3).stream()
-                .sorted()
-                .collect(Collectors.joining(" "));
-        selectOptionByText(loc, valuesToChoose);
-        clickButton("Submit");
+        UpdateQueryRowPage editRow = table.clickEditRow(0);
+        valuesToChoose = tcValues.subList(1, 3);
+        valuesToChoose.forEach(value->{
+            editRow.setField(columnName, value);
+        });
+        editRow.submit();
 
         // verify the multi choice value is persisted
-        checker().withScreenshot().verifyEquals("Multi choice value not as expected", valuesToChoose, table.getDataAsText(0, columnName));
+        checker().withScreenshot().verifyEquals("Multi choice value not as expected", String.join(" ", valuesToChoose), table.getDataAsText(0, columnName));
 
         _listHelper.deleteList();
     }
