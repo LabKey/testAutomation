@@ -13,11 +13,13 @@ import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.OptionSelect;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.util.EscapeUtil;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class UpdateQueryRowPage extends LabKeyPage<UpdateQueryRowPage.ElementCache>
@@ -87,6 +89,10 @@ public class UpdateQueryRowPage extends LabKeyPage<UpdateQueryRowPage.ElementCac
             {
                 setField(entry.getKey(), f);
             }
+            else if (value instanceof List l)
+            {
+                setField(entry.getKey(), l);
+            }
             else
             {
                 throw new IllegalArgumentException("Unsupported value type for '" + entry.getKey() + "': " + value.getClass().getName());
@@ -105,6 +111,19 @@ public class UpdateQueryRowPage extends LabKeyPage<UpdateQueryRowPage.ElementCac
         {
             setFormElement(field, value);
         }
+        return this;
+    }
+
+    public UpdateQueryRowPage setField(String fieldName, List<String> values)
+    {
+        WebElement field = elementCache().findField(fieldName, true);
+        List<WebElement> options = field.findElements(By.tagName("option"));
+       //unselect all options that selected but shouldn't be selected
+        options.forEach(option ->
+        {
+            if (!values.contains(option.getText()) && option.getAttribute("selected") != null) option.click();
+        });
+        values.forEach(value -> selectOptionByText(field, value));
         return this;
     }
 

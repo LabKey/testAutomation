@@ -85,6 +85,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -1705,21 +1706,22 @@ public class ListTest extends BaseWebDriverTest
         DataRegionTable table = new DataRegionTable("query", getDriver());
         UpdateQueryRowPage insertNewRow = table.clickInsertNewRow();
         List<String> valuesToChoose = tcValues.subList(1, 3);
-        valuesToChoose.forEach(value->{
-            insertNewRow.setField(columnName, value);
-        });
+        insertNewRow.setField(columnName, valuesToChoose);
         insertNewRow.submit();
-        checker().withScreenshot().verifyEquals("Multi choice value not as expected", String.join(" ", valuesToChoose), table.getDataAsText(0, columnName));
+        String expectedList = valuesToChoose.stream()
+                .sorted()
+                .collect(Collectors.joining(" "));
+        checker().withScreenshot().verifyEquals("Multi choice value not as expected", expectedList, table.getDataAsText(0, columnName));
 
         UpdateQueryRowPage editRow = table.clickEditRow(0);
         valuesToChoose = tcValues.subList(1, 3);
-        valuesToChoose.forEach(value->{
-            editRow.setField(columnName, value);
-        });
+        editRow.setField(columnName, valuesToChoose);
         editRow.submit();
-
+        expectedList = valuesToChoose.stream()
+                .sorted()
+                .collect(Collectors.joining(" "));
         // verify the multi choice value is persisted
-        checker().withScreenshot().verifyEquals("Multi choice value not as expected", String.join(" ", valuesToChoose), table.getDataAsText(0, columnName));
+        checker().withScreenshot().verifyEquals("Multi choice value not as expected", expectedList, table.getDataAsText(0, columnName));
 
         _listHelper.deleteList();
     }
