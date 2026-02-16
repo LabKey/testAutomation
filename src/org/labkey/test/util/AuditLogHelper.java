@@ -94,6 +94,7 @@ public class AuditLogHelper
         ATTACHMENT_AUDIT_EVENT("AttachmentAuditEvent"),
         EXPERIMENT_AUDIT_EVENT("ExperimentAuditEvent"),
         FILE_SYSTEM_EVENT("FileSystem"),
+        GRID_VIEW_AUDIT_EVENT("GridViewAuditEvent"),
         INVENTORY_AUDIT_EVENT("InventoryAuditEvent"),
         LIST_AUDIT_EVENT("ListAuditEvent"),
         PLATE_AUDIT_EVENT("PlateEvent"), // available in Biologics module
