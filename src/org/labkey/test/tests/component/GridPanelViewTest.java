@@ -226,24 +226,38 @@ public class GridPanelViewTest extends GridPanelBaseTest
 
         log("Verify audit event for shared default view save.");
         // if the current default view is a private view, 2 events will be generated, one for the creation of the new shared default view, and one for deletion of the existing view.
-        // If the current default view is already a shared view, then only 1 event will be generated for the update of the default view.
+        // If the current default view is already a shared view, then only 1 event will be generated for the update of the default view. If no current view, a view will be created.
         List<Map<String, Object>> defaultViewAuditRows = getGridViewAuditEvents(defaultViewBaselineRowId);
         checker().verifyTrue("Expected at least 1 audit event for shared default view save.",
                 !defaultViewAuditRows.isEmpty());
 
         if (!defaultViewAuditRows.isEmpty())
         {
-            Map<String, Object> defaultViewEvent = defaultViewAuditRows.get(0);
+            if (defaultViewAuditRows.size() > 1)
+            {
+                Map<String, Object> deletedPrivateViewEvent = defaultViewAuditRows.get(0);
 
-            checker().verifyTrue("Comment should contain 'created' or 'updated' for default view.",
-                    String.valueOf(defaultViewEvent.get("Comment")).contains("created") ||
-                            String.valueOf(defaultViewEvent.get("Comment")).contains("updated"));
+                checker().verifyTrue("Comment should contain 'deleted' for private default view that's deleted.",
+                        String.valueOf(deletedPrivateViewEvent.get("Comment")).contains("deleted"));
 
-            checker().verifyTrue("ViewName should be null or empty for a default view.",
-                    defaultViewEvent.get("ViewName") == null || String.valueOf(defaultViewEvent.get("ViewName")).isEmpty());
+                checker().verifyEquals("ViewName should be 'Default'.", "Default", deletedPrivateViewEvent.get("ViewName"));
 
-            checker().verifyTrue("CustomViewOwner should be null for a shared view.",
-                    defaultViewEvent.get("CustomViewOwner") == null);
+                checker().verifyFalse("CustomViewOwner for the deleted private view should not be null.",
+                        deletedPrivateViewEvent.get("CustomViewOwner") == null);
+            }
+            else
+            {
+                Map<String, Object> defaultViewEvent = defaultViewAuditRows.get(0);
+
+                checker().verifyTrue("Comment should contain 'created' or 'updated' for default view.",
+                        String.valueOf(defaultViewEvent.get("Comment")).contains("created") || String.valueOf(defaultViewEvent.get("Comment")).contains("updated"));
+
+                checker().verifyEquals("ViewName should be 'Default'.", "Default", defaultViewEvent.get("ViewName"));
+
+                checker().verifyTrue("CustomViewOwner should be null for a shared view.",
+                        defaultViewEvent.get("CustomViewOwner") == null);
+            }
+
         }
 
         checker().screenShotIfNewError("Audit_Shared_Default_View_Error");
@@ -313,8 +327,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
                     String.valueOf(personalDefaultEvent.get("Comment")).contains("created") ||
                             String.valueOf(personalDefaultEvent.get("Comment")).contains("updated"));
 
-            checker().verifyTrue("ViewName should be null or empty for a default view.",
-                    personalDefaultEvent.get("ViewName") == null || String.valueOf(personalDefaultEvent.get("ViewName")).isEmpty());
+            checker().verifyEquals("ViewName should be 'Default'.", "Default", personalDefaultEvent.get("ViewName"));
 
             checker().verifyTrue("CustomViewOwner should not be null for a personal view.",
                     personalDefaultEvent.get("CustomViewOwner") != null);
