@@ -478,7 +478,7 @@ public class FieldDefinition extends PropertyDescriptor
     public FieldDefinition setMultiChoiceValues(List<String> values)
     {
         Assert.assertEquals("Invalid field type for text choice values.", ColumnType.MultiValueTextChoice, getType());
-        setValidators(List.of(new FieldDefinition.MultiValueTextChoiceValidator(values)));
+        setValidators(List.of(new FieldDefinition.TextChoiceValidator(values)));
         return this;
     }
 
@@ -1152,50 +1152,6 @@ public class FieldDefinition extends PropertyDescriptor
         }
 
     }
-
-    /**
-     * TextChoice is implemented using a validator, however it is more 'limited' in scope. The user does not name a TextChoice
-     * validator or add a description or error message. A TextChoice is a lot like a look-up field, but it is not linked
-     * to an external data source. The user only provides the list of (string) values that the field will display in the dropdown.
-     * Another difference is that there can only be one TextChoice on a field, whereas you can have multiple validators on a field.
-     */
-    public static class MultiValueTextChoiceValidator extends FieldValidator<MultiValueTextChoiceValidator>
-    {
-        private final List<String> _values;
-
-        public MultiValueTextChoiceValidator(List<String> values)
-        {
-            // The TextChoice validator only has a name and no description or message.
-            // And the name is generated (not user defined).
-            super("Text Choice Validator", "", "");
-            _values = Collections.unmodifiableList(values);
-        }
-
-        @Override
-        protected MultiValueTextChoiceValidator getThis()
-        {
-            return this;
-        }
-
-        @Override
-        protected String getType()
-        {
-            return "TextChoice";
-        }
-
-        @Override
-        protected String getExpression()
-        {
-            return EscapeUtil.getTextChoiceValidatorExpression(_values);
-        }
-
-        public List<String> getValues()
-        {
-            return _values;
-        }
-
-    }
-
 }
 
 class ColumnTypeImpl implements FieldDefinition.ColumnType

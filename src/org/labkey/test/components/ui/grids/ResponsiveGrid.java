@@ -46,6 +46,8 @@ import static org.labkey.remoteapi.query.Filter.Operator.ARRAY_CONTAINS_ANY;
 import static org.labkey.remoteapi.query.Filter.Operator.ARRAY_CONTAINS_EXACT;
 import static org.labkey.remoteapi.query.Filter.Operator.ARRAY_CONTAINS_NONE;
 import static org.labkey.remoteapi.query.Filter.Operator.ARRAY_CONTAINS_NOT_EXACT;
+import static org.labkey.remoteapi.query.Filter.Operator.ARRAY_ISEMPTY;
+import static org.labkey.remoteapi.query.Filter.Operator.ARRAY_ISNOTEMPTY;
 import static org.labkey.remoteapi.query.Filter.Operator.IN;
 import static org.labkey.test.WebDriverWrapper.waitFor;
 
@@ -242,25 +244,24 @@ public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverCompon
     private GridFilterModal initFilterColumn(CharSequence columnIdentifier, Filter.Operator operator, Object value)
     {
         List<Filter.Operator> listOperators = List.of(IN, ARRAY_CONTAINS_ALL, ARRAY_CONTAINS_ANY, ARRAY_CONTAINS_EXACT, ARRAY_CONTAINS_NONE,
-                ARRAY_CONTAINS_NOT_EXACT);
+                ARRAY_CONTAINS_NOT_EXACT, ARRAY_ISEMPTY, ARRAY_ISNOTEMPTY);
         clickColumnMenuItem(columnIdentifier, "Filter...", false);
         GridFilterModal filterModal = new GridFilterModal(getDriver(), this);
         if (operator != null)
         {
-            if (listOperators.contains(operator) && value instanceof List<?>)
+            if (operator.equals(Filter.Operator.IN) && value instanceof List<?> || listOperators.contains(operator))
             {
-                List<String> values = (List<String>) value;
                 FilterFacetedPanel filterPanel = filterModal.selectFacetTab();
-                filterPanel.selectValue(values.get(0));
-                filterPanel.checkValues(values.toArray(String[]::new));
-                if (filterPanel.isFiltersPresented())
+                if (listOperators.contains(operator))
                 {
-                    filterPanel.selectFilter(operator);
+                    filterPanel.selectArrayFilterOperator(operator);
                 }
-            }
-            else if (value == null)
-            {
-                filterModal.selectFacetTab().selectFilter(operator);
+                if (value != null)
+                {
+                    List<String> values = (List<String>) value;
+                    filterPanel.selectValue(values.get(0));
+                    filterPanel.checkValues(values.toArray(String[]::new));
+                }
             }
             else
             {

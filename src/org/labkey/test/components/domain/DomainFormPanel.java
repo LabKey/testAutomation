@@ -238,7 +238,6 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
                     fieldRow.setTextChoiceValues(textChoiceValidator.getValues());
                     fieldRow.setAllowMultipleSelections(fieldDefinition.getType() == FieldDefinition.ColumnType.MultiValueTextChoice);
                 }
-                }
                 else
                 {
                     throw new IllegalArgumentException("Validator not supported: " + validator.getClass().getName());

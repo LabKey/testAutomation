@@ -53,20 +53,12 @@ public class FilterFacetedPanel extends WebDriverComponent<FilterFacetedPanel.El
     }
 
     /**
-     * Check that filter choosing option exists on the page.
-     */
-    public boolean isFiltersPresented()
-    {
-        return waitFor(() -> isVisible(elementCache().filterTypeSelects), 1000);
-    }
-
-    /**
      * Select a filer by clicking its label. Right now this method relevant only for multi-value text choice.
      * @param operator desired filter value
      */
     public void selectArrayFilterOperator(Filter.Operator operator)
     {
-        elementCache().filterTypeSelects.select(operator.getDisplayValue());
+        elementCache().arrayFilterOperatorSelect.select(operator.getDisplayValue());
     }
 
     /**
