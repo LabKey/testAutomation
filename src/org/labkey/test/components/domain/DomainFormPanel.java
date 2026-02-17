@@ -236,17 +236,8 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
                         throw new IllegalArgumentException("TextChoice fields cannot have additional validators.");
                     }
                     fieldRow.setTextChoiceValues(textChoiceValidator.getValues());
-                    fieldRow.setAllowMultipleSelections(false);
+                    fieldRow.setAllowMultipleSelections(fieldDefinition.getType() == FieldDefinition.ColumnType.MultiValueTextChoice);
                 }
-                else if (validator instanceof FieldDefinition.MultiValueTextChoiceValidator multiValueTextChoiceValidator)
-                {
-                    // MultiValueTextChoice is a field type; implemented using a special validator. TextChoice field cannot have other validators.
-                    if (validators.size() > 1)
-                    {
-                        throw new IllegalArgumentException("TextChoice fields cannot have additional validators.");
-                    }
-                    fieldRow.setTextChoiceValues(multiValueTextChoiceValidator.getValues());
-                    fieldRow.setAllowMultipleSelections(true);
                 }
                 else
                 {

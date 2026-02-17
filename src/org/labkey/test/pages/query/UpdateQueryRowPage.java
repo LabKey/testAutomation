@@ -116,14 +116,9 @@ public class UpdateQueryRowPage extends LabKeyPage<UpdateQueryRowPage.ElementCac
 
     public UpdateQueryRowPage setField(String fieldName, List<String> values)
     {
-        WebElement field = elementCache().findField(fieldName, true);
-        List<WebElement> options = field.findElements(By.tagName("option"));
-       //unselect all options that selected but shouldn't be selected
-        options.forEach(option ->
-        {
-            if (!values.contains(option.getText()) && option.getAttribute("selected") != null) option.click();
-        });
-        values.forEach(value -> selectOptionByText(field, value));
+        WebElement field = new Select(elementCache().findField(fieldName, true));
+        field.deselectAll();
+        values.forEach(value -> field.selectByVisibleText(value));
         return this;
     }
 

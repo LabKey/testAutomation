@@ -64,7 +64,7 @@ public class FilterFacetedPanel extends WebDriverComponent<FilterFacetedPanel.El
      * Select a filer by clicking its label. Right now this method relevant only for multi-value text choice.
      * @param operator desired filter value
      */
-    public void selectFilter(Filter.Operator operator)
+    public void selectArrayFilterOperator(Filter.Operator operator)
     {
         elementCache().filterTypeSelects.select(operator.getDisplayValue());
     }
@@ -144,7 +144,7 @@ public class FilterFacetedPanel extends WebDriverComponent<FilterFacetedPanel.El
     {
         protected final Input filterInput =
                 Input(Locator.id("filter-faceted__typeahead-input"), getDriver()).findWhenNeeded(this);
-        protected final ReactSelect filterTypeSelects =
+        protected final ReactSelect arrayFilterOperatorSelect =
                 new ReactSelect.ReactSelectFinder(getDriver()).index(0).findWhenNeeded(this);
         protected final WebElement checkboxSection =
                 Locator.byClass("labkey-wizard-pills").index(0).refindWhenNeeded(this);
