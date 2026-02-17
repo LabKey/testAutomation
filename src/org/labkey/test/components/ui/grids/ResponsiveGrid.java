@@ -41,14 +41,12 @@ import java.util.stream.Collectors;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.labkey.remoteapi.query.Filter.Operator.CONTAINS_ALL;
-import static org.labkey.remoteapi.query.Filter.Operator.CONTAINS_ANY;
-import static org.labkey.remoteapi.query.Filter.Operator.CONTAINS_EXACTLY;
-import static org.labkey.remoteapi.query.Filter.Operator.CONTAINS_NONE;
-import static org.labkey.remoteapi.query.Filter.Operator.DOES_NOT_CONTAIN_EXACTLY;
+import static org.labkey.remoteapi.query.Filter.Operator.ARRAY_CONTAINS_ALL;
+import static org.labkey.remoteapi.query.Filter.Operator.ARRAY_CONTAINS_ANY;
+import static org.labkey.remoteapi.query.Filter.Operator.ARRAY_CONTAINS_EXACT;
+import static org.labkey.remoteapi.query.Filter.Operator.ARRAY_CONTAINS_NONE;
+import static org.labkey.remoteapi.query.Filter.Operator.ARRAY_CONTAINS_NOT_EXACT;
 import static org.labkey.remoteapi.query.Filter.Operator.IN;
-import static org.labkey.remoteapi.query.Filter.Operator.IS_EMPTY;
-import static org.labkey.remoteapi.query.Filter.Operator.IS_NOT_EMPTY;
 import static org.labkey.test.WebDriverWrapper.waitFor;
 
 public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverComponent<ResponsiveGrid<T>.ElementCache> implements UpdatingComponent
@@ -243,8 +241,8 @@ public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverCompon
 
     private GridFilterModal initFilterColumn(CharSequence columnIdentifier, Filter.Operator operator, Object value)
     {
-        List<Filter.Operator> listOperators = List.of(IN, CONTAINS_ALL, CONTAINS_ANY, CONTAINS_EXACTLY, CONTAINS_NONE,
-                DOES_NOT_CONTAIN_EXACTLY);
+        List<Filter.Operator> listOperators = List.of(IN, ARRAY_CONTAINS_ALL, ARRAY_CONTAINS_ANY, ARRAY_CONTAINS_EXACT, ARRAY_CONTAINS_NONE,
+                ARRAY_CONTAINS_NOT_EXACT);
         clickColumnMenuItem(columnIdentifier, "Filter...", false);
         GridFilterModal filterModal = new GridFilterModal(getDriver(), this);
         if (operator != null)
