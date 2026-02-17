@@ -55,7 +55,7 @@ public class UpdateQueryRowPage extends LabKeyPage<UpdateQueryRowPage.ElementCac
     public static UpdateQueryRowPage beginAtInsertRowPage(WebDriverWrapper webDriverWrapper, String containerPath, String schemaName, String queryName)
     {
         webDriverWrapper.beginAt(WebTestHelper.buildURL("query", containerPath, "insertQueryRow",
-            Map.of("schemaName", schemaName, "query.queryName", queryName)));
+                Map.of("schemaName", schemaName, "query.queryName", queryName)));
         return new UpdateQueryRowPage(webDriverWrapper.getDriver());
     }
 
@@ -117,7 +117,7 @@ public class UpdateQueryRowPage extends LabKeyPage<UpdateQueryRowPage.ElementCac
 
     public UpdateQueryRowPage setField(String fieldName, List<String> values)
     {
-        Select field = SelectWrapper.Select(Locator.name(EscapeUtil.getFormFieldName(fieldName, true))).find(new ElementCache());
+        Select field = elementCache().getMultiChoiceSelect(fieldName);
         field.deselectAll();
         values.forEach(field::selectByVisibleText);
         return this;
@@ -148,12 +148,6 @@ public class UpdateQueryRowPage extends LabKeyPage<UpdateQueryRowPage.ElementCac
     public UpdateQueryRowPage setField(String fieldName, OptionSelect.SelectOption option)
     {
         new OptionSelect<>(elementCache().findField(fieldName)).selectOption(option);
-        return this;
-    }
-
-    public UpdateQueryRowPage setMultiValueField(String fieldName, OptionSelect.SelectOption option)
-    {
-        new OptionSelect<>(elementCache().findField(fieldName, true)).selectOption(option);
         return this;
     }
 
@@ -218,5 +212,11 @@ public class UpdateQueryRowPage extends LabKeyPage<UpdateQueryRowPage.ElementCac
         }
 
         final WebElement submitButton = Locator.lkButton("Submit").findWhenNeeded(this);
+
+        Select getMultiChoiceSelect(String name)
+        {
+            return SelectWrapper.Select(Locator.name(EscapeUtil.getFormFieldName(name, true)))
+                    .find(getDriver());
+        }
     }
 }
