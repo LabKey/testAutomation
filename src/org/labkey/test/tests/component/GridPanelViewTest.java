@@ -225,6 +225,8 @@ public class GridPanelViewTest extends GridPanelBaseTest
         cv.saveCustomView("", true);
 
         log("Verify audit event for shared default view save.");
+        // if the current default view is a private view, 2 events will be generated, one for the creation of the new shared default view, and one for deletion of the existing view.
+        // If the current default view is already a shared view, then only 1 event will be generated for the update of the default view.
         List<Map<String, Object>> defaultViewAuditRows = getGridViewAuditEvents(defaultViewBaselineRowId);
         checker().verifyTrue("Expected at least 1 audit event for shared default view save.",
                 !defaultViewAuditRows.isEmpty());
