@@ -5,7 +5,12 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.query.ContainerFilter;
 import org.labkey.remoteapi.query.Filter;
+import org.labkey.remoteapi.query.SelectRowsCommand;
+import org.labkey.remoteapi.query.SelectRowsResponse;
+import org.labkey.remoteapi.query.Sort;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.categories.Daily;
@@ -22,8 +27,10 @@ import org.labkey.test.components.ui.search.FilterFacetedPanel;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldKey;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.APIUserHelper;
 import org.labkey.test.util.ApiPermissionsHelper;
+import org.labkey.test.util.AuditLogHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PermissionsHelper;
 import org.labkey.test.util.SampleTypeHelper;
@@ -76,6 +83,8 @@ public class GridPanelViewTest extends GridPanelBaseTest
     private static final List<String> stringSetMembers = Arrays.asList("A", "B", "C");
     private static List<String> stringSets = new ArrayList<>();
 
+    private static final String AUDIT_TEST_VIEW = "Audit_Test_View";
+
     private static final String EDITED_ALERT = "EDITED";
     private static final String UPDATED_ALERT = "UPDATED";
 
@@ -84,6 +93,8 @@ public class GridPanelViewTest extends GridPanelBaseTest
 
     // Using the core-components.view adds 'GridPanel - ' to the panel header. Need to take that into account .
     private static final String PANEL_VIEW_NAME_PREFIX = "GridPanel - %s";
+
+    private final AuditLogHelper _auditLogHelper = new AuditLogHelper(this);
 
     // Tests that need to be written:
     // Validate "Save As..." from the grid save button.
@@ -179,7 +190,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
      * @param sampleTypeName Name of the sample type with the default view to change.
      * @param columns The columns to show in the default view. Will be added in the order of the list.
      */
-    private void resetDefaultView(String sampleTypeName, List<String> columns)
+    private void resetDefaultView(String sampleTypeName, List<String> columns) throws Exception
     {
         log(String.format("Set the default view for '%s' to have these columns: '%s'", sampleTypeName, columns));
 
@@ -207,8 +218,49 @@ public class GridPanelViewTest extends GridPanelBaseTest
             cv.addColumn(columnName);
         }
 
+        log("Get baseline audit row ID before saving the shared default view.");
+        Integer defaultViewBaselineRowId = _auditLogHelper.getLatestAuditRowId("GridViewAuditEvent");
+
         // Save as default view for everyone.
         cv.saveCustomView("", true);
+
+        log("Verify audit event for shared default view save.");
+        // if the current default view is a private view, 2 events will be generated, one for the creation of the new shared default view, and one for deletion of the existing view.
+        // If the current default view is already a shared view, then only 1 event will be generated for the update of the default view. If no current view, a view will be created.
+        List<Map<String, Object>> defaultViewAuditRows = getGridViewAuditEvents(defaultViewBaselineRowId);
+        checker().verifyTrue("Expected at least 1 audit event for shared default view save.",
+                !defaultViewAuditRows.isEmpty());
+
+        if (!defaultViewAuditRows.isEmpty())
+        {
+            if (defaultViewAuditRows.size() > 1)
+            {
+                Map<String, Object> deletedPrivateViewEvent = defaultViewAuditRows.get(0);
+
+                checker().verifyTrue("Comment should contain 'deleted' for private default view that's deleted.",
+                        String.valueOf(deletedPrivateViewEvent.get("Comment")).contains("deleted"));
+
+                checker().verifyEquals("ViewName should be 'Default'.", "Default", deletedPrivateViewEvent.get("ViewName"));
+
+                checker().verifyFalse("CustomViewOwner for the deleted private view should not be null.",
+                        deletedPrivateViewEvent.get("CustomViewOwner") == null);
+            }
+            else
+            {
+                Map<String, Object> defaultViewEvent = defaultViewAuditRows.get(0);
+
+                checker().verifyTrue("Comment should contain 'created' or 'updated' for default view.",
+                        String.valueOf(defaultViewEvent.get("Comment")).contains("created") || String.valueOf(defaultViewEvent.get("Comment")).contains("updated"));
+
+                checker().verifyEquals("ViewName should be 'Default'.", "Default", defaultViewEvent.get("ViewName"));
+
+                checker().verifyTrue("CustomViewOwner should be null for a shared view.",
+                        defaultViewEvent.get("CustomViewOwner") == null);
+            }
+
+        }
+
+        checker().screenShotIfNewError("Audit_Shared_Default_View_Error");
 
         // In the default view none of the columns will be filtered or sorted.
         defaultColumnState = new HashMap<>();
@@ -234,7 +286,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
      * </p>
      */
     @Test
-    public void testMyDefaultView()
+    public void testMyDefaultView() throws Exception
     {
         String screenShotID = "testMyDefaultView";
 
@@ -256,8 +308,32 @@ public class GridPanelViewTest extends GridPanelBaseTest
         CustomizeView cv = drtSamples.openCustomizeGrid();
         cv.removeColumn(columnToRemove);
 
+        log("Get baseline audit row ID before saving personal default view.");
+        Integer personalDefaultBaselineRowId = _auditLogHelper.getLatestAuditRowId("GridViewAuditEvent");
+
         log("Do not share this default view with everyone.");
         cv.saveCustomView("", false);
+
+        log("Verify audit event for personal default view save.");
+        List<Map<String, Object>> personalDefaultAuditRows = getGridViewAuditEvents(personalDefaultBaselineRowId);
+        checker().verifyTrue("Expected at least 1 audit event for personal default view save.",
+                !personalDefaultAuditRows.isEmpty());
+
+        if (!personalDefaultAuditRows.isEmpty())
+        {
+            Map<String, Object> personalDefaultEvent = personalDefaultAuditRows.get(0);
+
+            checker().verifyTrue("Comment should contain 'created' or 'updated' for personal default view.",
+                    String.valueOf(personalDefaultEvent.get("Comment")).contains("created") ||
+                            String.valueOf(personalDefaultEvent.get("Comment")).contains("updated"));
+
+            checker().verifyEquals("ViewName should be 'Default'.", "Default", personalDefaultEvent.get("ViewName"));
+
+            checker().verifyTrue("CustomViewOwner should not be null for a personal view.",
+                    personalDefaultEvent.get("CustomViewOwner") != null);
+        }
+
+        checker().screenShotIfNewError("Audit_Personal_Default_View_Error");
 
         QueryGrid grid = beginAtQueryGrid(DEFAULT_VIEW_SAMPLE_TYPE);
 
@@ -307,7 +383,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
      * </p>
      */
     @Test
-    public void testRemoveColumnForView()
+    public void testRemoveColumnForView() throws Exception
     {
 
         final String screenShotPrefix = "testRemoveColumnForView";
@@ -390,7 +466,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
      * @see GridPanelViewTest#testColumnHeaderAndFilterPill(String, String)
      */
     @Test
-    public void testColumnHeaderAndFilterPillDefaultView()
+    public void testColumnHeaderAndFilterPillDefaultView() throws Exception
     {
         testColumnHeaderAndFilterPill("testColumnHeaderAndFilterPillDefaultView", "");
     }
@@ -400,7 +476,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
      * @see GridPanelViewTest#testColumnHeaderAndFilterPill(String, String)
      */
     @Test
-    public void testColumnHeaderAndFilterPillCustomView()
+    public void testColumnHeaderAndFilterPillCustomView() throws Exception
     {
         testColumnHeaderAndFilterPill("testColumnHeaderAndFilterPillCustomView", "Test_Columns_And_Pills_View");
     }
@@ -423,7 +499,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
      * @param testName The name of the test, used for the screenshot prefix.
      * @param viewName What to name the saved view. If empty string will be default view.
      */
-    public void testColumnHeaderAndFilterPill(String testName, String viewName)
+    public void testColumnHeaderAndFilterPill(String testName, String viewName) throws Exception
     {
 
         resetDefaultView(DEFAULT_VIEW_SAMPLE_TYPE, DEFAULT_COLUMNS);
@@ -549,7 +625,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
      * @see GridPanelViewTest#testEditView(String, String)
      */
     @Test
-    public void testEditCustomView()
+    public void testEditCustomView() throws Exception
     {
         testEditView("testEditCustomView", "Edit_Filter_Custom_View");
     }
@@ -559,7 +635,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
      * @see GridPanelViewTest#testEditView(String, String)
      */
     @Test
-    public void testEditDefaultView()
+    public void testEditDefaultView() throws Exception
     {
         testEditView("testEditDefaultView", "");
     }
@@ -583,7 +659,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
      * @param testName The name of the test, used for the screenshot prefix.
      * @param viewName What to name the saved view. If empty string will be default view.
      */
-    private void testEditView(String testName, String viewName)
+    private void testEditView(String testName, String viewName) throws Exception
     {
 
         resetDefaultView(DEFAULT_VIEW_SAMPLE_TYPE, DEFAULT_COLUMNS);
@@ -807,7 +883,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
      * </p>
      */
     @Test
-    public void testSaveViewTrickyName()
+    public void testSaveViewTrickyName() throws Exception
     {
 
         resetDefaultView(DEFAULT_VIEW_SAMPLE_TYPE, DEFAULT_COLUMNS);
@@ -861,7 +937,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
      * </p>
      */
     @Test
-    public void testFieldInsertionOrder()
+    public void testFieldInsertionOrder() throws Exception
     {
         goToProjectHome();
 
@@ -946,7 +1022,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
      * </p>
      */
     @Test
-    public void testShowAllLabelEditAndUndo()
+    public void testShowAllLabelEditAndUndo() throws Exception
     {
         goToProjectHome();
 
@@ -1059,7 +1135,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
      * </p>
      */
     @Test
-    public void testManageViews()
+    public void testManageViews() throws Exception
     {
         goToProjectHome();
 
@@ -1233,7 +1309,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
     }
 
     @Test
-    public void testRemoveAllFields()
+    public void testRemoveAllFields() throws Exception
     {
 
         goToProjectHome();
@@ -1267,7 +1343,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
 
     // Issue 52661 Saved grid view with an invalid date filter can't be edited or deleted
     @Test
-    public void testWarningOnInvalidDateFilter()
+    public void testWarningOnInvalidDateFilter() throws Exception
     {
         String viewName = "broken view";
         goToProjectHome();
@@ -1482,6 +1558,232 @@ public class GridPanelViewTest extends GridPanelBaseTest
         }
 
         return checker().errorsSinceMark() == 0;
+    }
+
+    /**
+     * <p>
+     *     Verify that audit events are logged when grid views are created, updated, and deleted.
+     * </p>
+     * <p>
+     *     This test will:
+     *     <ul>
+     *         <li>Create a named view and verify a "Grid view created" audit event is logged with correct fields.</li>
+     *         <li>Update the view and verify a "Grid view updated" audit event is logged with old and new data maps.</li>
+     *         <li>Delete the view and verify a "Grid view deleted" audit event is logged.</li>
+     *     </ul>
+     * </p>
+     */
+    @Test
+    public void testGridViewAuditEvents() throws Exception
+    {
+        goToProjectHome();
+
+        resetDefaultView(VIEW_DIALOG_ST, DEFAULT_COLUMNS);
+
+        // Part A: Verify audit event on Create
+
+        log("Get baseline audit row ID before creating a view.");
+        Integer baselineRowId = _auditLogHelper.getLatestAuditRowId("GridViewAuditEvent");
+
+        QueryGrid grid = beginAtQueryGrid(VIEW_DIALOG_ST);
+
+        log(String.format("Hide column '%s' and save as named view '%s'.", COL_INT, AUDIT_TEST_VIEW));
+        grid.hideColumn(COL_INT);
+        SaveViewDialog saveViewDialog = grid.clickSaveButton(true);
+        saveViewDialog.setViewName(AUDIT_TEST_VIEW)
+                .setMakeShared(false)
+                .saveView();
+
+        log("Query the GridViewAuditEvent audit log for the create event.");
+        List<Map<String, Object>> auditRows = getGridViewAuditEvents(baselineRowId);
+
+        checker().verifyEquals("Expected exactly 1 audit event for view creation.", 1, auditRows.size());
+
+        if (!auditRows.isEmpty())
+        {
+            Map<String, Object> createEvent = auditRows.get(0);
+
+            checker().verifyTrue("Comment should contain 'Grid view created: " + AUDIT_TEST_VIEW + "'.",
+                    String.valueOf(createEvent.get("Comment")).contains("Grid view created: " + AUDIT_TEST_VIEW));
+
+            checker().verifyEquals("ViewName should match.", AUDIT_TEST_VIEW, createEvent.get("ViewName"));
+
+            checker().verifyEquals("SchemaName should be 'samples'.", "samples", createEvent.get("SchemaName"));
+
+            checker().verifyEquals("QueryName should match the sample type name.", VIEW_DIALOG_ST, createEvent.get("QueryName"));
+
+            checker().verifyTrue("CustomViewOwner should not be null for a personal view.",
+                    createEvent.get("CustomViewOwner") != null);
+
+            checker().verifyEquals("Inheritable should be false.", false, createEvent.get("Inheritable"));
+
+            checker().verifyTrue("NewRecordMap should not be null/empty for a create event.",
+                    createEvent.get("NewRecordMap") != null && !String.valueOf(createEvent.get("NewRecordMap")).isEmpty());
+
+            checker().verifyTrue("OldRecordMap should be null or empty for a create event.",
+                    createEvent.get("OldRecordMap") == null || String.valueOf(createEvent.get("OldRecordMap")).isEmpty());
+        }
+
+        checker().screenShotIfNewError("Audit_Create_Event_Error");
+
+        // Part B: Verify audit event on Update (set sort direction on COL_STRING1 to be DESC)
+
+        log("Get new baseline row ID before updating the view with a sort change.");
+        Integer sortUpdateBaselineRowId = _auditLogHelper.getLatestAuditRowId("GridViewAuditEvent");
+
+        log(String.format("Update the view '%s' by sorting '%s' descending.", AUDIT_TEST_VIEW, COL_STRING1));
+        grid.sortColumn(COL_STRING1, SortDirection.DESC);
+        grid.saveView().saveView();
+
+        // Allow time for the save to complete.
+        sleep(1_000);
+
+        log("Query the GridViewAuditEvent audit log for the sort update event.");
+        auditRows = getGridViewAuditEvents(sortUpdateBaselineRowId);
+
+        checker().verifyEquals("Expected exactly 1 audit event for view sort update.", 1, auditRows.size());
+
+        if (!auditRows.isEmpty())
+        {
+            Map<String, Object> sortUpdateEvent = auditRows.get(0);
+
+            checker().verifyTrue("Comment should contain 'Grid view updated: " + AUDIT_TEST_VIEW + "'.",
+                    String.valueOf(sortUpdateEvent.get("Comment")).contains("Grid view updated: " + AUDIT_TEST_VIEW));
+
+            checker().verifyEquals("ViewName should match.", AUDIT_TEST_VIEW, sortUpdateEvent.get("ViewName"));
+
+            checker().verifyEquals("SchemaName should be 'samples'.", "samples", sortUpdateEvent.get("SchemaName"));
+
+            checker().verifyEquals("QueryName should match the sample type name.", VIEW_DIALOG_ST, sortUpdateEvent.get("QueryName"));
+
+            checker().verifyTrue("OldRecordMap should not be null/empty for an update event.",
+                    sortUpdateEvent.get("OldRecordMap") != null && !String.valueOf(sortUpdateEvent.get("OldRecordMap")).isEmpty());
+
+            checker().verifyTrue("NewRecordMap should not be null/empty for an update event.",
+                    sortUpdateEvent.get("NewRecordMap") != null && !String.valueOf(sortUpdateEvent.get("NewRecordMap")).isEmpty());
+
+            checker().verifyFalse("NewRecordMap should differ from OldRecordMap after changing sort direction.",
+                    String.valueOf(sortUpdateEvent.get("NewRecordMap")).equals(String.valueOf(sortUpdateEvent.get("OldRecordMap"))));
+
+            checker().verifyTrue("CustomViewOwner should not be null for a personal view.",
+                    sortUpdateEvent.get("CustomViewOwner") != null);
+        }
+
+        checker().screenShotIfNewError("Audit_Sort_Update_Event_Error");
+
+        // Part C: Verify audit event on Update (make shared, add sort on COL_STRING2)
+
+        log("Get new baseline row ID before updating the view.");
+        Integer updateBaselineRowId = _auditLogHelper.getLatestAuditRowId("GridViewAuditEvent");
+
+        log(String.format("Update the view '%s' by adding a sort on '%s' and making it shared.", AUDIT_TEST_VIEW, COL_STRING1));
+        grid.sortColumn(COL_STRING2, SortDirection.ASC);
+        SaveViewDialog updateSaveDialog = grid.saveView();
+        updateSaveDialog.setMakeShared(true);
+        updateSaveDialog.saveView();
+
+        // Allow time for the save to complete.
+        sleep(1_000);
+
+        log("Query the GridViewAuditEvent audit log for the update event. RowId > " + updateBaselineRowId);
+        auditRows = getGridViewAuditEvents(updateBaselineRowId);
+
+        checker().verifyEquals("Expected 2 audit events for view update and changed to shared.", 2, auditRows.size());
+
+        if (auditRows.size() == 2)
+        {
+            // A shared view is created from the private view
+            Map<String, Object> createEvent = auditRows.get(1);
+
+            checker().verifyTrue("Comment should contain 'Grid view created: " + AUDIT_TEST_VIEW + "'.",
+                    String.valueOf(createEvent.get("Comment")).contains("Grid view created: " + AUDIT_TEST_VIEW));
+
+            checker().verifyEquals("ViewName should match.", AUDIT_TEST_VIEW, createEvent.get("ViewName"));
+
+            checker().verifyEquals("SchemaName should be 'samples'.", "samples", createEvent.get("SchemaName"));
+
+            checker().verifyEquals("QueryName should match the sample type name.", VIEW_DIALOG_ST, createEvent.get("QueryName"));
+
+            checker().verifyTrue("OldRecordMap should be empty for new private view created from Shared view.",
+                    createEvent.get("OldRecordMap") == null || String.valueOf(createEvent.get("OldRecordMap")).isEmpty());
+
+            checker().verifyTrue("NewRecordMap should not be null/empty for an update event.",
+                    createEvent.get("NewRecordMap") != null && !String.valueOf(createEvent.get("NewRecordMap")).isEmpty());
+
+            checker().verifyTrue("CustomViewOwner should be null when creating new shared view from existing private view.",
+                    createEvent.get("CustomViewOwner") == null);
+
+            // the old private view is deleted
+            Map<String, Object> deleteEvent = auditRows.get(0);
+
+            log(String.valueOf(deleteEvent.get("Comment")));
+            checker().verifyTrue("Comment should contain 'Grid view deleted: " + AUDIT_TEST_VIEW + "'.",
+                    String.valueOf(deleteEvent.get("Comment")).contains("Grid view deleted: " + AUDIT_TEST_VIEW));
+
+            checker().verifyEquals("ViewName should match.", AUDIT_TEST_VIEW, deleteEvent.get("ViewName"));
+
+            checker().verifyTrue("OldRecordMap should not be null/empty for a delete event.",
+                    deleteEvent.get("OldRecordMap") != null && !String.valueOf(deleteEvent.get("OldRecordMap")).isEmpty());
+
+            checker().verifyTrue("NewRecordMap should be null or empty for a delete event.",
+                    deleteEvent.get("NewRecordMap") == null || String.valueOf(deleteEvent.get("NewRecordMap")).isEmpty());
+        }
+
+        checker().screenShotIfNewError("Audit_Update_Event_Error");
+
+        // Part D: Verify audit event on Delete
+
+        log("Get new baseline row ID before deleting the view.");
+        Integer deleteBaselineRowId = _auditLogHelper.getLatestAuditRowId("GridViewAuditEvent");
+
+        log(String.format("Delete the view '%s' via the Manage Views dialog.", AUDIT_TEST_VIEW));
+        grid.manageViews()
+                .deleteView(AUDIT_TEST_VIEW + " (shared)")  // The view name in the manage views dialog for a shared view is the view name with " (shared)" appended to it.
+                .confirmDelete()
+                .dismiss();
+
+        log("Query the GridViewAuditEvent audit log for the delete event.");
+        auditRows = getGridViewAuditEvents(deleteBaselineRowId);
+
+        checker().verifyEquals("Expected exactly 1 audit event for view deletion.", 1, auditRows.size());
+
+        if (!auditRows.isEmpty())
+        {
+            Map<String, Object> deleteEvent = auditRows.get(0);
+
+            checker().verifyTrue("Comment should contain 'Grid view deleted: " + AUDIT_TEST_VIEW + "'.",
+                    String.valueOf(deleteEvent.get("Comment")).contains("Grid view deleted: " + AUDIT_TEST_VIEW));
+
+            checker().verifyEquals("ViewName should match.", AUDIT_TEST_VIEW, deleteEvent.get("ViewName"));
+
+            checker().verifyTrue("OldRecordMap should not be null/empty for a delete event.",
+                    deleteEvent.get("OldRecordMap") != null && !String.valueOf(deleteEvent.get("OldRecordMap")).isEmpty());
+
+            checker().verifyTrue("NewRecordMap should be null or empty for a delete event.",
+                    deleteEvent.get("NewRecordMap") == null || String.valueOf(deleteEvent.get("NewRecordMap")).isEmpty());
+        }
+
+        checker().screenShotIfNewError("Audit_Delete_Event_Error");
+    }
+
+    /**
+     * Helper to query GridViewAuditEvent rows created after the given row ID.
+     *
+     * @param afterRowId Only return rows with RowId greater than this value.
+     * @return List of audit event rows, sorted by RowId descending.
+     */
+    private List<Map<String, Object>> getGridViewAuditEvents(Integer afterRowId) throws IOException, CommandException
+    {
+        Connection cn = WebTestHelper.getRemoteApiConnection();
+        SelectRowsCommand cmd = new SelectRowsCommand("auditLog", "GridViewAuditEvent");
+        cmd.setColumns(List.of("RowId", "Comment", "ViewName", "SchemaName", "QueryName",
+                "CustomViewOwner", "Inheritable", "OldRecordMap", "NewRecordMap"));
+        cmd.addFilter("RowId", afterRowId, Filter.Operator.GT);
+        cmd.setSorts(List.of(new Sort("RowId", Sort.Direction.DESCENDING)));
+        cmd.setContainerFilter(ContainerFilter.CurrentAndSubfolders);
+
+        SelectRowsResponse response = cmd.execute(cn, getProjectName());
+        return response.getRows();
     }
 
 }
