@@ -4,19 +4,16 @@ import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.apache.commons.lang3.tuple.Pair;
 import org.assertj.core.api.Assertions;
-import org.labkey.api.util.SelectBuilder;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.components.Component;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.OptionSelect;
 import org.labkey.test.components.html.SelectWrapper;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.util.EscapeUtil;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
@@ -218,10 +215,6 @@ public class UpdateQueryRowPage extends LabKeyPage<UpdateQueryRowPage.ElementCac
         WebElement findField(String name)
         {
             return findField(name, false);
-        }
-
-        Select findSelect(String name) {
-            return SelectWrapper.Select(Locator.name(EscapeUtil.getFormFieldName(name, true))).find(this);
         }
 
         final WebElement submitButton = Locator.lkButton("Submit").findWhenNeeded(this);
