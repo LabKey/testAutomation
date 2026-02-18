@@ -1210,24 +1210,21 @@ public abstract class WebDriverWrapper implements WrapsDriver
                 logMessage = "Navigating to " + relativeURL;
             }
 
-            if (WebTestHelper.isUseContainerRelativeUrl())
+            try
             {
-                try
+                if (new Crawler.ControllerActionId(relativeURL).isControllerFirstUrl() && !_controllerFirstUrls.contains(url))
                 {
-                    if (new Crawler.ControllerActionId(relativeURL).isControllerFirstUrl() && !_controllerFirstUrls.contains(url))
-                    {
-                        _controllerFirstUrls.add(url);
-                        RuntimeException ex = new RuntimeException("Controller-first url used: " + relativeURL);
-                        if (TestProperties.isControllerFirstUrlFatal())
-                            throw ex;
-                        else
-                            TestLogger.log().warn(ex.getMessage(), ex);
-                    }
+                    _controllerFirstUrls.add(url);
+                    RuntimeException ex = new RuntimeException("Controller-first url used: " + relativeURL);
+                    if (TestProperties.isControllerFirstUrlFatal())
+                        throw ex;
+                    else
+                        TestLogger.log().warn(ex.getMessage(), ex);
                 }
-                catch (IllegalArgumentException e)
-                {
-                    TestLogger.warn("Unable to parse URL: " + relativeURL, e);
-                }
+            }
+            catch (IllegalArgumentException e)
+            {
+                TestLogger.warn("Unable to parse URL: " + relativeURL, e);
             }
 
             final String fullURL = WebTestHelper.getBaseURL() + relativeURL;
