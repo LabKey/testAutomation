@@ -511,9 +511,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
             // If this is a list assume that it will need a lookup.
             List<String> values = (List) value;
 
-            ReactSelect lookupSelect = elementCache().lookupSelect(gridCell);
-
-            lookupSelect.clearSelection();
+            ReactSelect lookupSelect = findAndClearLookup(gridCell);
 
             lookupSelect.open();
 
@@ -589,6 +587,12 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
             }
         }
         return gridCell;
+    }
+
+    private ReactSelect findAndClearLookup(WebElement gridCell)
+    {
+        elementCache().lookupSelect(gridCell).clearSelection();
+        return elementCache().lookupSelect(gridCell);
     }
 
     public void setEntityData(List<Map<String, Object> >data, List<FieldDefinition> fields)
