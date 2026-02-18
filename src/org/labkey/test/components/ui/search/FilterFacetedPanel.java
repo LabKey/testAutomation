@@ -1,6 +1,7 @@
 package org.labkey.test.components.ui.search;
 
 import org.apache.commons.lang3.StringUtils;
+import org.labkey.remoteapi.query.Filter;
 import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
@@ -8,7 +9,6 @@ import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.react.ReactSelect;
 import org.labkey.test.components.ui.FilterStatusValue;
-import org.labkey.remoteapi.query.Filter;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -16,9 +16,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.labkey.test.WebDriverWrapper.waitFor;
 import static org.labkey.test.components.html.Input.Input;
-import static org.labkey.test.util.samplemanagement.SMTestUtils.isVisible;
 
 public class FilterFacetedPanel extends WebDriverComponent<FilterFacetedPanel.ElementCache>
 {

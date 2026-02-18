@@ -48,7 +48,6 @@ import static org.labkey.remoteapi.query.Filter.Operator.ARRAY_CONTAINS_NONE;
 import static org.labkey.remoteapi.query.Filter.Operator.ARRAY_CONTAINS_NOT_EXACT;
 import static org.labkey.remoteapi.query.Filter.Operator.ARRAY_ISEMPTY;
 import static org.labkey.remoteapi.query.Filter.Operator.ARRAY_ISNOTEMPTY;
-import static org.labkey.remoteapi.query.Filter.Operator.IN;
 import static org.labkey.test.WebDriverWrapper.waitFor;
 
 public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverComponent<ResponsiveGrid<T>.ElementCache> implements UpdatingComponent
@@ -250,10 +249,10 @@ private static final List<Filter.Operator> ARRAY_OPERATORS = List.of(ARRAY_CONTA
         GridFilterModal filterModal = new GridFilterModal(getDriver(), this);
         if (operator != null)
         {
-            if (operator.equals(Filter.Operator.IN) && value instanceof List<?> || listOperators.contains(operator))
+            if (operator.equals(Filter.Operator.IN) && value instanceof List<?> || ARRAY_OPERATORS.contains(operator))
             {
                 FilterFacetedPanel filterPanel = filterModal.selectFacetTab();
-                if (listOperators.contains(operator))
+                if (ARRAY_OPERATORS.contains(operator))
                 {
                     filterPanel.selectArrayFilterOperator(operator);
                 }
