@@ -236,7 +236,10 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
                         throw new IllegalArgumentException("TextChoice fields cannot have additional validators.");
                     }
                     fieldRow.setTextChoiceValues(textChoiceValidator.getValues());
-                    fieldRow.setAllowMultipleSelections(fieldDefinition.getType() == FieldDefinition.ColumnType.MultiValueTextChoice);
+                    if(fieldDefinition.getType() == FieldDefinition.ColumnType.MultiValueTextChoice)
+                    {
+                        fieldRow.setAllowMultipleSelections(true);
+                    }
                 }
                 else
                 {
