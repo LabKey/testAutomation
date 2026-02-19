@@ -982,6 +982,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
     public void dragFill(WebElement startCell, WebElement endCell)
     {
+        dismissPopover();
         Locator.XPathLocator selectionHandleLoc = Locator.byClass("cell-selection-handle");
         WebElement selectionHandle = selectionHandleLoc.findElement(startCell);
         dragToCell(selectionHandle, endCell);
