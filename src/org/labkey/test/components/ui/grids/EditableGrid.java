@@ -429,6 +429,12 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         setCellValue(getRowIndex(columnToSearch, valueToSearch), columnToSet, valueToSet);
     }
 
+    public void overwriteCellValue(CharSequence columnToSearch, String valueToSearch, CharSequence columnToSet, Object valueToSet)
+    {
+        clearCellValue(getRowIndex(columnToSearch, valueToSearch), columnToSet);
+        setCellValue(getRowIndex(columnToSearch, valueToSearch), columnToSet, valueToSet);
+    }
+
     /**
      * <p>
      * For the identified row set the value in the identified column.
@@ -511,7 +517,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
             // If this is a list assume that it will need a lookup.
             List<String> values = (List) value;
 
-            ReactSelect lookupSelect = findAndClearLookup(gridCell);
+            ReactSelect lookupSelect = elementCache().lookupSelect(gridCell);
 
             lookupSelect.open();
 
@@ -587,12 +593,6 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
             }
         }
         return gridCell;
-    }
-
-    private ReactSelect findAndClearLookup(WebElement gridCell)
-    {
-        elementCache().lookupSelect(gridCell).clearSelection();
-        return elementCache().lookupSelect(gridCell);
     }
 
     public void setEntityData(List<Map<String, Object> >data, List<FieldDefinition> fields)
