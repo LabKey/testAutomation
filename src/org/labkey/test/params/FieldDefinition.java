@@ -606,7 +606,6 @@ public class FieldDefinition extends PropertyDescriptor
             }
         };
         ColumnType File = new ColumnTypeImpl("File", "http://cpas.fhcrc.org/exp/xml#fileLink");
-        ColumnType Flag = new ColumnTypeImpl("Flag", "string", "http://www.labkey.org/exp/xml#flag", null);
         ColumnType Attachment = new ColumnTypeImpl("Attachment", "http://www.labkey.org/exp/xml#attachment");
         ColumnType User = new ColumnTypeImpl("User", "int", null, new IntLookup("core", "users"));
         @Deprecated(since = "22.10") // 'Lookup' isn't a type outside of the UI
