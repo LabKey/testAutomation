@@ -125,6 +125,19 @@ public class EntityBulkUpdateDialog extends ModalDialog
     }
 
     /**
+     * Clear the field (fieldIdentifier).
+     *
+     * @param fieldIdentifier Identifier for the field; name ({@link String}) or fieldKey ({@link FieldKey})
+     * @return this component
+     */
+    public EntityBulkUpdateDialog clearSelection(CharSequence fieldIdentifier)
+    {
+        FilteringReactSelect reactSelect = enableSelectionField(fieldIdentifier);
+        reactSelect.clearSelection();
+        return this;
+    }
+
+    /**
      * @param fieldIdentifier Identifier for the field; name ({@link String}) or fieldKey ({@link FieldKey})
      * @param selectValue value to select
      * @return this component

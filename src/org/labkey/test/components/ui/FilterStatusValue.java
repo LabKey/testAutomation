@@ -50,9 +50,10 @@ public class FilterStatusValue extends WebDriverComponent<FilterStatusValue.Elem
     {
         String originalText = getText();
         getWrapper().mouseOver(getComponentElement());
-        getWrapper().mouseOver(elementCache().icon);
-        WebDriverWrapper.waitFor(()-> isActive() && isClose(),
-                "The filter status item with text ["+getText()+"] did not become active.", 500);
+        if(elementCache().popover.isDisplayed())
+        {
+            getWrapper().mouseOut();
+        }
         elementCache().icon.click();
 
         // If the item you're dismissing is not the rightmost, it won't become stale; instead, its text will
@@ -94,6 +95,8 @@ public class FilterStatusValue extends WebDriverComponent<FilterStatusValue.Elem
         public final WebElement textSpan = Locator.tag("span").refindWhenNeeded(getComponentElement());
 
         public final WebElement icon = Locator.tag("i").findWhenNeeded(getComponentElement());
+
+        public final WebElement popover = Locator.tag("div").withClass("lk-popover popover bottom").findWhenNeeded(_driver);
     }
 
 

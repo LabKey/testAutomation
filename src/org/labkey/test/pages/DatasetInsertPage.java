@@ -22,6 +22,7 @@ import org.labkey.test.util.EscapeUtil;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import java.util.List;
 import java.util.Map;
 
 import static org.labkey.test.util.EscapeUtil.FORM_FIELD_PREFIX;
@@ -45,26 +46,26 @@ public class DatasetInsertPage extends InsertPage
         waitForElement(Locator.tag("*").attributeStartsWith("name", FORM_FIELD_PREFIX));
     }
 
-    public void insert(Map<String, String> values)
+    public void insert(Map<String, ?> values)
     {
         tryInsert(values);
 
         assertElementNotPresent(Locators.labkeyError);
     }
 
-    public void insert(Map<String, String> values, boolean b, String s)
+    public void insert(Map<String, ?> values, boolean b, String s)
     {
         tryInsert(values);
 
         assertElementNotPresent(Locators.labkeyError);
     }
 
-    public void insertExpectingError(Map<String, String> values)
+    public void insertExpectingError(Map<String, ?> values)
     {
         insertExpectingError(values, null);
     }
 
-    public void insertExpectingError(Map<String, String> values, String errorMsg)
+    public void insertExpectingError(Map<String, ?> values, String errorMsg)
     {
         tryInsert(values);
 
@@ -78,20 +79,20 @@ public class DatasetInsertPage extends InsertPage
         }
     }
 
-    private void tryInsert(Map<String, String> values)
+    private void tryInsert(Map<String, ?> values)
     {
-        for (Map.Entry<String, String> entry : values.entrySet())
+        for (Map.Entry<String, ?> entry : values.entrySet())
         {
-            WebElement fieldInput = Locator.name(EscapeUtil.getFormFieldName(entry.getKey())).findElement(getDriver());
+            WebElement fieldInput =  Locator.tag("*").attributeEndsWith("name", EscapeUtil.getFormFieldName(entry.getKey())).findElement(getDriver());
             String type = fieldInput.getAttribute("type");
             switch (type)
             {
                 case "text":
                 case "file":
-                    setFormElement(fieldInput, entry.getValue());
+                    setFormElement(fieldInput, entry.getValue().toString());
                     break;
                 case "checkbox":
-                    if (Boolean.valueOf(entry.getValue()))
+                    if (Boolean.valueOf(entry.getValue().toString()))
                         checkCheckbox(fieldInput);
                     else
                         uncheckCheckbox(fieldInput);
@@ -101,10 +102,19 @@ public class DatasetInsertPage extends InsertPage
                     switch (tag)
                     {
                         case "textarea":
-                            setFormElementJS(fieldInput, entry.getValue());
+                            setFormElementJS(fieldInput, entry.getValue().toString());
                             break;
                         case "select":
-                            selectOptionByText(fieldInput, entry.getValue());
+                            if (entry.getValue() instanceof List)
+                            {
+                                List<String> options = (List<String>) entry.getValue();
+                                for (String option : options)
+                                {
+                                    selectOptionByText(fieldInput, option);
+                                }
+                                break;
+                            }
+                            selectOptionByText(fieldInput, entry.getValue().toString());
                             break;
                         default:
                             throw new IllegalArgumentException("Update " + getClass().getSimpleName() + "#insert() to support field: " + entry.getKey() + ", tag = " + tag + ", type = " + type);

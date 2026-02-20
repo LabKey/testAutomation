@@ -17,6 +17,7 @@ import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.components.react.ReactCheckBox;
 import org.labkey.test.components.ui.grids.FieldReferenceManager.FieldReference;
 import org.labkey.test.components.ui.search.FilterExpressionPanel;
+import org.labkey.test.components.ui.search.FilterFacetedPanel;
 import org.labkey.test.params.FieldKey;
 import org.labkey.test.util.selenium.WebElementUtils;
 import org.openqa.selenium.Keys;
@@ -40,6 +41,13 @@ import java.util.stream.Collectors;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
+import static org.labkey.remoteapi.query.Filter.Operator.ARRAY_CONTAINS_ALL;
+import static org.labkey.remoteapi.query.Filter.Operator.ARRAY_CONTAINS_ANY;
+import static org.labkey.remoteapi.query.Filter.Operator.ARRAY_CONTAINS_EXACT;
+import static org.labkey.remoteapi.query.Filter.Operator.ARRAY_CONTAINS_NONE;
+import static org.labkey.remoteapi.query.Filter.Operator.ARRAY_CONTAINS_NOT_EXACT;
+import static org.labkey.remoteapi.query.Filter.Operator.ARRAY_ISEMPTY;
+import static org.labkey.remoteapi.query.Filter.Operator.ARRAY_ISNOTEMPTY;
 import static org.labkey.test.WebDriverWrapper.waitFor;
 
 public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverComponent<ResponsiveGrid<T>.ElementCache> implements UpdatingComponent
@@ -232,20 +240,33 @@ public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverCompon
         return errorMsg;
     }
 
+private static final List<Filter.Operator> ARRAY_OPERATORS = List.of(ARRAY_CONTAINS_ALL, ARRAY_CONTAINS_ANY, ARRAY_CONTAINS_EXACT, ARRAY_CONTAINS_NONE,
+                ARRAY_CONTAINS_NOT_EXACT, ARRAY_ISEMPTY, ARRAY_ISNOTEMPTY);
+                
     private GridFilterModal initFilterColumn(CharSequence columnIdentifier, Filter.Operator operator, Object value)
     {
         clickColumnMenuItem(columnIdentifier, "Filter...", false);
         GridFilterModal filterModal = new GridFilterModal(getDriver(), this);
         if (operator != null)
         {
-            if (operator.equals(Filter.Operator.IN) && value instanceof List<?>)
+            if (operator.equals(Filter.Operator.IN) && value instanceof List<?> || ARRAY_OPERATORS.contains(operator))
             {
-                List<String> values = (List<String>) value;
-                filterModal.selectFacetTab().selectValue(values.get(0));
-                filterModal.selectFacetTab().checkValues(values.toArray(String[]::new));
+                FilterFacetedPanel filterPanel = filterModal.selectFacetTab();
+                if (ARRAY_OPERATORS.contains(operator))
+                {
+                    filterPanel.selectArrayFilterOperator(operator);
+                }
+                if (value != null)
+                {
+                    List<String> values = (List<String>) value;
+                    filterPanel.selectValue(values.get(0));
+                    filterPanel.checkValues(values.toArray(String[]::new));
+                }
             }
             else
+            {
                 filterModal.selectExpressionTab().setFilter(new FilterExpressionPanel.Expression(operator, value));
+            }
         }
         return filterModal;
     }
@@ -385,15 +406,16 @@ public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverCompon
 
     /**
      * Finds the first row with the specified texts in the specified columns, and sets its checkbox
-     * @param partialMap    key-column (fieldKey, name, or label), value-text in that column
-     * @param checked       the desired checkbox state
+     *
+     * @param partialMap key-column (fieldKey, name, or label), value-text in that column
+     * @param checked    the desired checkbox state
      * @return this grid
      */
     public T selectRow(Map<String, String> partialMap, boolean checked)
     {
         GridRow row = getRow(partialMap);
         selectRowAndVerifyCheckedCounts(row, checked);
-        getWrapper().log("Row described by map ["+partialMap+"] selection state set to + ["+row.isSelected()+"]");
+        getWrapper().log("Row described by map [" + partialMap + "] selection state set to + [" + row.isSelected() + "]");
 
         return getThis();
     }
