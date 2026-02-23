@@ -609,7 +609,7 @@ public class Crawler
 
         private void checkControllerRelativeUrl()
         {
-            if (_actionId != null && _actionId.isControllerFirstUrl() && WebTestHelper.isUseContainerRelativeUrl() && !_controllerFirstUrls.contains(_actionId))
+            if (_actionId != null && _actionId.isControllerFirstUrl() && !_controllerFirstUrls.contains(_actionId))
             {
                 _controllerFirstUrls.add(_actionId);
                 RuntimeException ex = new RuntimeException("Found a controller-first URL (%s) on %s".formatted(getUrlText(), getOrigin()));

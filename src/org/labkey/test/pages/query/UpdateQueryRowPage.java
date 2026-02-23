@@ -11,13 +11,16 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.OptionSelect;
+import org.labkey.test.components.html.SelectWrapper;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.util.EscapeUtil;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.Select;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class UpdateQueryRowPage extends LabKeyPage<UpdateQueryRowPage.ElementCache>
@@ -52,7 +55,7 @@ public class UpdateQueryRowPage extends LabKeyPage<UpdateQueryRowPage.ElementCac
     public static UpdateQueryRowPage beginAtInsertRowPage(WebDriverWrapper webDriverWrapper, String containerPath, String schemaName, String queryName)
     {
         webDriverWrapper.beginAt(WebTestHelper.buildURL("query", containerPath, "insertQueryRow",
-            Map.of("schemaName", schemaName, "query.queryName", queryName)));
+                Map.of("schemaName", schemaName, "query.queryName", queryName)));
         return new UpdateQueryRowPage(webDriverWrapper.getDriver());
     }
 
@@ -87,6 +90,10 @@ public class UpdateQueryRowPage extends LabKeyPage<UpdateQueryRowPage.ElementCac
             {
                 setField(entry.getKey(), f);
             }
+            else if (value instanceof List l)
+            {
+                setField(entry.getKey(), l);
+            }
             else
             {
                 throw new IllegalArgumentException("Unsupported value type for '" + entry.getKey() + "': " + value.getClass().getName());
@@ -99,12 +106,20 @@ public class UpdateQueryRowPage extends LabKeyPage<UpdateQueryRowPage.ElementCac
         WebElement field = elementCache().findField(fieldName);
         if (field.getTagName().equals("select"))
         {
-            setField(fieldName, OptionSelect.SelectOption.textOption(value));
+            selectOptionByText(field, value);
         }
         else
         {
             setFormElement(field, value);
         }
+        return this;
+    }
+
+    public UpdateQueryRowPage setField(String fieldName, List<String> values)
+    {
+        Select field = elementCache().getMultiChoiceSelect(fieldName);
+        field.deselectAll();
+        values.forEach(field::selectByVisibleText);
         return this;
     }
 
@@ -133,12 +148,6 @@ public class UpdateQueryRowPage extends LabKeyPage<UpdateQueryRowPage.ElementCac
     public UpdateQueryRowPage setField(String fieldName, OptionSelect.SelectOption option)
     {
         new OptionSelect<>(elementCache().findField(fieldName)).selectOption(option);
-        return this;
-    }
-
-    public UpdateQueryRowPage setMultiValueField(String fieldName, OptionSelect.SelectOption option)
-    {
-        new OptionSelect<>(elementCache().findField(fieldName, true)).selectOption(option);
         return this;
     }
 
@@ -203,5 +212,11 @@ public class UpdateQueryRowPage extends LabKeyPage<UpdateQueryRowPage.ElementCac
         }
 
         final WebElement submitButton = Locator.lkButton("Submit").findWhenNeeded(this);
+
+        Select getMultiChoiceSelect(String name)
+        {
+            return SelectWrapper.Select(Locator.name(EscapeUtil.getFormFieldName(name, true)))
+                    .find(getDriver());
+        }
     }
 }

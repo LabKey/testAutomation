@@ -429,6 +429,12 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         setCellValue(getRowIndex(columnToSearch, valueToSearch), columnToSet, valueToSet);
     }
 
+    public void overwriteCellValue(CharSequence columnToSearch, String valueToSearch, CharSequence columnToSet, Object valueToSet)
+    {
+        clearCellValue(getRowIndex(columnToSearch, valueToSearch), columnToSet);
+        setCellValue(getRowIndex(columnToSearch, valueToSearch), columnToSet, valueToSet);
+    }
+
     /**
      * <p>
      * For the identified row set the value in the identified column.
@@ -507,6 +513,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
         if (value instanceof List)
         {
+
             // If this is a list assume that it will need a lookup.
             List<String> values = (List) value;
 
@@ -975,6 +982,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
     public void dragFill(WebElement startCell, WebElement endCell)
     {
+        dismissPopover();
         Locator.XPathLocator selectionHandleLoc = Locator.byClass("cell-selection-handle");
         WebElement selectionHandle = selectionHandleLoc.findElement(startCell);
         dragToCell(selectionHandle, endCell);

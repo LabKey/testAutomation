@@ -18,6 +18,7 @@ package org.labkey.test.tests.list;
 
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.MatcherAssert;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -84,6 +85,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -1684,6 +1686,42 @@ public class ListTest extends BaseWebDriverTest
         table = new DataRegionTable("query", getDriver());
         checker().verifyEquals("Key value not as expected", "1", table.getDataAsText(0, keyName));
         checker().verifyEquals("Name value not as expected", nameValue, table.getDataAsText(0, "Name"));
+
+        _listHelper.deleteList();
+    }
+
+    @Test
+    public void testMultiChoiceValues()
+    {
+        Assume.assumeTrue("Multi-choice text fields are only supported on PostgreSQL", WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.PostgreSQL);
+        // setup a list with an auto-increment key and multi text choice field
+        String encodedListName = TestDataGenerator.randomDomainName("multiChoiceList", DomainUtils.DomainKind.IntList);
+        String keyName = TestDataGenerator.randomFieldName("'><script>alert(\":(\")</script>'");
+        String columnName = TestDataGenerator.randomFieldName("MultiChoiceField");
+        List<String> tcValues = List.of("~`!@#$%^&*()_+=[]{}\\|';:\"<>?,./", "1", "2");
+        _listHelper.createList(PROJECT_VERIFY, encodedListName, keyName, col(columnName, ColumnType.MultiValueTextChoice)
+                .setMultiChoiceValues(tcValues));
+        _listHelper.goToList(encodedListName);
+
+        DataRegionTable table = new DataRegionTable("query", getDriver());
+        UpdateQueryRowPage insertNewRow = table.clickInsertNewRow();
+        List<String> valuesToChoose = tcValues.subList(1, 3);
+        insertNewRow.setField(columnName, valuesToChoose);
+        insertNewRow.submit();
+        String expectedList = valuesToChoose.stream()
+                .sorted()
+                .collect(Collectors.joining(" "));
+        checker().withScreenshot().verifyEquals("Multi choice value not as expected", expectedList, table.getDataAsText(0, columnName));
+
+        UpdateQueryRowPage editRow = table.clickEditRow(0);
+        valuesToChoose = tcValues.subList(1, 3);
+        editRow.setField(columnName, valuesToChoose);
+        editRow.submit();
+        expectedList = valuesToChoose.stream()
+                .sorted()
+                .collect(Collectors.joining(" "));
+        // verify the multi choice value is persisted
+        checker().withScreenshot().verifyEquals("Multi choice value not as expected", expectedList, table.getDataAsText(0, columnName));
 
         _listHelper.deleteList();
     }

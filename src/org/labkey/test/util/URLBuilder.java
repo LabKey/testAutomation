@@ -151,12 +151,6 @@ public class URLBuilder
     {
         StringBuilder url = new StringBuilder();
 
-        if (!WebTestHelper.isUseContainerRelativeUrl())
-        {
-            url.append("/");
-            url.append(_controller);
-        }
-
         if (_containerPath != null) // null is root container; nothing to append.
         {
             url.append("/");
@@ -167,11 +161,8 @@ public class URLBuilder
         }
 
         url.append("/");
-        if (WebTestHelper.isUseContainerRelativeUrl())
-        {
-            url.append(_controller);
-            url.append("-");
-        }
+        url.append(_controller);
+        url.append("-");
         url.append(_action);
         if (!_action.contains("."))
             url.append(".view");

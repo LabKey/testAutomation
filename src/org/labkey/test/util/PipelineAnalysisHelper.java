@@ -17,6 +17,7 @@ package org.labkey.test.util;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.labkey.api.util.XmlBeansUtil;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
@@ -27,7 +28,6 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
@@ -78,7 +78,7 @@ public class PipelineAnalysisHelper
         for (String file : files)
         {
             String directory = file.substring(0, file.lastIndexOf("/") + 1);
-            String fileName = file.substring(file.lastIndexOf("/") + 1, file.length());
+            String fileName = file.substring(file.lastIndexOf("/") + 1);
             if (filePrefix == null)
             {
                 filePrefix = directory;
@@ -252,8 +252,7 @@ public class PipelineAnalysisHelper
     {
         try
         {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder = factory.newDocumentBuilder();
+            DocumentBuilder builder = XmlBeansUtil.DOCUMENT_BUILDER_FACTORY.newDocumentBuilder();
             InputSource is = new InputSource(new StringReader(xml));
             Document doc = builder.parse(is);
 

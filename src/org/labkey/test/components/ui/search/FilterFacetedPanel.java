@@ -1,11 +1,13 @@
 package org.labkey.test.components.ui.search;
 
 import org.apache.commons.lang3.StringUtils;
+import org.labkey.remoteapi.query.Filter;
 import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
+import org.labkey.test.components.react.ReactSelect;
 import org.labkey.test.components.ui.FilterStatusValue;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -46,6 +48,15 @@ public class FilterFacetedPanel extends WebDriverComponent<FilterFacetedPanel.El
     public void selectValue(String value)
     {
         elementCache().findCheckboxLabel(value).click();
+    }
+
+    /**
+     * Select a filer by clicking its label. Right now this method relevant only for multi-value text choice.
+     * @param operator desired filter value
+     */
+    public void selectArrayFilterOperator(Filter.Operator operator)
+    {
+        elementCache().arrayFilterOperatorSelect.select(operator.getDisplayValue());
     }
 
     /**
@@ -123,6 +134,8 @@ public class FilterFacetedPanel extends WebDriverComponent<FilterFacetedPanel.El
     {
         protected final Input filterInput =
                 Input(Locator.id("filter-faceted__typeahead-input"), getDriver()).findWhenNeeded(this);
+        protected final ReactSelect arrayFilterOperatorSelect =
+                new ReactSelect.ReactSelectFinder(getDriver()).index(0).findWhenNeeded(this);
         protected final WebElement checkboxSection =
                 Locator.byClass("labkey-wizard-pills").index(0).refindWhenNeeded(this);
         protected final Locator.XPathLocator checkboxLabelLoc
