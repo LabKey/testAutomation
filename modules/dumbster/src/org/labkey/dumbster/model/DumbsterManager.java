@@ -23,6 +23,7 @@ import org.labkey.api.settings.AppProps;
 import org.labkey.api.util.ContextListener;
 import org.labkey.api.util.MailHelper;
 import org.labkey.api.util.ShutdownListener;
+import org.labkey.api.util.SmtpTransportProvider;
 import org.labkey.api.util.StringUtilsLabKey;
 
 import jakarta.mail.MessagingException;
@@ -60,6 +61,12 @@ public class DumbsterManager implements ShutdownListener
 
     public boolean start()
     {
+        if (!(MailHelper.getActiveProvider() instanceof SmtpTransportProvider))
+        {
+            _log.error("Mail recorder cannot be started: active mail provider is not SmtpTransportProvider");
+            return false;
+        }
+
         if (_server != null && !_server.isStopped())
         {
             // We're already running, no need to spin up another, but reset the list of messages
