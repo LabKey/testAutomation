@@ -10,23 +10,23 @@ import java.util.Set;
 
 public class JavascriptExecutorWrapper implements JavascriptExecutor
 {
-    final JavascriptExecutor _executor;
+    private final JavascriptExecutor _wrappedExecutor;
 
     public JavascriptExecutorWrapper(WebDriver driver)
     {
-        _executor = (JavascriptExecutor) driver;
+        _wrappedExecutor = (JavascriptExecutor) driver;
     }
 
     @Override
     public @Nullable Object executeScript(@Language("JavaScript") String script, @Nullable Object... args)
     {
-        return _executor.executeScript(script, args);
+        return _wrappedExecutor.executeScript(script, args);
     }
 
     @Override
     public @Nullable Object executeScript(ScriptKey key, @Nullable Object... args)
     {
-        return _executor.executeScript(key, args);
+        return _wrappedExecutor.executeScript(key, args);
     }
 
     /**
@@ -49,7 +49,7 @@ public class JavascriptExecutorWrapper implements JavascriptExecutor
                 "try {" +
                 script +
                 "} catch (error) { callback(error); }"; // ensure that the callback is invoked when an exception would otherwise prevent it
-        return _executor.executeAsyncScript(script, arguments);
+        return _wrappedExecutor.executeAsyncScript(script, arguments);
     }
 
     public <T> @Nullable T executeAsyncScript(@Language("JavaScript") String script, Class<T> expectedResultType, @Nullable Object... arguments)
@@ -68,18 +68,18 @@ public class JavascriptExecutorWrapper implements JavascriptExecutor
     @Override
     public Set<ScriptKey> getPinnedScripts()
     {
-        return _executor.getPinnedScripts();
+        return _wrappedExecutor.getPinnedScripts();
     }
 
     @Override
     public void unpin(ScriptKey key)
     {
-        _executor.unpin(key);
+        _wrappedExecutor.unpin(key);
     }
 
     @Override
     public ScriptKey pin(@Language("JavaScript") String script)
     {
-        return _executor.pin(script);
+        return _wrappedExecutor.pin(script);
     }
 }
