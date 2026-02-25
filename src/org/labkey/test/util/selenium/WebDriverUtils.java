@@ -25,6 +25,8 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WrapsDriver;
 import org.openqa.selenium.WrapsElement;
 
+import java.util.Objects;
+
 public abstract class WebDriverUtils
 {
     /**
@@ -72,6 +74,17 @@ public abstract class WebDriverUtils
             return webDriver;
         else
             return null;
+    }
+
+    /**
+     * Extract a WebDriver instance from an arbitrarily wrapped object and the JavascriptExecutor tied to it.
+     *
+     * @param object Object that wraps a WebDriver. Typically, a Component, SearchContext, or WebElement
+     * @return JavascriptExecutor instance
+     */
+    public static JavascriptExecutorWrapper getJavascriptExecutor(Object object)
+    {
+        return Objects.requireNonNull(new JavascriptExecutorWrapper(extractWrappedDriver(object)), () -> "No WebDriver found in " + object.getClass());
     }
 
     /**
