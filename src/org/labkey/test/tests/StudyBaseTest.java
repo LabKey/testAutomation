@@ -58,6 +58,8 @@ import static org.junit.Assert.assertEquals;
 public abstract class StudyBaseTest extends BaseWebDriverTest
 {
     protected static final File ARCHIVE_TEMP_DIR = StudyHelper.getStudyTempDir();
+    private static Boolean _specimenModulePresent;
+
     protected int datasetCount = getDatasetCount();
     protected int visitCount = 65;
 
@@ -72,6 +74,14 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
     protected void setupRequestStatuses()
     {
         new SpecimenHelper(this).setupRequestStatuses();
+    }
+
+    public boolean isSpecimenModulePresent()
+    {
+        if (null == _specimenModulePresent)
+            _specimenModulePresent = _containerHelper.getAllModules().contains("specimen");
+
+        return _specimenModulePresent;
     }
 
     protected final AuditLogHelper _auditLogHelper = new AuditLogHelper(this);
@@ -130,13 +140,19 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
 
     protected void startSpecimenImport(int completeJobsExpected, File specimenArchive)
     {
-        _specimenImporter = new SpecimenImporter(new File(StudyHelper.getStudySubfolderPath()), specimenArchive, ARCHIVE_TEMP_DIR, getFolderName(), completeJobsExpected);
-        _specimenImporter.startImport();
+        if (isSpecimenModulePresent())
+        {
+            _specimenImporter = new SpecimenImporter(new File(StudyHelper.getStudySubfolderPath()), specimenArchive, ARCHIVE_TEMP_DIR, getFolderName(), completeJobsExpected);
+            _specimenImporter.startImport();
+        }
     }
 
     protected void waitForSpecimenImport()
     {
-        _specimenImporter.waitForComplete();
+        if (isSpecimenModulePresent())
+        {
+            _specimenImporter.waitForComplete();
+        }
     }
 
     protected void setExpectSpecimenImportError(boolean expected)
