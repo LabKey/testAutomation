@@ -262,7 +262,7 @@ public class GpatAssayTest extends BaseWebDriverTest
     // GitHub Issue #875: Optionally add transform scripts in GPAT assay design to test code path with and without transform script
     private void randomlyAddTransformScript(ReactAssayDesignerPage assayDesignerPage)
     {
-        boolean shouldAddTransformScript = TestDataGenerator.randomBoolean();
+        boolean shouldAddTransformScript = TestDataGenerator.randomBoolean("whether to add transform script in assay design");
         if (shouldAddTransformScript)
             assayDesignerPage.addTransformScript(RTRANSFORM_SCRIPT_FILE_NOOP);
     }
