@@ -388,7 +388,7 @@ public abstract class AbstractAssayTest extends BaseWebDriverTest
                 .setType(TEST_ASSAY_DATA_PROP_TYPES[i - TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT])
                 .setLabel(TEST_ASSAY_DATA_PROP_NAME + i);
         }
-        propertiesPanel.addField("Flags").setType(FieldDefinition.ColumnType.Flag);
+
         // Set some to required
         propertiesPanel.getField(0).setRequiredField(true);
         propertiesPanel.getField(TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT + 2).setRequiredField(true);
