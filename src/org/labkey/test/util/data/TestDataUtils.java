@@ -581,7 +581,7 @@ public class TestDataUtils
     public static String parseMultiValueText(String multiValueString) throws IOException
     {
         CSVFormat format = CSVFormat.RFC4180.builder()
-                .setIgnoreSurroundingSpaces(true).setTrim(true).setQuote('"').get();
+                .setIgnoreSurroundingSpaces(true).setTrim(true).get();
         try (CSVParser parser = format.parse(new StringReader(multiValueString)))
         {
             List<CSVRecord> records = parser.getRecords();
