@@ -103,7 +103,7 @@ public class DumbsterManager implements ShutdownListener
         Session session = Session.getInstance(props);
 
         _log.info("Switching MailHelper to use port " + port);
-        MailHelper.setSession(session);
+        MailHelper.setSmtpSession(session);
 
         _log.info("Connecting mail recorder to port " + port);
         _server = SimpleSmtpServer.start(port);
@@ -124,7 +124,7 @@ public class DumbsterManager implements ShutdownListener
         if (_server != null)
         {
             _log.info("Reverting MailHelper to " + AppProps.getInstance().getWebappConfigurationFilename() + " configuration");
-            MailHelper.setSession(null);
+            MailHelper.setSmtpSession(null);
 
             _server.stop();
             ContextListener.removeShutdownListener(this);
