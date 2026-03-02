@@ -578,7 +578,7 @@ public class TestDataUtils
         }
     }
 
-    public static String parseMultiValueText(String multiValueString) throws IOException
+    public static List<String> parseMultiValueText(String multiValueString) throws IOException
     {
         CSVFormat format = CSVFormat.RFC4180.builder()
                 .setIgnoreSurroundingSpaces(true).setTrim(true).get();
@@ -586,8 +586,8 @@ public class TestDataUtils
         {
             List<CSVRecord> records = parser.getRecords();
             if (records.isEmpty())
-                return "";
-            return records.getFirst().stream().collect(Collectors.joining(multiValueString.contains(", ") ? ", " : ","));
+                return List.of();
+            return records.getFirst().toList();
         }
     }
 
