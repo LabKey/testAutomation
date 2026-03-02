@@ -585,8 +585,8 @@ public class TestDataUtils
         try (CSVParser parser = format.parse(new StringReader(multiValueString)))
         {
             List<CSVRecord> records = parser.getRecords();
-            if (records.isEmpty())
-                return List.of();
+            if (records.size() != 1)
+                throw new IllegalArgumentException("Invalid multi-value text string: " + multiValueString);
             return records.getFirst().toList();
         }
     }
