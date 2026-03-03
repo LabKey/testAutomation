@@ -557,7 +557,7 @@ public class AuditLogTest extends BaseWebDriverTest
 
         ExecuteQueryPage.beginAt(this, containerPath, "auditLog", "GroupAuditEvent");
         if (canSeeAuditLog)
-            verifyAuditQueryEvent(this, COMMENT_COLUMN, "The user " + AUDIT_TEST_USER + " was assigned to the security role Editor.", 1);
+            verifyAuditQueryEvent(this, COMMENT_COLUMN, "The user " + AUDIT_TEST_USER + " was assigned to the security role Editor.", 4);
         else
             assertTextPresent("No data to show.");
     }
