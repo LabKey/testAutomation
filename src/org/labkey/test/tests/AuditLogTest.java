@@ -64,11 +64,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.labkey.test.util.PasswordUtil.getUsername;
 import static org.labkey.test.util.PermissionsHelper.AUTHOR_ROLE;
 import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
 import static org.labkey.test.util.PermissionsHelper.FOLDER_ADMIN_ROLE;
 import static org.labkey.test.util.PermissionsHelper.PROJECT_ADMIN_ROLE;
-import static org.labkey.test.util.PasswordUtil.getUsername;
 
 @Category({Daily.class, Hosting.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 9)
@@ -378,18 +378,27 @@ public class AuditLogTest extends BaseWebDriverTest
         createUserWithPermissions(AUDIT_TEST_USER2, AUDIT_TEST_PROJECT, PROJECT_ADMIN_ROLE);
 
         // signed in as an admin so we should see rows here
-        verifyAuditQueries(true);
+        verifyAuditQueries(true, getProjectName());
 
         // signed in as an editor should not show any rows for audit query links
         impersonate(AUDIT_TEST_USER);
-        verifyAuditQueries(false);
+        verifyAuditQueries(false, getProjectName());
+        verifyAuditQueries(false, "home");
         stopImpersonating();
 
-        // now grant CanSeeAuditLog permission to our audit user and verify
-        // we see audit information
+        // grant CanSeeAuditLog role to our audit user in the project and verify we see audit information in this project but not /home
+        permissionsHelper.addMemberToRole(AUDIT_TEST_USER, "See Audit Log Events", PermissionsHelper.MemberType.user, getProjectName());
+        impersonate(AUDIT_TEST_USER);
+        verifyAuditQueries(true, getProjectName());
+        verifyAuditQueries(false, "home");
+        stopImpersonating();
+        permissionsHelper.removeUserRoleAssignment(AUDIT_TEST_USER, "See Audit Log Events", getProjectName());
+
+        // grant CanSeeAuditLog role to our audit user in the root and verify we see audit information in this project and in /home
         permissionsHelper.setSiteRoleUserPermissions(AUDIT_TEST_USER, "See Audit Log Events");
         impersonate(AUDIT_TEST_USER);
-        verifyAuditQueries(true);
+        verifyAuditQueries(true, getProjectName());
+        verifyAuditQueries(true, "home");
 
         // cleanup
         stopImpersonating();
@@ -535,15 +544,15 @@ public class AuditLogTest extends BaseWebDriverTest
         verifyAuditQueryEvent(this, "List", "Child List", 1, canSeeChild(v));
     }
 
-    protected void verifyAuditQueries(boolean canSeeAuditLog)
+    protected void verifyAuditQueries(boolean canSeeAuditLog, String containerPath)
     {
-        ExecuteQueryPage.beginAt(this, getProjectName(), "auditLog", "ContainerAuditEvent");
+        ExecuteQueryPage.beginAt(this, containerPath, "auditLog", "ContainerAuditEvent");
         if (canSeeAuditLog)
             verifyAuditQueryEvent(this, COMMENT_COLUMN, AUDIT_TEST_PROJECT + " was created", 1);
         else
             assertTextPresent("No data to show.");
 
-        ExecuteQueryPage.beginAt(this, getProjectName(), "auditLog", "GroupAuditEvent");
+        ExecuteQueryPage.beginAt(this, containerPath, "auditLog", "GroupAuditEvent");
         if (canSeeAuditLog)
             verifyAuditQueryEvent(this, COMMENT_COLUMN, "The user " + AUDIT_TEST_USER + " was assigned to the security role Editor.", 1);
         else
