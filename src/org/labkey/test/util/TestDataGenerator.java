@@ -800,7 +800,15 @@ public class TestDataGenerator
 
     public static boolean randomBoolean()
     {
-        return ThreadLocalRandom.current().nextBoolean();
+        return randomBoolean(null);
+    }
+
+    public static boolean randomBoolean(@Nullable String message)
+    {
+        boolean value = ThreadLocalRandom.current().nextBoolean();
+        if (message != null)
+            TestLogger.log("Generated random boolean value for %s: %s".formatted(message, value));
+        return value;
     }
 
     private @NotNull List<String> getFieldsForFile()
