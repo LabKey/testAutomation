@@ -256,7 +256,7 @@ private static final List<Filter.Operator> ARRAY_OPERATORS = List.of(ARRAY_CONTA
                 {
                     filterPanel.selectArrayFilterOperator(operator);
                 }
-                if (value != null)
+                if (value != null && !((List<String>) value).isEmpty())
                 {
                     List<String> values = (List<String>) value;
                     filterPanel.selectValue(values.get(0));
