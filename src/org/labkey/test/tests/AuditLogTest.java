@@ -386,16 +386,19 @@ public class AuditLogTest extends BaseWebDriverTest
         verifyAuditQueries(false, "home");
         stopImpersonating();
 
-        // grant CanSeeAuditLog role to our audit user in the project and verify we see audit information in this project but not /home
-        permissionsHelper.addMemberToRole(AUDIT_TEST_USER, "See Audit Log Events", PermissionsHelper.MemberType.user, getProjectName());
+        // Grant the "See Audit Log Events" role to our audit user in the project and verify we see audit information
+        // in this project but not /home. We pass the fully qualified classnames in the next few calls to disambiguate
+        // the root role from the folder role.
+        permissionsHelper.addMemberToRole(AUDIT_TEST_USER, "org.labkey.api.security.roles.CanSeeAuditLogFolderRole", PermissionsHelper.MemberType.user, getProjectName());
         impersonate(AUDIT_TEST_USER);
         verifyAuditQueries(true, getProjectName());
         verifyAuditQueries(false, "home");
         stopImpersonating();
-        permissionsHelper.removeUserRoleAssignment(AUDIT_TEST_USER, "See Audit Log Events", getProjectName());
+        permissionsHelper.removeUserRoleAssignment(AUDIT_TEST_USER, "org.labkey.api.security.roles.CanSeeAuditLogFolderRole", getProjectName());
 
-        // grant CanSeeAuditLog role to our audit user in the root and verify we see audit information in this project and in /home
-        permissionsHelper.setSiteRoleUserPermissions(AUDIT_TEST_USER, "See Audit Log Events");
+        // Grant the "See Audit Log Events" role to our audit user in the root and verify we see audit information in
+        // this project and in /home
+        permissionsHelper.setSiteRoleUserPermissions(AUDIT_TEST_USER, "org.labkey.api.security.roles.CanSeeAuditLogRole");
         impersonate(AUDIT_TEST_USER);
         verifyAuditQueries(true, getProjectName());
         verifyAuditQueries(true, "home");
