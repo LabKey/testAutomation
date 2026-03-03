@@ -36,7 +36,6 @@ import org.labkey.test.categories.Hosting;
 import org.labkey.test.components.domain.ConditionalFormatDialog;
 import org.labkey.test.components.domain.DomainFieldRow;
 import org.labkey.test.components.domain.DomainFormPanel;
-import org.labkey.test.components.search.SearchBodyWebPart;
 import org.labkey.test.pages.core.admin.logger.ManagerPage.LoggingLevel;
 import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.pages.query.ExecuteQueryPage;
@@ -48,6 +47,7 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Log4jUtils;
 import org.labkey.test.util.PermissionsHelper;
 import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.SearchHelper;
 import org.labkey.test.util.UIUserHelper;
 
 import java.io.BufferedReader;
@@ -377,7 +377,7 @@ public class AuditLogTest extends BaseWebDriverTest
 
         // Do a search to ensure an audit entry in /home
         clickProject("Home");
-        new SearchBodyWebPart(getDriver()).searchForm().searchFor(SEARCH_TERM);
+        new SearchHelper(this).searchFor(SEARCH_TERM);
         goToProjectHome();
 
         // signed in as an admin so we should see rows here
