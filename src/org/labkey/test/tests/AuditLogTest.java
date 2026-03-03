@@ -376,7 +376,7 @@ public class AuditLogTest extends BaseWebDriverTest
         createUserWithPermissions(AUDIT_TEST_USER2, AUDIT_TEST_PROJECT, PROJECT_ADMIN_ROLE);
 
         // Do a search to ensure an audit entry in /home
-        clickProject("home");
+        clickProject("Home");
         new SearchBodyWebPart(getDriver()).searchForm().searchFor(SEARCH_TERM);
         goToProjectHome();
 
@@ -386,25 +386,25 @@ public class AuditLogTest extends BaseWebDriverTest
         // signed in as an editor should not show any rows for audit query links
         impersonate(AUDIT_TEST_USER);
         verifyAuditQueries(false, getProjectName());
-        verifyAuditQueries(false, "home");
+        verifyAuditQueries(false, "Home");
         stopImpersonating();
 
-        // Grant the "See Audit Log Events" role to our audit user in the project and verify we see audit information
-        // in this project but not /home. We pass the fully qualified classnames in the next few calls to disambiguate
-        // the root role from the folder role.
+        // Grant the "See Audit Log Events" folder role to our audit user in the project and verify we see audit
+        // information in this project but not /Home. We pass the fully qualified classnames in the next few calls to
+        // disambiguate the root role from the folder role.
         permissionsHelper.addMemberToRole(AUDIT_TEST_USER, "org.labkey.api.security.roles.CanSeeAuditLogFolderRole", PermissionsHelper.MemberType.user, getProjectName());
         impersonate(AUDIT_TEST_USER);
         verifyAuditQueries(true, getProjectName());
-        verifyAuditQueries(false, "home");
+        verifyAuditQueries(false, "Home");
         stopImpersonating();
         permissionsHelper.removeUserRoleAssignment(AUDIT_TEST_USER, "org.labkey.api.security.roles.CanSeeAuditLogFolderRole", getProjectName());
 
-        // Grant the "See Audit Log Events" role to our audit user in the root and verify we see audit information in
-        // this project and in /home
+        // Grant the "See Audit Log Events" root role to our audit user and verify we see audit information in this
+        // project and in /Home
         permissionsHelper.setSiteRoleUserPermissions(AUDIT_TEST_USER, "org.labkey.api.security.roles.CanSeeAuditLogRole");
         impersonate(AUDIT_TEST_USER);
         verifyAuditQueries(true, getProjectName());
-        ExecuteQueryPage.beginAt(this, "home", "auditLog", "SearchAuditEvent");
+        ExecuteQueryPage.beginAt(this, "Home", "auditLog", "SearchAuditEvent");
         verifyAuditQueryEvent(this, "Query", SEARCH_TERM, 1);
 
         // cleanup
