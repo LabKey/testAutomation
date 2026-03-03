@@ -36,6 +36,7 @@ import org.labkey.test.categories.Hosting;
 import org.labkey.test.components.domain.ConditionalFormatDialog;
 import org.labkey.test.components.domain.DomainFieldRow;
 import org.labkey.test.components.domain.DomainFormPanel;
+import org.labkey.test.components.search.SearchBodyWebPart;
 import org.labkey.test.pages.core.admin.logger.ManagerPage.LoggingLevel;
 import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.pages.query.ExecuteQueryPage;
@@ -79,21 +80,18 @@ public class AuditLogTest extends BaseWebDriverTest
     public static final String QUERY_UPDATE_EVENT = "Query update events";
     public static final String PROJECT_AUDIT_EVENT = "Project and Folder events";
     public static final String ASSAY_AUDIT_EVENT = "Link to Study events";
+    public static final String COMMENT_COLUMN = "Comment";
 
     private static final String AUDIT_TEST_USER = "audit_user1@auditlog.test";
     private static final String AUDIT_TEST_USER2 = "audit_user2@auditlog.test";
     private static final String AUDIT_TEST_USER3 = "audit_user3@auditlog.test";
-
     private static final String AUDIT_SECURITY_GROUP = "Testers";
-
     private static final String AUDIT_TEST_PROJECT = "AuditVerifyTest";
     private static final String AUDIT_DETAILED_TEST_PROJECT = "AuditDetailedLogTest";
     private static final String AUDIT_TEST_SUBFOLDER = "AuditVerifyTest_Subfolder";
     private static final String AUDIT_PROPERTY_EVENTS_PROJECT = "AuditDomainPropertyEvents";
-
-    final String DOMAIN_PROPERTY_LOG_NAME = "Domain property events";
-
-    public static final String COMMENT_COLUMN = "Comment";
+    private static final String DOMAIN_PROPERTY_LOG_NAME = "Domain property events";
+    private static final String SEARCH_TERM = "doesn't matter";
 
     private final ApiPermissionsHelper permissionsHelper = new ApiPermissionsHelper(this);
     private final AuditLogHelper _auditLogHelper = new AuditLogHelper(this);
@@ -377,6 +375,11 @@ public class AuditLogTest extends BaseWebDriverTest
         createUserWithPermissions(AUDIT_TEST_USER, AUDIT_TEST_PROJECT, EDITOR_ROLE);
         createUserWithPermissions(AUDIT_TEST_USER2, AUDIT_TEST_PROJECT, PROJECT_ADMIN_ROLE);
 
+        // Do a search to ensure an audit entry in /home
+        clickProject("home");
+        new SearchBodyWebPart(getDriver()).searchForm().searchFor(SEARCH_TERM);
+        goToProjectHome();
+
         // signed in as an admin so we should see rows here
         verifyAuditQueries(true, getProjectName());
 
@@ -401,7 +404,8 @@ public class AuditLogTest extends BaseWebDriverTest
         permissionsHelper.setSiteRoleUserPermissions(AUDIT_TEST_USER, "org.labkey.api.security.roles.CanSeeAuditLogRole");
         impersonate(AUDIT_TEST_USER);
         verifyAuditQueries(true, getProjectName());
-        verifyAuditQueries(true, "home");
+        ExecuteQueryPage.beginAt(this, "home", "auditLog", "SearchAuditEvent");
+        verifyAuditQueryEvent(this, "Query", SEARCH_TERM, 1);
 
         // cleanup
         stopImpersonating();
@@ -494,7 +498,7 @@ public class AuditLogTest extends BaseWebDriverTest
             //then create model (which has detailed audit log level)
             InsertRowsCommand insertCmd2 = new InsertRowsCommand("vehicle", "models");
             rowMap = new HashMap<>();
-            rowMap.put("manufacturerId", resp1.getRows().get(0).get("rowid"));
+            rowMap.put("manufacturerId", resp1.getRows().getFirst().get("rowid"));
             rowMap.put("name", "Soul");
             insertCmd2.addRow(rowMap);
             insertCmd2.execute(cn, AUDIT_DETAILED_TEST_PROJECT);
