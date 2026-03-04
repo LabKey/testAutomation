@@ -1,13 +1,17 @@
 package org.labkey.test.util.selenium;
 
 import org.intellij.lang.annotations.Language;
+import org.labkey.test.selenium.LazyWebElement;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 import static org.labkey.test.Locator.NBSP;
 
@@ -93,6 +97,29 @@ public abstract class WebElementUtils
      */
     public static String getTextContent(WebElement element)
     {
-        return element.getDomProperty("textContent").replace(NBSP, " ");
+        return Optional.ofNullable(element.getDomProperty("textContent")).map(s -> s.replace(NBSP, " ")).orElse(null);
+    }
+
+    /**
+     * Determines whether the specified element is visible. {@link WebElement#isDisplayed()} might return false if the
+     * element is out the viewport and scrolling is disabled due to a modal dialog.<br>
+     * TODO: Consider moving to {@link LazyWebElement#isDisplayed()}
+     *
+     * @param element element to inspect
+     * @return true if the element is visible, false otherwise
+     */
+    public static boolean checkVisibility(WebElement element)
+    {
+        try
+        {
+            return element.isDisplayed() ||
+                    Objects.requireNonNullElse(WebDriverUtils.getJavascriptExecutor(element)
+                            .executeScript("return arguments[0].checkVisibility();", Boolean.class, element),
+                            false);
+        }
+        catch (NoSuchElementException | StaleElementReferenceException e)
+        {
+            return false;
+        }
     }
 }
