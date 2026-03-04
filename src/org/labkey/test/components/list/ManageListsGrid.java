@@ -53,9 +53,28 @@ public class ManageListsGrid extends DataRegionTable
 
     public BeginPage deleteSelectedLists()
     {
-        clickHeaderButtonAndWait("Delete");
+        if (getHeaderButton("Delete").getAttribute("class").contains("labkey-menu-button"))
+            clickHeaderMenu("Delete", true, "Delete List");
+        else
+            clickHeaderButtonAndWait("Delete");
+
         ConfirmDeletePage confirmPage = new ConfirmDeletePage(getDriver());
         return confirmPage.confirmDelete();
+    }
+
+    public BeginPage deleteAllDataFromSelectedLists()
+    {
+        clickHeaderMenu("Delete", true, "Delete All Data from List");
+        ConfirmDeletePage confirmPage = new ConfirmDeletePage(getDriver(), "Confirm Delete All Data");
+        return confirmPage.confirmDelete();
+    }
+
+    public ManageListsGrid selectLists(List<String> listNames)
+    {
+        for (String listName : listNames)
+            checkCheckbox(getRowIndex("Name", listName));
+
+        return this;
     }
 
     public List<String> getListNames()

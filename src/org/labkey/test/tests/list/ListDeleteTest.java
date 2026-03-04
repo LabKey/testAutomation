@@ -1,7 +1,5 @@
 package org.labkey.test.tests.list;
 
-import org.apache.hc.core5.http.HttpStatus;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -10,11 +8,9 @@ import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
-import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Data;
 import org.labkey.test.categories.Hosting;
-import org.labkey.test.components.list.ManageListsGrid;
 import org.labkey.test.pages.list.BeginPage;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.params.FieldDefinition;
@@ -23,15 +19,11 @@ import org.labkey.test.params.list.VarListDefinition;
 import org.labkey.test.util.DomainUtils;
 import org.labkey.test.util.TestDataGenerator;
 import org.labkey.test.util.TestUser;
-import org.openqa.selenium.By;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
 
 @Category({Daily.class, Data.class, Hosting.class})
@@ -161,19 +153,19 @@ public class ListDeleteTest extends BaseWebDriverTest
         var grid = listsPage.getGrid();
         grid.uncheckAllOnPage();
         var deleteButton = grid.getHeaderButton("Delete");
-        Assert.assertTrue("Delete button should be disabled when no rows selected",
+        checker().withScreenshot().verifyTrue("Delete button should be disabled when no rows selected",
                 deleteButton.getAttribute("class").contains("disabled"));
 
         // Select lists, verify delete menu is enabled and has 2 options
-        selectLists(grid, listNames);
+        grid.selectLists(listNames);
         var menuOptions = grid.getHeaderMenuOptions("Delete");
-        Assert.assertEquals("Expected 2 delete menu options",
+        checker().withScreenshot().verifyEquals("Expected 2 delete menu options",
                 List.of("Delete List", "Delete All Data from List"), menuOptions);
 
         // Click DELETE -> "Delete List", verify landing on confirmation page with expected text, cancel
         listsPage = BeginPage.beginAt(this, containerPath);
         grid = listsPage.getGrid();
-        selectLists(grid, listNames);
+        grid.selectLists(listNames);
         grid.clickHeaderMenu("Delete", true, "Delete List");
         assertTextPresent("Are you sure you want to delete the following Lists?");
         for (String listName : listNames)
@@ -183,7 +175,7 @@ public class ListDeleteTest extends BaseWebDriverTest
         // Click DELETE -> "Delete All Data from List", verify landing on confirmation page with expected text, cancel
         listsPage = BeginPage.beginAt(this, containerPath);
         grid = listsPage.getGrid();
-        selectLists(grid, listNames);
+        grid.selectLists(listNames);
         grid.clickHeaderMenu("Delete", true, "Delete All Data from List");
         assertTextPresent("Are you sure you want to delete all data");
         assertTextPresent("This action cannot be undone and will result in an empty list.");
@@ -195,17 +187,11 @@ public class ListDeleteTest extends BaseWebDriverTest
         clickButton("Cancel");
     }
 
-    private void selectLists(ManageListsGrid grid, List<String> listNames)
-    {
-        for (String listName : listNames)
-            grid.checkCheckbox(grid.getRowIndex("Name", listName));
-    }
-
     private void verifyListRowCount(String containerPath, String listName, int expectedCount)
     {
         _listHelper.beginAtList(containerPath, listName);
         var table = new DataRegionTable("query", getDriver());
-        Assert.assertEquals("Expected " + expectedCount + " rows in " + listName + " at " + containerPath,
+        checker().withScreenshot().verifyEquals("Expected " + expectedCount + " rows in " + listName + " at " + containerPath,
                 expectedCount, table.getDataRowCount());
     }
 
@@ -213,26 +199,19 @@ public class ListDeleteTest extends BaseWebDriverTest
     {
         _listHelper.beginAtList(containerPath, listName);
         var table = new DataRegionTable("query", getDriver());
-        Assert.assertEquals("Expected " + expectedCount + " rows in " + listName + " at " + containerPath,
+        checker().withScreenshot().verifyEquals("Expected " + expectedCount + " rows in " + listName + " at " + containerPath,
                 expectedCount, table.getDataRowCount());
 
         if (attachmentFileName.contains(IMG_FILE.getName()))
         {
             log("Hover over the thumbnail for the image and make sure the pop-up is as expected.");
-            // Mouse over the logo, migh help with the following mouse over the image.
-            mouseOver(Locator.tagWithAttributeContaining("img", "src", IMG_FILE.getName()));
-            sleep(500);
-            mouseOver(Locator.xpath("//img[contains(@title, '" + IMG_FILE.getName() + "')]"));
-            longWait().until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("#helpDiv")));
-            String src = Locator.xpath("//div[@id='helpDiv']//img[contains(@src, 'download')]").findElement(getDriver()).getAttribute("src");
-            assertTrue("Wrong image in popup: " + src, src.contains(IMG_FILE.getName()));
-            assertEquals("Bad response from image pop-up", HttpStatus.SC_OK, WebTestHelper.getHttpResponse(src).getResponseCode());
+            verifyImagePopupInGrid(IMG_FILE);
 
         }
         else
         {
             File download = doAndWaitForDownload(() -> click(Locator.linkWithText(attachmentFileName)));
-            Assert.assertTrue("Downloaded attachment should exist: " + attachmentFileName, download.exists());
+            checker().withScreenshot().verifyTrue("Downloaded attachment should exist: " + attachmentFileName, download.exists());
         }
 
     }
@@ -270,13 +249,13 @@ public class ListDeleteTest extends BaseWebDriverTest
         var grid = listsPage.getGrid();
         grid.uncheckAllOnPage();
         var deleteButton = grid.getHeaderButton("Delete");
-        Assert.assertTrue("Delete button should be disabled when no rows selected",
+        checker().withScreenshot().verifyTrue("Delete button should be disabled when no rows selected",
                 deleteButton.getAttribute("class").contains("disabled"));
 
-        // Select lists, verify delete menu is enabled and has 2 options
-        selectLists(grid, List.of(LIST_1.getName(), LIST_2.getName()));
+        // Select lists, verify delete button is enabled
+        grid.selectLists(List.of(LIST_1.getName(), LIST_2.getName()));
         // verify DELETE button is enabled, verify click DELETE land on confirmation page, click cancel
-        Assert.assertFalse("Delete button should be enabled when rows are selected",
+        checker().withScreenshot().verifyFalse("Delete button should be enabled when rows are selected",
                 deleteButton.getAttribute("class").contains("disabled"));
         grid.clickHeaderButton("Delete");
         assertTextPresent("Are you sure you want to delete the following Lists?");
@@ -288,7 +267,7 @@ public class ListDeleteTest extends BaseWebDriverTest
         // Verify deleting data from Subfolder A doesn't impact lists or data in project folder or Subfolder B
         listsPage = BeginPage.beginAt(this, SUBFOLDER_A_PATH);
         grid = listsPage.getGrid();
-        selectLists(grid, List.of(LIST_1.getName(), LIST_2.getName()));
+        grid.selectLists(List.of(LIST_1.getName(), LIST_2.getName()));
         grid.clickHeaderMenu("Delete", true, "Delete All Data from List");
         assertTextPresent("Are you sure you want to delete all data");
         assertTextPresent("This action cannot be undone and will result in an empty list.");
@@ -313,7 +292,7 @@ public class ListDeleteTest extends BaseWebDriverTest
         // Now delete just LIST_2 data from project folder
         listsPage = BeginPage.beginAt(this, PROJECT_PATH);
         grid = listsPage.getGrid();
-        selectLists(grid, List.of(LIST_2.getName()));
+        grid.selectLists(List.of(LIST_2.getName()));
         grid.clickHeaderMenu("Delete", true, "Delete All Data from List");
 
         // Verify confirmation page
@@ -337,13 +316,13 @@ public class ListDeleteTest extends BaseWebDriverTest
         // since they don't have designer permission in the sub folder
         listsPage = BeginPage.beginAt(this, SUBFOLDER_B_PATH);
         grid = listsPage.getGrid();
-        Assert.assertFalse("Delete button should not be present without designer permission",
+        checker().withScreenshot().verifyFalse("Delete button should not be present without designer permission",
                 grid.hasHeaderMenu("Delete"));
 
         // From Subfolder A, verify LIST_DESIGNER_USER can delete LIST_1
         listsPage = BeginPage.beginAt(this, SUBFOLDER_A_PATH);
         grid = listsPage.getGrid();
-        selectLists(grid, List.of(LIST_1.getName()));
+        grid.selectLists(List.of(LIST_1.getName()));
         grid.clickHeaderButtonAndWait("Delete");
         assertTextPresent("Are you sure you want to delete the following Lists?");
         assertElementPresent(Locator.linkWithText(LIST_1.getName()));
@@ -352,13 +331,13 @@ public class ListDeleteTest extends BaseWebDriverTest
         // Verify LIST_1 is deleted successfully
         listsPage = BeginPage.beginAt(this, PROJECT_PATH);
         grid = listsPage.getGrid();
-        Assert.assertFalse("LIST_1 should no longer exist",
+        checker().withScreenshot().verifyFalse("LIST_1 should no longer exist",
                 grid.getListNames().contains(LIST_1.getName()));
-        Assert.assertTrue("LIST_2 should still exist",
+        checker().withScreenshot().verifyTrue("LIST_2 should still exist",
                 grid.getListNames().contains(LIST_2.getName()));
 
         // From project folder, verify LIST_DESIGNER_USER can delete LIST_2
-        selectLists(grid, List.of(LIST_2.getName()));
+        grid.selectLists(List.of(LIST_2.getName()));
         grid.clickHeaderButtonAndWait("Delete");
         assertTextPresent("Are you sure you want to delete the following Lists?");
         assertElementPresent(Locator.linkWithText(LIST_2.getName()));
