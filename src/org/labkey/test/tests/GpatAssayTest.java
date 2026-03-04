@@ -41,6 +41,7 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
+import org.labkey.test.util.RReportHelper;
 import org.labkey.test.util.TestDataGenerator;
 import org.labkey.test.util.core.webdav.WebDavUploadHelper;
 import org.openqa.selenium.WebElement;
@@ -72,11 +73,13 @@ public class GpatAssayTest extends BaseWebDriverTest
     private static final String ASSAY_NAME_FNA = "FASTA Assay";
     private static final String ASSAY_NAME_FNA_MULTIPLE = "FASTA Assay - Multiple file upload";
     private static final String ASSAY_NAME_FNA_MULTIPLE_SINGLE_INPUT = "FASTA Assay - Multiple file single input upload";
+    private static final File RTRANSFORM_SCRIPT_FILE_NOOP = TestFileUtils.getSampleData("qc/noopTransform.R");
 
     @BeforeClass
     public static void doSetup()
     {
         GpatAssayTest init = getCurrentTest();
+        new RReportHelper(init).ensureRConfig();
         init._containerHelper.createProject(init.getProjectName(), "Assay");
         init.goToProjectHome();
     }
@@ -256,6 +259,14 @@ public class GpatAssayTest extends BaseWebDriverTest
         clickButton("Save and Finish", defaultWaitForPage);
     }
 
+    // GitHub Issue #875: Optionally add transform scripts in GPAT assay design to test code path with and without transform script
+    private void randomlyAddTransformScript(ReactAssayDesignerPage assayDesignerPage)
+    {
+        boolean shouldAddTransformScript = TestDataGenerator.randomBoolean("whether to add transform script in assay design");
+        if (shouldAddTransformScript)
+            assayDesignerPage.addTransformScript(RTRANSFORM_SCRIPT_FILE_NOOP);
+    }
+
     @LogMethod
     private ReactAssayDesignerPage startCreateGpatAssay(File dataFile, @LoggedParam String assayName)
     {
@@ -265,9 +276,9 @@ public class GpatAssayTest extends BaseWebDriverTest
         _fileBrowserHelper.importFile(dataFile.getName(), "Create New Standard Assay Design");
 
         ReactAssayDesignerPage assayDesignerPage = new ReactAssayDesignerPage(getDriver());
-
         if (assayName != null)
             assayDesignerPage.setName(assayName);
+        randomlyAddTransformScript(assayDesignerPage);
         return assayDesignerPage;
     }
 
