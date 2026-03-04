@@ -101,8 +101,8 @@ public class LineageGraph extends WebDriverComponent<LineageGraph.ElementCache>
     }
 
     /**
-     * clicks the overview Link of the currently-selected node/element and optionally waits for a page load
-     * @param wait  Whether or not to expect a page load, false if not
+     * clicks the overview Link of the currently selected node/element and optionally waits for a page load
+     * @param wait  Whether to expect a page load, false if not
      */
     public void clickOverviewLink(boolean wait)
     {
@@ -131,6 +131,11 @@ public class LineageGraph extends WebDriverComponent<LineageGraph.ElementCache>
         getWrapper().scrollIntoView(stepEl);
         Locator.linkWithText("Details").findElement(stepEl).click();
         getWrapper().shortWait().until(ExpectedConditions.stalenessOf(stepEl));
+    }
+
+    public boolean isUnidentifiedPillPresent()
+    {
+        return Locator.byClass("unidentified-sequence-pill").areAnyVisible(elementCache().nodeDetailLinksContainer);
     }
 
     public WebElement clickDetailsTab()
@@ -175,7 +180,6 @@ public class LineageGraph extends WebDriverComponent<LineageGraph.ElementCache>
     {
         return new ElementCache();
     }
-
 
     protected class ElementCache extends Component<?>.ElementCache
     {
@@ -225,7 +229,6 @@ public class LineageGraph extends WebDriverComponent<LineageGraph.ElementCache>
             return new NodeDetailGroup.NodeDetailsFinder(getDriver()).findAll(nodeDetailContainer);
         }
     }
-
 
     public static class LineageGraphFinder extends WebDriverComponentFinder<LineageGraph, LineageGraphFinder>
     {
