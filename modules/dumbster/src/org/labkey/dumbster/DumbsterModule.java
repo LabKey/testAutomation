@@ -20,6 +20,8 @@ import org.jetbrains.annotations.NotNull;
 import org.labkey.api.module.CodeOnlyModule;
 import org.labkey.api.module.ModuleContext;
 import org.labkey.api.settings.AppProps;
+import org.labkey.api.util.MailHelper;
+import org.labkey.api.util.SmtpTransportProvider;
 import org.labkey.api.view.BaseWebPartFactory;
 import org.labkey.api.view.Portal;
 import org.labkey.api.view.ViewContext;
@@ -65,7 +67,7 @@ public class DumbsterModule extends CodeOnlyModule
     @Override
     public void doStartup(ModuleContext moduleContext)
     {
-        if (AppProps.getInstance().isMailRecorderEnabled())
+        if (MailHelper.getActiveProvider() instanceof SmtpTransportProvider && AppProps.getInstance().isMailRecorderEnabled())
             DumbsterManager.get().start();
     }
 }
