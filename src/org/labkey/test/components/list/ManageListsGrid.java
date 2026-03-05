@@ -53,7 +53,7 @@ public class ManageListsGrid extends DataRegionTable
 
     public BeginPage deleteSelectedLists()
     {
-        if (getHeaderButton("Delete").getAttribute("class").contains("labkey-menu-button"))
+        if (getHeaderButton("Delete").getAttribute("class").contains("labkey-down-arrow"))
             clickHeaderMenu("Delete", true, "Delete List");
         else
             clickHeaderButtonAndWait("Delete");

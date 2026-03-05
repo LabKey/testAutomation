@@ -292,6 +292,7 @@ public class ListDeleteTest extends BaseWebDriverTest
         // Now delete just LIST_2 data from project folder
         listsPage = BeginPage.beginAt(this, PROJECT_PATH);
         grid = listsPage.getGrid();
+        grid.uncheckAllOnPage();
         grid.selectLists(List.of(LIST_2.getName()));
         grid.clickHeaderMenu("Delete", true, "Delete All Data from List");
 
@@ -322,6 +323,7 @@ public class ListDeleteTest extends BaseWebDriverTest
         // From Subfolder A, verify LIST_DESIGNER_USER can delete LIST_1
         listsPage = BeginPage.beginAt(this, SUBFOLDER_A_PATH);
         grid = listsPage.getGrid();
+        grid.uncheckAllOnPage();
         grid.selectLists(List.of(LIST_1.getName()));
         grid.clickHeaderButtonAndWait("Delete");
         assertTextPresent("Are you sure you want to delete the following Lists?");
