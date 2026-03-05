@@ -47,6 +47,11 @@ public abstract class PermissionsHelper
     public static final String AUTHOR_ROLE = "Author";
     public static final String SUBMITTER_ROLE = "Submitter";
 
+    // These two roles have the same friendly name; disambiguate using their fully qualified class names
+    public static final String SEE_AUDIT_LOG_SITE_ROLE = "org.labkey.api.security.roles.CanSeeAuditLogRole";
+    public static final String SEE_AUDIT_LOG_FOLDER_ROLE = "org.labkey.api.security.roles.CanSeeAuditLogFolderRole";
+
+    // TODO: Should "See Audit Log" roles be added here?
     public static final Set<String> AUDIT_LOG_VIEWER_ROLES = Set.of(SITE_ADMIN_ROLE, APP_ADMIN_ROLE, PROJECT_ADMIN_ROLE, FOLDER_ADMIN_ROLE);
 
     public static boolean canSeeAuditLogs(String roleName)
