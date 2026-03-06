@@ -22,6 +22,7 @@ import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.commons.lang3.time.FastDateFormat;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.hc.core5.http.HttpStatus;
 import org.awaitility.Awaitility;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -2732,6 +2733,15 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             mouseOver(chartLoc);
             return doAndWaitForDownload(exportIcon::click);
         }
+    }
+
+    public void verifyImagePopupInGrid(File imageFile)
+    {
+        mouseOver(Locator.xpath("//img[contains(@title, '" + imageFile.getName() + "')]"));
+        longWait().until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("#helpDiv")));
+        String src = Locator.xpath("//div[@id='helpDiv']//img[contains(@src, 'download')]").findElement(getDriver()).getAttribute("src");
+        assertTrue("Wrong image in popup: " + src, src.contains(imageFile.getName()));
+        assertEquals("Bad response from image pop-up", HttpStatus.SC_OK, WebTestHelper.getHttpResponse(src).getResponseCode());
     }
 
     public List<Map<String, Object>> loadTsv(File tsv)

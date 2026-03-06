@@ -824,12 +824,11 @@ public class TriggerScriptTest extends BaseWebDriverTest
      */
     private void cleanUpListRows()
     {
-        goToManagedList(LIST_NAME);
-        clickButton("Delete All Rows", 0);
-        waitForElement(Locator.xpath("//*[text()='Confirm Deletion']"));
-        clickButton("Yes", 0);
-        waitForText("Success");
-        clickButton("OK");
+        var listsPage = goToManageLists();
+        var grid = listsPage.getGrid();
+        grid.uncheckAllOnPage();
+        grid.selectLists(List.of(LIST_NAME));
+        grid.deleteAllDataFromSelectedLists();
     }
 
     /**
