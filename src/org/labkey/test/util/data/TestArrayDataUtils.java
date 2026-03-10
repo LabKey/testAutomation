@@ -34,6 +34,7 @@ public class TestArrayDataUtils
      */
     public static <T> Map<String, String> filterMap(Map<String, T> map, List<String> searchValues, Filter.Operator filterType)
     {
+        Comparator<String> comparator = Comparator.comparing((String s) -> s.toLowerCase()).thenComparing(s -> s);
         return map.entrySet().stream()
                 .filter(entry -> entry.getValue() instanceof List)
                 .map(entry -> Map.entry(entry.getKey(), (List<String>) entry.getValue()))
@@ -41,7 +42,7 @@ public class TestArrayDataUtils
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
                         e -> e.getValue().stream()
-                                .sorted(Comparator.comparing(String::toLowerCase))
+                                .sorted(comparator)
                                 .collect(Collectors.joining(", ")),
                         (e1, e2) -> e1,
                         LinkedHashMap::new
