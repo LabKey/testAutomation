@@ -499,6 +499,16 @@ public class TestDataGenerator
         return randomString(size, null);
     }
 
+    public static List<String> randomTextChoice(int size)
+    {
+        List<String> textChoices = new ArrayList<>();
+        for (int i = 0; i < size; i++)
+        {
+            textChoices.add(randomString(randomInt(0, 30)));
+        }
+        return textChoices;
+    }
+
     public static String randomString(int size, @Nullable String exclusion)
     {
         return randomString(size, exclusion, CHARSET_STRING);

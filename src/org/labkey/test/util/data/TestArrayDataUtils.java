@@ -2,6 +2,7 @@ package org.labkey.test.util.data;
 
 import org.labkey.remoteapi.query.Filter;
 
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +32,7 @@ public class TestArrayDataUtils
      *
      * @return filtered Map
      */
-    public static<T> Map<String, String> filterMap(Map<String, T> map, List<String> searchValues, Filter.Operator filterType)
+    public static <T> Map<String, String> filterMap(Map<String, T> map, List<String> searchValues, Filter.Operator filterType)
     {
         return map.entrySet().stream()
                 .filter(entry -> entry.getValue() instanceof List)
@@ -39,7 +40,9 @@ public class TestArrayDataUtils
                 .filter(entry -> isMatch(entry.getValue(), searchValues, filterType))
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
-                        e -> e.getValue().stream().sorted().collect(Collectors.joining(", ")),
+                        e -> e.getValue().stream()
+                                .sorted(Comparator.comparing(String::toLowerCase))
+                                .collect(Collectors.joining(", ")),
                         (e1, e2) -> e1,
                         LinkedHashMap::new
                 ));
