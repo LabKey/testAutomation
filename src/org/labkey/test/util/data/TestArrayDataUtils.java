@@ -7,16 +7,35 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static org.labkey.test.util.samplemanagement.SMTestUtils.COL_SAMPLE_ID_NAME;
+import static org.labkey.test.util.samplemanagement.SMTestUtils.COL_SAMPLE_NAME_NAME;
+
 public class TestArrayDataUtils
 {
+
+    public static<T> Map<String, T> getMapWithIdAndMultiChoiceField(List<Map<String, T>> data)
+    {
+        return data.stream()
+                .collect(Collectors.toMap(
+                        row -> String.valueOf(row.get(COL_SAMPLE_NAME_NAME)!=null?row.get(COL_SAMPLE_NAME_NAME):row.get(COL_SAMPLE_ID_NAME)),
+                        row -> {String complexKey = row.keySet().stream()
+                                .filter(k -> k.contains("Multi Choice"))
+                                .findFirst()
+                                .orElse("");
+                          return  row.get(complexKey);}
+                ));
+    }
+
     /**
      * Filtering Map according to filter and then sorting values in alphabetical order.
      *
      * @return filtered Map
      */
-    public static Map<String, String> filterMap(Map<String, List<String>> sourceMap, List<String> searchValues, Filter.Operator filterType)
+    public static<T> Map<String, String> filterMap(Map<String, T> map, List<String> searchValues, Filter.Operator filterType)
     {
-        return sourceMap.entrySet().stream()
+        return map.entrySet().stream()
+                .filter(entry -> entry.getValue() instanceof List)
+                .map(entry -> Map.entry(entry.getKey(), (List<String>) entry.getValue()))
                 .filter(entry -> isMatch(entry.getValue(), searchValues, filterType))
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
