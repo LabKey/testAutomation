@@ -437,19 +437,23 @@ public class DataReportsTest extends ReportTest
         _rReportHelper.ensureFieldSetExpanded("Shared Scripts");
         _ext4Helper.checkCheckbox(R_SCRIPTS[0]);
         _ext4Helper.checkCheckbox(R_SCRIPTS[1]);
-        assertTrue("Script didn't execute as expeced", _rReportHelper.executeScript(R_SCRIPT3(DATA_BASE_PREFIX, "mouseid"), R_SCRIPT2_TEXT1));
+        BaseWebDriverTest.getCurrentTest().getArtifactCollector().dumpPageSnapshot("Check Boxes");
+        assertTrue("Script didn't execute as expected", _rReportHelper.executeScript(R_SCRIPT3(DATA_BASE_PREFIX, "mouseid"), R_SCRIPT2_TEXT1));
         saveReport(R_SCRIPTS[2]);
 
         log("Test editing R scripts");
         signIn(); // Reset session to make sure R report isn't cached
         navigateToFolder(getProjectName(), getFolderName());
         clickReportGridLink(R_SCRIPTS[0]);
-        assertTrue("Script didn't execute as expeced", _rReportHelper.executeScript(R_SCRIPT1(R_SCRIPT1_EDIT_FUNC, DATA_BASE_PREFIX), R_SCRIPT1_TEXT1));
+        BaseWebDriverTest.getCurrentTest().getArtifactCollector().dumpPageSnapshot("Rscripts-0");
+        assertTrue("Script didn't execute as expected", _rReportHelper.executeScript(R_SCRIPT1(R_SCRIPT1_EDIT_FUNC, DATA_BASE_PREFIX), R_SCRIPT1_TEXT1));
         resaveReport();
+        BaseWebDriverTest.getCurrentTest().getArtifactCollector().dumpPageSnapshot("resaved");
 
         log("Check that edit worked");
         navigateToFolder(getProjectName(), getFolderName());
         clickReportGridLink(R_SCRIPTS[1]);
+        BaseWebDriverTest.getCurrentTest().getArtifactCollector().dumpPageSnapshot("Rscripts-1");
         waitAndClick(Locator.lkButton("Start Job"));
 
         WebElement pipelineLink = waitForElement(Locator.linkWithText("click here"));

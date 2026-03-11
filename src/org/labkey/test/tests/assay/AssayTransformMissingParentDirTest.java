@@ -1,8 +1,10 @@
 package org.labkey.test.tests.assay;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.api.util.FileUtil;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Assays;
@@ -43,10 +45,15 @@ public class AssayTransformMissingParentDirTest extends AbstractAssayTransformTe
         assayDesignerPage.goToBatchFields().removeAllFields(true);
         // add by path so the absolute path is stored; this allows reproducing the missing parent dir scenario
         assayDesignerPage.addTransformScript(transformFile);
+        BaseWebDriverTest.getCurrentTest().getArtifactCollector().dumpPageSnapshot("Transform Scrip Added");
         assayDesignerPage.clickSave();
+
+        log("Is directory present? " + FileUtils.isDirectory(parentDir.toFile()));
 
         // Now delete the parent dir to ensure we handle it reasonably
         TestFileUtils.deleteDir(parentDir.toFile());
+
+        log("Is directory present? " + FileUtils.isDirectory(parentDir.toFile()));
 
         // Attempt to import data and verify a reasonable error message is shown
         String importData = """
