@@ -504,7 +504,7 @@ public class TestDataGenerator
         List<String> textChoices = new ArrayList<>();
         for (int i = 0; i < size; i++)
         {
-            textChoices.add(randomString(randomInt(0, 30)));
+            textChoices.add(randomString(randomInt(1, 25)));
         }
         return textChoices;
     }

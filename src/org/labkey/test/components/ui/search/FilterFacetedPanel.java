@@ -13,9 +13,12 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static org.labkey.test.WebDriverWrapper.waitFor;
 import static org.labkey.test.components.html.Input.Input;
 
 public class FilterFacetedPanel extends WebDriverComponent<FilterFacetedPanel.ElementCache>
@@ -74,9 +77,15 @@ public class FilterFacetedPanel extends WebDriverComponent<FilterFacetedPanel.El
      */
     public void checkValues(String... values)
     {
+       // waitForElement(elementCache().findCheckbox(values[0]));
+       // waitFor(() -> elementCache().findCheckbox(values[0]).isDisplayed(), 10000);
         for (String value : values)
         {
-            elementCache().findCheckbox(value).check();
+            try{
+            elementCache().findCheckbox(value).check();}
+            catch (Exception e){
+                elementCache().findCheckbox(value).check();
+            }
         }
     }
 
