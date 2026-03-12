@@ -45,7 +45,7 @@ public class AssayTransformMissingParentDirTest extends AbstractAssayTransformTe
         assayDesignerPage.goToBatchFields().removeAllFields(true);
         // add by path so the absolute path is stored; this allows reproducing the missing parent dir scenario
         assayDesignerPage.addTransformScript(transformFile);
-        BaseWebDriverTest.getCurrentTest().getArtifactCollector().dumpPageSnapshot("Transform Scrip Added");
+        getArtifactCollector().dumpPageSnapshot("TransformScript_Added");
         assayDesignerPage.clickSave();
 
         log("Is directory present? " + FileUtils.isDirectory(parentDir.toFile()));
