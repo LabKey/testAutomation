@@ -474,17 +474,52 @@ public class DataReportsTest extends ReportTest
         navigateToFolder(getProjectName(), getFolderName());
         clickReportGridLink(R_SCRIPTS[1]);
         sleep(1_000);
-        getArtifactCollector().dumpPageSnapshot("Debug_011");
+        getArtifactCollector().dumpPageSnapshot("Debug_11");
+        log("URL 01: " + getURL().toString());
         waitAndClick(Locator.lkButton("Start Job"));
 
         WebElement pipelineLink = waitForElement(Locator.linkWithText("click here"));
         waitForElement(Locator.byClass("x4-window").containing("Start Pipeline Job").hidden());
+        sleep(1_000);
+        getArtifactCollector().dumpPageSnapshot("Debug_12");
+        log("URL 02: " + getURL().toString());
         clickAndWait(pipelineLink);
         waitForPipelineJobsToComplete(2, false);
-        // go back to the report and confirm it is visible
-        clickReportGridLink(R_SCRIPTS[1]);
         sleep(1_000);
-        getArtifactCollector().dumpPageSnapshot("Debug_012");
+        getArtifactCollector().dumpPageSnapshot("Debug_13");
+        log("URL 03: " + getURL().toString());
+
+
+
+
+
+        // go back to the report and confirm it is visible
+//        clickReportGridLink(R_SCRIPTS[1]);
+
+//        Locator link = getReportGridLink(R_SCRIPTS[1], true);
+//        goToManageViews();
+        clickAdminMenuItem("Manage Views");
+        waitForElement(Locator.xpath("//*[starts-with(@id, 'dataviews-panel')]"));
+        _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
+
+        sleep(1_000);
+        getArtifactCollector().dumpPageSnapshot("Debug_14");
+        log("URL 04: " + getURL().toString());
+
+        waitForElement(Locator.linkWithText(R_SCRIPTS[1]), WAIT_FOR_JAVASCRIPT);
+        Locator link =  Locator.linkWithText(R_SCRIPTS[1]);
+        sleep(1_000);
+        getArtifactCollector().dumpPageSnapshot("Debug_15");
+        log("URL 05: " + getURL().toString());
+
+        clickAndWait(link, WAIT_FOR_JAVASCRIPT);
+        _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
+
+
+        sleep(1_000);
+        getArtifactCollector().dumpPageSnapshot("Debug_16");
+        log("URL 06: " + getURL().toString());
+
         waitForElement(Locator.tagWithName("img", "resultImage"));
         assertTextPresent(R_SCRIPT2_TEXT2);
         assertTextNotPresent(R_SCRIPT2_TEXT1);
