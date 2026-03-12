@@ -319,8 +319,11 @@ public class DataReportsTest extends ReportTest
 
         log("Execute bad scripts");
         _rReportHelper.clickReportTab();
+        getArtifactCollector().dumpPageSnapshot("Debug_00");
         assertTextPresent("Empty script, a script must be provided.");
         assertTrue("Script didn't execute as expected", _rReportHelper.executeScript(R_SCRIPT1(R_SCRIPT1_ORIG_FUNC, DATA_BASE_PREFIX) + "\nbadString", R_SCRIPT1_TEXT1));
+
+        getArtifactCollector().dumpPageSnapshot("Debug_01");
 
         // horrible hack to get around single versus double quote difference when running R on Linux or Windows systems.
         assertTextPresent("Error: object ", "badString", R_SCRIPT1_TEXT1, R_SCRIPT1_TEXT2, R_SCRIPT1_PDF);
@@ -328,10 +331,12 @@ public class DataReportsTest extends ReportTest
 
         log("Execute and save a script");
         assertTrue("Script didn't execute as expected", _rReportHelper.executeScript(R_SCRIPT1(R_SCRIPT1_ORIG_FUNC, DATA_BASE_PREFIX), R_SCRIPT1_TEXT1));
+        getArtifactCollector().dumpPageSnapshot("Debug_02");
 
         log("Check that the script executed properly");
         assertTextPresent(R_SCRIPT1_TEXT1, R_SCRIPT1_TEXT2, R_SCRIPT1_PDF);
         assertElementPresent(Locator.xpath("//img[starts-with(@id,'" + R_SCRIPT1_IMG + "')]"));
+        getArtifactCollector().dumpPageSnapshot("Debug_03");
 
         saveReport(R_SCRIPTS[0]);
         verifyReportPdfDownload("study", 4500d);
@@ -368,6 +373,7 @@ public class DataReportsTest extends ReportTest
         waitForText(WAIT_FOR_PAGE, "Console output");
         assertTextPresent("null device", R_SCRIPT1_TEXT1, R_SCRIPT1_TEXT2, R_SCRIPT1_PDF);
         assertElementPresent(Locator.xpath("//img[starts-with(@id,'" + R_SCRIPT1_IMG + "')]"));
+        getArtifactCollector().dumpPageSnapshot("Debug_04");
         assertTextNotPresent("Error executing command");
         verifyReportPdfDownload("study", 4500d);
         popLocation();
@@ -386,6 +392,7 @@ public class DataReportsTest extends ReportTest
         navigateToFolder(getProjectName(), getFolderName());
         clickAndWait(Locator.linkWithText(DATA_SET));
         createRReport(AUTHOR_REPORT, R_SCRIPT2(DATA_BASE_PREFIX, "mouseId"), true, true, new String[0]);
+        getArtifactCollector().dumpPageSnapshot("Debug_05");
         if (!TestProperties.isPrimaryUserAppAdmin())
         {
             stopImpersonating();
@@ -397,10 +404,12 @@ public class DataReportsTest extends ReportTest
         _rReportHelper.ensureFieldSetExpanded("Shared Scripts");
         _ext4Helper.checkCheckbox(R_SCRIPTS[0]);
         assertTrue("Script didn't execute as expected", _rReportHelper.executeScript(R_SCRIPT2(DATA_BASE_PREFIX, "mouseid"), R_SCRIPT2_TEXT1));
+        getArtifactCollector().dumpPageSnapshot("Debug_06");
         _rReportHelper.clickSourceTab();
         _rReportHelper.selectOption(ScriptReportPage.StandardReportOption.shareReport);
         _rReportHelper.selectOption(ScriptReportPage.StandardReportOption.runInPipeline);
         saveReport(R_SCRIPTS[1]);
+        getArtifactCollector().dumpPageSnapshot("Debug_07");
 
         log("Check that R script worked");
         _rReportHelper.clickReportTab();
@@ -437,7 +446,7 @@ public class DataReportsTest extends ReportTest
         _rReportHelper.ensureFieldSetExpanded("Shared Scripts");
         _ext4Helper.checkCheckbox(R_SCRIPTS[0]);
         _ext4Helper.checkCheckbox(R_SCRIPTS[1]);
-        getArtifactCollector().dumpPageSnapshot("Check_Boxes");
+        getArtifactCollector().dumpPageSnapshot("Debug_08");
         assertTrue("Script didn't execute as expected", _rReportHelper.executeScript(R_SCRIPT3(DATA_BASE_PREFIX, "mouseid"), R_SCRIPT2_TEXT1));
         saveReport(R_SCRIPTS[2]);
 
@@ -445,15 +454,15 @@ public class DataReportsTest extends ReportTest
         signIn(); // Reset session to make sure R report isn't cached
         navigateToFolder(getProjectName(), getFolderName());
         clickReportGridLink(R_SCRIPTS[0]);
-        getArtifactCollector().dumpPageSnapshot("Rscripts_0");
+        getArtifactCollector().dumpPageSnapshot("Debug_09");
         assertTrue("Script didn't execute as expected", _rReportHelper.executeScript(R_SCRIPT1(R_SCRIPT1_EDIT_FUNC, DATA_BASE_PREFIX), R_SCRIPT1_TEXT1));
         resaveReport();
-        getArtifactCollector().dumpPageSnapshot("ReSaved");
+        getArtifactCollector().dumpPageSnapshot("Debug_10");
 
         log("Check that edit worked");
         navigateToFolder(getProjectName(), getFolderName());
         clickReportGridLink(R_SCRIPTS[1]);
-        getArtifactCollector().dumpPageSnapshot("Rscripts_1");
+        getArtifactCollector().dumpPageSnapshot("Debug_011");
         waitAndClick(Locator.lkButton("Start Job"));
 
         WebElement pipelineLink = waitForElement(Locator.linkWithText("click here"));

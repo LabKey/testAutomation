@@ -1,6 +1,7 @@
 package org.labkey.test.tests.assay;
 
 import org.apache.commons.io.FileUtils;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.api.util.FileUtil;
@@ -31,7 +32,7 @@ public class AssayTransformMissingParentDirTest extends AbstractAssayTransformTe
     {
         // Create a nested directory and an R transform script within it
         String assayName = "missingParentDirAssay";
-        Path parentDir = Files.createTempDirectory("assay-transform-parent-");
+        Path parentDir = Files.createTempDirectory("assay-transform-missing-parent-");
         Path nestedDir = FileUtil.createDirectories(parentDir.resolve("child"), false);
         String scriptName = "transformMissingParent.R";
         String transformContent = "library(Rlabkey);";
@@ -48,12 +49,19 @@ public class AssayTransformMissingParentDirTest extends AbstractAssayTransformTe
         getArtifactCollector().dumpPageSnapshot("TransformScript_Added");
         assayDesignerPage.clickSave();
 
-        log("Is directory present? " + FileUtils.isDirectory(parentDir.toFile()));
-
         // Now delete the parent dir to ensure we handle it reasonably
         TestFileUtils.deleteDir(parentDir.toFile());
 
-        log("Is directory present? " + FileUtils.isDirectory(parentDir.toFile()));
+        int count = 1;
+        while (!FileUtils.isDirectory(parentDir.toFile()) && count <= 5)
+        {
+            sleep(1_000);
+            TestFileUtils.deleteDir(parentDir.toFile());
+            count++;
+        }
+
+        Assert.assertFalse(String.format("Directory %s not deleted.", parentDir.toString()),
+                FileUtils.isDirectory(parentDir.toFile()));
 
         // Attempt to import data and verify a reasonable error message is shown
         String importData = """
