@@ -70,6 +70,8 @@ import static org.labkey.test.util.PermissionsHelper.AUTHOR_ROLE;
 import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
 import static org.labkey.test.util.PermissionsHelper.FOLDER_ADMIN_ROLE;
 import static org.labkey.test.util.PermissionsHelper.PROJECT_ADMIN_ROLE;
+import static org.labkey.test.util.PermissionsHelper.SEE_AUDIT_LOG_FOLDER_ROLE;
+import static org.labkey.test.util.PermissionsHelper.SEE_AUDIT_LOG_SITE_ROLE;
 
 @Category({Daily.class, Hosting.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 9)
@@ -392,16 +394,16 @@ public class AuditLogTest extends BaseWebDriverTest
         // Grant the "See Audit Log Events" folder role to our audit user in the project and verify we see audit
         // information in this project but not /Home. We pass the fully qualified classnames in the next few calls to
         // disambiguate the root role from the folder role.
-        permissionsHelper.addMemberToRole(AUDIT_TEST_USER, "org.labkey.api.security.roles.CanSeeAuditLogFolderRole", PermissionsHelper.MemberType.user, getProjectName());
+        permissionsHelper.addMemberToRole(AUDIT_TEST_USER, SEE_AUDIT_LOG_FOLDER_ROLE, PermissionsHelper.MemberType.user, getProjectName());
         impersonate(AUDIT_TEST_USER);
         verifyAuditQueries(true, getProjectName());
         verifyAuditQueries(false, "Home");
         stopImpersonating();
-        permissionsHelper.removeUserRoleAssignment(AUDIT_TEST_USER, "org.labkey.api.security.roles.CanSeeAuditLogFolderRole", getProjectName());
+        permissionsHelper.removeUserRoleAssignment(AUDIT_TEST_USER, SEE_AUDIT_LOG_FOLDER_ROLE, getProjectName());
 
         // Grant the "See Audit Log Events" root role to our audit user and verify we see audit information in this
         // project and in /Home
-        permissionsHelper.setSiteRoleUserPermissions(AUDIT_TEST_USER, "org.labkey.api.security.roles.CanSeeAuditLogRole");
+        permissionsHelper.setSiteRoleUserPermissions(AUDIT_TEST_USER, SEE_AUDIT_LOG_SITE_ROLE);
         impersonate(AUDIT_TEST_USER);
         verifyAuditQueries(true, getProjectName());
         ExecuteQueryPage.beginAt(this, "Home", "auditLog", "SearchAuditEvent");

@@ -219,11 +219,7 @@ public class InlineImagesListTest extends BaseWebDriverTest
         // Mouse over the logo, migh help with the following mouse over the image.
         mouseOver(Locator.tagWithAttributeContaining("img", "src", "logo.image"));
         sleep(500);
-        mouseOver(Locator.xpath("//img[contains(@title, '" + LRG_PNG_FILE.getName() + "')]"));
-        longWait().until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("#helpDiv")));
-        String src = Locator.xpath("//div[@id='helpDiv']//img[contains(@src, 'download')]").findElement(getDriver()).getAttribute("src");
-        assertTrue("Wrong image in popup: " + src, src.contains(LRG_PNG_FILE.getName()));
-        assertEquals("Bad response from image pop-up", HttpStatus.SC_OK, WebTestHelper.getHttpResponse(src).getResponseCode());
+        verifyImagePopupInGrid(LRG_PNG_FILE);
 
         // Commenting out for now. There is a random behavior where sometimes the thumbnail image will not show up when you move from one cell to another.
         /*
@@ -303,7 +299,7 @@ public class InlineImagesListTest extends BaseWebDriverTest
         sleep(500);
         mouseOver(Locator.xpath("//img[contains(@title, '" + LRG_PNG_FILE.getName() + "')]"));
         shortWait().until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("#helpDiv")));
-        src = Locator.xpath("//div[@id='helpDiv']//img[contains(@src, 'download')]").findElement(getDriver()).getAttribute("src");
+        var src = Locator.xpath("//div[@id='helpDiv']//img[contains(@src, 'download')]").findElement(getDriver()).getAttribute("src");
         assertTrue("Wrong image in popup: " + src, src.contains(LRG_PNG_FILE.getName()));
         assertEquals("Bad response from image pop-up", HttpStatus.SC_OK, WebTestHelper.getHttpResponse(src).getResponseCode());
 

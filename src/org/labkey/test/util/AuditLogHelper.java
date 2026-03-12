@@ -163,7 +163,7 @@ public class AuditLogHelper
 
     public DataRegionTable goToAuditEventView(String eventType)
     {
-        if (!_wrapper.isTextPresent("Audit Log"))
+        if (!StringUtils.trimToEmpty(_wrapper.getDriver().getCurrentUrl()).contains("audit-showAuditLog.view"))
         {
             ShowAdminPage.beginAt(_wrapper).clickAuditLog();
         }
