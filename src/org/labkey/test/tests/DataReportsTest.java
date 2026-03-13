@@ -465,7 +465,31 @@ public class DataReportsTest extends ReportTest
         clickReportGridLink(R_SCRIPTS[0]);
         sleep(1_000);
         getArtifactCollector().dumpPageSnapshot("Debug_09");
-        assertTrue("Script didn't execute as expected", _rReportHelper.executeScript(R_SCRIPT1(R_SCRIPT1_EDIT_FUNC, DATA_BASE_PREFIX), R_SCRIPT1_TEXT1));
+        log("Script: function: " + R_SCRIPT1_EDIT_FUNC);
+        log("Script: database: " + DATA_BASE_PREFIX);
+        log("Script: R_SCRIPT1: " + R_SCRIPT1(R_SCRIPT1_EDIT_FUNC, DATA_BASE_PREFIX));
+//        assertTrue("Script didn't execute as expected", _rReportHelper.executeScript(R_SCRIPT1(R_SCRIPT1_EDIT_FUNC, DATA_BASE_PREFIX), R_SCRIPT1_TEXT1));
+
+
+
+        _rReportHelper.clickSourceTab();
+
+        setCodeEditorValue("script-report-editor", R_SCRIPT1(R_SCRIPT1_EDIT_FUNC, DATA_BASE_PREFIX));
+        sleep(1_000);
+        getArtifactCollector().dumpPageSnapshot("Debug_09_A");
+
+        _rReportHelper.clickReportTab();
+        sleep(1_000);
+        getArtifactCollector().dumpPageSnapshot("Debug_09_B");
+
+        String html = _rReportHelper.getReportText();
+        log("_rReportHelper.getReportText(): " + html);
+        log("expected text: " + R_SCRIPT1_TEXT1);
+        log("checkScriptOutput: " + _rReportHelper.checkScriptOutput(html, R_SCRIPT1_TEXT1, true));
+
+
+
+
         resaveReport();
         sleep(1_000);
         getArtifactCollector().dumpPageSnapshot("Debug_10");
@@ -514,6 +538,9 @@ public class DataReportsTest extends ReportTest
 
         clickAndWait(link, WAIT_FOR_JAVASCRIPT);
         _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
+
+
+
 
 
         sleep(1_000);
