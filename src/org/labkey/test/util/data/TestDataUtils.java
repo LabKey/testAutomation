@@ -578,19 +578,6 @@ public class TestDataUtils
         }
     }
 
-    public static List<String> parseMultiValueText(String multiValueString) throws IOException
-    {
-        CSVFormat format = CSVFormat.RFC4180.builder()
-                .setIgnoreSurroundingSpaces(true).setTrim(true).get();
-        try (CSVParser parser = format.parse(new StringReader(multiValueString)))
-        {
-            List<CSVRecord> records = parser.getRecords();
-            if (records.size() != 1)
-                throw new IllegalArgumentException("Invalid multi-value text string: " + multiValueString);
-            return records.getFirst().toList();
-        }
-    }
-
     public static <T> String stringFromRows(List<List<T>> rows, CSVFormat format)
     {
         StringWriter stringWriter = new StringWriter();
