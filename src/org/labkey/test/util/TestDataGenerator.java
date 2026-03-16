@@ -57,6 +57,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -500,12 +501,16 @@ public class TestDataGenerator
 
     public static List<String> randomTextChoice(int size)
     {
-        List<String> textChoices = new ArrayList<>();
-        for (int i = 0; i < size; i++)
+        Set<String> textChoices = new LinkedHashSet<>();
+        while (textChoices.size() < size)
         {
-            textChoices.add(randomString(randomInt(1, 25)));
+            String generated = randomString(randomInt(1, 25)).trim();
+            if (!generated.isEmpty())
+            {
+                textChoices.add(generated);
+            }
         }
-        return textChoices;
+        return new ArrayList<>(textChoices);
     }
 
     public static String randomString(int size, @Nullable String exclusion)

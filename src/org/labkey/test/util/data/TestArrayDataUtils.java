@@ -49,6 +49,8 @@ public class TestArrayDataUtils
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
                         e -> e.getValue().stream()
+                                // Standard alphabetical sort that accounts for symbols and numbers.
+                                // But uppercase letters are positioned before lowercase letters.
                                 .sorted(Comparator
                                         .comparing((String s) -> s.substring(0, 1).toLowerCase())
                                         .thenComparing(s -> s.substring(0, 1))
