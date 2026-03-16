@@ -617,7 +617,7 @@ public class FieldDefinition extends PropertyDescriptor
         ColumnType Sample = new ColumnTypeImpl("Sample", "int", "http://www.labkey.org/exp/xml#sample", new IntLookup( "exp", "Materials"));
         ColumnType Barcode = new ColumnTypeImpl("Unique ID", "string", "http://www.labkey.org/types#storageUniqueId", null);
         ColumnType TextChoice = new ColumnTypeImpl("Text Choice", "string", "http://www.labkey.org/types#textChoice", null);
-        ColumnType MultiValueTextChoice = new ColumnTypeImpl("Text Choice", "string", "http://cpas.fhcrc.org/exp/xml#multiChoice", null);
+        ColumnType MultiValueTextChoice = new ColumnTypeImpl("Text Choice", "http://cpas.fhcrc.org/exp/xml#multiChoice", null, null);
         ColumnType SMILES = new ColumnTypeImpl("SMILES", "string", "http://www.labkey.org/exp/xml#smiles", null);
         ColumnType Calculation = new ColumnTypeImpl("Calculation", null, "http://www.labkey.org/exp/xml#calculated", null);
         /**

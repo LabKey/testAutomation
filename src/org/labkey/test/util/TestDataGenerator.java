@@ -57,6 +57,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -182,6 +183,13 @@ public class TestDataGenerator
                             entityData.put(key, List.of(textChoices.get(textChoiceIndex)));
                         else
                             entityData.put(key, textChoices.get(textChoiceIndex));
+                    }
+                    else if (fieldDefinition.getType().equals(FieldDefinition.ColumnType.MultiValueTextChoice))
+                    {
+                        FieldDefinition.TextChoiceValidator validator =
+                                (FieldDefinition.TextChoiceValidator) fieldDefinition.getValidators().getFirst();
+                        List<String> values = shuffleSelect(validator.getValues());
+                        entityData.put(key, values);
                     }
                 }
             }
@@ -489,6 +497,20 @@ public class TestDataGenerator
     public static String randomString(int size)
     {
         return randomString(size, null);
+    }
+
+    public static List<String> randomTextChoice(int size)
+    {
+        Set<String> textChoices = new LinkedHashSet<>();
+        while (textChoices.size() < size)
+        {
+            String generated = randomString(randomInt(1, 25)).trim();
+            if (!generated.isEmpty())
+            {
+                textChoices.add(generated);
+            }
+        }
+        return List.copyOf(textChoices);
     }
 
     public static String randomString(int size, @Nullable String exclusion)
