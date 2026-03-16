@@ -510,7 +510,7 @@ public class TestDataGenerator
                 textChoices.add(generated);
             }
         }
-        return new ArrayList<>(textChoices);
+        return List.copyOf(textChoices);
     }
 
     public static String randomString(int size, @Nullable String exclusion)
