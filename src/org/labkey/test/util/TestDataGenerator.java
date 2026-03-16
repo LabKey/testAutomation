@@ -188,7 +188,6 @@ public class TestDataGenerator
                         FieldDefinition.TextChoiceValidator validator =
                                 (FieldDefinition.TextChoiceValidator) fieldDefinition.getValidators().getFirst();
                         List<String> values = shuffleSelect(validator.getValues());
-                        Collections.sort(values);
                         entityData.put(key, values);
                     }
                 }
