@@ -13,9 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static org.labkey.test.util.samplemanagement.SMTestUtils.COL_SAMPLE_ID_NAME;
-import static org.labkey.test.util.samplemanagement.SMTestUtils.COL_SAMPLE_NAME_NAME;
-
 public class TestArrayDataUtils
 {
 
@@ -23,7 +20,7 @@ public class TestArrayDataUtils
     {
         return data.stream()
                 .collect(Collectors.toMap(
-                        row -> String.valueOf(row.get(COL_SAMPLE_NAME_NAME) != null ? row.get(COL_SAMPLE_NAME_NAME) : row.get(COL_SAMPLE_ID_NAME)),
+                        row -> String.valueOf(row.get("Name") != null ? row.get("Name") : row.get("SampleID")),
                         row ->
                         {
                             String complexKey = row.keySet().stream()
@@ -96,9 +93,11 @@ public class TestArrayDataUtils
         {
             case ARRAY_CONTAINS_ALL -> actualValues.containsAll(searchValues);
             case ARRAY_CONTAINS_ANY -> searchValues.stream().anyMatch(actualValues::contains);
-            case ARRAY_CONTAINS_EXACT -> actualValues.size() == searchValues.size() && actualValues.containsAll(searchValues);
+            case ARRAY_CONTAINS_EXACT ->
+                    actualValues.size() == searchValues.size() && actualValues.containsAll(searchValues);
             case ARRAY_CONTAINS_NONE -> searchValues.stream().noneMatch(actualValues::contains);
-            case ARRAY_CONTAINS_NOT_EXACT -> !(actualValues.size() == searchValues.size() && actualValues.containsAll(searchValues));
+            case ARRAY_CONTAINS_NOT_EXACT ->
+                    !(actualValues.size() == searchValues.size() && actualValues.containsAll(searchValues));
             case ARRAY_ISEMPTY -> actualValues.isEmpty();
             case ARRAY_ISNOTEMPTY -> !actualValues.isEmpty();
             default -> throw new IllegalArgumentException("Invalid filter type " + type);
