@@ -13,9 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static org.labkey.test.util.samplemanagement.SMTestUtils.COL_SAMPLE_ID_NAME;
-import static org.labkey.test.util.samplemanagement.SMTestUtils.COL_SAMPLE_NAME_NAME;
-
 public class TestArrayDataUtils
 {
 
@@ -23,7 +20,7 @@ public class TestArrayDataUtils
     {
         return data.stream()
                 .collect(Collectors.toMap(
-                        row -> String.valueOf(row.get(COL_SAMPLE_NAME_NAME) != null ? row.get(COL_SAMPLE_NAME_NAME) : row.get(COL_SAMPLE_ID_NAME)),
+                        row -> String.valueOf(row.get("Name") != null ? row.get("Name") : row.get("SampleID")),
                         row ->
                         {
                             String complexKey = row.keySet().stream()
