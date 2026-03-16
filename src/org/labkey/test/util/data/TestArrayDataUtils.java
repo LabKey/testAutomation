@@ -93,11 +93,9 @@ public class TestArrayDataUtils
         {
             case ARRAY_CONTAINS_ALL -> actualValues.containsAll(searchValues);
             case ARRAY_CONTAINS_ANY -> searchValues.stream().anyMatch(actualValues::contains);
-            case ARRAY_CONTAINS_EXACT ->
-                    actualValues.size() == searchValues.size() && actualValues.containsAll(searchValues);
+            case ARRAY_CONTAINS_EXACT -> actualValues.size() == searchValues.size() && actualValues.containsAll(searchValues);
             case ARRAY_CONTAINS_NONE -> searchValues.stream().noneMatch(actualValues::contains);
-            case ARRAY_CONTAINS_NOT_EXACT ->
-                    !(actualValues.size() == searchValues.size() && actualValues.containsAll(searchValues));
+            case ARRAY_CONTAINS_NOT_EXACT -> !(actualValues.size() == searchValues.size() && actualValues.containsAll(searchValues));
             case ARRAY_ISEMPTY -> actualValues.isEmpty();
             case ARRAY_ISNOTEMPTY -> !actualValues.isEmpty();
             default -> throw new IllegalArgumentException("Invalid filter type " + type);
