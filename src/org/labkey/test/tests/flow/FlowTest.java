@@ -821,7 +821,7 @@ public class FlowTest extends BaseFlowTest
         beginAt(buildURL("flow", getContainerPath(), "query", Map.of("schemaName", "flow", "query.queryName", "FCSAnalyses")));
         DataRegionTable drt = new DataRegionTable("query", getDriver());
         String error = BootstrapLocators.warningBanner.findElement(drt.getComponentElement()).getText();
-        assertEquals("Ignoring filter/sort on column '" + reportName + ".Response' because it does not exist.", error);
+        assertEquals("Ignoring filter/sort on column '" + reportName + ".Response' because it does not exist or the filter type is invalid.", error);
     }
 
     private void clickButtonWithText(String text)
