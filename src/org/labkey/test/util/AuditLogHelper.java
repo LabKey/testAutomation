@@ -15,14 +15,12 @@ import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.remoteapi.query.Sort;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
-import org.labkey.test.WebTestHelper;
 import org.labkey.test.pages.core.admin.ShowAdminPage;
 import org.labkey.test.pages.core.admin.ShowAuditLogPage;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -92,6 +90,8 @@ public class AuditLogHelper
         ASSAY_AUDIT_EVENT("AssayAuditEvent"), // available with SampleManagement module
         ASSAY_RESULT_AUDIT_EVENT("AssayResultAuditEvent"), // available with SampleManagement module
         ATTACHMENT_AUDIT_EVENT("AttachmentAuditEvent"),
+        DOMAIN_AUDIT_EVENT("DomainAuditEvent"),
+        DOMAIN_PROPERTY_AUDIT_EVENT("DomainPropertyAuditEvent"),
         EXPERIMENT_AUDIT_EVENT("ExperimentAuditEvent"),
         FILE_SYSTEM_EVENT("FileSystem"),
         GRID_VIEW_AUDIT_EVENT("GridViewAuditEvent"),
@@ -101,6 +101,7 @@ public class AuditLogHelper
         PLATE_DATA_AUDIT_EVENT("PlateDataAuditEvent"), // available in Biologics module
         PLATE_SET_AUDIT_EVENT("PlateSetEvent"), // available in Biologics module
         QUERY_UPDATE_AUDIT_EVENT("QueryUpdateAuditEvent"),
+        REGISTRY_AUDIT_EVENT("RegistryEvent"), // available in Biologics module
         SAMPLE_SET_AUDIT_EVENT("SampleSetAuditEvent"),
         SAMPLE_TIMELINE_EVENT("SampleTimelineEvent"),
         SAMPLE_WORKFLOW_AUDIT_EVENT("SamplesWorkflowAuditEvent"),
@@ -137,7 +138,7 @@ public class AuditLogHelper
         FileWatcher;
     }
 
-    public Integer getLatestAuditRowId(String auditTable) throws IOException, CommandException
+    public Integer getLatestAuditRowId(String auditTable)
     {
         String rowId = "rowId";
 
@@ -147,13 +148,12 @@ public class AuditLogHelper
         selectRows.setMaxRows(1);
         selectRows.setContainerFilter(ContainerFilter.AllFolders);
 
-        SelectRowsResponse response = selectRows.execute(_connectionSupplier.get(), null);
-        List<Map<String, Object>> rows = response.getRows();
+        List<Map<String, Object>> rows = executeSelectCommand(selectRows);
         if (rows.isEmpty())
         {
             return 0;
         }
-        return (Integer) rows.get(0).get(rowId);
+        return (Integer) rows.getFirst().get(rowId);
     }
 
     public DataRegionTable beginAtAuditEventView(String auditTable, Integer rowIdCutoff)
@@ -179,25 +179,25 @@ public class AuditLogHelper
      * Get the audit logs from the LabKey server filtered to the given project.
      *
      * @param containerPath Path of the LK container to use for the select command.
-     * @param auditEventName Name of the audit event to filter on. Example 'SamplesWorkflowAuditEvent'.
+     * @param auditEvent Name of the audit event to filter on. Example 'SamplesWorkflowAuditEvent'.
      * @param columnNames The name of the columns to return.
      * @param filters The filters to be applied
      * @param maxRows The maximum number of rows to return. If null, all rows for the provided filters will be returned.
-     * @param containerFilter The container filter to be applied. If null, default is ContainerFilter.Current.
+     * @param containerFilter The container filter to be applied. If null, the default is ContainerFilter.Current.
      * @return A rowResponse with the query logs.
      * @throws IOException Can be thrown by the SelectRowsCommand.
      * @throws CommandException Can be thrown by the SelectRowsCommand.
      */
-    public SelectRowsResponse getAuditLogsFromLKS(String containerPath, AuditEvent auditEventName, List<String> columnNames,
+    public SelectRowsResponse getAuditLogsFromLKS(String containerPath, AuditEvent auditEvent, List<String> columnNames,
                                                         @Nullable List<Filter> filters, @Nullable Integer maxRows, @Nullable ContainerFilter containerFilter) throws IOException, CommandException
     {
-        return getAuditLogsFromLKS(containerPath, _wrapper.getCurrentProject(), auditEventName, columnNames, filters, maxRows, containerFilter);
+        return getAuditLogsFromLKS(containerPath, _wrapper.getCurrentProject(), auditEvent, columnNames, filters, maxRows, containerFilter);
     }
 
-    public SelectRowsResponse getAuditLogsFromLKS(String containerPath, @NotNull String projectName, AuditEvent auditEventName, List<String> columnNames,
+    public SelectRowsResponse getAuditLogsFromLKS(String containerPath, @NotNull String projectName, AuditEvent auditEvent, List<String> columnNames,
                                                   @Nullable List<Filter> filters, @Nullable Integer maxRows, @Nullable ContainerFilter containerFilter) throws IOException, CommandException
     {
-        SelectRowsCommand cmd = new SelectRowsCommand("auditLog", auditEventName.getName());
+        SelectRowsCommand cmd = new SelectRowsCommand("auditLog", auditEvent.getName());
         cmd.setColumns(columnNames);
         cmd.addFilter("ProjectId/Name", projectName, Filter.Operator.EQUAL);
         if (filters != null)
@@ -220,7 +220,7 @@ public class AuditLogHelper
     {
         List<Filter> transactionFilter = new ArrayList<>();
         if (transactionId != null)
-            transactionFilter.add(new Filter("TransactionId", transactionId, Filter.Operator.EQUAL));
+            transactionFilter.add(new Filter("TransactionId", transactionId));
         if (eventFilters != null && !eventFilters.isEmpty())
             transactionFilter.addAll(eventFilters);
         return getAuditLogsFromLKS(containerPath, auditEventName, columnNames, transactionFilter, null, containerFilter).getRows();
@@ -236,7 +236,7 @@ public class AuditLogHelper
     {
         List<Filter> transactionFilter = new ArrayList<>();
         if (transactionId != null)
-            transactionFilter.add(new Filter("TransactionId", transactionId, Filter.Operator.EQUAL));
+            transactionFilter.add(new Filter("TransactionId", transactionId));
         if (eventFilters != null && !eventFilters.isEmpty())
             transactionFilter.addAll(eventFilters);
         return getAuditLogsFromLKS(containerPath, projectName, auditEventName, columnNames, transactionFilter, null, containerFilter).getRows();
@@ -261,7 +261,7 @@ public class AuditLogHelper
 
     public void checkAuditEventValuesForTransactionId(String containerPath, AuditEvent auditEventName, Integer transactionId, List<Map<String, Object>> expectedValues) throws IOException, CommandException
     {
-        List<String> columnNames = expectedValues.get(0).keySet().stream().map(Object::toString).toList();
+        List<String> columnNames = expectedValues.getFirst().keySet().stream().map(Object::toString).toList();
         checkAuditEventValuesForTransactionId(containerPath, auditEventName, columnNames, transactionId, expectedValues);
     }
 
@@ -278,14 +278,13 @@ public class AuditLogHelper
 
     public Map<String, Object> getTransactionAuditLogDetails(Integer transactionAuditId)
     {
-        Connection cn = WebTestHelper.getRemoteApiConnection();
-        SelectRowsCommand cmd = new SelectRowsCommand("auditLog", "TransactionAuditEvent");
+        SelectRowsCommand cmd = new SelectRowsCommand("auditLog", AuditEvent.TRANSACTION_AUDIT_EVENT.getName());
         cmd.setRequiredVersion(9.1);
-        cmd.setColumns(Arrays.asList("TransactionDetails"));
+        cmd.setColumns(List.of("TransactionDetails"));
         cmd.addFilter("RowId", transactionAuditId, Filter.Operator.EQUAL);
         cmd.setContainerFilter(ContainerFilter.AllFolders);
 
-        Map<String, Object> event = executeSelectCommand(cn, cmd).get(0);
+        Map<String, Object> event = executeSelectCommand(cmd).getFirst();
         String detailJSON = getLogColumnValue(event, "TransactionDetails");
         log("TransactionAuditEvent Details: " + detailJSON);
         if (detailJSON == null || detailJSON.isEmpty())
@@ -376,14 +375,13 @@ public class AuditLogHelper
 
     public void checkAuditLogDataChanges(AuditEvent auditEventName, int transactionId, List<String> changes)
     {
-        Connection cn = WebTestHelper.getRemoteApiConnection();
         SelectRowsCommand cmd = new SelectRowsCommand("auditLog", auditEventName.getName());
         cmd.setRequiredVersion(9.1);
-        cmd.setColumns(Arrays.asList("oldvalues", "newvalues", "datachanges"));
+        cmd.setColumns(List.of("oldvalues", "newvalues", "datachanges"));
         cmd.addFilter("transactionauditid", transactionId, Filter.Operator.EQUAL);
         cmd.setContainerFilter(ContainerFilter.AllFolders);
 
-        Map<String, Object> event = executeSelectCommand(cn, cmd).get(0);
+        Map<String, Object> event = executeSelectCommand(cmd).getFirst();
 
         String datachanges = getLogColumnDisplayValue(event, "datachanges").toLowerCase();
 
@@ -397,7 +395,7 @@ public class AuditLogHelper
         try
         {
             List<Map<String, Object>> events = getAuditLogsFromLKS(containerPath, auditEventName, List.of("TransactionId"), Collections.emptyList(), 1, ContainerFilter.CurrentAndSubfolders).getRows();
-            return events.size() == 1 ? (Integer) events.get(0).get("TransactionId") : null;
+            return events.size() == 1 ? (Integer) events.getFirst().get("TransactionId") : null;
         }
         catch (Exception e)
         {
@@ -410,7 +408,7 @@ public class AuditLogHelper
         try
         {
             List<Map<String, Object>> events = getAuditLogsFromLKS(containerPath, AuditEvent.TRANSACTION_AUDIT_EVENT, List.of("RowId"), Collections.emptyList(), 1, ContainerFilter.CurrentAndSubfolders).getRows();
-            return events.size() == 1 ? (Integer) events.get(0).get("RowId") : null;
+            return events.size() == 1 ? (Integer) events.getFirst().get("RowId") : null;
         }
         catch (Exception e)
         {
@@ -423,7 +421,7 @@ public class AuditLogHelper
         try
         {
             List<Map<String, Object>> events = getAuditLogsFromLKS(containerPath, auditEventName, List.of("RowId"), Collections.emptyList(), 1, ContainerFilter.CurrentAndSubfolders).getRows();
-            return events.size() == 1 ? (Integer) events.get(0).get("RowId") : null;
+            return events.size() == 1 ? (Integer) events.getFirst().get("RowId") : null;
         }
         catch (Exception e)
         {
@@ -470,14 +468,14 @@ public class AuditLogHelper
         Integer transactionId = getLastTransactionId(containerPath, auditEventName);
         List<Filter> transactionFilter = new ArrayList<>();
         if (transactionId != null)
-            transactionFilter.add(new Filter("TransactionId", transactionId, Filter.Operator.EQUAL));
+            transactionFilter.add(new Filter("TransactionId", transactionId));
         if (eventFilters != null && !eventFilters.isEmpty())
             transactionFilter.addAll(eventFilters);
         List<Map<String, Object>> events = getAuditLogsFromLKS(containerPath, auditEventName, List.of("Comment", "UserComment", "NewRecordMap"), transactionFilter, null, ContainerFilter.CurrentAndSubfolders).getRows();
         if (expectedEventCount != null)
         {
-            if (expectedEventCount.intValue() != events.size())
-                log("Last audit event info: " + events.get(0));
+            if (expectedEventCount != events.size())
+                log("Last audit event info: " + events.getFirst());
             assertEquals("Unexpected number of events for transactionId " + transactionId, expectedEventCount.intValue(), events.size());
         }
         List<Integer> expectedChangeCounts = Collections.nCopies(events.size(), expectedDiffCount);
@@ -558,7 +556,7 @@ public class AuditLogHelper
         if (expectedAuditDetails.size() != actualAuditDetails.size())
         {
             pass = false;
-            log(String.format("Number of DomainPropertyAuditEvent events not as expected. Expected %d, Actual %d.", expectedAuditDetails.size(), actualAuditDetails.size()));
+            log(String.format("Number of %s events not as expected. Expected %d, Actual %d.", AuditEvent.DOMAIN_PROPERTY_AUDIT_EVENT.getName(), expectedAuditDetails.size(), actualAuditDetails.size()));
         }
 
         for (String key : expectedAuditDetails.keySet())
@@ -568,7 +566,7 @@ public class AuditLogHelper
             if (actualAuditDetail == null)
             {
                 pass = false;
-                log("Field " + key + " is missing DomainPropertyAuditEvent.");
+                log(String.format("Field %s is missing %s", key, AuditEvent.DOMAIN_PROPERTY_AUDIT_EVENT.getName()));
             }
             else
                 pass = pass && validateDetailAuditLog(expectedAuditDetail, actualAuditDetail);
@@ -607,7 +605,7 @@ public class AuditLogHelper
         List<DetailedAuditEventRow> eventLog = getDomainAuditEventLog(projectName, domainName, null, 1);
         if (eventLog.isEmpty())
             return null;
-        return eventLog.get(0);
+        return eventLog.getFirst();
     }
 
     public @Nullable Integer getLastDomainEventId(String projectName, String domainName)
@@ -757,10 +755,9 @@ public class AuditLogHelper
         log("Get a list of the Domain Events for project '" + projectName + "'. ");
         domainName = domainName.trim();
 
-        Connection cn = WebTestHelper.getRemoteApiConnection();
-        SelectRowsCommand cmd = new SelectRowsCommand("auditLog", "DomainAuditEvent");
+        SelectRowsCommand cmd = new SelectRowsCommand("auditLog", AuditEvent.DOMAIN_AUDIT_EVENT.getName());
         cmd.setRequiredVersion(9.1);
-        cmd.setColumns(Arrays.asList("rowid", "domainuri", "domainname", "comment", "usercomment", "oldvalues", "newvalues", "datachanges"));
+        cmd.setColumns(List.of("rowid", "domainuri", "domainname", "comment", "usercomment", "oldvalues", "newvalues", "datachanges"));
         cmd.addFilter("projectid/DisplayName", projectName, Filter.Operator.EQUAL);
         cmd.addFilter("domainname", domainName, Filter.Operator.EQUAL);
         if (null != ignoreIds)
@@ -774,7 +771,7 @@ public class AuditLogHelper
         if (maxRows != null)
             cmd.setMaxRows(maxRows);
 
-        List<Map<String, Object>> domainAuditEventAllRows = executeSelectCommand(cn, cmd);
+        List<Map<String, Object>> domainAuditEventAllRows = executeSelectCommand(cmd);
         log(String.format("Number of Domain Event log entries for domain '%s' in '%s': %d", domainName, projectName, domainAuditEventAllRows.size()));
 
         List<DetailedAuditEventRow> domainAuditEventRows = new ArrayList<>();
@@ -796,10 +793,10 @@ public class AuditLogHelper
 
     private List<Map<String, Object>> getDomainPropertyEventLog(String domainName, @Nullable List<Integer> eventIds)
     {
-        Connection cn = WebTestHelper.getRemoteApiConnection();
-        SelectRowsCommand cmd = new SelectRowsCommand("auditLog", "DomainPropertyAuditEvent");
+        SelectRowsCommand cmd = new SelectRowsCommand("auditLog", AuditEvent.DOMAIN_PROPERTY_AUDIT_EVENT.getName());
         cmd.setRequiredVersion(9.1);
-        cmd.setColumns(Arrays.asList("Created", "CreatedBy", "ImpersonatedBy", "propertyname", "action", "domainname", "domaineventid", "Comment", "UserComment", "oldvalues", "newvalues", "datachanges"));
+        cmd.setColumns(List.of("Created", "CreatedBy", "ImpersonatedBy", "propertyname", "action", "domainname", "domaineventid", "Comment", "UserComment", "oldvalues", "newvalues", "datachanges"));
+        cmd.setContainerFilter(ContainerFilter.AllFolders);
         cmd.addFilter("domainname", domainName, Filter.Operator.EQUAL);
 
         if (null != eventIds)
@@ -808,19 +805,16 @@ public class AuditLogHelper
             cmd.addFilter("domaineventid/rowid", rowIds, Filter.Operator.IN);
         }
 
-        cmd.setContainerFilter(ContainerFilter.AllFolders);
-
-        return executeSelectCommand(cn, cmd);
+        return executeSelectCommand(cmd);
     }
 
-    private List<Map<String, Object>> executeSelectCommand(Connection cn, SelectRowsCommand cmd)
+    private List<Map<String, Object>> executeSelectCommand(SelectRowsCommand cmd)
     {
-        List<Map<String, Object>> rowsReturned = new ArrayList<>();
         try
         {
-            SelectRowsResponse response = cmd.execute(cn, "/");
+            SelectRowsResponse response = cmd.execute(_connectionSupplier.get(), "/");
             log("Number of rows: " + response.getRowCount());
-            rowsReturned.addAll(response.getRows());
+            return response.getRows();
         }
         catch (IOException | CommandException ex)
         {
@@ -828,43 +822,7 @@ public class AuditLogHelper
             fail("There was a command exception when getting the log: " + ex);
         }
 
-        return rowsReturned;
-    }
-
-    private Map<String, String> getDomainPropertyEventComment(Map<String, Object> row)
-    {
-        String comment = getLogColumnValue(row, "Comment");
-        if (comment != null)
-            return null;
-
-        String[] commentAsArray = comment.split(";");
-
-        Map<String, String> fieldComments = new HashMap<>();
-
-        for (String s : commentAsArray)
-        {
-            String[] fieldValue = s.split(":");
-
-            // If the split on the ':' produced more than two entries in the array it most likely means that the
-            // comment for that property had a : in it. So treat the first entry as the field name and then concat the
-            // other fields together.
-            // For example the ConditionalFormats field will log the following during an update:
-            // ConditionalFormats: old: <none>, new: 1;
-            // And a create of a Lookup will log as:
-            // Lookup: [Schema: lists, Query: LookUp01];
-            StringBuilder sb = new StringBuilder();
-            sb.append(fieldValue[1].trim());
-
-            for (int j = 2; j < fieldValue.length; j++)
-            {
-                sb.append(":");
-                sb.append(fieldValue[j]);
-            }
-
-            fieldComments.put(fieldValue[0].trim(), sb.toString());
-        }
-
-        return fieldComments;
+        return Collections.emptyList();
     }
 
     private String getLogColumnValue(Map<String, Object> rowEntry, String columnName, String valueType)
