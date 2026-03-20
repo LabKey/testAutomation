@@ -2,11 +2,13 @@ package org.labkey.test.util.data;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.CSVRecord;
 import org.labkey.remoteapi.query.Filter;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -45,17 +47,25 @@ public class TestArrayDataUtils
                 .filter(entry -> isMatch(entry.getValue(), searchValues, filterType))
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
-                        e -> e.getValue().stream()
-                                // Standard alphabetical sort that accounts for symbols and numbers.
-                                // But uppercase letters are positioned before lowercase letters.
-                                .sorted(Comparator
-                                        .comparing((String s) -> s.substring(0, 1).toLowerCase())
-                                        .thenComparing(s -> s.substring(0, 1))
-                                        .thenComparing(s -> s))
-                                .collect(Collectors.toList()),
+                        e -> sortValues(e.getValue()),
                         (e1, e2) -> e1,
                         LinkedHashMap::new
                 ));
+    }
+
+    /**
+     * Standard alphabetical sort that accounts for symbols and numbers.
+     * Uppercase letters are positioned before lowercase letters.
+     */
+    public static List<String> sortValues(List<String> values)
+    {
+        return values.stream()
+                .filter(s -> !s.isEmpty())
+                .sorted(Comparator
+                        .comparing((String s) -> s.substring(0, 1).toLowerCase())
+                        .thenComparing(s -> s.substring(0, 1))
+                        .thenComparing(s -> s))
+                .collect(Collectors.toList());
     }
 
     public static Map<String, String> prepareMapForCheck(Map<String, List<String>> map)
@@ -85,6 +95,21 @@ public class TestArrayDataUtils
                 throw new IllegalArgumentException("Invalid multi-value text string: " + multiValueString);
             return records.getFirst().toList();
         }
+    }
+
+    public static String formatMultiValueText(List<String> values)
+    {
+        CSVFormat format = CSVFormat.RFC4180;
+        StringWriter stringWriter = new StringWriter();
+        try (CSVPrinter printer = new CSVPrinter(stringWriter, format))
+        {
+            printer.printRecord(values);
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException("Failed to format multi-value text", e);
+        }
+        return stringWriter.toString().trim();
     }
 
     private static boolean isMatch(List<String> actualValues, List<String> searchValues, Filter.Operator type)
