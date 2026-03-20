@@ -68,6 +68,14 @@ public class TestArrayDataUtils
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Sorts values alphabetically and joins them with the given separator.
+     */
+    public static String sortAndJoin(List<String> values, String separator)
+    {
+        return String.join(separator, sortValues(values));
+    }
+
     public static Map<String, String> prepareMapForCheck(Map<String, List<String>> map)
     {
         return map.entrySet().stream()
