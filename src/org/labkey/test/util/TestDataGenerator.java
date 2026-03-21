@@ -670,16 +670,16 @@ public class TestDataGenerator
                 + WIDE_PLACEHOLDER + REPEAT_PLACEHOLDER + ALL_CHARS_PLACEHOLDER;
 
         int currentTries = 0;
-        RandomName randomFieldName = randomName(part, getNumChars(numStartChars, 5), getNumChars(numEndChars, 50), chars, exclusion);
+        RandomName randomFieldName = randomName(part, getNumChars(numStartChars, 5), getNumChars(numEndChars, 48), chars, exclusion);
         while ((maxLength != null && randomFieldName.name().length() > maxLength) || isDomainAndFieldNameInvalid(_domainKind, null, randomFieldName))
         {
-            randomFieldName = randomName(part, getNumChars(numStartChars, 5), getNumChars(numEndChars, 50), chars, exclusion);
+            randomFieldName = randomName(part, getNumChars(numStartChars, 5), getNumChars(numEndChars, 48), chars, exclusion);
             if (++currentTries >= MAX_RANDOM_TRIES)
                 throw new IllegalStateException("Failed to generate a valid field name after " + MAX_RANDOM_TRIES + " tries. Last generated name: " + randomFieldName);
         }
 
         TestLogger.log("Generated random field name for domainKind " + _domainKind + ": " + randomFieldName);
-        return randomFieldName.name();
+        return randomFieldName.name() + "\"\'";
     }
 
     private static boolean isDomainAndFieldNameInvalid(DomainKind domainKind, @Nullable RandomName domainName, @Nullable RandomName fieldName)
