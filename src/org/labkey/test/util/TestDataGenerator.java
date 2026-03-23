@@ -504,7 +504,7 @@ public class TestDataGenerator
         Set<String> textChoices = new LinkedHashSet<>();
         while (textChoices.size() < size)
         {
-            String generated = randomString(randomInt(1, 25)).trim();
+            String generated = randomString(randomInt(1, 25), "%<>").trim();
             if (!generated.isEmpty())
             {
                 textChoices.add(generated);
