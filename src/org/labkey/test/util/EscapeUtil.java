@@ -282,7 +282,7 @@ public class EscapeUtil
      */
     public static String getFormFieldName(String columnName, @Nullable String prefix)
     {
-        String name = prefix + columnName;
+        String name = Objects.toString(prefix,"") + columnName;
 
         final String escapeChar = "%";
         final String problemChars = "\\\"";

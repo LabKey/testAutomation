@@ -1654,7 +1654,6 @@ public class ListTest extends BaseWebDriverTest
         // setup a list with an auto-increment key that we need to make sure is encoded in the form input
         String encodedListName = "autoIncrementEncodeList";
         String keyName = "'><script>alert(\":(\")</script>'";
-        String encodedKeyFieldName = EscapeUtil.getFormFieldName(keyName);
         _listHelper.createList(PROJECT_VERIFY, encodedListName, keyName, col("Name", ColumnType.String));
         _listHelper.goToList(encodedListName);
 
@@ -1666,7 +1665,7 @@ public class ListTest extends BaseWebDriverTest
 
         // insert a new row and verify the key field is not present
         table.clickInsertNewRow();
-        checker().withScreenshot().verifyEquals("List fields on insert form.", List.of("quf_Name"), getQueryFormFieldNames());
+        checker().withScreenshot().verifyEquals("List fields on insert form.", List.of("Name"), getQueryFormFieldNamesDecoded());
         String nameValue = "test";
         setFormElement(Locator.name(EscapeUtil.getFormFieldName("Name")), nameValue);
         clickButton("Submit");
@@ -1678,7 +1677,7 @@ public class ListTest extends BaseWebDriverTest
 
         // verify name value can be updated
         table.clickEditRow(0);
-        checker().withScreenshot().verifyEquals("List fields on update form.", List.of("quf_Name", encodedKeyFieldName), getQueryFormFieldNames());
+        checker().withScreenshot().verifyEquals("List fields on update form.", List.of("Name", keyName), getQueryFormFieldNamesDecoded());
         nameValue = "test updated";
         setFormElement(Locator.name(EscapeUtil.getFormFieldName("Name")), nameValue);
         clickButton("Submit");
@@ -1728,12 +1727,20 @@ public class ListTest extends BaseWebDriverTest
         _listHelper.deleteList();
     }
 
-    private List<String> getQueryFormFieldNames()
+ private List<String> getQueryFormFieldNamesDecoded()
     {
-        return Locator.tag("input").attributeStartsWith("name", "quf_")
-            .findElements(getDriver()).stream()
-            .map(el -> el.getDomAttribute("name"))
-            .toList();
+        ArrayList<String> ret = new ArrayList<>();
+        Locator.tag("input").attributeStartsWith("name", "quf_")
+                .findElements(getDriver()).stream()
+                .map(el -> el.getDomAttribute("name"))
+                .map(s -> s.substring(4))
+                .forEach(name -> ret.add(name));
+        Locator.tag("input").attributeStartsWith("name", "%_quf_")
+                .findElements(getDriver()).stream()
+                .map(el -> el.getDomAttribute("name"))
+                .map(name -> EscapeUtil.decode(name.substring(6)))
+                .forEach(name -> ret.add(name));
+        return ret;
     }
 
     private void viewRawTableMetadata(String listName)
