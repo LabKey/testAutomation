@@ -437,109 +437,27 @@ public class DataReportsTest extends ReportTest
         _rReportHelper.ensureFieldSetExpanded("Shared Scripts");
         _ext4Helper.checkCheckbox(R_SCRIPTS[0]);
         _ext4Helper.checkCheckbox(R_SCRIPTS[1]);
-        assertTrue("Script didn't execute as expected", _rReportHelper.executeScript(R_SCRIPT3(DATA_BASE_PREFIX, "mouseid"), R_SCRIPT2_TEXT1));
+        assertTrue("Script didn't execute as expeced", _rReportHelper.executeScript(R_SCRIPT3(DATA_BASE_PREFIX, "mouseid"), R_SCRIPT2_TEXT1));
         saveReport(R_SCRIPTS[2]);
 
         log("Test editing R scripts");
         signIn(); // Reset session to make sure R report isn't cached
         navigateToFolder(getProjectName(), getFolderName());
         clickReportGridLink(R_SCRIPTS[0]);
-
-        // Trying to debug windows failures on TC.
-        sleep(1_000);
-        getArtifactCollector().dumpPageSnapshot("Debug_01");
-        log("Script: function: " + R_SCRIPT1_EDIT_FUNC);
-        log("Script: database: " + DATA_BASE_PREFIX);
-        log("Script: R_SCRIPT1: " + R_SCRIPT1(R_SCRIPT1_EDIT_FUNC, DATA_BASE_PREFIX));
-
-
-
-        // Trying to debug windows failures on TC.
-        // Moved the code behind the call to _rReportHelper.executeScript into this test to make loggin less obnoxious for other tests.
-//        assertTrue("Script didn't execute as expected", _rReportHelper.executeScript(R_SCRIPT1(R_SCRIPT1_EDIT_FUNC, DATA_BASE_PREFIX), R_SCRIPT1_TEXT1));
-        _rReportHelper.clickSourceTab();
-
-        setCodeEditorValue("script-report-editor", R_SCRIPT1(R_SCRIPT1_EDIT_FUNC, DATA_BASE_PREFIX));
-        sleep(1_000);
-        getArtifactCollector().dumpPageSnapshot("Debug_09_A");
-
-        _rReportHelper.clickReportTab();
-        sleep(1_000);
-        getArtifactCollector().dumpPageSnapshot("Debug_09_B");
-
-        String html = _rReportHelper.getReportText();
-        log("_rReportHelper.getReportText(): " + html);
-        log("expected text: " + R_SCRIPT1_TEXT1);
-        log("checkScriptOutput: " + _rReportHelper.checkScriptOutput(html, R_SCRIPT1_TEXT1, true));
-
-
-
-
+        assertTrue("Script didn't execute as expeced", _rReportHelper.executeScript(R_SCRIPT1(R_SCRIPT1_EDIT_FUNC, DATA_BASE_PREFIX), R_SCRIPT1_TEXT1));
         resaveReport();
-
-        // Trying to debug windows failures on TC.
-        sleep(1_000);
-        getArtifactCollector().dumpPageSnapshot("Debug_02");
 
         log("Check that edit worked");
         navigateToFolder(getProjectName(), getFolderName());
         clickReportGridLink(R_SCRIPTS[1]);
-
-        // Trying to debug windows failures on TC.
-        sleep(1_000);
-        getArtifactCollector().dumpPageSnapshot("Debug_03");
-        log("URL 01: " + getURL().toString());
-
         waitAndClick(Locator.lkButton("Start Job"));
 
         WebElement pipelineLink = waitForElement(Locator.linkWithText("click here"));
         waitForElement(Locator.byClass("x4-window").containing("Start Pipeline Job").hidden());
-
-        // Trying to debug windows failures on TC.
-        sleep(1_000);
-        getArtifactCollector().dumpPageSnapshot("Debug_04");
-        log("URL 02: " + getURL().toString());
-
         clickAndWait(pipelineLink);
         waitForPipelineJobsToComplete(2, false);
-
-        // Trying to debug windows failures on TC.
-        clickAndWait(Locator.linkWithText("COMPLETE"));
-        click(Locator.linkWithText("Show full log file"));
-        sleep(1_000);
-        getArtifactCollector().dumpPageSnapshot("Debug_05");
-        log("URL 03: " + getURL().toString());
-
-
-        // Trying to debug windows failures on TC.
-        // Moving code for the next few lines to make logging less obnoxious.
         // go back to the report and confirm it is visible
         clickReportGridLink(R_SCRIPTS[1]);
-
-//        Locator link = getReportGridLink(R_SCRIPTS[1], true);
-//        goToManageViews();
-        clickAdminMenuItem("Manage Views");
-        waitForElement(Locator.xpath("//*[starts-with(@id, 'dataviews-panel')]"));
-        _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
-
-        sleep(1_000);
-        getArtifactCollector().dumpPageSnapshot("Debug_06");
-        log("URL 04: " + getURL().toString());
-
-        //clickReportGridLink
-        waitForElement(Locator.linkWithText(R_SCRIPTS[1]), WAIT_FOR_JAVASCRIPT);
-        Locator link =  Locator.linkWithText(R_SCRIPTS[1]);
-        sleep(1_000);
-        getArtifactCollector().dumpPageSnapshot("Debug_07");
-        log("URL 05: " + getURL().toString());
-
-        clickAndWait(link, WAIT_FOR_JAVASCRIPT);
-        _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
-
-        sleep(1_000);
-        getArtifactCollector().dumpPageSnapshot("Debug_08");
-        log("URL 06: " + getURL().toString());
-
         waitForElement(Locator.tagWithName("img", "resultImage"));
         assertTextPresent(R_SCRIPT2_TEXT2);
         assertTextNotPresent(R_SCRIPT2_TEXT1);
