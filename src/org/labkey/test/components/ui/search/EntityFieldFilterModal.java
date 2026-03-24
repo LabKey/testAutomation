@@ -36,8 +36,7 @@ public class EntityFieldFilterModal extends GridFilterModal
     public EntityFieldFilterModal selectQuery(String queryName)
     {
         WebElement queryItem = elementCache().findQueryOption(queryName);
-        getWrapper().doAndWaitForElementToRefresh(queryItem::click,
-                () -> elementCache().listItemLoc.findElement(elementCache().fieldsSelectionPanel), getWrapper().shortWait());
+        queryItem.click();
 
         getWrapper().shortWait().until(ExpectedConditions.invisibilityOfElementLocated(BootstrapLocators.loadingSpinner));
 
