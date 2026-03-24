@@ -8,6 +8,7 @@ import org.labkey.test.util.TestDataGenerator;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.regex.Matcher;
 
 import static org.labkey.test.util.TestDataGenerator.ALL_CHARS_PLACEHOLDER;
 import static org.labkey.test.util.TestDataGenerator.WIDE_PLACEHOLDER;
@@ -41,7 +42,8 @@ public class ContainerInfo
             if (name.startsWith("@"))
             {
                 // Folder name may not begin with '@'
-                name = name.replaceFirst("@", TestDataGenerator.randomString(1, "@", RANDOM_CHARSET));
+                String replacement = TestDataGenerator.randomString(1, "@", RANDOM_CHARSET);
+                name = name.replaceFirst("@", Matcher.quoteReplacement(replacement));
             }
             return name;
         }
