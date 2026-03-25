@@ -2,13 +2,11 @@ package org.labkey.test.util.data;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.CSVRecord;
 import org.labkey.remoteapi.query.Filter;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.io.StringWriter;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -105,19 +103,9 @@ public class TestArrayDataUtils
         }
     }
 
-    public static String formatMultiValueText(List<String> values)
+    public static <T> String formatMultiValueText(List<T> values)
     {
-        CSVFormat format = CSVFormat.RFC4180;
-        StringWriter stringWriter = new StringWriter();
-        try (CSVPrinter printer = new CSVPrinter(stringWriter, format))
-        {
-            printer.printRecord(values);
-        }
-        catch (IOException e)
-        {
-            throw new RuntimeException("Failed to format multi-value text", e);
-        }
-        return stringWriter.toString().trim();
+        return values.stream().map(CSVFormat.DEFAULT::format).collect(Collectors.joining(","));
     }
 
     private static boolean isMatch(List<String> actualValues, List<String> searchValues, Filter.Operator type)
