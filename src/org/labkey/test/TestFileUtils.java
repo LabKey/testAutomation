@@ -38,6 +38,7 @@ import org.bouncycastle.openpgp.operator.jcajce.JcaPGPDigestCalculatorProviderBu
 import org.bouncycastle.openpgp.operator.jcajce.JcePBEDataDecryptorFactoryBuilder;
 import org.bouncycastle.util.io.Streams;
 import org.jetbrains.annotations.NotNull;
+import org.junit.Assert;
 import org.labkey.api.util.FileUtil;
 import org.jetbrains.annotations.Nullable;
 import org.openqa.selenium.NotFoundException;
@@ -442,6 +443,25 @@ public abstract class TestFileUtils
         catch (IOException e)
         {
             LOG.info("WARNING: Exception deleting directory -- " + e.getMessage());
+        }
+    }
+
+    public static void renameDir(Path sourceDir, String newDirName)
+    {
+        LOG.info("Renaming " + sourceDir + " to " + newDirName);
+        checkFileLocation(sourceDir.toFile());
+        Assert.assertTrue(sourceDir + " does not exists.", sourceDir.toFile().exists());
+
+        try
+        {
+            String separator = File.separator;
+            Path newDir = Paths.get(sourceDir.toString().substring(0, sourceDir.toString().lastIndexOf(separator)) + separator + newDirName);
+            Files.move(sourceDir, newDir);
+            LOG.info("Rename successful.");
+        }
+        catch (IOException e)
+        {
+            LOG.info("WARNING: Exception renaming directory -- " + e.getMessage());
         }
     }
 

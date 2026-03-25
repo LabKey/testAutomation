@@ -1,11 +1,11 @@
 package org.labkey.test.tests.assay;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.api.util.FileUtil;
-import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Assays;
@@ -19,6 +19,8 @@ import org.labkey.test.params.assay.GeneralAssayDesign;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.Instant;
 
 /**
  * Issue 54156: Regression test to ensure a reasonable error message is shown when an assay design references
@@ -49,18 +51,19 @@ public class AssayTransformMissingParentDirTest extends AbstractAssayTransformTe
         getArtifactCollector().dumpPageSnapshot("TransformScript_Added");
         assayDesignerPage.clickSave();
 
-        // Now delete the parent dir to ensure we handle it reasonably
-        TestFileUtils.deleteDir(parentDir.toFile());
-
-        int count = 1;
-        while (!FileUtils.isDirectory(parentDir.toFile()) && count <= 5)
+        // Now delete, or rename, the parent dir to ensure we handle it reasonably
+        if (SystemUtils.IS_OS_WINDOWS)
         {
-            sleep(1_000);
+            // Deleting directories on Windows is not always reliable, try renaming as an alternative.
+            String newName = "Not-Here-" + Instant.now().getEpochSecond();
+            TestFileUtils.renameDir(parentDir, newName);
+        }
+        else
+        {
             TestFileUtils.deleteDir(parentDir.toFile());
-            count++;
         }
 
-        Assert.assertFalse(String.format("Directory %s not deleted.", parentDir.toString()),
+        Assert.assertFalse(String.format("Directory %s is still present.", parentDir),
                 FileUtils.isDirectory(parentDir.toFile()));
 
         // Attempt to import data and verify a reasonable error message is shown
