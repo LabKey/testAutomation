@@ -790,6 +790,18 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         return addValuesDialog.clickApply();
     }
 
+    public String setTextChoiceValuesExpectingError(List<String> values)
+    {
+        WebElement button = Locator.tagWithClass("span", "container--action-button").withText("Add Values").findElement(this);
+        button.click();
+
+        TextChoiceValueDialog addValuesDialog = new TextChoiceValueDialog(this);
+        addValuesDialog.addValues(values);
+        String error = addValuesDialog.getError();
+        addValuesDialog.clickCancel();
+        return error;
+    }
+
     /**
      * Get the displayed list of allowed values a TextChoice field.
      *
