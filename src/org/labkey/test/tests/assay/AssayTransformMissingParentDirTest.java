@@ -1,7 +1,6 @@
 package org.labkey.test.tests.assay;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.SystemUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -19,8 +18,7 @@ import org.labkey.test.params.assay.GeneralAssayDesign;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.Instant;
+import java.util.UUID;
 
 /**
  * Issue 54156: Regression test to ensure a reasonable error message is shown when an assay design references
@@ -53,7 +51,7 @@ public class AssayTransformMissingParentDirTest extends AbstractAssayTransformTe
 
         // Now rename the parent dir to ensure we handle it reasonably. Deleting directories on Windows is not always
         // timely, renaming the directory will have the same effect.
-        String newName = "Not-Here-" + Instant.now().getEpochSecond();
+        String newName = "Not-Here-" + UUID.randomUUID();
         TestFileUtils.renameDir(parentDir, newName);
 
         Assert.assertFalse(String.format("Directory %s is still present.", parentDir),

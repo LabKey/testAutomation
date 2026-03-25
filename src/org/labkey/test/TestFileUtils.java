@@ -451,30 +451,21 @@ public abstract class TestFileUtils
      * @param sourceDir the directory to rename
      * @param newDirName the new name for the directory
      */
-    public static void renameDir(Path sourceDir, String newDirName)
+    public static void renameDir(Path sourceDir, String newDirName) throws IOException
     {
         LOG.info("Renaming {} to {}", sourceDir, newDirName);
 
         // Check if the directory is outside the test enlistment.
         checkFileLocation(sourceDir.toFile());
 
-        Assert.assertTrue(sourceDir + " does not exists.", sourceDir.toFile().exists());
+        Assert.assertTrue("Directory does not exist: " + sourceDir, sourceDir.toFile().exists());
 
-        try
-        {
-            // Get the separator appropriate for the given OS.
-            String separator = File.separator;
-            int lastIndex = sourceDir.toString().lastIndexOf(separator);
-            Path newDir = lastIndex <= 0 ?
-                    Paths.get(separator + newDirName) :
-                    Paths.get(sourceDir.toString().substring(0, lastIndex) + separator + newDirName);
-            Files.move(sourceDir, newDir);
-            LOG.info("Rename successful.");
-        }
-        catch (IOException e)
-        {
-            LOG.info("WARNING: Exception renaming directory -- " + e.getMessage());
-        }
+        Path newDir = sourceDir.getParent() != null
+                ? sourceDir.getParent().resolve(newDirName)
+                : Paths.get(newDirName);
+        Files.move(sourceDir, newDir);
+
+        LOG.info("Rename successful.");
     }
 
     private static void checkFileLocation(File file)
