@@ -450,8 +450,9 @@ public abstract class TestFileUtils
      * Rename a directory.
      * @param sourceDir the directory to rename
      * @param newDirName the new name for the directory
+     * @return return the path to the renamed directory
      */
-    public static void renameDir(Path sourceDir, String newDirName) throws IOException
+    public static Path renameDir(Path sourceDir, String newDirName) throws IOException
     {
         LOG.info("Renaming {} to {}", sourceDir, newDirName);
 
@@ -465,7 +466,9 @@ public abstract class TestFileUtils
                 : Paths.get(newDirName);
         Files.move(sourceDir, newDir);
 
-        LOG.info("Rename successful.");
+        LOG.info("Renamed {} to {}", sourceDir, newDir);
+
+        return newDir;
     }
 
     private static void checkFileLocation(File file)

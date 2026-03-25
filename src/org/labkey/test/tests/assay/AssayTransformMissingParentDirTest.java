@@ -46,16 +46,19 @@ public class AssayTransformMissingParentDirTest extends AbstractAssayTransformTe
         assayDesignerPage.goToBatchFields().removeAllFields(true);
         // add by path so the absolute path is stored; this allows reproducing the missing parent dir scenario
         assayDesignerPage.addTransformScript(transformFile);
-        getArtifactCollector().dumpPageSnapshot("TransformScript_Added");
         assayDesignerPage.clickSave();
 
-        // Now rename the parent dir to ensure we handle it reasonably. Deleting directories on Windows is not always
+        // Rename the parent dir to ensure we handle it reasonably. Deleting directories on Windows is not always
         // timely, renaming the directory will have the same effect.
         String newName = "Not-Here-" + UUID.randomUUID();
-        TestFileUtils.renameDir(parentDir, newName);
+        Path renamedDir = TestFileUtils.renameDir(parentDir, newName);
 
         Assert.assertFalse(String.format("Directory %s is still present.", parentDir),
                 FileUtils.isDirectory(parentDir.toFile()));
+
+        // Delete the renamed directory as a cleanup step. Since the directory has been renamed, the slow delete on Windows
+        // will not cause the test to fail.
+        TestFileUtils.deleteDir(renamedDir.toFile());
 
         // Attempt to import data and verify a reasonable error message is shown
         String importData = """
@@ -94,6 +97,7 @@ public class AssayTransformMissingParentDirTest extends AbstractAssayTransformTe
 
         // Verify we land on the run details page and can see the run name (no transform needed)
         new AssayRunsPage(getDriver()).clickAssayIdLink("fixedAssayImport");
+
     }
 
 }
