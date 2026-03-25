@@ -60,7 +60,7 @@ public class TestArrayDataUtils
     public static List<String> sortValues(List<String> values)
     {
         return values.stream()
-                .filter(s -> !s.isEmpty())
+                .peek(s -> { if (s.isEmpty()) throw new IllegalArgumentException("Empty values aren't allowed: " + values);})
                 .sorted(Comparator
                         .comparing((String s) -> s.substring(0, 1).toLowerCase())
                         .thenComparing(s -> s.substring(0, 1))
