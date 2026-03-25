@@ -160,7 +160,7 @@ public class RReportHelper
         return checkScriptOutput(scriptOutput, expectedLines, failOnError);
     }
 
-    public boolean checkScriptOutput(String scriptOutput, String expectedLines, boolean failOnError)
+    private boolean checkScriptOutput(String scriptOutput, String expectedLines, boolean failOnError)
     {
         if (failOnError && doesScriptProduceError(scriptOutput))
             return false;

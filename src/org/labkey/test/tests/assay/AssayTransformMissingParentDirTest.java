@@ -51,17 +51,10 @@ public class AssayTransformMissingParentDirTest extends AbstractAssayTransformTe
         getArtifactCollector().dumpPageSnapshot("TransformScript_Added");
         assayDesignerPage.clickSave();
 
-        // Now delete, or rename, the parent dir to ensure we handle it reasonably
-        if (SystemUtils.IS_OS_WINDOWS)
-        {
-            // Deleting directories on Windows is not always reliable, try renaming as an alternative.
-            String newName = "Not-Here-" + Instant.now().getEpochSecond();
-            TestFileUtils.renameDir(parentDir, newName);
-        }
-        else
-        {
-            TestFileUtils.deleteDir(parentDir.toFile());
-        }
+        // Now rename the parent dir to ensure we handle it reasonably. Deleting directories on Windows is not always
+        // timely, renaming the directory will have the same effect.
+        String newName = "Not-Here-" + Instant.now().getEpochSecond();
+        TestFileUtils.renameDir(parentDir, newName);
 
         Assert.assertFalse(String.format("Directory %s is still present.", parentDir),
                 FileUtils.isDirectory(parentDir.toFile()));

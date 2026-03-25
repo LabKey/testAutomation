@@ -446,16 +446,28 @@ public abstract class TestFileUtils
         }
     }
 
+    /**
+     * Rename a directory.
+     * @param sourceDir the directory to rename
+     * @param newDirName the new name for the directory
+     */
     public static void renameDir(Path sourceDir, String newDirName)
     {
-        LOG.info("Renaming " + sourceDir + " to " + newDirName);
+        LOG.info("Renaming {} to {}", sourceDir, newDirName);
+
+        // Check if the directory is outside the test enlistment.
         checkFileLocation(sourceDir.toFile());
+
         Assert.assertTrue(sourceDir + " does not exists.", sourceDir.toFile().exists());
 
         try
         {
+            // Get the separator appropriate for the given OS.
             String separator = File.separator;
-            Path newDir = Paths.get(sourceDir.toString().substring(0, sourceDir.toString().lastIndexOf(separator)) + separator + newDirName);
+            int lastIndex = sourceDir.toString().lastIndexOf(separator);
+            Path newDir = lastIndex <= 0 ?
+                    Paths.get(separator + newDirName) :
+                    Paths.get(sourceDir.toString().substring(0, lastIndex) + separator + newDirName);
             Files.move(sourceDir, newDir);
             LOG.info("Rename successful.");
         }
@@ -472,7 +484,7 @@ public abstract class TestFileUtils
             if (!FileUtils.directoryContains(getLabKeyRoot(), file))
             {
                 // TODO: Consider throwing IllegalArgumentException
-                LOG.info("DEBUG: Attempting to delete a file outside of test enlistment: " + getLabKeyRoot());
+                LOG.info("DEBUG: Attempting to delete / rename a file outside of test enlistment: " + getLabKeyRoot());
             }
         }
         catch (IOException ignore) { }
