@@ -64,6 +64,18 @@ public class TextChoiceValueDialog extends ModalDialog
     }
 
     /**
+     * Get the error message displayed in the dialog, if any.
+     *
+     * @return The error text, or null if no error is displayed.
+     */
+    public String getError()
+    {
+        WebElement error = Locator.tagWithClass("div", "domain-text-choices-error")
+                .findElementOrNull(this);
+        return error != null ? error.getText() : null;
+    }
+
+    /**
      * Click the apply button.
      *
      * @return The {@link DomainFieldRow} that has the TextChoice field.
