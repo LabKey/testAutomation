@@ -478,7 +478,8 @@ public abstract class TestFileUtils
             if (!FileUtils.directoryContains(getLabKeyRoot(), file))
             {
                 // TODO: Consider throwing IllegalArgumentException
-                LOG.info("DEBUG: Attempting to delete / rename a file outside of test enlistment: " + getLabKeyRoot());
+                LOG.info("DEBUG: Attempting to delete / rename a file, {}, outside of test enlistment {}.",
+                        file, getLabKeyRoot());
             }
         }
         catch (IOException ignore) { }

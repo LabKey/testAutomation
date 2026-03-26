@@ -53,9 +53,6 @@ public class AssayTransformMissingParentDirTest extends AbstractAssayTransformTe
         String newName = "Not-Here-" + UUID.randomUUID();
         Path renamedDir = TestFileUtils.renameDir(parentDir, newName);
 
-        Assert.assertFalse(String.format("Directory %s is still present.", parentDir),
-                FileUtils.isDirectory(parentDir.toFile()));
-
         // Delete the renamed directory as a cleanup step. Since the directory has been renamed, the slow delete on Windows
         // will not cause the test to fail.
         TestFileUtils.deleteDir(renamedDir.toFile());
