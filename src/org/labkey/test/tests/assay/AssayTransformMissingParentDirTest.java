@@ -1,5 +1,7 @@
 package org.labkey.test.tests.assay;
 
+import org.apache.commons.io.FileUtils;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.api.util.FileUtil;
@@ -50,6 +52,9 @@ public class AssayTransformMissingParentDirTest extends AbstractAssayTransformTe
         // timely, renaming the directory will have the same effect.
         String newName = "Not-Here-" + UUID.randomUUID();
         Path renamedDir = TestFileUtils.renameDir(parentDir, newName);
+
+        Assert.assertFalse(String.format("Directory %s is still present.", parentDir),
+                FileUtils.isDirectory(parentDir.toFile()));
 
         // Delete the renamed directory as a cleanup step. Since the directory has been renamed, the slow delete on Windows
         // will not cause the test to fail.
