@@ -1745,7 +1745,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         return errorMessage;
     }
 
-    private ProductKey getProductConfiguration() throws IOException, CommandException
+    protected ProductKey getProductConfiguration() throws IOException, CommandException
     {
         SimpleGetCommand command = new SimpleGetCommand("admin", "productFeature");
         var resp = command.execute(createDefaultConnection(), "/");
