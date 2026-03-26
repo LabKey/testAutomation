@@ -1,7 +1,5 @@
 package org.labkey.test.tests.assay;
 
-import org.apache.commons.io.FileUtils;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.api.util.FileUtil;
@@ -94,7 +92,6 @@ public class AssayTransformMissingParentDirTest extends AbstractAssayTransformTe
 
         // Verify we land on the run details page and can see the run name (no transform needed)
         new AssayRunsPage(getDriver()).clickAssayIdLink("fixedAssayImport");
-
     }
 
 }
