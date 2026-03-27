@@ -49,16 +49,17 @@ public class AssayTransformMissingParentDirTest extends AbstractAssayTransformTe
 
         // Now delete the parent dir to ensure we handle it reasonably. On Windows something locks the directory, maybe
         // an external process. If that happens sleep for a second and try again.
-        for (int i = 0; i < 30; i++) {
+        for (int attempt = 0; attempt < 10; attempt++) {
             try
             {
                 FileUtils.deleteDirectory(parentDir.toFile());
-                log("Deletion successful.");
+                log(String.format("Deletion of directory %s was successful.", parentDir));
                 break;
             } catch (AccessDeniedException e) {
-                log("Access denied trying to delete directory. Waiting and retrying.");
-                if (i == 29) throw e;
-                Thread.sleep(1_000);
+                log(String.format("Access denied trying to delete directory %s. Waiting and retrying. Retry count: %d",
+                        parentDir, attempt));
+                if (attempt == 9) throw e;
+                sleep(10_000);
             }
         }
 
