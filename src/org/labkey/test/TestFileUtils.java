@@ -38,7 +38,6 @@ import org.bouncycastle.openpgp.operator.jcajce.JcaPGPDigestCalculatorProviderBu
 import org.bouncycastle.openpgp.operator.jcajce.JcePBEDataDecryptorFactoryBuilder;
 import org.bouncycastle.util.io.Streams;
 import org.jetbrains.annotations.NotNull;
-import org.junit.Assert;
 import org.labkey.api.util.FileUtil;
 import org.jetbrains.annotations.Nullable;
 import org.openqa.selenium.NotFoundException;
@@ -58,7 +57,6 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.AccessDeniedException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -447,40 +445,6 @@ public abstract class TestFileUtils
         }
     }
 
-    /**
-     * Rename a directory.
-     * @param sourceDir the directory to rename
-     * @param newDirName the new name for the directory
-     * @return return the path to the renamed directory
-     */
-    public static Path renameDir(Path sourceDir, String newDirName) throws IOException, InterruptedException
-    {
-        LOG.info("Renaming {} to {}", sourceDir, newDirName);
-
-        // Check if the directory is outside the test enlistment.
-        checkFileLocation(sourceDir.toFile());
-
-        Assert.assertTrue("Directory does not exist: " + sourceDir, sourceDir.toFile().exists());
-
-        Path newDir = sourceDir.getParent() != null
-                ? sourceDir.getParent().resolve(newDirName)
-                : Paths.get(newDirName);
-
-        for (int i = 0; i < 3; i++) {
-            try {
-                Files.move(sourceDir, newDir);
-                break;
-            } catch (AccessDeniedException e) {
-                LOG.info("Access denied trying to rename directory. Waiting and retrying.");
-                if (i == 2) throw e;
-                Thread.sleep(500);
-            }
-        }
-        LOG.info("Renamed {} to {}", sourceDir, newDir);
-
-        return newDir;
-    }
-
     private static void checkFileLocation(File file)
     {
         try
@@ -488,8 +452,7 @@ public abstract class TestFileUtils
             if (!FileUtils.directoryContains(getLabKeyRoot(), file))
             {
                 // TODO: Consider throwing IllegalArgumentException
-                LOG.info("DEBUG: Attempting to delete / rename a file, {}, outside of test enlistment {}.",
-                        file, getLabKeyRoot());
+                LOG.info("DEBUG: Attempting to delete a file outside of test enlistment: " + getLabKeyRoot());
             }
         }
         catch (IOException ignore) { }
