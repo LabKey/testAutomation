@@ -1,7 +1,5 @@
 package org.labkey.test.tests.assay;
 
-//import org.apache.commons.io.FileUtils;
-//import org.junit.Assert;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -17,12 +15,9 @@ import org.labkey.test.pages.assay.AssayRunsPage;
 import org.labkey.test.params.assay.GeneralAssayDesign;
 
 import java.io.File;
-//import java.io.IOException;
-import java.io.IOException;
 import java.nio.file.AccessDeniedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-//import java.util.UUID;
 
 /**
  * Issue 54156: Regression test to ensure a reasonable error message is shown when an assay design references
@@ -36,7 +31,7 @@ public class AssayTransformMissingParentDirTest extends AbstractAssayTransformTe
     {
         // Create a nested directory and an R transform script within it
         String assayName = "missingParentDirAssay";
-        Path parentDir = Files.createTempDirectory("assay-transform-missing-parent-");
+        Path parentDir = Files.createTempDirectory("assay-transform-parent-");
         Path nestedDir = FileUtil.createDirectories(parentDir.resolve("child"), false);
         String scriptName = "transformMissingParent.R";
         String transformContent = "library(Rlabkey);";
@@ -52,30 +47,18 @@ public class AssayTransformMissingParentDirTest extends AbstractAssayTransformTe
         assayDesignerPage.addTransformScript(transformFile);
         assayDesignerPage.clickSave();
 
-        // Rename the parent dir to ensure we handle it reasonably. Deleting directories on Windows is not always
-        // timely, renaming the directory will have the same effect.
-//        String newName = "Not-Here-" + UUID.randomUUID();
-//        Path renamedDir = TestFileUtils.renameDir(parentDir, newName);
-//
-//        Assert.assertFalse(String.format("Directory %s is still present.", parentDir),
-//                FileUtils.isDirectory(parentDir.toFile()));
-
-        // Delete the renamed directory as a cleanup step. Since the directory has been renamed, the slow delete on Windows
-        // will not cause the test to fail.
-        for (int i = 0; i < 3; i++) {
+        // Now delete the parent dir to ensure we handle it reasonably. On Windows something locks the directory, maybe
+        // an external process. If that happens sleep for a second and try again.
+        for (int i = 0; i < 30; i++) {
             try
             {
                 FileUtils.deleteDirectory(parentDir.toFile());
                 log("Deletion successful.");
                 break;
             } catch (AccessDeniedException e) {
-                log("Access denied trying to rename directory. Waiting and retrying.");
-                if (i == 2) throw e;
-                Thread.sleep(500);
-            }
-            catch (IOException e)
-            {
-                log("WARNING: Exception deleting directory -- " + e.getMessage());
+                log("Access denied trying to delete directory. Waiting and retrying.");
+                if (i == 29) throw e;
+                Thread.sleep(1_000);
             }
         }
 
