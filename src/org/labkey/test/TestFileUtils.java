@@ -58,6 +58,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.AccessDeniedException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -452,7 +453,7 @@ public abstract class TestFileUtils
      * @param newDirName the new name for the directory
      * @return return the path to the renamed directory
      */
-    public static Path renameDir(Path sourceDir, String newDirName) throws IOException
+    public static Path renameDir(Path sourceDir, String newDirName) throws IOException, InterruptedException
     {
         LOG.info("Renaming {} to {}", sourceDir, newDirName);
 
@@ -464,8 +465,16 @@ public abstract class TestFileUtils
         Path newDir = sourceDir.getParent() != null
                 ? sourceDir.getParent().resolve(newDirName)
                 : Paths.get(newDirName);
-        Files.move(sourceDir, newDir);
 
+        for (int i = 0; i < 3; i++) {
+            try {
+                Files.move(sourceDir, newDir);
+                break;
+            } catch (AccessDeniedException e) {
+                if (i == 2) throw e;
+                Thread.sleep(500);
+            }
+        }
         LOG.info("Renamed {} to {}", sourceDir, newDir);
 
         return newDir;
