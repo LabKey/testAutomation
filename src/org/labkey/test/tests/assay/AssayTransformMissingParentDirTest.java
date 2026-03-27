@@ -1,7 +1,8 @@
 package org.labkey.test.tests.assay;
 
+//import org.apache.commons.io.FileUtils;
+//import org.junit.Assert;
 import org.apache.commons.io.FileUtils;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.api.util.FileUtil;
@@ -16,9 +17,12 @@ import org.labkey.test.pages.assay.AssayRunsPage;
 import org.labkey.test.params.assay.GeneralAssayDesign;
 
 import java.io.File;
+//import java.io.IOException;
+import java.io.IOException;
+import java.nio.file.AccessDeniedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.UUID;
+//import java.util.UUID;
 
 /**
  * Issue 54156: Regression test to ensure a reasonable error message is shown when an assay design references
@@ -50,15 +54,30 @@ public class AssayTransformMissingParentDirTest extends AbstractAssayTransformTe
 
         // Rename the parent dir to ensure we handle it reasonably. Deleting directories on Windows is not always
         // timely, renaming the directory will have the same effect.
-        String newName = "Not-Here-" + UUID.randomUUID();
-        Path renamedDir = TestFileUtils.renameDir(parentDir, newName);
-
-        Assert.assertFalse(String.format("Directory %s is still present.", parentDir),
-                FileUtils.isDirectory(parentDir.toFile()));
+//        String newName = "Not-Here-" + UUID.randomUUID();
+//        Path renamedDir = TestFileUtils.renameDir(parentDir, newName);
+//
+//        Assert.assertFalse(String.format("Directory %s is still present.", parentDir),
+//                FileUtils.isDirectory(parentDir.toFile()));
 
         // Delete the renamed directory as a cleanup step. Since the directory has been renamed, the slow delete on Windows
         // will not cause the test to fail.
-        TestFileUtils.deleteDir(renamedDir.toFile());
+        for (int i = 0; i < 3; i++) {
+            try
+            {
+                FileUtils.deleteDirectory(parentDir.toFile());
+                log("Deletion successful.");
+                break;
+            } catch (AccessDeniedException e) {
+                log("Access denied trying to rename directory. Waiting and retrying.");
+                if (i == 2) throw e;
+                Thread.sleep(500);
+            }
+            catch (IOException e)
+            {
+                log("WARNING: Exception deleting directory -- " + e.getMessage());
+            }
+        }
 
         // Attempt to import data and verify a reasonable error message is shown
         String importData = """

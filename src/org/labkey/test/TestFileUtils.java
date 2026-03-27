@@ -471,6 +471,7 @@ public abstract class TestFileUtils
                 Files.move(sourceDir, newDir);
                 break;
             } catch (AccessDeniedException e) {
+                LOG.info("Access denied trying to rename directory. Waiting and retrying.");
                 if (i == 2) throw e;
                 Thread.sleep(500);
             }
