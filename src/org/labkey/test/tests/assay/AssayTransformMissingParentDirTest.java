@@ -57,13 +57,15 @@ public class AssayTransformMissingParentDirTest extends AbstractAssayTransformTe
                 log(String.format("Deletion of directory %s was successful.", parentDir));
                 break;
             } catch (AccessDeniedException deniedException) {
+                // Yes I know AccessDeniedException is a subset of an IOException, but I wanted to log explicitly a
+                // failure and retry because of an AccessDeniedException from some other IOException.
                 log(String.format("Access denied trying to delete directory %s. Error: %s. Waiting 10s and retrying. Attempt %d of 10.",
                         parentDir, deniedException.getMessage(), attempt));
                 if (attempt == 10) throw deniedException;
                 sleep(10_000);
             }
             catch (IOException ioException) {
-                log(String.format("IOException trying to delete directory %s. Error: %s. Waiting 10s and retrying. Retry count: %d of 10.",
+                log(String.format("IOException trying to delete directory %s. Error: %s. Waiting 10s and retrying. Attempt %d of 10.",
                         parentDir, ioException.getMessage(), attempt));
                 if (attempt == 10) throw ioException;
                 sleep(10_000);
