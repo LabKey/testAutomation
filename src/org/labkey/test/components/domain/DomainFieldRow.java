@@ -770,7 +770,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     public void setAllowMultipleSelections(Boolean allowMultipleSelections)
     {
         WebDriverWrapper.waitFor(() -> elementCache().allowMultipleSelectionsCheckbox.isDisplayed(),
-                "Allow Multiple Selections checkbox did not become visible", 2000);
+                "Allow Multiple Selections checkbox did not become visible", 1000);
         elementCache().allowMultipleSelectionsCheckbox.set(allowMultipleSelections);
     }
 

@@ -56,6 +56,7 @@ import static org.awaitility.Awaitility.await;
 import static org.labkey.test.BaseWebDriverTest.WAIT_FOR_JAVASCRIPT;
 import static org.labkey.test.WebDriverWrapper.waitFor;
 import static org.labkey.test.util.TestLogger.log;
+import static org.labkey.test.util.data.TestArrayDataUtils.formatMultiValueText;
 import static org.labkey.test.util.selenium.ScrollUtils.Alignment.center;
 import static org.labkey.test.util.selenium.WebDriverUtils.MODIFIER_KEY;
 
@@ -919,6 +920,39 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         selectCellRange(startCell, endCell);
         getWrapper().actionPaste(null, pasteText);
         return this;
+    }
+
+    /**
+     * Format data for pasting into an editable grid. List elements in each row are quoted and separated by commas.
+     * This allows values containing commas to be pasted into multi-value columns. Even single-selections for these
+     * types of columns should be passed in as Lists to ensure they are quoted properly.
+     *
+     * @param rows values for pasting into an editable grid.
+     * @return rows formatted for pasting into an editable grid.
+     */
+    public static String formatForPaste(List<List<?>> rows)
+    {
+        StringBuilder sb = new StringBuilder();
+        for (List<?> row : rows)
+        {
+            if (!sb.isEmpty())
+                sb.append("\n");
+
+            boolean firstVal = true;
+            for (Object value : row)
+            {
+                if (!firstVal)
+                    sb.append("\t");
+                else
+                    firstVal = false;
+
+                if (value instanceof List<?> l)
+                    sb.append(formatMultiValueText(l));
+                else
+                    sb.append(value);
+            }
+        }
+        return sb.toString();
     }
 
     /**

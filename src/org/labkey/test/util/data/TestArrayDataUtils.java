@@ -45,17 +45,33 @@ public class TestArrayDataUtils
                 .filter(entry -> isMatch(entry.getValue(), searchValues, filterType))
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
-                        e -> e.getValue().stream()
-                                // Standard alphabetical sort that accounts for symbols and numbers.
-                                // But uppercase letters are positioned before lowercase letters.
-                                .sorted(Comparator
-                                        .comparing((String s) -> s.substring(0, 1).toLowerCase())
-                                        .thenComparing(s -> s.substring(0, 1))
-                                        .thenComparing(s -> s))
-                                .collect(Collectors.toList()),
+                        e -> sortValues(e.getValue()),
                         (e1, e2) -> e1,
                         LinkedHashMap::new
                 ));
+    }
+
+    /**
+     * Standard alphabetical sort that accounts for symbols and numbers.
+     * Uppercase letters are positioned before lowercase letters.
+     */
+    public static List<String> sortValues(List<String> values)
+    {
+        return values.stream()
+                .peek(s -> { if (s.isEmpty()) throw new IllegalArgumentException("Empty values aren't allowed: " + values);})
+                .sorted(Comparator
+                        .comparing((String s) -> s.substring(0, 1).toLowerCase())
+                        .thenComparing(s -> s.substring(0, 1))
+                        .thenComparing(s -> s))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Sorts values alphabetically and joins them with the given separator.
+     */
+    public static String sortAndJoin(List<String> values, String separator)
+    {
+        return String.join(separator, sortValues(values));
     }
 
     public static Map<String, String> prepareMapForCheck(Map<String, List<String>> map)
@@ -85,6 +101,11 @@ public class TestArrayDataUtils
                 throw new IllegalArgumentException("Invalid multi-value text string: " + multiValueString);
             return records.getFirst().toList();
         }
+    }
+
+    public static <T> String formatMultiValueText(List<T> values)
+    {
+        return values.stream().map(CSVFormat.DEFAULT::format).collect(Collectors.joining(","));
     }
 
     private static boolean isMatch(List<String> actualValues, List<String> searchValues, Filter.Operator type)
