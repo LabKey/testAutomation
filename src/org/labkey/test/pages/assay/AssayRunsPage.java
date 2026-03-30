@@ -113,6 +113,13 @@ public class AssayRunsPage extends LabKeyPage<AssayRunsPage.ElementCache>
         elementCache().manageMenu.doMenuAction("Edit Assay Design");
     }
 
+    //Method for Standard assays only.
+    public AssayImportPage clickImportData()
+    {
+        clickAndWait(Locator.linkWithText("Import Data"));
+        return new AssayImportPage(getDriver());
+    }
+
     @Override
     protected ElementCache newElementCache()
     {
