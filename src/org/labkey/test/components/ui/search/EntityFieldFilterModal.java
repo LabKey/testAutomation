@@ -19,7 +19,7 @@ public class EntityFieldFilterModal extends GridFilterModal
 {
     public EntityFieldFilterModal(WebDriver driver, UpdatingComponent linkedComponent)
     {
-        super(driver, linkedComponent);
+        super(driver, linkedComponent, "Select");
     }
 
     @Override

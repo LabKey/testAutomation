@@ -26,7 +26,12 @@ public class GridFilterModal extends ModalDialog
 
     public GridFilterModal(WebDriver driver, UpdatingComponent linkedComponent)
     {
-        super(new ModalDialogFinder(driver));
+        this(driver, linkedComponent, "Filter");
+    }
+
+    public GridFilterModal(WebDriver driver, UpdatingComponent linkedComponent, String titlePrefix)
+    {
+        super(new ModalDialogFinder(driver).withTitle(titlePrefix));
         _linkedComponent = linkedComponent;
     }
 
