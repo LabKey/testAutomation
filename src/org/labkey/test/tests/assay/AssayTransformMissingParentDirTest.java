@@ -1,5 +1,6 @@
 package org.labkey.test.tests.assay;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.api.util.FileUtil;
@@ -14,6 +15,8 @@ import org.labkey.test.pages.assay.AssayRunsPage;
 import org.labkey.test.params.assay.GeneralAssayDesign;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.AccessDeniedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -45,8 +48,29 @@ public class AssayTransformMissingParentDirTest extends AbstractAssayTransformTe
         assayDesignerPage.addTransformScript(transformFile);
         assayDesignerPage.clickSave();
 
-        // Now delete the parent dir to ensure we handle it reasonably
-        TestFileUtils.deleteDir(parentDir.toFile());
+        // Now delete the parent dir to ensure we handle it reasonably. On Windows something locks the directory, maybe
+        // an external process. If that happens sleep for a second and try again.
+        for (int attempt = 1; attempt <= 10; attempt++) {
+            try
+            {
+                FileUtils.deleteDirectory(parentDir.toFile());
+                log(String.format("Deletion of directory %s was successful.", parentDir));
+                break;
+            } catch (AccessDeniedException deniedException) {
+                // Yes I know AccessDeniedException is a subset of an IOException, but I wanted to log explicitly a
+                // failure and retry because of an AccessDeniedException from some other IOException.
+                log(String.format("Access denied trying to delete directory %s. Error: %s. Waiting 10s and retrying. Attempt %d of 10.",
+                        parentDir, deniedException.getMessage(), attempt));
+                if (attempt == 10) throw deniedException;
+                sleep(10_000);
+            }
+            catch (IOException ioException) {
+                log(String.format("IOException trying to delete directory %s. Error: %s. Waiting 10s and retrying. Attempt %d of 10.",
+                        parentDir, ioException.getMessage(), attempt));
+                if (attempt == 10) throw ioException;
+                sleep(10_000);
+            }
+        }
 
         // Attempt to import data and verify a reasonable error message is shown
         String importData = """
