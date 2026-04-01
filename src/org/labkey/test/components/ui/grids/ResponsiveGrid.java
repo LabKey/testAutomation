@@ -240,10 +240,10 @@ public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverCompon
         return errorMsg;
     }
 
-private static final List<Filter.Operator> ARRAY_OPERATORS = List.of(ARRAY_CONTAINS_ALL, ARRAY_CONTAINS_ANY, ARRAY_CONTAINS_EXACT, ARRAY_CONTAINS_NONE,
+    private static final List<Filter.Operator> ARRAY_OPERATORS = List.of(ARRAY_CONTAINS_ALL, ARRAY_CONTAINS_ANY, ARRAY_CONTAINS_EXACT, ARRAY_CONTAINS_NONE,
                 ARRAY_CONTAINS_NOT_EXACT, ARRAY_ISEMPTY, ARRAY_ISNOTEMPTY);
                 
-    private GridFilterModal initFilterColumn(CharSequence columnIdentifier, Filter.Operator operator, Object value)
+    public GridFilterModal initFilterColumn(CharSequence columnIdentifier, Filter.Operator operator, Object value)
     {
         clickColumnMenuItem(columnIdentifier, "Filter...", false);
         GridFilterModal filterModal = new GridFilterModal(getDriver(), this);
