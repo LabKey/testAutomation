@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.nio.file.AccessDeniedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.stream.Stream;
 
 /**
  * Issue 54156: Regression test to ensure a reasonable error message is shown when an assay design references
@@ -48,11 +49,19 @@ public class AssayTransformMissingParentDirTest extends AbstractAssayTransformTe
         assayDesignerPage.addTransformScript(transformFile);
         assayDesignerPage.clickSave();
 
-        // Now delete the parent dir to ensure we handle it reasonably. On Windows something locks the directory, maybe
-        // an external process. If that happens sleep for a second and try again.
+        // Now delete the parent dir to ensure we handle it reasonably.
+        // Sometimes on Windows the directory could be locked, maybe by an external process, or the child directory is
+        // readonly. Use a retry mechanism to set the writeable flag and then try to delete the parent directory.
         for (int attempt = 1; attempt <= 10; attempt++) {
             try
             {
+                parentDir.toFile().setWritable(true, false);
+
+                // Wrap in a try to close the stream.
+                try (Stream<Path> files = Files.walk(parentDir)) {
+                    files.forEach(p -> p.toFile().setWritable(true, false));
+                }
+
                 FileUtils.deleteDirectory(parentDir.toFile());
                 log(String.format("Deletion of directory %s was successful.", parentDir));
                 break;
