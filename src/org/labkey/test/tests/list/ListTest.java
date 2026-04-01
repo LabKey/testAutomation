@@ -861,6 +861,11 @@ public class ListTest extends BaseWebDriverTest
 
         customizeURLTest();
         crossContainerLookupTest();
+
+        // Prevent crawler errors after the list is deleted
+        // A Query WebPart for a missing query contains links that will 404
+        goToProjectHome();
+        new PortalHelper(this).removeAllWebParts();
     }
 
     /* Issue 23487: add regression coverage for batch insert into list with multiple errors
@@ -1128,8 +1133,10 @@ public class ListTest extends BaseWebDriverTest
         clickProject(PROJECT_VERIFY);
 
         PortalHelper portalHelper = new PortalHelper(this);
-        portalHelper.addQueryWebPart(null, "lists", LIST_NAME_COLORS, null);
-        portalHelper.addQueryWebPart(null, "lists", LIST_NAME_COLORS, null);
+        portalHelper.doInAdminMode(ph -> {
+            portalHelper.addQueryWebPart(null, "lists", LIST_NAME_COLORS, null);
+            portalHelper.addQueryWebPart(null, "lists", LIST_NAME_COLORS, null);
+        });
 
         log("Test that the right filters are present for each type");
         DataRegionTable region = new DataRegionTable("qwp3", getDriver());
