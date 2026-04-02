@@ -222,7 +222,7 @@ public class PortalTab extends WebDriverComponent<PortalTab.ElementCache>
         }
 
         static public Locator.XPathLocator container = Locator.tagWithClass("ul", "lk-nav-tabs");
-        static public Locator.XPathLocator tabItem = Locator.xpath("//li");
+        static public Locator.XPathLocator tabItem = Locator.xpath("/li");
         static public Locator.XPathLocator subContainerTabSelect = Locator.tagWithAttribute("select", "title", "subContainerTabs");
 
         static public Locator.XPathLocator tabList = container.append(tabItem);

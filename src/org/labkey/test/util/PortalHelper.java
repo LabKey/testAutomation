@@ -87,7 +87,7 @@ public class PortalHelper extends WebDriverWrapper
             throw new IllegalArgumentException("Can't move folder tabs vertically.");
 
         String tabId = tabText.replace(" ", "") + "Tab";
-        Locator.XPathLocator tabList = Locator.xpath("//ul[contains(@class, 'lk-nav-tabs-admin')]//li[@role='presentation']");
+        Locator.XPathLocator tabList = Locator.xpath("//ul[contains(@class, 'lk-nav-tabs-admin')]/li");
         Locator.XPathLocator tabLink = Locator.xpath("//a[@id=" + Locator.xq(tabId) + "]");
 
         int tabCount = getElementCount(tabList) - 1;
