@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.nio.file.AccessDeniedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 /**
  * Issue 54156: Regression test to ensure a reasonable error message is shown when an assay design references
@@ -40,10 +41,9 @@ public class AssayTransformMissingParentDirTest extends AbstractAssayTransformTe
         TestFileUtils.writeFile(transformFile, transformContent);
 
         // Create a General assay and add the transform by absolute path (not upload)
-        var protocolResponse = new GeneralAssayDesign(assayName).createAssay(getProjectName(), createDefaultConnection());
+        var protocolResponse = new GeneralAssayDesign(assayName).setBatchFields(List.of(), false).createAssay(getProjectName(), createDefaultConnection());
         var assayDesignerPage = ReactAssayDesignerPage.beginAt(this, getProjectName(), protocolResponse.getProtocolId(),
-                "general", getURL().toString());
-        assayDesignerPage.goToBatchFields().removeAllFields(true);
+                "general", "");
         // add by path so the absolute path is stored; this allows reproducing the missing parent dir scenario
         assayDesignerPage.addTransformScript(transformFile);
         assayDesignerPage.clickSave();
@@ -78,7 +78,6 @@ public class AssayTransformMissingParentDirTest extends AbstractAssayTransformTe
                 1\tP1\timport after parent deleted
                 """;
 
-        clickAndWait(Locator.linkWithText(assayName));
         new AssayRunsPage(getDriver()).getTable().clickHeaderButtonAndWait("Import Data");
         var importPage = new AssayImportPage(getDriver());
         importPage.setNamedInputText("Name", "missingParentImport");
