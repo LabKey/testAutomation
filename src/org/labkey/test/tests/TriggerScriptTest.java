@@ -24,11 +24,13 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
 import org.labkey.remoteapi.query.DeleteRowsCommand;
 import org.labkey.remoteapi.query.InsertRowsCommand;
 import org.labkey.remoteapi.query.BaseRowsCommand;
 import org.labkey.remoteapi.query.MoveRowsCommand;
 import org.labkey.remoteapi.query.RowsResponse;
+import org.labkey.remoteapi.query.TruncateTableCommand;
 import org.labkey.remoteapi.query.UpdateRowsCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -193,14 +195,22 @@ public class TriggerScriptTest extends BaseWebDriverTest
         _containerHelper.createSubfolder(getProjectName(), SUBFOLDER_NAME);
         _containerHelper.enableModules(getProjectName(), List.of("Query", SIMPLE_MODULE, TRIGGER_MODULE));
 
+        // Create a data class
+        new DataClassDefinition(DATA_CLASSES_NAME)
+                .setFields(List.of(new FieldDefinition(COMMENTS_FIELD), new FieldDefinition(COUNTRY_FIELD)))
+                .create(createDefaultConnection(), getProjectName());
+
+        // Create a sample type
+        SampleTypeAPIHelper.createEmptySampleType(getProjectName(), new SampleTypeDefinition(SAMPLE_TYPE_NAME)
+                .setFields(List.of(new FieldDefinition(COMMENTS_FIELD), new FieldDefinition(COUNTRY_FIELD))));
+
         // Create lists
         {
             List<FieldDefinition> fields = List.of(
-                new FieldDefinition("name", ColumnType.String).setLabel("Name"),
-                new FieldDefinition("ssn", ColumnType.String).setLabel("SSN"),
-                new FieldDefinition("company", ColumnType.String).setLabel("Company"),
-                new FieldDefinition("employeeId", ColumnType.String)
-                        .setLabel("Employee ID")
+                new FieldDefinition("name").setLabel("Name"),
+                new FieldDefinition("ssn").setLabel("SSN"),
+                new FieldDefinition("company").setLabel("Company"),
+                new FieldDefinition("employeeId").setLabel("Employee ID")
                         .setHidden(true)
                         .setShownInInsertView(false)
                         .setShownInUpdateView(false)
@@ -210,7 +220,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
             EMPLOYEE_LIST.create(createDefaultConnection(), getProjectName());
 
             fields = List.of(
-                new FieldDefinition("Name", ColumnType.String).setDescription("Name"),
+                new FieldDefinition("Name").setDescription("Name"),
                 new FieldDefinition("Age", ColumnType.Integer).setDescription("Age"),
                 new FieldDefinition("FavoriteDateTime", ColumnType.DateAndTime).setDescription("Favorite date time. Who doesn't have one?"),
                 new FieldDefinition("Crazy", ColumnType.Boolean).setDescription("Crazy?")
@@ -221,6 +231,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
                     .create(createDefaultConnection(), getProjectName());
         }
 
+        // Create dataset via import
         importFolderFromZip(TestFileUtils.getSampleData("studies/LabkeyDemoStudy.zip"));
 
         //Add webparts for dataset, data class, sample type setup
@@ -520,10 +531,6 @@ public class TriggerScriptTest extends BaseWebDriverTest
         assertAPIErrorMessage(delCmd, BEFORE_DELETE_ERROR, cn);
     }
 
-    /********************************
-     * Dataset Trigger Script Tests
-     ********************************/
-
     @Test
     public void testDatasetIndividualTriggers()
     {
@@ -581,17 +588,14 @@ public class TriggerScriptTest extends BaseWebDriverTest
         doAPITriggerTest(STUDY_SCHEMA, DATASET_NAME, "ParticipantId", true);
     }
 
-    /********************************
-     * Data Class Trigger Script Tests
-     ********************************/
-
     @Test
     public void testDataClassIndividualTriggers() throws Exception
     {
+        cleanUpTableRows(DATA_CLASSES_SCHEMA, DATA_CLASSES_NAME);
+
         //Generate delegate to move to data class UI
         GoToDataUI goToDataClass = () -> goTo("Data Classes", DATA_CLASSES_NAME);
 
-        setupDataClass();
         openServerJavaScriptConsole();
 
         doIndividualTriggerTest("query", goToDataClass, "Name", false, "Yes, Delete", false);
@@ -602,34 +606,170 @@ public class TriggerScriptTest extends BaseWebDriverTest
         closeServerJavaScriptConsole();
     }
 
-
     @Test
     public void testDataClassAPITriggers() throws Exception
     {
-        setupDataClass();
+        cleanUpTableRows(DATA_CLASSES_SCHEMA, DATA_CLASSES_NAME);
         doAPITriggerTest(DATA_CLASSES_SCHEMA, DATA_CLASSES_NAME, "Name", false);
     }
 
-    /********************************
-     * Sample Type Trigger Script Tests
-     ********************************/
-
     @Test
-    public void testSampleTypeIndividualTriggers()
+    public void testSampleTypeIndividualTriggers() throws Exception
     {
+        cleanUpTableRows(SAMPLE_TYPE_SCHEMA, SAMPLE_TYPE_NAME);
+
         //Generate delegate to move to sample type UI
         GoToDataUI goToSampleType = () -> goTo("Sample Types", SAMPLE_TYPE_NAME);
 
-        setupSampleType();
         doIndividualTriggerTest("Material", goToSampleType, "Name", false, "Yes, Delete", false);
     }
-
 
     @Test
     public void testSampleTypeAPITriggers() throws Exception
     {
-        setupSampleType();
+        cleanUpTableRows(SAMPLE_TYPE_SCHEMA, SAMPLE_TYPE_NAME);
         doAPITriggerTest(SAMPLE_TYPE_SCHEMA, SAMPLE_TYPE_NAME, "Name", false);
+    }
+
+    @Test
+    public void testDataClassManagedColumnsTriggers() throws Exception
+    {
+        cleanUpTableRows(DATA_CLASSES_SCHEMA, DATA_CLASSES_NAME);
+        doManagedColumnsTriggerTest(DATA_CLASSES_SCHEMA, DATA_CLASSES_NAME, "Name", false, "Name");
+    }
+
+    @Test
+    public void testSampleTypeManagedColumnsTriggers() throws Exception
+    {
+        cleanUpTableRows(SAMPLE_TYPE_SCHEMA, SAMPLE_TYPE_NAME);
+        doManagedColumnsTriggerTest(SAMPLE_TYPE_SCHEMA, SAMPLE_TYPE_NAME, "Name", false, "Name");
+    }
+
+    @Test
+    public void testDatasetManagedColumnsTriggers() throws Exception
+    {
+        doManagedColumnsTriggerTest(STUDY_SCHEMA, DATASET_NAME, "ParticipantId", true, COMMENTS_FIELD);
+    }
+
+    /**
+     * Shared test of managed columns trigger behavior across data types.
+     * Verifies that the framework enforces managed column declarations and detects structural violations.
+     *
+     * @param schemaName          Schema containing the query
+     * @param queryName           Query/table name
+     * @param keyColumnName       Primary key column ("Name" for DC/ST, "ParticipantId" for Dataset)
+     * @param requiresDate        Whether rows require a "Date" field (datasets)
+     * @param insertDispatchField Field that routes managed-column behavior in beforeInsert;
+     *                            equals keyColumnName for DC/ST, COMMENTS_FIELD for Dataset
+     */
+    private void doManagedColumnsTriggerTest(String schemaName, String queryName, String keyColumnName,
+            boolean requiresDate, String insertDispatchField) throws Exception
+    {
+        Connection cn = WebTestHelper.getRemoteApiConnection();
+        boolean dispatchIsKey = insertDispatchField.equals(keyColumnName);
+
+        // Insert: declared managed column not set by trigger → error
+        InsertRowsCommand insCmd = new InsertRowsCommand(schemaName, queryName);
+        insCmd.addRow(makeInsertRow(keyColumnName, requiresDate, dispatchIsKey, insertDispatchField,
+                "Managed Unhandled", "MC-UN-001"));
+        assertAPIErrorMessage(insCmd, "declared the managed column", cn);
+
+        // Insert: trigger sets managed column → success
+        insCmd = new InsertRowsCommand(schemaName, queryName);
+        insCmd.addRow(makeInsertRow(keyColumnName, requiresDate, dispatchIsKey, insertDispatchField,
+                "Managed Insert", "MC-IN-001"));
+        RowsResponse resp = insCmd.execute(cn, getProjectName());
+        Assert.assertEquals("Trigger should have set " + COUNTRY_FIELD, "MANAGED-INS",
+                resp.getRows().getFirst().get(COUNTRY_FIELD));
+
+        // Insert: structural add error — trigger adds undeclared column → error
+        insCmd = new InsertRowsCommand(schemaName, queryName);
+        insCmd.addRow(makeInsertRow(keyColumnName, requiresDate, dispatchIsKey, insertDispatchField,
+                "Managed Struct", "MC-ST-001"));
+        assertAPIErrorMessage(insCmd, MANAGED_STRUCT_ADD_ERROR, cn);
+
+        // Insert: structural remove error — trigger deletes column → error
+        insCmd = new InsertRowsCommand(schemaName, queryName);
+        insCmd.addRow(makeInsertRow(keyColumnName, requiresDate, dispatchIsKey, insertDispatchField,
+                "Managed Struct Remove", "MC-SR-001"));
+        assertAPIErrorMessage(insCmd, MANAGED_STRUCT_REMOVE_ERROR, cn);
+
+        // Setup: insert rows for update tests with neutral Comments so the trigger fallback fires
+        InsertRowsCommand setupCmd = new InsertRowsCommand(schemaName, queryName);
+        setupCmd.addRow(makeSetupRow(keyColumnName, requiresDate, dispatchIsKey, "MC Update Setup", "MC-UPD-001"));
+        setupCmd.addRow(makeSetupRow(keyColumnName, requiresDate, dispatchIsKey, "MC Struct Setup", "MC-STR-001"));
+        setupCmd.addRow(makeSetupRow(keyColumnName, requiresDate, dispatchIsKey, "MC Struct Remove Setup", "MC-SRR-001"));
+        RowsResponse setupResp = setupCmd.execute(cn, getProjectName());
+        Map<String, Object> updRow = new CaseInsensitiveHashMap<>(setupResp.getRows().getFirst());
+        Map<String, Object> strRow = new CaseInsensitiveHashMap<>(setupResp.getRows().get(1));
+        Map<String, Object> srrRow = new CaseInsensitiveHashMap<>(setupResp.getRows().get(2));
+
+        // Update: trigger sets managed column → success
+        UpdateRowsCommand updCmd = new UpdateRowsCommand(schemaName, queryName);
+        updRow.put(COMMENTS_FIELD, "Managed Update");
+        updCmd.addRow(updRow);
+        resp = updCmd.execute(cn, getProjectName());
+        Assert.assertEquals("Trigger should have set " + COUNTRY_FIELD, "MANAGED-UPD",
+                resp.getRows().getFirst().get(COUNTRY_FIELD));
+
+        // Update: declared managed column not set by trigger → error
+        updCmd = new UpdateRowsCommand(schemaName, queryName);
+        updRow.put(COMMENTS_FIELD, "Managed Unhandled");
+        updCmd.addRow(updRow);
+        assertAPIErrorMessage(updCmd, "declared the managed column", cn);
+
+        // Update: structural add error — trigger adds undeclared column → error
+        updCmd = new UpdateRowsCommand(schemaName, queryName);
+        strRow.put(COMMENTS_FIELD, "Managed Struct");
+        updCmd.addRow(strRow);
+        assertAPIErrorMessage(updCmd, MANAGED_STRUCT_ADD_ERROR, cn);
+
+        // Update: structural remove error — trigger deletes column → error
+        updCmd = new UpdateRowsCommand(schemaName, queryName);
+        srrRow.put(COMMENTS_FIELD, "Managed Struct Remove");
+        updCmd.addRow(srrRow);
+        assertAPIErrorMessage(updCmd, MANAGED_STRUCT_REMOVE_ERROR, cn);
+    }
+
+    /**
+     * Builds an insert row for the managed column trigger test.
+     * When dispatchIsKey, the dispatch value goes in the key column (DC/ST); otherwise it goes in
+     * the separate dispatch field (Dataset) and a generated unique value is used for the key.
+     */
+    private Map<String, Object> makeInsertRow(String keyColumnName, boolean requiresDate, boolean dispatchIsKey, String dispatchField, String dispatchValue, String uniqueKey)
+    {
+        Map<String, Object> row = new HashMap<>();
+        if (dispatchIsKey)
+        {
+            row.put(keyColumnName, dispatchValue);
+            row.put(COMMENTS_FIELD, "managed-test");  // ensure Comments exists for struct-remove test
+        }
+        else
+        {
+            row.put(keyColumnName, uniqueKey);
+            row.put(dispatchField, dispatchValue);
+        }
+        if (requiresDate)
+            row.put("Date", new Date());
+        return row;
+    }
+
+    /**
+     * Builds a neutral setup row for update-phase tests; trigger fallback fires for these rows.
+     */
+    private Map<String, Object> makeSetupRow(String keyColumnName, boolean requiresDate, boolean dispatchIsKey, String nameValue, String uniqueKey)
+    {
+        Map<String, Object> row = new HashMap<>();
+        row.put(keyColumnName, dispatchIsKey ? nameValue : uniqueKey);
+        row.put(COMMENTS_FIELD, "setup");
+        if (requiresDate)
+            row.put("Date", new Date());
+        return row;
+    }
+
+    private void cleanUpTableRows(String schemaName, String queryName) throws Exception
+    {
+        new TruncateTableCommand(schemaName, queryName).execute(createDefaultConnection(), getProjectName());
     }
 
     /**
@@ -950,41 +1090,6 @@ public class TriggerScriptTest extends BaseWebDriverTest
         StringBuilder sb = new StringBuilder();
         data.keySet().forEach(val -> sb.append(val).append(delimiter));
         return sb.toString().trim();
-    }
-
-    /**
-     * Setup the data class
-     */
-    private void setupDataClass() throws CommandException, IOException
-    {
-        //Setup Data Class
-        goToProjectHome();
-        DataRegionTable drt = DataRegionTable.findDataRegionWithinWebpart(this, "Data Classes");
-        int rowId = drt.getRowIndex("Name", DATA_CLASSES_NAME);
-        if (rowId >= 0)
-        {
-            drt.checkCheckbox(rowId);
-            drt.clickHeaderButtonAndWait("Delete");
-            clickButton("Confirm Delete");
-        }
-
-        DataClassDefinition dataClass = new DataClassDefinition(DATA_CLASSES_NAME)
-                .setFields(List.of(
-                        new FieldDefinition(COMMENTS_FIELD, ColumnType.String),
-                        new FieldDefinition(COUNTRY_FIELD, ColumnType.String)));
-        dataClass.create(createDefaultConnection(), getProjectName());
-    }
-
-    /**
-     * Setup the sample type
-     */
-    private void setupSampleType()
-    {
-        SampleTypeDefinition sampleType = new SampleTypeDefinition(SAMPLE_TYPE_NAME)
-                .setFields(List.of(
-                        new FieldDefinition(COMMENTS_FIELD, ColumnType.String),
-                        new FieldDefinition(COUNTRY_FIELD, ColumnType.String)));
-        SampleTypeAPIHelper.createEmptySampleType(getProjectName(), sampleType);
     }
 
     private void closeServerJavaScriptConsole()
