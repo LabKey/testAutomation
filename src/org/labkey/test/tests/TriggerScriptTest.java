@@ -81,6 +81,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
     private static final String AFTER_DELETE_ERROR = "This is the After Delete Error";
 
     private static final String MANAGED_STRUCT_ADD_ERROR = "attempted to add";
+    private static final String MANAGED_STRUCT_REMOVE_ERROR = "attempted to remove";
 
     //Dataset constants
     private static final String STUDY_SCHEMA = "study";
@@ -372,13 +373,20 @@ public class TriggerScriptTest extends BaseWebDriverTest
         insCmd.addRow(Map.of("Name", "Managed Struct", "SSN", "111222335", "Company", "Test Co"));
         assertAPIErrorMessage(insCmd, MANAGED_STRUCT_ADD_ERROR, cn);
 
+        // Insert: structural remove error — trigger deletes a column not declared as managed
+        insCmd = new InsertRowsCommand(LIST_SCHEMA, LIST_NAME);
+        insCmd.addRow(Map.of("Name", "Managed Struct Remove", "SSN", "111222336", "Company", "Test Co"));
+        assertAPIErrorMessage(insCmd, MANAGED_STRUCT_REMOVE_ERROR, cn);
+
         // Setup: insert rows for update tests; include "employeeId" in payload so insert validation passes
         insCmd = new InsertRowsCommand(LIST_SCHEMA, LIST_NAME);
         insCmd.addRow(Map.of("Name", "MC Update Setup", "SSN", "111222340", "Company", "Setup Co", "employeeId", "OLD-ID"));
         insCmd.addRow(Map.of("Name", "MC Struct Setup", "SSN", "111222341", "Company", "Setup Co", "employeeId", "OLD-ID-2"));
+        insCmd.addRow(Map.of("Name", "MC Struct Remove Setup", "SSN", "111222342", "Company", "Setup Co", "employeeId", "OLD-ID-3"));
         resp = insCmd.execute(cn, getProjectName());
         Integer updateKey = (Integer) resp.getRows().getFirst().get("Key");
         Integer structKey = (Integer) resp.getRows().get(1).get("Key");
+        Integer structRemoveKey = (Integer) resp.getRows().get(2).get("Key");
 
         // Update: trigger sets both declared managed columns "company" and "employeeId"
         UpdateRowsCommand updCmd = new UpdateRowsCommand(LIST_SCHEMA, LIST_NAME);
@@ -389,15 +397,21 @@ public class TriggerScriptTest extends BaseWebDriverTest
         Assert.assertEquals("Trigger should have set employeeId", "EMP-UPD", updated.employeeId);
 
         // Update: declared managed column not set by trigger
-        // "employeeId" is absent from the payload; trigger has no handler for this name and never sets it
+        // "boomerang" is absent from the payload; SSN="-123" causes the trigger to skip setting it
+        // Name is explicitly provided so the trigger does not accidentally match a named handler
         updCmd = new UpdateRowsCommand(LIST_SCHEMA, LIST_NAME);
-        updCmd.addRow(Map.of("Key", updateKey, "SSN", "-123", "Company", "Test Co"));
+        updCmd.addRow(Map.of("Key", updateKey, "Name", "MC Update Setup", "SSN", "-123", "Company", "Test Co"));
         assertAPIErrorMessage(updCmd, "declared the managed column 'boomerang'", cn);
 
         // Update: structural add error — trigger adds a column not declared as managed
         updCmd = new UpdateRowsCommand(LIST_SCHEMA, LIST_NAME);
         updCmd.addRow(Map.of("Key", structKey, "Name", "Managed Struct", "SSN", "111222341"));
         assertAPIErrorMessage(updCmd, MANAGED_STRUCT_ADD_ERROR, cn);
+
+        // Update: structural remove error — trigger deletes a column not declared as managed
+        updCmd = new UpdateRowsCommand(LIST_SCHEMA, LIST_NAME);
+        updCmd.addRow(Map.of("Key", structRemoveKey, "Name", "Managed Struct Remove", "SSN", "111222342"));
+        assertAPIErrorMessage(updCmd, MANAGED_STRUCT_REMOVE_ERROR, cn);
     }
 
     /** Issue 52098 - ensure trigger scripts have a chance to do custom type conversion with the incoming row */

@@ -33,6 +33,10 @@ function beforeInsert(row, errors) {
         row.employeeId = "EMP-STRUCT";
         row.undeclaredCol = "bad";
     }
+    else if (row.name === "Managed Struct Remove") {
+        row.employeeId = "EMP-STRUCT-REM";
+        delete row.SSN;
+    }
 
     if (!row.employeeId) {
         row.employeeId = "EMP-INS1";
@@ -59,6 +63,11 @@ function beforeUpdate(row, oldRow, errors) {
         row.company = "Struct Co";
         row.employeeId = "EMP-STRUCT";
         row.undeclaredCol = "bad";
+    }
+    else if (row.name === "Managed Struct Remove") {
+        row.company = "Struct Remove Co";
+        row.employeeId = "EMP-STRUCT-REM";
+        delete row.SSN;
     }
 
     if (!row.employeeId) {
