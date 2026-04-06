@@ -59,7 +59,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Test trigger script matrix, expands on ScriptValidationTest which covers custom schemas (Vehicles)
+ * Test trigger script matrix, expands on {@link ScriptValidationTest} which covers custom schemas (Vehicles)
  */
 @Category({Daily.class, Data.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 8)
@@ -79,6 +79,8 @@ public class TriggerScriptTest extends BaseWebDriverTest
     private static final String BEFORE_UPDATE_COMPANY = "Before Update changed me";
     private static final String BEFORE_DELETE_ERROR = "This is the Before Delete Error";
     private static final String AFTER_DELETE_ERROR = "This is the After Delete Error";
+
+    private static final String MANAGED_STRUCT_ADD_ERROR = "attempted to add";
 
     //Dataset constants
     private static final String STUDY_SCHEMA = "study";
@@ -121,7 +123,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
 
     public static class EmployeeRecord
     {
-        public String name, ssn, company;
+        public String name, ssn, company, employeeId;
         public Integer key;
 
         public EmployeeRecord(String name, String ssn, String company)
@@ -139,7 +141,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
 
         public Map<String, Object> toMap()
         {
-            return Maps.of("Name", name, "SSN", ssn, "Company", company, "Key", key);
+            return Maps.of("Name", name, "SSN", ssn, "Company", company, "Key", key, "employeeId", employeeId);
         }
 
         public Map<String, String> toStringMap()
@@ -149,7 +151,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
 
         public String toDelimitedString(String delimiter)
         {
-            return name + delimiter + ssn + delimiter + company + "\n";
+            return name + delimiter + ssn + delimiter + company + delimiter + (employeeId != null ? employeeId : "") + "\n";
         }
 
         public static EmployeeRecord fromMap(Map<String, Object> map)
@@ -157,13 +159,15 @@ public class TriggerScriptTest extends BaseWebDriverTest
             EmployeeRecord newbie = new EmployeeRecord((String)map.get("Name"), (String)map.get("ssn"), (String)map.get("Company"));
             if (map.containsKey("Key"))
                 newbie.key = (Integer)map.get("Key");
+            if (map.containsKey("employeeId"))
+                newbie.employeeId = (String)map.get("employeeId");
 
             return newbie;
         }
 
         public static String getTsvHeaders()
         {
-            return "Name\tSSN\tCompany\n";
+            return "Name\tSSN\tCompany\tEmployeeId\n";
         }
     }
 
@@ -186,16 +190,19 @@ public class TriggerScriptTest extends BaseWebDriverTest
     {
         _containerHelper.createProject(getProjectName(), null);
         _containerHelper.createSubfolder(getProjectName(), SUBFOLDER_NAME);
-        _containerHelper.enableModule(getProjectName(), "Query");
-        _containerHelper.enableModule(getProjectName(), SIMPLE_MODULE);
-        _containerHelper.enableModule(getProjectName(), TRIGGER_MODULE);
+        _containerHelper.enableModules(getProjectName(), List.of("Query", SIMPLE_MODULE, TRIGGER_MODULE));
 
         // Create lists
         {
             List<FieldDefinition> fields = List.of(
                 new FieldDefinition("name", ColumnType.String).setLabel("Name"),
                 new FieldDefinition("ssn", ColumnType.String).setLabel("SSN"),
-                new FieldDefinition("company", ColumnType.String).setLabel("Company")
+                new FieldDefinition("company", ColumnType.String).setLabel("Company"),
+                new FieldDefinition("employeeId", ColumnType.String)
+                        .setLabel("Employee ID")
+                        .setHidden(true)
+                        .setShownInInsertView(false)
+                        .setShownInUpdateView(false)
             );
 
             EMPLOYEE_LIST = new IntListDefinition(LIST_NAME, "Key").setFields(fields);
@@ -334,11 +341,63 @@ public class TriggerScriptTest extends BaseWebDriverTest
         openServerJavaScriptConsole();
 
         MoveRowsCommand command = new MoveRowsCommand(SUBFOLDER_PATH, LIST_SCHEMA, LIST_NAME);
-        command.setRows(List.of(Map.of("Key", records.get(0).key)));
+        command.setRows(List.of(Map.of("Key", records.getFirst().key)));
         command.execute(createDefaultConnection(), getProjectName());
         waitForConsole("init got triggered with event: move", "complete got triggered with event: move");
 
         closeServerJavaScriptConsole();
+    }
+
+    @Test
+    public void testListManagedColumnsTriggers() throws Exception
+    {
+        cleanUpListRows();
+        Connection cn = WebTestHelper.getRemoteApiConnection();
+
+        // Insert: declared managed column not set by trigger
+        // "boomerang" is absent from the payload; trigger has no handler for this name and never sets it
+        InsertRowsCommand insCmd = new InsertRowsCommand(LIST_SCHEMA, LIST_NAME);
+        insCmd.addRow(Map.of("Name", "Unhandled Name", "SSN", "-123", "Company", "Test Co"));
+        assertAPIErrorMessage(insCmd, "declared the managed column 'boomerang'", cn);
+
+        // Insert: trigger sets the declared managed column "employeeId"
+        insCmd = new InsertRowsCommand(LIST_SCHEMA, LIST_NAME);
+        insCmd.addRow(Map.of("Name", "Managed Insert", "SSN", "111222334", "Company", "Test Co"));
+        RowsResponse resp = insCmd.execute(cn, getProjectName());
+        EmployeeRecord inserted = EmployeeRecord.fromMap(resp.getRows().getFirst());
+        Assert.assertEquals("Trigger should have set employeeId", "EMP-INS", inserted.employeeId);
+
+        // Insert: structural add error — trigger adds a column not declared as managed
+        insCmd = new InsertRowsCommand(LIST_SCHEMA, LIST_NAME);
+        insCmd.addRow(Map.of("Name", "Managed Struct", "SSN", "111222335", "Company", "Test Co"));
+        assertAPIErrorMessage(insCmd, MANAGED_STRUCT_ADD_ERROR, cn);
+
+        // Setup: insert rows for update tests; include "employeeId" in payload so insert validation passes
+        insCmd = new InsertRowsCommand(LIST_SCHEMA, LIST_NAME);
+        insCmd.addRow(Map.of("Name", "MC Update Setup", "SSN", "111222340", "Company", "Setup Co", "employeeId", "OLD-ID"));
+        insCmd.addRow(Map.of("Name", "MC Struct Setup", "SSN", "111222341", "Company", "Setup Co", "employeeId", "OLD-ID-2"));
+        resp = insCmd.execute(cn, getProjectName());
+        Integer updateKey = (Integer) resp.getRows().getFirst().get("Key");
+        Integer structKey = (Integer) resp.getRows().get(1).get("Key");
+
+        // Update: trigger sets both declared managed columns "company" and "employeeId"
+        UpdateRowsCommand updCmd = new UpdateRowsCommand(LIST_SCHEMA, LIST_NAME);
+        updCmd.addRow(Map.of("Key", updateKey, "Name", "Managed Update", "SSN", "111222340"));
+        resp = updCmd.execute(cn, getProjectName());
+        EmployeeRecord updated = EmployeeRecord.fromMap(resp.getRows().getFirst());
+        Assert.assertEquals("Trigger should have set company", "Managed Co", updated.company);
+        Assert.assertEquals("Trigger should have set employeeId", "EMP-UPD", updated.employeeId);
+
+        // Update: declared managed column not set by trigger
+        // "employeeId" is absent from the payload; trigger has no handler for this name and never sets it
+        updCmd = new UpdateRowsCommand(LIST_SCHEMA, LIST_NAME);
+        updCmd.addRow(Map.of("Key", updateKey, "SSN", "-123", "Company", "Test Co"));
+        assertAPIErrorMessage(updCmd, "declared the managed column 'boomerang'", cn);
+
+        // Update: structural add error — trigger adds a column not declared as managed
+        updCmd = new UpdateRowsCommand(LIST_SCHEMA, LIST_NAME);
+        updCmd.addRow(Map.of("Key", structKey, "Name", "Managed Struct", "SSN", "111222341"));
+        assertAPIErrorMessage(updCmd, MANAGED_STRUCT_ADD_ERROR, cn);
     }
 
     /** Issue 52098 - ensure trigger scripts have a chance to do custom type conversion with the incoming row */
@@ -355,7 +414,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
         List<Map<String, Object>> insertedRows = insResp.getRows();
         Assert.assertEquals(1, insertedRows.size());
 
-        Map<String, Object> insertedRow = insertedRows.get(0);
+        Map<String, Object> insertedRow = insertedRows.getFirst();
         Assert.assertEquals("Jimbo", insertedRow.get("Name"));
         Assert.assertEquals(25, insertedRow.get("Age"));
         Assert.assertEquals("2025-06-11 11:42:00.000", insertedRow.get("FavoriteDateTime"));
@@ -368,7 +427,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
         List<Map<String, Object>> updatedRows = upResp.getRows();
         Assert.assertEquals(1, updatedRows.size());
 
-        Map<String, Object> updatedRow = updatedRows.get(0);
+        Map<String, Object> updatedRow = updatedRows.getFirst();
         Assert.assertEquals(26, updatedRow.get("Age"));
     }
 
@@ -405,7 +464,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
         insCmd.addRow(row2.toMap());
         insCmd.addRow(row3.toMap());
         resp = insCmd.execute(cn, getProjectName());
-        row2 = EmployeeRecord.fromMap(resp.getRows().get(0));
+        row2 = EmployeeRecord.fromMap(resp.getRows().getFirst());
         Assert.assertEquals("API BeforeInsert", row2.company);
 
         row3 = EmployeeRecord.fromMap(resp.getRows().get(1));
@@ -427,7 +486,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
         updCmd.addRow(row2.toMap());
         updCmd.addRow(row3.toMap());
         resp = updCmd.execute(cn, getProjectName());
-        EmployeeRecord updateCo = EmployeeRecord.fromMap(resp.getRows().get(0));
+        EmployeeRecord updateCo = EmployeeRecord.fromMap(resp.getRows().getFirst());
         Assert.assertEquals(BEFORE_UPDATE_COMPANY, updateCo.company);
         //Check update persisted
         Assert.assertEquals(ssn1, updateCo.ssn);
@@ -542,7 +601,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
      ********************************/
 
     @Test
-    public void testSampleTypeIndividualTriggers() throws Exception
+    public void testSampleTypeIndividualTriggers()
     {
         //Generate delegate to move to sample type UI
         GoToDataUI goToSampleType = () -> goTo("Sample Types", SAMPLE_TYPE_NAME);
@@ -610,7 +669,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
         insCmd.addRow(row2);
         insCmd.addRow(row3);
         RowsResponse resp = insCmd.execute(cn, getProjectName());
-        row2 = resp.getRows().get(0);
+        row2 = resp.getRows().getFirst();
         Assert.assertEquals("API BeforeInsert", row2.get(COUNTRY_FIELD));
 
         SearchAdminAPIHelper.waitForIndexer();
@@ -627,7 +686,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
         updCmd.addRow(row2);
         updCmd.addRow(row3);
         resp = updCmd.execute(cn, getProjectName());
-        Map<String, Object> updateCo = resp.getRows().get(0);
+        Map<String, Object> updateCo = resp.getRows().getFirst();
         Assert.assertEquals(BEFORE_UPDATE_COMPANY, updateCo.get(updateField));
         //Check update persisted
         Assert.assertEquals("BeforeUpdate", updateCo.get(flagField));

@@ -46,7 +46,6 @@ import org.labkey.test.util.Maps;
 import org.labkey.test.util.query.QueryApiHelper;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -67,6 +66,7 @@ public class ScriptValidationTest extends BaseWebDriverTest
     public static final String MODULE_NAME = "simpletest";
     public static final String VEHICLE_SCHEMA = "vehicle";
 
+    public static final String COLORS_TABLE = "colors";
     public static final String VEHICLES_TABLE = "vehicles";
 
     public static class ColorRecord
@@ -103,7 +103,7 @@ public class ScriptValidationTest extends BaseWebDriverTest
         _containerHelper.createProject(getProjectName(), null);
         _containerHelper.enableModule(getProjectName(), MODULE_NAME);
         new QueryApiHelper(createDefaultConnection(), getProjectName(), VEHICLE_SCHEMA, VEHICLES_TABLE).truncateTable();
-        new QueryApiHelper(createDefaultConnection(), getProjectName(), VEHICLE_SCHEMA, "Colors").truncateTable();
+        new QueryApiHelper(createDefaultConnection(), getProjectName(), VEHICLE_SCHEMA, COLORS_TABLE).truncateTable();
     }
 
     @Test
@@ -127,9 +127,7 @@ public class ScriptValidationTest extends BaseWebDriverTest
     {
         Connection cn = createDefaultConnection();
 
-        List<ColorRecord> colors = insertColors(Arrays.asList(
-                new ColorRecord("Yellow2", "#f00")
-        ));
+        List<ColorRecord> colors = insertColors(List.of(new ColorRecord("Yellow2", "#f00")));
 
         // Create manufacturers:
         ArrayList<Map<String, Object>> list1 = new ArrayList<>();
@@ -156,8 +154,8 @@ public class ScriptValidationTest extends BaseWebDriverTest
         assertNotNull("RowId not returned for vehicles insert, keys found: " + StringUtils.join(row.keySet(), ","), vehicleRowId);
 
         SelectRowsCommand src = new SelectRowsCommand(VEHICLE_SCHEMA, VEHICLES_TABLE);
-        src.setColumns(Arrays.asList("Container", "TriggerScriptContainer", "RowId", "ModelId", "Milage"));
-        src.setSorts(Arrays.asList(new Sort("RowId", Sort.Direction.DESCENDING)));
+        src.setColumns(List.of("Container", "TriggerScriptContainer", "RowId", "ModelId", "Milage"));
+        src.setSorts(List.of(new Sort("RowId", Sort.Direction.DESCENDING)));
         SelectRowsResponse sr2 = src.execute(cn, getProjectName());
         assertEquals("Incorrect model", modelId, sr2.getRows().get(0).get("ModelId"));
         assertEquals("Incorrect Milage", 1234, sr2.getRows().get(0).get("Milage"));
@@ -224,7 +222,7 @@ public class ScriptValidationTest extends BaseWebDriverTest
 
     private void doTestTransformation() throws Exception
     {
-        List<ColorRecord> inserted = insertColors(Arrays.asList(
+        List<ColorRecord> inserted = insertColors(List.of(
                 new ColorRecord("Yellow", "#f00"),
                 new ColorRecord("Cyan", "#0f0")
         ));
@@ -247,7 +245,7 @@ public class ScriptValidationTest extends BaseWebDriverTest
             /* The following exception is logged to the server as it is meant to simulate an unexpected error in
              * script validation */
             log("** Test errors: throw Error()'");
-            insertColors(Arrays.asList(new ColorRecord("ShouldError", "not a hex value")));
+            insertColors(List.of(new ColorRecord("ShouldError", "not a hex value")));
             fail("Should throw an exception");
         }
         catch (CommandException e)
@@ -259,7 +257,7 @@ public class ScriptValidationTest extends BaseWebDriverTest
         try
         {
             log("** Test errors: Field='message' and test extraContext is echoed back");
-            insertColors(Arrays.asList(new ColorRecord("TestFieldErrorMessage", null)), Maps.of("A", "a", "B", 3));
+            insertColors(List.of(new ColorRecord("TestFieldErrorMessage", null)), Maps.of("A", "a", "B", 3));
             fail("Should throw an exception");
         }
         catch (CommandException e)
@@ -298,7 +296,7 @@ public class ScriptValidationTest extends BaseWebDriverTest
         try
         {
             log("** Test errors: Field=[array of messages]");
-            insertColors(Arrays.asList(new ColorRecord("TestFieldErrorArray", null)));
+            insertColors(List.of(new ColorRecord("TestFieldErrorArray", null)));
             fail("Should throw an exception");
         }
         catch (CommandException e)
@@ -333,7 +331,7 @@ public class ScriptValidationTest extends BaseWebDriverTest
         try
         {
             log("** Test errors: row level error");
-            insertColors(Arrays.asList(new ColorRecord("TestRowError", null)));
+            insertColors(List.of(new ColorRecord("TestRowError", null)));
             fail("Should throw an exception");
         }
         catch (CommandException e)
@@ -366,7 +364,7 @@ public class ScriptValidationTest extends BaseWebDriverTest
         try
         {
             log("** Test errors: returning false");
-            insertColors(Arrays.asList(new ColorRecord("TestReturnFalse", "")));
+            insertColors(List.of(new ColorRecord("TestReturnFalse", "")));
             fail("Should throw an exception");
         }
         catch (CommandException e)
@@ -402,7 +400,7 @@ public class ScriptValidationTest extends BaseWebDriverTest
         try
         {
             log("** Test errors: error in complete");
-            insertColors(Arrays.asList(
+            insertColors(List.of(
                     new ColorRecord("Yellow", "#f00"),
                     new ColorRecord("Cyan", "#0f0"),
                     new ColorRecord("TestErrorInComplete", "")
@@ -438,7 +436,7 @@ public class ScriptValidationTest extends BaseWebDriverTest
         try
         {
             log("** Test errors: adding array of errors in complete");
-            insertColors(Arrays.asList(new ColorRecord("TestFieldErrorArrayInComplete", "")));
+            insertColors(List.of(new ColorRecord("TestFieldErrorArrayInComplete", "")));
             fail("Should throw an exception");
         }
         catch (CommandException e)
@@ -485,7 +483,7 @@ public class ScriptValidationTest extends BaseWebDriverTest
         try
         {
             log("** Test errors: script level variables, color regular expression");
-            insertColors(Arrays.asList(new ColorRecord("ShouldError", "#still not a hex value")));
+            insertColors(List.of(new ColorRecord("ShouldError", "#still not a hex value")));
             fail("Should throw an exception");
         }
         catch (CommandException e)
@@ -498,7 +496,7 @@ public class ScriptValidationTest extends BaseWebDriverTest
             log("** Test errors: updating hex value");
             ColorRecord yellow = selectColor("Yellow?").get(0);
             yellow.hex = "shouldn't happen";
-            updateColors(Arrays.asList(yellow));
+            updateColors(List.of(yellow));
             fail("Should throw an exception");
         }
         catch (CommandException e)
@@ -512,7 +510,7 @@ public class ScriptValidationTest extends BaseWebDriverTest
         log("** Selecting colors...");
 
         Connection cn = createDefaultConnection();
-        SelectRowsCommand cmd = new SelectRowsCommand(VEHICLE_SCHEMA, "Colors");
+        SelectRowsCommand cmd = new SelectRowsCommand(VEHICLE_SCHEMA, COLORS_TABLE);
         cmd.addFilter("Name", StringUtils.join(names, ";"), Filter.Operator.IN);
         SelectRowsResponse response = cmd.execute(cn, getProjectName());
         assertEquals("Expected to select " + names.length + " rows.", names.length, response.getRowCount().intValue());
@@ -536,7 +534,7 @@ public class ScriptValidationTest extends BaseWebDriverTest
 
         log("** Inserting colors...");
         Connection cn = createDefaultConnection();
-        InsertRowsCommand cmd = new InsertRowsCommand(VEHICLE_SCHEMA, "Colors");
+        InsertRowsCommand cmd = new InsertRowsCommand(VEHICLE_SCHEMA, COLORS_TABLE);
         cmd.getRows().addAll(list);
         cmd.setExtraContext(extraContext);
         RowsResponse response = cmd.execute(cn, getProjectName());
@@ -561,7 +559,7 @@ public class ScriptValidationTest extends BaseWebDriverTest
 
         log("** Updating colors...");
         Connection cn = createDefaultConnection();
-        UpdateRowsCommand cmd = new UpdateRowsCommand(VEHICLE_SCHEMA, "Colors");
+        UpdateRowsCommand cmd = new UpdateRowsCommand(VEHICLE_SCHEMA, COLORS_TABLE);
         cmd.getRows().addAll(list);
         cmd.setExtraContext(extraContext);
         RowsResponse response = cmd.execute(cn, getProjectName());
@@ -581,7 +579,7 @@ public class ScriptValidationTest extends BaseWebDriverTest
     @Override
     public List<String> getAssociatedModules()
     {
-        return Arrays.asList("simpletest");
+        return List.of(MODULE_NAME);
     }
 
     @Override
