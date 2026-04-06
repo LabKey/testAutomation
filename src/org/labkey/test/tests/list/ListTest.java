@@ -1415,6 +1415,9 @@ public class ListTest extends BaseWebDriverTest
         row.put(fieldA, "not null");
         row.put(fieldB, "");
         _listHelper.insertNewRow(row, false);
+        row.put(fieldA, "still not null");
+        row.put(fieldB, "also not null");
+        _listHelper.insertNewRow(row, false);
 
         // fieldA can be set to required==true
         EditListDefinitionPage listDefinitionPage = _listHelper.goToEditDesign(listName);
@@ -1432,6 +1435,10 @@ public class ListTest extends BaseWebDriverTest
         assertEquals(2, errors.size());
         assertEquals("The property \"" + fieldB + "\" cannot be required when it contains rows with blank values.", errors.get(0));
         assertEquals("Please correct errors in " + listName + " before saving.", errors.get(1));
+
+        goToProjectHome();
+        clickAndWait(Locator.linkWithText(listName));
+        _listHelper.deleteList();
     }
 
 
