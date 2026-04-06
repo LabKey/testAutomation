@@ -1396,6 +1396,45 @@ public class ListTest extends BaseWebDriverTest
         assertTextBefore(newFieldName, origFieldName);
     }
 
+
+    @Test
+    public void requiredFieldsTest()
+    {
+        log("Test changing required property of field");
+        String listName = "requiredColList";
+        String fieldA = "c$a";
+        String fieldB = "c_b";
+
+        _listHelper.createList(PROJECT_VERIFY, listName, "key",
+                new FieldDefinition(fieldA, ColumnType.String).setDescription("first column").setRequired(false),
+                new FieldDefinition(fieldB, ColumnType.String).setDescription("second column").setRequired(false)
+        );
+
+        // insert a row with a NULL value and NON-NULL value
+        Map<String, String> row = new HashMap<>();
+        row.put(fieldA, "not null");
+        row.put(fieldB, "");
+        _listHelper.insertNewRow(row, false);
+
+        // fieldA can be set to required==true
+        EditListDefinitionPage listDefinitionPage = _listHelper.goToEditDesign(listName);
+        listDefinitionPage.getFieldsPanel()
+                .getField(fieldA)
+                .setRequiredField(true);
+        listDefinitionPage.clickSave();
+
+        // fieldB can not be set to required==true
+        listDefinitionPage = _listHelper.goToEditDesign(listName);
+        listDefinitionPage.getFieldsPanel()
+                .getField(fieldB)
+                .setRequiredField(true);
+        List<String> errors = listDefinitionPage.clickSaveExpectingErrors();
+        assertEquals(2, errors.size());
+        assertEquals("The property \"" + fieldB + "\" cannot be required when it contains rows with blank values.", errors.get(0));
+        assertEquals("Please correct errors in " + listName + " before saving.", errors.get(1));
+    }
+
+
     @Test
     public void exportPhiFileColumn() throws Exception
     {
