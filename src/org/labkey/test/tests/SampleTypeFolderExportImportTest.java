@@ -553,6 +553,37 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
     }
 
     @Test
+    public void testExportImportSampleTypesWithSubfolder()
+    {
+        String subfolder = "subfolderNoSampleType";
+        String projectSampleType = "testSamplesWithSubfolder";
+        String importProject = "testDupeTypeImportProject";
+
+        _containerHelper.createSubfolder(getProjectName(), subfolder);
+        _containerHelper.deleteProject(importProject, false);
+        _containerHelper.createProject(importProject);
+        log("Create a sample type in the parent folder");
+        List<FieldDefinition> testFields = SampleTypeAPIHelper.sampleTypeTestFields(false);
+        SampleTypeDefinition testSampleType = new SampleTypeDefinition(projectSampleType).setFields(testFields);
+        SampleTypeAPIHelper.createEmptySampleType(getProjectName(), testSampleType);
+
+        goToProjectHome();
+        ExportFolderPage exportPage = goToFolderManagement()
+                .goToExportTab();
+        exportPage.includeSubfolders(true);
+        File exportedFolderFile = exportPage.exportToBrowserAsZipFile();
+
+        goToProjectHome(importProject);
+        importFolderFromZip(exportedFolderFile, false, 1);
+        goToProjectFolder(importProject, subfolder);
+        PortalHelper portalHelper = new PortalHelper(this);
+        portalHelper.addWebPart("Sample Types");
+        DataRegionTable table = DataRegionTable.DataRegion(getDriver()).withName("SampleSet").waitFor();
+        List<String> typeNames = table.getColumnDataAsText("Name");
+        checker().verifyEquals("Type names not as expected", List.of(projectSampleType), typeNames);
+    }
+
+    @Test
     public void testExportImportSampleTypesWithAssayRuns() throws Exception
     {
         String subfolder = "samplesWithAssayRunsFolder";
@@ -650,7 +681,7 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
         runRecords2.add(Map.of("sampleId", "sample2", "resultData", "less thing"));
         runRecords2.add(Map.of("sampleId", "sample3", "resultData", "the other other thing"));
 
-        ImportRunCommand importRunCommand2 = new ImportRunCommand(protocolId, runRecords1);
+        ImportRunCommand importRunCommand2 = new ImportRunCommand(protocolId, runRecords2);
         importRunCommand2.setName("secondRun");
         importRunCommand2.setBatchId(124);
         importRunCommand2.execute(createDefaultConnection(), subfolderPath);
