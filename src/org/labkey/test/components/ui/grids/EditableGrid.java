@@ -1040,6 +1040,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
                 // WebDriver doesn't calculate correct location to click the cell selection handle
                 .moveToElement(elementToDrag, 0, 7)
                 .clickAndHold()
+                .pause(Duration.ofMillis(200))
                 .moveToElement(destinationCell)
                 // Extra wiggle to get it to stick
                 .moveByOffset(0, -size.getHeight())
