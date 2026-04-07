@@ -82,7 +82,7 @@ public enum InventoryMetricUnit
 
     public static List<String> getAllCountUnits()
     {
-        return Arrays.asList("blocks", "bottles", "boxes", "cells", "kits", "packs", "pieces", "slides", "tests", "unit");
+        return Arrays.asList("blocks", "bottles", "boxes", "cells", "kits", "organisms", "packs", "pieces", "slides", "syringes", "tests", "tubes", "unit", "vials");
     }
 
     public static List<InventoryMetricUnit> getMassSampleUnits()
