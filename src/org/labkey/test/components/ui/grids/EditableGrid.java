@@ -949,7 +949,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
                 if (value instanceof List<?> l)
                     sb.append(formatMultiValueText(l));
                 else
-                    sb.append(value);
+                    sb.append(quoteForPaste(value.toString()));
             }
         }
         return sb.toString();

@@ -48,6 +48,7 @@ import static org.labkey.remoteapi.query.Filter.Operator.ARRAY_CONTAINS_NONE;
 import static org.labkey.remoteapi.query.Filter.Operator.ARRAY_CONTAINS_NOT_EXACT;
 import static org.labkey.remoteapi.query.Filter.Operator.ARRAY_ISEMPTY;
 import static org.labkey.remoteapi.query.Filter.Operator.ARRAY_ISNOTEMPTY;
+import static org.labkey.test.WebDriverWrapper.sleep;
 import static org.labkey.test.WebDriverWrapper.waitFor;
 
 public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverComponent<ResponsiveGrid<T>.ElementCache> implements UpdatingComponent
@@ -261,6 +262,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverCompon
                     List<String> values = (List<String>) value;
                     filterPanel.selectValue(values.get(0));
                     filterPanel.checkValues(values.toArray(String[]::new));
+                    sleep(500);
                 }
             }
             else
