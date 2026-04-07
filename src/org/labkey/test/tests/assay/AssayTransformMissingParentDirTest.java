@@ -1,9 +1,11 @@
 package org.labkey.test.tests.assay;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.api.util.FileUtil;
+import org.labkey.api.util.StringUtilsLabKey;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Assays;
@@ -76,7 +78,22 @@ public class AssayTransformMissingParentDirTest extends AbstractAssayTransformTe
             catch (IOException ioException) {
                 log(String.format("IOException trying to delete directory %s. Error: %s. Waiting 10s and retrying. Attempt %d of 10.",
                         parentDir, ioException.getMessage(), attempt));
-                if (attempt == 10) throw ioException;
+                if (attempt == 10)
+                {
+                    if (SystemUtils.IS_OS_WINDOWS) {
+                        try {
+                            log("Lock diagnostic...");
+                            ProcessBuilder pb = new ProcessBuilder("tasklist");
+                            pb.redirectErrorStream(true);
+                            Process p = pb.start();
+                            String output = new String(p.getInputStream().readAllBytes(), StringUtilsLabKey.DEFAULT_CHARSET);
+                            log("Running processes:\n" + output);
+                        } catch (IOException diagnosticException) {
+                            log("Failed to run lock diagnostic: " + diagnosticException.getMessage());
+                        }
+                    }
+                    throw ioException;
+                }
                 sleep(10_000);
             }
         }
