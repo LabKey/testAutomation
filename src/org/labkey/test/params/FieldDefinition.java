@@ -498,11 +498,6 @@ public class FieldDefinition extends PropertyDescriptor
         _namePart = namePart;
     }
 
-    public String getNamePart()
-    {
-        return _namePart;
-    }
-
     public boolean isNamePartMatch(String namePart)
     {
         return _namePart != null && _namePart.equals(namePart);
