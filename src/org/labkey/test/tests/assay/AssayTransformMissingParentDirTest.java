@@ -15,6 +15,7 @@ import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.pages.assay.AssayImportPage;
 import org.labkey.test.pages.assay.AssayRunsPage;
 import org.labkey.test.params.assay.GeneralAssayDesign;
+import org.labkey.test.util.search.SearchAdminAPIHelper;
 
 import java.io.File;
 import java.io.IOException;
@@ -50,6 +51,9 @@ public class AssayTransformMissingParentDirTest extends AbstractAssayTransformTe
         // add by path so the absolute path is stored; this allows reproducing the missing parent dir scenario
         assayDesignerPage.addTransformScript(transformFile);
         assayDesignerPage.clickSave();
+
+        // Let the index run if needed.
+        SearchAdminAPIHelper.waitForIndexer();
 
         // Now delete the parent dir to ensure we handle it reasonably.
         // Sometimes on Windows the directory could be locked, maybe by an external process, or the child directory is
