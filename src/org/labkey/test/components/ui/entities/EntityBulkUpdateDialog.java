@@ -306,8 +306,6 @@ public class EntityBulkUpdateDialog extends ModalDialog
     public EntityBulkUpdateDialog removeExistingAttachment(CharSequence fieldIdentifier)
     {
         var row = getFileField(fieldIdentifier);
-        // setEditableState(fieldIdentifier, true);
-        // WebElement row = elementCache().formRow(fieldIdentifier);
         AttachmentCard card = new AttachmentCard.FileAttachmentCardFinder(getDriver()).waitFor(row);
         card.clickRemove();
         return this;
