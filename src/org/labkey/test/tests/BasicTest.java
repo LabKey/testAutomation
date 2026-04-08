@@ -64,14 +64,6 @@ public class BasicTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testOrphanedAttachments()
-    {
-        int orphanCount = AttachmentHelper.logOrphanedAttachments();
-        if (orphanCount > 0)
-            log("Orphaned attachments: " + orphanCount);
-    }
-
-    @Test
     public void testStartupLogging()
     {
         ShowAdminPage adminPage = goToAdminConsole();
