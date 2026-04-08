@@ -62,6 +62,7 @@ public class TestArrayDataUtils
                 .sorted(Comparator
                         .comparing((String s) -> s.substring(0, 1).toLowerCase())
                         .thenComparing(s -> s.substring(0, 1))
+                        .thenComparing(String.CASE_INSENSITIVE_ORDER)
                         .thenComparing(s -> s))
                 .collect(Collectors.toList());
     }
@@ -90,7 +91,7 @@ public class TestArrayDataUtils
         return prepareMapForCheck(filterMap(map, searchValues, filterType));
     }
 
-    public static List<String> parseMultiValueText(String multiValueString) throws IOException
+    public static List<String> parseMultiValueText(String multiValueString)
     {
         CSVFormat format = CSVFormat.RFC4180.builder()
                 .setIgnoreSurroundingSpaces(true).setTrim(true).get();
@@ -100,6 +101,10 @@ public class TestArrayDataUtils
             if (records.size() != 1)
                 throw new IllegalArgumentException("Invalid multi-value text string: " + multiValueString);
             return records.getFirst().toList();
+        }
+        catch (IOException e)
+        {
+            throw new IllegalArgumentException(e);
         }
     }
 
