@@ -84,6 +84,9 @@ public class AssayTransformMissingParentDirTest extends AbstractAssayTransformTe
                         parentDir, ioException.getMessage(), attempt));
                 if (attempt == 10)
                 {
+                    log("Dump the heap.");
+                    dumpHeap();
+
                     if (SystemUtils.IS_OS_WINDOWS) {
                         try {
                             log("Lock diagnostic...");
