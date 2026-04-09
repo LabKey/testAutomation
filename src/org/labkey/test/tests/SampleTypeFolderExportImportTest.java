@@ -566,8 +566,12 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
         List<FieldDefinition> testFields = SampleTypeAPIHelper.sampleTypeTestFields(false);
         SampleTypeDefinition testSampleType = new SampleTypeDefinition(projectSampleType).setFields(testFields);
         SampleTypeAPIHelper.createEmptySampleType(getProjectName(), testSampleType);
-
         goToProjectHome();
+        PortalHelper portalHelper = new PortalHelper(this);
+        portalHelper.addWebPart("Sample Types");
+        DataRegionTable table = DataRegionTable.DataRegion(getDriver()).withName("SampleSet").waitFor();
+        List<String> exportedNames = table.getColumnDataAsText("Name");
+
         ExportFolderPage exportPage = goToFolderManagement()
                 .goToExportTab();
         exportPage.includeSubfolders(true);
@@ -576,11 +580,11 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
         goToProjectHome(importProject);
         importFolderFromZip(exportedFolderFile, false, 1);
         goToProjectFolder(importProject, subfolder);
-        PortalHelper portalHelper = new PortalHelper(this);
+        portalHelper = new PortalHelper(this);
         portalHelper.addWebPart("Sample Types");
-        DataRegionTable table = DataRegionTable.DataRegion(getDriver()).withName("SampleSet").waitFor();
+        table = DataRegionTable.DataRegion(getDriver()).withName("SampleSet").waitFor();
         List<String> typeNames = table.getColumnDataAsText("Name");
-        checker().verifyEquals("Type names not as expected", List.of(projectSampleType), typeNames);
+        checker().verifyEquals("Type names not as expected", exportedNames, typeNames);
     }
 
     @Test
