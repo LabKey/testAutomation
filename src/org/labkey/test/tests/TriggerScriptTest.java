@@ -77,7 +77,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
     private static final String SUBFOLDER_NAME = "SubfolderA";
     private static final String SUBFOLDER_PATH = "/" + PROJECT_NAME + "/" + SUBFOLDER_NAME;
 
-    //List constants
+    // List constants
     private static final String TRIGGER_MODULE = "triggerTestModule";
     private static final String SIMPLE_MODULE = "simpletest";
     private static final String LIST_NAME = "Employees";
@@ -91,7 +91,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
     private static final String MANAGED_STRUCT_ADD_ERROR = "attempted to add";
     private static final String MANAGED_STRUCT_REMOVE_ERROR = "attempted to remove";
 
-    //Dataset constants
+    // Dataset constants
     private static final String STUDY_SCHEMA = "study";
     private static final String DATASET_NAME = "Demographics";
     private static final String INDIVIDUAL_TEST = "Individual Test";
@@ -638,6 +638,42 @@ public class TriggerScriptTest extends BaseWebDriverTest
     public void testDatasetManagedColumnsTriggers() throws Exception
     {
         doManagedColumnsTriggerTest(STUDY_SCHEMA, DATASET_NAME, "ParticipantId", true, COMMENTS_FIELD);
+    }
+
+    @Test
+    public void testNonIteratorTriggerManagedColumnsDisabled() throws Exception
+    {
+        // List insert is not backed by data iterator, so expect the trigger mutations to apply without error
+        var keyField = new FieldDefinition("type").setLabel("Type");
+
+        var unmanagedList = new VarListDefinition("Unmanaged")
+                .setKeyName(keyField.getName())
+                .setFields(List.of(keyField, new FieldDefinition("color"), new FieldDefinition("flower"), new FieldDefinition("hemisphere")));
+
+        var cn = createDefaultConnection();
+        unmanagedList.create(cn, getProjectName());
+
+        var insCmd = new InsertRowsCommand(LIST_SCHEMA, unmanagedList.getName());
+        insCmd.addRow(Map.of("type", "A", "color", "Red"));
+        insCmd.execute(cn, getProjectName());
+
+        var queryHelper = new QueryApiHelper(cn, getProjectName(), LIST_SCHEMA, unmanagedList.getName());
+
+        var row = queryHelper.selectRows().getRows().getFirst();
+        Assert.assertEquals("A", row.get("type"));
+        Assert.assertEquals("Red", row.get("color"));
+        Assert.assertEquals("Rose", row.get("flower"));
+        Assert.assertNull(row.get("hemisphere"));
+
+        var updCmd = new UpdateRowsCommand(LIST_SCHEMA, unmanagedList.getName());
+        updCmd.addRow(Map.of("type", "A", "flower", "Tulip"));
+        updCmd.execute(cn, getProjectName());
+
+        row = queryHelper.selectRows().getRows().getFirst();
+        Assert.assertEquals("A", row.get("type"));
+        Assert.assertEquals("Red", row.get("color"));
+        Assert.assertEquals("Tulip", row.get("flower"));
+        Assert.assertEquals("Northern", row.get("hemisphere"));
     }
 
     /**
