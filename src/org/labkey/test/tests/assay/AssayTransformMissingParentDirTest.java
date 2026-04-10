@@ -52,9 +52,6 @@ public class AssayTransformMissingParentDirTest extends AbstractAssayTransformTe
         assayDesignerPage.addTransformScript(transformFile);
         assayDesignerPage.clickSave();
 
-        // Let the index run if needed.
-        SearchAdminAPIHelper.waitForIndexer();
-
         // Now delete the parent dir to ensure we handle it reasonably.
         // Sometimes on Windows the directory could be locked, maybe by an external process, or the child directory is
         // readonly. Use a retry mechanism to set the writeable flag and then try to delete the parent directory.
