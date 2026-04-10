@@ -1,4 +1,4 @@
-var shared = require("TriggerTestModule/EmployeeLib");
+var shared = require("TriggerTestModule/SharedTriggerLib");
 var console = require("console");
    
 function managedColumns() {
