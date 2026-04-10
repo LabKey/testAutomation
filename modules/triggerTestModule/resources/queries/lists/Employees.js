@@ -1,9 +1,3 @@
-/*
- * Copyright (c) 2016-2018 LabKey Corporation
- *
- * Licensed under the Apache License, Version 2.0: http://www.apache.org/licenses/LICENSE-2.0
- */
-var shared = require("TriggerTestModule/EmployeeLib");
 var console = require("console");
 
 function managedColumns() {
@@ -16,7 +10,6 @@ function managedColumns() {
 
 function init(event, errors) {
 	console.log("init got triggered with event: " + event);
-    console.log(shared.sampleFunc("this is from the shared function"));
 }
 
 function beforeInsert(row, errors) {
@@ -48,12 +41,11 @@ function beforeInsert(row, errors) {
         row.boomeRANG = "Back at ya!";
     }
     console.log("list: edited row is: " + row);
-    console.log(shared.sampleFunc("list: this is from the shared function"));
 }
 
 function beforeUpdate(row, oldRow, errors) {
 	console.log("list: beforeUpdate: row is: " + row);
-	if (row.name === "Emp 3" || row.name === "Emp 8")
+	if (row.company === "Company Up")
         row.company = "Before Update changed me";
     else if (row.name === "Managed Update") {
         row.company = "Managed Co";
@@ -80,15 +72,12 @@ function beforeUpdate(row, oldRow, errors) {
         row.boomeRANG = "Back at me!";
     }
 	console.log("list: old row is: " + oldRow);
-    console.log(shared.sampleFunc("list: this is from the shared function"));
 }
 
 function beforeDelete(row, errors) {
 	console.log("list: beforeDelete: row is: " + row);
     if (row.company === "Inserting Single" || row.company === "DeleteMe")
         errors[null] = "This is the Before Delete Error";
-
-    console.log(shared.sampleFunc("list: this is from the shared function"));
 }
 
 function afterInsert(row, errors) {
@@ -96,19 +85,15 @@ function afterInsert(row, errors) {
 
     if (row.name === "Emp 1")
         errors[null] = "This is the After Insert Error";
-
-    console.log(shared.sampleFunc("list: this is from the shared function"));
 }
 
 function afterUpdate(row, oldRow, errors) {
 	console.log("list: afterUpdate: row is: " + row);
 
-    if (row.name === "Emp 2" || row.name === "Emp 6" )
+    if (row.company === "Company After Update Error")
         errors[null] = "This is the After Update Error";
-    //throw new Error("This is the After Update Error");
 
 	console.log("list: old row is: " +oldRow);
-    console.log(shared.sampleFunc("list: this is from the shared function"));
 }
 
 function afterDelete(row, errors) {
@@ -116,11 +101,8 @@ function afterDelete(row, errors) {
 
     if (row.company === "Before Update changed me")
         errors[null] = "This is the After Delete Error";
-
-    console.log(shared.sampleFunc("list: this is from the shared function"));
 }
 
 function complete(event, errors) {
 	console.log("list: complete got triggered with event: " + event);
-    console.log(shared.sampleFunc("list: this is from the shared function"));
 }
