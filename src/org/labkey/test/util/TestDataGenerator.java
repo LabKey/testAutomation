@@ -660,12 +660,12 @@ public class TestDataGenerator
         return randomFieldName(part, null, null, exclusion, domainKind);
     }
 
-    public static String randomFieldName(@NotNull String part, @Nullable Integer numStartChars, @Nullable Integer numEndChars, @Nullable String exclusion, @Nullable DomainKind domainKind)
+    public static String randomFieldName(@NotNull String part, @Nullable Integer minNumStartChars, @Nullable Integer minNumEndChars, @Nullable String exclusion, @Nullable DomainKind domainKind)
     {
-        return randomFieldName(part, numStartChars, numEndChars, exclusion, domainKind, null);
+        return randomFieldName(part, minNumStartChars, minNumEndChars, exclusion, domainKind, null);
     }
 
-    public static String randomFieldName(@NotNull String part, @Nullable Integer numStartChars, @Nullable Integer numEndChars, @Nullable String exclusion, @Nullable DomainKind domainKind, @Nullable Integer maxLength)
+    public static String randomFieldName(@NotNull String part, @Nullable Integer minNumStartChars, @Nullable Integer minNumEndChars, @Nullable String exclusion, @Nullable DomainKind domainKind, @Nullable Integer maxLength)
     {
         DomainKind _domainKind = domainKind == null ? DomainKind.SampleSet : domainKind;
 
@@ -675,10 +675,10 @@ public class TestDataGenerator
                 + WIDE_PLACEHOLDER + REPEAT_PLACEHOLDER + ALL_CHARS_PLACEHOLDER;
 
         int currentTries = 0;
-        RandomName randomFieldName = randomName(part, getNumChars(numStartChars, 5), getNumChars(numEndChars, 50), chars, exclusion);
+        RandomName randomFieldName = randomName(part, getNumChars(minNumStartChars, 5), getNumChars(minNumEndChars, 50), chars, exclusion);
         while ((maxLength != null && randomFieldName.name().length() > maxLength) || isDomainAndFieldNameInvalid(_domainKind, null, randomFieldName))
         {
-            randomFieldName = randomName(part, getNumChars(numStartChars, 5), getNumChars(numEndChars, 50), chars, exclusion);
+            randomFieldName = randomName(part, getNumChars(minNumStartChars, 5), getNumChars(minNumEndChars, 50), chars, exclusion);
             if (++currentTries >= MAX_RANDOM_TRIES)
                 throw new IllegalStateException("Failed to generate a valid field name after " + MAX_RANDOM_TRIES + " tries. Last generated name: " + randomFieldName);
         }
