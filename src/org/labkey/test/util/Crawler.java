@@ -194,7 +194,6 @@ public class Crawler
             new ControllerActionId("login", "setPassword"),
             new ControllerActionId("ms2", "showList"),
             new ControllerActionId("ms2", "showParamsFile"),
-            new ControllerActionId("nlp", "runPipeline"),
             new ControllerActionId("pipeline-analysis", "analyze"), // Doesn't navigate
             new ControllerActionId("project", "togglePageAdminMode"),
             // Tested directly in XTandemTest
