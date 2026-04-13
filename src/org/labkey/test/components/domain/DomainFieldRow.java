@@ -767,11 +767,17 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     // behind the scenes. Because of that the validator aspect of the TextChoice field is hidden from the user (just like
     // it is in the product).
 
-    public void setAllowMultipleSelections(Boolean allowMultipleSelections)
+    public DomainFieldRow setAllowMultipleSelections(Boolean allowMultipleSelections)
     {
         WebDriverWrapper.waitFor(() -> elementCache().allowMultipleSelectionsCheckbox.isDisplayed(),
                 "Allow Multiple Selections checkbox did not become visible", 1000);
         elementCache().allowMultipleSelectionsCheckbox.set(allowMultipleSelections);
+        // A confirmation dialog may appear when re-enabling multiple selections; dismiss it if present
+        ModalDialog modal = new ModalDialog.ModalDialogFinder(getDriver())
+                .withTitle("Confirm Data Type Change").findOrNull(getDriver());
+        if (modal != null)
+            modal.dismiss("Yes, Change Data Type");
+        return this;
     }
 
     /**
