@@ -771,6 +771,8 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     {
         WebDriverWrapper.waitFor(() -> elementCache().allowMultipleSelectionsCheckbox.isDisplayed(),
                 "Allow Multiple Selections checkbox did not become visible", 1000);
+        WebDriverWrapper.waitFor(() -> elementCache().allowMultipleSelectionsCheckbox.isEnabled(),
+                "Allow Multiple Selections checkbox isn't enabled", 1000);
         elementCache().allowMultipleSelectionsCheckbox.set(allowMultipleSelections);
         // A confirmation dialog may appear when re-enabling multiple selections; dismiss it if present
         ModalDialog modal = new ModalDialog.ModalDialogFinder(getDriver())
