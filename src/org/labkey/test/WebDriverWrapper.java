@@ -47,6 +47,7 @@ import org.labkey.test.pages.reports.ManageViewsPage;
 import org.labkey.test.pages.study.ManageStudyPage;
 import org.labkey.test.pages.user.ShowUsersPage;
 import org.labkey.test.selenium.EphemeralWebElement;
+import org.labkey.test.util.AccessibilityUtils;
 import org.labkey.test.util.CodeMirrorHelper;
 import org.labkey.test.util.Crawler;
 import org.labkey.test.util.EscapeUtil;
@@ -2134,6 +2135,8 @@ public abstract class WebDriverWrapper implements WrapsDriver
                 String warning = "Action doesn't define a page title";
                 addActionWarning(warning, getDriver().getCurrentUrl());
             }
+
+            AccessibilityUtils.scanPage(getDriver());
         }
 
         return loadTimer.elapsed().toMillis();

@@ -15,11 +15,15 @@
  */
 package org.labkey.test.components;
 
+import com.deque.html.axecore.results.Results;
+import com.deque.html.axecore.selenium.AxeBuilder;
 import org.apache.commons.lang3.NotImplementedException;
 import org.jetbrains.annotations.NotNull;
 import org.labkey.test.Locator;
 import org.labkey.test.selenium.RefindingWebElement;
+import org.labkey.test.util.AccessibilityUtils;
 import org.labkey.test.util.TestLogger;
+import org.labkey.test.util.selenium.WebDriverUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
@@ -79,6 +83,8 @@ public abstract class Component<EC extends Component.ElementCache> implements Se
                 // It succeeded, so it should be safe to get a fresh `newElementCache`
                 _elementCache = Objects.requireNonNull(newElementCache());
             }
+
+            AccessibilityUtils.scanComponent(this);
         }
         return _elementCache;
     }

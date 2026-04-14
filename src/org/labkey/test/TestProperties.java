@@ -352,6 +352,11 @@ public abstract class TestProperties
         return "true".equals(System.getProperty("webtest.ignoreDatabaseNotSupportedException"));
     }
 
+    public static boolean isAccessibilityCheckEnabled()
+    {
+        return "true".equals(System.getProperty("webtest.enableAccessibilityCheck", "true")); // TODO: default to "false" if lots of TeamCity noise
+    }
+
     /**
      * Parses system property 'webtest.server.startup.timeout' to determine maximum allowed server startup time.
      * If property is not defined or is not an integer, it defaults to 120 seconds.

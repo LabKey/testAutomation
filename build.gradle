@@ -36,6 +36,9 @@ project.dependencies {
     implementation("org.seleniumhq.selenium:selenium-remote-driver:${seleniumVersion}")
     implementation("org.seleniumhq.selenium:selenium-chrome-driver:${seleniumVersion}")
     implementation "org.seleniumhq.selenium:selenium-ie-driver:${seleniumVersion}"
+
+    implementation("com.deque.html.axe-core:selenium:${axeCoreSeleniumVersion}")
+
     implementation("org.eclipse.jetty:jetty-util:${jettyVersion}")
 
     implementation("com.google.guava:guava:${guavaVersion}")
