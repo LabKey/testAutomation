@@ -3,7 +3,10 @@ package org.labkey.test.util.data;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.junit.Assert;
 import org.labkey.remoteapi.query.Filter;
+import org.labkey.test.components.ui.grids.QueryGrid;
+import org.labkey.test.util.DeferredErrorCollector;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -12,6 +15,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestArrayDataUtils
 {
@@ -126,5 +131,26 @@ public class TestArrayDataUtils
             case ARRAY_ISNOTEMPTY -> !actualValues.isEmpty();
             default -> throw new IllegalArgumentException("Invalid filter type " + type);
         };
+    }
+
+    /**
+     * Verifies that the grid contains exactly the expected sample IDs and that each sample's MVTC column
+     * value matches the expected value in {@code sampleMVTCMap}.
+     * Size mismatch is a hard failure; ID and per-row value checks are soft (collected via {@code checker}).
+     */
+    public static void verifyMVTCResults(QueryGrid grid, Map<String, String> sampleMVTCMap,
+                                         String colLabel, String stepMessage, DeferredErrorCollector checker)
+    {
+        List<String> foundIds = grid.getColumnDataAsText("Sample ID");
+        Assert.assertEquals(stepMessage + ": size mismatch", sampleMVTCMap.size(), foundIds.size());
+        checker.wrapAssertion(() -> assertThat(foundIds)
+                .as(stepMessage + ": Sample IDs")
+                .containsExactlyInAnyOrderElementsOf(sampleMVTCMap.keySet()));
+        sampleMVTCMap.forEach((sampleId, expected) -> {
+            Map<String, String> rowMap = grid.getRowMapByLabel("Sample ID", sampleId);
+            checker.wrapAssertion(() -> assertThat(rowMap.get(colLabel))
+                    .as("%s: %s for sample %s", stepMessage, colLabel, sampleId)
+                    .isEqualTo(expected == null ? "" : expected));
+        });
     }
 }
