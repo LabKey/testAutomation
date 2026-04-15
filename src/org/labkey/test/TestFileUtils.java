@@ -458,12 +458,10 @@ public abstract class TestFileUtils
      * directories. This is primarily intended to work around Windows file-locking issues where an external process
      * may hold a lock on the directory or its contents.
      * <p>
-     * On the final failed attempt, a heap dump is captured for diagnostics. On Windows, the list of running
+     * On the final failed attempt, a heap dump is captured for diagnostics if running on TeamCity. The list of running
      * processes is also logged to help identify what may be holding the lock.
      *
      * @param dir the directory to delete
-     * @throws AccessDeniedException if access is denied on all 10 attempts
-     * @throws IOException if an I/O error occurs on all 10 attempts
      * @throws Exception if an unexpected error occurs
      */
     public static void deleteDirWithRetry(File dir) throws Exception
