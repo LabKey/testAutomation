@@ -471,8 +471,7 @@ public abstract class TestFileUtils
         // Sometimes on Windows the directory could be locked, maybe by an external process, or the child directory is
         // readonly. Use a retry mechanism to set the writeable flag and then try to delete the parent directory.
         for (int attempt = 1; attempt <= 10; attempt++) {
-            try
-            {
+            try {
                 dir.setWritable(true, false);
 
                 // Wrap in a try to close the stream.
@@ -483,40 +482,42 @@ public abstract class TestFileUtils
                 FileUtils.deleteDirectory(dir);
                 LOG.info(String.format("Deletion of directory %s was successful.", dir));
                 break;
-            } catch (AccessDeniedException deniedException) {
-                // Yes I know AccessDeniedException is a subset of an IOException, but I wanted to log explicitly a
-                // failure and retry because of an AccessDeniedException from some other IOException.
-                LOG.warn(String.format("Access denied trying to delete directory %s. Error: %s. Waiting 10s and retrying. Attempt %d of 10.",
-                        dir, deniedException.getMessage(), attempt));
-                if (attempt == 10) throw deniedException;
-                sleep(10_000);
-            }
-            catch (IOException ioException) {
+            } catch (IOException ioException) {
                 LOG.warn(String.format("IOException trying to delete directory %s. Error: %s. Waiting 10s and retrying. Attempt %d of 10.",
                         dir, ioException.getMessage(), attempt));
-                if (attempt == 10)
-                {
-                    LOG.info("Dump the heap.");
-                    dumpHeap();
+                if (attempt == 10) {
 
+                    if (TestProperties.isTestRunningOnTeamCity()) {
+                        LOG.info("Dump the heap.");
+                        dumpHeap();
+                    }
+
+                    ProcessBuilder pb;
                     if (SystemUtils.IS_OS_WINDOWS) {
+                        pb = new ProcessBuilder("tasklist");
+                    }
+                    else {
+                        pb = new ProcessBuilder("ps", "-ef");
+                    }
+
+                    try {
+                        LOG.info("Lock diagnostic...");
+                        pb.redirectErrorStream(true);
+
+                        // Tried to use "try (Process p = pb.start()) {" without the finally block but our build
+                        // system didn't like that and complained that Process doesn't implement closeable (it does).
+                        Process p = pb.start();
                         try {
-                            LOG.info("Lock diagnostic...");
-                            ProcessBuilder pb = new ProcessBuilder("tasklist");
-                            pb.redirectErrorStream(true);
-                            Process p = pb.start();
-                            try {
-                                String output = new String(p.getInputStream().readAllBytes(), StringUtilsLabKey.DEFAULT_CHARSET);
-                                LOG.info("Running processes:\n" + output);
-                            }
-                            finally
-                            {
-                                // Don't leak the process resource.
-                                p.destroy();
-                            }
-                        } catch (IOException diagnosticException) {
-                            LOG.warn("Failed to run lock diagnostic: " + diagnosticException.getMessage());
+                            String output = new String(p.getInputStream().readAllBytes(), StringUtilsLabKey.DEFAULT_CHARSET);
+                            LOG.info("Running processes:\n" + output);
                         }
+                        finally {
+                            // Don't leak the process resource.
+                            p.destroy();
+                        }
+
+                    } catch (IOException diagnosticException) {
+                        LOG.warn("Failed to run lock diagnostic: " + diagnosticException.getMessage());
                     }
                     throw ioException;
                 }
