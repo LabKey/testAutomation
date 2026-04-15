@@ -84,12 +84,18 @@ public abstract class Component<EC extends Component.ElementCache> implements Se
                 _elementCache = Objects.requireNonNull(newElementCache());
             }
 
-            AccessibilityUtils.scanComponent(this);
+            if (shouldScanAfterReady())
+                AccessibilityUtils.scanComponent(this);
         }
         return _elementCache;
     }
 
     protected void waitForReady() { }
+
+    protected boolean shouldScanAfterReady()
+    {
+        return false;
+    }
 
     protected EC newElementCache()
     {

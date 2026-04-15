@@ -43,6 +43,7 @@ public class GridFilterModal extends ModalDialog
      */
     public GridFilterModal selectField(CharSequence fieldIdentifier)
     {
+        getWrapper().shortWait().until(ExpectedConditions.invisibilityOfElementLocated(Locator.byClass("field-modal__empty-msg")));
         WebElement fieldItem = elementCache().findFieldOption(fieldIdentifier);
         getWrapper().scrollIntoView(fieldItem);
         String fieldLabel = WebElementUtils.getTextContent(fieldItem);

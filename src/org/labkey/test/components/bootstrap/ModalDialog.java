@@ -65,6 +65,12 @@ public class ModalDialog extends WebDriverComponent<ModalDialog.ElementCache>
     }
 
     @Override
+    protected boolean shouldScanAfterReady()
+    {
+        return true;
+    }
+
+    @Override
     public WebElement getComponentElement()
     {
         return _el;
