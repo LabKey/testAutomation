@@ -505,8 +505,15 @@ public abstract class TestFileUtils
                             ProcessBuilder pb = new ProcessBuilder("tasklist");
                             pb.redirectErrorStream(true);
                             Process p = pb.start();
-                            String output = new String(p.getInputStream().readAllBytes(), StringUtilsLabKey.DEFAULT_CHARSET);
-                            LOG.info("Running processes:\n" + output);
+                            try {
+                                String output = new String(p.getInputStream().readAllBytes(), StringUtilsLabKey.DEFAULT_CHARSET);
+                                LOG.info("Running processes:\n" + output);
+                            }
+                            finally
+                            {
+                                // Don't leak the process resource.
+                                p.destroy();
+                            }
                         } catch (IOException diagnosticException) {
                             LOG.warn("Failed to run lock diagnostic: " + diagnosticException.getMessage());
                         }
