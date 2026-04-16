@@ -15,7 +15,7 @@ public class EditInlineField extends WebDriverComponent<EditInlineField.ElementC
     private final WebElement _el;
     private final WebDriver _driver;
 
-    protected EditInlineField(WebElement element, WebDriver driver)
+    public EditInlineField(WebElement element, WebDriver driver)
     {
         _el = element;
         _driver = driver;
