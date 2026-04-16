@@ -110,15 +110,15 @@ public class EditInlineField extends WebDriverComponent<EditInlineField.ElementC
 
     protected class ElementCache extends Component<?>.ElementCache
     {
-        final WebElement label = Locator.tagWithClass("span", "edit-inline-field__label")
+        final WebElement label = Locator.byClass("edit-inline-field__label")
                 .refindWhenNeeded(this);
-        final Locator toggleLoc = Locator.tagWithClass("span", "edit-inline-field__toggle");
+        final Locator toggleLoc = Locator.byClass("edit-inline-field__toggle");
         final Locator pencilLoc = Locator.tagWithClass("i", "fa-pencil");
         final WebElement input = Locator.css("input.form-control, input.select-input__input, textarea.form-control").refindWhenNeeded(this);
 
         WebElement placeholderElement()
         {
-            return Locator.tagWithClass("span", "edit-inline-field__placeholder")
+            return Locator.byClass("edit-inline-field__placeholder")
                     .findElement(this);
         }
 
@@ -166,7 +166,7 @@ public class EditInlineField extends WebDriverComponent<EditInlineField.ElementC
         {
             if (_label != null)
                 return _baseLocator.withChild(
-                        Locator.tagWithClass("span", "edit-inline-field__label")
+                        Locator.byClass("edit-inline-field__label")
                         .containing(_label));
             else
                 return _baseLocator;
