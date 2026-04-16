@@ -134,22 +134,24 @@ public class TestArrayDataUtils
     }
 
     /**
-     * Verifies that the grid contains exactly the expected sample IDs and that each sample's MVTC column
+     * Verifies that the grid contains exactly the expected row IDs and that each row's MVTC column
      * value matches the expected value in {@code sampleMVTCMap}.
      * Size mismatch is a hard failure; ID and per-row value checks are soft (collected via {@code checker}).
+     *
+     * @param idColumn the column label used to identify rows (e.g. "Sample ID" or "Name")
      */
     public static void verifyMVTCResults(QueryGrid grid, Map<String, String> sampleMVTCMap,
-                                         String colLabel, String stepMessage, DeferredErrorCollector checker)
+                                         String idColumn, String colLabel, DeferredErrorCollector checker)
     {
-        List<String> foundIds = grid.getColumnDataAsText("Sample ID");
-        Assert.assertEquals(stepMessage + ": size mismatch", sampleMVTCMap.size(), foundIds.size());
+        List<String> foundIds = grid.getColumnDataAsText(idColumn);
+        Assert.assertEquals("grid row count mismatch", sampleMVTCMap.size(), foundIds.size());
         checker.wrapAssertion(() -> assertThat(foundIds)
-                .as(stepMessage + ": Sample IDs")
+                .as(idColumn + " values in grid")
                 .containsExactlyInAnyOrderElementsOf(sampleMVTCMap.keySet()));
-        sampleMVTCMap.forEach((sampleId, expected) -> {
-            Map<String, String> rowMap = grid.getRowMapByLabel("Sample ID", sampleId);
+        sampleMVTCMap.forEach((id, expected) -> {
+            Map<String, String> rowMap = grid.getRowMapByLabel(idColumn, id);
             checker.wrapAssertion(() -> assertThat(rowMap.get(colLabel))
-                    .as("%s: %s for sample %s", stepMessage, colLabel, sampleId)
+                    .as("'%s' value for %s '%s'", colLabel, idColumn, id)
                     .isEqualTo(expected == null ? "" : expected));
         });
     }

@@ -1,6 +1,7 @@
 package org.labkey.test.tests.component;
 
 import org.assertj.core.api.Assertions;
+import org.jetbrains.annotations.Nullable;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -13,6 +14,7 @@ import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.remoteapi.query.Sort;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.bootstrap.ModalDialog;
@@ -24,17 +26,20 @@ import org.labkey.test.components.ui.grids.QueryGrid;
 import org.labkey.test.components.ui.grids.SaveViewDialog;
 import org.labkey.test.components.ui.search.FilterExpressionPanel;
 import org.labkey.test.components.ui.search.FilterFacetedPanel;
+import org.labkey.test.pages.experiment.UpdateSampleTypePage;
+import org.labkey.test.pages.test.CoreComponentsTestPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldKey;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
-import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.APIUserHelper;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.AuditLogHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PermissionsHelper;
+import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
 import org.labkey.test.util.TestDataGenerator;
+import org.labkey.test.util.data.TestArrayDataUtils;
 import org.labkey.test.util.exp.SampleTypeAPIHelper;
 import org.openqa.selenium.WebDriverException;
 
@@ -44,10 +49,15 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 import static org.labkey.test.util.PermissionsHelper.FOLDER_ADMIN_ROLE;
+import static org.labkey.test.util.SampleTypeHelper.beginAtSampleTypesList;
+import static org.labkey.test.util.TestDataGenerator.randomTextChoice;
 
 @Category({Daily.class})
 public class GridPanelViewTest extends GridPanelBaseTest
@@ -63,14 +73,21 @@ public class GridPanelViewTest extends GridPanelBaseTest
     private static final int VIEW_DIALOG_ST_SIZE = 100;
     private static final String VIEW_DIALOG_ST_PREFIX = "DLG-";
 
+    // Samples in the subfolder.
+    private static final String GRID_SUB_FOLDER = "Sub Folder For Grid Views";
+    private static final int SUBFOLDER_VIEW_SAMPLE_TYPE_SIZE = 30;
+    private static final String SUBFOLDER_VIEW_SAMPLE_PREFIX = "SUBFOLDER_VIEW-";
+
     // Column names.
     private static final String COL_NAME = "Name";
     private static final String COL_STRING1 = "Str1";
     private static final String COL_STRING2 = "Str2";
     private static final String COL_INT = "Int";
     private static final String COL_BOOL = "Bool";
+    public static final List<String> TEXT_MULTI_CHOICE_LIST = randomTextChoice(10);
+    public static final String COL_MULTITEXTCHOICE = "Multi Choice";
 
-    private static final List<String> DEFAULT_COLUMNS = Arrays.asList(COL_NAME, COL_INT, COL_STRING1, COL_STRING2, COL_BOOL);
+    private static final List<String> DEFAULT_COLUMNS = Arrays.asList(COL_NAME, COL_INT, COL_STRING1, COL_STRING2, COL_BOOL, COL_MULTITEXTCHOICE);
 
     // Will keep track of state of the columns, that is are they filtered, sorted, or have no modifiers.
     private static Map<String, Integer> defaultColumnState = new HashMap<>();
@@ -95,6 +112,28 @@ public class GridPanelViewTest extends GridPanelBaseTest
     private static final String PANEL_VIEW_NAME_PREFIX = "GridPanel - %s";
 
     private final AuditLogHelper _auditLogHelper = new AuditLogHelper(this);
+
+    // --- MVTC conversion test support ---
+
+    private record GridConversionResult(boolean isDropped, @Nullable String expectedFilterText)
+    {
+        static GridConversionResult kept(String filterText) { return new GridConversionResult(false, filterText); }
+        static GridConversionResult dropped()               { return new GridConversionResult(true, null); }
+    }
+
+    private record GridMVTCCase(String viewName, Filter.Operator op, String[] filterVals,
+                                GridConversionResult conversionResult,
+                                Map<String, String> expectedSampleMap) {}
+
+    private record GridTCCase(String viewName, Filter.Operator op, String[] filterVals,
+                              String expectedAfterConversionText,
+                              Map<String, String> expectedSampleMap) {}
+
+    /** Holds a single case for the subfolder round-trip test (MVTC → TC → MVTC → Text). */
+    private record GridSubFolderCase(String viewName, Filter.Operator op, String[] filterVals,
+                                     GridConversionResult resultTC,
+                                     GridConversionResult resultMVTC,
+                                     GridConversionResult resultText) {}
 
     // Tests that need to be written:
     // Validate "Save As..." from the grid save button.
@@ -122,6 +161,13 @@ public class GridPanelViewTest extends GridPanelBaseTest
         init.doSetup();
     }
 
+
+    static void main()
+    {
+        List<String> randomTextChoice = randomTextChoice(10);
+        System.out.println("Done");
+    }
+
     private void doSetup() throws IOException, CommandException
     {
         initProject();
@@ -136,7 +182,9 @@ public class GridPanelViewTest extends GridPanelBaseTest
         List<FieldDefinition> fields = Arrays.asList(new FieldDefinition(COL_INT, FieldDefinition.ColumnType.Integer),
                 new FieldDefinition(COL_STRING1, FieldDefinition.ColumnType.String),
                 new FieldDefinition(COL_STRING2, FieldDefinition.ColumnType.String),
-                new FieldDefinition(COL_BOOL, FieldDefinition.ColumnType.Boolean));
+                new FieldDefinition(COL_BOOL, FieldDefinition.ColumnType.Boolean),
+                new FieldDefinition(COL_MULTITEXTCHOICE, FieldDefinition.ColumnType.MultiValueTextChoice)
+                        .setMultiChoiceValues(TEXT_MULTI_CHOICE_LIST));
 
         createSampleType(VIEW_DIALOG_ST, VIEW_DIALOG_ST_PREFIX, VIEW_DIALOG_ST_SIZE, fields);
 
@@ -145,16 +193,33 @@ public class GridPanelViewTest extends GridPanelBaseTest
         _userHelper.createUser(OTHER_USER, true,false);
         new ApiPermissionsHelper(this).addMemberToRole(OTHER_USER, FOLDER_ADMIN_ROLE, PermissionsHelper.MemberType.user, getProjectName());
 
+        PortalHelper portalHelper = new PortalHelper(this);
+        _containerHelper.createSubfolder(getProjectName(), GRID_SUB_FOLDER);
+        portalHelper.addWebPart("Sample Types");
+        portalHelper.exitAdminMode();
+
+        TestDataGenerator sampleSetDataGeneratorForSubfolder = new TestDataGenerator("samples", DEFAULT_VIEW_SAMPLE_TYPE, getProjectName() + "/" + GRID_SUB_FOLDER);
+        generateSamples(sampleSetDataGeneratorForSubfolder, SUBFOLDER_VIEW_SAMPLE_PREFIX, SUBFOLDER_VIEW_SAMPLE_TYPE_SIZE);
+        sampleSetDataGeneratorForSubfolder.insertRows();
+        removeFlagColumnFromDefaultView(DEFAULT_VIEW_SAMPLE_TYPE);
     }
 
     private void createSampleType(String sampleTypeName, String samplePrefix, int numOfSamples, List<FieldDefinition> fields) throws IOException, CommandException
     {
-
         SampleTypeDefinition props = new SampleTypeDefinition(sampleTypeName)
                 .setFields(fields);
 
         TestDataGenerator sampleSetDataGenerator = SampleTypeAPIHelper.createEmptySampleType(getProjectName(), props);
 
+        generateSamples(sampleSetDataGenerator, samplePrefix, numOfSamples);
+
+        sampleSetDataGenerator.insertRows();
+
+        removeFlagColumnFromDefaultView(sampleTypeName);
+    }
+
+    private void generateSamples(TestDataGenerator sampleSetDataGenerator, String samplePrefix, int numOfSamples) throws IOException, CommandException
+    {
         int sampleId = 1;
         int allPossibleIndex = 0;
         int memIndex = 0;
@@ -167,21 +232,19 @@ public class GridPanelViewTest extends GridPanelBaseTest
 
             if(memIndex == stringSetMembers.size())
                 memIndex = 0;
+            String name = String.format("%s%d", samplePrefix, sampleId);
             sampleSetDataGenerator.addCustomRow(
-                    Map.of(COL_NAME, String.format("%s%d", samplePrefix, sampleId),
+                    Map.of(COL_NAME, name,
                             COL_INT, sampleId,
                             COL_STRING1, stringSets.get(allPossibleIndex),
                             COL_STRING2, stringSetMembers.get(memIndex),
-                            COL_BOOL, sampleId % 2 == 0));
+                            COL_BOOL, sampleId % 2 == 0,
+                            COL_MULTITEXTCHOICE, sampleId % 5 == 0 ? List.of() : List.of(TEXT_MULTI_CHOICE_LIST.get(Math.abs(name.hashCode()) % TEXT_MULTI_CHOICE_LIST.size()))));
 
             allPossibleIndex++;
             memIndex++;
             sampleId++;
         }
-
-        sampleSetDataGenerator.insertRows();
-
-        removeFlagColumnFromDefaultView(sampleTypeName);
     }
 
     /**
@@ -190,11 +253,11 @@ public class GridPanelViewTest extends GridPanelBaseTest
      * @param sampleTypeName Name of the sample type with the default view to change.
      * @param columns The columns to show in the default view. Will be added in the order of the list.
      */
-    private void resetDefaultView(String sampleTypeName, List<String> columns) throws Exception
+    private void resetDefaultView(String projectPath, String sampleTypeName, List<String> columns) throws Exception
     {
         log(String.format("Set the default view for '%s' to have these columns: '%s'", sampleTypeName, columns));
 
-        goToProjectHome();
+        goToProjectHome(projectPath);
         waitAndClickAndWait(Locator.linkWithText(sampleTypeName));
         SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
         DataRegionTable drtSamples = sampleHelper.getSamplesDataRegionTable();
@@ -290,7 +353,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
     {
         String screenShotID = "testMyDefaultView";
 
-        resetDefaultView(DEFAULT_VIEW_SAMPLE_TYPE, DEFAULT_COLUMNS);
+        resetDefaultView(getProjectName(), DEFAULT_VIEW_SAMPLE_TYPE, DEFAULT_COLUMNS);
 
         goToProjectHome();
 
@@ -388,7 +451,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
 
         final String screenShotPrefix = "testRemoveColumnForView";
 
-        resetDefaultView(DEFAULT_VIEW_SAMPLE_TYPE, DEFAULT_COLUMNS);
+        resetDefaultView(getProjectName(), DEFAULT_VIEW_SAMPLE_TYPE, DEFAULT_COLUMNS);
 
         String columnToRemove = COL_BOOL;
         log(String.format("For sample type '%s' remove the '%s' column using the column header menu.", DEFAULT_VIEW_SAMPLE_TYPE, columnToRemove));
@@ -502,7 +565,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
     public void testColumnHeaderAndFilterPill(String testName, String viewName) throws Exception
     {
 
-        resetDefaultView(DEFAULT_VIEW_SAMPLE_TYPE, DEFAULT_COLUMNS);
+        resetDefaultView(getProjectName(), DEFAULT_VIEW_SAMPLE_TYPE, DEFAULT_COLUMNS);
 
         QueryGrid grid = beginAtQueryGrid(DEFAULT_VIEW_SAMPLE_TYPE);
 
@@ -662,7 +725,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
     private void testEditView(String testName, String viewName) throws Exception
     {
 
-        resetDefaultView(DEFAULT_VIEW_SAMPLE_TYPE, DEFAULT_COLUMNS);
+        resetDefaultView(getProjectName(), DEFAULT_VIEW_SAMPLE_TYPE, DEFAULT_COLUMNS);
 
         String filterCol1 = COL_STRING1;
         String filterValue1 = stringSetMembers.get(2);
@@ -886,7 +949,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
     public void testSaveViewTrickyName() throws Exception
     {
 
-        resetDefaultView(DEFAULT_VIEW_SAMPLE_TYPE, DEFAULT_COLUMNS);
+        resetDefaultView(getProjectName(), DEFAULT_VIEW_SAMPLE_TYPE, DEFAULT_COLUMNS);
 
         String hideCol = COL_INT;
 
@@ -941,7 +1004,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
     {
         goToProjectHome();
 
-        resetDefaultView(VIEW_DIALOG_ST, DEFAULT_COLUMNS);
+        resetDefaultView(getProjectName(), VIEW_DIALOG_ST, DEFAULT_COLUMNS);
 
         QueryGrid grid = beginAtQueryGrid(VIEW_DIALOG_ST);
 
@@ -992,7 +1055,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
                 customizeModal.isAvailableFieldSelected(columnToAdd));
 
         log("Validate that the order of the fields in the 'Shown in Grid' column are as expected.");
-        expectedFields = List.of(COL_NAME, COL_STRING1, COL_STRING2, COL_INT, COL_BOOL);
+        expectedFields = List.of(COL_NAME, COL_STRING1, COL_STRING2, COL_INT, COL_BOOL, COL_MULTITEXTCHOICE);
         checker().verifyEquals(String.format("After adding '%s' fields displayed in 'Show in Grid' panel not as expected.", columnToAdd),
                 expectedFields, customizeModal.getSelectedFieldLabels());
 
@@ -1026,7 +1089,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
     {
         goToProjectHome();
 
-        resetDefaultView(VIEW_DIALOG_ST, DEFAULT_COLUMNS);
+        resetDefaultView(getProjectName(), VIEW_DIALOG_ST, DEFAULT_COLUMNS);
 
         QueryGrid grid = beginAtQueryGrid(VIEW_DIALOG_ST);
 
@@ -1139,7 +1202,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
     {
         goToProjectHome();
 
-        resetDefaultView(VIEW_DIALOG_ST, DEFAULT_COLUMNS);
+        resetDefaultView(getProjectName(), VIEW_DIALOG_ST, DEFAULT_COLUMNS);
 
         QueryGrid grid = beginAtQueryGrid(VIEW_DIALOG_ST);
 
@@ -1314,7 +1377,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
 
         goToProjectHome();
 
-        resetDefaultView(VIEW_DIALOG_ST, DEFAULT_COLUMNS);
+        resetDefaultView(getProjectName(), VIEW_DIALOG_ST, DEFAULT_COLUMNS);
 
         QueryGrid grid = beginAtQueryGrid(VIEW_DIALOG_ST);
 
@@ -1348,7 +1411,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
         String viewName = "broken view";
         goToProjectHome();
 
-        resetDefaultView(VIEW_DIALOG_ST, DEFAULT_COLUMNS);
+        resetDefaultView(getProjectName(), VIEW_DIALOG_ST, DEFAULT_COLUMNS);
 
         QueryGrid grid = beginAtQueryGrid(VIEW_DIALOG_ST);
 
@@ -1392,6 +1455,537 @@ public class GridPanelViewTest extends GridPanelBaseTest
                 .confirmDelete()
                 .dismiss("Done");
     }
+
+    @Test
+    public void testCustomGridViewsMVTCtoTC() throws Exception
+    {
+        goToProjectHome();
+        resetDefaultView(getProjectName(), DEFAULT_VIEW_SAMPLE_TYPE, DEFAULT_COLUMNS);
+
+        log("Compute expected sample data for MVTC conversion test.");
+        Map<String, String> allSamples = computeSampleMVTCMap();
+        String filterValue  = TEXT_MULTI_CHOICE_LIST.get(0);
+        String filterValue2 = TEXT_MULTI_CHOICE_LIST.get(1);
+
+        Map<String, String> emptyMap          = filterSampleMap(allSamples, v -> v == null);
+        Map<String, String> nonemptyMap        = filterSampleMap(allSamples, v -> v != null);
+        Map<String, String> containsAnyMap     = filterSampleMap(allSamples, v -> filterValue.equals(v) || filterValue2.equals(v));
+        Map<String, String> containsExactMap   = filterSampleMap(allSamples, v -> filterValue.equals(v));
+        Map<String, String> containsNotEqMap   = filterSampleMap(allSamples, v -> v == null || !filterValue.equals(v));
+        Map<String, String> containsNoneMap    = filterSampleMap(allSamples, v -> v == null || (!filterValue.equals(v) && !filterValue2.equals(v)));
+
+        List<GridMVTCCase> cases = List.of(
+                new GridMVTCCase("MVTC→TC Grid - Is Empty", Filter.Operator.ARRAY_ISEMPTY, new String[0],
+                        GridConversionResult.kept(Filter.Operator.ISBLANK.getDisplayValue()), emptyMap),
+                new GridMVTCCase("MVTC→TC Grid - Contains Any", Filter.Operator.ARRAY_CONTAINS_ANY, new String[]{filterValue, filterValue2},
+                        GridConversionResult.kept(Filter.Operator.IN.getDisplayValue()), containsAnyMap),
+                new GridMVTCCase("MVTC→TC Grid - Contains All", Filter.Operator.ARRAY_CONTAINS_ALL, new String[]{filterValue, filterValue2},
+                        GridConversionResult.dropped(), containsAnyMap),
+                new GridMVTCCase("MVTC→TC Grid - Is Not Empty", Filter.Operator.ARRAY_ISNOTEMPTY, new String[0],
+                        GridConversionResult.kept(Filter.Operator.NONBLANK.getDisplayValue()), nonemptyMap),
+                new GridMVTCCase("MVTC→TC Grid - Contains Not Exact", Filter.Operator.ARRAY_CONTAINS_NOT_EXACT, new String[]{filterValue},
+                        GridConversionResult.kept(filterValue), containsNotEqMap),
+                new GridMVTCCase("MVTC→TC Grid - Contains Exact", Filter.Operator.ARRAY_CONTAINS_EXACT, new String[]{filterValue},
+                        GridConversionResult.kept(filterValue), containsExactMap),
+                new GridMVTCCase("MVTC→TC Grid - Contains None", Filter.Operator.ARRAY_CONTAINS_NONE, new String[]{filterValue, filterValue2},
+                        GridConversionResult.kept(filterValue), containsNoneMap)
+        );
+
+        log("Creating saved grid views with all MVTC operators on column '" + COL_MULTITEXTCHOICE + "'.");
+        List<String> viewNames = cases.stream().map(GridMVTCCase::viewName).toList();
+        for (GridMVTCCase c : cases)
+            createMVTCGridView(c.viewName(), c.op(), c.filterVals());
+
+        log("Converting '" + COL_MULTITEXTCHOICE + "' field of " + DEFAULT_VIEW_SAMPLE_TYPE + " from MVTC to TextChoice.");
+        enableMVTCFieldMultiSelect(false);
+
+        log("Verifying saved grid views after MVTC → TC conversion.");
+        verifyGridMVTCCases(cases);
+        checker().screenShotIfNewError("GridMVTCtoTC_Error");
+
+        log("Restoring field back to MultiValueTextChoice.");
+        enableMVTCFieldMultiSelect(true);
+
+        log("Cleaning up MVTC→TC test views.");
+        cleanupGridViews(beginAtQueryGrid(DEFAULT_VIEW_SAMPLE_TYPE), viewNames);
+    }
+
+    @Test
+    public void testCustomGridViewsTCtoMVTC() throws Exception
+    {
+        goToProjectHome();
+        resetDefaultView(getProjectName(), DEFAULT_VIEW_SAMPLE_TYPE, DEFAULT_COLUMNS);
+
+        log("Converting '" + COL_MULTITEXTCHOICE + "' field of " + DEFAULT_VIEW_SAMPLE_TYPE + " from MVTC to TextChoice for TC→MVTC test setup.");
+        enableMVTCFieldMultiSelect(false);
+
+        log("Compute expected sample data for TC conversion test.");
+        Map<String, String> allSamples = computeSampleMVTCMap();
+        String filterValue  = TEXT_MULTI_CHOICE_LIST.get(0);
+        String filterValue2 = TEXT_MULTI_CHOICE_LIST.get(1);
+
+        Map<String, String> emptyMap        = filterSampleMap(allSamples, v -> v == null);
+        Map<String, String> nonemptyMap      = filterSampleMap(allSamples, v -> v != null);
+        Map<String, String> equalsMap        = filterSampleMap(allSamples, v -> filterValue.equals(v));
+        Map<String, String> equalsAnyMap     = filterSampleMap(allSamples, v -> filterValue.equals(v) || filterValue2.equals(v));
+        Map<String, String> notEqualsMap     = filterSampleMap(allSamples, v -> v == null || !filterValue.equals(v));
+
+        List<GridTCCase> cases = List.of(
+                new GridTCCase("TC→MVTC Grid - Is Blank", Filter.Operator.ISBLANK, new String[0],
+                        Filter.Operator.ARRAY_ISEMPTY.getDisplayValue(), emptyMap),
+                new GridTCCase("TC→MVTC Grid - Is Not Blank", Filter.Operator.NONBLANK, new String[0],
+                        Filter.Operator.ARRAY_ISNOTEMPTY.getDisplayValue(), nonemptyMap),
+                new GridTCCase("TC→MVTC Grid - Equals", Filter.Operator.EQUAL, new String[]{filterValue},
+                        Filter.Operator.ARRAY_CONTAINS_EXACT.getDisplayValue(), equalsMap),
+                new GridTCCase("TC→MVTC Grid - Equals One Of", Filter.Operator.IN, new String[]{filterValue, filterValue2},
+                        Filter.Operator.ARRAY_CONTAINS_ANY.getDisplayValue(), equalsAnyMap),
+                new GridTCCase("TC→MVTC Grid - Does Not Equal", Filter.Operator.NEQ, new String[]{filterValue},
+                        filterValue, notEqualsMap),
+                new GridTCCase("TC→MVTC Grid - Equals None Of", Filter.Operator.NOT_IN, new String[]{filterValue},
+                        filterValue, notEqualsMap)
+        );
+
+        log("Creating saved grid views with all TC operators on column '" + COL_MULTITEXTCHOICE + "'.");
+        List<String> viewNames = cases.stream().map(GridTCCase::viewName).toList();
+        for (GridTCCase c : cases)
+            createTCGridView(c.viewName(), c.op(), c.filterVals());
+
+        log("Converting '" + COL_MULTITEXTCHOICE + "' field of " + DEFAULT_VIEW_SAMPLE_TYPE + " back to MultiValueTextChoice.");
+        enableMVTCFieldMultiSelect(true);
+
+        log("Verifying saved grid views after TC → MVTC conversion.");
+        verifyGridTCCases(cases);
+        checker().screenShotIfNewError("GridTCtoMVTC_Error");
+
+        log("Cleaning up TC→MVTC test views.");
+        cleanupGridViews(beginAtQueryGrid(DEFAULT_VIEW_SAMPLE_TYPE), viewNames);
+    }
+
+    @Test
+    public void testCustomGridViewsMVTCtoText() throws Exception
+    {
+        goToProjectHome();
+        resetDefaultView(getProjectName(), DEFAULT_VIEW_SAMPLE_TYPE, DEFAULT_COLUMNS);
+
+        log("Compute expected sample data for MVTC→Text conversion test.");
+        Map<String, String> allSamples = computeSampleMVTCMap();
+        String filterValue  = TEXT_MULTI_CHOICE_LIST.get(0);
+        String filterValue2 = TEXT_MULTI_CHOICE_LIST.get(1);
+
+        Map<String, String> emptyMap          = filterSampleMap(allSamples, v -> v == null);
+        Map<String, String> nonemptyMap        = filterSampleMap(allSamples, v -> v != null);
+        Map<String, String> containsAnyMap     = filterSampleMap(allSamples, v -> filterValue.equals(v) || filterValue2.equals(v));
+        Map<String, String> containsExactMap   = filterSampleMap(allSamples, v -> filterValue.equals(v));
+        Map<String, String> containsNotEqMap   = filterSampleMap(allSamples, v -> v == null || !filterValue.equals(v));
+        Map<String, String> containsNoneMap    = filterSampleMap(allSamples, v -> v == null || (!filterValue.equals(v) && !filterValue2.equals(v)));
+
+        List<GridMVTCCase> cases = List.of(
+                new GridMVTCCase("MVTC→Str Grid - Is Empty", Filter.Operator.ARRAY_ISEMPTY, new String[0],
+                        GridConversionResult.kept(Filter.Operator.ISBLANK.getDisplayValue()), emptyMap),
+                new GridMVTCCase("MVTC→Str Grid - Contains Any", Filter.Operator.ARRAY_CONTAINS_ANY, new String[]{filterValue, filterValue2},
+                        GridConversionResult.kept(Filter.Operator.IN.getDisplayValue()), containsAnyMap),
+                new GridMVTCCase("MVTC→Str Grid - Contains All", Filter.Operator.ARRAY_CONTAINS_ALL, new String[]{filterValue, filterValue2},
+                        GridConversionResult.dropped(), containsAnyMap),
+                new GridMVTCCase("MVTC→Str Grid - Is Not Empty", Filter.Operator.ARRAY_ISNOTEMPTY, new String[0],
+                        GridConversionResult.kept(Filter.Operator.NONBLANK.getDisplayValue()), nonemptyMap),
+                new GridMVTCCase("MVTC→Str Grid - Contains Not Exact", Filter.Operator.ARRAY_CONTAINS_NOT_EXACT, new String[]{filterValue},
+                        GridConversionResult.dropped(), containsNotEqMap),
+                new GridMVTCCase("MVTC→Str Grid - Contains Exact", Filter.Operator.ARRAY_CONTAINS_EXACT, new String[]{filterValue},
+                        GridConversionResult.dropped(), containsExactMap),
+                new GridMVTCCase("MVTC→Str Grid - Contains None", Filter.Operator.ARRAY_CONTAINS_NONE, new String[]{filterValue, filterValue2},
+                        GridConversionResult.kept(filterValue), containsNoneMap)
+        );
+
+        log("Creating saved grid views with all MVTC operators on column '" + COL_MULTITEXTCHOICE + "'.");
+        List<String> viewNames = cases.stream().map(GridMVTCCase::viewName).toList();
+        for (GridMVTCCase c : cases)
+            createMVTCGridView(c.viewName(), c.op(), c.filterVals());
+
+        log("Converting '" + COL_MULTITEXTCHOICE + "' field of " + DEFAULT_VIEW_SAMPLE_TYPE + " from MVTC to plain String.");
+        changeMVTCFieldToText();
+
+        log("Verifying saved grid views after MVTC → String conversion.");
+        verifyGridMVTCCases(cases);
+        checker().screenShotIfNewError("GridMVTCtoStr_Error");
+
+        log("Restoring field back to MultiValueTextChoice.");
+        changeTextFieldToMVTC();
+
+        log("Cleaning up MVTC→String test views.");
+        cleanupGridViews(beginAtQueryGrid(DEFAULT_VIEW_SAMPLE_TYPE), viewNames);
+    }
+
+   // @Test
+    public void testCustomGridViewsMVTCSubFolderConversion() throws Exception
+    {
+        String subFolderPath = getProjectName() + "/" + GRID_SUB_FOLDER;
+        log("Verify saved views created in sub folder survive MVTC→TC→MVTC→String conversions.");
+        goToProjectHome(getProjectName()+"/"+GRID_SUB_FOLDER);
+        resetDefaultView(subFolderPath, DEFAULT_VIEW_SAMPLE_TYPE, DEFAULT_COLUMNS);
+
+        String filterValue  = TEXT_MULTI_CHOICE_LIST.get(0);
+        String filterValue2 = TEXT_MULTI_CHOICE_LIST.get(1);
+
+        List<GridSubFolderCase> cases = List.of(
+                new GridSubFolderCase("SF Grid - Is Empty", Filter.Operator.ARRAY_ISEMPTY, new String[0],
+                        GridConversionResult.kept(Filter.Operator.ISBLANK.getDisplayValue()),
+                        GridConversionResult.kept(Filter.Operator.ARRAY_ISEMPTY.getDisplayValue()),
+                        GridConversionResult.kept(Filter.Operator.ISBLANK.getDisplayValue())),
+
+                new GridSubFolderCase("SF Grid - Contains Any", Filter.Operator.ARRAY_CONTAINS_ANY, new String[]{filterValue, filterValue2},
+                        GridConversionResult.kept(Filter.Operator.IN.getDisplayValue()),
+                        GridConversionResult.kept(Filter.Operator.ARRAY_CONTAINS_ANY.getDisplayValue()),
+                        GridConversionResult.dropped()),
+
+                new GridSubFolderCase("SF Grid - Contains All", Filter.Operator.ARRAY_CONTAINS_ALL, new String[]{filterValue, filterValue2},
+                        GridConversionResult.dropped(),
+                        GridConversionResult.dropped(),
+                        GridConversionResult.dropped()),
+
+                new GridSubFolderCase("SF Grid - Is Not Empty", Filter.Operator.ARRAY_ISNOTEMPTY, new String[0],
+                        GridConversionResult.kept(Filter.Operator.NONBLANK.getDisplayValue()),
+                        GridConversionResult.kept(Filter.Operator.ARRAY_ISNOTEMPTY.getDisplayValue()),
+                        GridConversionResult.kept(Filter.Operator.NONBLANK.getDisplayValue())),
+
+                new GridSubFolderCase("SF Grid - Contains Not Exact", Filter.Operator.ARRAY_CONTAINS_NOT_EXACT, new String[]{filterValue},
+                        GridConversionResult.kept(filterValue),
+                        GridConversionResult.kept(filterValue),
+                        GridConversionResult.dropped()),
+
+                new GridSubFolderCase("SF Grid - Contains Exact", Filter.Operator.ARRAY_CONTAINS_EXACT, new String[]{filterValue},
+                        GridConversionResult.kept(filterValue),
+                        GridConversionResult.kept(Filter.Operator.ARRAY_CONTAINS_EXACT.getDisplayValue()),
+                        GridConversionResult.dropped()),
+
+                new GridSubFolderCase("SF Grid - Contains None", Filter.Operator.ARRAY_CONTAINS_NONE, new String[]{filterValue, filterValue2},
+                        GridConversionResult.kept(filterValue),
+                        GridConversionResult.kept(filterValue),
+                        GridConversionResult.kept(filterValue))
+        );
+
+        log("Creating saved grid views in sub folder with all MVTC operators on column '" + COL_MULTITEXTCHOICE + "'.");
+        List<String> viewNames = cases.stream().map(GridSubFolderCase::viewName).toList();
+        for (GridSubFolderCase c : cases)
+            createMVTCGridViewInFolder(subFolderPath, c.viewName(), c.op(), c.filterVals());
+
+        log("Converting '" + COL_MULTITEXTCHOICE + "' field from MVTC to TextChoice.");
+        enableMVTCFieldMultiSelect(false);
+
+        log("Verifying sub folder views after MVTC → TC conversion.");
+        verifyGridSubFolderPhase(subFolderPath, cases, GridSubFolderCase::resultTC);
+        checker().screenShotIfNewError("SF_GridMVTCtoTC_Error");
+
+        log("Converting '" + COL_MULTITEXTCHOICE + "' field back to MultiValueTextChoice.");
+        enableMVTCFieldMultiSelect(true);
+
+        log("Verifying sub folder views after TC → MVTC conversion.");
+        verifyGridSubFolderPhase(subFolderPath, cases, GridSubFolderCase::resultMVTC);
+        checker().screenShotIfNewError("SF_GridTCtoMVTC_Error");
+
+        log("Converting '" + COL_MULTITEXTCHOICE + "' field from MVTC to plain String.");
+        changeMVTCFieldToText();
+
+        log("Verifying sub folder views after MVTC → String conversion.");
+        verifyGridSubFolderPhase(subFolderPath, cases, GridSubFolderCase::resultText);
+        checker().screenShotIfNewError("SF_GridMVTCtoStr_Error");
+
+        log("Restoring field back to MultiValueTextChoice.");
+        changeTextFieldToMVTC();
+
+        log("Cleaning up sub folder views.");
+        cleanupGridViews(beginAtQueryGridInFolder(subFolderPath), viewNames);
+    }
+
+    /**
+     * Builds a map of sample name → expected MVTC column value for DEFAULT_VIEW_SAMPLE_TYPE.
+     * Samples with sampleId % 5 == 0 have a {@code null} (empty) value; others get one
+     * value from {@link #TEXT_MULTI_CHOICE_LIST} determined by the hash of the sample name.
+     */
+    private static Map<String, String> computeSampleMVTCMap()
+    {
+        Map<String, String> map = new LinkedHashMap<>();
+        for (int i = 1; i <= DEFAULT_VIEW_SAMPLE_TYPE_SIZE; i++)
+        {
+            String name = DEFAULT_VIEW_SAMPLE_PREFIX + i;
+            String value = (i % 5 == 0) ? null
+                    : TEXT_MULTI_CHOICE_LIST.get(Math.abs(name.hashCode()) % TEXT_MULTI_CHOICE_LIST.size());
+            map.put(name, value);
+        }
+        return map;
+    }
+
+    /**
+     * Returns a sub-map keeping only entries whose value satisfies {@code valuePredicate}.
+     */
+    private static Map<String, String> filterSampleMap(Map<String, String> allSamples,
+                                                       Predicate<String> valuePredicate)
+    {
+        // Collectors.toMap rejects null values, so populate the map manually.
+        Map<String, String> result = new LinkedHashMap<>();
+        allSamples.entrySet().stream()
+                .filter(e -> valuePredicate.test(e.getValue()))
+                .forEach(e -> result.put(e.getKey(), e.getValue()));
+        return result;
+    }
+
+    /**
+     * Navigates to DEFAULT_VIEW_SAMPLE_TYPE grid, applies an MVTC-type array filter via the
+     * grid filter dialog, and saves the result as a personal named view.
+     */
+    private void createMVTCGridView(String viewName, Filter.Operator op, String... vals)
+    {
+        QueryGrid grid = beginAtQueryGrid(DEFAULT_VIEW_SAMPLE_TYPE);
+        GridFilterModal filterDialog = grid.getGridBar().openFilterDialog();
+        filterDialog.selectField(COL_MULTITEXTCHOICE);
+        FilterFacetedPanel facetPanel = filterDialog.selectFacetTab();
+        facetPanel.selectArrayFilterOperator(op);
+        if (vals.length > 0)
+            facetPanel.checkValues(vals);
+        filterDialog.confirm();
+
+        grid.saveView()
+                .setMakeCustom()
+                .setViewName(viewName)
+                .setMakeShared(false)
+                .saveView();
+    }
+
+    /**
+     * Navigates to DEFAULT_VIEW_SAMPLE_TYPE grid (with TextChoice field), applies a TC filter
+     * via the expression tab, and saves the result as a personal named view.
+     */
+    /**
+     * Navigates to DEFAULT_VIEW_SAMPLE_TYPE grid (with TextChoice field), applies a TC filter,
+     * and saves the result as a personal named view.
+     * For {@link Filter.Operator#IN}, values are selected via the facet tab (supporting multiple
+     * values); all other operators use the expression tab.
+     */
+    private void createTCGridView(String viewName, Filter.Operator op, String... vals)
+    {
+        QueryGrid grid = beginAtQueryGrid(DEFAULT_VIEW_SAMPLE_TYPE);
+        GridFilterModal filterDialog = grid.getGridBar().openFilterDialog();
+        filterDialog.selectField(COL_MULTITEXTCHOICE);
+        if (op == Filter.Operator.IN)
+        {
+            FilterFacetedPanel filterFacetedPanel = filterDialog.selectFacetTab();
+            filterFacetedPanel.uncheckValues("[All]");
+            filterFacetedPanel.checkValues(vals);
+        }
+        else if (vals.length > 0)
+        {
+            filterDialog.selectExpressionTab().setFilter(new FilterExpressionPanel.Expression(op, vals[0]));
+        }
+        else
+        {
+            filterDialog.selectExpressionTab().setFilter(new FilterExpressionPanel.Expression(op));
+        }
+        filterDialog.confirm();
+
+        grid.saveView()
+                .setMakeCustom()
+                .setViewName(viewName)
+                .setMakeShared(false)
+                .saveView();
+    }
+
+    /**
+     * Toggles 'Allow Multiple Selections' on the {@value #COL_MULTITEXTCHOICE} field of
+     * DEFAULT_VIEW_SAMPLE_TYPE. Pass {@code false} for MVTC→TC, {@code true} for TC→MVTC.
+     */
+    private void enableMVTCFieldMultiSelect(boolean enable)
+    {
+        UpdateSampleTypePage updatePage = beginAtSampleTypesList(this, getProjectName())
+                .goToEditSampleType(DEFAULT_VIEW_SAMPLE_TYPE);
+        updatePage.getFieldsPanel()
+                .getField(COL_MULTITEXTCHOICE)
+                .expand()
+                .setAllowMultipleSelections(enable);
+        updatePage.clickSave();
+    }
+
+    /**
+     * Changes the {@value #COL_MULTITEXTCHOICE} field of DEFAULT_VIEW_SAMPLE_TYPE from MVTC
+     * to plain String type (MVTC → Text conversion).
+     */
+    private void changeMVTCFieldToText()
+    {
+        UpdateSampleTypePage updatePage = beginAtSampleTypesList(this, getProjectName())
+                .goToEditSampleType(DEFAULT_VIEW_SAMPLE_TYPE);
+        updatePage.getFieldsPanel()
+                .getField(COL_MULTITEXTCHOICE)
+                .expand()
+                .setType(FieldDefinition.ColumnType.String, true);
+        updatePage.clickSave();
+    }
+
+    /**
+     * Restores the {@value #COL_MULTITEXTCHOICE} field of DEFAULT_VIEW_SAMPLE_TYPE from plain
+     * String back to MultiValueTextChoice (Text → MVTC restoration).
+     */
+    private void changeTextFieldToMVTC()
+    {
+        UpdateSampleTypePage updatePage = beginAtSampleTypesList(this, getProjectName())
+                .goToEditSampleType(DEFAULT_VIEW_SAMPLE_TYPE);
+        updatePage.getFieldsPanel()
+                .getField(COL_MULTITEXTCHOICE)
+                .expand()
+                .setType(FieldDefinition.ColumnType.MultiValueTextChoice, false)
+                .setTextChoiceValues(TEXT_MULTI_CHOICE_LIST)
+                .setAllowMultipleSelections(true);
+        updatePage.clickSave();
+    }
+
+    /**
+     * Verifies all MVTC cases after a type conversion.
+     * For kept filters: checks the filter pill text and (when row count fits on one page) data.
+     * For dropped filters: checks that no filter pills are shown.
+     */
+    private void verifyGridMVTCCases(List<GridMVTCCase> cases)
+    {
+        for (GridMVTCCase c : cases)
+        {
+            if (c.conversionResult().isDropped())
+                verifyDroppedGridView(c.viewName());
+            else
+            {
+                QueryGrid grid = verifyGridViewFilter(c.viewName(), c.conversionResult().expectedFilterText());
+                if (c.expectedSampleMap().size() <= DEFAULT_PAGE_SIZE)
+                    TestArrayDataUtils.verifyMVTCResults(grid, c.expectedSampleMap(), COL_NAME, COL_MULTITEXTCHOICE, checker());
+            }
+        }
+    }
+
+    /**
+     * Verifies all TC→MVTC cases: checks filter pill text and (when small enough) data.
+     */
+    private void verifyGridTCCases(List<GridTCCase> cases)
+    {
+        for (GridTCCase c : cases)
+        {
+            QueryGrid grid = verifyGridViewFilter(c.viewName(), c.expectedAfterConversionText());
+            if (c.expectedSampleMap().size() <= DEFAULT_PAGE_SIZE)
+                TestArrayDataUtils.verifyMVTCResults(grid, c.expectedSampleMap(), COL_NAME, COL_MULTITEXTCHOICE, checker());
+        }
+    }
+
+    /**
+     * Navigates to the DEFAULT_VIEW_SAMPLE_TYPE grid, selects the named view, and verifies
+     * that at least one filter pill text contains {@code expectedFilterText}.
+     *
+     * @return the QueryGrid showing the named view, for further data assertions.
+     */
+    private QueryGrid verifyGridViewFilter(String viewName, String expectedFilterText)
+    {
+        QueryGrid grid = beginAtQueryGrid(DEFAULT_VIEW_SAMPLE_TYPE);
+        grid.selectView(viewName);
+        List<String> pillTexts = grid.getFilterStatusValuesText();
+        checker().withScreenshot().verifyTrue(
+                "View '" + viewName + "': filter pill should contain '" + expectedFilterText + "'",
+                pillTexts.stream().anyMatch(pill -> pill.contains(expectedFilterText)));
+        return grid;
+    }
+
+    /**
+     * Verifies that a saved view whose filter was dropped after type conversion shows no
+     * filter pills (i.e., the grid displays all samples without restriction).
+     */
+    private void verifyDroppedGridView(String viewName)
+    {
+        QueryGrid grid = beginAtQueryGrid(DEFAULT_VIEW_SAMPLE_TYPE);
+        grid.selectView(viewName);
+        checker().withScreenshot().verifyTrue(
+                "View '" + viewName + "': dropped filter should not show any filter pills",
+                grid.getFilterStatusValues().isEmpty());
+    }
+
+    /**
+     * Deletes the named views from the DEFAULT_VIEW_SAMPLE_TYPE grid's Manage Views dialog.
+     * Views that are no longer present (e.g., already deleted) are silently skipped.
+     */
+    private void cleanupGridViews(QueryGrid grid, List<String> viewNames)
+    {
+        ManageViewsDialog dialog = grid.manageViews();
+        List<String> existingViews = dialog.getViewNames();
+        for (String name : viewNames)
+        {
+            if (existingViews.stream().anyMatch(v -> v.equals(name)))
+                dialog.deleteView(name).confirmDelete();
+        }
+        dialog.dismiss("Done");
+    }
+
+    /**
+     * Navigates to the DEFAULT_VIEW_SAMPLE_TYPE grid in the given container, clears any transient
+     * state (filters, search, selections), and returns the grid.
+     */
+    private QueryGrid beginAtQueryGridInFolder(String containerPath)
+    {
+        QueryGrid grid = CoreComponentsTestPage.beginAt(this, containerPath)
+                .getGridPanel(TEST_SCHEMA, DEFAULT_VIEW_SAMPLE_TYPE);
+        grid.clearFilters();
+        grid.clearSearch();
+        grid.clearAllSelections();
+        return grid;
+    }
+
+    /**
+     * Navigates to the DEFAULT_VIEW_SAMPLE_TYPE grid in {@code containerPath}, applies an MVTC
+     * array filter on {@link #COL_MULTITEXTCHOICE}, and saves the result as a personal named view
+     * scoped to that container.
+     */
+    private void createMVTCGridViewInFolder(String containerPath, String viewName,
+                                            Filter.Operator op, String... vals)
+    {
+        QueryGrid grid = beginAtQueryGridInFolder(containerPath);
+        GridFilterModal filterDialog = grid.getGridBar().openFilterDialog();
+        filterDialog.selectField(COL_MULTITEXTCHOICE);
+        FilterFacetedPanel facetPanel = filterDialog.selectFacetTab();
+        facetPanel.selectArrayFilterOperator(op);
+        if (vals.length > 0)
+            facetPanel.checkValues(vals);
+        filterDialog.confirm();
+
+        grid.saveView()
+                .setMakeCustom()
+                .setViewName(viewName)
+                .setMakeShared(false)
+                .saveView();
+    }
+
+    /**
+     * For each case in {@code cases}, navigates to the DEFAULT_VIEW_SAMPLE_TYPE grid in the
+     * subfolder, selects the saved view, and verifies that the filter state matches the
+     * {@link GridConversionResult} extracted by {@code resultExtractor}:
+     * <ul>
+     *   <li>dropped result → no filter pills shown</li>
+     *   <li>kept result → at least one filter pill contains the expected text</li>
+     * </ul>
+     */
+    private void verifyGridSubFolderPhase(String containerPath, List<GridSubFolderCase> cases,
+                                          Function<GridSubFolderCase, GridConversionResult> resultExtractor)
+    {
+        for (GridSubFolderCase c : cases)
+        {
+            GridConversionResult result = resultExtractor.apply(c);
+            QueryGrid grid = beginAtQueryGridInFolder(containerPath);
+            grid.selectView(c.viewName());
+            if (result.isDropped())
+            {
+                checker().withScreenshot().verifyTrue(
+                        "Sub-folder view '" + c.viewName() + "': dropped filter should show no filter pills",
+                        grid.getFilterStatusValues().isEmpty());
+            }
+            else
+            {
+                List<String> pillTexts = grid.getFilterStatusValuesText();
+                checker().withScreenshot().verifyTrue(
+                        "Sub-folder view '" + c.viewName() + "': filter pill should contain '" + result.expectedFilterText() + "'",
+                        pillTexts.stream().anyMatch(pill -> pill.contains(result.expectedFilterText())));
+            }
+        }
+    }
+
+    // ===== end MVTC conversion helpers =====
 
     /**
      * Helper to validate the 'Views' menu.
@@ -1578,7 +2172,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
     {
         goToProjectHome();
 
-        resetDefaultView(VIEW_DIALOG_ST, DEFAULT_COLUMNS);
+        resetDefaultView(getProjectName(), VIEW_DIALOG_ST, DEFAULT_COLUMNS);
 
         // Part A: Verify audit event on Create
 
