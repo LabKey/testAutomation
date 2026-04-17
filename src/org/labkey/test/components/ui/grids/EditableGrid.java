@@ -116,11 +116,6 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         return quoteValues(",", values);
     }
 
-    public static String joinMultiChoiceForExport(String... sorted)
-    {
-        return quoteValues(", ", sorted);
-    }
-
     public void clickDelete()
     {
         doAndWaitForRowCountUpdate(() -> elementCache().deleteRowsBtn.click());

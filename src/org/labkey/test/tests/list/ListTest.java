@@ -47,7 +47,6 @@ import org.labkey.test.components.domain.DomainFieldRow;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.ext4.Checkbox;
 import org.labkey.test.components.list.AdvancedListSettingsDialog;
-import org.labkey.test.components.ui.grids.EditableGrid;
 import org.labkey.test.pages.ImportDataPage;
 import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.pages.list.GridPage;
@@ -1756,7 +1755,7 @@ public class ListTest extends BaseWebDriverTest
         String plainValue  = "1";      // no special characters
         String quotedValue1 = "\"2\""; // literal string: "2" (contains double-quote chars)
         String quotedValue2 = "\"3\""; // literal string: "3"
-        List<String> tcValues = List.of(plainValue, quotedValue1, quotedValue2);
+        List<String> tcValues = List.of("~`!@#$%^&*()_+=[]{}\\|';:\"<>?,./", plainValue, quotedValue1, quotedValue2);
         _listHelper.createList(PROJECT_VERIFY, encodedListName, keyName, col(columnName, ColumnType.MultiValueTextChoice)
                 .setMultiChoiceValues(tcValues));
         _listHelper.goToList(encodedListName);
@@ -1822,19 +1821,19 @@ public class ListTest extends BaseWebDriverTest
 
         // Insert row 1: "1" needs no escaping.
         checker().verifyTrue("Insert row 1: plain value not in audit",
-                foundInsertAuditValues.contains(EditableGrid.joinMultiChoiceForExport(plainValue)));
+                foundInsertAuditValues.contains(_auditLogHelper.joinMultiChoiceForAudit(plainValue)));
         // Insert row 2: "2" contains double-quotes, escaped as: """2""".
         checker().verifyTrue("Insert row 2: quoted value not in audit",
-                foundInsertAuditValues.contains(EditableGrid.joinMultiChoiceForExport(quotedValue1)));
+                foundInsertAuditValues.contains(_auditLogHelper.joinMultiChoiceForAudit(quotedValue1)));
         // Insert row 3: "2" sorts before 1: """2""", 1.
         checker().verifyTrue("Insert row 3: mixed values not in audit",
-                foundInsertAuditValues.contains(EditableGrid.joinMultiChoiceForExport(quotedValue1, plainValue)));
+                foundInsertAuditValues.contains(_auditLogHelper.joinMultiChoiceForAudit(quotedValue1, plainValue)));
 
         // Update: old = "1", new = """3""".
         checker().verifyEquals("Update: old audit value not as expected",
-                EditableGrid.joinMultiChoiceForExport(plainValue), updateOldAuditValue);
+                _auditLogHelper.joinMultiChoiceForAudit(plainValue), updateOldAuditValue);
         checker().verifyEquals("Update: new audit value not as expected",
-                EditableGrid.joinMultiChoiceForExport(quotedValue2), updateNewAuditValue);
+                _auditLogHelper.joinMultiChoiceForAudit(quotedValue2), updateNewAuditValue);
 
         _listHelper.deleteList();
     }
