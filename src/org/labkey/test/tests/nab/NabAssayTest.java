@@ -30,13 +30,16 @@ import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.PlateGrid;
 import org.labkey.test.components.assay.AssayConstants;
+import org.labkey.test.components.domain.AdvancedFieldSetting;
 import org.labkey.test.components.labkey.LabKeyAlert;
+import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.pages.admin.PermissionsPage;
 import org.labkey.test.pages.assay.RunQCPage;
 import org.labkey.test.pages.assay.plate.PlateDesignerPage;
 import org.labkey.test.pages.assay.plate.PlateTemplateListPage;
 import org.labkey.test.pages.query.NewQueryPage;
 import org.labkey.test.pages.query.SourceQueryPage;
+import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.tests.AbstractAssayTest;
 import org.labkey.test.util.AssayImportOptions;
 import org.labkey.test.util.AssayImporter;
@@ -234,7 +237,6 @@ public class NabAssayTest extends AbstractAssayTest
 
         clickProject(TEST_ASSAY_PRJ_NAB);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
-
         _assayHelper.clickEditAssayDesign()
                 .setPlateTemplate(PLATE_TEMPLATE_NAME)
                 .clickFinish();
@@ -259,6 +261,15 @@ public class NabAssayTest extends AbstractAssayTest
         clickAndWait(Locator.linkWithText("Assay List"));
         clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
 
+        log("GitHub Issue #1061: set ParticipantVisitResolver field as fixed value for default value setting");
+        clickProject(TEST_ASSAY_PRJ_NAB);
+        clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
+        ReactAssayDesignerPage assayDesignerPage = _assayHelper.clickEditAssayDesign();
+        assayDesignerPage.goToBatchFields()
+                .getField(AssayConstants.PARTICIPANT_VISIT_RESOLVER_FIELD_NAME)
+                .setAdvancedSettings(List.of(AdvancedFieldSetting.defaultType(FieldDefinition.DefaultType.FIXED_NON_EDITABLE)));
+        assayDesignerPage.clickFinish();
+
         log("Uploading NAb Runs");
         new AssayImporter(this, new AssayImportOptions.ImportOptionsBuilder().
                         assayId("ptid + visit").
@@ -275,6 +286,15 @@ public class NabAssayTest extends AbstractAssayTest
                         methods(new String[]{"Dilution", "Dilution", "Dilution", "Dilution", "Dilution"}).
                         runFile(TEST_ASSAY_NAB_FILE1).
                         build()).doImport();
+
+        log("GitHub Issue #1061: revert ParticipantVisitResolver field default value setting");
+        clickProject(TEST_ASSAY_PRJ_NAB);
+        clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
+        assayDesignerPage = _assayHelper.clickEditAssayDesign();
+        assayDesignerPage.goToBatchFields()
+                .getField(AssayConstants.PARTICIPANT_VISIT_RESOLVER_FIELD_NAME)
+                .setAdvancedSettings(List.of(AdvancedFieldSetting.defaultType(FieldDefinition.DefaultType.LAST_ENTERED)));
+        assayDesignerPage.clickFinish();
 
         // verify that we catch an invalid date prior to upload
         new AssayImporter(this, new AssayImportOptions.ImportOptionsBuilder().
