@@ -25,10 +25,18 @@ import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.DeleteRowsCommand;
+import org.labkey.remoteapi.query.Filter;
+import org.labkey.remoteapi.query.ImportDataCommand;
+import org.labkey.remoteapi.query.ImportDataResponse;
 import org.labkey.remoteapi.query.InsertRowsCommand;
 import org.labkey.remoteapi.query.BaseRowsCommand;
 import org.labkey.remoteapi.query.MoveRowsCommand;
 import org.labkey.remoteapi.query.RowsResponse;
+import org.labkey.remoteapi.query.SelectRowsResponse;
+import org.labkey.test.params.list.VarListDefinition;
+import org.labkey.test.util.data.TestDataUtils;
+import org.labkey.test.util.query.QueryApiHelper;
+import org.labkey.remoteapi.query.TruncateTableCommand;
 import org.labkey.remoteapi.query.UpdateRowsCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -59,7 +67,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Test trigger script matrix, expands on ScriptValidationTest which covers custom schemas (Vehicles)
+ * Test trigger script matrix, expands on {@link ScriptValidationTest} which covers custom schemas (Vehicles)
  */
 @Category({Daily.class, Data.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 8)
@@ -69,7 +77,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
     private static final String SUBFOLDER_NAME = "SubfolderA";
     private static final String SUBFOLDER_PATH = "/" + PROJECT_NAME + "/" + SUBFOLDER_NAME;
 
-    //List constants
+    // List constants
     private static final String TRIGGER_MODULE = "triggerTestModule";
     private static final String SIMPLE_MODULE = "simpletest";
     private static final String LIST_NAME = "Employees";
@@ -80,7 +88,10 @@ public class TriggerScriptTest extends BaseWebDriverTest
     private static final String BEFORE_DELETE_ERROR = "This is the Before Delete Error";
     private static final String AFTER_DELETE_ERROR = "This is the After Delete Error";
 
-    //Dataset constants
+    private static final String MANAGED_STRUCT_ADD_ERROR = "attempted to add";
+    private static final String MANAGED_STRUCT_REMOVE_ERROR = "attempted to remove";
+
+    // Dataset constants
     private static final String STUDY_SCHEMA = "study";
     private static final String DATASET_NAME = "Demographics";
     private static final String INDIVIDUAL_TEST = "Individual Test";
@@ -121,25 +132,18 @@ public class TriggerScriptTest extends BaseWebDriverTest
 
     public static class EmployeeRecord
     {
-        public String name, ssn, company;
-        public Integer key;
+        public String name, ssn, company, employeeId;
 
         public EmployeeRecord(String name, String ssn, String company)
-        {
-            this(name, ssn, company, null);
-        }
-
-        public EmployeeRecord(String name, String ssn, String company, Integer key)
         {
             this.name = name;
             this.ssn = ssn;
             this.company = company;
-            this.key = key;
         }
 
         public Map<String, Object> toMap()
         {
-            return Maps.of("Name", name, "SSN", ssn, "Company", company, "Key", key);
+            return Maps.of("Name", name, "SSN", ssn, "Company", company, "employeeId", employeeId);
         }
 
         public Map<String, String> toStringMap()
@@ -149,21 +153,21 @@ public class TriggerScriptTest extends BaseWebDriverTest
 
         public String toDelimitedString(String delimiter)
         {
-            return name + delimiter + ssn + delimiter + company + "\n";
+            return name + delimiter + ssn + delimiter + company + delimiter + (employeeId != null ? employeeId : "") + "\n";
         }
 
         public static EmployeeRecord fromMap(Map<String, Object> map)
         {
             EmployeeRecord newbie = new EmployeeRecord((String)map.get("Name"), (String)map.get("ssn"), (String)map.get("Company"));
-            if (map.containsKey("Key"))
-                newbie.key = (Integer)map.get("Key");
+            if (map.containsKey("employeeId"))
+                newbie.employeeId = (String)map.get("employeeId");
 
             return newbie;
         }
 
         public static String getTsvHeaders()
         {
-            return "Name\tSSN\tCompany\n";
+            return "Name\tSSN\tCompany\tEmployeeId\n";
         }
     }
 
@@ -186,23 +190,34 @@ public class TriggerScriptTest extends BaseWebDriverTest
     {
         _containerHelper.createProject(getProjectName(), null);
         _containerHelper.createSubfolder(getProjectName(), SUBFOLDER_NAME);
-        _containerHelper.enableModule(getProjectName(), "Query");
-        _containerHelper.enableModule(getProjectName(), SIMPLE_MODULE);
-        _containerHelper.enableModule(getProjectName(), TRIGGER_MODULE);
+        _containerHelper.enableModules(getProjectName(), List.of("Query", SIMPLE_MODULE, TRIGGER_MODULE));
+
+        // Create a data class
+        new DataClassDefinition(DATA_CLASSES_NAME)
+                .setFields(List.of(new FieldDefinition(COMMENTS_FIELD), new FieldDefinition(COUNTRY_FIELD)))
+                .create(createDefaultConnection(), getProjectName());
+
+        // Create a sample type
+        SampleTypeAPIHelper.createEmptySampleType(getProjectName(), new SampleTypeDefinition(SAMPLE_TYPE_NAME)
+                .setFields(List.of(new FieldDefinition(COMMENTS_FIELD), new FieldDefinition(COUNTRY_FIELD))));
 
         // Create lists
         {
             List<FieldDefinition> fields = List.of(
-                new FieldDefinition("name", ColumnType.String).setLabel("Name"),
-                new FieldDefinition("ssn", ColumnType.String).setLabel("SSN"),
-                new FieldDefinition("company", ColumnType.String).setLabel("Company")
+                new FieldDefinition("name").setLabel("Name"),
+                new FieldDefinition("ssn").setLabel("SSN"),
+                new FieldDefinition("company").setLabel("Company"),
+                new FieldDefinition("employeeId").setLabel("Employee ID")
+                        .setHidden(true)
+                        .setShownInInsertView(false)
+                        .setShownInUpdateView(false)
             );
 
-            EMPLOYEE_LIST = new IntListDefinition(LIST_NAME, "Key").setFields(fields);
+            EMPLOYEE_LIST = new VarListDefinition(LIST_NAME).setKeyName("name").setFields(fields);
             EMPLOYEE_LIST.create(createDefaultConnection(), getProjectName());
 
             fields = List.of(
-                new FieldDefinition("Name", ColumnType.String).setDescription("Name"),
+                new FieldDefinition("Name").setDescription("Name"),
                 new FieldDefinition("Age", ColumnType.Integer).setDescription("Age"),
                 new FieldDefinition("FavoriteDateTime", ColumnType.DateAndTime).setDescription("Favorite date time. Who doesn't have one?"),
                 new FieldDefinition("Crazy", ColumnType.Boolean).setDescription("Crazy?")
@@ -213,9 +228,9 @@ public class TriggerScriptTest extends BaseWebDriverTest
                     .create(createDefaultConnection(), getProjectName());
         }
 
+        // Create dataset via import
         importFolderFromZip(TestFileUtils.getSampleData("studies/LabkeyDemoStudy.zip"));
 
-        //Add webparts for dataset, data class, sample type setup
         goToProjectHome();
 
         _portalHelper.addWebPart("Datasets");
@@ -233,89 +248,88 @@ public class TriggerScriptTest extends BaseWebDriverTest
     public void testListIndividualTriggers()
     {
         cleanUpListRows();
-        EmployeeRecord caughtAfter = new EmployeeRecord("Emp 1", "1112223333", "Test"),
-                changedBefore = new EmployeeRecord("Emp 2", "2223334444", "Some Other");
+        var employeeOne = new EmployeeRecord("Emp 1", "1112223333", "Test");
+        var employeeTwo = new EmployeeRecord("Emp 2", "2223334444", "Some Other");
 
-        //Insert row into List
-        insertSingleRowViaUI(caughtAfter);
+        // Insert a row into a list
+        insertSingleRowViaUI(employeeOne);
         String testName = INDIVIDUAL_TEST;
         String step = "AfterInsert";
 
-        //Check AfterInsert event
+        // Check AfterInsert event
         log("** " + testName + " " + step + " Event");
         waitForText(AFTER_INSERT_ERROR, 1, 1_000);
         clickButton("Cancel");
 
-        //Check BeforeInsert event
+        // Check BeforeInsert event
         step = "BeforeInsert";
         log("** " + testName + " " + step + " Event");
-        insertSingleRowViaUI(changedBefore);
+        insertSingleRowViaUI(employeeTwo);
         assertElementNotPresent("Transaction was committed after error", Locator.tagWithText("td", "Emp 1"));
         waitForElement(Locator.tagWithText("td","Inserting Single"));
 
-        //Check BeforeDelete Event
+        // Check BeforeDelete event
         step = "BeforeDelete";
         log("** " + testName + " " + step + " Event");
         deleteSingleRowViaUI("Company", "Inserting Single", "query", "Confirm Delete", true);
         waitForText(BEFORE_DELETE_ERROR);
         clickButton("Back");
 
-        //Check AfterUpdate Event
+        // Check AfterUpdate event
         step = "AfterUpdate";
         log("** " + testName + " " + step + " Event");
-        new DataRegionTable("query", getDriver()).clickEditRow(0);
-        clickButton("Submit");
+        employeeTwo.company = "Company After Update Error";
+        _listHelper.updateRow(1, employeeTwo.toStringMap());
         waitForText(AFTER_UPDATE_ERROR);
         clickButton("Cancel");
 
-        //Check BeforeUpdate Event
+        // Check BeforeUpdate event
         step = "BeforeUpdate";
         log("** " + testName + " " + step + " Event");
-        changedBefore.name = "Emp 3";
-        _listHelper.updateRow(1, changedBefore.toStringMap());
+        employeeTwo.company = "Company Up";
+        _listHelper.updateRow(1, employeeTwo.toStringMap());
         waitForText(BEFORE_UPDATE_COMPANY);
 
-        //Check AfterDelete Event
+        // Check AfterDelete event
         step = "AfterDelete";
         log("** " + testName + " " + step + " Event");
         deleteSingleRowViaUI("Company", BEFORE_UPDATE_COMPANY, "query", "Confirm Delete", true);
         waitForText(AFTER_DELETE_ERROR);
         clickButton("Back");
-        //Verify validation error prevented delete
-        waitForElement(Locator.tagWithText("td", "Emp 3"));
+
+        // Verify validation error prevented delete
+        waitForElement(Locator.tagWithText("td", BEFORE_UPDATE_COMPANY));
     }
 
     @Test
     public void testListImportTriggers()
     {
         cleanUpListRows();
-        goToManagedList(LIST_NAME);
-        _listHelper.clickImportData();
 
         EmployeeRecord caughtAfter = new EmployeeRecord("Emp 1", "1112223333", "Test"),
                 changedBefore = new EmployeeRecord("Emp 5", "2223334444", "Some Other");
 
         String testName = IMPORT_TEST;
-        String step = "AfterInsert";
 
-        //Check AfterInsert event
+        // Check AfterInsert event
+        String step = "AfterInsert";
         log("** " + testName + " " + step + " Event");
         String tsvData = EmployeeRecord.getTsvHeaders();
         String delimiter = "\t";
         tsvData += caughtAfter.toDelimitedString(delimiter);
         tsvData += changedBefore.toDelimitedString(delimiter);
 
-        ImportDataPage importDataPage = new ImportDataPage(getDriver());
-        importDataPage.setText(tsvData);
-        importDataPage.submitExpectingErrorContaining(AFTER_INSERT_ERROR);
+        _listHelper.goToList(LIST_NAME);
+        _listHelper.bulkImportDataExpectingError(tsvData, AFTER_INSERT_ERROR);
 
-        //Check BeforeInsert event
+        // Check BeforeInsert event
         step = "BeforeInsert";
         log("** " + testName + " " + step + " Event");
         tsvData = EmployeeRecord.getTsvHeaders();
         tsvData += changedBefore.toDelimitedString(delimiter);
-        importDataPage.setText(tsvData);
-        importDataPage.submit();
+
+        _listHelper.goToList(LIST_NAME);
+        _listHelper.bulkImportData(tsvData);
 
         waitForElement(Locator.tagWithText("td","Importing TSV"));
     }
@@ -334,11 +348,73 @@ public class TriggerScriptTest extends BaseWebDriverTest
         openServerJavaScriptConsole();
 
         MoveRowsCommand command = new MoveRowsCommand(SUBFOLDER_PATH, LIST_SCHEMA, LIST_NAME);
-        command.setRows(List.of(Map.of("Key", records.get(0).key)));
+        command.setRows(List.of(Map.of("Name", records.getFirst().name)));
         command.execute(createDefaultConnection(), getProjectName());
         waitForConsole("init got triggered with event: move", "complete got triggered with event: move");
 
         closeServerJavaScriptConsole();
+    }
+
+    @Test
+    public void testListManagedColumnsTriggers() throws Exception
+    {
+        cleanUpListRows();
+        Connection cn = WebTestHelper.getRemoteApiConnection();
+
+        // Insert: declared a managed column not set by trigger
+        // "boomerang" is absent from the payload; trigger has no handler for this name and never sets it
+        InsertRowsCommand insCmd = new InsertRowsCommand(LIST_SCHEMA, LIST_NAME);
+        insCmd.addRow(Map.of("Name", "Unhandled Name", "SSN", "-123", "Company", "Test Co"));
+        assertAPIErrorMessage(insCmd, "declared the managed column 'boomerang'", cn);
+
+        // Insert: trigger sets the declared managed column "employeeId"
+        insCmd = new InsertRowsCommand(LIST_SCHEMA, LIST_NAME);
+        insCmd.addRow(Map.of("Name", "Managed Insert", "SSN", "111222334", "Company", "Test Co"));
+        RowsResponse resp = insCmd.execute(cn, getProjectName());
+        EmployeeRecord inserted = EmployeeRecord.fromMap(resp.getRows().getFirst());
+        Assert.assertEquals("Trigger should have set employeeId", "EMP-INS", inserted.employeeId);
+
+        // Insert: structural add error — trigger adds a column not declared as managed
+        insCmd = new InsertRowsCommand(LIST_SCHEMA, LIST_NAME);
+        insCmd.addRow(Map.of("Name", "Managed Struct", "SSN", "111222335", "Company", "Test Co"));
+        assertAPIErrorMessage(insCmd, MANAGED_STRUCT_ADD_ERROR, cn);
+
+        // Insert: structural remove error — trigger deletes a column not declared as managed
+        insCmd = new InsertRowsCommand(LIST_SCHEMA, LIST_NAME);
+        insCmd.addRow(Map.of("Name", "Managed Struct Remove", "SSN", "111222336", "Company", "Test Co"));
+        assertAPIErrorMessage(insCmd, MANAGED_STRUCT_REMOVE_ERROR, cn);
+
+        // Setup: insert rows for update tests; include "employeeId" in payload so insert validation passes
+        insCmd = new InsertRowsCommand(LIST_SCHEMA, LIST_NAME);
+        insCmd.addRow(Map.of("Name", "Managed Update", "SSN", "111222340", "Company", "Setup Co", "employeeId", "OLD-ID"));
+        insCmd.addRow(Map.of("Name", "MC Struct Setup", "SSN", "111222341", "Company", "Setup Co", "employeeId", "OLD-ID-2"));
+        insCmd.addRow(Map.of("Name", "MC Struct Remove Setup", "SSN", "111222342", "Company", "Setup Co", "employeeId", "OLD-ID-3"));
+        insCmd.execute(cn, getProjectName());
+
+        // Update: trigger sets both declared managed columns "company" and "employeeId"
+        UpdateRowsCommand updCmd = new UpdateRowsCommand(LIST_SCHEMA, LIST_NAME);
+        updCmd.addRow(Map.of("Name", "Managed Update", "SSN", "111222340-1"));
+        resp = updCmd.execute(cn, getProjectName());
+        EmployeeRecord updated = EmployeeRecord.fromMap(resp.getRows().getFirst());
+        Assert.assertEquals("Trigger should have set company", "Managed Co", updated.company);
+        Assert.assertEquals("Trigger should have set employeeId", "EMP-UPD", updated.employeeId);
+
+        // Update via DIB: declared a managed column not set by trigger
+        // "boomerang" is absent from the payload; SSN="-123" causes the trigger to skip setting it
+        // Name is explicitly provided so the trigger does not accidentally match a named handler
+        var row = Map.of("Name", "Managed Update", "SSN", "-123", "Company", "Test Co");
+        _listHelper.goToList(LIST_NAME);
+        _listHelper.bulkUpdateExpectingError(TestDataUtils.tsvStringFromRowMaps(List.of(row), List.of("Name", "SSN", "Company"), true), "declared the managed column 'boomerang'");
+
+        // Update: structural add error — trigger adds a column not declared as managed
+        row = Map.of("Name", "Managed Struct", "SSN", "111222341");
+        _listHelper.goToList(LIST_NAME);
+        _listHelper.bulkUpdateExpectingError(TestDataUtils.tsvStringFromRowMaps(List.of(row), List.of("Name", "SSN"), true), "attempted to add: 'undeclaredCol'");
+
+        // Update: structural remove error — trigger deletes a column not declared as managed
+        row = Map.of("Name", "Managed Struct Remove", "SSN", "111222342");
+        _listHelper.goToList(LIST_NAME);
+        _listHelper.bulkUpdateExpectingError(TestDataUtils.tsvStringFromRowMaps(List.of(row), List.of("Name", "SSN"), true), "attempted to remove: 'SSN'");
     }
 
     /** Issue 52098 - ensure trigger scripts have a chance to do custom type conversion with the incoming row */
@@ -355,7 +431,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
         List<Map<String, Object>> insertedRows = insResp.getRows();
         Assert.assertEquals(1, insertedRows.size());
 
-        Map<String, Object> insertedRow = insertedRows.get(0);
+        Map<String, Object> insertedRow = insertedRows.getFirst();
         Assert.assertEquals("Jimbo", insertedRow.get("Name"));
         Assert.assertEquals(25, insertedRow.get("Age"));
         Assert.assertEquals("2025-06-11 11:42:00.000", insertedRow.get("FavoriteDateTime"));
@@ -368,7 +444,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
         List<Map<String, Object>> updatedRows = upResp.getRows();
         Assert.assertEquals(1, updatedRows.size());
 
-        Map<String, Object> updatedRow = updatedRows.get(0);
+        Map<String, Object> updatedRow = updatedRows.getFirst();
         Assert.assertEquals(26, updatedRow.get("Age"));
     }
 
@@ -388,15 +464,13 @@ public class TriggerScriptTest extends BaseWebDriverTest
         String step = "AfterInsert";
         log("** " + testName + " " + step + " Event");
 
-        //Check After Insert Event
+        // Check After Insert Event
         InsertRowsCommand insCmd = new InsertRowsCommand(LIST_SCHEMA, LIST_NAME);
-        RowsResponse resp;
-
         insCmd.addRow(row1.toMap()); //can add multiple rows to insert many at once
         insCmd.addRow(row2.toMap());
         assertAPIErrorMessage(insCmd, AFTER_INSERT_ERROR, cn);
 
-        //Check Before Insert Event
+        // Check Before Insert Event
         step = "BeforeInsert";
         log("** " + testName + " " + step + " Event");
         insCmd = new InsertRowsCommand(LIST_SCHEMA, LIST_NAME);
@@ -404,52 +478,49 @@ public class TriggerScriptTest extends BaseWebDriverTest
 
         insCmd.addRow(row2.toMap());
         insCmd.addRow(row3.toMap());
-        resp = insCmd.execute(cn, getProjectName());
-        row2 = EmployeeRecord.fromMap(resp.getRows().get(0));
+        RowsResponse resp = insCmd.execute(cn, getProjectName());
+        row2 = EmployeeRecord.fromMap(resp.getRows().getFirst());
         Assert.assertEquals("API BeforeInsert", row2.company);
 
         row3 = EmployeeRecord.fromMap(resp.getRows().get(1));
 
-        //Check After Update Event
+        // Check After Update Event
         step = "AfterUpdate";
         log("** " + testName + " " + step + " Event");
         UpdateRowsCommand updCmd = new UpdateRowsCommand(LIST_SCHEMA, LIST_NAME);
         row2.ssn = ssn1;
+        row2.company = "Company After Update Error";
         updCmd.addRow(row2.toMap());
         updCmd.addRow(row3.toMap());
         assertAPIErrorMessage(updCmd, AFTER_UPDATE_ERROR, cn);
 
-        //Check Before Update Event
+        // Check Before Update Event
         step = "BeforeUpdate";
         log("** " + testName + " " + step + " Event");
-        updCmd = new UpdateRowsCommand(LIST_SCHEMA,LIST_NAME);
-        row2.name = "Emp 8";
+        updCmd = new UpdateRowsCommand(LIST_SCHEMA, LIST_NAME);
+        row2.company = "Company Up";
         updCmd.addRow(row2.toMap());
         updCmd.addRow(row3.toMap());
         resp = updCmd.execute(cn, getProjectName());
-        EmployeeRecord updateCo = EmployeeRecord.fromMap(resp.getRows().get(0));
+        EmployeeRecord updateCo = EmployeeRecord.fromMap(resp.getRows().getFirst());
         Assert.assertEquals(BEFORE_UPDATE_COMPANY, updateCo.company);
-        //Check update persisted
+        // Check update persisted
         Assert.assertEquals(ssn1, updateCo.ssn);
 
-        //Check After Delete Event
+        // Check After Delete Event
         step = "AfterDelete";
         log("** " + testName + " " + step + " Event");
         DeleteRowsCommand delCmd = new DeleteRowsCommand(LIST_SCHEMA, LIST_NAME);
         delCmd.addRow(row2.toMap());
         assertAPIErrorMessage(delCmd, AFTER_DELETE_ERROR, cn);
 
-        //Check Before Delete Event
+        // Check Before Delete Event
         step = "BeforeDelete";
         log("** " + testName + " " + step + " Event");
         delCmd = new DeleteRowsCommand(LIST_SCHEMA, LIST_NAME);
         delCmd.addRow(row3.toMap());
         assertAPIErrorMessage(delCmd, BEFORE_DELETE_ERROR, cn);
     }
-
-    /********************************
-     * Dataset Trigger Script Tests
-     ********************************/
 
     @Test
     public void testDatasetIndividualTriggers()
@@ -486,7 +557,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
         changedBefore.put("Gender", "f");
         changedBefore.put(flagField, testName);
 
-        //Check AfterInsert event
+        // Check AfterInsert event
         String step = "AfterInsert";
         log("** " + testName + " " + step + " Event");
         String importHeaders = joinMapKeys(caughtAfter, delimiter);
@@ -508,55 +579,224 @@ public class TriggerScriptTest extends BaseWebDriverTest
         doAPITriggerTest(STUDY_SCHEMA, DATASET_NAME, "ParticipantId", true);
     }
 
-    /********************************
-     * Data Class Trigger Script Tests
-     ********************************/
-
     @Test
     public void testDataClassIndividualTriggers() throws Exception
     {
+        cleanUpTableRows(DATA_CLASSES_SCHEMA, DATA_CLASSES_NAME);
+
         //Generate delegate to move to data class UI
         GoToDataUI goToDataClass = () -> goTo("Data Classes", DATA_CLASSES_NAME);
 
-        setupDataClass();
         openServerJavaScriptConsole();
 
         doIndividualTriggerTest("query", goToDataClass, "Name", false, "Yes, Delete", false);
 
-        waitForConsole("init got triggered with event: delete",
-                "exp.data: this is from the shared function",
-                "complete got triggered with event: delete");
+        waitForConsole("init got triggered with event: delete", "complete got triggered with event: delete");
         closeServerJavaScriptConsole();
     }
-
 
     @Test
     public void testDataClassAPITriggers() throws Exception
     {
-        setupDataClass();
+        cleanUpTableRows(DATA_CLASSES_SCHEMA, DATA_CLASSES_NAME);
         doAPITriggerTest(DATA_CLASSES_SCHEMA, DATA_CLASSES_NAME, "Name", false);
     }
-
-    /********************************
-     * Sample Type Trigger Script Tests
-     ********************************/
 
     @Test
     public void testSampleTypeIndividualTriggers() throws Exception
     {
+        cleanUpTableRows(SAMPLE_TYPE_SCHEMA, SAMPLE_TYPE_NAME);
+
         //Generate delegate to move to sample type UI
         GoToDataUI goToSampleType = () -> goTo("Sample Types", SAMPLE_TYPE_NAME);
 
-        setupSampleType();
         doIndividualTriggerTest("Material", goToSampleType, "Name", false, "Yes, Delete", false);
     }
-
 
     @Test
     public void testSampleTypeAPITriggers() throws Exception
     {
-        setupSampleType();
+        cleanUpTableRows(SAMPLE_TYPE_SCHEMA, SAMPLE_TYPE_NAME);
         doAPITriggerTest(SAMPLE_TYPE_SCHEMA, SAMPLE_TYPE_NAME, "Name", false);
+    }
+
+    @Test
+    public void testDataClassManagedColumnsTriggers() throws Exception
+    {
+        cleanUpTableRows(DATA_CLASSES_SCHEMA, DATA_CLASSES_NAME);
+        doManagedColumnsTriggerTest(DATA_CLASSES_SCHEMA, DATA_CLASSES_NAME, "Name", false, "Name");
+    }
+
+    @Test
+    public void testSampleTypeManagedColumnsTriggers() throws Exception
+    {
+        cleanUpTableRows(SAMPLE_TYPE_SCHEMA, SAMPLE_TYPE_NAME);
+        doManagedColumnsTriggerTest(SAMPLE_TYPE_SCHEMA, SAMPLE_TYPE_NAME, "Name", false, "Name");
+    }
+
+    @Test
+    public void testDatasetManagedColumnsTriggers() throws Exception
+    {
+        doManagedColumnsTriggerTest(STUDY_SCHEMA, DATASET_NAME, "ParticipantId", true, COMMENTS_FIELD);
+    }
+
+    @Test
+    public void testNonIteratorTriggerManagedColumnsDisabled() throws Exception
+    {
+        // List insert is not backed by data iterator, so expect the trigger mutations to apply without error
+        var keyField = new FieldDefinition("type").setLabel("Type");
+
+        var unmanagedList = new VarListDefinition("Unmanaged")
+                .setKeyName(keyField.getName())
+                .setFields(List.of(keyField, new FieldDefinition("color"), new FieldDefinition("flower"), new FieldDefinition("hemisphere")));
+
+        var cn = createDefaultConnection();
+        unmanagedList.create(cn, getProjectName());
+
+        var insCmd = new InsertRowsCommand(LIST_SCHEMA, unmanagedList.getName());
+        insCmd.addRow(Map.of("type", "A", "color", "Red"));
+        insCmd.execute(cn, getProjectName());
+
+        var queryHelper = new QueryApiHelper(cn, getProjectName(), LIST_SCHEMA, unmanagedList.getName());
+
+        var row = queryHelper.selectRows().getRows().getFirst();
+        Assert.assertEquals("A", row.get("type"));
+        Assert.assertEquals("Red", row.get("color"));
+        Assert.assertEquals("Rose", row.get("flower"));
+        Assert.assertNull(row.get("hemisphere"));
+
+        var updCmd = new UpdateRowsCommand(LIST_SCHEMA, unmanagedList.getName());
+        updCmd.addRow(Map.of("type", "A", "flower", "Tulip"));
+        updCmd.execute(cn, getProjectName());
+
+        row = queryHelper.selectRows().getRows().getFirst();
+        Assert.assertEquals("A", row.get("type"));
+        Assert.assertEquals("Red", row.get("color"));
+        Assert.assertEquals("Tulip", row.get("flower"));
+        Assert.assertEquals("Northern", row.get("hemisphere"));
+    }
+
+    /**
+     * Shared test of managed columns trigger behavior across data types.
+     * Verifies that the framework enforces managed column declarations and detects structural violations.
+     *
+     * @param schemaName          Schema containing the query
+     * @param queryName           Query/table name
+     * @param keyColumnName       Primary key column ("Name" for DC/ST, "ParticipantId" for Dataset)
+     * @param requiresDate        Whether rows require a "Date" field (datasets)
+     * @param insertDispatchField Field that routes managed-column behavior in beforeInsert;
+     *                            equals keyColumnName for DC/ST, COMMENTS_FIELD for Dataset
+     */
+    private void doManagedColumnsTriggerTest(String schemaName, String queryName, String keyColumnName,
+            boolean requiresDate, String insertDispatchField) throws Exception
+    {
+        Connection cn = WebTestHelper.getRemoteApiConnection();
+        boolean dispatchIsKey = insertDispatchField.equals(keyColumnName);
+
+        // Insert: declared managed column not set by trigger → error
+        InsertRowsCommand insCmd = new InsertRowsCommand(schemaName, queryName);
+        insCmd.addRow(makeInsertRow(keyColumnName, requiresDate, dispatchIsKey, insertDispatchField,
+                "Managed Unhandled", "MC-UN-001"));
+        assertAPIErrorMessage(insCmd, "declared the managed column '" + COUNTRY_FIELD + "'", cn);
+
+        // Insert: trigger sets managed column → success
+        insCmd = new InsertRowsCommand(schemaName, queryName);
+        insCmd.addRow(makeInsertRow(keyColumnName, requiresDate, dispatchIsKey, insertDispatchField,
+                "Managed Insert", "MC-IN-001"));
+        RowsResponse resp = insCmd.execute(cn, getProjectName());
+        Assert.assertEquals("Trigger should have set " + COUNTRY_FIELD, "MANAGED-INS",
+                resp.getRows().getFirst().get(COUNTRY_FIELD));
+
+        // Insert: structural add error — trigger adds undeclared column → error
+        insCmd = new InsertRowsCommand(schemaName, queryName);
+        insCmd.addRow(makeInsertRow(keyColumnName, requiresDate, dispatchIsKey, insertDispatchField,
+                "Managed Struct", "MC-ST-001"));
+        assertAPIErrorMessage(insCmd, MANAGED_STRUCT_ADD_ERROR, cn);
+
+        // Insert: structural remove error — trigger deletes column → error
+        insCmd = new InsertRowsCommand(schemaName, queryName);
+        insCmd.addRow(makeInsertRow(keyColumnName, requiresDate, dispatchIsKey, insertDispatchField,
+                "Managed Struct Remove", "MC-SR-001"));
+        assertAPIErrorMessage(insCmd, MANAGED_STRUCT_REMOVE_ERROR, cn);
+
+        // Setup: insert rows for update tests with neutral Comments so the trigger fallback fires.
+        // Dataset requires a fixed date so the composite key can be matched by the MERGE import below.
+        String updKey = dispatchIsKey ? "MC Update Setup" : "MC-UPD-001";
+        String strKey = dispatchIsKey ? "MC Struct Setup" : "MC-STR-001";
+        String srrKey = dispatchIsKey ? "MC Struct Remove Setup" : "MC-SRR-001";
+
+        InsertRowsCommand setupCmd = new InsertRowsCommand(schemaName, queryName);
+        setupCmd.addRow(makeSetupRow(keyColumnName, requiresDate, dispatchIsKey, "MC Update Setup", "MC-UPD-001"));
+        setupCmd.addRow(makeSetupRow(keyColumnName, requiresDate, dispatchIsKey, "MC Struct Setup", "MC-STR-001"));
+        setupCmd.addRow(makeSetupRow(keyColumnName, requiresDate, dispatchIsKey, "MC Struct Remove Setup", "MC-SRR-001"));
+        RowsResponse setupResp = setupCmd.execute(cn, getProjectName());
+
+        // For datasets, derive the Date from the insert response so the MERGE key matches exactly
+        // what the server stored rather than relying on a string literal that may round-trip differently.
+        String tsvHeader = keyColumnName + (requiresDate ? "\tDate" : "") + "\t" + COMMENTS_FIELD + "\n";
+        String updDateVal = requiresDate ? "\t" + setupResp.getRows().get(0).get("Date") : "";
+        String strDateVal = requiresDate ? "\t" + setupResp.getRows().get(1).get("Date") : "";
+        String srrDateVal = requiresDate ? "\t" + setupResp.getRows().get(2).get("Date") : "";
+
+        // Merge via DIB: trigger sets managed column → success
+        importData(cn, schemaName, queryName, tsvHeader + updKey + updDateVal + "\tManaged Merge\n", ImportDataCommand.InsertOption.MERGE);
+        SelectRowsResponse selResp = new QueryApiHelper(cn, getProjectName(), schemaName, queryName)
+                .selectRows(null, List.of(new Filter(keyColumnName, updKey)));
+        Assert.assertEquals("Trigger should have set " + COUNTRY_FIELD, "MANAGED-MERGE",
+                selResp.getRows().getFirst().get(COUNTRY_FIELD));
+
+        // Merge via DIB: declared managed column not set by trigger → error
+        assertImportError(cn, schemaName, queryName, tsvHeader + updKey + updDateVal + "\tManaged Unhandled\n",
+                ImportDataCommand.InsertOption.MERGE, "declared the managed column");
+
+        // Merge via DIB: structural add error — trigger adds undeclared column → error
+        assertImportError(cn, schemaName, queryName, tsvHeader + strKey + strDateVal + "\tManaged Struct\n",
+                ImportDataCommand.InsertOption.MERGE, "attempted to add: 'undeclaredInsertCol'");
+
+        // Merge via DIB: structural remove error — trigger deletes column → error
+        assertImportError(cn, schemaName, queryName, tsvHeader + srrKey + srrDateVal + "\tManaged Struct Remove\n",
+                ImportDataCommand.InsertOption.MERGE, "attempted to remove: '" + COMMENTS_FIELD + "'");
+    }
+
+    /**
+     * Builds an insert row for the managed column trigger test.
+     * When dispatchIsKey, the dispatch value goes in the key column (DC/ST); otherwise it goes in
+     * the separate dispatch field (Dataset) and a generated unique value is used for the key.
+     */
+    private Map<String, Object> makeInsertRow(String keyColumnName, boolean requiresDate, boolean dispatchIsKey, String dispatchField, String dispatchValue, String uniqueKey)
+    {
+        Map<String, Object> row = new HashMap<>();
+        if (dispatchIsKey)
+        {
+            row.put(keyColumnName, dispatchValue);
+            row.put(COMMENTS_FIELD, "managed-test");  // ensure Comments exists for struct-remove test
+        }
+        else
+        {
+            row.put(keyColumnName, uniqueKey);
+            row.put(dispatchField, dispatchValue);
+        }
+        if (requiresDate)
+            row.put("Date", new Date());
+        return row;
+    }
+
+    /**
+     * Builds a neutral setup row for update-phase tests; trigger fallback fires for these rows.
+     */
+    private Map<String, Object> makeSetupRow(String keyColumnName, boolean requiresDate, boolean dispatchIsKey, String nameValue, String uniqueKey)
+    {
+        Map<String, Object> row = new HashMap<>();
+        row.put(keyColumnName, dispatchIsKey ? nameValue : uniqueKey);
+        row.put(COMMENTS_FIELD, "setup");
+        if (requiresDate)
+            row.put("Date", new Date());
+        return row;
+    }
+
+    private void cleanUpTableRows(String schemaName, String queryName) throws Exception
+    {
+        new TruncateTableCommand(schemaName, queryName).execute(createDefaultConnection(), getProjectName());
     }
 
     /**
@@ -588,14 +828,14 @@ public class TriggerScriptTest extends BaseWebDriverTest
         String step = "AfterInsert";
         log("** " + testName + " " + step + " Event");
 
-        //Check After Insert Event
+        // Check After Insert Event
         InsertRowsCommand insCmd = new InsertRowsCommand(schemaName, queryName);
 
         insCmd.addRow(row1); //can add multiple rows to insert many at once
         insCmd.addRow(row2);
         assertAPIErrorMessage(insCmd, AFTER_INSERT_ERROR, cn);
 
-        //Check Before Insert Event
+        // Check Before Insert Event
         step = "BeforeInsert";
         log("** " + testName + " " + step + " Event");
         insCmd = new InsertRowsCommand(schemaName, queryName);
@@ -610,14 +850,14 @@ public class TriggerScriptTest extends BaseWebDriverTest
         insCmd.addRow(row2);
         insCmd.addRow(row3);
         RowsResponse resp = insCmd.execute(cn, getProjectName());
-        row2 = resp.getRows().get(0);
+        row2 = resp.getRows().getFirst();
         Assert.assertEquals("API BeforeInsert", row2.get(COUNTRY_FIELD));
 
         SearchAdminAPIHelper.waitForIndexer();
 
         row3 = resp.getRows().get(1);
 
-        //Check Before Update Event
+        // Check Before Update Event
         step = "BeforeUpdate";
         log("** " + testName + " " + step + " Event");
         UpdateRowsCommand updCmd = new UpdateRowsCommand(schemaName,queryName);
@@ -627,14 +867,14 @@ public class TriggerScriptTest extends BaseWebDriverTest
         updCmd.addRow(row2);
         updCmd.addRow(row3);
         resp = updCmd.execute(cn, getProjectName());
-        Map<String, Object> updateCo = resp.getRows().get(0);
+        Map<String, Object> updateCo = resp.getRows().getFirst();
         Assert.assertEquals(BEFORE_UPDATE_COMPANY, updateCo.get(updateField));
-        //Check update persisted
+        // Check update persisted
         Assert.assertEquals("BeforeUpdate", updateCo.get(flagField));
 
         SearchAdminAPIHelper.waitForIndexer();
 
-        //Check After Update Event
+        // Check After Update Event
         step = "AfterUpdate";
         log("** " + testName + " " + step + " Event");
         updCmd = new UpdateRowsCommand(schemaName, queryName);
@@ -643,14 +883,14 @@ public class TriggerScriptTest extends BaseWebDriverTest
         updCmd.addRow(row3);
         assertAPIErrorMessage(updCmd, AFTER_UPDATE_ERROR, cn);
 
-        //Check After Delete Event
+        // Check After Delete Event
         step = "After Delete";
         log("** " + testName + " " + step + " Event");
         DeleteRowsCommand delCmd = new DeleteRowsCommand(schemaName, queryName);
         delCmd.addRow(row2);
         assertAPIErrorMessage(delCmd, AFTER_DELETE_ERROR, cn);
 
-        //Check Before Delete Event
+        // Check Before Delete Event
         step = "BeforeDelete";
         log("** " + testName + " " + step + " Event");
         delCmd = new DeleteRowsCommand(schemaName, queryName);
@@ -664,7 +904,6 @@ public class TriggerScriptTest extends BaseWebDriverTest
     private void doIndividualTriggerTest(String dataRegionName, GoToDataUI goToData, String keyColumnName, boolean requiresDate, String deleteButtonText, boolean expectPageLoad)
     {
         String flagField = COMMENTS_FIELD; //Field to watch in trigger script
-        String updateField = COUNTRY_FIELD; //Field updated by trigger script
         String testName = INDIVIDUAL_TEST;
 
         Map<String,String> caughtAfter = new HashMap<>();
@@ -683,7 +922,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
             changedBefore.put("date", date2.toString());
         changedBefore.put(flagField, testName);
 
-        //Check AfterInsert event
+        // Check AfterInsert event
         String step = "AfterInsert";
         log("** " + testName + " " + step + " Event");
         //  Insert row into List
@@ -692,7 +931,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
         waitForText(AFTER_INSERT_ERROR, 1, 1_000);
         clickButton("Cancel");
 
-        //Check BeforeInsert event
+        // Check BeforeInsert event
         step = "BeforeInsert";
         log("** " + testName + " " + step + " Event");
         goToData.goToDataUIPage();
@@ -700,20 +939,20 @@ public class TriggerScriptTest extends BaseWebDriverTest
         assertElementNotPresent("Transaction was committed after error", Locator.tagWithText("td", badParticipant));
         waitForElement(Locator.tagWithText("td","Inserting Single"));
 
-        //Check BeforeDelete Event
+        // Check BeforeDelete Event
         step = "BeforeDelete";
         log("** " + testName + " " + step + " Event");
 
-        //Check previous step prepared row for delete
+        // Check that the previous step prepared row for delete
         pushLocation();
         waitForElement(Locator.tagWithText("td", "BeforeDelete"));
         deleteSingleRowViaUI(flagField, step, dataRegionName, deleteButtonText, expectPageLoad);
         waitForText(1_000, BEFORE_DELETE_ERROR);
         popLocation();
-        //Verify validation error prevented delete
+        // Verify validation error prevented delete
         waitForElement(Locator.tagWithText("td", "BeforeDelete"));
 
-        //Check AfterUpdate Event
+        // Check AfterUpdate Event
         step = "AfterUpdate";
         log("** " + testName + " " + step + " Event");
         changedBefore.put(flagField, step);
@@ -721,27 +960,27 @@ public class TriggerScriptTest extends BaseWebDriverTest
         waitForText(1_000, AFTER_UPDATE_ERROR);
         clickButton("Cancel");
 
-        //Check BeforeUpdate Event
+        // Check BeforeUpdate Event
         step = "BeforeUpdate";
         log("** " + testName + " " + step + " Event");
         changedBefore.put(flagField, step);
         updateDataSetRow(1, dataRegionName, changedBefore);
         waitForText(1_000, BEFORE_UPDATE_COMPANY);
-        waitForText(1_000, "BeforeUpdate");  //Check change was retained
+        waitForText(1_000, "BeforeUpdate");  // Check change was retained
 
-        //Check AfterDelete Event
+        // Check AfterDelete Event
         step = "AfterDelete";
         log("** " + testName + " " + step + " Event");
         pushLocation();
-        deleteSingleRowViaUI(updateField, BEFORE_UPDATE_COMPANY, dataRegionName, deleteButtonText, expectPageLoad);
+        deleteSingleRowViaUI(COUNTRY_FIELD, BEFORE_UPDATE_COMPANY, dataRegionName, deleteButtonText, expectPageLoad);
         waitForText(1_000, AFTER_DELETE_ERROR);
         popLocation();
-        //Verify validation error prevented delete
+        // Verify validation error prevented delete
         waitForElement(Locator.tagWithText("td", "BeforeUpdate"));
     }
 
     /**
-     * Verify error message received from api call matches the expected error
+     * Verify the error message received from an API call matches the expected error
      * @param cmd command to run
      * @param expected error message to check
      * @param cn connection object to run against
@@ -762,11 +1001,45 @@ public class TriggerScriptTest extends BaseWebDriverTest
     }
 
     /**
+     * Assert that an {@link #importData} call throws a {@link CommandException} whose message contains {@code expected}.
+     */
+    private void assertImportError(Connection cn, String schemaName, String queryName, String text,
+            @Nullable ImportDataCommand.InsertOption insertOption, String expected) throws IOException
+    {
+        try
+        {
+            importData(cn, schemaName, queryName, text, insertOption);
+            Assert.fail("No error triggered. Expected: " + expected);
+        }
+        catch (CommandException e)
+        {
+            Assertions.assertThat(e.getMessage())
+                    .as("Trigger script error should contain expected text")
+                    .contains(expected);
+        }
+    }
+
+    /**
+     * Import TSV text into a schema/query via the Data Iterator pipeline.
+     * Pass {@code null} for {@code insertOption} to use the server default (IMPORT/insert).
+     */
+    private ImportDataResponse importData(Connection cn, String schemaName, String queryName, String text,
+                                          @Nullable ImportDataCommand.InsertOption insertOption) throws IOException, CommandException
+    {
+        ImportDataCommand cmd = new ImportDataCommand(schemaName, queryName);
+        cmd.setText(text);
+        if (insertOption != null)
+            cmd.setInsertOption(insertOption);
+        cmd.setTimeout(180_000);
+        return cmd.execute(cn, getProjectName());
+    }
+
+    /**
      * Insert a single record into list
      */
     private void insertSingleRowViaUI(EmployeeRecord record)
     {
-        goToManagedList(LIST_NAME);
+        _listHelper.goToList(LIST_NAME);
         _listHelper.insertNewRow(record.toStringMap());
     }
 
@@ -776,7 +1049,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
     private void insertSingleRowViaUI(String dataRegionName, Map<String,String> record)
     {
         DataRegionTable.DataRegion(getDriver()).withName(dataRegionName).find().clickInsertNewRow();
-        record.entrySet().forEach((entry) -> setFormElement( Locator.xpath("//*[@name='quf_"+ entry.getKey() + "']"), entry.getValue()));
+        record.forEach((key, value) -> setFormElement(Locator.xpath("//*[@name='quf_" + key + "']"), value));
         clickButton("Submit");
     }
 
@@ -815,7 +1088,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
     {
         DataRegionTable dr = new DataRegionTable(tableName, this);
         this.clickAndWait(dr.updateLink(id - 1));
-        data.entrySet().forEach((entry) -> setFormElement( Locator.xpath("//*[@name='quf_"+ entry.getKey() + "']"), entry.getValue()));
+        data.forEach((key, value) -> setFormElement(Locator.xpath("//*[@name='quf_" + key + "']"), value));
         clickButton("Submit");
     }
 
@@ -829,15 +1102,6 @@ public class TriggerScriptTest extends BaseWebDriverTest
         grid.uncheckAllOnPage();
         grid.selectLists(List.of(LIST_NAME));
         grid.deleteAllDataFromSelectedLists();
-    }
-
-    /**
-     * Navigate to a particular test
-     */
-    private void goToManagedList(String listName)
-    {
-        goToManageLists();
-        clickAndWait(Locator.linkWithText(listName));
     }
 
     /**
@@ -877,41 +1141,6 @@ public class TriggerScriptTest extends BaseWebDriverTest
         StringBuilder sb = new StringBuilder();
         data.keySet().forEach(val -> sb.append(val).append(delimiter));
         return sb.toString().trim();
-    }
-
-    /**
-     * Setup the data class
-     */
-    private void setupDataClass() throws CommandException, IOException
-    {
-        //Setup Data Class
-        goToProjectHome();
-        DataRegionTable drt = DataRegionTable.findDataRegionWithinWebpart(this, "Data Classes");
-        int rowId = drt.getRowIndex("Name", DATA_CLASSES_NAME);
-        if (rowId >= 0)
-        {
-            drt.checkCheckbox(rowId);
-            drt.clickHeaderButtonAndWait("Delete");
-            clickButton("Confirm Delete");
-        }
-
-        DataClassDefinition dataClass = new DataClassDefinition(DATA_CLASSES_NAME)
-                .setFields(List.of(
-                        new FieldDefinition(COMMENTS_FIELD, ColumnType.String),
-                        new FieldDefinition(COUNTRY_FIELD, ColumnType.String)));
-        dataClass.create(createDefaultConnection(), getProjectName());
-    }
-
-    /**
-     * Setup the sample type
-     */
-    private void setupSampleType()
-    {
-        SampleTypeDefinition sampleType = new SampleTypeDefinition(SAMPLE_TYPE_NAME)
-                .setFields(List.of(
-                        new FieldDefinition(COMMENTS_FIELD, ColumnType.String),
-                        new FieldDefinition(COUNTRY_FIELD, ColumnType.String)));
-        SampleTypeAPIHelper.createEmptySampleType(getProjectName(), sampleType);
     }
 
     private void closeServerJavaScriptConsole()
