@@ -15,28 +15,43 @@
  */
 package org.labkey.test.pipeline;
 
-import org.apache.commons.lang3.StringUtils;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.components.WebDriverComponent;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 /**
  * <code>ExperimentGraph</code>
  */
-public class ExperimentGraph
+public class ExperimentGraph extends WebDriverComponent
 {
-    private static final String MAP_NAME = "graphmap";
-    
-    private final PipelineWebTestBase _test;
+    private final WebElement _el;
+    private final WebDriver _driver;
 
-    public ExperimentGraph(PipelineWebTestBase test)
+    public ExperimentGraph(BaseWebDriverTest test)
     {
-        _test = test;
+        _driver = test.getDriver();
+        _el = Locator.id("graph_root").findElement(test.getDriver());
+    }
+
+    @Override
+    protected WebDriver getDriver()
+    {
+        return _driver;
+    }
+
+    @Override
+    public WebElement getComponentElement()
+    {
+        return _el;
     }
 
     public void clickLink(String link)
     {
-        _test.clickAndWait(Locator.imageMapLinkByTitle(MAP_NAME, link));
+        getWrapper().clickAndWait(svgLinkByTitle(link));
     }
 
     public void clickInputLink(String input)
@@ -61,7 +76,7 @@ public class ExperimentGraph
 
     public boolean isNodePresent(String link)
     {
-        return _test.isElementPresent(Locator.imageMapLinkByTitle(MAP_NAME, link));
+        return svgLinkByTitle(link).isDisplayed();
     }
 
     public boolean isInputPresent(String input)
@@ -94,20 +109,14 @@ public class ExperimentGraph
         String[] names = tp.getExperimentLinks();
         for (String name : names)
         {
-            if (_test.isTextPresent(name))
-            {
-                assertNodePresent(name);
-                String baseName = getBaseName(tp);
-                assertInputPresent(tp.getParametersFile());
-                for (String inputExt : tp.getInputExtensions())
-                    assertInputPresent(baseName + inputExt);
-                for (String outputExt : tp.getOutputExtensions())
-                    assertOutputPresent(baseName + outputExt);
-                return;
-            }
+            assertNodePresent(name);
+            String baseName = getBaseName(tp);
+            assertInputPresent(tp.getParametersFile());
+            for (String inputExt : tp.getInputExtensions())
+                assertInputPresent(baseName + inputExt);
+            for (String outputExt : tp.getOutputExtensions())
+                assertOutputPresent(baseName + outputExt);
         }
-
-        assertTrue("Unable to find experiment links: " + StringUtils.join(names, ", "), false);
     }
 
     private String getBaseName(PipelineTestParams tp)
@@ -122,7 +131,7 @@ public class ExperimentGraph
         {
             for (String sampleName : sampleNames)
             {
-                if (_test.isTextPresent(sampleName))
+                if (getWrapper().isTextPresent(sampleName))
                     return sampleName;
             }
         }
@@ -130,4 +139,10 @@ public class ExperimentGraph
         // Probably fail later, but simpler than checking for null return.
         return "all";
     }
+
+    private WebElement svgLinkByTitle(String title)
+    {
+        return Locator.css("a").withAttribute("xlink\\:title", title).findWhenNeeded(_el);
+    }
+
 }
