@@ -1615,7 +1615,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
         cleanupGridViews(beginAtQueryGrid(DEFAULT_VIEW_SAMPLE_TYPE), viewNames);
     }
 
-   // @Test
+    @Test
     public void testCustomGridViewsMVTCSubFolderConversion() throws Exception
     {
         String subFolderPath = getProjectName() + "/" + GRID_SUB_FOLDER;
@@ -1635,7 +1635,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
                 new GridSubFolderCase("SF Grid - Contains Any", Filter.Operator.ARRAY_CONTAINS_ANY, new String[]{filterValue, filterValue2},
                         GridConversionResult.kept(Filter.Operator.IN.getDisplayValue()),
                         GridConversionResult.kept(Filter.Operator.ARRAY_CONTAINS_ANY.getDisplayValue()),
-                        GridConversionResult.dropped()),
+                        GridConversionResult.kept(Filter.Operator.IN.getDisplayValue())),
 
                 new GridSubFolderCase("SF Grid - Contains All", Filter.Operator.ARRAY_CONTAINS_ALL, new String[]{filterValue, filterValue2},
                         GridConversionResult.dropped(),
@@ -1670,6 +1670,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
 
         log("Converting '" + COL_MULTITEXTCHOICE + "' field from MVTC to TextChoice.");
         enableMVTCFieldMultiSelect(false);
+        refresh();
 
         log("Verifying sub folder views after MVTC → TC conversion.");
         verifyGridSubFolderPhase(subFolderPath, cases, GridSubFolderCase::resultTC);
@@ -1677,6 +1678,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
 
         log("Converting '" + COL_MULTITEXTCHOICE + "' field back to MultiValueTextChoice.");
         enableMVTCFieldMultiSelect(true);
+        refresh();
 
         log("Verifying sub folder views after TC → MVTC conversion.");
         verifyGridSubFolderPhase(subFolderPath, cases, GridSubFolderCase::resultMVTC);
@@ -1684,6 +1686,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
 
         log("Converting '" + COL_MULTITEXTCHOICE + "' field from MVTC to plain String.");
         changeMVTCFieldToText();
+        refresh();
 
         log("Verifying sub folder views after MVTC → String conversion.");
         verifyGridSubFolderPhase(subFolderPath, cases, GridSubFolderCase::resultText);
@@ -1972,20 +1975,18 @@ public class GridPanelViewTest extends GridPanelBaseTest
             if (result.isDropped())
             {
                 checker().withScreenshot().verifyTrue(
-                        "Sub-folder view '" + c.viewName() + "': dropped filter should show no filter pills",
+                        "Sub-folder view '" + c.viewName() + "': dropped filter should show no filter",
                         grid.getFilterStatusValues().isEmpty());
             }
             else
             {
-                List<String> pillTexts = grid.getFilterStatusValuesText();
+                List<String> filterTexts = grid.getFilterStatusValuesText();
                 checker().withScreenshot().verifyTrue(
-                        "Sub-folder view '" + c.viewName() + "': filter pill should contain '" + result.expectedFilterText() + "'",
-                        pillTexts.stream().anyMatch(pill -> pill.contains(result.expectedFilterText())));
+                        "Sub-folder view '" + c.viewName() + "': filter should contain '" + result.expectedFilterText() + "'",
+                        filterTexts.stream().anyMatch(pill -> pill.contains(result.expectedFilterText())));
             }
         }
     }
-
-    // ===== end MVTC conversion helpers =====
 
     /**
      * Helper to validate the 'Views' menu.
