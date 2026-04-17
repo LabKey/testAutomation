@@ -24,6 +24,11 @@ function stripPrefix(row)
     }
 }
 
+// Disable managed columns from a script
+function managedColumns() {
+    return false;
+}
+
 function beforeInsert(row, errors)
 {
     // Test row map is case-insensitive
@@ -32,12 +37,9 @@ function beforeInsert(row, errors)
 
     stripPrefix(row);
 
-//    var result = LABKEY.Query.deleteRows({
-//        schemaName: "lists",
-//        queryName: "People",
-//        rowDataArray: [{Key: 100}]
-//    });
-//    console.log("Result of deleteRows: ", result);
+    // Test disabling managed columns from a script by placing an invalid key/value on the row.
+    // If this script managed columns, then this would fail.
+    row.ImNotManagedInsert = "I'm not managed insert";
 }
 
 function afterInsert(row, errors)
@@ -58,6 +60,10 @@ function beforeUpdate(row, oldRow, errors)
         throw new Error("beforeUpdate oldRow properties must be case-insensitive.");
 
     stripPrefix(row);
+
+    // Test disabling managed columns from a script by placing an invalid key/value on the row.
+    // If this script managed columns, then this would fail.
+    row.ImNotManagedUpdate = "I'm not managed update";
 }
 
 function afterUpdate(row, oldRow, errors)

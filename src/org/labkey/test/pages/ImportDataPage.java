@@ -36,7 +36,6 @@ import static org.labkey.test.components.ext4.Checkbox.Ext4Checkbox;
 
 public class ImportDataPage extends LabKeyPage<ImportDataPage.ElementCache>
 {
-
     public static final String IMPORT_ERROR_SIGNAL = "importFailureSignal"; // See query/import.jsp
 
     public ImportDataPage(WebDriver driver)
@@ -102,17 +101,16 @@ public class ImportDataPage extends LabKeyPage<ImportDataPage.ElementCache>
         return this;
     }
 
-    public ImportDataPage submitExpectingError(String error)
+    public ImportDataPage submitExpectingError(String expectedError)
     {
         String actualError = submitExpectingError();
-        assertEquals(error, actualError);
+        assertEquals(expectedError, actualError);
         return this;
     }
 
     public String submitExpectingError()
     {
-        doAndWaitForPageSignal(() -> elementCache().getSubmitButton().click(),
-                IMPORT_ERROR_SIGNAL);
+        doAndWaitForPageSignal(() -> elementCache().getSubmitButton().click(), IMPORT_ERROR_SIGNAL);
         clearCache();
         return waitForErrors();
     }
@@ -139,17 +137,17 @@ public class ImportDataPage extends LabKeyPage<ImportDataPage.ElementCache>
         return doAndWaitForDownload(()->elementCache().getDownloadTemplateButton().click());
     }
 
-    public void setFileInsertOption(boolean isUpdate)
+    public ImportDataPage setFileInsertOption(boolean isUpdate)
     {
-        setInsertOption(true, isUpdate);
+        return setInsertOption(true, isUpdate);
     }
 
-    public void setFileMerge(boolean isMerge)
+    public ImportDataPage setFileMerge(boolean isMerge)
     {
-        setFileMerge(isMerge, isMerge);
+        return setFileMerge(isMerge, isMerge);
     }
 
-    public void setFileMerge(boolean isMerge, boolean isUpdate)
+    public ImportDataPage setFileMerge(boolean isMerge, boolean isUpdate)
     {
         setFileInsertOption(isUpdate || isMerge);
 
@@ -158,6 +156,7 @@ public class ImportDataPage extends LabKeyPage<ImportDataPage.ElementCache>
         else if (!isMerge && isFileMergeChecked())
             elementCache().mergeFile.uncheck();
 
+        return this;
     }
 
     public boolean isFileMergeChecked()
@@ -170,17 +169,17 @@ public class ImportDataPage extends LabKeyPage<ImportDataPage.ElementCache>
         return elementCache().mergeFileOptional != null;
     }
 
-    public void setCopyPasteInsertOption(boolean isUpdate)
+    public ImportDataPage setCopyPasteInsertOption(boolean isUpdate)
     {
-        setInsertOption(false, isUpdate);
+        return setInsertOption(false, isUpdate);
     }
 
-    public void setCopyPasteMerge(boolean isMerge)
+    public ImportDataPage setCopyPasteMerge(boolean isMerge)
     {
-        setCopyPasteMerge(isMerge, isMerge);
+        return setCopyPasteMerge(isMerge, isMerge);
     }
 
-    public void setCopyPasteMerge(boolean isMerge, boolean isUpdate)
+    public ImportDataPage setCopyPasteMerge(boolean isMerge, boolean isUpdate)
     {
         setCopyPasteInsertOption(isUpdate || isMerge);
 
@@ -188,6 +187,8 @@ public class ImportDataPage extends LabKeyPage<ImportDataPage.ElementCache>
             elementCache().mergePaste.check();
         else if (!isMerge && isCopyPasteMergeChecked())
             elementCache().mergePaste.uncheck();
+
+        return this;
     }
 
     public boolean isCopyPasteMergeChecked()
@@ -195,7 +196,7 @@ public class ImportDataPage extends LabKeyPage<ImportDataPage.ElementCache>
         return elementCache().mergePaste.isChecked();
     }
 
-    public void setInsertOption(boolean isFile, boolean isUpdate)
+    public ImportDataPage setInsertOption(boolean isFile, boolean isUpdate)
     {
         if (isFile)
         {
@@ -211,6 +212,8 @@ public class ImportDataPage extends LabKeyPage<ImportDataPage.ElementCache>
             else
                 elementCache().addRowsPaste.set(true);
         }
+
+        return this;
     }
 
     public boolean isPasteMergeOptionPresent()
