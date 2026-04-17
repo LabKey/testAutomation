@@ -255,12 +255,6 @@ public class NabAssayTest extends AbstractAssayTest
         assertTextPresent(PLATE_TEMPLATE_NAME);
         assertTextNotPresent("NAb: 5 specimens in duplicate");
 
-        navigateToFolder(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_NAB);
-        portalHelper.addWebPart("Assay List");
-
-        clickAndWait(Locator.linkWithText("Assay List"));
-        clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
-
         log("GitHub Issue #1061: set ParticipantVisitResolver field as fixed value for default value setting");
         clickProject(TEST_ASSAY_PRJ_NAB);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
@@ -269,6 +263,11 @@ public class NabAssayTest extends AbstractAssayTest
                 .getField(AssayConstants.PARTICIPANT_VISIT_RESOLVER_FIELD_NAME)
                 .setAdvancedSettings(List.of(AdvancedFieldSetting.defaultType(FieldDefinition.DefaultType.FIXED_NON_EDITABLE)));
         assayDesignerPage.clickFinish();
+
+        navigateToFolder(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_NAB);
+        portalHelper.addWebPart("Assay List");
+        clickAndWait(Locator.linkWithText("Assay List"));
+        clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
 
         log("Uploading NAb Runs");
         new AssayImporter(this, new AssayImportOptions.ImportOptionsBuilder().
@@ -295,6 +294,9 @@ public class NabAssayTest extends AbstractAssayTest
                 .getField(AssayConstants.PARTICIPANT_VISIT_RESOLVER_FIELD_NAME)
                 .setAdvancedSettings(List.of(AdvancedFieldSetting.defaultType(FieldDefinition.DefaultType.LAST_ENTERED)));
         assayDesignerPage.clickFinish();
+        navigateToFolder(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_NAB);
+        clickAndWait(Locator.linkWithText("Assay List"));
+        clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
 
         // verify that we catch an invalid date prior to upload
         new AssayImporter(this, new AssayImportOptions.ImportOptionsBuilder().
