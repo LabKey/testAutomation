@@ -1793,14 +1793,21 @@ public class ListTest extends BaseWebDriverTest
         checker().withScreenshot().verifyEquals("Row 0 after update: display not as expected",
                 quotedValue2, table.getDataAsText(0, columnName));
 
+        // --- Update row 1: change from quoted value to blank ---
+        editRow = table.clickEditRow(1);
+        editRow.setField(columnName, List.of());
+        editRow.submit();
+        checker().withScreenshot().verifyEquals("Row 1 after clearing: display not as expected",
+                "", table.getDataAsText(1, columnName));
+
         // GitHub Issue 1073: multi-choice values containing quotes were stored as raw
         // PostgreSQL array syntax (e.g. {"2"}) instead of the proper export-encoded format (e.g. """2""").
         List<Map<String, Object>> auditEvents = getListAuditEventsSince(encodedListName, baselineRowId);
-        assertEquals("Expected 4 audit events (3 inserts + 1 update)", 4, auditEvents.size());
+        assertEquals("Expected 5 audit events (3 inserts + 2 updates)", 5, auditEvents.size());
 
         Set<String> foundInsertAuditValues = new HashSet<>();
-        String updateOldAuditValue = null;
-        String updateNewAuditValue  = null;
+        // Track each update as a [oldValue, newValue] pair; order across updates is not guaranteed.
+        List<String[]> updateAuditPairs = new ArrayList<>();
 
         for (Map<String, Object> event : auditEvents)
         {
@@ -1814,8 +1821,9 @@ public class ListTest extends BaseWebDriverTest
             }
             else if ("An existing list record was modified".equals(comment))
             {
-                if (oldMapRaw != null) updateOldAuditValue = AuditLogHelper.decodeValues(oldMapRaw).get(columnName);
-                if (newMapRaw != null) updateNewAuditValue  = AuditLogHelper.decodeValues(newMapRaw).get(columnName);
+                String oldVal = oldMapRaw != null ? AuditLogHelper.decodeValues(oldMapRaw).get(columnName) : null;
+                String newVal = newMapRaw != null ? AuditLogHelper.decodeValues(newMapRaw).get(columnName) : null;
+                updateAuditPairs.add(new String[]{oldVal, newVal});
             }
         }
 
@@ -1829,11 +1837,18 @@ public class ListTest extends BaseWebDriverTest
         checker().verifyTrue("Insert row 3: mixed values not in audit",
                 foundInsertAuditValues.contains(_auditLogHelper.joinMultiChoiceForAudit(quotedValue1, plainValue)));
 
-        // Update: old = "1", new = """3""".
-        checker().verifyEquals("Update: old audit value not as expected",
-                _auditLogHelper.joinMultiChoiceForAudit(plainValue), updateOldAuditValue);
-        checker().verifyEquals("Update: new audit value not as expected",
-                _auditLogHelper.joinMultiChoiceForAudit(quotedValue2), updateNewAuditValue);
+        assertEquals("Expected 2 update audit events", 2, updateAuditPairs.size());
+
+        // Update row 0: old = "1", new = """3""".
+        String expectedUpdate0Old = _auditLogHelper.joinMultiChoiceForAudit(plainValue);
+        String expectedUpdate0New = _auditLogHelper.joinMultiChoiceForAudit(quotedValue2);
+        checker().verifyTrue("Update row 0: audit pair not found",
+                updateAuditPairs.stream().anyMatch(p -> expectedUpdate0Old.equals(p[0]) && expectedUpdate0New.equals(p[1])));
+
+        // Update row 1: old = """2""", new = null (clearing all selections removes the field from the audit record).
+        String expectedUpdate1Old = _auditLogHelper.joinMultiChoiceForAudit(quotedValue1);
+        checker().verifyTrue("Update row 1 (remove value): audit pair not found",
+                updateAuditPairs.stream().anyMatch(p -> expectedUpdate1Old.equals(p[0]) && p[1] == null));
 
         _listHelper.deleteList();
     }
