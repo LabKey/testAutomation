@@ -15,6 +15,7 @@ import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.remoteapi.query.Sort;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.components.ui.grids.EditableGrid;
 import org.labkey.test.pages.core.admin.ShowAdminPage;
 import org.labkey.test.pages.core.admin.ShowAuditLogPage;
 
@@ -869,4 +870,11 @@ public class AuditLogHelper
             throw new IllegalArgumentException(je);
         }
     }
+
+    // returns the expected audit-log serialization format for multi-choice values
+    public String joinMultiChoiceForAudit(String... sorted)
+    {
+        return EditableGrid.quoteValues(", ", sorted);
+    }
+
 }
