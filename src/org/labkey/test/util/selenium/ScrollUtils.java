@@ -64,11 +64,23 @@ public class ScrollUtils
             if (floatingHeaders.stream().anyMatch(headerEl -> rectanglesOverlap(rect, headerEl.getRect())))
             {
                 TestLogger.debug("Scrolled under floating headers:\n" + floatingHeaders.stream().map(WebElement::toString).collect(Collectors.joining("\n")));
-                ((Locatable) targetElement).getCoordinates().inViewPort(); // 'inViewPort()' will scroll element into view
+                scrollIntoViewPort(targetElement);
                 return true;
             }
         }
         return false;
+    }
+
+    /**
+     * An alternate method for scrolling an element into view. Tends to get more of the element into view.
+     *
+     * @param targetElement the element to scroll into view
+     * @return the target element
+     */
+    public static WebElement scrollIntoViewPort(WebElement targetElement)
+    {
+        ((Locatable) targetElement).getCoordinates().inViewPort(); // 'inViewPort()' will scroll element into view
+        return targetElement;
     }
 
     private static boolean rectanglesOverlap(Rectangle r1, Rectangle r2)

@@ -17,16 +17,19 @@ package org.labkey.test.pipeline;
 
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
+import org.labkey.test.util.selenium.ScrollUtils;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import static org.junit.Assert.assertTrue;
+import static org.labkey.test.Locator.xq;
 
 /**
  * <code>ExperimentGraph</code>
  */
-public class ExperimentGraph extends WebDriverComponent
+public class ExperimentGraph extends WebDriverComponent<Component<?>.ElementCache>
 {
     private final WebElement _el;
     private final WebDriver _driver;
@@ -34,7 +37,7 @@ public class ExperimentGraph extends WebDriverComponent
     public ExperimentGraph(BaseWebDriverTest test)
     {
         _driver = test.getDriver();
-        _el = Locator.id("graph_root").findElement(test.getDriver());
+        _el = Locator.id("graph_root").parent().findElement(test.getDriver());
     }
 
     @Override
@@ -51,7 +54,8 @@ public class ExperimentGraph extends WebDriverComponent
 
     public void clickLink(String link)
     {
-        getWrapper().clickAndWait(svgLinkByTitle(link));
+        ScrollUtils.scrollIntoViewPort(getComponentElement());
+        getWrapper().doAndWaitForPageToLoad(() -> getWrapper().actionClick(svgLinkByTitle(link)));
     }
 
     public void clickInputLink(String input)
@@ -122,27 +126,21 @@ public class ExperimentGraph extends WebDriverComponent
     private String getBaseName(PipelineTestParams tp)
     {
         String[] sampleNames = tp.getSampleNames();
-        if (sampleNames.length == 0)
+        for (String sampleName : sampleNames)
         {
-            // AbstractMS2SearchProtocol.getJoinedBaseName() is hard-coded to use "all"
-            return "all";
-        }
-        else
-        {
-            for (String sampleName : sampleNames)
-            {
-                if (getWrapper().isTextPresent(sampleName))
-                    return sampleName;
-            }
+            if (getWrapper().isTextPresent(sampleName))
+                return sampleName;
         }
 
+        // AbstractMS2SearchProtocol.getJoinedBaseName() is hard-coded to use "all"
         // Probably fail later, but simpler than checking for null return.
         return "all";
     }
 
     private WebElement svgLinkByTitle(String title)
     {
-        return Locator.css("a").withAttribute("xlink\\:title", title).findWhenNeeded(_el);
+        // Funky locator to find element within an SVG
+        return Locator.xpath(".//*[local-name()='a'][@*[local-name()='title']=" + xq(title) + "]").findWhenNeeded(_el);
     }
 
 }
