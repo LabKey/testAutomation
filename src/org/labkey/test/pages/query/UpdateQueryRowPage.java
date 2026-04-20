@@ -119,7 +119,10 @@ public class UpdateQueryRowPage extends LabKeyPage<UpdateQueryRowPage.ElementCac
     {
         Select field = elementCache().getMultiChoiceSelect(fieldName);
         field.deselectAll();
-        values.forEach(field::selectByVisibleText);
+        if (values != null &&  !values.isEmpty())
+            values.forEach(field::selectByVisibleText);
+        else
+            field.selectByIndex(0); // the 1st option is a blank option to remove existing values
         return this;
     }
 
