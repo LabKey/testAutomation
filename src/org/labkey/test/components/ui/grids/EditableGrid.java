@@ -100,6 +100,11 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         Locators.spinner.waitForElementToDisappear(this, 30000);
     }
 
+    public static String quoteValues(String delimiter, String... sorted)
+    {
+        return Arrays.stream(sorted).map(CSVFormat.DEFAULT::format).collect(Collectors.joining(delimiter));
+    }
+
     /**
      * Quote values to be pasted into lookup columns. Prevents a value containing a comma from being interpreted as
      * multiple values.
@@ -108,7 +113,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
      */
     public static String quoteForPaste(String... values)
     {
-        return Arrays.stream(values).map(CSVFormat.DEFAULT::format).collect(Collectors.joining(","));
+        return quoteValues(",", values);
     }
 
     public void clickDelete()
