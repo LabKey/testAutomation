@@ -55,7 +55,9 @@ public class ExperimentGraph extends WebDriverComponent<Component<?>.ElementCach
     public void clickLink(String link)
     {
         ScrollUtils.scrollIntoViewPort(getComponentElement());
-        getWrapper().doAndWaitForPageToLoad(() -> getWrapper().actionClick(svgLinkByTitle(link)));
+        WebElement linkEl = svgLinkByTitle(link);
+        // It is challenging to scroll SVG elements to the correct part of the page. Just navigate.
+        getWrapper().beginAt(linkEl.getAttribute("xlink:href"));
     }
 
     public void clickInputLink(String input)
