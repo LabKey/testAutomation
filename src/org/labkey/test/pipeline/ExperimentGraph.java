@@ -15,6 +15,7 @@
  */
 package org.labkey.test.pipeline;
 
+import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
@@ -115,26 +116,39 @@ public class ExperimentGraph extends WebDriverComponent<Component<?>.ElementCach
         String[] names = tp.getExperimentLinks();
         for (String name : names)
         {
-            assertNodePresent(name);
-            String baseName = getBaseName(tp);
-            assertInputPresent(tp.getParametersFile());
-            for (String inputExt : tp.getInputExtensions())
-                assertInputPresent(baseName + inputExt);
-            for (String outputExt : tp.getOutputExtensions())
-                assertOutputPresent(baseName + outputExt);
+            if (getWrapper().isTextPresent(name))
+            {
+                assertNodePresent(name);
+                String baseName = getBaseName(tp);
+                assertInputPresent(tp.getParametersFile());
+                for (String inputExt : tp.getInputExtensions())
+                    assertInputPresent(baseName + inputExt);
+                for (String outputExt : tp.getOutputExtensions())
+                    assertOutputPresent(baseName + outputExt);
+                return;
+            }
         }
+
+        assertTrue("Unable to find experiment links: " + StringUtils.join(names, ", "), false);
     }
 
     private String getBaseName(PipelineTestParams tp)
     {
         String[] sampleNames = tp.getSampleNames();
-        for (String sampleName : sampleNames)
+        if (sampleNames.length == 0)
         {
-            if (getWrapper().isTextPresent(sampleName))
-                return sampleName;
+            // AbstractMS2SearchProtocol.getJoinedBaseName() is hard-coded to use "all"
+            return "all";
+        }
+        else
+        {
+            for (String sampleName : sampleNames)
+            {
+                if (getWrapper().isTextPresent(sampleName))
+                    return sampleName;
+            }
         }
 
-        // AbstractMS2SearchProtocol.getJoinedBaseName() is hard-coded to use "all"
         // Probably fail later, but simpler than checking for null return.
         return "all";
     }
