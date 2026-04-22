@@ -15,14 +15,13 @@
  */
 package org.labkey.test.selenium;
 
-import org.apache.commons.lang3.mutable.Mutable;
-import org.apache.commons.lang3.mutable.MutableObject;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.junit.Test;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.core.ProjectMenu;
+import org.labkey.test.util.CachingSupplier;
 import org.labkey.test.util.TestLogger;
 import org.labkey.test.util.selenium.ScrollUtils;
 import org.labkey.test.util.selenium.WebDriverUtils;
@@ -44,7 +43,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
+
+import static org.apache.commons.lang3.StringUtils.trimToEmpty;
 
 public class ReclickingWebElement extends WebElementDecorator
 {
@@ -68,7 +68,7 @@ public class ReclickingWebElement extends WebElementDecorator
         {
             if (getDriver() != null)
             {
-                final String shortMessage = ex.getMessage().split("\n")[0];
+                final String shortMessage = trimToEmpty(ex.getMessage()).split("\n")[0];
                 TestLogger.debug("Retry click: " + shortMessage);
                 revealElement(getWrappedElement(), shortMessage);
                 super.click();
@@ -84,7 +84,7 @@ public class ReclickingWebElement extends WebElementDecorator
                     && getDriver().getClass().isAssignableFrom(FirefoxDriver.class))
             {
                 String tagName = getWrappedElement().getTagName();
-                List<String> classes = Arrays.asList(getWrappedElement().getAttribute("class").toLowerCase().trim().split("\\s"));
+                List<String> classes = Arrays.asList(trimToEmpty(getWrappedElement().getAttribute("class")).toLowerCase().split("\\s"));
                 if ("tr".equals(tagName))
                 {
                     if (!clickRowInFirefox())
@@ -123,7 +123,7 @@ public class ReclickingWebElement extends WebElementDecorator
      */
     private void clickImageMapArea()
     {
-        String shape = getWrappedElement().getAttribute("shape");
+        String shape = trimToEmpty(getWrappedElement().getAttribute("shape"));
         if (shape.equals("default"))
         {
             throw new IllegalArgumentException("Refusing to click the 'default' <area> of an image map. Can't guarantee that it won't click a different <area> instead");
@@ -146,13 +146,13 @@ public class ReclickingWebElement extends WebElementDecorator
     /**
      * Calculate the center of a convex &lt;area&gt; in an image-map. Can handle 'rect', 'circle', and 'poly' shapes
      * Doc: <a href="https://www.w3schools.com/tags/tag_area.asp">tag_area</a>
-     * TODO: Implement this formula for concave polygons [https://en.wikipedia.org/wiki/Centroid#Of_a_polygon]
+     * Does not handle concave polygons [https://en.wikipedia.org/wiki/Centroid#Of_a_polygon]
      * @return The center point of the area element relative to the image
      */
     @NotNull
     private Point getAreaCenter()
     {
-        List<Integer> coords = Arrays.stream(getWrappedElement().getAttribute("coords").split(",")).map(Integer::parseInt).collect(Collectors.toList());
+        List<Integer> coords = Arrays.stream(trimToEmpty(getWrappedElement().getAttribute("coords")).split(",")).map(Integer::parseInt).toList();
         int minX = Integer.MAX_VALUE;
         Integer maxX = 0;
         int minY = Integer.MAX_VALUE;
@@ -223,7 +223,7 @@ public class ReclickingWebElement extends WebElementDecorator
                 if (interceptingElements.size() == 1)
                 {
                     //noinspection ResultOfMethodCallIgnored
-                    WebDriverWrapper.waitFor(() -> ExpectedConditions.stalenessOf(interceptingElements.get(0)).apply(getDriver()), 1_000);
+                    WebDriverWrapper.waitFor(() -> ExpectedConditions.stalenessOf(interceptingElements.getFirst()).apply(getDriver()), 1_000);
                 }
                 else if (interceptingElements.size() > 1)
                 {
@@ -262,20 +262,17 @@ public class ReclickingWebElement extends WebElementDecorator
         return interceptingElLoc;
     }
 
-    private Mutable<WebDriver> _webDriver = null;
+    private final CachingSupplier<WebDriver> _webDriver = new CachingSupplier<>(() -> WebDriverUtils.extractWrappedDriver(getWrappedElement()));
     private WebDriver getDriver()
     {
-        if (_webDriver == null)
-        {
-            _webDriver = new MutableObject<>(WebDriverUtils.extractWrappedDriver(getWrappedElement()));
-        }
-        return _webDriver.getValue();
+        return _webDriver.get();
     }
 
-    public static class TempEceptionParser
+    // Run manually to test parsing of exception message
+    public static class TempExceptionParserTest
     {
         @Test
-        public void testInterceptinElLoc()
+        public void testInterceptingElLoc()
         {
             final Locator.XPathLocator xPathLocator = parseInterceptingElementLoc("Element <a href=\"something\"> is not clickable at point (732,301) because another element " +
                     "<div id=\"elId\" class=\"cls1 cls2\"> obscures it");
