@@ -1651,10 +1651,6 @@ public class GridPanelViewTest extends GridPanelBaseTest
     }
 
     /**
-     * Navigates to DEFAULT_VIEW_SAMPLE_TYPE grid (with TextChoice field), applies a TC filter
-     * via the expression tab, and saves the result as a personal named view.
-     */
-    /**
      * Navigates to DEFAULT_VIEW_SAMPLE_TYPE grid (with TextChoice field), applies a TC filter,
      * and saves the result as a personal named view.
      * For {@link Filter.Operator#IN}, values are selected via the facet tab (supporting multiple
