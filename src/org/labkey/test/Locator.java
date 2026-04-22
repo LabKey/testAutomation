@@ -901,11 +901,6 @@ public abstract class Locator extends By
         return tag("input").withAttribute("type", "radio");
     }
 
-    public static XPathLocator imageMapLinkByTitle(String imageMapName, String title)
-    {
-        return tag("map").withAttribute("name", imageMapName).child(tag("area").withAttribute("title", title));
-    }
-
     public static XPathLocator lookupLink(String schemaName, String queryName, String pkName)
     {
         String linkText = schemaName + "." + queryName + "." + (null != pkName ? pkName : "");
