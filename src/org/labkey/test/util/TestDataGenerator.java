@@ -52,19 +52,23 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static org.labkey.test.BaseWebDriverTest.ALL_ILLEGAL_QUERY_KEY_CHARACTERS;
 import static org.labkey.test.util.data.TestDataUtils.REALISTIC_ASSAY_FIELDS;
@@ -181,6 +185,16 @@ public class TestDataGenerator
                             entityData.put(key, List.of(textChoices.get(textChoiceIndex)));
                         else
                             entityData.put(key, textChoices.get(textChoiceIndex));
+                    }
+                    else if (fieldDefinition.getType().equals(FieldDefinition.ColumnType.MultiValueTextChoice))
+                    {
+                        FieldDefinition.TextChoiceValidator validator =
+                                (FieldDefinition.TextChoiceValidator) fieldDefinition.getValidators().getFirst();
+                        // Use i + 1 as a bitmask so each row gets a deterministic, non-empty subset of choices,
+                        // consistent with how other field types (Integer, Boolean, TextChoice) use i for predictable data.
+                        // Salt with queryName hash so different entity types produce distinct MVTC values at the same row index.
+                        List<String> values = bitmaskSelect(validator.getValues(), i + 1, queryName.hashCode());
+                        entityData.put(key, values);
                     }
                 }
             }
@@ -488,6 +502,20 @@ public class TestDataGenerator
     public static String randomString(int size)
     {
         return randomString(size, null);
+    }
+
+    public static List<String> randomTextChoice(int size)
+    {
+        Set<String> textChoices = new LinkedHashSet<>();
+        while (textChoices.size() < size)
+        {
+            String generated = randomString(randomInt(1, 25)).trim();
+            if (!generated.isEmpty())
+            {
+                textChoices.add(generated);
+            }
+        }
+        return List.copyOf(textChoices);
     }
 
     public static String randomString(int size, @Nullable String exclusion)
@@ -799,7 +827,15 @@ public class TestDataGenerator
 
     public static boolean randomBoolean()
     {
-        return ThreadLocalRandom.current().nextBoolean();
+        return randomBoolean(null);
+    }
+
+    public static boolean randomBoolean(@Nullable String message)
+    {
+        boolean value = ThreadLocalRandom.current().nextBoolean();
+        if (message != null)
+            TestLogger.log("Generated random boolean value for %s: %s".formatted(message, value));
+        return value;
     }
 
     private @NotNull List<String> getFieldsForFile()
@@ -956,11 +992,34 @@ public class TestDataGenerator
         return getQueryHelper(cn).importData(TestDataUtils.stringFromRows(TestDataUtils.rowListsFromMaps(rows)), lookupByAlternateKey);
     }
 
+    public static <T> List<T> shuffleSelect(List<T> allFields)
+    {
+        int randomSize = new Random().nextInt(allFields.size()) + 1;
+        return shuffleSelect(allFields, randomSize);
+    }
+
     public static <T> List<T> shuffleSelect(List<T> allFields, int selectCount)
     {
         List<T> shuffled = new ArrayList<>(allFields);
         Collections.shuffle(shuffled);
         return shuffled.subList(0, selectCount);
+    }
+
+    /**
+     * Selects elements by index using {@code bitmask}: bit N set → include element N. Supports up to 32 elements.
+     * XORs the bitmask with {@code salt} so that callers with the same bitmask (e.g. same row index) produce
+     * different selections.
+     */
+    public static <T> List<T> bitmaskSelect(List<T> allElements, int bitmask, int salt)
+    {
+        int n = allElements.size();
+        int validMask = n < 32 ? (1 << n) - 1 : Integer.MAX_VALUE;
+        int effective = (bitmask ^ salt) & validMask;
+        if (effective == 0)
+            effective = bitmask & validMask;
+        return BitSet.valueOf(new long[]{effective}).stream()
+                .mapToObj(allElements::get)
+                .collect(Collectors.toList());
     }
 
     public static <T> List<T> randomSelect(List<T> allOptions, int selectCount)

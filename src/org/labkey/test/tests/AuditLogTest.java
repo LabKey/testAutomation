@@ -47,6 +47,7 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Log4jUtils;
 import org.labkey.test.util.PermissionsHelper;
 import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.SearchHelper;
 import org.labkey.test.util.UIUserHelper;
 
 import java.io.BufferedReader;
@@ -64,11 +65,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.labkey.test.util.PasswordUtil.getUsername;
 import static org.labkey.test.util.PermissionsHelper.AUTHOR_ROLE;
 import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
 import static org.labkey.test.util.PermissionsHelper.FOLDER_ADMIN_ROLE;
 import static org.labkey.test.util.PermissionsHelper.PROJECT_ADMIN_ROLE;
-import static org.labkey.test.util.PasswordUtil.getUsername;
+import static org.labkey.test.util.PermissionsHelper.SEE_AUDIT_LOG_FOLDER_ROLE;
+import static org.labkey.test.util.PermissionsHelper.SEE_AUDIT_LOG_SITE_ROLE;
 
 @Category({Daily.class, Hosting.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 9)
@@ -79,21 +82,18 @@ public class AuditLogTest extends BaseWebDriverTest
     public static final String QUERY_UPDATE_EVENT = "Query update events";
     public static final String PROJECT_AUDIT_EVENT = "Project and Folder events";
     public static final String ASSAY_AUDIT_EVENT = "Link to Study events";
+    public static final String COMMENT_COLUMN = "Comment";
 
     private static final String AUDIT_TEST_USER = "audit_user1@auditlog.test";
     private static final String AUDIT_TEST_USER2 = "audit_user2@auditlog.test";
     private static final String AUDIT_TEST_USER3 = "audit_user3@auditlog.test";
-
     private static final String AUDIT_SECURITY_GROUP = "Testers";
-
     private static final String AUDIT_TEST_PROJECT = "AuditVerifyTest";
     private static final String AUDIT_DETAILED_TEST_PROJECT = "AuditDetailedLogTest";
     private static final String AUDIT_TEST_SUBFOLDER = "AuditVerifyTest_Subfolder";
     private static final String AUDIT_PROPERTY_EVENTS_PROJECT = "AuditDomainPropertyEvents";
-
-    final String DOMAIN_PROPERTY_LOG_NAME = "Domain property events";
-
-    public static final String COMMENT_COLUMN = "Comment";
+    private static final String DOMAIN_PROPERTY_LOG_NAME = "Domain property events";
+    private static final String SEARCH_TERM = "doesn't matter";
 
     private final ApiPermissionsHelper permissionsHelper = new ApiPermissionsHelper(this);
     private final AuditLogHelper _auditLogHelper = new AuditLogHelper(this);
@@ -377,19 +377,37 @@ public class AuditLogTest extends BaseWebDriverTest
         createUserWithPermissions(AUDIT_TEST_USER, AUDIT_TEST_PROJECT, EDITOR_ROLE);
         createUserWithPermissions(AUDIT_TEST_USER2, AUDIT_TEST_PROJECT, PROJECT_ADMIN_ROLE);
 
+        // Do a search to ensure an audit entry in /home
+        clickProject("Home");
+        new SearchHelper(this).searchFor(SEARCH_TERM);
+        goToProjectHome();
+
         // signed in as an admin so we should see rows here
-        verifyAuditQueries(true);
+        verifyAuditQueries(true, getProjectName());
 
         // signed in as an editor should not show any rows for audit query links
         impersonate(AUDIT_TEST_USER);
-        verifyAuditQueries(false);
+        verifyAuditQueries(false, getProjectName());
+        verifyAuditQueries(false, "Home");
         stopImpersonating();
 
-        // now grant CanSeeAuditLog permission to our audit user and verify
-        // we see audit information
-        permissionsHelper.setSiteRoleUserPermissions(AUDIT_TEST_USER, "See Audit Log Events");
+        // Grant the "See Audit Log Events" folder role to our audit user in the project and verify we see audit
+        // information in this project but not /Home. We pass the fully qualified classnames in the next few calls to
+        // disambiguate the root role from the folder role.
+        permissionsHelper.addMemberToRole(AUDIT_TEST_USER, SEE_AUDIT_LOG_FOLDER_ROLE, PermissionsHelper.MemberType.user, getProjectName());
         impersonate(AUDIT_TEST_USER);
-        verifyAuditQueries(true);
+        verifyAuditQueries(true, getProjectName());
+        verifyAuditQueries(false, "Home");
+        stopImpersonating();
+        permissionsHelper.removeUserRoleAssignment(AUDIT_TEST_USER, SEE_AUDIT_LOG_FOLDER_ROLE, getProjectName());
+
+        // Grant the "See Audit Log Events" root role to our audit user and verify we see audit information in this
+        // project and in /Home
+        permissionsHelper.setSiteRoleUserPermissions(AUDIT_TEST_USER, SEE_AUDIT_LOG_SITE_ROLE);
+        impersonate(AUDIT_TEST_USER);
+        verifyAuditQueries(true, getProjectName());
+        ExecuteQueryPage.beginAt(this, "Home", "auditLog", "SearchAuditEvent");
+        verifyAuditQueryEvent(this, "Query", SEARCH_TERM, 1);
 
         // cleanup
         stopImpersonating();
@@ -482,7 +500,7 @@ public class AuditLogTest extends BaseWebDriverTest
             //then create model (which has detailed audit log level)
             InsertRowsCommand insertCmd2 = new InsertRowsCommand("vehicle", "models");
             rowMap = new HashMap<>();
-            rowMap.put("manufacturerId", resp1.getRows().get(0).get("rowid"));
+            rowMap.put("manufacturerId", resp1.getRows().getFirst().get("rowid"));
             rowMap.put("name", "Soul");
             insertCmd2.addRow(rowMap);
             insertCmd2.execute(cn, AUDIT_DETAILED_TEST_PROJECT);
@@ -535,17 +553,17 @@ public class AuditLogTest extends BaseWebDriverTest
         verifyAuditQueryEvent(this, "List", "Child List", 1, canSeeChild(v));
     }
 
-    protected void verifyAuditQueries(boolean canSeeAuditLog)
+    protected void verifyAuditQueries(boolean canSeeAuditLog, String containerPath)
     {
-        ExecuteQueryPage.beginAt(this, getProjectName(), "auditLog", "ContainerAuditEvent");
+        ExecuteQueryPage.beginAt(this, containerPath, "auditLog", "ContainerAuditEvent");
         if (canSeeAuditLog)
             verifyAuditQueryEvent(this, COMMENT_COLUMN, AUDIT_TEST_PROJECT + " was created", 1);
         else
             assertTextPresent("No data to show.");
 
-        ExecuteQueryPage.beginAt(this, getProjectName(), "auditLog", "GroupAuditEvent");
+        ExecuteQueryPage.beginAt(this, containerPath, "auditLog", "GroupAuditEvent");
         if (canSeeAuditLog)
-            verifyAuditQueryEvent(this, COMMENT_COLUMN, "The user " + AUDIT_TEST_USER + " was assigned to the security role Editor.", 1);
+            verifyAuditQueryEvent(this, COMMENT_COLUMN, "The user " + AUDIT_TEST_USER + " was assigned to the security role Editor.", 4);
         else
             assertTextPresent("No data to show.");
     }

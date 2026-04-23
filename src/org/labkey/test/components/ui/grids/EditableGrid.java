@@ -56,6 +56,7 @@ import static org.awaitility.Awaitility.await;
 import static org.labkey.test.BaseWebDriverTest.WAIT_FOR_JAVASCRIPT;
 import static org.labkey.test.WebDriverWrapper.waitFor;
 import static org.labkey.test.util.TestLogger.log;
+import static org.labkey.test.util.data.TestArrayDataUtils.formatMultiValueText;
 import static org.labkey.test.util.selenium.ScrollUtils.Alignment.center;
 import static org.labkey.test.util.selenium.WebDriverUtils.MODIFIER_KEY;
 
@@ -99,6 +100,11 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         Locators.spinner.waitForElementToDisappear(this, 30000);
     }
 
+    public static String quoteValues(String delimiter, String... sorted)
+    {
+        return Arrays.stream(sorted).map(CSVFormat.DEFAULT::format).collect(Collectors.joining(delimiter));
+    }
+
     /**
      * Quote values to be pasted into lookup columns. Prevents a value containing a comma from being interpreted as
      * multiple values.
@@ -107,7 +113,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
      */
     public static String quoteForPaste(String... values)
     {
-        return Arrays.stream(values).map(CSVFormat.DEFAULT::format).collect(Collectors.joining(","));
+        return quoteValues(",", values);
     }
 
     public void clickDelete()
@@ -429,6 +435,12 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         setCellValue(getRowIndex(columnToSearch, valueToSearch), columnToSet, valueToSet);
     }
 
+    public void overwriteCellValue(CharSequence columnToSearch, String valueToSearch, CharSequence columnToSet, Object valueToSet)
+    {
+        clearCellValue(getRowIndex(columnToSearch, valueToSearch), columnToSet);
+        setCellValue(getRowIndex(columnToSearch, valueToSearch), columnToSet, valueToSet);
+    }
+
     /**
      * <p>
      * For the identified row set the value in the identified column.
@@ -507,6 +519,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
         if (value instanceof List)
         {
+
             // If this is a list assume that it will need a lookup.
             List<String> values = (List) value;
 
@@ -915,6 +928,39 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     }
 
     /**
+     * Format data for pasting into an editable grid. List elements in each row are quoted and separated by commas.
+     * This allows values containing commas to be pasted into multi-value columns. Even single-selections for these
+     * types of columns should be passed in as Lists to ensure they are quoted properly.
+     *
+     * @param rows values for pasting into an editable grid.
+     * @return rows formatted for pasting into an editable grid.
+     */
+    public static String formatForPaste(List<List<?>> rows)
+    {
+        StringBuilder sb = new StringBuilder();
+        for (List<?> row : rows)
+        {
+            if (!sb.isEmpty())
+                sb.append("\n");
+
+            boolean firstVal = true;
+            for (Object value : row)
+            {
+                if (!firstVal)
+                    sb.append("\t");
+                else
+                    firstVal = false;
+
+                if (value instanceof List<?> l)
+                    sb.append(formatMultiValueText(l));
+                else
+                    sb.append(quoteForPaste(value.toString()));
+            }
+        }
+        return sb.toString();
+    }
+
+    /**
      * Copies text from the grid, b
      * @param startRowIndex Index of the top-left cell's row
      * @param startColumn   fieldKey, name, or label of the top-left cell
@@ -975,6 +1021,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
     public void dragFill(WebElement startCell, WebElement endCell)
     {
+        dismissPopover();
         Locator.XPathLocator selectionHandleLoc = Locator.byClass("cell-selection-handle");
         WebElement selectionHandle = selectionHandleLoc.findElement(startCell);
         dragToCell(selectionHandle, endCell);
@@ -998,6 +1045,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
                 // WebDriver doesn't calculate correct location to click the cell selection handle
                 .moveToElement(elementToDrag, 0, 7)
                 .clickAndHold()
+                .pause(Duration.ofMillis(200))
                 .moveToElement(destinationCell)
                 // Extra wiggle to get it to stick
                 .moveByOffset(0, -size.getHeight())

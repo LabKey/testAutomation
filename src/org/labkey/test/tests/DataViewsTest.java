@@ -471,7 +471,9 @@ public class DataViewsTest extends ParticipantListTest
 
         // check if top category sorts Alphabetical
         openCustomizePanel(ORIGINAL_WEBPART_TITLE);
-        RadioButton().withLabel("Alphabetical").find(getDriver()).check();
+        var alphabeticalRadio = RadioButton().withLabel("Alphabetical").find(getDriver());
+        alphabeticalRadio.check();
+        waitFor(alphabeticalRadio::isChecked, "Radio button 'Alphabetical' did not become checked after clicking.", 2000);
         clickButton("Save", 0);
         _ext4Helper.waitForMaskToDisappear();
         assertTextPresentInThisOrder(CATEGORIES[0], "Abbreviated Demographics", "Alt ID mapping", "APX-1: Abbreviated Physical Exam",

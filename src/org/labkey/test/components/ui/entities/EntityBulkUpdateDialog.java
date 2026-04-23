@@ -16,6 +16,7 @@ import org.labkey.test.components.html.Input;
 import org.labkey.test.components.react.FilteringReactSelect;
 import org.labkey.test.components.react.ReactDateTimePicker;
 import org.labkey.test.components.react.ToggleButton;
+import org.labkey.test.components.ui.files.AttachmentCard;
 import org.labkey.test.components.ui.files.FileAttachmentContainer;
 import org.labkey.test.components.ui.files.FileUploadField;
 import org.labkey.test.params.FieldDefinition;
@@ -121,6 +122,19 @@ public class EntityBulkUpdateDialog extends ModalDialog
     {
         FilteringReactSelect reactSelect = enableSelectionField(fieldIdentifier);
         selectValues.forEach(reactSelect::filterSelect);
+        return this;
+    }
+
+    /**
+     * Clear the field (fieldIdentifier).
+     *
+     * @param fieldIdentifier Identifier for the field; name ({@link String}) or fieldKey ({@link FieldKey})
+     * @return this component
+     */
+    public EntityBulkUpdateDialog clearSelection(CharSequence fieldIdentifier)
+    {
+        FilteringReactSelect reactSelect = enableSelectionField(fieldIdentifier);
+        reactSelect.clearSelection();
         return this;
     }
 
@@ -278,6 +292,22 @@ public class EntityBulkUpdateDialog extends ModalDialog
     public EntityBulkUpdateDialog removeFile(CharSequence fieldIdentifier)
     {
         getFileField(fieldIdentifier).removeFile();
+        return this;
+    }
+
+    /**
+     * Removes an existing attachment displayed as an {@link AttachmentCard} in the bulk update dialog.
+     * This is used when the rows being edited already have an attachment — the existing file is shown
+     * as an AttachmentCard with a dropdown menu containing "Remove attachment".
+     *
+     * @param fieldIdentifier Identifier for the field; name ({@link String}) or fieldKey ({@link FieldKey})
+     * @return this component
+     */
+    public EntityBulkUpdateDialog removeExistingAttachment(CharSequence fieldIdentifier)
+    {
+        var row = getFileField(fieldIdentifier);
+        AttachmentCard card = new AttachmentCard.FileAttachmentCardFinder(getDriver()).waitFor(row);
+        card.clickRemove();
         return this;
     }
 

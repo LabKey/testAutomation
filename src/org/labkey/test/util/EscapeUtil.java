@@ -15,6 +15,7 @@
  */
 package org.labkey.test.util;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
 import org.apache.poi.ss.util.WorkbookUtil;
 import org.eclipse.jetty.util.URIUtil;
@@ -266,20 +267,30 @@ public class EscapeUtil
         return getFormFieldName(columnName, FORM_FIELD_PREFIX);
     }
 
+    public static String getFormFieldName(String columnName, boolean multiValue)
+    {
+        return getFormFieldName(columnName, (multiValue ? "[]" : "") + FORM_FIELD_PREFIX);
+    }
+
+
+
+    static final String FIELD_ENCODED_PREFIX = "%_";
+
     /**
      * Escapes special characters in a column name to be used as a form field name.
-     * See associated {@link org.labkey.api.query.QueryUpdateForm#getFormFieldName}
+     * See associated {@link org.labkey.api.util.PageFlowUtil#encodeFormName}
      */
     public static String getFormFieldName(String columnName, @Nullable String prefix)
     {
-        StringBuilder fieldName = new StringBuilder();
-        for (char c : columnName.toCharArray())
-        {
-            if (SPECIAL_CHARS.indexOf(c) >= 0)
-                fieldName.append(BACKSLASH);
-            fieldName.append(c);
-        }
+        String name = Objects.toString(prefix,"") + columnName;
 
-        return prefix == null ? fieldName.toString() : prefix + fieldName;
+        final String escapeChar = "%";
+        final String problemChars = "\\\"";
+        final String unclean = escapeChar + problemChars;
+        if (!StringUtils.containsAny(name, unclean))
+            return name;
+        var ret = FIELD_ENCODED_PREFIX + encode(name);
+        assert !StringUtils.containsAny(ret, problemChars);
+        return ret;
     }
 }

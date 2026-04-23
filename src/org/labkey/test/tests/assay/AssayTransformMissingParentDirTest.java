@@ -1,5 +1,6 @@
 package org.labkey.test.tests.assay;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.api.util.FileUtil;
@@ -14,8 +15,11 @@ import org.labkey.test.pages.assay.AssayRunsPage;
 import org.labkey.test.params.assay.GeneralAssayDesign;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.AccessDeniedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 /**
  * Issue 54156: Regression test to ensure a reasonable error message is shown when an assay design references
@@ -37,16 +41,36 @@ public class AssayTransformMissingParentDirTest extends AbstractAssayTransformTe
         TestFileUtils.writeFile(transformFile, transformContent);
 
         // Create a General assay and add the transform by absolute path (not upload)
-        var protocolResponse = new GeneralAssayDesign(assayName).createAssay(getProjectName(), createDefaultConnection());
+        var protocolResponse = new GeneralAssayDesign(assayName).setBatchFields(List.of(), false).createAssay(getProjectName(), createDefaultConnection());
         var assayDesignerPage = ReactAssayDesignerPage.beginAt(this, getProjectName(), protocolResponse.getProtocolId(),
-                "general", getURL().toString());
-        assayDesignerPage.goToBatchFields().removeAllFields(true);
+                "general", "");
         // add by path so the absolute path is stored; this allows reproducing the missing parent dir scenario
         assayDesignerPage.addTransformScript(transformFile);
         assayDesignerPage.clickSave();
 
-        // Now delete the parent dir to ensure we handle it reasonably
-        TestFileUtils.deleteDir(parentDir.toFile());
+        // Now delete the parent dir to ensure we handle it reasonably. On Windows something locks the directory, maybe
+        // an external process. If that happens sleep for a second and try again.
+        for (int attempt = 1; attempt <= 10; attempt++) {
+            try
+            {
+                FileUtils.deleteDirectory(parentDir.toFile());
+                log(String.format("Deletion of directory %s was successful.", parentDir));
+                break;
+            } catch (AccessDeniedException deniedException) {
+                // Yes I know AccessDeniedException is a subset of an IOException, but I wanted to log explicitly a
+                // failure and retry because of an AccessDeniedException from some other IOException.
+                log(String.format("Access denied trying to delete directory %s. Error: %s. Waiting 10s and retrying. Attempt %d of 10.",
+                        parentDir, deniedException.getMessage(), attempt));
+                if (attempt == 10) throw deniedException;
+                sleep(10_000);
+            }
+            catch (IOException ioException) {
+                log(String.format("IOException trying to delete directory %s. Error: %s. Waiting 10s and retrying. Attempt %d of 10.",
+                        parentDir, ioException.getMessage(), attempt));
+                if (attempt == 10) throw ioException;
+                sleep(10_000);
+            }
+        }
 
         // Attempt to import data and verify a reasonable error message is shown
         String importData = """
@@ -54,7 +78,6 @@ public class AssayTransformMissingParentDirTest extends AbstractAssayTransformTe
                 1\tP1\timport after parent deleted
                 """;
 
-        clickAndWait(Locator.linkWithText(assayName));
         new AssayRunsPage(getDriver()).getTable().clickHeaderButtonAndWait("Import Data");
         var importPage = new AssayImportPage(getDriver());
         importPage.setNamedInputText("Name", "missingParentImport");

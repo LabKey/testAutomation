@@ -194,7 +194,6 @@ public class Crawler
             new ControllerActionId("login", "setPassword"),
             new ControllerActionId("ms2", "showList"),
             new ControllerActionId("ms2", "showParamsFile"),
-            new ControllerActionId("nlp", "runPipeline"),
             new ControllerActionId("pipeline-analysis", "analyze"), // Doesn't navigate
             new ControllerActionId("project", "togglePageAdminMode"),
             // Tested directly in XTandemTest
@@ -609,7 +608,7 @@ public class Crawler
 
         private void checkControllerRelativeUrl()
         {
-            if (_actionId != null && _actionId.isControllerFirstUrl() && WebTestHelper.isUseContainerRelativeUrl() && !_controllerFirstUrls.contains(_actionId))
+            if (_actionId != null && _actionId.isControllerFirstUrl() && !_controllerFirstUrls.contains(_actionId))
             {
                 _controllerFirstUrls.add(_actionId);
                 RuntimeException ex = new RuntimeException("Found a controller-first URL (%s) on %s".formatted(getUrlText(), getOrigin()));

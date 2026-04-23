@@ -146,6 +146,12 @@ public class FieldInfo implements CharSequence, WrapsFieldKey
         return _fieldKey.getName();
     }
 
+    @Contract(pure = true)
+    public String getNamePart()
+    {
+        return _namePart;
+    }
+
     /**
      * Get column name quoted for use in queries and calculated field expressions
      */

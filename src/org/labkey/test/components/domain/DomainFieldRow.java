@@ -767,6 +767,13 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     // behind the scenes. Because of that the validator aspect of the TextChoice field is hidden from the user (just like
     // it is in the product).
 
+    public void setAllowMultipleSelections(Boolean allowMultipleSelections)
+    {
+        WebDriverWrapper.waitFor(() -> elementCache().allowMultipleSelectionsCheckbox.isDisplayed(),
+                "Allow Multiple Selections checkbox did not become visible", 1000);
+        elementCache().allowMultipleSelectionsCheckbox.set(allowMultipleSelections);
+    }
+
     /**
      * Set the list of allowed values for a TextChoice field.
      *
@@ -781,6 +788,18 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         TextChoiceValueDialog addValuesDialog = new TextChoiceValueDialog(this);
         addValuesDialog.addValues(values);
         return addValuesDialog.clickApply();
+    }
+
+    public String setTextChoiceValuesExpectingError(List<String> values)
+    {
+        WebElement button = Locator.tagWithClass("span", "container--action-button").withText("Add Values").findElement(this);
+        button.click();
+
+        TextChoiceValueDialog addValuesDialog = new TextChoiceValueDialog(this);
+        addValuesDialog.addValues(values);
+        String error = addValuesDialog.getError();
+        addValuesDialog.clickCancel();
+        return error;
     }
 
     /**
@@ -1701,6 +1720,10 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
                 .descendant("div[contains(@class,'select-input__single-value--is-disabled')]").findWhenNeeded(this);
         public final WebElement domainWarningIcon = Locator.tagWithClass("span", "domain-warning-icon")
                 .findWhenNeeded(this);
+
+        // text choice field option
+        public final Checkbox allowMultipleSelectionsCheckbox = new Checkbox(Locator.tagWithClass("input", "domain-text-choice-multi")
+                .refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT));
 
         // lookup field options
         public final Select lookupContainerSelect = SelectWrapper.Select(Locator.name("domainpropertiesrow-lookupContainer"))

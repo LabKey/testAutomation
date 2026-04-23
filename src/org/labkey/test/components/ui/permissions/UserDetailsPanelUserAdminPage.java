@@ -25,6 +25,18 @@ public class UserDetailsPanelUserAdminPage extends UserDetailsPanel
         resetPwdDialog.dismiss("Yes, Reset Password");
     }
 
+    public boolean canResetTOTPSettings()
+    {
+        return Locator.button("Reset TOTP Settings").isDisplayed(getDriver());
+    }
+
+    public void resetTOTPSettings()
+    {
+        elementCache().resetTOTP.click();
+        ModalDialog resetPwdDialog = new ModalDialog.ModalDialogFinder(getDriver()).withTitle("Reset TOTP Settings?").find();
+        resetPwdDialog.dismiss("Yes, Reset TOTP Settings");
+    }
+
     public void deactivateUser()
     {
         elementCache().deactivate.click();
@@ -55,6 +67,7 @@ public class UserDetailsPanelUserAdminPage extends UserDetailsPanel
     protected class ElementCache extends Component.ElementCache
     {
         private final WebElement resetPwd = Locator.button("Reset Password").findWhenNeeded(getComponentElement());
+        private final WebElement resetTOTP = Locator.button("Reset TOTP Settings").findWhenNeeded(getComponentElement());
         private final WebElement delete = Locator.button("Delete").findWhenNeeded(getComponentElement());
         private final WebElement deactivate = Locator.button("Deactivate").findWhenNeeded(getComponentElement());
         private final WebElement reactivate = Locator.button("Reactivate").findWhenNeeded(getComponentElement());

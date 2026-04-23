@@ -26,7 +26,6 @@ import org.apache.hc.client5.http.cookie.CookieStore;
 import org.apache.hc.client5.http.impl.auth.BasicAuthCache;
 import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 import org.apache.hc.client5.http.impl.io.ManagedHttpClientConnectionFactory;
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
@@ -99,7 +98,6 @@ import java.util.concurrent.TimeUnit;
  */
 public class WebTestHelper
 {
-
     private static final Logger LOG = LogManager.getLogger(WebTestHelper.class);
 
     public static final Random RANDOM = new Random();
@@ -114,18 +112,12 @@ public class WebTestHelper
     private static String _contextPath = null;
     public static final int MAX_LEAK_LIMIT = 0;
     public static final int GC_ATTEMPT_LIMIT = 6;
-    private static boolean USE_CONTAINER_RELATIVE_URL = true;
     private static final Map<String, Map<String, Cookie>> savedCookies = new HashMap<>();
     private static final Map<String, String> savedSessionKeys = new HashMap<>();
     private static final Map<String, String> savedApiKeys = new HashMap<>();
     private static final Set<String> deletedApiKeys = new HashSet<>();
 
     static { TestProperties.load(); }
-
-    public static void setUseContainerRelativeUrl(boolean useContainerRelativeUrl)
-    {
-        USE_CONTAINER_RELATIVE_URL = useContainerRelativeUrl;
-    }
 
     /**
      * Save cookies to be used by HTTP requests
@@ -227,11 +219,6 @@ public class WebTestHelper
                 TestLogger.warn("Refusing to delete an API key not created by 'WebTestHelper.createApiKey'");
             }
         }
-    }
-
-    public static boolean isUseContainerRelativeUrl()
-    {
-        return USE_CONTAINER_RELATIVE_URL;
     }
 
     private static void acceptLocalhostCert() throws Exception

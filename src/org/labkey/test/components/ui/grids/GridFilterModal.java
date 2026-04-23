@@ -26,7 +26,12 @@ public class GridFilterModal extends ModalDialog
 
     public GridFilterModal(WebDriver driver, UpdatingComponent linkedComponent)
     {
-        super(new ModalDialogFinder(driver));
+        this(driver, linkedComponent, "Filter");
+    }
+
+    public GridFilterModal(WebDriver driver, UpdatingComponent linkedComponent, String titlePrefix)
+    {
+        super(new ModalDialogFinder(driver).withTitle(titlePrefix));
         _linkedComponent = linkedComponent;
     }
 
@@ -166,9 +171,14 @@ public class GridFilterModal extends ModalDialog
         return getWrapper().shortWait().until(ExpectedConditions.visibilityOf(elementCache().errorAlert)).getText();
     }
 
+    public boolean isConfirmButtonEnabled()
+    {
+        return elementCache().submitButton.isEnabled();
+    }
+
     protected void clickConfirm()
     {
-        if (!elementCache().submitButton.isEnabled())
+        if (!isConfirmButtonEnabled())
         {
             throw new IllegalStateException("Confirmation button is not enabled.");
         }

@@ -420,7 +420,8 @@ public class DataClassTest extends BaseWebDriverTest
     {
         List<String> suffixes  = new ArrayList<>();
         suffixes.add("lsid");
-        suffixes.add("name_classid");
+        suffixes.add("name");
+        suffixes.add("rowid");
         suffixes.addAll(indexSuffixes);
 
         for (String suffix : suffixes)

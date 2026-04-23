@@ -31,6 +31,7 @@ import org.labkey.test.categories.Git;
 import org.labkey.test.io.Grep;
 import org.labkey.test.pages.core.admin.SiteValidationPage;
 import org.labkey.test.pages.pipeline.PipelineStatusDetailsPage;
+import org.labkey.test.util.AttachmentHelper;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.Order;
 import org.labkey.test.util.PasswordUtil;
@@ -133,6 +134,14 @@ public class DatabaseDiagnosticsTest extends BaseWebDriverTest
         WebElement exceptionCount = waitForElement(Locator.id("exceptionCount"));
         if (!"no exceptions".equals(exceptionCount.getText()))
             getArtifactCollector().dumpPageSnapshot("exceptions", null);
+    }
+
+    @Test
+    public void testOrphanedAttachments()
+    {
+        int orphanCount = AttachmentHelper.logOrphanedAttachments();
+        if (orphanCount > 0)
+            log("Orphaned attachments: " + orphanCount);
     }
 
     @Override

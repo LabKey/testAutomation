@@ -475,6 +475,13 @@ public class FieldDefinition extends PropertyDescriptor
         return this;
     }
 
+    public FieldDefinition setMultiChoiceValues(List<String> values)
+    {
+        Assert.assertEquals("Invalid field type for text choice values.", ColumnType.MultiValueTextChoice, getType());
+        setValidators(List.of(new FieldDefinition.TextChoiceValidator(values)));
+        return this;
+    }
+
     public ExpSchema.DerivationDataScopeType getAliquotOption()
     {
         return _aliquotOption;
@@ -599,7 +606,6 @@ public class FieldDefinition extends PropertyDescriptor
             }
         };
         ColumnType File = new ColumnTypeImpl("File", "http://cpas.fhcrc.org/exp/xml#fileLink");
-        ColumnType Flag = new ColumnTypeImpl("Flag", "string", "http://www.labkey.org/exp/xml#flag", null);
         ColumnType Attachment = new ColumnTypeImpl("Attachment", "http://www.labkey.org/exp/xml#attachment");
         ColumnType User = new ColumnTypeImpl("User", "int", null, new IntLookup("core", "users"));
         @Deprecated(since = "22.10") // 'Lookup' isn't a type outside of the UI
@@ -611,6 +617,7 @@ public class FieldDefinition extends PropertyDescriptor
         ColumnType Sample = new ColumnTypeImpl("Sample", "int", "http://www.labkey.org/exp/xml#sample", new IntLookup( "exp", "Materials"));
         ColumnType Barcode = new ColumnTypeImpl("Unique ID", "string", "http://www.labkey.org/types#storageUniqueId", null);
         ColumnType TextChoice = new ColumnTypeImpl("Text Choice", "string", "http://www.labkey.org/types#textChoice", null);
+        ColumnType MultiValueTextChoice = new ColumnTypeImpl("Text Choice", "http://cpas.fhcrc.org/exp/xml#multiChoice", null, null);
         ColumnType SMILES = new ColumnTypeImpl("SMILES", "string", "http://www.labkey.org/exp/xml#smiles", null);
         ColumnType Calculation = new ColumnTypeImpl("Calculation", null, "http://www.labkey.org/exp/xml#calculated", null);
         /**
@@ -1144,7 +1151,6 @@ public class FieldDefinition extends PropertyDescriptor
         }
 
     }
-
 }
 
 class ColumnTypeImpl implements FieldDefinition.ColumnType

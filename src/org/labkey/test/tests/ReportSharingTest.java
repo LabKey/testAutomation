@@ -27,6 +27,7 @@ import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Reports;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.OptionalFeatureHelper;
 import org.labkey.test.util.RReportHelper;
 
 import java.util.Arrays;
@@ -50,6 +51,8 @@ public class ReportSharingTest extends BaseWebDriverTest
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
+        OptionalFeatureHelper.resetOptionalFeature(createDefaultConnection(), "rReportCustomSharing");
+
         _containerHelper.deleteProject(getProjectName(),afterTest);
         _userHelper.deleteUsers(false, USER_DEV,USER_EDITOR,USER_NON_EDITOR);
     }
@@ -63,6 +66,8 @@ public class ReportSharingTest extends BaseWebDriverTest
 
     private void doSetup()
     {
+        OptionalFeatureHelper.setOptionalFeature(createDefaultConnection(), "rReportCustomSharing", true);
+
         _rReportHelper.ensureRConfig();
 
         _containerHelper.createProject(getProjectName(), null);

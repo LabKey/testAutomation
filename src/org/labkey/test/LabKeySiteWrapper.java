@@ -646,7 +646,6 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             throw new RuntimeException("Webapp failed to start up after " + MAX_SERVER_STARTUP_WAIT_SECONDS + " seconds.", lastError);
         }
         log("Server is running.");
-        WebTestHelper.setUseContainerRelativeUrl((Boolean)executeScript("return LABKEY.experimental.containerRelativeURL;"));
     }
 
     @LogMethod
@@ -1746,7 +1745,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         return errorMessage;
     }
 
-    private ProductKey getProductConfiguration() throws IOException, CommandException
+    protected ProductKey getProductConfiguration() throws IOException, CommandException
     {
         SimpleGetCommand command = new SimpleGetCommand("admin", "productFeature");
         var resp = command.execute(createDefaultConnection(), "/");

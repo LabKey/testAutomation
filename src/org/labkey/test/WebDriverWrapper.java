@@ -63,6 +63,7 @@ import org.labkey.test.util.TestLogger;
 import org.labkey.test.util.TextSearcher;
 import org.labkey.test.util.TextSearcher.TextTransformers;
 import org.labkey.test.util.Timer;
+import org.labkey.test.util.selenium.JavascriptExecutorWrapper;
 import org.labkey.test.util.selenium.ScrollUtils;
 import org.labkey.test.util.selenium.WebDriverUtils;
 import org.openqa.selenium.Alert;
@@ -539,11 +540,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
      */
     public <T> T executeScript(@Language("JavaScript") String script, Class<T> expectedResultType, Object... arguments)
     {
-        Object o = executeScript(script, arguments);
-        if (o != null && !expectedResultType.isAssignableFrom(o.getClass()))
-            Assert.fail("Script return wrong type. Expected '" + expectedResultType.getSimpleName() + "'. Got: " + o.getClass().getName() + ". Result: " + o);
-
-        return (T) o;
+        return new JavascriptExecutorWrapper(getDriver()).executeScript(script, expectedResultType, arguments);
     }
 
     /**
@@ -552,20 +549,12 @@ public abstract class WebDriverWrapper implements WrapsDriver
      */
     public Object executeAsyncScript(@Language("JavaScript") String script, Object... arguments)
     {
-        script = "var callback = arguments[arguments.length - 1];\n" + // See WebDriver documentation for details on injected callback
-                "try {" +
-                script +
-                "} catch (error) { callback(error); }"; // ensure that the callback is invoked when an exception would otherwise prevent it
-        return ((JavascriptExecutor) getDriver()).executeAsyncScript(script, arguments);
+        return new JavascriptExecutorWrapper(getDriver()).executeAsyncScript(script, arguments);
     }
 
     public <T> T executeAsyncScript(@Language("JavaScript") String script, Class<T> expectedResultType, Object... arguments)
     {
-        Object o = executeAsyncScript(script, arguments);
-        if (o != null && !expectedResultType.isAssignableFrom(o.getClass()))
-            Assert.fail("Script return wrong type. Expected '" + expectedResultType.getSimpleName() + "'. Got: " + o.getClass().getName() + ". Result: " + o);
-
-        return (T) o;
+        return new JavascriptExecutorWrapper(getDriver()).executeAsyncScript(script, expectedResultType, arguments);
     }
 
     @LogMethod(quiet = true)
@@ -1210,24 +1199,21 @@ public abstract class WebDriverWrapper implements WrapsDriver
                 logMessage = "Navigating to " + relativeURL;
             }
 
-            if (WebTestHelper.isUseContainerRelativeUrl())
+            try
             {
-                try
+                if (new Crawler.ControllerActionId(relativeURL).isControllerFirstUrl() && !_controllerFirstUrls.contains(url))
                 {
-                    if (new Crawler.ControllerActionId(relativeURL).isControllerFirstUrl() && !_controllerFirstUrls.contains(url))
-                    {
-                        _controllerFirstUrls.add(url);
-                        RuntimeException ex = new RuntimeException("Controller-first url used: " + relativeURL);
-                        if (TestProperties.isControllerFirstUrlFatal())
-                            throw ex;
-                        else
-                            TestLogger.log().warn(ex.getMessage(), ex);
-                    }
+                    _controllerFirstUrls.add(url);
+                    RuntimeException ex = new RuntimeException("Controller-first url used: " + relativeURL);
+                    if (TestProperties.isControllerFirstUrlFatal())
+                        throw ex;
+                    else
+                        TestLogger.log().warn(ex.getMessage(), ex);
                 }
-                catch (IllegalArgumentException e)
-                {
-                    TestLogger.warn("Unable to parse URL: " + relativeURL, e);
-                }
+            }
+            catch (IllegalArgumentException e)
+            {
+                TestLogger.warn("Unable to parse URL: " + relativeURL, e);
             }
 
             final String fullURL = WebTestHelper.getBaseURL() + relativeURL;
