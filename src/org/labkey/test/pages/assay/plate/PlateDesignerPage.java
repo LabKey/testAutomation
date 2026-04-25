@@ -8,6 +8,7 @@ import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.Select;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -41,12 +42,14 @@ public class PlateDesignerPage extends LabKeyPage<PlateDesignerPage.ElementCache
         WebElement newNameInput = Locator.css(".group-types-panel__new-name-input")
                 .waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
 
-        // If it's a text input, type the name; if it's a select, the default is already populated
         if ("input".equalsIgnoreCase(newNameInput.getTagName()))
         {
             setFormElement(newNameInput, name);
         }
-        // else: select already has the correct option pre-selected or we rely on default
+        else
+        {
+            new Select(newNameInput).selectByVisibleText(name);
+        }
 
         clickButton("Create", 0);
         waitForElement(Locator.css(".group-types-panel__group-name").withText(name));
