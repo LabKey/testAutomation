@@ -86,6 +86,13 @@ public class PlateDesignerPage extends LabKeyPage<PlateDesignerPage.ElementCache
         builder.clickAndHold(fromEl).moveToElement(toEl).release().build().perform();
     }
 
+    public void setWellGroupProperty(String propertyKey, String value)
+    {
+        WebElement input = Locator.tag("input").withAttribute("aria-label", propertyKey)
+                .waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
+        setFormElement(input, value);
+    }
+
     public void setName(String name)
     {
         WebElement nameField = Locator.css(".plate-template-designer__name-input")
