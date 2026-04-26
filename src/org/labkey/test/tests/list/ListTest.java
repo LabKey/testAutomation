@@ -1746,7 +1746,6 @@ public class ListTest extends BaseWebDriverTest
     @Test
     public void testMultiChoiceValues() throws IOException, CommandException
     {
-        OptionalFeatureHelper.enableOptionalFeature(getCurrentTest().createDefaultConnection(), "multiChoiceDataType");
         Assume.assumeTrue("Multi-choice text fields are only supported on PostgreSQL", WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.PostgreSQL);
         // Setup a list with an auto-increment key and a multi-value text choice field.
         String encodedListName = TestDataGenerator.randomDomainName("multiChoiceList", DomainUtils.DomainKind.IntList);
