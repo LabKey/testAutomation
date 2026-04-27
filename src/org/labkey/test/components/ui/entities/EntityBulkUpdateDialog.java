@@ -457,7 +457,7 @@ public class EntityBulkUpdateDialog extends ModalDialog
         {
             String fieldKey = FieldKey.fromName(fieldIdentifier).toString();
             return Locator.tagWithClass("div", "row")
-                    .withChild(Locator.tagWithAttribute("label", "for", fieldKey))
+                    .withDescendant(Locator.tagWithAttribute("label", "for", fieldKey))
                     .waitForElement(this, WAIT_TIMEOUT);
         }
 
