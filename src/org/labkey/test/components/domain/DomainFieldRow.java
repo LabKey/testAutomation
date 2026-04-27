@@ -766,20 +766,34 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     // To a user a TextChoice field looks and behaves a lot like a lookup, even though it is implemented using a validator
     // behind the scenes. Because of that the validator aspect of the TextChoice field is hidden from the user (just like
     // it is in the product).
-
     public DomainFieldRow setAllowMultipleSelections(Boolean allowMultipleSelections)
     {
-        WebDriverWrapper.waitFor(() -> elementCache().allowMultipleSelectionsCheckbox.isDisplayed(),
-                "Allow Multiple Selections checkbox did not become visible", 1000);
+      return setAllowMultipleSelections(allowMultipleSelections, false);
+    }
+
+    public DomainFieldRow setAllowMultipleSelections(Boolean allowMultipleSelections, boolean confirmDialogExpected)
+    {
+        if (getAllowMultipleSelections() == allowMultipleSelections)
+        {
+            return this;
+        }
         WebDriverWrapper.waitFor(() -> elementCache().allowMultipleSelectionsCheckbox.isEnabled(),
                 "Allow Multiple Selections checkbox isn't enabled", 1000);
         elementCache().allowMultipleSelectionsCheckbox.set(allowMultipleSelections);
-        // A confirmation dialog may appear when re-enabling multiple selections; dismiss it if present
-        ModalDialog modal = new ModalDialog.ModalDialogFinder(getDriver())
-                .withTitle("Confirm Data Type Change").findOrNull(getDriver());
-        if (modal != null)
+        if (confirmDialogExpected)
+        {
+            ModalDialog modal = new ModalDialog.ModalDialogFinder(getDriver())
+                    .withTitle("Confirm Data Type Change").timeout(1000).waitFor();
             modal.dismiss("Yes, Change Data Type");
+        }
         return this;
+    }
+
+    public Boolean getAllowMultipleSelections()
+    {
+        WebDriverWrapper.waitFor(() -> elementCache().allowMultipleSelectionsCheckbox.isDisplayed(),
+                "Allow Multiple Selections checkbox did not become visible", 1000);
+        return elementCache().allowMultipleSelectionsCheckbox.isSelected();
     }
 
     /**

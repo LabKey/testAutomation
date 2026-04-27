@@ -20,6 +20,7 @@ import org.labkey.test.WebTestHelper.DatabaseType;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.bootstrap.ModalDialog;
+import org.labkey.test.components.domain.DomainFieldRow;
 import org.labkey.test.components.ui.FilterStatusValue;
 import org.labkey.test.components.ui.grids.FieldSelectionDialog;
 import org.labkey.test.components.ui.grids.GridFilterModal;
@@ -56,7 +57,6 @@ import java.util.function.Predicate;
 
 import static org.labkey.test.util.PermissionsHelper.FOLDER_ADMIN_ROLE;
 import static org.labkey.test.util.SampleTypeHelper.beginAtSampleTypesList;
-import static org.labkey.test.util.TestDataGenerator.randomFieldName;
 import static org.labkey.test.util.TestDataGenerator.randomTextChoice;
 
 @Category({Daily.class})
@@ -80,7 +80,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
     private static final String COL_INT = "Int";
     private static final String COL_BOOL = "Bool";
     public static final List<String> TEXT_MULTI_CHOICE_LIST = randomTextChoice(10);
-    public static final String COL_MULTITEXTCHOICE = randomFieldName("Multi Choice", 20);
+    public static final String COL_MULTITEXTCHOICE = "Multi Choice";
 
     private static final boolean MULTI_CHOICE_ENABLED = WebTestHelper.getDatabaseType() == DatabaseType.PostgreSQL;
     private static final List<String> DEFAULT_COLUMNS = MULTI_CHOICE_ENABLED
@@ -111,16 +111,46 @@ public class GridPanelViewTest extends GridPanelBaseTest
 
     private final AuditLogHelper _auditLogHelper = new AuditLogHelper(this);
 
+    /**
+     * Describes the expected state of a saved grid view's filter pill after a field type conversion.
+     *
+     * @param isDropped          {@code true} if the filter is expected to be silently dropped by the conversion
+     *                           (i.e., no filter pill should be visible); {@code false} if the filter should survive.
+     * @param expectedFilterText the substring expected to appear in the filter pill after conversion;
+     *                           {@code null} when {@code isDropped} is {@code true}.
+     */
     private record GridConversionResult(boolean isDropped, @Nullable String expectedFilterText)
     {
+        /** The filter survives conversion and its pill should contain {@code filterText}. */
         static GridConversionResult kept(String filterText) { return new GridConversionResult(false, filterText); }
+        /** The filter is silently dropped by the conversion; no filter pill should be visible. */
         static GridConversionResult dropped()               { return new GridConversionResult(true, null); }
     }
 
+    /**
+     * A test case for verifying that a saved grid view with an MVTC filter survives (or is dropped by)
+     * a field type conversion.
+     *
+     * @param viewName          name of the saved grid view to create and verify.
+     * @param op                the MVTC filter operator applied when creating the view.
+     * @param filterVals        the filter values; may be empty for unary operators (e.g. IS EMPTY).
+     * @param conversionResult  the expected filter state after conversion.
+     * @param expectedSampleMap map of sample name → expected MVTC column value for result verification.
+     */
     private record GridMVTCCase(String viewName, Filter.Operator op, String[] filterVals,
                                 GridConversionResult conversionResult,
                                 Map<String, String> expectedSampleMap) {}
 
+    /**
+     * A test case for verifying that a saved grid view with a TextChoice filter survives
+     * a TC→MVTC field type conversion.
+     *
+     * @param viewName                  name of the saved grid view to create and verify.
+     * @param op                        the TC filter operator applied when creating the view.
+     * @param filterVals                the filter values; may be empty for unary operators.
+     * @param expectedAfterConversionText substring expected in the filter pill after TC→MVTC conversion.
+     * @param expectedSampleMap         map of sample name → expected MVTC column value for result verification.
+     */
     private record GridTCCase(String viewName, Filter.Operator op, String[] filterVals,
                               String expectedAfterConversionText,
                               Map<String, String> expectedSampleMap) {}
@@ -236,11 +266,11 @@ public class GridPanelViewTest extends GridPanelBaseTest
      * @param sampleTypeName Name of the sample type with the default view to change.
      * @param columns The columns to show in the default view. Will be added in the order of the list.
      */
-    private void resetDefaultView(String projectPath, String sampleTypeName, List<String> columns) throws Exception
+    private void resetDefaultView(String sampleTypeName, List<String> columns) throws Exception
     {
         log(String.format("Set the default view for '%s' to have these columns: '%s'", sampleTypeName, columns));
 
-        goToProjectHome(projectPath);
+        goToProjectHome();
         waitAndClickAndWait(Locator.linkWithText(sampleTypeName));
         SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
         DataRegionTable drtSamples = sampleHelper.getSamplesDataRegionTable();
@@ -336,7 +366,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
     {
         String screenShotID = "testMyDefaultView";
 
-        resetDefaultView(getProjectName(), DEFAULT_VIEW_SAMPLE_TYPE, DEFAULT_COLUMNS);
+        resetDefaultView(DEFAULT_VIEW_SAMPLE_TYPE, DEFAULT_COLUMNS);
 
         goToProjectHome();
 
@@ -434,7 +464,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
 
         final String screenShotPrefix = "testRemoveColumnForView";
 
-        resetDefaultView(getProjectName(), DEFAULT_VIEW_SAMPLE_TYPE, DEFAULT_COLUMNS);
+        resetDefaultView(DEFAULT_VIEW_SAMPLE_TYPE, DEFAULT_COLUMNS);
 
         String columnToRemove = COL_BOOL;
         log(String.format("For sample type '%s' remove the '%s' column using the column header menu.", DEFAULT_VIEW_SAMPLE_TYPE, columnToRemove));
@@ -548,7 +578,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
     public void testColumnHeaderAndFilterPill(String testName, String viewName) throws Exception
     {
 
-        resetDefaultView(getProjectName(), DEFAULT_VIEW_SAMPLE_TYPE, DEFAULT_COLUMNS);
+        resetDefaultView(DEFAULT_VIEW_SAMPLE_TYPE, DEFAULT_COLUMNS);
 
         QueryGrid grid = beginAtQueryGrid(DEFAULT_VIEW_SAMPLE_TYPE);
 
@@ -708,7 +738,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
     private void testEditView(String testName, String viewName) throws Exception
     {
 
-        resetDefaultView(getProjectName(), DEFAULT_VIEW_SAMPLE_TYPE, DEFAULT_COLUMNS);
+        resetDefaultView(DEFAULT_VIEW_SAMPLE_TYPE, DEFAULT_COLUMNS);
 
         String filterCol1 = COL_STRING1;
         String filterValue1 = stringSetMembers.get(2);
@@ -932,7 +962,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
     public void testSaveViewTrickyName() throws Exception
     {
 
-        resetDefaultView(getProjectName(), DEFAULT_VIEW_SAMPLE_TYPE, DEFAULT_COLUMNS);
+        resetDefaultView(DEFAULT_VIEW_SAMPLE_TYPE, DEFAULT_COLUMNS);
 
         String hideCol = COL_INT;
 
@@ -987,7 +1017,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
     {
         goToProjectHome();
 
-        resetDefaultView(getProjectName(), VIEW_DIALOG_ST, DEFAULT_COLUMNS);
+        resetDefaultView(VIEW_DIALOG_ST, DEFAULT_COLUMNS);
 
         QueryGrid grid = beginAtQueryGrid(VIEW_DIALOG_ST);
 
@@ -1038,7 +1068,9 @@ public class GridPanelViewTest extends GridPanelBaseTest
                 customizeModal.isAvailableFieldSelected(columnToAdd));
 
         log("Validate that the order of the fields in the 'Shown in Grid' column are as expected.");
-        expectedFields = List.of(COL_NAME, COL_STRING1, COL_STRING2, COL_INT, COL_BOOL, COL_MULTITEXTCHOICE);
+        expectedFields = MULTI_CHOICE_ENABLED
+                ? List.of(COL_NAME, COL_STRING1, COL_STRING2, COL_INT, COL_BOOL, COL_MULTITEXTCHOICE)
+                : List.of(COL_NAME, COL_STRING1, COL_STRING2, COL_INT, COL_BOOL);
         checker().verifyEquals(String.format("After adding '%s' fields displayed in 'Show in Grid' panel not as expected.", columnToAdd),
                 expectedFields, customizeModal.getSelectedFieldLabels());
 
@@ -1072,7 +1104,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
     {
         goToProjectHome();
 
-        resetDefaultView(getProjectName(), VIEW_DIALOG_ST, DEFAULT_COLUMNS);
+        resetDefaultView(VIEW_DIALOG_ST, DEFAULT_COLUMNS);
 
         QueryGrid grid = beginAtQueryGrid(VIEW_DIALOG_ST);
 
@@ -1185,7 +1217,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
     {
         goToProjectHome();
 
-        resetDefaultView(getProjectName(), VIEW_DIALOG_ST, DEFAULT_COLUMNS);
+        resetDefaultView(VIEW_DIALOG_ST, DEFAULT_COLUMNS);
 
         QueryGrid grid = beginAtQueryGrid(VIEW_DIALOG_ST);
 
@@ -1360,7 +1392,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
 
         goToProjectHome();
 
-        resetDefaultView(getProjectName(), VIEW_DIALOG_ST, DEFAULT_COLUMNS);
+        resetDefaultView(VIEW_DIALOG_ST, DEFAULT_COLUMNS);
 
         QueryGrid grid = beginAtQueryGrid(VIEW_DIALOG_ST);
 
@@ -1394,7 +1426,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
         String viewName = "broken view";
         goToProjectHome();
 
-        resetDefaultView(getProjectName(), VIEW_DIALOG_ST, DEFAULT_COLUMNS);
+        resetDefaultView(VIEW_DIALOG_ST, DEFAULT_COLUMNS);
 
         QueryGrid grid = beginAtQueryGrid(VIEW_DIALOG_ST);
 
@@ -1444,7 +1476,8 @@ public class GridPanelViewTest extends GridPanelBaseTest
     {
         Assume.assumeTrue("Multi-choice text fields are only supported on PostgreSQL", MULTI_CHOICE_ENABLED);
         goToProjectHome();
-        resetDefaultView(getProjectName(), DEFAULT_VIEW_SAMPLE_TYPE, DEFAULT_COLUMNS);
+        resetFieldToMVTC();
+        resetDefaultView(DEFAULT_VIEW_SAMPLE_TYPE, DEFAULT_COLUMNS);
 
         log("Compute expected sample data for MVTC conversion test.");
         Map<String, String> allSamples = createSampleMVTCMap();
@@ -1487,9 +1520,6 @@ public class GridPanelViewTest extends GridPanelBaseTest
         verifyGridMVTCCases(cases);
         checker().screenShotIfNewError("GridMVTCtoTC_Error");
 
-        log("Restoring field back to MultiValueTextChoice.");
-        enableMVTCFieldMultiSelect(true);
-
         log("Cleaning up MVTC→TC test views.");
         cleanupGridViews(beginAtQueryGrid(DEFAULT_VIEW_SAMPLE_TYPE), viewNames);
     }
@@ -1499,7 +1529,8 @@ public class GridPanelViewTest extends GridPanelBaseTest
     {
         Assume.assumeTrue("Multi-choice text fields are only supported on PostgreSQL", MULTI_CHOICE_ENABLED);
         goToProjectHome();
-        resetDefaultView(getProjectName(), DEFAULT_VIEW_SAMPLE_TYPE, DEFAULT_COLUMNS);
+        resetFieldToMVTC();
+        resetDefaultView(DEFAULT_VIEW_SAMPLE_TYPE, DEFAULT_COLUMNS);
 
         log("Converting '" + COL_MULTITEXTCHOICE + "' field of " + DEFAULT_VIEW_SAMPLE_TYPE + " from MVTC to TextChoice for TC→MVTC test setup.");
         enableMVTCFieldMultiSelect(false);
@@ -1551,7 +1582,8 @@ public class GridPanelViewTest extends GridPanelBaseTest
     {
         Assume.assumeTrue("Multi-choice text fields are only supported on PostgreSQL", MULTI_CHOICE_ENABLED);
         goToProjectHome();
-        resetDefaultView(getProjectName(), DEFAULT_VIEW_SAMPLE_TYPE, DEFAULT_COLUMNS);
+        resetFieldToMVTC();
+        resetDefaultView(DEFAULT_VIEW_SAMPLE_TYPE, DEFAULT_COLUMNS);
 
         log("Create expected sample data for MVTC→Text conversion test.");
         Map<String, String> allSamples = createSampleMVTCMap();
@@ -1593,9 +1625,6 @@ public class GridPanelViewTest extends GridPanelBaseTest
         log("Verifying saved grid views after MVTC → String conversion.");
         verifyGridMVTCCases(cases);
         checker().screenShotIfNewError("GridMVTCtoStr_Error");
-
-        log("Restoring field back to MultiValueTextChoice.");
-        changeTextFieldToMVTC();
 
         log("Cleaning up MVTC→String test views.");
         cleanupGridViews(beginAtQueryGrid(DEFAULT_VIEW_SAMPLE_TYPE), viewNames);
@@ -1691,7 +1720,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
         updatePage.getFieldsPanel()
                 .getField(COL_MULTITEXTCHOICE)
                 .expand()
-                .setAllowMultipleSelections(enable);
+                .setAllowMultipleSelections(enable, true);
         updatePage.clickSave();
     }
 
@@ -1711,19 +1740,24 @@ public class GridPanelViewTest extends GridPanelBaseTest
     }
 
     /**
-     * Restores the COL_MULTITEXTCHOICE field of DEFAULT_VIEW_SAMPLE_TYPE from plain
-     * String back to MultiValueTextChoice (Text → MVTC restoration).
+     * Resets the COL_MULTITEXTCHOICE field of DEFAULT_VIEW_SAMPLE_TYPE to MultiValueTextChoice
+     * if it is not already. Safe to call at the start of each MVTC conversion test to ensure
+     * a known initial state.
      */
-    private void changeTextFieldToMVTC()
+    private void resetFieldToMVTC()
     {
         UpdateSampleTypePage updatePage = beginAtSampleTypesList(this, getProjectName())
                 .goToEditSampleType(DEFAULT_VIEW_SAMPLE_TYPE);
-        updatePage.getFieldsPanel()
+        DomainFieldRow fieldRow = updatePage.getFieldsPanel()
                 .getField(COL_MULTITEXTCHOICE)
-                .expand()
-                .setType(FieldDefinition.ColumnType.MultiValueTextChoice, false)
+                .expand();
+
+        if (fieldRow.getType().getLabel() == FieldDefinition.ColumnType.MultiValueTextChoice.getLabel() && fieldRow.getAllowMultipleSelections())
+            return;
+
+        fieldRow.setType(FieldDefinition.ColumnType.MultiValueTextChoice, false)
                 .setTextChoiceValues(TEXT_MULTI_CHOICE_LIST)
-                .setAllowMultipleSelections(true);
+                .setAllowMultipleSelections(true, true);
         updatePage.clickSave();
     }
 
@@ -1991,7 +2025,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
     {
         goToProjectHome();
 
-        resetDefaultView(getProjectName(), VIEW_DIALOG_ST, DEFAULT_COLUMNS);
+        resetDefaultView(VIEW_DIALOG_ST, DEFAULT_COLUMNS);
 
         // Part A: Verify audit event on Create
 
