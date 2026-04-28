@@ -76,10 +76,10 @@ public class PlateDesignerPage extends LabKeyPage<PlateDesignerPage.ElementCache
             selectGroup(wellGroup);
         }
 
-        // Cells are <td> elements with title matching the location (e.g. "A1" or "A1: Specimen 1")
-        WebElement fromEl = Locator.css(".template-grid__cell[title^='" + startLocation + "']")
+        // Cells are <td> elements with aria-label matching the location (e.g. "A1" or "A1: Specimen 1")
+        WebElement fromEl = Locator.css(".template-grid__cell[aria-label^='" + startLocation + "']")
                 .waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
-        WebElement toEl = Locator.css(".template-grid__cell[title^='" + endLocation + "']")
+        WebElement toEl = Locator.css(".template-grid__cell[aria-label^='" + endLocation + "']")
                 .waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
 
         Actions builder = new Actions(getDriver());
