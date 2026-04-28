@@ -465,7 +465,7 @@ public class EntityBulkInsertDialog extends EntityBulkDialog
         WebElement alert = Locator.tagWithClassContaining("div", "alert-danger")
                 .findWhenNeeded(getComponentElement());
 
-        final Locator fieldLabels = Locator.tag("hr").followingSibling("div").childTag("label");
+        final Locator fieldLabels = Locator.tag("hr").followingSibling("div").child(Locator.byClass("control-label"));
     }
 
 }
