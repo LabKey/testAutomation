@@ -18,6 +18,7 @@ import org.labkey.test.pages.issues.IssuesAdminPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.IssuesHelper;
+import org.labkey.test.util.OptionalFeatureHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
 
@@ -39,8 +40,11 @@ public class TextChoiceImportExportAndOtherDomainsTest extends TextChoiceTest
     private static final String LIST_NAME = "Simple_TC_List";
     private static final String LIST_TC_FIELD = "LTC_Field";
     private static final String LIST_TEXT_FIELD = "Str";
+    private static final String LIST_MVTC_FIELD = "LMVTC_Field";
     private static final List<String> LIST_VALUES = Arrays.asList("L1", "L2|withPipes|", "L3", "L4");
+    private static final List<String> LIST_MVTC_VALUES = Arrays.asList("M1", "M2", "M3");
     private static final List<Map<String, String>> listData = new ArrayList<>();
+    private static final List<List<String>> listMvtcData = new ArrayList<>();
 
     // Issue names, etc...
     private static final String ISSUE_DESIGN_NAME = "Simple_TC_Issue";
@@ -97,13 +101,16 @@ public class TextChoiceImportExportAndOtherDomainsTest extends TextChoiceTest
      * <p>
      *     This test will:
      *     <ul>
-     *         <li>Create a list design with a TextChoice field.</li>
+     *         <li>Create a list design with a TextChoice field and optionally a MultiValueTextChoice field.</li>
      *         <li>Import list data in bulk.</li>
      *         <li>Add a new list item using the UI.</li>
      *     </ul>
      * </p>
+     *
+     * @param includeMvtc If true, include a {@link FieldDefinition.ColumnType#MultiValueTextChoice} field
+     *                    in the list and populate it. Only supported on PostgreSQL.
      */
-    private void verifyTextChoiceInList()
+    private void verifyTextChoiceInList(boolean includeMvtc)
     {
 
         FieldDefinition tcField = new FieldDefinition(LIST_TC_FIELD, FieldDefinition.ColumnType.TextChoice);
@@ -111,10 +118,24 @@ public class TextChoiceImportExportAndOtherDomainsTest extends TextChoiceTest
 
         FieldDefinition txtField = new FieldDefinition(LIST_TEXT_FIELD, FieldDefinition.ColumnType.String);
 
-        log(String.format("Create a list named '%s' with a string field '%s' and a TextChoice field '%s'.",
-                LIST_NAME, LIST_TEXT_FIELD, LIST_TC_FIELD));
+        final String allMVTCValues = "M1, M2, M3";
+        if (includeMvtc)
+        {
+            FieldDefinition mvtcField = new FieldDefinition(LIST_MVTC_FIELD, FieldDefinition.ColumnType.MultiValueTextChoice);
+            mvtcField.setMultiChoiceValues(LIST_MVTC_VALUES);
 
-        _listHelper.createList(getCurrentContainerPath(), LIST_NAME, "Key", tcField, txtField);
+            log(String.format("Create a list named '%s' with a string field '%s', a TextChoice field '%s', and a MultiValueTextChoice field '%s'.",
+                    LIST_NAME, LIST_TEXT_FIELD, LIST_TC_FIELD, LIST_MVTC_FIELD));
+
+            _listHelper.createList(getCurrentContainerPath(), LIST_NAME, "Key", tcField, txtField, mvtcField);
+        }
+        else
+        {
+            log(String.format("Create a list named '%s' with a string field '%s' and a TextChoice field '%s'.",
+                    LIST_NAME, LIST_TEXT_FIELD, LIST_TC_FIELD));
+
+            _listHelper.createList(getCurrentContainerPath(), LIST_NAME, "Key", tcField, txtField);
+        }
 
         log("Bulk upload data into the list.");
 
@@ -124,10 +145,23 @@ public class TextChoiceImportExportAndOtherDomainsTest extends TextChoiceTest
         listData.add(Map.of(LIST_TC_FIELD, LIST_VALUES.get(2), LIST_TEXT_FIELD, "Is"));
 
         StringBuilder sb = new StringBuilder();
-        sb.append(String.format("%s\t%s\n", LIST_TC_FIELD, LIST_TEXT_FIELD));
-        for(Map<String, String> row : listData)
+        if (includeMvtc)
         {
-            sb.append(String.format("%s\t%s\n", row.get(LIST_TC_FIELD), row.get(LIST_TEXT_FIELD)));
+            sb.append(String.format("%s\t%s\t%s\n", LIST_TC_FIELD, LIST_TEXT_FIELD, LIST_MVTC_FIELD));
+            for (int i = 0; i < listData.size(); i++)
+            {
+                Map<String, String> row = listData.get(i);
+                sb.append(String.format("%s\t%s\t%s\n", row.get(LIST_TC_FIELD), row.get(LIST_TEXT_FIELD), allMVTCValues));
+                listMvtcData.add(LIST_MVTC_VALUES);
+            }
+        }
+        else
+        {
+            sb.append(String.format("%s\t%s\n", LIST_TC_FIELD, LIST_TEXT_FIELD));
+            for (Map<String, String> row : listData)
+            {
+                sb.append(String.format("%s\t%s\n", row.get(LIST_TC_FIELD), row.get(LIST_TEXT_FIELD)));
+            }
         }
 
         _listHelper.uploadData(sb.toString());
@@ -136,6 +170,9 @@ public class TextChoiceImportExportAndOtherDomainsTest extends TextChoiceTest
 
         // Add the new row to the expected data.
         listData.add(newRow);
+
+        if (includeMvtc)
+            listMvtcData.add(List.of()); // No MVTC value for the UI-inserted row.
 
         log("Add a new row to the list using the UI.");
         _listHelper.insertNewRow(newRow);
@@ -208,6 +245,8 @@ public class TextChoiceImportExportAndOtherDomainsTest extends TextChoiceTest
     @Test
     public void testOtherDomainsExportAndImport() throws IOException, CommandException
     {
+        boolean isPg = WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.PostgreSQL;
+
         goToProjectHome();
 
         log("Create a sample type, assay design and an assay run. These will be used to validate export/import.");
@@ -219,8 +258,11 @@ public class TextChoiceImportExportAndOtherDomainsTest extends TextChoiceTest
 
         Map<String, String> assayResultRowData = createAssayRun();
 
+        if (isPg)
+            OptionalFeatureHelper.enableOptionalFeature(createDefaultConnection(), "multiChoiceDataType");
+
         log("Create a list with a TextChoice field. The list will also be validated after import.");
-        verifyTextChoiceInList();
+        verifyTextChoiceInList(isPg);
 
         log("Create an issue design with a TextChoice field and create an issue that uses it. Issue designs are not exported.");
         verifyTextChoiceInIssueDesign();
@@ -238,7 +280,7 @@ public class TextChoiceImportExportAndOtherDomainsTest extends TextChoiceTest
 
         _containerHelper.createProject(IMPORTED_PROJ_NAME, null);
 
-        importFolderFromZip(exportFile);
+        importFolderFromZip(exportFile, false, 1);
 
         // Not sure if I need this either.
         Assert.assertEquals("Import caused server side errors.", 0, getServerErrorCount());
@@ -254,20 +296,36 @@ public class TextChoiceImportExportAndOtherDomainsTest extends TextChoiceTest
 
         Connection cn = WebTestHelper.getRemoteApiConnection();
         SelectRowsCommand cmd = new SelectRowsCommand("lists", LIST_NAME);
-        cmd.setColumns(Arrays.asList(LIST_TC_FIELD, LIST_TEXT_FIELD));
+        List<String> selectColumns = new ArrayList<>(Arrays.asList(LIST_TC_FIELD, LIST_TEXT_FIELD));
+        if (isPg)
+            selectColumns.add(LIST_MVTC_FIELD);
+        cmd.setColumns(selectColumns);
 
         SelectRowsResponse response = cmd.execute(cn, getCurrentContainerPath());
 
         List<Map<String, String>> importedListData = new ArrayList<>();
+        List<List<String>> importedListMvtcData = new ArrayList<>();
         for (Map<String, Object> row : response.getRows())
         {
             importedListData.add(
                     Map.of(LIST_TC_FIELD, row.get(LIST_TC_FIELD).toString(),
                             LIST_TEXT_FIELD, row.get(LIST_TEXT_FIELD).toString()));
+
+            if (isPg)
+            {
+                Object mvtcRaw = row.get(LIST_MVTC_FIELD);
+                List<String> mvtcValues = mvtcRaw instanceof List<?> list
+                        ? list.stream().map(Object::toString).toList()
+                        : List.of();
+                importedListMvtcData.add(mvtcValues);
+            }
         }
 
         checker().withScreenshot("Imported_List_Error")
                 .verifyEquals("Imported data for the list not as expected.", listData, importedListData);
+
+        if (isPg)
+            checker().verifyEquals("Imported MultiValueTextChoice data for the list not as expected.", listMvtcData, importedListMvtcData);
 
         log("Validate the assay data.");
         goToProjectHome(IMPORTED_PROJ_NAME);
