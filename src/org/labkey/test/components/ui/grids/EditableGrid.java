@@ -1023,18 +1023,22 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     {
         dismissPopover();
         Locator.XPathLocator selectionHandleLoc = Locator.byClass("cell-selection-handle");
-
-        WebElement selectionHandle = selectionHandleLoc.waitForElement(startCell, 2_000);
+        // Get the value from the start cell
+        String fillValue = getCellValue(startCell);
+        WebElement selectionHandle = selectionHandleLoc.waitForElement(getComponentElement(), 2_000);
         dragToCell(selectionHandle, endCell);
 
-        // Wait and check after drag
-        if (WebDriverWrapper.waitFor(() -> !selectionHandleLoc.findElements(endCell).isEmpty(), 2_000))
-            return;
-
-        // Retry if failed
-        selectionHandle = selectionHandleLoc.waitForElement(startCell, 2_000);
-        dragToCell(selectionHandle, endCell);
-        selectionHandleLoc.waitForElement(endCell, 5_000);
+        // Wait until endCell actually receives the fill value.
+        if (!WebDriverWrapper.waitFor(() -> fillValue.equals(getCellValue(endCell)), 3_000))
+        {
+            // Fill didn't complete on the first attempt — the drag likely extended the selection
+            // without triggering the fill. Re-click startCell to restore selection, then retry the drag.
+            startCell.click();
+            selectionHandle = selectionHandleLoc.waitForElement(getComponentElement(), 2_000);
+            dragToCell(selectionHandle, endCell);
+            WebDriverWrapper.waitFor(() -> fillValue.equals(getCellValue(endCell)),
+                    "Drag fill did not populate end cell with value: " + fillValue, 5_000);
+        }
     }
 
     public void selectCellRange(WebElement startCell, WebElement endCell)
