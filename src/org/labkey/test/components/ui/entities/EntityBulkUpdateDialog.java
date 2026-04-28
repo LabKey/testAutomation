@@ -10,11 +10,7 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.UpdatingComponent;
-import org.labkey.test.components.bootstrap.ModalDialog;
-import org.labkey.test.components.html.Checkbox;
-import org.labkey.test.components.html.Input;
 import org.labkey.test.components.react.FilteringReactSelect;
-import org.labkey.test.components.react.ReactDateTimePicker;
 import org.labkey.test.components.react.ToggleButton;
 import org.labkey.test.components.ui.files.AttachmentCard;
 import org.labkey.test.components.ui.files.FileAttachmentContainer;
@@ -37,11 +33,10 @@ import java.util.List;
  * <br>
  * `fieldIdentifier` arguments accept field names or {@link FieldKey}s
  */
-public class EntityBulkUpdateDialog extends ModalDialog
+public class EntityBulkUpdateDialog extends EntityBulkDialog
 {
     private final int WAIT_TIMEOUT = 2000;
     private final UpdatingComponent _updatingComponent;
-    private int _changeCounter = 0;
 
     public EntityBulkUpdateDialog(WebDriver driver)
     {
@@ -154,7 +149,7 @@ public class EntityBulkUpdateDialog extends ModalDialog
      */
     public @Nullable String getSelectionFieldHelpBlockText(CharSequence fieldIdentifier)
     {
-        return elementCache().getSelect(fieldIdentifier).getHelpBlockText();
+        return elementCache().selectionField(fieldIdentifier).getHelpBlockText();
     }
 
     /**
@@ -178,7 +173,7 @@ public class EntityBulkUpdateDialog extends ModalDialog
     private @NotNull FilteringReactSelect enableSelectionField(CharSequence fieldIdentifier)
     {
         setEditableState(fieldIdentifier, true);
-        FilteringReactSelect reactSelect = elementCache().getSelect(fieldIdentifier);
+        FilteringReactSelect reactSelect = elementCache().selectionField(fieldIdentifier);
         WebDriverWrapper.waitFor(reactSelect::isEnabled,
             "the ["+ fieldIdentifier +"] reactSelect did not become enabled in time", WAIT_TIMEOUT);
         return reactSelect;
@@ -193,15 +188,6 @@ public class EntityBulkUpdateDialog extends ModalDialog
     {
         enableAndWait(fieldIdentifier, elementCache().textArea(fieldIdentifier)).set(value);
         return this;
-    }
-
-    /**
-     * @param fieldIdentifier Identifier for the field; name ({@link String}) or fieldKey ({@link FieldKey})
-     * @return current value of the specified field
-     */
-    public String getTextArea(CharSequence fieldIdentifier)
-    {
-        return elementCache().textArea(fieldIdentifier).get();
     }
 
     /**
@@ -233,15 +219,6 @@ public class EntityBulkUpdateDialog extends ModalDialog
     {
         enableAndWait(fieldIdentifier, elementCache().textInput(fieldIdentifier)).set(value);
         return this;
-    }
-
-    /**
-     * @param fieldIdentifier Identifier for the field; name ({@link String}) or fieldKey ({@link FieldKey})
-     * @return current value of the specified field
-     */
-    public String getNumericField(CharSequence fieldIdentifier)
-    {
-        return elementCache().textInput(fieldIdentifier).get();
     }
 
     /**
@@ -324,7 +301,7 @@ public class EntityBulkUpdateDialog extends ModalDialog
      */
     public EntityBulkUpdateDialog setBooleanField(CharSequence fieldIdentifier, boolean checked)
     {
-        enableAndWait(fieldIdentifier, getCheckBox(fieldIdentifier)).set(checked);
+        enableAndWait(fieldIdentifier, elementCache().checkBox(fieldIdentifier)).set(checked);
         return this;
     }
 
@@ -334,21 +311,6 @@ public class EntityBulkUpdateDialog extends ModalDialog
         // "Clickable" means visible and enabled
         waiter().until(ExpectedConditions.elementToBeClickable(formItem.getComponentElement()));
         return formItem;
-    }
-
-    /**
-     * @param fieldIdentifier Identifier for the field; name ({@link String}) or fieldKey ({@link FieldKey})
-     * @return current value of the specified field
-     */
-    public boolean getBooleanField(CharSequence fieldIdentifier)
-    {
-        return getCheckBox(fieldIdentifier).get();
-    }
-
-    private Checkbox getCheckBox(CharSequence fieldIdentifier)
-    {
-        WebElement row = elementCache().formRow(fieldIdentifier);
-        return new Checkbox(elementCache().checkBoxLoc.findElement(row));
     }
 
     public String getErrorAlertText()
@@ -451,8 +413,9 @@ public class EntityBulkUpdateDialog extends ModalDialog
         return (ElementCache) super.elementCache();
     }
 
-    protected class ElementCache extends ModalDialog.ElementCache
+    protected class ElementCache extends EntityBulkDialog.ElementCache
     {
+        @Override
         public WebElement formRow(CharSequence fieldIdentifier)
         {
             String fieldKey = FieldKey.fromName(fieldIdentifier).toString();
@@ -466,40 +429,11 @@ public class EntityBulkUpdateDialog extends ModalDialog
             return new ToggleButton.ToggleButtonFinder(getDriver()).waitFor(formRow(fieldIdentifier));
         }
 
-        public FilteringReactSelect getSelect(CharSequence fieldIdentifier)
-        {
-            return new FilteringReactSelect(formRow(fieldIdentifier), getDriver());
-        }
-
-        public Input textInput(CharSequence fieldIdentifier)
-        {
-            WebElement inputEl = textInputLoc.waitForElement(formRow(fieldIdentifier), WAIT_TIMEOUT);
-            return new Input(inputEl, getDriver());
-        }
-
-        public Input textArea(CharSequence fieldIdentifier)
-        {
-            WebElement inputEl = Locator.tag("textarea").waitForElement(formRow(fieldIdentifier), WAIT_TIMEOUT);
-            return new Input(inputEl, getDriver());
-        }
-
-        public ReactDateTimePicker dateInput(CharSequence fieldIdentifier)
-        {
-            return new ReactDateTimePicker.ReactDateTimeInputFinder(getDriver()).waitFor(formRow(fieldIdentifier));
-        }
-
-        public FileAttachmentContainer fileUploadField(CharSequence fieldIdentifier)
-        {
-            return new FileAttachmentContainer(formRow(fieldIdentifier), getDriver());
-        }
-
         public FileUploadField fileField(CharSequence fieldIdentifier)
         {
             return new FileUploadField(Locator.tagWithClass("div", "col-xs-12").findElementOrNull(formRow(fieldIdentifier)), getDriver());
         }
 
-        final Locator textInputLoc = Locator.tagWithAttribute("input", "type", "text");
-        final Locator checkBoxLoc = Locator.tagWithAttribute("input", "type", "checkbox");
         final Locator.XPathLocator commentInputLocator = Locator.tagWithId("textarea", "actionComments");
         final WebElement commentInput = commentInputLocator.refindWhenNeeded(this);
 

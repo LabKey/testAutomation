@@ -3,13 +3,9 @@ package org.labkey.test.components.ui.entities;
 import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
-import org.labkey.test.components.bootstrap.ModalDialog;
-import org.labkey.test.components.html.Checkbox;
-import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.components.react.FilteringReactSelect;
 import org.labkey.test.components.react.ReactDateTimePicker;
-import org.labkey.test.components.ui.files.FileAttachmentContainer;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldKey;
 import org.openqa.selenium.StaleElementReferenceException;
@@ -27,7 +23,7 @@ import java.util.Optional;
 /**
  * `fieldIdentifier` arguments accept field names or {@link FieldKey}s
  */
-public class EntityBulkInsertDialog extends ModalDialog
+public class EntityBulkInsertDialog extends EntityBulkDialog
 {
     public EntityBulkInsertDialog(WebDriver driver)
     {
@@ -174,15 +170,6 @@ public class EntityBulkInsertDialog extends ModalDialog
 
     /**
      * @param fieldIdentifier Identifier for the field; name ({@link String}) or fieldKey ({@link FieldKey})
-     * @return current value of the specified field
-     */
-    public String getTextArea(CharSequence fieldIdentifier)
-    {
-        return elementCache().textArea(fieldIdentifier).get();
-    }
-
-    /**
-     * @param fieldIdentifier Identifier for the field; name ({@link String}) or fieldKey ({@link FieldKey})
      * @param value value to set
      * @return this component
      */
@@ -214,15 +201,6 @@ public class EntityBulkInsertDialog extends ModalDialog
 
     /**
      * @param fieldIdentifier Identifier for the field; name ({@link String}) or fieldKey ({@link FieldKey})
-     * @return current value of the specified field
-     */
-    public String getNumericField(CharSequence fieldIdentifier)
-    {
-        return elementCache().textInput(fieldIdentifier).get();
-    }
-
-    /**
-     * @param fieldIdentifier Identifier for the field; name ({@link String}) or fieldKey ({@link FieldKey})
      * @param selectValues values to select
      * @return this component
      */
@@ -239,8 +217,7 @@ public class EntityBulkInsertDialog extends ModalDialog
      */
     public List<String> getSelectionField(CharSequence fieldIdentifier)
     {
-        FilteringReactSelect reactSelect = elementCache().selectionField(fieldIdentifier);
-        return reactSelect.getSelections();
+        return elementCache().selectionField(fieldIdentifier).getSelections();
     }
 
     /**
@@ -251,8 +228,7 @@ public class EntityBulkInsertDialog extends ModalDialog
      */
     public EntityBulkInsertDialog clearSelectionField(CharSequence fieldIdentifier)
     {
-        FilteringReactSelect reactSelect = elementCache().selectionField(fieldIdentifier);
-        reactSelect.clearSelection();
+        elementCache().selectionField(fieldIdentifier).clearSelection();
         return this;
     }
 
@@ -319,18 +295,8 @@ public class EntityBulkInsertDialog extends ModalDialog
      */
     public EntityBulkInsertDialog setBooleanField(CharSequence fieldIdentifier, boolean checked)
     {
-        Checkbox box = elementCache().checkBox(fieldIdentifier);
-        box.set(checked);
+        elementCache().checkBox(fieldIdentifier).set(checked);
         return this;
-    }
-
-    /**
-     * @param fieldIdentifier Identifier for the field; name ({@link String}) or fieldKey ({@link FieldKey})
-     * @return current value of the specified field
-     */
-    public boolean getBooleanField(CharSequence fieldIdentifier)
-    {
-        return elementCache().checkBox(fieldIdentifier).get();
     }
 
     /**
@@ -452,53 +418,19 @@ public class EntityBulkInsertDialog extends ModalDialog
         return (ElementCache) super.elementCache();
     }
 
-    protected class ElementCache extends ModalDialog.ElementCache
+    protected class ElementCache extends EntityBulkDialog.ElementCache
     {
         public final Locator validationMessage = Locator.tagWithClass("span", "validation-message");
 
-        private final Map<String, WebElement> _rows = new HashMap<>();
-
+        @Override
         public WebElement formRow(CharSequence fieldIdentifier)
         {
             String fieldKey = FieldKey.fromName(fieldIdentifier).toString();
             return _rows.computeIfAbsent(fieldKey, fk ->
                 Locator.tagWithClass("div", "row")
                     // TODO: Shouldn't need to be case-insensitive. Parent/source lookups have weird casing
-                    .withChild(Locator.tagWithAttributeIgnoreCase("label", "for", fieldKey))
+                    .withDescendant(Locator.tagWithAttributeIgnoreCase("label", "for", fieldKey))
                     .findElement(this));
-        }
-
-        public FilteringReactSelect selectionField(CharSequence fieldIdentifier)
-        {
-            return new FilteringReactSelect(formRow(fieldIdentifier), getDriver());
-        }
-
-        public Checkbox checkBox(CharSequence fieldIdentifier)
-        {
-            WebElement row = formRow(fieldIdentifier);
-            return new Checkbox(checkBoxLoc.findElement(row));
-        }
-
-        public Input textInput(CharSequence fieldIdentifier)
-        {
-            WebElement inputEl = textInputLoc.findElement(formRow(fieldIdentifier));
-            return new Input(inputEl, getDriver());
-        }
-
-        public Input textArea(CharSequence fieldIdentifier)
-        {
-            WebElement inputEl = Locator.tag("textarea").findElement(formRow(fieldIdentifier));
-            return new Input(inputEl, getDriver());
-        }
-
-        public ReactDateTimePicker dateInput(CharSequence fieldIdentifier)
-        {
-            return new ReactDateTimePicker.ReactDateTimeInputFinder(getDriver()).find(formRow(fieldIdentifier));
-        }
-
-        public FileAttachmentContainer fileUploadField(CharSequence fieldIdentifier)
-        {
-            return new FileAttachmentContainer(formRow(fieldIdentifier), getDriver());
         }
 
         public List<WebElement> fieldLabels()
@@ -533,8 +465,6 @@ public class EntityBulkInsertDialog extends ModalDialog
         WebElement alert = Locator.tagWithClassContaining("div", "alert-danger")
                 .findWhenNeeded(getComponentElement());
 
-        final Locator textInputLoc = Locator.tagWithAttribute("input", "type", "text");
-        final Locator checkBoxLoc = Locator.tagWithAttribute("input", "type", "checkbox");
         final Locator fieldLabels = Locator.tag("hr").followingSibling("div").childTag("label");
     }
 
