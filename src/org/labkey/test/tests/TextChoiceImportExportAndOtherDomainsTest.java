@@ -18,7 +18,6 @@ import org.labkey.test.pages.issues.IssuesAdminPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.IssuesHelper;
-import org.labkey.test.util.OptionalFeatureHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
 
@@ -257,9 +256,6 @@ public class TextChoiceImportExportAndOtherDomainsTest extends TextChoiceTest
         clickAndWait(Locator.linkWithText(ASSAY_NAME));
 
         Map<String, String> assayResultRowData = createAssayRun();
-
-        if (isPg)
-            OptionalFeatureHelper.enableOptionalFeature(createDefaultConnection(), "multiChoiceDataType");
 
         log("Create a list with a TextChoice field. The list will also be validated after import.");
         verifyTextChoiceInList(isPg);
