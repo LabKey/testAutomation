@@ -1023,7 +1023,16 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     {
         dismissPopover();
         Locator.XPathLocator selectionHandleLoc = Locator.byClass("cell-selection-handle");
-        WebElement selectionHandle = selectionHandleLoc.findElement(startCell);
+
+        WebElement selectionHandle = selectionHandleLoc.waitForElement(startCell, 2_000);
+        dragToCell(selectionHandle, endCell);
+
+        // Wait and check after drag
+        if (WebDriverWrapper.waitFor(() -> !selectionHandleLoc.findElements(endCell).isEmpty(), 2_000))
+            return;
+
+        // Retry if failed
+        selectionHandle = selectionHandleLoc.waitForElement(startCell, 2_000);
         dragToCell(selectionHandle, endCell);
         selectionHandleLoc.waitForElement(endCell, 5_000);
     }
@@ -1045,7 +1054,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
                 // WebDriver doesn't calculate correct location to click the cell selection handle
                 .moveToElement(elementToDrag, 0, 7)
                 .clickAndHold()
-                .pause(Duration.ofMillis(200))
+                .pause(Duration.ofMillis(500))
                 .moveToElement(destinationCell)
                 // Extra wiggle to get it to stick
                 .moveByOffset(0, -size.getHeight())
