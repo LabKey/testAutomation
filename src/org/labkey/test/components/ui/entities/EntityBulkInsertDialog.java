@@ -467,5 +467,4 @@ public class EntityBulkInsertDialog extends EntityBulkDialog
 
         final Locator fieldLabels = Locator.tag("hr").followingSibling("div").child(Locator.byClass("control-label"));
     }
-
 }
