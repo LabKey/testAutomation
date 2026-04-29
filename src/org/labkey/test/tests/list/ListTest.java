@@ -65,7 +65,6 @@ import org.labkey.test.util.DomainUtils;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.Maps;
-import org.labkey.test.util.OptionalFeatureHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.TestDataGenerator;
 import org.labkey.test.util.TextSearcher;
@@ -1746,7 +1745,6 @@ public class ListTest extends BaseWebDriverTest
     @Test
     public void testMultiChoiceValues() throws IOException, CommandException
     {
-        OptionalFeatureHelper.enableOptionalFeature(getCurrentTest().createDefaultConnection(), "multiChoiceDataType");
         Assume.assumeTrue("Multi-choice text fields are only supported on PostgreSQL", WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.PostgreSQL);
         // Setup a list with an auto-increment key and a multi-value text choice field.
         String encodedListName = TestDataGenerator.randomDomainName("multiChoiceList", DomainUtils.DomainKind.IntList);
