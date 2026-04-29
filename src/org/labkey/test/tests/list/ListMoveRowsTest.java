@@ -19,12 +19,13 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Data;
 import org.labkey.test.categories.Hosting;
+import org.labkey.test.params.ContainerInfo;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.FieldInfo;
 import org.labkey.test.params.list.IntListDefinition;
 import org.labkey.test.params.list.ListDefinition;
 import org.labkey.test.params.list.VarListDefinition;
 import org.labkey.test.util.AuditLogHelper;
-import org.labkey.test.util.DomainUtils;
 import org.labkey.test.util.TestDataGenerator;
 import org.labkey.test.util.TestUser;
 import org.labkey.test.util.query.MoveRowsResponse;
@@ -38,6 +39,8 @@ import java.util.List;
 import java.util.Map;
 
 import static org.labkey.test.util.AuditLogHelper.AuditEvent.LIST_AUDIT_EVENT;
+import static org.labkey.test.util.DomainUtils.DomainKind.IntList;
+import static org.labkey.test.util.DomainUtils.DomainKind.VarList;
 import static org.labkey.test.util.PermissionsHelper.AUTHOR_ROLE;
 import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
 import static org.labkey.test.util.PermissionsHelper.READER_ROLE;
@@ -45,30 +48,30 @@ import static org.labkey.test.util.PermissionsHelper.READER_ROLE;
 @Category({Daily.class, Data.class, Hosting.class}) // Matches ListTest for now
 public class ListMoveRowsTest extends BaseWebDriverTest
 {
-    private static final String PROJECT_NAME = "ListMoveRowsTest";
-    private static final String PROJECT_PATH = "/" + PROJECT_NAME;
-    private static final String SUBFOLDER_A_NAME = "SubfolderA";
-    private static final String SUBFOLDER_A_PATH = "/" + PROJECT_NAME + "/" + SUBFOLDER_A_NAME;
-    private static final String SUBFOLDER_MINOR_A_NAME = "MinorA";
-    private static final String SUBFOLDER_MINOR_A_PATH = SUBFOLDER_A_PATH + "/" + SUBFOLDER_MINOR_A_NAME;
-    private static final String SUBFOLDER_B_NAME = "SubfolderB";
-    private static final String SUBFOLDER_B_PATH = "/" + PROJECT_NAME + "/" + SUBFOLDER_B_NAME;
+    private static final ContainerInfo PROJECT = ContainerInfo.project("ListMoveRowsTest");
+    private static final String PROJECT_PATH = PROJECT.getContainerPath();
+    private static final ContainerInfo SUBFOLDER_A = ContainerInfo.folder("SubfolderA", PROJECT);
+    private static final String SUBFOLDER_A_PATH = SUBFOLDER_A.getContainerPath();
+    private static final ContainerInfo SUBFOLDER_MINOR_A = ContainerInfo.folder("MinorA", SUBFOLDER_A);
+    private static final String SUBFOLDER_MINOR_A_PATH = SUBFOLDER_MINOR_A.getContainerPath();
+    private static final ContainerInfo SUBFOLDER_B = ContainerInfo.folder("SubfolderB", PROJECT);
+    private static final String SUBFOLDER_B_PATH = SUBFOLDER_B.getContainerPath();
     private static final String LIST_SCHEMA = "lists";
 
     private static final TestUser AUTHOR_USER = new TestUser("author@listmoverows.test");
     private static final TestUser READER_USER = new TestUser("reader@listmoverows.test");
     private static final TestUser SUBFOLDER_EDITOR_USER = new TestUser("sub.editor@listmoverows.test");
 
-    private static final String attachmentFieldName = TestDataGenerator.randomFieldName("Attachment", null, DomainUtils.DomainKind.IntList);
-    private static final String booleanFieldName = TestDataGenerator.randomFieldName("Boolean", null, DomainUtils.DomainKind.IntList);
-    private static final String dateFieldName = TestDataGenerator.randomFieldName("Date", null, DomainUtils.DomainKind.IntList);
-    private static final String dateTimeFieldName = TestDataGenerator.randomFieldName("DateTime", null, DomainUtils.DomainKind.IntList);
-    private static final String decimalFieldName = TestDataGenerator.randomFieldName("Decimal", null, DomainUtils.DomainKind.IntList);
-    private static final String integerFieldName = TestDataGenerator.randomFieldName("Integer", null, DomainUtils.DomainKind.IntList);
+    private static final FieldInfo attachmentField = IntList.randomField("Attachment", FieldDefinition.ColumnType.Attachment);
+    private static final FieldInfo booleanField = IntList.randomField("Boolean", FieldDefinition.ColumnType.Boolean);
+    private static final FieldInfo dateField = IntList.randomField("Date", FieldDefinition.ColumnType.Date);
+    private static final FieldInfo dateTimeField = IntList.randomField("DateTime", FieldDefinition.ColumnType.DateAndTime);
+    private static final FieldInfo decimalField = IntList.randomField("Decimal", FieldDefinition.ColumnType.Decimal);
+    private static final FieldInfo integerField = IntList.randomField("Integer", FieldDefinition.ColumnType.Integer);
 
-    private static final String autoIncrementKeyFieldName = TestDataGenerator.randomFieldName("AutoIncrementKey", null, DomainUtils.DomainKind.IntList);
-    private static final String integerKeyFieldName = TestDataGenerator.randomFieldName("IntegerKey", null, DomainUtils.DomainKind.IntList);
-    private static final String stringKeyFieldName = TestDataGenerator.randomFieldName("StringKey", null, DomainUtils.DomainKind.VarList);
+    private static final FieldInfo autoIncrementKeyField = IntList.randomField("AutoIncrementKey", FieldDefinition.ColumnType.Integer);
+    private static final FieldInfo integerKeyField = IntList.randomField("IntegerKey", FieldDefinition.ColumnType.Integer);
+    private static final FieldInfo stringKeyField = VarList.randomField("StringKey", FieldDefinition.ColumnType.String);
 
     private static final File SAMPLE_DATA_FILE = TestFileUtils.getSampleData("lists/ListImportFields.txt");
 
@@ -93,9 +96,9 @@ public class ListMoveRowsTest extends BaseWebDriverTest
         // Create folders
         {
             _containerHelper.createProject(getProjectName(), null);
-            _containerHelper.createSubfolder(getProjectName(), SUBFOLDER_A_NAME);
-            _containerHelper.createSubfolder(getProjectName(), SUBFOLDER_B_NAME);
-            _containerHelper.createSubfolder(SUBFOLDER_A_PATH, SUBFOLDER_MINOR_A_NAME);
+            SUBFOLDER_A.create(_containerHelper);
+            SUBFOLDER_B.create(_containerHelper);
+            SUBFOLDER_MINOR_A.create(_containerHelper);
         }
 
         // Configure users
@@ -123,18 +126,18 @@ public class ListMoveRowsTest extends BaseWebDriverTest
             var fields = getFields();
 
             // List keyed by auto-increment
-            var autoKeyListName = DomainUtils.DomainKind.IntList.randomName("AUTO");
-            AUTO_INCREMENT_LIST = (IntListDefinition) new IntListDefinition(autoKeyListName, autoIncrementKeyFieldName)
+            var autoKeyListName = IntList.randomName("AUTO");
+            AUTO_INCREMENT_LIST = (IntListDefinition) new IntListDefinition(autoKeyListName, autoIncrementKeyField.getName())
                     .setFields(fields);
             AUTO_INCREMENT_LIST.getCreateCommand().execute(conn, PROJECT_PATH);
             AUTO_INCREMENT_LIST.setListId(resolveListId(conn, autoKeyListName, PROJECT_PATH));
 
             // List keyed by integer (not auto-increment)
-            var intKeyField = new FieldDefinition(integerKeyFieldName, FieldDefinition.ColumnType.Integer);
+            var intKeyField = integerKeyField.getFieldDefinition();
             var intListFields = new ArrayList<FieldDefinition>();
             intListFields.add(intKeyField);
             intListFields.addAll(fields);
-            var intKeyListName = DomainUtils.DomainKind.IntList.randomName("INT");
+            var intKeyListName = IntList.randomName("INT");
             INTEGER_KEY_LIST = (IntListDefinition) new IntListDefinition(intKeyListName)
                     .setKeyName(intKeyField.getName())
                     .setFields(intListFields);
@@ -142,11 +145,11 @@ public class ListMoveRowsTest extends BaseWebDriverTest
             INTEGER_KEY_LIST.setListId(resolveListId(conn, intKeyListName, PROJECT_PATH));
 
             // List keyed by string
-            var stringKeyField = new FieldDefinition(stringKeyFieldName);
+            var stringKeyField = ListMoveRowsTest.stringKeyField.getFieldDefinition();
             var varListFields = new ArrayList<FieldDefinition>();
             varListFields.add(stringKeyField);
             varListFields.addAll(fields);
-            var stringKeyListName = DomainUtils.DomainKind.VarList.randomName("STR");
+            var stringKeyListName = VarList.randomName("STR");
             STRING_KEY_LIST = (VarListDefinition) new VarListDefinition(stringKeyListName)
                     .setFields(varListFields)
                     .setKeyName(stringKeyField.getName());
@@ -266,8 +269,8 @@ public class ListMoveRowsTest extends BaseWebDriverTest
     public void testListInSubfolder() throws Exception
     {
         // Create a list domain in a subfolder
-        var subfolderListName = DomainUtils.DomainKind.IntList.randomName("SUBFOLDER");
-        var subfolderList = (IntListDefinition) new IntListDefinition(subfolderListName, autoIncrementKeyFieldName)
+        var subfolderListName = IntList.randomName("SUBFOLDER");
+        var subfolderList = new IntListDefinition(subfolderListName, autoIncrementKeyField.getName())
                 .setFields(getFields());
         var conn = createDefaultConnection();
         subfolderList.getCreateCommand().execute(conn, SUBFOLDER_A_PATH);
@@ -276,11 +279,11 @@ public class ListMoveRowsTest extends BaseWebDriverTest
         var subARows = addRows(subfolderList, SUBFOLDER_A_PATH, 10, 0);
 
         // Cannot move rows from a list defined in a subfolder to the project
-        String expectedError = String.format("List '%s' is not accessible from folder %s.", subfolderList.getName(), PROJECT_PATH);
+        String expectedError = String.format("List '%s' is not accessible from folder %s.", subfolderList.getName(), "/" + PROJECT_PATH);
         moveRowsExpectingError(subfolderList, SUBFOLDER_A_PATH, PROJECT_PATH, subARows.getRows(), expectedError);
 
         // Cannot move rows from a list defined in a subfolder to a folder further down the hierarchy
-        expectedError = String.format("List '%s' is not accessible from folder %s.", subfolderList.getName(), SUBFOLDER_MINOR_A_PATH);
+        expectedError = String.format("List '%s' is not accessible from folder %s.", subfolderList.getName(), "/" + SUBFOLDER_MINOR_A_PATH);
         moveRowsExpectingError(subfolderList, SUBFOLDER_A_PATH, SUBFOLDER_MINOR_A_PATH, subARows.getRows(), expectedError);
     }
 
@@ -312,7 +315,7 @@ public class ListMoveRowsTest extends BaseWebDriverTest
     {
         truncateList(AUTO_INCREMENT_LIST);
         var response = addRows(AUTO_INCREMENT_LIST, getProjectName(), 1, 0);
-        var validId = response.getRows().get(0).get(autoIncrementKeyFieldName);
+        var validId = response.getRows().getFirst().get(autoIncrementKeyField.getName());
 
         moveRowsExpectingError(AUTO_INCREMENT_LIST, getProjectName(), SUBFOLDER_B_PATH, List.of(), "No 'rows' array supplied.");
         moveRowsExpectingError(AUTO_INCREMENT_LIST, getProjectName(), SUBFOLDER_B_PATH, List.of(Map.of("InvalidKey", validId)), "Key field value required for moving list rows.");
@@ -376,7 +379,7 @@ public class ListMoveRowsTest extends BaseWebDriverTest
 
     private int attachmentCount(List<Map<String, Object>> rows)
     {
-        return (int) rows.stream().filter(row -> row.get(attachmentFieldName) != null).count();
+        return (int) rows.stream().filter(row -> row.get(attachmentField.getName()) != null).count();
     }
 
     private void verifySuccessfulMove(
@@ -505,8 +508,8 @@ public class ListMoveRowsTest extends BaseWebDriverTest
         // adds an initial set of rows without attachment values, then adds a second set of rows with attachment values.
         // Each row with attachment values is entered manually through the UI form.
         var dataGenerator = list.getTestDataGenerator(containerPath)
-                .addDataSupplier(stringKeyFieldName, () -> TestDataGenerator.randomString(TestDataGenerator.randomInt(21, 57)))
-                .addDataSupplier(attachmentFieldName, () -> null);
+                .addDataSupplier(stringKeyField.getName(), () -> TestDataGenerator.randomString(TestDataGenerator.randomInt(21, 57)))
+                .addDataSupplier(attachmentField.getName(), () -> null);
 
         dataGenerator.withGeneratedRows(numRows - numRowsWithAttachmentValue)
             .insertRows();
@@ -519,7 +522,7 @@ public class ListMoveRowsTest extends BaseWebDriverTest
         {
             var newRow = new CaseInsensitiveHashMap<>();
             newRow.putAll(row);
-            newRow.put(attachmentFieldName, SAMPLE_DATA_FILE);
+            newRow.put(attachmentField.getName(), SAMPLE_DATA_FILE);
             _listHelper.insertNewRow(newRow, false);
         }
 
@@ -530,12 +533,12 @@ public class ListMoveRowsTest extends BaseWebDriverTest
     private List<FieldDefinition> getFields()
     {
         return List.of(
-            new FieldDefinition(attachmentFieldName, FieldDefinition.ColumnType.Attachment),
-            new FieldDefinition(booleanFieldName, FieldDefinition.ColumnType.Boolean),
-            new FieldDefinition(dateFieldName, FieldDefinition.ColumnType.Date),
-            new FieldDefinition(dateTimeFieldName, FieldDefinition.ColumnType.DateAndTime),
-            new FieldDefinition(decimalFieldName, FieldDefinition.ColumnType.DateAndTime),
-            new FieldDefinition(integerFieldName, FieldDefinition.ColumnType.Integer)
+            attachmentField.getFieldDefinition(),
+            booleanField.getFieldDefinition(),
+            dateField.getFieldDefinition(),
+            dateTimeField.getFieldDefinition(),
+            decimalField.getFieldDefinition(),
+            integerField.getFieldDefinition()
         );
     }
 
@@ -546,7 +549,7 @@ public class ListMoveRowsTest extends BaseWebDriverTest
         cmd.setColumns(List.of("ListId"));
         var response = cmd.execute(conn, containerPath);
 
-        return (Integer) response.getRows().get(0).get("ListId");
+        return (Integer) response.getRows().getFirst().get("ListId");
     }
 
     private void truncateList(ListDefinition list) throws IOException, CommandException
@@ -564,7 +567,7 @@ public class ListMoveRowsTest extends BaseWebDriverTest
     @Override
     protected String getProjectName()
     {
-        return PROJECT_NAME;
+        return PROJECT.getName();
     }
 
     @Override
