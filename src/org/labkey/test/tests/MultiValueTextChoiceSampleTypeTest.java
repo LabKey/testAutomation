@@ -149,7 +149,7 @@ public class MultiValueTextChoiceSampleTypeTest extends BaseWebDriverTest implem
         updateSampleTypePage.getFieldsPanel()
                 .getField(multiValueTextChoiceFieldName)
                 .expand()
-                .setAllowMultipleSelections(false);
+                .setAllowMultipleSelections(false, true);
         updateSampleTypePage.clickSave();
 
         // Check that impossible to choose multiple values.
