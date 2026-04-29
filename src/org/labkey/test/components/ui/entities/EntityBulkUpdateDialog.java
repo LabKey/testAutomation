@@ -328,6 +328,11 @@ public class EntityBulkUpdateDialog extends EntityBulkDialog
         List<WebElement> labels = Locator.tagWithClass("label", "control-label").withAttribute("for")
                 .waitForElements(elementCache(), 2_000);
 
+        // Amount and Units is an example that has a "hide-label" for StoredAmount
+        List<WebElement> hiddenLabels = Locator.tagWithClass("label", "hide-label").withAttribute("for")
+                .findElements(elementCache());
+        labels.addAll(hiddenLabels);
+
         return labels.stream().map(a -> FieldKey.fromFieldKey(a.getDomAttribute("for")).getFullName()).toList();
     }
 
