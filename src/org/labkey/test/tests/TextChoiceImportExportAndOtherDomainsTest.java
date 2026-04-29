@@ -1,5 +1,6 @@
 package org.labkey.test.tests;
 
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -41,7 +42,7 @@ public class TextChoiceImportExportAndOtherDomainsTest extends TextChoiceTest
     private static final String LIST_TEXT_FIELD = "Str";
     private static final String LIST_MVTC_FIELD = "LMVTC_Field";
     private static final List<String> LIST_VALUES = Arrays.asList("L1", "L2|withPipes|", "L3", "L4");
-    private static final List<String> LIST_MVTC_VALUES = Arrays.asList("M1", "M2", "M3");
+    private static final List<String> LIST_MVTC_VALUES = Arrays.asList("M1&", "M2;b", "M3 %");
     private static final List<Map<String, String>> listData = new ArrayList<>();
     private static final List<List<String>> listMvtcData = new ArrayList<>();
 
@@ -117,7 +118,7 @@ public class TextChoiceImportExportAndOtherDomainsTest extends TextChoiceTest
 
         FieldDefinition txtField = new FieldDefinition(LIST_TEXT_FIELD, FieldDefinition.ColumnType.String);
 
-        final String allMVTCValues = "M1, M2, M3";
+        final String allMVTCValues = StringUtils.join(LIST_MVTC_VALUES, ", ");
         if (includeMvtc)
         {
             FieldDefinition mvtcField = new FieldDefinition(LIST_MVTC_FIELD, FieldDefinition.ColumnType.MultiValueTextChoice);
