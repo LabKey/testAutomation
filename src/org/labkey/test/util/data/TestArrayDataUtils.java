@@ -3,7 +3,10 @@ package org.labkey.test.util.data;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.junit.Assert;
 import org.labkey.remoteapi.query.Filter;
+import org.labkey.test.components.ui.grids.QueryGrid;
+import org.labkey.test.util.DeferredErrorCollector;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -12,6 +15,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestArrayDataUtils
 {
@@ -126,5 +131,28 @@ public class TestArrayDataUtils
             case ARRAY_ISNOTEMPTY -> !actualValues.isEmpty();
             default -> throw new IllegalArgumentException("Invalid filter type " + type);
         };
+    }
+
+    /**
+     * Verifies that the grid contains exactly the expected row IDs and that each row's MVTC column
+     * value matches the expected value in {@code sampleMVTCMap}.
+     * Size mismatch is a hard failure; ID and per-row value checks are soft (collected via {@code checker}).
+     *
+     * @param idColumn the column label used to identify rows (e.g. "Sample ID" or "Name")
+     */
+    public static void verifyMVTCResults(QueryGrid grid, Map<String, String> sampleMVTCMap,
+                                         String idColumn, String colLabel, DeferredErrorCollector checker)
+    {
+        List<String> foundIds = grid.getColumnDataAsText(idColumn);
+        Assert.assertEquals("grid row count mismatch", sampleMVTCMap.size(), foundIds.size());
+        checker.wrapAssertion(() -> assertThat(foundIds)
+                .as(idColumn + " values in grid")
+                .containsExactlyInAnyOrderElementsOf(sampleMVTCMap.keySet()));
+        sampleMVTCMap.forEach((id, expected) -> {
+            Map<String, String> rowMap = grid.getRowMapByLabel(idColumn, id);
+            checker.wrapAssertion(() -> assertThat(rowMap.get(colLabel))
+                    .as("'%s' value for %s '%s'", colLabel, idColumn, id)
+                    .isEqualTo(expected == null ? "" : expected));
+        });
     }
 }
