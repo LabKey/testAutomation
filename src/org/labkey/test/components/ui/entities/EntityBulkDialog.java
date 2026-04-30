@@ -55,7 +55,7 @@ public abstract class EntityBulkDialog extends ModalDialog
      */
     public boolean getBooleanField(CharSequence fieldIdentifier)
     {
-        return elementCache().checkBox(fieldIdentifier).get();
+        return elementCache().checkbox(fieldIdentifier).get();
     }
 
     public String getFieldValue(WebElement input)
@@ -88,22 +88,22 @@ public abstract class EntityBulkDialog extends ModalDialog
         return elementCache().formRowByControlLabel(fieldLabel);
     }
 
-    public Pair<String, String> getAmountUnit()
+    public Pair<String, String> getAmountAndUnitsReadOnlyValues()
     {
         String amountVal = getFieldValue(getAmountInput());
         String unitVal = Locator.tagWithClass("div", "select-input__value-container").withoutAttribute("type", "hidden").findElement(getAmountUnitsRow()).getText();
         return new Pair<>(amountVal, unitVal);
     }
 
-    public Pair<String, String> getAmountUnitValue()
+    public Pair<String, String> getAmountAndUnitsInputValues()
     {
-        enableAmountUnit();
+        enableAmountAndUnits();
         String amountVal = getWrapper().getFormElement(getAmountInput());
         String unitVal = getValueForReactSelect(getAmountUnitSelect());
         return new Pair<>(amountVal, unitVal);
     }
 
-    public void enableAmountUnit()
+    public void enableAmountAndUnits()
     {
         ToggleButton toggle = new ToggleButton.ToggleButtonFinder(getDriver()).findOrNull(getAmountUnitsRow());
         if (toggle != null && !toggle.isOn())
@@ -113,10 +113,10 @@ public abstract class EntityBulkDialog extends ModalDialog
         }
     }
 
-    public void disableAmountUnit()
+    public void disableAmountAndUnits()
     {
         ToggleButton toggle = new ToggleButton.ToggleButtonFinder(getDriver()).findOrNull(getAmountUnitsRow());
-        if(toggle != null && toggle.isOn())
+        if (toggle != null && toggle.isOn())
         {
             toggle.set(false);
             _changeCounter--;
@@ -130,13 +130,13 @@ public abstract class EntityBulkDialog extends ModalDialog
 
     public ReactSelect getAmountUnitSelect()
     {
-        enableAmountUnit();
+        enableAmountAndUnits();
         return new ReactSelect(getAmountUnitsRow(), getDriver());
     }
 
     public void setAmountUnit(String amount, String unit)
     {
-        enableAmountUnit();
+        enableAmountAndUnits();
 
         if (amount != null)
             getWrapper().setFormElement(getAmountInput(), amount);
@@ -165,7 +165,7 @@ public abstract class EntityBulkDialog extends ModalDialog
     protected abstract class ElementCache extends ModalDialog.ElementCache
     {
         protected final Locator textInputLoc = Locator.tagWithAttribute("input", "type", "text");
-        protected final Locator checkBoxLoc = Locator.tagWithAttribute("input", "type", "checkbox");
+        protected final Locator checkboxLoc = Locator.tagWithAttribute("input", "type", "checkbox");
         protected final Locator.XPathLocator amountInputLoc = Locator.tag("input").withAttribute("aria-label", "Amount");
 
         protected final Map<String, WebElement> _rows = new HashMap<>();
@@ -189,9 +189,9 @@ public abstract class EntityBulkDialog extends ModalDialog
             return new FilteringReactSelect(formRow(fieldIdentifier), getDriver());
         }
 
-        public Checkbox checkBox(CharSequence fieldIdentifier)
+        public Checkbox checkbox(CharSequence fieldIdentifier)
         {
-            return new Checkbox(checkBoxLoc.findElement(formRow(fieldIdentifier)));
+            return new Checkbox(checkboxLoc.findElement(formRow(fieldIdentifier)));
         }
 
         public Input textInput(CharSequence fieldIdentifier)

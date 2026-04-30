@@ -301,7 +301,7 @@ public class EntityBulkUpdateDialog extends EntityBulkDialog
      */
     public EntityBulkUpdateDialog setBooleanField(CharSequence fieldIdentifier, boolean checked)
     {
-        enableAndWait(fieldIdentifier, elementCache().checkBox(fieldIdentifier)).set(checked);
+        enableAndWait(fieldIdentifier, elementCache().checkbox(fieldIdentifier)).set(checked);
         return this;
     }
 

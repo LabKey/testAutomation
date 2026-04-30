@@ -15,7 +15,6 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -295,7 +294,7 @@ public class EntityBulkInsertDialog extends EntityBulkDialog
      */
     public EntityBulkInsertDialog setBooleanField(CharSequence fieldIdentifier, boolean checked)
     {
-        elementCache().checkBox(fieldIdentifier).set(checked);
+        elementCache().checkbox(fieldIdentifier).set(checked);
         return this;
     }
 
