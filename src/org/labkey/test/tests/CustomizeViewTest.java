@@ -42,6 +42,7 @@ import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.params.FieldDefinition.DOMAIN_TRICKY_CHARACTERS;
 
@@ -317,6 +318,66 @@ public class CustomizeViewTest extends BaseWebDriverTest
         drt.goToView("Default");
         drt.getViewsMenu().expand();
         assertTextPresentInThisOrder("Default", viewNames[0], viewNames[2], viewNames[1], viewNames[3], viewNames[4]);
+    }
+
+    @Test
+    public void testCustomViewsQueryTable()
+    {
+        final String viewName = "CustomViewsQueryTableTest";
+
+        // Navigate to the query.CustomViews table (requires folder admin permission)
+        goToSchemaBrowser();
+        viewQueryData("query", "CustomViews");
+        DataRegionTable drt = new DataRegionTable("query", getDriver());
+
+        // Verify the default visible columns are present
+        List<String> columnNames = drt.getColumnNames();
+        assertThat("Schema column should be present", columnNames, hasItem("Schema"));
+        assertThat("QueryName column should be present", columnNames, hasItem("QueryName"));
+        assertThat("Name column should be present", columnNames, hasItem("Name"));
+        assertThat("Flags column should be present", columnNames, hasItem("Flags"));
+
+        // Insert a new custom view via the table's insert URL (QueryController.InternalNewViewAction)
+        drt.clickInsertNewRow();
+        waitForElement(Locator.name("ff_schemaName"));
+        setFormElement(Locator.name("ff_schemaName"), "lists");
+        setFormElement(Locator.name("ff_queryName"), LIST_NAME);
+        setFormElement(Locator.name("ff_viewName"), viewName);
+        checkCheckbox(Locator.name("ff_share"));
+        clickButton("Create");
+
+        // Create redirects to InternalSourceViewAction; click Cancel to return to the CustomViews table
+        waitForElement(Locator.lkButton("Cancel"));
+        clickButton("Cancel");
+
+        drt = new DataRegionTable("query", getDriver());
+
+        // Verify the new view appears with correct metadata
+        int rowIndex = drt.getRowIndex("Name", viewName);
+        assertNotEquals("Inserted view should appear in the query.CustomViews table", -1, rowIndex);
+        assertEquals("View should belong to the 'lists' schema", "lists", drt.getDataAsText(rowIndex, "Schema"));
+        assertEquals("View query name should match list name", LIST_NAME, drt.getDataAsText(rowIndex, "QueryName"));
+        assertEquals("New view should have no flags set", "", drt.getDataAsText(rowIndex, "Flags"));
+
+        // Edit the row via the edit icon (QueryController.InternalSourceViewAction) and set the inherit flag
+        drt.clickEditRow(rowIndex);
+        waitForElement(Locator.id("ff_inherit"));
+        checkCheckbox(Locator.id("ff_inherit"));
+        clickButton("Save");
+
+        // Verify the Flags column now reflects the inherit flag
+        drt = new DataRegionTable("query", getDriver());
+        rowIndex = drt.getRowIndex("Name", viewName);
+        assertNotEquals("Edited view should still appear in the query.CustomViews table", -1, rowIndex);
+        assertEquals("Flags should show 'inherit' after editing", "inherit", drt.getDataAsText(rowIndex, "Flags"));
+
+        // Delete the row by selecting its checkbox and clicking Delete
+        drt.checkCheckbox(rowIndex);
+        drt.deleteSelectedRows();
+
+        // Verify the row is gone
+        drt = new DataRegionTable("query", getDriver());
+        assertEquals("Deleted view should no longer appear in the query.CustomViews table", -1, drt.getRowIndex("Name", viewName));
     }
 
     private void createList() throws Exception
