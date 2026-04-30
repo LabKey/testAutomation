@@ -14,12 +14,9 @@ import org.labkey.test.components.CustomizeView;
 import org.labkey.test.pages.ImportDataPage;
 import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.params.ContainerInfo;
-import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldInfo;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.DomainUtils;
-import org.labkey.test.util.EscapeUtil;
-import org.labkey.test.util.TestDataGenerator;
+import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.data.TestDataUtils;
 import org.labkey.test.util.query.QueryApiHelper;
 
@@ -28,11 +25,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static org.labkey.test.params.FieldDefinition.ColumnType;
+import static org.labkey.test.params.FieldDefinition.IntLookup;
 import static org.labkey.test.params.FieldDefinition.labelFromName;
 import static org.labkey.test.util.DomainUtils.DomainKind.IntList;
 import static org.labkey.test.util.TextUtils.normalizeSpace;
-import static org.labkey.test.util.TestDataGenerator.ALL_CHARS_PLACEHOLDER;
-import static org.labkey.test.util.TestDataGenerator.REPEAT_PLACEHOLDER;
 
 // Issue 52098, Issue 49422
 @Category({Daily.class, Data.class, Hosting.class})
@@ -41,17 +38,17 @@ public class ListLookupTest extends BaseWebDriverTest
     private static final ContainerInfo PROJECT = ContainerInfo.project("ListLookupTest");
 
     private static final String lookToListName = IntList.randomName("lookToList");
-    private static final String lookToKeyFieldName = TestDataGenerator.randomFieldName("lookToKeyField", 5, 5, "" + REPEAT_PLACEHOLDER + ALL_CHARS_PLACEHOLDER, DomainUtils.DomainKind.IntList);
-    private static final String lookToKeyFieldKey = EscapeUtil.fieldKeyEncodePart(lookToKeyFieldName);
-    private static final FieldInfo lookToField = IntList.randomField("lookToField", FieldDefinition.ColumnType.String);
-    private static final String lookToFieldFieldKey = EscapeUtil.fieldKeyEncodePart(lookToField.getName());
+    private static final FieldInfo lookToKeyField = IntList.randomField("lookToKeyField", ColumnType.Integer);
+    private static final String lookToKeyFieldKey = lookToKeyField.toString();
+    private static final FieldInfo lookToField = IntList.randomField("lookToField", ColumnType.String);
+    private static final String lookToFieldFieldKey = lookToField.toString();
     private static List<Map<String, String>> lookToListValues;
     private static String lookupKeyAsNameNumber;
     private static String lookupKeyAsNameFieldValue;
     private static final String lookFromListName = IntList.randomName("lookFromList");
-    private static final String lookFromKeyFieldName = TestDataGenerator.randomFieldName("Look From Key Field", 5, 5, "" + REPEAT_PLACEHOLDER + ALL_CHARS_PLACEHOLDER, DomainUtils.DomainKind.IntList);
-    private static final FieldInfo lookFromLookupField = IntList.randomField("Look From Lookup Field", new FieldDefinition.IntLookup("lists", lookToListName));
-    private static final String lookFromLookupFieldKey = EscapeUtil.fieldKeyEncodePart(lookFromLookupField.getName());
+    private static final FieldInfo lookFromKeyField = IntList.randomField("Look From Key Field", ColumnType.Integer);
+    private static final FieldInfo lookFromLookupField = IntList.randomField("Look From Lookup Field", new IntLookup(ListHelper.LIST_SCHEMA, lookToListName));
+    private static final String lookFromLookupFieldKey = lookFromLookupField.toString();
 
     @BeforeClass
     public static void setupProject()
@@ -72,7 +69,7 @@ public class ListLookupTest extends BaseWebDriverTest
         _containerHelper.createProject(getProjectName(), null);
 
         log("Create a list to use as a lookup table with some number-like names.");
-        _listHelper.createList(getProjectName(), lookToListName, lookToKeyFieldName, lookToField.getFieldDefinition());
+        _listHelper.createList(getProjectName(), lookToListName, lookToKeyField.getName(), lookToField.getFieldDefinition());
         String bulkData = tsvFromColumn(List.of(
             lookToField.getName(),
             "1E2",
@@ -92,7 +89,7 @@ public class ListLookupTest extends BaseWebDriverTest
         _listHelper.insertNewRow(Map.of(lookToField.getName(), lookupKeyAsNameNumber));
 
         log("Create a second list that looks up to the first list.");
-        _listHelper.createList(getProjectName(), lookFromListName, lookFromKeyFieldName);
+        _listHelper.createList(getProjectName(), lookFromListName, lookFromKeyField.getName());
         EditListDefinitionPage listDefinitionPage = _listHelper.goToEditDesign(lookFromListName);
         listDefinitionPage.getFieldsPanel()
                 .addField(lookFromLookupField.getFieldDefinition());
@@ -283,7 +280,7 @@ public class ListLookupTest extends BaseWebDriverTest
 
     private void resetList() throws IOException, CommandException
     {
-        new QueryApiHelper(createDefaultConnection(), getProjectName(), "lists", lookFromListName).truncateTable();
+        new QueryApiHelper(createDefaultConnection(), getProjectName(), ListHelper.LIST_SCHEMA, lookFromListName).truncateTable();
     }
 
     private void validateListValues(List<Map<String, String>> expectedValue)
