@@ -1046,13 +1046,23 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         }
     }
 
+    /**
+     * Drag-fill from {@code startCell} (which must already be selected / part of the current
+     * selection) to {@code endCell}.  Prefer {@link #dragFill(WebElement, WebElement, WebElement)}
+     * when the selection range is known — that overload can retry reliably.
+     */
     public void dragFill(WebElement startCell, WebElement endCell)
     {
         dismissPopover();
         Locator.XPathLocator selectionHandleLoc = Locator.byClass("cell-selection-handle");
-        WebElement selectionHandle = selectionHandleLoc.findElement(startCell);
+        // Get the value from the start cell
+        String fillValue = getCellValue(startCell);
+        WebElement selectionHandle = selectionHandleLoc.waitForElement(getComponentElement(), 2_000);
         dragToCell(selectionHandle, endCell);
-        selectionHandleLoc.waitForElement(endCell, 5_000);
+        // Handle appearing in endCell alone is insufficient — the selection can expand
+        // (handle moves) without fill values being applied. Wait for the actual value.
+        WebDriverWrapper.waitFor(() -> fillValue.equals(getCellValue(endCell)),
+                "Drag fill did not populate end cell with value: " + fillValue, 5_000);
     }
 
     public void selectCellRange(WebElement startCell, WebElement endCell)
