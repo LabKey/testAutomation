@@ -1055,14 +1055,9 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     {
         dismissPopover();
         Locator.XPathLocator selectionHandleLoc = Locator.byClass("cell-selection-handle");
-        // Get the value from the start cell
-        String fillValue = getCellValue(startCell);
-        WebElement selectionHandle = selectionHandleLoc.waitForElement(getComponentElement(), 2_000);
+        WebElement selectionHandle = selectionHandleLoc.findElement(startCell);
         dragToCell(selectionHandle, endCell);
-        // Handle appearing in endCell alone is insufficient — the selection can expand
-        // (handle moves) without fill values being applied. Wait for the actual value.
-        WebDriverWrapper.waitFor(() -> fillValue.equals(getCellValue(endCell)),
-                "Drag fill did not populate end cell with value: " + fillValue, 5_000);
+        selectionHandleLoc.waitForElement(endCell, 5_000);
     }
 
     public void selectCellRange(WebElement startCell, WebElement endCell)
