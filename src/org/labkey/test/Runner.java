@@ -547,7 +547,7 @@ public class Runner extends TestSuite
             }
             else if (test.countTestCases() > 0)
             {
-                suite.addTest(test);
+                flattenSuiteInto(suite, (TestSuite) test);
                 foundServerSideTest = true;
             }
         }
@@ -570,7 +570,7 @@ public class Runner extends TestSuite
             }
             TestSuite dynamicSuite = JUnitTest.dynamicSuite(requestedSuites, excludedSuites);
             if (dynamicSuite.countTestCases() > 0)
-                suite.addTest(dynamicSuite);
+                flattenSuiteInto(suite, dynamicSuite);
         }
     }
 
@@ -1124,6 +1124,26 @@ public class Runner extends TestSuite
 
         LOG.warn("Unable to determine module for: " + path);
         return null;
+    }
+
+    private static void flattenSuiteInto(TestSuite destination, TestSuite source)
+    {
+        Enumeration<Test> tests = source.tests();
+        while (tests.hasMoreElements())
+        {
+            Test t = tests.nextElement();
+            if (t instanceof TestSuite nested)
+            {
+                if (TestProperties.isTestRunningOnTeamCity())
+                    flattenSuiteInto(destination, nested);
+                else if (nested.testCount() > 0)
+                    destination.addTest(t);
+            }
+            else
+            {
+                destination.addTest(t);
+            }
+        }
     }
 
     private static Class<?> getTestClass(Test test)
