@@ -335,20 +335,17 @@ public class CustomizeViewTest extends BaseWebDriverTest
         assertThat("Schema column should be present", columnNames, hasItem("Schema"));
         assertThat("QueryName column should be present", columnNames, hasItem("QueryName"));
         assertThat("Name column should be present", columnNames, hasItem("Name"));
-        assertThat("Flags column should be present", columnNames, hasItem("Flags"));
+        assertThat("Hidden column should be present", columnNames, hasItem("Hidden"));
+        assertThat("Inheritable column should be present", columnNames, hasItem("Inheritable"));
 
         // Insert a new custom view via the table's insert URL (QueryController.InternalNewViewAction)
         drt.clickInsertNewRow();
-        waitForElement(Locator.name("ff_schemaName"));
-        setFormElement(Locator.name("ff_schemaName"), "lists");
-        setFormElement(Locator.name("ff_queryName"), LIST_NAME);
-        setFormElement(Locator.name("ff_viewName"), viewName);
-        checkCheckbox(Locator.name("ff_share"));
-        clickButton("Create");
-
-        // Create redirects to InternalSourceViewAction; click Cancel to return to the CustomViews table
-        waitForElement(Locator.lkButton("Cancel"));
-        clickButton("Cancel");
+        waitForElement(Locator.name("quf_Schema"));
+        setFormElement(Locator.name("quf_Schema"), "lists");
+        setFormElement(Locator.name("quf_QueryName"), LIST_NAME);
+        setFormElement(Locator.name("quf_Name"), viewName);
+        setFormElement(Locator.name("quf_Flags"), "0");
+        clickButton("Submit");
 
         drt = new DataRegionTable("query", getDriver());
 
@@ -357,19 +354,21 @@ public class CustomizeViewTest extends BaseWebDriverTest
         assertNotEquals("Inserted view should appear in the query.CustomViews table", -1, rowIndex);
         assertEquals("View should belong to the 'lists' schema", "lists", drt.getDataAsText(rowIndex, "Schema"));
         assertEquals("View query name should match list name", LIST_NAME, drt.getDataAsText(rowIndex, "QueryName"));
-        assertEquals("New view should have no flags set", "", drt.getDataAsText(rowIndex, "Flags"));
+        assertEquals("New view should not be hidden", "false", drt.getDataAsText(rowIndex, "Hidden"));
+        assertEquals("New view should not be inheritable", "false", drt.getDataAsText(rowIndex, "Inheritable"));
 
         // Edit the row via the edit icon (QueryController.InternalSourceViewAction) and set the inherit flag
         drt.clickEditRow(rowIndex);
-        waitForElement(Locator.id("ff_inherit"));
-        checkCheckbox(Locator.id("ff_inherit"));
-        clickButton("Save");
+        waitForElement(Locator.name("quf_Flags"));
+        setFormElement(Locator.name("quf_Flags"), "3");
+        clickButton("Submit");
 
         // Verify the Flags column now reflects the inherit flag
         drt = new DataRegionTable("query", getDriver());
         rowIndex = drt.getRowIndex("Name", viewName);
         assertNotEquals("Edited view should still appear in the query.CustomViews table", -1, rowIndex);
-        assertEquals("Flags should show 'inherit' after editing", "inherit", drt.getDataAsText(rowIndex, "Flags"));
+        assertEquals("New view should be hidden", "true", drt.getDataAsText(rowIndex, "Hidden"));
+        assertEquals("New view should be inheritable", "true", drt.getDataAsText(rowIndex, "Inheritable"));
 
         // Delete the row by selecting its checkbox and clicking Delete
         drt.checkCheckbox(rowIndex);
