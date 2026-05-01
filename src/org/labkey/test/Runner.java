@@ -761,7 +761,7 @@ public class Runner extends TestSuite
         if (text.length() > width)
             return text;
 
-        text = text.isEmpty() ? "" : " " + text.trim() + " ";
+        text = text.isEmpty() ? "" : " " + text + " ";
         int paddingLength = width - text.length();
         int leftPadding = paddingLength / 2;
         int rightPadding = paddingLength - leftPadding;
