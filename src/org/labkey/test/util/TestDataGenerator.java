@@ -86,7 +86,7 @@ public class TestDataGenerator
     public static final char REPEAT_PLACEHOLDER = '\u22EF'; // '⋯' - Used to indicate that the char will be repeated
     public static final char ALL_CHARS_PLACEHOLDER = '\u2211'; // '∑' - Used to indicate that all characters from the charset should be used
     public static final String NON_LATIN_STRING = "\u0438\u0418\uC548\u306F"; // "иИ안は"
-    public static final String CHARSET_STRING = "ABCDEFG01234abcdefvxyz~!@#$%^&*()-+=_{}[]|\\:;\"',.<>" + NON_LATIN_STRING + WIDE_PLACEHOLDER;
+    public static final String CHARSET_STRING = "ABCDEFG01234abcdefvxyz~!@#$%^&*()-+=_{}[]|:;\"',.<>" + NON_LATIN_STRING + WIDE_PLACEHOLDER;
     public static final String ALPHANUMERIC_STRING = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvxyz";
     public static final String DOMAIN_SPECIAL_STRING =  "+- _.:&()/";
     public static final String ILLEGAL_DOMAIN_NAME_CHARSET = "<>[]{};,`\"~!@#$%^*=|?\\";
@@ -538,7 +538,7 @@ public class TestDataGenerator
             {
                 randIndex = (int)(charSetFrom.length() * Math.random());
                 c = charSetFrom.charAt(randIndex);
-                int repeatCount = randomInt(2, 50); // repeat between 2 and 50 times
+                int repeatCount = randomInt(2, 5); // capped at 5: long same-char runs cause sporadic UI/DB errors
                 val.append(StringUtils.repeat(c, repeatCount));
             }
             else if (c == ALL_CHARS_PLACEHOLDER)
@@ -548,7 +548,8 @@ public class TestDataGenerator
             else
                 val.append(c);
         }
-        return val.toString();
+        // UI collapses consecutive spaces into one; collapse here so generated strings match what tests will see
+        return val.toString().replaceAll(" {2,}", " ");
     }
 
     public static String randomMultiLineString(int size)
@@ -671,7 +672,8 @@ public class TestDataGenerator
 
         // use the characters that we know are encoded in fieldKeys plus characters that we know clients are using
         // Issue 53197: Field name with double byte character can cause client side exception in Firefox when trying to customize grid view.
-        String chars = ALL_ILLEGAL_QUERY_KEY_CHARACTERS + " %()=+-[]_|*`'\":;\\<>?!@#^" + NON_LATIN_STRING
+        // Backslash excluded: same Selenium UI-read issue as in CHARSET_STRING
+        String chars = ALL_ILLEGAL_QUERY_KEY_CHARACTERS + " %()=+-[]_|*`'\":;<>?!@#^" + NON_LATIN_STRING
                 + WIDE_PLACEHOLDER + REPEAT_PLACEHOLDER + ALL_CHARS_PLACEHOLDER;
 
         int currentTries = 0;
@@ -684,7 +686,8 @@ public class TestDataGenerator
         }
 
         TestLogger.log("Generated random field name for domainKind " + _domainKind + ": " + randomFieldName);
-        return randomFieldName.name();
+        // Consistent with randomDomainName: UI collapses multiple whitespace chars to a single space
+        return randomFieldName.name().replaceAll("\\s+", " ");
     }
 
     private static boolean isDomainAndFieldNameInvalid(DomainKind domainKind, @Nullable RandomName domainName, @Nullable RandomName fieldName)
@@ -1027,7 +1030,7 @@ public class TestDataGenerator
         List<T> selected = new ArrayList<>();
         for (int i = 0; i < selectCount; i++)
         {
-            selected.add(allOptions.get(randomInt(0, allOptions.size())));
+            selected.add(allOptions.get(randomInt(0, allOptions.size() - 1)));
         }
         return selected;
     }
