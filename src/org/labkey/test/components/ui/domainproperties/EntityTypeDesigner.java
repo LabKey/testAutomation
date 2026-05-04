@@ -436,7 +436,8 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
 
         public final WebElement helpTarget(String divLabelText)
         {
-            return Locator.xpath(String.format("//div[text()='%s']//div[@class='overlay-trigger']", divLabelText)).findWhenNeeded(this);
+            String element = getThis().getClass().getSimpleName().contains("SampleType")? "div" : "span";
+            return Locator.xpath(String.format("//%s[text()='%s']//div[@class='overlay-trigger']", element, divLabelText)).findWhenNeeded(this);
         }
 
         // Tool tips exist on the page, outside the scope of the domainDesigner, so scope the search accordingly.
