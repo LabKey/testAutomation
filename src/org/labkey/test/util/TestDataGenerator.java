@@ -67,6 +67,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static org.labkey.test.BaseWebDriverTest.ALL_ILLEGAL_QUERY_KEY_CHARACTERS;
 import static org.labkey.test.util.data.TestDataUtils.REALISTIC_ASSAY_FIELDS;
@@ -505,7 +506,7 @@ public class TestDataGenerator
         int attempts = 0;
         while (textChoices.size() < size)
         {
-            if (++attempts > MAX_RANDOM_TRIES)
+            if (++attempts >= MAX_RANDOM_TRIES)
                 throw new IllegalStateException("Failed to generate " + size + " unique text choices after " + MAX_RANDOM_TRIES + " attempts");
             String generated = randomString(randomInt(1, 25), ";").trim();
             if (!generated.isEmpty())
@@ -546,7 +547,7 @@ public class TestDataGenerator
             else
                 val.append(c);
         }
-        // UI collapses consecutive spaces into one; collapse here so generated strings match what tests will see
+        // Collapse consecutive spaces into one to match what the UI displays.
         return val.toString().replaceAll(" {2,}", " ");
     }
 
@@ -1020,7 +1021,7 @@ public class TestDataGenerator
             effective = bitmask & validMask;
         return BitSet.valueOf(new long[]{effective}).stream()
                 .mapToObj(allElements::get)
-                .toList();
+                .collect(Collectors.toList());
     }
 
     public static <T> List<T> randomSelect(List<T> allOptions, int selectCount)
