@@ -222,7 +222,7 @@ public class DetailDataPanel extends WebDriverComponent<DetailDataPanel.ElementC
             if (_asTooltip)
                 return _baseLocatorAsTooltip;
             else if (_title != null)
-                return _baseLocator.withChild(Locator.tagWithClass("div", "panel-heading")
+                return _baseLocator.withChild(Locator.byClass("panel-heading")
                         .withText(_title));
             else
                 return _baseLocator;

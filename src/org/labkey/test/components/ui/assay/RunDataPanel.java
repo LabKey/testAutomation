@@ -243,7 +243,7 @@ public class RunDataPanel extends WebDriverComponent<RunDataPanel.ElementCache>
         {
             if (_title != null)
                 return Locator.tagWithClass("div", "panel")
-                        .withChild(Locator.tagWithClass("div", "panel-heading").withText(_title))
+                        .withChild(Locator.byClass( "panel-heading").withText(_title))
                         .child(Locator.tagWithClass("div", "panel-body"));
             else
                 return _baseLocator;

@@ -127,7 +127,7 @@ public class ParentEntityEditPanel extends Panel<ParentEntityEditPanel.ElementCa
                 infoCount <= 1);
 
         // A reference to the editing header title
-        Locator editingLocator = Locator.tagWithClass("div", "panel-heading").startsWith("Editing");
+        Locator editingLocator = Locator.byClass("panel-heading").startsWith("Editing");
 
         Assert.assertEquals("Cannot find a panel with 'Editing' in the header. There isn't a panel in edit mode.",
                 1, editingLocator.findElements(getDriver()).size());

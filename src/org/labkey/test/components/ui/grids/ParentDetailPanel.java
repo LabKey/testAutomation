@@ -154,7 +154,7 @@ public class ParentDetailPanel extends WebDriverComponent<ParentDetailPanel.Elem
 
     protected class ElementCache extends Component<?>.ElementCache
     {
-        public WebElement panelHeading = Locator.tagWithClass("div", "panel-heading")
+        public WebElement panelHeading = Locator.byClass( "panel-heading")
                 .findWhenNeeded(this).withTimeout(2000);
 
         public Locator editBtnLoc = Locator.tagWithClass("div", "detail__edit-button");
@@ -200,7 +200,7 @@ public class ParentDetailPanel extends WebDriverComponent<ParentDetailPanel.Elem
     public static class ParentDetailPanelFinder extends WebDriverComponentFinder<ParentDetailPanel, ParentDetailPanelFinder>
     {
         private final Locator.XPathLocator _baseLocator = Locator.tagWithClass("div", "panel-default")
-                .withChild(Locator.tagWithClass("div", "panel-heading")
+                .withChild(Locator.byClass("panel-heading")
                 .withChild(Locator.tagWithClass("span", "detail__edit--heading")));
         private String _title = null;
 
@@ -225,7 +225,7 @@ public class ParentDetailPanel extends WebDriverComponent<ParentDetailPanel.Elem
         protected Locator locator()
         {
             if (_title != null)
-                return  _baseLocator.withDescendant(Locator.tagWithClass("div", "panel-heading")
+                return  _baseLocator.withDescendant(Locator.byClass("panel-heading")
                         .startsWith(_title));
             else
                 return _baseLocator;

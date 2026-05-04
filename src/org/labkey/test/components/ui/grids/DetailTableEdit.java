@@ -580,7 +580,7 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
                     .invisibilityOfAllElements(Locator.byClass("select-input__loading-indicator").findElements(this)));
         }
 
-        public final WebElement header = Locator.tagWithClass("div", "panel-heading")
+        public final WebElement header = Locator.byClass("panel-heading")
                 .findWhenNeeded(this);
         public final WebElement editPanel = Locator.tagWithClass("div", "detail__editing")
                 .findWhenNeeded(this);
