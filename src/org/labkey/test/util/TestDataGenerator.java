@@ -178,7 +178,7 @@ public class TestDataGenerator
                     else if (fieldDefinition.getType().equals(FieldDefinition.ColumnType.TextChoice))
                     {
                         FieldDefinition.TextChoiceValidator validator =
-                                (FieldDefinition.TextChoiceValidator) fieldDefinition.getValidators().get(0);
+                                (FieldDefinition.TextChoiceValidator) fieldDefinition.getValidators().getFirst();
                         List<String> textChoices = validator.getValues();
                         int textChoiceIndex = i % textChoices.size();
                         if (forGridInsert)
@@ -532,11 +532,11 @@ public class TestDataGenerator
         StringBuilder val = new StringBuilder();
         for (int i=0; i<size; i++)
         {
-            int randIndex = (int)(charSetFrom.length() * Math.random());
+            int randIndex = ThreadLocalRandom.current().nextInt(charSetFrom.length());
             char c = charSetFrom.charAt(randIndex);
             if (c == REPEAT_PLACEHOLDER)
             {
-                randIndex = (int)(charSetFrom.length() * Math.random());
+                randIndex = ThreadLocalRandom.current().nextInt(charSetFrom.length());
                 c = charSetFrom.charAt(randIndex);
                 int repeatCount = randomInt(2, 5); // capped at 5: long same-char runs cause sporadic UI/DB errors
                 val.append(StringUtils.repeat(c, repeatCount));
@@ -997,7 +997,7 @@ public class TestDataGenerator
 
     public static <T> List<T> shuffleSelect(List<T> allFields)
     {
-        int randomSize = new Random().nextInt(allFields.size()) + 1;
+        int randomSize = ThreadLocalRandom.current().nextInt(allFields.size()) + 1;
         return shuffleSelect(allFields, randomSize);
     }
 
@@ -1022,7 +1022,7 @@ public class TestDataGenerator
             effective = bitmask & validMask;
         return BitSet.valueOf(new long[]{effective}).stream()
                 .mapToObj(allElements::get)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public static <T> List<T> randomSelect(List<T> allOptions, int selectCount)
