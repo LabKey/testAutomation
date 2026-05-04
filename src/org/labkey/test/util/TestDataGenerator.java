@@ -62,13 +62,11 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import static org.labkey.test.BaseWebDriverTest.ALL_ILLEGAL_QUERY_KEY_CHARACTERS;
 import static org.labkey.test.util.data.TestDataUtils.REALISTIC_ASSAY_FIELDS;
@@ -538,7 +536,7 @@ public class TestDataGenerator
             {
                 randIndex = ThreadLocalRandom.current().nextInt(charSetFrom.length());
                 c = charSetFrom.charAt(randIndex);
-                int repeatCount = randomInt(2, 5); // capped at 5: long same-char runs cause sporadic UI/DB errors
+                int repeatCount = randomInt(2, 5); // repeat between 2 and 5 times
                 val.append(StringUtils.repeat(c, repeatCount));
             }
             else if (c == ALL_CHARS_PLACEHOLDER)
@@ -672,7 +670,7 @@ public class TestDataGenerator
 
         // use the characters that we know are encoded in fieldKeys plus characters that we know clients are using
         // Issue 53197: Field name with double byte character can cause client side exception in Firefox when trying to customize grid view.
-        // Backslash excluded: same Selenium UI-read issue as in CHARSET_STRING
+        // Backslash excluded: Selenium UI-read issue
         String chars = ALL_ILLEGAL_QUERY_KEY_CHARACTERS + " %()=+-[]_|*`'\":;<>?!@#^" + NON_LATIN_STRING
                 + WIDE_PLACEHOLDER + REPEAT_PLACEHOLDER + ALL_CHARS_PLACEHOLDER;
 
