@@ -13,6 +13,7 @@ import org.labkey.test.params.login.AuthenticationProvider;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Select;
 
 import java.util.List;
 
@@ -140,6 +141,37 @@ public class LoginConfigurePage extends LabKeyPage<LoginConfigurePage.ElementCac
                 .withDescription(description).waitFor(toggleSecondaryConfiguration());
     }
 
+    // Login attempt settings (in the Global Settings panel)
+
+    public LoginConfigurePage setLoginAttemptEnabled(boolean enable)
+    {
+        elementCache().loginAttemptEnabledCheckbox.set(enable);
+        return this;
+    }
+
+    public boolean getLoginAttemptEnabled()
+    {
+        return elementCache().loginAttemptEnabledCheckbox.get();
+    }
+
+    public LoginConfigurePage setLoginAttemptLimit(String value)
+    {
+        new Select(elementCache().loginAttemptLimitSelect).selectByValue(value);
+        return this;
+    }
+
+    public LoginConfigurePage setLoginAttemptPeriod(String value)
+    {
+        new Select(elementCache().loginAttemptPeriodSelect).selectByValue(value);
+        return this;
+    }
+
+    public LoginConfigurePage setLoginAttemptResetTime(String value)
+    {
+        new Select(elementCache().loginAttemptResetTimeSelect).selectByValue(value);
+        return this;
+    }
+
     public ShowAdminPage clickSaveAndFinish()
     {
         shortWait().until(ExpectedConditions.elementToBeClickable(elementCache().saveAndFinishBtn()));
@@ -165,6 +197,11 @@ public class LoginConfigurePage extends LabKeyPage<LoginConfigurePage.ElementCac
         MultiMenu.MultiMenuFinder secondaryMenuFinder = new MultiMenu.MultiMenuFinder(getDriver())
                 .withText("Add New Secondary Configuration").timeout(WAIT_FOR_JAVASCRIPT);
         MultiMenu addSecondaryMenu = secondaryMenuFinder.findWhenNeeded(this);
+
+        Checkbox loginAttemptEnabledCheckbox = new Checkbox(this, "Limit unsuccessful login attempts");
+        WebElement loginAttemptLimitSelect = Locator.css("select[name='LoginAttemptLimit']").findWhenNeeded(this);
+        WebElement loginAttemptPeriodSelect = Locator.css("select[name='LoginAttemptPeriod']").findWhenNeeded(this);
+        WebElement loginAttemptResetTimeSelect = Locator.css("select[name='LoginAttemptResetTime']").findWhenNeeded(this);
 
         WebElement globalSettingsPanel()
         {
