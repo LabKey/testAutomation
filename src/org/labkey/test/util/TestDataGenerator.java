@@ -504,10 +504,11 @@ public class TestDataGenerator
     {
         Set<String> textChoices = new LinkedHashSet<>();
         int attempts = 0;
-        while (textChoices.size() < size)
-        {
-            if (++attempts >= MAX_RANDOM_TRIES)
-                throw new IllegalStateException("Failed to generate " + size + " unique text choices after " + MAX_RANDOM_TRIES + " attempts");
+        final int maxTries = Math.max(MAX_RANDOM_TRIES, size * 2);
+while (textChoices.size() < size)
+{
+            if (++attempts >= maxTries)
+                throw new IllegalStateException("Failed to generate " + size + " unique text choices after " + maxTries + " attempts");
             String generated = randomString(randomInt(1, 25), ";").trim();
             if (!generated.isEmpty())
             {
