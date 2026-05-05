@@ -79,7 +79,8 @@ public class GridPanelViewTest extends GridPanelBaseTest
     private static final String COL_STRING2 = "Str2";
     private static final String COL_INT = "Int";
     private static final String COL_BOOL = "Bool";
-    public static final List<String> TEXT_MULTI_CHOICE_LIST = randomTextChoice(10);
+    // Excluded semicolon due to GitHub Issue 1096
+    public static final List<String> TEXT_MULTI_CHOICE_LIST = randomTextChoice(10, ";");
     public static final String COL_MULTITEXTCHOICE = "Multi Choice";
 
     private static final boolean MULTI_CHOICE_ENABLED = WebTestHelper.getDatabaseType() == DatabaseType.PostgreSQL;
