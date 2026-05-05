@@ -1,6 +1,7 @@
 package org.labkey.test.pages.query;
 
 import org.labkey.test.Locator;
+import org.labkey.test.Locators;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.pages.LabKeyPage;
@@ -8,6 +9,7 @@ import org.labkey.test.util.DataRegion;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
@@ -88,7 +90,7 @@ public class SourceQueryPage extends LabKeyPage<SourceQueryPage.ElementCache>
 
     public SourceQueryPage clickSave()
     {
-        Ext4Helper.Locators.ext4Button("Save").findElement(getDriver()).click();
+        elementCache().saveButton.click();
         waitForElement(Locator.id("status").withText("Saved"), WAIT_FOR_JAVASCRIPT);
         waitForElementToDisappear(Locator.id("status").withText("Saved"), WAIT_FOR_JAVASCRIPT);
 
@@ -97,14 +99,22 @@ public class SourceQueryPage extends LabKeyPage<SourceQueryPage.ElementCache>
 
     public ExecuteQueryPage clickSaveAndFinish()
     {
-        clickAndWait(Ext4Helper.Locators.ext4Button("Save & Finish").findElement(getDriver()));
+        clickAndWait(elementCache().saveAndFinishButton);
+        assertNoLabKeyErrors();
         return new ExecuteQueryPage(getDriver());
     }
 
     public String clickSaveExpectingError()
     {
-        Ext4Helper.Locators.ext4Button("Save").findElement(getDriver()).click();
+        elementCache().saveButton.click();
         return waitForElement(Locator.tagWithId("div","status")).getText();
+    }
+
+    public String clickSaveAndFinishExpectingError()
+    {
+        clickAndWait(elementCache().saveAndFinishButton);
+        clearCache();
+        return waitForElement(Locators.labkeyError).getText();
     }
 
     @Override
@@ -115,5 +125,7 @@ public class SourceQueryPage extends LabKeyPage<SourceQueryPage.ElementCache>
 
     protected class ElementCache extends LabKeyPage<?>.ElementCache
     {
+        private final WebElement saveButton = Ext4Helper.Locators.ext4Button("Save").findWhenNeeded(this);
+        private final WebElement saveAndFinishButton = Ext4Helper.Locators.ext4Button("Save & Finish").findWhenNeeded(this);
     }
 }
