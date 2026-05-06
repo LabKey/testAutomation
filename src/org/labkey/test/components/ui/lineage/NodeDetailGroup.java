@@ -135,7 +135,7 @@ public class NodeDetailGroup extends WebDriverComponent<NodeDetailGroup.ElementC
         protected Locator locator()
         {
             if (_title != null)
-                return _baseLocator.withChild(Locator.tag("summary").withChild(Locator.tagContainingText("h6", _title)));
+                return _baseLocator.withChild(Locator.tag("summary").withChild(Locator.tagContainingText("div", _title)));
             else
                 return _baseLocator;
         }
