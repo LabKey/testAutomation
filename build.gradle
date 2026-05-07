@@ -182,9 +182,6 @@ project.tasks.named("uiTests").configure {
 project.parent.parent.tasks.named("ijConfigure").configure {
     dependsOn(initPropertiesTask)
 }
-project.tasks.withType(RunTestSuite).configureEach { it ->
-    scanForTestClasses = true // Required for Gradle 9.3
-}
 
 if (project.hasProperty('doPublishing'))
 {
