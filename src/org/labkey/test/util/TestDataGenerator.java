@@ -62,7 +62,9 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -625,20 +627,76 @@ public class TestDataGenerator
         namePart = namePart == null ? "" : namePart;
         DomainKind _domainKind = domainKind == null ? DomainKind.SampleSet : domainKind;
         String charSet = ALPHANUMERIC_STRING + DOMAIN_SPECIAL_STRING;
+        // Excluded characters for generation, spaces excluded for correct insertSpaces work
+        String exclusion = " ";
         int currentTries = 0;
-        RandomName randomName = randomName(namePart, getNumChars(numStartChars, 5), getNumChars(numEndChars, 50), charSet, null);
+        RandomName randomName = randomName(namePart, getNumChars(numStartChars, 5), getNumChars(numEndChars, 50), charSet, exclusion);
         while (isDomainAndFieldNameInvalid(_domainKind, randomName, null))
         {
-            randomName = randomName(namePart, getNumChars(numStartChars, 5), getNumChars(numEndChars, 50), charSet, null);
+            randomName = randomName(namePart, getNumChars(numStartChars, 5), getNumChars(numEndChars, 50), charSet, exclusion);
             if (++currentTries >= MAX_RANDOM_TRIES)
                 throw new IllegalStateException("Failed to generate a valid domain name after " + MAX_RANDOM_TRIES + " tries. Last generated name: " + randomName);
         }
 
-        // Multiple spaces in the UI are collapsed into a single space. If we need to test for handling of multiple spaces, we'll not use this generator
-        String domainName = randomName.name().replaceAll("\\s+", " ");
+        // Insert spaces every 8 chars (skipped for short names) and always one immediately before and after namePart.
+        String domainName = insertSpaces(randomName.name(), namePart);
 
         TestLogger.log("Generated random domain name for domainKind " + _domainKind + ": " + domainName);
         return domainName;
+    }
+
+    /**
+     * Insert single spaces around {@code namePart} and at every 8th char (when {@code base.length() > 6}),
+     * snapping inside-namePart positions to the nearest boundary. Skips any insertion that would land at
+     * an edge, create a double space, or form a "space-dash-non-space" pattern.
+     */
+    private static String insertSpaces(String base, String namePart)
+    {
+        int npStart = namePart.isEmpty() ? -1 : base.indexOf(namePart);
+        int npEnd = npStart < 0 ? -1 : npStart + namePart.length();
+
+        // Indices in base before which a single space will be inserted. TreeSet auto-sorts and dedupes.
+        Set<Integer> positions = new TreeSet<>();
+
+        // Mandatory: immediately before and after namePart.
+        addIfSafe(positions, base, npStart);
+        addIfSafe(positions, base, npEnd);
+
+        // Every-8-chars step; positions strictly inside namePart snap to the nearest boundary.
+        if (base.length() > 6)
+        {
+            for (int p = 8; p < base.length(); p += 8)
+            {
+                int snapped = p;
+                if (npStart >= 0 && p > npStart && p < npEnd)
+                    snapped = (npEnd - p) <= (p - npStart) ? npEnd : npStart;
+                addIfSafe(positions, base, snapped);
+            }
+        }
+
+        // Drop positions that would form " -X" (space, dash, non-space). A dash followed by another
+        // inserted space — or by end of string — is fine.
+        positions.removeIf(p -> base.charAt(p) == '-'
+                && p + 1 < base.length()
+                && !positions.contains(p + 1)
+                && base.charAt(p + 1) != ' ');
+
+        StringBuilder sb = new StringBuilder(base.length() + positions.size());
+        for (int i = 0; i < base.length(); i++)
+        {
+            if (positions.contains(i))
+                sb.append(' ');
+            sb.append(base.charAt(i));
+        }
+        return sb.toString();
+    }
+
+    /** Add {@code p} to {@code positions} only if inserting a space at {@code p} won't be at an edge of
+     * {@code base} or sit next to an already-existing space (which would form a double space). */
+    private static void addIfSafe(Set<Integer> positions, String base, int p)
+    {
+        if (p > 0 && p < base.length() && base.charAt(p - 1) != ' ' && base.charAt(p) != ' ')
+            positions.add(p);
     }
 
     private static int getNumChars(Integer val, int max)

@@ -84,7 +84,7 @@ public class JUnitTest extends TestSuite
 
     public static TestSuite suite() throws Exception
     {
-        return JUnitTest._suite((p) -> true, false);
+        return JUnitTest._suite(_ -> true, false);
     }
 
     private static String getWhen(Map<String,Object> test)
@@ -136,12 +136,9 @@ public class JUnitTest extends TestSuite
         }
         catch (Throwable t)
         {
-            if (bootstrapBrowser.getWrappedDriver() != null)
-            {
-                ArtifactCollector artifactCollector = new ArtifactCollector(bootstrapBrowser, JUnitTest.class.getSimpleName());
-                artifactCollector.dumpPageSnapshot("ServerBootstrap", null);
-                artifactCollector.publishDumpedArtifacts();
-            }
+            ArtifactCollector artifactCollector = new ArtifactCollector(bootstrapBrowser, JUnitTest.class.getSimpleName());
+            artifactCollector.dumpPageSnapshot("ServerBootstrap", null);
+            artifactCollector.publishDumpedArtifacts();
             throw t;
         }
         finally
@@ -176,8 +173,7 @@ public class JUnitTest extends TestSuite
         }
         catch (Throwable t)
         {
-            LOG.error("Unable to fetch Remote JUnit tests");
-            t.printStackTrace();
+            LOG.error("Unable to fetch Remote JUnit tests", t);
             TestSuite testSuite = new TestSuite();
             testSuite.addTest(new Runner.ErrorTest(JUnitTest.class.getSimpleName(), t));
             return testSuite;
@@ -289,7 +285,7 @@ public class JUnitTest extends TestSuite
                         catch (Throwable t)
                         {
                             upgradeError = t;
-                            t.printStackTrace();
+                            LOG.warn("Error during upgrade/bootstrap", t);
                         }
                         TestSuite testSuite;
                         try
@@ -298,7 +294,7 @@ public class JUnitTest extends TestSuite
                         }
                         catch (Exception retryException)
                         {
-                            retryException.printStackTrace();
+                            LOG.warn("Error fetching remote test suite", retryException);
                             testSuite = new TestSuite();
                             testSuite.addTest(new Runner.ErrorTest("", retryException));
                         }
@@ -321,7 +317,7 @@ public class JUnitTest extends TestSuite
                 for (String key : json.keySet())
                 {
                     AtomicInteger ioeCounter = new AtomicInteger(0);
-                    TestSuite testsuite = new TestSuite(key);
+                    TestSuite moduleSuite = new TestSuite(key + " Tests");
                     JSONArray testClassArray = json.getJSONArray(key);
                     // Individual tests include both the class name and the requested timeout
                     for (int i = 0; i < testClassArray.length(); i++)
@@ -334,17 +330,20 @@ public class JUnitTest extends TestSuite
                             // Timeout is represented in seconds
                             int timeout = testClass.getInt("timeout");
                             if (accept.test(testClass.toMap()))
-                                testsuite.addTest(new RemoteTest(className, timeout, ioeCounter));
+                                moduleSuite.addTest(new RemoteTest(className, timeout, ioeCounter));
                         }
 
                     }
-                    if (!addedHeader && testsuite.countTestCases() > 0)
+                    if (moduleSuite.countTestCases() > 0)
                     {
-                        BaseJUnitTestWrapper.extraSetup = !skipInitialUserChecks;
-                        remotesuite.addTest(new JUnit4TestAdapter(JUnitHeader.class));
-                        addedHeader = true;
+                        if (!addedHeader)
+                        {
+                            BaseJUnitTestWrapper.extraSetup = !skipInitialUserChecks;
+                            remotesuite.addTest(new JUnit4TestAdapter(JUnitHeader.class));
+                            addedHeader = true;
+                        }
+                        remotesuite.addTest(moduleSuite);
                     }
-                    remotesuite.addTest(testsuite);
                 }
                 if (addedHeader)
                 {
