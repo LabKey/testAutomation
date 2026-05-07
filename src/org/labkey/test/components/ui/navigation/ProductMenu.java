@@ -243,12 +243,12 @@ public class ProductMenu extends WebDriverComponent<ProductMenu.ElementCache>
         private final WebElement folderColumn = Locator.tagWithClass("div", "col-folders").findWhenNeeded(menuContent);
         private final WebElement sectionContent = Locator.tagWithClass("div", "sections-content").findWhenNeeded(menuContent);
 
-        public Locator.XPathLocator dashboardIconLoc = Locator.tagWithClass("i", "fa-home");
+        public Locator.XPathLocator dashboardIconLoc = Locator.tagWithClass("span", "fa-home");
         public WebElement activeDashboardIcon = Locator.tagWithClass("div", "col-folders")
                 .descendant(Locator.tagWithClass("li", "active"))
                 .descendant(dashboardIconLoc)
                 .findWhenNeeded(menuContent);
-        public Locator.XPathLocator administrationIconLoc = Locator.tagWithClass("i", "fa-gear");
+        public Locator.XPathLocator administrationIconLoc = Locator.tagWithClass("span", "fa-gear");
         public WebElement activeAdministrationIcon = Locator.tagWithClass("div", "col-folders")
                 .descendant(Locator.tagWithClass("li", "active"))
                 .descendant(administrationIconLoc)
