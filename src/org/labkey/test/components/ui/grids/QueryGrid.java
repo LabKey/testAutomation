@@ -821,7 +821,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         // If this is the default view this will not be present.
         public WebElement panelHeader()
         {
-            return Locator.xpath("preceding-sibling::h2[contains(@class,'panel-heading')]").findWhenNeeded(this);
+            return Locator.xpath("preceding-sibling::*[contains(@class,'panel-heading')]").findWhenNeeded(this);
         }
 
         final BootstrapMenu chartsMenu = new MultiMenu.MultiMenuFinder(getDriver()).withText("Charts").findWhenNeeded(this);
