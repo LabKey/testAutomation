@@ -3,9 +3,10 @@ package org.labkey.test.pages.core.login;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.components.html.Checkbox;
-import org.labkey.test.components.react.MultiMenu;
 import org.labkey.test.components.html.BootstrapMenu;
+import org.labkey.test.components.html.Checkbox;
+import org.labkey.test.components.html.SelectWrapper;
+import org.labkey.test.components.react.MultiMenu;
 import org.labkey.test.components.react.Tabs;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.pages.core.admin.ShowAdminPage;
@@ -156,20 +157,35 @@ public class LoginConfigurePage extends LabKeyPage<LoginConfigurePage.ElementCac
 
     public LoginConfigurePage setLoginAttemptLimit(String value)
     {
-        new Select(elementCache().loginAttemptLimitSelect).selectByValue(value);
+        elementCache().loginAttemptLimitSelect.selectByValue(value);
         return this;
+    }
+
+    public String getLoginAttemptLimit()
+    {
+        return elementCache().loginAttemptLimitSelect.getFirstSelectedOption().getAttribute("value");
     }
 
     public LoginConfigurePage setLoginAttemptPeriod(String value)
     {
-        new Select(elementCache().loginAttemptPeriodSelect).selectByValue(value);
+        elementCache().loginAttemptPeriodSelect.selectByValue(value);
         return this;
+    }
+
+    public String getLoginAttemptPeriod()
+    {
+        return elementCache().loginAttemptPeriodSelect.getFirstSelectedOption().getAttribute("value");
     }
 
     public LoginConfigurePage setLoginAttemptResetTime(String value)
     {
-        new Select(elementCache().loginAttemptResetTimeSelect).selectByValue(value);
+        elementCache().loginAttemptResetTimeSelect.selectByValue(value);
         return this;
+    }
+
+    public String getLoginAttemptResetTime()
+    {
+        return elementCache().loginAttemptResetTimeSelect.getFirstSelectedOption().getAttribute("value");
     }
 
     public ShowAdminPage clickSaveAndFinish()
@@ -199,9 +215,9 @@ public class LoginConfigurePage extends LabKeyPage<LoginConfigurePage.ElementCac
         MultiMenu addSecondaryMenu = secondaryMenuFinder.findWhenNeeded(this);
 
         Checkbox loginAttemptEnabledCheckbox = new Checkbox(this, "Limit unsuccessful login attempts");
-        WebElement loginAttemptLimitSelect = Locator.css("select[name='LoginAttemptLimit']").findWhenNeeded(this);
-        WebElement loginAttemptPeriodSelect = Locator.css("select[name='LoginAttemptPeriod']").findWhenNeeded(this);
-        WebElement loginAttemptResetTimeSelect = Locator.css("select[name='LoginAttemptResetTime']").findWhenNeeded(this);
+        Select loginAttemptLimitSelect = SelectWrapper.Select(Locator.css("select[name='LoginAttemptLimit']")).findWhenNeeded(this);
+        Select loginAttemptPeriodSelect = SelectWrapper.Select(Locator.css("select[name='LoginAttemptPeriod']")).findWhenNeeded(this);
+        Select loginAttemptResetTimeSelect = SelectWrapper.Select(Locator.css("select[name='LoginAttemptResetTime']")).findWhenNeeded(this);
 
         WebElement globalSettingsPanel()
         {
