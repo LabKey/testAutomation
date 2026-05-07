@@ -304,7 +304,7 @@ public class CustomizeViewTest extends BaseWebDriverTest
         FieldKey fieldKey = FieldKey.fromParts(LAST_NAME_COLUMN);
         String op = "Starts With";
         String value = "J";
-        String[] viewNames = {TRICKY_CHARACTERS + "view", "AAC", "aaa", "aad", "zzz"};
+        String[] viewNames = {TRICKY_CHARACTERS + "view", "AAC", "aaa", "aad", "zzz", "view,with,comma"};
 
         setColumns(LAST_NAME_COLUMN);
         for(String name : viewNames)
@@ -312,6 +312,10 @@ public class CustomizeViewTest extends BaseWebDriverTest
             _customizeViewsHelper.openCustomizeViewPanel();
             _customizeViewsHelper.addFilter(fieldKey, op, value);
             _customizeViewsHelper.saveCustomView(name);
+            _customizeViewsHelper.openCustomizeViewPanel();
+            // GitHub Issue #936 : ensure custom view can be edited
+            assertElementNotPresent(Locator.tagWithClass("div", "alert-warning").withText(String.format("Custom Grid View '%s' not found.", name)));
+            _customizeViewsHelper.closePanel();
         }
 
         DataRegionTable drt = new DataRegionTable("query", getDriver());

@@ -62,8 +62,9 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Random;
+import java.util.Optional;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -178,7 +179,7 @@ public class TestDataGenerator
                     else if (fieldDefinition.getType().equals(FieldDefinition.ColumnType.TextChoice))
                     {
                         FieldDefinition.TextChoiceValidator validator =
-                                (FieldDefinition.TextChoiceValidator) fieldDefinition.getValidators().get(0);
+                                (FieldDefinition.TextChoiceValidator) fieldDefinition.getValidators().getFirst();
                         List<String> textChoices = validator.getValues();
                         int textChoiceIndex = i % textChoices.size();
                         if (forGridInsert)
@@ -504,18 +505,29 @@ public class TestDataGenerator
         return randomString(size, null);
     }
 
-    public static List<String> randomTextChoice(int size)
+    public static List<String> randomTextChoice(int size, @Nullable String exclusion)
     {
         Set<String> textChoices = new LinkedHashSet<>();
+        int attempts = 0;
+        final int maxTries = Math.max(MAX_RANDOM_TRIES, size * 2);
         while (textChoices.size() < size)
         {
-            String generated = randomString(randomInt(1, 25), ";").trim();
+            if (++attempts >= maxTries)
+            {
+                throw new IllegalStateException("Failed to generate " + size + " unique text choices after " + maxTries + " attempts");
+            }
+            String generated = randomString(randomInt(1, 25), exclusion).trim();
             if (!generated.isEmpty())
             {
                 textChoices.add(generated);
             }
         }
         return List.copyOf(textChoices);
+    }
+
+    public static List<String> randomTextChoice(int size)
+    {
+      return randomTextChoice(size, null);
     }
 
     public static String randomString(int size, @Nullable String exclusion)
@@ -532,13 +544,13 @@ public class TestDataGenerator
         StringBuilder val = new StringBuilder();
         for (int i=0; i<size; i++)
         {
-            int randIndex = (int)(charSetFrom.length() * Math.random());
+            int randIndex = ThreadLocalRandom.current().nextInt(charSetFrom.length());
             char c = charSetFrom.charAt(randIndex);
             if (c == REPEAT_PLACEHOLDER)
             {
-                randIndex = (int)(charSetFrom.length() * Math.random());
+                randIndex = ThreadLocalRandom.current().nextInt(charSetFrom.length());
                 c = charSetFrom.charAt(randIndex);
-                int repeatCount = randomInt(2, 50); // repeat between 2 and 50 times
+                int repeatCount = randomInt(2, 5); // repeat between 2 and 5 times
                 val.append(StringUtils.repeat(c, repeatCount));
             }
             else if (c == ALL_CHARS_PLACEHOLDER)
@@ -548,7 +560,8 @@ public class TestDataGenerator
             else
                 val.append(c);
         }
-        return val.toString();
+        // Collapse consecutive spaces into one to match what the UI displays.
+        return val.toString().replaceAll(" {2,}", " ");
     }
 
     public static String randomMultiLineString(int size)
@@ -614,20 +627,76 @@ public class TestDataGenerator
         namePart = namePart == null ? "" : namePart;
         DomainKind _domainKind = domainKind == null ? DomainKind.SampleSet : domainKind;
         String charSet = ALPHANUMERIC_STRING + DOMAIN_SPECIAL_STRING;
+        // Excluded characters for generation, spaces excluded for correct insertSpaces work
+        String exclusion = " ";
         int currentTries = 0;
-        RandomName randomName = randomName(namePart, getNumChars(numStartChars, 5), getNumChars(numEndChars, 50), charSet, null);
+        RandomName randomName = randomName(namePart, getNumChars(numStartChars, 5), getNumChars(numEndChars, 50), charSet, exclusion);
         while (isDomainAndFieldNameInvalid(_domainKind, randomName, null))
         {
-            randomName = randomName(namePart, getNumChars(numStartChars, 5), getNumChars(numEndChars, 50), charSet, null);
+            randomName = randomName(namePart, getNumChars(numStartChars, 5), getNumChars(numEndChars, 50), charSet, exclusion);
             if (++currentTries >= MAX_RANDOM_TRIES)
                 throw new IllegalStateException("Failed to generate a valid domain name after " + MAX_RANDOM_TRIES + " tries. Last generated name: " + randomName);
         }
 
-        // Multiple spaces in the UI are collapsed into a single space. If we need to test for handling of multiple spaces, we'll not use this generator
-        String domainName = randomName.name().replaceAll("\\s+", " ");
+        // Insert spaces every 8 chars (skipped for short names) and always one immediately before and after namePart.
+        String domainName = insertSpaces(randomName.name(), namePart);
 
         TestLogger.log("Generated random domain name for domainKind " + _domainKind + ": " + domainName);
         return domainName;
+    }
+
+    /**
+     * Insert single spaces around {@code namePart} and at every 8th char (when {@code base.length() > 6}),
+     * snapping inside-namePart positions to the nearest boundary. Skips any insertion that would land at
+     * an edge, create a double space, or form a "space-dash-non-space" pattern.
+     */
+    private static String insertSpaces(String base, String namePart)
+    {
+        int npStart = namePart.isEmpty() ? -1 : base.indexOf(namePart);
+        int npEnd = npStart < 0 ? -1 : npStart + namePart.length();
+
+        // Indices in base before which a single space will be inserted. TreeSet auto-sorts and dedupes.
+        Set<Integer> positions = new TreeSet<>();
+
+        // Mandatory: immediately before and after namePart.
+        addIfSafe(positions, base, npStart);
+        addIfSafe(positions, base, npEnd);
+
+        // Every-8-chars step; positions strictly inside namePart snap to the nearest boundary.
+        if (base.length() > 6)
+        {
+            for (int p = 8; p < base.length(); p += 8)
+            {
+                int snapped = p;
+                if (npStart >= 0 && p > npStart && p < npEnd)
+                    snapped = (npEnd - p) <= (p - npStart) ? npEnd : npStart;
+                addIfSafe(positions, base, snapped);
+            }
+        }
+
+        // Drop positions that would form " -X" (space, dash, non-space). A dash followed by another
+        // inserted space — or by end of string — is fine.
+        positions.removeIf(p -> base.charAt(p) == '-'
+                && p + 1 < base.length()
+                && !positions.contains(p + 1)
+                && base.charAt(p + 1) != ' ');
+
+        StringBuilder sb = new StringBuilder(base.length() + positions.size());
+        for (int i = 0; i < base.length(); i++)
+        {
+            if (positions.contains(i))
+                sb.append(' ');
+            sb.append(base.charAt(i));
+        }
+        return sb.toString();
+    }
+
+    /** Add {@code p} to {@code positions} only if inserting a space at {@code p} won't be at an edge of
+     * {@code base} or sit next to an already-existing space (which would form a double space). */
+    private static void addIfSafe(Set<Integer> positions, String base, int p)
+    {
+        if (p > 0 && p < base.length() && base.charAt(p - 1) != ' ' && base.charAt(p) != ' ')
+            positions.add(p);
     }
 
     private static int getNumChars(Integer val, int max)
@@ -684,7 +753,8 @@ public class TestDataGenerator
         }
 
         TestLogger.log("Generated random field name for domainKind " + _domainKind + ": " + randomFieldName);
-        return randomFieldName.name();
+        // Consistent with randomDomainName: UI collapses multiple whitespace chars to a single space
+        return randomFieldName.name().replaceAll("\\s+", " ");
     }
 
     private static boolean isDomainAndFieldNameInvalid(DomainKind domainKind, @Nullable RandomName domainName, @Nullable RandomName fieldName)
@@ -994,7 +1064,7 @@ public class TestDataGenerator
 
     public static <T> List<T> shuffleSelect(List<T> allFields)
     {
-        int randomSize = new Random().nextInt(allFields.size()) + 1;
+        int randomSize = ThreadLocalRandom.current().nextInt(allFields.size()) + 1;
         return shuffleSelect(allFields, randomSize);
     }
 
@@ -1027,7 +1097,7 @@ public class TestDataGenerator
         List<T> selected = new ArrayList<>();
         for (int i = 0; i < selectCount; i++)
         {
-            selected.add(allOptions.get(randomInt(0, allOptions.size())));
+            selected.add(allOptions.get(randomInt(0, allOptions.size() - 1)));
         }
         return selected;
     }

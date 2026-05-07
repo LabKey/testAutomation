@@ -419,7 +419,6 @@ public class DataClassTest extends BaseWebDriverTest
     private void verifyTableIndices(String prefix, List<String> indexSuffixes)
     {
         List<String> suffixes  = new ArrayList<>();
-        suffixes.add("lsid");
         suffixes.add("name");
         suffixes.add("rowid");
         suffixes.addAll(indexSuffixes);
