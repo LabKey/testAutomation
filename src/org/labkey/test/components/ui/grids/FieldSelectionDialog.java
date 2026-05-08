@@ -149,7 +149,7 @@ public class FieldSelectionDialog extends ModalDialog
         Assert.assertTrue(String.format(FIELD_NOT_AVAILABLE, fieldKey),
             listItem.isDisplayed());
 
-        WebElement addIcon = Locator.tagWithClass("div", "view-field__action")
+        WebElement addIcon = Locator.tagWithClass("button", "view-field__action")
                 .withChild(Locator.tagWithClass("i", "fa-plus"))
                 .findElement(listItem);
 

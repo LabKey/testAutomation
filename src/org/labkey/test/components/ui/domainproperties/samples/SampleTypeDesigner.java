@@ -105,7 +105,7 @@ public abstract class SampleTypeDesigner<T extends SampleTypeDesigner<T>> extend
         protected final WebElement uniqueIdMsgCheckIcon = Locator.tagWithClass("div","uniqueid-msg")
                 .append(Locator.tagWithClassContaining("i", "domain-panel-status-icon-green")).refindWhenNeeded(this);
 
-        public final WebElement addParentAliasButton = Locator.tagWithClassContaining("span", "container--action-button")
+        public final WebElement addParentAliasButton = Locator.tagWithClassContaining("button", "container--action-button")
                 .withText("Add a Parent").findWhenNeeded(propertiesPanel);
         public final WebElement addAliasButton = Locator.tagWithClass("i","container--addition-icon").findWhenNeeded(this);
     }
