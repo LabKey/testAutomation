@@ -1174,6 +1174,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
         // Use dumpHeapAction rather that touching file so that we can get file name and publish artifact.
         beginAt(WebTestHelper.buildURL("admin", "dumpHeap"));
+        clickButton("OK");
         String dumpMsg = Locators.bodyPanel().childTag("div").findElement(getDriver()).getText();
         String filePrefix = "Heap dumped to ";
         int prefixIndex = dumpMsg.indexOf(filePrefix);
