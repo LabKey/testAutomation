@@ -212,10 +212,10 @@ public class FieldSelectionDialog extends ModalDialog
         String oppositeIconClass = !expand ? "fa-chevron-right" : "fa-chevron-down";
 
         WebElement expandIcon = Locator.tagWithClass("div", "field-expand-icon")
-                .withChild(Locator.tagWithClass("i", iconClass))
+                .withChild(Locator.tagWithClass("button", iconClass))
                 .findElement(listItem);
         Locator oppositeIcon = Locator.tagWithClass("div", "field-expand-icon")
-                .withChild(Locator.tagWithClass("i", oppositeIconClass));
+                .withChild(Locator.tagWithClass("button", oppositeIconClass));
 
 
         String errorMessage;
@@ -436,7 +436,7 @@ public class FieldSelectionDialog extends ModalDialog
     public FieldSelectionDialog setFieldLabel(FieldKey fieldKey, String newFieldLabel)
     {
         WebElement listItem = elementCache().findSelectedField(fieldKey);
-        WebElement updateIcon = Locator.tagWithClass("span", "edit-inline-field__toggle").findWhenNeeded(listItem);
+        WebElement updateIcon = Locator.byClass( "edit-inline-field__toggle").findWhenNeeded(listItem);
         updateIcon.click();
 
         WebDriverWrapper.waitFor(()->elementCache().fieldLabelEdit.isDisplayed(),
