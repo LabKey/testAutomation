@@ -466,7 +466,7 @@ public class ExternalSchemaTest extends BaseWebDriverTest
     }
 
     // Issue 52728: Update the same data twice should fail
-    void updateDuplicateRows(String containerPath, Connection cn, Row... rows) throws ParseException, IOException, CommandException
+    void updateDuplicateRows(String containerPath, Connection cn, Row... rows) throws ParseException, IOException
     {
         log("** Updating twice in a single request via api...");
         UpdateRowsCommand cmd = new UpdateRowsCommand(USER_SCHEMA_NAME, TABLE_NAME);

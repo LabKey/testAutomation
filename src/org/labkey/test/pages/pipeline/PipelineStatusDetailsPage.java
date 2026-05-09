@@ -379,7 +379,7 @@ public class PipelineStatusDetailsPage extends LabKeyPage<PipelineStatusDetailsP
     {
         List<WebElement> runLinks = getRunLinks();
         assertFalse("Expected at least one run link", runLinks.isEmpty());
-        WebElement runLink = runLinks.get(0);
+        WebElement runLink = runLinks.getFirst();
         log("clicking run link '" + runLink.getText() + "' with URL: " + runLink.getAttribute("href"));
     }
 

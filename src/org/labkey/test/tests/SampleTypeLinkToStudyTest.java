@@ -6,7 +6,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
@@ -61,7 +60,7 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
     protected String now = LocalDateTime.now().format(_dateTimeFormatter);
 
     @BeforeClass
-    public static void setupProject() throws IOException, CommandException
+    public static void setupProject() throws IOException
     {
         SampleTypeLinkToStudyTest init = getCurrentTest();
         init.doSetup();

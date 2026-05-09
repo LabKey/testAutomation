@@ -115,7 +115,7 @@ public class ListDeleteTest extends BaseWebDriverTest
         populateList2(SUBFOLDER_B_PATH, TXT_FILE);
     }
 
-    private void populateList1(String containerPath, File attachment) throws IOException, CommandException
+    private void populateList1(String containerPath, File attachment) throws IOException
     {
         var dataGenerator = LIST_1.getTestDataGenerator(containerPath)
                 .addDataSupplier(attachmentFieldName, () -> attachment);
@@ -130,7 +130,7 @@ public class ListDeleteTest extends BaseWebDriverTest
         _listHelper.insertNewRow(newRow, false);
     }
 
-    private void populateList2(String containerPath, File attachment) throws IOException, CommandException
+    private void populateList2(String containerPath, File attachment) throws IOException
     {
         var dataGenerator = LIST_2.getTestDataGenerator(containerPath)
                 .addDataSupplier(stringFieldName, () -> "String" + containerPath)

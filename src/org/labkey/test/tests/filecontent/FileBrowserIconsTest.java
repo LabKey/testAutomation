@@ -30,8 +30,6 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.assertTrue;
-
 @Category(Daily.class)
 @BaseWebDriverTest.ClassTimeout(minutes = 4 )
 public class FileBrowserIconsTest extends BaseWebDriverTest

@@ -113,8 +113,8 @@ public class AllowedFileExtensionTest extends AllowedFileExtensionBaseTest
 
         AllowedFileExtensionAdminPage allowedFileExtensionAdminPage = goToAdminConsole().clickAllowedFileExtensions();
 
-        allowedFileExtensionAdminPage.deleteExtension(allowedTypes.get(0));
-        excludedType = allowedTypes.remove(0);
+        allowedFileExtensionAdminPage.deleteExtension(allowedTypes.getFirst());
+        excludedType = allowedTypes.removeFirst();
         excludedTypes.add(excludedType);
 
         log(String.format("Remove '%s' as an allowed extension.", excludedType));

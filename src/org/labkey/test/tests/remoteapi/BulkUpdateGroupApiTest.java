@@ -257,7 +257,7 @@ public class BulkUpdateGroupApiTest extends BaseWebDriverTest
         BulkUpdateGroupResponse response = command.execute(connection, getProjectName());
         List<String> errors = collectErrors(response);
         assertTrue("Wong error(s) for invalid userId:\n" + String.join("\n", errors),
-                errors.size() == 1 && errors.get(0).contains("Invalid user id."));
+                errors.size() == 1 && errors.getFirst().contains("Invalid user id."));
     }
 
     @Test
@@ -274,7 +274,7 @@ public class BulkUpdateGroupApiTest extends BaseWebDriverTest
 
             List<String> errors = collectErrors(response);
             assertEquals("Expected one error but errors were:\n" + String.join("\n", errors), 1, errors.size());
-            String error = errors.get(0);
+            String error = errors.getFirst();
             assertTrue(error.startsWith("Can't add a member to the ") && error.endsWith(" group"));
         }
     }

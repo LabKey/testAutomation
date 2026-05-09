@@ -64,8 +64,8 @@ public class OlapHelper
         int i = 0;
         for (Object row : response.getRowsAxis())
         {
-            Object realRow = ((List)row).get(0);
-            Object cellValue = ((List)response.getCells().get(i)).get(0);
+            Object realRow = ((List)row).getFirst();
+            Object cellValue = ((List)response.getCells().get(i)).getFirst();
             results.put(((Map)realRow).get(field).toString(), cellValue);
             i++;
         }

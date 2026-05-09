@@ -15,6 +15,7 @@
  */
 package org.labkey.test.components.labkey;
 
+import org.jetbrains.annotations.NotNull;
 import org.labkey.test.Locator;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.openqa.selenium.Alert;
@@ -75,13 +76,13 @@ public class LabKeyAlert extends ModalDialog implements Alert
     }
 
     @Override
-    public String getText()
+    public @NotNull String getText()
     {
         return getTitle() + " : " + getBodyText();
     }
 
     @Override
-    public void sendKeys(String keysToSend) { }
+    public void sendKeys(@NotNull String keysToSend) { }
 
     public void clickButton(String buttonText)
     {

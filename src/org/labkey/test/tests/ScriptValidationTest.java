@@ -134,21 +134,21 @@ public class ScriptValidationTest extends BaseWebDriverTest
         list1.add(Map.of("Name", "Manufacturer1"));
         InsertRowsCommand cmd1 = new InsertRowsCommand(VEHICLE_SCHEMA, "Manufacturers");
         cmd1.getRows().addAll(list1);
-        Object manufacturerId = cmd1.execute(cn, getProjectName()).getRows().get(0).get("rowid");
+        Object manufacturerId = cmd1.execute(cn, getProjectName()).getRows().getFirst().get("rowid");
 
         // Create model:
         ArrayList<Map<String, Object>> list2 = new ArrayList<>();
         list2.add(Map.of("ManufacturerId", manufacturerId, "Name", "Model1"));
         InsertRowsCommand cmd2 = new InsertRowsCommand(VEHICLE_SCHEMA, "Models");
         cmd2.getRows().addAll(list2);
-        Object modelId = cmd2.execute(cn, getProjectName()).getRows().get(0).get("RowId");
+        Object modelId = cmd2.execute(cn, getProjectName()).getRows().getFirst().get("RowId");
         assertNotNull("RowId not returned for models insert, values", modelId);
 
         PostCommand<CommandResponse> saveRowsCommand = prepareSaveRowsCommand("insertWithKeys", getProjectName(), VEHICLE_SCHEMA, VEHICLES_TABLE, "RowId",
                 new String[]{"ModelId", "Color", "ModelYear", "Milage", "LastService"},
-                new Object[][]{new Object[]{modelId, colors.get(0).name, 2000, 1234, new Date()}}, null);
+                new Object[][]{new Object[]{modelId, colors.getFirst().name, 2000, 1234, new Date()}}, null);
         CommandResponse response = saveRowsCommand.execute(cn, "/home");
-        CaseInsensitiveHashMap row = new CaseInsensitiveHashMap<>((Map)((Map)((List)((Map)((List)response.getParsedData().get("result")).get(0)).get("rows")).get(0)).get("values"));
+        CaseInsensitiveHashMap row = new CaseInsensitiveHashMap<>((Map)((Map)((List)((Map)((List)response.getParsedData().get("result")).getFirst()).get("rows")).getFirst()).get("values"));
         // See discussion in: https://github.com/LabKey/testAutomation/pull/1338
         Object vehicleRowId = row.get("rowId");  // NOTE: even though the XML for this table defines the case as RowId, using SaveRows/insertWithKeys results in the code converting the first letter of the field names to lowercase, in ResultSetRowMapFactory
         assertNotNull("RowId not returned for vehicles insert, keys found: " + StringUtils.join(row.keySet(), ","), vehicleRowId);
@@ -157,9 +157,9 @@ public class ScriptValidationTest extends BaseWebDriverTest
         src.setColumns(List.of("Container", "TriggerScriptContainer", "RowId", "ModelId", "Milage"));
         src.setSorts(List.of(new Sort("RowId", Sort.Direction.DESCENDING)));
         SelectRowsResponse sr2 = src.execute(cn, getProjectName());
-        assertEquals("Incorrect model", modelId, sr2.getRows().get(0).get("ModelId"));
-        assertEquals("Incorrect Milage", 1234, sr2.getRows().get(0).get("Milage"));
-        assertEquals("Incorrect RowId for First Record", vehicleRowId, sr2.getRows().get(0).get("rowId"));
+        assertEquals("Incorrect model", modelId, sr2.getRows().getFirst().get("ModelId"));
+        assertEquals("Incorrect Milage", 1234, sr2.getRows().getFirst().get("Milage"));
+        assertEquals("Incorrect RowId for First Record", vehicleRowId, sr2.getRows().getFirst().get("rowId"));
 
         // This should be true for all rows, including the one we just added:
         sr2.getRows().forEach(r -> {
@@ -494,7 +494,7 @@ public class ScriptValidationTest extends BaseWebDriverTest
         try
         {
             log("** Test errors: updating hex value");
-            ColorRecord yellow = selectColor("Yellow?").get(0);
+            ColorRecord yellow = selectColor("Yellow?").getFirst();
             yellow.hex = "shouldn't happen";
             updateColors(List.of(yellow));
             fail("Should throw an exception");

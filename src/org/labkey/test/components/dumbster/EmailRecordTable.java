@@ -114,7 +114,7 @@ public class EmailRecordTable extends Table
     public EmailMessage getMessage(String subject)
     {
         List<EmailMessage> messages = getMessages(subject);
-        return messages.isEmpty() ? null : messages.get(0);
+        return messages.isEmpty() ? null : messages.getFirst();
     }
 
     public List<EmailMessage> getMessages(String subject)
@@ -130,7 +130,7 @@ public class EmailRecordTable extends Table
     public EmailMessage getMessageRegEx(String regExp)
     {
         List<EmailMessage> messages = getMessages(subject -> subject.matches(regExp));
-        return messages.isEmpty() ? null : messages.get(0);
+        return messages.isEmpty() ? null : messages.getFirst();
     }
 
     private List<EmailMessage> getMessages(Predicate<String> subjectFilter)

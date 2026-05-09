@@ -227,7 +227,7 @@ public class TimeChartImportTest extends StudyBaseTest
         // verify that clicking the Export as Script button works
         Assert.assertEquals("Unexpected number of export script icons", info.getCountSVGs(), getExportScriptIconCount("chart-render-div"));
         String exportScript = getExportScript();
-        Assert.assertTrue(exportScript != null);
+        Assert.assertNotNull(exportScript);
 
         // verify that there is a PDF export for each plot
         Assert.assertEquals("Unexpected number of export PNG icons", info.getCountSVGs(), getExportPDFIconCount("chart-render-div"));
@@ -251,7 +251,7 @@ public class TimeChartImportTest extends StudyBaseTest
         clickFolder(VISIT_STUDY_FOLDER_NAME);
         clickTab("Clinical and Assay Data");
 
-        TimeChartInfo info = VISIT_CHARTS.get(0);
+        TimeChartInfo info = VISIT_CHARTS.getFirst();
         waitForElement(Locator.linkWithText(info.getName()));
         clickAndWait(Locator.linkWithText(info.getName()));
         waitForElements(Locator.css("div:not(.thumbnail) > svg"), info.getCountSVGs());

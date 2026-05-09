@@ -29,7 +29,6 @@ import org.labkey.test.categories.Git;
 import org.labkey.test.categories.Hosting;
 import org.labkey.test.categories.Smoke;
 import org.labkey.test.pages.core.admin.ShowAdminPage;
-import org.labkey.test.util.AttachmentHelper;
 import org.labkey.test.util.Order;
 
 import java.util.List;

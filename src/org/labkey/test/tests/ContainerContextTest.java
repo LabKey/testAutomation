@@ -621,7 +621,7 @@ public class ContainerContextTest extends BaseWebDriverTest
 
         insertCmd.addRow(rowMap);
         RowsResponse response = insertCmd.execute(cn, getProjectName() + "/" + workbookId);
-        Map<String, Object> row = response.getRows().get(0);
+        Map<String, Object> row = response.getRows().getFirst();
         Integer rowId = (Integer)row.get("RowId");
         return rowId.toString();
     }
@@ -665,7 +665,7 @@ public class ContainerContextTest extends BaseWebDriverTest
         if (resp2.getRowCount().intValue() > 0)
         {
             DeleteRowsCommand del2 = new DeleteRowsCommand("vehicle", "models");
-            del2.addRow(Maps.of("rowid", resp2.getRows().get(0).get("rowid")));
+            del2.addRow(Maps.of("rowid", resp2.getRows().getFirst().get("rowid")));
             del2.execute(cn, getProjectName());
         }
 
@@ -676,7 +676,7 @@ public class ContainerContextTest extends BaseWebDriverTest
         if (resp.getRowCount().intValue() > 0)
         {
             DeleteRowsCommand del1 = new DeleteRowsCommand("vehicle", "manufacturers");
-            del1.addRow(Maps.of("rowid", resp.getRows().get(0).get("rowid")));
+            del1.addRow(Maps.of("rowid", resp.getRows().getFirst().get("rowid")));
             del1.execute(cn, getProjectName());
         }
 
@@ -707,7 +707,7 @@ public class ContainerContextTest extends BaseWebDriverTest
         //then create model
         InsertRowsCommand insertCmd2 = new InsertRowsCommand("vehicle", "models");
         rowMap = new HashMap<>();
-        rowMap.put("manufacturerId",  resp1.getRows().get(0).get("rowid"));
+        rowMap.put("manufacturerId",  resp1.getRows().getFirst().get("rowid"));
         rowMap.put("name", MODEL);
         insertCmd2.addRow(rowMap);
         RowsResponse resp2 = insertCmd2.execute(cn, getProjectName());
@@ -715,7 +715,7 @@ public class ContainerContextTest extends BaseWebDriverTest
         InsertRowsCommand insertCmd3 = new InsertRowsCommand("vehicle", "vehicles");
         rowMap = new HashMap<>();
         rowMap.put("Color", COLOR + "!");
-        rowMap.put("ModelId", resp2.getRows().get(0).get("rowid"));
+        rowMap.put("ModelId", resp2.getRows().getFirst().get("rowid"));
         rowMap.put("ModelYear", 2050);
         rowMap.put("Milage", 2);
         rowMap.put("LastService", new Date());
@@ -723,7 +723,7 @@ public class ContainerContextTest extends BaseWebDriverTest
         insertCmd3.addRow(rowMap);
         RowsResponse response = insertCmd3.execute(cn, getProjectName());
 
-        Map<String, Object> row = response.getRows().get(0);
+        Map<String, Object> row = response.getRows().getFirst();
         return (Integer)row.get("RowId");
     }
 

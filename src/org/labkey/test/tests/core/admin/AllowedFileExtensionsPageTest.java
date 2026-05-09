@@ -5,11 +5,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
-import org.labkey.test.Locator;
 import org.labkey.test.categories.Git;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.pages.core.admin.AllowedFileExtensionAdminPage;
-import org.openqa.selenium.Alert;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -128,8 +126,8 @@ public class AllowedFileExtensionsPageTest extends AllowedFileExtensionBaseTest
                 .verifyEquals("Incorrect error message for invalid extension.",
                         expectedValue, actualValue);
 
-        allowedFileExtensionAdminPage.setExtension(allowedTypes.get(0));
-        expectedValue = String.format("'%s' already exists. Duplicate values not allowed.", allowedTypes.get(0));
+        allowedFileExtensionAdminPage.setExtension(allowedTypes.getFirst());
+        expectedValue = String.format("'%s' already exists. Duplicate values not allowed.", allowedTypes.getFirst());
         actualValue = allowedFileExtensionAdminPage.clickSaveExpectingError();
         checker().withScreenshot()
                 .verifyEquals("Incorrect error message for duplicate extension.",

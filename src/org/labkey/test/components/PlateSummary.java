@@ -21,7 +21,6 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -79,7 +78,7 @@ public class PlateSummary extends Component<PlateSummary.Elements>
     {
         _test._ext4Helper.selectRadioButton("Measurement", measurement.label);
         _measurement = measurement;
-        _test.shortWait().until(ExpectedConditions.visibilityOf(elementCache().getCells(0).get(0)));
+        _test.shortWait().until(ExpectedConditions.visibilityOf(elementCache().getCells(0).getFirst()));
     }
 
     private int getRowCount()
@@ -141,10 +140,7 @@ public class PlateSummary extends Component<PlateSummary.Elements>
         {
             if (dataCells == null)
                 dataCells = new TreeMap<>();
-            if (dataCells.get(_measurement) == null)
-                dataCells.put(_measurement, new TreeMap<>());
-            if (dataCells.get(_measurement).get(row) == null)
-                dataCells.get(_measurement).put(row, Collections.unmodifiableList(Locator.css("td:not(:first-child) a." + _measurement.locatorClass).findElements(getDataRow(row))));
+            dataCells.computeIfAbsent(_measurement, _ -> new TreeMap<>());
             return dataCells.get(_measurement).get(row);
         }
 

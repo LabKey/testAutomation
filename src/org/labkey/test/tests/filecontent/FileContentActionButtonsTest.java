@@ -254,7 +254,7 @@ public class FileContentActionButtonsTest extends BaseWebDriverTest
 
         log("Drag and Drop file '" + uploadFileName + "'");
         _fileBrowserHelper.dragDropUpload(TestFileUtils.getSampleData(uploadFolderName + "/" + uploadFileName));
-        assertEquals("File not uploaded via drag and drop", uploadFileName, _fileBrowserHelper.getFileList().get(0));
+        assertEquals("File not uploaded via drag and drop", uploadFileName, _fileBrowserHelper.getFileList().getFirst());
 
     }
 

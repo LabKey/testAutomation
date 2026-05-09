@@ -1,5 +1,6 @@
 package org.labkey.test.selenium;
 
+import org.jetbrains.annotations.NotNull;
 import org.openqa.selenium.WebElement;
 
 public abstract class BaseLazyWebElement extends WebElementWrapper
@@ -7,7 +8,7 @@ public abstract class BaseLazyWebElement extends WebElementWrapper
     private WebElement _wrappedElement;
 
     @Override
-    public WebElement getWrappedElement()
+    public @NotNull WebElement getWrappedElement()
     {
         if (null == _wrappedElement)
         {

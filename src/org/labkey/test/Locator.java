@@ -20,8 +20,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
 import org.labkey.test.selenium.LazyWebElement;
 import org.labkey.test.selenium.ReclickingWebElement;
 import org.labkey.test.selenium.RefindingWebElement;
@@ -123,7 +123,7 @@ public abstract class Locator extends By
         }
 
         @Override
-        public String toString()
+        public @NotNull String toString()
         {
             return wrappedLocator.toString();
         }
@@ -174,7 +174,7 @@ public abstract class Locator extends By
     }
 
     @Override
-    protected WebDriver getWebDriver(SearchContext context)
+    protected @NotNull WebDriver getWebDriver(@NotNull SearchContext context)
     {
         return Objects.requireNonNullElseGet(WebDriverUtils.extractWrappedDriver(context), () -> super.getWebDriver(context));
     }
@@ -275,7 +275,7 @@ public abstract class Locator extends By
         {
             els = loc.findElements(context);
             if (!els.isEmpty())
-                return els.get(0);
+                return els.getFirst();
         }
         return null;
     }
@@ -329,7 +329,7 @@ public abstract class Locator extends By
         return new ImmutableLocator(this);
     }
 
-    public abstract String toString();
+    public abstract @NotNull String toString();
 
     protected abstract By getBy();
 
@@ -371,7 +371,7 @@ public abstract class Locator extends By
             wrappedContext.setValue(input);
             return true;
         });
-        return wrappedContext.getValue();
+        return wrappedContext.get();
     }
 
     @Contract(pure = true)
@@ -387,7 +387,7 @@ public abstract class Locator extends By
     }
 
     @Override
-    public WebElement findElement(SearchContext context)
+    public @NotNull WebElement findElement(@NotNull SearchContext context)
     {
         Optional<WebElement> optionalElement = findOptionalElement(context);
         return optionalElement.orElseThrow(() ->
@@ -406,12 +406,12 @@ public abstract class Locator extends By
         List<WebElement> elements = findElements(context);
         if (elements.isEmpty())
             return Optional.empty();
-        return Optional.of(elements.get(0));
+        return Optional.of(elements.getFirst());
     }
 
     @Contract(pure = true)
     @Override
-    public List<WebElement> findElements(SearchContext context)
+    public @NotNull List<WebElement> findElements(SearchContext context)
     {
         List<WebElement> elements = context.findElements(this.getBy());
         boolean matchText = _text != null;
@@ -596,7 +596,7 @@ public abstract class Locator extends By
         });
     }
 
-    public static IdLocator id(String id)
+    public static IdLocator id(@NotNull String id)
     {
         return new IdLocator(id);
     }
@@ -611,7 +611,7 @@ public abstract class Locator extends By
         return new CssLocator(selector);
     }
 
-    public static XPathLocator xpath(@Language("XPath") String xpathExpr)
+    public static XPathLocator xpath(@Language("XPath") @NotNull String xpathExpr)
     {
         return new XPathLocator(xpathExpr);
     }
@@ -1219,7 +1219,7 @@ public abstract class Locator extends By
         }
 
         @Override
-        public String toString()
+        public @NotNull String toString()
         {
             return _cssLoc.toString();
         }
@@ -1604,7 +1604,7 @@ public abstract class Locator extends By
             return new XPathLocator("((" + String.join(")|(", xpaths) + "))");
         }
 
-        public String toString()
+        public @NotNull String toString()
         {
             return "xpath="+toXpath();
         }
@@ -1615,7 +1615,7 @@ public abstract class Locator extends By
         }
 
         @Override
-        public List<WebElement> findElements(SearchContext context)
+        public @NotNull List<WebElement> findElements(SearchContext context)
         {
             if (!(context instanceof WebDriver || context instanceof WrapsDriver) || context instanceof WebElement)
                 return decorateWebElements(context.findElements(getRelativeBy()));
@@ -1661,7 +1661,7 @@ public abstract class Locator extends By
             return _id == null ? super.getBy() : By.id(_id);
         }
 
-        public String toString()
+        public @NotNull String toString()
         {
             return _id == null ? super.toString() : "id=" + _id;
         }
@@ -1842,7 +1842,7 @@ public abstract class Locator extends By
         }
 
         @Override
-        public String toString()
+        public @NotNull String toString()
         {
             return "css=" + getLoc();
         }
@@ -1867,7 +1867,7 @@ public abstract class Locator extends By
         }
 
         @Override
-        public List<WebElement> findElements(SearchContext context)
+        public @NotNull List<WebElement> findElements(SearchContext context)
         {
             List<WebElement> elements;
             try
@@ -1906,7 +1906,7 @@ public abstract class Locator extends By
         }
 
         @Override
-        public String toString()
+        public @NotNull String toString()
         {
             return "link=" + _linkText;
         }

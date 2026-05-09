@@ -164,21 +164,21 @@ public class DataIntegrationHelper
         if (response.getRows().isEmpty())
             return null;
         else
-            return response.getRows().get(0).get(fieldName).toString();
+            return response.getRows().getFirst().get(fieldName).toString();
     }
 
     public String getTransformRunFieldByJobId(@NotNull String jobId, String fieldName) throws CommandException, IOException
     {
         String query = "SELECT " + fieldName + " FROM dataintegration.TransformRun WHERE JobId = '" + jobId + "'";
         SelectRowsResponse response = executeQuery(_folderPath, DI_SCHEMA, query);
-        return response.getRows().get(0).get(fieldName).toString();
+        return response.getRows().getFirst().get(fieldName).toString();
     }
 
     public String getTransformState(@NotNull String transformId) throws CommandException, IOException
     {
         String query = "SELECT TransformState FROM dataintegration.TransformConfiguration WHERE transformId = '" + transformId + "' ORDER BY Created DESC LIMIT 1";
         SelectRowsResponse response = executeQuery(_folderPath, DI_SCHEMA, query);
-        return response.getRows().get(0).get("TransformState").toString();
+        return response.getRows().getFirst().get("TransformState").toString();
     }
 
     public ResetTransformStateResponse resetTransformState(String transformId) throws CommandException, IOException
@@ -204,14 +204,14 @@ public class DataIntegrationHelper
     {
         String query = "SELECT Enabled FROM dataintegration.TransformConfiguration WHERE transformId = '" + transformId + "' ORDER BY Created DESC LIMIT 1";
         SelectRowsResponse response = executeQuery(_folderPath, DI_SCHEMA, query);
-        return Boolean.parseBoolean(response.getRows().get(0).get("Enabled").toString());
+        return Boolean.parseBoolean(response.getRows().getFirst().get("Enabled").toString());
     }
 
     private String getContainerForFolder(String folderName) throws CommandException, IOException
     {
         String query = "select EntityID from Containers where Name = '" + folderName + "'";
         SelectRowsResponse response = executeQuery(folderName, "core", query);
-        return response.getRows().get(0).get("EntityID").toString();
+        return response.getRows().getFirst().get("EntityID").toString();
     }
 
     public void sleep(long ms)
@@ -223,7 +223,7 @@ public class DataIntegrationHelper
     {
         String query = "SELECT FilePath FROM pipeline.job WHERE RowId = '" + jobId + "'";
         SelectRowsResponse response = executeQuery(_folderPath, DI_SCHEMA, query);
-        String filePath = response.getRows().get(0).get("FilePath").toString();
+        String filePath = response.getRows().getFirst().get("FilePath").toString();
         if (filePath == null)
             return null;
 
