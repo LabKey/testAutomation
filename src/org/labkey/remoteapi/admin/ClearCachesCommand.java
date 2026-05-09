@@ -23,9 +23,9 @@ public class ClearCachesCommand extends PostCommand<CommandResponse>
     {
         Map<String, Object> params = new HashMap<>();
         if (_clearCaches)
-            params.put("clearCaches", "1");
+            params.put("clearCaches", true);
         if (_gc)
-            params.put("gc", "1");
+            params.put("gc", true);
         return params;
     }
 }
