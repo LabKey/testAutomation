@@ -140,8 +140,8 @@ public class PlateSummary extends Component<PlateSummary.Elements>
         {
             if (dataCells == null)
                 dataCells = new TreeMap<>();
-            dataCells.computeIfAbsent(_measurement, _ -> new TreeMap<>());
-            return dataCells.get(_measurement).get(row);
+            return dataCells.computeIfAbsent(_measurement, _ -> new TreeMap<>())
+                    .computeIfAbsent(row, _ -> List.copyOf(Locator.css("td:not(:first-child) a." + _measurement.locatorClass).findElements(getDataRow(row))));
         }
 
         protected WebElement getCell(int row, int col)
