@@ -239,7 +239,7 @@ public class FieldSelectionDialog extends ModalDialog
     {
         // As long as there is no expand icon then this field is expanded.
         return   !Locator.tagWithClass("div", "field-expand-icon")
-                .withChild(Locator.tagWithClass("i", "fa-chevron-right"))
+                .withChild(Locator.tagWithClass("button", "fa-chevron-right"))
                 .findWhenNeeded(listItem).isDisplayed();
     }
 
