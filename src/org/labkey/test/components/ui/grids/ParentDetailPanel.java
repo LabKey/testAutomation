@@ -157,7 +157,7 @@ public class ParentDetailPanel extends WebDriverComponent<ParentDetailPanel.Elem
         public WebElement panelHeading = Locator.tagWithClass("div", "panel-heading")
                 .findWhenNeeded(this).withTimeout(2000);
 
-        public Locator editBtnLoc = Locator.tagWithClass("div", "detail__edit-button");
+        public Locator editBtnLoc = Locator.byClass("detail__edit-button");
         public Optional<WebElement> optionalEditBtn()
         {
             return editBtnLoc.findOptionalElement(panelHeading);
