@@ -1032,6 +1032,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     {
         Locator.XPathLocator selectionHandleLoc = Locator.byClass("cell-selection-handle");
         selectCellRange(selectStart, selectEnd);
+        selectEnd.click();
         String fillValue = getCellValue(selectEnd);
         WebElement selectionHandle = selectionHandleLoc.waitForElement(getComponentElement(), 2_000);
         dragToCell(selectionHandle, dragEnd);
@@ -1039,6 +1040,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         {
             // Fill didn't complete — the drag likely extended the selection without triggering the fill.
             selectCellRange(selectStart, selectEnd);
+            selectEnd.click();
             selectionHandle = selectionHandleLoc.waitForElement(getComponentElement(), 2_000);
             dragToCell(selectionHandle, dragEnd);
             WebDriverWrapper.waitFor(() -> fillValue.equals(getCellValue(dragEnd)),
