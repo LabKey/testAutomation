@@ -947,7 +947,7 @@ public class Crawler
                     {
                         File[] filesArray = WebDriverWrapper.getNewFiles(0, downloadDir, existingDownloads);
                         downloadedFiles.setValue(filesArray);
-                        if (downloadedFiles.getValue().length > 0)
+                        if (downloadedFiles.get().length > 0)
                         {
                             navigated.setValue(false); // Don't wait for page load when a download occurs
                             return true; // Stop waiting
@@ -966,24 +966,24 @@ public class Crawler
                 {
                     TestLogger.warn("URL didn't trigger a download or navigation: " + fullURL);
                 }
-                return navigated.getValue();
+                return navigated.get();
             });
 
-            if (!navigated.getValue())
+            if (!navigated.get())
             {
                 logMessage = logMessage.replace(messagePrefix, "Downloading from ");
             }
 
             logMessage += TestLogger.formatElapsedTime(elapsedTime);
 
-            return navigated.getValue();
+            return navigated.get();
         }
         finally
         {
             TestLogger.info(logMessage); // log after navigation to
-            if (downloadedFiles.getValue() != null)
+            if (downloadedFiles.get() != null)
             {
-                Arrays.stream(downloadedFiles.getValue()).forEach(file -> {
+                Arrays.stream(downloadedFiles.get()).forEach(file -> {
                     TestLogger.info("  \u2517" + file.getName()); // Log downloaded files
                     FileUtils.deleteQuietly(file); // Clean up crawled downloads
                 });
@@ -996,7 +996,7 @@ public class Crawler
         String relativeURL = urlToCheck.getRelativeURL();
         ControllerActionId actionId = new ControllerActionId(relativeURL);
         URL actualUrl; // URL might redirect
-        boolean navigated = true; // URL might download
+        boolean navigated; // URL might download
         List<UrlToCheck> newUrlsToCheck = new ArrayList<>();
 
         // Keep track of where crawler has been
@@ -1010,15 +1010,7 @@ public class Crawler
 
         try
         {
-            try
-            {
-                navigated = beginAt(relativeURL);
-            }
-            catch (UnhandledAlertException alert)
-            {
-                if (isRealFailure(alert))
-                    throw alert;
-            }
+            navigated = beginAt(relativeURL);
 
             if (navigated) // These checks were already performed if navigation didn't occur
             {
@@ -1059,7 +1051,7 @@ public class Crawler
                     List<String> serverError = _test.getTexts(Locator.css("table.server-error").findElements(_test.getDriver()));
                     if (!serverError.isEmpty())
                     {
-                        String[] errorLines = serverError.get(0).split("\n");
+                        String[] errorLines = serverError.getFirst().split("\n");
                         fail(relativeURL + "\nproduced error: \"" + errorLines[0] + "\"." + originMessage);
                     }
 
@@ -1270,7 +1262,7 @@ public class Crawler
 
     public static void tryInject(WebDriverWrapper test, Runnable r)
     {
-        tryInject(test, arg -> {r.run(); return true;}, null);
+        tryInject(test, _ -> {r.run(); return true;}, null);
     }
 
     /**
@@ -1342,15 +1334,6 @@ public class Crawler
         }
     }
 
-    /** Ignore GWT alerts from designer pages */
-    private boolean isRealFailure(Exception e)
-    {
-        return !(e instanceof UnhandledAlertException && (
-                e.getMessage().contains("Script Tag Failure - no status available") || // alert when navigating away quickly
-                e.getMessage().contains("Service_Proxy") // Alert from various GWT services (e.g. "from StudyDefinitionService_Proxy.getBlank")
-        ));
-    }
-
     private void testInjection(URL start)
     {
         String base = stripQueryParams(stripHash(start.toString()));
@@ -1409,16 +1392,11 @@ public class Crawler
             }
             catch (Exception ex)
             {
-                if (isRealFailure(ex))
-                {
-                    throw new AssertionError("Non-injection error while attempting script injection on " + actionId + "\n" +
-                            "param: " + paramMalicious + "\n" +
-                            "URL: " + urlMalicious, ex);
-                }
+                throw new AssertionError("Non-injection error while attempting script injection on " + actionId + "\n" +
+                        "param: " + paramMalicious + "\n" +
+                        "URL: " + urlMalicious, ex);
             }
         }
-        // TODO this blows up jquery document completed handling, which causes pageload to not fire and then timeout
-        /// tryInject(_test, urlTester, base + "?" + query + "#" + injectString);
     }
 
     static Random random = new Random();
