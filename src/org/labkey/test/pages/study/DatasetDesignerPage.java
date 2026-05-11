@@ -314,8 +314,8 @@ public class DatasetDesignerPage extends DomainDesigner<DatasetDesignerPage.Elem
 
         protected FilteringReactSelect columnMapSelect(String labelText)
         {   // find the row with the specified label span, then get the select in it
-            WebElement container = Locator.tag("div").withChild(Locator.tag("div").withChild(Locator.tag("span")
-                    .withChild(Locator.tagWithClass("span", "domain-no-wrap").withText(labelText))))
+            WebElement container = Locator.tag("div").withChild(Locator.tag("div")
+                    .withChild(Locator.tagWithClass("span", "domain-no-wrap").withText(labelText)))
                     .waitForElement(fieldsPanel, 2000);
             return FilteringReactSelect.finder(getDriver()).find(container);
         }
