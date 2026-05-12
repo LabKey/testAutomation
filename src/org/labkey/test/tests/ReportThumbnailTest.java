@@ -41,7 +41,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 
 @Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 15)
@@ -512,7 +512,7 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         String iconData = getIconDataFromPropertiesPanel();
 
         if (null == expected)
-            assertFalse("Icon was still default", ICON_DATA.equals(iconData));
+            assertNotEquals("Icon was still default", ICON_DATA, iconData);
         else
             assertEquals("Unexpected icon", expected, iconData);
 

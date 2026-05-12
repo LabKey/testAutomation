@@ -254,7 +254,7 @@ public class CrossFolderListTest extends BaseWebDriverTest
         assertThat(subFolderListPage.getGrid().getColumnNames())
                 .as("expect to be shown folder and key columns").contains("container", "Key");
 
-        var displayedRecord = displayedData.get(0);
+        var displayedRecord = displayedData.getFirst();
         assertEquals("expect subfolder name metadata to be available here",
                 SUBFOLDER_A, displayedRecord.get("container"));
         assertNotNull("expect list metadata like key to be accessible in a subfolder",

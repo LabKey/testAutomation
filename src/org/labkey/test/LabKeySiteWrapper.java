@@ -892,7 +892,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             DefaultRedirectStrategy redirectStrategy = new DefaultRedirectStrategy()
             {
                 @Override
-                public boolean isRedirected(HttpRequest httpRequest, HttpResponse httpResponse, HttpContext httpContext) throws ProtocolException
+                public boolean isRedirected(HttpRequest httpRequest, HttpResponse httpResponse, HttpContext httpContext)
                 {
                     boolean isRedirect = false;
                     try
@@ -979,7 +979,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         // "All Site Users" after sorting takes place
         List<Map<String, Object>> siteGroups = helper.getSiteGroups();
         assertEquals(2, siteGroups.size());
-        Map<String, Object> guests = siteGroups.get(0);
+        Map<String, Object> guests = siteGroups.getFirst();
         assertEquals("Guests", guests.get("name"));
         assertEquals(-3, guests.get("id"));
         Map<String, Object> users = siteGroups.get(1);

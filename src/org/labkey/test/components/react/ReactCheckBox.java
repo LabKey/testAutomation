@@ -19,21 +19,9 @@ public class ReactCheckBox extends Checkbox
     }
 
     @Override
-    public boolean isEnabled()
-    {
-        return getComponentElement().isEnabled();
-    }
-
-    @Override
     public boolean isSelected()
     {
         return isChecked();
-    }
-
-    @Override
-    public boolean isDisplayed()
-    {
-        return getComponentElement().isDisplayed();
     }
 
     @Override

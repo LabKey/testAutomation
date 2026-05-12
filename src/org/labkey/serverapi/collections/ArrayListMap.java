@@ -16,6 +16,7 @@
 package org.labkey.serverapi.collections;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -107,7 +108,7 @@ public class ArrayListMap<K, V> extends AbstractMap<K, V> implements Serializabl
         }
 
         @Override
-        public void putAll(Map<? extends K, ? extends Integer> map)
+        public void putAll(@NotNull Map<? extends K, ? extends Integer> map)
         {
             _map.putAll(map);
         }
@@ -119,19 +120,19 @@ public class ArrayListMap<K, V> extends AbstractMap<K, V> implements Serializabl
         }
 
         @Override
-        public Set<K> keySet()
+        public @NotNull Set<K> keySet()
         {
             return _map.keySet();
         }
 
         @Override
-        public Collection<Integer> values()
+        public @NotNull Collection<Integer> values()
         {
             return _map.values();
         }
 
         @Override
-        public Set<Entry<K, Integer>> entrySet()
+        public @NotNull Set<Entry<K, Integer>> entrySet()
         {
             return _map.entrySet();
         }
@@ -238,7 +239,7 @@ public class ArrayListMap<K, V> extends AbstractMap<K, V> implements Serializabl
 
 
     @Override
-    public Set<Entry<K, V>> entrySet()
+    public @NotNull Set<Entry<K, V>> entrySet()
     {
         Set<Entry<K, V>> r = new HashSet<>(_row.size() * 2);
         for (Entry<K, Integer> e : _findMap.entrySet())
@@ -255,7 +256,7 @@ public class ArrayListMap<K, V> extends AbstractMap<K, V> implements Serializabl
 
 
     @Override
-    public Set<K> keySet()
+    public @NotNull Set<K> keySet()
     {
         Set<K> ret = _findMap.keySet();
         assert null != (ret = Collections.unmodifiableSet(ret));
@@ -288,7 +289,7 @@ public class ArrayListMap<K, V> extends AbstractMap<K, V> implements Serializabl
 
 
     @Override
-    public Collection<V> values()
+    public @NotNull Collection<V> values()
     {
         ArrayList<V> a = new ArrayList<>(size());
         for (Object o : _row)

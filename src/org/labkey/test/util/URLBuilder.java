@@ -2,7 +2,6 @@ package org.labkey.test.util;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
-import org.labkey.test.WebTestHelper;
 
 import java.nio.charset.Charset;
 import java.util.Map;

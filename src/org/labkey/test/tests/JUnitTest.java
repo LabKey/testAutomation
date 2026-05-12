@@ -250,7 +250,7 @@ public class JUnitTest extends TestSuite
                     if (responseBody.contains("<title>Start Modules</title>"))
                     {
                         // Server still starting up.  We don't need to use the upgradeHelper to sign in.
-                        LOG.info("Remote JUnitTest: Server modules starting up (remaining " + TestDateUtils.durationString(startupTimer.timeRemaining()) + ") ...");
+                        LOG.info("Remote JUnitTest: Server modules starting up (remaining {}) ...", TestDateUtils.durationString(startupTimer.timeRemaining()));
 
                         EntityUtils.consumeQuietly(response.getEntity()); // Consume before possible recursion
                         if (!startupTimer.isTimedOut())
@@ -349,14 +349,14 @@ public class JUnitTest extends TestSuite
                 {
                     remotesuite.addTest(new JUnit4TestAdapter(JUnitFooter.class));
                     // Exclude header and footer from count
-                    LOG.info("Remote JUnitTest: found " + (remotesuite.countTestCases() - 2) + " tests.");
+                    LOG.info("Remote JUnitTest: found {} tests.", remotesuite.countTestCases() - 2);
                 }
 
                 return remotesuite;
             }
             else
             {
-                LOG.error("Getting unit test list from server failed with error code " + status + ". Error page content is:");
+                LOG.error("Getting unit test list from server failed with error code {}. Error page content is:", status);
                 final OutputStream streamLogger = IoBuilder.forLogger(LOG).setLevel(Level.ERROR).buildOutputStream();
                 response.getEntity().writeTo(streamLogger);
                 throw new AssertionFailedError("Failed to fetch remote junit test list (" + status + " - " + response.getReasonPhrase() + "): " + url);

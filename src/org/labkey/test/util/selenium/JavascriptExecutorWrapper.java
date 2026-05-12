@@ -2,6 +2,7 @@ package org.labkey.test.util.selenium;
 
 import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.ScriptKey;
 import org.openqa.selenium.WebDriver;
@@ -18,13 +19,13 @@ public class JavascriptExecutorWrapper implements JavascriptExecutor
     }
 
     @Override
-    public @Nullable Object executeScript(@Language("JavaScript") String script, @Nullable Object... args)
+    public @Nullable Object executeScript(@Language("JavaScript") @NotNull String script, Object @NotNull ... args)
     {
         return _wrappedExecutor.executeScript(script, args);
     }
 
     @Override
-    public @Nullable Object executeScript(ScriptKey key, @Nullable Object... args)
+    public @Nullable Object executeScript(@NotNull ScriptKey key, Object @NotNull ... args)
     {
         return _wrappedExecutor.executeScript(key, args);
     }
@@ -43,7 +44,7 @@ public class JavascriptExecutorWrapper implements JavascriptExecutor
      * See {@link JavascriptExecutor#executeAsyncScript(java.lang.String, java.lang.Object...)} for details
      */
     @Override
-    public @Nullable Object executeAsyncScript(@Language("JavaScript") String script, @Nullable Object... arguments)
+    public @Nullable Object executeAsyncScript(@Language("JavaScript") @NotNull String script, Object @NotNull ... arguments)
     {
         script = "var callback = arguments[arguments.length - 1];\n" + // See WebDriver documentation for details on injected callback
                 "try {" +
@@ -66,19 +67,19 @@ public class JavascriptExecutorWrapper implements JavascriptExecutor
     }
 
     @Override
-    public Set<ScriptKey> getPinnedScripts()
+    public @NotNull Set<ScriptKey> getPinnedScripts()
     {
         return _wrappedExecutor.getPinnedScripts();
     }
 
     @Override
-    public void unpin(ScriptKey key)
+    public void unpin(@NotNull ScriptKey key)
     {
         _wrappedExecutor.unpin(key);
     }
 
     @Override
-    public ScriptKey pin(@Language("JavaScript") String script)
+    public @NotNull ScriptKey pin(@Language("JavaScript") @NotNull String script)
     {
         return _wrappedExecutor.pin(script);
     }

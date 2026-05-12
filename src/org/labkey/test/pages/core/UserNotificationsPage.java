@@ -285,7 +285,7 @@ public class UserNotificationsPage extends LabKeyPage
 
         public void clickDelete()
         {
-            _parent.findElements(By.cssSelector("span.notification-link")).get(0).click();
+            _parent.findElements(By.cssSelector("span.notification-link")).getFirst().click();
             try
             {
                 waitForElementToDisappear(Locator.css("div#" + _parent.getAttribute("id")));

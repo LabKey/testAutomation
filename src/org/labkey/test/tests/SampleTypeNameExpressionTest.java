@@ -857,10 +857,9 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
      *     </ul>
      * </p>
      * @throws IOException Can be thrown by the test helper.
-     * @throws CommandException Can be thrown by test helper.
      */
     @Test
-    public void testNameExpressionPreview() throws IOException, CommandException
+    public void testNameExpressionPreview() throws IOException
     {
 
         goToProjectHome();
@@ -946,7 +945,7 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         DataRegionTable sampleTypeList =  DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
         sampleTypeList.clickInsertNewRow();
 
-        WebElement popUpLink = Locator.tagWithClass("span", "labkey-help-pop-up").findElements(getDriver()).get(0);
+        WebElement popUpLink = Locator.tagWithClass("span", "labkey-help-pop-up").findElements(getDriver()).getFirst();
         mouseOver(popUpLink);
 
         waitForElement(Locator.tagWithId("div", "helpDiv"));
@@ -1018,7 +1017,7 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         {
             String expectedError = "Name Pattern error: No closing brace found for the substitution pattern starting at position 7.";
             checker().verifyEquals("Error message on saving is not as expected.",
-                    expectedError, errors.get(0));
+                    expectedError, errors.getFirst());
         }
 
         checker().screenShotIfNewError("Error_On_Save_Failure");

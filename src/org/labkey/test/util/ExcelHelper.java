@@ -247,7 +247,7 @@ public abstract class ExcelHelper
         {
             rows.add(getRowData(sheet, i));
         }
-        final int colCount = rows.get(0).size(); // Assume first row is column headers
+        final int colCount = rows.getFirst().size(); // Assume first row is column headers
         for (int j = 1; j < rows.size(); j++)
         {
             List<String> dataRow = rows.get(j);
@@ -276,7 +276,7 @@ public abstract class ExcelHelper
                 Sheet sheet = workbook.getSheetAt(s);
 
                 List<List<String>> rawRows = getAllRows(sheet);
-                List<String> rawHeaders = rawRows.get(0);
+                List<String> rawHeaders = rawRows.getFirst();
                 List<List<String>> rawData = rawRows.subList(1, rawRows.size());
 
                 List<Map<String, String>> rowMaps = new ArrayList<>();

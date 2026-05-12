@@ -79,7 +79,7 @@ public abstract class ListDefinition extends DomainProps
         if (!fields.isEmpty() && getKeyName() == null)
         {
             // Use first field as key
-            setKeyName(fields.get(0).getName());
+            setKeyName(fields.getFirst().getName());
         }
         _fields = new ArrayList<>(fields); // Make sure it isn't immutable
         return this;

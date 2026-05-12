@@ -673,7 +673,7 @@ public class ClientAPITest extends BaseWebDriverTest
 
         Map<String, Object> createResult = (Map<String,Object>)executeAsyncScript(create);
         List<Map<String, Object>> fields = (List<Map<String, Object>>)createResult.get("fields");
-        assertTrue(fields.size() == 6);
+        assertEquals(6, fields.size());
         assertTrue(fields.stream().anyMatch(a-> a.get("name").toString().equals("intFieldOne")));
         assertTrue(fields.stream().anyMatch(a-> a.get("name").toString().equals("stringFieldOne")));
         assertTrue(fields.stream().anyMatch(a-> a.get("name").toString().equals("labName")));
@@ -720,7 +720,7 @@ public class ClientAPITest extends BaseWebDriverTest
 
         Map<String, Object> updateResult = (Map<String, Object>)executeAsyncScript(updateDomain);
         List<Map<String, Object>> updatedFields = (List<Map<String, Object>>) updateResult.get("fields");
-        assertTrue(updatedFields.size() == 7);
+        assertEquals(7, updatedFields.size());
         assertTrue(updatedFields.stream().anyMatch(a -> a.get("name").toString().equals("intFieldOne")));
         assertTrue(updatedFields.stream().anyMatch(a -> a.get("name").toString().equals("stringFieldOne")));
         assertTrue(updatedFields.stream().anyMatch(a -> a.get("name").toString().equals("labName")));

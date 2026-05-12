@@ -365,7 +365,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     public QueryGrid shiftSelectRange(int start, int end)
     {
         var checkBoxes = Locator.tagWithClass("input", "grid-panel__row-checkbox").findElements(this);
-        getWrapper().scrollIntoView(checkBoxes.get(0), true); // scroll the top row to the top
+        getWrapper().scrollIntoView(checkBoxes.getFirst(), true); // scroll the top row to the top
         new Actions(getDriver())
                 .click(checkBoxes.get(start))
                 .keyDown(Keys.SHIFT)

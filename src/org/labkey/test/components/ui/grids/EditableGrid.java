@@ -1032,6 +1032,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     {
         Locator.XPathLocator selectionHandleLoc = Locator.byClass("cell-selection-handle");
         selectCellRange(selectStart, selectEnd);
+        selectEnd.click();
         String fillValue = getCellValue(selectEnd);
         WebElement selectionHandle = selectionHandleLoc.waitForElement(getComponentElement(), 2_000);
         dragToCell(selectionHandle, dragEnd);
@@ -1039,6 +1040,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         {
             // Fill didn't complete — the drag likely extended the selection without triggering the fill.
             selectCellRange(selectStart, selectEnd);
+            selectEnd.click();
             selectionHandle = selectionHandleLoc.waitForElement(getComponentElement(), 2_000);
             dragToCell(selectionHandle, dragEnd);
             WebDriverWrapper.waitFor(() -> fillValue.equals(getCellValue(dragEnd)),
@@ -1192,7 +1194,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         List<String> columns = getColumnLabels();
         int selectIndexOffset = hasSelectColumn() ? 1 : 0;
         WebElement indexCell = getCell(0, columns.get(1 + selectIndexOffset));
-        WebElement endCell = getCell(elementCache().getRows().size()-1, columns.get(columns.size()-1));
+        WebElement endCell = getCell(elementCache().getRows().size()-1, columns.getLast());
         return (isInSelection(indexCell) && isInSelection(endCell));
     }
 
@@ -1354,7 +1356,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
                 if (hasSelectColumn())
                 {
-                    columnHeaders.add(new EditableGridColumnHeader(headerCellElements.get(0), domIndex, SELECT_COLUMN_LABEL_PLACEHOLDER));
+                    columnHeaders.add(new EditableGridColumnHeader(headerCellElements.getFirst(), domIndex, SELECT_COLUMN_LABEL_PLACEHOLDER));
                     domIndex++;
                 }
 
@@ -1498,13 +1500,13 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
                 else
                 {
                     // Depth-first search until we find some text
-                    return getLabelFromHeaderCell(children.get(0));
+                    return getLabelFromHeaderCell(children.getFirst());
                 }
             }
             else
             {
                 boolean required = Locator.byClass("required-symbol").existsIn(el);
-                String label = textNodes.get(0).trim(); // trim trailing NBSP
+                String label = textNodes.getFirst().trim(); // trim trailing NBSP
                 return label + (required ? " *" : ""); // re-add required asterisk for tests that expect it
             }
         }

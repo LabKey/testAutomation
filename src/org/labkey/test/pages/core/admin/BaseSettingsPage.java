@@ -4,7 +4,6 @@ import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.test.Locator;
-import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.WebDriver;

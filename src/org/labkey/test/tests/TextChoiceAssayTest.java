@@ -163,8 +163,8 @@ public class TextChoiceAssayTest extends TextChoiceTest
 
         WebElement select = Locator.name(String.format("quf_%s", RUN_TC_FIELD)).findElement(getDriver());
 
-        String newRunValue = unusedRunFieldValues.get(0);
-        unusedRunFieldValues.remove(0);
+        String newRunValue = unusedRunFieldValues.getFirst();
+        unusedRunFieldValues.removeFirst();
 
         log(String.format("Update the Run TextChoice field from '%s' to '%s'.", currentRunValue, newRunValue));
 
@@ -191,7 +191,7 @@ public class TextChoiceAssayTest extends TextChoiceTest
         rowIndex = dataRegionTable.getRowIndex(RESULT_SAMPLE_FIELD, sample);
         dataRegionTable.clickEditRow(rowIndex);
         select = Locator.name(String.format("quf_%s", RESULT_TC_FIELD)).findElement(getDriver());
-        String updatedResultValue = unusedResultFiledValues.get(0);
+        String updatedResultValue = unusedResultFiledValues.getFirst();
         log(String.format("Result TextChoice value for sample '%s' will be changed from '%s' to '%s'.", sample, currentResultRowData.get(sample), updatedResultValue));
         new OptionSelect<>(select).selectOption(OptionSelect.SelectOption.textOption(updatedResultValue));
 

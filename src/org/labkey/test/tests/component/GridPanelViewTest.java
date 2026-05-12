@@ -189,7 +189,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
         // Create list of strings that has the various sets of the letters A, B, C & D
         stringSets = getAllSets(stringSetMembers, stringSetMembers.size() - 1);
         // Remove the empty set.
-        stringSets.remove(0);
+        stringSets.removeFirst();
 
         // Create a sample type that will validate views can be saved and shared. Primarily interested in the views not
         // with complex filtering scenarios.
@@ -226,7 +226,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
         removeFlagColumnFromDefaultView(sampleTypeName);
     }
 
-    private void generateSamples(TestDataGenerator sampleSetDataGenerator, String samplePrefix, int numOfSamples) throws IOException, CommandException
+    private void generateSamples(TestDataGenerator sampleSetDataGenerator, String samplePrefix, int numOfSamples) throws IOException
     {
         int sampleId = 1;
         int allPossibleIndex = 0;
@@ -312,7 +312,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
         {
             if (defaultViewAuditRows.size() > 1)
             {
-                Map<String, Object> deletedPrivateViewEvent = defaultViewAuditRows.get(0);
+                Map<String, Object> deletedPrivateViewEvent = defaultViewAuditRows.getFirst();
 
                 checker().verifyTrue("Comment should contain 'deleted' for private default view that's deleted.",
                         String.valueOf(deletedPrivateViewEvent.get("Comment")).contains("deleted"));
@@ -324,7 +324,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
             }
             else
             {
-                Map<String, Object> defaultViewEvent = defaultViewAuditRows.get(0);
+                Map<String, Object> defaultViewEvent = defaultViewAuditRows.getFirst();
 
                 checker().verifyTrue("Comment should contain 'created' or 'updated' for default view.",
                         String.valueOf(defaultViewEvent.get("Comment")).contains("created") || String.valueOf(defaultViewEvent.get("Comment")).contains("updated"));
@@ -398,7 +398,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
 
         if (!personalDefaultAuditRows.isEmpty())
         {
-            Map<String, Object> personalDefaultEvent = personalDefaultAuditRows.get(0);
+            Map<String, Object> personalDefaultEvent = personalDefaultAuditRows.getFirst();
 
             checker().verifyTrue("Comment should contain 'created' or 'updated' for personal default view.",
                     String.valueOf(personalDefaultEvent.get("Comment")).contains("created") ||
@@ -2049,7 +2049,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
 
         if (!auditRows.isEmpty())
         {
-            Map<String, Object> createEvent = auditRows.get(0);
+            Map<String, Object> createEvent = auditRows.getFirst();
 
             checker().verifyTrue("Comment should contain 'Grid view created: " + AUDIT_TEST_VIEW + "'.",
                     String.valueOf(createEvent.get("Comment")).contains("Grid view created: " + AUDIT_TEST_VIEW));
@@ -2093,7 +2093,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
 
         if (!auditRows.isEmpty())
         {
-            Map<String, Object> sortUpdateEvent = auditRows.get(0);
+            Map<String, Object> sortUpdateEvent = auditRows.getFirst();
 
             checker().verifyTrue("Comment should contain 'Grid view updated: " + AUDIT_TEST_VIEW + "'.",
                     String.valueOf(sortUpdateEvent.get("Comment")).contains("Grid view updated: " + AUDIT_TEST_VIEW));
@@ -2162,7 +2162,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
                     createEvent.get("CustomViewOwner") == null);
 
             // the old private view is deleted
-            Map<String, Object> deleteEvent = auditRows.get(0);
+            Map<String, Object> deleteEvent = auditRows.getFirst();
 
             log(String.valueOf(deleteEvent.get("Comment")));
             checker().verifyTrue("Comment should contain 'Grid view deleted: " + AUDIT_TEST_VIEW + "'.",
@@ -2197,7 +2197,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
 
         if (!auditRows.isEmpty())
         {
-            Map<String, Object> deleteEvent = auditRows.get(0);
+            Map<String, Object> deleteEvent = auditRows.getFirst();
 
             checker().verifyTrue("Comment should contain 'Grid view deleted: " + AUDIT_TEST_VIEW + "'.",
                     String.valueOf(deleteEvent.get("Comment")).contains("Grid view deleted: " + AUDIT_TEST_VIEW));

@@ -795,7 +795,7 @@ public class ListTest extends BaseWebDriverTest
                 EscapeUtil.fieldKeyEncodePart(LIST_KEY_NAME2) + '/' + _listColGood.getName());
 
         List<Map<String, Object>> exportedFileData = tabLoader.load();
-        List<String> actualValues = exportedFileData.get(0).keySet().stream().toList();
+        List<String> actualValues = exportedFileData.getFirst().keySet().stream().toList();
 
         assertTrue("Exported file does not contain expected header values.",
                 actualValues.containsAll(expectedValues));
@@ -2110,7 +2110,7 @@ public class ListTest extends BaseWebDriverTest
 
         assertNoLabKeyErrors();
 
-        expectedValues.remove(0);
+        expectedValues.removeFirst();
 
         validateDataRegionTableForTricky(expectedValues);
 
@@ -2212,7 +2212,7 @@ public class ListTest extends BaseWebDriverTest
     );
 
     List<FieldDefinition> BatchListMergeColumns = Arrays.asList(
-            BatchListColumns.get(0),
+            BatchListColumns.getFirst(),
             BatchListColumns.get(1),
             BatchListColumns.get(3)
     );
@@ -2276,7 +2276,7 @@ public class ListTest extends BaseWebDriverTest
     void createList(String name, List<FieldDefinition> cols, String tsvData)
     {
         log("Add List -- " + name);
-        _listHelper.createList(PROJECT_VERIFY, name, cols.get(0), cols.subList(1, cols.size()).toArray(new FieldDefinition[cols.size() - 1]));
+        _listHelper.createList(PROJECT_VERIFY, name, cols.getFirst(), cols.subList(1, cols.size()).toArray(new FieldDefinition[cols.size() - 1]));
         _listHelper.goToList(name);
         _listHelper.clickImportData();
         setListImportAsTestDataField(tsvData);
@@ -2380,8 +2380,8 @@ public class ListTest extends BaseWebDriverTest
         goToProjectHome();
         goToManageLists().getGrid().viewListData(listName);
 
-        clickAndWait(Locator.linkWithText(pks.get(0)));
-        assertElementPresent(Locator.tagContainingText("td", pks.get(0)));
+        clickAndWait(Locator.linkWithText(pks.getFirst()));
+        assertElementPresent(Locator.tagContainingText("td", pks.getFirst()));
     }
 
     @Test // Issue 53979

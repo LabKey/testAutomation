@@ -130,7 +130,7 @@ public class CspResourceHostsTest extends BaseWebDriverTest
             String host1UpperCase = host1.toUpperCase();
             List<String> errors = externalSourcesPage.addHostExpectingError(directive, "  " + host1UpperCase + "  ");
             assertThat(errors).as("error count").hasSize(1);
-            assertThat(errors.get(0)).contains("Duplicate values are not allowed.", directive.name(), host1UpperCase);
+            assertThat(errors.getFirst()).contains("Duplicate values are not allowed.", directive.name(), host1UpperCase);
         }
 
         assertThat(externalSourcesPage.getExistingHosts()).as("Defined directives")
@@ -163,7 +163,7 @@ public class CspResourceHostsTest extends BaseWebDriverTest
             externalSourcesPage.editHost(directive, host2, "  " + host1UpperCase + "  ");
             List<String> errors = externalSourcesPage.saveChangesExpectingError();
             assertThat(errors).as("error count").hasSize(1);
-            assertThat(errors.get(0)).contains("Duplicate values are not allowed.", directive.name(), host1);
+            assertThat(errors.getFirst()).contains("Duplicate values are not allowed.", directive.name(), host1);
         }
 
         assertThat(externalSourcesPage.getExistingHosts()).as("Defined directives")

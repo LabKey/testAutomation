@@ -406,7 +406,7 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
     public String getParentAliasSelectText(int index)
     {
         expandPropertiesPanel();
-        return elementCache().parentAliasSelect(index).getSelections().get(0);
+        return elementCache().parentAliasSelect(index).getSelections().getFirst();
     }
 
     protected class ElementCache extends DomainDesigner<?>.ElementCache

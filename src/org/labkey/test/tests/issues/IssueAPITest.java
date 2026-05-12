@@ -99,10 +99,10 @@ public class IssueAPITest extends BaseWebDriverTest
         IssuesCommand cmd = new IssuesCommand();
         cmd.setIssues(List.of(testIssue));
         IssueResponse response = cmd.execute(createDefaultConnection(), getProjectName());
-        assertNotNull("expect our issue response to tell us an issue ID", response.getIssueIds().get(0));
+        assertNotNull("expect our issue response to tell us an issue ID", response.getIssueIds().getFirst());
 
-        var issueResponseModel = getIssueResponse(response.getIssueIds().get(0));
-        var lastComment = issueResponseModel.getComments().get(0);
+        var issueResponseModel = getIssueResponse(response.getIssueIds().getFirst());
+        var lastComment = issueResponseModel.getComments().getFirst();
         var attachments = lastComment.getAttachments();
         assertThat("expect that the comment was set", lastComment.getComment(), containsString(comment));
         assertEquals("expect issue author to be correctly identified", TEST_USER_DISPLAY_NAME, lastComment.getCreatedBy());
@@ -136,7 +136,7 @@ public class IssueAPITest extends BaseWebDriverTest
 
         // Update without including the custom field, ensuring that the old value is retained
         IssueModel toUpdate = new IssueModel();
-        toUpdate.setIssueId(response.getIssueIds().get(0));
+        toUpdate.setIssueId(response.getIssueIds().getFirst());
         final String updatedTitle = "Updated custom field test issue";
         toUpdate.setTitle(updatedTitle);
         toUpdate.setIssueDefName(ISSUES_WITH_REQUIRED);
@@ -144,13 +144,13 @@ public class IssueAPITest extends BaseWebDriverTest
         IssueResponse updateResponse = new IssuesCommand(List.of(toUpdate)).execute(createDefaultConnection(), getProjectName());
         assertEquals(1, updateResponse.getIssueIds().size());
 
-        IssueResponseModel updatedIssue = getIssueResponse(updateResponse.getIssueIds().get(0));
+        IssueResponseModel updatedIssue = getIssueResponse(updateResponse.getIssueIds().getFirst());
         assertEquals(updatedTitle, updatedIssue.getTitle());
         assertEquals(customFieldValue, updatedIssue.getProperties(CUSTOM_REQUIRED_FIELD));
 
         // Update with a new value for the custom field
         toUpdate = new IssueModel();
-        toUpdate.setIssueId(response.getIssueIds().get(0));
+        toUpdate.setIssueId(response.getIssueIds().getFirst());
         toUpdate.setIssueDefName(ISSUES_WITH_REQUIRED);
         toUpdate.setAction(IssueModel.IssueAction.update);
         final String newCustomFieldValue = "new value";
@@ -158,13 +158,13 @@ public class IssueAPITest extends BaseWebDriverTest
         updateResponse = new IssuesCommand(List.of(toUpdate)).execute(createDefaultConnection(), getProjectName());
         assertEquals(1, updateResponse.getIssueIds().size());
 
-        updatedIssue = getIssueResponse(updateResponse.getIssueIds().get(0));
+        updatedIssue = getIssueResponse(updateResponse.getIssueIds().getFirst());
         assertEquals(updatedTitle, updatedIssue.getTitle());
         assertEquals(newCustomFieldValue, updatedIssue.getProperties(CUSTOM_REQUIRED_FIELD));
 
         // Attempt an update setting the value to null, which should fail
         toUpdate = new IssueModel();
-        toUpdate.setIssueId(response.getIssueIds().get(0));
+        toUpdate.setIssueId(response.getIssueIds().getFirst());
         toUpdate.setIssueDefName(ISSUES_WITH_REQUIRED);
         toUpdate.setAction(IssueModel.IssueAction.update);
         toUpdate.setProp(CUSTOM_REQUIRED_FIELD, null);
@@ -406,7 +406,7 @@ public class IssueAPITest extends BaseWebDriverTest
                 {
                     // verify initial values
                     assertEquals("expect the first attachment",
-                            List.of(firstFile.getName()), issueresponseModel.getComments().get(0).getAttachments());
+                            List.of(firstFile.getName()), issueresponseModel.getComments().getFirst().getAttachments());
                     // set new ones for update
                     firstIssue.setIssueId(issueId)
                             .setAction(IssueModel.IssueAction.resolve)
@@ -417,7 +417,7 @@ public class IssueAPITest extends BaseWebDriverTest
                 {
                     // verify expected
                     assertEquals("expect the second attachment only",
-                            List.of(secondFile.getName()), issueresponseModel.getComments().get(0).getAttachments());
+                            List.of(secondFile.getName()), issueresponseModel.getComments().getFirst().getAttachments());
                     // set for update
                     secondIssue.setIssueId(issueId)
                             .setAction(IssueModel.IssueAction.close)
@@ -428,7 +428,7 @@ public class IssueAPITest extends BaseWebDriverTest
                 {
                     // verify expected
                     assertEquals("expect both attachments",
-                            List.of(firstFile.getName(), secondFile.getName()), issueresponseModel.getComments().get(0).getAttachments());
+                            List.of(firstFile.getName(), secondFile.getName()), issueresponseModel.getComments().getFirst().getAttachments());
                     // set for update
                     thirdIssue.setIssueId(issueId)
                             .setAction(IssueModel.IssueAction.update)
@@ -546,7 +546,7 @@ public class IssueAPITest extends BaseWebDriverTest
         IssuesCommand updateCmd = new IssuesCommand();
         updateCmd.setIssues(List.of(params));
         var updateResponse = updateCmd.execute(createDefaultConnection(), getProjectName());
-        return updateResponse.getIssueIds().get(0);
+        return updateResponse.getIssueIds().getFirst();
     }
 
     private IssueResponseModel getIssueResponse(Long issueId) throws Exception

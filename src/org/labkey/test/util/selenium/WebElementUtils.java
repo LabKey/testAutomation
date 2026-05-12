@@ -81,7 +81,7 @@ public abstract class WebElementUtils
         {
             throw new NoSuchElementException("Element does not have any text children: " + element.toString());
         }
-        return textChildren.get(0);
+        return textChildren.getFirst();
     }
 
     /**
