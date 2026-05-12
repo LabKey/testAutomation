@@ -23,7 +23,7 @@ public class RecentRequestsCollector
     public List<RequestInfo> getRecentRequests() throws IOException, CommandException
     {
         List<RequestInfo> requestInfos = new RecentRequestsCommand(lastRequestId).execute(_connection, null).getRequestInfos();
-        lastRequestId = requestInfos.get(requestInfos.size() - 1).getId();
+        lastRequestId = requestInfos.getLast().getId();
         return requestInfos.stream().filter(requestInfo -> HarConverter.EXCLUDED_ACTIONS.contains(new Crawler.ControllerActionId(requestInfo.getUrl()))).toList();
     }
 }

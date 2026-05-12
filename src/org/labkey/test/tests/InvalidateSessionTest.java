@@ -127,7 +127,7 @@ public class InvalidateSessionTest extends BaseWebDriverTest
 
         log("Capture the cookie after logout");
         Set<Cookie> afterCookie = getDriver().manage().getCookies();
-        Assert.assertFalse("Before and after log out cookie should be different", getJSessionIdValue(beforeCookie).equals(getJSessionIdValue(afterCookie)));
+        Assert.assertNotEquals("Before and after log out cookie should be different", getJSessionIdValue(beforeCookie), getJSessionIdValue(afterCookie));
     }
 
     private String getJSessionIdValue(Set<Cookie> cookies)

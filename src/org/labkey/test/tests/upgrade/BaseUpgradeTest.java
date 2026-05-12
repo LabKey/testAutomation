@@ -121,7 +121,7 @@ public abstract class BaseUpgradeTest extends BaseWebDriverTest
     {
 
         @Override
-        public @NotNull Statement apply(Statement base, Description description)
+        public @NotNull Statement apply(@NotNull Statement base, Description description)
         {
             String earliestVersion = Optional.ofNullable(description.getAnnotation(EarliestVersion.class))
                 .map(EarliestVersion::value).orElse(null);

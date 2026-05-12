@@ -105,10 +105,10 @@ public class DataClassAPIHelper
     {
         // first the header
         List<String> rows = new ArrayList<>();
-        rows.add(String.join("\t", data.get(0).keySet()));
+        rows.add(String.join("\t", data.getFirst().keySet()));
         data.forEach(dataMap -> {
             StringBuilder row = new StringBuilder();
-            data.get(0).keySet().forEach(key -> {
+            data.getFirst().keySet().forEach(key -> {
                 row.append(dataMap.get(key));
                 row.append("\t");
             });

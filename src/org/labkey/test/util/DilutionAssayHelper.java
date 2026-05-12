@@ -97,23 +97,15 @@ public class DilutionAssayHelper
 
     private void verifyDataIdentifierText(AssayImportOptions.VisitResolverType type, @Nullable String ptidSuffix)
     {
-        String format = "";
-
-        switch (type)
+        String format = switch (type)
         {
-            case ParticipantDate:
-                format = (ptidSuffix == null) ? "ptid %1$d, 2014-02-28" : "ptid %1$d %2$s, 2014-02-28";
-                break;
-            case ParticipantVisit:
-                format = (ptidSuffix == null) ? "ptid %1$d, Vst %3$.1f" : "ptid %1$d %2$s, Vst %3$.1f";
-                break;
-            case ParticipantVisitDate:
-                format = (ptidSuffix == null) ? "ptid %1$d, 2014-02-28" : "ptid %1$d %2$s, 2014-02-28";
-                break;
-            case SpecimenIDParticipantVisit:
-                format = (ptidSuffix == null) ? "SPECIMEN-%1$d, ptid %1$d, Vst %3$.1f" : "SPECIMEN-%1$d, ptid %1$d %2$s, Vst %3$.1f";
-                break;
-        }
+            case ParticipantDate -> (ptidSuffix == null) ? "ptid %1$d, 2014-02-28" : "ptid %1$d %2$s, 2014-02-28";
+            case ParticipantVisit -> (ptidSuffix == null) ? "ptid %1$d, Vst %3$.1f" : "ptid %1$d %2$s, Vst %3$.1f";
+            case ParticipantVisitDate -> (ptidSuffix == null) ? "ptid %1$d, 2014-02-28" : "ptid %1$d %2$s, 2014-02-28";
+            case SpecimenIDParticipantVisit ->
+                    (ptidSuffix == null) ? "SPECIMEN-%1$d, ptid %1$d, Vst %3$.1f" : "SPECIMEN-%1$d, ptid %1$d %2$s, Vst %3$.1f";
+            default -> "";
+        };
 
         for (int i=1; i < 6; i++)
         {

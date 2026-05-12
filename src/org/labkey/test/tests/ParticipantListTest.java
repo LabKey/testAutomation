@@ -179,7 +179,7 @@ public class ParticipantListTest extends StudyBaseTest
         dragAndDrop(Locator.xpath("//div[contains(@class, 'x4-resizable-handle-east')]"), 250, 0);
         group2Height = _extHelper.getExtElementHeight("normalwrap-gridcell", 8);
         group3Height = _extHelper.getExtElementHeight("normalwrap-gridcell", 11);
-        assertTrue("Expected panel width to allow " + PARTICIPANT_GROUP_THREE + " grid cell on one line", group3Height == group2Height);
+        assertEquals("Expected panel width to allow " + PARTICIPANT_GROUP_THREE + " grid cell on one line", group3Height, group2Height);
     }
 
     @Override

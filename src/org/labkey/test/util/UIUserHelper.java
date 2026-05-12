@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 public class UIUserHelper extends AbstractUserHelper
@@ -61,8 +61,8 @@ public class UIUserHelper extends AbstractUserHelper
         List<WebElement> userInfo = Locator.css("meta").findElements(resultEl);
         if (!userInfo.isEmpty())
         {
-            email = userInfo.get(0).getAttribute("email");
-            String userIdStr = userInfo.get(0).getAttribute("userId");
+            email = userInfo.getFirst().getAttribute("email");
+            String userIdStr = userInfo.getFirst().getAttribute("userId");
             userId = userIdStr == null ? null : Integer.parseInt(userIdStr);
         }
         else
@@ -135,7 +135,7 @@ public class UIUserHelper extends AbstractUserHelper
 
         users.setFilter("Email", "Equals", email);
         int userRow = users.getRowIndex("Email", email);
-        assertFalse("No such user: " + email, userRow == -1);
+        assertNotEquals("No such user: " + email, -1, userRow);
         getWrapper().clickAndWait(users.detailsLink(userRow));
 
         getWrapper().clickButton("Edit");

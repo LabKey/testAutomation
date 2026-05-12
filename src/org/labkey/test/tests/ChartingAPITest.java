@@ -401,8 +401,8 @@ public class ChartingAPITest extends BaseWebDriverTest
          */
 
         points = Locator.css("svg g a path").findElements(getDriver());
-        assertEquals("Bottom left point was an unexpected color.", CIRCLE_COLOR, points.get(0).getAttribute("fill"));
-        assertEquals("Bottom left point was not a circle.", CIRCLE_PATH, points.get(0).getAttribute("d"));
+        assertEquals("Bottom left point was an unexpected color.", CIRCLE_COLOR, points.getFirst().getAttribute("fill"));
+        assertEquals("Bottom left point was not a circle.", CIRCLE_PATH, points.getFirst().getAttribute("d"));
         assertEquals("Top right point was an unexpected color.", ARROW_COLOR, points.get(399).getAttribute("fill"));
         assertEquals("Top right point was not an upward arrow.", ARROW_PATH, points.get(399).getAttribute("d"));
 
@@ -629,21 +629,21 @@ public class ChartingAPITest extends BaseWebDriverTest
     {
         if (hasError)
         {
-            assertTrue("Expected one error", getElementCount(Locator.css(".labkey-error")) == 1);
+            assertEquals("Expected one error", 1, getElementCount(Locator.css(".labkey-error")));
         }
         else
         {
-            assertTrue("Expected zero errors.", getElementCount(Locator.css(".labkey-error")) == 0);
+            assertEquals("Expected zero errors.", 0, getElementCount(Locator.css(".labkey-error")));
         }
 
         if (svgCount > 0)
         {
             waitForSvgWithTitle(title, false);
-            assertTrue("Expected " + svgCount + " SVG element(s).", getElementCount(Locator.css("svg")) == svgCount);
+            assertEquals("Expected " + svgCount + " SVG element(s).", getElementCount(Locator.css("svg")), svgCount);
         }
         else
         {
-            assertTrue("Expected 0 SVG elements.", getElementCount(Locator.css("svg")) == 0);
+            assertEquals("Expected 0 SVG elements.", 0, getElementCount(Locator.css("svg")));
         }
 
         if (svgText != null)

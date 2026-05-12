@@ -198,7 +198,7 @@ public class FilesQueryTest extends BaseWebDriverTest
         if (canSeeAbsolutePath)
         {
             results = table.getRowDataAsText(rowIndex, "Absolute File Path");
-            Assert.assertTrue("Absolute File Path is not as expected", results.get(0).indexOf(filename) > 0);
+            Assert.assertTrue("Absolute File Path is not as expected", results.getFirst().indexOf(filename) > 0);
         }
         else
         {
@@ -215,7 +215,7 @@ public class FilesQueryTest extends BaseWebDriverTest
         page.submit();
 
         List<String> results = table.getRowDataAsText(rowIndex, "Custom Prop");
-        Assert.assertEquals("Custom Prop is not as expected", updatedCustomPropValue, results.get(0));
+        Assert.assertEquals("Custom Prop is not as expected", updatedCustomPropValue, results.getFirst());
     }
 
     private void uploadFile(File testFile, String customPropValue, String fileDescription)

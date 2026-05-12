@@ -111,7 +111,7 @@ public class MultiplePKUploadAssayTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("First run"));
         DataRegionTable table = new DataRegionTable("Data", getDriver());
         List<String> visitID = table.getColumnDataAsText("VisitID");
-        assertEquals("Missing visitID", "17.0", visitID.get(0));
+        assertEquals("Missing visitID", "17.0", visitID.getFirst());
         assertEquals("Mismatch in row count",1,table.getDataRowCount());
 
     }

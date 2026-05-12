@@ -69,7 +69,7 @@ public class FlowDuplicateSamplesTest extends BaseFlowTest
         var rows = dr.getRows("Name", "Count", DTOTfk, filePathFk);
         Assert.assertEquals(2, rows.size());
 
-        var row0 = rows.get(0);
+        var row0 = rows.getFirst();
         Assert.assertEquals("118795.fcs", row0.get(0));
         Assert.assertEquals("1,000", row0.get(1));
         Assert.assertEquals("1000", row0.get(2));

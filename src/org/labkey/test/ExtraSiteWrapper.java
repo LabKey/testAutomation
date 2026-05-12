@@ -17,6 +17,7 @@ package org.labkey.test;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.jetbrains.annotations.NotNull;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.service.DriverService;
 
@@ -49,7 +50,7 @@ public class ExtraSiteWrapper extends LabKeySiteWrapper implements AutoCloseable
     }
 
     @Override
-    public WebDriver getWrappedDriver()
+    public @NotNull WebDriver getWrappedDriver()
     {
         return extraDriver.getLeft();
     }

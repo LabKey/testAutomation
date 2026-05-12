@@ -24,9 +24,9 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.hc.core5.http.HttpStatus;
 import org.awaitility.Awaitility;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Assume;
 import org.junit.AssumptionViolatedException;
 import org.junit.ClassRule;
@@ -298,7 +298,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     }
 
     @Override
-    public WebDriver getWrappedDriver()
+    public @NotNull WebDriver getWrappedDriver()
     {
         return SingletonWebDriver.getInstance().getWebDriver();
     }
@@ -566,7 +566,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             }
 
             @Override
-            public Statement apply(Statement base, Description description)
+            public @NotNull Statement apply(Statement base, Description description)
             {
                 try
                 {
@@ -936,7 +936,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         if (error instanceof MultipleFailureException mfe)
         {
             // Only "handle" primary test failure. Just log failures thrown during @After or @AfterClass methods.
-            error = mfe.getFailures().get(0);
+            error = mfe.getFailures().getFirst();
             for (int i = 1; i < mfe.getFailures().size(); i++)
             {
                 TestLogger.error("Secondary error after test:", mfe.getFailures().get(i));
@@ -2465,7 +2465,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
             while (!_pipelineRoot.equals(testDir))
             {
-                dirNames.add(0, testDir.getName());
+                dirNames.addFirst(testDir.getName());
                 testDir = testDir.getParentFile();
             }
 
@@ -2823,7 +2823,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             if (exception instanceof String exceptionStr)
             {
                 if (errors.size() == 1)
-                    checker().verifyEquals("Unexpected error message", errors.get(0), exception);
+                    checker().verifyEquals("Unexpected error message", errors.getFirst(), exception);
                 else
                 {
                     for (String error : altErrors)

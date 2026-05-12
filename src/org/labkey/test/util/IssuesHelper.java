@@ -16,6 +16,7 @@
 package org.labkey.test.util;
 
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
@@ -63,7 +64,7 @@ public class IssuesHelper extends WebDriverWrapper
     }
 
     @Override
-    public WebDriver getWrappedDriver()
+    public @NotNull WebDriver getWrappedDriver()
     {
         return _driverWrapper.getWrappedDriver();
     }
@@ -171,7 +172,7 @@ public class IssuesHelper extends WebDriverWrapper
             SelectRowsResponse response = command.execute(connection, containerPath);
             if (response.getRows().isEmpty())
                 return 0;
-            return (Integer) response.getRows().get(0).get("IssueId");
+            return (Integer) response.getRows().getFirst().get("IssueId");
         }
         catch (IOException | CommandException e)
         {

@@ -45,7 +45,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 @Category({Daily.class})
@@ -319,7 +319,7 @@ public class FileBasedPipelineTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("ERROR"));
         String fullBodyText = getBodyText();
         int apiKeyIndex = fullBodyText.indexOf(API_KEY_LABEL);
-        assertFalse("Couldn't find API key echoed in job log file", apiKeyIndex == -1);
+        assertNotEquals("Couldn't find API key echoed in job log file", -1, apiKeyIndex);
 
         // Grab the first 10 characters of the API key to check for in the arg list
         String startOfApiKey = fullBodyText.substring(apiKeyIndex + API_KEY_LABEL.length(), apiKeyIndex + API_KEY_LABEL.length() + 10);

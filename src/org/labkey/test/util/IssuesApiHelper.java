@@ -40,9 +40,9 @@ public class IssuesApiHelper extends IssuesHelper
             List<GetUsersResponse.UserInfo> user = _userHelper.getUsers().getUsersInfo().stream()
                     .filter(ui -> ui.getDisplayName().equals(displayName)).toList();
 
-            Assert.assertTrue("Unable to properly match user with displayName: " + displayName, user.size() == 1);
+            Assert.assertEquals("Unable to properly match user with displayName: " + displayName, 1, user.size());
             if (user.size() == 1)
-                issue.setAssignedTo(user.get(0).getUserId());
+                issue.setAssignedTo(user.getFirst().getUserId());
         }
 
         if (!props.containsKey("Priority"))
@@ -55,7 +55,7 @@ public class IssuesApiHelper extends IssuesHelper
 
             Assert.assertEquals("Unexpected errors", 200, response.getStatusCode());
 
-            return DetailsPage.beginAt(this, String.valueOf(response.getIssueIds().get(0)));
+            return DetailsPage.beginAt(this, String.valueOf(response.getIssueIds().getFirst()));
         }
         catch (Exception e)
         {

@@ -123,7 +123,7 @@ public class ManageImportTemplatesDialog extends ModalDialog
     {
         List<WebElement> rows = elementCache().templateRows();
         if (templateName.equalsIgnoreCase("default template"))
-            return rows.get(0);
+            return rows.getFirst();
 
         for (int i = 1; i < rows.size(); i++)
         {

@@ -747,7 +747,7 @@ public class ScatterPlotTest extends GenericChartsTest
 
         Integer buttonsCount = getElementCount(Locator.xpath("//div[contains(@id, 'chart-wizard-report')]//div/a[contains(@class, 'x4-btn')]"));
         Integer disabledButtonsCount = getElementCount(Locator.xpath("//div[contains(@id, 'chart-wizard-report')]//div/a[contains(@class, 'x4-btn') and contains(@class, 'x4-item-disabled')]"));
-        assertTrue("Only the help button should be enabled. More than one button enabled.", 1 == (buttonsCount - disabledButtonsCount));
+        assertEquals("Only the help button should be enabled. More than one button enabled.", 1, (buttonsCount - disabledButtonsCount));
     }
 
     @LogMethod

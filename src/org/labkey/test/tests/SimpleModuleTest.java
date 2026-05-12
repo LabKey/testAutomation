@@ -377,7 +377,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         rowMapM.put("Name", "TestManufacturer");
         insertCmdM.addRow(rowMapM);
         RowsResponse respM = insertCmdM.execute(createDefaultConnection(), getProjectName());
-        Object manufacturerId = respM.getRows().get(0).get("RowId");
+        Object manufacturerId = respM.getRows().getFirst().get("RowId");
 
         //This table has one validator defined in the schema XML and one in query XML.  First do insert that should fail schema validator:
         InsertRowsCommand insertCmd = new InsertRowsCommand("vehicle", "Models");
@@ -405,7 +405,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         rowMap.put("InitialReleaseYear", 2000);
         insertCmd.addRow(rowMap);
         RowsResponse resp = insertCmd.execute(createDefaultConnection(), getProjectName());
-        Object rowId = resp.getRows().get(0).get("RowId");
+        Object rowId = resp.getRows().getFirst().get("RowId");
 
         //now try to update it:
         UpdateRowsCommand updateCmd = new UpdateRowsCommand("vehicle", "Models");
@@ -463,7 +463,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
             }
 
             List<Map<String, Object>> errors = (List<Map<String, Object>>) responseJson.get("errors");
-            String msg = errors.get(0).get("exception").toString();
+            String msg = errors.getFirst().get("exception").toString();
             assertEquals("Incorrect exception", expectedError, msg);
         }
     }
@@ -764,7 +764,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         log("** Updating vehicles...");
         RowsResponse updateRows = updateCmd.execute(cn, getProjectName());
         assertEquals("Expected to update 1 row.", 1, updateRows.getRowsAffected().intValue());
-        assertEquals(4, ((Number) (updateRows.getRows().get(0).get("Milage"))).intValue());
+        assertEquals(4, ((Number) (updateRows.getRows().getFirst().get("Milage"))).intValue());
 
 
         log("** Testing vehicle.Vehicles details url link...");
@@ -1276,7 +1276,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         SelectRowsResponse selectResp = selectCmd.execute(cn, getProjectName());
         assertEquals("Expected to select 1 rows.", 1, selectResp.getRowCount().intValue());
 
-        Map<String, Object> row = selectResp.getRows().get(0);
+        Map<String, Object> row = selectResp.getRows().getFirst();
         String entityId = (String)((Map<String, Object>)row.get("EntityId")).get("value");
         assertEquals("Expected core.containers path column to return the string: /" + getProjectName(), "/" + getProjectName(), ((Map<String, Object>)row.get("Path")).get("value"));
 
@@ -1285,7 +1285,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         selectCmd.setColumns(columns);
         selectCmd.setRequiredVersion(9.1);
         selectResp = selectCmd.execute(cn, getProjectName());
-        Map<String, Object> vehicleRow = (Map<String, Object>)(selectResp.getRows().get(0)).get("container");
+        Map<String, Object> vehicleRow = (Map<String, Object>)(selectResp.getRows().getFirst()).get("container");
 
         assertEquals("Expected vehicles.container to return the value: " + entityId, entityId, vehicleRow.get("value"));
         assertEquals("Expected vehicles.container to return the displayValue: " + getProjectName(), getProjectName(), vehicleRow.get("displayValue"));
@@ -1304,7 +1304,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         List<WebElement> errors = Locators.labkeyError.findElements(getDriver());
 
         if (!errors.isEmpty())
-            fail("Error(s) running workbook test. First error: " + errors.get(0).getText());
+            fail("Error(s) running workbook test. First error: " + errors.getFirst().getText());
     }
 
     @LogMethod
@@ -1774,7 +1774,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
         log("Check metadata for insert");
         Map insertFilterGroup = getColorColumnFilterGroup();
-        Map insertFilterMap = (Map)((List)insertFilterGroup.get("filters")).get(0);
+        Map insertFilterMap = (Map)((List)insertFilterGroup.get("filters")).getFirst();
         assertEquals("Filter column 'Name' for vehicle.Vehicles query not found", "Name", insertFilterMap.get("column"));
         assertEquals("Filter operator 'eq' for vehicle.Vehicles query not found", "eq", insertFilterMap.get("operator"));
         assertEquals("Filter value 'Green!' for vehicle.Vehicles query not found!", "Green!", insertFilterMap.get("value"));
@@ -1789,7 +1789,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
         log("Check metadata for update");
         Map updateFilterGroup = getColorColumnFilterGroup();
-        Map updateFilterMap = (Map)((List)updateFilterGroup.get("filters")).get(0);
+        Map updateFilterMap = (Map)((List)updateFilterGroup.get("filters")).getFirst();
         assertEquals("Filter column 'Name' for vehicle.Vehicles query not found", "Name", updateFilterMap.get("column"));
         assertEquals("Filter operator 'contains' for vehicle.Vehicles query not found", "contains", updateFilterMap.get("operator"));
         assertEquals("Filter value 'Blue!' for vehicle.Vehicles query not found!", "Bl", updateFilterMap.get("value"));
@@ -1799,11 +1799,11 @@ public class SimpleModuleTest extends BaseWebDriverTest
     private Map getColorColumnFilterGroup()
     {
         Map result = (Map)executeAsyncScript(vehicleMetadataJsQuery);
-        Map colorColumnFields = ((List<Map>)(((Map)result.get("metaData")).get("fields"))).get(0);
+        Map colorColumnFields = ((List<Map>)(((Map)result.get("metaData")).get("fields"))).getFirst();
 
         assertEquals("Column fields for column 'Color' in vehicle.Vehicles query not found!", "Color", colorColumnFields.get("name"));
 
-        return (Map)((List)((Map)colorColumnFields.get("lookup")).get("filterGroups")).get(0);
+        return (Map)((List)((Map)colorColumnFields.get("lookup")).get("filterGroups")).getFirst();
     }
 
     @LogMethod
