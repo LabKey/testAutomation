@@ -563,8 +563,6 @@ public class TestDataGenerator
             String picks = charSetFrom;
             if (val.length() == 0 || isLast || prev == ' ')
                 picks = picks.replace(" ", "");
-            if (prev == ' ')
-                picks = picks.replace("-", "");
             if (picks.isEmpty())
                 picks = charSetFrom; // pathological charset, fall back
 
@@ -574,7 +572,7 @@ public class TestDataGenerator
             {
                 randIndex = ThreadLocalRandom.current().nextInt(picks.length());
                 c = picks.charAt(randIndex);
-                int repeatCount = randomInt(2, 5);
+                int repeatCount = (c == ' ') ? 0 : randomInt(2, 5);
                 val.append(StringUtils.repeat(c, repeatCount));
                 nonSpaceRun = (c == ' ') ? 0 : nonSpaceRun + repeatCount;
             }
