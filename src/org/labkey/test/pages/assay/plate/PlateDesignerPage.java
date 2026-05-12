@@ -8,6 +8,7 @@ import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.Select;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -37,55 +38,65 @@ public class PlateDesignerPage extends LabKeyPage<PlateDesignerPage.ElementCache
     {
         selectTypeTab(type);
 
-        WebElement nameField = Locator.tagWithName("input", "wellGroupName")
-                .withAttribute("data-type", type)
-                .findElement(getDriver());
-        setFormElement(nameField, name);
-        fireEvent(nameField, SeleniumEvent.change);
+        // Wait for the create row to be visible (canAdd must be true for this type)
+        WebElement newNameInput = Locator.css(".group-types-panel__new-name-input")
+                .waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
+
+        if ("input".equalsIgnoreCase(newNameInput.getTagName()))
+        {
+            setFormElement(newNameInput, name);
+        }
+        else
+        {
+            new Select(newNameInput).selectByVisibleText(name);
+        }
+
         clickButton("Create", 0);
-        waitForElement(Locator.tagContainingText("label", name));
+        waitForElement(Locator.css(".group-types-panel__group-name").withText(name));
     }
 
     public void selectTypeTab(String name)
     {
-        Locator.tagWithClass("div", "gwt-Label").withText(name).waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT).click();
+        Locator.css(".group-types-panel__tab").withText(name)
+                .waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT).click();
+    }
+
+    public void selectGroup(String name)
+    {
+        Locator.css(".group-types-panel__group-name").withText(name)
+                .waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT).click();
     }
 
     public void selectWellsForWellgroup(String type, String wellGroup, String startLocation, String endLocation)
     {
         selectTypeTab(type);
-        waitForElement(Locator.tagWithText("label", wellGroup));
 
-        Locator start = Locator.css(".Cell-"+startLocation);
-        Locator end = Locator.css(".Cell-"+endLocation);
-        if (wellGroup != null & !"".equals(wellGroup))
+        if (wellGroup != null && !wellGroup.isEmpty())
         {
-            if (!getText(Locator.css(".gwt-TabBarItem-selected")).equals(type))
-            {
-                Locator.css(".gwt-Label").withText(type).findElement(getDriver()).click();
-                //want for switch
-            }
-            if (!isChecked(Locator.xpath("//input[@name='wellGroup' and following-sibling::label[text()='"+wellGroup+"']]")))
-                click(Locator.xpath("//input[@name='wellGroup' and following-sibling::label[text()='"+wellGroup+"']]"));
-            if (!getAttribute(start, "style").contains("rgb(255, 255, 255)"))
-                click(start);
+            selectGroup(wellGroup);
         }
-        else
-        {
-            Locator.tagWithClass("*", "gwt-Label").withText(type).findElement(getDriver()).click();
-            //select no group in order to clear area
-        }
-        WebElement fromEl = start.findElement(getDriver());
-        WebElement toEl = end.findElement(getDriver());
+
+        // Cells are <td> elements with aria-label matching the location (e.g. "A1" or "A1: Specimen 1")
+        WebElement fromEl = Locator.css(".template-grid__cell[aria-label^='" + startLocation + "']")
+                .waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
+        WebElement toEl = Locator.css(".template-grid__cell[aria-label^='" + endLocation + "']")
+                .waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
 
         Actions builder = new Actions(getDriver());
         builder.clickAndHold(fromEl).moveToElement(toEl).release().build().perform();
     }
 
+    public void setWellGroupProperty(String propertyKey, String value)
+    {
+        WebElement input = Locator.tag("input").withAttribute("aria-label", propertyKey)
+                .waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
+        setFormElement(input, value);
+    }
+
     public void setName(String name)
     {
-        Locator nameField = Locator.id("templateName");
-        waitForElement(nameField, WAIT_FOR_JAVASCRIPT);
+        WebElement nameField = Locator.css(".plate-template-designer__name-input")
+                .waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
         setFormElement(nameField, name);
         fireEvent(nameField, SeleniumEvent.change);
     }
@@ -100,13 +111,18 @@ public class PlateDesignerPage extends LabKeyPage<PlateDesignerPage.ElementCache
         clickButton("Save", 0);
     }
 
+    public void cancel()
+    {
+        clickButton("Cancel");
+    }
+
     @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();
     }
 
-    protected class ElementCache extends LabKeyPage.ElementCache
+    protected class ElementCache extends LabKeyPage<?>.ElementCache
     {
     }
 
