@@ -51,6 +51,12 @@ public class LabkeyErrorPage extends LabKeyPage<LabkeyErrorPage.ElementCache>
     {
         return elementCache().errorImage.getAttribute("src");
     }
+
+    public boolean isShowDetailsPresent()
+    {
+        return !Locator.button("View Details").findElements(getDriver()).isEmpty();
+    }
+
     @Override
     protected ElementCache newElementCache()
     {
