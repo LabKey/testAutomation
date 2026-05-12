@@ -153,7 +153,7 @@ public class BoxPlotTest extends GenericChartsTest
 
         // We need to specifically click the last element because those are the outliers.
         List<WebElement> paths = svgPathLoc.findElements(getDriver());
-        fireEvent(paths.get(paths.size() - 1), SeleniumEvent.click);
+        fireEvent(paths.getLast(), SeleniumEvent.click);
         _extHelper.waitForExtDialog("Data Point Information");
         assertTextPresent("RCHtempc:");
         clickButton("OK", 0);

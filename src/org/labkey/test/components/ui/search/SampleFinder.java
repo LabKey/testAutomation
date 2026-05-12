@@ -302,7 +302,7 @@ public class SampleFinder extends WebDriverComponent<SampleFinder.ElementCache>
         {
             List<WebElement> views = getViewsWithCls("active");
             if (!views.isEmpty())
-                return views.get(0).getText();
+                return views.getFirst().getText();
 
             return null;
         }
@@ -311,7 +311,7 @@ public class SampleFinder extends WebDriverComponent<SampleFinder.ElementCache>
         {
             List<WebElement> views = getViewsWithCls("session-finder-view");
             if (!views.isEmpty())
-                return views.get(0).getText();
+                return views.getFirst().getText();
 
             return null;
         }

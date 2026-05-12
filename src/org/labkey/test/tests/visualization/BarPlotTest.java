@@ -320,7 +320,7 @@ public class BarPlotTest extends GenericChartsTest
         Assert.assertTrue("The plot region is not visible after a chart was created. It should be.", plotRegion.isRegionVisible());
 
         log("Click on the bar plot and validate that we are redirected to the plot wizard.");
-        clickAndWait(plotRegion.getPlots().get(0), WAIT_FOR_PAGE);
+        clickAndWait(plotRegion.getPlots().getFirst(), WAIT_FOR_PAGE);
         TimeChartWizard chartWizard = new TimeChartWizard(this).waitForReportRender();
 
         URL currentUrl = getURL();
@@ -332,7 +332,7 @@ public class BarPlotTest extends GenericChartsTest
         chartTypeDialog = chartWizard.clickChartTypeButton();
 
         strTemp = chartTypeDialog.getXCategories();
-        Assert.assertTrue("Categories field did not contain the expected value. Expected '" + COL_TEXT_BAR + "'. Found '" + strTemp + "'", strTemp.toLowerCase().equals(COL_TEXT_BAR.toLowerCase()));
+        Assert.assertEquals("Categories field did not contain the expected value. Expected '" + COL_TEXT_BAR + "'. Found '" + strTemp + "'", strTemp.toLowerCase(), COL_TEXT_BAR.toLowerCase());
 
         strTemp = chartTypeDialog.getMeasure();
         Assert.assertEquals("Measure field was not empty. Found '" + strTemp + "'", 0, strTemp.trim().length());
@@ -342,10 +342,10 @@ public class BarPlotTest extends GenericChartsTest
         chartLayoutDialog = clickChartLayoutButton();
 
         strTemp = chartLayoutDialog.getPlotTitle();
-        Assert.assertTrue("Value for plot title not as expected. Expected '" + DATA_SOURCE_1 + "' found '" + strTemp + "'", strTemp.toLowerCase().equals(DATA_SOURCE_1.toLowerCase()));
+        Assert.assertEquals("Value for plot title not as expected. Expected '" + DATA_SOURCE_1 + "' found '" + strTemp + "'", strTemp.toLowerCase(), DATA_SOURCE_1.toLowerCase());
 
         strTemp = chartLayoutDialog.getXAxisLabel();
-        Assert.assertTrue("Value for plot x-axis label not as expected. Expected '" + COL_TEXT_BAR + "' found '" + strTemp + "'", strTemp.toLowerCase().equals(COL_TEXT_BAR.toLowerCase()));
+        Assert.assertEquals("Value for plot x-axis label not as expected. Expected '" + COL_TEXT_BAR + "' found '" + strTemp + "'", strTemp.toLowerCase(), COL_TEXT_BAR.toLowerCase());
 
         chartLayoutDialog.clickCancel();
     }
@@ -404,7 +404,7 @@ public class BarPlotTest extends GenericChartsTest
         chartTypeDialog = chartWizard.clickChartTypeButton();
 
         strTemp = chartTypeDialog.getXCategories();
-        Assert.assertTrue("Categories field did not contain the expected value. Expected '" + COL_TEXT_BAR + "'. Found '" + strTemp + "'", strTemp.toLowerCase().equals(COL_TEXT_BAR.toLowerCase()));
+        Assert.assertEquals("Categories field did not contain the expected value. Expected '" + COL_TEXT_BAR + "'. Found '" + strTemp + "'", strTemp.toLowerCase(), COL_TEXT_BAR.toLowerCase());
 
         strTemp = chartTypeDialog.getMeasure();
         Assert.assertEquals("Measure field was not empty. Found '" + strTemp + "'", 0, strTemp.trim().length());
@@ -414,10 +414,10 @@ public class BarPlotTest extends GenericChartsTest
         chartLayoutDialog = clickChartLayoutButton();
 
         strTemp = chartLayoutDialog.getPlotTitle();
-        Assert.assertTrue("Value for plot title not as expected. Expected '" + DATA_SOURCE_1 + "' found '" + strTemp + "'", strTemp.toLowerCase().equals(DATA_SOURCE_1.toLowerCase()));
+        Assert.assertEquals("Value for plot title not as expected. Expected '" + DATA_SOURCE_1 + "' found '" + strTemp + "'", strTemp.toLowerCase(), DATA_SOURCE_1.toLowerCase());
 
         strTemp = chartLayoutDialog.getXAxisLabel();
-        Assert.assertTrue("Value for plot x-axis label not as expected. Expected '" + COL_TEXT_BAR + "' found '" + strTemp + "'", strTemp.toLowerCase().equals(COL_TEXT_BAR.toLowerCase()));
+        Assert.assertEquals("Value for plot x-axis label not as expected. Expected '" + COL_TEXT_BAR + "' found '" + strTemp + "'", strTemp.toLowerCase(), COL_TEXT_BAR.toLowerCase());
 
         chartLayoutDialog.clickCancel();
     }

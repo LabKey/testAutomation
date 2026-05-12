@@ -3,6 +3,7 @@ package org.labkey.junit.rules;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.AssumptionViolatedException;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
@@ -16,7 +17,7 @@ import org.junit.runners.model.Statement;
 public abstract class TestWatcher implements TestRule
 {
     @Override
-    public Statement apply(final Statement base, final Description description) {
+    public @NotNull Statement apply(final @NotNull Statement base, final @NotNull Description description) {
         return new Statement() {
             @Override
             public void evaluate() throws Throwable {

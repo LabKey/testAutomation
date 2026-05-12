@@ -8,9 +8,7 @@ import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 /*
     Wraps Optional Features, Experimental Features, Deprecated Features pages linked

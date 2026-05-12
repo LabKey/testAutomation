@@ -16,7 +16,6 @@
 package org.labkey.test.util;
 
 import org.jetbrains.annotations.Nullable;
-import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.pages.assay.ChooseAssayTypePage;
@@ -33,13 +32,13 @@ public class UIAssayHelper extends AbstractAssayHelper
     }
 
     @Override
-    public void importAssay(String assayName, File file, String projectPath) throws CommandException, IOException
+    public void importAssay(String assayName, File file, String projectPath) throws IOException
     {
         importAssay(assayName, file, projectPath, null, null);
     }
 
     @Override
-    public void importAssay(String assayName, File file, String projectPath, Map<String, Object> batchProperties) throws CommandException, IOException
+    public void importAssay(String assayName, File file, String projectPath, Map<String, Object> batchProperties) throws IOException
     {
         importAssay(assayName, file, projectPath, batchProperties, null);
     }

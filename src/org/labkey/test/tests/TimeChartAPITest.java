@@ -25,7 +25,6 @@ import org.labkey.test.categories.Charting;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Reports;
 import org.labkey.test.tests.visualization.TimeChartTest;
-import org.labkey.test.util.CachingSupplier;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
@@ -336,7 +335,7 @@ public class TimeChartAPITest extends TimeChartTest
                 int columnIndex = table.getColumnIndexStrict(columnName);
                 List<Object> expectedValues = expectedColumn.getValue();
                 List<Object> actualValues = new ArrayList<>();
-                boolean isNumberCol = expectedValues.get(0) instanceof Number;
+                boolean isNumberCol = expectedValues.getFirst() instanceof Number;
 
                 for (int i = 0; i < table.getDataRowCount() && actualValues.size() < expectedValues.size() && columnIndex >= 0; i++)
                 {
@@ -369,11 +368,5 @@ public class TimeChartAPITest extends TimeChartTest
     protected File[] getTestFiles()
     {
         return new File[]{TestFileUtils.getSampleData("api/timechart-api.xml")};
-    }
-
-    @Override
-    protected BrowserType bestBrowser()
-    {
-        return BrowserType.CHROME;
     }
 }

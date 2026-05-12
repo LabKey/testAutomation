@@ -117,7 +117,7 @@ public class FileAttachmentContainer extends WebDriverComponent<FileAttachmentCo
      */
     public FileAttachmentContainer removeFile()
     {
-        getAttachedFileEntries().get(0).remove();
+        getAttachedFileEntries().getFirst().remove();
         return this;
     }
 

@@ -569,13 +569,13 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
         SelectRowsResponse samples = executeSelectRowCommand("samples", sampleTypeName,
                 ContainerFilter.Current, getProjectName(), null);
         Map<String, Object> rowA =  samples.getRows().stream().filter(
-                (a)-> a.get("Name").equals("A")).collect(Collectors.toList()).get(0);
+                (a)-> a.get("Name").equals("A")).collect(Collectors.toList()).getFirst();
         Map<String, Object> rowB =  samples.getRows().stream().filter(
-                (a)-> a.get("Name").equals("B")).collect(Collectors.toList()).get(0);
+                (a)-> a.get("Name").equals("B")).collect(Collectors.toList()).getFirst();
         Map<String, Object> rowC =  samples.getRows().stream().filter(
-                (a)-> a.get("Name").equals("C")).collect(Collectors.toList()).get(0);
+                (a)-> a.get("Name").equals("C")).collect(Collectors.toList()).getFirst();
         Map<String, Object> rowD =  samples.getRows().stream().filter(
-                (a)-> a.get("Name").equals("D")).collect(Collectors.toList()).get(0);
+                (a)-> a.get("Name").equals("D")).collect(Collectors.toList()).getFirst();
 
         assertNull("Row A shouldn't have a parent", rowA.get("Run"));
         assertEquals("Rows B and C should both derive from A and get the same run", rowB.get("Run"), rowC.get("Run"));
@@ -732,7 +732,7 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
         log(String.format("Verify again that '%s' parents are still as expected.", parentSample));
         checkRowsInDataRegion("parentMaterials", "Name", parents);
 
-        String grandParent = parents.get(0);
+        String grandParent = parents.getFirst();
         log(String.format("Select one of '%s' parents, '%s' and verify that it now has two children.", parentSample, grandParent));
 
         clickAndWait(Locator.linkWithText(grandParent));
@@ -1133,10 +1133,10 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
             sampleData);
         DataRegionTable drtSamples = sampleHelper.getSamplesDataRegionTable();
         log("Derive one sample from another");
-        drtSamples.checkCheckbox(drtSamples.getRowIndex("Name", parentSampleNames.get(0)));
+        drtSamples.checkCheckbox(drtSamples.getRowIndex("Name", parentSampleNames.getFirst()));
         clickButton("Derive Samples");
         waitAndClickAndWait(Locator.lkButton("Next"));
-        String childName = parentSampleNames.get(0) + ".1";
+        String childName = parentSampleNames.getFirst() + ".1";
         String nameFieldInputFieldName = "Output Sample 1_Name";
         String bloodPlusFieldInputFieldName = "Output Sample 1_Blood+";
         String bloodMinusFieldInputFieldName = "Output Sample 1_Blood-";
@@ -1170,7 +1170,7 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
 
 
         log("Try to delete parent sample");
-        drtSamples.checkCheckbox(drtSamples.getRowIndex("Name", parentSampleNames.get(0)));
+        drtSamples.checkCheckbox(drtSamples.getRowIndex("Name", parentSampleNames.getFirst()));
         drtSamples.clickHeaderButton("Delete");
         Window.Window(getDriver()).withTitle("No samples can be deleted").waitFor()
                 .clickButton("Dismiss", true);

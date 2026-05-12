@@ -15,6 +15,7 @@
  */
 package org.labkey.test.selenium;
 
+import org.jetbrains.annotations.NotNull;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.OutputType;
@@ -44,7 +45,7 @@ public abstract class WebElementWrapper implements WebElement, WrapsElement, Loc
     }
 
     @Override
-    public void sendKeys(CharSequence... keysToSend)
+    public void sendKeys(CharSequence @NotNull ... keysToSend)
     {
         getWrappedElement().sendKeys(keysToSend);
     }
@@ -56,13 +57,13 @@ public abstract class WebElementWrapper implements WebElement, WrapsElement, Loc
     }
 
     @Override
-    public String getTagName()
+    public @NotNull String getTagName()
     {
         return getWrappedElement().getTagName();
     }
 
     @Override
-    public String getAttribute(String name)
+    public String getAttribute(@NotNull String name)
     {
         return getWrappedElement().getAttribute(name);
     }
@@ -80,19 +81,19 @@ public abstract class WebElementWrapper implements WebElement, WrapsElement, Loc
     }
 
     @Override
-    public String getText()
+    public @NotNull String getText()
     {
         return getWrappedElement().getText();
     }
 
     @Override
-    public List<WebElement> findElements(By by)
+    public @NotNull List<WebElement> findElements(@NotNull By by)
     {
         return getWrappedElement().findElements(by);
     }
 
     @Override
-    public WebElement findElement(By by)
+    public @NotNull WebElement findElement(@NotNull By by)
     {
         return getWrappedElement().findElement(by);
     }
@@ -104,43 +105,43 @@ public abstract class WebElementWrapper implements WebElement, WrapsElement, Loc
     }
 
     @Override
-    public Point getLocation()
+    public @NotNull Point getLocation()
     {
         return getWrappedElement().getLocation();
     }
 
     @Override
-    public Dimension getSize()
+    public @NotNull Dimension getSize()
     {
         return getWrappedElement().getSize();
     }
 
     @Override
-    public String getCssValue(String propertyName)
+    public @NotNull String getCssValue(@NotNull String propertyName)
     {
         return getWrappedElement().getCssValue(propertyName);
     }
 
     @Override
-    public <X> X getScreenshotAs(OutputType<X> target) throws WebDriverException
+    public <X> @NotNull X getScreenshotAs(@NotNull OutputType<X> target) throws WebDriverException
     {
         return getWrappedElement().getScreenshotAs(target);
     }
 
     @Override
-    public Rectangle getRect()
+    public @NotNull Rectangle getRect()
     {
         return getWrappedElement().getRect();
     }
 
     @Override
-    public String getDomProperty(String name)
+    public String getDomProperty(@NotNull String name)
     {
         return getWrappedElement().getDomProperty(name);
     }
 
     @Override
-    public String getDomAttribute(String name)
+    public String getDomAttribute(@NotNull String name)
     {
         return getWrappedElement().getDomAttribute(name);
     }
@@ -158,13 +159,13 @@ public abstract class WebElementWrapper implements WebElement, WrapsElement, Loc
     }
 
     @Override
-    public SearchContext getShadowRoot()
+    public @NotNull SearchContext getShadowRoot()
     {
         return getWrappedElement().getShadowRoot();
     }
 
     @Override
-    public Coordinates getCoordinates()
+    public @NotNull Coordinates getCoordinates()
     {
         return ((Locatable)getWrappedElement()).getCoordinates();
     }

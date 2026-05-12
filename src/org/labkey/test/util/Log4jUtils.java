@@ -100,7 +100,7 @@ public abstract class Log4jUtils
     }
 
     @LogMethod(quiet = true)
-    public static void showLogSinceMark(WebDriverWrapper driver) throws IOException, CommandException
+    public static void showLogSinceMark(WebDriverWrapper driver) throws IOException
     {
         driver.beginAt(WebTestHelper.buildURL("admin", "showPrimaryLogSinceMark"));
     }

@@ -53,7 +53,7 @@ public class OntologyTreePanel extends WebDriverComponent<OntologyTreePanel.Elem
     public TreeNode openToPath(List<String> nodes)
     {
         var currentNode = getRootNode();
-        assertThat(currentNode.getTitle(), is(nodes.get(0)));
+        assertThat(currentNode.getTitle(), is(nodes.getFirst()));
 
         for (int i=1; i < nodes.size(); i++)
         {

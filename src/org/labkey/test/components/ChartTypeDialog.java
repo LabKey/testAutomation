@@ -492,7 +492,7 @@ public class ChartTypeDialog extends ChartWizardDialog<ChartTypeDialog.ElementCa
         String rawText = elementCache().columnList.getText();
         String[] textArray = rawText.split("\n");
         ArrayList<String> arrayList = new ArrayList<>(Arrays.asList(textArray));
-        arrayList.remove(0); // Remove the first element in the list. This is the title "Columns".
+        arrayList.removeFirst(); // Remove the first element in the list. This is the title "Columns".
         return arrayList;
     }
 

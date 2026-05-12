@@ -77,7 +77,7 @@ public class GenericFormItem extends WebDriverComponent implements FormItem
             List<WebElement> children = Locator.css("*").findElements(this);
             if (children.isEmpty())
                 return new ReadOnlyFormItem(getComponentElement());
-            element = children.get(0);
+            element = children.getFirst();
             tagName = element.getTagName();
         }
 

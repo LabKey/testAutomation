@@ -56,17 +56,17 @@ public class BulkUpdateGroupCommand extends PostCommand<BulkUpdateGroupResponse>
         _groupId = groupId;
     }
 
-    public void setGroupId(Integer groupId)
+    public void setGroupId(@Nullable Integer groupId)
     {
         _groupId = groupId;
     }
 
-    public void setGroupName(String groupName)
+    public void setGroupName(@Nullable String groupName)
     {
         _groupName = groupName;
     }
 
-    public void setMembers(List<Map<String, Object>> members)
+    public void setMembers(@Nullable List<Map<String, Object>> members)
     {
         _members = members;
     }

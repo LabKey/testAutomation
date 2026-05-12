@@ -26,7 +26,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 
 /**
  * MS2TestsBase class
@@ -172,7 +172,7 @@ public class PipelineTestsBase
                 }
                 else
                 {
-                    assertFalse("Unexpected error in job: " + names[i], "ERROR".equals(getStatusTable().getJobStatus(names[i])));
+                    assertNotEquals("Unexpected error in job: " + names[i], "ERROR", getStatusTable().getJobStatus(names[i]));
 
                     String completeName = getExperimentTable(tableName).getRunName(names[i]);
                     if (completeName == null || getStatusTable().hasJob(names[i]))

@@ -437,7 +437,7 @@ public class ParentEntityEditPanel extends Panel<ParentEntityEditPanel.ElementCa
            {
                // If this is removing the last/only one the count of select controls will still be 1 ('add new' one is shown),
                // so need a different check.
-               ReactSelect rs = getAllEntityTypes().get(0);
+               ReactSelect rs = getAllEntityTypes().getFirst();
                WebDriverWrapper.waitFor(() -> rs.getSelections().isEmpty(),
                        "The type '" + typeName + "' was not successfully removed.",
                        1_000);

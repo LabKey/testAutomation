@@ -67,7 +67,7 @@ public class RecordIterator implements Iterator<List<Object>>
 
     public <T> RecordIterator(@NotNull List<Map<String, T>> rows)
     {
-        this(rows.get(0).keySet(), rows);
+        this(rows.getFirst().keySet(), rows);
     }
 
     @Override

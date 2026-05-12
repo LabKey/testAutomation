@@ -325,12 +325,6 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
         {
             return name();
         }
-
-        @Override
-        public String getText()
-        {
-            return null;
-        }
     }
 
     public DomainFormPanel goToBatchFields()

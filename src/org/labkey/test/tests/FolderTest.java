@@ -438,7 +438,7 @@ public class FolderTest extends BaseWebDriverTest
             SelectRowsCommand sr = new SelectRowsCommand("core", "workbooks");
             sr.setColumns(Arrays.asList("EntityId"));
             SelectRowsResponse srr = sr.execute(cn, getProjectName() + "/WorkbookParent");
-            Object entityId = srr.getRows().get(0).get("EntityId");
+            Object entityId = srr.getRows().getFirst().get("EntityId");
 
             DeleteRowsCommand drc = new DeleteRowsCommand("core", "workbooks");
             Map<String, Object> row1 = new HashMap<>();

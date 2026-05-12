@@ -611,7 +611,7 @@ public class AssayExportImportTest extends BaseWebDriverTest
         List<String> runColumns = Arrays.asList("participantid", "Date", "M1", "M2", "M3");
         executeScript(
             "LABKEY.Assay.importRun({" +
-                    "assayId: " + response.getRows().get(0).get("RowId") + "," +
+                    "assayId: " + response.getRows().getFirst().get("RowId") + "," +
                     "name: \"" + runName + "\"," +
                     "dataRows: [{" +
                         "ParticipantId: 10," +

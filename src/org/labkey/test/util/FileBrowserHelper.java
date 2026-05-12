@@ -18,8 +18,8 @@ package org.labkey.test.util;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.commons.lang3.mutable.MutableObject;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.query.Filter;
@@ -85,7 +85,7 @@ public class FileBrowserHelper extends WebDriverWrapper
     }
 
     @Override
-    public WebDriver getWrappedDriver()
+    public @NotNull WebDriver getWrappedDriver()
     {
         return _driver.getWrappedDriver();
     }
@@ -931,7 +931,7 @@ public class FileBrowserHelper extends WebDriverWrapper
             throw new AssertionError(message);
         }
 
-        return fileInfos.isEmpty() ? null : fileInfos.get(0);
+        return fileInfos.isEmpty() ? null : fileInfos.getFirst();
     }
 
     private static @NotNull List<FileDetailInfo> getFileDetailInfos(String containerPath, @Nullable Collection<Filter> filters)

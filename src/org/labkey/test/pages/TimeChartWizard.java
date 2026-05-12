@@ -143,7 +143,7 @@ public class TimeChartWizard extends LabKeyPage
         _ext4Helper.checkGridRowCheckbox(label);
         if (!svgs.isEmpty())
         {
-            shortWait().until(ExpectedConditions.stalenessOf(svgs.get(0)));
+            shortWait().until(ExpectedConditions.stalenessOf(svgs.getFirst()));
         }
         _ext4Helper.waitForMaskToDisappear();
     }
@@ -155,7 +155,7 @@ public class TimeChartWizard extends LabKeyPage
         _ext4Helper.uncheckGridRowCheckbox(label);
         if (!svgs.isEmpty())
         {
-            shortWait().until(ExpectedConditions.stalenessOf(svgs.get(0)));
+            shortWait().until(ExpectedConditions.stalenessOf(svgs.getFirst()));
         }
         _ext4Helper.waitForMaskToDisappear();
     }

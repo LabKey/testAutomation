@@ -225,7 +225,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
                 ));
         DomainResponse createResponse = dgen.createDomain(createDefaultConnection(), SAMPLE_TYPE_DOMAIN_KIND);
         List<PropertyDescriptor> createdFields = createResponse.getDomain().getFields();
-        assertTrue(createdFields.get(0).getName().equals("deleteMe"));
+        assertEquals("deleteMe", createdFields.getFirst().getName());
 
         // go to the new domain designer and do some work here
         DomainDesignerPage domainDesignerPage = DomainDesignerPage.beginAt(this, getProjectName(), "exp.materials", sampleType);
@@ -572,7 +572,7 @@ public class DomainDesignerTest extends BaseWebDriverTest
 
         DomainFieldRow nameRow = domainFormPanel.getField("name");
         // confirm the UI shows its expected 'required' status
-        assertEquals(true, nameRow.getRequiredField());
+        assertTrue(nameRow.getRequiredField());
 
         nameRow.clickRemoveField(true);
         domainDesignerPage.clickFinish();
