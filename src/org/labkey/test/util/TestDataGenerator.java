@@ -535,7 +535,7 @@ public class TestDataGenerator
 
     /** After this many consecutive non-space characters, {@link #randomString} forces the next char to ' '
      * (provided ' ' is in the effective charset). */
-    private static final int FORCE_SPACE_AFTER = 8;
+    private static final int FORCE_SPACE_AFTER = 15;
 
     public static String randomString(int size, @Nullable String exclusion, @Nullable String charSet)
     {
