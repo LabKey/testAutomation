@@ -3252,8 +3252,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
                 Locator.extButton(text),
                 // normal HTML button:
                 Locator.button(text),
-                // GWT button:
-                Locator.gwtButton(text),
                 // bootstrap button
                 BootstrapLocators.button(text)
         );
@@ -3511,8 +3509,8 @@ public abstract class WebDriverWrapper implements WrapsDriver
         try
         {
             String elementClass = input.getAttribute("class");
-            if (elementClass.contains("gwt-TextBox") || elementClass.contains("gwt-TextArea") || elementClass.contains("x-form-text"))
-                fireEvent(input, SeleniumEvent.blur); // Make GWT and ExtJS form elements behave better
+            if (elementClass.contains("x-form-text"))
+                fireEvent(input, SeleniumEvent.blur); // Make ExtJS form elements behave better
         }
         catch(StaleElementReferenceException stale)
         {

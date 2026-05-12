@@ -689,11 +689,6 @@ public abstract class Locator extends By
         return tag("a").withChild(tag("img").withAttributeContaining("src", image));
     }
 
-    public static XPathLocator gwtButton(String text)
-    {
-        return tag("a").withClass("gwt-Anchor").withText(text);
-    }
-
     public static XPathLocator button(String text)
     {
         return tag("button").notHidden().withPredicate("not(contains(@class, 'tab'))").withText(text);
@@ -905,21 +900,6 @@ public abstract class Locator extends By
     {
         String linkText = schemaName + "." + queryName + "." + (null != pkName ? pkName : "");
         return tagWithClass("span", "labkey-link").containing(linkText);
-    }
-
-    public static XPathLocator gwtTextBoxByLabel(String label)
-    {
-        return tagWithClass("input", "gwt-TextBox").withPredicate(xpath("../preceding-sibling::td").withText(label));
-    }
-
-    public static XPathLocator gwtListBoxByLabel(String label)
-    {
-        return tagWithClass("select", "gwt-ListBox").withPredicate(xpath("../preceding-sibling::label").withText(label));
-    }
-
-    public static XPathLocator gwtCheckBoxOnImportGridByColLabel(String label)
-    {
-        return tagWithAttribute("input", "type", "checkbox").withPredicate(xpath("../../following-sibling::td/span").containing(label));
     }
 
     public static Locator permissionRendered()
