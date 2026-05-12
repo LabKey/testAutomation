@@ -9,6 +9,7 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.util.TestLogger;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -174,23 +175,39 @@ public class ProductMenu extends WebDriverComponent<ProductMenu.ElementCache>
     public void goToFolderDashboard(String folderName)
     {
         clickFolderItem(folderName);
+        getWrapper().mouseOver(elementCache().activeDashboardIcon);
         clickNavLink(elementCache().activeDashboardIcon);
     }
 
+    // Interactions with icon elements on the page to catch GitHub Issue 1146.
     public int getDashboardIconCount()
     {
-        return elementCache().dashboardIconLoc.findElements(elementCache().menuContent).size();
+        List<WebElement> dashboardIcons = elementCache().dashboardIconLoc.findElements(elementCache().menuContent);
+        for (WebElement dashboardIcon : dashboardIcons)
+        {
+            getWrapper().mouseOver(dashboardIcon.findElement(By.xpath("./ancestor::li[1]")));
+            getWrapper().mouseOver(dashboardIcon);
+        }
+        return dashboardIcons.size();
     }
 
     public void goToFolderAdministration(String folderName)
     {
         clickFolderItem(folderName);
+        getWrapper().mouseOver(elementCache().activeAdministrationIcon);
         clickNavLink(elementCache().activeAdministrationIcon);
     }
 
+    // Interactions with icon elements on the page to catch GitHub Issue 1146.
     public int getAdministrationIconCount()
     {
-        return elementCache().administrationIconLoc.findElements(elementCache().menuContent).size();
+        List<WebElement> adminIcons = elementCache().administrationIconLoc.findElements(elementCache().menuContent);
+        for (WebElement adminIcon : adminIcons)
+        {
+            getWrapper().mouseOver(adminIcon.findElement(By.xpath("./ancestor::li[1]")));
+            getWrapper().mouseOver(adminIcon);
+        }
+        return adminIcons.size();
     }
 
     public String getButtonTitle()
