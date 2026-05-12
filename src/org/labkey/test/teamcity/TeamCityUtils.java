@@ -69,7 +69,7 @@ public class TeamCityUtils
     {
         if (buildStatistics.containsKey(key))
         {
-            TestLogger.log("WARNING: Overwriting previous build statistic [" + key + "]: " + buildStatistics.get(key).get(0) + " => " + value);
+            TestLogger.log("WARNING: Overwriting previous build statistic [" + key + "]: " + buildStatistics.get(key).getFirst() + " => " + value);
         }
         buildStatistics.put(key, Collections.singletonList(value));
     }

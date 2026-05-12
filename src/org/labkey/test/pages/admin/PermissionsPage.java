@@ -348,7 +348,7 @@ public class PermissionsPage extends LabKeyPage<PermissionsPage.ElementCache>
         _ext4Helper.clickTabContainingText("Project Groups");
         // warning Adminstrators can apper multiple times
         List<Ext4CmpRef> refs = _ext4Helper.componentQuery("grid", Ext4CmpRef.class);
-        Ext4CmpRef ref = refs.get(0);
+        Ext4CmpRef ref = refs.getFirst();
         Long idx = (Long) ref.getEval("getStore().find(\"name\", \"" + groupName + "\")");
         ref.eval("getSelectionModel().select(" + idx + ")");
         return this;
@@ -367,7 +367,7 @@ public class PermissionsPage extends LabKeyPage<PermissionsPage.ElementCache>
         _ext4Helper.clickTabContainingText("Site Groups");
         // warning Administrators can appear multiple times
         List<Ext4CmpRef> refs = _ext4Helper.componentQuery("grid", Ext4CmpRef.class);
-        Ext4CmpRef ref = refs.get(0);
+        Ext4CmpRef ref = refs.getFirst();
         Long idx = (Long) ref.getEval("getStore().find(\"name\", \"" + groupName + "\")");
         ref.eval("getSelectionModel().select(" + idx + ")");
         waitAndClickAndWait(Locator.tagContainingText("a", "manage group"));
@@ -443,7 +443,7 @@ public class PermissionsPage extends LabKeyPage<PermissionsPage.ElementCache>
         _ext4Helper.clickTabContainingText("Project Groups");
         waitForText("Member Groups");
         List<Ext4CmpRef> refs = _ext4Helper.componentQuery("grid", Ext4CmpRef.class);
-        Ext4CmpRef ref = refs.get(0);
+        Ext4CmpRef ref = refs.getFirst();
         Long idx = (Long) ref.getEval("getStore().find(\"name\", \"" + groupName + "\")");
         return (idx >= 0);
     }

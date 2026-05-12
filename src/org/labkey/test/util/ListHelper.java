@@ -16,6 +16,7 @@
 
 package org.labkey.test.util;
 
+import org.jetbrains.annotations.NotNull;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
@@ -56,7 +57,7 @@ public class ListHelper extends LabKeySiteWrapper
     }
 
     @Override
-    public WebDriver getWrappedDriver()
+    public @NotNull WebDriver getWrappedDriver()
     {
         return _wrapsDriver.getWrappedDriver();
     }

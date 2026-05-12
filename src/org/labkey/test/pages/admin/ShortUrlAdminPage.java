@@ -86,7 +86,7 @@ public class ShortUrlAdminPage extends LabKeyPage<ShortUrlAdminPage.ElementCache
     {
         List<List<String>> rows = elementCache().shortUrlsTable.getRows(SHORT_URL_COL, TARGET_URL_COL);
         Map<String, String> urls = new LinkedHashMap<>(rows.size());
-        rows.forEach(row -> urls.put(row.get(0), row.get(1)));
+        rows.forEach(row -> urls.put(row.getFirst(), row.get(1)));
         return urls;
     }
 

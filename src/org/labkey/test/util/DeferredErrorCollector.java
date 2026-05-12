@@ -164,7 +164,7 @@ public class DeferredErrorCollector
         if (errorsSinceMark() > 0)
         {
             final String s = artifactCollector.dumpPageSnapshot(screenshotName);
-            allErrors.get(allErrors.size() - 1).setScreenshotName(s);
+            allErrors.getLast().setScreenshotName(s);
             artifactCollector.reportTestMetadata(s);
             setErrorMark();
             return true;
@@ -381,7 +381,7 @@ public class DeferredErrorCollector
     {
         if (hasErrorBeenRecorded())
         {
-            if (allErrors.get(allErrors.size() - 1).getScreenshotName() == null)
+            if (allErrors.getLast().getScreenshotName() == null)
             {
                 withScreenshot("fallback").error("No screeshot taken for last deferred error(s). " +
                         "This screenshot may be relevant to previous failures. " +

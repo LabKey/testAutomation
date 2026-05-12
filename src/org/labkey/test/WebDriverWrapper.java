@@ -1063,7 +1063,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         }
         if (windows.size() > 1)
         {
-            getDriver().switchTo().window(windows.get(0));
+            getDriver().switchTo().window(windows.getFirst());
         }
     }
 
@@ -2108,7 +2108,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
             getPageLoadListeners().forEach((listener) -> {
                 if (null != listener)
                 {
-                    TestLogger.log().trace("beforePageLoad - " + listener.getClass().getSimpleName());
+                    TestLogger.log().trace("beforePageLoad - {}", listener.getClass().getSimpleName());
                     listener.beforePageLoad();
                 }
             });
@@ -2125,7 +2125,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
             getPageLoadListeners().forEach((listener) -> {
                 if (null != listener)
                 {
-                    TestLogger.log().trace("afterPageLoad - " + listener.getClass().getSimpleName());
+                    TestLogger.log().trace("afterPageLoad - {}", listener.getClass().getSimpleName());
                     listener.afterPageLoad();
                 }
             });
@@ -3056,21 +3056,13 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public void dragAndDrop(WebElement fromEl, WebElement toEl, Position pos)
     {
-        int y;
-        switch (pos)
+        int y = switch (pos)
         {
-            case top:
-                y = 1;
-                break;
-            case bottom:
-                y = toEl.getSize().getHeight() - 1;
-                break;
-            case middle:
-                y = toEl.getSize().getHeight() / 2;
-                break;
-            default:
-                throw new IllegalArgumentException("Unexpected position: " + pos);
-        }
+            case top -> 1;
+            case bottom -> toEl.getSize().getHeight() - 1;
+            case middle -> toEl.getSize().getHeight() / 2;
+            default -> throw new IllegalArgumentException("Unexpected position: " + pos);
+        };
 
         Actions builder = new Actions(getDriver());
         builder.clickAndHold(fromEl).moveToElement(toEl, toEl.getSize().getWidth() / 2, y).release().build().perform();
@@ -3260,8 +3252,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
                 Locator.extButton(text),
                 // normal HTML button:
                 Locator.button(text),
-                // GWT button:
-                Locator.gwtButton(text),
                 // bootstrap button
                 BootstrapLocators.button(text)
         );
@@ -3519,8 +3509,8 @@ public abstract class WebDriverWrapper implements WrapsDriver
         try
         {
             String elementClass = input.getAttribute("class");
-            if (elementClass.contains("gwt-TextBox") || elementClass.contains("gwt-TextArea") || elementClass.contains("x-form-text"))
-                fireEvent(input, SeleniumEvent.blur); // Make GWT and ExtJS form elements behave better
+            if (elementClass.contains("x-form-text"))
+                fireEvent(input, SeleniumEvent.blur); // Make ExtJS form elements behave better
         }
         catch(StaleElementReferenceException stale)
         {
@@ -4063,7 +4053,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         }
 
         if (matches.size() == 1)
-            select.selectByVisibleText(matches.get(0));
+            select.selectByVisibleText(matches.getFirst());
         else if (matches.isEmpty())
             select.selectByVisibleText(value);
         else

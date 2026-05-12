@@ -58,7 +58,7 @@ public abstract class BaseSearchHelper<H extends BaseSearchHelper<H, SearchResul
     }
 
     @Override
-    public WebDriver getWrappedDriver()
+    public @NotNull WebDriver getWrappedDriver()
     {
         return _test.getDriver();
     }

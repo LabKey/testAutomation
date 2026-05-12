@@ -107,14 +107,14 @@ public class PostgresQueriesTest extends AbstractAdminConsoleTest implements Pos
         {
             assertNotNull("Should have a response from a successful request", activityResponse);
             assertFalse("Should have at least one row", activityResponse.getRows().isEmpty());
-            assertNotNull("Should have a pid", activityResponse.getRows().get(0).get("pid"));
+            assertNotNull("Should have a pid", activityResponse.getRows().getFirst().get("pid"));
         }
         SelectRowsResponse locksResponse = selectRows(expectSuccess, "pg_locks");
         if (expectSuccess)
         {
             assertNotNull("Should have a response from a successful request", locksResponse);
             assertFalse("Should have at least one row", locksResponse.getRows().isEmpty());
-            assertNotNull("Should have a pid", locksResponse.getRows().get(0).get("locktype"));
+            assertNotNull("Should have a pid", locksResponse.getRows().getFirst().get("locktype"));
         }
     }
 

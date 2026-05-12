@@ -73,7 +73,7 @@ public class AnnouncementAPITest extends BaseWebDriverTest
         // Assert
         assertThat("Expect a single response", response.getThreads().size(), is(1));
         assertThat("Expect the discussion request to return the parent thread",
-                response.getThreads().get(0).getEntityId(), is(parentThread.getEntityId()));
+                response.getThreads().getFirst().getEntityId(), is(parentThread.getEntityId()));
     }
 
     @Test

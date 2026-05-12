@@ -177,7 +177,7 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
     {
         List<String> columnValues = elementCache().getCellTexts();
         if (hasSelectColumn())
-            columnValues.remove(0);
+            columnValues.removeFirst();
         return columnValues;
     }
 

@@ -355,8 +355,8 @@ public class LinePlotTest extends GenericChartsTest
         assertEquals("Point found that should be hidden", 0, points.size());
 
         List<WebElement> layers = Locator.css(".line").findElements(getDriver());
-        assertEquals("Line layer was an unexpected color", COLOR_RED, layers.get(0).getAttribute("stroke"));
-        assertEquals("Line layer was an unexpected width", "6", layers.get(0).getAttribute("stroke-width"));
+        assertEquals("Line layer was an unexpected color", COLOR_RED, layers.getFirst().getAttribute("stroke"));
+        assertEquals("Line layer was an unexpected width", "6", layers.getFirst().getAttribute("stroke-width"));
 
         log("Svg text: " + getSVGText());
 

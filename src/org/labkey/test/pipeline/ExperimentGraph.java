@@ -25,6 +25,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.labkey.test.Locator.xq;
 
 /**
@@ -129,7 +130,7 @@ public class ExperimentGraph extends WebDriverComponent<Component<?>.ElementCach
             }
         }
 
-        assertTrue("Unable to find experiment links: " + StringUtils.join(names, ", "), false);
+        fail("Unable to find experiment links: " + StringUtils.join(names, ", "));
     }
 
     private String getBaseName(PipelineTestParams tp)

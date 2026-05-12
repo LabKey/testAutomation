@@ -97,6 +97,6 @@ public class Ext4CmpRef
         String id = (String)getEval("down(arguments[0]).id", componentSelector);
         List<Type> ret = _test._ext4Helper.componentsFromIds(Arrays.asList(id), clazz);
 
-        return ret.isEmpty() ? null : ret.get(0);
+        return ret.isEmpty() ? null : ret.getFirst();
     }
 }

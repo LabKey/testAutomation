@@ -361,7 +361,7 @@ public class UIPermissionsHelper extends PermissionsHelper
         goToProjectGroups();
         _driver.waitForText("Member Groups");
         List<Ext4CmpRef> refs = _driver._ext4Helper.componentQuery("grid", Ext4CmpRef.class);
-        Ext4CmpRef ref = refs.get(0);
+        Ext4CmpRef ref = refs.getFirst();
         Long idx = (Long)ref.getEval("getStore().find(\"name\", \"" + groupName + "\")");
         exitPermissionsUI();
         return (idx >= 0);
@@ -410,7 +410,7 @@ public class UIPermissionsHelper extends PermissionsHelper
         goToProjectGroups();
         // warning Administrators can appear multiple times
         List<Ext4CmpRef> refs = _driver._ext4Helper.componentQuery("grid", Ext4CmpRef.class);
-        Ext4CmpRef ref = refs.get(0);
+        Ext4CmpRef ref = refs.getFirst();
         Long idx = (Long)ref.getEval("getStore().find(\"name\", \"" + groupName + "\")");
         assertFalse("Unable to locate group: \"" + groupName + "\"", idx < 0);
         ref.eval("getSelectionModel().select(" + idx + ")");

@@ -408,7 +408,7 @@ public class SampleTypeTest extends BaseWebDriverTest
         SampleTypeHelper sampleTypeHelper = new SampleTypeHelper(this);
         log("Create a new sample type with a name and name expression");
         projectMenu().navigateToFolder(PROJECT_NAME, FOLDER_NAME);
-        SampleTypeDefinition definition = new SampleTypeDefinition(sampleTypeName).setNameExpression("${" + fields.get(0).getName() + "}-${batchRandomId}-${randomId}").setFields(fields);
+        SampleTypeDefinition definition = new SampleTypeDefinition(sampleTypeName).setNameExpression("${" + fields.getFirst().getName() + "}-${batchRandomId}-${randomId}").setFields(fields);
         sampleTypeHelper.createSampleType(definition);
         sampleTypeHelper.goToSampleType(sampleTypeName);
         sampleTypeHelper.verifyFields(fields);
@@ -419,7 +419,7 @@ public class SampleTypeTest extends BaseWebDriverTest
 
         log("Verify values are as expected with name expression saved");
         DataRegionTable drt = sampleTypeHelper.getSamplesDataRegionTable();
-        int index = drt.getRowIndex(fieldNames.get(0), "Vee");
+        int index = drt.getRowIndex(fieldNames.getFirst(), "Vee");
         assertTrue("Did not find row containing data", index >= 0);
         Map<String, String> rowData = drt.getRowDataAsMap(index);
         assertTrue("Name not as expected", rowData.get("Name").startsWith("Vee-"));
@@ -442,8 +442,8 @@ public class SampleTypeTest extends BaseWebDriverTest
 
         assertEquals("Number of samples not as expected", 4, sampleTypeHelper.getSampleCount());
 
-        assertTrue("Should have row with first imported value", drt.getRowIndex(fieldNames.get(0), "Dubya") >= 0);
-        assertTrue("Should have row with second imported value", drt.getRowIndex(fieldNames.get(0), "Ex") >= 0);
+        assertTrue("Should have row with first imported value", drt.getRowIndex(fieldNames.getFirst(), "Dubya") >= 0);
+        assertTrue("Should have row with second imported value", drt.getRowIndex(fieldNames.getFirst(), "Ex") >= 0);
     }
 
     @Test
@@ -462,14 +462,14 @@ public class SampleTypeTest extends BaseWebDriverTest
         UpdateQueryRowPage updateQueryRowPage = DataRegionTable.findDataRegionWithinWebpart(this, "Sample Type Contents")
             .clickInsertNewRow();
         updateQueryRowPage.setField("Name", "Name1");
-        updateQueryRowPage.setField(fieldNames.get(0), "Bee");
+        updateQueryRowPage.setField(fieldNames.getFirst(), "Bee");
         updateQueryRowPage.submit();
 
         log("Try to import overlapping data with TSV");
 
         DataRegionTable drt = sampleHelper.getSamplesDataRegionTable();
         ImportDataPage importDataPage = drt.clickImportBulkData();
-        String header = "Name\t" + fieldNames.get(0) + "\n";
+        String header = "Name\t" + fieldNames.getFirst() + "\n";
         String overlap =  "Name1\tToBee\n";
         String newData = "Name2\tSee\n";
         importDataPage.setText(header + overlap + newData);
@@ -486,12 +486,12 @@ public class SampleTypeTest extends BaseWebDriverTest
         int index = drt.getRowIndex("Name", "Name1");
         assertTrue("Should have row with first sample name", index >= 0);
         Map<String, String> rowData = drt.getRowDataAsMap(index);
-        assertEquals(fieldNames.get(0) + " for sample 'Name1' not as expected", "ToBee", rowData.get(fieldNames.get(0)));
+        assertEquals(fieldNames.getFirst() + " for sample 'Name1' not as expected", "ToBee", rowData.get(fieldNames.getFirst()));
 
         index = drt.getRowIndex("Name", "Name2");
         assertTrue("Should have a row with the second sample name", index >= 0);
         rowData = drt.getRowDataAsMap(index);
-        assertEquals(fieldNames.get(0) + " for sample 'Name2' not as expected", "See", rowData.get(fieldNames.get(0)));
+        assertEquals(fieldNames.getFirst() + " for sample 'Name2' not as expected", "See", rowData.get(fieldNames.getFirst()));
 
         log("Try to import overlapping data from file");
         final File sampleData = TestFileUtils.getSampleData("simpleSampleType.xls");
@@ -513,17 +513,17 @@ public class SampleTypeTest extends BaseWebDriverTest
         index = drt.getRowIndex("Name", "Name1");
         assertTrue("Should have row with first sample name", index >= 0);
         rowData = drt.getRowDataAsMap(index);
-        assertEquals(fieldNames.get(0) + " for sample 'Name1' not as expected", "NotTwoBee", rowData.get(fieldNames.get(0)));
+        assertEquals(fieldNames.getFirst() + " for sample 'Name1' not as expected", "NotTwoBee", rowData.get(fieldNames.getFirst()));
 
         index = drt.getRowIndex("Name", "Name2");
         assertTrue("Should have a row with the second sample name", index >= 0);
         rowData = drt.getRowDataAsMap(index);
-        assertEquals(fieldNames.get(0) + " for sample 'Name2' not as expected", "Sea", rowData.get(fieldNames.get(0)));
+        assertEquals(fieldNames.getFirst() + " for sample 'Name2' not as expected", "Sea", rowData.get(fieldNames.getFirst()));
 
         index = drt.getRowIndex("Name", "Name3");
         assertTrue("Should have a row with the third sample name", index >= 0);
         rowData = drt.getRowDataAsMap(index);
-        assertEquals(fieldNames.get(0) + " for sample 'Name' not as expected", "Dee", rowData.get(fieldNames.get(0)));
+        assertEquals(fieldNames.getFirst() + " for sample 'Name' not as expected", "Dee", rowData.get(fieldNames.getFirst()));
     }
 
     // I don't think this test is doing what was intended. I'm unclear if this is intended to be a lineage test or a

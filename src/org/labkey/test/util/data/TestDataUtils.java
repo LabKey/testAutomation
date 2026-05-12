@@ -24,7 +24,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
-import java.io.StringReader;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -314,7 +313,7 @@ public class TestDataUtils
 
         if (allRows != null && !allRows.isEmpty())
         {
-            List<T> header = allRows.get(0);
+            List<T> header = allRows.getFirst();
 
             for (int i = 1; i != allRows.size(); i++)
             {
@@ -416,7 +415,7 @@ public class TestDataUtils
         if (rowLists == null || rowLists.isEmpty())
             return rowLists;
 
-        List<String> headerRow = rowLists.get(0);
+        List<String> headerRow = rowLists.getFirst();
 
         List<List<String>> updatedRows = new ArrayList<>();
         updatedRows.add(headerRow.stream().map(columnMapper).collect(Collectors.toList()));

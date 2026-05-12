@@ -77,7 +77,7 @@ public class TestDataValidator
     {
         List<Map<String, Object>> filteringList = new ArrayList<>();
         filteringList.addAll(getRows());
-        List<String> columnNames = getColumnKeys(filteringList.get(0)); // these are the case-sensitive keys to the passed-in row
+        List<String> columnNames = getColumnKeys(filteringList.getFirst()); // these are the case-sensitive keys to the passed-in row
 
         for (String columnName : columnNames)
         {

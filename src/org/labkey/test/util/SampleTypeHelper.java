@@ -15,8 +15,8 @@
  */
 package org.labkey.test.util;
 
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.InsertRowsCommand;
@@ -82,12 +82,12 @@ public class SampleTypeHelper extends WebDriverWrapper
     @NotNull
     private static String convertMapToTsv(@NotNull List<Map<String, String>> data)
     {
-        List<String> headers = new ArrayList<>(data.get(0).keySet());
+        List<String> headers = new ArrayList<>(data.getFirst().keySet());
         return TestDataUtils.tsvStringFromRowMaps(data, headers, true);
     }
 
     @Override
-    public WebDriver getWrappedDriver()
+    public @NotNull WebDriver getWrappedDriver()
     {
         return _driver;
     }
