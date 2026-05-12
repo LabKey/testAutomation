@@ -17,7 +17,6 @@
 package org.labkey.crawlertest;
 
 import org.jetbrains.annotations.NotNull;
-import org.labkey.api.data.Container;
 import org.labkey.api.module.CodeOnlyModule;
 import org.labkey.api.module.ModuleContext;
 import org.labkey.api.view.WebPartFactory;
@@ -51,12 +50,5 @@ public class CrawlerTestModule extends CodeOnlyModule
     @Override
     public void doStartup(ModuleContext moduleContext)
     {
-    }
-
-    @Override
-    @NotNull
-    public Collection<String> getSummary(Container c)
-    {
-        return Collections.emptyList();
     }
 }

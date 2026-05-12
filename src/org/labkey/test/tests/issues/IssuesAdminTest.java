@@ -163,7 +163,7 @@ public class IssuesAdminTest extends BaseWebDriverTest
 
         portalHelper.addWebPart("Issues List");
         clickAndWait(Locator.linkWithText("Submit"));
-        assertEquals("Wrong title for ID column", singular + " ID", new DataRegionTable("issues-issues", getDriver()).getColumnLabels().get(0));
+        assertEquals("Wrong title for ID column", singular + " ID", new DataRegionTable("issues-issues", getDriver()).getColumnLabels().getFirst());
         assertElementPresent(Locator.lkButton("New " + singular));
         assertElementNotPresent(Locator.lkButton("New " + defaultSingular));
     }
@@ -264,7 +264,7 @@ public class IssuesAdminTest extends BaseWebDriverTest
                 .save();
 
         log("Verifying the first comment");
-        checker().verifyEquals("Incorrect comment order for Oldest first", "First Comment", detailsPage.getComments().get(0).getComment());
+        checker().verifyEquals("Incorrect comment order for Oldest first", "First Comment", detailsPage.getComments().getFirst().getComment());
 
         log("Changing the comment direction in admin page");
         adminPage = IssuesAdminPage.beginAt(this, getProjectName(), issueDefinitionName);
@@ -274,7 +274,7 @@ public class IssuesAdminTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(title));
         detailsPage = new DetailsPage(getDriver());
         checker().verifyEquals("Incorrect comment order for Newest first", "Third Comment",
-                detailsPage.getComments().get(0).getComment());
+                detailsPage.getComments().getFirst().getComment());
     }
 
     @Override

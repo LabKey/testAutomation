@@ -147,7 +147,7 @@ public class HarConverter
             LOG.info("Use the following containerPath replacements for these requests:");
             for (Map.Entry<String, String> entry : _containerReplacements.entrySet())
             {
-                LOG.info("    '" + entry.getValue() + "' => '" + entry.getKey() + "'");
+                LOG.info("    '{}' => '{}'", entry.getValue(), entry.getKey());
             }
         }
         return apiTestsDoc;
@@ -161,7 +161,7 @@ public class HarConverter
     private InputStream getInputStream(String inputParam) throws FileNotFoundException
     {
         File inputFile = new File(inputParam);
-        LOG.info("Reading HAR file from " + inputFile.getAbsolutePath());
+        LOG.info("Reading HAR file from {}", inputFile.getAbsolutePath());
         return new FileInputStream(inputFile);
     }
 
@@ -170,11 +170,11 @@ public class HarConverter
         File outputFile = new File(outputParam);
         if (outputFile.exists())
         {
-            LOG.warn("Specified output file (" + outputFile.getAbsolutePath() + ") already exists. Not writing file.");
+            LOG.warn("Specified output file ({}) already exists. Not writing file.", outputFile.getAbsolutePath());
         }
         else
         {
-            LOG.info("Writing converted HAR file to " + outputFile.getAbsolutePath());
+            LOG.info("Writing converted HAR file to {}", outputFile.getAbsolutePath());
         }
         return new FileOutputStream(outputFile);
     }
@@ -215,18 +215,18 @@ public class HarConverter
             ControllerActionId actionId = new ControllerActionId(url);
             if (EXCLUDED_ACTIONS.contains(actionId) || StringUtils.isBlank(actionId.getAction()) || "app".equals(actionId.getAction()))
             {
-                LOG.info("Skipping request: " + url);
+                LOG.info("Skipping request: {}", url);
                 return false;
             }
             else
             {
-                LOG.info("Including request: " + url);
+                LOG.info("Including request: {}", url);
                 return true;
             }
         }
         catch (IllegalArgumentException ignore)
         {
-            LOG.warn("Request doesn't target expected server (%s): %s".formatted(WebTestHelper.getBaseURL(), url));
+            LOG.warn("Request doesn't target expected server ({}): {}", WebTestHelper.getBaseURL(), url);
             return false;
         }
     }

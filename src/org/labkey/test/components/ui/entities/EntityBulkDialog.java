@@ -74,7 +74,7 @@ public abstract class EntityBulkDialog extends ModalDialog
     {
         if (!reactSelect.getSelections().isEmpty())
         {
-            return reactSelect.getSelections().get(0);
+            return reactSelect.getSelections().getFirst();
         }
         else
         {

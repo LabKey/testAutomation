@@ -433,7 +433,7 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
 
         Locator.XPathLocator clauseXPath = itemXPath.append("//tr[@clauseindex]");
         List<WebElement> filterClauses = clauseXPath.findElements(getDriver());
-        WebElement clauseRow = filterClauses.get(filterClauses.size() - 1);
+        WebElement clauseRow = filterClauses.getLast();
 
         ComboBox filterTypeCombo = new ComboBox.ComboBoxFinder(getDriver()).withIdPrefix("labkey-filterOpCombo").find(clauseRow);
         filterTypeCombo.selectComboBoxItem(filter_type);

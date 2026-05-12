@@ -104,37 +104,23 @@ public class SmtpActionType {
    * @return a String
    */
   public String toString() {
-    switch(value) {
-      case CONNECT_BYTE:
-        return "Connect";
-      case EHLO_BYTE:
-        return "EHLO";
-      case MAIL_BYTE:
-        return "MAIL";
-      case RCPT_BYTE:
-        return "RCPT";
-      case DATA_BYTE:
-        return "DATA";
-      case DATA_END_BYTE:
-        return ".";
-      case QUIT_BYTE:
-        return "QUIT";
-      case RSET_BYTE:
-        return "RSET";
-      case VRFY_BYTE:
-        return "VRFY";
-      case EXPN_BYTE:
-        return "EXPN";
-      case HELP_BYTE:
-        return "HELP";
-      case NOOP_BYTE:
-        return "NOOP";
-      case UNREC_BYTE:
-        return "Unrecognized command / data";
-      case BLANK_LINE_BYTE:
-        return "Blank line";
-      default:
-        return "Unknown";
-    }
+      return switch (value)
+      {
+          case CONNECT_BYTE -> "Connect";
+          case EHLO_BYTE -> "EHLO";
+          case MAIL_BYTE -> "MAIL";
+          case RCPT_BYTE -> "RCPT";
+          case DATA_BYTE -> "DATA";
+          case DATA_END_BYTE -> ".";
+          case QUIT_BYTE -> "QUIT";
+          case RSET_BYTE -> "RSET";
+          case VRFY_BYTE -> "VRFY";
+          case EXPN_BYTE -> "EXPN";
+          case HELP_BYTE -> "HELP";
+          case NOOP_BYTE -> "NOOP";
+          case UNREC_BYTE -> "Unrecognized command / data";
+          case BLANK_LINE_BYTE -> "Blank line";
+          default -> "Unknown";
+      };
   }
 }

@@ -179,7 +179,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
         var selections = getSelections();
 
         if (selections.size() == 1)
-            return selections.get(0);
+            return selections.getFirst();
         return "";
     }
 

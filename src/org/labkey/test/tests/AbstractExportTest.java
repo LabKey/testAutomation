@@ -455,7 +455,7 @@ public abstract class AbstractExportTest extends BaseWebDriverTest
         }
         else
         {
-            assertEquals("Wrong column header", expectedColumnContents.get(0), actualColumnContents.get(0));
+            assertEquals("Wrong column header", expectedColumnContents.getFirst(), actualColumnContents.getFirst());
             assertEquals("Wrong rows exported",
                     new HashSet<>(expectedColumnContents.subList(1, expectedColumnContents.size())),
                     new HashSet<>(actualColumnContents.subList(1, actualColumnContents.size())));

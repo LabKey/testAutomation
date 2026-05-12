@@ -70,7 +70,7 @@ public class RefindingWebElement extends LazyWebElement<RefindingWebElement>
     }
 
     @Override
-    public WebElement getWrappedElement()
+    public @NotNull WebElement getWrappedElement()
     {
         try
         {

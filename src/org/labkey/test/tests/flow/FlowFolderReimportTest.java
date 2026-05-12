@@ -99,7 +99,7 @@ public class FlowFolderReimportTest extends BaseWebDriverTest
         if (TestProperties.isServerRemote())
         {
             List<String> fileList = fileBrowserHelper.getFileList();
-            fileBrowserHelper.selectFileBrowserItem(fileList.get(0));
+            fileBrowserHelper.selectFileBrowserItem(fileList.getFirst());
             file = fileBrowserHelper.downloadSelectedFiles();
         }
         else

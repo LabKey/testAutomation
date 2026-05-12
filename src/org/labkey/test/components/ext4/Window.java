@@ -71,7 +71,7 @@ public class Window<EC extends Window.ElementCache> extends WebDriverComponent<E
         }
         else
         {
-            return allWindows.get(0);
+            return allWindows.getFirst();
         }
     }
 

@@ -71,7 +71,7 @@ public abstract class ReportEditorPage<Page extends ReportEditorPage> extends La
     {
         elementCache().addKeywordFilter.click();
         final List<WebElement> filterRows = elementCache().findFilterRows(FilterType.Keyword);
-        WebElement newFilter = filterRows.get(filterRows.size() - 1);
+        WebElement newFilter = filterRows.getLast();
         final WebElement propertyCombo = Locator.tag("input").attributeEndsWith("name", ".property").parent().findElement(newFilter);
         final Input valueInput = Input(Locator.tag("input").attributeEndsWith("name", ".value"), getDriver()).find(newFilter);
         _extHelper.selectComboBoxItem(propertyCombo, property);
@@ -83,7 +83,7 @@ public abstract class ReportEditorPage<Page extends ReportEditorPage> extends La
     {
         elementCache().addSampleFilter.click();
         final List<WebElement> filterRows = elementCache().findFilterRows(FilterType.SampleProperty);
-        WebElement newFilter = filterRows.get(filterRows.size() - 1);
+        WebElement newFilter = filterRows.getLast();
         final WebElement propertyCombo = Locator.tag("input").attributeEndsWith("name", ".property").parent().findElement(newFilter);
         final Input valueInput = Input(Locator.tag("input").attributeEndsWith("name", ".value"), getDriver()).find(newFilter);
         _extHelper.selectComboBoxItem(propertyCombo, property);
@@ -95,7 +95,7 @@ public abstract class ReportEditorPage<Page extends ReportEditorPage> extends La
     {
         elementCache().addStatisticFilter.click();
         final List<WebElement> filterRows = elementCache().findFilterRows(FilterType.Statistic);
-        WebElement newFilter = filterRows.get(filterRows.size() - 1);
+        WebElement newFilter = filterRows.getLast();
         final Locator.XPathLocator subsetInput = Locator.tag("input").attributeEndsWith("name", ".property_subset");
         final WebElement statCombo = Locator.tag("input").attributeEndsWith("name", ".property_stat").parent().findElement(newFilter);
         final WebElement opCombo = Locator.tag("input").attributeEndsWith("name", ".op").parent().findElement(newFilter);
@@ -113,7 +113,7 @@ public abstract class ReportEditorPage<Page extends ReportEditorPage> extends La
     {
         elementCache().addFieldFilter.click();
         final List<WebElement> filterRows = elementCache().findFilterRows(FilterType.Field);
-        WebElement newFilter = filterRows.get(filterRows.size() - 1);
+        WebElement newFilter = filterRows.getLast();
         final Input propertyInput = Input(Locator.tag("input").attributeEndsWith("name", ".property"), getDriver()).find(newFilter);
         final WebElement opCombo = Locator.tag("input").attributeEndsWith("name", ".op").parent().findElement(newFilter);
         final Input valueInput = Input(Locator.tag("input").attributeEndsWith("name", ".value"), getDriver()).find(newFilter);

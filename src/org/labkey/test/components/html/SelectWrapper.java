@@ -15,6 +15,7 @@
  */
 package org.labkey.test.components.html;
 
+import org.jetbrains.annotations.NotNull;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
@@ -36,7 +37,7 @@ public class SelectWrapper extends org.openqa.selenium.support.ui.Select
         super(new RemoteWebElement()
         {
             @Override
-            public String getTagName()
+            public @NotNull String getTagName()
             {
                 return "select";
             }
@@ -63,7 +64,7 @@ public class SelectWrapper extends org.openqa.selenium.support.ui.Select
     }
 
     @Override
-    public WebElement getWrappedElement()
+    public @NotNull WebElement getWrappedElement()
     {
         return wrappedElement;
     }
@@ -75,25 +76,25 @@ public class SelectWrapper extends org.openqa.selenium.support.ui.Select
     }
 
     @Override
-    public List<WebElement> getOptions()
+    public @NotNull List<WebElement> getOptions()
     {
         return getWrappedSelect().getOptions();
     }
 
     @Override
-    public List<WebElement> getAllSelectedOptions()
+    public @NotNull List<WebElement> getAllSelectedOptions()
     {
         return getWrappedSelect().getAllSelectedOptions();
     }
 
     @Override
-    public WebElement getFirstSelectedOption()
+    public @NotNull WebElement getFirstSelectedOption()
     {
         return getWrappedSelect().getFirstSelectedOption();
     }
 
     @Override
-    public void selectByVisibleText(String text)
+    public void selectByVisibleText(@NotNull String text)
     {
         getWrappedSelect().selectByVisibleText(text);
     }
@@ -105,7 +106,7 @@ public class SelectWrapper extends org.openqa.selenium.support.ui.Select
     }
 
     @Override
-    public void selectByValue(String value)
+    public void selectByValue(@NotNull String value)
     {
         getWrappedSelect().selectByValue(value);
     }
@@ -117,7 +118,7 @@ public class SelectWrapper extends org.openqa.selenium.support.ui.Select
     }
 
     @Override
-    public void deselectByValue(String value)
+    public void deselectByValue(@NotNull String value)
     {
         getWrappedSelect().deselectByValue(value);
     }
@@ -129,7 +130,7 @@ public class SelectWrapper extends org.openqa.selenium.support.ui.Select
     }
 
     @Override
-    public void deselectByVisibleText(String text)
+    public void deselectByVisibleText(@NotNull String text)
     {
         getWrappedSelect().deselectByVisibleText(text);
     }

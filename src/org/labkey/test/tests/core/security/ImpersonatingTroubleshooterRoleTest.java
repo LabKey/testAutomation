@@ -14,8 +14,6 @@ import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PermissionsHelper;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
 
 import static org.labkey.test.util.PermissionsHelper.IMP_TROUBLESHOOTER_ROLE;
 import static org.labkey.test.util.PermissionsHelper.SITE_ADMIN_ROLE;
@@ -97,9 +95,4 @@ public class ImpersonatingTroubleshooterRoleTest extends TroubleshooterRoleTest
         return "ImpersonatingTroubleshooterRoleTest Project";
     }
 
-    @Override
-    public List<String> getAssociatedModules()
-    {
-        return Arrays.asList();
-    }
 }

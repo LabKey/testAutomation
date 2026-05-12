@@ -287,7 +287,7 @@ public class WebTestHelper
                 else
                 {
                     _webPort = Integer.parseInt(webPortStr);
-                    LOG.info("Using labkey port '" + _webPort + "', as provided by system property 'labkey.port'.");
+                    LOG.info("Using labkey port '{}', as provided by system property 'labkey.port'.", _webPort);
                 }
             }
             return _webPort;
@@ -308,7 +308,7 @@ public class WebTestHelper
                     _targetServer = DEFAULT_TARGET_SERVER;
                 }
                 else
-                    LOG.info("Using target server '" + _targetServer + "', as provided by system property 'labkey.server'.");
+                    LOG.info("Using target server '{}', as provided by system property 'labkey.server'.", _targetServer);
             }
             return _targetServer;
         }
@@ -481,7 +481,7 @@ public class WebTestHelper
                     _contextPath = DEFAULT_CONTEXT_PATH;
                 }
                 else
-                    LOG.info("Using labkey context path '" + _contextPath + "', as provided by system property 'labkey.contextpath'.");
+                    LOG.info("Using labkey context path '{}', as provided by system property 'labkey.contextpath'.", _contextPath);
 
                 _contextPath = StringUtils.strip(_contextPath, "/ ");
                 if (!_contextPath.isEmpty())

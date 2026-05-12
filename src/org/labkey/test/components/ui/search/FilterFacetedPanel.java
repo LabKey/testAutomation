@@ -115,7 +115,7 @@ public class FilterFacetedPanel extends WebDriverComponent<FilterFacetedPanel.El
         // If there were options before, wait until they are removed.
         if (!checkBoxes.isEmpty())
         {
-            getWrapper().shortWait().until(ExpectedConditions.stalenessOf(checkBoxes.get(0)));
+            getWrapper().shortWait().until(ExpectedConditions.stalenessOf(checkBoxes.getFirst()));
         }
 
         getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(elementCache()

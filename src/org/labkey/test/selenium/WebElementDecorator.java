@@ -28,7 +28,7 @@ public abstract class WebElementDecorator extends WebElementWrapper
     }
 
     @Override
-    public final WebElement getWrappedElement()
+    public final @NotNull WebElement getWrappedElement()
     {
         return _decoratedElement;
     }
