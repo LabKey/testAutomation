@@ -179,13 +179,13 @@ public class ProductMenu extends WebDriverComponent<ProductMenu.ElementCache>
         clickNavLink(elementCache().activeDashboardIcon);
     }
 
-    // Interactions with icon elements on the page to catch GitHub Issue 1146.
     public int getDashboardIconCount()
     {
         List<WebElement> dashboardIcons = elementCache().dashboardIconLoc.findElements(elementCache().menuContent);
         for (WebElement dashboardIcon : dashboardIcons)
         {
-            getWrapper().mouseOver(dashboardIcon.findElement(By.xpath("./ancestor::li[1]")));
+            // Interactions with icon elements on the page to catch GitHub Issue 1146.
+            getWrapper().mouseOver(Locator.xpath("./ancestor::li[1]").findElement(dashboardIcon));
             getWrapper().mouseOver(dashboardIcon);
         }
         return dashboardIcons.size();
@@ -198,13 +198,13 @@ public class ProductMenu extends WebDriverComponent<ProductMenu.ElementCache>
         clickNavLink(elementCache().activeAdministrationIcon);
     }
 
-    // Interactions with icon elements on the page to catch GitHub Issue 1146.
     public int getAdministrationIconCount()
     {
         List<WebElement> adminIcons = elementCache().administrationIconLoc.findElements(elementCache().menuContent);
         for (WebElement adminIcon : adminIcons)
         {
-            getWrapper().mouseOver(adminIcon.findElement(By.xpath("./ancestor::li[1]")));
+            // Interactions with icon elements on the page to catch GitHub Issue 1146.
+            getWrapper().mouseOver(Locator.xpath("./ancestor::li[1]").findElement(adminIcon));
             getWrapper().mouseOver(adminIcon);
         }
         return adminIcons.size();
