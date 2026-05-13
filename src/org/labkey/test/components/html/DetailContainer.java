@@ -53,7 +53,7 @@ public class DetailContainer extends WebDriverComponent<DetailContainer.ElementC
     static public class Locators
     {
         static public Locator.XPathLocator panelLoc = Locator.tagWithClass("div", "panel-default");
-        static public Locator.XPathLocator headerLoc = Locator.tagWithClass("div", "panel-heading");
+        static public Locator.XPathLocator headerLoc = Locator.byClass("panel-heading");
         static public Locator.XPathLocator bodyLoc = Locator.tagWithClass("div", "panel-body");
         static public Locator panelWithTitle(String title)
         {

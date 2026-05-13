@@ -56,7 +56,7 @@ public class PermissionsMember extends WebDriverComponent<PermissionsMember.Elem
     protected class ElementCache extends Component<?>.ElementCache
     {
         private final WebElement _removeButton = Locator.byClass("btn")
-                .withChild(Locator.byClass("fa-remove")).findWhenNeeded(this);
+                .withDescendant(Locator.byClass("fa-remove")).findWhenNeeded(this);
         private final WebElement _nameButton = Locator.byClass("permissions-button-display")
                 .findWhenNeeded(this).withTimeout(1000);
     }

@@ -13,7 +13,7 @@ import org.openqa.selenium.WebElement;
  * <pre>{@code
  *
  * <div class="panel panel-default">
- *   <div class="panel-heading">Panel Title</div>
+ *   <h2 class="panel-heading">Panel Title</h2>
  *   <div class="panel-body">
  *       <SomeComponent>
  *   </div>

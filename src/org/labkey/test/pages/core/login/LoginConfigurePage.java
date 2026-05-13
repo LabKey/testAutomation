@@ -222,7 +222,7 @@ public class LoginConfigurePage extends LabKeyPage<LoginConfigurePage.ElementCac
         WebElement globalSettingsPanel()
         {
             return Locator.tagWithClass("div", "panel-default")
-                    .withChild(Locator.tagWithClass("div", "panel-heading")
+                    .withChild(Locator.byClass("panel-heading")
                             .withChild(Locator.tag("span").withText("Global Settings")))
                     .waitForElement(this, WAIT_FOR_JAVASCRIPT);
         }
@@ -230,7 +230,7 @@ public class LoginConfigurePage extends LabKeyPage<LoginConfigurePage.ElementCac
         WebElement configurationsPanel()
         {
             return Locator.tagWithClass("div", "panel-default")
-                    .withDescendant(Locator.tagWithClass("div", "panel-heading").withChild(Locator.tag("span").withText("Configurations")))
+                    .withDescendant(Locator.byClass("panel-heading").withChild(Locator.tag("span").withText("Configurations")))
                     .waitForElement(this, WAIT_FOR_JAVASCRIPT);
         }
 
