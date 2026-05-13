@@ -14,15 +14,13 @@ public class VersionRange
      *
      * @param earliestVersion The earliest version in the range (inclusive). If null, there is no lower bound.
      * @param latestVersion The latest version in the range (inclusive). If null, there is no upper bound.
-     * @throws IllegalArgumentException if both versions are null, or if earliestVersion is after latestVersion.
+     * @throws IllegalArgumentException if earliestVersion is after latestVersion.
      */
     public VersionRange(Version earliestVersion, Version latestVersion)
     {
         this.earliestVersion = earliestVersion;
         this.latestVersion = latestVersion;
 
-        if (earliestVersion == null && latestVersion == null)
-            throw new IllegalArgumentException("Version range requires at least one version");
         if (earliestVersion != null && latestVersion != null && earliestVersion.compareTo(latestVersion) > 0)
             throw new IllegalArgumentException("%s is after %s".formatted(earliestVersion, latestVersion));
 
