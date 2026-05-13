@@ -28,6 +28,7 @@ import java.util.Set;
 public class PackageLockJsonTest
 {
     private static final Set<String> ALLOWED_DEPENDENCY_HOSTS = Set.of("registry.npmjs.org", "labkey.jfrog.io");
+    private static final File SERVER_MODULES_DIR = new File(TestFileUtils.getLabKeyRoot(), "server/modules");
 
     private final List<String> errors = new ArrayList<>();
     private final File moduleDir;
@@ -42,11 +43,10 @@ public class PackageLockJsonTest
     {
         List<File> allModules = new ArrayList<>();
 
-        File modulesDir = new File(TestFileUtils.getLabKeyRoot(), "server/modules");
-        File[] files = modulesDir.listFiles();
+        File[] files = SERVER_MODULES_DIR.listFiles();
         if (files == null)
         {
-            throw new RuntimeException("No files found in modules directory: " + modulesDir.getAbsolutePath());
+            throw new RuntimeException("No files found in modules directory: " + SERVER_MODULES_DIR.getAbsolutePath());
         }
         for (File file : files)
         {
@@ -94,17 +94,19 @@ public class PackageLockJsonTest
             }
         }
 
-        Assert.assertTrue("Bad sources: " + errors, errors.isEmpty());
+        Assert.assertTrue("Untrusted package sources:\n" + String.join("\n", errors), errors.isEmpty());
     }
 
     /// Verify that a package reference in a package-lock.json file only resolves to known hosts and has a valid version
     /// Also checks sub-dependencies
     private void verifyPackage(String packageName, JSONObject packageJson, File packageLockFile)
     {
+        String relPath = SERVER_MODULES_DIR.toPath().relativize(packageLockFile.toPath()).toString();
+
         String resolved = packageJson.optString("resolved");
         if (resolved.isBlank())
         {
-            TestLogger.debug("Resolved field is blank for package " + packageName + " in " + packageLockFile.getAbsolutePath());
+            TestLogger.debug("Resolved field is blank for package " + packageName + " in " + relPath);
         }
         else
         {
@@ -114,14 +116,14 @@ public class PackageLockJsonTest
                 String host = resolvedURL.getHost();
                 if (!ALLOWED_DEPENDENCY_HOSTS.contains(host))
                 {
-                    String message = "Package " + packageName + " resolved to unrecognized host [" + host + "] in " + packageLockFile.getAbsolutePath();
+                    String message = "Package " + packageName + " resolved to unrecognized host [" + host + "] in " + relPath;
                     errors.add(message);
                     TestLogger.error(message);
                 }
             }
             catch (URISyntaxException e)
             {
-                String message = "Package " + packageName + " resolved to an invalid location [" + resolved + "] in " + packageLockFile.getAbsolutePath();
+                String message = "Package " + packageName + " resolved to an invalid location [" + resolved + "] in " + relPath;
                 errors.add(message);
                 TestLogger.error(message);
             }
@@ -130,7 +132,7 @@ public class PackageLockJsonTest
         String version = packageJson.optString("version");
         if (version.isBlank() || !CharUtils.isAsciiNumeric(version.charAt(0)))
         {
-            String message = "Package " + packageName + " has bad version [" + version + "] in " + packageLockFile.getAbsolutePath();
+            String message = "Package " + packageName + " has bad version [" + version + "] in " + relPath;
             errors.add(message);
             TestLogger.error(message);
         }
@@ -146,9 +148,9 @@ public class PackageLockJsonTest
             else
             {
                 String tVer = transitiveDeps.optString(tDep);
-                if (tVer == null || (tVer.contains(":") && !tVer.startsWith("npm:"))) // URL, file, or workspace dependency
+                if (tVer == null || (tVer.contains(":"))) // URL, file, or workspace dependency
                 {
-                    String message = "Package " + packageName + " has bad transitive dependency [" + tVer + "] in " + packageLockFile.getAbsolutePath();
+                    String message = "Package " + packageName + " has bad transitive dependency [" + tVer + "] in " + relPath;
                     errors.add(message);
                     TestLogger.error(message);
                 }
