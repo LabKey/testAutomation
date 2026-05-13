@@ -321,7 +321,7 @@ public class FieldSelectionDialog extends ModalDialog
     public boolean canFieldBeRemoved(String field, int index)
     {
         WebElement listItem = getSelectedListItems(field).get(index);
-        WebElement removeIcon = Locator.tagWithClass("span", "view-field__action").findWhenNeeded(listItem);
+        WebElement removeIcon = Locator.tagWithClass("button", "view-field__action").findWhenNeeded(listItem);
         return removeIcon.isDisplayed();
     }
 
@@ -363,7 +363,7 @@ public class FieldSelectionDialog extends ModalDialog
     public FieldSelectionDialog removeFieldFromSelected(String field, int index)
     {
         WebElement listItem = getSelectedListItems(field).get(index);
-        WebElement removeIcon = Locator.tagWithClass("span", "view-field__action").findElement(listItem);
+        WebElement removeIcon = Locator.tagWithClass("button", "view-field__action").findElement(listItem);
         getWrapper().mouseOver(removeIcon);
         removeIcon.click();
 
@@ -391,7 +391,7 @@ public class FieldSelectionDialog extends ModalDialog
         {
             getWrapper().log(String.format("Removing field '%s' from selected fields.", listItem.getText()));
 
-            WebElement removeIcon = Locator.tagWithClass("span", "view-field__action").findWhenNeeded(listItem);
+            WebElement removeIcon = Locator.tagWithClass("button", "view-field__action").findWhenNeeded(listItem);
 
             // In some usages there may be fields that are not removable.
             if (!removeIcon.isDisplayed())
