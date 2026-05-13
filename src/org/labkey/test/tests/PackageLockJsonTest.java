@@ -29,7 +29,7 @@ public class PackageLockJsonTest
 {
     private static final Set<String> ALLOWED_DEPENDENCY_HOSTS = Set.of("registry.npmjs.org", "labkey.jfrog.io");
     // Allow-list of '@isaacs/cliui' dependencies
-    private static final Set<String> ALLOWED_NONSTANDARD_VERSIONS = Set.of("npm:string-width@^4.2.0", "npm:strip-ansi@^6.0.1", "npm:wrap-ansi@^7.0.0", "npm:react-is@^18.3.1", "npm:react-is@^19.2.5");
+    private static final Set<String> ALLOWED_NONSTANDARD_VERSIONS = Set.of("npm:string-width@^4.2.0", "npm:strip-ansi@^6.0.1", "npm:wrap-ansi@^7.0.0");
 
     private final List<String> errors = new ArrayList<>();
     private final File moduleDir;
