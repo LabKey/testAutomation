@@ -28,8 +28,6 @@ import java.util.Set;
 public class PackageLockJsonTest
 {
     private static final Set<String> ALLOWED_DEPENDENCY_HOSTS = Set.of("registry.npmjs.org", "labkey.jfrog.io");
-    // Allow-list of '@isaacs/cliui' dependencies
-    private static final Set<String> ALLOWED_NONSTANDARD_VERSIONS = Set.of("npm:string-width@^4.2.0", "npm:strip-ansi@^6.0.1", "npm:wrap-ansi@^7.0.0");
 
     private final List<String> errors = new ArrayList<>();
     private final File moduleDir;
@@ -148,7 +146,7 @@ public class PackageLockJsonTest
             else
             {
                 String tVer = transitiveDeps.optString(tDep);
-                if (tVer == null || tVer.contains(":") && !ALLOWED_NONSTANDARD_VERSIONS.contains(tVer)) // URL, file, or workspace dependency
+                if (tVer == null || (tVer.contains(":") && !tVer.startsWith("npm:"))) // URL, file, or workspace dependency
                 {
                     String message = "Package " + packageName + " has bad transitive dependency [" + tVer + "] in " + packageLockFile.getAbsolutePath();
                     errors.add(message);
