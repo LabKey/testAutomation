@@ -368,7 +368,7 @@ public class FieldSelectionDialog extends ModalDialog
         removeIcon.click();
 
         // Move the mouse over the dialog title.
-        getWrapper().mouseOver(Locator.tagWithClass("h4", "modal-title").findElement(this));
+        getWrapper().mouseOver(ModalDialog.Locators.title.findElement(this));
 
         getWrapper().shortWait()
                 .withMessage(String.format("Field '%s' was not removed from list.", field))

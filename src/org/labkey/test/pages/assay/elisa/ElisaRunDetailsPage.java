@@ -200,7 +200,7 @@ public class ElisaRunDetailsPage extends LabKeyPage<ElisaRunDetailsPage.ElementC
         Locator dataPanelWithTitle(String title)
         {
             return Locator.tagWithClass("div", "panel-default")
-                    .withChild(Locator.tagWithClass("div", "panel-heading").withText(title));
+                    .withChild(Locator.byClass("panel-heading").withText(title));
         }
 
         // data selections
@@ -233,7 +233,7 @@ public class ElisaRunDetailsPage extends LabKeyPage<ElisaRunDetailsPage.ElementC
 
         // curve fit
         WebElement curveFitPanel = Locator.tagWithClass("div", "panel-default")
-                .withChild(Locator.tagWithClass("div", "panel-heading").startsWith("Curve Fit:"))
+                .withChild(Locator.byClass( "panel-heading").startsWith("Curve Fit:"))
                 .findWhenNeeded(this);
         Checkbox showCurveFitLineBox = new Checkbox(Locator.checkbox().findWhenNeeded(curveFitPanel));
         Optional<WebElement> fitParameters()

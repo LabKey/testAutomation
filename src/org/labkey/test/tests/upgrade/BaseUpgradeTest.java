@@ -50,13 +50,23 @@ public abstract class BaseUpgradeTest extends BaseWebDriverTest
     {
         BaseUpgradeTest currentTest = BaseWebDriverTest.getCurrentTest();
 
+        Class<?> testClass = currentTest.getClass();
+        String earliestVersion = Optional.ofNullable(testClass.getAnnotation(EarliestVersion.class))
+                .map(EarliestVersion::value).orElse(null);
+        String latestVersion = Optional.ofNullable(testClass.getAnnotation(LatestVersion.class))
+                .map(LatestVersion::value).orElse(null);
+
+        Assume.assumeTrue("Test class not valid when upgrading from version: " + setupVersion,
+                VersionRange.versionRange(earliestVersion, latestVersion).contains(setupVersion)
+        );
+
         if (isUpgradeSetupPhase)
         {
             currentTest.doSetup();
         }
         else
         {
-            TestLogger.info("Skipping setup for %s. Verifying upgrade.". formatted(currentTest.getClass().getSimpleName()));
+            TestLogger.info("Skipping setup for %s. Verifying upgrade.". formatted(testClass.getSimpleName()));
         }
     }
 
@@ -100,19 +110,19 @@ public abstract class BaseUpgradeTest extends BaseWebDriverTest
      * Specifies the earliest version of the test class that performed the required setup for the annotated method.
      */
     @Retention(RetentionPolicy.RUNTIME)
-    @Target({ElementType.METHOD})
+    @Target({ElementType.METHOD, ElementType.TYPE})
     protected @interface EarliestVersion
     {
         String value();
     }
 
     /**
-     * Annotates test methods that should only run when upgrading from particular LabKey versions, as specified in
-     * {@code webtest.upgradePreviousVersion}.<br>
-     * Specifies the latest version of the test class that performed the required setup for the annotated method.
+     * Annotates test methods or classes that should only run when upgrading from particular LabKey versions, as
+     * specified in {@code webtest.upgradePreviousVersion}.<br>
+     * Specifies the latest version of the test class that performed the required setup for the annotated method or class.
      */
     @Retention(RetentionPolicy.RUNTIME)
-    @Target({ElementType.METHOD})
+    @Target({ElementType.METHOD, ElementType.TYPE})
     protected @interface LatestVersion {
         String value();
     }

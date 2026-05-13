@@ -55,7 +55,7 @@ public class GroupDetailsPanel extends WebDriverComponent<GroupDetailsPanel.Elem
 
     protected class ElementCache extends Component<?>.ElementCache
     {
-        final WebElement title = Locator.tagWithClass("p", "panel-heading").findWhenNeeded(this);
+        final WebElement title = Locator.byClass("panel-heading").findWhenNeeded(this);
 
         WebElement detailValueEl(String label)
         {

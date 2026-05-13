@@ -196,7 +196,7 @@ public class LineageGraph extends WebDriverComponent<LineageGraph.ElementCache>
                 .findWhenNeeded(this).withTimeout(4000);
         final WebElement componentDetailImage = Locator.tagWithClass("i", "component-detail--child--img")
                 .child(Locator.tag("img")).findWhenNeeded(nodeDetailContainer);
-        final WebElement nodeDetailName = Locator.tagWithClass("h4", "lineage-name-data")
+        final WebElement nodeDetailName = Locator.tagWithClass("div", "lineage-name-data")
                 .findWhenNeeded(nodeDetailContainer);
         final WebElement nodeDetailLinksContainer = Locator.tagWithClass("div", "lineage-node-detail")
                 .findWhenNeeded(nodeDetailContainer);
