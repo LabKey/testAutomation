@@ -148,7 +148,7 @@ public class PackageLockJsonTest
             else
             {
                 String tVer = transitiveDeps.optString(tDep);
-                if (tVer == null || (tVer.contains(":"))) // URL, file, or workspace dependency
+                if (tVer == null || tVer.replaceAll("^npm:", "").contains(":")) // URL, file, or workspace dependency
                 {
                     String message = "Package " + packageName + " has bad transitive dependency [" + tVer + "] in " + relPath;
                     errors.add(message);
