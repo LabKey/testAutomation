@@ -50,7 +50,7 @@ public class PasswordUtil
         }
     }
 
-    public static void main(String args[]) throws IOException
+    public static void main(String[] args) throws IOException
     {
         PasswordUtil util = new PasswordUtil();
         if (args.length == 0)

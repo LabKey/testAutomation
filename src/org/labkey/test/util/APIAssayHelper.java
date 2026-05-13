@@ -402,7 +402,7 @@ public class APIAssayHelper extends AbstractAssayHelper
     {
         SelectRowsResponse resp = getPlateTemplates(folderPath);
 
-        return String.valueOf(resp.getRows().get(0).get("Lsid"));
+        return String.valueOf(resp.getRows().getFirst().get("Lsid"));
     }
 
     public String getPlateTemplateLsid(String folderPath, String name) throws Exception

@@ -170,7 +170,7 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
         List<Map<String, String>> samples = new ArrayList<>();
 
         samples.add(Map.of(textChoiceFieldName, valuesUsed.get(0), textField, ""));
-        samples.add(Map.of(textChoiceFieldName, "", textField, expectedConvertedValues.get(0)));
+        samples.add(Map.of(textChoiceFieldName, "", textField, expectedConvertedValues.getFirst()));
         samples.add(Map.of(textChoiceFieldName, valuesUsed.get(1), textField, ""));
         samples.add(Map.of(textChoiceFieldName, valuesUsed.get(1), textField, ""));
         samples.add(Map.of(textChoiceFieldName, "", textField, expectedConvertedValues.get(1)));
@@ -404,7 +404,7 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
         checker().screenShotIfNewError("Edit_Values_Locked_Locked_Error");
 
         log("Validate that unused values are not locked and can be deleted.");
-        value = expectedUnLockedValues.get(0);
+        value = expectedUnLockedValues.getFirst();
         fieldRow.selectTextChoiceValue(value);
 
         if (checker().verifyTrue(String.format("Delete button is not enabled for value '%s', it should be.", value),
@@ -514,8 +514,8 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
         fieldRow = updatePage.getFieldsPanel().getField(textChoiceFieldName);
         fieldRow = fieldRow.expand();
 
-        valueToUpdate = expectedUnLockedValues.get(0);
-        updatedValue = expectedLockedValues.get(0);
+        valueToUpdate = expectedUnLockedValues.getFirst();
+        updatedValue = expectedLockedValues.getFirst();
 
         actualMsg = fieldRow.updateTextChoiceValueExpectError(valueToUpdate, updatedValue);
         expectedMsg = String.format("\"%s\" already exists in the list of values.", updatedValue);
@@ -642,8 +642,8 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
 
         refresh();
 
-        String sample = availableSamples.get(0);
-        availableSamples.remove(0);
+        String sample = availableSamples.getFirst();
+        availableSamples.removeFirst();
 
         log(String.format("Edit the sample '%s' and validate TextChoice values are shown in the select for the field.", sample));
 
@@ -665,7 +665,7 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
         LabKeyAssert.assertEqualsSorted(String.format("Options for the '%s' field not as expected. Fatal error.", textChoiceFieldName),
                 tcValues, options);
 
-        String expectedValue = tcValues.get(0);
+        String expectedValue = tcValues.getFirst();
         updateSamplePage.setField(textChoiceFieldName, OptionSelect.SelectOption.textOption(expectedValue));
 
         updateSamplePage.submit();
@@ -678,8 +678,8 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
                         expectedValue, actualValue);
 
         log("Use import to update/set a TextChoice value.");
-        sample = availableSamples.get(0);
-        availableSamples.remove(0);
+        sample = availableSamples.getFirst();
+        availableSamples.removeFirst();
 
         expectedValue = tcValues.get(1);
         List<Map<String, String>> sampleData = new ArrayList<>();
@@ -696,8 +696,8 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
 
         log("Finally validate that an invalid TextChoice value used during sample import/update fails.");
 
-        sample = availableSamples.get(0);
-        availableSamples.remove(0);
+        sample = availableSamples.getFirst();
+        availableSamples.removeFirst();
 
         String invalidValue = "ZZZZ";
 

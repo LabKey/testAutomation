@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class SummaryStatisticsHelper
@@ -141,7 +142,7 @@ public class SummaryStatisticsHelper
             assertTrue("Expected summary stat is not present: " + stat, statsWindow.isPresent(stat));
 
         for (String stat : getUnexpectedColumnStats(colType, isLookup, isPK))
-            assertTrue("Unexpected summary stat is present: " + stat, !statsWindow.isPresent(stat));
+            assertFalse("Unexpected summary stat is present: " + stat, statsWindow.isPresent(stat));
 
         statsWindow.cancel();
     }

@@ -250,7 +250,7 @@ public class EditableGridTest extends BaseWebDriverTest
         EditableGrid testGrid = goToEditableGrid(EXTRAPOLATING_SAMPLE_TYPE);
 
         testGrid.addRows(6);
-        WebElement topLeft = setCellValues(testGrid, ASC_STRING, "2", "4").get(0);
+        WebElement topLeft = setCellValues(testGrid, ASC_STRING, "2", "4").getFirst();
         setCellValues(testGrid, DESC_STRING, "4", "2");
         setCellValues(testGrid, ASC_INT, "2", "4");
         WebElement bottomRight = setCellValues(testGrid, DESC_INT, "4", "2").get(1);
@@ -281,7 +281,7 @@ public class EditableGridTest extends BaseWebDriverTest
         EditableGrid testGrid = goToEditableGrid(EXTRAPOLATING_SAMPLE_TYPE);
 
         testGrid.addRows(6);
-        WebElement topLeft = setCellValues(testGrid, ASC_STRING, "ABC-2", "ABC-4").get(0);
+        WebElement topLeft = setCellValues(testGrid, ASC_STRING, "ABC-2", "ABC-4").getFirst();
         WebElement bottomRight = setCellValues(testGrid, DESC_STRING, "ABC-4", "ABC-2").get(1);
         WebElement fillTo = testGrid.getCell(4, DESC_STRING);
 
@@ -372,7 +372,7 @@ public class EditableGridTest extends BaseWebDriverTest
         String mlRow2 = "Line 3\nLine 4";
 
         testGrid.addRows(7);
-        WebElement topLeft = setCellValues(testGrid, FILL_STRING, "QWE", "ASD", "ZXC").get(0);
+        WebElement topLeft = setCellValues(testGrid, FILL_STRING, "QWE", "ASD", "ZXC").getFirst();
 
         // Just for fun put an empty row between.
         testGrid.setMultiLineCellValue(0, FILL_MULTI_LINE, mlRow1);
@@ -692,7 +692,7 @@ public class EditableGridTest extends BaseWebDriverTest
         editableGrid.addRows(1);
 
         // Scroll the last column into view it will make any failure screenshots more useful.
-        String lastColumn = editableGrid.getColumnLabels().get(editableGrid.getColumnLabels().size() - 1);
+        String lastColumn = editableGrid.getColumnLabels().getLast();
         scrollIntoView(editableGrid.getCell(0, lastColumn));
 
         int emptyWidth = editableGrid.getCell(0, PASTE_ML).getSize().getWidth();

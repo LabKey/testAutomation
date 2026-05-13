@@ -155,7 +155,7 @@ public class AuditLogTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testSteps() throws IOException, CommandException
+    public void testSteps() throws IOException
     {
         turnOnAuditLogFile();
 

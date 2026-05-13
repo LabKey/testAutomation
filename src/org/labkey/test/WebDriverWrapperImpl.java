@@ -15,6 +15,7 @@
  */
 package org.labkey.test;
 
+import org.jetbrains.annotations.NotNull;
 import org.openqa.selenium.WebDriver;
 
 public class WebDriverWrapperImpl extends WebDriverWrapper
@@ -27,7 +28,7 @@ public class WebDriverWrapperImpl extends WebDriverWrapper
     }
 
     @Override
-    public WebDriver getWrappedDriver()
+    public @NotNull WebDriver getWrappedDriver()
     {
         return driver;
     }

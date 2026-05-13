@@ -56,12 +56,6 @@ public class TimeChartVisitBasedTest extends TimeChartTest
     };
 
     @Override
-    protected BrowserType bestBrowser()
-    {
-        return BrowserType.CHROME;
-    }
-
-    @Override
     protected void doCreateSteps()
     {
         configureVisitStudy();

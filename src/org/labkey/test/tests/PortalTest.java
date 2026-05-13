@@ -39,6 +39,8 @@ import java.util.List;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -145,8 +147,7 @@ public class PortalTest extends BaseWebDriverTest
             BootstrapMenu titleMenu = webPart.getTitleMenu();
             titleMenu.expand();
             waitFor(()-> Locator.linkContainingText("Permissions").findElementOrNull(titleMenu.getComponentElement()) != null, 2000);
-            assertTrue("WebPart should not be removable",
-                    Locator.linkContainingText("Remove From Page").findElementOrNull(titleMenu.getComponentElement()) == null);
+            assertNull("WebPart should not be removable", Locator.linkContainingText("Remove From Page").findElementOrNull(titleMenu.getComponentElement()));
             titleMenu.collapse();
         }
 
@@ -158,10 +159,9 @@ public class PortalTest extends BaseWebDriverTest
             BootstrapMenu titleMenu = webPart.getTitleMenu();
             titleMenu.expand();
             waitFor(()-> Locator.linkContainingText("Permissions").findElementOrNull(titleMenu.getComponentElement()) != null, 2000);
-            assertTrue("WebPart should be removable",
-                    Locator.linkContainingText("Remove From Page")
-                            .notHidden().
-                            findElementOrNull(titleMenu.getComponentElement()) != null);
+            assertNotNull("WebPart should be removable", Locator.linkContainingText("Remove From Page")
+                    .notHidden().
+                    findElementOrNull(titleMenu.getComponentElement()));
 
             titleMenu.collapse();
          }

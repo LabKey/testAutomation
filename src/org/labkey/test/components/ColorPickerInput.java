@@ -35,7 +35,7 @@ public class ColorPickerInput extends WebDriverComponent<Component<?>.ElementCac
         List<WebElement> inputs = Locator.tag("input").findElements(this);
         if (inputs.isEmpty())
             throw new NoSuchElementException("Input tag not found in color picker");
-        WebElement hexInput = inputs.get(0);
+        WebElement hexInput = inputs.getFirst();
         new Input(hexInput, getDriver()).setWithPaste(hexValue);
     }
 
@@ -44,7 +44,7 @@ public class ColorPickerInput extends WebDriverComponent<Component<?>.ElementCac
         List<WebElement> inputs = Locator.tag("input").findElements(this);
         if (inputs.isEmpty())
             throw new NoSuchElementException("Input tag not found in color picker");
-        WebElement hexInput = inputs.get(0);
+        WebElement hexInput = inputs.getFirst();
         return new Input(hexInput, getDriver()).getValue();
     }
 

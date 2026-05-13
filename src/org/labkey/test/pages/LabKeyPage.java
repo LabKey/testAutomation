@@ -15,6 +15,7 @@
  */
 package org.labkey.test.pages;
 
+import org.jetbrains.annotations.NotNull;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locators;
 import org.labkey.test.WebDriverWrapper;
@@ -53,7 +54,7 @@ public class LabKeyPage<EC extends LabKeyPage.ElementCache> extends WebDriverWra
     }
 
     @Override
-    public WebDriver getWrappedDriver()
+    public @NotNull WebDriver getWrappedDriver()
     {
         return _wrapsDriver.getWrappedDriver();
     }
@@ -94,13 +95,13 @@ public class LabKeyPage<EC extends LabKeyPage.ElementCache> extends WebDriverWra
     public class ElementCache implements SearchContext
     {
         @Override
-        public List<WebElement> findElements(By by)
+        public @NotNull List<WebElement> findElements(@NotNull By by)
         {
             return getDriver().findElements(by);
         }
 
         @Override
-        public WebElement findElement(By by)
+        public @NotNull WebElement findElement(@NotNull By by)
         {
             return getDriver().findElement(by);
         }

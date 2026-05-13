@@ -467,7 +467,7 @@ public class ElispotAssayTest extends AbstractAssayTest
         plateDesigner.selectTypeTab("CONTROL");
 
         clickButton("Create", 0);
-        waitForElement(Locator.tagWithText("label", "Background Wells"));
+        waitForElement(Locator.tagWithText("span", "Background Wells"));
 
         plateDesigner.selectWellsForWellgroup("CONTROL", "Background Wells", "A1", "B3");
         plateDesigner.selectWellsForWellgroup("CONTROL", "Background Wells", "C4", "D6");

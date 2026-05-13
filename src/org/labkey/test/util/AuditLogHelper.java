@@ -522,7 +522,7 @@ public class AuditLogHelper
 
     public interface ConnectionSupplier
     {
-        Connection get() throws IOException, CommandException;
+        Connection get() throws IOException;
     }
 
     public boolean validateDetailAuditLog(DetailedAuditEventRow expectedAuditDetail, DetailedAuditEventRow actualAuditDetail)

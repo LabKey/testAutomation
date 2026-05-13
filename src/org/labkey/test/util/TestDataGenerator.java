@@ -62,9 +62,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -535,32 +533,67 @@ public class TestDataGenerator
         return randomString(size, exclusion, CHARSET_STRING);
     }
 
+    /** After this many consecutive non-space characters, {@link #randomString} forces the next char to ' '
+     * (provided ' ' is in the effective charset). */
+    private static final int FORCE_SPACE_AFTER = 15;
+
     public static String randomString(int size, @Nullable String exclusion, @Nullable String charSet)
     {
         String charSetFrom = StringUtils.isEmpty(charSet) ? CHARSET_STRING : charSet;
         if (!StringUtils.isEmpty(exclusion))
             charSetFrom = charSetFrom.replaceAll("[" + Pattern.quote(exclusion) + "]", "");
+        boolean spacesAllowed = charSetFrom.indexOf(' ') >= 0;
 
         StringBuilder val = new StringBuilder();
-        for (int i=0; i<size; i++)
+        int nonSpaceRun = 0;
+        for (int i = 0; i < size; i++)
         {
-            int randIndex = ThreadLocalRandom.current().nextInt(charSetFrom.length());
-            char c = charSetFrom.charAt(randIndex);
+            boolean isLast = (i == size - 1);
+            char prev = val.length() == 0 ? '\0' : val.charAt(val.length() - 1);
+
+            // Force a space once we've accumulated enough non-space chars (but never as the last char).
+            if (spacesAllowed && nonSpaceRun >= FORCE_SPACE_AFTER && !isLast)
+            {
+                val.append(' ');
+                nonSpaceRun = 0;
+                continue;
+            }
+
+            // Random pick. Filter to keep invariants: no leading/trailing space, no double space, no " -" pattern.
+            String picks = charSetFrom;
+            if (val.length() == 0 || isLast || prev == ' ')
+                picks = picks.replace(" ", "");
+            if (picks.isEmpty())
+                picks = charSetFrom; // pathological charset, fall back
+
+            int randIndex = ThreadLocalRandom.current().nextInt(picks.length());
+            char c = picks.charAt(randIndex);
             if (c == REPEAT_PLACEHOLDER)
             {
-                randIndex = ThreadLocalRandom.current().nextInt(charSetFrom.length());
-                c = charSetFrom.charAt(randIndex);
-                int repeatCount = randomInt(2, 5); // repeat between 2 and 5 times
+                randIndex = ThreadLocalRandom.current().nextInt(picks.length());
+                c = picks.charAt(randIndex);
+                int repeatCount = (c == ' ') ? 0 : randomInt(2, 5);
                 val.append(StringUtils.repeat(c, repeatCount));
+                nonSpaceRun = (c == ' ') ? 0 : nonSpaceRun + repeatCount;
             }
             else if (c == ALL_CHARS_PLACEHOLDER)
+            {
                 val.append(charSetFrom);
+                int lastSpace = val.lastIndexOf(" ");
+                nonSpaceRun = lastSpace < 0 ? val.length() : val.length() - lastSpace - 1;
+            }
             else if (c == WIDE_PLACEHOLDER)
+            {
                 val.append(WIDE_CHAR);
+                nonSpaceRun++;
+            }
             else
+            {
                 val.append(c);
+                nonSpaceRun = (c == ' ') ? 0 : nonSpaceRun + 1;
+            }
         }
-        // Collapse consecutive spaces into one to match what the UI displays.
+        // Collapse consecutive spaces into one — defensive net for placeholder branches that may produce them.
         return val.toString().replaceAll(" {2,}", " ");
     }
 
@@ -626,77 +659,21 @@ public class TestDataGenerator
     {
         namePart = namePart == null ? "" : namePart;
         DomainKind _domainKind = domainKind == null ? DomainKind.SampleSet : domainKind;
+        // Spaces stay in the charset — randomString itself injects them every FORCE_SPACE_AFTER non-space chars,
+        // so the total length stays within numStartChars + namePart + numEndChars.
         String charSet = ALPHANUMERIC_STRING + DOMAIN_SPECIAL_STRING;
-        // Excluded characters for generation, spaces excluded for correct insertSpaces work
-        String exclusion = " ";
         int currentTries = 0;
-        RandomName randomName = randomName(namePart, getNumChars(numStartChars, 5), getNumChars(numEndChars, 50), charSet, exclusion);
+        RandomName randomName = randomName(namePart, getNumChars(numStartChars, 5), getNumChars(numEndChars, 50), charSet, null);
         while (isDomainAndFieldNameInvalid(_domainKind, randomName, null))
         {
-            randomName = randomName(namePart, getNumChars(numStartChars, 5), getNumChars(numEndChars, 50), charSet, exclusion);
+            randomName = randomName(namePart, getNumChars(numStartChars, 5), getNumChars(numEndChars, 50), charSet, null);
             if (++currentTries >= MAX_RANDOM_TRIES)
                 throw new IllegalStateException("Failed to generate a valid domain name after " + MAX_RANDOM_TRIES + " tries. Last generated name: " + randomName);
         }
 
-        // Insert spaces every 8 chars (skipped for short names) and always one immediately before and after namePart.
-        String domainName = insertSpaces(randomName.name(), namePart);
-
+        String domainName = randomName.name();
         TestLogger.log("Generated random domain name for domainKind " + _domainKind + ": " + domainName);
         return domainName;
-    }
-
-    /**
-     * Insert single spaces around {@code namePart} and at every 8th char (when {@code base.length() > 6}),
-     * snapping inside-namePart positions to the nearest boundary. Skips any insertion that would land at
-     * an edge, create a double space, or form a "space-dash-non-space" pattern.
-     */
-    private static String insertSpaces(String base, String namePart)
-    {
-        int npStart = namePart.isEmpty() ? -1 : base.indexOf(namePart);
-        int npEnd = npStart < 0 ? -1 : npStart + namePart.length();
-
-        // Indices in base before which a single space will be inserted. TreeSet auto-sorts and dedupes.
-        Set<Integer> positions = new TreeSet<>();
-
-        // Mandatory: immediately before and after namePart.
-        addIfSafe(positions, base, npStart);
-        addIfSafe(positions, base, npEnd);
-
-        // Every-8-chars step; positions strictly inside namePart snap to the nearest boundary.
-        if (base.length() > 6)
-        {
-            for (int p = 8; p < base.length(); p += 8)
-            {
-                int snapped = p;
-                if (npStart >= 0 && p > npStart && p < npEnd)
-                    snapped = (npEnd - p) <= (p - npStart) ? npEnd : npStart;
-                addIfSafe(positions, base, snapped);
-            }
-        }
-
-        // Drop positions that would form " -X" (space, dash, non-space). A dash followed by another
-        // inserted space — or by end of string — is fine.
-        positions.removeIf(p -> base.charAt(p) == '-'
-                && p + 1 < base.length()
-                && !positions.contains(p + 1)
-                && base.charAt(p + 1) != ' ');
-
-        StringBuilder sb = new StringBuilder(base.length() + positions.size());
-        for (int i = 0; i < base.length(); i++)
-        {
-            if (positions.contains(i))
-                sb.append(' ');
-            sb.append(base.charAt(i));
-        }
-        return sb.toString();
-    }
-
-    /** Add {@code p} to {@code positions} only if inserting a space at {@code p} won't be at an edge of
-     * {@code base} or sit next to an already-existing space (which would form a double space). */
-    private static void addIfSafe(Set<Integer> positions, String base, int p)
-    {
-        if (p > 0 && p < base.length() && base.charAt(p - 1) != ' ' && base.charAt(p) != ' ')
-            positions.add(p);
     }
 
     private static int getNumChars(Integer val, int max)

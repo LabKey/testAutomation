@@ -260,7 +260,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverCompon
                 if (value != null && !((List<String>) value).isEmpty())
                 {
                     List<String> values = (List<String>) value;
-                    filterPanel.selectValue(values.get(0));
+                    filterPanel.selectValue(values.getFirst());
                     filterPanel.checkValues(values.toArray(String[]::new));
                     sleep(500);
                 }
@@ -315,7 +315,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverCompon
      */
     public FieldSelectionDialog insertColumn()
     {
-        return insertColumn(getHeaders().get(0).getFieldKey().toString());
+        return insertColumn(getHeaders().getFirst().getFieldKey().toString());
     }
 
     /**

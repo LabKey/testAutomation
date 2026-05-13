@@ -20,6 +20,7 @@ import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.beanutils.Converter;
 import org.apache.commons.collections4.IteratorUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
 import org.labkey.serverapi.collections.ArrayListMap;
 import org.labkey.serverapi.collections.RowMapFactory;
@@ -285,7 +286,7 @@ public abstract class DataLoader implements Iterable<Map<String, Object>>, Loade
      * Returns an iterator over the data
      */
     @Override
-    public abstract CloseableIterator<Map<String, Object>> iterator();
+    public abstract @NotNull CloseableIterator<Map<String, Object>> iterator();
 
 
     /**

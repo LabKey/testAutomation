@@ -91,7 +91,7 @@ public class BaseManageVaccineDesignVisitPage extends BaseManageVaccineDesignPag
 
         List<Map<String, Object>> rows = response.getRows();
         if (rows.size() == 1)
-            return Integer.parseInt(rows.get(0).get("RowId").toString());
+            return Integer.parseInt(rows.getFirst().get("RowId").toString());
 
         return null;
     }

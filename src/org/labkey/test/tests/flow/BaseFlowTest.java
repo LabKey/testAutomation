@@ -430,7 +430,7 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
             case Browse:
                 checkRadioButton(Locator.radioButtonById("Browse"));
                 // UNDONE: Currently, only one file path supported
-                _fileBrowserHelper.selectFileBrowserItem(keywordDirs.get(0));
+                _fileBrowserHelper.selectFileBrowserItem(keywordDirs.getFirst());
                 break;
 
             default:

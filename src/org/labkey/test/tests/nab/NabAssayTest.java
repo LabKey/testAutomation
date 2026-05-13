@@ -210,28 +210,22 @@ public class NabAssayTest extends AbstractAssayTest
                 .setAssayType("NAb")
                 .setTemplateType("single-plate")));
 
-        setFormElement(Locator.inputById("templateName"), PLATE_TEMPLATE_NAME);
+        PlateDesignerPage designerPage = new PlateDesignerPage(getDriver());
+        designerPage.setName(PLATE_TEMPLATE_NAME);
+        designerPage.selectTypeTab("SPECIMEN");
 
-        // select the specimen wellgroup tab
-        click(Locator.tagWithText("div", "SPECIMEN"));
+        designerPage.selectGroup("Specimen 1");
+        designerPage.setWellGroupProperty("ReverseDilutionDirection", "true");
 
-        // select the first specimen group
-        click(Locator.tagWithText("label", "Specimen 1"));
-        // set reversed dilution direction to true:
-        setFormElement(Locator.inputById("property-ReverseDilutionDirection"), "true");
+        designerPage.selectGroup("Specimen 2");
+        designerPage.setWellGroupProperty("ReverseDilutionDirection", "false");
 
-        // select the second specimen group
-        click(Locator.tagWithText("label", "Specimen 2"));
-        // set reversed dilution direction to false:
-        setFormElement(Locator.inputById("property-ReverseDilutionDirection"), "false");
-
-        // select the third specimen group
-        click(Locator.tagWithText("label", "Specimen 3"));
+        designerPage.selectGroup("Specimen 3");
         // set reversed dilution direction to a nonsense value:
-        setFormElement(Locator.inputById("property-ReverseDilutionDirection"), "invalid boolean value");
+        designerPage.setWellGroupProperty("ReverseDilutionDirection", "invalid boolean value");
 
         // note that we're intentionally leaving the fourth and fifth direction specifiers null, which should default to 'false'
-        clickButton("Save & Close");
+        designerPage.saveAndClose();
 
         assertTextPresent(PLATE_TEMPLATE_NAME, "NAb: 5 specimens in duplicate");
 

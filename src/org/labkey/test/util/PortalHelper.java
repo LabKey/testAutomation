@@ -15,8 +15,8 @@
  */
 package org.labkey.test.util;
 
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.BodyWebPart;
@@ -59,7 +59,7 @@ public class PortalHelper extends WebDriverWrapper
     }
 
     @Override
-    public WebDriver getWrappedDriver()
+    public @NotNull WebDriver getWrappedDriver()
     {
         return _driverWrapper.getWrappedDriver();
     }

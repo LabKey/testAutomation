@@ -11,7 +11,6 @@ import org.labkey.test.Locator;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Hosting;
 import org.labkey.test.components.list.ManageListsGrid;
-import org.labkey.test.pages.list.BeginPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.list.IntListDefinition;
 import org.labkey.test.util.ApiPermissionsHelper;

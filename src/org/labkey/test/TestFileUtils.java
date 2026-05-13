@@ -159,7 +159,7 @@ public abstract class TestFileUtils
 
                 _labkeyRoot = _labkeyRoot.getAbsoluteFile().toPath().normalize().toFile();
 
-                LOG.info("Using labkey root '" + _labkeyRoot + "', as provided by system property 'labkey.root'.");
+                LOG.info("Using labkey root '{}', as provided by system property 'labkey.root'.", _labkeyRoot);
             }
             else
             {
@@ -282,7 +282,7 @@ public abstract class TestFileUtils
                     sampleDatas.stream().map(File::getAbsolutePath).collect(Collectors.joining("\n")));
         }
 
-        return sampleDatas.get(0);
+        return sampleDatas.getFirst();
     }
 
     /**
@@ -413,7 +413,7 @@ public abstract class TestFileUtils
 
     public static void delete(File file)
     {
-        LOG.info("Deleting from filesystem: " + file.toString());
+        LOG.info("Deleting from filesystem: {}", file.toString());
         checkFileLocation(file);
 
         if (!file.exists())
@@ -424,12 +424,12 @@ public abstract class TestFileUtils
         if (!file.exists())
             LOG.info("Deletion successful.");
         else
-            LOG.info("Failed to delete : " + file.getAbsolutePath());
+            LOG.info("Failed to delete : {}", file.getAbsolutePath());
     }
 
     public static void deleteDir(File dir)
     {
-        LOG.info("Deleting from filesystem: " + dir.toString());
+        LOG.info("Deleting from filesystem: {}", dir.toString());
         checkFileLocation(dir);
         if (!dir.exists())
             return;
@@ -441,7 +441,7 @@ public abstract class TestFileUtils
         }
         catch (IOException e)
         {
-            LOG.info("WARNING: Exception deleting directory -- " + e.getMessage());
+            LOG.info("WARNING: Exception deleting directory -- {}", e.getMessage());
         }
     }
 
@@ -452,7 +452,7 @@ public abstract class TestFileUtils
             if (!FileUtils.directoryContains(getLabKeyRoot(), file))
             {
                 // TODO: Consider throwing IllegalArgumentException
-                LOG.info("DEBUG: Attempting to delete a file outside of test enlistment: " + getLabKeyRoot());
+                LOG.info("DEBUG: Attempting to delete a file outside of test enlistment: {}", getLabKeyRoot());
             }
         }
         catch (IOException ignore) { }

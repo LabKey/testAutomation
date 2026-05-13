@@ -30,7 +30,7 @@ public class RegexValidatorDialog extends ModalDialog
     }
     public RegexValidatorPanel getValidationPanel()
     {
-        return validationPanels().get(0);
+        return validationPanels().getFirst();
     }
     public RegexValidatorPanel getValidationPanel(int index)
     {

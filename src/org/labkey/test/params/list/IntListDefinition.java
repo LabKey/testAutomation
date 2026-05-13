@@ -34,7 +34,7 @@ public class IntListDefinition extends ListDefinition
         List<PropertyDescriptor> fields = super.getFields();
         if (isAutoIncrementKey)
         {
-            fields.add(0, new FieldDefinition(getKeyName(), FieldDefinition.ColumnType.Integer).setPrimaryKey(true));
+            fields.addFirst(new FieldDefinition(getKeyName(), FieldDefinition.ColumnType.Integer).setPrimaryKey(true));
         }
         return fields;
     }

@@ -1,5 +1,6 @@
 package org.labkey.test.util.study.specimen;
 
+import org.jetbrains.annotations.NotNull;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.study.specimen.SpecimenDetailGrid;
@@ -25,7 +26,7 @@ public class SpecimenHelper extends WebDriverWrapper
     }
 
     @Override
-    public WebDriver getWrappedDriver()
+    public @NotNull WebDriver getWrappedDriver()
     {
         return _driverWrapper.getWrappedDriver();
     }

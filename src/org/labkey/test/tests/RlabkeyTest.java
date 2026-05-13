@@ -53,6 +53,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
 
@@ -225,7 +226,7 @@ public class RlabkeyTest extends BaseWebDriverTest
         assertTrue("Expected container to exist", helper.doesContainerExist(getProjectName() + "/FromAPI1"));
         assertTrue("Expected container to exist", helper.doesContainerExist(getProjectName() + "/FromAPI2")); // exists because of alias to old location before move
         assertTrue("Expected container to exist", helper.doesContainerExist(getProjectName() + "/FromAPI1/FromAPI2")); // exists because of alias to old location before move
-        assertTrue("Expected container not to exist", !helper.doesContainerExist(getProjectName() + "/FromAPI3")); // folder was deleted
+        assertFalse("Expected container not to exist", helper.doesContainerExist(getProjectName() + "/FromAPI3")); // folder was deleted
     }
 
     @Test

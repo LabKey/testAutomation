@@ -33,6 +33,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 @Category({Daily.class, Flow.class, FileBrowser.class})
@@ -93,7 +94,7 @@ public class FlowImportTest extends BaseFlowTest
         List<String> fileDates = filesTable.getColumnDataAsText("FileDate");
         for (String date : fileDates)
         {
-            assertTrue("expect each field in FileDate column to have a value, is [" + date + "]", !date.isEmpty());
+            assertFalse("expect each field in FileDate column to have a value, is [" + date + "]", date.isEmpty());
             // make sure the resulting value parses to a date
             new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(date);
         }

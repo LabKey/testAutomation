@@ -236,7 +236,7 @@ public class SampleTypeParentColumnTest extends BaseWebDriverTest
 
         List<String> dataInTable = dataRegionTable.getColumnDataAsText(columnName);
 
-        Assert.assertTrue("There were no rows in the data region '" + dataRegionName + "'.", !dataInTable.isEmpty());
+        Assert.assertFalse("There were no rows in the data region '" + dataRegionName + "'.", dataInTable.isEmpty());
         Assert.assertTrue("The index given for the row (" + rowIndex + ") is beyond the number of rows in the data region '" + dataRegionName + "' (" + dataInTable.size() + ").", rowIndex < dataInTable.size());
 
         String cellValue = dataInTable.get(rowIndex);

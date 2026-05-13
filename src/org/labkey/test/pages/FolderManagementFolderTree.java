@@ -184,23 +184,25 @@ public class FolderManagementFolderTree
         WebElement toEl = to.findElement(_test.getDriver());
         int offset;
         int y;
-        switch (pos)
+        offset = switch (pos)
         {
-            case top:
+            case top ->
+            {
                 y = 5;
-                offset = -1 * (Integer.parseInt(toEl.getAttribute("height")) / 2 + 1);
-                break;
-            case bottom:
+                yield -1 * (Integer.parseInt(toEl.getAttribute("height")) / 2 + 1);
+            }
+            case bottom ->
+            {
                 y = Integer.parseInt(toEl.getAttribute("height")) - 5;
-                offset = Integer.parseInt(toEl.getAttribute("height")) / 2 + 1;
-                break;
-            case middle:
+                yield Integer.parseInt(toEl.getAttribute("height")) / 2 + 1;
+            }
+            case middle ->
+            {
                 y = Integer.parseInt(toEl.getAttribute("height")) / 2;
-                offset = -1 * (Integer.parseInt(toEl.getAttribute("height")) / 2 + 1);
-                break;
-            default:
-                throw new IllegalArgumentException("Unexpected position: " + pos);
-        }
+                yield -1 * (Integer.parseInt(toEl.getAttribute("height")) / 2 + 1);
+            }
+            default -> throw new IllegalArgumentException("Unexpected position: " + pos);
+        };
 
         Locator.XPathLocator dragBubble = Locator.byClass("x4-grid-dd-wrap");
         /* For reference, this is the HTML for the drag bubble. Saving here because it's a pain to retrieve.
