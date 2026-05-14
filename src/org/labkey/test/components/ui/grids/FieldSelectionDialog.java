@@ -363,7 +363,7 @@ public class FieldSelectionDialog extends ModalDialog
     public FieldSelectionDialog removeFieldFromSelected(String field, int index)
     {
         WebElement listItem = getSelectedListItems(field).get(index);
-        WebElement removeIcon = Locator.tagWithClass("button", "view-field__action").findElement(listItem);
+        WebElement removeIcon = Locator.byClass("view-field__action").findElement(listItem);
         getWrapper().mouseOver(removeIcon);
         removeIcon.click();
 

@@ -272,7 +272,7 @@ public class ManageSampleStatusesPanel extends WebDriverComponent<ManageSampleSt
             return Locator.tagWithClass("button", "list-group-item").withClass("active")
                     .refindWhenNeeded(this);
         }
-        final WebElement addStatusButton = Locator.tagWithText("span", "Add New Status")
+        final WebElement addStatusButton = Locator.button( "Add New Status")
                 .refindWhenNeeded(getComponentElement());
         final Input labelField()
         {
