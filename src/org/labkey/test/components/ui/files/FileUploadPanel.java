@@ -132,7 +132,7 @@ public class FileUploadPanel extends WebDriverComponent<FileUploadPanel.ElementC
 
         WebElement removeBtn(String fileName)
         {
-            return Locator.tagWithAttribute("span", "title", "Remove file")
+            return Locator.tagWithAttribute("button", "title", "Remove file")
                     .findElement(attachedFileContainer(fileName).findElement(this));
         }
     }
