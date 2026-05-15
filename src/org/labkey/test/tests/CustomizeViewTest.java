@@ -42,6 +42,7 @@ import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.params.FieldDefinition.DOMAIN_TRICKY_CHARACTERS;
 
@@ -321,6 +322,65 @@ public class CustomizeViewTest extends BaseWebDriverTest
         drt.goToView("Default");
         drt.getViewsMenu().expand();
         assertTextPresentInThisOrder("Default", viewNames[0], viewNames[2], viewNames[1], viewNames[3], viewNames[4]);
+    }
+
+    @Test
+    public void testCustomViewsQueryTable()
+    {
+        final String viewName = "CustomViewsQueryTableTest";
+
+        // Navigate to the query.CustomViews table (requires folder admin permission)
+        goToSchemaBrowser();
+        viewQueryData("query", "CustomViews");
+        DataRegionTable drt = new DataRegionTable("query", getDriver());
+
+        // Verify the default visible columns are present
+        List<String> columnNames = drt.getColumnNames();
+        assertThat("Schema column should be present", columnNames, hasItem("Schema"));
+        assertThat("QueryName column should be present", columnNames, hasItem("QueryName"));
+        assertThat("Name column should be present", columnNames, hasItem("Name"));
+        assertThat("Hidden column should be present", columnNames, hasItem("Hidden"));
+        assertThat("Inheritable column should be present", columnNames, hasItem("Inheritable"));
+
+        // Insert a new custom view via the table's insert URL (QueryController.InternalNewViewAction)
+        drt.clickInsertNewRow();
+        waitForElement(Locator.name("quf_Schema"));
+        setFormElement(Locator.name("quf_Schema"), "lists");
+        setFormElement(Locator.name("quf_QueryName"), LIST_NAME);
+        setFormElement(Locator.name("quf_Name"), viewName);
+        setFormElement(Locator.name("quf_Flags"), "0");
+        clickButton("Submit");
+
+        drt = new DataRegionTable("query", getDriver());
+
+        // Verify the new view appears with correct metadata
+        int rowIndex = drt.getRowIndex("Name", viewName);
+        assertNotEquals("Inserted view should appear in the query.CustomViews table", -1, rowIndex);
+        assertEquals("View should belong to the 'lists' schema", "lists", drt.getDataAsText(rowIndex, "Schema"));
+        assertEquals("View query name should match list name", LIST_NAME, drt.getDataAsText(rowIndex, "QueryName"));
+        assertEquals("New view should not be hidden", "false", drt.getDataAsText(rowIndex, "Hidden"));
+        assertEquals("New view should not be inheritable", "false", drt.getDataAsText(rowIndex, "Inheritable"));
+
+        // Edit the row via the edit icon (QueryController.InternalSourceViewAction) and set the inherit flag
+        drt.clickEditRow(rowIndex);
+        waitForElement(Locator.name("quf_Flags"));
+        setFormElement(Locator.name("quf_Flags"), "3");
+        clickButton("Submit");
+
+        // Verify the Flags column now reflects the inherit flag
+        drt = new DataRegionTable("query", getDriver());
+        rowIndex = drt.getRowIndex("Name", viewName);
+        assertNotEquals("Edited view should still appear in the query.CustomViews table", -1, rowIndex);
+        assertEquals("New view should be hidden", "true", drt.getDataAsText(rowIndex, "Hidden"));
+        assertEquals("New view should be inheritable", "true", drt.getDataAsText(rowIndex, "Inheritable"));
+
+        // Delete the row by selecting its checkbox and clicking Delete
+        drt.checkCheckbox(rowIndex);
+        drt.deleteSelectedRows();
+
+        // Verify the row is gone
+        drt = new DataRegionTable("query", getDriver());
+        assertEquals("Deleted view should no longer appear in the query.CustomViews table", -1, drt.getRowIndex("Name", viewName));
     }
 
     private void createList() throws Exception
