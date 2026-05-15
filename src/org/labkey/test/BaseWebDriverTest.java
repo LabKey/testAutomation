@@ -24,9 +24,9 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.hc.core5.http.HttpStatus;
 import org.awaitility.Awaitility;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Assume;
 import org.junit.AssumptionViolatedException;
 import org.junit.ClassRule;
@@ -1686,20 +1686,17 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     protected void setSelectedFields(String containerPath, String schema, String query, String viewName, String[] fields)
     {
         pushLocation();
-        beginAt(WebTestHelper.buildURL("query", containerPath, "internalNewView"));
-        setFormElement(Locator.name("ff_schemaName"), schema);
-        setFormElement(Locator.name("ff_queryName"), query);
+        beginAt(WebTestHelper.buildURL("query", containerPath, "executeQuery", Map.of("schemaName", "query", "queryName", "CustomViews")));
+        DataRegionTable drt = new DataRegionTable("query", getDriver());
+        drt.clickInsertNewRow();
+        waitForElement(Locator.name("quf_Schema"));
+        setFormElement(Locator.name("quf_Schema"), schema);
+        setFormElement(Locator.name("quf_QueryName"), query);
         if (viewName != null)
-            setFormElement(Locator.name("ff_viewName"), viewName);
-        clickButton("Create");
-        StringBuilder strFields = new StringBuilder(fields[0]);
-        for (int i = 1; i < fields.length; i ++)
-        {
-            strFields.append("&");
-            strFields.append(fields[i]);
-        }
-        setFormElement(Locator.name("ff_columnList"), strFields.toString());
-        clickButton("Save");
+            setFormElement(Locator.name("quf_Name"), viewName);
+        setFormElement(Locator.name("quf_Columns"), String.join("&", fields));
+        setFormElement(Locator.name("quf_Flags"), "0");
+        clickButton("Submit");
         popLocation();
     }
 
