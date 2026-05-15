@@ -269,8 +269,14 @@ public class QueryChartDialog extends ModalDialog
         clickFieldOptions(label); // open the popover
         if (elementCache().scaleManualRadio.isChecked())
         {
-            doAndWaitForPreview(() -> elementCache().scaleRangeMinInput.set(min));
-            doAndWaitForPreview(() -> elementCache().scaleRangeMaxInput.set(max));
+            doAndWaitForPreview(() -> {
+                elementCache().scaleRangeMinInput.set(min);
+                elementCache().scaleRangeMaxInput.getComponentElement().click(); // trigger svg refresh
+            });
+            doAndWaitForPreview(() -> {
+                elementCache().scaleRangeMaxInput.set(max);
+                elementCache().scaleRangeMinInput.getComponentElement().click(); // trigger svg refresh
+            });
         }
         clickFieldOptions(label); // close the popover
         return this;
@@ -711,7 +717,7 @@ public class QueryChartDialog extends ModalDialog
         var seriesDropdown = elementCache().reactSelectByLabel("Line Color and Style");
         // series select component uses a custom option renderer
         seriesDropdown.setOptionLocator((String type) -> Locator.byClass("chart-builder-type-option").withAttribute("data-series-option", type));
-        doAndWaitForPreview(() -> seriesDropdown.select(option));
+        seriesDropdown.select(option);
 
         if (hexColor != null)
             setColor(elementCache().seriesColorPicker, hexColor);
