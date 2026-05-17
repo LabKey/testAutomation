@@ -628,6 +628,14 @@ public class DataRegionTable extends DataRegion
         return rows;
     }
 
+    /**
+     * Strips the trailing Unicode word joiner character added by AJAXDetailsDisplayColumn for line wrapping purposes.
+     */
+    public static String stripWordJoiner(String value)
+    {
+        return value.replace("\u2060", "");
+    }
+
     public WebElement findRow(int index)
     {
         return elementCache().getDataRow(index);
