@@ -24,9 +24,9 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.hc.core5.http.HttpStatus;
 import org.awaitility.Awaitility;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Assume;
 import org.junit.AssumptionViolatedException;
 import org.junit.ClassRule;
@@ -1686,20 +1686,16 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     protected void setSelectedFields(String containerPath, String schema, String query, String viewName, String[] fields)
     {
         pushLocation();
-        beginAt(WebTestHelper.buildURL("query", containerPath, "internalNewView"));
-        setFormElement(Locator.name("ff_schemaName"), schema);
-        setFormElement(Locator.name("ff_queryName"), query);
+        beginAt(WebTestHelper.buildURL("query", containerPath, "executeQuery", Map.of("schemaName", "query", "queryName", "CustomViews")));
+        DataRegionTable drt = new DataRegionTable("query", getDriver());
+        var queryRowPage = drt.clickInsertNewRow();
+        queryRowPage.setField("Schema", schema);
+        queryRowPage.setField("QueryName", query);
         if (viewName != null)
-            setFormElement(Locator.name("ff_viewName"), viewName);
-        clickButton("Create");
-        StringBuilder strFields = new StringBuilder(fields[0]);
-        for (int i = 1; i < fields.length; i ++)
-        {
-            strFields.append("&");
-            strFields.append(fields[i]);
-        }
-        setFormElement(Locator.name("ff_columnList"), strFields.toString());
-        clickButton("Save");
+            queryRowPage.setField("Name", viewName);
+        queryRowPage.setField("Columns", String.join("&", fields));
+        queryRowPage.setField("Flags", "0");
+        queryRowPage.submit();
         popLocation();
     }
 
