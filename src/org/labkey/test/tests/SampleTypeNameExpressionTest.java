@@ -569,8 +569,8 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         // Test that a name expression using a generic "Inputs" and a field name can resolve the field name in Material and Data classes.
         log("Test a name expression that uses \"Inputs/SomeFieldName\".");
 
-        log("Create a DataClass to use as a parent.");
         final String dataParentClass = "InputsDataParentFieldExpression";
+        log(String.format("Create a DataClass, %s to use as a parent.", dataParentClass));
         DataClassDefinition dpDef = new DataClassDefinition(dataParentClass);
         dpDef.setFields(List.of(new FieldDefinition(SHARED_FIELD_NAME, ColumnType.String)));
         TestDataGenerator dpGen = dpDef.create(createDefaultConnection(), getProjectName());
@@ -584,7 +584,9 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
 
         StringBuilder data = new StringBuilder();
         data.append(SHARED_FIELD_NAME);
-        data.append("\tDataInputs/InputsDataParentFieldExpression\n");
+        data.append("\tDataInputs/");
+        data.append(dataParentClass);
+        data.append("\n");
         data.append("a\tDS-1\n");
         data.append("b\tDS-2\n");
         data.append("c\tDS-1, DS-2\n");
@@ -592,6 +594,8 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
 
         goToProjectHome();
         final String sampleTypeName = "InputsExpressionTestData";
+        log(String.format("Create a SampleType, %s, with a name expression of %s. Test name expression using a DataClass, %s as a parent.",
+                sampleTypeName, nameExpression, dataParentClass));
         createSampleTypeForNameValidation(sampleTypeName,
                 nameExpression, null, data.toString());
 
@@ -615,6 +619,7 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
 
         goToProjectHome();
         final String parentSampleType = "InputsMaterialParentFieldExpression";
+        log(String.format("Create a SampleType, %s to use as a parent.", parentSampleType));
         createSampleTypeForNameValidation(parentSampleType,
                 "S-${genId}", null, data.toString());
 
@@ -628,6 +633,8 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         data.append("k\tS-1, S-2\n");
         data.append("l\n");
 
+        log(String.format("Again using SampleType, %s, test name expression using a SampleType, %s as a parent.",
+                sampleTypeName, parentSampleType));
         goToProjectHome();
         SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
         sampleHelper.goToSampleType(sampleTypeName).bulkImport(data.toString());
@@ -644,6 +651,41 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
 
         validateNamesGenerated(actualNames, sampleTypeParentNames);
 
+        data = new StringBuilder();
+        data.append(SHARED_FIELD_NAME);
+        data.append("\tMaterialInputs/");
+        data.append(parentSampleType);
+        data.append("\tDataInputs/");
+        data.append(dataParentClass);
+        data.append("\n");
+        data.append("m\tS-1\n");
+        data.append("n\t\tDS-1\n");
+        data.append("o\tS-2\tDS-2\n");
+        data.append("p\tS-1, S-2\tDS-1\n");
+        data.append("p\tS-1\tDS-1, DS-2\n");
+        data.append("q\tS-1, S-2\tDS-1, DS-2\n");
+        data.append("r\n");
+
+        log(String.format("Finally using SampleType, %s, test name expression using both a SampleType and a DataClass as a parent.",
+                sampleTypeName));
+        goToProjectHome();
+        sampleHelper = new SampleTypeHelper(this);
+        sampleHelper.goToSampleType(sampleTypeName).bulkImport(data.toString());
+
+        List<String> combinedParentNames = new ArrayList<>();
+        combinedParentNames.add(Pattern.quote("Gen-none-") + ".*");
+        combinedParentNames.add(Pattern.quote("Gen-[ABC, DEF, UVW, XYZ]-") + ".*");
+        combinedParentNames.add(Pattern.quote("Gen-[ABC, DEF, UVW]-") + ".*");
+        combinedParentNames.add(Pattern.quote("Gen-[ABC, UVW, XYZ]-") + ".*");
+        combinedParentNames.add(Pattern.quote("Gen-[DEF, XYZ]-") + ".*");
+        combinedParentNames.add(Pattern.quote("Gen-ABC-") + ".*");
+        combinedParentNames.add(Pattern.quote("Gen-UVW-") + ".*");
+        combinedParentNames.addAll(sampleTypeParentNames);
+
+        materialTable = new DataRegionTable("Material", this);
+        actualNames = materialTable.getColumnDataAsText("Name");
+
+        validateNamesGenerated(actualNames, combinedParentNames);
     }
 
     @Test
