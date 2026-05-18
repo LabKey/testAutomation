@@ -1688,15 +1688,14 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         pushLocation();
         beginAt(WebTestHelper.buildURL("query", containerPath, "executeQuery", Map.of("schemaName", "query", "queryName", "CustomViews")));
         DataRegionTable drt = new DataRegionTable("query", getDriver());
-        drt.clickInsertNewRow();
-        waitForElement(Locator.name("quf_Schema"));
-        setFormElement(Locator.name("quf_Schema"), schema);
-        setFormElement(Locator.name("quf_QueryName"), query);
+        var queryRowPage = drt.clickInsertNewRow();
+        queryRowPage.setField("Schema", schema);
+        queryRowPage.setField("QueryName", query);
         if (viewName != null)
-            setFormElement(Locator.name("quf_Name"), viewName);
-        setFormElement(Locator.name("quf_Columns"), String.join("&", fields));
-        setFormElement(Locator.name("quf_Flags"), "0");
-        clickButton("Submit");
+            queryRowPage.setField("Name", viewName);
+        queryRowPage.setField("Columns", String.join("&", fields));
+        queryRowPage.setField("Flags", "0");
+        queryRowPage.submit();
         popLocation();
     }
 

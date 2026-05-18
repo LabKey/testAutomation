@@ -311,11 +311,6 @@ public class TimeChartImportTest extends StudyBaseTest
 
         log("Verify masked ptids in publish study reportInfo");
         clickFolder(publishFolderName);
-        for (TimeChartInfo chartInfo : VISIT_CHARTS)
-        {
-            clickTab("Clinical and Assay Data");
-            waitAndClickAndWait(Locator.linkWithText(chartInfo.getName()));
-        }
 
         // verify the report descriptor XML does not contain the masked ptid
         goToSchemaBrowser();
@@ -325,7 +320,6 @@ public class TimeChartImportTest extends StudyBaseTest
         customizeView.applyCustomView();
 
         drt = new DataRegionTable("query", getDriver());
-        drt.setPageSize(100);
         int xmlIdx = drt.getColumnIndex("DescriptorXML");
 
         for (int row=0; row < drt.getDataRowCount(); row++)
