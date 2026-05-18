@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.io.FileUtils;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.assertj.core.api.Assertions;
@@ -966,10 +967,10 @@ public class SampleTypeTest extends BaseWebDriverTest
         }
 
         List<String> fileData = new ArrayList<>();
-        fileData.add(String.format("%s\t%s", "Name", field01.getLabel()));
+        fileData.add(CSVFormat.TDF.format("Name", field01.getLabel()));
         for(Map<String, String> sample : sampleData)
         {
-            fileData.add(String.format("%s\t%s", sample.get("Name"), sample.get(field01.getName())));
+            fileData.add(CSVFormat.TDF.format(sample.get("Name"), sample.get(field01.getName())));
         }
 
         String fileName = "SampleTypeTest_UpdateSamples.tsv";
