@@ -325,6 +325,7 @@ public class TimeChartImportTest extends StudyBaseTest
         customizeView.applyCustomView();
 
         drt = new DataRegionTable("query", getDriver());
+        drt.setPageSize(100);
         int xmlIdx = drt.getColumnIndex("DescriptorXML");
 
         for (int row=0; row < drt.getDataRowCount(); row++)
