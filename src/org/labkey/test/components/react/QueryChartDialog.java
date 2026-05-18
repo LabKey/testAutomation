@@ -46,36 +46,48 @@ public class QueryChartDialog extends ModalDialog
         return elementCache().nameInput.get();
     }
 
-    public QueryChartDialog setTitle(String value) {
-        elementCache().titleInput.set(value);
-        elementCache().title.click(); // blur the element
+    public QueryChartDialog setTitle(String value)
+    {
+        doAndWaitForPreview(() -> {
+            elementCache().titleInput.set(value);
+            elementCache().title.click(); // blur the element
+        });
         return this;
     }
 
     public QueryChartDialog setSubtitle(String value)
     {
-        elementCache().subtitleInput.set(value);
-        elementCache().title.click(); // blur the element
+        doAndWaitForPreview(() -> {
+            elementCache().subtitleInput.set(value);
+            elementCache().title.click(); // blur the element
+        });
         return this;
     }
 
     public QueryChartDialog setHeight(String value)
     {
-        elementCache().heightInput.set(value);
-        elementCache().title.click(); // blur the element
+        doAndWaitForPreview(() -> {
+            elementCache().heightInput.set(value);
+            elementCache().title.click(); // blur the element
+        });
         return this;
     }
 
     public QueryChartDialog setWidth(String value)
     {
-        elementCache().widthInput.set(value);
-        elementCache().title.click(); // blur the element
+        doAndWaitForPreview(() -> {
+            elementCache().widthInput.set(value);
+            elementCache().title.click(); // blur the element
+        });
         return this;
     }
 
     public QueryChartDialog setUseFullWidth(boolean checked)
     {
-        elementCache().fullWidthCheckbox.set(checked);
+        if (checked)
+            doAndWaitForPreview(() -> elementCache().fullWidthCheckbox.check()); // always refreshes the svg
+        else
+            elementCache().fullWidthCheckbox.uncheck();
         return this;
     }
 
@@ -110,7 +122,7 @@ public class QueryChartDialog extends ModalDialog
 
     public QueryChartDialog clearFieldValue(String fieldLabel)
     {
-        elementCache().reactSelectByLabel(fieldLabel).clearSelection();
+        doAndWaitForPreview(() -> elementCache().reactSelectByLabel(fieldLabel).clearSelection());
         return this;
     }
 
@@ -119,7 +131,7 @@ public class QueryChartDialog extends ModalDialog
      */
     public QueryChartDialog selectXAxis(String field)
     {
-        elementCache().reactSelectByLabel("X Axis").select(field);
+        doAndWaitForPreview(() -> elementCache().reactSelectByLabel("X Axis").select(field));
         return this;
     }
 
@@ -145,14 +157,16 @@ public class QueryChartDialog extends ModalDialog
 
     public QueryChartDialog setLegendPos(String legendPos)
     {
-
+        RadioButton radio;
         if ("bottom".equals(legendPos))
-            elementCache().legendBottomRadio.check();
+            radio = elementCache().legendBottomRadio;
         else if ("right".equals(legendPos))
-            elementCache().legendRightRadio.check();
+            radio = elementCache().legendRightRadio;
         else
             throw new IllegalArgumentException("Invalid legend value: " + legendPos);
 
+        if (!radio.isChecked())
+            doAndWaitForPreview(radio::check);
         return this;
     }
 
@@ -173,10 +187,7 @@ public class QueryChartDialog extends ModalDialog
 
     public QueryChartDialog setPointsHidden(boolean hidden)
     {
-        if (hidden)
-            elementCache().pointsHideRadio.check();
-        else
-            elementCache().pointsShowRadio.check();
+        doAndWaitForPreview(() -> elementCache().pointsHideRadio.set(hidden));
         return this;
     }
 
@@ -194,12 +205,15 @@ public class QueryChartDialog extends ModalDialog
     public QueryChartDialog setAxisScaleType(String label, String value)
     {
         clickFieldOptions(label); // open the popover
+        RadioButton radio;
         if ("linear".equalsIgnoreCase(value))
-            elementCache().scaleLinearRadio.check();
+            radio = elementCache().scaleLinearRadio;
         else if ("log".equalsIgnoreCase(value))
-            elementCache().scaleLogRadio.check();
+            radio = elementCache().scaleLogRadio;
         else
             throw new IllegalArgumentException("Invalid scale value: " + value);
+        if (!radio.isChecked())
+            doAndWaitForPreview(radio::check);
         clickFieldOptions(label); // close the popover
         return this;
     }
@@ -228,12 +242,15 @@ public class QueryChartDialog extends ModalDialog
     public QueryChartDialog setAxisRangeType(String label, String value)
     {
         clickFieldOptions(label); // open the popover
+        RadioButton radio;
         if ("automatic".equalsIgnoreCase(value))
-            elementCache().scaleAutomaticRadio.check();
+            radio = elementCache().scaleAutomaticRadio;
         else if ("manual".equalsIgnoreCase(value))
-            elementCache().scaleManualRadio.check();
+            radio = elementCache().scaleManualRadio;
         else
             throw new IllegalArgumentException("Invalid range value: " + value);
+        if (!radio.isChecked())
+            doAndWaitForPreview(radio::check);
         clickFieldOptions(label); // close the popover
         return this;
     }
@@ -252,8 +269,14 @@ public class QueryChartDialog extends ModalDialog
         clickFieldOptions(label); // open the popover
         if (elementCache().scaleManualRadio.isChecked())
         {
-            elementCache().scaleRangeMinInput.set(min);
-            elementCache().scaleRangeMaxInput.set(max);
+            doAndWaitForPreview(() -> {
+                elementCache().scaleRangeMinInput.set(min);
+                elementCache().scaleRangeMaxInput.getComponentElement().click(); // trigger svg refresh
+            });
+            doAndWaitForPreview(() -> {
+                elementCache().scaleRangeMaxInput.set(max);
+                elementCache().scaleRangeMinInput.getComponentElement().click(); // trigger svg refresh
+            });
         }
         clickFieldOptions(label); // close the popover
         return this;
@@ -280,7 +303,7 @@ public class QueryChartDialog extends ModalDialog
      */
     public QueryChartDialog selectYAxis(String field)
     {
-        elementCache().reactSelectByLabel("Y Axis").select(field);
+        doAndWaitForPreview(() -> elementCache().reactSelectByLabel("Y Axis").select(field));
         return this;
     }
 
@@ -294,10 +317,20 @@ public class QueryChartDialog extends ModalDialog
         return elementCache().reactSelectByLabel("Y Axis").getOptions();
     }
 
+    private void doAndWaitForPreview(Runnable action)
+    {
+        WebElement svg = isPreviewPresent() ? elementCache().svg() : null;
+        action.run();
+
+        // preview might not appear after action, but it will definitely go stale.
+        if (svg != null)
+            getWrapper().shortWait().until(ExpectedConditions.stalenessOf(svg));
+    }
+
     public QueryChartDialog selectYAxisAggregateMethod(String option)
     {
         clickFieldOptions("Y Axis"); // open the popover
-        getAggregateMethodSelect().select(option);
+        doAndWaitForPreview(() -> getAggregateMethodSelect().select(option));
         Locator.tagWithText("label", "Name *").findElement(this).click(); // close the popover
         return this;
     }
@@ -334,7 +367,9 @@ public class QueryChartDialog extends ModalDialog
     public QueryChartDialog selectYAxisErrorBar(String value)
     {
         clickFieldOptions("Y Axis"); // open the popover
-        getErrorBarsRadio(value).check();
+        RadioButton errorBarsRadio = getErrorBarsRadio(value);
+        if (!errorBarsRadio.isChecked())
+            doAndWaitForPreview(errorBarsRadio::check);
         Locator.tagWithText("label", "Name *").findElement(this).click(); // close the popover
         return this;
     }
@@ -350,7 +385,7 @@ public class QueryChartDialog extends ModalDialog
     public QueryChartDialog setXAxisLabel(String value)
     {
         clickFieldOptions("X Axis");
-        elementCache().xLabelInput.set(value);
+        doAndWaitForPreview(() -> elementCache().xLabelInput.set(value));
         Locator.tagWithText("label", "Name *").findElement(this).click(); // close the popover
         return this;
     }
@@ -358,7 +393,7 @@ public class QueryChartDialog extends ModalDialog
     public QueryChartDialog setYAxisLabel(String value)
     {
         clickFieldOptions("Y Axis");
-        elementCache().yLabelInput.set(value);
+        doAndWaitForPreview(() -> elementCache().yLabelInput.set(value));
         Locator.tagWithText("label", "Name *").findElement(this).click(); // close the popover
         return this;
     }
@@ -368,7 +403,7 @@ public class QueryChartDialog extends ModalDialog
      */
     public QueryChartDialog selectGroupBy(String field)
     {
-        elementCache().reactSelectByLabel("Group By").select(field);
+        doAndWaitForPreview(() -> elementCache().reactSelectByLabel("Group By").select(field));
         return this;
     }
 
@@ -387,7 +422,7 @@ public class QueryChartDialog extends ModalDialog
      */
     public QueryChartDialog selectColor(String field)
     {
-        elementCache().reactSelectByLabel("Color").select(field);
+        doAndWaitForPreview(() -> elementCache().reactSelectByLabel("Color").select(field));
         return this;
     }
 
@@ -401,7 +436,7 @@ public class QueryChartDialog extends ModalDialog
      */
     public QueryChartDialog selectShape(String field)
     {
-        elementCache().reactSelectByLabel("Shape").select(field);
+        doAndWaitForPreview(() -> elementCache().reactSelectByLabel("Shape").select(field));
         return this;
     }
 
@@ -415,7 +450,7 @@ public class QueryChartDialog extends ModalDialog
      */
     public QueryChartDialog selectSeries(String field)
     {
-        elementCache().reactSelectByLabel("Series").select(field);
+        doAndWaitForPreview(() -> elementCache().reactSelectByLabel("Series").select(field));
         return this;
     }
 
@@ -440,17 +475,19 @@ public class QueryChartDialog extends ModalDialog
      */
     public QueryChartDialog selectTrendline(String field)
     {
-        elementCache().reactSelectByLabel("Trendline").select(field);
+        doAndWaitForPreview(() -> elementCache().reactSelectByLabel("Trendline").select(field));
         return this;
     }
 
     public QueryChartDialog setTrendlineProvidedParameters(String field)
     {
         clickFieldOptions("Trendline"); // open the popover
-        if (field != null)
-            getTrendlineProvidedParametersSelect().select(field);
-        else
-            getTrendlineProvidedParametersSelect().clearSelection();
+        doAndWaitForPreview(() -> {
+            if (field != null)
+                getTrendlineProvidedParametersSelect().select(field);
+            else
+                getTrendlineProvidedParametersSelect().clearSelection();
+        });
         elementCache().title.click(); // close the popover
         return this;
     }
@@ -480,7 +517,7 @@ public class QueryChartDialog extends ModalDialog
      */
     public QueryChartDialog selectCategories(String field)
     {
-        elementCache().reactSelectByLabel("Categories").select(field);
+        doAndWaitForPreview(() -> elementCache().reactSelectByLabel("Categories").select(field));
         return this;
     }
 
@@ -508,7 +545,7 @@ public class QueryChartDialog extends ModalDialog
         var chartTypeDropdown = elementCache().reactSelectByLabel("Chart Type");
         // ChartTypeDropdown component uses a custom option renderer
         chartTypeDropdown.setOptionLocator((String type) -> Locator.byClass("chart-builder-type-option").withAttribute("data-chart-type", type));
-        chartTypeDropdown.select(chartType.getChartType());
+        doAndWaitForPreview(() -> chartTypeDropdown.select(chartType.getChartType()));
         WebDriverWrapper.waitFor(()-> getSelectedChartType().equals(chartType),
                 "The requested chart type did not become selected", 2000);
 
@@ -538,7 +575,7 @@ public class QueryChartDialog extends ModalDialog
 
     public WebElement getSvgChart()
     {
-        WebDriverWrapper.waitFor(()-> isPreviewPresent(),
+        WebDriverWrapper.waitFor(this::isPreviewPresent,
                 "the preview was not present in time", 2000);
         return elementCache().svg();
     }
@@ -654,7 +691,7 @@ public class QueryChartDialog extends ModalDialog
     {
         Locator.tagWithClassContaining("button", "color-picker__button").findElement(colorPickerContainer).click();
         ColorPickerInput colorInput = new ColorPickerInput.ColorPickerInputFinder(getDriver()).findWhenNeeded();
-        colorInput.setHexValue(hexColor);
+        doAndWaitForPreview(() -> colorInput.setHexValue(hexColor));
         colorPickerContainer.click(); // need to click outside the color picker to close it
         return this;
     }
@@ -666,7 +703,7 @@ public class QueryChartDialog extends ModalDialog
 
     public QueryChartDialog selectColorPalette(String option)
     {
-        elementCache().reactSelectByLabel("Color Palette").select(option);
+        doAndWaitForPreview(() -> elementCache().reactSelectByLabel("Color Palette").select(option));
         return this;
     }
 
@@ -690,7 +727,7 @@ public class QueryChartDialog extends ModalDialog
         {
             var lineTypeDropdown = elementCache().reactSelectByLabel("Line Type");
             lineTypeDropdown.setOptionLocator((String type) -> Locator.byClass("chart-builder-type-option").withAttribute("data-series-linetype", type));
-            lineTypeDropdown.select(lineType);
+            doAndWaitForPreview(() -> lineTypeDropdown.select(lineType));
         }
 
         return this;

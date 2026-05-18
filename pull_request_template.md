@@ -6,3 +6,9 @@
 
 #### Changes
 - <!-- list of descriptions of changes that are worth noting (replace this comment) -->
+
+<!-- list of standard tasks (remove this comment to enable)
+#### Tasks 📍
+- [ ] Claude Code Review
+- [ ] TeamCity verification
+-->
