@@ -389,7 +389,7 @@ public class PasswordTest extends BaseWebDriverTest
     {
         signOut();
         goToHome();
-        clickAndWait(Locator.linkWithText("Sign In"));
+        clickAndWait(Locator.button("Sign In"));
         clickAndWait(Locator.linkContainingText("Forgot password"));
         setFormElement(Locator.id("email"), username);
         clickButtonContainingText("Reset", 0);
