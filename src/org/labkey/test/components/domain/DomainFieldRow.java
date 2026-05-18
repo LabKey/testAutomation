@@ -452,11 +452,11 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     {
         expand();
 
-        if(elementCache().formatInput.getComponentElement().isDisplayed())
+        if (elementCache().formatInput.getComponentElement().isDisplayed())
         {
             return elementCache().formatInput.getValue();
         }
-        else if(elementCache().charScaleInput.getComponentElement().isDisplayed())
+        else if (elementCache().charScaleInput.getComponentElement().isDisplayed())
         {
             // Formatting of Boolean types use the scale input.
             return elementCache().charScaleInput.getValue();
@@ -469,11 +469,11 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
 
     public WebElement getFormatControl()
     {
-        if(elementCache().formatInput.getComponentElement().isDisplayed())
+        if (elementCache().formatInput.getComponentElement().isDisplayed())
         {
             return elementCache().formatInput.getComponentElement();
         }
-        else if(elementCache().charScaleInput.getComponentElement().isDisplayed())
+        else if (elementCache().charScaleInput.getComponentElement().isDisplayed())
         {
             // Formatting of Boolean types use the scale input.
             return elementCache().charScaleInput.getComponentElement();
@@ -923,7 +923,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         selectTextChoiceValue(originalValue);
         setUpdateTextChoiceValue(newValue);
 
-        if(clickApply)
+        if (clickApply)
         {
             WebDriverWrapper.waitFor(this::isTextChoiceApplyButtonEnabled, "'Apply' button is not enabled.", 1_000);
             Locator.button("Apply").findElement(this).click();
@@ -1055,7 +1055,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     public String getValueExpressionStatusMessage()
     {
         String statusMsg = "";
-        if(waitFor(elementCache().expressionStatusMsg::isDisplayed, 1_000))
+        if (waitFor(elementCache().expressionStatusMsg::isDisplayed, 1_000))
         {
             statusMsg = elementCache().expressionStatusMsg.getText();
         }
@@ -1180,7 +1180,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     {
         String warningMsg = "";
         WebElement warningMsgElement = Locator.byClass("domain-row-warning").findWhenNeeded(this);
-        if(warningMsgElement.isDisplayed())
+        if (warningMsgElement.isDisplayed())
             warningMsg = warningMsgElement.getText();
 
         return warningMsg;
@@ -1411,7 +1411,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     {
         String formatValue;
 
-        if(elementCache().dateTimeFormatDateSelect.isInteractive())
+        if (elementCache().dateTimeFormatDateSelect.isInteractive())
         {
             formatValue = getFormatWithoutExample(elementCache().dateTimeFormatDateSelect.getValue());
         }
@@ -1442,7 +1442,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     {
         String formatValue;
 
-        if(elementCache().dateTimeFormatTimeSelect.isInteractive())
+        if (elementCache().dateTimeFormatTimeSelect.isInteractive())
         {
             formatValue = getFormatWithoutExample(elementCache().dateTimeFormatTimeSelect.getValue());
         }
@@ -1458,9 +1458,9 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     {
         ArrayList<String> formatValues = new ArrayList<>();
         for (String formatOption : elementCache().dateTimeFormatTimeSelect.getOptions())
-            {
-                formatValues.add(getFormatWithoutExample(formatOption));
-            }
+        {
+            formatValues.add(getFormatWithoutExample(formatOption));
+        }
         return formatValues;
     }
 
@@ -1495,7 +1495,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     {
         String formatValue;
 
-        if(elementCache().dateFormatSelect.isInteractive())
+        if (elementCache().dateFormatSelect.isInteractive())
         {
             formatValue = getFormatWithoutExample(elementCache().dateFormatSelect.getValue());
         }
@@ -1511,9 +1511,9 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     {
         List<String> options = new ArrayList<>();
         for (String option : elementCache().dateFormatSelect.getOptions())
-            {
-                options.add(getFormatWithoutExample(option));
-            }
+        {
+            options.add(getFormatWithoutExample(option));
+        }
         return options;
     }
 
@@ -1558,7 +1558,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     {
         String formatValue;
 
-        if(elementCache().timeFormatSelect.isInteractive())
+        if (elementCache().timeFormatSelect.isInteractive())
         {
             formatValue = getFormatWithoutExample(elementCache().timeFormatSelect.getValue());
         }
@@ -1760,7 +1760,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
                 .findWhenNeeded(this);
         private final Locator.XPathLocator expressionStatusMsgLoc = Locator.tagWithClass("div", "domain-field-calc-footer");
         public final WebElement expressionStatusValidated = expressionStatusMsgLoc.child(Locator.tagWithClass("div", "validated")).refindWhenNeeded(this);
-        public final WebElement expressionStatusError = expressionStatusMsgLoc.child(Locator.tagWithClass("div", "error")).refindWhenNeeded(this);
+        public final WebElement expressionStatusError = expressionStatusMsgLoc.descendant(Locator.tagWithClass("span", "error")).refindWhenNeeded(this);
         public final WebElement expressionStatusMsg = expressionStatusMsgLoc.childTag("div").refindWhenNeeded(this);
         public final WebElement expressionValidateLink = expressionStatusMsgLoc.child(Locator.tagWithClass("div", "validate-link")).refindWhenNeeded(this);
 
