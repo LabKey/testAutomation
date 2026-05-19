@@ -966,17 +966,17 @@ public class SampleTypeTest extends BaseWebDriverTest
             sample.replace(field01.getName(), fieldValue.toUpperCase());
         }
 
-        List<String> fileData = new ArrayList<>();
-        fileData.add(CSVFormat.TDF.format("Name", field01.getLabel()));
+        List<List<String>> fileData = new ArrayList<>();
+        fileData.add(List.of("Name", field01.getLabel()));
         for(Map<String, String> sample : sampleData)
         {
-            fileData.add(CSVFormat.TDF.format(sample.get("Name"), sample.get(field01.getName())));
+            fileData.add(List.of(sample.get("Name"), sample.get(field01.getName())));
         }
 
         String fileName = "SampleTypeTest_UpdateSamples.tsv";
         if (!TestFileUtils.getTestTempDir().exists())
             TestFileUtils.getTestTempDir().mkdirs();
-        File importFile = TestFileUtils.writeTempFile(fileName, String.join(System.lineSeparator(), fileData));
+        File importFile = TestDataUtils.writeRowsToFile(fileName, fileData);
 
         sampleHelper.mergeImport(importFile);
 
