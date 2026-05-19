@@ -23,10 +23,10 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
-import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Charting;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Reports;
+import org.labkey.test.components.CustomizeView;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.PortalHelper;
@@ -35,7 +35,6 @@ import org.labkey.test.util.WikiHelper;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * This test imports a folder archive that has 2 subfolders (a date based study and a visit based study) which have been
@@ -312,17 +311,23 @@ public class TimeChartImportTest extends StudyBaseTest
 
         log("Verify masked ptids in publish study reportInfo");
         clickFolder(publishFolderName);
-        for (TimeChartInfo chartInfo : VISIT_CHARTS)
+
+        // verify the report descriptor XML does not contain the masked ptid
+        goToSchemaBrowser();
+        DataRegionTable drt = viewQueryData("core", "Reports");
+        CustomizeView customizeView = drt.openCustomizeGrid();
+        customizeView.addColumn("DescriptorXML");
+        customizeView.applyCustomView();
+
+        drt = new DataRegionTable("query", getDriver());
+        int xmlIdx = drt.getColumnIndex("DescriptorXML");
+
+        for (int row=0; row < drt.getDataRowCount(); row++)
         {
-            clickTab("Clinical and Assay Data");
-            waitAndClickAndWait(Locator.linkWithText(chartInfo.getName()));
-            beginAt(WebTestHelper.buildURL("reports",
-                getProjectName() + "/" + VISIT_STUDY_FOLDER_NAME + "/" + publishFolderName,
-                "reportInfo", Map.of("reportId", getUrlParam("reportId"))));
-            waitForText("Report Debug Information");
+            String descriptor = drt.getDataAsText(row, xmlIdx);
             for (String origMouseId : origMouseIds)
             {
-                assertTextNotPresent(origMouseId);
+                Assert.assertFalse("Unexpected masked ptid in report descriptor : " + descriptor, descriptor.contains(origMouseId));
             }
         }
     }

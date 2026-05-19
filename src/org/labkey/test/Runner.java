@@ -555,7 +555,14 @@ public class Runner extends TestSuite
             }
             else if (test.countTestCases() > 0)
             {
-                flattenSuiteInto(suite, (TestSuite) test);
+                if (test instanceof TestSuite)
+                {
+                    flattenSuiteInto(suite, (TestSuite) test);
+                }
+                else
+                {
+                    suite.addTest(test);
+                }
                 foundServerSideTest = true;
             }
         }
