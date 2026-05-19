@@ -172,7 +172,7 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
         btn.click();                                                                    // awaits being enabled, for example by selecting grid items
     }
 
-    public void doMenuAction(String buttonText, List<String> menuActions)
+    private MultiMenu getMultiMenu(String buttonText)
     {
         MultiMenu multiMenu = null;
         boolean found = false;
@@ -180,7 +180,7 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
 
         // Sometimes the grid and query bar will load, and even the menu button will render but the text will
         // take just a few ms to render, so if at first you don't succeed try again.
-        while(!found && tries <= 3)
+        while (!found && tries <= 3)
         {
             try
             {
@@ -194,8 +194,8 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
             }
         }
 
-        // If the button still wasn't found try the 'More' button.
-        if(!found)
+        // If the button still wasn't found, try the 'More' button.
+        if (!found)
         {
             multiMenu = elementCache().findMenu("More");
             Assert.assertTrue(String.format("Could not find a menu button '%s' or 'More', don't know what to click.", buttonText),
@@ -203,12 +203,25 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
             getWrapper().log(String.format("Couldn't find menu button '%s', clicking the 'More' menu button.", buttonText));
         }
 
+        return multiMenu;
+    }
+
+    public void doMenuAction(String buttonText, List<String> menuActions)
+    {
+        MultiMenu multiMenu = getMultiMenu(buttonText);
+
         if (menuActions.size() == 1)
             multiMenu.doMenuAction(menuActions.get(0));
         else if (menuActions.size() == 2)
             multiMenu.doMenuAction(menuActions.get(0), menuActions.get(1));
         else
             throw new IllegalArgumentException("There should be either 1 or 2 menu actions, but was:" + menuActions);
+    }
+
+    public boolean isMenuItemDisabled(String buttonText, String menuItem)
+    {
+        MultiMenu multiMenu = getMultiMenu(buttonText);
+        return multiMenu.isMenuItemDisabled(menuItem);
     }
 
     public List<String> getMenuButtonsText()
@@ -255,42 +268,6 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
             return multiMenu.getMenuText();
 
         throw new NoSuchElementException("Couldn't find menu button with text '" + buttonText + "'.");
-    }
-
-    /**
-     * Private helper function that will get the text of the aliquot view button. This can be used to determine the
-     * current view. Asserts that the button is present.
-     *
-     * @return Text of the aliquot view button.
-     */
-    private String currentAliquotViewText()
-    {
-        Assert.assertTrue("There is no 'Aliquot View' button on this grid.",
-                elementCache().aliquotView.getComponentElement().isDisplayed());
-
-        return elementCache().aliquotView.getComponentElement().getText();
-    }
-
-    /**
-     * Get the current view selected in the aliquot view button. This asserts that the button is present.
-     *
-     * @return A {@link AliquotViewOptions} item.
-     */
-    public AliquotViewOptions getCurrentAliquotView()
-    {
-        String text = currentAliquotViewText().toLowerCase();
-
-        if(text.contains("all samples"))
-            return AliquotViewOptions.ALL;
-
-        // If the current page is the sources page the text would be 'Derived Samples Only', so this should still work.
-        if(text.contains("samples only"))
-            return AliquotViewOptions.SAMPLES;
-
-        if(text.contains("aliquots only"))
-            return AliquotViewOptions.ALIQUOTS;
-
-        return null;
     }
 
     public GridBar searchFor(String searchStr)
@@ -353,8 +330,6 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
 
             return menus.get(buttonText);
         }
-
-        protected final MultiMenu aliquotView = new MultiMenu.MultiMenuFinder(getDriver()).withButtonClass("aliquot-view-selector").findWhenNeeded(this);
 
         protected final Input searchBox = Input.Input(Locator.tagWithClass("input", "grid-panel__search-input"), getDriver()).findWhenNeeded(this);
         protected final WebElement clearSearchButton = Locator.byClass("fa-remove").findWhenNeeded(this);
