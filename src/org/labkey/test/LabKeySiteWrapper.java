@@ -391,7 +391,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             try
             {
                 // attempt to navigate to login page
-                clickAndWait(Locator.button("Sign In"));
+                clickAndWait(Locator.linkWithText("Sign In"));
             }
             catch (NoSuchElementException error)
             {
