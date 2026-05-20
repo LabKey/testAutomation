@@ -79,6 +79,10 @@
                 <!-- TODO: Use new InputDatas and InputSamples for auto-derivation -->
             </dat:columns>
         </table>
+        <reservedColumnNames>
+            <column>reservedOne</column>
+            <column>ReservedTwo</column>
+        </reservedColumnNames>
         <initialData>
             <file>/data/samples.tsv</file>
         </initialData>
