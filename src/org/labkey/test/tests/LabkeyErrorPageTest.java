@@ -45,6 +45,8 @@ public class LabkeyErrorPageTest extends BaseWebDriverTest
         checker().verifyEquals("Incorrect error heading message", "404: page not found",
                 errorPage.getErrorHeading());
         checker().verifyThat("Incorrect error image", errorPage.getErrorImage(), CoreMatchers.containsString(imageTitle));
+        checker().verifyTrue("'Show Details' button should appear on not found error page",
+                errorPage.isShowDetailsPresent());
 
         beginAt(WebTestHelper.buildRelativeUrl("project", getCurrentContainerPath(), "beginning"));
         errorPage = new LabkeyErrorPage(getDriver());
@@ -88,6 +90,8 @@ public class LabkeyErrorPageTest extends BaseWebDriverTest
         checker().verifyEquals("Incorrect error sub-heading message", "The requested page cannot be found. You have a configuration problem.",
                 errorPage.getSubErrorHeading());
         checker().verifyThat("Incorrect error image", errorPage.getErrorImage(), CoreMatchers.containsString(imageTitle));
+        checker().verifyTrue("'Show Details' button should appear on configuration error page",
+                errorPage.isShowDetailsPresent());
 
         checkExpectedErrors(1);
     }
@@ -103,9 +107,11 @@ public class LabkeyErrorPageTest extends BaseWebDriverTest
         checker().verifyEquals("Incorrect error heading message", "Oops! An error has occurred.",
                 errorPage.getErrorHeading());
         checker().verifyEquals("Incorrect error instructions", "You can find help resources here and may " +
-                "find troubleshooting hints by reading the full stack trace in the View Details section below.",
+                "find troubleshooting hints by reading the full stack trace in the server logs.",
                 errorPage.getErrorInstruction());
         checker().verifyThat("Incorrect error image", errorPage.getErrorImage(), CoreMatchers.containsString(imageTitle));
+        checker().verifyFalse("'Show Details' button should not appear on execution error page",
+                errorPage.isShowDetailsPresent());
 
         checkExpectedErrors(2);
     }
