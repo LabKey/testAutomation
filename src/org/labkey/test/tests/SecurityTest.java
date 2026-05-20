@@ -514,7 +514,7 @@ public class SecurityTest extends BaseWebDriverTest
         }
         assertTitleContains(SIGN_IN_TEXT);
         assertElementPresent(Locator.tagWithName("form", "login"));
-        clickAndWait(Locator.lkButton("Register"));
+        clickAndWait(Locator.button("Register"));
 
         assertTitleContains("Register");
         assertElementPresent(Locator.tagWithName("form", "register"));
