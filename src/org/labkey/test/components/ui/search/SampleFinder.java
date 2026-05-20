@@ -119,7 +119,7 @@ public class SampleFinder extends WebDriverComponent<SampleFinder.ElementCache>
      */
     public void removeAllSearchCards()
     {
-        List<WebElement> removeButtons = Locator.tagWithAttribute("i", "title", "Remove filter")
+        List<WebElement> removeButtons = Locator.tagWithAttribute("button", "title", "Remove filter")
                 .findElements(elementCache().filterCardsSection);
         Collections.reverse(removeButtons);
         // Don't wait for search results to update after each removed card
