@@ -361,9 +361,9 @@ public class SampleFinder extends WebDriverComponent<SampleFinder.ElementCache>
         private final WebElement cardEl;
         private final WebElement name = Locator.byClass("primary-text").findWhenNeeded(this);
         private final WebElement editButton =
-                Locator.tagWithAttribute("i", "title", "Edit filter").findWhenNeeded(this);
+                Locator.tagWithAttribute("button", "title", "Edit filter").findWhenNeeded(this);
         private final WebElement removeButton =
-                Locator.tagWithAttribute("i", "title", "Remove filter").findWhenNeeded(this);
+                Locator.tagWithAttribute("button", "title", "Remove filter").findWhenNeeded(this);
 
         private FilterCard(WebElement el)
         {
