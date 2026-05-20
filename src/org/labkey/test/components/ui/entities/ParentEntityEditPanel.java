@@ -277,7 +277,7 @@ public class ParentEntityEditPanel extends Panel<ParentEntityEditPanel.ElementCa
     public ReactSelect getDisabledEntityTypeByLabel(String typeName)
     {
         return ReactSelect.finder(getDriver())
-                .followingLabelWithSpan(typeName)
+                .withSpanLabel(typeName)
                 .waitFor(elementCache());
     }
 
@@ -300,7 +300,7 @@ public class ParentEntityEditPanel extends Panel<ParentEntityEditPanel.ElementCa
      */
     public List<String> getEntityTypeNames()
     {
-        List<WebElement> labels = Locator.tagWithClass("label", "entity-insert--type-select").findElements(elementCache());
+        List<WebElement> labels = Locator.tagWithClass("span", "entity-insert--type-select").findElements(elementCache());
         return labels.stream().map(WebElement::getText).toList();
     }
 
@@ -312,7 +312,7 @@ public class ParentEntityEditPanel extends Panel<ParentEntityEditPanel.ElementCa
     public List<ReactSelect> getAllEntityTypes()
     {
         return ReactSelect.finder(getDriver())
-                .followingLabelWithClass("entity-insert--type-select")
+                .followingSpanWithClass("entity-insert--type-select")
                 .findAll(elementCache());
     }
 
@@ -340,7 +340,7 @@ public class ParentEntityEditPanel extends Panel<ParentEntityEditPanel.ElementCa
     public List<FilteringReactSelect> getAllParents()
     {
         return FilteringReactSelect.finder(getDriver())
-                .followingLabelWithClass("entity-insert--parent-select")
+                .followingSpanWithClass("entity-insert--parent-select")
                 .findAll(elementCache());
     }
 

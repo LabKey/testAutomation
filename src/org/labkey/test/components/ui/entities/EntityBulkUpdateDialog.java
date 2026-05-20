@@ -26,6 +26,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -325,15 +326,29 @@ public class EntityBulkUpdateDialog extends EntityBulkDialog
 
     public List<String> getFieldNames()
     {
-        List<WebElement> labels = Locator.tagWithClass("label", "control-label").withAttribute("for")
-                .waitForElements(elementCache(), 2_000);
+        List<WebElement> controlLabels = Locator.byClass("control-label").waitForElements(elementCache(), 2_000);
+        List<String> names = new ArrayList<>();
+        for (WebElement label : controlLabels)
+        {
+            String attribute = label.getAttribute("for");
+            if (attribute != null)
+                names.add(FieldKey.fromFieldKey(attribute).getFullName());
+            else // Select inputs have spans in the label column to prevent orphaned labels for accessibility
+            {
+                attribute = label.getAttribute("data-fieldkey");
+                if (attribute != null)
+                    names.add(FieldKey.fromFieldKey(attribute).getFullName());
+                else
+                    throw new RuntimeException("Could not find field name for label: " + label.getText());
+            }
+        }
 
         // Amount and Units is an example that has a "hide-label" for StoredAmount
         List<WebElement> hiddenLabels = Locator.tagWithClass("label", "hide-label").withAttribute("for")
                 .findElements(elementCache());
-        labels.addAll(hiddenLabels);
+        names.addAll(hiddenLabels.stream().map(a -> FieldKey.fromFieldKey(a.getDomAttribute("for")).getFullName()).toList());
 
-        return labels.stream().map(a -> FieldKey.fromFieldKey(a.getDomAttribute("for")).getFullName()).toList();
+        return names;
     }
 
     public EntityBulkUpdateDialog waitForFieldsToBe(List<String> expectedFieldNames, int waitMilliseconds)
@@ -425,7 +440,7 @@ public class EntityBulkUpdateDialog extends EntityBulkDialog
         {
             String fieldKey = FieldKey.fromName(fieldIdentifier).toString();
             return Locator.tagWithClass("div", "row")
-                    .withDescendant(Locator.tagWithAttribute("label", "for", fieldKey))
+                    .withDescendant(Locator.tagWithAttribute("span", "data-fieldkey", fieldKey))
                     .waitForElement(this, WAIT_TIMEOUT);
         }
 
