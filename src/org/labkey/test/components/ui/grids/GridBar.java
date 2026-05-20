@@ -382,11 +382,4 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
             return _separator;
         }
     }
-
-    public enum AliquotViewOptions
-    {
-        ALL,
-        SAMPLES,
-        ALIQUOTS
-    }
 }
