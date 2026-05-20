@@ -529,7 +529,7 @@ public class ParentEntityEditPanel extends Panel<ParentEntityEditPanel.ElementCa
         WebElement removeButton(int index)
         {
             return Locator
-                    .tagWithClass("span", "container--action-button")
+                    .tagWithClass("button", "container--action-button")
                     .findElements(this).get(index);
         }
     }
