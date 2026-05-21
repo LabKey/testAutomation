@@ -520,7 +520,7 @@ public class ParentEntityEditPanel extends Panel<ParentEntityEditPanel.ElementCa
 
         // This is the 'Add' button that is contained inside the panel.
         final WebElement addButton = Locator
-                .tagContainingText("span", "Add")
+                .tagContainingText("button", "Add")
                 .findWhenNeeded(this);
 
         public WebElement commentInput = Locator.tagWithId("textarea", "actionComments").refindWhenNeeded(getDriver());
@@ -529,7 +529,7 @@ public class ParentEntityEditPanel extends Panel<ParentEntityEditPanel.ElementCa
         WebElement removeButton(int index)
         {
             return Locator
-                    .tagWithClass("span", "container--action-button")
+                    .tagWithClass("button", "container--action-button")
                     .findElements(this).get(index);
         }
     }

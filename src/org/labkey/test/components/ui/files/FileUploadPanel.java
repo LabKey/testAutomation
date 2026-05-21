@@ -19,13 +19,11 @@ public class FileUploadPanel extends WebDriverComponent<FileUploadPanel.ElementC
 {
     final WebElement _el;
     final WebDriver _driver;
-    final boolean _backwardsCompat;
 
-    public FileUploadPanel(WebElement element, WebDriver driver, boolean backwardsCompat)
+    public FileUploadPanel(WebElement element, WebDriver driver)
     {
         _el = element;
         _driver = driver;
-        _backwardsCompat = backwardsCompat;
     }
 
     @Override
@@ -120,9 +118,7 @@ public class FileUploadPanel extends WebDriverComponent<FileUploadPanel.ElementC
         }
 
         Locator.XPathLocator attachedFileContainer = Locator.tagWithClass("div", "attached-file__container")
-                .withChild(Locator.tagWithClass("span", "fa-times-circle"));
-        Locator.XPathLocator attachedFileContainerOld = Locator.tagWithClass("div", "attached-file--container")
-                .withChild(Locator.tagWithClass("span", "fa-times-circle"));
+                .withChild(Locator.tagWithClass("button", "fa-times-circle"));
 
         TemplateDownloadButton templateDownloadButton()
         {
@@ -131,13 +127,12 @@ public class FileUploadPanel extends WebDriverComponent<FileUploadPanel.ElementC
 
         Locator attachedFileContainer(String fileName)
         {
-            if (_backwardsCompat) return attachedFileContainerOld.withText(fileName);
             return attachedFileContainer.withText(fileName);
         }
 
         WebElement removeBtn(String fileName)
         {
-            return Locator.tagWithAttribute("span", "title", "Remove file")
+            return Locator.tagWithAttribute("button", "title", "Remove file")
                     .findElement(attachedFileContainer(fileName).findElement(this));
         }
     }
@@ -145,29 +140,17 @@ public class FileUploadPanel extends WebDriverComponent<FileUploadPanel.ElementC
 
     public static class FileUploadPanelFinder extends WebDriverComponentFinder<FileUploadPanel, FileUploadPanelFinder>
     {
-        private Locator.XPathLocator _baseLocator = Locator.tagWithClass("div", "file-upload__container").parent();
-        private final boolean _backwardsCompat;
+        private final Locator.XPathLocator _baseLocator = Locator.tagWithClass("div", "file-upload__container").parent();
 
         public FileUploadPanelFinder(WebDriver driver)
         {
             super(driver);
-            _backwardsCompat = false;
         }
-
-        public FileUploadPanelFinder(WebDriver driver, boolean backwardsCompat)
-        {
-            super(driver);
-            _backwardsCompat = backwardsCompat;
-            if (backwardsCompat)
-                _baseLocator = Locator.tagWithClass("div", "file-upload--container").parent();
-        }
-
-
 
         @Override
         protected FileUploadPanel construct(WebElement el, WebDriver driver)
         {
-            return new FileUploadPanel(el, driver, _backwardsCompat);
+            return new FileUploadPanel(el, driver);
         }
 
         @Override

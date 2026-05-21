@@ -33,7 +33,7 @@ public class NodeDetailGroup extends WebDriverComponent<NodeDetailGroup.ElementC
 
     private void showAllItems()
     {
-        Locator.tag("li").child(Locator.tagWithClass("a", "lineage-link"))
+        Locator.tag("li").child(Locator.byClass("lineage-link"))
                 .findOptionalElement(this)
                 .ifPresent(moreLink ->
                 {

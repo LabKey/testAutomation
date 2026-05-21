@@ -274,7 +274,7 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
         assertTrue("Unable to locate the transform script: " + transformScript, transformScript.exists());
 
         expandPropertiesPanel();
-        getWrapper().click(Locator.tagWithClass("span", "btn").containing("Add Script"));
+        getWrapper().click(Locator.buttonContainingText("Add Script"));
         String targetPath = transformScript.getAbsolutePath();
         if (usingFileUpload)
         {

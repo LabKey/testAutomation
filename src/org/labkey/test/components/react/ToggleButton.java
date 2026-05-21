@@ -85,7 +85,7 @@ public class ToggleButton extends WebDriverComponent<WebDriverComponent<?>.Eleme
     private boolean hasButtons()
     {
         if (hasButtons == null)
-            hasButtons = Locator.tag("button").existsIn(this);
+            hasButtons = Locator.tag("button").findElements(this).size() > 1;
         return hasButtons;
     }
 
