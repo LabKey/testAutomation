@@ -88,7 +88,7 @@ public class SchemaBrowserPerfTest extends PerformanceTest
         long[] emptyCacheOpenStudyTimes = new long[5];
         // run tests
         for (int x = 0 ; x < 5; x++) {
-            beginAt(WebTestHelper.buildURL("admin", "caches", Map.of("clearCaches", 1)), 120000);
+            clearCaches();
             goToHome();
             clickProject(getProjectName());
             goToSchemaBrowser();
@@ -103,7 +103,7 @@ public class SchemaBrowserPerfTest extends PerformanceTest
     private long[] studyBaselineFullCache() {
         long[] fullCacheOpenStudyTimes = new long[5];
         // prepare cache
-        beginAt(WebTestHelper.buildURL("admin", "caches", Map.of("clearCaches", 1)), 120000);
+        clearCaches();
         goToHome();
         clickProject(getProjectName());
         goToSchemaBrowser();
@@ -125,7 +125,7 @@ public class SchemaBrowserPerfTest extends PerformanceTest
     private long[] studyDataBaselineFullCache() {
         long[] emptyCacheOpenStudyDataTimes = new long[5];
         // prepare cache
-        beginAt(WebTestHelper.buildURL("admin", "caches", Map.of("clearCaches", 1)), 120000);
+        clearCaches();
         goToHome();
         clickProject(getProjectName());
         goToSchemaBrowser();
