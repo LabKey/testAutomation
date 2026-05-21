@@ -158,7 +158,7 @@
         <response>
             <![CDATA[
                 Text Field Integer Field Double Field DateTime Field Boolean Field
-                some text here 99 987.654 2010-02-14 FALSE
+                some text here 99999999999 987.654 2010-02-14 FALSE
                 More plane values -34 98123.450 1999-01-01 FALSE
                 null NULL NA and na 123 44.330 2002-02-20 FALSE
                 how its done 98 12.345 2010-03-01 FALSE
