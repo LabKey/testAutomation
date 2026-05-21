@@ -804,7 +804,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
      */
     public DomainFieldRow setTextChoiceValues(List<String> values)
     {
-        WebElement button = Locator.tagWithClass("span", "container--action-button").withText("Add Values").findElement(this);
+        WebElement button = Locator.tagWithClass("button", "container--action-button").withText("Add Values").findElement(this);
         button.click();
 
         TextChoiceValueDialog addValuesDialog = new TextChoiceValueDialog(this);
@@ -814,7 +814,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
 
     public String setTextChoiceValuesExpectingError(List<String> values)
     {
-        WebElement button = Locator.tagWithClass("span", "container--action-button").withText("Add Values").findElement(this);
+        WebElement button = Locator.tagWithClass("button", "container--action-button").withText("Add Values").findElement(this);
         button.click();
 
         TextChoiceValueDialog addValuesDialog = new TextChoiceValueDialog(this);

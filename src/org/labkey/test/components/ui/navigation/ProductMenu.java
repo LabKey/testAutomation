@@ -302,7 +302,7 @@ public class ProductMenu extends WebDriverComponent<ProductMenu.ElementCache>
             return Locator.linkWithText(linkText).findElement(menuSectionBody(headerText));
         }
 
-        private final Locator.XPathLocator folderMenuItemLocator = Locator.tagWithClass("a", "menu-folder-item");
+        private final Locator.XPathLocator folderMenuItemLocator = Locator.tagWithClass("button", "menu-folder-item");
         private final Locator activeFolderMenuItemLocator = Locator.tagWithClass("li", "active").descendant(folderMenuItemLocator);
 
         List<WebElement> folderMenuItems()

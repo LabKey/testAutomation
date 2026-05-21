@@ -164,7 +164,7 @@ public class DetailDataPanel extends WebDriverComponent<DetailDataPanel.ElementC
 
         public Optional<WebElement> editButton()
         {
-            return Locator.tagWithClass("div", "detail__edit-button")
+            return Locator.byClass("detail__edit-button")
                     .findOptionalElement(heading);
         }
 

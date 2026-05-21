@@ -635,8 +635,6 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
         public final Checkbox selectAll = new Checkbox(Locator.tagWithAttributeContaining("input", "id", "domain-select-all-checkbox")
                 .findWhenNeeded(this));
 
-        public final WebElement toggleButton = Locator.tagWithAttributeContaining("div", "id", "domain-toggle-summary").
-                findWhenNeeded(this);
         public final ToggleButton customFieldsViewToggle = new ToggleButton.ToggleButtonFinder(getDriver())
                 .withState("Detail").timeout(5000).findWhenNeeded(this);
 

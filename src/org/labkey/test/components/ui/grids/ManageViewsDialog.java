@@ -203,7 +203,7 @@ public class ManageViewsDialog extends ModalDialog
      */
     public ManageViewsDialog makeViewDefault(String viewName)
     {
-        Locator.tagWithText("span", "Make default").findElement(elementCache().viewRow(viewName)).click();
+        Locator.tagWithText("button", "Make default").findElement(elementCache().viewRow(viewName)).click();
 
         return this;
     }
@@ -242,6 +242,6 @@ public class ManageViewsDialog extends ModalDialog
         protected final WebElement deleteYesButton = Locator.button("Yes").refindWhenNeeded(this);
         protected final WebElement deleteNoButton = Locator.button("No").refindWhenNeeded(this);
 
-        protected final WebElement revertDefault = Locator.tagWithText("span", "Revert").refindWhenNeeded(this);
+        protected final WebElement revertDefault = Locator.tagWithText("button", "Revert").refindWhenNeeded(this);
     }
 }
