@@ -438,7 +438,8 @@ public class SecurityTest extends BaseWebDriverTest
     protected void useReturnDuringSignInTest()
     {
         signOut();
-        clickAndWait(Locator.linkWithText(SIGN_IN_TEXT));
+        if (!Locator.tagWithName("form", "login").isDisplayed(getDriver()))
+            clickAndWait(Locator.button(SIGN_IN_TEXT));
 
         waitForText("Remember my email address");
 
