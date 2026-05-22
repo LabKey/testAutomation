@@ -18,6 +18,7 @@ import org.labkey.test.components.ui.files.FileUploadField;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldKey;
 import org.labkey.test.util.AuditLogHelper;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -330,17 +331,17 @@ public class EntityBulkUpdateDialog extends EntityBulkDialog
         List<String> names = new ArrayList<>();
         for (WebElement label : controlLabels)
         {
-            String attribute = label.getAttribute("for");
-            if (attribute != null)
-                names.add(FieldKey.fromFieldKey(attribute).getFullName());
-            else // Select inputs have spans in the label column to prevent orphaned labels for accessibility
-            {
-                attribute = label.getAttribute("data-fieldkey");
-                if (attribute != null)
-                    names.add(FieldKey.fromFieldKey(attribute).getFullName());
-                else
-                    throw new RuntimeException("Could not find field name for label: " + label.getText());
-            }
+            if (label.getAttribute("data-fieldkey") == null)
+                try
+                {
+                    label = label.findElement(Locator.tagWithAttribute("span", "data-fieldkey"));
+                }
+                catch (NoSuchElementException e)
+                {
+                    throw new RuntimeException("Could not find field key for label: " + label.getText(), e);
+                }
+            String attribute = label.getAttribute("data-fieldkey");
+            names.add(FieldKey.fromFieldKey(attribute).getFullName());
         }
 
         // Amount and Units is an example that has a "hide-label" for StoredAmount
