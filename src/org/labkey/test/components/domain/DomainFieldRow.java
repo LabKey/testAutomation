@@ -1070,6 +1070,17 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         return getWrapper().getFormElement(elementCache().expressionInput);
     }
 
+    /**
+     * Click the "AI Assistant" button in the expanded Calculation field options and return the resulting dialog.
+     */
+    public CalculatedColumnAssistantDialog openAIAssistant()
+    {
+        if (!isExpanded())
+            expand();
+        elementCache().aiAssistantButton.click();
+        return new CalculatedColumnAssistantDialog(this);
+    }
+
     // advanced settings
 
     public DomainFieldRow showFieldOnDefaultView(boolean checked)
@@ -1763,6 +1774,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         public final WebElement expressionStatusError = expressionStatusMsgLoc.descendant(Locator.tagWithClass("span", "error")).refindWhenNeeded(this);
         public final WebElement expressionStatusMsg = expressionStatusMsgLoc.childTag("div").refindWhenNeeded(this);
         public final WebElement expressionValidateLink = expressionStatusMsgLoc.child(Locator.tagWithClass("div", "validate-link")).refindWhenNeeded(this);
+        public final WebElement aiAssistantButton = Locator.tagWithClass("button", "btn").withText("AI Assistant").refindWhenNeeded(this);
 
         Locator.XPathLocator aliquotWarningAlert = Locator.tagWithClassContaining("div", "aliquot-alert-warning");
 
