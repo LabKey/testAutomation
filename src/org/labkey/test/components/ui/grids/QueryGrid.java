@@ -815,7 +815,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
             return new FilterStatusValue.FilterStatusValueFinder(getDriver()).findAll(filterStatusPanel);
         }
 
-        final WebElement removeAllFilters = Locator.tagWithClass("a", "remove-all-filters").refindWhenNeeded(this);
+        final WebElement removeAllFilters = Locator.byClass("remove-all-filters").refindWhenNeeded(this);
 
         // The panel header element which will contain the edit status text, the view name and the Save & Undo buttons.
         // If this is the default view this will not be present.
