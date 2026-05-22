@@ -634,7 +634,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
         public BaseReactSelectFinder<Select> withinFormGroup(String labelText)
         {
             _locator = Locator.tagWithClass("div", "form-group")
-                    .withChild(Locator.tag("label").withPredicate("text() = " + Locator.xq(labelText)))
+                    .withChild(Locator.byClass("control-label").withPredicate("text() = " + Locator.xq(labelText)))
                     .descendant(Locators.selectContainer());
             return this;
         }
