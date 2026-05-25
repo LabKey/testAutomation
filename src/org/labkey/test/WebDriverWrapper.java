@@ -1169,6 +1169,12 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return createDefaultConnection();
     }
 
+    // Exempt the provided URL from controller-first URL warnings and exceptions
+    public void allowControllerFirstUrl(String url)
+    {
+        _controllerFirstUrls.add(url);
+    }
+
     public long beginAt(String url)
     {
         return beginAt(url, defaultWaitForPage);
