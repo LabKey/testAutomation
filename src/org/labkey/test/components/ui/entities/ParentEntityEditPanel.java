@@ -127,7 +127,7 @@ public class ParentEntityEditPanel extends Panel<ParentEntityEditPanel.ElementCa
                 infoCount <= 1);
 
         // A reference to the editing header title
-        Locator editingLocator = Locator.tagWithClass("div", "panel-heading").startsWith("Editing");
+        Locator editingLocator = Locator.byClass("panel-heading").startsWith("Editing");
 
         Assert.assertEquals("Cannot find a panel with 'Editing' in the header. There isn't a panel in edit mode.",
                 1, editingLocator.findElements(getDriver()).size());
@@ -437,7 +437,7 @@ public class ParentEntityEditPanel extends Panel<ParentEntityEditPanel.ElementCa
            {
                // If this is removing the last/only one the count of select controls will still be 1 ('add new' one is shown),
                // so need a different check.
-               ReactSelect rs = getAllEntityTypes().get(0);
+               ReactSelect rs = getAllEntityTypes().getFirst();
                WebDriverWrapper.waitFor(() -> rs.getSelections().isEmpty(),
                        "The type '" + typeName + "' was not successfully removed.",
                        1_000);
@@ -520,7 +520,7 @@ public class ParentEntityEditPanel extends Panel<ParentEntityEditPanel.ElementCa
 
         // This is the 'Add' button that is contained inside the panel.
         final WebElement addButton = Locator
-                .tagContainingText("span", "Add")
+                .tagContainingText("button", "Add")
                 .findWhenNeeded(this);
 
         public WebElement commentInput = Locator.tagWithId("textarea", "actionComments").refindWhenNeeded(getDriver());
@@ -529,7 +529,7 @@ public class ParentEntityEditPanel extends Panel<ParentEntityEditPanel.ElementCa
         WebElement removeButton(int index)
         {
             return Locator
-                    .tagWithClass("span", "container--action-button")
+                    .tagWithClass("button", "container--action-button")
                     .findElements(this).get(index);
         }
     }

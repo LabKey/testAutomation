@@ -119,7 +119,7 @@ public class SampleFinder extends WebDriverComponent<SampleFinder.ElementCache>
      */
     public void removeAllSearchCards()
     {
-        List<WebElement> removeButtons = Locator.tagWithAttribute("i", "title", "Remove filter")
+        List<WebElement> removeButtons = Locator.tagWithAttribute("button", "title", "Remove filter")
                 .findElements(elementCache().filterCardsSection);
         Collections.reverse(removeButtons);
         // Don't wait for search results to update after each removed card
@@ -302,7 +302,7 @@ public class SampleFinder extends WebDriverComponent<SampleFinder.ElementCache>
         {
             List<WebElement> views = getViewsWithCls("active");
             if (!views.isEmpty())
-                return views.get(0).getText();
+                return views.getFirst().getText();
 
             return null;
         }
@@ -311,7 +311,7 @@ public class SampleFinder extends WebDriverComponent<SampleFinder.ElementCache>
         {
             List<WebElement> views = getViewsWithCls("session-finder-view");
             if (!views.isEmpty())
-                return views.get(0).getText();
+                return views.getFirst().getText();
 
             return null;
         }
@@ -361,9 +361,9 @@ public class SampleFinder extends WebDriverComponent<SampleFinder.ElementCache>
         private final WebElement cardEl;
         private final WebElement name = Locator.byClass("primary-text").findWhenNeeded(this);
         private final WebElement editButton =
-                Locator.tagWithAttribute("i", "title", "Edit filter").findWhenNeeded(this);
+                Locator.tagWithAttribute("button", "title", "Edit filter").findWhenNeeded(this);
         private final WebElement removeButton =
-                Locator.tagWithAttribute("i", "title", "Remove filter").findWhenNeeded(this);
+                Locator.tagWithAttribute("button", "title", "Remove filter").findWhenNeeded(this);
 
         private FilterCard(WebElement el)
         {

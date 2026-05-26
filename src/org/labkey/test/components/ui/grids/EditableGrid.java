@@ -56,6 +56,7 @@ import static org.awaitility.Awaitility.await;
 import static org.labkey.test.BaseWebDriverTest.WAIT_FOR_JAVASCRIPT;
 import static org.labkey.test.WebDriverWrapper.waitFor;
 import static org.labkey.test.util.TestLogger.log;
+import static org.labkey.test.util.data.TestArrayDataUtils.formatMultiValueText;
 import static org.labkey.test.util.selenium.ScrollUtils.Alignment.center;
 import static org.labkey.test.util.selenium.WebDriverUtils.MODIFIER_KEY;
 
@@ -99,6 +100,11 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         Locators.spinner.waitForElementToDisappear(this, 30000);
     }
 
+    public static String quoteValues(String delimiter, String... sorted)
+    {
+        return Arrays.stream(sorted).map(CSVFormat.DEFAULT::format).collect(Collectors.joining(delimiter));
+    }
+
     /**
      * Quote values to be pasted into lookup columns. Prevents a value containing a comma from being interpreted as
      * multiple values.
@@ -107,7 +113,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
      */
     public static String quoteForPaste(String... values)
     {
-        return Arrays.stream(values).map(CSVFormat.DEFAULT::format).collect(Collectors.joining(","));
+        return quoteValues(",", values);
     }
 
     public void clickDelete()
@@ -922,6 +928,39 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     }
 
     /**
+     * Format data for pasting into an editable grid. List elements in each row are quoted and separated by commas.
+     * This allows values containing commas to be pasted into multi-value columns. Even single-selections for these
+     * types of columns should be passed in as Lists to ensure they are quoted properly.
+     *
+     * @param rows values for pasting into an editable grid.
+     * @return rows formatted for pasting into an editable grid.
+     */
+    public static String formatForPaste(List<List<?>> rows)
+    {
+        StringBuilder sb = new StringBuilder();
+        for (List<?> row : rows)
+        {
+            if (!sb.isEmpty())
+                sb.append("\n");
+
+            boolean firstVal = true;
+            for (Object value : row)
+            {
+                if (!firstVal)
+                    sb.append("\t");
+                else
+                    firstVal = false;
+
+                if (value instanceof List<?> l)
+                    sb.append(formatMultiValueText(l));
+                else
+                    sb.append(quoteForPaste(value.toString()));
+            }
+        }
+        return sb.toString();
+    }
+
+    /**
      * Copies text from the grid, b
      * @param startRowIndex Index of the top-left cell's row
      * @param startColumn   fieldKey, name, or label of the top-left cell
@@ -980,6 +1019,40 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         return getWrapper().getClipboardContent();
     }
 
+    /**
+     * Select a cell range and drag-fill from the end of that selection to {@code dragEnd}.
+     * Because this overload owns the {@link #selectCellRange} step, it can fully restore state
+     * and retry if the first drag extended the selection without applying the fill.
+     *
+     * @param selectStart first cell of the selection (passed to {@link #selectCellRange})
+     * @param selectEnd   last cell of the selection; also the source of the fill value
+     * @param dragEnd     destination cell for the fill drag
+     */
+    public void dragFill(WebElement selectStart, WebElement selectEnd, WebElement dragEnd)
+    {
+        Locator.XPathLocator selectionHandleLoc = Locator.byClass("cell-selection-handle");
+        selectCellRange(selectStart, selectEnd);
+        selectEnd.click();
+        String fillValue = getCellValue(selectEnd);
+        WebElement selectionHandle = selectionHandleLoc.waitForElement(getComponentElement(), 2_000);
+        dragToCell(selectionHandle, dragEnd);
+        if (!WebDriverWrapper.waitFor(() -> fillValue.equals(getCellValue(dragEnd)), 3_000))
+        {
+            // Fill didn't complete — the drag likely extended the selection without triggering the fill.
+            selectCellRange(selectStart, selectEnd);
+            selectEnd.click();
+            selectionHandle = selectionHandleLoc.waitForElement(getComponentElement(), 2_000);
+            dragToCell(selectionHandle, dragEnd);
+            WebDriverWrapper.waitFor(() -> fillValue.equals(getCellValue(dragEnd)),
+                    "Drag fill did not populate end cell with value: " + fillValue, 5_000);
+        }
+    }
+
+    /**
+     * Drag-fill from {@code startCell} (which must already be selected / part of the current
+     * selection) to {@code endCell}.  Prefer {@link #dragFill(WebElement, WebElement, WebElement)}
+     * when the selection range is known — that overload can retry reliably.
+     */
     public void dragFill(WebElement startCell, WebElement endCell)
     {
         dismissPopover();
@@ -1006,6 +1079,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
                 // WebDriver doesn't calculate correct location to click the cell selection handle
                 .moveToElement(elementToDrag, 0, 7)
                 .clickAndHold()
+                .pause(Duration.ofMillis(500))
                 .moveToElement(destinationCell)
                 // Extra wiggle to get it to stick
                 .moveByOffset(0, -size.getHeight())
@@ -1120,7 +1194,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         List<String> columns = getColumnLabels();
         int selectIndexOffset = hasSelectColumn() ? 1 : 0;
         WebElement indexCell = getCell(0, columns.get(1 + selectIndexOffset));
-        WebElement endCell = getCell(elementCache().getRows().size()-1, columns.get(columns.size()-1));
+        WebElement endCell = getCell(elementCache().getRows().size()-1, columns.getLast());
         return (isInSelection(indexCell) && isInSelection(endCell));
     }
 
@@ -1282,7 +1356,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
                 if (hasSelectColumn())
                 {
-                    columnHeaders.add(new EditableGridColumnHeader(headerCellElements.get(0), domIndex, SELECT_COLUMN_LABEL_PLACEHOLDER));
+                    columnHeaders.add(new EditableGridColumnHeader(headerCellElements.getFirst(), domIndex, SELECT_COLUMN_LABEL_PLACEHOLDER));
                     domIndex++;
                 }
 
@@ -1426,13 +1500,13 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
                 else
                 {
                     // Depth-first search until we find some text
-                    return getLabelFromHeaderCell(children.get(0));
+                    return getLabelFromHeaderCell(children.getFirst());
                 }
             }
             else
             {
                 boolean required = Locator.byClass("required-symbol").existsIn(el);
-                String label = textNodes.get(0).trim(); // trim trailing NBSP
+                String label = textNodes.getFirst().trim(); // trim trailing NBSP
                 return label + (required ? " *" : ""); // re-add required asterisk for tests that expect it
             }
         }

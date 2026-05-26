@@ -123,7 +123,7 @@ public class ManageImportTemplatesDialog extends ModalDialog
     {
         List<WebElement> rows = elementCache().templateRows();
         if (templateName.equalsIgnoreCase("default template"))
-            return rows.get(0);
+            return rows.getFirst();
 
         for (int i = 1; i < rows.size(); i++)
         {
@@ -216,7 +216,7 @@ public class ManageImportTemplatesDialog extends ModalDialog
 
     protected class ElementCache extends ModalDialog.ElementCache
     {
-        WebElement addTemplateRow = Locator.tagWithClassContaining("span", "container--action-button")
+        WebElement addTemplateRow = Locator.tagWithClassContaining("button", "container--action-button")
                 .withText("Add a Template").findWhenNeeded(getComponentElement());
 
         WebElement defaultTemplateFileLink = Locator.tagWithClass("span", "clickable-text").findWhenNeeded(getComponentElement());

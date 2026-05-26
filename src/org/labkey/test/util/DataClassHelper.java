@@ -15,6 +15,7 @@
  */
 package org.labkey.test.util;
 
+import org.jetbrains.annotations.NotNull;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
@@ -64,7 +65,7 @@ public class DataClassHelper extends WebDriverWrapper
     
 
     @Override
-    public WebDriver getWrappedDriver()
+    public @NotNull WebDriver getWrappedDriver()
     {
         return _driver;
     }

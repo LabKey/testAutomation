@@ -16,6 +16,7 @@
 
 package org.labkey.test.util;
 
+import org.jetbrains.annotations.NotNull;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
@@ -56,7 +57,7 @@ public class ListHelper extends LabKeySiteWrapper
     }
 
     @Override
-    public WebDriver getWrappedDriver()
+    public @NotNull WebDriver getWrappedDriver()
     {
         return _wrapsDriver.getWrappedDriver();
     }
@@ -288,25 +289,45 @@ public class ListHelper extends LabKeySiteWrapper
     public ImportDataPage clickImportData()
     {
         Optional<WebElement> importButton = Locator.lkButton("Import Data").findOptionalElement(getDriver());
-        if(importButton.isPresent())
+        if (importButton.isPresent())
         {
             // Probably at list-editListDefinition after creating a list
             clickAndWait(importButton.get());
             return new ImportDataPage(getDriver());
         }
-        else
-        {
-            // Importing from list data region
-            return DataRegionTable.DataRegion(getDriver()).find()
-                    .clickImportBulkData();
-        }
+
+        // Importing from list data region
+        return DataRegionTable.DataRegion(getDriver()).find().clickImportBulkData();
     }
 
-    public void bulkImportData(String listData)
+    public ImportDataPage bulkImportData(String listData)
     {
-        clickImportData()
-                .setText(listData)
-                .submit();
+        return configureImportText(listData).submit();
+    }
+
+    public ImportDataPage bulkImportDataExpectingError(String listData, String expectedError)
+    {
+        return configureImportText(listData).submitExpectingErrorContaining(expectedError);
+    }
+
+    private ImportDataPage configureImportText(String text)
+    {
+        return clickImportData().setText(text);
+    }
+
+    private ImportDataPage configureBulkUpdate(String listData)
+    {
+        return configureImportText(listData).setCopyPasteMerge(false, true);
+    }
+
+    public ImportDataPage bulkUpdate(String listData)
+    {
+        return configureBulkUpdate(listData).submit();
+    }
+
+    public ImportDataPage bulkUpdateExpectingError(String listData, String expectedError)
+    {
+        return configureBulkUpdate(listData).submitExpectingErrorContaining(expectedError);
     }
 
     public EditListDefinitionPage goToEditDesign(String listName)

@@ -10,6 +10,8 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.List;
 
+import static org.labkey.test.WebDriverWrapper.sleep;
+
 /**
  * Wraps 'labkey-ui-component' defined in <code>internal/components/search/EntityFieldFilterModal.tsx</code>
  */
@@ -17,7 +19,7 @@ public class EntityFieldFilterModal extends GridFilterModal
 {
     public EntityFieldFilterModal(WebDriver driver, UpdatingComponent linkedComponent)
     {
-        super(driver, linkedComponent);
+        super(driver, linkedComponent, "Select");
     }
 
     @Override
@@ -36,8 +38,13 @@ public class EntityFieldFilterModal extends GridFilterModal
     public EntityFieldFilterModal selectQuery(String queryName)
     {
         WebElement queryItem = elementCache().findQueryOption(queryName);
-        getWrapper().doAndWaitForElementToRefresh(queryItem::click,
-                () -> elementCache().listItemLoc.findElement(elementCache().fieldsSelectionPanel), getWrapper().shortWait());
+        queryItem.click();
+        sleep(500); // wait for the fields to be displayed or updated.
+        // The wait below does not consistently work. It works for the first rendering of the modal, but
+        // if the modal is opened with a query already selected, selecting another query does not cause
+        // staleness of the field panel elements, only an update of the contents.
+//        getWrapper().doAndWaitForElementToRefresh(queryItem::click,
+//                () -> elementCache().listItemLoc.findElement(elementCache().fieldsSelectionPanel), getWrapper().shortWait());
 
         getWrapper().shortWait().until(ExpectedConditions.invisibilityOfElementLocated(BootstrapLocators.loadingSpinner));
 

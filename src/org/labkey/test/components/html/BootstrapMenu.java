@@ -152,7 +152,7 @@ public class BootstrapMenu extends BaseBootstrapMenu
             WebElement menuList = findOpenMenu();
             List<WebElement> submenus = Locator.css("ul.dropdown-layer-menu.open").findElements(menuList);
             if (!submenus.isEmpty())
-                return submenus.get(submenus.size() - 1);   /* if one or more submenus are open, use the last open one */
+                return submenus.getLast();   /* if one or more submenus are open, use the last open one */
             return menuList;
         }
 

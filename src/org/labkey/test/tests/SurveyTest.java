@@ -36,6 +36,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
 import static org.labkey.test.util.PermissionsHelper.READER_ROLE;
@@ -466,7 +467,7 @@ public class SurveyTest extends BaseWebDriverTest
         // verify question counts on section header
         assertTextPresent("Section 1 (2)", "Section 2 (7)");
         assertTextNotPresent("-Txt Field", "-Int Field", "-Dt Field");
-        assertTrue("Submit button should not be disabled", !isElementPresent(Locator.xpath("//a[contains(@class,'item-disabled')]//span[text() = 'Submit completed form']")));
+        assertFalse("Submit button should not be disabled", isElementPresent(Locator.xpath("//a[contains(@class,'item-disabled')]//span[text() = 'Submit completed form']")));
         clickButton("Submit completed form");
         waitForText("Surveys: " + SUBFOLDER_SURVEY_DESIGN);
         assertTextPresent(SECOND_SURVEY);

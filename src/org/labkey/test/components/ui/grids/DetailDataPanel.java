@@ -85,7 +85,7 @@ public class DetailDataPanel extends WebDriverComponent<DetailDataPanel.ElementC
         List<DetailTable> tables = elementCache().detailTables();
 
         // As of release 21.05 the table with the column values for the sample is the last table in the panel.
-        return  tables.get(tables.size() - 1);
+        return  tables.getLast();
     }
 
     /**
@@ -102,7 +102,7 @@ public class DetailDataPanel extends WebDriverComponent<DetailDataPanel.ElementC
             throw new NoSuchElementException("There does not appear to be an 'Aliquot' table in this panel.");
 
         // As of release 21.05 if this sample is an aliquot, then the table with the aliquot information is the first table in the panel.
-        return tables.get(0);
+        return tables.getFirst();
     }
 
     /**
@@ -119,7 +119,7 @@ public class DetailDataPanel extends WebDriverComponent<DetailDataPanel.ElementC
         if(tables.size() != 2)
             throw new NoSuchElementException("This does not appear to be a sub-aliquot.");
 
-        return tables.get(0);
+        return tables.getFirst();
     }
 
     public AttachmentCard getFileField(String fieldLabel)
@@ -164,7 +164,7 @@ public class DetailDataPanel extends WebDriverComponent<DetailDataPanel.ElementC
 
         public Optional<WebElement> editButton()
         {
-            return Locator.tagWithClass("div", "detail__edit-button")
+            return Locator.byClass("detail__edit-button")
                     .findOptionalElement(heading);
         }
 
@@ -222,7 +222,7 @@ public class DetailDataPanel extends WebDriverComponent<DetailDataPanel.ElementC
             if (_asTooltip)
                 return _baseLocatorAsTooltip;
             else if (_title != null)
-                return _baseLocator.withChild(Locator.tagWithClass("div", "panel-heading")
+                return _baseLocator.withChild(Locator.byClass("panel-heading")
                         .withText(_title));
             else
                 return _baseLocator;

@@ -8,9 +8,17 @@ import org.openqa.selenium.WebElement;
 
 public class ConfirmDeletePage extends LabKeyPage<ConfirmDeletePage.ElementCache>
 {
+    private String _deleteBtnText;
+
     public ConfirmDeletePage(WebDriver driver)
     {
+        this(driver, "Confirm Delete");
+    }
+
+    public ConfirmDeletePage(WebDriver driver, String deleteBtnText)
+    {
         super(driver);
+        _deleteBtnText = deleteBtnText;
     }
 
     public BeginPage confirmDelete()
@@ -27,6 +35,6 @@ public class ConfirmDeletePage extends LabKeyPage<ConfirmDeletePage.ElementCache
 
     protected class ElementCache extends LabKeyPage<?>.ElementCache
     {
-        WebElement deleteButton = Locator.lkButton("Confirm Delete").findWhenNeeded(this);
+        WebElement deleteButton = Locator.lkButton(_deleteBtnText == null ? "Confirm Delete" : _deleteBtnText).findWhenNeeded(this);
     }
 }

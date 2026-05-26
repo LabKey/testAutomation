@@ -45,7 +45,7 @@ public class MetadataEditorHelper
                 .append(Locator.tag("tr"));
 
         List<WebElement> allRows = fieldRow.waitForElements(_test.getDriver(), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        WebElement headerRow = allRows.get(0);
+        WebElement headerRow = allRows.getFirst();
         List<WebElement> fieldRows = allRows.subList(1, allRows.size());
 
         int nameColumnIndex = getCellIndexFromRow(headerRow, "Name");

@@ -111,10 +111,9 @@ public class NabMultiVirusPlateTest extends BaseWebDriverTest
                 .setAssayType("NAb")
                 .setTemplateType("multi-virus plate")));
 
-        waitForElement(Locator.xpath("//input[@id='templateName']"), WAIT_FOR_JAVASCRIPT);
-        setFormElement(Locator.xpath("//input[@id='templateName']"), PLATE_TEMPLATE_NAME);
-
-        clickButton("Save & Close");
+        PlateDesignerPage designerPage = new PlateDesignerPage(getDriver());
+        designerPage.setName(PLATE_TEMPLATE_NAME);
+        designerPage.saveAndClose();
 
         goToProjectHome();
 

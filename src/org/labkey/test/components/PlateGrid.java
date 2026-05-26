@@ -76,7 +76,7 @@ public class PlateGrid extends WebDriverComponent
             rowName++;
         }
 
-        final int columnCount = _gridValues.get(0).size();
+        final int columnCount = _gridValues.getFirst().size();
         _colsIndex = new HashMap<>();
         for(int j = 0; j < columnCount; j++)
         {

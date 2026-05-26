@@ -84,7 +84,7 @@ public class JUnitTest extends TestSuite
 
     public static TestSuite suite() throws Exception
     {
-        return JUnitTest._suite((p) -> true, false);
+        return JUnitTest._suite(_ -> true, false);
     }
 
     private static String getWhen(Map<String,Object> test)
@@ -136,12 +136,9 @@ public class JUnitTest extends TestSuite
         }
         catch (Throwable t)
         {
-            if (bootstrapBrowser.getWrappedDriver() != null)
-            {
-                ArtifactCollector artifactCollector = new ArtifactCollector(bootstrapBrowser, JUnitTest.class.getSimpleName());
-                artifactCollector.dumpPageSnapshot("ServerBootstrap", null);
-                artifactCollector.publishDumpedArtifacts();
-            }
+            ArtifactCollector artifactCollector = new ArtifactCollector(bootstrapBrowser, JUnitTest.class.getSimpleName());
+            artifactCollector.dumpPageSnapshot("ServerBootstrap", null);
+            artifactCollector.publishDumpedArtifacts();
             throw t;
         }
         finally
@@ -176,8 +173,7 @@ public class JUnitTest extends TestSuite
         }
         catch (Throwable t)
         {
-            LOG.error("Unable to fetch Remote JUnit tests");
-            t.printStackTrace();
+            LOG.error("Unable to fetch Remote JUnit tests", t);
             TestSuite testSuite = new TestSuite();
             testSuite.addTest(new Runner.ErrorTest(JUnitTest.class.getSimpleName(), t));
             return testSuite;
@@ -254,7 +250,7 @@ public class JUnitTest extends TestSuite
                     if (responseBody.contains("<title>Start Modules</title>"))
                     {
                         // Server still starting up.  We don't need to use the upgradeHelper to sign in.
-                        LOG.info("Remote JUnitTest: Server modules starting up (remaining " + TestDateUtils.durationString(startupTimer.timeRemaining()) + ") ...");
+                        LOG.info("Remote JUnitTest: Server modules starting up (remaining {}) ...", TestDateUtils.durationString(startupTimer.timeRemaining()));
 
                         EntityUtils.consumeQuietly(response.getEntity()); // Consume before possible recursion
                         if (!startupTimer.isTimedOut())
@@ -289,7 +285,7 @@ public class JUnitTest extends TestSuite
                         catch (Throwable t)
                         {
                             upgradeError = t;
-                            t.printStackTrace();
+                            LOG.warn("Error during upgrade/bootstrap", t);
                         }
                         TestSuite testSuite;
                         try
@@ -298,7 +294,7 @@ public class JUnitTest extends TestSuite
                         }
                         catch (Exception retryException)
                         {
-                            retryException.printStackTrace();
+                            LOG.warn("Error fetching remote test suite", retryException);
                             testSuite = new TestSuite();
                             testSuite.addTest(new Runner.ErrorTest("", retryException));
                         }
@@ -321,7 +317,7 @@ public class JUnitTest extends TestSuite
                 for (String key : json.keySet())
                 {
                     AtomicInteger ioeCounter = new AtomicInteger(0);
-                    TestSuite testsuite = new TestSuite(key);
+                    TestSuite moduleSuite = new TestSuite(key + " Tests");
                     JSONArray testClassArray = json.getJSONArray(key);
                     // Individual tests include both the class name and the requested timeout
                     for (int i = 0; i < testClassArray.length(); i++)
@@ -334,30 +330,33 @@ public class JUnitTest extends TestSuite
                             // Timeout is represented in seconds
                             int timeout = testClass.getInt("timeout");
                             if (accept.test(testClass.toMap()))
-                                testsuite.addTest(new RemoteTest(className, timeout, ioeCounter));
+                                moduleSuite.addTest(new RemoteTest(className, timeout, ioeCounter));
                         }
 
                     }
-                    if (!addedHeader && testsuite.countTestCases() > 0)
+                    if (moduleSuite.countTestCases() > 0)
                     {
-                        BaseJUnitTestWrapper.extraSetup = !skipInitialUserChecks;
-                        remotesuite.addTest(new JUnit4TestAdapter(JUnitHeader.class));
-                        addedHeader = true;
+                        if (!addedHeader)
+                        {
+                            BaseJUnitTestWrapper.extraSetup = !skipInitialUserChecks;
+                            remotesuite.addTest(new JUnit4TestAdapter(JUnitHeader.class));
+                            addedHeader = true;
+                        }
+                        remotesuite.addTest(moduleSuite);
                     }
-                    remotesuite.addTest(testsuite);
                 }
                 if (addedHeader)
                 {
                     remotesuite.addTest(new JUnit4TestAdapter(JUnitFooter.class));
                     // Exclude header and footer from count
-                    LOG.info("Remote JUnitTest: found " + (remotesuite.countTestCases() - 2) + " tests.");
+                    LOG.info("Remote JUnitTest: found {} tests.", remotesuite.countTestCases() - 2);
                 }
 
                 return remotesuite;
             }
             else
             {
-                LOG.error("Getting unit test list from server failed with error code " + status + ". Error page content is:");
+                LOG.error("Getting unit test list from server failed with error code {}. Error page content is:", status);
                 final OutputStream streamLogger = IoBuilder.forLogger(LOG).setLevel(Level.ERROR).buildOutputStream();
                 response.getEntity().writeTo(streamLogger);
                 throw new AssertionFailedError("Failed to fetch remote junit test list (" + status + " - " + response.getReasonPhrase() + "): " + url);

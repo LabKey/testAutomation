@@ -228,7 +228,7 @@ public class PivotQueryTest extends ReportTest
         createQueryPage.setName(queryName);
         var sourceQueryPage = createQueryPage.clickCreate();
         sourceQueryPage.setSource(queryText);
-        sourceQueryPage.clickSaveAndFinish();
+        sourceQueryPage.clickSaveAndFinishExpectingError();
 
         // expect query error
         waitForText("Query 'Q1' has errors", "Error on line 3: Can not find pivot column:");

@@ -22,6 +22,7 @@ import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.commons.lang3.time.FastDateFormat;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.hc.core5.http.HttpStatus;
 import org.awaitility.Awaitility;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -43,6 +44,7 @@ import org.labkey.junit.rules.TestWatcher;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.admin.ClearCachesCommand;
 import org.labkey.remoteapi.SimpleGetCommand;
 import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
@@ -98,7 +100,6 @@ import org.labkey.test.util.TestLogger;
 import org.labkey.test.util.UIPermissionsHelper;
 import org.labkey.test.util.core.webdav.WebDavUploadHelper;
 import org.labkey.test.util.ext4cmp.Ext4FieldRef;
-import org.labkey.test.util.query.QueryUtils;
 import org.labkey.test.util.selenium.WebDriverUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.ElementClickInterceptedException;
@@ -297,7 +298,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     }
 
     @Override
-    public WebDriver getWrappedDriver()
+    public @NotNull WebDriver getWrappedDriver()
     {
         return SingletonWebDriver.getInstance().getWebDriver();
     }
@@ -565,7 +566,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             }
 
             @Override
-            public Statement apply(Statement base, Description description)
+            public @NotNull Statement apply(Statement base, Description description)
             {
                 try
                 {
@@ -935,7 +936,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         if (error instanceof MultipleFailureException mfe)
         {
             // Only "handle" primary test failure. Just log failures thrown during @After or @AfterClass methods.
-            error = mfe.getFailures().get(0);
+            error = mfe.getFailures().getFirst();
             for (int i = 1; i < mfe.getFailures().size(); i++)
             {
                 TestLogger.error("Secondary error after test:", mfe.getFailures().get(i));
@@ -1173,6 +1174,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
         // Use dumpHeapAction rather that touching file so that we can get file name and publish artifact.
         beginAt(WebTestHelper.buildURL("admin", "dumpHeap"));
+        clickButton("OK");
         String dumpMsg = Locators.bodyPanel().childTag("div").findElement(getDriver()).getText();
         String filePrefix = "Heap dumped to ";
         int prefixIndex = dumpMsg.indexOf(filePrefix);
@@ -1388,6 +1390,22 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         return SingletonWebDriver.getInstance().getDownloadDir();
     }
 
+    /**
+     * Clears all server caches and runs garbage collection via the admin ClearCachesAction.
+     * Leaves the browser on the MemTracker page.
+     */
+    protected void clearCaches()
+    {
+        try
+        {
+            new ClearCachesCommand(true, true).execute(createDefaultConnection(), "/");
+        }
+        catch (IOException | CommandException e)
+        {
+            throw new RuntimeException("Failed to clear caches", e);
+        }
+    }
+
     protected void checkLeaks()
     {
         if (isLeakCheckSkipped())
@@ -1414,7 +1432,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 }
             }
             msSinceTestStart = System.currentTimeMillis() - previousLeakCheck;
-            beginAt(WebTestHelper.buildURL("admin", "memTracker", Map.of("gc", 1, "clearCaches", 1)), 120000);
+            clearCaches();
+            beginAt(WebTestHelper.buildURL("admin", "memTracker"));
             if (!isTextPresent("In-Use Objects"))
                 throw new IllegalStateException("Asserts must be enabled to track memory leaks; add -ea to your server VM params and restart or add -DmemCheck=false to your test VM params.");
             leakCount = getImageWithAltTextCount("expand/collapse");
@@ -1685,20 +1704,16 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     protected void setSelectedFields(String containerPath, String schema, String query, String viewName, String[] fields)
     {
         pushLocation();
-        beginAt(WebTestHelper.buildURL("query", containerPath, "internalNewView"));
-        setFormElement(Locator.name("ff_schemaName"), schema);
-        setFormElement(Locator.name("ff_queryName"), query);
+        beginAt(WebTestHelper.buildURL("query", containerPath, "executeQuery", Map.of("schemaName", "query", "queryName", "CustomViews")));
+        DataRegionTable drt = new DataRegionTable("query", getDriver());
+        var queryRowPage = drt.clickInsertNewRow();
+        queryRowPage.setField("Schema", schema);
+        queryRowPage.setField("QueryName", query);
         if (viewName != null)
-            setFormElement(Locator.name("ff_viewName"), viewName);
-        clickButton("Create");
-        StringBuilder strFields = new StringBuilder(fields[0]);
-        for (int i = 1; i < fields.length; i ++)
-        {
-            strFields.append("&");
-            strFields.append(fields[i]);
-        }
-        setFormElement(Locator.name("ff_columnList"), strFields.toString());
-        clickButton("Save");
+            queryRowPage.setField("Name", viewName);
+        queryRowPage.setField("Columns", String.join("&", fields));
+        queryRowPage.setField("Flags", "0");
+        queryRowPage.submit();
         popLocation();
     }
 
@@ -2378,12 +2393,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         validateQueries(validateSubfolders, 120000);
     }
 
-    @Deprecated
-    public void deleteAllRows(String projectName, String schema, String table) throws IOException, CommandException
-    {
-        QueryUtils.truncateTable(projectName, schema, table);
-    }
-
     // This class makes it easier to start a specimen import early in a test and wait for completion later.
     public class SpecimenImporter
     {
@@ -2464,7 +2473,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
             while (!_pipelineRoot.equals(testDir))
             {
-                dirNames.add(0, testDir.getName());
+                dirNames.addFirst(testDir.getName());
                 testDir = testDir.getParentFile();
             }
 
@@ -2734,6 +2743,15 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         }
     }
 
+    public void verifyImagePopupInGrid(File imageFile)
+    {
+        mouseOver(Locator.xpath("//img[contains(@title, '" + imageFile.getName() + "')]"));
+        longWait().until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("#helpDiv")));
+        String src = Locator.xpath("//div[@id='helpDiv']//img[contains(@src, 'download')]").findElement(getDriver()).getAttribute("src");
+        assertTrue("Wrong image in popup: " + src, src.contains(imageFile.getName()));
+        assertEquals("Bad response from image pop-up", HttpStatus.SC_OK, WebTestHelper.getHttpResponse(src).getResponseCode());
+    }
+
     public List<Map<String, Object>> loadTsv(File tsv)
     {
         try (TabLoader loader = new TabLoader(tsv, true))
@@ -2813,7 +2831,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             if (exception instanceof String exceptionStr)
             {
                 if (errors.size() == 1)
-                    checker().verifyEquals("Unexpected error message", errors.get(0), exception);
+                    checker().verifyEquals("Unexpected error message", errors.getFirst(), exception);
                 else
                 {
                     for (String error : altErrors)

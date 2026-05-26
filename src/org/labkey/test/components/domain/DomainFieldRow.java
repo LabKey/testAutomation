@@ -452,11 +452,11 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     {
         expand();
 
-        if(elementCache().formatInput.getComponentElement().isDisplayed())
+        if (elementCache().formatInput.getComponentElement().isDisplayed())
         {
             return elementCache().formatInput.getValue();
         }
-        else if(elementCache().charScaleInput.getComponentElement().isDisplayed())
+        else if (elementCache().charScaleInput.getComponentElement().isDisplayed())
         {
             // Formatting of Boolean types use the scale input.
             return elementCache().charScaleInput.getValue();
@@ -469,11 +469,11 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
 
     public WebElement getFormatControl()
     {
-        if(elementCache().formatInput.getComponentElement().isDisplayed())
+        if (elementCache().formatInput.getComponentElement().isDisplayed())
         {
             return elementCache().formatInput.getComponentElement();
         }
-        else if(elementCache().charScaleInput.getComponentElement().isDisplayed())
+        else if (elementCache().charScaleInput.getComponentElement().isDisplayed())
         {
             // Formatting of Boolean types use the scale input.
             return elementCache().charScaleInput.getComponentElement();
@@ -766,10 +766,34 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     // To a user a TextChoice field looks and behaves a lot like a lookup, even though it is implemented using a validator
     // behind the scenes. Because of that the validator aspect of the TextChoice field is hidden from the user (just like
     // it is in the product).
-
-    public void setAllowMultipleSelections(Boolean allowMultipleSelections)
+    public DomainFieldRow setAllowMultipleSelections(Boolean allowMultipleSelections)
     {
+      return setAllowMultipleSelections(allowMultipleSelections, false);
+    }
+
+    public DomainFieldRow setAllowMultipleSelections(Boolean allowMultipleSelections, boolean confirmDialogExpected)
+    {
+        if (getAllowMultipleSelections() == allowMultipleSelections)
+        {
+            return this;
+        }
+        WebDriverWrapper.waitFor(() -> elementCache().allowMultipleSelectionsCheckbox.isEnabled(),
+                "Allow Multiple Selections checkbox isn't enabled", 1000);
         elementCache().allowMultipleSelectionsCheckbox.set(allowMultipleSelections);
+        if (confirmDialogExpected)
+        {
+            ModalDialog modal = new ModalDialog.ModalDialogFinder(getDriver())
+                    .withTitle("Confirm Data Type Change").timeout(1000).waitFor();
+            modal.dismiss("Yes, Change Data Type");
+        }
+        return this;
+    }
+
+    public Boolean getAllowMultipleSelections()
+    {
+        WebDriverWrapper.waitFor(() -> elementCache().allowMultipleSelectionsCheckbox.isDisplayed(),
+                "Allow Multiple Selections checkbox did not become visible", 1000);
+        return elementCache().allowMultipleSelectionsCheckbox.isSelected();
     }
 
     /**
@@ -780,12 +804,24 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
      */
     public DomainFieldRow setTextChoiceValues(List<String> values)
     {
-        WebElement button = Locator.tagWithClass("span", "container--action-button").withText("Add Values").findElement(this);
+        WebElement button = Locator.tagWithClass("button", "container--action-button").withText("Add Values").findElement(this);
         button.click();
 
         TextChoiceValueDialog addValuesDialog = new TextChoiceValueDialog(this);
         addValuesDialog.addValues(values);
         return addValuesDialog.clickApply();
+    }
+
+    public String setTextChoiceValuesExpectingError(List<String> values)
+    {
+        WebElement button = Locator.tagWithClass("button", "container--action-button").withText("Add Values").findElement(this);
+        button.click();
+
+        TextChoiceValueDialog addValuesDialog = new TextChoiceValueDialog(this);
+        addValuesDialog.addValues(values);
+        String error = addValuesDialog.getError();
+        addValuesDialog.clickCancel();
+        return error;
     }
 
     /**
@@ -887,7 +923,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         selectTextChoiceValue(originalValue);
         setUpdateTextChoiceValue(newValue);
 
-        if(clickApply)
+        if (clickApply)
         {
             WebDriverWrapper.waitFor(this::isTextChoiceApplyButtonEnabled, "'Apply' button is not enabled.", 1_000);
             Locator.button("Apply").findElement(this).click();
@@ -1019,7 +1055,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     public String getValueExpressionStatusMessage()
     {
         String statusMsg = "";
-        if(waitFor(elementCache().expressionStatusMsg::isDisplayed, 1_000))
+        if (waitFor(elementCache().expressionStatusMsg::isDisplayed, 1_000))
         {
             statusMsg = elementCache().expressionStatusMsg.getText();
         }
@@ -1144,7 +1180,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     {
         String warningMsg = "";
         WebElement warningMsgElement = Locator.byClass("domain-row-warning").findWhenNeeded(this);
-        if(warningMsgElement.isDisplayed())
+        if (warningMsgElement.isDisplayed())
             warningMsg = warningMsgElement.getText();
 
         return warningMsg;
@@ -1375,7 +1411,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     {
         String formatValue;
 
-        if(elementCache().dateTimeFormatDateSelect.isInteractive())
+        if (elementCache().dateTimeFormatDateSelect.isInteractive())
         {
             formatValue = getFormatWithoutExample(elementCache().dateTimeFormatDateSelect.getValue());
         }
@@ -1406,7 +1442,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     {
         String formatValue;
 
-        if(elementCache().dateTimeFormatTimeSelect.isInteractive())
+        if (elementCache().dateTimeFormatTimeSelect.isInteractive())
         {
             formatValue = getFormatWithoutExample(elementCache().dateTimeFormatTimeSelect.getValue());
         }
@@ -1422,9 +1458,9 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     {
         ArrayList<String> formatValues = new ArrayList<>();
         for (String formatOption : elementCache().dateTimeFormatTimeSelect.getOptions())
-            {
-                formatValues.add(getFormatWithoutExample(formatOption));
-            }
+        {
+            formatValues.add(getFormatWithoutExample(formatOption));
+        }
         return formatValues;
     }
 
@@ -1459,7 +1495,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     {
         String formatValue;
 
-        if(elementCache().dateFormatSelect.isInteractive())
+        if (elementCache().dateFormatSelect.isInteractive())
         {
             formatValue = getFormatWithoutExample(elementCache().dateFormatSelect.getValue());
         }
@@ -1475,9 +1511,9 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     {
         List<String> options = new ArrayList<>();
         for (String option : elementCache().dateFormatSelect.getOptions())
-            {
-                options.add(getFormatWithoutExample(option));
-            }
+        {
+            options.add(getFormatWithoutExample(option));
+        }
         return options;
     }
 
@@ -1522,7 +1558,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
     {
         String formatValue;
 
-        if(elementCache().timeFormatSelect.isInteractive())
+        if (elementCache().timeFormatSelect.isInteractive())
         {
             formatValue = getFormatWithoutExample(elementCache().timeFormatSelect.getValue());
         }
@@ -1724,7 +1760,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
                 .findWhenNeeded(this);
         private final Locator.XPathLocator expressionStatusMsgLoc = Locator.tagWithClass("div", "domain-field-calc-footer");
         public final WebElement expressionStatusValidated = expressionStatusMsgLoc.child(Locator.tagWithClass("div", "validated")).refindWhenNeeded(this);
-        public final WebElement expressionStatusError = expressionStatusMsgLoc.child(Locator.tagWithClass("div", "error")).refindWhenNeeded(this);
+        public final WebElement expressionStatusError = expressionStatusMsgLoc.descendant(Locator.tagWithClass("span", "error")).refindWhenNeeded(this);
         public final WebElement expressionStatusMsg = expressionStatusMsgLoc.childTag("div").refindWhenNeeded(this);
         public final WebElement expressionValidateLink = expressionStatusMsgLoc.child(Locator.tagWithClass("div", "validate-link")).refindWhenNeeded(this);
 

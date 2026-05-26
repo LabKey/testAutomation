@@ -28,6 +28,7 @@ import org.labkey.remoteapi.domain.Domain;
 import org.labkey.remoteapi.domain.DomainResponse;
 import org.labkey.remoteapi.domain.PropertyDescriptor;
 import org.labkey.remoteapi.domain.SaveDomainCommand;
+import org.labkey.remoteapi.query.ContainerFilter;
 import org.labkey.remoteapi.query.Filter;
 import org.labkey.serverapi.reader.TabLoader;
 import org.labkey.test.BaseWebDriverTest;
@@ -64,7 +65,6 @@ import org.labkey.test.util.DomainUtils;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.Maps;
-import org.labkey.test.util.OptionalFeatureHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.TestDataGenerator;
 import org.labkey.test.util.TextSearcher;
@@ -86,7 +86,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -796,7 +795,7 @@ public class ListTest extends BaseWebDriverTest
                 EscapeUtil.fieldKeyEncodePart(LIST_KEY_NAME2) + '/' + _listColGood.getName());
 
         List<Map<String, Object>> exportedFileData = tabLoader.load();
-        List<String> actualValues = exportedFileData.get(0).keySet().stream().toList();
+        List<String> actualValues = exportedFileData.getFirst().keySet().stream().toList();
 
         assertTrue("Exported file does not contain expected header values.",
                 actualValues.containsAll(expectedValues));
@@ -861,6 +860,11 @@ public class ListTest extends BaseWebDriverTest
 
         customizeURLTest();
         crossContainerLookupTest();
+
+        // Prevent crawler errors after the list is deleted
+        // A Query WebPart for a missing query contains links that will 404
+        goToProjectHome();
+        new PortalHelper(this).removeAllWebParts();
     }
 
     /* Issue 23487: add regression coverage for batch insert into list with multiple errors
@@ -1128,8 +1132,10 @@ public class ListTest extends BaseWebDriverTest
         clickProject(PROJECT_VERIFY);
 
         PortalHelper portalHelper = new PortalHelper(this);
-        portalHelper.addQueryWebPart(null, "lists", LIST_NAME_COLORS, null);
-        portalHelper.addQueryWebPart(null, "lists", LIST_NAME_COLORS, null);
+        portalHelper.doInAdminMode(ph -> {
+            portalHelper.addQueryWebPart(null, "lists", LIST_NAME_COLORS, null);
+            portalHelper.addQueryWebPart(null, "lists", LIST_NAME_COLORS, null);
+        });
 
         log("Test that the right filters are present for each type");
         DataRegionTable region = new DataRegionTable("qwp3", getDriver());
@@ -1396,6 +1402,52 @@ public class ListTest extends BaseWebDriverTest
         assertTextBefore(newFieldName, origFieldName);
     }
 
+
+    @Test
+    public void requiredFieldsTest()
+    {
+        log("Test changing required property of field");
+        String listName = "requiredColList";
+        String fieldA = "c$a";
+        String fieldB = "c_b";
+
+        _listHelper.createList(PROJECT_VERIFY, listName, "key",
+                new FieldDefinition(fieldA, ColumnType.String).setDescription("first column").setRequired(false),
+                new FieldDefinition(fieldB, ColumnType.String).setDescription("second column").setRequired(false)
+        );
+
+        // insert a row with a NULL value and NON-NULL value
+        Map<String, String> row = new HashMap<>();
+        row.put(fieldA, "not null");
+        row.put(fieldB, "");
+        _listHelper.insertNewRow(row, false);
+        row.put(fieldA, "still not null");
+        row.put(fieldB, "also not null");
+        _listHelper.insertNewRow(row, false);
+
+        // fieldA can be set to required==true
+        EditListDefinitionPage listDefinitionPage = _listHelper.goToEditDesign(listName);
+        listDefinitionPage.getFieldsPanel()
+                .getField(fieldA)
+                .setRequiredField(true);
+        listDefinitionPage.clickSave();
+
+        // fieldB can not be set to required==true
+        listDefinitionPage = _listHelper.goToEditDesign(listName);
+        listDefinitionPage.getFieldsPanel()
+                .getField(fieldB)
+                .setRequiredField(true);
+        List<String> errors = listDefinitionPage.clickSaveExpectingErrors();
+        assertEquals(2, errors.size());
+        assertEquals("The property \"" + fieldB + "\" cannot be required when it contains rows with blank values.", errors.get(0));
+        assertEquals("Please correct errors in " + listName + " before saving.", errors.get(1));
+
+        goToProjectHome();
+        clickAndWait(Locator.linkWithText(listName));
+        _listHelper.deleteList();
+    }
+
+
     @Test
     public void exportPhiFileColumn() throws Exception
     {
@@ -1654,7 +1706,6 @@ public class ListTest extends BaseWebDriverTest
         // setup a list with an auto-increment key that we need to make sure is encoded in the form input
         String encodedListName = "autoIncrementEncodeList";
         String keyName = "'><script>alert(\":(\")</script>'";
-        String encodedKeyFieldName = EscapeUtil.getFormFieldName(keyName);
         _listHelper.createList(PROJECT_VERIFY, encodedListName, keyName, col("Name", ColumnType.String));
         _listHelper.goToList(encodedListName);
 
@@ -1666,7 +1717,7 @@ public class ListTest extends BaseWebDriverTest
 
         // insert a new row and verify the key field is not present
         table.clickInsertNewRow();
-        checker().withScreenshot().verifyEquals("List fields on insert form.", List.of("quf_Name"), getQueryFormFieldNames());
+        checker().withScreenshot().verifyEquals("List fields on insert form.", List.of("Name"), getQueryFormFieldNamesDecoded());
         String nameValue = "test";
         setFormElement(Locator.name(EscapeUtil.getFormFieldName("Name")), nameValue);
         clickButton("Submit");
@@ -1678,7 +1729,7 @@ public class ListTest extends BaseWebDriverTest
 
         // verify name value can be updated
         table.clickEditRow(0);
-        checker().withScreenshot().verifyEquals("List fields on update form.", List.of("quf_Name", encodedKeyFieldName), getQueryFormFieldNames());
+        checker().withScreenshot().verifyEquals("List fields on update form.", List.of("Name", keyName), getQueryFormFieldNamesDecoded());
         nameValue = "test updated";
         setFormElement(Locator.name(EscapeUtil.getFormFieldName("Name")), nameValue);
         clickButton("Submit");
@@ -1692,48 +1743,145 @@ public class ListTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testMultiChoiceValues()
+    public void testMultiChoiceValues() throws IOException, CommandException
     {
-        OptionalFeatureHelper.enableOptionalFeature(getCurrentTest().createDefaultConnection(), "multiChoiceDataType");
         Assume.assumeTrue("Multi-choice text fields are only supported on PostgreSQL", WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.PostgreSQL);
-        // setup a list with an auto-increment key and multi text choice field
+        // Setup a list with an auto-increment key and a multi-value text choice field.
         String encodedListName = TestDataGenerator.randomDomainName("multiChoiceList", DomainUtils.DomainKind.IntList);
         String keyName = TestDataGenerator.randomFieldName("'><script>alert(\":(\")</script>'");
         String columnName = TestDataGenerator.randomFieldName("MultiChoiceField");
-        List<String> tcValues = List.of("~`!@#$%^&*()_+=[]{}\\|';:\"<>?,./", "1", "2");
+        String plainValue  = "1";      // no special characters
+        String quotedValue1 = "\"2\""; // literal string: "2" (contains double-quote chars)
+        String quotedValue2 = "\"3\""; // literal string: "3"
+        List<String> tcValues = List.of("~`!@#$%^&*()_+=[]{}\\|';:\"<>?,./", plainValue, quotedValue1, quotedValue2);
         _listHelper.createList(PROJECT_VERIFY, encodedListName, keyName, col(columnName, ColumnType.MultiValueTextChoice)
                 .setMultiChoiceValues(tcValues));
         _listHelper.goToList(encodedListName);
 
-        DataRegionTable table = new DataRegionTable("query", getDriver());
-        UpdateQueryRowPage insertNewRow = table.clickInsertNewRow();
-        List<String> valuesToChoose = tcValues.subList(1, 3);
-        insertNewRow.setField(columnName, valuesToChoose);
-        insertNewRow.submit();
-        String expectedList = valuesToChoose.stream()
-                .sorted()
-                .collect(Collectors.joining(" "));
-        checker().withScreenshot().verifyEquals("Multi choice value not as expected", expectedList, table.getDataAsText(0, columnName));
+        // Capture baseline after list creation so the "list created" event is not counted below.
+        int baselineRowId = _auditLogHelper.getLatestAuditRowId(AuditLogHelper.AuditEvent.LIST_AUDIT_EVENT.getName());
 
+        DataRegionTable table = new DataRegionTable("query", getDriver());
+
+        // --- Insert row 1: single non-quoted value ---
+        UpdateQueryRowPage insertNewRow = table.clickInsertNewRow();
+        insertNewRow.setField(columnName, List.of(plainValue));
+        insertNewRow.submit();
+        checker().withScreenshot().verifyEquals("Row 1: display not as expected", plainValue, table.getDataAsText(0, columnName));
+
+        // --- Insert row 2: single quoted value ---
+        insertNewRow = table.clickInsertNewRow();
+        insertNewRow.setField(columnName, List.of(quotedValue1));
+        insertNewRow.submit();
+        // The cell displays the literal string including the double-quote characters.
+        checker().withScreenshot().verifyEquals("Row 2: display not as expected", quotedValue1, table.getDataAsText(1, columnName));
+
+        // --- Insert row 3: mixed (plain + quoted) ---
+        insertNewRow = table.clickInsertNewRow();
+        insertNewRow.setField(columnName, List.of(plainValue, quotedValue1));
+        insertNewRow.submit();
+        // MultiChoice.Array sorts case-insensitively; '"' (ASCII 34) < '1' (ASCII 49), so "2" sorts before 1.
+        String mixedDisplay = quotedValue1 + " " + plainValue;
+        checker().withScreenshot().verifyEquals("Row 3: display not as expected", mixedDisplay, table.getDataAsText(2, columnName));
+
+        // --- Update row 0: change from plain "1" to quoted "3" ---
         UpdateQueryRowPage editRow = table.clickEditRow(0);
-        valuesToChoose = tcValues.subList(1, 3);
-        editRow.setField(columnName, valuesToChoose);
+        editRow.setField(columnName, List.of(quotedValue2));
         editRow.submit();
-        expectedList = valuesToChoose.stream()
-                .sorted()
-                .collect(Collectors.joining(" "));
-        // verify the multi choice value is persisted
-        checker().withScreenshot().verifyEquals("Multi choice value not as expected", expectedList, table.getDataAsText(0, columnName));
+        checker().withScreenshot().verifyEquals("Row 0 after update: display not as expected",
+                quotedValue2, table.getDataAsText(0, columnName));
+
+        // --- Update row 1: change from quoted value to blank ---
+        editRow = table.clickEditRow(1);
+        editRow.setField(columnName, List.of());
+        editRow.submit();
+        checker().withScreenshot().verifyEquals("Row 1 after clearing: display not as expected",
+                "", table.getDataAsText(1, columnName));
+
+        // GitHub Issue 1073: multi-choice values containing quotes were stored as raw
+        // PostgreSQL array syntax (e.g. {"2"}) instead of the proper export-encoded format (e.g. """2""").
+        List<Map<String, Object>> auditEvents = getListAuditEventsSince(encodedListName, baselineRowId);
+        assertEquals("Expected 5 audit events (3 inserts + 2 updates)", 5, auditEvents.size());
+
+        Set<String> foundInsertAuditValues = new HashSet<>();
+        // Track each update as a [oldValue, newValue] pair; order across updates is not guaranteed.
+        List<String[]> updateAuditPairs = new ArrayList<>();
+
+        for (Map<String, Object> event : auditEvents)
+        {
+            String comment    = (String) event.get("Comment");
+            String newMapRaw  = (String) event.get("NewRecordMap");
+            String oldMapRaw  = (String) event.get("OldRecordMap");
+
+            if ("A new list record was inserted".equals(comment) && newMapRaw != null)
+            {
+                foundInsertAuditValues.add(AuditLogHelper.decodeValues(newMapRaw).get(columnName));
+            }
+            else if ("An existing list record was modified".equals(comment))
+            {
+                String oldVal = oldMapRaw != null ? AuditLogHelper.decodeValues(oldMapRaw).get(columnName) : null;
+                String newVal = newMapRaw != null ? AuditLogHelper.decodeValues(newMapRaw).get(columnName) : null;
+                updateAuditPairs.add(new String[]{oldVal, newVal});
+            }
+        }
+
+        // Insert row 1: "1" needs no escaping.
+        checker().verifyTrue("Insert row 1: plain value not in audit",
+                foundInsertAuditValues.contains(_auditLogHelper.joinMultiChoiceForAudit(plainValue)));
+        // Insert row 2: "2" contains double-quotes, escaped as: """2""".
+        checker().verifyTrue("Insert row 2: quoted value not in audit",
+                foundInsertAuditValues.contains(_auditLogHelper.joinMultiChoiceForAudit(quotedValue1)));
+        // Insert row 3: "2" sorts before 1: """2""", 1.
+        checker().verifyTrue("Insert row 3: mixed values not in audit",
+                foundInsertAuditValues.contains(_auditLogHelper.joinMultiChoiceForAudit(quotedValue1, plainValue)));
+
+        assertEquals("Expected 2 update audit events", 2, updateAuditPairs.size());
+
+        // Update row 0: old = "1", new = """3""".
+        String expectedUpdate0Old = _auditLogHelper.joinMultiChoiceForAudit(plainValue);
+        String expectedUpdate0New = _auditLogHelper.joinMultiChoiceForAudit(quotedValue2);
+        checker().verifyTrue("Update row 0: audit pair not found",
+                updateAuditPairs.stream().anyMatch(p -> expectedUpdate0Old.equals(p[0]) && expectedUpdate0New.equals(p[1])));
+
+        // Update row 1: old = """2""", new = null (clearing all selections removes the field from the audit record).
+        String expectedUpdate1Old = _auditLogHelper.joinMultiChoiceForAudit(quotedValue1);
+        checker().verifyTrue("Update row 1 (remove value): audit pair not found",
+                updateAuditPairs.stream().anyMatch(p -> expectedUpdate1Old.equals(p[0]) && p[1] == null));
 
         _listHelper.deleteList();
     }
 
-    private List<String> getQueryFormFieldNames()
+    private List<Map<String, Object>> getListAuditEventsSince(String listName, int previousRowId)
+            throws IOException, CommandException
     {
-        return Locator.tag("input").attributeStartsWith("name", "quf_")
-            .findElements(getDriver()).stream()
-            .map(el -> el.getDomAttribute("name"))
-            .toList();
+        List<Filter> filters = List.of(
+                new Filter("ListName", listName, Filter.Operator.EQUAL),
+                new Filter("RowId", previousRowId, Filter.Operator.GT)
+        );
+
+        return _auditLogHelper.getAuditLogsFromLKS(getProjectName(),
+                AuditLogHelper.AuditEvent.LIST_AUDIT_EVENT,
+                List.of("RowId", "Comment", "OldRecordMap", "NewRecordMap"),
+                filters,
+                null,
+                ContainerFilter.CurrentAndSubfolders
+        ).getRows();
+    }
+
+ private List<String> getQueryFormFieldNamesDecoded()
+    {
+        ArrayList<String> ret = new ArrayList<>();
+        Locator.tag("input").attributeStartsWith("name", "quf_")
+                .findElements(getDriver()).stream()
+                .map(el -> el.getDomAttribute("name"))
+                .map(s -> s.substring(4))
+                .forEach(name -> ret.add(name));
+        Locator.tag("input").attributeStartsWith("name", "%_quf_")
+                .findElements(getDriver()).stream()
+                .map(el -> el.getDomAttribute("name"))
+                .map(name -> EscapeUtil.decode(name.substring(6)))
+                .forEach(name -> ret.add(name));
+        return ret;
     }
 
     private void viewRawTableMetadata(String listName)
@@ -1962,7 +2110,7 @@ public class ListTest extends BaseWebDriverTest
 
         assertNoLabKeyErrors();
 
-        expectedValues.remove(0);
+        expectedValues.removeFirst();
 
         validateDataRegionTableForTricky(expectedValues);
 
@@ -2064,7 +2212,7 @@ public class ListTest extends BaseWebDriverTest
     );
 
     List<FieldDefinition> BatchListMergeColumns = Arrays.asList(
-            BatchListColumns.get(0),
+            BatchListColumns.getFirst(),
             BatchListColumns.get(1),
             BatchListColumns.get(3)
     );
@@ -2128,7 +2276,7 @@ public class ListTest extends BaseWebDriverTest
     void createList(String name, List<FieldDefinition> cols, String tsvData)
     {
         log("Add List -- " + name);
-        _listHelper.createList(PROJECT_VERIFY, name, cols.get(0), cols.subList(1, cols.size()).toArray(new FieldDefinition[cols.size() - 1]));
+        _listHelper.createList(PROJECT_VERIFY, name, cols.getFirst(), cols.subList(1, cols.size()).toArray(new FieldDefinition[cols.size() - 1]));
         _listHelper.goToList(name);
         _listHelper.clickImportData();
         setListImportAsTestDataField(tsvData);
@@ -2232,8 +2380,8 @@ public class ListTest extends BaseWebDriverTest
         goToProjectHome();
         goToManageLists().getGrid().viewListData(listName);
 
-        clickAndWait(Locator.linkWithText(pks.get(0)));
-        assertElementPresent(Locator.tagContainingText("td", pks.get(0)));
+        clickAndWait(Locator.linkWithText(pks.getFirst()));
+        assertElementPresent(Locator.tagContainingText("td", pks.getFirst()));
     }
 
     @Test // Issue 53979

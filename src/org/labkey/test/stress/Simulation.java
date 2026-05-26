@@ -274,7 +274,7 @@ public class Simulation<T>
 
         public Definition(Server server)
         {
-            this(server.getHost(), server.getLogins().get(0));
+            this(server.getHost(), server.getLogins().getFirst());
         }
 
         public Definition setMaxActivityThreads(int maxActivityThreads)

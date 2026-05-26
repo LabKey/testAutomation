@@ -638,7 +638,7 @@ public class Ext4Helper
         if (null == cmpRefs || cmpRefs.isEmpty())
             return null;
 
-        return cmpRefs.get(0);
+        return cmpRefs.getFirst();
     }
 
     public <Type extends Ext4CmpRef> List<Type> componentsFromIds(List<String> ids, Class<Type> clazz)

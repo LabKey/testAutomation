@@ -63,6 +63,7 @@ import org.labkey.test.util.TestLogger;
 import org.labkey.test.util.TextSearcher;
 import org.labkey.test.util.TextSearcher.TextTransformers;
 import org.labkey.test.util.Timer;
+import org.labkey.test.util.selenium.JavascriptExecutorWrapper;
 import org.labkey.test.util.selenium.ScrollUtils;
 import org.labkey.test.util.selenium.WebDriverUtils;
 import org.openqa.selenium.Alert;
@@ -539,11 +540,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
      */
     public <T> T executeScript(@Language("JavaScript") String script, Class<T> expectedResultType, Object... arguments)
     {
-        Object o = executeScript(script, arguments);
-        if (o != null && !expectedResultType.isAssignableFrom(o.getClass()))
-            Assert.fail("Script return wrong type. Expected '" + expectedResultType.getSimpleName() + "'. Got: " + o.getClass().getName() + ". Result: " + o);
-
-        return (T) o;
+        return new JavascriptExecutorWrapper(getDriver()).executeScript(script, expectedResultType, arguments);
     }
 
     /**
@@ -552,20 +549,12 @@ public abstract class WebDriverWrapper implements WrapsDriver
      */
     public Object executeAsyncScript(@Language("JavaScript") String script, Object... arguments)
     {
-        script = "var callback = arguments[arguments.length - 1];\n" + // See WebDriver documentation for details on injected callback
-                "try {" +
-                script +
-                "} catch (error) { callback(error); }"; // ensure that the callback is invoked when an exception would otherwise prevent it
-        return ((JavascriptExecutor) getDriver()).executeAsyncScript(script, arguments);
+        return new JavascriptExecutorWrapper(getDriver()).executeAsyncScript(script, arguments);
     }
 
     public <T> T executeAsyncScript(@Language("JavaScript") String script, Class<T> expectedResultType, Object... arguments)
     {
-        Object o = executeAsyncScript(script, arguments);
-        if (o != null && !expectedResultType.isAssignableFrom(o.getClass()))
-            Assert.fail("Script return wrong type. Expected '" + expectedResultType.getSimpleName() + "'. Got: " + o.getClass().getName() + ". Result: " + o);
-
-        return (T) o;
+        return new JavascriptExecutorWrapper(getDriver()).executeAsyncScript(script, expectedResultType, arguments);
     }
 
     @LogMethod(quiet = true)
@@ -1074,7 +1063,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         }
         if (windows.size() > 1)
         {
-            getDriver().switchTo().window(windows.get(0));
+            getDriver().switchTo().window(windows.getFirst());
         }
     }
 
@@ -1178,6 +1167,12 @@ public abstract class WebDriverWrapper implements WrapsDriver
     public Connection createDefaultConnection(boolean reuseSession)
     {
         return createDefaultConnection();
+    }
+
+    // Exempt the provided URL from controller-first URL warnings and exceptions
+    public void allowControllerFirstUrl(String url)
+    {
+        _controllerFirstUrls.add(url);
     }
 
     public long beginAt(String url)
@@ -2119,7 +2114,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
             getPageLoadListeners().forEach((listener) -> {
                 if (null != listener)
                 {
-                    TestLogger.log().trace("beforePageLoad - " + listener.getClass().getSimpleName());
+                    TestLogger.log().trace("beforePageLoad - {}", listener.getClass().getSimpleName());
                     listener.beforePageLoad();
                 }
             });
@@ -2136,7 +2131,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
             getPageLoadListeners().forEach((listener) -> {
                 if (null != listener)
                 {
-                    TestLogger.log().trace("afterPageLoad - " + listener.getClass().getSimpleName());
+                    TestLogger.log().trace("afterPageLoad - {}", listener.getClass().getSimpleName());
                     listener.afterPageLoad();
                 }
             });
@@ -3067,21 +3062,13 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public void dragAndDrop(WebElement fromEl, WebElement toEl, Position pos)
     {
-        int y;
-        switch (pos)
+        int y = switch (pos)
         {
-            case top:
-                y = 1;
-                break;
-            case bottom:
-                y = toEl.getSize().getHeight() - 1;
-                break;
-            case middle:
-                y = toEl.getSize().getHeight() / 2;
-                break;
-            default:
-                throw new IllegalArgumentException("Unexpected position: " + pos);
-        }
+            case top -> 1;
+            case bottom -> toEl.getSize().getHeight() - 1;
+            case middle -> toEl.getSize().getHeight() / 2;
+            default -> throw new IllegalArgumentException("Unexpected position: " + pos);
+        };
 
         Actions builder = new Actions(getDriver());
         builder.clickAndHold(fromEl).moveToElement(toEl, toEl.getSize().getWidth() / 2, y).release().build().perform();
@@ -3271,8 +3258,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
                 Locator.extButton(text),
                 // normal HTML button:
                 Locator.button(text),
-                // GWT button:
-                Locator.gwtButton(text),
                 // bootstrap button
                 BootstrapLocators.button(text)
         );
@@ -3530,8 +3515,8 @@ public abstract class WebDriverWrapper implements WrapsDriver
         try
         {
             String elementClass = input.getAttribute("class");
-            if (elementClass.contains("gwt-TextBox") || elementClass.contains("gwt-TextArea") || elementClass.contains("x-form-text"))
-                fireEvent(input, SeleniumEvent.blur); // Make GWT and ExtJS form elements behave better
+            if (elementClass.contains("x-form-text"))
+                fireEvent(input, SeleniumEvent.blur); // Make ExtJS form elements behave better
         }
         catch(StaleElementReferenceException stale)
         {
@@ -4074,7 +4059,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         }
 
         if (matches.size() == 1)
-            select.selectByVisibleText(matches.get(0));
+            select.selectByVisibleText(matches.getFirst());
         else if (matches.isEmpty())
             select.selectByVisibleText(value);
         else

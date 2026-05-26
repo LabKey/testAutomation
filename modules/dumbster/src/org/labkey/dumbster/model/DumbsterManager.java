@@ -23,6 +23,7 @@ import org.labkey.api.settings.AppProps;
 import org.labkey.api.util.ContextListener;
 import org.labkey.api.util.MailHelper;
 import org.labkey.api.util.ShutdownListener;
+import org.labkey.api.util.SmtpTransportProvider;
 import org.labkey.api.util.StringUtilsLabKey;
 
 import jakarta.mail.MessagingException;
@@ -60,6 +61,12 @@ public class DumbsterManager implements ShutdownListener
 
     public boolean start()
     {
+        if (!(MailHelper.getActiveProvider() instanceof SmtpTransportProvider))
+        {
+            _log.error("Mail recorder cannot be started: active mail provider is not SmtpTransportProvider");
+            return false;
+        }
+
         if (_server != null && !_server.isStopped())
         {
             // We're already running, no need to spin up another, but reset the list of messages
@@ -95,14 +102,14 @@ public class DumbsterManager implements ShutdownListener
         props.setProperty("mail.smtp.port", Integer.toString(port));
         Session session = Session.getInstance(props);
 
-        _log.info("Switching MailHelper to use port " + port);
-        MailHelper.setSession(session);
+        _log.info("Switching MailHelper to use port {}", port);
+        MailHelper.setSmtpSession(session);
 
-        _log.info("Connecting mail recorder to port " + port);
+        _log.info("Connecting mail recorder to port {}", port);
         _server = SimpleSmtpServer.start(port);
         if (_server.isStopped())
         {
-            _log.error("Failed to connect mail recorder. Port " + port + " may be in use.");
+            _log.error("Failed to connect mail recorder. Port {} may be in use.", port);
             _server = null;
             return false;
         }
@@ -116,8 +123,8 @@ public class DumbsterManager implements ShutdownListener
         // viewing until the next call to start() overwrites.
         if (_server != null)
         {
-            _log.info("Reverting MailHelper to " + AppProps.getInstance().getWebappConfigurationFilename() + " configuration");
-            MailHelper.setSession(null);
+            _log.info("Reverting MailHelper to {} configuration", AppProps.getInstance().getWebappConfigurationFilename());
+            MailHelper.setSmtpSession(null);
 
             _server.stop();
             ContextListener.removeShutdownListener(this);
@@ -129,11 +136,6 @@ public class DumbsterManager implements ShutdownListener
     public String getName()
     {
         return "Dumbster manager";
-    }
-
-    @Override
-    public void shutdownPre()
-    {
     }
 
     @Override
@@ -158,10 +160,10 @@ public class DumbsterManager implements ShutdownListener
         // Dumbster returns iterator on list which requires synchronization.
         synchronized (_server)
         {
-            Iterator it = _server.getReceivedEmail();
+            Iterator<SmtpMessage> it = _server.getReceivedEmail();
             while (it.hasNext())
             {
-                messageList.add((SmtpMessage) it.next());
+                messageList.add(it.next());
             }
         }
 

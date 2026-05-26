@@ -18,6 +18,10 @@
                 </column>
             </columns>
         </ns:table>
+        <ns:reservedColumnNames>
+            <ns:column>reservedOne</ns:column>
+            <ns:column>ReservedTwo</ns:column>
+        </ns:reservedColumnNames>
         <ns:indices>
             <ns:index type='unique'>
                 <ns:column>aa</ns:column>

@@ -30,13 +30,16 @@ import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.PlateGrid;
 import org.labkey.test.components.assay.AssayConstants;
+import org.labkey.test.components.domain.AdvancedFieldSetting;
 import org.labkey.test.components.labkey.LabKeyAlert;
+import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.pages.admin.PermissionsPage;
 import org.labkey.test.pages.assay.RunQCPage;
 import org.labkey.test.pages.assay.plate.PlateDesignerPage;
 import org.labkey.test.pages.assay.plate.PlateTemplateListPage;
 import org.labkey.test.pages.query.NewQueryPage;
 import org.labkey.test.pages.query.SourceQueryPage;
+import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.tests.AbstractAssayTest;
 import org.labkey.test.util.AssayImportOptions;
 import org.labkey.test.util.AssayImporter;
@@ -207,34 +210,27 @@ public class NabAssayTest extends AbstractAssayTest
                 .setAssayType("NAb")
                 .setTemplateType("single-plate")));
 
-        setFormElement(Locator.inputById("templateName"), PLATE_TEMPLATE_NAME);
+        PlateDesignerPage designerPage = new PlateDesignerPage(getDriver());
+        designerPage.setName(PLATE_TEMPLATE_NAME);
+        designerPage.selectTypeTab("SPECIMEN");
 
-        // select the specimen wellgroup tab
-        click(Locator.tagWithText("div", "SPECIMEN"));
+        designerPage.selectGroup("Specimen 1");
+        designerPage.setWellGroupProperty("ReverseDilutionDirection", "true");
 
-        // select the first specimen group
-        click(Locator.tagWithText("label", "Specimen 1"));
-        // set reversed dilution direction to true:
-        setFormElement(Locator.inputById("property-ReverseDilutionDirection"), "true");
+        designerPage.selectGroup("Specimen 2");
+        designerPage.setWellGroupProperty("ReverseDilutionDirection", "false");
 
-        // select the second specimen group
-        click(Locator.tagWithText("label", "Specimen 2"));
-        // set reversed dilution direction to false:
-        setFormElement(Locator.inputById("property-ReverseDilutionDirection"), "false");
-
-        // select the third specimen group
-        click(Locator.tagWithText("label", "Specimen 3"));
+        designerPage.selectGroup("Specimen 3");
         // set reversed dilution direction to a nonsense value:
-        setFormElement(Locator.inputById("property-ReverseDilutionDirection"), "invalid boolean value");
+        designerPage.setWellGroupProperty("ReverseDilutionDirection", "invalid boolean value");
 
         // note that we're intentionally leaving the fourth and fifth direction specifiers null, which should default to 'false'
-        clickButton("Save & Close");
+        designerPage.saveAndClose();
 
         assertTextPresent(PLATE_TEMPLATE_NAME, "NAb: 5 specimens in duplicate");
 
         clickProject(TEST_ASSAY_PRJ_NAB);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
-
         _assayHelper.clickEditAssayDesign()
                 .setPlateTemplate(PLATE_TEMPLATE_NAME)
                 .clickFinish();
@@ -253,9 +249,17 @@ public class NabAssayTest extends AbstractAssayTest
         assertTextPresent(PLATE_TEMPLATE_NAME);
         assertTextNotPresent("NAb: 5 specimens in duplicate");
 
+        log("GitHub Issue #1061: set ParticipantVisitResolver field as fixed value for default value setting");
+        clickProject(TEST_ASSAY_PRJ_NAB);
+        clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
+        ReactAssayDesignerPage assayDesignerPage = _assayHelper.clickEditAssayDesign();
+        assayDesignerPage.goToBatchFields()
+                .getField(AssayConstants.PARTICIPANT_VISIT_RESOLVER_FIELD_NAME)
+                .setAdvancedSettings(List.of(AdvancedFieldSetting.defaultType(FieldDefinition.DefaultType.FIXED_NON_EDITABLE)));
+        assayDesignerPage.clickFinish();
+
         navigateToFolder(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_NAB);
         portalHelper.addWebPart("Assay List");
-
         clickAndWait(Locator.linkWithText("Assay List"));
         clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
 
@@ -275,6 +279,18 @@ public class NabAssayTest extends AbstractAssayTest
                         methods(new String[]{"Dilution", "Dilution", "Dilution", "Dilution", "Dilution"}).
                         runFile(TEST_ASSAY_NAB_FILE1).
                         build()).doImport();
+
+        log("GitHub Issue #1061: revert ParticipantVisitResolver field default value setting");
+        clickProject(TEST_ASSAY_PRJ_NAB);
+        clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
+        assayDesignerPage = _assayHelper.clickEditAssayDesign();
+        assayDesignerPage.goToBatchFields()
+                .getField(AssayConstants.PARTICIPANT_VISIT_RESOLVER_FIELD_NAME)
+                .setAdvancedSettings(List.of(AdvancedFieldSetting.defaultType(FieldDefinition.DefaultType.LAST_ENTERED)));
+        assayDesignerPage.clickFinish();
+        navigateToFolder(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_NAB);
+        clickAndWait(Locator.linkWithText("Assay List"));
+        clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
 
         // verify that we catch an invalid date prior to upload
         new AssayImporter(this, new AssayImportOptions.ImportOptionsBuilder().

@@ -37,12 +37,17 @@ public class SubNavBar extends WebDriverComponent<SubNavBar.ElementCache>
 
     public boolean hasTab(String tabText)
     {
-        return getWrapper().isElementPresent(elementCache().getTabLocator(tabText));
+        return getWrapper().isElementPresent(elementCache().getTabLocator(tabText, false));
     }
 
     public void clickTab(String tabText)
     {
-        elementCache().getTab(tabText).click();
+        clickTab(tabText, false);
+    }
+
+    public void clickTab(String tabText, boolean startsWithText)
+    {
+        elementCache().getTab(tabText, startsWithText).click();
     }
 
     public String getActiveTab()
@@ -101,15 +106,17 @@ public class SubNavBar extends WebDriverComponent<SubNavBar.ElementCache>
         WebElement tabScrollContainer = Locator.tagWithClass("div", "tab-scroll-ct").findWhenNeeded(this);
         WebElement activeTab = Locator.css("ul.navbar-nav > li.active").findWhenNeeded(this);
 
-        Locator.XPathLocator getTabLocator(String text)
+        Locator.XPathLocator getTabLocator(String text, boolean startsWithText)
         {
-            return Locator.tagWithClass("ul", "nav navbar-nav")
-                    .child(Locator.tag("li")).withText(text);
+            Locator.XPathLocator loc = Locator.tagWithClass("ul", "nav navbar-nav").child(Locator.tag("li"));
+            if (startsWithText)
+                return loc.startsWith(text);
+            return loc.withText(text);
         }
 
-        WebElement getTab(String text)
+        WebElement getTab(String text, boolean startsWithText)
         {
-            return getTabLocator(text).findElement(this);
+            return getTabLocator(text, startsWithText).findElement(this);
         }
 
     }

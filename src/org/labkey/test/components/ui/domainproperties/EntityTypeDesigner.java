@@ -406,7 +406,7 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
     public String getParentAliasSelectText(int index)
     {
         expandPropertiesPanel();
-        return elementCache().parentAliasSelect(index).getSelections().get(0);
+        return elementCache().parentAliasSelect(index).getSelections().getFirst();
     }
 
     protected class ElementCache extends DomainDesigner<?>.ElementCache
@@ -436,7 +436,7 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
 
         public final WebElement helpTarget(String divLabelText)
         {
-            return Locator.xpath(String.format("//div[text()='%s']//span[@class='label-help-target']", divLabelText)).findWhenNeeded(this);
+            return Locator.xpath(String.format("//span[text()='%s']//div[@class='overlay-trigger']", divLabelText)).findWhenNeeded(this);
         }
 
         // Tool tips exist on the page, outside the scope of the domainDesigner, so scope the search accordingly.

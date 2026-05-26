@@ -1,6 +1,7 @@
 package org.labkey.test.components.domain;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
@@ -288,7 +289,7 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
         elementCache().addFieldButton.click();
 
         List<DomainFieldRow> fieldRows = elementCache().findFieldRows();
-        DomainFieldRow newFieldRow = fieldRows.get(fieldRows.size() - 1);
+        DomainFieldRow newFieldRow = fieldRows.getLast();
         newFieldRow.setName(name);
         return newFieldRow;
     }
@@ -309,7 +310,7 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
     {
         clickManuallyDefineFields();
 
-        DomainFieldRow newFieldRow = elementCache().findFieldRows().get(0);
+        DomainFieldRow newFieldRow = elementCache().findFieldRows().getFirst();
         newFieldRow.setName(name);
         return newFieldRow;
     }
@@ -634,8 +635,6 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
         public final Checkbox selectAll = new Checkbox(Locator.tagWithAttributeContaining("input", "id", "domain-select-all-checkbox")
                 .findWhenNeeded(this));
 
-        public final WebElement toggleButton = Locator.tagWithAttributeContaining("div", "id", "domain-toggle-summary").
-                findWhenNeeded(this);
         public final ToggleButton customFieldsViewToggle = new ToggleButton.ToggleButtonFinder(getDriver())
                 .withState("Detail").timeout(5000).findWhenNeeded(this);
 
@@ -644,7 +643,7 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
             final WebElement el = Locator.css(".domain-form-add-btn .btn").findWhenNeeded(DomainFormPanel.this);
 
             @Override
-            public WebElement getWrappedElement()
+            public @NotNull WebElement getWrappedElement()
             {
                 return el;
             }
@@ -716,7 +715,7 @@ public class DomainFormPanel extends DomainPanel<DomainFormPanel.ElementCache, D
             final WebElement el = Locator.css(".domain-form-manual-btn").findWhenNeeded(DomainFormPanel.this);
 
             @Override
-            public WebElement getWrappedElement()
+            public @NotNull WebElement getWrappedElement()
             {
                 return el;
             }

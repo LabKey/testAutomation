@@ -102,7 +102,7 @@ public class OverviewPage extends LabKeyPage<OverviewPage.Elements>
 
         for (Map.Entry<String, List<CountPair>> entry : datasetCounts.entrySet())
         {
-            datasetParticipantCounts.put(entry.getKey(), entry.getValue().get(0).getParticipantCount());
+            datasetParticipantCounts.put(entry.getKey(), entry.getValue().getFirst().getParticipantCount());
         }
 
         return datasetParticipantCounts;
@@ -118,7 +118,7 @@ public class OverviewPage extends LabKeyPage<OverviewPage.Elements>
 
         for (Map.Entry<String, List<CountPair>> entry : datasetCounts.entrySet())
         {
-            datasetParticipantCounts.put(entry.getKey(), entry.getValue().get(0).getRowCount());
+            datasetParticipantCounts.put(entry.getKey(), entry.getValue().getFirst().getRowCount());
         }
 
         return datasetParticipantCounts;
@@ -138,7 +138,7 @@ public class OverviewPage extends LabKeyPage<OverviewPage.Elements>
         for (WebElement row : overviewRows)
         {
             List<WebElement> cells = Locator.css("td").findElements(row);
-            String dataset = cells.get(0).getText();
+            String dataset = cells.getFirst().getText();
             dataset = dataset.substring(0, dataset.length() - 1); // Strip help link '?'
             if (leftVisitIndex == null) leftVisitIndex = 0;
             if (endVisitIndex == null) endVisitIndex = cells.size() - 2;
@@ -177,7 +177,7 @@ public class OverviewPage extends LabKeyPage<OverviewPage.Elements>
 
     public List<String> getVisits()
     {
-        WebElement headerRow = elementCache().studyOverviewRows.get().get(0);
+        WebElement headerRow = elementCache().studyOverviewRows.get().getFirst();
         List<WebElement> visitCells = Locator.css("td").findElements(headerRow);
         visitCells = visitCells.subList(1, visitCells.size() - 1);
 

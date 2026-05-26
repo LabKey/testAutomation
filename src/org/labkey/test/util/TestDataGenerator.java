@@ -52,20 +52,22 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static org.labkey.test.BaseWebDriverTest.ALL_ILLEGAL_QUERY_KEY_CHARACTERS;
 import static org.labkey.test.util.data.TestDataUtils.REALISTIC_ASSAY_FIELDS;
@@ -175,13 +177,23 @@ public class TestDataGenerator
                     else if (fieldDefinition.getType().equals(FieldDefinition.ColumnType.TextChoice))
                     {
                         FieldDefinition.TextChoiceValidator validator =
-                                (FieldDefinition.TextChoiceValidator) fieldDefinition.getValidators().get(0);
+                                (FieldDefinition.TextChoiceValidator) fieldDefinition.getValidators().getFirst();
                         List<String> textChoices = validator.getValues();
                         int textChoiceIndex = i % textChoices.size();
                         if (forGridInsert)
                             entityData.put(key, List.of(textChoices.get(textChoiceIndex)));
                         else
                             entityData.put(key, textChoices.get(textChoiceIndex));
+                    }
+                    else if (fieldDefinition.getType().equals(FieldDefinition.ColumnType.MultiValueTextChoice))
+                    {
+                        FieldDefinition.TextChoiceValidator validator =
+                                (FieldDefinition.TextChoiceValidator) fieldDefinition.getValidators().getFirst();
+                        // Use i + 1 as a bitmask so each row gets a deterministic, non-empty subset of choices,
+                        // consistent with how other field types (Integer, Boolean, TextChoice) use i for predictable data.
+                        // Salt with queryName hash so different entity types produce distinct MVTC values at the same row index.
+                        List<String> values = bitmaskSelect(validator.getValues(), i + 1, queryName.hashCode());
+                        entityData.put(key, values);
                     }
                 }
             }
@@ -491,37 +503,98 @@ public class TestDataGenerator
         return randomString(size, null);
     }
 
+    public static List<String> randomTextChoice(int size, @Nullable String exclusion)
+    {
+        Set<String> textChoices = new LinkedHashSet<>();
+        int attempts = 0;
+        final int maxTries = Math.max(MAX_RANDOM_TRIES, size * 2);
+        while (textChoices.size() < size)
+        {
+            if (++attempts >= maxTries)
+            {
+                throw new IllegalStateException("Failed to generate " + size + " unique text choices after " + maxTries + " attempts");
+            }
+            String generated = randomString(randomInt(1, 25), exclusion).trim();
+            if (!generated.isEmpty())
+            {
+                textChoices.add(generated);
+            }
+        }
+        return List.copyOf(textChoices);
+    }
+
+    public static List<String> randomTextChoice(int size)
+    {
+      return randomTextChoice(size, null);
+    }
+
     public static String randomString(int size, @Nullable String exclusion)
     {
         return randomString(size, exclusion, CHARSET_STRING);
     }
+
+    /** After this many consecutive non-space characters, {@link #randomString} forces the next char to ' '
+     * (provided ' ' is in the effective charset). */
+    private static final int FORCE_SPACE_AFTER = 15;
 
     public static String randomString(int size, @Nullable String exclusion, @Nullable String charSet)
     {
         String charSetFrom = StringUtils.isEmpty(charSet) ? CHARSET_STRING : charSet;
         if (!StringUtils.isEmpty(exclusion))
             charSetFrom = charSetFrom.replaceAll("[" + Pattern.quote(exclusion) + "]", "");
+        boolean spacesAllowed = charSetFrom.indexOf(' ') >= 0;
 
         StringBuilder val = new StringBuilder();
-        for (int i=0; i<size; i++)
+        int nonSpaceRun = 0;
+        for (int i = 0; i < size; i++)
         {
-            int randIndex = (int)(charSetFrom.length() * Math.random());
-            char c = charSetFrom.charAt(randIndex);
+            boolean isLast = (i == size - 1);
+            char prev = val.length() == 0 ? '\0' : val.charAt(val.length() - 1);
+
+            // Force a space once we've accumulated enough non-space chars (but never as the last char).
+            if (spacesAllowed && nonSpaceRun >= FORCE_SPACE_AFTER && !isLast)
+            {
+                val.append(' ');
+                nonSpaceRun = 0;
+                continue;
+            }
+
+            // Random pick. Filter to keep invariants: no leading/trailing space, no double space, no " -" pattern.
+            String picks = charSetFrom;
+            if (val.length() == 0 || isLast || prev == ' ')
+                picks = picks.replace(" ", "");
+            if (picks.isEmpty())
+                picks = charSetFrom; // pathological charset, fall back
+
+            int randIndex = ThreadLocalRandom.current().nextInt(picks.length());
+            char c = picks.charAt(randIndex);
             if (c == REPEAT_PLACEHOLDER)
             {
-                randIndex = (int)(charSetFrom.length() * Math.random());
-                c = charSetFrom.charAt(randIndex);
-                int repeatCount = randomInt(2, 50); // repeat between 2 and 50 times
+                randIndex = ThreadLocalRandom.current().nextInt(picks.length());
+                c = picks.charAt(randIndex);
+                int repeatCount = (c == ' ') ? 0 : randomInt(2, 5);
                 val.append(StringUtils.repeat(c, repeatCount));
+                nonSpaceRun = (c == ' ') ? 0 : nonSpaceRun + repeatCount;
             }
             else if (c == ALL_CHARS_PLACEHOLDER)
+            {
                 val.append(charSetFrom);
+                int lastSpace = val.lastIndexOf(" ");
+                nonSpaceRun = lastSpace < 0 ? val.length() : val.length() - lastSpace - 1;
+            }
             else if (c == WIDE_PLACEHOLDER)
+            {
                 val.append(WIDE_CHAR);
+                nonSpaceRun++;
+            }
             else
+            {
                 val.append(c);
+                nonSpaceRun = (c == ' ') ? 0 : nonSpaceRun + 1;
+            }
         }
-        return val.toString();
+        // Collapse consecutive spaces into one — defensive net for placeholder branches that may produce them.
+        return val.toString().replaceAll(" {2,}", " ");
     }
 
     public static String randomMultiLineString(int size)
@@ -586,6 +659,8 @@ public class TestDataGenerator
     {
         namePart = namePart == null ? "" : namePart;
         DomainKind _domainKind = domainKind == null ? DomainKind.SampleSet : domainKind;
+        // Spaces stay in the charset — randomString itself injects them every FORCE_SPACE_AFTER non-space chars,
+        // so the total length stays within numStartChars + namePart + numEndChars.
         String charSet = ALPHANUMERIC_STRING + DOMAIN_SPECIAL_STRING;
         int currentTries = 0;
         RandomName randomName = randomName(namePart, getNumChars(numStartChars, 5), getNumChars(numEndChars, 50), charSet, null);
@@ -596,9 +671,7 @@ public class TestDataGenerator
                 throw new IllegalStateException("Failed to generate a valid domain name after " + MAX_RANDOM_TRIES + " tries. Last generated name: " + randomName);
         }
 
-        // Multiple spaces in the UI are collapsed into a single space. If we need to test for handling of multiple spaces, we'll not use this generator
-        String domainName = randomName.name().replaceAll("\\s+", " ");
-
+        String domainName = randomName.name();
         TestLogger.log("Generated random domain name for domainKind " + _domainKind + ": " + domainName);
         return domainName;
     }
@@ -657,7 +730,8 @@ public class TestDataGenerator
         }
 
         TestLogger.log("Generated random field name for domainKind " + _domainKind + ": " + randomFieldName);
-        return randomFieldName.name();
+        // Consistent with randomDomainName: UI collapses multiple whitespace chars to a single space
+        return randomFieldName.name().replaceAll("\\s+", " ");
     }
 
     private static boolean isDomainAndFieldNameInvalid(DomainKind domainKind, @Nullable RandomName domainName, @Nullable RandomName fieldName)
@@ -800,7 +874,15 @@ public class TestDataGenerator
 
     public static boolean randomBoolean()
     {
-        return ThreadLocalRandom.current().nextBoolean();
+        return randomBoolean(null);
+    }
+
+    public static boolean randomBoolean(@Nullable String message)
+    {
+        boolean value = ThreadLocalRandom.current().nextBoolean();
+        if (message != null)
+            TestLogger.log("Generated random boolean value for %s: %s".formatted(message, value));
+        return value;
     }
 
     private @NotNull List<String> getFieldsForFile()
@@ -959,7 +1041,7 @@ public class TestDataGenerator
 
     public static <T> List<T> shuffleSelect(List<T> allFields)
     {
-        int randomSize = new Random().nextInt(allFields.size()) + 1;
+        int randomSize = ThreadLocalRandom.current().nextInt(allFields.size()) + 1;
         return shuffleSelect(allFields, randomSize);
     }
 
@@ -970,12 +1052,29 @@ public class TestDataGenerator
         return shuffled.subList(0, selectCount);
     }
 
+    /**
+     * Selects elements by index using {@code bitmask}: bit N set → include element N. Supports up to 32 elements.
+     * XORs the bitmask with {@code salt} so that callers with the same bitmask (e.g. same row index) produce
+     * different selections.
+     */
+    public static <T> List<T> bitmaskSelect(List<T> allElements, int bitmask, int salt)
+    {
+        int n = allElements.size();
+        int validMask = n < 32 ? (1 << n) - 1 : Integer.MAX_VALUE;
+        int effective = (bitmask ^ salt) & validMask;
+        if (effective == 0)
+            effective = bitmask & validMask;
+        return BitSet.valueOf(new long[]{effective}).stream()
+                .mapToObj(allElements::get)
+                .collect(Collectors.toList());
+    }
+
     public static <T> List<T> randomSelect(List<T> allOptions, int selectCount)
     {
         List<T> selected = new ArrayList<>();
         for (int i = 0; i < selectCount; i++)
         {
-            selected.add(allOptions.get(randomInt(0, allOptions.size())));
+            selected.add(allOptions.get(randomInt(0, allOptions.size() - 1)));
         }
         return selected;
     }

@@ -365,7 +365,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     public QueryGrid shiftSelectRange(int start, int end)
     {
         var checkBoxes = Locator.tagWithClass("input", "grid-panel__row-checkbox").findElements(this);
-        getWrapper().scrollIntoView(checkBoxes.get(0), true); // scroll the top row to the top
+        getWrapper().scrollIntoView(checkBoxes.getFirst(), true); // scroll the top row to the top
         new Actions(getDriver())
                 .click(checkBoxes.get(start))
                 .keyDown(Keys.SHIFT)
@@ -815,13 +815,13 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
             return new FilterStatusValue.FilterStatusValueFinder(getDriver()).findAll(filterStatusPanel);
         }
 
-        final WebElement removeAllFilters = Locator.tagWithClass("a", "remove-all-filters").refindWhenNeeded(this);
+        final WebElement removeAllFilters = Locator.byClass("remove-all-filters").refindWhenNeeded(this);
 
         // The panel header element which will contain the edit status text, the view name and the Save & Undo buttons.
         // If this is the default view this will not be present.
         public WebElement panelHeader()
         {
-            return Locator.xpath("preceding-sibling::div[contains(@class,'panel-heading')]").findWhenNeeded(this);
+            return Locator.xpath("preceding-sibling::*[contains(@class,'panel-heading')]").findWhenNeeded(this);
         }
 
         final BootstrapMenu chartsMenu = new MultiMenu.MultiMenuFinder(getDriver()).withText("Charts").findWhenNeeded(this);

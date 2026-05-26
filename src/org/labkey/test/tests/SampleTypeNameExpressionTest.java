@@ -34,6 +34,7 @@ import org.labkey.test.pages.experiment.UpdateSampleTypePage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldDefinition.ColumnType;
 import org.labkey.test.params.FieldInfo;
+import org.labkey.test.params.experiment.DataClassDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.AuditLogHelper;
 import org.labkey.test.util.DataRegionTable;
@@ -58,12 +59,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
+import java.util.regex.Pattern;
 
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.labkey.test.params.FieldDefinition.DOMAIN_TRICKY_CHARACTERS;
 import static org.labkey.test.util.EscapeUtil.escapeForNameExpression;
 
@@ -514,53 +516,176 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
 
     }
 
+    // Field used in the testInputsExpression test.
+    private static final String SHARED_FIELD_NAME = "FieldB";
+
     @Test
-    public void testInputsExpression()
+    public void testInputsExpression() throws IOException, CommandException
     {
+
         verifyNames(
                 "InputsExpressionTest",
-                "Name\tFieldB\tMaterialInputs/InputsExpressionTest",
+                "Name\t" + SHARED_FIELD_NAME + "\tMaterialInputs/InputsExpressionTest",
                 "${Inputs:first:defaultValue('" + DEFAULT_SAMPLE_PARENT_VALUE + "')}_${batchRandomId}",
                 null, "Pat");
-
 
         final String urlLikeDefaultVal = "a+b%c#d";
         verifyNames(
                 "InputsExpressionTest2",
-                "Name\tFieldB\tMaterialInputs/InputsExpressionTest2",
+                "Name\t" + SHARED_FIELD_NAME + "\tMaterialInputs/InputsExpressionTest2",
                 "${Inputs:first:defaultValue('" + urlLikeDefaultVal + "')}_${batchRandomId}",
                 null, "Fed", true, urlLikeDefaultVal);
 
         verifyNames(
                 "Inputs/ExpressionTest2",
-                "Name\tFieldB\tMaterialInputs/Inputs$SExpressionTest2",
+                "Name\t" + SHARED_FIELD_NAME + "\tMaterialInputs/Inputs$SExpressionTest2",
                 "${Inputs:defaultValue('" + DEFAULT_SAMPLE_PARENT_VALUE + "')}_${batchRandomId}",
                 null, "Bat", false);
 
         verifyNames(
                 "Inputs/WithDataTypeExpression",
-                "Name\tFieldB\tMaterialInputs/Inputs/WithDataTypeExpression",
+                "Name\t" + SHARED_FIELD_NAME + "\tMaterialInputs/Inputs/WithDataTypeExpression",
                 "${Inputs/Inputs$SWithDataTypeExpression:first:defaultValue('" + DEFAULT_SAMPLE_PARENT_VALUE + "')}_${batchRandomId}",
                 null, "Red");
 
         verifyNames(
                 "Inputs/WithDataTypeExpression2",
-                "Name\tFieldB\tMaterialInputs/Inputs$SWithDataTypeExpression2",
+                "Name\t" + SHARED_FIELD_NAME + "\tMaterialInputs/Inputs$SWithDataTypeExpression2",
                 "${Inputs/Inputs$SWithDataTypeExpression2:defaultValue('" + DEFAULT_SAMPLE_PARENT_VALUE + "')}_${batchRandomId}",
                 null, "Ted", false);
 
         verifyNames(
                 "Material/WithDataTypeExpression",
-                "Name\tFieldB\tMaterialInputs/Material/WithDataTypeExpression",
+                "Name\t" + SHARED_FIELD_NAME + "\tMaterialInputs/Material/WithDataTypeExpression",
                 "${MaterialInputs/Material$SWithDataTypeExpression:first:defaultValue('" + DEFAULT_SAMPLE_PARENT_VALUE + "')}_${batchRandomId}",
                 null, "Ned");
 
         verifyNames(
                 "Material/WithDataTypeExpression2",
-                "Name\tFieldB\tMaterialInputs/Material$SWithDataTypeExpression2",
+                "Name\t" + SHARED_FIELD_NAME + "\tMaterialInputs/Material$SWithDataTypeExpression2",
                 "${MaterialInputs/Material$SWithDataTypeExpression2:defaultValue('" + DEFAULT_SAMPLE_PARENT_VALUE + "')}_${batchRandomId}",
                 null, "Med", false);
 
+        // Test that a name expression using a generic "Inputs" and a field name can resolve the field name in Material and Data classes.
+        log("Test a name expression that uses \"Inputs/SomeFieldName\".");
+
+        final String dataParentClass = "InputsDataParentFieldExpression";
+        log(String.format("Create a DataClass, %s to use as a parent.", dataParentClass));
+        DataClassDefinition dpDef = new DataClassDefinition(dataParentClass);
+        dpDef.setFields(List.of(new FieldDefinition(SHARED_FIELD_NAME, ColumnType.String)));
+        TestDataGenerator dpGen = dpDef.create(createDefaultConnection(), getProjectName());
+        dpGen.addCustomRow(Map.of("Name", "DS-1",
+                SHARED_FIELD_NAME, "ABC"));
+        dpGen.addCustomRow(Map.of("Name", "DS-2",
+                SHARED_FIELD_NAME, "DEF"));
+        dpGen.insertRows(createDefaultConnection(), dpGen.getRows());
+
+        final String nameExpression = "Gen-${Inputs/" + SHARED_FIELD_NAME + ":defaultValue('none')}-${genId}";
+
+        StringBuilder data = new StringBuilder();
+        data.append(SHARED_FIELD_NAME);
+        data.append("\tDataInputs/");
+        data.append(dataParentClass);
+        data.append("\n");
+        data.append("a\tDS-1\n");
+        data.append("b\tDS-2\n");
+        data.append("c\tDS-1, DS-2\n");
+        data.append("d\n");
+
+        goToProjectHome();
+        final String sampleTypeName = "InputsExpressionTestData";
+        log(String.format("Create a SampleType, %s, with a name expression of %s. Test name expression using a DataClass, %s as a parent.",
+                sampleTypeName, nameExpression, dataParentClass));
+        createSampleTypeForNameValidation(sampleTypeName,
+                nameExpression, null, data.toString());
+
+        DataRegionTable materialTable = new DataRegionTable("Material", this);
+        List<String> actualNames = materialTable.getColumnDataAsText("Name");
+
+        List<String> dataSourceParentNames = List.of(
+                Pattern.quote("Gen-none-") + ".*",
+                Pattern.quote("Gen-[ABC, DEF]-") + ".*",
+                Pattern.quote("Gen-DEF-") + ".*",
+                Pattern.quote("Gen-ABC-") + ".*"
+                );
+        validateNamesGenerated(actualNames, dataSourceParentNames);
+
+        data = new StringBuilder();
+        data.append("Name\t");
+        data.append(SHARED_FIELD_NAME);
+        data.append("\n");
+        data.append("S-1\tUVW\n");
+        data.append("S-2\tXYZ\n");
+
+        goToProjectHome();
+        final String parentSampleType = "InputsMaterialParentFieldExpression";
+        log(String.format("Create a SampleType, %s to use as a parent.", parentSampleType));
+        createSampleTypeForNameValidation(parentSampleType,
+                "S-${genId}", null, data.toString());
+
+        data = new StringBuilder();
+        data.append(SHARED_FIELD_NAME);
+        data.append("\tMaterialInputs/");
+        data.append(parentSampleType);
+        data.append("\n");
+        data.append("i\tS-1\n");
+        data.append("j\tS-2\n");
+        data.append("k\tS-1, S-2\n");
+        data.append("l\n");
+
+        log(String.format("Again using SampleType, %s, test name expression using a SampleType, %s as a parent.",
+                sampleTypeName, parentSampleType));
+        goToProjectHome();
+        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
+        sampleHelper.goToSampleType(sampleTypeName).bulkImport(data.toString());
+
+        List<String> sampleTypeParentNames = new ArrayList<>();
+        sampleTypeParentNames.add(Pattern.quote("Gen-none-") + ".*");
+        sampleTypeParentNames.add(Pattern.quote("Gen-[UVW, XYZ]-") + ".*");
+        sampleTypeParentNames.add(Pattern.quote("Gen-XYZ-") + ".*");
+        sampleTypeParentNames.add(Pattern.quote("Gen-UVW-") + ".*");
+        sampleTypeParentNames.addAll(dataSourceParentNames);
+
+        materialTable = new DataRegionTable("Material", this);
+        actualNames = materialTable.getColumnDataAsText("Name");
+
+        validateNamesGenerated(actualNames, sampleTypeParentNames);
+
+        data = new StringBuilder();
+        data.append(SHARED_FIELD_NAME);
+        data.append("\tMaterialInputs/");
+        data.append(parentSampleType);
+        data.append("\tDataInputs/");
+        data.append(dataParentClass);
+        data.append("\n");
+        data.append("m\tS-1\n");
+        data.append("n\t\tDS-1\n");
+        data.append("o\tS-2\tDS-2\n");
+        data.append("p\tS-1, S-2\tDS-1\n");
+        data.append("p\tS-1\tDS-1, DS-2\n");
+        data.append("q\tS-1, S-2\tDS-1, DS-2\n");
+        data.append("r\n");
+
+        log(String.format("Finally using SampleType, %s, test name expression using both a SampleType and a DataClass as a parent.",
+                sampleTypeName));
+        goToProjectHome();
+        sampleHelper = new SampleTypeHelper(this);
+        sampleHelper.goToSampleType(sampleTypeName).bulkImport(data.toString());
+
+        List<String> combinedParentNames = new ArrayList<>();
+        combinedParentNames.add(Pattern.quote("Gen-none-") + ".*");
+        combinedParentNames.add(Pattern.quote("Gen-[ABC, DEF, UVW, XYZ]-") + ".*");
+        combinedParentNames.add(Pattern.quote("Gen-[ABC, DEF, UVW]-") + ".*");
+        combinedParentNames.add(Pattern.quote("Gen-[ABC, UVW, XYZ]-") + ".*");
+        combinedParentNames.add(Pattern.quote("Gen-[DEF, XYZ]-") + ".*");
+        combinedParentNames.add(Pattern.quote("Gen-ABC-") + ".*");
+        combinedParentNames.add(Pattern.quote("Gen-UVW-") + ".*");
+        combinedParentNames.addAll(sampleTypeParentNames);
+
+        materialTable = new DataRegionTable("Material", this);
+        actualNames = materialTable.getColumnDataAsText("Name");
+
+        validateNamesGenerated(actualNames, combinedParentNames);
     }
 
     @Test
@@ -663,30 +788,87 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
                 // Name generated and uses defaultValue('SS')
                 "\tb\t\n";
 
+        createSampleTypeForNameValidation(sampleTypeName, nameExpression, currentTypeAlias, data);
+
+        DataRegionTable materialTable = new DataRegionTable("Material", this);
+        List<String> actualNames = materialTable.getColumnDataAsText("Name");
+
+        List<String> expectedNames = new ArrayList<>();
+
+        expectedNames.add(Pattern.quote(defaultValue + "_") + ".*");
+
+        String batchRandomId = actualNames.getFirst().substring(actualNames.getFirst().lastIndexOf("_") + 1);
+
+        expectedNames.add(Pattern.quote(name2 + "_" + batchRandomId));
+
+        String pattern = useFirst ? name1 : "[" + name1 + ", " + name2 + "]";
+        pattern = pattern + "_" + batchRandomId;
+        expectedNames.add(Pattern.quote(pattern));
+
+        expectedNames.add(Pattern.quote(name2));
+
+        expectedNames.add(Pattern.quote(name1));
+
+        validateNamesGenerated(actualNames, expectedNames);
+    }
+
+    private void createSampleTypeForNameValidation(String sampleTypeName, String nameExpression, @Nullable String currentTypeAlias, String data)
+    {
+        log(String.format("Create a sample type %s with a name expression of %s and populate it using the name expression.",
+                sampleTypeName, nameExpression));
+
         SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
         SampleTypeDefinition definition = new SampleTypeDefinition(sampleTypeName)
                 .setNameExpression(nameExpression);
         if (currentTypeAlias != null)
             definition = definition.setParentAliases(Map.of(currentTypeAlias, "(Current Sample Type)"));
-        definition = definition.setFields(List.of(new FieldDefinition("FieldB", ColumnType.String)));
+        definition = definition.setFields(List.of(new FieldDefinition(SHARED_FIELD_NAME, ColumnType.String)));
         sampleHelper.createSampleType(definition, data);
 
         assertTextPresent(nameExpression);
 
-        DataRegionTable materialTable = new DataRegionTable("Material", this);
-        List<String> names = materialTable.getColumnDataAsText("Name");
+    }
 
-        // The next two lines assume the name expression has specific values in specific locations, and as far as I
-        // can tell, that is how the tests are written.
-        assertTrue("First name (" + names.get(0) + ") expected to start with " + defaultValue + "_ but it did not", names.get(0).startsWith(defaultValue + "_"));
-        String batchRandomId = names.get(0).substring(names.get(0).lastIndexOf("_") + 1);
+    /**
+     * <p>
+     *     Validate that every name in {@code actualNames} matches one of the regex patterns in
+     *     {@code expectedNames}, using a multiset diff: every expected pattern must match at least
+     *     one actual name, every actual name must be matched by some expected pattern, and the
+     *     counts must be equal. Order is intentionally NOT verified.
+     * </p>
+     * <p>
+     *     On a mismatch the failure reports both the patterns that found no match and the actual
+     *     names that found no pattern, so a "missing row" or "extra row" failure is immediately
+     *     diagnosable instead of just a "wrong count" error.
+     * </p>
+     * <p>
+     *     This method was generated by Claude.
+     * </p>
+     */
+    private void validateNamesGenerated(List<String> actualNames, List<String> expectedNames)
+    {
+        checker().verifyEquals("Number of samples not as expected.",
+                expectedNames.size(), actualNames.size());
 
-        assertEquals("Second name not as expected", name2 + "_" + batchRandomId, names.get(1));
+        List<String> unmatchedActuals = new ArrayList<>(actualNames);
+        List<String> unmatchedPatterns = new ArrayList<>();
+        for (String pattern : expectedNames)
+        {
+            Optional<String> match = unmatchedActuals.stream()
+                    .filter(a -> Pattern.matches(pattern, a))
+                    .findFirst();
+            if (match.isPresent())
+                unmatchedActuals.remove(match.get());
+            else
+                unmatchedPatterns.add(pattern);
+        }
 
-        assertEquals("Third name not as expected",  (useFirst ? name1 : ("[" + name1 + ", " + name2 + "]")) + "_" + batchRandomId, names.get(2));
+        checker().verifyTrue("Expected patterns with no matching actual name: " + unmatchedPatterns,
+                unmatchedPatterns.isEmpty());
+        checker().verifyTrue("Actual names not matching any expected pattern (extras): " + unmatchedActuals,
+                unmatchedActuals.isEmpty());
 
-        assertEquals("Fourth name not as expected", name2,  names.get(3));
-        assertEquals("Fifth name not as expected", name1, names.get(4));
+        checker().screenShotIfNewError("Generated_Names_Error");
     }
 
     /**
@@ -857,10 +1039,9 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
      *     </ul>
      * </p>
      * @throws IOException Can be thrown by the test helper.
-     * @throws CommandException Can be thrown by test helper.
      */
     @Test
-    public void testNameExpressionPreview() throws IOException, CommandException
+    public void testNameExpressionPreview() throws IOException
     {
 
         goToProjectHome();
@@ -946,7 +1127,7 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         DataRegionTable sampleTypeList =  DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
         sampleTypeList.clickInsertNewRow();
 
-        WebElement popUpLink = Locator.tagWithClass("span", "labkey-help-pop-up").findElements(getDriver()).get(0);
+        WebElement popUpLink = Locator.tagWithClass("span", "labkey-help-pop-up").findElements(getDriver()).getFirst();
         mouseOver(popUpLink);
 
         waitForElement(Locator.tagWithId("div", "helpDiv"));
@@ -1018,7 +1199,7 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
         {
             String expectedError = "Name Pattern error: No closing brace found for the substitution pattern starting at position 7.";
             checker().verifyEquals("Error message on saving is not as expected.",
-                    expectedError, errors.get(0));
+                    expectedError, errors.getFirst());
         }
 
         checker().screenShotIfNewError("Error_On_Save_Failure");

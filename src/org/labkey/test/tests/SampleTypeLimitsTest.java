@@ -138,7 +138,7 @@ public class SampleTypeLimitsTest extends BaseWebDriverTest
         SelectRowsCommand command = new SelectRowsCommand("samples", SAMPLE_TYPE_NAME);
         command.setFilters(Arrays.asList(new Filter("Name", "Sample1")));
         SelectRowsResponse response = command.execute(createDefaultConnection(), getProjectName());
-        verifyValidLookupSample("quf_lookUpField", response.getRows().get(0).get("RowId").toString(), "Sample1", "query", false);
+        verifyValidLookupSample("quf_lookUpField", response.getRows().getFirst().get("RowId").toString(), "Sample1", "query", false);
     }
 
     private void verifyInvalidLookupSample(String fieldName, String sampleValue, @Nullable String expectedErrorMsg)
@@ -209,7 +209,7 @@ public class SampleTypeLimitsTest extends BaseWebDriverTest
         SelectRowsCommand command = new SelectRowsCommand("samples", SAMPLE_TYPE_NAME);
         command.setFilters(Arrays.asList(new Filter("Name", "Sample1")));
         SelectRowsResponse response = command.execute(createDefaultConnection(), getProjectName());
-        verifyValidLookupSample("Output Sample 1_lookUpField", response.getRows().get(0).get("RowId").toString(), "Sample1", "Material", true);
+        verifyValidLookupSample("Output Sample 1_lookUpField", response.getRows().getFirst().get("RowId").toString(), "Sample1", "Material", true);
     }
 
     private void initDeriveSamplesForm(String sampleTypeName, String sampleName)
@@ -273,7 +273,7 @@ public class SampleTypeLimitsTest extends BaseWebDriverTest
         int generationDepth = 0;
         while(!node.getChildren().isEmpty())  // walk the node depth until the end
         {
-            node = node.getChildren().get(0).getNode();
+            node = node.getChildren().getFirst().getNode();
             generationDepth++;
         }
         assertEquals("Expect lineage depth to be" +intendedGenerationDepth, intendedGenerationDepth, generationDepth);

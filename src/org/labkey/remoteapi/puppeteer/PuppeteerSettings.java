@@ -23,9 +23,6 @@ import java.util.Map;
 public class PuppeteerSettings
 {
     private Boolean _enabled;
-    private String _mode;
-    private String _dockerImage;
-    private Integer _dockerPort;
     private String _remoteUrl;
 
     public PuppeteerSettings()
@@ -36,9 +33,6 @@ public class PuppeteerSettings
     {
         this();
         _enabled = json.getBoolean("enabled");
-        _mode = json.getString("mode");
-        _dockerImage = json.optString("docker.image", null);
-        _dockerPort = json.optInt("docker.port");
         _remoteUrl = json.getString("remote.url");
     }
 
@@ -57,36 +51,6 @@ public class PuppeteerSettings
         _enabled = enabled;
     }
 
-    public String getMode()
-    {
-        return _mode;
-    }
-
-    public void setMode(String mode)
-    {
-        _mode = mode;
-    }
-
-    public String getDockerImage()
-    {
-        return _dockerImage;
-    }
-
-    public void setDockerImage(String dockerImage)
-    {
-        _dockerImage = dockerImage;
-    }
-
-    public Integer getDockerPort()
-    {
-        return _dockerPort;
-    }
-
-    public void setDockerPort(Integer dockerPort)
-    {
-        _dockerPort = dockerPort;
-    }
-
     public String getRemoteUrl()
     {
         return _remoteUrl;
@@ -103,12 +67,6 @@ public class PuppeteerSettings
 
         if (getEnabled() != null)
             settings.put("enabled", getEnabled());
-        if (getMode() != null)
-            settings.put("mode", getMode());
-        if (getDockerImage() != null)
-            settings.put("docker.image", getDockerImage());
-        if (getDockerPort() != null)
-            settings.put("docker.port", getDockerPort());
         if (getRemoteUrl() != null)
             settings.put("remote.url", getRemoteUrl());
 

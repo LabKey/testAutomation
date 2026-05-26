@@ -282,7 +282,7 @@ public class ApiKeyTest extends BaseWebDriverTest
         goToExternalToolPage();
         List<WebElement> banners = Locator.byClass(BootstrapLocators.BannerType.WARNING.getCss()).findElements(this.getDriver());
         assertEquals("Number of warning banners not as expected", 1, banners.size());
-        assertEquals("API and session key generation warning not as expected", "API and session key generation is not available while impersonating.", banners.get(0).getText());
+        assertEquals("API and session key generation warning not as expected", "API and session key generation is not available while impersonating.", banners.getFirst().getText());
     }
 
     @Test
@@ -518,7 +518,7 @@ public class ApiKeyTest extends BaseWebDriverTest
         }
 
         String keyField = "RowId";
-        Map<String, Object> record = response.getRows().get(0);
+        Map<String, Object> record = response.getRows().getFirst();
         Map<String, Object> newRow = new HashMap<>();
         Integer rowId = (Integer) ((Map<String, Object>) record.get(keyField)).get("value");
         newRow.put(keyField, rowId);

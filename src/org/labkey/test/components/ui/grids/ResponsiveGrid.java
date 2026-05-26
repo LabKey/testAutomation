@@ -48,6 +48,7 @@ import static org.labkey.remoteapi.query.Filter.Operator.ARRAY_CONTAINS_NONE;
 import static org.labkey.remoteapi.query.Filter.Operator.ARRAY_CONTAINS_NOT_EXACT;
 import static org.labkey.remoteapi.query.Filter.Operator.ARRAY_ISEMPTY;
 import static org.labkey.remoteapi.query.Filter.Operator.ARRAY_ISNOTEMPTY;
+import static org.labkey.test.WebDriverWrapper.sleep;
 import static org.labkey.test.WebDriverWrapper.waitFor;
 
 public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverComponent<ResponsiveGrid<T>.ElementCache> implements UpdatingComponent
@@ -75,7 +76,7 @@ public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverCompon
 
     public Boolean isLoaded()
     {
-        return getComponentElement().isDisplayed() &&
+        return WebElementUtils.checkVisibility(getComponentElement()) &&
                 !Locators.loadingGrid.existsIn(this) &&
                 !Locators.spinner.existsIn(this) &&
                 (Locator.tag("td").existsIn(this) ||
@@ -240,10 +241,10 @@ public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverCompon
         return errorMsg;
     }
 
-private static final List<Filter.Operator> ARRAY_OPERATORS = List.of(ARRAY_CONTAINS_ALL, ARRAY_CONTAINS_ANY, ARRAY_CONTAINS_EXACT, ARRAY_CONTAINS_NONE,
+    private static final List<Filter.Operator> ARRAY_OPERATORS = List.of(ARRAY_CONTAINS_ALL, ARRAY_CONTAINS_ANY, ARRAY_CONTAINS_EXACT, ARRAY_CONTAINS_NONE,
                 ARRAY_CONTAINS_NOT_EXACT, ARRAY_ISEMPTY, ARRAY_ISNOTEMPTY);
                 
-    private GridFilterModal initFilterColumn(CharSequence columnIdentifier, Filter.Operator operator, Object value)
+    public GridFilterModal initFilterColumn(CharSequence columnIdentifier, Filter.Operator operator, Object value)
     {
         clickColumnMenuItem(columnIdentifier, "Filter...", false);
         GridFilterModal filterModal = new GridFilterModal(getDriver(), this);
@@ -256,11 +257,12 @@ private static final List<Filter.Operator> ARRAY_OPERATORS = List.of(ARRAY_CONTA
                 {
                     filterPanel.selectArrayFilterOperator(operator);
                 }
-                if (value != null)
+                if (value != null && !((List<String>) value).isEmpty())
                 {
                     List<String> values = (List<String>) value;
-                    filterPanel.selectValue(values.get(0));
+                    filterPanel.selectValue(values.getFirst());
                     filterPanel.checkValues(values.toArray(String[]::new));
+                    sleep(500);
                 }
             }
             else
@@ -313,7 +315,7 @@ private static final List<Filter.Operator> ARRAY_OPERATORS = List.of(ARRAY_CONTA
      */
     public FieldSelectionDialog insertColumn()
     {
-        return insertColumn(getHeaders().get(0).getFieldKey().toString());
+        return insertColumn(getHeaders().getFirst().getFieldKey().toString());
     }
 
     /**

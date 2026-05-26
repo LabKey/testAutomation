@@ -123,12 +123,8 @@ public class SmtpMessage {
    * @param value header value
    */
   private void addHeader(String name, String value) {
-    List<String> valueList = headers.get(name);
-    if (valueList == null) {
-      valueList = new ArrayList<>(1);
-      headers.put(name, valueList);
-    }
-    valueList.add(value);
+      List<String> valueList = headers.computeIfAbsent(name, _ -> new ArrayList<>(1));
+      valueList.add(value);
   }
 
   /**
@@ -137,12 +133,8 @@ public class SmtpMessage {
    * @param value header value
    */
   private void appendHeader(String name, String value) {
-    List<String> valueList = headers.get(name);
-    if (valueList == null) {
-      valueList = new ArrayList<>(1);
-      headers.put(name, valueList);
-    }
-    valueList.set(0, valueList.get(0) + value);
+    List<String> valueList = headers.computeIfAbsent(name, k -> new ArrayList<>(1));
+    valueList.set(0, valueList.getFirst() + value);
   }
 
   /**

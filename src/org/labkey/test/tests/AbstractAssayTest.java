@@ -36,6 +36,7 @@ import java.util.List;
 import static org.labkey.test.params.FieldDefinition.DOMAIN_TRICKY_CHARACTERS;
 import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
 import static org.labkey.test.util.PermissionsHelper.READER_ROLE;
+import static org.labkey.test.util.PermissionsHelper.SEE_AUDIT_LOG_SITE_ROLE;
 
 /**
  * @deprecated TODO: Move shared functionality to a Helper class
@@ -212,8 +213,8 @@ public abstract class AbstractAssayTest extends BaseWebDriverTest
 
         //add a PI user to that group
         permissionsHelper.addUserToProjGroup(TEST_ASSAY_USR_PI1, getProjectName(), TEST_ASSAY_GRP_PIS);
-        // give the PI user "CanSeeAuditLog" permission
-        permissionsHelper.setSiteRoleUserPermissions(TEST_ASSAY_USR_PI1, "See Audit Log Events");
+        // give the PI user site "CanSeeAuditLog" permission
+        permissionsHelper.setSiteRoleUserPermissions(TEST_ASSAY_USR_PI1, SEE_AUDIT_LOG_SITE_ROLE);
 
         //add a lab tech user to the Users group
         permissionsHelper.addUserToProjGroup(TEST_ASSAY_USR_TECH1, getProjectName(), TEST_ASSAY_GRP_USERS);
@@ -391,7 +392,7 @@ public abstract class AbstractAssayTest extends BaseWebDriverTest
                 .setType(TEST_ASSAY_DATA_PROP_TYPES[i - TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT])
                 .setLabel(TEST_ASSAY_DATA_PROP_NAME + i);
         }
-        propertiesPanel.addField("Flags").setType(FieldDefinition.ColumnType.Flag);
+
         // Set some to required
         propertiesPanel.getField(0).setRequiredField(true);
         propertiesPanel.getField(TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT + 2).setRequiredField(true);

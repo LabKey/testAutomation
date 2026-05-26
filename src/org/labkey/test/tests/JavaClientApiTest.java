@@ -226,7 +226,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
         assertEquals(1, saveResp.getRowsAffected().intValue());
 
         //get new key value
-        Number newKey = (Number) saveResp.getRows().get(0).get("Key");
+        Number newKey = (Number) saveResp.getRows().getFirst().get("Key");
         assertNotNull(newKey);
         int key = newKey.intValue();
 
@@ -234,7 +234,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
         SelectRowsCommand selectCmd = new SelectRowsCommand("lists", LIST_NAME);
         SelectRowsResponse selResp = selectCmd.execute(cn, PROJECT_NAME);
         assertEquals("Wrong number of rows returned", 1, selResp.getRowCount().intValue());
-        Map<String, Object> responseRow = selResp.getRows().get(0);
+        Map<String, Object> responseRow = selResp.getRows().getFirst();
         assertEquals("Wrong FirstName in response", "first to be inserted", responseRow.get("FirstName"));
         assertEquals("Wrong LastName in response", "last to be inserted " + FieldDefinition.TRICKY_CHARACTERS, responseRow.get(LAST_NAME));
         assertEquals("Wrong type for Birthdate in response", Date.class, responseRow.get("Birthdate").getClass());
@@ -261,7 +261,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
         //verify that row was updated
         selectCmd.addFilter("Key", key, Filter.Operator.EQUAL);
         selResp = selectCmd.execute(cn, PROJECT_NAME);
-        responseRow = selResp.getRows().get(0);
+        responseRow = selResp.getRows().getFirst();
         assertEquals("UPDATED first name" + FieldDefinition.TRICKY_CHARACTERS, responseRow.get("FirstName"));
         assertEquals("UPDATED last name", responseRow.get(LAST_NAME));
         assertEquals(5.5, (Double)responseRow.get("GooAmount"), 0.001);
@@ -329,8 +329,8 @@ public class JavaClientApiTest extends BaseWebDriverTest
 
         assertNotNull("null rows array", resp.getRows());
         assertNotEquals("empty rows array", 0, resp.getRows().size());
-        Assertions.assertThat(resp.getRows().get(0).get("FirstName")).as("FirstName column").isInstanceOf(Map.class);
-        Map<?, ?> firstNameField = (Map<?, ?>)resp.getRows().get(0).get("FirstName");
+        Assertions.assertThat(resp.getRows().getFirst().get("FirstName")).as("FirstName column").isInstanceOf(Map.class);
+        Map<?, ?> firstNameField = (Map<?, ?>)resp.getRows().getFirst().get("FirstName");
         assertEquals("FirstName.value is incorrect", "Barney", firstNameField.get("value"));
 
         log("Completed test of the new extended select results format.");
@@ -340,7 +340,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
         selCmd.setSorts(List.of(new Sort(LAST_NAME, Sort.Direction.ASCENDING)));
         selCmd.setColumns(List.of("FirstName", LAST_NAME));
         resp = selCmd.execute(cn, PROJECT_NAME);
-        firstNameField = (Map<?, ?>)resp.getRows().get(0).get("FirstName");
+        firstNameField = (Map<?, ?>)resp.getRows().getFirst().get("FirstName");
         assertEquals("Known issue. Sort with tricky characters is ignored", "Barney" /*"Betty"*/, firstNameField.get("value"));
         assertEquals("Known issue. Filter with tricky characters is ignored", 3 /*2*/, resp.getRowCount());
         assertEquals("Known issue. Column list with tricky characters is ignored",
@@ -352,7 +352,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
         selCmd.setSorts(List.of(new Sort(encodeColumnName(LAST_NAME), Sort.Direction.ASCENDING)));
         selCmd.setColumns(List.of("FirstName", encodeColumnName(LAST_NAME)));
         resp = selCmd.execute(cn, PROJECT_NAME);
-        firstNameField = (Map<?, ?>)resp.getRows().get(0).get("FirstName");
+        firstNameField = (Map<?, ?>)resp.getRows().getFirst().get("FirstName");
         assertEquals("Known issue. Sort with tricky characters is ignored", "Betty", firstNameField.get("value"));
         assertEquals("Filter with tricky characters", 2, resp.getRowCount());
         assertEquals("Known issue. Column list with tricky characters is ignored",
@@ -414,8 +414,8 @@ public class JavaClientApiTest extends BaseWebDriverTest
         verifyDomain(response.getDomain(), expected);
 
         log("remove some fields from the existing domain");
-        domain.getFields().remove(domain.getFields().size()-1);
-        domain.getFields().remove(domain.getFields().size()-1);
+        domain.getFields().removeLast();
+        domain.getFields().removeLast();
 
         expected.remove("new field");
         expected.remove("new field with lookup");
@@ -583,7 +583,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
 
         SelectRowsResponse selectResp = selectCmd.execute(cn, PROJECT_NAME);
         assertEquals(1, selectResp.getRowCount().intValue());
-        Integer createdBy = (Integer)selectResp.getRows().get(0).get("CreatedBy");
+        Integer createdBy = (Integer)selectResp.getRows().getFirst().get("CreatedBy");
         assertEquals(userId, createdBy.intValue());
     }
 
@@ -712,7 +712,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
 
         // Verify saveRows results per command
         {
-            var result = response.getResults().get(0);
+            var result = response.getResults().getFirst();
             assertEquals("insert", result.getCommand());
             assertEquals(1, result.getRowsAffected());
             assertEquals(0, result.getTransactionAuditId());

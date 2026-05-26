@@ -9,6 +9,7 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.util.TestLogger;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -174,23 +175,39 @@ public class ProductMenu extends WebDriverComponent<ProductMenu.ElementCache>
     public void goToFolderDashboard(String folderName)
     {
         clickFolderItem(folderName);
+        getWrapper().mouseOver(elementCache().activeDashboardIcon);
         clickNavLink(elementCache().activeDashboardIcon);
     }
 
     public int getDashboardIconCount()
     {
-        return elementCache().dashboardIconLoc.findElements(elementCache().menuContent).size();
+        List<WebElement> dashboardIcons = elementCache().dashboardIconLoc.findElements(elementCache().menuContent);
+        for (WebElement dashboardIcon : dashboardIcons)
+        {
+            // Interactions with icon elements on the page to catch GitHub Issue 1146.
+            getWrapper().mouseOver(Locator.xpath("./ancestor::li[1]").findElement(dashboardIcon));
+            getWrapper().mouseOver(dashboardIcon);
+        }
+        return dashboardIcons.size();
     }
 
     public void goToFolderAdministration(String folderName)
     {
         clickFolderItem(folderName);
+        getWrapper().mouseOver(elementCache().activeAdministrationIcon);
         clickNavLink(elementCache().activeAdministrationIcon);
     }
 
     public int getAdministrationIconCount()
     {
-        return elementCache().administrationIconLoc.findElements(elementCache().menuContent).size();
+        List<WebElement> adminIcons = elementCache().administrationIconLoc.findElements(elementCache().menuContent);
+        for (WebElement adminIcon : adminIcons)
+        {
+            // Interactions with icon elements on the page to catch GitHub Issue 1146.
+            getWrapper().mouseOver(Locator.xpath("./ancestor::li[1]").findElement(adminIcon));
+            getWrapper().mouseOver(adminIcon);
+        }
+        return adminIcons.size();
     }
 
     public String getButtonTitle()
@@ -243,12 +260,12 @@ public class ProductMenu extends WebDriverComponent<ProductMenu.ElementCache>
         private final WebElement folderColumn = Locator.tagWithClass("div", "col-folders").findWhenNeeded(menuContent);
         private final WebElement sectionContent = Locator.tagWithClass("div", "sections-content").findWhenNeeded(menuContent);
 
-        public Locator.XPathLocator dashboardIconLoc = Locator.tagWithClass("i", "fa-home");
+        public Locator.XPathLocator dashboardIconLoc = Locator.tagWithClass("span", "fa-home");
         public WebElement activeDashboardIcon = Locator.tagWithClass("div", "col-folders")
                 .descendant(Locator.tagWithClass("li", "active"))
                 .descendant(dashboardIconLoc)
                 .findWhenNeeded(menuContent);
-        public Locator.XPathLocator administrationIconLoc = Locator.tagWithClass("i", "fa-gear");
+        public Locator.XPathLocator administrationIconLoc = Locator.tagWithClass("span", "fa-gear");
         public WebElement activeAdministrationIcon = Locator.tagWithClass("div", "col-folders")
                 .descendant(Locator.tagWithClass("li", "active"))
                 .descendant(administrationIconLoc)
@@ -285,7 +302,7 @@ public class ProductMenu extends WebDriverComponent<ProductMenu.ElementCache>
             return Locator.linkWithText(linkText).findElement(menuSectionBody(headerText));
         }
 
-        private final Locator.XPathLocator folderMenuItemLocator = Locator.tagWithClass("a", "menu-folder-item");
+        private final Locator.XPathLocator folderMenuItemLocator = Locator.tagWithClass("button", "menu-folder-item");
         private final Locator activeFolderMenuItemLocator = Locator.tagWithClass("li", "active").descendant(folderMenuItemLocator);
 
         List<WebElement> folderMenuItems()

@@ -88,12 +88,9 @@ public class NabHighThroughputAssayTest extends BaseWebDriverTest
                 .setAssayType("NAb")
                 .setTemplateType("high-throughput (single plate dilution)")));
 
-        Locator.IdLocator nameField = Locator.id("templateName");
-        waitForElement(nameField, WAIT_FOR_JAVASCRIPT);
-        setFormElement(nameField, PLATE_TEMPLATE_NAME);
-        fireEvent(nameField, SeleniumEvent.change);
-
-        clickButton("Save & Close");
+        PlateDesignerPage designerPage = new PlateDesignerPage(getDriver());
+        designerPage.setName(PLATE_TEMPLATE_NAME);
+        designerPage.saveAndClose();
         assertTextPresent(PLATE_TEMPLATE_NAME);
 
         // create the cross plate dilution template
@@ -103,11 +100,9 @@ public class NabHighThroughputAssayTest extends BaseWebDriverTest
                 .setAssayType("NAb")
                 .setTemplateType("high-throughput (cross plate dilution)")));
 
-        waitForElement(nameField, WAIT_FOR_JAVASCRIPT);
-        setFormElement(nameField, CPD_PLATE_TEMPLATE_NAME);
-        fireEvent(nameField, SeleniumEvent.change);
-
-        clickButton("Save & Close");
+        designerPage = new PlateDesignerPage(getDriver());
+        designerPage.setName(CPD_PLATE_TEMPLATE_NAME);
+        designerPage.saveAndClose();
         assertTextPresent(CPD_PLATE_TEMPLATE_NAME);
 
         _containerHelper.createSubfolder(getProjectName(), TEST_ASSAY_FLDR_NAB);

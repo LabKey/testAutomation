@@ -84,12 +84,6 @@ public class ModuleAssayTest extends AbstractAssayTest
     }
 
     @Override
-    public List<String> getAssociatedModules()
-    {
-        return Arrays.asList("study");
-    }
-
-    @Override
     protected String getProjectName()
     {
         return PROJECT_NAME;
@@ -395,7 +389,7 @@ public class ModuleAssayTest extends AbstractAssayTest
         assertEquals("Expected single data row", 1, rows.size());
 
         // verify the hidden data column was transformed
-        Map<String, Object> row = rows.get(0);
+        Map<String, Object> row = rows.getFirst();
         String hiddenData = (String)row.get("hiddenData");
         assertEquals(_useTransform ? "foo transformed" : "foo", hiddenData);
     }

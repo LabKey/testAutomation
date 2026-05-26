@@ -17,7 +17,7 @@ import java.time.Duration;
 public class NodeDetail extends WebDriverComponent<NodeDetail.ElementCache>
 {
     private static final Locator.XPathLocator NAME_LOC = Locator.XPathLocator.union(
-            Locator.tagWithClass("a", "lineage-link"),
+            Locator.byClass("lineage-link"),
             Locator.tag("span"));
 
     final WebElement _el;

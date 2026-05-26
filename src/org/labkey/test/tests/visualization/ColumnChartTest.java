@@ -215,25 +215,25 @@ public class ColumnChartTest extends BaseWebDriverTest
         Assert.assertEquals("Number of plots not as expected.", expectedPlotCount, plotRegion.getPlots().size());
 
         log("Validate that each of the plots is of the type expected and has the column name as a title.");
-        plotComponent = plotRegion.getColumnPlotWrapper(plotRegion.getPlots().get(0));
-        Assert.assertTrue("Plot type not as expected. Expected: '" + ColumnChartComponent.TYPE_PIE + "'. Found: '" + plotComponent.getPlotType() + "'.", ColumnChartComponent.TYPE_PIE.equals(plotComponent.getPlotType()));
-        Assert.assertTrue("Plot title not as expected. Expected: '" + plotTitlePie + "'. Found: '" + plotComponent.getTitle() + "'.", plotComponent.getTitle().equals(plotTitlePie));
+        plotComponent = plotRegion.getColumnPlotWrapper(plotRegion.getPlots().getFirst());
+        Assert.assertEquals("Plot type not as expected. Expected: '" + ColumnChartComponent.TYPE_PIE + "'. Found: '" + plotComponent.getPlotType() + "'.", ColumnChartComponent.TYPE_PIE, plotComponent.getPlotType());
+        Assert.assertEquals("Plot title not as expected. Expected: '" + plotTitlePie + "'. Found: '" + plotComponent.getTitle() + "'.", plotComponent.getTitle(), plotTitlePie);
 
         plotComponent = plotRegion.getColumnPlotWrapper(plotRegion.getPlots().get(1));
-        Assert.assertTrue("Plot type not as expected. Expected: '" + ColumnChartComponent.TYPE_BAR + "'. Found: '" + plotComponent.getPlotType() + "'.", ColumnChartComponent.TYPE_BAR.equals(plotComponent.getPlotType()));
-        Assert.assertTrue("Plot title not as expected. Expected: '" + plotTitleBar + "'. Found: '" + plotComponent.getTitle() + "'.", plotComponent.getTitle().equals(plotTitleBar));
+        Assert.assertEquals("Plot type not as expected. Expected: '" + ColumnChartComponent.TYPE_BAR + "'. Found: '" + plotComponent.getPlotType() + "'.", ColumnChartComponent.TYPE_BAR, plotComponent.getPlotType());
+        Assert.assertEquals("Plot title not as expected. Expected: '" + plotTitleBar + "'. Found: '" + plotComponent.getTitle() + "'.", plotComponent.getTitle(), plotTitleBar);
 
         plotComponent = plotRegion.getColumnPlotWrapper(plotRegion.getPlots().get(2));
-        Assert.assertTrue("Plot type not as expected. Expected: '" + ColumnChartComponent.TYPE_BOX + "'. Found: '" + plotComponent.getPlotType() + "'.", ColumnChartComponent.TYPE_BOX.equals(plotComponent.getPlotType()));
-        Assert.assertTrue("Plot title not as expected. Expected: '" + plotTitleBox1 + "'. Found: '" + plotComponent.getTitle() + "'.", plotComponent.getTitle().equals(plotTitleBox1));
+        Assert.assertEquals("Plot type not as expected. Expected: '" + ColumnChartComponent.TYPE_BOX + "'. Found: '" + plotComponent.getPlotType() + "'.", ColumnChartComponent.TYPE_BOX, plotComponent.getPlotType());
+        Assert.assertEquals("Plot title not as expected. Expected: '" + plotTitleBox1 + "'. Found: '" + plotComponent.getTitle() + "'.", plotComponent.getTitle(), plotTitleBox1);
 
         plotComponent = plotRegion.getColumnPlotWrapper(plotRegion.getPlots().get(3));
-        Assert.assertTrue("Plot type not as expected. Expected: '" + ColumnChartComponent.TYPE_BOX + "'. Found: '" + plotComponent.getPlotType() + "'.", ColumnChartComponent.TYPE_BOX.equals(plotComponent.getPlotType()));
-        Assert.assertTrue("Plot title not as expected. Expected: '" + plotTitleBox2 + "'. Found: '" + plotComponent.getTitle() + "'.", plotComponent.getTitle().equals(plotTitleBox2));
+        Assert.assertEquals("Plot type not as expected. Expected: '" + ColumnChartComponent.TYPE_BOX + "'. Found: '" + plotComponent.getPlotType() + "'.", ColumnChartComponent.TYPE_BOX, plotComponent.getPlotType());
+        Assert.assertEquals("Plot title not as expected. Expected: '" + plotTitleBox2 + "'. Found: '" + plotComponent.getTitle() + "'.", plotComponent.getTitle(), plotTitleBox2);
 
         log("Validate that mouse over shows the 'x' (remove option)");
 
-        plotComponent = plotRegion.getColumnPlotWrapper(plotRegion.getPlots().get(0));
+        plotComponent = plotRegion.getColumnPlotWrapper(plotRegion.getPlots().getFirst());
         plotComponent.showRemoveIcon();
         Assert.assertTrue("Remove icon is not visible for the expected plot.", plotComponent.isRemoveIconVisible());
 
@@ -379,19 +379,19 @@ public class ColumnChartTest extends BaseWebDriverTest
 
         log("Validate the initial values of the plots.");
 
-        plotComponent = plotRegion.getColumnPlotWrapper(plots.get(0));
-        Assert.assertTrue("Plot type not as expected. Expected: '" + ColumnChartComponent.TYPE_PIE + "'. Found: '" + plotComponent.getPlotType() + "'.", ColumnChartComponent.TYPE_PIE.equals(plotComponent.getPlotType()));
-        Assert.assertTrue("Plot title not as expected. Expected: '" + plotTitlePie + "'. Found: '" + plotComponent.getTitle() + "'.", plotComponent.getTitle().equals(plotTitlePie));
+        plotComponent = plotRegion.getColumnPlotWrapper(plots.getFirst());
+        Assert.assertEquals("Plot type not as expected. Expected: '" + ColumnChartComponent.TYPE_PIE + "'. Found: '" + plotComponent.getPlotType() + "'.", ColumnChartComponent.TYPE_PIE, plotComponent.getPlotType());
+        Assert.assertEquals("Plot title not as expected. Expected: '" + plotTitlePie + "'. Found: '" + plotComponent.getTitle() + "'.", plotComponent.getTitle(), plotTitlePie);
         Assert.assertEquals("Number of data points for the pie chart are not as expected.", UNFILTERED_PIE_COUNT, plotComponent.getNumberOfDataPoints());
 
         plotComponent = plotRegion.getColumnPlotWrapper(plots.get(1));
-        Assert.assertTrue("Plot type not as expected. Expected: '" + ColumnChartComponent.TYPE_BAR + "'. Found: '" + plotComponent.getPlotType() + "'.", ColumnChartComponent.TYPE_BAR.equals(plotComponent.getPlotType()));
-        Assert.assertTrue("Plot title not as expected. Expected: '" + plotTitleBar1 + "'. Found: '" + plotComponent.getTitle() + "'.", plotComponent.getTitle().equals(plotTitleBar1));
+        Assert.assertEquals("Plot type not as expected. Expected: '" + ColumnChartComponent.TYPE_BAR + "'. Found: '" + plotComponent.getPlotType() + "'.", ColumnChartComponent.TYPE_BAR, plotComponent.getPlotType());
+        Assert.assertEquals("Plot title not as expected. Expected: '" + plotTitleBar1 + "'. Found: '" + plotComponent.getTitle() + "'.", plotComponent.getTitle(), plotTitleBar1);
         Assert.assertEquals("Number of data points for the bar chart (" + plotTitleBar1 + ") are not as expected.", UNFILTERED_BAR1_COUNT, plotComponent.getNumberOfDataPoints());
 
         plotComponent = plotRegion.getColumnPlotWrapper(plots.get(2));
-        Assert.assertTrue("Plot type not as expected. Expected: '" + ColumnChartComponent.TYPE_BOX + "'. Found: '" + plotComponent.getPlotType() + "'.", ColumnChartComponent.TYPE_BOX.equals(plotComponent.getPlotType()));
-        Assert.assertTrue("Plot title not as expected. Expected: '" + plotTitleBox + "'. Found: '" + plotComponent.getTitle() + "'.", plotComponent.getTitle().equals(plotTitleBox));
+        Assert.assertEquals("Plot type not as expected. Expected: '" + ColumnChartComponent.TYPE_BOX + "'. Found: '" + plotComponent.getPlotType() + "'.", ColumnChartComponent.TYPE_BOX, plotComponent.getPlotType());
+        Assert.assertEquals("Plot title not as expected. Expected: '" + plotTitleBox + "'. Found: '" + plotComponent.getTitle() + "'.", plotComponent.getTitle(), plotTitleBox);
         Assert.assertEquals("Number of data points for the box chart are not as expected.", UNFILTERED_BOX_COUNT, plotComponent.getNumberOfDataPoints());
 
         log("Filter the data in the Pregnancy column.");
@@ -553,10 +553,10 @@ public class ColumnChartTest extends BaseWebDriverTest
             Map<String, String> singleChartProps = columnChartProps.get(i);
 
             String msg = "Plot type not as expected. Expected: '" + singleChartProps.get("type") + "'. Found: '" + plotComponent.getPlotType() + "'.";
-            Assert.assertTrue(msg, plotComponent.getPlotType().equals(singleChartProps.get("type")));
+            Assert.assertEquals(msg, plotComponent.getPlotType(), singleChartProps.get("type"));
 
             msg = "Plot title not as expected. Expected: '"+ singleChartProps.get("title") + "'. Found: '" + plotComponent.getTitle() + "'.";
-            Assert.assertTrue(msg, plotComponent.getTitle().equals(singleChartProps.get("title")));
+            Assert.assertEquals(msg, plotComponent.getTitle(), singleChartProps.get("title"));
 
             msg = "Number of data points for the chart not as expected.";
             Assert.assertEquals(msg, singleChartProps.get("dataPointCount"), ""+plotComponent.getNumberOfDataPoints());

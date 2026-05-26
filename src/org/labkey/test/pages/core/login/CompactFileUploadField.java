@@ -101,7 +101,7 @@ public class CompactFileUploadField extends WebDriverComponent<CompactFileUpload
         WebElement logoFileInput = Locator.tagWithClass("input", "file-upload__input")
                 .refindWhenNeeded(this).withTimeout(4000);
 
-        WebElement removeBtn = Locator.tagWithClass("span", "attached-file__remove-icon")
+        WebElement removeBtn = Locator.tagWithClass("button", "attached-file__remove-icon")
                 .refindWhenNeeded(this).withTimeout(4000);
 
         Locator attachedFile(File file)

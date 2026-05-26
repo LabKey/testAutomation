@@ -149,7 +149,7 @@ public class FieldSelectionDialog extends ModalDialog
         Assert.assertTrue(String.format(FIELD_NOT_AVAILABLE, fieldKey),
             listItem.isDisplayed());
 
-        WebElement addIcon = Locator.tagWithClass("div", "view-field__action")
+        WebElement addIcon = Locator.tagWithClass("button", "view-field__action")
                 .withChild(Locator.tagWithClass("i", "fa-plus"))
                 .findElement(listItem);
 
@@ -212,10 +212,10 @@ public class FieldSelectionDialog extends ModalDialog
         String oppositeIconClass = !expand ? "fa-chevron-right" : "fa-chevron-down";
 
         WebElement expandIcon = Locator.tagWithClass("div", "field-expand-icon")
-                .withChild(Locator.tagWithClass("i", iconClass))
+                .withChild(Locator.tagWithClass("button", iconClass))
                 .findElement(listItem);
         Locator oppositeIcon = Locator.tagWithClass("div", "field-expand-icon")
-                .withChild(Locator.tagWithClass("i", oppositeIconClass));
+                .withChild(Locator.tagWithClass("button", oppositeIconClass));
 
 
         String errorMessage;
@@ -239,7 +239,7 @@ public class FieldSelectionDialog extends ModalDialog
     {
         // As long as there is no expand icon then this field is expanded.
         return   !Locator.tagWithClass("div", "field-expand-icon")
-                .withChild(Locator.tagWithClass("i", "fa-chevron-right"))
+                .withChild(Locator.tagWithClass("button", "fa-chevron-right"))
                 .findWhenNeeded(listItem).isDisplayed();
     }
 
@@ -321,7 +321,7 @@ public class FieldSelectionDialog extends ModalDialog
     public boolean canFieldBeRemoved(String field, int index)
     {
         WebElement listItem = getSelectedListItems(field).get(index);
-        WebElement removeIcon = Locator.tagWithClass("span", "view-field__action").findWhenNeeded(listItem);
+        WebElement removeIcon = Locator.tagWithClass("button", "view-field__action").findWhenNeeded(listItem);
         return removeIcon.isDisplayed();
     }
 
@@ -363,12 +363,12 @@ public class FieldSelectionDialog extends ModalDialog
     public FieldSelectionDialog removeFieldFromSelected(String field, int index)
     {
         WebElement listItem = getSelectedListItems(field).get(index);
-        WebElement removeIcon = Locator.tagWithClass("span", "view-field__action").findElement(listItem);
+        WebElement removeIcon = Locator.byClass("view-field__action").findElement(listItem);
         getWrapper().mouseOver(removeIcon);
         removeIcon.click();
 
         // Move the mouse over the dialog title.
-        getWrapper().mouseOver(Locator.tagWithClass("h4", "modal-title").findElement(this));
+        getWrapper().mouseOver(ModalDialog.Locators.title.findElement(this));
 
         getWrapper().shortWait()
                 .withMessage(String.format("Field '%s' was not removed from list.", field))
@@ -391,7 +391,7 @@ public class FieldSelectionDialog extends ModalDialog
         {
             getWrapper().log(String.format("Removing field '%s' from selected fields.", listItem.getText()));
 
-            WebElement removeIcon = Locator.tagWithClass("span", "view-field__action").findWhenNeeded(listItem);
+            WebElement removeIcon = Locator.tagWithClass("button", "view-field__action").findWhenNeeded(listItem);
 
             // In some usages there may be fields that are not removable.
             if (!removeIcon.isDisplayed())
@@ -436,7 +436,7 @@ public class FieldSelectionDialog extends ModalDialog
     public FieldSelectionDialog setFieldLabel(FieldKey fieldKey, String newFieldLabel)
     {
         WebElement listItem = elementCache().findSelectedField(fieldKey);
-        WebElement updateIcon = Locator.tagWithClass("span", "edit-inline-field__toggle").findWhenNeeded(listItem);
+        WebElement updateIcon = Locator.byClass( "edit-inline-field__toggle").findWhenNeeded(listItem);
         updateIcon.click();
 
         WebDriverWrapper.waitFor(()->elementCache().fieldLabelEdit.isDisplayed(),

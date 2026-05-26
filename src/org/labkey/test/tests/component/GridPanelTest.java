@@ -1,6 +1,5 @@
 package org.labkey.test.tests.component;
 
-import au.com.bytecode.opencsv.CSVReader;
 import org.apache.commons.lang3.time.DateUtils;
 import org.jetbrains.annotations.Nullable;
 import org.junit.BeforeClass;
@@ -10,7 +9,6 @@ import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
-import org.labkey.serverapi.reader.Readers;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
@@ -24,7 +22,6 @@ import org.labkey.test.components.ui.search.FilterExpressionPanel;
 import org.labkey.test.components.ui.search.FilterFacetedPanel;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldInfo;
-import org.labkey.test.params.FieldKey;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.SampleTypeHelper;
@@ -39,7 +36,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -133,7 +129,7 @@ public class GridPanelTest extends GridPanelBaseTest
         // Create list of strings that has the various sets of the letters A, B, C & D
         stringSets = getAllSets(stringSetMembers, stringSetMembers.size() - 1);
         // Remove the empty set.
-        stringSets.remove(0);
+        stringSets.removeFirst();
 
         createSmallSampleType();
         createFilterSampleType();
@@ -756,7 +752,7 @@ public class GridPanelTest extends GridPanelBaseTest
         FilterFacetedPanel facetedPanel = filterDialog.selectFacetTab();
         List<String> availableValues = facetedPanel.getAvailableValues();
         checker().verifyEquals("Initial filter options should include max options of 250", 250, availableValues.size());
-        checker().verifyEquals("First value not as expected", FILTER_SAMPLE_PREFIX + "1", availableValues.get(0));
+        checker().verifyEquals("First value not as expected", FILTER_SAMPLE_PREFIX + "1", availableValues.getFirst());
         checker().verifyFalse("Available options should not be selected by default", facetedPanel.isChecked(FILTER_SAMPLE_PREFIX + "1"));
         checker().verifyEquals("Last value not as expected", FILTER_SAMPLE_PREFIX + "300", availableValues.get(249));
         checker().verifyFalse("Available options should not be selected by default", facetedPanel.isChecked(FILTER_SAMPLE_PREFIX + "300"));
@@ -766,11 +762,11 @@ public class GridPanelTest extends GridPanelBaseTest
         facetedPanel.filterValues(filterValue);
         availableValues = facetedPanel.getAvailableValues();
         checker().verifyEquals("Only one option should be available after filter", 1, availableValues.size());
-        checker().verifyEquals("Only one option should be available after filter", filterValue, availableValues.get(0));
+        checker().verifyEquals("Only one option should be available after filter", filterValue, availableValues.getFirst());
         facetedPanel.checkValues(filterValue);
         List<String> selectedValues = facetedPanel.getSelectedValues();
         checker().verifyEquals("Only one option should be selected after filter", 1, selectedValues.size());
-        checker().verifyEquals("Only one option should be selected after filter", filterValue, selectedValues.get(0));
+        checker().verifyEquals("Only one option should be selected after filter", filterValue, selectedValues.getFirst());
 
         log("Remove filter and verify the available and selected options");
         facetedPanel.filterValues("");
@@ -779,7 +775,7 @@ public class GridPanelTest extends GridPanelBaseTest
         checker().verifyFalse("Filtered value should not exist in the available options", availableValues.contains(filterValue));
         selectedValues = facetedPanel.getSelectedValues();
         checker().verifyEquals("Should retain single filtered selection", 1, selectedValues.size());
-        checker().verifyEquals("Should retain single filtered selection", filterValue, selectedValues.get(0));
+        checker().verifyEquals("Should retain single filtered selection", filterValue, selectedValues.getFirst());
 
         log("Verify single filtered value filter applied as expected");
         filterDialog.confirm();
@@ -791,7 +787,7 @@ public class GridPanelTest extends GridPanelBaseTest
         facetedPanel = filterDialog.selectFacetTab();
         selectedValues = facetedPanel.getSelectedValues();
         checker().verifyEquals("Should retain single filtered selection", 1, selectedValues.size());
-        checker().verifyEquals("Should retain single filtered selection", filterValue, selectedValues.get(0));
+        checker().verifyEquals("Should retain single filtered selection", filterValue, selectedValues.getFirst());
         facetedPanel.filterValues(FILTER_SAMPLE_PREFIX + "8");
         availableValues = facetedPanel.getAvailableValues();
         checker().verifyEquals("Filtered set of available options not as expected", 11, availableValues.size());
@@ -800,7 +796,7 @@ public class GridPanelTest extends GridPanelBaseTest
             facetedPanel.checkValues(FILTER_SAMPLE_PREFIX + "8" + i);
         selectedValues = facetedPanel.getSelectedValues();
         checker().verifyEquals("Should retain filtered selection", 12, selectedValues.size());
-        checker().verifyEquals("Should retain filtered selection", filterValue, selectedValues.get(0));
+        checker().verifyEquals("Should retain filtered selection", filterValue, selectedValues.getFirst());
         checker().verifyEquals("Should retain filtered selection", FILTER_SAMPLE_PREFIX + "89", selectedValues.get(11));
 
         log("And verify adding selections from the unfiltered set");
@@ -948,7 +944,7 @@ public class GridPanelTest extends GridPanelBaseTest
         filterDialog = grid.getGridBar().openFilterDialog();
         filterDialog.selectField(FILTER_STRING_COL.getLabel());
 
-        String firstFilterValue = stringSets.get(0);
+        String firstFilterValue = stringSets.getFirst();
 
         log(String.format("Filter '%s' to values equal to '%s'.", FILTER_STRING_COL, firstFilterValue));
         expressionPanel = filterDialog.selectExpressionTab();
@@ -990,7 +986,7 @@ public class GridPanelTest extends GridPanelBaseTest
                 1, filterValues.size());
 
         checker().verifyEquals("The filter value is not as expected.",
-                String.format("%s\n%s", firstFilterValue, secondFilterValue), getFormElement(filterValues.get(0)));
+                String.format("%s\n%s", firstFilterValue, secondFilterValue), getFormElement(filterValues.getFirst()));
 
         checker().screenShotIfNewError("Updated_Filter_Error");
 
@@ -1209,7 +1205,7 @@ public class GridPanelTest extends GridPanelBaseTest
         // next pill to get the 'x' icon. This causes the next call to getFilterStatusValues to not recognize the pill as a filter.
         Locator.tagWithClass("input", "grid-panel__search-input").findElement(getDriver()).click();
 
-        FilterStatusValue filterPill = grid.getFilterStatusValues().get(0);
+        FilterStatusValue filterPill = grid.getFilterStatusValues().getFirst();
 
         filterPill.getComponentElement().click();
 
@@ -1242,7 +1238,7 @@ public class GridPanelTest extends GridPanelBaseTest
         List<ReactSelect> filterTypes = new ReactSelect.ReactSelectFinder(getDriver()).findAll(panelElement);
 
         checker().verifyEquals(String.format("Filter expression for '%s' is not as expected.", FILTER_INT_COL),
-                "Is Greater Than", filterTypes.get(0).getValue());
+                "Is Greater Than", filterTypes.getFirst().getValue());
 
         WebElement filterValues = Locator.tagWithClass("input", "filter-expression__input").findElement(panelElement);
 
@@ -1259,7 +1255,7 @@ public class GridPanelTest extends GridPanelBaseTest
         filterTypes = new ReactSelect.ReactSelectFinder(getDriver()).findAll(panelElement);
 
         checker().verifyEquals(String.format("Filter expression for '%s' is not as expected.", FILTER_STRING_COL),
-                "Contains One Of", filterTypes.get(0).getValue());
+                "Contains One Of", filterTypes.getFirst().getValue());
 
         filterValues = Locator.tagWithClass("textarea", "filter-expression__textarea").findElement(panelElement);
 
@@ -1791,7 +1787,7 @@ public class GridPanelTest extends GridPanelBaseTest
         List<FilterStatusValue> filterPills = grid.getFilterStatusValues();
         String expectedValue = String.format("%s = true", FILTER_BOOL_COL.getLabel());
         checker().withScreenshot("View_Filter_Pill_Error").verifyTrue(String.format("Filter pills not as expected. There should only be one with value of '%s'", expectedValue),
-                filterPills.size() == 1 && filterPills.get(0).getText().equals(expectedValue));
+                filterPills.size() == 1 && filterPills.getFirst().getText().equals(expectedValue));
 
         log("Validate the fields in the dialog.");
 

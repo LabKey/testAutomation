@@ -30,7 +30,6 @@ public class PuppeteerHelper
     {
         var puppeteerSettings = new PuppeteerSettings();
         puppeteerSettings.setEnabled(true);
-        puppeteerSettings.setMode("remote");
         puppeteerSettings.setRemoteUrl(getRemoteServiceURL());
 
         updateSettings(connection, puppeteerSettings);

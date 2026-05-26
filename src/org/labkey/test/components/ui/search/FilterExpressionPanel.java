@@ -27,7 +27,8 @@ public class FilterExpressionPanel extends WebDriverComponent<FilterExpressionPa
             Operator.CONTAINS_ONE_OF, "Contains One Of",
             Operator.CONTAINS_NONE_OF, "Does Not Contain Any Of",
             Operator.BETWEEN, "Between",
-            Operator.NOT_BETWEEN, "Not Between"
+            Operator.NOT_BETWEEN, "Not Between",
+            Operator.NOT_IN, "Does Not Equal Any Of"
     );
 
     protected FilterExpressionPanel(WebElement element, WebDriver driver)
