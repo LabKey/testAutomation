@@ -3998,15 +3998,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
     }
 
     /**
-     * @deprecated Use {@link WebElement#isSelected()}
-     */
-    @Deprecated (since = "22.9")
-    public boolean isChecked(WebElement checkBox)
-    {
-        return checkBox.isSelected();
-    }
-
-    /**
      * Try to select option by text or value.
      */
     private void selectOption(WebElement el, String text)
