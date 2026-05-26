@@ -155,12 +155,11 @@ public class QueryApiHelper
         return importDataCommand.execute(_connection, _containerPath);
     }
 
-    public ImportDataResponse importExperimentData(String text, AuditLogHelper.AuditBehaviorType auditBehaviorType, ImportDataCommand.InsertOption insertOption, boolean isCrossType, boolean isCrossFolder, boolean isAsync) throws IOException, CommandException
+    public ImportDataResponse importExperimentData(String text, AuditLogHelper.AuditBehaviorType auditBehaviorType, ImportDataCommand.InsertOption insertOption, boolean isCrossType, boolean isAsync) throws IOException, CommandException
     {
         ImportExperimentDataCommand importDataCommand = new ImportExperimentDataCommand(_schema, _query, _containerPath);
         importDataCommand.setAuditBehavior(auditBehaviorType);
         importDataCommand.setUseAsync(isAsync);
-        importDataCommand.setCrossFolderImport(isCrossFolder);
         importDataCommand.setCrossTypeImport(isCrossType);
         importDataCommand.setText(text);
         importDataCommand.setInsertOption(insertOption);
