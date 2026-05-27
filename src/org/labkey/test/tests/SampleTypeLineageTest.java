@@ -13,9 +13,9 @@ import org.labkey.remoteapi.query.RowsResponse;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.WebTestHelper;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.params.FieldDefinition;
@@ -57,7 +57,7 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
     @Override
     public List<String> getAssociatedModules()
     {
-        return Arrays.asList("experiment");
+        return List.of("experiment");
     }
 
     @Override
@@ -1231,7 +1231,6 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
         var cmd = new SimpleGetCommand("experiment", "checkEdges");
         Map<String, Object> response = cmd.execute(createDefaultConnection(), "/" + PROJECT_NAME).getParsedData();
         assertEquals("CheckEdgesAction should report success", Boolean.TRUE, response.get("success"));
-        assertTrue("CheckEdgesAction should find no cycle edges", ((List<?>) response.get("result")).isEmpty());
+        assertEquals("CheckEdgesAction should find no cycle edges", List.of(), response.get("result"));
     }
-
 }
