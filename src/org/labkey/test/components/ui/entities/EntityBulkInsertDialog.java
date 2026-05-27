@@ -428,7 +428,7 @@ public class EntityBulkInsertDialog extends EntityBulkDialog
             return _rows.computeIfAbsent(fieldKey, fk ->
                 Locator.tagWithClass("div", "row")
                     // TODO: Shouldn't need to be case-insensitive. Parent/source lookups have weird casing
-                    .withDescendant(Locator.tagWithAttributeIgnoreCase("label", "for", fieldKey))
+                    .withDescendant(Locator.tagWithAttributeIgnoreCase("span", "data-fieldkey", fieldKey))
                     .findElement(this));
         }
 

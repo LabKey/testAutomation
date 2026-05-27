@@ -175,12 +175,12 @@ public abstract class EntityBulkDialog extends ModalDialog
          */
         public abstract WebElement formRow(CharSequence fieldIdentifier);
 
-        // For composite fields (e.g. StoredAmount + Units) that render a <div> label instead of <label for="...">,
+        // For composite fields (e.g. StoredAmount + Units) that render a <span> label instead of <label for="...">,
         private WebElement formRowByControlLabel(String fieldLabel)
         {
             return _rows.computeIfAbsent(fieldLabel, k ->
                     Locator.tagWithClass("div", "row")
-                            .withChild(Locator.tagWithClass("div", "control-label").withText(fieldLabel))
+                            .withChild(Locator.tagWithClass("span", "control-label").withText(fieldLabel))
                             .waitForElement(this, WAIT_FOR_JAVASCRIPT));
         }
 
