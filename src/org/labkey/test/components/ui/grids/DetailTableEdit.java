@@ -667,7 +667,7 @@ public class DetailTableEdit extends WebDriverComponent<DetailTableEdit.ElementC
         public DetailTableEditFinder withTitle(String title)
         {
             _locator = _baseLocator.withDescendant(Locator.tagWithClass("span", "detail__edit--heading")
-                .parent().withText(title));
+                .parent().childTag("span").withText(title));
             return this;
         }
 

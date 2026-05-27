@@ -409,7 +409,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         assertElementPresent(Locator.tagWithName("form", "login"));
         setFormElement(Locator.id("email"), email);
         setFormElement(Locator.id("password"), password);
-        WebElement signInButton = Locator.lkButton("Sign In").findElement(getDriver());
+        WebElement signInButton = Locator.button("Sign In").findElement(getDriver());
         doAndMaybeWaitForPageToLoad(10_000, () -> {
             signInButton.click();
             shortWait().until(ExpectedConditions.invisibilityOfElementLocated(Locator.byClass("signing-in-msg")));

@@ -612,21 +612,16 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
             return this;
         }
 
-        /* use this to find a reactSelect when the label text is contained within a label/span*/
-        public BaseReactSelectFinder<Select> withLabelwithSpan(String labelSpanText)
+        /* use this to find a reactSelect when the label text is contained within a span/span*/
+        public BaseReactSelectFinder<Select> withSpanLabel(String spanText)
         {
-            return followingLabelWithSpan(labelSpanText);
-        }
-
-        public BaseReactSelectFinder<Select> followingLabelWithSpan(String labelText)
-        {
-            _locator = Locators.containerWithDescendant(Locator.tag("label").withChild(Locator.tagWithText("span", labelText)));
+            _locator = Locators.containerWithDescendant(Locator.tagWithClassContaining("span", "control-label").withDescendant(Locator.tag("span").withText(spanText)));
             return this;
         }
 
-        public BaseReactSelectFinder<Select> followingLabelWithClass(String cls)
+        public BaseReactSelectFinder<Select> followingSpanWithClass(String cls)
         {
-            _locator = Locators.containerWithDescendant(Locator.tagWithClass("label", cls));
+            _locator = Locators.containerWithDescendant(Locator.tagWithClass("span", cls));
             return this;
         }
 
@@ -639,7 +634,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
         public BaseReactSelectFinder<Select> withinFormGroup(String labelText)
         {
             _locator = Locator.tagWithClass("div", "form-group")
-                    .withChild(Locator.tag("label").withPredicate("text() = " + Locator.xq(labelText)))
+                    .withChild(Locator.byClass("control-label").withPredicate("text() = " + Locator.xq(labelText)))
                     .descendant(Locators.selectContainer());
             return this;
         }
@@ -647,7 +642,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
         public BaseReactSelectFinder<Select> withinFormGroupSkipSelect(String labelText)
         {
             _locator = Locator.tagWithClass("div", "form-group")
-                    .withChild(Locator.tag("label").withChild(Locator.tagWithText("span", labelText)));
+                    .withChild(Locator.byClass("control-label").withChild(Locator.tagWithText("span", labelText)));
             return this;
         }
 

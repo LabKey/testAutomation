@@ -44,7 +44,7 @@ public class DetailDataPanel extends WebDriverComponent<DetailDataPanel.ElementC
     public String getTitle()
     {
         if (_title == null)
-            _title = elementCache().heading.getText();
+            _title = elementCache().headingText.getText();
         return _title;
     }
 
@@ -160,12 +160,15 @@ public class DetailDataPanel extends WebDriverComponent<DetailDataPanel.ElementC
 
     protected class ElementCache extends Component<?>.ElementCache
     {
-        final WebElement heading = Locator.tagWithClass("span", "detail__edit--heading").parent().findWhenNeeded(this);
+        final Locator.XPathLocator editHeadingLocator = Locator.tagWithClass("span", "detail__edit--heading");
+        final Locator.XPathLocator headingLocator = editHeadingLocator.parent();
+        final WebElement editHeading = editHeadingLocator.findWhenNeeded(this);
+        final WebElement headingText = headingLocator.childTag("span").findWhenNeeded(this);
 
         public Optional<WebElement> editButton()
         {
             return Locator.byClass("detail__edit-button")
-                    .findOptionalElement(heading);
+                    .findOptionalElement(editHeading);
         }
 
         // If this panel is for an aliquot sample there will be more than one table present.
@@ -223,7 +226,7 @@ public class DetailDataPanel extends WebDriverComponent<DetailDataPanel.ElementC
                 return _baseLocatorAsTooltip;
             else if (_title != null)
                 return _baseLocator.withChild(Locator.byClass("panel-heading")
-                        .withText(_title));
+                        .withText().containing(_title));
             else
                 return _baseLocator;
         }
