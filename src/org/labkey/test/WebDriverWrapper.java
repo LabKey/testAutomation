@@ -1169,6 +1169,12 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return createDefaultConnection();
     }
 
+    // Exempt the provided URL from controller-first URL warnings and exceptions
+    public void allowControllerFirstUrl(String url)
+    {
+        _controllerFirstUrls.add(url);
+    }
+
     public long beginAt(String url)
     {
         return beginAt(url, defaultWaitForPage);
@@ -3989,15 +3995,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
     public boolean isChecked(Locator checkBoxLocator)
     {
         return checkBoxLocator.findElement(getDriver()).isSelected();
-    }
-
-    /**
-     * @deprecated Use {@link WebElement#isSelected()}
-     */
-    @Deprecated (since = "22.9")
-    public boolean isChecked(WebElement checkBox)
-    {
-        return checkBox.isSelected();
     }
 
     /**
