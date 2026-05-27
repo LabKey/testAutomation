@@ -4,6 +4,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.SimpleGetCommand;
 import org.labkey.remoteapi.experiment.LineageCommand;
 import org.labkey.remoteapi.experiment.LineageNode;
 import org.labkey.remoteapi.experiment.LineageResponse;
@@ -12,6 +13,7 @@ import org.labkey.remoteapi.query.RowsResponse;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Daily;
@@ -842,7 +844,7 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
         // create a sample type with the following explicit domain columns
         SampleTypeDefinition sampleType = new SampleTypeDefinition("Family");
         TestDataGenerator sampleGenerator = sampleType.create(createDefaultConnection(), getProjectName());
-        
+
         sampleGenerator.addRow(List.of("A"));
         sampleGenerator.addRow(List.of("B"));
         sampleGenerator.addCustomRow(Map.of("name", "C", "MaterialInputs/Family", "A,B"));
@@ -1214,6 +1216,22 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
         sampleHelper.deleteSamples(drtSamples, "Permanently delete 1 sample");
         assertEquals("Number of samples after deletion not as expected", 0, drtSamples.getDataRowCount());
 
+    }
+
+    @Test
+    public void testDiagnosticActions() throws IOException, CommandException
+    {
+        // CycleCheckAction: confirm the page loads and the acyclic test data reports no cycles
+        beginAt(WebTestHelper.buildURL("experiment", PROJECT_NAME, "cycleCheck"));
+        assertTextPresent("This operation can use a lot of memory.");
+        clickButton("Continue");
+        assertTextPresent("No cycles found");
+
+        // CheckEdgesAction: confirm the API returns success with an empty cycle list
+        var cmd = new SimpleGetCommand("experiment", "checkEdges");
+        Map<String, Object> response = cmd.execute(createDefaultConnection(), "/" + PROJECT_NAME).getParsedData();
+        assertEquals("CheckEdgesAction should report success", Boolean.TRUE, response.get("success"));
+        assertTrue("CheckEdgesAction should find no cycle edges", ((List<?>) response.get("result")).isEmpty());
     }
 
 }
