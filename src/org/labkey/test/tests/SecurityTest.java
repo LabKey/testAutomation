@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019 LabKey Corporation
+ * Copyright (c) 2008-2026 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -514,7 +514,7 @@ public class SecurityTest extends BaseWebDriverTest
         }
         assertTitleContains(SIGN_IN_TEXT);
         assertElementPresent(Locator.tagWithName("form", "login"));
-        clickAndWait(Locator.lkButton("Register"));
+        clickAndWait(Locator.linkWithText("Register"));
 
         assertTitleContains("Register");
         assertElementPresent(Locator.tagWithName("form", "register"));
@@ -542,7 +542,7 @@ public class SecurityTest extends BaseWebDriverTest
             clickAndWait(Locator.linkWithText(SIGN_IN_TEXT));
         }
         assertTitleContains(SIGN_IN_TEXT);
-        WebElement link = Locator.button("Register").findElementOrNull(getDriver());
+        WebElement link = Locator.linkWithText("Register").findElementOrNull(getDriver());
         assertFalse("Self-registration button is visible", link != null && link.isDisplayed());
 
         beginAt(buildURL("login", "register"));

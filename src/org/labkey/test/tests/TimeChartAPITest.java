@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2019 LabKey Corporation
+ * Copyright (c) 2012-2026 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -255,9 +255,9 @@ public class TimeChartAPITest extends TimeChartTest
                 "No enum constant org.labkey.api.visualization.VisualizationIntervalColumn.Interval.MINUTE",
                 "SchemaName, queryName, and name are all required for each measure, dimension, or sort.",
                 "Unable to find field ObcConcNA in study.LuminexAssay.",
-                "The 'zeroDayVisitTag' property or the 'dateCol' and 'zeroDateCol' properties are required.",
+                "Either 'dateCol' or 'zeroDateCol' must be specified for date-based charts",
                 "Unable to find field NADate in study.LuminexAssay.",
-                "The 'zeroDayVisitTag' property or the 'dateCol' and 'zeroDateCol' properties are required.",
+                "Either 'dateCol' or 'zeroDateCol' must be specified for date-based charts",
                 "Unable to find field NADate in study.Demographics.",
                 "Unable to find table study.LuminexAssayNA.",
                 "Unable to find field AnalyteNameNA in study.LuminexAssay.",
