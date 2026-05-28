@@ -1,3 +1,18 @@
+/*
+ * Copyright (c) 2026 LabKey Corporation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.labkey.test.components.ui.entities;
 
 import org.apache.commons.lang3.StringUtils;
@@ -175,12 +190,12 @@ public abstract class EntityBulkDialog extends ModalDialog
          */
         public abstract WebElement formRow(CharSequence fieldIdentifier);
 
-        // For composite fields (e.g. StoredAmount + Units) that render a <div> label instead of <label for="...">,
+        // For composite fields (e.g. StoredAmount + Units) that render a <span> label instead of <label for="...">,
         private WebElement formRowByControlLabel(String fieldLabel)
         {
             return _rows.computeIfAbsent(fieldLabel, k ->
                     Locator.tagWithClass("div", "row")
-                            .withChild(Locator.tagWithClass("div", "control-label").withText(fieldLabel))
+                            .withChild(Locator.tagWithClass("span", "control-label").withText(fieldLabel))
                             .waitForElement(this, WAIT_FOR_JAVASCRIPT));
         }
 

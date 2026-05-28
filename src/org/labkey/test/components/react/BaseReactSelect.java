@@ -1,6 +1,17 @@
 /*
- * Copyright (c) 2018-2019 LabKey Corporation. All rights reserved. No portion of this work may be reproduced in
- * any form or by any electronic or mechanical means without written permission from LabKey Corporation.
+ * Copyright (c) 2020-2026 LabKey Corporation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.labkey.test.components.react;
 
@@ -612,21 +623,16 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
             return this;
         }
 
-        /* use this to find a reactSelect when the label text is contained within a label/span*/
-        public BaseReactSelectFinder<Select> withLabelwithSpan(String labelSpanText)
+        /* use this to find a reactSelect when the label text is contained within a span/span*/
+        public BaseReactSelectFinder<Select> withSpanLabel(String spanText)
         {
-            return followingLabelWithSpan(labelSpanText);
-        }
-
-        public BaseReactSelectFinder<Select> followingLabelWithSpan(String labelText)
-        {
-            _locator = Locators.containerWithDescendant(Locator.tag("label").withChild(Locator.tagWithText("span", labelText)));
+            _locator = Locators.containerWithDescendant(Locator.tagWithClassContaining("span", "control-label").withDescendant(Locator.tag("span").withText(spanText)));
             return this;
         }
 
-        public BaseReactSelectFinder<Select> followingLabelWithClass(String cls)
+        public BaseReactSelectFinder<Select> followingSpanWithClass(String cls)
         {
-            _locator = Locators.containerWithDescendant(Locator.tagWithClass("label", cls));
+            _locator = Locators.containerWithDescendant(Locator.tagWithClass("span", cls));
             return this;
         }
 
@@ -639,7 +645,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
         public BaseReactSelectFinder<Select> withinFormGroup(String labelText)
         {
             _locator = Locator.tagWithClass("div", "form-group")
-                    .withChild(Locator.tag("label").withPredicate("text() = " + Locator.xq(labelText)))
+                    .withChild(Locator.byClass("control-label").withPredicate("text() = " + Locator.xq(labelText)))
                     .descendant(Locators.selectContainer());
             return this;
         }
@@ -647,7 +653,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
         public BaseReactSelectFinder<Select> withinFormGroupSkipSelect(String labelText)
         {
             _locator = Locator.tagWithClass("div", "form-group")
-                    .withChild(Locator.tag("label").withChild(Locator.tagWithText("span", labelText)));
+                    .withChild(Locator.byClass("control-label").withChild(Locator.tagWithText("span", labelText)));
             return this;
         }
 

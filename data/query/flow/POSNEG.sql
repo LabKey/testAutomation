@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2020-2026 LabKey Corporation
+ *
+ * Licensed under the Apache License, Version 2.0: http://www.apache.org/licenses/LICENSE-2.0
+ */
 SELECT q.s AS FCSAnalysis,
  MAX(q.s.Statistic."S/Lv/L/3+/4+/(IFNg+|IL2+):Freq_Of_Parent")- AVG(q.BG.Statistic."S/Lv/L/3+/4+/(IFNg+|IL2+):Freq_Of_Parent") AS "4+ POS BG ADJ",
  MAX(q.s.Statistic."S/Lv/L/3+/8+/(IFNg+|IL2+):Freq_Of_Parent")- AVG(q.BG.Statistic."S/Lv/L/3+/8+/(IFNg+|IL2+):Freq_Of_Parent") AS "8+ POS BG ADJ",
