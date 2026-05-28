@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2019 LabKey Corporation
+ * Copyright (c) 2015-2026 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -409,7 +409,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         assertElementPresent(Locator.tagWithName("form", "login"));
         setFormElement(Locator.id("email"), email);
         setFormElement(Locator.id("password"), password);
-        WebElement signInButton = Locator.lkButton("Sign In").findElement(getDriver());
+        WebElement signInButton = Locator.button("Sign In").findElement(getDriver());
         doAndMaybeWaitForPageToLoad(10_000, () -> {
             signInButton.click();
             shortWait().until(ExpectedConditions.invisibilityOfElementLocated(Locator.byClass("signing-in-msg")));

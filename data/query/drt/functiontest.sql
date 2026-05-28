@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2020-2026 LabKey Corporation
+ *
+ * Licensed under the Apache License, Version 2.0: http://www.apache.org/licenses/LICENSE-2.0
+ */
 SELECT abs(-1) AS col1,
 degrees(acos(.5))  AS col2,
 round(degrees(atan(1)), 5) AS col3,

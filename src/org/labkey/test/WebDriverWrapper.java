@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2019 LabKey Corporation
+ * Copyright (c) 2015-2026 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -3995,15 +3995,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
     public boolean isChecked(Locator checkBoxLocator)
     {
         return checkBoxLocator.findElement(getDriver()).isSelected();
-    }
-
-    /**
-     * @deprecated Use {@link WebElement#isSelected()}
-     */
-    @Deprecated (since = "22.9")
-    public boolean isChecked(WebElement checkBox)
-    {
-        return checkBox.isSelected();
     }
 
     /**

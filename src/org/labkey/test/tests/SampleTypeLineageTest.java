@@ -1,9 +1,25 @@
+/*
+ * Copyright (c) 2020-2026 LabKey Corporation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.labkey.test.tests;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.SimpleGetCommand;
 import org.labkey.remoteapi.experiment.LineageCommand;
 import org.labkey.remoteapi.experiment.LineageNode;
 import org.labkey.remoteapi.experiment.LineageResponse;
@@ -14,6 +30,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.params.FieldDefinition;
@@ -55,7 +72,7 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
     @Override
     public List<String> getAssociatedModules()
     {
-        return Arrays.asList("experiment");
+        return List.of("experiment");
     }
 
     @Override
@@ -842,7 +859,7 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
         // create a sample type with the following explicit domain columns
         SampleTypeDefinition sampleType = new SampleTypeDefinition("Family");
         TestDataGenerator sampleGenerator = sampleType.create(createDefaultConnection(), getProjectName());
-        
+
         sampleGenerator.addRow(List.of("A"));
         sampleGenerator.addRow(List.of("B"));
         sampleGenerator.addCustomRow(Map.of("name", "C", "MaterialInputs/Family", "A,B"));
@@ -1216,4 +1233,19 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
 
     }
 
+    @Test
+    public void testDiagnosticActions() throws IOException, CommandException
+    {
+        // CycleCheckAction: confirm the page loads and the acyclic test data reports no cycles
+        beginAt(WebTestHelper.buildURL("experiment", PROJECT_NAME, "cycleCheck"));
+        assertTextPresent("This operation can use a lot of memory.");
+        clickButton("Continue");
+        assertTextPresent("No cycles found");
+
+        // CheckEdgesAction: confirm the API returns success with an empty cycle list
+        var cmd = new SimpleGetCommand("experiment", "checkEdges");
+        Map<String, Object> response = cmd.execute(createDefaultConnection(), "/" + PROJECT_NAME).getParsedData();
+        assertEquals("CheckEdgesAction should report success", Boolean.TRUE, response.get("success"));
+        assertEquals("CheckEdgesAction should find no cycle edges", List.of(), response.get("result"));
+    }
 }
