@@ -96,8 +96,10 @@ public class CalculatedColumnAssistantDialog extends ModalDialog
     }
 
     /**
-     * @return every SQL expression suggested in the most recent assistant response, in display order.
-     * Usually a single entry, occasionally more.
+     * @return every <em>applicable</em> SQL expression suggested in the most recent assistant response, in display
+     * order. Only counts {@code .assistant-expression} blocks that include an "Apply Expression" button — read-only
+     * SQL the assistant shows for illustration (e.g. an alternative custom-query example) is excluded, since the user
+     * can't accept it as the field's calculation.
      */
     public List<String> getSuggestedExpressions()
     {
@@ -105,6 +107,7 @@ public class CalculatedColumnAssistantDialog extends ModalDialog
         if (lastResponse == null)
             return List.of();
         return Locator.tagWithClass("div", "assistant-expression")
+                .withDescendant(Locator.tagWithClass("button", "clickable-text"))
                 .descendant(Locator.tag("code"))
                 .findElements(lastResponse).stream()
                 .map(WebElement::getText)
@@ -126,14 +129,64 @@ public class CalculatedColumnAssistantDialog extends ModalDialog
      */
     public DomainFieldRow applyFirstSuggestedExpression()
     {
+        return applySuggestedExpression(0);
+    }
+
+    /**
+     * Click "Apply Expression" on the suggestion at the given index in the most recent assistant response.
+     */
+    public DomainFieldRow applySuggestedExpression(int index)
+    {
         WebElement lastResponse = lastAssistantResponseElement();
         if (lastResponse == null)
             throw new IllegalStateException("No assistant response is available to apply.");
-        Locator.tagWithClass("div", "assistant-expression")
+        List<WebElement> buttons = Locator.tagWithClass("div", "assistant-expression")
                 .descendant(Locator.tagWithClass("button", "clickable-text"))
-                .findElement(lastResponse)
-                .click();
+                .findElements(lastResponse);
+        if (index < 0 || index >= buttons.size())
+            throw new IndexOutOfBoundsException(
+                    "Requested expression index " + index + " but only " + buttons.size() + " expression(s) available.");
+        buttons.get(index).click();
         return _row;
+    }
+
+    /**
+     * @return text of the first assistant response in the chat history, or empty string if there are none. Useful
+     * for asserting the intro message in NEW / CHANGE / VALIDATE entry modes.
+     */
+    public String getFirstAssistantResponse()
+    {
+        List<String> responses = getAssistantResponses();
+        return responses.isEmpty() ? "" : responses.get(0);
+    }
+
+    /**
+     * @return true while the dialog is waiting for an AI response (the "Thinking..." pending bubble is shown).
+     */
+    public boolean isPending()
+    {
+        return Locator.tagWithClass("div", "chat-item").withClass("pending").existsIn(this);
+    }
+
+    /**
+     * Click the stop button to abort an in-flight AI request. The submit button toggles to a stop button (fa-stop)
+     * while the dialog is in the pending state; calling this method when no request is pending will fail.
+     */
+    public void clickStop()
+    {
+        Locator.tagWithClass("button", "prompt-button")
+                .withDescendant(Locator.tagWithClass("i", "fa-stop"))
+                .findElement(this)
+                .click();
+    }
+
+    /**
+     * Click submit without waiting for the response. Useful for tests that need to interrupt or otherwise observe
+     * the pending state before the response arrives. Prefer {@link #submitPrompt()} when the caller wants to wait.
+     */
+    public void clickSubmitWithoutWaiting()
+    {
+        elementCache().promptSubmitButton.click();
     }
 
     private WebElement lastAssistantResponseElement()
@@ -169,12 +222,12 @@ public class CalculatedColumnAssistantDialog extends ModalDialog
     {
         final WebElement endChatButton = Locator.tagWithClass("button", "btn")
                 .withText("End Chat")
-                .findWhenNeeded(this);
+                .refindWhenNeeded(this);
 
         final WebElement promptInput = Locator.tagWithClass("textarea", "prompt-input")
-                .findWhenNeeded(this);
+                .refindWhenNeeded(this);
 
         final WebElement promptSubmitButton = Locator.tagWithClass("button", "prompt-button")
-                .findWhenNeeded(this);
+                .refindWhenNeeded(this);
     }
 }

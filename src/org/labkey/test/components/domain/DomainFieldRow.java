@@ -1096,6 +1096,19 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         return new CalculatedColumnAssistantDialog(this);
     }
 
+    /**
+     * @return true if the "AI Assistant" button is present in the expanded Calculation field options.
+     * The button is only available when the {@code professional} module is enabled.
+     */
+    public boolean hasAIAssistantButton()
+    {
+        if (!isExpanded())
+            expand();
+        return Locator.tagWithClass("button", "btn")
+                .withText("AI Assistant")
+                .findElementOrNull(this) != null;
+    }
+
     // advanced settings
 
     public DomainFieldRow showFieldOnDefaultView(boolean checked)
