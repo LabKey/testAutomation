@@ -56,6 +56,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.UncheckedIOException;
 import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -469,18 +470,23 @@ public abstract class TestFileUtils
         // Sometimes on Windows the directory could be locked, maybe by an external process, or the child directory is
         // readonly. Use a retry mechanism to set the writeable flag and then try to delete the parent directory.
         for (int attempt = 1; attempt <= 10; attempt++) {
-            try {
+            try
+            {
                 dir.setWritable(true, false);
 
                 // Wrap in a try to close the stream.
-                try (Stream<Path> files = Files.walk(dir.toPath())) {
+                try (Stream<Path> files = Files.walk(dir.toPath()))
+                {
                     files.forEach(p -> p.toFile().setWritable(true, false));
                 }
 
                 FileUtils.deleteDirectory(dir);
                 LOG.info(String.format("Deletion of directory %s was successful.", dir));
                 break;
-            } catch (IOException ioException) {
+            } catch (AccessDeniedException e)
+            {
+                throw e;
+            } catch (IOException | UncheckedIOException ioException) {
                 LOG.warn(String.format("IOException trying to delete directory %s. Error: %s. Waiting 10s and retrying. Attempt %d of 10.",
                         dir, ioException.getMessage(), attempt));
                 if (attempt == 10) {
@@ -502,8 +508,6 @@ public abstract class TestFileUtils
                         LOG.info("Lock diagnostic...");
                         pb.redirectErrorStream(true);
 
-                        // Tried to use "try (Process p = pb.start()) {" without the finally block but our build
-                        // system didn't like that and complained that Process doesn't implement closeable (it does).
                         Process p = pb.start();
                         try (InputStream is = p.getInputStream()) {
                             String output = new String(is.readAllBytes(), StringUtilsLabKey.DEFAULT_CHARSET);
@@ -515,7 +519,7 @@ public abstract class TestFileUtils
                         }
 
                     } catch (IOException diagnosticException) {
-                        LOG.warn("Failed to run lock diagnostic: " + diagnosticException);
+                        LOG.warn("Failed to run lock diagnostic: " + diagnosticException.getMessage(), diagnosticException);
                     }
                     throw ioException;
                 }
