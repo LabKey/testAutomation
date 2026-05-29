@@ -173,7 +173,7 @@ public class FilesQueryTest extends BaseWebDriverTest
     private void ensureFilesUpToDate()
     {
         log("Clear cache so that exp.files will do a sync immediately");
-        beginAt(WebTestHelper.buildURL("admin", "caches", Map.of("clearCaches", "1")), 120000);
+        clearCaches();
         goToProjectHome();
     }
 

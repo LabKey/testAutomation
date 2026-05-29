@@ -35,6 +35,11 @@ public class ComplianceLoginSettingsPage extends BaseComplianceSettingsPage<Comp
         shortWait().until(wd -> !elementCache().loginAttemptCountCombo.isEnabled());
     }
 
+    public boolean isLoginLimitEnabled()
+    {
+        return elementCache().enableLoginChk.isSelected();
+    }
+
     public void setLoginAttemptCount(String count)
     {
         setFormElement(elementCache().loginAttemptCountInput, count);
@@ -43,6 +48,21 @@ public class ComplianceLoginSettingsPage extends BaseComplianceSettingsPage<Comp
     public void selectLoginAttemptCount(String count)
     {
         elementCache().loginAttemptCountCombo.selectComboBoxItem(count);
+    }
+
+    public String getLoginAttemptCount()
+    {
+        return getFormElement(elementCache().loginAttemptCountInput);
+    }
+
+    public String getLoginAttemptPeriod()
+    {
+        return getFormElement(elementCache().loginAttemptPeriodInput);
+    }
+
+    public String getLoginAttemptRecoveryTime()
+    {
+        return getFormElement(elementCache().loginAttemptRecoveryTimeInput);
     }
 
     public void selectLoginAttemptPeriod(String period)
