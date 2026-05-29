@@ -505,8 +505,8 @@ public abstract class TestFileUtils
                         // Tried to use "try (Process p = pb.start()) {" without the finally block but our build
                         // system didn't like that and complained that Process doesn't implement closeable (it does).
                         Process p = pb.start();
-                        try {
-                            String output = new String(p.getInputStream().readAllBytes(), StringUtilsLabKey.DEFAULT_CHARSET);
+                        try (InputStream is = p.getInputStream()) {
+                            String output = new String(is.readAllBytes(), StringUtilsLabKey.DEFAULT_CHARSET);
                             LOG.info("Running processes:\n" + output);
                         }
                         finally {
@@ -515,7 +515,7 @@ public abstract class TestFileUtils
                         }
 
                     } catch (IOException diagnosticException) {
-                        LOG.warn("Failed to run lock diagnostic: " + diagnosticException.getMessage());
+                        LOG.warn("Failed to run lock diagnostic: " + diagnosticException);
                     }
                     throw ioException;
                 }
