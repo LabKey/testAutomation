@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<etl xmlns="http://labkey.org/etl/xml">
+    <name>Stored Proc Special Characters</name>
+    <description>Run a stored procedure whose schema and procedure names contain special characters (spaces, '!', and an embedded double-quote) to verify identifier quoting/escaping.</description>
+    <transforms>
+        <transform id="step1" type="StoredProcedure">
+            <procedure schemaName="etl test!schema" procedureName='etl"test proc!' useTransaction="false"/>
+        </transform>
+    </transforms>
+    <schedule>
+        <poll interval="5s" />
+    </schedule>
+</etl>
