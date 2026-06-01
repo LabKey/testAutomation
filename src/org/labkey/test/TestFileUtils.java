@@ -21,6 +21,7 @@ import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.pdfbox.Loader;
@@ -40,6 +41,7 @@ import org.bouncycastle.util.io.Streams;
 import org.jetbrains.annotations.NotNull;
 import org.labkey.api.util.FileUtil;
 import org.jetbrains.annotations.Nullable;
+import org.labkey.api.util.StringUtilsLabKey;
 import org.openqa.selenium.NotFoundException;
 
 import java.io.BufferedInputStream;
@@ -54,9 +56,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.UncheckedIOException;
 import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.AccessDeniedException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -71,10 +75,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import static org.labkey.api.util.DebugInfoDumper.dumpHeap;
+import static org.labkey.test.WebDriverWrapper.sleep;
 import static org.labkey.test.util.TestDataGenerator.CHARSET_STRING;
 import static org.labkey.test.util.TestDataGenerator.randomInt;
 import static org.labkey.test.util.TestDataGenerator.randomName;
@@ -443,6 +450,83 @@ public abstract class TestFileUtils
         {
             LOG.info("WARNING: Exception deleting directory -- " + e.getMessage());
         }
+    }
+
+    /**
+     * Deletes a directory and all its contents, retrying up to 10 times with a 10-second delay between attempts.
+     * <p>
+     * Before each attempt, the directory and all its children are marked writable to handle read-only files or
+     * directories. This is primarily intended to work around Windows file-locking issues where an external process
+     * may hold a lock on the directory or its contents.
+     * <p>
+     * On the final failed attempt, a heap dump is captured for diagnostics if running on TeamCity. The list of running
+     * processes is also logged to help identify what may be holding the lock.
+     *
+     * @param dir the directory to delete
+     * @throws Exception if an unexpected error occurs
+     */
+    public static void deleteDirWithRetry(File dir) throws Exception
+    {
+        // Sometimes on Windows the directory could be locked, maybe by an external process, or the child directory is
+        // readonly. Use a retry mechanism to set the writeable flag and then try to delete the parent directory.
+        for (int attempt = 1; attempt <= 10; attempt++) {
+            try
+            {
+                dir.setWritable(true, false);
+
+                // Wrap in a try to close the stream.
+                try (Stream<Path> files = Files.walk(dir.toPath()))
+                {
+                    files.forEach(p -> p.toFile().setWritable(true, false));
+                }
+
+                FileUtils.deleteDirectory(dir);
+                LOG.info(String.format("Deletion of directory %s was successful.", dir));
+                break;
+            } catch (AccessDeniedException e)
+            {
+                throw e;
+            } catch (IOException | UncheckedIOException ioException) {
+                LOG.warn(String.format("IOException trying to delete directory %s. Error: %s. Waiting 10s and retrying. Attempt %d of 10.",
+                        dir, ioException.getMessage(), attempt));
+                if (attempt == 10) {
+
+                    if (TestProperties.isTestRunningOnTeamCity()) {
+                        LOG.info("Dump the heap.");
+                        dumpHeap();
+                    }
+
+                    ProcessBuilder pb;
+                    if (SystemUtils.IS_OS_WINDOWS) {
+                        pb = new ProcessBuilder("tasklist");
+                    }
+                    else {
+                        pb = new ProcessBuilder("ps", "-ef");
+                    }
+
+                    try {
+                        LOG.info("Lock diagnostic...");
+                        pb.redirectErrorStream(true);
+
+                        Process p = pb.start();
+                        try (InputStream is = p.getInputStream()) {
+                            String output = new String(is.readAllBytes(), StringUtilsLabKey.DEFAULT_CHARSET);
+                            LOG.info("Running processes:\n" + output);
+                        }
+                        finally {
+                            // Don't leak the process resource.
+                            p.destroy();
+                        }
+
+                    } catch (IOException diagnosticException) {
+                        LOG.warn("Failed to run lock diagnostic: " + diagnosticException.getMessage(), diagnosticException);
+                    }
+                    throw ioException;
+                }
+                sleep(10_000);
+            }
+        }
+
     }
 
     private static void checkFileLocation(File file)
