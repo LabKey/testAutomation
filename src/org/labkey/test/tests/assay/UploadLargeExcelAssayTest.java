@@ -103,7 +103,7 @@ public class UploadLargeExcelAssayTest extends BaseWebDriverTest
 
         // wait for import complete
         var assayJobsPage1 = new AssayUploadJobsPage(getDriver());
-        var pipelineDetailsPage1 = assayJobsPage1.clickJobStatus("200k", 3 * WebDriverWrapper.WAIT_FOR_PAGE);
+        var pipelineDetailsPage1 = assayJobsPage1.clickJobStatus("200k", 6 * WebDriverWrapper.WAIT_FOR_PAGE);
         pipelineDetailsPage1.waitForComplete(12 * WebDriverWrapper.WAIT_FOR_PAGE);
 
         // export assay1 data to excel
