@@ -5,12 +5,12 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.openqa.selenium.WebElement;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 /**
  * Modal that opens when the user clicks the "AI Assistant" button inside the Calculation field options.
- * Provides a chat-style interface where the user enters prompts and the assistant suggests expressions.
  */
 public class CalculatedColumnAssistantDialog extends ModalDialog
 {
@@ -61,9 +61,7 @@ public class CalculatedColumnAssistantDialog extends ModalDialog
 
     private void waitForThinkingSpinnerToDisappear()
     {
-        Locator spinner = Locator.tagWithClass("i", "fa-spinner");
-        // Spinner may not appear if the response is instantaneous; that's fine.
-        WebDriverWrapper.waitFor(() -> !spinner.existsIn(this), 60_000);
+        WebDriverWrapper.waitFor(() -> !Locators.thinkingSpinner.existsIn(this), 60_000);
     }
 
     /**
@@ -80,8 +78,7 @@ public class CalculatedColumnAssistantDialog extends ModalDialog
      */
     public List<String> getAssistantResponses()
     {
-        return Locator.tagWithClass("div", "chat-item").withClass("assistant-response")
-                .findElements(this).stream()
+        return Locators.assistantResponse.findElements(this).stream()
                 .map(WebElement::getText)
                 .collect(Collectors.toList());
     }
@@ -106,10 +103,7 @@ public class CalculatedColumnAssistantDialog extends ModalDialog
         WebElement lastResponse = lastAssistantResponseElement();
         if (lastResponse == null)
             return List.of();
-        return Locator.tagWithClass("div", "assistant-expression")
-                .withDescendant(Locator.tagWithClass("button", "clickable-text"))
-                .descendant(Locator.tag("code"))
-                .findElements(lastResponse).stream()
+        return Locators.applicableSqlCode.findElements(lastResponse).stream()
                 .map(WebElement::getText)
                 .collect(Collectors.toList());
     }
@@ -133,17 +127,24 @@ public class CalculatedColumnAssistantDialog extends ModalDialog
     }
 
     /**
-     * Click "Apply Expression" on the suggestion at the given index in the most recent assistant response.
+     * Click "Apply Expression" on the suggestion at the given index in the most recent assistant response. Waits
+     * up to 5 seconds for at least one applicable expression to render — the spinner disappears as soon as the
+     * bubble exists, but the inner {@code assistant-expression} block sometimes finishes rendering a moment later.
      */
     public DomainFieldRow applySuggestedExpression(int index)
     {
-        WebElement lastResponse = lastAssistantResponseElement();
-        if (lastResponse == null)
-            throw new IllegalStateException("No assistant response is available to apply.");
-        List<WebElement> buttons = Locator.tagWithClass("div", "assistant-expression")
-                .descendant(Locator.tagWithClass("button", "clickable-text"))
-                .findElements(lastResponse);
-        if (index < 0 || index >= buttons.size())
+        List<WebElement> buttons = new ArrayList<>();
+        WebDriverWrapper.waitFor(() -> {
+                    buttons.clear();
+                    WebElement last = lastAssistantResponseElement();
+                    if (last != null)
+                        buttons.addAll(Locators.applyButton.findElements(last));
+                    return !buttons.isEmpty();
+                },
+                "No applicable expression rendered in the assistant response.",
+                5_000);
+
+        if (index >= buttons.size())
             throw new IndexOutOfBoundsException(
                     "Requested expression index " + index + " but only " + buttons.size() + " expression(s) available.");
         buttons.get(index).click();
@@ -165,7 +166,7 @@ public class CalculatedColumnAssistantDialog extends ModalDialog
      */
     public boolean isPending()
     {
-        return Locator.tagWithClass("div", "chat-item").withClass("pending").existsIn(this);
+        return Locators.pendingBubble.existsIn(this);
     }
 
     /**
@@ -174,10 +175,7 @@ public class CalculatedColumnAssistantDialog extends ModalDialog
      */
     public void clickStop()
     {
-        Locator.tagWithClass("button", "prompt-button")
-                .withDescendant(Locator.tagWithClass("i", "fa-stop"))
-                .findElement(this)
-                .click();
+        Locators.stopButton.findElement(this).click();
     }
 
     /**
@@ -191,8 +189,7 @@ public class CalculatedColumnAssistantDialog extends ModalDialog
 
     private WebElement lastAssistantResponseElement()
     {
-        List<WebElement> responses = Locator.tagWithClass("div", "chat-item").withClass("assistant-response")
-                .findElements(this);
+        List<WebElement> responses = Locators.assistantResponse.findElements(this);
         return responses.isEmpty() ? null : responses.get(responses.size() - 1);
     }
 
@@ -218,16 +215,31 @@ public class CalculatedColumnAssistantDialog extends ModalDialog
         return (ElementCache) super.elementCache();
     }
 
+    public static class Locators
+    {
+        public static final Locator.XPathLocator assistantResponse = Locator.tagWithClass("div", "chat-item").withClass("assistant-response");
+
+        public static final Locator.XPathLocator pendingBubble = Locator.tagWithClass("div", "chat-item").withClass("pending");
+
+        public static final Locator.XPathLocator thinkingSpinner = Locator.tagWithClass("i", "fa-spinner");
+
+        public static final Locator.XPathLocator applyButton = Locator.tagWithClass("div", "assistant-expression")
+                .descendant(Locator.tagWithClass("button", "clickable-text"));
+
+        public static final Locator.XPathLocator applicableSqlCode = Locator.tagWithClass("div", "assistant-expression")
+                .withDescendant(Locator.tagWithClass("button", "clickable-text"))
+                        .descendant(Locator.tag("code"));
+
+        public static final Locator.XPathLocator stopButton = Locator.tagWithClass("button", "prompt-button")
+                .withDescendant(Locator.tagWithClass("i", "fa-stop"));
+    }
+
     protected class ElementCache extends ModalDialog.ElementCache
     {
-        final WebElement endChatButton = Locator.tagWithClass("button", "btn")
-                .withText("End Chat")
-                .refindWhenNeeded(this);
+        final WebElement endChatButton = Locator.tagWithClass("button", "btn").withText("End Chat").refindWhenNeeded(this);
 
-        final WebElement promptInput = Locator.tagWithClass("textarea", "prompt-input")
-                .refindWhenNeeded(this);
+        final WebElement promptInput = Locator.tagWithClass("textarea", "prompt-input").refindWhenNeeded(this);
 
-        final WebElement promptSubmitButton = Locator.tagWithClass("button", "prompt-button")
-                .refindWhenNeeded(this);
+        final WebElement promptSubmitButton = Locator.tagWithClass("button", "prompt-button").refindWhenNeeded(this);
     }
 }
