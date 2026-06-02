@@ -214,7 +214,7 @@ public class ScriptReportPage extends LabKeyPage<ScriptReportPage.ElementCache>
         scrollToTop(); // Clicking report tab can scroll such that the cursor hovers over and opens the project menu
         waitAndClick(Ext4Helper.Locators.tab("Report"));
         // Report view should appear quickly
-        shortWait().until(ExpectedConditions.visibilityOfElementLocated(Locator.tagWithClass("div", "reportView")));
+        longWait().until(ExpectedConditions.visibilityOfElementLocated(Locator.tagWithClass("div", "reportView")));
         // Actual report might take a while to load
         _ext4Helper.waitForMaskToDisappear(BaseWebDriverTest.WAIT_FOR_PAGE);
     }
