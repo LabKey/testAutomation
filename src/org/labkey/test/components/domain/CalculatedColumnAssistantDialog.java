@@ -240,6 +240,6 @@ public class CalculatedColumnAssistantDialog extends ModalDialog
 
         final WebElement promptInput = Locator.tagWithClass("textarea", "prompt-input").findWhenNeeded(this);
 
-        final WebElement promptSubmitButton = Locator.tagWithClass("button", "prompt-button").findWhenNeeded(this);
+        final WebElement promptSubmitButton = Locator.tagWithClass("button", "prompt-button").refindWhenNeeded(this);
     }
 }
