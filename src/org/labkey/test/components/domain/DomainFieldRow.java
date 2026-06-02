@@ -1090,8 +1090,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
      */
     public CalculatedColumnAssistantDialog openAIAssistant()
     {
-        if (!isExpanded())
-            expand();
+        expand();
         elementCache().aiAssistantButton.click();
         return new CalculatedColumnAssistantDialog(this);
     }
@@ -1102,8 +1101,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
      */
     public boolean hasAIAssistantButton()
     {
-        if (!isExpanded())
-            expand();
+        expand();
         return Locator.tagWithClass("button", "btn")
                 .withText("AI Assistant")
                 .findElementOrNull(this) != null;

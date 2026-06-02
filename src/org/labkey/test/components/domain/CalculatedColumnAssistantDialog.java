@@ -236,10 +236,10 @@ public class CalculatedColumnAssistantDialog extends ModalDialog
 
     protected class ElementCache extends ModalDialog.ElementCache
     {
-        final WebElement endChatButton = Locator.tagWithClass("button", "btn").withText("End Chat").refindWhenNeeded(this);
+        final WebElement endChatButton = Locator.tagWithClass("button", "btn").withText("End Chat").findWhenNeeded(this);
 
-        final WebElement promptInput = Locator.tagWithClass("textarea", "prompt-input").refindWhenNeeded(this);
+        final WebElement promptInput = Locator.tagWithClass("textarea", "prompt-input").findWhenNeeded(this);
 
-        final WebElement promptSubmitButton = Locator.tagWithClass("button", "prompt-button").refindWhenNeeded(this);
+        final WebElement promptSubmitButton = Locator.tagWithClass("button", "prompt-button").findWhenNeeded(this);
     }
 }
