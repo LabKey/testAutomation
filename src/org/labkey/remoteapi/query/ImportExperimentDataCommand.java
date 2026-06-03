@@ -28,7 +28,6 @@ public class ImportExperimentDataCommand extends ImportDataCommand
 {
     private AuditLogHelper.AuditBehaviorType _auditBehavior;
     private Boolean _crossTypeImport;
-    private Boolean _crossFolderImport;
     private String _containerPath;
 
     public ImportExperimentDataCommand(String schemaName, String queryName, String containerPath)
@@ -57,16 +56,6 @@ public class ImportExperimentDataCommand extends ImportDataCommand
         _crossTypeImport = crossTypeImport;
     }
 
-    public Boolean getCrossFolderImport()
-    {
-        return _crossFolderImport;
-    }
-
-    public void setCrossFolderImport(Boolean crossFolderImport)
-    {
-        _crossFolderImport = crossFolderImport;
-    }
-
     @Override
     protected HttpPost createRequest(URI uri) {
         HttpPost post = super.createRequest(uri);
@@ -76,8 +65,6 @@ public class ImportExperimentDataCommand extends ImportDataCommand
             params.put("auditBehavior", _auditBehavior.name());
         if (_crossTypeImport)
             params.put("crossTypeImport", "true");
-        if (_crossFolderImport)
-            params.put("crossFolderImport", "true");
         String url = WebTestHelper.buildURL("experiment", _containerPath, action, params);
         try
         {
