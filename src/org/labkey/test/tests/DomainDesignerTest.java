@@ -40,6 +40,7 @@ import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.serverapi.collections.ArrayListMap;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.SortDirection;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
@@ -1915,6 +1916,47 @@ public class DomainDesignerTest extends BaseWebDriverTest
                 .findFirst().orElse(null);
         assertNotNull("did not find conditionalFormat [" + filterExpression + "] on column. Column properties: " + column.getAllProperties().toString(), conditionalFormat);
         return conditionalFormat;
+    }
+
+    @Test // GitHub Issue #1023
+    public void testNoExternalReturnUrlRedirect() throws Exception
+    {
+        String listName = "ExternalRedirectTestList";
+        TestDataGenerator dgen = new TestDataGenerator("lists", listName, getProjectName())
+                .withColumns(List.of(new FieldDefinition("testField", FieldDefinition.ColumnType.String)));
+        dgen.createDomain(createDefaultConnection(), "IntList", Map.of("keyName", "id"));
+
+        // Verify a valid local returnUrl is used as expected
+        String localReturnUrl = WebTestHelper.buildURL("query", getProjectName(), "begin");
+        beginAt(WebTestHelper.buildURL("core", getProjectName(), "domainDesigner",
+                Map.of("schemaName", "lists", "queryName", listName, "returnUrl", localReturnUrl)));
+        DomainDesignerPage domainDesignerPage = new DomainDesignerPage(getDriver());
+        domainDesignerPage.fieldsPanel();
+        domainDesignerPage.clickCancel();
+        String postCancelUrl = getDriver().getCurrentUrl();
+        assertTrue("Cancel with a local returnUrl should redirect to the specified local page",
+                postCancelUrl.contains("query-begin.view"));
+
+        // Navigate to domain designer with an external returnUrl. The safeRedirect action
+        // should prevent external redirects, falling back to the local home page instead.
+        List<String> domainDesignerUrls = new ArrayList<>();
+        domainDesignerUrls.add(WebTestHelper.buildURL("core", getProjectName(), "domainDesigner",
+                Map.of("schemaName", "lists", "queryName", listName, "returnUrl", "https://labkey.com")));
+        domainDesignerUrls.add(WebTestHelper.buildURL("list", getProjectName(), "editListDefinition", Map.of("returnUrl", "https://labkey.com")));
+        domainDesignerUrls.add(WebTestHelper.buildURL("experiment", getProjectName(), "editSampleType", Map.of("returnUrl", "https://labkey.com")));
+        domainDesignerUrls.add(WebTestHelper.buildURL("experiment", getProjectName(), "editDataClass", Map.of("returnUrl", "https://labkey.com")));
+        for (String domainDesignerUrl : domainDesignerUrls)
+        {
+            beginAt(domainDesignerUrl);
+            domainDesignerPage = new DomainDesignerPage(getDriver());
+            domainDesignerPage.fieldsPanel();
+            domainDesignerPage.clickCancel();
+            postCancelUrl = getDriver().getCurrentUrl();
+            assertFalse("Cancel with an external returnUrl should not navigate to an external site",
+                    postCancelUrl.contains("labkey.com"));
+            assertTrue("Cancel with an external returnUrl should redirect to a local LabKey page instead of: " + postCancelUrl,
+                    WebTestHelper.isTestServerUrl(postCancelUrl));
+        }
     }
 
     @Override
