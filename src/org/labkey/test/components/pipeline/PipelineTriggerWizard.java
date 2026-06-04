@@ -272,6 +272,12 @@ public class PipelineTriggerWizard extends WebDriverComponent<PipelineTriggerWiz
         getWrapper().clickAndWait(elementCache().saveButton);
     }
 
+    public boolean isSaveEnabled()
+    {
+        goToConfiguration();
+        return elementCache().saveButton.isEnabled();
+    }
+
     public PipelineTriggerWizard saveAndExpectError(String error)
     {
         goToConfiguration();
