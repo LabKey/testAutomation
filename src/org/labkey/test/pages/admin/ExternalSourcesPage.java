@@ -220,6 +220,7 @@ public class ExternalSourcesPage extends LabKeyPage<ExternalSourcesPage.ElementC
         Connection("connect-src"),
         Font("font-src"),
         Frame("frame-src"),
+        FrameAncestors("frame-ancestors"),
         Image("image-src"),
         Object("object-src"),
         Script("script-src"),
