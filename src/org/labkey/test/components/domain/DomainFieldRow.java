@@ -1085,6 +1085,28 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         return getWrapper().getFormElement(elementCache().expressionInput);
     }
 
+    /**
+     * Click the "AI Assistant" button in the expanded Calculation field options and return the resulting dialog.
+     */
+    public CalculatedColumnAssistantDialog openAIAssistant()
+    {
+        expand();
+        elementCache().aiAssistantButton.click();
+        return new CalculatedColumnAssistantDialog(this);
+    }
+
+    /**
+     * @return true if the "AI Assistant" button is present in the expanded Calculation field options.
+     * The button is only available when the {@code professional} module is enabled.
+     */
+    public boolean hasAIAssistantButton()
+    {
+        expand();
+        return Locator.tagWithClass("button", "btn")
+                .withText("AI Assistant")
+                .findElementOrNull(this) != null;
+    }
+
     // advanced settings
 
     public DomainFieldRow showFieldOnDefaultView(boolean checked)
@@ -1778,6 +1800,7 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         public final WebElement expressionStatusError = expressionStatusMsgLoc.descendant(Locator.tagWithClass("span", "error")).refindWhenNeeded(this);
         public final WebElement expressionStatusMsg = expressionStatusMsgLoc.childTag("div").refindWhenNeeded(this);
         public final WebElement expressionValidateLink = expressionStatusMsgLoc.child(Locator.tagWithClass("div", "validate-link")).refindWhenNeeded(this);
+        public final WebElement aiAssistantButton = Locator.tagWithClass("button", "btn").withText("AI Assistant").refindWhenNeeded(this);
 
         Locator.XPathLocator aliquotWarningAlert = Locator.tagWithClassContaining("div", "aliquot-alert-warning");
 
