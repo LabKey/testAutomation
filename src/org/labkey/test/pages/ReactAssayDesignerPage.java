@@ -298,7 +298,7 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
         {
             getWrapper().waitFor(()-> Locator.tagWithClass("div", "alert-danger").withText(expectedError).isDisplayed(this),
                     "Transform script expected error not found", WAIT_FOR_JAVASCRIPT);
-            getWrapper().click(Locator.tagWithClass("i", "container--removal-icon"));
+            getWrapper().click(Locator.tagWithClass("span", "container--removal-icon"));
         }
 
         return this;
