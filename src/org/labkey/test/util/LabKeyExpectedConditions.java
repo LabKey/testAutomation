@@ -271,7 +271,7 @@ public class LabKeyExpectedConditions
         }
 
         @Override @NotNull
-        public <V> V until(@NotNull Function<? super T, V> isTrue)
+        public <V> V until(@NotNull Function<? super T, ? extends V> isTrue)
         {
             List<V> result;
             result = _wrapped.until(input -> {
