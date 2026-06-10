@@ -388,10 +388,17 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
     public void attemptSignIn(String email, String password)
     {
-        if (isSignedIn())
+        attemptSignIn(email, password, false);
+    }
+
+    public void attemptSignIn(String email, String password, boolean isReAuth)
+    {
+        if (!isReAuth && isSignedIn())
             throw new IllegalStateException("You need to be logged out to log in. Please log out to log in.");
 
-        if (!getDriver().getTitle().contains("Sign In"))
+        boolean onLoginPage = getDriver().getTitle().contains("Sign In");
+
+        if (!onLoginPage && !isReAuth)
         {
             try
             {
@@ -403,13 +410,17 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                 throw new IllegalStateException("Unable to find \"Sign In\" link on current page.", error);
             }
         }
+        else if (!onLoginPage)
+        {
+            throw new IllegalStateException("Unable to Sign In, not already on the Sign In page");
+        }
 
         assertTitleContains("Sign In");
 
         assertElementPresent(Locator.tagWithName("form", "login"));
         setFormElement(Locator.id("email"), email);
         setFormElement(Locator.id("password"), password);
-        WebElement signInButton = Locator.button("Sign In").findElement(getDriver());
+        WebElement signInButton = Locator.byClass("signin-btn").findElement(getDriver());
         doAndMaybeWaitForPageToLoad(10_000, () -> {
             signInButton.click();
             shortWait().until(ExpectedConditions.invisibilityOfElementLocated(Locator.byClass("signing-in-msg")));
@@ -418,6 +429,11 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                     ExpectedConditions.presenceOfElementLocated(Locators.labkeyError.withText()))); // Error during sign-in
             return ExpectedConditions.stalenessOf(signInButton).apply(null);
         });
+    }
+
+    public void attemptReauth()
+    {
+        attemptSignIn(PasswordUtil.getUsername(), PasswordUtil.getPassword(), true);
     }
 
     public void signInShouldFail(String email, String password, String... expectedMessages)
