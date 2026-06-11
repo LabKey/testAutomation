@@ -16,9 +16,15 @@
 
 package org.labkey.test.tests.nab;
 
+import org.jetbrains.annotations.Nullable;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.query.ContainerFilter;
+import org.labkey.remoteapi.query.Filter;
+import org.labkey.remoteapi.query.SelectRowsCommand;
+import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
@@ -37,13 +43,18 @@ import org.labkey.test.pages.assay.plate.PlateTemplateListPage;
 import org.labkey.test.pages.query.NewQueryPage;
 import org.labkey.test.pages.query.SourceQueryPage;
 import org.labkey.test.tests.AbstractAssayTest;
+import org.labkey.test.util.APIAssayHelper;
+import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.AssayImportOptions;
 import org.labkey.test.util.AssayImporter;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.DilutionAssayHelper;
 import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.PermissionsHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.QCAssayScriptHelper;
+import org.labkey.test.util.SimpleHttpRequest;
+import org.labkey.test.util.SimpleHttpResponse;
 import org.labkey.test.util.TestLogger;
 import org.labkey.test.util.WikiHelper;
 import org.openqa.selenium.WebDriverException;
@@ -51,9 +62,11 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -72,6 +85,10 @@ public class NabAssayTest extends AbstractAssayTest
 
     protected final static String TEST_ASSAY_USR_NAB_READER = "nabreader1@security.test";
     private final static String TEST_ASSAY_GRP_NAB_READER = "Nab Dataset Reader";
+
+    // Container-scoping fixtures (GitHub Issue #1892, NAB-1/2/8/9): a "bystander" folder and a user privileged only there.
+    private final static String TEST_ASSAY_FLDR_NAB_SCOPE = "NabScopeBystanderFolder";
+    private final static String TEST_ASSAY_USR_NAB_SCOPE = "nabscope@security.test";
 
     private static final String NAB_FILENAME2 = "m0902053;3999.xls";
     protected final File TEST_ASSAY_NAB_FILE1 = TestFileUtils.getSampleData("Nab/m0902051;3997.xls");
@@ -170,6 +187,8 @@ public class NabAssayTest extends AbstractAssayTest
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         super.doCleanup(afterTest);
+
+        _userHelper.deleteUsers(false, TEST_ASSAY_USR_NAB_SCOPE);
 
         try
         {
@@ -383,6 +402,9 @@ public class NabAssayTest extends AbstractAssayTest
         startSystemMaintenance("Database");
         waitForSystemMaintenanceCompletion();
 
+        // Verify cross-container access control for the run/specimen-resolving actions (NAB-1/2/8/9) while the imported runs are still present.
+        verifyContainerScopedAccessControl();
+
         // Return to the run list
         navigateToFolder(getProjectName(), TEST_ASSAY_FLDR_NAB);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
@@ -487,6 +509,94 @@ public class NabAssayTest extends AbstractAssayTest
         directBrowserQueryTest();
 
         runNabQCTest();
+    }
+
+    /**
+     * GitHub Issue #1892: Selenium coverage for the NAb container-scoping fixes (NAB-1, NAB-2, NAB-8, NAB-9). Each of these
+     * actions resolves a run (by global rowId) or a NAb specimen object id (resolved to its run by a global, cross-container
+     * lookup) without an intrinsic container check. A user privileged only in a bystander folder must not be able to reach a
+     * run living in the (foreign) assay folder by pointing one of these actions at its row/object id while scoping the request
+     * to the bystander folder. We capture the ids as the admin, then issue the requests as an impersonated bystander Editor.
+     */
+    @LogMethod
+    private void verifyContainerScopedAccessControl()
+    {
+        // Capture a protocol id, a run rowId, and a NAb specimen object id from the (foreign) assay folder — done as the admin, before impersonating.
+        int protocolId = ((APIAssayHelper) _assayHelper).getIdFromAssayName(TEST_ASSAY_NAB, "/" + getProjectName());
+        int runId = firstRowId("Runs", null);
+        int objectId = firstRowId("Data", null);
+        assertTrue("Expected an imported NAb run and specimen to scope against", runId > 0 && objectId > 0);
+
+        // A user who is an Editor (read + delete) in the bystander folder only — no access to the assay folder where the run lives.
+        _containerHelper.createSubfolder(getProjectName(), TEST_ASSAY_FLDR_NAB_SCOPE);
+        String bystanderPath = getProjectName() + "/" + TEST_ASSAY_FLDR_NAB_SCOPE;
+        _userHelper.createUser(TEST_ASSAY_USR_NAB_SCOPE);
+        new ApiPermissionsHelper(this).addMemberToRole(TEST_ASSAY_USR_NAB_SCOPE, "Editor", PermissionsHelper.MemberType.user, "/" + bystanderPath);
+
+        impersonate(TEST_ASSAY_USR_NAB_SCOPE);
+        try
+        {
+            // NAB-2: DownloadDatafileAction resolves the run by global rowId.
+            assertForeignContainerRejected("downloadDatafile (NAB-2)",
+                    WebTestHelper.buildURL("nabassay", bystanderPath, "downloadDatafile", Map.of("rowId", String.valueOf(runId))), "GET");
+
+            // NAB-8: NabMultiGraphAction -> MultiGraphAction.getView resolves the object ids to runs.
+            assertForeignContainerRejected("nabMultiGraph (NAB-8)",
+                    WebTestHelper.buildURL("nabassay", bystanderPath, "nabMultiGraph", Map.of("protocolId", String.valueOf(protocolId), "id", String.valueOf(objectId))), "GET");
+
+            // NAB-9: NabGraphSelectedAction -> GraphSelectedAction.getView resolves the object ids to runs.
+            assertForeignContainerRejected("nabGraphSelected (NAB-9)",
+                    WebTestHelper.buildURL("nabassay", bystanderPath, "nabGraphSelected", Map.of("protocolId", String.valueOf(protocolId), "id", String.valueOf(objectId))), "GET");
+
+            // NAB-1: DeleteRunAction resolves the run by global rowId; this action is a POST.
+            assertForeignContainerRejected("deleteRun (NAB-1)",
+                    WebTestHelper.buildURL("nabassay", bystanderPath, "deleteRun", Map.of("rowId", String.valueOf(runId))), "POST");
+        }
+        finally
+        {
+            stopImpersonating();
+        }
+
+        // The run must survive the rejected cross-container delete attempt.
+        assertEquals("Foreign-container delete must not remove the run", runId, firstRowId("Runs", List.of(new Filter("RowId", runId))));
+    }
+
+    /** Fetch the RowId of the first row of an assay.NAb query across the project's subfolders, as the admin. Returns -1 if none. */
+    private int firstRowId(String queryName, @Nullable List<Filter> filters)
+    {
+        SelectRowsCommand command = new SelectRowsCommand("assay.NAb." + TEST_ASSAY_NAB, queryName);
+        command.setColumns(List.of("RowId"));
+        command.setContainerFilter(ContainerFilter.CurrentAndSubfolders);
+        if (filters != null)
+            command.setFilters(filters);
+        try
+        {
+            SelectRowsResponse response = command.execute(createDefaultConnection(), "/" + getProjectName());
+            return response.getRows().isEmpty() ? -1 : ((Number) response.getRows().get(0).get("RowId")).intValue();
+        }
+        catch (IOException | CommandException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void assertForeignContainerRejected(String description, String url, String requestMethod)
+    {
+        SimpleHttpRequest request = new SimpleHttpRequest(url, requestMethod);
+        request.copySession(getDriver()); // execute as the impersonated bystander user (carries CSRF token for the POST)
+        request.clearLogin();             // rely solely on the impersonated session, not admin basic-auth
+        SimpleHttpResponse response;
+        try
+        {
+            response = request.getResponse();
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException(e);
+        }
+        assertEquals("Foreign-container request should be rejected with 404: " + description, 404, response.getResponseCode());
+        assertTrue("Foreign-container rejection for " + description + " should report the resource does not exist, was: " + response.getResponseBody(),
+                response.getResponseBody().contains("exist"));
     }
 
     //Issue 17050: UnsupportedOperationException from org.labkey.nab.query.NabProtocolSchema$NabResultsQueryView.createDataView
