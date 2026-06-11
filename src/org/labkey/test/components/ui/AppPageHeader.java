@@ -20,6 +20,7 @@ import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import static org.labkey.test.util.selenium.WebElementUtils.tryMapElement;
 
@@ -47,6 +48,22 @@ public class AppPageHeader extends WebDriverComponent<AppPageHeader.ElementCache
     public WebDriver getDriver()
     {
         return _driver;
+    }
+
+    @Override
+    protected void waitForReady()
+    {
+        getWrapper().quickWait().withMessage(getClass().getSimpleName() + " is not present.").until(ExpectedConditions.visibilityOf(getComponentElement()));
+    }
+
+    /**
+     * Get the source file of the page icon. If there is no icon returns an empty string.
+     *
+     * @return The 'src' attribute header icon, empty string if element is not there.
+     */
+    public String getIconSource()
+    {
+        return tryMapElement(elementCache().icon, el -> el.getDomAttribute("src"));
     }
 
     /**
@@ -85,16 +102,6 @@ public class AppPageHeader extends WebDriverComponent<AppPageHeader.ElementCache
     public String getLabelColor()
     {
         throw new UnsupportedOperationException("Label color is not supported by AppPageHeader.");
-    }
-
-    /**
-     * Get the source file of the page icon. If there is no icon returns an empty string.
-     *
-     * @return The 'src' attribute header icon, empty string if element is not there.
-     */
-    public String getIconSource()
-    {
-        return tryMapElement(elementCache().icon, el -> el.getDomAttribute("src"));
     }
 
     @Override
