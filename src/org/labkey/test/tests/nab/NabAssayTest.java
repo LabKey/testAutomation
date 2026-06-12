@@ -17,11 +17,12 @@
 package org.labkey.test.tests.nab;
 
 import org.jetbrains.annotations.Nullable;
+import org.json.JSONObject;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
-import org.labkey.remoteapi.query.ContainerFilter;
+import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
@@ -71,6 +72,7 @@ import java.util.Map;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 @Category({Daily.class, Assays.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 15)
@@ -86,7 +88,7 @@ public class NabAssayTest extends AbstractAssayTest
     protected final static String TEST_ASSAY_USR_NAB_READER = "nabreader1@security.test";
     private final static String TEST_ASSAY_GRP_NAB_READER = "Nab Dataset Reader";
 
-    // Container-scoping fixtures (GitHub Issue #1892, NAB-1/2/8/9): a "bystander" folder and a user privileged only there.
+    // Container-scoping fixtures (GitHub Kanban #1892, NAB-1/2/8/9): a "bystander" folder and a user privileged only there.
     private final static String TEST_ASSAY_FLDR_NAB_SCOPE = "NabScopeBystanderFolder";
     private final static String TEST_ASSAY_USR_NAB_SCOPE = "nabscope@security.test";
 
@@ -366,6 +368,13 @@ public class NabAssayTest extends AbstractAssayTest
                         build()).doImport();
 
         verifyRunDetails();
+
+        verifyCrossContainerExcludedWellsDenied();
+        verifyCrossContainerQCControlInfoDenied();
+        verifyCrossContainerQCDataDenied();
+        verifyCrossContainerSaveQCControlInfoDenied();
+        verifyCrossContainerGraphDenied();
+
         // Test editing runs
         // Set the design to allow editing
         clickAndWait(Locator.linkWithText("View Runs"));
@@ -512,7 +521,7 @@ public class NabAssayTest extends AbstractAssayTest
     }
 
     /**
-     * GitHub Issue #1892: Selenium coverage for the NAb container-scoping fixes (NAB-1, NAB-2, NAB-8, NAB-9). Each of these
+     * GitHub Kanban #1892: Selenium coverage for the NAb container-scoping fixes (NAB-1, NAB-2, NAB-8, NAB-9). Each of these
      * actions resolves a run (by global rowId) or a NAb specimen object id (resolved to its run by a global, cross-container
      * lookup) without an intrinsic container check. A user privileged only in a bystander folder must not be able to reach a
      * run living in the (foreign) assay folder by pointing one of these actions at its row/object id while scoping the request
@@ -523,8 +532,9 @@ public class NabAssayTest extends AbstractAssayTest
     {
         // Capture a protocol id, a run rowId, and a NAb specimen object id from the (foreign) assay folder — done as the admin, before impersonating.
         int protocolId = ((APIAssayHelper) _assayHelper).getIdFromAssayName(TEST_ASSAY_NAB, "/" + getProjectName());
-        int runId = firstRowId("Runs", null);
-        int objectId = firstRowId("Data", null);
+        String runFolderPath = getProjectName() + "/" + TEST_ASSAY_FLDR_NAB;
+        int runId = firstRowId("Runs", runFolderPath, null);
+        int objectId = firstRowId("Data", runFolderPath, null);
         assertTrue("Expected an imported NAb run and specimen to scope against", runId > 0 && objectId > 0);
 
         // A user who is an Editor (read + delete) in the bystander folder only — no access to the assay folder where the run lives.
@@ -558,20 +568,19 @@ public class NabAssayTest extends AbstractAssayTest
         }
 
         // The run must survive the rejected cross-container delete attempt.
-        assertEquals("Foreign-container delete must not remove the run", runId, firstRowId("Runs", List.of(new Filter("RowId", runId))));
+        assertEquals("Foreign-container delete must not remove the run", runId, firstRowId("Runs", runFolderPath, List.of(new Filter("RowId", runId))));
     }
 
     /** Fetch the RowId of the first row of an assay.NAb query across the project's subfolders, as the admin. Returns -1 if none. */
-    private int firstRowId(String queryName, @Nullable List<Filter> filters)
+    private int firstRowId(String queryName, String containerPath, @Nullable List<Filter> filters)
     {
         SelectRowsCommand command = new SelectRowsCommand("assay.NAb." + TEST_ASSAY_NAB, queryName);
         command.setColumns(List.of("RowId"));
-        command.setContainerFilter(ContainerFilter.CurrentAndSubfolders);
         if (filters != null)
             command.setFilters(filters);
         try
         {
-            SelectRowsResponse response = command.execute(createDefaultConnection(), "/" + getProjectName());
+            SelectRowsResponse response = command.execute(createDefaultConnection(), containerPath);
             return response.getRows().isEmpty() ? -1 : ((Number) response.getRows().get(0).get("RowId")).intValue();
         }
         catch (IOException | CommandException e)
@@ -597,6 +606,119 @@ public class NabAssayTest extends AbstractAssayTest
         assertEquals("Foreign-container request should be rejected with 404: " + description, 404, response.getResponseCode());
         assertTrue("Foreign-container rejection for " + description + " should report the resource does not exist, was: " + response.getResponseBody(),
                 response.getResponseBody().contains("exist"));
+    }
+
+    // GitHub Kanban #1892: verify GetExcludedWellsAction resolves run by RowId and container
+    @LogMethod
+    private void verifyCrossContainerExcludedWellsDenied()
+    {
+        String runFolderPath = getProjectName() + "/" + TEST_ASSAY_FLDR_NAB;
+        int runId = firstRowId("Runs", runFolderPath, null);
+
+        log("Excluded wells request from the run's own folder should succeed");
+        SimpleHttpResponse ownFolder = getNabRunApi("getExcludedWells.api", runFolderPath, runId);
+        assertEquals("Excluded wells request in the run's own folder should succeed", 200, ownFolder.getResponseCode());
+        assertTrue("Excluded wells response should include the excluded payload", ownFolder.getResponseBody().contains("\"excluded\""));
+
+        log("The same run requested from a different container (the project) must be denied, not disclosed");
+        SimpleHttpResponse crossContainer = getNabRunApi("getExcludedWells.api", getProjectName(), runId);
+        assertEquals("Cross-container excluded wells request should be denied", 400, crossContainer.getResponseCode());
+        assertFalse("Cross-container request must not disclose excluded well data", crossContainer.getResponseBody().contains("\"excluded\""));
+        assertTrue("Cross-container error message not as expected", crossContainer.getResponseBody().contains("NAb Run " + runId + " does not exist."));
+    }
+
+    // GitHub Kanban #1892: verify GetQCControlInfoAction resolves run by RowId and container
+    @LogMethod
+    private void verifyCrossContainerQCControlInfoDenied()
+    {
+        String runFolderPath = getProjectName() + "/" + TEST_ASSAY_FLDR_NAB;
+        int runId = firstRowId("Runs", runFolderPath, null);
+
+        log("QC control info request from the run's own folder should succeed");
+        SimpleHttpResponse ownFolder = getNabRunApi("getQCControlInfo.api", runFolderPath, runId);
+        assertEquals("QC control info request in the run's own folder should succeed", 200, ownFolder.getResponseCode());
+        assertTrue("QC control info response should include the plates payload", ownFolder.getResponseBody().contains("\"plates\""));
+
+        log("The same run requested from a different container (the project) must be denied, not disclosed");
+        SimpleHttpResponse crossContainer = getNabRunApi("getQCControlInfo.api", getProjectName(), runId);
+        assertEquals("Cross-container QC control info request should be denied", 404, crossContainer.getResponseCode());
+        assertFalse("Cross-container request must not disclose plate data", crossContainer.getResponseBody().contains("\"plates\""));
+        assertTrue("Cross-container error message not as expected", crossContainer.getResponseBody().contains("Run " + runId + " does not exist."));
+    }
+
+    // GitHub Kanban #1892: verify QCDataAction resolves run by RowId and container
+    @LogMethod
+    private void verifyCrossContainerQCDataDenied()
+    {
+        String runFolderPath = getProjectName() + "/" + TEST_ASSAY_FLDR_NAB;
+        int runId = firstRowId("Runs", runFolderPath, null);
+
+        log("QC data view from the run's own folder should render");
+        SimpleHttpResponse ownFolder = getNabRunApi("qcData.view", runFolderPath, runId);
+        assertEquals("QC data view in the run's own folder should render", 200, ownFolder.getResponseCode());
+
+        log("The same run requested from a different container (the project) must be denied, not disclosed");
+        SimpleHttpResponse crossContainer = getNabRunApi("qcData.view", getProjectName(), runId);
+        assertEquals("Cross-container QC data view should be denied", 404, crossContainer.getResponseCode());
+        assertTrue("Cross-container error message not as expected", crossContainer.getResponseBody().contains("Run " + runId + " does not exist."));
+    }
+
+    // GitHub Kanban #1892: verify SaveQCControlInfoAction resolves run by RunId and container (write path)
+    @LogMethod
+    private void verifyCrossContainerSaveQCControlInfoDenied()
+    {
+        String runFolderPath = getProjectName() + "/" + TEST_ASSAY_FLDR_NAB;
+        int runId = firstRowId("Runs", runFolderPath, null);
+
+        log("Saving QC control info for the run from a different container (the project) must be denied");
+        SimplePostCommand command = new SimplePostCommand("nabassay", "saveQCControlInfo");
+        command.setJsonObject(new JSONObject().put("runId", runId));
+        try
+        {
+            command.execute(createDefaultConnection(), getProjectName());
+            fail("Cross-container QC control info save should have been denied");
+        }
+        catch (CommandException e)
+        {
+            assertEquals("Cross-container QC control info save should be denied", 400, e.getStatusCode());
+            assertTrue("Cross-container error message not as expected", e.getMessage().contains("NAb Run " + runId + " does not exist."));
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
+    // GitHub Kanban #1892: verify DilutionGraphAction (NAb GraphAction) resolves run by RowId and container
+    @LogMethod
+    private void verifyCrossContainerGraphDenied()
+    {
+        String runFolderPath = getProjectName() + "/" + TEST_ASSAY_FLDR_NAB;
+        int runId = firstRowId("Runs", runFolderPath, null);
+
+        log("NAb graph from the run's own folder should render");
+        SimpleHttpResponse ownFolder = getNabRunApi("graph.view", runFolderPath, runId);
+        assertEquals("NAb graph in the run's own folder should render", 200, ownFolder.getResponseCode());
+
+        log("The same run requested from a different container (the project) must be denied, not disclosed");
+        SimpleHttpResponse crossContainer = getNabRunApi("graph.view", getProjectName(), runId);
+        assertEquals("Cross-container NAb graph should be denied", 404, crossContainer.getResponseCode());
+        assertTrue("Cross-container error message not as expected", crossContainer.getResponseBody().contains("Run " + runId + " does not exist."));
+    }
+
+    private SimpleHttpResponse getNabRunApi(String action, String containerPath, long runId)
+    {
+        String url = WebTestHelper.buildURL("nabassay", containerPath, action, Map.of("rowId", String.valueOf(runId)));
+        SimpleHttpRequest request = new SimpleHttpRequest(url);
+        request.copySession(getDriver());
+        try
+        {
+            return request.getResponse();
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
     //Issue 17050: UnsupportedOperationException from org.labkey.nab.query.NabProtocolSchema$NabResultsQueryView.createDataView
