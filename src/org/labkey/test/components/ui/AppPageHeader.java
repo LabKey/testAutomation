@@ -116,6 +116,7 @@ public class AppPageHeader extends WebDriverComponent<AppPageHeader.ElementCache
         public final WebElement title = getTitleLocator().findWhenNeeded(this);
         public final WebElement subtitle = getSubtitleLocator().findWhenNeeded(this);
         public final WebElement description = getDescriptionLocator().findWhenNeeded(this);
+        public final WebElement children = Locator.byClass("app-page-header__children").findWhenNeeded(this);
 
         protected Locator.XPathLocator getIconLocator()
         {
