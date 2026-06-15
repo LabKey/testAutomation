@@ -18,6 +18,10 @@ package org.labkey.test.tests.issues;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.api.security.permissions.UpdatePermission;
+import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.CommandResponse;
+import org.labkey.remoteapi.SimpleGetCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
@@ -37,10 +41,13 @@ import org.labkey.test.util.Maps;
 import org.labkey.test.util.PermissionsHelper;
 import org.labkey.test.util.PortalHelper;
 
+import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
@@ -88,12 +95,12 @@ public class IssuesAdminTest extends BaseWebDriverTest
 
         _issuesHelper.createNewIssuesList(ISSUE_LIST_NAME, _containerHelper);
         IssuesAdminPage adminPage = IssuesAdminPage.beginAt(this, getProjectName(), ISSUE_LIST_NAME);
-        adminPage.setAssignedTo(null); // All Project Users
+        adminPage.setAssignedTo(null); // All users with update permission in this project
         adminPage.clickSave();
     }
 
     @Test
-    public void testEmptyAssignedToList() throws Exception
+    public void testAssignedToList() throws IOException, CommandException
     {
         goToProjectHome();
         final String group = "AssignedToGroup";
@@ -102,19 +109,49 @@ public class IssuesAdminTest extends BaseWebDriverTest
         _permissionsHelper.createProjectGroup(group, getProjectName());
         goToModule("Issues");
         OptionSelect assignedTo = new ListPage(getDriver())
-                .clickNewIssue()
-                .assignedTo();
+            .clickNewIssue()
+            .assignedTo();
+
+        // Nobody should be assigned in new issue
         assertEquals("", assignedTo.get());
-        assertEquals(Collections.singletonList(""), getTexts(assignedTo.getOptions()));
+
+        // By default, all users with update permissions should appear in the assigned-to list
+        SimpleGetCommand command = new SimpleGetCommand("user", "getUsersWithPermissions");
+        command.setParameters(Map.of("permissions", UpdatePermission.class.getName()));
+        CommandResponse response = command.execute(createDefaultConnection(), getProjectName());
+        List<Map<String, Object>> users = response.getProperty("users");
+        Set<String> expected = users.stream()
+            .map(m -> (String)m.get("displayName"))
+            .collect(Collectors.toCollection(HashSet::new)); // Assure mutable
+        expected.add(""); // Empty option is always there
+        log(expected.toString());
+        assertEquals(expected, new HashSet<>(getTexts(assignedTo.getOptions())));
+
+        // Set an empty assigned-to group and ensure no users in the assigned-to list
+        IssuesAdminPage adminPage = IssuesAdminPage.beginAt(this, getProjectName(), ISSUE_LIST_NAME);
+        adminPage.setAssignedTo(group); // Just the users in this group
+        adminPage.clickSave();
+        assignedTo = new ListPage(getDriver())
+            .clickNewIssue()
+            .assignedTo();
+        assertEquals("", assignedTo.get());
+        assertEquals(Arrays.asList(""), getTexts(assignedTo.getOptions())); // Empty list
+
+        // Add a user to the group and ensure they now appear as an option
         _permissionsHelper.addUserToProjGroup(ADMIN_USER, getProjectName(), group);
         refresh();
         assignedTo = new InsertPage(getDriver()).assignedTo();
         assertEquals("", assignedTo.get());
         assertEquals(Arrays.asList("", _userHelper.getDisplayNameForEmail(ADMIN_USER)), getTexts(assignedTo.getOptions()));
+
+        // Reset assigned-to list back to all users with update permission in this project
+        adminPage = IssuesAdminPage.beginAt(this, getProjectName(), ISSUE_LIST_NAME);
+        adminPage.setAssignedTo(null);
+        adminPage.clickSave();
     }
 
     @Test
-    public void testIssueDefinitionRequiresModule() throws Exception
+    public void testIssueDefinitionRequiresModule()
     {
         _containerHelper.createProject(PROJECT2, null);
         _issuesHelper.goToIssueListDefinitions(PROJECT2)
@@ -169,7 +206,7 @@ public class IssuesAdminTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testProtectedFields() throws Exception
+    public void testProtectedFields()
     {
         goToProjectHome();
         clickAndWait(Locator.linkWithText(ISSUE_LIST_NAME));
@@ -186,7 +223,7 @@ public class IssuesAdminTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testRelatedIssuesComments() throws Exception
+    public void testRelatedIssuesComments()
     {
         log("Adding the test user to test group to appear in assigned to drop down");
         if (!_permissionsHelper.isUserInGroup(TEST_USER, TEST_GROUP,getProjectName(), PermissionsHelper.PrincipalType.USER))
