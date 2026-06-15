@@ -15,11 +15,15 @@
  */
 package org.labkey.test.tests.elisa;
 
+import org.apache.hc.core5.http.HttpStatus;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.query.SelectRowsCommand;
+import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.pages.ReactAssayDesignerPage;
@@ -29,11 +33,15 @@ import org.labkey.test.tests.AbstractAssayTest;
 import org.labkey.test.util.OptionalFeatureHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.QCAssayScriptHelper;
+import org.labkey.test.util.SimpleHttpResponse;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 @Category({Daily.class, Assays.class})
@@ -125,6 +133,43 @@ public class ElisaAssayTest extends AbstractAssayTest
         uploadFile(TEST_ASSAY_ELISA_FILE3, "C", "Save and Import Another Run", true, 1, 5);
         assertTextPresent("Upload successful.");
         uploadFile(TEST_ASSAY_ELISA_FILE4, "D", "Save and Finish", true, 1, 5);
+
+        verifyCurveFitContainerScoping();
+    }
+
+    /**
+     * GitHub #1236 regression test: getCurveFitXYPairs resolves the run by a global runId that is independent of
+     * the container-verified protocol. Verify that a run is only resolvable from its own container, so the action
+     * cannot be used cross-container as a run-existence oracle or to read a foreign run's curve-fit method.
+     */
+    private void verifyCurveFitContainerScoping() throws Exception
+    {
+        log("ELISA-1: getCurveFitXYPairs must reject a runId from another container");
+
+        // Pull a real ELISA run created above by the BVT upload steps.
+        SelectRowsResponse runs = new SelectRowsCommand("assay.ELISA." + TEST_ASSAY_ELISA, "Runs")
+                .execute(createDefaultConnection(), getProjectName());
+        assertFalse("Expected at least one ELISA run to test with", runs.getRows().isEmpty());
+        int runId = ((Number) runs.getRows().get(0).get("RowId")).intValue();
+
+        // A sibling folder with no ELISA run. The admin can read it, so a rejection there can only be due to the run
+        // belonging to a different container -- not a permission failure.
+        String foreignFolder = "ELISA Scoping Folder";
+        _containerHelper.createSubfolder(getProjectName(), foreignFolder);
+
+        // Deny: resolving the run from the foreign container must 404. Pre-fix getExpRun(runId) was global, so this
+        // returned 200 and leaked the run's curveFitMethod label across the container boundary.
+        String foreignUrl = WebTestHelper.buildURL("elisa", getProjectName() + "/" + foreignFolder, "getCurveFitXYPairs",
+                Map.of("runId", String.valueOf(runId)));
+        assertEquals("A run from another container must not be resolvable", HttpStatus.SC_NOT_FOUND,
+                WebTestHelper.getHttpResponse(foreignUrl).getResponseCode());
+
+        // Positive control: the same run requested from its own container still works and returns the curve fit.
+        String ownUrl = WebTestHelper.buildURL("elisa", getProjectName(), "getCurveFitXYPairs",
+                Map.of("runId", String.valueOf(runId), "assayName", TEST_ASSAY_ELISA));
+        SimpleHttpResponse ownResponse = WebTestHelper.getHttpResponse(ownUrl);
+        assertEquals("The run should resolve from its own container", HttpStatus.SC_OK, ownResponse.getResponseCode());
+        assertTrue("Expected curve fit data in the response", ownResponse.getResponseBody().contains("curveFitMethod"));
     }
 
     protected void createTemplate()
