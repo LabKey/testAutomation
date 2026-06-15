@@ -521,7 +521,7 @@ public class NabAssayTest extends AbstractAssayTest
     }
 
     /**
-     * GitHub Kanban #1892: Selenium coverage for the NAb container-scoping fixes (NAB-1, NAB-2, NAB-8, NAB-9). Each of these
+     * GitHub Issue #1892: Selenium coverage for the NAb container-scoping fixes. Each of these
      * actions resolves a run (by global rowId) or a NAb specimen object id (resolved to its run by a global, cross-container
      * lookup) without an intrinsic container check. A user privileged only in a bystander folder must not be able to reach a
      * run living in the (foreign) assay folder by pointing one of these actions at its row/object id while scoping the request
