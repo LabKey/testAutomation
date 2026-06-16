@@ -36,6 +36,7 @@ import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.params.list.ListDefinition;
 import org.labkey.test.params.list.VarListDefinition;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.OptionalFeatureHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
 import org.labkey.test.util.TestDataGenerator;
@@ -196,6 +197,7 @@ public class SampleTypeLimitsTest extends BaseWebDriverTest
     public void testDeriveSamplesLookupFields() throws IOException, CommandException
     {
         goToProjectHome();
+        OptionalFeatureHelper.setOptionalFeature(createDefaultConnection(), "deriveSamplesNotInApp", true);
 
         log("Create sample type with lookup field to " + SAMPLE_TYPE_NAME);
         String sampleTypeName = "SampleTypeWithLookup";

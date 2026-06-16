@@ -40,6 +40,7 @@ import org.labkey.test.pages.study.ManageVisitPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.OptionalFeatureHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
 import org.labkey.test.util.StudyHelper;
@@ -105,6 +106,8 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         new PortalHelper(getDriver()).addBodyWebPart("Datasets");
 
         createSampleTypes();
+        OptionalFeatureHelper.setOptionalFeature(createDefaultConnection(), "deriveSamplesNotInApp", true);
+
     }
 
     private void createSampleTypes()
