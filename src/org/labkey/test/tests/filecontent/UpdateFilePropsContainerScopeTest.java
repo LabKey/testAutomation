@@ -97,6 +97,7 @@ public class UpdateFilePropsContainerScopeTest extends BaseWebDriverTest
         _fileBrowserHelper.uploadFile(localFile);
         String localFileUrl = WebDavUtils.buildBaseWebDavUrl(getProjectName() + "/" + FOLDER_A) + localFile.getName();
 
+        goToProjectHome();
         final File foreignFile = TestFileUtils.getSampleData("security/InlineFile2.html");
         navigateToFolder(getProjectName(), FOLDER_B);
         _fileBrowserHelper.uploadFile(foreignFile);
