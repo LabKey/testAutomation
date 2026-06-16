@@ -90,6 +90,7 @@ public class NabAssayTest extends AbstractAssayTest
 
     // Container-scoping fixtures (GitHub Kanban #1892, NAB-1/2/8/9): a "bystander" folder and a user privileged only there.
     private final static String TEST_ASSAY_FLDR_NAB_SCOPE = "NabScopeBystanderFolder";
+    private final static String TEST_ASSAY_PROJECT_NAB_SCOPE = "NabScopeBystanderProject";
     private final static String TEST_ASSAY_USR_NAB_SCOPE = "nabscope@security.test";
 
     private static final String NAB_FILENAME2 = "m0902053;3999.xls";
@@ -543,6 +544,10 @@ public class NabAssayTest extends AbstractAssayTest
         _userHelper.createUser(TEST_ASSAY_USR_NAB_SCOPE);
         new ApiPermissionsHelper(this).addMemberToRole(TEST_ASSAY_USR_NAB_SCOPE, "Editor", PermissionsHelper.MemberType.user, "/" + bystanderPath);
 
+        // for sample template check
+        _containerHelper.createProject(TEST_ASSAY_PROJECT_NAB_SCOPE);
+        new ApiPermissionsHelper(this).addMemberToRole(TEST_ASSAY_USR_NAB_SCOPE, "Editor", PermissionsHelper.MemberType.user, "/" + TEST_ASSAY_PROJECT_NAB_SCOPE);
+
         impersonate(TEST_ASSAY_USR_NAB_SCOPE);
         try
         {
@@ -561,6 +566,10 @@ public class NabAssayTest extends AbstractAssayTest
             // NAB-1: DeleteRunAction resolves the run by global rowId; this action is a POST.
             assertForeignContainerRejected("deleteRun (NAB-1)",
                     WebTestHelper.buildURL("nabassay", bystanderPath, "deleteRun", Map.of("rowId", String.valueOf(runId))), "POST");
+
+            // NAB-10: SampleSpreadsheetTemplateAction resolves the protocol by global rowId.
+            assertForeignContainerRejected("sampleSpreadsheetTemplate (NAB-10)",
+                    WebTestHelper.buildURL("nabassay", TEST_ASSAY_PROJECT_NAB_SCOPE, "sampleSpreadsheetTemplate", Map.of("protocol", String.valueOf(protocolId))), "GET");
         }
         finally
         {
