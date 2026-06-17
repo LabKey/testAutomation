@@ -36,7 +36,6 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.PasswordUtil;
-import org.labkey.test.util.PermissionsHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.StudyHelper;
 import org.labkey.test.util.TextSearcher;
@@ -133,23 +132,23 @@ public class SpecimenTest extends SpecimenBaseTest
     @LogMethod
     protected void doVerifySteps() throws IOException
     {
-//        verifyActorDetails();
-//        createRequest();
-//        verifyViews();
-//        verifyAdditionalRequestFields();
-//        verifyNotificationEmails();
-//        verifyInactiveUsersInRequests();
-//        verifyRequestCancel();
-//        verifyReports();
-//        exportSpecimenTest();
-//        verifyRequestingLocationRestriction();
-//        verifySpecimenTableAttachments();
-//        searchTest();
-//        verifySpecimenGroupings();
-//        verifyRequestEnabled();
-//        disableRequests();
-//        verifyRequestsDisabled();
-//        verifyDrawTimestamp();
+        verifyActorDetails();
+        createRequest();
+        verifyViews();
+        verifyAdditionalRequestFields();
+        verifyNotificationEmails();
+        verifyInactiveUsersInRequests();
+        verifyRequestCancel();
+        verifyReports();
+        exportSpecimenTest();
+        verifyRequestingLocationRestriction();
+        verifySpecimenTableAttachments();
+        searchTest();
+        verifySpecimenGroupings();
+        verifyRequestEnabled();
+        disableRequests();
+        verifyRequestsDisabled();
+        verifyDrawTimestamp();
         verifySpecimenEventsRedirect();
     }
 
