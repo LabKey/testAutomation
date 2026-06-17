@@ -1121,10 +1121,10 @@ public class SpecimenTest extends SpecimenBaseTest
     {
         String targetStudyId = getContainerId();
 
-        // Create an empty second study where we'll initiate the redirect
+        // Create an empty second folder (doesn't need to be a study) with guest read. We'll attempt to invoke the
+        // redirect action from this folder.
         String folderName = "Another Study";
         _containerHelper.createSubfolder(getProjectName(), folderName, "Study");
-        createDefaultStudy();
         new ApiPermissionsHelper(this).setSiteGroupPermissions("Guests", "Reader");
 
         // Happy path - admin should redirect
