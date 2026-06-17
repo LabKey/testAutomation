@@ -201,8 +201,8 @@ public class ReactDateTimePicker extends WebDriverComponent<ReactDateTimePicker.
     protected class ElementCache extends Component<?>.ElementCache
     {
         WebElement inputContainer = Locator.tagWithClass("div", "react-datepicker__input-container")
-                .findElement(this);
-        public Input input = new Input(Locator.tag("input").findWhenNeeded(inputContainer), getDriver());
+                .refindWhenNeeded(this);
+        public Input input = new Input(Locator.tag("input").refindWhenNeeded(inputContainer), getDriver());
 
         WebElement popup = Locator.xpath(".").followingSibling("div").withClass("react-datepicker__tab-loop")
                 .refindWhenNeeded(this);
