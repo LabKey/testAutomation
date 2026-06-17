@@ -53,12 +53,36 @@ public class RemoteConnectionHelper
         return success;
     }
 
+    /** Test the named connection, expecting failure with an error message starting with the given prefix. The full message may include environment-specific exception text. */
+    public void testConnectionExpectFailure(String name, String expectedErrorPrefix)
+    {
+        WebElement target = findConnectionStrict(name, "test");
+        _test.clickAndWait(target, _test.getDefaultWaitForPage());
+        _test.assertTextPresent("not successful");
+        String error = getDisplayedError();
+        Assert.assertNotNull("No error message shown on connection test failure page", error);
+        Assert.assertTrue("Expected error message to start with '" + expectedErrorPrefix + "' but was: " + error, error.startsWith(expectedErrorPrefix));
+        _test.clickAndWait(Locator.linkWithText("Manage Remote Connections"));
+    }
+
     public void createConnection(String name, String url, String container, String user, String password, String expectedError)
     {
         _test.clickAndWait(Locator.linkWithText("Create New Connection"));
         setConnectionProperties(name, url, container, user, password);
         _test.clickButton("save");
         verifyExpectedError(expectedError);
+    }
+
+    /** Expect the save to fail with an error message starting with the given prefix. The full message may include environment-specific exception text. */
+    public void createConnectionExpectErrorPrefix(String name, String url, String container, String user, String password, String expectedErrorPrefix)
+    {
+        _test.clickAndWait(Locator.linkWithText("Create New Connection"));
+        setConnectionProperties(name, url, container, user, password);
+        _test.clickButton("save");
+        String error = getDisplayedError();
+        Assert.assertNotNull("No error message shown after attempting to save connection", error);
+        Assert.assertTrue("Expected error message to start with '" + expectedErrorPrefix + "' but was: " + error, error.startsWith(expectedErrorPrefix));
+        _test.clickButton("cancel");
     }
 
     public void editConnection(String name, String newName, String newUrl, String newContainer, String newUser, String newPassword)
@@ -137,10 +161,15 @@ public class RemoteConnectionHelper
     {
         if (null != expectedError)
         {
-            String error = Locators.labkeyError.findOptionalElement(_test.getDriver()).map(WebElement::getText).orElse(null);
+            String error = getDisplayedError();
             Assert.assertEquals("Remote connection error.", expectedError, error);
             _test.clickButton("cancel");
         }
+    }
+
+    private String getDisplayedError()
+    {
+        return Locators.labkeyError.findOptionalElement(_test.getDriver()).map(WebElement::getText).orElse(null);
     }
 
     private WebElement findConnection(String name, String action)
