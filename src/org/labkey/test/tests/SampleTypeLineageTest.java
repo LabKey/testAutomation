@@ -110,6 +110,8 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         super.doCleanup(afterTest);
+        if (previousDeriveSamplesSetting != null)
+            OptionalFeatureHelper.setOptionalFeature(createDefaultConnection(), "deriveSamplesNotInApp", previousDeriveSamplesSetting);
     }
 
     /**
