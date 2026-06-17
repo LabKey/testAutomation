@@ -61,7 +61,7 @@ public class SignInPage extends LabKeyPage<SignInPage.ElementCache>
         return new ElementCache();
     }
 
-    protected class ElementCache extends LabKeyPage<?>.ElementCache
+    protected class ElementCache extends LabKeyPage<ElementCache>.ElementCache
     {
         WebElement emailInput = Locator.id("email").findWhenNeeded(getDriver());
         WebElement passwordInput = Locator.id("password").findWhenNeeded(getDriver());
