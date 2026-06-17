@@ -133,6 +133,7 @@ public class SpecimenTest extends SpecimenBaseTest
     protected void doVerifySteps() throws IOException
     {
         verifyActorDetails();
+        verifySpecimenEventsRedirect();
         createRequest();
         verifyViews();
         verifyAdditionalRequestFields();
@@ -149,7 +150,6 @@ public class SpecimenTest extends SpecimenBaseTest
         disableRequests();
         verifyRequestsDisabled();
         verifyDrawTimestamp();
-        verifySpecimenEventsRedirect();
     }
 
     private void checkSpecimenReport()
@@ -325,6 +325,37 @@ public class SpecimenTest extends SpecimenBaseTest
             assertAlertIgnoreCaseAndSpaces("Canceling will permanently delete this pending request.  Continue?");
         });
         DataRegion(getDriver()).withName("SpecimenRequest").waitFor();
+    }
+
+    // Simulate SpecimenForeignKey redirect behavior
+    @LogMethod (quiet = true)
+    private void verifySpecimenEventsRedirect()
+    {
+        String targetStudyId = getContainerId();
+
+        // Create an empty second folder (doesn't need to be a study) with guest read. We'll attempt to invoke the
+        // redirect action from this folder.
+        String folderName = "Another Study";
+        _containerHelper.createSubfolder(getProjectName(), folderName, "Study");
+        new ApiPermissionsHelper(this).setSiteGroupPermissions("Guests", "Reader");
+
+        // Happy path - admin should redirect
+        String baseUrl = WebTestHelper.getBaseURL() + "/" + getProjectName() + "/" + folderName + "/specimen-specimenEventsRedirect.view?targetStudy=" + targetStudyId + "&id=";
+        String url = baseUrl + "AAA07XK5-01";
+        beginAt(url);
+        assertTextPresent("Vial History", "999320812", "350V0600294A");
+
+        // Guest has access in Another Study but not in the target study (My Study), so should not redirect
+        signOut();
+        beginAt(baseUrl + "abcdefg_123456"); // Bogus ID and user doesn't have read permission
+        assertTextPresent("Unable to resolve the Specimen ID and target Study");
+        beginAt(url); // Valid ID, but user doesn't have read permission to target study, so same error
+        assertTextPresent("Unable to resolve the Specimen ID and target Study");
+
+        // Sign in and back to the main study
+        signIn();
+        goToProjectHome();
+        clickFolder(getFolderName());
     }
 
     @LogMethod
@@ -1113,31 +1144,5 @@ public class SpecimenTest extends SpecimenBaseTest
 
         goBack();
         DataRegion(getDriver()).withName("SpecimenDetail").waitFor();
-    }
-
-    // Simulate SpecimenForeignKey redirect behavior
-    @LogMethod (quiet = true)
-    private void verifySpecimenEventsRedirect()
-    {
-        String targetStudyId = getContainerId();
-
-        // Create an empty second folder (doesn't need to be a study) with guest read. We'll attempt to invoke the
-        // redirect action from this folder.
-        String folderName = "Another Study";
-        _containerHelper.createSubfolder(getProjectName(), folderName, "Study");
-        new ApiPermissionsHelper(this).setSiteGroupPermissions("Guests", "Reader");
-
-        // Happy path - admin should redirect
-        String baseUrl = WebTestHelper.getBaseURL() + "/" + getProjectName() + "/" + folderName + "/specimen-specimenEventsRedirect.view?targetStudy=" + targetStudyId + "&id=";
-        String url = baseUrl + "AAA07XK5-01";
-        beginAt(url);
-        assertTextPresent("Vial History", "999320812", "350V0600294A");
-
-        // Guest has access in Another Study but not in the target study (My Study), so should not redirect
-        signOut();
-        beginAt(baseUrl + "abcdefg_123456"); // Bogus ID and user doesn't have read permission
-        assertTextPresent("Unable to resolve the Specimen ID and target Study");
-        beginAt(url); // Valid ID, but user doesn't have read permission to target study, so same error
-        assertTextPresent("Unable to resolve the Specimen ID and target Study");
     }
 }
