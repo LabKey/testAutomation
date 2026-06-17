@@ -70,6 +70,8 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
     private static final String PROJECT_NAME = "SampleType_Lineage_Test_Project";
     private static final String SUB_FOLDER_NAME = "SubFolder_A";
 
+    private Boolean previousDeriveSamplesSetting = null;
+
     @Override
     public List<String> getAssociatedModules()
     {
@@ -87,7 +89,6 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
     {
         SampleTypeLineageTest init = getCurrentTest();
 
-        // Comment out this line (after you run once) it will make iterating on tests much easier.
         init.doSetup();
     }
 
@@ -102,17 +103,13 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
         portalHelper.addWebPart("Sample Types");
 
         portalHelper.exitAdminMode();
-        OptionalFeatureHelper.setOptionalFeature(createDefaultConnection(), "deriveSamplesNotInApp", true);
+        previousDeriveSamplesSetting = OptionalFeatureHelper.setOptionalFeature(createDefaultConnection(), "deriveSamplesNotInApp", true);
     }
 
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         super.doCleanup(afterTest);
-
-        // If you are debugging tests change this function to do nothing.
-        // It can make re-running faster but you need to valid the integrity of the test data on your own.
-//        log("Do nothing.");
     }
 
     /**
@@ -606,8 +603,6 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
     @Test
     public void testDeriveSampleByUI() throws CommandException, IOException
     {
-        OptionalFeatureHelper.setOptionalFeature(createDefaultConnection(), "deriveSamplesNotInApp", true);
-
         String sampleTypeName= "LineageUI_01";
         String namePrefix = "SampleUI-";
         int newSampleIndex = 6;
