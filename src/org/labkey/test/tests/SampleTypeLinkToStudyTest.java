@@ -74,8 +74,6 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
 
     protected DateTimeFormatter _dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     protected String now = LocalDateTime.now().format(_dateTimeFormatter);
-    private Boolean previousDeriveSamplesSetting = null;
-
 
     @BeforeClass
     public static void setupProject() throws IOException
@@ -108,7 +106,7 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         new PortalHelper(getDriver()).addBodyWebPart("Datasets");
 
         createSampleTypes();
-        previousDeriveSamplesSetting = OptionalFeatureHelper.setOptionalFeature(createDefaultConnection(), "deriveSamplesNotInApp", true);
+        OptionalFeatureHelper.setOptionalFeature(createDefaultConnection(), "deriveSamplesNotInApp", true);
 
     }
 
@@ -888,7 +886,6 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         _containerHelper.deleteProject(DATE_BASED_STUDY, false);
         _containerHelper.deleteProject(SAMPLE_TYPE_PROJECT + " Study 1", false);
         _containerHelper.deleteProject(SAMPLE_TYPE_PROJECT + " Study 2", false);
-        if (previousDeriveSamplesSetting != null)
-            OptionalFeatureHelper.setOptionalFeature(createDefaultConnection(), "deriveSamplesNotInApp", previousDeriveSamplesSetting);
+        OptionalFeatureHelper.resetOptionalFeature(createDefaultConnection(), "deriveSamplesNotInApp");
     }
 }

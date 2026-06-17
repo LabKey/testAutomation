@@ -70,8 +70,6 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
     private static final String PROJECT_NAME = "SampleType_Lineage_Test_Project";
     private static final String SUB_FOLDER_NAME = "SubFolder_A";
 
-    private Boolean previousDeriveSamplesSetting = null;
-
     @Override
     public List<String> getAssociatedModules()
     {
@@ -103,15 +101,15 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
         portalHelper.addWebPart("Sample Types");
 
         portalHelper.exitAdminMode();
-        previousDeriveSamplesSetting = OptionalFeatureHelper.setOptionalFeature(createDefaultConnection(), "deriveSamplesNotInApp", true);
+        OptionalFeatureHelper.setOptionalFeature(createDefaultConnection(), "deriveSamplesNotInApp", true);
     }
 
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         super.doCleanup(afterTest);
-        if (previousDeriveSamplesSetting != null)
-            OptionalFeatureHelper.setOptionalFeature(createDefaultConnection(), "deriveSamplesNotInApp", previousDeriveSamplesSetting);
+
+        OptionalFeatureHelper.resetOptionalFeature(createDefaultConnection(), "deriveSamplesNotInApp");
     }
 
     /**

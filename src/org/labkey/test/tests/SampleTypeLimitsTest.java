@@ -62,7 +62,6 @@ public class SampleTypeLimitsTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "SampleTypeLimitsTest";
     private static final String SAMPLE_TYPE_NAME = "10000Samples"; // Testing with 10,000 samples because as per the product the lookup is converted into text field only when the samples exceed 10,000 samples
-    private Boolean previousDeriveSamplesSetting = null;
 
     @Override
     public List<String> getAssociatedModules()
@@ -123,8 +122,7 @@ public class SampleTypeLimitsTest extends BaseWebDriverTest
     protected void doCleanup(boolean afterTest)
     {
         super.doCleanup(afterTest);
-        if (previousDeriveSamplesSetting != null)
-            OptionalFeatureHelper.setOptionalFeature(createDefaultConnection(), "deriveSamplesNotInApp", previousDeriveSamplesSetting);
+        OptionalFeatureHelper.resetOptionalFeature(createDefaultConnection(), "deriveSamplesNotInApp");
     }
 
     @Test
@@ -206,7 +204,7 @@ public class SampleTypeLimitsTest extends BaseWebDriverTest
     public void testDeriveSamplesLookupFields() throws IOException, CommandException
     {
         goToProjectHome();
-        previousDeriveSamplesSetting = OptionalFeatureHelper.setOptionalFeature(createDefaultConnection(), "deriveSamplesNotInApp", true);
+        OptionalFeatureHelper.setOptionalFeature(createDefaultConnection(), "deriveSamplesNotInApp", true);
 
         log("Create sample type with lookup field to " + SAMPLE_TYPE_NAME);
         String sampleTypeName = "SampleTypeWithLookup";

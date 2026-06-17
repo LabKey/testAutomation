@@ -113,8 +113,6 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
 
     protected final AuditLogHelper _auditLogHelper = new AuditLogHelper(this);
 
-    private Boolean previousDeriveSamplesSetting = null;
-
     @Override
     public List<String> getAssociatedModules()
     {
@@ -139,8 +137,7 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
     protected void doCleanup(boolean afterTest)
     {
         super.doCleanup(afterTest);
-        if (previousDeriveSamplesSetting != null)
-            OptionalFeatureHelper.setOptionalFeature(createDefaultConnection(), "deriveSamplesNotInApp", previousDeriveSamplesSetting);
+        OptionalFeatureHelper.resetOptionalFeature(createDefaultConnection(), "deriveSamplesNotInApp");
     }
 
     private void addDataRow(TestDataGenerator dataGenerator, String name, int intVal)
@@ -207,7 +204,7 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
 
         // Just want to get an updated view of the sample types.
         refresh();
-        previousDeriveSamplesSetting = OptionalFeatureHelper.setOptionalFeature(createDefaultConnection(), "deriveSamplesNotInApp", true);
+        OptionalFeatureHelper.setOptionalFeature(createDefaultConnection(), "deriveSamplesNotInApp", true);
     }
 
     @Before
