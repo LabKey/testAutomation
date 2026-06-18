@@ -157,7 +157,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         }
         else
         {
-            fillSignInFormAndSubmit();
+            fillSignInFormAndSubmit("Sign In");
 
             // verify we're signed in now
             if (!waitFor(() ->
@@ -198,14 +198,14 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         WebTestHelper.saveSession(PasswordUtil.getUsername(), getDriver());
     }
 
-    public void fillSignInFormAndSubmit()
+    public void fillSignInFormAndSubmit(String buttonText)
     {
-        log("Signing in as " + PasswordUtil.getUsername());
+        log(buttonText + " as " + PasswordUtil.getUsername());
         assertElementPresent(Locator.tagWithName("form", "login"));
         setFormElement(Locator.name("email"), PasswordUtil.getUsername());
         setFormElement(Locator.name("password"), PasswordUtil.getPassword());
         acceptTermsOfUse(null, false);
-        clickButton("Sign In", 0);
+        clickButton(buttonText, 0);
     }
 
     /**
