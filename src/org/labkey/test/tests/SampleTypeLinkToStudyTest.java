@@ -40,6 +40,7 @@ import org.labkey.test.pages.study.ManageVisitPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.OptionalFeatureHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
 import org.labkey.test.util.StudyHelper;
@@ -105,7 +106,11 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         new PortalHelper(getDriver()).addBodyWebPart("Datasets");
 
         createSampleTypes();
+        OptionalFeatureHelper.setOptionalFeature(createDefaultConnection(), "deriveSamplesNotInApp", true);
+
     }
+
+
 
     private void createSampleTypes()
     {
@@ -881,5 +886,6 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         _containerHelper.deleteProject(DATE_BASED_STUDY, false);
         _containerHelper.deleteProject(SAMPLE_TYPE_PROJECT + " Study 1", false);
         _containerHelper.deleteProject(SAMPLE_TYPE_PROJECT + " Study 2", false);
+        OptionalFeatureHelper.resetOptionalFeature(createDefaultConnection(), "deriveSamplesNotInApp");
     }
 }
