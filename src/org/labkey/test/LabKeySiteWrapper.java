@@ -200,12 +200,20 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
     public void fillSignInFormAndSubmit(String buttonText)
     {
-        log(buttonText + " as " + PasswordUtil.getUsername());
+        fillSignInFormAndSubmit(buttonText, PasswordUtil.getUsername(), PasswordUtil.getPassword());
+    }
+
+    public void fillSignInFormAndSubmit(String buttonText, String username, String password)
+    {
+        log(buttonText + " as " + username);
         assertElementPresent(Locator.tagWithName("form", "login"));
-        setFormElement(Locator.name("email"), PasswordUtil.getUsername());
-        setFormElement(Locator.name("password"), PasswordUtil.getPassword());
+        setFormElement(Locator.name("email"), username);
+        setFormElement(Locator.name("password"), password);
         acceptTermsOfUse(null, false);
-        clickButton(buttonText, 0);
+        WebElement signInButton = Locator.byClass("signin-btn").findElement(getDriver());
+        if (buttonText != null)
+            assertEquals("Wrong sign-in button text", buttonText, signInButton.getText());
+        signInButton.click();
     }
 
     /**
