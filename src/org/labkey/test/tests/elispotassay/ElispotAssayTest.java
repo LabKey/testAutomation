@@ -21,11 +21,16 @@ import org.assertj.core.api.Assertions;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.api.query.QueryKey;
+import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.query.SelectRowsCommand;
+import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.CrosstabDataRegion;
@@ -40,15 +45,19 @@ import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PipelineStatusTable;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.QCAssayScriptHelper;
+import org.labkey.test.util.SimpleHttpRequest;
+import org.labkey.test.util.SimpleHttpResponse;
 import org.openqa.selenium.NoSuchElementException;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.labkey.test.components.PlateSummary.Row.A;
 import static org.labkey.test.components.PlateSummary.Row.C;
 import static org.labkey.test.components.PlateSummary.Row.E;
@@ -521,8 +530,59 @@ public class ElispotAssayTest extends AbstractAssayTest
     protected void doBackgroundSubtractionTest()
     {
         removeTransformScript();
+        verifyCrossContainerBackgroundSubtractionDenied();
         verifyBackgroundSubtractionOnExistingRun();
         verifyBackgroundSubtractionOnNewRun();
+    }
+
+    // GitHub Kanban #1892: verify BackgroundSubtractionAction selected run in the current container.
+    @LogMethod
+    protected void verifyCrossContainerBackgroundSubtractionDenied()
+    {
+        final String crossFolder = "BackgroundSubtractionAuth";
+        _containerHelper.createSubfolder(getProjectName(), crossFolder, "Assay");
+
+        // A run RowId from the assay in the project - "foreign" from the subfolder's perspective.
+        long foreignRunId = getFirstElispotRunId();
+
+        log("POST background subtraction for the project's run (RowId " + foreignRunId + ") from the sibling subfolder - must be denied");
+        String url = WebTestHelper.buildURL("elispot-assay", getProjectName() + "/" + crossFolder, "backgroundSubtraction",
+                Map.of(".select", String.valueOf(foreignRunId)));
+        SimpleHttpRequest request = new SimpleHttpRequest(url, "POST");
+        request.copySession(getDriver());
+        SimpleHttpResponse response;
+        try
+        {
+            response = request.getResponse();
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException(e);
+        }
+        // The run is not in the subfolder, so the action should report it as not found (HTTP 404) rather than queuing the job.
+        assertEquals("Cross-container background subtraction should be denied for a run in another folder", 404, response.getResponseCode());
+        assertTrue("Cross-container background subtraction error message not as expected", response.getResponseBody().contains("Run " + foreignRunId + " does not exist"));
+
+        log("Verify the project's run was not modified by the cross-container request");
+        clickProject(TEST_ASSAY_PRJ_ELISPOT);
+        clickAndWait(Locator.linkWithText(TEST_ASSAY_ELISPOT));
+        DataRegionTable runTable = new DataRegionTable("Runs", this);
+        for (String item : runTable.getColumnDataAsText("Background Subtraction"))
+            assertEquals("Cross-container request must not change background subtraction", "false", item);
+    }
+
+    private long getFirstElispotRunId()
+    {
+        SelectRowsCommand select = new SelectRowsCommand("assay.ELISpot." + QueryKey.encodePart(TEST_ASSAY_ELISPOT), "Runs");
+        try
+        {
+            SelectRowsResponse response = select.execute(createDefaultConnection(), getProjectName());
+            return ((Number) response.getRowset().iterator().next().getValue("RowId")).longValue();
+        }
+        catch (IOException | CommandException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
     // Unable to apply background substitution to runs imported with a transform script.
