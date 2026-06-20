@@ -234,7 +234,7 @@ public class AttachmentFieldTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(assayName));
         clickButton("Import Data");
         clickButton("Next");
-        setFormElement(Locator.name("name"), "TestRun");
+        setFormElement(Locator.name("Name"), "TestRun");
         setFormElement(Locator.name("TextAreaDataCollector.textArea"),
                 "Specimen ID\tParticipant ID\tVisit ID\n100\t1A2B\t1");
         clickButton("Save and Finish");
