@@ -47,6 +47,7 @@ import org.labkey.test.util.ArtifactCollector;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.OptionalFeatureHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
 import org.labkey.test.util.TestDataGenerator;
@@ -118,6 +119,8 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
         projectMenu().navigateToProject(PROJECT_NAME);
         portalHelper.addWebPart("Sample Types");
         portalHelper.addWebPart("Experiment Runs");
+
+        OptionalFeatureHelper.setOptionalFeature(createDefaultConnection(), "deriveSamplesNotInApp", true);
 
     }
 
