@@ -114,13 +114,6 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
         }
     }
 
-//    @BeforeClass
-//    public static void setupProject()
-//    {
-//        SampleTypeFolderExportImportTest init = getCurrentTest();
-//        init.doSetup();
-//    }
-
     private void doSetup()
     {
         // Delete the import project if it exists.
