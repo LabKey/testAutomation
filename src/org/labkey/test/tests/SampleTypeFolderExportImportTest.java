@@ -99,12 +99,27 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
         return BrowserType.CHROME;
     }
 
-    @BeforeClass
-    public static void setupProject()
+    @Override
+    protected void doCleanup(boolean afterTest)
     {
-        SampleTypeFolderExportImportTest init = getCurrentTest();
-        init.doSetup();
+        super.doCleanup(afterTest);
+        if (afterTest)
+        {
+            OptionalFeatureHelper.resetOptionalFeature(createDefaultConnection(), "deriveSamplesNotInApp");
+        }
+        else {
+            OptionalFeatureHelper.setOptionalFeature(createDefaultConnection(), "deriveSamplesNotInApp", true);
+            SampleTypeFolderExportImportTest init = getCurrentTest();
+            init.doSetup();
+        }
     }
+
+//    @BeforeClass
+//    public static void setupProject()
+//    {
+//        SampleTypeFolderExportImportTest init = getCurrentTest();
+//        init.doSetup();
+//    }
 
     private void doSetup()
     {
@@ -119,8 +134,6 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
         projectMenu().navigateToProject(PROJECT_NAME);
         portalHelper.addWebPart("Sample Types");
         portalHelper.addWebPart("Experiment Runs");
-
-        OptionalFeatureHelper.setOptionalFeature(createDefaultConnection(), "deriveSamplesNotInApp", true);
 
     }
 
