@@ -15,21 +15,17 @@
  */
 package org.labkey.test.tests;
 
-import org.junit.Assert;
-import org.junit.Assume;
-import org.junit.BeforeClass;
-import org.junit.Before;
+import org.assertj.core.api.Assertions;
 import org.junit.Test;
-import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.Locators;
 import org.labkey.test.pages.test.TestReauthPage;
 
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 public abstract class AbstractReauthTest extends BaseWebDriverTest
 {
@@ -47,6 +43,7 @@ public abstract class AbstractReauthTest extends BaseWebDriverTest
     protected abstract void clickSignIn();
     protected abstract void authenticate(String email, String password);
     protected abstract void authenticateExpectingError(String email, String password);
+    protected abstract String getAuthDescription();
 
     @Test
     public void testReauth()
@@ -54,14 +51,19 @@ public abstract class AbstractReauthTest extends BaseWebDriverTest
         signInAs(user1);
 
         TestReauthPage testReauthPage = TestReauthPage.beginAt(this);
+        assertEquals("Authentication method", getAuthDescription(), testReauthPage.getDescription());
         testReauthPage.clickReauth();
         authenticate(user1.email, user1.password);
+        String reauthToken1 = testReauthPage.getReauthToken();
+        assertEquals("Authentication method", getAuthDescription(), testReauthPage.getDescription());
         testReauthPage.validateToken();
 
-        // Reauth again as the same user to ensure newer token is recognized
+        // Reauth again as the same user to ensure a new token is generated
         testReauthPage = TestReauthPage.beginAt(this);
         testReauthPage.clickReauth();
         authenticate(user1.email, user1.password);
+        String reauthToken2 = testReauthPage.getReauthToken();
+        assertNotEquals("Reauth should generate a new token each time", reauthToken1, reauthToken2);
         testReauthPage.validateToken();
     }
 
@@ -89,7 +91,7 @@ public abstract class AbstractReauthTest extends BaseWebDriverTest
         TestReauthPage testReauthPage = TestReauthPage.beginAt(this);
         testReauthPage.clickReauth();
         authenticate(user2.email, user2.password);
-        assertElementPresent(Locators.labkeyError.containing("wrong user reauthenticated"));
+        Assertions.assertThat(testReauthPage.getReauthError()).as("Reauth error").contains("wrong user reauthenticated");
 
         testReauthPage.clickReauth(); // Try again
         authenticate(user1.email, user1.password);
@@ -122,7 +124,8 @@ public abstract class AbstractReauthTest extends BaseWebDriverTest
 
     private void assertSignedInAs(User user)
     {
-        Assert.assertEquals("Signed in as", user.email, getCurrentUser());
+        if (!waitFor(() -> getCurrentUser().equals(user.email), 1_000))
+            assertEquals("Signed in as", user.email, getCurrentUser());
     }
 
     @Override

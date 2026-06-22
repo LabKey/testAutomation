@@ -1,11 +1,14 @@
 package org.labkey.test.tests.core.login;
 
 import org.junit.BeforeClass;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.tests.AbstractReauthTest;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.TestUser;
 
+@Category({Daily.class})
 public class DbReauthTest extends AbstractReauthTest
 {
     private static final TestUser USER1 = new TestUser("db_user1@reauth.test");
@@ -32,6 +35,12 @@ public class DbReauthTest extends AbstractReauthTest
     protected void authenticateExpectingError(String email, String password)
     {
         fillSignInFormAndSubmit(null, email, password);
+    }
+
+    @Override
+    protected String getAuthDescription()
+    {
+        return "Standard database authentication";
     }
 
     @Override

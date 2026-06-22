@@ -17,6 +17,7 @@ package org.labkey.test.pages.test;
 
 import org.apache.hc.core5.http.HttpStatus;
 import org.labkey.test.Locator;
+import org.labkey.test.Locators;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.pages.LabKeyPage;
@@ -50,10 +51,7 @@ public class TestReauthPage extends LabKeyPage<TestReauthPage.ElementCache>
 
     public String getDescription()
     {
-        if (elementCache().description.isDisplayed())
-            return elementCache().description.getText();
-        else
-            return "";
+        return elementCache().description.getText();
     }
 
     public void clickReauth()
@@ -65,7 +63,7 @@ public class TestReauthPage extends LabKeyPage<TestReauthPage.ElementCache>
     public String getReauthToken()
     {
         return elementCache().reauthTokenInput()
-                .map(el -> el.getDomProperty("value")).orElse("");
+                .map(el -> el.getDomProperty("value")).orElse(null);
     }
 
     public void validateToken()
@@ -83,6 +81,17 @@ public class TestReauthPage extends LabKeyPage<TestReauthPage.ElementCache>
         assertNotEquals("Response code", HttpStatus.SC_OK, getResponseCode());
     }
 
+    public String getReauthError()
+    {
+        if (elementCache().reauthLink.isDisplayed())
+        {
+            return elementCache().reauthLink.getText();
+        }
+        else
+        {
+            return "";
+        }
+    }
 
     @Override
     protected ElementCache newElementCache()
@@ -92,12 +101,18 @@ public class TestReauthPage extends LabKeyPage<TestReauthPage.ElementCache>
 
     protected class ElementCache extends LabKeyPage<ElementCache>.ElementCache
     {
+        public ElementCache()
+        {
+            waitFor(description::isDisplayed, "Page failed to load", 5_000);
+        }
+
         final WebElement description = Locator.id("description").findWhenNeeded(this);
         final WebElement reauthLink = Locator.id("link").findWhenNeeded(this);
         final Optional<WebElement> reauthTokenInput()
         {
             return Locator.name("reauthToken").findOptionalElement(this);
         }
+        final WebElement reauthError = Locators.labkeyError.findWhenNeeded(this);
         final WebElement validateButton = Locator.tagWithAttribute("input", "value", "Sign!").findWhenNeeded(this);
     }
 }
