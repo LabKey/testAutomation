@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<query name="Normal" schemaName="core" xmlns="http://labkey.org/data/xml/query">
+  <metadata>
+    <tables xmlns="http://labkey.org/data/xml">
+      <table tableName="Normal" tableDbType="NOT_IN_DB">
+        <columns>
+    </columns>
+      </table>
+    </tables>
+  </metadata>
+</query>
