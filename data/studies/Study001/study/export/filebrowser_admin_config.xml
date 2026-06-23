@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<PipelineOptions xmlns="http://labkey.org/data/xml">
-  <importEnabled>true</importEnabled>
-  <filePropertiesConfig>useDefault</filePropertiesConfig>
-  <inheritedTbarConfig>false</inheritedTbarConfig>
-</PipelineOptions>

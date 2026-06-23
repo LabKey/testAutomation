@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<views xmlns="http://labkey.org/study/xml/studyViews">
-  <participantView file="participant.html" active="true"/>
-</views>

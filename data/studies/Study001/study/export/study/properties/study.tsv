@@ -1,3 +1,0 @@
-Label	StartDate	EndDate	TimepointType	SubjectNounSingular	SubjectNounPlural	SubjectColumnName	Grant	Investigator	Species	ParticipantAliasDatasetId	ParticipantAliasProperty	ParticipantAliasSourceProperty	AssayPlan	Description	DescriptionRendererType	DateBased	LSID	cust_string	cust_integer	cust_dateTime	cust_double	cust_multiline
-Study Properties	2025-11-10 00:00:00.0		VISIT	Participant	Participants	ParticipantId	Grantland	Dr. Strangelove	Human					study description	TEXT_WITH_LINKS	false	urn:lsid:labkey.com:Study.Folder-68:68	custom string	2	2014-03-26 00:00:00.0	3.14	"custom multiline
-custom multiline"
