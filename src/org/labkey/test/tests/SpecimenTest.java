@@ -411,7 +411,7 @@ public class SpecimenTest extends SpecimenBaseTest
         helper.addMemberToRole(USER1, "Specimen Requester", PermissionsHelper.MemberType.user, containerPath);
         Connection conn = createDefaultConnection();
 
-        // Impersonate USER1. Specimen Requester role who doesn't own the request shouldn't be able to modify it.
+        // Impersonate USER1. Specimen Requester who doesn't own the request shouldn't be able to modify it.
         impersonate(USER1);
         Assert.assertThrows("Request " + requestId + " was not found or the current user does not have permissions to access it.",
             CommandException.class,
@@ -427,7 +427,7 @@ public class SpecimenTest extends SpecimenBaseTest
         );
         stopImpersonating(false);
 
-        // Verify that the owner can add a vial
+        // Let's have the "Specimen Requester" owner add a vial so USER1 has something to (attempt to) delete
         impersonateRoles(READER_ROLE, "Specimen Requester");
         CommandResponse response = addVialsCommand.execute(conn, containerPath);
         assertEquals(HttpStatus.SC_OK, response.getStatusCode());
@@ -435,7 +435,7 @@ public class SpecimenTest extends SpecimenBaseTest
         assertEquals(1, ((List<String>)response.getParsedData().get("vials")).size());
         stopImpersonating(false);
 
-        // Attempt to remove the just-added vial as non-owner
+        // Attempt to remove the just-added vial as "Specimen Requester" non-owner
         impersonate(USER1);
         Assert.assertThrows("Request " + requestId + " was not found or the current user does not have permissions to access it.",
             CommandException.class,
@@ -443,7 +443,8 @@ public class SpecimenTest extends SpecimenBaseTest
         );
         stopImpersonating(false);
 
-        // Owner can remove vials and add via specimen hash
+        // "Specimen Requester" owner should be able to remove vials and add via specimen hash. This hash won't match
+        // any vials, but we're just checking permissions.
         impersonateRoles(READER_ROLE, "Specimen Requester");
         response = removeVialsCommand.execute(conn, containerPath);
         assertEquals(HttpStatus.SC_OK, response.getStatusCode());
@@ -453,7 +454,8 @@ public class SpecimenTest extends SpecimenBaseTest
         assertEquals(HttpStatus.SC_OK, response.getStatusCode());
         stopImpersonating(false);
 
-        // Now give USER1 the "Specimen Coordinator" role and verify they can modify the request, including cancel
+        // Now give USER1 the (more powerful) "Specimen Coordinator" role and verify they can now modify the request
+        // that they don't own, including canceling it.
         helper.addMemberToRole(USER1, "Specimen Coordinator", PermissionsHelper.MemberType.user, containerPath);
         impersonate(USER1);
         assertEquals(HttpStatus.SC_OK, addVialsCommand.execute(conn, containerPath).getStatusCode());
