@@ -83,9 +83,9 @@ public class TestReauthPage extends LabKeyPage<TestReauthPage.ElementCache>
 
     public String getReauthError()
     {
-        if (elementCache().reauthLink.isDisplayed())
+        if (elementCache().reauthError.isDisplayed())
         {
-            return elementCache().reauthLink.getText();
+            return elementCache().reauthError.getText();
         }
         else
         {
