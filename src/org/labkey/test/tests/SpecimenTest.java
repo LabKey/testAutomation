@@ -137,8 +137,8 @@ public class SpecimenTest extends SpecimenBaseTest
     {
         verifyActorDetails();
         verifySpecimenEventsRedirect();
-        createRequest();
         createRequestWithApi();
+        createRequest();
         verifyViews();
         verifyAdditionalRequestFields();
         verifyNotificationEmails();
@@ -332,7 +332,7 @@ public class SpecimenTest extends SpecimenBaseTest
     }
 
     // Simulate SpecimenForeignKey redirect behavior
-    @LogMethod (quiet = true)
+    @LogMethod
     private void verifySpecimenEventsRedirect()
     {
         String targetStudyId = getContainerId();
@@ -360,89 +360,6 @@ public class SpecimenTest extends SpecimenBaseTest
         signIn();
         goToProjectHome();
         clickFolder(getFolderName());
-    }
-
-    @LogMethod
-    private void createRequest()
-    {
-        goToSpecimenData();
-        click(Locator.xpath("//span[text()='Vials by Derivative Type']/../img"));
-        waitForElement(Locator.linkWithText("Plasma, Unknown Processing"));
-        clickAndWait(Locator.linkWithText("Plasma, Unknown Processing"));
-        // Verify unavailable sample
-        assertElementPresent(Locator.xpath("//input[@id='check_" + UNREQUESTABLE_SAMPLE + "' and @disabled]"));
-        assertElementPresent(Locator.xpath("//input[@id='check_" + UNREQUESTABLE_SAMPLE + "']/../../td[contains(text(), 'This vial is unavailable because it was found in the set called \"" + REQUESTABILITY_QUERY + "\".')]"));
-// TODO ONMOUSEOVER        assertElementPresent(Locator.xpath("//input[@id='check_" + UNREQUESTABLE_SAMPLE + "']/../a[contains(@onmouseover, 'This vial is unavailable because it was found in the set called \\\"" + REQUESTABILITY_QUERY + "\\\".')]"));
-        new DataRegionTable.DataRegionFinder(getDriver()).find()
-                .checkAllOnPage();
-
-        clickAndWait(Locator.linkContainingText("history"));
-        assertTextPresent("Vial History");
-        goBack();
-
-        BootstrapMenu.find(getDriver(), "Request Options").clickSubMenu(true, "Create New Request");
-        selectOptionByText(Locator.name("destinationLocation"), DESTINATION_SITE);
-        setFormElement(Locator.id("input0"), "Assay Plan");
-        setFormElement(Locator.id("input2"), "Comments");
-        setFormElement(Locator.id("input1"), "Shipping");
-        clickButton("Create and View Details");
-        assertTextPresent("Please provide all required input.");
-        setFormElement(Locator.id("input3"), "sample last one input");
-        clickButton("Create and View Details");
-        assertTextPresent("sample last one input", "IRB", "KCMC, Moshi, Tanzania", "Originating IRB Approval",
-                SOURCE_SITE, "Providing IRB Approval", DESTINATION_SITE, "Receiving IRB Approval", "SLG",
-                "SLG Approval", "BAA07XNP-01");
-        assertTextNotPresent(
-                UNREQUESTABLE_SAMPLE,
-                // verify that the swab specimen isn't present yet
-                "DAA07YGW-01", "Complete");
-
-        // add additional specimens
-        goToSpecimenData();
-        click(Locator.xpath("//span[text()='Vials by Derivative Type']/../img"));
-        waitAndClickAndWait(Locator.linkWithText("Swab"));
-        new DataRegionTable.DataRegionFinder(getDriver()).find()
-                .checkAllOnPage();
-        BootstrapMenu.find(getDriver(), "Request Options").clickSubMenu(false, "Add To Existing Request");
-        _extHelper.waitForExtDialog("Request Vial", WAIT_FOR_JAVASCRIPT);
-        waitForElement(Locator.css("#request-vial-details .x-grid3-row"));
-        clickButton("Add 8 Vials to Request", 0);
-        _extHelper.waitForExtDialog("Success", WAIT_FOR_JAVASCRIPT * 5);
-        clickButton("OK", 0);
-        BootstrapMenu.find(getDriver(), "Request Options").clickSubMenu(false, "View Existing Requests");
-        clickButton("Details");
-        assertTextPresent("sample last one input", "IRB", "KCMC, Moshi, Tanzania", "Originating IRB Approval",
-                SOURCE_SITE, "Providing IRB Approval", DESTINATION_SITE, "Receiving IRB Approval", "SLG",
-                "SLG Approval", "BAA07XNP-01", "DAA07YGW-01");
-
-        // submit request
-        assertTextPresent("Not Yet Submitted");
-        assertTextNotPresent("New Request");
-        doAndWaitForPageToLoad(() ->
-        {
-            clickButton("Submit Request", 0);
-            assertAlertIgnoreCaseAndSpaces("Once a request is submitted, its specimen list may no longer be modified.  Continue?");
-        });
-        waitForText("New Request");
-        assertTextNotPresent("Not Yet Submitted");
-
-        // Add request attachment
-        click(Locator.linkWithText("Update Request"));
-        waitForElement(Locator.name("formFiles[0]"));
-        setFormElement(Locator.name("formFiles[0]"), REQUEST_ATTACHMENT);
-        clickButton("Save Changes and Send Notifications");
-        waitForElement(Locator.linkContainingText(REQUEST_ATTACHMENT.getName()));
-
-        // modify request
-        selectOptionByText(Locator.name("newActor"), "SLG");
-        setFormElement(Locator.name("newDescription"), "Other SLG Approval");
-        clickButton("Add Requirement");
-        clickAndWait(Locator.linkWithText("Details"));
-        checkCheckbox(Locator.checkboxByName("complete"));
-        checkCheckbox(Locator.checkboxByName("notificationIdPairs"));
-        checkCheckbox(Locator.checkboxByName("notificationIdPairs").index(1));
-        clickButton("Save Changes and Send Notifications");
-        waitForElement(Locator.css(".labkey-message").withText("Complete"));
     }
 
     @LogMethod
@@ -547,6 +464,89 @@ public class SpecimenTest extends SpecimenBaseTest
 
         // Restore permissions back to inherit
         helper.checkInheritedPermissions();
+    }
+
+    @LogMethod
+    private void createRequest()
+    {
+        goToSpecimenData();
+        click(Locator.xpath("//span[text()='Vials by Derivative Type']/../img"));
+        waitForElement(Locator.linkWithText("Plasma, Unknown Processing"));
+        clickAndWait(Locator.linkWithText("Plasma, Unknown Processing"));
+        // Verify unavailable sample
+        assertElementPresent(Locator.xpath("//input[@id='check_" + UNREQUESTABLE_SAMPLE + "' and @disabled]"));
+        assertElementPresent(Locator.xpath("//input[@id='check_" + UNREQUESTABLE_SAMPLE + "']/../../td[contains(text(), 'This vial is unavailable because it was found in the set called \"" + REQUESTABILITY_QUERY + "\".')]"));
+// TODO ONMOUSEOVER        assertElementPresent(Locator.xpath("//input[@id='check_" + UNREQUESTABLE_SAMPLE + "']/../a[contains(@onmouseover, 'This vial is unavailable because it was found in the set called \\\"" + REQUESTABILITY_QUERY + "\\\".')]"));
+        new DataRegionTable.DataRegionFinder(getDriver()).find()
+                .checkAllOnPage();
+
+        clickAndWait(Locator.linkContainingText("history"));
+        assertTextPresent("Vial History");
+        goBack();
+
+        BootstrapMenu.find(getDriver(), "Request Options").clickSubMenu(true, "Create New Request");
+        selectOptionByText(Locator.name("destinationLocation"), DESTINATION_SITE);
+        setFormElement(Locator.id("input0"), "Assay Plan");
+        setFormElement(Locator.id("input2"), "Comments");
+        setFormElement(Locator.id("input1"), "Shipping");
+        clickButton("Create and View Details");
+        assertTextPresent("Please provide all required input.");
+        setFormElement(Locator.id("input3"), "sample last one input");
+        clickButton("Create and View Details");
+        assertTextPresent("sample last one input", "IRB", "KCMC, Moshi, Tanzania", "Originating IRB Approval",
+                SOURCE_SITE, "Providing IRB Approval", DESTINATION_SITE, "Receiving IRB Approval", "SLG",
+                "SLG Approval", "BAA07XNP-01");
+        assertTextNotPresent(
+                UNREQUESTABLE_SAMPLE,
+                // verify that the swab specimen isn't present yet
+                "DAA07YGW-01", "Complete");
+
+        // add additional specimens
+        goToSpecimenData();
+        click(Locator.xpath("//span[text()='Vials by Derivative Type']/../img"));
+        waitAndClickAndWait(Locator.linkWithText("Swab"));
+        new DataRegionTable.DataRegionFinder(getDriver()).find()
+                .checkAllOnPage();
+        BootstrapMenu.find(getDriver(), "Request Options").clickSubMenu(false, "Add To Existing Request");
+        _extHelper.waitForExtDialog("Request Vial", WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.css("#request-vial-details .x-grid3-row"));
+        clickButton("Add 8 Vials to Request", 0);
+        _extHelper.waitForExtDialog("Success", WAIT_FOR_JAVASCRIPT * 5);
+        clickButton("OK", 0);
+        BootstrapMenu.find(getDriver(), "Request Options").clickSubMenu(false, "View Existing Requests");
+        clickButton("Details");
+        assertTextPresent("sample last one input", "IRB", "KCMC, Moshi, Tanzania", "Originating IRB Approval",
+                SOURCE_SITE, "Providing IRB Approval", DESTINATION_SITE, "Receiving IRB Approval", "SLG",
+                "SLG Approval", "BAA07XNP-01", "DAA07YGW-01");
+
+        // submit request
+        assertTextPresent("Not Yet Submitted");
+        assertTextNotPresent("New Request");
+        doAndWaitForPageToLoad(() ->
+        {
+            clickButton("Submit Request", 0);
+            assertAlertIgnoreCaseAndSpaces("Once a request is submitted, its specimen list may no longer be modified.  Continue?");
+        });
+        waitForText("New Request");
+        assertTextNotPresent("Not Yet Submitted");
+
+        // Add request attachment
+        click(Locator.linkWithText("Update Request"));
+        waitForElement(Locator.name("formFiles[0]"));
+        setFormElement(Locator.name("formFiles[0]"), REQUEST_ATTACHMENT);
+        clickButton("Save Changes and Send Notifications");
+        waitForElement(Locator.linkContainingText(REQUEST_ATTACHMENT.getName()));
+
+        // modify request
+        selectOptionByText(Locator.name("newActor"), "SLG");
+        setFormElement(Locator.name("newDescription"), "Other SLG Approval");
+        clickButton("Add Requirement");
+        clickAndWait(Locator.linkWithText("Details"));
+        checkCheckbox(Locator.checkboxByName("complete"));
+        checkCheckbox(Locator.checkboxByName("notificationIdPairs"));
+        checkCheckbox(Locator.checkboxByName("notificationIdPairs").index(1));
+        clickButton("Save Changes and Send Notifications");
+        waitForElement(Locator.css(".labkey-message").withText("Complete"));
     }
 
     @LogMethod
