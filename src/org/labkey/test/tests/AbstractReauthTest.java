@@ -16,6 +16,7 @@
 package org.labkey.test.tests;
 
 import org.assertj.core.api.Assertions;
+import org.junit.Assume;
 import org.junit.Test;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -86,6 +87,8 @@ public abstract class AbstractReauthTest extends BaseWebDriverTest
     @Test
     public void testReauthAsWrongUser()
     {
+        Assume.assumeTrue("Authentication method doesn't have two logins available; skipping wrong-user reauth test", user2 != null);
+
         signInAs(user1);
 
         TestReauthPage testReauthPage = TestReauthPage.beginAt(this);
