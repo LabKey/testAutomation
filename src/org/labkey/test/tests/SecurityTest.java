@@ -556,7 +556,7 @@ public class SecurityTest extends BaseWebDriverTest
     @Test
     public void invokeMutatingSqlAction()
     {
-        // Ensure that GET request that invokes mutating SQL is flagged
+        // Ensure that a GET request invoking mutating SQL is flagged
         String feature = "AllowMutatingSqlViaGet";
         Connection conn = createDefaultConnection();
         OptionalFeatureHelper.disableOptionalFeature(conn, feature);
