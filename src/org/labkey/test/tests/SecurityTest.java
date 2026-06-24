@@ -64,6 +64,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.labkey.test.WebTestHelper.buildURL;
+import static org.labkey.test.WebTestHelper.getHttpResponse;
 import static org.labkey.test.util.PermissionsHelper.AUTHOR_ROLE;
 import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
 import static org.labkey.test.util.PermissionsHelper.READER_ROLE;
@@ -556,20 +557,34 @@ public class SecurityTest extends BaseWebDriverTest
     @Test
     public void invokeMutatingSqlAction()
     {
-        // Ensure that a GET request invoking mutating SQL is flagged
+        String getUrl = buildURL("test", "executeMutatingSqlGet");
+        String postUrl = buildURL("test", "executeMutatingSqlPost");
         String feature = "AllowMutatingSqlViaGet";
         Connection conn = createDefaultConnection();
-        OptionalFeatureHelper.disableOptionalFeature(conn, feature);
-        beginAt(buildURL("test", "executeMutatingSql"));
-        assertTextPresent("MUTATING SQL executed as part of handling action: GET org.labkey.devtools.TestController$ExecuteMutatingSqlAction");
-        checkExpectedErrors(2);
 
-        // Turn on the deprecated feature flag and ensure that GET request can invoke mutating SQL
-        OptionalFeatureHelper.enableOptionalFeature(conn, feature);
-        beginAt(buildURL("test", "executeMutatingSql"));
-        assertTextPresent("UPDATE via GET was allowed!");
+        try
+        {
+            OptionalFeatureHelper.disableOptionalFeature(conn, feature);
 
-        // Restore flag to original value
-        OptionalFeatureHelper.resetOptionalFeature(conn, feature);
+            // Ensure that a GET request invoking mutating SQL is forbidden
+            beginAt(getUrl);
+            assertTextPresent("MUTATING SQL executed as part of handling action: GET org.labkey.devtools.TestController$ExecuteMutatingSqlAction");
+            checkExpectedErrors(2);
+
+            // Ensure that a POST request to a POST action can invoke mutating SQL
+            SimpleHttpResponse response = getHttpResponse(postUrl, "POST");
+            assertTrue(response.getResponseBody().contains("UPDATE via POST was allowed!"));
+            assertEquals(HttpStatus.SC_OK, response.getResponseCode());
+
+            // Turn on the deprecated feature flag and ensure that a GET request can now invoke mutating SQL
+            OptionalFeatureHelper.enableOptionalFeature(conn, feature);
+            beginAt(getUrl);
+            assertTextPresent("UPDATE via GET was allowed!");
+        }
+        finally
+        {
+            // Restore flag to its original value
+            OptionalFeatureHelper.resetOptionalFeature(conn, feature);
+        }
     }
 }
