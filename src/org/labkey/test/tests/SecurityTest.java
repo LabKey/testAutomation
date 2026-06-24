@@ -100,7 +100,7 @@ public class SecurityTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        ((SecurityTest)getCurrentTest()).doSetup();
+        ((SecurityTest) getCurrentTest()).doSetup();
     }
 
     protected void doSetup()
@@ -425,9 +425,9 @@ public class SecurityTest extends BaseWebDriverTest
         if (isPresent)
         {
             clickAndWait(userAccessLink);
-            
+
             // check for the expected number of group membership links (note: they may be hidden by expandos)
-            click(Locator.xpath("//tr[td/a[text()='" + getProjectName() + "']]//img" ));
+            click(Locator.xpath("//tr[td/a[text()='" + getProjectName() + "']]//img"));
             assertElementPresent(Locator.linkWithText(groupName), expectedCount);
             return;
         }
@@ -476,10 +476,10 @@ public class SecurityTest extends BaseWebDriverTest
         DataRegionTable table = new DataRegionTable("query", getDriver());
 
         table.getDataAsText(2, 2);
-        String createdBy      = table.getDataAsText(2, "Created By");
+        String createdBy = table.getDataAsText(2, "Created By");
         String impersonatedBy = table.getDataAsText(2, "Impersonated By");
-        String user           = table.getDataAsText(2, "User");
-        String comment        = table.getDataAsText(2, "Comment");
+        String user = table.getDataAsText(2, "User");
+        String comment = table.getDataAsText(2, "Comment");
 
         assertTrue("Incorrect display for deleted user -- expected '<nnnn>', found '" + user + "'", user.matches("<\\d{4,}>"));
         assertEquals("Incorrect log entry for deleted user",
@@ -504,7 +504,7 @@ public class SecurityTest extends BaseWebDriverTest
         _userHelper.deleteUsers(false, selfRegUserEmail);
 
         int getResponse = setAuthenticationParameter("SelfRegistration", true);
-        assertEquals("failed to set authentication param to enable self register via http get", 200, getResponse );
+        assertEquals("failed to set authentication param to enable self register via http get", 200, getResponse);
         signOut();
 
         // test: attempt login, check if register button appears, click register
@@ -550,5 +550,26 @@ public class SecurityTest extends BaseWebDriverTest
 
         // cleanup: sign admin back in
         signIn();
+    }
+
+    @LogMethod
+    @Test
+    public void invokeMutatingSqlAction()
+    {
+        // Ensure that GET request that invokes mutating SQL is flagged
+        String feature = "AllowMutatingSqlViaGet";
+        Connection conn = createDefaultConnection();
+        OptionalFeatureHelper.disableOptionalFeature(conn, feature);
+        beginAt(buildURL("test", "executeMutatingSql"));
+        assertTextPresent("MUTATING SQL executed as part of handling action: GET org.labkey.devtools.TestController$ExecuteMutatingSqlAction");
+        checkExpectedErrors(2);
+
+        // Turn on the deprecated feature flag and ensure that GET request can invoke mutating SQL
+        OptionalFeatureHelper.enableOptionalFeature(conn, feature);
+        beginAt(buildURL("test", "executeMutatingSql"));
+        assertTextPresent("UPDATE via GET was allowed!");
+
+        // Restore flag to original value
+        OptionalFeatureHelper.resetOptionalFeature(conn, feature);
     }
 }
