@@ -18,7 +18,13 @@ package org.labkey.test.tests;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hc.core5.http.HttpStatus;
+import org.json.JSONObject;
+import org.junit.Assert;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.CommandResponse;
+import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
@@ -31,10 +37,12 @@ import org.labkey.test.components.dumbster.EmailRecordTable;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.pages.ImportDataPage;
 import org.labkey.test.pages.study.specimen.ManageNotificationsPage;
+import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.PasswordUtil;
+import org.labkey.test.util.PermissionsHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.StudyHelper;
 import org.labkey.test.util.TextSearcher;
@@ -50,6 +58,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
@@ -58,6 +67,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.pages.study.specimen.ManageNotificationsPage.SpecimensAttachment;
 import static org.labkey.test.util.DataRegionTable.DataRegion;
+import static org.labkey.test.util.PermissionsHelper.READER_ROLE;
 
 @Category({Daily.class, Specimen.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 20)
@@ -123,9 +133,11 @@ public class SpecimenTest extends SpecimenBaseTest
 
     @Override
     @LogMethod
-    protected void doVerifySteps() throws IOException
+    protected void doVerifySteps() throws IOException, CommandException
     {
         verifyActorDetails();
+        verifySpecimenEventsRedirect();
+        createRequestWithApi();
         createRequest();
         verifyViews();
         verifyAdditionalRequestFields();
@@ -317,6 +329,143 @@ public class SpecimenTest extends SpecimenBaseTest
             assertAlertIgnoreCaseAndSpaces("Canceling will permanently delete this pending request.  Continue?");
         });
         DataRegion(getDriver()).withName("SpecimenRequest").waitFor();
+    }
+
+    // Simulate SpecimenForeignKey redirect behavior
+    @LogMethod
+    private void verifySpecimenEventsRedirect()
+    {
+        String targetStudyId = getContainerId();
+
+        // Create an empty second folder (doesn't need to be a study) with guest read. We'll attempt to invoke the
+        // redirect action from this folder.
+        String folderName = "Another Study";
+        _containerHelper.createSubfolder(getProjectName(), folderName, "Study");
+        new ApiPermissionsHelper(this).setSiteGroupPermissions("Guests", "Reader");
+
+        // Happy path - admin should redirect
+        String baseUrl = WebTestHelper.getBaseURL() + "/" + getProjectName() + "/" + folderName + "/specimen-specimenEventsRedirect.view?targetStudy=" + targetStudyId + "&id=";
+        String url = baseUrl + "AAA07XK5-01";
+        beginAt(url);
+        assertTextPresent("Vial History", "999320812", "350V0600294A");
+
+        // Guest has access in Another Study but not in the target study (My Study), so should not redirect
+        signOut();
+        beginAt(baseUrl + "abcdefg_123456"); // Bogus ID and user doesn't have read permission
+        assertTextPresent("Unable to resolve the Specimen ID and target Study");
+        beginAt(url); // Valid ID, but user doesn't have read permission to target study, so same error
+        assertTextPresent("Unable to resolve the Specimen ID and target Study");
+
+        // Sign in and back to the main study
+        signIn();
+        goToProjectHome();
+        clickFolder(getFolderName());
+    }
+
+    @LogMethod
+    private void createRequestWithApi() throws IOException, CommandException
+    {
+        // Create an empty specimen request as admin user
+        goToSpecimenData();
+        click(Locator.tag("img").withAttributeContaining("alt", "[New Request Icon]"));
+        selectOptionByText(Locator.name("destinationLocation"), DESTINATION_SITE);
+        setFormElement(Locator.id("input0"), "Assay Plan");
+        setFormElement(Locator.id("input1"), "Shipping");
+        setFormElement(Locator.id("input3"), "Comments");
+        clickButton("Create and View Details");
+        int requestId = Integer.parseInt(getUrlParam("id"));
+
+        // Create commands to add vials, remove vials, add specimens, and cancel the request
+        JSONObject vialParameters = new JSONObject(
+            Map.of(
+                "requestId", requestId,
+                "idType", "GlobalUniqueId",
+                "vialIds", new String[]{"ABH00LT8-01"}
+            )
+        );
+        SimplePostCommand addVialsCommand = new SimplePostCommand("specimen-api", "addVialsToRequest");
+        addVialsCommand.setJsonObject(vialParameters);
+        SimplePostCommand removeVialsCommand = new SimplePostCommand("specimen-api", "removeVialsFromRequest");
+        removeVialsCommand.setJsonObject(vialParameters);
+        SimplePostCommand addSpecimenCommand = new SimplePostCommand("specimen-api", "addSpecimensToRequest");
+        addSpecimenCommand.setJsonObject(new JSONObject(
+            Map.of(
+                "requestId", requestId,
+                "specimenHashes", new String[]{"FakeSpecimenHashThatDoesntMatter"}
+            )
+        ));
+        SimplePostCommand cancelRequestCommand = new SimplePostCommand("specimen-api", "cancelRequest");
+        cancelRequestCommand.setJsonObject(new JSONObject(
+            Map.of(
+                "requestId", requestId
+            )
+        ));
+
+        // Assign "Specimen Requester" role to USER1
+        String containerPath = getCurrentContainerPath();
+        log(containerPath);
+        ApiPermissionsHelper helper = new ApiPermissionsHelper(containerPath);
+        helper.uncheckInheritedPermissions(); // Uses UI to un-inherit and save...
+        clickButton("Cancel"); // ...so click button to return to specimen page
+        helper.addMemberToRole(USER1, READER_ROLE, PermissionsHelper.MemberType.user, containerPath);
+        helper.addMemberToRole(USER1, "Specimen Requester", PermissionsHelper.MemberType.user, containerPath);
+        Connection conn = createDefaultConnection();
+
+        // Impersonate USER1. Specimen Requester who doesn't own the request shouldn't be able to modify it.
+        impersonate(USER1);
+        Assert.assertThrows("Request " + requestId + " was not found or the current user does not have permissions to access it.",
+            CommandException.class,
+            () -> addVialsCommand.execute(conn, containerPath)
+        );
+        Assert.assertThrows("Request " + requestId + " was not found or the current user does not have permissions to access it.",
+            CommandException.class,
+            () -> addSpecimenCommand.execute(conn, containerPath)
+        );
+        Assert.assertThrows("Request " + requestId + " was not found or the current user does not have permissions to access it.",
+            CommandException.class,
+            () -> cancelRequestCommand.execute(conn, containerPath)
+        );
+        stopImpersonating(false);
+
+        // Let's have the "Specimen Requester" owner add a vial so USER1 has something to (attempt to) delete
+        impersonateRoles(READER_ROLE, "Specimen Requester");
+        CommandResponse response = addVialsCommand.execute(conn, containerPath);
+        assertEquals(HttpStatus.SC_OK, response.getStatusCode());
+        //noinspection unchecked
+        assertEquals(1, ((List<String>)response.getParsedData().get("vials")).size());
+        stopImpersonating(false);
+
+        // Attempt to remove the just-added vial as "Specimen Requester" non-owner
+        impersonate(USER1);
+        Assert.assertThrows("Request " + requestId + " was not found or the current user does not have permissions to access it.",
+            CommandException.class,
+            () -> removeVialsCommand.execute(conn, containerPath)
+        );
+        stopImpersonating(false);
+
+        // "Specimen Requester" owner should be able to remove vials and add via specimen hash. This hash won't match
+        // any vials, but we're just checking permissions.
+        impersonateRoles(READER_ROLE, "Specimen Requester");
+        response = removeVialsCommand.execute(conn, containerPath);
+        assertEquals(HttpStatus.SC_OK, response.getStatusCode());
+        //noinspection unchecked
+        assertEquals(0, ((List<String>)response.getParsedData().get("vials")).size());
+        response = addSpecimenCommand.execute(conn, containerPath);
+        assertEquals(HttpStatus.SC_OK, response.getStatusCode());
+        stopImpersonating(false);
+
+        // Now give USER1 the (more powerful) "Specimen Coordinator" role and verify they can now modify the request
+        // that they don't own, including canceling it.
+        helper.addMemberToRole(USER1, "Specimen Coordinator", PermissionsHelper.MemberType.user, containerPath);
+        impersonate(USER1);
+        assertEquals(HttpStatus.SC_OK, addVialsCommand.execute(conn, containerPath).getStatusCode());
+        assertEquals(HttpStatus.SC_OK, removeVialsCommand.execute(conn, containerPath).getStatusCode());
+        assertEquals(HttpStatus.SC_OK, addSpecimenCommand.execute(conn, containerPath).getStatusCode());
+        assertEquals(HttpStatus.SC_OK, cancelRequestCommand.execute(conn, containerPath).getStatusCode());
+        stopImpersonating(false);
+
+        // Restore permissions back to inherit
+        helper.checkInheritedPermissions();
     }
 
     @LogMethod
@@ -551,8 +700,8 @@ public class SpecimenTest extends SpecimenBaseTest
         assertTrue(emailMessages1.getFirst().getBody().contains(_specimen_McMichael));
         assertNotNull("No message found", emailMessages1);
         String messageBody = emailMessages2.getFirst().getBody().replaceFirst("-*=_Part_\\d{3}_\\d*.\\d*\\n","");
-        messageBody = messageBody.replaceAll("Content-Type: text\\/html; charset=UTF-8\n","");
-        messageBody = messageBody.replaceAll("Content-Transfer-Encoding: 7bit\n", "");
+        messageBody = messageBody.replace("Content-Type: text/html; charset=UTF-8\n","");
+        messageBody = messageBody.replace("Content-Transfer-Encoding: 7bit\n", "");
         assertTrue("Notification was not as expected.\nExpected:\n" + notification + "\n\nActual:\n" + messageBody, messageBody.contains(notification));
 
         String attachment1 = getAttribute(Locator.linkWithText(ATTACHMENT1), "href");
@@ -1042,7 +1191,7 @@ public class SpecimenTest extends SpecimenBaseTest
     {
         if (StringUtils.isBlank(qcControl))
         {
-            // no conflict, so all three fields shold be valid
+            // no conflict, so all three fields should be valid
             assertTrue(StringUtils.isNotBlank(timestamp));
             assertTrue(StringUtils.isNotBlank(time));
             assertTrue(StringUtils.isNotBlank(date));

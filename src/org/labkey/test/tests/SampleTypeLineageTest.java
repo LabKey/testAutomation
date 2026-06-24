@@ -38,6 +38,7 @@ import org.labkey.test.params.FieldKey;
 import org.labkey.test.params.experiment.DataClassDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.OptionalFeatureHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
 import org.labkey.test.util.TestDataGenerator;
@@ -86,7 +87,6 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
     {
         SampleTypeLineageTest init = getCurrentTest();
 
-        // Comment out this line (after you run once) it will make iterating on  tests much easier.
         init.doSetup();
     }
 
@@ -101,6 +101,7 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
         portalHelper.addWebPart("Sample Types");
 
         portalHelper.exitAdminMode();
+        OptionalFeatureHelper.setOptionalFeature(createDefaultConnection(), "deriveSamplesNotInApp", true);
     }
 
     @Override
@@ -108,9 +109,7 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
     {
         super.doCleanup(afterTest);
 
-        // If you are debugging tests change this function to do nothing.
-        // It can make re-running faster but you need to valid the integrity of the test data on your own.
-//        log("Do nothing.");
+        OptionalFeatureHelper.resetOptionalFeature(createDefaultConnection(), "deriveSamplesNotInApp");
     }
 
     /**

@@ -102,7 +102,7 @@ public class LabkeyErrorPageTest extends BaseWebDriverTest
 
         checker().verifyEquals("Incorrect error heading message", "Oops! A server configuration error has occurred.",
                 errorPage.getErrorHeading());
-        checker().verifyEquals("Incorrect error sub-heading message", "The requested page cannot be found. You have a configuration problem.",
+        checker().verifyEquals("Incorrect error sub-heading message", "You have a configuration problem.",
                 errorPage.getSubErrorHeading());
         checker().verifyThat("Incorrect error image", errorPage.getErrorImage(), CoreMatchers.containsString(imageTitle));
         checker().verifyTrue("'Show Details' button should appear on configuration error page",
