@@ -39,7 +39,7 @@ public class PuppeteerHelper
     {
         // Note: We are explicitly using localhost here instead of WebTestHelper.getTargetServer() because on TC it will
         // use the hostname of the server, which is running Puppeteer with http, so API requests to it will be rejected.
-        return "localhost:3031";
+        return "http://localhost:3031";
     }
 
     public static PuppeteerStatus getStatus(Connection connection) throws IOException, CommandException
