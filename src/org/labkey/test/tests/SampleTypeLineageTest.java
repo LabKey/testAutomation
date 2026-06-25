@@ -797,9 +797,9 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
             fail("Expect CommandException when inserting bogus lineage");
         }catch (CommandException successMaybe)
         {
-            assertTrue("expect bad lineage to produce error containing [Sample 'BOGUS' not found in Sample Type 'badLineageTest'.];\n" +
+            assertTrue("expect bad lineage to produce error containing [Parent sample 'BOGUS' from Sample Type 'badLineageTest' not found in the current context.];\n" +
                             "instead got: [" + successMaybe.getMessage() + "]",
-                    successMaybe.getMessage().contains("Sample 'BOGUS' not found in Sample Type 'badLineageTest'."));
+                    successMaybe.getMessage().contains("Parent sample 'BOGUS' from Sample Type 'badLineageTest' not found in the current context."));
         }
     }
 
@@ -826,9 +826,9 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
             fail("Expect CommandException when inserting bogus lineage");
         }catch (CommandException successMaybe)  // success looks like a CommandException with the expected message
         {
-            assertTrue("expect bad lineage to produce error containing [Sample 'BOGUS' not found in Sample Type 'badParentLineage'.];\n" +
+            assertTrue("expect bad lineage to produce error containing [Parent sample 'BOGUS' from Sample Type 'badParentLineage' not found in the current context.];\n" +
                             "instead got: [" + successMaybe.getMessage() + "]",
-                    successMaybe.getMessage().contains("Sample 'BOGUS' not found in Sample Type 'badParentLineage'."));
+                    successMaybe.getMessage().contains("Parent sample 'BOGUS' from Sample Type 'badParentLineage' not found in the current context."));
         }
 
         // clean up on success
