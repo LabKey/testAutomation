@@ -398,7 +398,7 @@ public class DeferredErrorCollector
         {
             if (allErrors.getLast().getScreenshotName() == null)
             {
-                withScreenshot("fallback").error("No screeshot taken for last deferred error(s). " +
+                withScreenshot("fallback").error("No screenshot taken for last deferred error(s). " +
                         "This screenshot may be relevant to previous failures. " +
                         "Please update test to take appropriate screenshots.");
             }
