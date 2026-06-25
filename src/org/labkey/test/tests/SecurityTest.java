@@ -568,7 +568,7 @@ public class SecurityTest extends BaseWebDriverTest
 
             // Ensure that a GET request invoking mutating SQL is forbidden
             beginAt(getUrl);
-            assertTextPresent("MUTATING SQL executed as part of handling action: GET org.labkey.devtools.TestController$ExecuteMutatingSqlAction");
+            assertTextPresent("MUTATING SQL executed as part of handling action: GET org.labkey.devtools.TestController$ExecuteMutatingSqlGetAction");
             checkExpectedErrors(2);
 
             // Ensure that a POST request to a POST action can invoke mutating SQL
