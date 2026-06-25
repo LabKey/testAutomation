@@ -68,6 +68,9 @@ cleanOnly=false
 #webtest.log.level=DEBUG
 ## Set whether DeferredErrorCollector should fail immediately when errors are encountered (default: false)
 #webtest.checker.fatal=true
+## Set to leave Geckodriver running after test failures (https://github.com/mozilla/geckodriver/issues/2247)
+## Note: requires you to manually kill 'geckodriver' processes (`killall geckodriver`)
+#webtest.allowZombieGeckodriver=true
 
 
 #==============================================================================
