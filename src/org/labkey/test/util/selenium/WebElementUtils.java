@@ -168,4 +168,16 @@ public abstract class WebElementUtils
     {
         return tryMapElement(element, mapper, "");
     }
+
+    /**
+     * Gets the visible text of each element in a list. Elements that are stale or missing return {@code null}.
+     * @param elements list of elements to inspect
+     * @return list of visible text values, with {@code null} for any unavailable element
+     * @see WebElement#getText()
+     * @see #tryMapElement(WebElement, Function, Object)
+     */
+    public static List<String> getTexts(List<WebElement> elements)
+    {
+        return elements.stream().map(el -> tryMapElement(el, WebElement::getText, null)).toList();
+    }
 }
