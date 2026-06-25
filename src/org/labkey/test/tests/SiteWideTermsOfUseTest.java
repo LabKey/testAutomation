@@ -287,6 +287,7 @@ public class SiteWideTermsOfUseTest extends BaseTermsOfUseTest
         assertTrue("Second acceptance didn't occur within 15 seconds!", diff < max_millis);
         assertFalse("Second acceptance occurred too early (" + diff + "ms)", diff < FREQUENCY_SECONDS * 1000);
 
+        // Back to every sign-in
         setFrequency(0);
     }
 
