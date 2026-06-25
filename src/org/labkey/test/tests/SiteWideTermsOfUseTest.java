@@ -15,12 +15,10 @@
  */
 package org.labkey.test.tests;
 
-import org.apache.hc.core5.http.HttpStatus;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
-import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.test.BaseWebDriverTest;
@@ -99,6 +97,7 @@ public class SiteWideTermsOfUseTest extends BaseTermsOfUseTest
     protected void assureSiteWideTermsOfUsePage()
     {
         createTermsOfUsePage(null, SITE_WIDE_TERMS_TEXT);
+        setFrequency(0);
     }
 
     // Test that the site-wide terms appear when you log out, even if you've accepted the terms when logged in
@@ -245,7 +244,7 @@ public class SiteWideTermsOfUseTest extends BaseTermsOfUseTest
     private final static int FREQUENCY_SECONDS = 10;
 
     @Test
-    public void testRememberMeTerms() throws IOException, CommandException
+    public void testRememberMeTerms()
     {
         log("Testing \"Require terms-of-use acceptance\" set to " + FREQUENCY_SECONDS + " seconds");
 
@@ -291,14 +290,20 @@ public class SiteWideTermsOfUseTest extends BaseTermsOfUseTest
         setFrequency(0);
     }
 
-    private void setFrequency(int frequency) throws IOException, CommandException
+    private void setFrequency(int frequency)
     {
         // Use direct API call to set a value that may not appear in the drop-down list
         Connection conn = createDefaultConnection();
         SimplePostCommand frequencyCommand = new SimplePostCommand("admin", "setTermsOfUseFrequency");
         frequencyCommand.setParameters(Map.of("seconds", frequency));
-        CommandResponse response = frequencyCommand.execute(conn, "/");
-        assertEquals(HttpStatus.SC_OK, response.getStatusCode());
+        try
+        {
+            frequencyCommand.execute(conn, "/");
+        }
+        catch (IOException | CommandException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
     protected void signOutWithSiteWideTerms(String termsText, boolean acceptTerms)
