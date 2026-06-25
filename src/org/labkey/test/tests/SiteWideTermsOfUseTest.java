@@ -15,19 +15,29 @@
  */
 package org.labkey.test.tests;
 
+import org.apache.hc.core5.http.HttpStatus;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.CommandResponse;
+import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.util.PasswordUtil;
 import org.openqa.selenium.WebElement;
 
+import java.io.IOException;
+import java.util.Map;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 @Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 7)
@@ -230,6 +240,64 @@ public class SiteWideTermsOfUseTest extends BaseTermsOfUseTest
         signOutWithSiteWideTerms(SITE_WIDE_TERMS_TEXT, true); // agrees to terms of use as guest
         signInShouldFail(PasswordUtil.getUsername(), "baaaaaaaad", "The email address and password you entered did not match any accounts on file. Note: Passwords are case sensitive; make sure your Caps Lock is off.");
         waitForText(SITE_WIDE_TERMS_TEXT); // should show
+    }
+
+    private final static int FREQUENCY_SECONDS = 10;
+
+    @Test
+    public void testRememberMeTerms() throws IOException, CommandException
+    {
+        log("Testing \"Require terms-of-use acceptance\" set to " + FREQUENCY_SECONDS + " seconds");
+
+        // Remember terms acceptance for FREQUENCY_SECONDS
+        setFrequency(FREQUENCY_SECONDS);
+        boolean firstSignIn = true;
+        boolean secondAcceptance = false;
+        long firstAcceptance = 0;
+        long diff;
+
+        // Sign out and back in again for up to FREQUENCY_SECONDS * 1.5 seconds
+        double max_millis = FREQUENCY_SECONDS * 1.5 * 1000;
+        do
+        {
+            simpleSignOut();
+            // Terms dialog doesn't show a sign-in link, so navigate directly to the login page
+            beginAt(WebTestHelper.buildURL("login", "login"));
+            assertTextNotPresent(SITE_WIDE_TERMS_TEXT);
+            doAndWaitForPageToLoad(() -> fillSignInFormAndSubmit("Sign In"));
+            if (isTextPresent(SITE_WIDE_TERMS_TEXT))
+            {
+                acceptTermsOfUse(SITE_WIDE_TERMS_TEXT, true);
+                if (firstSignIn)
+                {
+                    firstAcceptance = System.currentTimeMillis();
+                    firstSignIn = false;
+                }
+                else
+                {
+                    secondAcceptance = true;
+                }
+            }
+            diff = System.currentTimeMillis() - firstAcceptance;
+        }
+        while (!secondAcceptance && !firstSignIn && diff < max_millis);
+
+        assertFalse("First sign in didn't result in TOU!", firstSignIn);
+        assertTrue("First acceptance time was 0!", firstAcceptance > 0);
+        assertTrue("Second acceptance didn't occur within 15 seconds!", diff < max_millis);
+        assertFalse("Second acceptance occurred too early (" + diff + "ms)", diff < FREQUENCY_SECONDS * 1000);
+
+        setFrequency(0);
+    }
+
+    private void setFrequency(int frequency) throws IOException, CommandException
+    {
+        // Use direct API call to set a value that may not appear in the drop-down list
+        Connection conn = createDefaultConnection();
+        SimplePostCommand frequencyCommand = new SimplePostCommand("admin", "setTermsOfUseFrequency");
+        frequencyCommand.setParameters(Map.of("seconds", frequency));
+        CommandResponse response = frequencyCommand.execute(conn, "/");
+        assertEquals(HttpStatus.SC_OK, response.getStatusCode());
     }
 
     protected void signOutWithSiteWideTerms(String termsText, boolean acceptTerms)
