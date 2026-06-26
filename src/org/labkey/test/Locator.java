@@ -20,8 +20,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.labkey.test.selenium.LazyWebElement;
 import org.labkey.test.selenium.ReclickingWebElement;
 import org.labkey.test.selenium.RefindingWebElement;
@@ -1019,6 +1019,40 @@ public abstract class Locator extends By
         return "\"" + value.replace("\\", "\\\\").replace("\"", "\\\"") + "\"";
     }
 
+    public static Locator union(Locator... locators)
+    {
+        if (locators.length < 1)
+            throw new IllegalArgumentException("Specify at least one locator");
+        if (locators.length == 1)
+            return locators[0];
+
+        List<CssLocator> cssLocators = Arrays.stream(locators).map(locator -> {
+            CssLocator cssLocator = null;
+            if (locator instanceof CssLocator)
+                cssLocator = (CssLocator) locator;
+            else if (locator instanceof XPathCSSLocator xcLoc)
+                cssLocator = xcLoc.getCssLoc();
+
+            if (cssLocator != null && CssLocator.isRawCssLocator(cssLocator))
+                return cssLocator;
+            else
+                return null;
+        }).filter(Objects::nonNull).toList();
+        if (cssLocators.size() == locators.length)
+            return CssLocator.union(cssLocators.toArray(new CssLocator[0]));
+
+        List<XPathLocator> xPathLocators = Arrays.stream(locators).map(locator -> {
+            if (locator instanceof XPathLocator)
+                return (XPathLocator) locator;
+            else
+                return null;
+        }).filter(Objects::nonNull).toList();
+        if (xPathLocators.size() == locators.length)
+            return XPathLocator.union(xPathLocators.toArray(new XPathLocator[0]));
+
+        throw new IllegalArgumentException("Locators should be all CSS or all XPath");
+    }
+
     private static class XPathCSSLocator extends XPathLocator
     {
         private final XPathLocator _xLoc;
@@ -1672,7 +1706,7 @@ public abstract class Locator extends By
 
             for (Locator loc : locators)
             {
-                if (loc._contains != null || loc._text != null || loc._index != null)
+                if (isRawCssLocator(loc))
                     throw new IllegalArgumentException("Only able to union raw CSS selectors");
             }
 
@@ -1685,6 +1719,11 @@ public abstract class Locator extends By
             }
 
             return new WrappedLocator(new CssLocator(unionedLocators.toString()));
+        }
+
+        private static boolean isRawCssLocator(Locator loc)
+        {
+            return loc._contains != null || loc._text != null || loc._index != null;
         }
 
         @Override
