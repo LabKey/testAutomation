@@ -183,6 +183,11 @@ public abstract class TestProperties
         return !getBooleanProperty("selenium.reuseWebDriver", false);
     }
 
+    public static boolean allowZombieGeckodriver()
+    {
+        return getBooleanProperty("webtest.allowZombieGeckodriver", false);
+    }
+
     public static boolean isViewCheckSkipped()
     {
         return !getBooleanProperty("viewCheck", true);
