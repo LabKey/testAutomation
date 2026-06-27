@@ -53,7 +53,8 @@ public class AppPageHeader extends WebDriverComponent<AppPageHeader.ElementCache
     @Override
     protected void waitForReady()
     {
-        getWrapper().shortWait().withMessage(getClass().getSimpleName() + " is not present.").until(ExpectedConditions.visibilityOf(getComponentElement()));
+        getWrapper().shortWait().withMessage(getClass().getSimpleName() + " is not present.")
+                .until(ExpectedConditions.elementToBeClickable(getComponentElement()));
     }
 
     /**
