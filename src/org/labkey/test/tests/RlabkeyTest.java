@@ -20,6 +20,7 @@ import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.api.util.FileUtil;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.reports.SaveCategoriesCommand;
 import org.labkey.test.BaseWebDriverTest;
@@ -239,7 +240,7 @@ public class RlabkeyTest extends BaseWebDriverTest
         WebDavUploadHelper webDav = new WebDavUploadHelper(getProjectName());
 
         // Setup dir to simulate local R environment
-        File downloadDir = new File(TestFileUtils.getDefaultFileRoot(getProjectName()), "webdav_download");
+        File downloadDir = FileUtil.appendName(TestFileUtils.getDefaultFileRoot(getProjectName()), "webdav_download");
         webDav.mkDir(downloadDir.getName());
         scriptReplacements.put("downloadDir", downloadDir.getAbsolutePath().replaceAll("\\\\", "/"));
 
@@ -253,7 +254,7 @@ public class RlabkeyTest extends BaseWebDriverTest
         webDav.mkDir("remote/writeChecks/deleteMe_empty");
         webDav.putRandomAlphanumeric("remote/writeChecks/deleteMe/file.txt");
         webDav.putRandomAlphanumeric("remote/writeChecks/deleteMe.txt");
-        File remoteDir = new File(downloadDir.getParentFile(), "remote");
+        File remoteDir = FileUtil.appendName(downloadDir.getParentFile(), "remote");
         scriptReplacements.put("remoteDir", remoteDir.getAbsolutePath().replaceAll("\\\\", "/"));
 
         doRLabkeyTest(RLABKEY_API_WEBDAV, scriptReplacements);
