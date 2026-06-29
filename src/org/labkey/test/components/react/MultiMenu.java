@@ -288,20 +288,25 @@ public class MultiMenu extends BootstrapMenu
         for (WebElement item : listItems)
         {
             String className = StringUtils.trimToEmpty(item.getAttribute("class"));
-            String role = StringUtils.trimToEmpty(item.getAttribute("role"));
-            String text = item.getText().trim();
 
-            if (className.contains("dropdown-header") && text.equalsIgnoreCase(heading))
+            if (!headingFound && className.contains("dropdown-header") && item.getText().trim().equalsIgnoreCase(heading))
+            {
                 headingFound = true;
+            }
+            else if (headingFound && !className.contains("dropdown-section-toggle")) // Exclude section toggle
+            {
+                String role = StringUtils.trimToEmpty(item.getAttribute("role"));
 
-            // Once we've found our header we know that all presentation elements belong to the heading
-            // we are interested in
-            if (headingFound && role.equals("presentation"))
-                itemsUnderHeading.add(item);
+                // Once we hit a divider we're done looking at menu items related to the heading, so we can stop iterating
+                if (role.equals("separator"))
+                    break;
 
-            // Once we hit a divider we're done looking at menu items related to the heading, so we can stop iterating
-            if (headingFound && role.equals("separator"))
-                break;
+                // Once we've found our header we know that all presentation elements belong to the heading
+                // we are interested in
+                if (role.equals("presentation"))
+                    itemsUnderHeading.add(item);
+
+            }
         }
 
         return itemsUnderHeading;

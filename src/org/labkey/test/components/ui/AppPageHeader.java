@@ -23,6 +23,8 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import static org.labkey.test.util.selenium.WebElementUtils.tryMapElement;
+import static org.openqa.selenium.support.ui.ExpectedConditions.stalenessOf;
+import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOf;
 
 /**
  * Wraps <AppPageHeader/> component
@@ -54,7 +56,7 @@ public class AppPageHeader extends WebDriverComponent<AppPageHeader.ElementCache
     protected void waitForReady()
     {
         getWrapper().shortWait().withMessage(getClass().getSimpleName() + " is not present.")
-                .until(ExpectedConditions.elementToBeClickable(getComponentElement()));
+                .until(ExpectedConditions.or(visibilityOf(getComponentElement()), stalenessOf(getComponentElement()))); // short-circuit if element goes stale
     }
 
     /**
