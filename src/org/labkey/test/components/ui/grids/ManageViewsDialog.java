@@ -25,6 +25,7 @@ import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -158,7 +159,9 @@ public class ManageViewsDialog extends ModalDialog
      */
     public ManageViewsDialog confirmDelete()
     {
-        elementCache().deleteYesButton.click();
+        WebElement deleteYesButton = elementCache().deleteYesButton;
+        deleteYesButton.click();
+        getWrapper().quickWait().until(ExpectedConditions.stalenessOf(deleteYesButton));
         return this;
     }
 
@@ -169,7 +172,9 @@ public class ManageViewsDialog extends ModalDialog
      */
     public ManageViewsDialog cancelDelete()
     {
-        elementCache().deleteNoButton.click();
+        WebElement deleteNoButton = elementCache().deleteNoButton;
+        deleteNoButton.click();
+        getWrapper().quickWait().until(ExpectedConditions.stalenessOf(deleteNoButton));
         return this;
     }
 
