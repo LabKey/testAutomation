@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<studySecurityPolicy xmlns="http://labkey.org/studySecurityPolicy/xml">
-  <securityType>BASIC_READ</securityType>
-  <groupPermissions>
-    <groupPermission groupName="Guests" securityType="NONE"/>
-    <groupPermission groupName="Users" securityType="NONE"/>
-    <groupPermission groupName="Users" securityType="NONE"/>
-  </groupPermissions>
-</studySecurityPolicy>

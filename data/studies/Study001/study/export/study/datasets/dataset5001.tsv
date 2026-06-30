@@ -1,2 +1,0 @@
-ParticipantId	SequenceNum	date	QCStateLabel	TestInt	TestString	TestDate	TestDateTime	Location
-PTID123	1.0000		First QC State	999	ABC	2013-10-29 00:00:00.0	2013-10-28 01:23:00.0	
