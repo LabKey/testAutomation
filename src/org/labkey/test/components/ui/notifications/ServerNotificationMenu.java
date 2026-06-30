@@ -269,7 +269,7 @@ public class ServerNotificationMenu extends WebDriverComponent<ServerNotificatio
     {
         public final WebElement menuContent = Locator.byClass("navbar-menu__content").refindWhenNeeded(this);
 
-        public final WebElement toggle = Locator.byClass("navbar-menu-button").findWhenNeeded(this);
+        public final WebElement toggle = Locator.byClass("navbar-menu-button").refindWhenNeeded(this);
 
         public final WebElement statusIcon()
         {
