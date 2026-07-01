@@ -8,6 +8,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.FluentWait;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -153,7 +154,10 @@ public class FileTree extends WebDriverComponent<FileTree.ElementCache>
         // Second <div> under the <li>
         private final WebElement _children = Locator.xpath("./div[2]").findWhenNeeded(this);
 
-        private final FluentWait<Object> toggleWait = new FluentWait<>(new Object());
+        private FluentWait<Object> toggleWait()
+        {
+            return new FluentWait<>(new Object()).withTimeout(Duration.ofSeconds(1));
+        }
 
         SubTree(WebElement el)
         {
@@ -266,7 +270,7 @@ public class FileTree extends WebDriverComponent<FileTree.ElementCache>
             if (waitForToggle() != DirExpansionState.OPEN)
             {
                 _toggleArrow.click();
-                toggleWait.withMessage(() -> String.format("Waiting for '%s' to expand.", getName()))
+                toggleWait().withMessage(() -> String.format("Waiting for '%s' to expand.", getName()))
                     .until(o -> getState() == DirExpansionState.OPEN);
             }
         }
@@ -276,7 +280,7 @@ public class FileTree extends WebDriverComponent<FileTree.ElementCache>
             if (waitForToggle() != DirExpansionState.CLOSED)
             {
                 _toggleArrow.click();
-                toggleWait.withMessage(() -> String.format("Waiting for '%s' to collapse.", getName()))
+                toggleWait().withMessage(() -> String.format("Waiting for '%s' to collapse.", getName()))
                     .until(o -> getState() == DirExpansionState.CLOSED);
             }
         }
@@ -288,7 +292,7 @@ public class FileTree extends WebDriverComponent<FileTree.ElementCache>
 
         private DirExpansionState waitForToggle()
         {
-            return toggleWait.withMessage(() -> String.format("Waiting for '%s' to animate.", getName()))
+            return toggleWait().withMessage(() -> String.format("Waiting for '%s' to animate.", getName()))
                 .until(o -> {
                     DirExpansionState state = getState();
                     if (state == DirExpansionState.ANIMATING)
