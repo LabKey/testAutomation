@@ -1846,6 +1846,7 @@ public class SampleTypeTest extends BaseWebDriverTest
         createPage.clickSave();
 
         viewRawTableMetadata(sampleTypeName);
+        assertTextPresentCaseInsensitive("fk_rowid_"); // GitHub Issue 1117
         verifyTableIndices("unique_constraint_test_", List.of("field_Name1", "fieldName_2"));
         assertTextNotPresent("unique_constraint_test_fieldname_3");
         verifyTableIndexNonUnique("unique_constraint_test_", "field_Name1", false);

@@ -559,6 +559,19 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
             String[] importedDataParents = matchingMap.get("Inputs/Data/parentDataClass").replace(" ", "").split(",");
             assertThat("expect parent dataClass derivation to round trip with equivalent values", sourceDataParents, hasItems(importedDataParents));
         }
+
+        // GitHub Issue 1117
+        String importFolderPath = IMPORT_PROJECT_NAME + "/" + importFolder;
+        verifyRowIdForeignKey(importFolderPath, "samples", testSamples);
+        verifyRowIdForeignKey(importFolderPath, "samples", parentSampleType);
+        verifyRowIdForeignKey(importFolderPath, "exp.data", dataClass);
+    }
+
+    private void verifyRowIdForeignKey(String containerPath, String schemaName, String queryName)
+    {
+        beginAt(WebTestHelper.buildURL("query", containerPath, "rawTableMetaData",
+                Map.of("schemaName", schemaName, "query.queryName", queryName)));
+        assertTextPresentCaseInsensitive("fk_rowid_");
     }
 
     @Test
