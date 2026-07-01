@@ -60,11 +60,6 @@ public class Checkbox extends Component implements FormItem<Boolean>
         return isChecked();
     }
 
-    public boolean isDisplayed()
-    {
-        return getComponentElement().isDisplayed();
-    }
-
     public boolean isChecked()
     {
         return getComponentElement().isSelected();

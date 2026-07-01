@@ -38,6 +38,11 @@ public abstract class Component<EC extends Component.ElementCache> implements Se
 
     public abstract WebElement getComponentElement();
 
+    public boolean isDisplayed()
+    {
+        return getComponentElement().isDisplayed();
+    }
+
     @Override
     public String toString()
     {
