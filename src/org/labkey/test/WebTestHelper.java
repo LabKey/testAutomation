@@ -578,6 +578,23 @@ public class WebTestHelper
                 : value;
     }
 
+    public static Map<String, String> parseAppQuery(URL url)
+    {
+        String ref = url.getRef();
+
+        if (ref != null)
+        {
+            int queryIndex = ref.indexOf("?");
+
+            if (queryIndex > -1)
+            {
+                return parseUrlQueryString(ref.substring(queryIndex), true);
+            }
+        }
+
+        return Collections.emptyMap();
+    }
+
     public static Connection getRemoteApiConnection()
     {
         return getRemoteApiConnection(true);
