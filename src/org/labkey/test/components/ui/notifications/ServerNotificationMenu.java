@@ -5,6 +5,7 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.ui.pipeline.ImportsPage;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -157,10 +158,19 @@ public class ServerNotificationMenu extends WebDriverComponent<ServerNotificatio
 
     public ImportsPage clickViewAll()
     {
-        expand();
-        WebDriverWrapper.waitFor(elementCache().viewAllLink()::isDisplayed,
-                "View all link did not become visible.", 2_500);
-        elementCache().viewAllLink().click();
+        // Retry for clicking 'View all activity' link because of stale element.
+        WebDriverWrapper.waitFor(() -> {
+            try
+            {
+                expand();
+                elementCache().viewAllLink().click();
+                return true;
+            }
+            catch (StaleElementReferenceException | NoSuchElementException retry)
+            {
+                return false;
+            }
+        }, "View all link did not become clickable.", 5_000);
         return new ImportsPage(getWrapper());
     }
 
@@ -259,7 +269,7 @@ public class ServerNotificationMenu extends WebDriverComponent<ServerNotificatio
     {
         public final WebElement menuContent = Locator.byClass("navbar-menu__content").refindWhenNeeded(this);
 
-        public final WebElement toggle = Locator.byClass("navbar-menu-button").findWhenNeeded(this);
+        public final WebElement toggle = Locator.byClass("navbar-menu-button").refindWhenNeeded(this);
 
         public final WebElement statusIcon()
         {
