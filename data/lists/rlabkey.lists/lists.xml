@@ -66,7 +66,7 @@
         <columnTitle>Text Field</columnTitle>
       </column>
       <column columnName="IntFld">
-        <datatype>integer</datatype>
+        <datatype>bigint</datatype>
         <columnTitle>Integer Field</columnTitle>
       </column>
       <column columnName="DoubleFld">

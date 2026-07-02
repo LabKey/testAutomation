@@ -1,5 +1,5 @@
 DisplayFld	TextFld	IntFld	DoubleFld	DateTimeFld	BooleanFld	LongTextFld	AttachmentFld	RequiredText	RequiredInt	Category
-Row 1	some text here	99	987.654	2/14/2010	FALSE	Could be some very long text		I have to fill this out	42	PLAIN
+Row 1	some text here	99999999999	987.654	2/14/2010	FALSE	Could be some very long text		I have to fill this out	42	PLAIN
 Row 2 Empty Vals					FALSE			Cannot be empty	55	
 Row 3 (plain)	More plane values	-34	98123.45	1/1/1999	FALSE	The quick brown fox jumped over the fence.  The quick brown fox jumped over the fence.  The quick brown fox jumped over the fence.  The quick brown fox jumped over the fence.  The quick brown fox jumped over the fence.  The quick brown fox jumped over the fence.  The quick brown fox jumped over the fence.  The quick brown fox jumped over the fence.  The quick brown fox jumped over the fence.  The quick brown fox jumped over the fence.  		no attachment	88	PLAIN
 row 4 (the n word)	null NULL NA and na	123	44.33	2/20/2002	FALSE			lots of words for empty	456	EMPTY
