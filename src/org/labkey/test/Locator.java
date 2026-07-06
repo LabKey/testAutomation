@@ -1026,18 +1026,8 @@ public abstract class Locator extends By
         if (locators.length == 1)
             return locators[0];
 
-        List<CssLocator> cssLocators = Arrays.stream(locators).map(locator -> {
-            CssLocator cssLocator = null;
-            if (locator instanceof CssLocator)
-                cssLocator = (CssLocator) locator;
-            else if (locator instanceof XPathCSSLocator xcLoc)
-                cssLocator = xcLoc.getCssLoc();
-
-            if (cssLocator != null && CssLocator.isRawCssLocator(cssLocator))
-                return cssLocator;
-            else
-                return null;
-        }).filter(Objects::nonNull).toList();
+        List<CssLocator> cssLocators = Arrays.stream(locators).map(Locator::asRawCssLocator)
+                .filter(Objects::nonNull).toList();
         if (cssLocators.size() == locators.length)
             return CssLocator.union(cssLocators.toArray(new CssLocator[0]));
 
@@ -1051,6 +1041,17 @@ public abstract class Locator extends By
             return XPathLocator.union(xPathLocators.toArray(new XPathLocator[0]));
 
         throw new IllegalArgumentException("Locators should be all CSS or all XPath");
+    }
+
+    private static CssLocator asRawCssLocator(Locator locator)
+    {
+        CssLocator cssLocator = null;
+        if (locator instanceof CssLocator cssLoc)
+            cssLocator = cssLoc;
+        else if (locator instanceof XPathCSSLocator xcLoc)
+            cssLocator = xcLoc.getCssLoc();
+
+        return cssLocator != null && cssLocator.isRawCssLocator() ? cssLocator : null;
     }
 
     private static class XPathCSSLocator extends XPathLocator
@@ -1704,9 +1705,9 @@ public abstract class Locator extends By
             if (locators.length == 0)
                 throw new IllegalArgumentException("Specify one or more locators to union");
 
-            for (Locator loc : locators)
+            for (CssLocator loc : locators)
             {
-                if (isRawCssLocator(loc))
+                if (!loc.isRawCssLocator())
                     throw new IllegalArgumentException("Only able to union raw CSS selectors");
             }
 
@@ -1721,9 +1722,9 @@ public abstract class Locator extends By
             return new WrappedLocator(new CssLocator(unionedLocators.toString()));
         }
 
-        private static boolean isRawCssLocator(Locator loc)
+        private boolean isRawCssLocator()
         {
-            return loc._contains != null || loc._text != null || loc._index != null;
+            return _contains == null && _text == null && _index == null;
         }
 
         @Override
