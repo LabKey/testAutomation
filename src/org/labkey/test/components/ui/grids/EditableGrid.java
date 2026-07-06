@@ -1179,9 +1179,6 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     private boolean isInSelection(WebElement cell)  // 'in selection' shows as blue color, means it is part of one or many selected cells for copy/paste, etc
     {
         // Should not need to add code for a reactSelect here. A selection involves clicking/dragging, which closes the reactSelect.
-        // findOptionalElement rather than findElement: the cellular-display div can be briefly absent
-        // mid-transition (e.g. a lookup field's async dropdown still open right after a paste). Treat
-        // "not present yet" as "not selected yet" so callers' waitFor polling can retry instead of aborting.
         return Locator.tagWithClass("div", "cellular-display")
                 .findOptionalElement(cell)
                 .map(el -> el.getDomAttribute("class").contains("cell-selection"))
