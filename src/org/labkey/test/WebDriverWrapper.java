@@ -205,6 +205,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         _ext4Helper = new Ext4Helper(this);
     }
 
+    @Contract(pure = true)
     @NotNull
     public final WebDriver getDriver()
     {
@@ -1352,9 +1353,10 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return "/"; //root
     }
 
+    @Contract(pure = true)
     public String getCurrentContainerPath()
     {
-        return (String)executeScript("return LABKEY.container.path;");
+        return (String) executeScript("return LABKEY.container.path;");
     }
 
     public WhoAmIResponse whoAmI()
