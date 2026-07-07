@@ -518,7 +518,7 @@ public class WebTestHelper
      * @return A url string that can be used for navigation.
      * @see URLBuilder
      */
-    public static String buildAppURL(String containerPath, String controllerName, Map<String, Object> params, Object... parts)
+    public static String buildAppURL(String containerPath, String controllerName, Map<String, ?> params, Object... parts)
     {
         if (StringUtils.isBlank(containerPath))
         {
