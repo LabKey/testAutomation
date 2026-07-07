@@ -16,6 +16,7 @@
 package org.labkey.test.util;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
@@ -248,7 +249,7 @@ public class ApiPermissionsHelper extends PermissionsHelper
         return id;
     }
 
-    public Integer getUserId(String user)
+    public Integer getUserId(@Nullable String user)
     {
         try
         {
@@ -291,12 +292,12 @@ public class ApiPermissionsHelper extends PermissionsHelper
         return (List)response.getParsedData().get("groupMembers");
     }
 
-    private List<Map<String, Object>> getUserGroups(String container, String user) throws CommandException
+    private List<Map<String, Object>> getUserGroups(String container, @Nullable String user) throws CommandException
     {
         return getUserPerms(container, user).getProperty("container.groups");
     }
 
-    public List<String> getUserRoles(String container, String user)
+    public List<String> getUserRoles(String container, @Nullable String user)
     {
         try
         {
@@ -308,7 +309,20 @@ public class ApiPermissionsHelper extends PermissionsHelper
         }
     }
 
-    private CommandResponse getUserPerms(String container, String user) throws CommandException
+    public List<String> getUserPermissions(String container, @Nullable String user)
+    {
+        try
+        {
+            return getUserPerms(container, user).getProperty("container.effectivePermissions");
+        }
+        catch (CommandException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
+    // Pass null for current user
+    private CommandResponse getUserPerms(String container, @Nullable String user) throws CommandException
     {
         Connection connection = getConnection();
         SimpleGetCommand command = new SimpleGetCommand("security", "getUserPerms");
