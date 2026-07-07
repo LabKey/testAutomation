@@ -75,6 +75,7 @@ import java.net.SocketException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
@@ -581,6 +582,11 @@ public class WebTestHelper
 
     public static Map<String, String> parseUrlQueryString(String query)
     {
+        return parseUrlQueryString(query, true);
+    }
+
+    public static Map<String, String> parseUrlQueryString(String query, boolean decode)
+    {
         if (query != null)
         {
             if (query.startsWith("?"))
@@ -592,10 +598,34 @@ public class WebTestHelper
             for (String arg : queryArgs)
             {
                 String[] split = arg.split("=", 2);
-                parsedQuery.put(split[0], split.length > 1 ? split[1] : null);
+                parsedQuery.put(maybeDecode(split[0], decode), split.length > 1 ? maybeDecode(split[1], decode) : null);
             }
 
             return parsedQuery;
+        }
+
+        return Collections.emptyMap();
+    }
+
+    private static String maybeDecode(String value, boolean decode)
+    {
+        return decode
+                ? URLDecoder.decode(value, StandardCharsets.UTF_8)
+                : value;
+    }
+
+    public static Map<String, String> parseAppQuery(URL url)
+    {
+        String ref = url.getRef();
+
+        if (ref != null)
+        {
+            int queryIndex = ref.indexOf("?");
+
+            if (queryIndex > -1)
+            {
+                return parseUrlQueryString(ref.substring(queryIndex), true);
+            }
         }
 
         return Collections.emptyMap();
