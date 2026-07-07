@@ -882,10 +882,13 @@ public class ListTest extends BaseWebDriverTest
         final String LIST_Y_ROW_EDITED = "y-modified-secret";
 
         log("Set up two lists in the same container, each with a Name field");
-        _listHelper.createList(getProjectName(), LIST_X, "Key",
-            new FieldDefinition(NAME_FIELD, ColumnType.String));
-        _listHelper.createList(getProjectName(), LIST_Y, "Key",
-            new FieldDefinition(NAME_FIELD, ColumnType.String));
+        Connection connection = createDefaultConnection();
+        new IntListDefinition(LIST_X, "Key")
+            .addField(new FieldDefinition(NAME_FIELD, ColumnType.String))
+            .create(connection, getProjectName());
+        new IntListDefinition(LIST_Y, "Key")
+            .addField(new FieldDefinition(NAME_FIELD, ColumnType.String))
+            .create(connection, getProjectName());
 
         log("Insert and then modify a row in List Y so it generates an audit event with old/new record maps");
         _listHelper.goToList(LIST_Y);
