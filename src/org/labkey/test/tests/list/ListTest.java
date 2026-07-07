@@ -58,6 +58,7 @@ import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldDefinition.StringLookup;
 import org.labkey.test.params.FieldInfo;
 import org.labkey.test.params.FieldKey;
+import org.labkey.test.params.list.IntListDefinition;
 import org.labkey.test.params.list.VarListDefinition;
 import org.labkey.test.tests.AuditLogTest;
 import org.labkey.test.util.AbstractDataRegionExportOrSignHelper.ColumnHeaderType;
