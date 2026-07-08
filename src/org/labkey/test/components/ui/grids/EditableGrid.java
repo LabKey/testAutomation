@@ -1270,18 +1270,6 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         return Locator.tagWithClass("div", "cell-error").findElements(this);
     }
 
-    public boolean isDisplayed()
-    {
-        try
-        {
-            return getComponentElement().isDisplayed();
-        }
-        catch (NoSuchElementException nse)
-        {
-            return false;
-        }
-    }
-
     public void setAddRows(int count)
     {
         elementCache().addCountInput.set(String.valueOf(count));
