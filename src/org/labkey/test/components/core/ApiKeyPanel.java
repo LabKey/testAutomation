@@ -36,15 +36,19 @@ public class ApiKeyPanel extends Panel<ApiKeyPanel.ElementCache>
         return new Panel.PanelFinder(driver).withTitle("API Keys").wrap(ApiKeyPanel::new);
     }
 
-    public String generateApiKey(@Nullable String description)
+    public String generateApiKey(@Nullable String description, @Nullable String restrictionRole)
     {
         ApiKeyDialog apiKeyDialog = clickGenerateApiKey();
         if (description != null)
         {
             apiKeyDialog.setDescription(description);
         }
+        if (restrictionRole != null)
+        {
+            apiKeyDialog.setRestrictionRole(restrictionRole);
+        }
         apiKeyDialog.generateApiKey();
-        Assert.assertEquals("API Key discription", description == null ? "" : description, apiKeyDialog.getDescription());
+        Assert.assertEquals("API Key description", description == null ? "" : description, apiKeyDialog.getDescription());
         String inputFieldValue = apiKeyDialog.getInputFieldValue();
         apiKeyDialog.clickDone();
         return inputFieldValue;
@@ -52,8 +56,9 @@ public class ApiKeyPanel extends Panel<ApiKeyPanel.ElementCache>
 
     public String generateApiKey()
     {
-        return generateApiKey(null);
+        return generateApiKey(null, null);
     }
+
     public ApiKeyDialog clickGenerateApiKey()
     {
         elementCache().generateApiKeyButton.click();
