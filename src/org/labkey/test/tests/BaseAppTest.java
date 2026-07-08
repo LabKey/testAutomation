@@ -18,7 +18,7 @@ public abstract class BaseAppTest extends BaseWebDriverTest
     }
 
     @Contract(pure = true)
-    public String buildAppURL(String containerPath, Map<String, Object> params, Object... parts)
+    public String buildAppURL(String containerPath, Map<String, ?> params, Object... parts)
     {
         return WebTestHelper.buildAppURL(containerPath, getAppControllerName(), params, parts);
     }
