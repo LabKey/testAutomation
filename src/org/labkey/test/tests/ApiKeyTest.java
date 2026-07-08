@@ -50,6 +50,7 @@ import org.labkey.test.components.ui.grids.QueryGrid;
 import org.labkey.test.pages.core.admin.CustomizeSitePage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.list.IntListDefinition;
+import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.TestUser;
@@ -362,6 +363,35 @@ public class ApiKeyTest extends BaseWebDriverTest
         }
     }
 
+    @Test
+    public void testRestrictedApiKey() throws IOException
+    {
+        List<Map<String, Object>> _generatedApiKeys = new ArrayList<>();
+
+        goToAdminConsole()
+            .clickSiteSettings()
+            .setAllowApiKeys(true)
+            .setApiKeyExpiration(CustomizeSitePage.KeyExpirationOptions.ONE_WEEK)
+            .save();
+
+        String apiKey = generateAPIKey(null, "Reader");
+        _generatedApiKeys.add(getLastAPIKeyRecord());
+
+        // Test connection that does not keep a session
+        log("Verify active API key via basic authentication");
+        Connection cn = createBasicAuthConnection(apiKey);
+        verifyReadOnlyAPIKey(cn);
+
+        // Test connection that does keep a session
+        cn = createApiKeyConnection(apiKey);
+        log("Verify active API key via api authentication");
+        verifyReadOnlyAPIKey(cn);
+
+        log("Verify revoked/deleted api key");
+        deleteAPIKeys(_generatedApiKeys);
+        verifyInvalidAPIKey(createApiKeyConnection(apiKey), false);
+    }
+
     private void verifyValidAPIKey(Connection connection) throws IOException
     {
         verifyValidAPIKey(connection, PasswordUtil.getUsername());
@@ -390,6 +420,37 @@ public class ApiKeyTest extends BaseWebDriverTest
 
             whoAmI = new WhoAmICommand().execute(connection, null);
             assertEquals("Connection user", userEmail, whoAmI.getEmail());
+        }
+        catch (CommandException e)
+        {
+            throw new RuntimeException("Response: " + e.getStatusCode(), e);
+        }
+    }
+
+    private void verifyReadOnlyAPIKey(Connection connection) throws IOException
+    {
+        try
+        {
+            WhoAmIResponse whoAmI = new WhoAmICommand().execute(connection, null);
+            assertEquals("Connection user", PasswordUtil.getUsername(), whoAmI.getEmail());
+
+            // Likely multiple permissions (depending on what modules are running), but all should end with "ReadPermission"
+            List<String> badPerms = new ApiPermissionsHelper(this, () -> connection).getUserPermissions(getProjectName(), null).stream()
+                .filter(perm -> !perm.endsWith("ReadPermission"))
+                .toList();
+
+            assertFalse("Unexpected permissions: " + badPerms, badPerms.isEmpty());
+
+            // Should be able to select rows
+            QueryApiHelper queryApiHelper = new QueryApiHelper(connection, getProjectName(), "lists", LIST_NAME);
+            SelectRowsResponse selectResponse = queryApiHelper.selectRows();
+            assertEquals("Total rows", valueCount.get(), selectResponse.getRowCount());
+
+            // Should NOT be able to import, insert, update, or delete
+            Assert.assertThrows("User does not have permission to insert rows", CommandException.class, () -> queryApiHelper.importData(LIST_VALUE + "\nvalue" + valueCount.get()));
+            Assert.assertThrows("User does not have permission to perform this operation.", CommandException.class, () -> queryApiHelper.insertRows(List.of()));
+            Assert.assertThrows("User does not have permission to perform this operation.", CommandException.class, () -> queryApiHelper.updateRows(List.of()));
+            Assert.assertThrows("User does not have permission to perform this operation.", CommandException.class, () -> queryApiHelper.deleteRows(List.of()));
         }
         catch (CommandException e)
         {
@@ -485,8 +546,13 @@ public class ApiKeyTest extends BaseWebDriverTest
 
     private String generateAPIKey(@Nullable String description)
     {
+        return generateAPIKey(description, null);
+    }
+
+    private String generateAPIKey(@Nullable String description, @Nullable String restrictionRole)
+    {
         goToExternalToolPage();
-        return ApiKeyPanel.panelFinder(getDriver()).find().generateApiKey(description);
+        return ApiKeyPanel.panelFinder(getDriver()).find().generateApiKey(description, restrictionRole);
     }
 
     private String generateAPIKeyAndRecord(List<Map<String, Object>> _generatedApiKeys) throws IOException

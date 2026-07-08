@@ -246,6 +246,11 @@ public abstract class TestFileUtils
         return _modulesDir;
     }
 
+    public static File getExternalModulesDir()
+    {
+        return FileUtil.appendName(getModulesDir().getParentFile(), "externalModules");
+    }
+
     public static File getDefaultFileRoot(String containerPath)
     {
         return FileUtil.appendPath(getBaseFileRoot(), org.labkey.api.util.Path.parse(containerPath + "/@files"));
