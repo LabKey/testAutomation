@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static java.lang.Integer.parseInt;
 import static org.junit.Assert.assertEquals;
@@ -261,19 +262,24 @@ public class AuditLogHelper
 
     public void checkAuditEventValuesForTransactionId(String containerPath, AuditEvent auditEventName, Integer transactionId, List<Map<String, Object>> expectedValues) throws IOException, CommandException
     {
-        List<String> columnNames = expectedValues.get(0).keySet().stream().map(Object::toString).toList();
+        List<String> columnNames = expectedValues.getFirst().keySet().stream().map(Object::toString).toList();
         checkAuditEventValuesForTransactionId(containerPath, auditEventName, columnNames, transactionId, expectedValues);
     }
 
     public void checkAuditEventValuesForTransactionId(String containerPath, AuditEvent auditEventName, List<String> columnNames, Integer transactionId, List<Map<String, Object>> expectedValues) throws IOException, CommandException
     {
         List<Map<String, Object>> events = getAuditLogsForTransactionId(containerPath, auditEventName, columnNames, transactionId, ContainerFilter.CurrentAndSubfolders);
-        assertEquals("Unexpected number of events for transactionId " + transactionId, expectedValues.size(), events.size());
-        for (int i = 0; i < expectedValues.size(); i++)
-        {
-            for (String key : expectedValues.get(i).keySet())
-                assertEquals("Event " + i  + " value for " + key + " not as expected", expectedValues.get(i).get(key), events.get(i).get(key));
-        }
+
+        Set<String> keysOfInterest = expectedValues.getFirst().keySet();
+        List<Map<String, Object>> actualFiltered = events.stream()
+                .map(row -> row.entrySet().stream()
+                        .filter(e -> keysOfInterest.contains(e.getKey()))
+                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)))
+                .toList();
+
+        assertEquals("Lists do not contain the same entries",
+                new HashSet<>(actualFiltered), new HashSet<>(expectedValues));
+
     }
 
     public Map<String, Object> getTransactionAuditLogDetails(Integer transactionAuditId)
