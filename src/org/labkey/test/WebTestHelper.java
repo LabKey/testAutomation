@@ -494,6 +494,42 @@ public class WebTestHelper
         }
     }
 
+    /**
+     * Convenience method to build an app url for the given controller
+     * @see URLBuilder
+     *
+     * @param containerPath Often getProjectName() or getCurrentContainerPath()
+     * @param controller Name of the controller
+     * @param parts The app resource path
+     * @return A url string that can be used for navigation.
+     */
+    public static String buildAppURL(String containerPath, String controller, Object... parts)
+    {
+        return buildAppURL(containerPath, controller, null, parts).trim();
+    }
+
+    /**
+     * Convenience method to build an app url. Assumes Sample Manager app (samplemanager-app.view)
+     *
+     * @param containerPath  Often getProjectName() or getCurrentContainerPath()
+     * @param controllerName Name of the controller
+     * @param params         Any params that are part of the app query. {@link URLBuilder#setSecondaryQuery(Map)}
+     * @param parts          The app resource path
+     * @return A url string that can be used for navigation.
+     * @see URLBuilder
+     */
+    public static String buildAppURL(String containerPath, String controllerName, Map<String, ?> params, Object... parts)
+    {
+        if (StringUtils.isBlank(containerPath))
+        {
+            throw new IllegalArgumentException("Invalid app containerPath: " + containerPath);
+        }
+        return new URLBuilder(controllerName, "app", containerPath)
+                .setAppResourcePath(parts)
+                .setSecondaryQuery(params)
+                .buildURL();
+    }
+
     public static String buildURL(String controller, String action)
     {
         return buildURL(controller, null, action, Collections.emptyMap());

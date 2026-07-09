@@ -24,6 +24,7 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.hc.core5.http.HttpStatus;
 import org.awaitility.Awaitility;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
@@ -303,8 +304,10 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         return SingletonWebDriver.getInstance().getWebDriver();
     }
 
+    @Contract(pure = true)
     protected abstract String getProjectName();
 
+    @Contract(pure = true)
     public final @Nullable String getPrimaryTestProject()
     {
         return getProjectName();
