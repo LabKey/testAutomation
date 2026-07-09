@@ -31,6 +31,9 @@ import org.openqa.selenium.WebElement;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Wraps 'components/samples/ManageSampleStatusesPanel.tsx'
+ */
 public class ManageSampleStatusesPanel extends WebDriverComponent<ManageSampleStatusesPanel.ElementCache>
 {
     private final WebDriver _driver;
