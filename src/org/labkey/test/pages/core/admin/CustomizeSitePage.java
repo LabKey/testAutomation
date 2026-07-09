@@ -188,18 +188,6 @@ public class CustomizeSitePage extends LabKeyPage<CustomizeSitePage.ElementCache
         return this;
     }
 
-    public CustomizeSitePage setCSRFCheck(CSRFCheck value)
-    {
-        elementCache().CSRFCheck.selectByValue(value.name());
-        return this;
-    }
-
-    public CustomizeSitePage setXFrameOption(XFrameOption value)
-    {
-        elementCache().XFrameOption.selectByValue(value.name());
-        return this;
-    }
-
     public CustomizeSitePage setEnableServerHttpHeader(boolean enable)
     {
         elementCache().enableServerHttpHeader.set(enable);
@@ -271,8 +259,6 @@ public class CustomizeSitePage extends LabKeyPage<CustomizeSitePage.ElementCache
         protected final Input adminOnlyMessage = Input(Locator.id("adminOnlyMessage"), getDriver()).findWhenNeeded(this);
 
         // HTTP Security Settings
-        protected final Select CSRFCheck = Select(Locator.id("CSRFCheck")).findWhenNeeded(this);
-        protected final Select XFrameOption = Select(Locator.id("XFrameOption")).findWhenNeeded(this);
         protected final Checkbox enableServerHttpHeader = Checkbox(Locator.id("includeServerHttpHeader")).findWhenNeeded(this);
     }
 
@@ -281,17 +267,8 @@ public class CustomizeSitePage extends LabKeyPage<CustomizeSitePage.ElementCache
         NONE, LOW, MEDIUM, HIGH
     }
 
-    public enum CSRFCheck
-    {
-        POST, ADMINONLY
-    }
-
-    public enum XFrameOption
-    {
-        SAMEORIGIN, ALLOW
-    }
-
     private static final int SECONDS_PER_DAY = 60*60*24;
+
     public enum KeyExpirationOptions implements OptionSelect.SelectOption
     {
         UNLIMITED(-1),
