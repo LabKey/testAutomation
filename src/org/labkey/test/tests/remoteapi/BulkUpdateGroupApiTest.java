@@ -29,6 +29,7 @@ import org.labkey.test.tests.AuditLogTest;
 import org.labkey.test.util.APIUserHelper;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.PermissionsHelper;
 import org.labkey.test.util.PermissionsHelper.PrincipalType;
 
 import java.util.ArrayList;
@@ -61,11 +62,15 @@ public class BulkUpdateGroupApiTest extends BaseWebDriverTest
     private static Integer group1Id;
     private static Integer group2Id;
     private static final String siteGroup = "createdSiteGroup";
+    private static final String OTHER_PROJECT = "BulkUpdateGroupApiTest Other Project";
+    private static final String OTHER_GROUP = "otherProjectGroup";
+    private static Integer otherProjectGroupId;
 
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         _containerHelper.deleteProject(getProjectName(), afterTest);
+        _containerHelper.deleteProject(OTHER_PROJECT, afterTest);
         deleteTestUsers(EMAIL_SUFFIX);
         _permissionsHelper.deleteGroup(siteGroup);
     }
@@ -101,6 +106,9 @@ public class BulkUpdateGroupApiTest extends BaseWebDriverTest
         user2Id = _userHelper.createUser(USER2).getUserId();
         group1Id = _permissionsHelper.createProjectGroup(GROUP1, getProjectName());
         group2Id = _permissionsHelper.createProjectGroup(GROUP2, getProjectName());
+
+        _containerHelper.createProject(OTHER_PROJECT, null);
+        otherProjectGroupId = _permissionsHelper.createProjectGroup(OTHER_GROUP, OTHER_PROJECT);
     }
 
     @Test
@@ -497,6 +505,60 @@ public class BulkUpdateGroupApiTest extends BaseWebDriverTest
         AuditLogTest.verifyAuditEvent(this, AuditLogTest.GROUP_AUDIT_EVENT, "Comment", groupName, 1);
         AuditLogTest.verifyAuditEvent(this, AuditLogTest.GROUP_AUDIT_EVENT, "Comment", email, 2);
         AuditLogTest.verifyAuditEvent(this, AuditLogTest.GROUP_AUDIT_EVENT, "Comment", GROUP1, 2);
+    }
+
+    // A project group may only be modified through the container it belongs to; targeting another project's group must be rejected.
+    @Test
+    public void testGroupFromDifferentContainerError() throws Exception
+    {
+        // otherProjectGroupId belongs to OTHER_PROJECT, but the command targets this test's project
+        BulkUpdateGroupCommand command = new BulkUpdateGroupCommand(otherProjectGroupId);
+        command.addMemberUser(USER1);
+        Connection connection = createDefaultConnection();
+
+        try
+        {
+            String message = command.execute(connection, getProjectName()).getText();
+            fail("Expected CommandException modifying a group from another container\nResponse:\n" + message);
+        }
+        catch (CommandException e)
+        {
+            assertTrue("Expected cross-container error. Actual error: " + e.getMessage(), e.getMessage().contains("does not belong to this project"));
+        }
+
+        _permissionsHelper.assertUserNotInGroup(USER1, OTHER_GROUP, OTHER_PROJECT, PrincipalType.USER);
+    }
+
+    // Adding an existing user to a group requires only AdminPermission, but creating a brand-new user additionally requires AddUserPermission.
+    @Test
+    public void testCreateUserWithoutAddUserPermission() throws Exception
+    {
+        // A Folder Administrator has AdminPermission (so the action's @RequiresPermission passes) but lacks AddUserPermission
+        String folderAdmin = genTestEmail("folderadminnoadduser");
+        String newUser = genTestEmail("shouldnotbecreated");
+        _userHelper.createUser(folderAdmin);
+        _permissionsHelper.addMemberToRole(folderAdmin, PermissionsHelper.FOLDER_ADMIN_ROLE, PermissionsHelper.MemberType.user, getProjectName());
+
+        Connection connection = createDefaultConnection();
+        connection.impersonate(folderAdmin, getProjectName());
+        try
+        {
+            BulkUpdateGroupCommand command = new BulkUpdateGroupCommand(group1Id);
+            command.addMemberUser(USER1);   // pre-existing user: should be added successfully
+            command.addMemberUser(newUser); // new user: folder admin lacks AddUserPermission
+            BulkUpdateGroupResponse response = command.execute(connection, getProjectName());
+
+            List<String> errors = collectErrors(response);
+            assertEquals("Expected exactly one member error:\n" + String.join("\n", errors), 1, errors.size());
+            assertTrue("Expected AddUserPermission error. Actual error: " + errors.getFirst(), errors.getFirst().contains("do not have permission to create new users"));
+        }
+        finally
+        {
+            connection.stopImpersonating();
+        }
+
+        assertNull("New user was created despite the caller lacking AddUserPermission", _userHelper.getUserId(newUser));
+        _permissionsHelper.assertUserInGroup(USER1, GROUP1, getProjectName(), PrincipalType.USER);
     }
 
     protected List<String> collectErrors(BulkUpdateGroupResponse response)
