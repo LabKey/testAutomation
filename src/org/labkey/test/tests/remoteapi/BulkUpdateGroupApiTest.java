@@ -550,7 +550,7 @@ public class BulkUpdateGroupApiTest extends BaseWebDriverTest
 
             List<String> errors = collectErrors(response);
             assertEquals("Expected exactly one member error:\n" + String.join("\n", errors), 1, errors.size());
-            assertTrue("Expected AddUserPermission error. Actual error: " + errors.getFirst(), errors.getFirst().contains("do not have permission to create new users"));
+            assertTrue("Expected AddUserPermission error. Actual error: " + errors.get(0), errors.get(0).contains("do not have permission to create new users"));
         }
         finally
         {
