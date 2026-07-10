@@ -23,11 +23,15 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.domain.Domain;
 import org.labkey.remoteapi.domain.DomainResponse;
 import org.labkey.remoteapi.domain.PropertyDescriptor;
 import org.labkey.remoteapi.domain.SaveDomainCommand;
 import org.labkey.remoteapi.query.Filter;
+import org.labkey.remoteapi.query.SelectRowsCommand;
+import org.labkey.remoteapi.query.SelectRowsResponse;
+import org.labkey.remoteapi.query.Sort;
 import org.labkey.serverapi.reader.TabLoader;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -52,6 +56,7 @@ import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldDefinition.StringLookup;
 import org.labkey.test.params.FieldInfo;
 import org.labkey.test.params.FieldKey;
+import org.labkey.test.params.list.IntListDefinition;
 import org.labkey.test.params.list.VarListDefinition;
 import org.labkey.test.tests.AuditLogTest;
 import org.labkey.test.util.AbstractDataRegionExportOrSignHelper.ColumnHeaderType;
@@ -856,6 +861,95 @@ public class ListTest extends BaseWebDriverTest
 
         customizeURLTest();
         crossContainerLookupTest();
+    }
+
+    /**
+     * CWE-639 (IDOR): a list audit event loaded by user-controlled rowId in
+     * ListItemDetailsAction must be tied back to the URL-requested listId before its
+     * old/new record maps are rendered. Without this, listId=X&rowId=N-belonging-to-Y
+     * would render List Y's audit payload inside List X's details page.
+     *
+     * Builds two lists in the same container, generates a modify-audit-event on the
+     * second one, then verifies the action refuses to render it when the URL names the
+     * first list. A positive control confirms the matched-listId path still works, so
+     * the test fails if the predicate is ever inverted/over-rejects.
+     */
+    @Test
+    public void testAuditDetailRejectsRowIdFromOtherList() throws Exception
+    {
+        final String LIST_X = "IDOR_VICTIM_LIST";       // attacker claims to be viewing details for this list
+        final String LIST_Y = "IDOR_SOURCE_LIST";       // audit event actually belongs to this list
+        final String NAME_FIELD = "Name";
+        final String LIST_Y_ROW_VALUE = "y-original";
+        final String LIST_Y_ROW_EDITED = "y-modified-secret";
+
+        log("Set up two lists in the same container, each with a Name field");
+        Connection connection = createDefaultConnection();
+        new IntListDefinition(LIST_X, "Key")
+            .addField(new FieldDefinition(NAME_FIELD, ColumnType.String))
+            .create(connection, getProjectName());
+        new IntListDefinition(LIST_Y, "Key")
+            .addField(new FieldDefinition(NAME_FIELD, ColumnType.String))
+            .create(connection, getProjectName());
+
+        log("Insert and then modify a row in List Y so it generates an audit event with old/new record maps");
+        _listHelper.goToList(LIST_Y);
+        _listHelper.clickImportData()
+            .setText(NAME_FIELD + "\n" + LIST_Y_ROW_VALUE)
+            .submit();
+        DataRegionTable yTable = new DataRegionTable("query", getDriver());
+        yTable.clickEditRow(yTable.getRowIndex(LIST_Y_ROW_VALUE));
+        setFormElement(Locator.name("quf_" + NAME_FIELD), LIST_Y_ROW_EDITED);
+        clickButton("Submit");
+
+        log("Discover List X's listId and the audit rowId for List Y's modification event");
+        Connection cn = createDefaultConnection();
+        int listXId = lookupListId(cn, LIST_X);
+        int listYId = lookupListId(cn, LIST_Y);
+        int listYAuditRowId = lookupListAuditRowId(cn, LIST_Y);
+
+        log("Attack: URL says listId=" + LIST_X + " but rowId points at the audit event for " + LIST_Y);
+        String attackUrl = WebTestHelper.buildURL("list", getProjectName(), "listItemDetails",
+            Map.of("listId", String.valueOf(listXId), "rowId", String.valueOf(listYAuditRowId)));
+        beginAt(attackUrl);
+        assertEquals("Action should render normally (200), not throw", 200, getResponseCode());
+        assertTextPresent("No details available for this event");
+        assertTextNotPresent(LIST_Y_ROW_VALUE);   // proof of non-disclosure: pre-edit value
+        assertTextNotPresent(LIST_Y_ROW_EDITED);  // proof of non-disclosure: post-edit value
+
+        log("Positive control: same rowId but with the matching listId must still render the audit changes");
+        String matchedUrl = WebTestHelper.buildURL("list", getProjectName(), "listItemDetails",
+            Map.of("listId", String.valueOf(listYId), "rowId", String.valueOf(listYAuditRowId)));
+        beginAt(matchedUrl);
+        assertEquals(200, getResponseCode());
+        assertTextPresent(LIST_Y_ROW_VALUE);
+        assertTextPresent(LIST_Y_ROW_EDITED);
+        assertTextNotPresent("No details available for this event");
+    }
+
+    private int lookupListId(Connection cn, String listName) throws Exception
+    {
+        SelectRowsCommand cmd = new SelectRowsCommand("exp", "Lists");
+        cmd.setColumns(List.of("RowId", "Name"));
+        cmd.addFilter(new Filter("Name", listName, Filter.Operator.EQUAL));
+        SelectRowsResponse rs = cmd.execute(cn, getProjectName());
+        if (rs.getRows().isEmpty())
+            throw new AssertionError("No exp.Lists row for " + listName);
+        return ((Number) rs.getRows().get(0).get("RowId")).intValue();
+    }
+
+    private int lookupListAuditRowId(Connection cn, String listName) throws Exception
+    {
+        // Most-recent ListAuditEvent for this list; the row-modify above will be it.
+        SelectRowsCommand cmd = new SelectRowsCommand("auditLog", "ListAuditEvent");
+        cmd.setColumns(List.of("RowId", "ListName", "Comment"));
+        cmd.addFilter(new Filter("ListName", listName, Filter.Operator.EQUAL));
+        cmd.setSorts(List.of(new Sort("RowId", Sort.Direction.DESCENDING)));
+        cmd.setMaxRows(1);
+        SelectRowsResponse rs = cmd.execute(cn, getProjectName());
+        if (rs.getRows().isEmpty())
+            throw new AssertionError("No ListAuditEvent for " + listName);
+        return ((Number) rs.getRows().get(0).get("RowId")).intValue();
     }
 
     /* Issue 23487: add regression coverage for batch insert into list with multiple errors
