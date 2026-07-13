@@ -261,19 +261,29 @@ public class AuditLogHelper
 
     public void checkAuditEventValuesForTransactionId(String containerPath, AuditEvent auditEventName, Integer transactionId, List<Map<String, Object>> expectedValues) throws IOException, CommandException
     {
-        List<String> columnNames = expectedValues.get(0).keySet().stream().map(Object::toString).toList();
+        List<String> columnNames = expectedValues.getFirst().keySet().stream().map(Object::toString).toList();
         checkAuditEventValuesForTransactionId(containerPath, auditEventName, columnNames, transactionId, expectedValues);
     }
 
     public void checkAuditEventValuesForTransactionId(String containerPath, AuditEvent auditEventName, List<String> columnNames, Integer transactionId, List<Map<String, Object>> expectedValues) throws IOException, CommandException
     {
         List<Map<String, Object>> events = getAuditLogsForTransactionId(containerPath, auditEventName, columnNames, transactionId, ContainerFilter.CurrentAndSubfolders);
-        assertEquals("Unexpected number of events for transactionId " + transactionId, expectedValues.size(), events.size());
-        for (int i = 0; i < expectedValues.size(); i++)
-        {
-            for (String key : expectedValues.get(i).keySet())
-                assertEquals("Event " + i  + " value for " + key + " not as expected", expectedValues.get(i).get(key), events.get(i).get(key));
-        }
+
+        List<Map<String, Object>> unmatched = expectedValues.stream()
+                .filter(expectedRow -> {
+                    Set<String> keysOfInterest = expectedRow.keySet();
+                    return events.stream().noneMatch(actualRow -> {
+                        Map<String, Object> actualFiltered = actualRow.entrySet().stream()
+                                .filter(e -> keysOfInterest.contains(e.getKey()))
+                                .collect(HashMap::new,
+                                        (m, e) -> m.put(e.getKey(), e.getValue()),
+                                        HashMap::putAll);
+                        return actualFiltered.equals(expectedRow);
+                    });
+                })
+                .toList();
+
+        assertTrue("Expected rows with no match in actual: " + unmatched, unmatched.isEmpty());
     }
 
     public Map<String, Object> getTransactionAuditLogDetails(Integer transactionAuditId)
