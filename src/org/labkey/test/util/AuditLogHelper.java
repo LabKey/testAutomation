@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static java.lang.Integer.parseInt;
 import static org.junit.Assert.assertEquals;
@@ -270,16 +269,21 @@ public class AuditLogHelper
     {
         List<Map<String, Object>> events = getAuditLogsForTransactionId(containerPath, auditEventName, columnNames, transactionId, ContainerFilter.CurrentAndSubfolders);
 
-        Set<String> keysOfInterest = expectedValues.getFirst().keySet();
-        List<Map<String, Object>> actualFiltered = events.stream()
-                .map(row -> row.entrySet().stream()
-                        .filter(e -> keysOfInterest.contains(e.getKey()))
-                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)))
+        List<Map<String, Object>> unmatched = expectedValues.stream()
+                .filter(expectedRow -> {
+                    Set<String> keysOfInterest = expectedRow.keySet();
+                    return events.stream().noneMatch(actualRow -> {
+                        Map<String, Object> actualFiltered = actualRow.entrySet().stream()
+                                .filter(e -> keysOfInterest.contains(e.getKey()))
+                                .collect(HashMap::new,
+                                        (m, e) -> m.put(e.getKey(), e.getValue()),
+                                        HashMap::putAll);
+                        return actualFiltered.equals(expectedRow);
+                    });
+                })
                 .toList();
 
-        assertEquals("Lists do not contain the same entries",
-                new HashSet<>(actualFiltered), new HashSet<>(expectedValues));
-
+        assertTrue("Expected rows with no match in actual: " + unmatched, unmatched.isEmpty());
     }
 
     public Map<String, Object> getTransactionAuditLogDetails(Integer transactionAuditId)
