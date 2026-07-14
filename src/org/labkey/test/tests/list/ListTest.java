@@ -903,7 +903,7 @@ public class ListTest extends BaseWebDriverTest
             .setText(NAME_FIELD + "\n" + LIST_Y_ROW_VALUE)
             .submit();
         DataRegionTable yTable = new DataRegionTable("query", getDriver());
-        yTable.clickEditRow(yTable.getRowIndex(LIST_Y_ROW_VALUE));
+        yTable.clickEditRow(yTable.getRowIndex(NAME_FIELD, LIST_Y_ROW_VALUE));
         setFormElement(Locator.name("quf_" + NAME_FIELD), LIST_Y_ROW_EDITED);
         clickButton("Submit");
 
