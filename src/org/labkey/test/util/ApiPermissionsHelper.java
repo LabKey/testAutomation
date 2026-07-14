@@ -672,7 +672,7 @@ public class ApiPermissionsHelper extends PermissionsHelper
         Integer groupId = getSiteGroupId(groupName);
         if (groupId == null)
             throw new IllegalArgumentException("Attempting to remove members from non-existent group: " + groupName);
-        removeMembersFromGroup(groupId, userName);
+        removeMembersFromGroup(groupId, "/", userName);
     }
 
     private void removeMembersFromGroup(Integer groupId, String projectPath, String... members)
