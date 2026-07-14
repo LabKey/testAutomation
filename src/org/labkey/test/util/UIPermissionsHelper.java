@@ -317,11 +317,11 @@ public class UIPermissionsHelper extends PermissionsHelper
     @Override
     public void removeUserFromSiteGroup(String groupName, String userEmail)
     {
-        removeUserFromGroup(groupName, userEmail);
+        removeUserFromGroup(groupName, userEmail, "/");
     }
 
     @Override
-    public void removeUserFromGroup(String groupName, String userEmail)
+    public void removeUserFromGroup(String groupName, String userEmail, String projectPath)
     {
         if (!_driver.isTextPresent("Group " + groupName))
             selectGroup(groupName);
