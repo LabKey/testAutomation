@@ -272,7 +272,7 @@ public class UserPermissionsTest extends BaseWebDriverTest
 
         log("Remove user from group and verify logs");
         goToProjectHome();
-        permissionsHelper.removeUserFromGroup(GAMMA_SUBMITTER_GROUP_NAME, GAMMA_SUBMITTER_USER);
+        permissionsHelper.removeUserFromGroup(GAMMA_SUBMITTER_GROUP_NAME, GAMMA_SUBMITTER_USER, getProjectName());
         verifyAuditLog("User: " + GAMMA_SUBMITTER_USER + " was deleted from Group: " + GAMMA_SUBMITTER_GROUP_NAME);
     }
 
