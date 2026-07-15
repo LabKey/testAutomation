@@ -903,7 +903,7 @@ public class ListTest extends BaseWebDriverTest
             .setText(NAME_FIELD + "\n" + LIST_Y_ROW_VALUE)
             .submit();
         DataRegionTable yTable = new DataRegionTable("query", getDriver());
-        yTable.clickEditRow(yTable.getRowIndex(LIST_Y_ROW_VALUE));
+        yTable.clickEditRow(yTable.getRowIndex(NAME_FIELD, LIST_Y_ROW_VALUE));
         setFormElement(Locator.name("quf_" + NAME_FIELD), LIST_Y_ROW_EDITED);
         clickButton("Submit");
 
@@ -934,13 +934,13 @@ public class ListTest extends BaseWebDriverTest
 
     private int lookupListId(Connection cn, String listName) throws Exception
     {
-        SelectRowsCommand cmd = new SelectRowsCommand("exp", "Lists");
-        cmd.setColumns(List.of("RowId", "Name"));
+        SelectRowsCommand cmd = new SelectRowsCommand("ListManager", "ListManager");
+        cmd.setColumns(List.of("ListId", "Name"));
         cmd.addFilter(new Filter("Name", listName, Filter.Operator.EQUAL));
         SelectRowsResponse rs = cmd.execute(cn, getProjectName());
         if (rs.getRows().isEmpty())
-            throw new AssertionError("No exp.Lists row for " + listName);
-        return ((Number) rs.getRows().get(0).get("RowId")).intValue();
+            throw new AssertionError("No ListManager row for " + listName);
+        return ((Number) rs.getRows().get(0).get("ListId")).intValue();
     }
 
     private int lookupListAuditRowId(Connection cn, String listName) throws Exception
