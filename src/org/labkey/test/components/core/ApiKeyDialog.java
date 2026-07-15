@@ -182,7 +182,7 @@ public class ApiKeyDialog extends ModalDialog
         OptionSelect<OptionSelect.SelectOption> restrictionRoleSelect = new OptionSelect<>(Locator.tagWithId("select", "keyRole")
             .findWhenNeeded(this).withTimeout(2000));
         WebElement generateApiKeyButton = Locator.tagWithText("button", "Generate API Key").findWhenNeeded(this);
-        Input inputField = Input.Input(Locator.tagWithClass("input", "api-key__input"), getDriver()).findWhenNeeded(this);
+        Input inputField = Input.Input(Locator.tagWithClass("input", "api-key__display"), getDriver()).findWhenNeeded(this);
         WebElement copyKeyButton = Locator.tagWithName("button", "copy_apikey_token").findWhenNeeded(this);
         WebElement doneButton = Locator.tagWithText("button", "Done").findWhenNeeded(this);
     }
