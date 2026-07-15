@@ -21,6 +21,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 import org.labkey.api.settings.AppProps;
 import org.labkey.api.util.ContextListener;
+import org.labkey.api.util.EmailTransportProvider;
 import org.labkey.api.util.MailHelper;
 import org.labkey.api.util.ShutdownListener;
 import org.labkey.api.util.SmtpTransportProvider;
@@ -59,14 +60,11 @@ public class DumbsterManager implements ShutdownListener
 
     SimpleSmtpServer _server;
 
+    // The transport provider that was active before the recorder installed its own; restored on stop().
+    private EmailTransportProvider _previousProvider;
+
     public boolean start()
     {
-        if (!(MailHelper.getActiveProvider() instanceof SmtpTransportProvider))
-        {
-            _log.error("Mail recorder cannot be started: active mail provider is not SmtpTransportProvider");
-            return false;
-        }
-
         if (_server != null && !_server.isStopped())
         {
             // We're already running, no need to spin up another, but reset the list of messages
@@ -74,36 +72,14 @@ public class DumbsterManager implements ShutdownListener
             return true;
         }
 
-        int port;
-        ServerSocket socket = null;
-        try
+        int port = -1;
+        try (ServerSocket socket = new ServerSocket(0))
         {
-            socket = new ServerSocket(0);
             port = socket.getLocalPort();
         }
-        catch (IOException e)
+        catch (IOException ignored)
         {
-            _log.error("Failed to open a server socket", e);
-            return false;
         }
-        finally
-        {
-            try
-            {
-                if (socket != null)
-                    socket.close();
-            }
-            catch (IOException ignored) {}
-        }
-
-        Properties props = new Properties();
-        props.setProperty("mail.smtp.host", "localhost");
-        props.setProperty("mail.smtp.user", "Anonymous");
-        props.setProperty("mail.smtp.port", Integer.toString(port));
-        Session session = Session.getInstance(props);
-
-        _log.info("Switching MailHelper to use port {}", port);
-        MailHelper.setSmtpSession(session);
 
         _log.info("Connecting mail recorder to port {}", port);
         _server = SimpleSmtpServer.start(port);
@@ -113,18 +89,34 @@ public class DumbsterManager implements ShutdownListener
             _server = null;
             return false;
         }
+
+        // Install our own SMTP provider pointed at the local capture server and make it the active provider, rather
+        // than mutating another provider's session state. All outgoing email is captured regardless of how the server's
+        // real email transport (SMTP, Microsoft Graph, etc.) is configured.
+        Properties props = new Properties();
+        props.setProperty("mail.smtp.host", "localhost");
+        props.setProperty("mail.smtp.user", "Anonymous");
+        props.setProperty("mail.smtp.port", Integer.toString(port));
+
+        SmtpTransportProvider recorderProvider = new SmtpTransportProvider();
+        recorderProvider.configure(props);
+
+        _log.info("Switching MailHelper to the mail recorder on port {}", port);
+        _previousProvider = MailHelper.getActiveProvider();
+        MailHelper.setActiveProvider(recorderProvider);
+
         ContextListener.addShutdownListener(this);
         return true;
     }
 
     public void stop()
     {
-        // Stop the server, if there is one, but leave it around for
-        // viewing until the next call to start() overwrites.
+        // Stop the server, if there is one, but leave it around for viewing until the next call to start() overwrites.
         if (_server != null)
         {
             _log.info("Reverting MailHelper to {} configuration", AppProps.getInstance().getWebappConfigurationFilename());
-            MailHelper.setSmtpSession(null);
+            MailHelper.setActiveProvider(_previousProvider);
+            _previousProvider = null;
 
             _server.stop();
             ContextListener.removeShutdownListener(this);
