@@ -934,13 +934,13 @@ public class ListTest extends BaseWebDriverTest
 
     private int lookupListId(Connection cn, String listName) throws Exception
     {
-        SelectRowsCommand cmd = new SelectRowsCommand("exp", "Lists");
-        cmd.setColumns(List.of("RowId", "Name"));
+        SelectRowsCommand cmd = new SelectRowsCommand("ListManager", "ListManager");
+        cmd.setColumns(List.of("ListId", "Name"));
         cmd.addFilter(new Filter("Name", listName, Filter.Operator.EQUAL));
         SelectRowsResponse rs = cmd.execute(cn, getProjectName());
         if (rs.getRows().isEmpty())
-            throw new AssertionError("No exp.Lists row for " + listName);
-        return ((Number) rs.getRows().get(0).get("RowId")).intValue();
+            throw new AssertionError("No ListManager row for " + listName);
+        return ((Number) rs.getRows().get(0).get("ListId")).intValue();
     }
 
     private int lookupListAuditRowId(Connection cn, String listName) throws Exception
