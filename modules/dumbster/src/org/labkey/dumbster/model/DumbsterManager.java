@@ -63,6 +63,10 @@ public class DumbsterManager implements ShutdownListener
     // The transport provider that was active before the recorder installed its own; restored on stop().
     private EmailTransportProvider _previousProvider;
 
+    // True while the recorder's capture provider is installed as the active provider. Guards against overwriting
+    // _previousProvider if start() runs again after the capture server stopped on its own (without a stop() call).
+    private boolean _recording;
+
     public boolean start()
     {
         if (_server != null && !_server.isStopped())
@@ -72,13 +76,15 @@ public class DumbsterManager implements ShutdownListener
             return true;
         }
 
-        int port = -1;
+        int port;
         try (ServerSocket socket = new ServerSocket(0))
         {
             port = socket.getLocalPort();
         }
-        catch (IOException ignored)
+        catch (IOException e)
         {
+            _log.error("Failed to open a server socket", e);
+            return false;
         }
 
         _log.info("Connecting mail recorder to port {}", port);
@@ -102,7 +108,13 @@ public class DumbsterManager implements ShutdownListener
         recorderProvider.configure(props);
 
         _log.info("Switching MailHelper to the mail recorder on port {}", port);
-        _previousProvider = MailHelper.getActiveProvider();
+        if (!_recording)
+        {
+            // Capture the real provider only when first entering the recording state; a restart after the capture
+            // server stopped on its own must not overwrite it with a previously installed recorder provider.
+            _previousProvider = MailHelper.getActiveProvider();
+            _recording = true;
+        }
         MailHelper.setActiveProvider(recorderProvider);
 
         ContextListener.addShutdownListener(this);
@@ -117,6 +129,7 @@ public class DumbsterManager implements ShutdownListener
             _log.info("Reverting MailHelper to {} configuration", AppProps.getInstance().getWebappConfigurationFilename());
             MailHelper.setActiveProvider(_previousProvider);
             _previousProvider = null;
+            _recording = false;
 
             _server.stop();
             ContextListener.removeShutdownListener(this);
