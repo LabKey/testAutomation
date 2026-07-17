@@ -68,8 +68,8 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
     final static String ASSAY_NAME = "Test assay";
     final static String SAMPLE_TYPE1 = "Sample type 1";
     final static String SAMPLE_TYPE2 = "Sample type 2";
-    private final static String visitLabel1 = "Screening";
-    private final static String visitLabel2 = "Baseline";
+    private final static String visitLabel1 = TestDataGenerator.randomName("Screening", 4, 4, TRICKY_CHARACTERS, null).name();
+    private final static String visitLabel2 = TestDataGenerator.randomName("Baseline", 4, 4, TRICKY_CHARACTERS, null).name();
     private static final String READER_USER = "reader_user@user.test";
 
     protected DateTimeFormatter _dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -727,8 +727,8 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
     public void testVisitLabelAutoLinkToStudy()
     {
         log("Creating the visit labels");
-        String visitLabel = "Baseline";
-        createNewVisits(visitLabel, "100", "250");
+        String visitLabel = TestDataGenerator.randomName("Baseline", 4, 4, TRICKY_CHARACTERS, null).name();
+        createNewVisits(visitLabel, "600", "650");
 
         String sampleName = "Sample with Visit label";
         log("Creating sample type with auto link enabled");
