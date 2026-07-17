@@ -169,7 +169,7 @@ public abstract class PermissionsHelper
     @LogMethod(quiet = true)
     public abstract void deleteGroup(@LoggedParam String groupName, boolean failIfNotFound);
 
-    public abstract void removeUserFromGroup(String groupName, String userName);
+    public abstract void removeUserFromGroup(String groupName, String userName, String projectName);
     public abstract void removeUserFromSiteGroup(String groupName, String userName);
 
     public abstract boolean doesGroupExist(String groupName, String projectName);
