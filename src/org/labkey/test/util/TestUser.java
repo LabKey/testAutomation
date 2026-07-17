@@ -213,4 +213,10 @@ public class TestUser
         }
         return _test;
     }
+
+    @Override
+    public String toString()
+    {
+        return getEmail();
+    }
 }
