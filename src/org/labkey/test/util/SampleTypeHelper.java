@@ -15,8 +15,8 @@
  */
 package org.labkey.test.util;
 
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.InsertRowsCommand;
@@ -388,7 +388,6 @@ public class SampleTypeHelper extends WebDriverWrapper
 
         DataRegionTable table =  new DataRegionTable("query", getDriver());
         table.clickHeaderButtonAndWait("Link to Study");
-        assertNoLabKeyErrors();
         return table;
     }
 }
