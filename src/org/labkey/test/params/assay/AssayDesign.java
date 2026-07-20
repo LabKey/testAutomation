@@ -32,6 +32,7 @@ import java.util.function.Consumer;
 
 public abstract class AssayDesign<T extends AssayDesign<T>>
 {
+    final String _name;
     final String _providerName;
     final List<Consumer<Protocol>> _transformers = new ArrayList<>();
 
@@ -39,6 +40,7 @@ public abstract class AssayDesign<T extends AssayDesign<T>>
     {
         _providerName = providerName;
         _transformers.add(p -> p.setName(name));
+        _name = name;
     }
 
     public static AssayDesign<?> of(String providerName, String name)
@@ -76,15 +78,15 @@ public abstract class AssayDesign<T extends AssayDesign<T>>
 
     public Protocol createAssay(String containerPath, Connection connection) throws IOException, CommandException
     {
-        TestLogger.info(String.format("Creating %s assay in '%s'", _providerName, containerPath));
+        TestLogger.info("Creating %s assay '%s' in '%s'".formatted(_providerName, _name, containerPath));
 
         GetProtocolCommand getProtocolCommand = new GetProtocolCommand(_providerName);
         ProtocolResponse getProtocolResponse = getProtocolCommand.execute(connection, containerPath);
 
         Protocol protocol = updateProtocol(containerPath, connection, getProtocolResponse.getProtocol());
 
-        TestLogger.info(String.format("Successfully created %s assay '%s' in '%s':\n%s", _providerName,
-            protocol.getName(), containerPath, protocol.toJSONObject().toString(2)));
+        TestLogger.log().debug(() -> String.format("Successfully created %s assay '%s':\n%s", _providerName,
+                protocol.getName(), protocol.toJSONObject().toString(2)));
 
         return protocol;
     }
