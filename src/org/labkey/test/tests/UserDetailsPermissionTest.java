@@ -18,7 +18,10 @@ package org.labkey.test.tests;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.api.security.permissions.Permission;
+import org.labkey.api.security.permissions.ReadPermission;
 import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.SimpleGetCommand;
 import org.labkey.test.BaseWebDriverTest;
@@ -29,22 +32,30 @@ import org.labkey.test.categories.Daily;
 import org.labkey.test.components.DomainDesignerPage;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.pages.query.ExecuteQueryPage;
+import org.labkey.test.pages.user.ShowUsersPage;
 import org.labkey.test.pages.user.UpdateUserDetailsPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.ApiPermissionsHelper;
+import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.DataRegionTable.DataRegionFinder;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.labkey.test.util.PermissionsHelper.PROJECT_ADMIN_ROLE;
 import static org.labkey.test.util.PermissionsHelper.READER_ROLE;
 import static org.labkey.test.util.PermissionsHelper.SITE_ADMIN_ROLE;
 
@@ -57,6 +68,8 @@ public class UserDetailsPermissionTest extends BaseWebDriverTest
     private static final String USER_INFO_VIEWER = "user_info_viewer@usertable.test";
     private static final String IMPERSONATED_USER = "impersonated_user@usertable.test";
     private static final String CHECKED_USER = "checked_user@usertable.test";
+    private static final String PROJECT_ADMIN = "project_admin@usertable.test";
+    private static final String NON_MEMBER = "non_member@usertable.test";
     private static final String EMAIL_TEST_LIST = "My Users";
     private static final String CUSTOM_USER_COLUMN = "UserTablePermTest";
     private static final String HIDDEN_COL_VIEW = "hiddenColView";
@@ -73,7 +86,7 @@ public class UserDetailsPermissionTest extends BaseWebDriverTest
     {
         super.doCleanup(afterTest);
 
-        _userHelper.deleteUsers(false, USER_INFO_VIEWER, IMPERSONATED_USER, CHECKED_USER, ADMIN_USER);
+        _userHelper.deleteUsers(false, USER_INFO_VIEWER, IMPERSONATED_USER, CHECKED_USER, ADMIN_USER, PROJECT_ADMIN, NON_MEMBER);
     }
 
     @Override
@@ -115,6 +128,14 @@ public class UserDetailsPermissionTest extends BaseWebDriverTest
         apiPermissionsHelper.createPermissionsGroup(TEST_GROUP, USER_INFO_VIEWER, IMPERSONATED_USER, CHECKED_USER);
         apiPermissionsHelper.setPermissions(TEST_GROUP, READER_ROLE);
         apiPermissionsHelper.setSiteRoleUserPermissions(USER_INFO_VIEWER, "See User and Group Details");
+
+        // A project administrator (no site-wide User Management permission) is used to verify that user details
+        // render from the Project Users page.
+        _userHelper.createUser(PROJECT_ADMIN, true, true);
+        new ApiPermissionsHelper("/" + getProjectName()).setUserPermissions(PROJECT_ADMIN, PROJECT_ADMIN_ROLE);
+
+        // A user with no role in the project (no read access) that should never appear on the Project Users page.
+        _userHelper.createUser(NON_MEMBER, true, true);
 
         impersonate(ADMIN_USER);
         {
@@ -206,6 +227,52 @@ public class UserDetailsPermissionTest extends BaseWebDriverTest
 
         log("Verify that user table info can be seen with permission");
         assertTextPresent(CHECKED_USER, ADMIN_USER, HIDDEN_STRING, TEST_GROUP);
+    }
+
+    @Test
+    public void testProjectUsers() throws Exception
+    {
+        // The list of project users will be all users with read access to the folder.
+        Set<String> projectUsers = getUsersWithAccess(getProjectName(), ReadPermission.class);
+        assertFalse("A user with no project role must not have read access",
+                projectUsers.contains(NON_MEMBER));
+
+        // Both a site administrator and a project administrator should see the project's users and be able to open
+        // the details view for every one of them.
+        for (String admin : List.of(ADMIN_USER, PROJECT_ADMIN))
+        {
+            impersonate(admin);
+            goToProjectHome();
+
+            log("Verify the Project Users page, impersonating " + admin);
+            ShowUsersPage projectUsersPage = goToProjectUsers();
+            assertEquals("Project Users page displaying the wrong set of users.",
+                    projectUsers, new HashSet<>(projectUsersPage.getUsersTable().getColumnDataAsText("Email")));
+
+            log("Verify " + admin + " can view the details page of every project user");
+            for (String userEmail : projectUsers)
+            {
+                DataRegionTable usersTable = goToProjectUsers().getUsersTable();
+                clickAndWait(usersTable.detailsLink(usersTable.getRowIndexStrict("Email", userEmail)));
+                assertTextPresent(userEmail, _userHelper.getDisplayNameForEmail(userEmail));
+            }
+
+            stopImpersonating();
+        }
+    }
+
+    /**
+     * Returns the set of user emails who have permission to the folder
+     */
+    private Set<String> getUsersWithAccess(String folderPath, Class<? extends Permission> perm) throws IOException, CommandException
+    {
+        SimpleGetCommand command = new SimpleGetCommand("user", "getUsersWithPermissions");
+        command.setParameters(Map.of("permissions", perm.getName()));
+        CommandResponse response = command.execute(createDefaultConnection(), folderPath);
+        List<Map<String, Object>> users = response.getProperty("users");
+
+        return users.stream().
+                map(m -> (String) m.get("email")).collect(Collectors.toSet());
     }
 
     @Test
