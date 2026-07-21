@@ -267,7 +267,7 @@ public class ProductMenu extends WebDriverComponent<ProductMenu.ElementCache>
     protected class ElementCache extends Component<?>.ElementCache
     {
         private final WebElement toggle = Locator.byClass("product-menu-button").findWhenNeeded(this);
-        private final WebElement menuContent = Locator.tagWithClass("div", "product-menu-content").findWhenNeeded(this);
+        private final WebElement menuContent = Locator.tagWithClass("div", "product-menu-content").refindWhenNeeded(this);
         private final WebElement folderColumn = Locator.tagWithClass("div", "col-folders").findWhenNeeded(menuContent);
         private final WebElement sectionContent = Locator.tagWithClass("div", "sections-content").findWhenNeeded(menuContent);
 
