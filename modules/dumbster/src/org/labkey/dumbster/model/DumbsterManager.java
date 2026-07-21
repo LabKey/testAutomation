@@ -96,9 +96,8 @@ public class DumbsterManager implements ShutdownListener
             return false;
         }
 
-        // Install our own SMTP provider pointed at the local capture server and make it the active provider, rather
-        // than mutating another provider's session state. All outgoing email is captured regardless of how the server's
-        // real email transport (SMTP, Microsoft Graph, etc.) is configured.
+        // Dumbster uses its own SMTP configuration and sets the MailHelper active provider to capture all outgoing
+        // email. Previous provider (official SMTP or Microsoft Graph configuration) is stashed and restored on stop().
         Properties props = new Properties();
         props.setProperty("mail.smtp.host", "localhost");
         props.setProperty("mail.smtp.user", "Anonymous");
