@@ -15,13 +15,19 @@
  */
 package org.labkey.test.pages.compliance;
 
+import org.json.JSONObject;
+import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 public class ComplianceLoginSettingsPage extends BaseComplianceSettingsPage<ComplianceLoginSettingsPage.ElementCache>
 {
@@ -66,6 +72,25 @@ public class ComplianceLoginSettingsPage extends BaseComplianceSettingsPage<Comp
     {
         elementCache().saveButton.click();
         assertAlert(expectedAlert);
+    }
+
+    public static void setFicamRestriction(Connection connection, boolean restrict)
+    {
+        SimplePostCommand command = new SimplePostCommand("compliance", "complianceSettings");
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("tab", "login");
+        if (restrict)
+            jsonObject.put("acceptOnlyFICAMProviders", "on");
+        command.setJsonObject(jsonObject);
+
+        try
+        {
+            command.execute(connection, null);
+        }
+        catch (IOException | CommandException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
