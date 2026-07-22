@@ -431,8 +431,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
     public boolean isAddNewVisible()
     {
         open();
-        WebElement addNew = Locators.addEntitiesFooter.findElementOrNull(getComponentElement());
-        return addNew != null && addNew.isDisplayed();
+        return Locators.addEntitiesFooter.isDisplayed(this);
     }
 
     /**
@@ -443,15 +442,18 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
     public void clickAddNew()
     {
         open();
-        WebElement addNew = Locators.addEntitiesFooter.waitForElement(getComponentElement(), WAIT_FOR_JAVASCRIPT);
+
         try
         {
-            addNew.click();
+            Locators.addEntitiesFooter.findElement(this).click();
         }
-        catch (WebDriverException wde) // handle the "another element would receive the click" situation
+        catch (WebDriverException e)
         {
-            getWrapper().scrollIntoView(addNew);
-            getWrapper().fireEvent(addNew, WebDriverWrapper.SeleniumEvent.click);
+            // ReactSelect is notoriously bad at positioning the menu so that it does not render off the screen.
+            // That said, it can behave better if you close and reopen the menu.
+            close();
+            open();
+            Locators.addEntitiesFooter.findElement(this).click();
         }
     }
 
