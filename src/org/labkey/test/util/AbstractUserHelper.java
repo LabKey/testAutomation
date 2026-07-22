@@ -144,8 +144,7 @@ public abstract class AbstractUserHelper
     }
 
     public abstract void ensureUsersExist(List<String> userEmails);
-    @LogMethod (quiet = true)
-    public abstract CreateUserResponse createUser(@LoggedParam String userName, boolean sendEmail, boolean verifySuccess);
+    public abstract CreateUserResponse createUser(String userName, boolean sendEmail, boolean verifySuccess);
     public abstract String setInitialPassword(int userId);
     protected abstract void _deleteUser(String userEmail);
     protected abstract void _deleteUsers(boolean failIfNotFound, String... userEmails);
