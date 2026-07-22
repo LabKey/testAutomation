@@ -15,21 +15,13 @@
  */
 package org.labkey.test.pages.compliance;
 
-import org.labkey.remoteapi.CommandException;
-import org.labkey.remoteapi.Connection;
-import org.labkey.remoteapi.SimpleFormCommand;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
-import org.labkey.test.util.LogMethod;
-import org.labkey.test.util.LoggedParam;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
-import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class ComplianceLoginSettingsPage extends BaseComplianceSettingsPage<ComplianceLoginSettingsPage.ElementCache>
 {
@@ -74,25 +66,6 @@ public class ComplianceLoginSettingsPage extends BaseComplianceSettingsPage<Comp
     {
         elementCache().saveButton.click();
         assertAlert(expectedAlert);
-    }
-
-    @LogMethod(quiet = true)
-    public static void setFicamRestrictionViaApi(Connection connection, @LoggedParam boolean restrict)
-    {
-        Map<String, String> formData = new HashMap<>();
-        formData.put("tab", "login");
-        if (restrict)
-            formData.put("acceptOnlyFICAMProviders", "on");
-        SimpleFormCommand command = new SimpleFormCommand("compliance", "complianceSettings", formData);
-
-        try
-        {
-            command.execute(connection, null);
-        }
-        catch (IOException | CommandException e)
-        {
-            throw new RuntimeException(e);
-        }
     }
 
     @Override
