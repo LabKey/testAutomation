@@ -40,11 +40,13 @@ import org.labkey.test.pages.study.ManageVisitPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.DomainUtils;
 import org.labkey.test.util.OptionalFeatureHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
 import org.labkey.test.util.StudyHelper;
 import org.labkey.test.util.TestDataGenerator;
+import org.labkey.test.util.data.TestDataUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -82,7 +84,7 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         init.doSetup();
     }
 
-    private void doSetup()
+    private void doSetup() throws IOException
     {
         _containerHelper.createProject(getProjectName(), null);
         _containerHelper.createProject(VISIT_BASED_STUDY, "Study");
@@ -112,7 +114,7 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
 
 
 
-    private void createSampleTypes()
+    private void createSampleTypes() throws IOException
     {
         SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
 
@@ -130,11 +132,12 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
                         new FieldDefinition("ParticipantId", FieldDefinition.ColumnType.Subject))), data1);
 
         goToProjectHome(SAMPLE_TYPE_PROJECT);
-        String data2 = "Name\tVisitLabel\tVisitDate\tParticipantId\n" +
-                "First\t" + visitLabel1 + "\t" + now + "\tP1\n" +
-                "Second\t" + visitLabel2 + "\t" + now + "\tP2\n" +
-                "Third\t" + visitLabel1 + "\t" + now + "\tP3\n" +
-                "Fourth\t" + visitLabel2 + "\t" + now + "\tP4\n";
+        File data2 = TestDataUtils.writeRowsToFile("samples.tsv", List.of(
+                List.of("Name", "VisitLabel", "VisitDate", "ParticipantId"),
+                List.of("First", visitLabel1, now, "P1"),
+                List.of("Second", visitLabel2, now, "P2"),
+                List.of("Third", visitLabel1, now, "P3"),
+                List.of("Fourth", visitLabel2, now, "P4")));
 
         sampleHelper.createSampleType(new SampleTypeDefinition(SAMPLE_TYPE2)
                 .setFields(List.of(
@@ -777,14 +780,10 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
     public void preTest() throws Exception
     {
         //deleting the datasets from study folders.
-        if (TestDataGenerator.doesDomainExists(DATE_BASED_STUDY, "study", "Sample type 1"))
-            TestDataGenerator.deleteDomain(DATE_BASED_STUDY, "study", "Sample type 1");
-        if (TestDataGenerator.doesDomainExists(DATE_BASED_STUDY, "study", "Sample type 2"))
-            TestDataGenerator.deleteDomain(DATE_BASED_STUDY, "study", "Sample type 2");
-        if (TestDataGenerator.doesDomainExists(VISIT_BASED_STUDY, "study", "Sample type 1"))
-            TestDataGenerator.deleteDomain(VISIT_BASED_STUDY, "study", "Sample type 1");
-        if (TestDataGenerator.doesDomainExists(VISIT_BASED_STUDY, "study", "Sample type 2"))
-            TestDataGenerator.deleteDomain(VISIT_BASED_STUDY, "study", "Sample type 2");
+        DomainUtils.ensureDeleted(DATE_BASED_STUDY, "study", "Sample type 1");
+        DomainUtils.ensureDeleted(DATE_BASED_STUDY, "study", "Sample type 2");
+        DomainUtils.ensureDeleted(VISIT_BASED_STUDY, "study", "Sample type 1");
+        DomainUtils.ensureDeleted(VISIT_BASED_STUDY, "study", "Sample type 2");
     }
 
     private void createNewVisits(String label, String startRange, String endRange)

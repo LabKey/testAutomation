@@ -672,12 +672,12 @@ public class ApiPermissionsHelper extends PermissionsHelper
     }
 
     @Override
-    public void removeUserFromGroup(String groupName, String userName)
+    public void removeUserFromGroup(String groupName, String userName, String projectPath)
     {
         Integer groupId = getGroupId(groupName);
         if (groupId == null)
             throw new IllegalArgumentException("Attempting to remove members from non-existent site group: " + groupName);
-        removeMembersFromGroup(groupId, userName);
+        removeMembersFromGroup(groupId, projectPath, userName);
     }
 
     @Override
@@ -686,10 +686,10 @@ public class ApiPermissionsHelper extends PermissionsHelper
         Integer groupId = getSiteGroupId(groupName);
         if (groupId == null)
             throw new IllegalArgumentException("Attempting to remove members from non-existent group: " + groupName);
-        removeMembersFromGroup(groupId, userName);
+        removeMembersFromGroup(groupId, "/", userName);
     }
 
-    private void removeMembersFromGroup(Integer groupId, String... members)
+    private void removeMembersFromGroup(Integer groupId, String projectPath, String... members)
     {
         BulkUpdateGroupCommand command = new BulkUpdateGroupCommand(groupId);
         command.setCreateGroup(false);
@@ -699,7 +699,7 @@ public class ApiPermissionsHelper extends PermissionsHelper
         try
         {
             Connection connection = getConnection();
-            command.execute(connection, "/");
+            command.execute(connection, projectPath);
         }
         catch (IOException | CommandException e)
         {
