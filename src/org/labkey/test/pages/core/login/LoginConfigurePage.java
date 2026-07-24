@@ -26,6 +26,7 @@ import org.labkey.test.components.react.Tabs;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.pages.core.admin.ShowAdminPage;
 import org.labkey.test.params.login.AuthenticationProvider;
+import org.labkey.test.util.selenium.WebElementUtils;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -62,6 +63,14 @@ public class LoginConfigurePage extends LabKeyPage<LoginConfigurePage.ElementCac
         return authenticationProvider.getNewDialog(getDriver());
     }
 
+    public List<String> getPrimaryProviders()
+    {
+        togglePrimaryConfiguration();
+        BootstrapMenu addPrimaryMenu = elementCache().addPrimaryMenu;
+        addPrimaryMenu.expand();
+        return WebElementUtils.getTexts(addPrimaryMenu.findVisibleMenuItems());
+    }
+
     public boolean canAddConfiguration()
     {
         togglePrimaryConfiguration();
@@ -76,6 +85,14 @@ public class LoginConfigurePage extends LabKeyPage<LoginConfigurePage.ElementCac
                 clickSubMenu(false, authenticationProvider.getProviderName() + " : " + authenticationProvider.getProviderDescription());
 
         return authenticationProvider.getNewDialog(getDriver());
+    }
+
+    public List<String> getSecondaryProviders()
+    {
+        toggleSecondaryConfiguration();
+        BootstrapMenu addSecondaryMenu = elementCache().addSecondaryMenu;
+        addSecondaryMenu.expand();
+        return WebElementUtils.getTexts(addSecondaryMenu.findVisibleMenuItems());
     }
 
     public boolean canAddSecondaryConfiguration()
