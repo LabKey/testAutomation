@@ -756,7 +756,7 @@ public class SampleTypeParentColumnTest extends BaseWebDriverTest
         updatePage.getFieldsPanel().addField("DupeAliasCheck")
                 .setImportAliases(GOOD_PARENT_NAME);
         errors = updatePage.clickSaveExpectingErrors();
-        errorMsgExpectedTxt = "Field DupeAliasCheck has an import alias " + GOOD_PARENT_NAME+ " that conflicts with a parent alias header.";
+        errorMsgExpectedTxt = "Field DupeAliasCheck has an import alias " + GOOD_PARENT_NAME + " that conflicts with a parent alias header.";
         assertThat("Error message", String.join("\n", errors), CoreMatchers.containsString(errorMsgExpectedTxt));
 
         updatePage.clickCancel();
