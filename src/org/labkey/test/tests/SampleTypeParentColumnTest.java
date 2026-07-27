@@ -724,7 +724,7 @@ public class SampleTypeParentColumnTest extends BaseWebDriverTest
                 String.join("\n", errors));
         updatePage.removeParentAlias(0);
 
-        log("Now add a valid parent column and check that you cannot not add a field in the sample type with the same name.");
+        log("Now add a valid parent column and check that you cannot add a field in the sample type with the same name.");
         updatePage.addParentAlias(GOOD_PARENT_NAME, SampleTypeDesigner.CURRENT_SAMPLE_TYPE);
         updatePage.clickSave();
 
@@ -750,9 +750,9 @@ public class SampleTypeParentColumnTest extends BaseWebDriverTest
         updatePage.clickCancel();
 
         // GH Issue 1257
+        clickFolder(SUB_FOLDER_NAME);
         log("Check that you cannot add a field with an import alias that conflicts with the parent import alias");
-        waitAndClickAndWait(Locator.lkButton("Edit Type"));
-        updatePage = new UpdateSampleTypePage(getDriver());
+        updatePage = sampleHelper.goToEditSampleType(SAMPLE_TYPE_NAME);
         updatePage.getFieldsPanel().addField("DupeAliasCheck")
                 .setImportAliases(ALIAS_NAME_CONFLICT);
         errors = updatePage.clickSaveExpectingErrors();
