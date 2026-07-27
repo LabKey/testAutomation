@@ -754,9 +754,9 @@ public class SampleTypeParentColumnTest extends BaseWebDriverTest
         log("Check that you cannot add a field with an import alias that conflicts with the parent import alias");
         updatePage = sampleHelper.goToEditSampleType(SAMPLE_TYPE_NAME);
         updatePage.getFieldsPanel().addField("DupeAliasCheck")
-                .setImportAliases(ALIAS_NAME_CONFLICT);
+                .setImportAliases(GOOD_PARENT_NAME);
         errors = updatePage.clickSaveExpectingErrors();
-        errorMsgExpectedTxt = "Import alias " + ALIAS_NAME_CONFLICT + " on field DupeAliasCheck conflicts with a field name.";
+        errorMsgExpectedTxt = "Field DupeAliasCheck has an import alias " + GOOD_PARENT_NAME+ " that conflicts with a parent alias header.";
         assertThat("Error message", String.join("\n", errors), CoreMatchers.containsString(errorMsgExpectedTxt));
 
         updatePage.clickCancel();
