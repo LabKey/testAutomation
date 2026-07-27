@@ -699,8 +699,6 @@ public class SampleTypeParentColumnTest extends BaseWebDriverTest
         goToProjectHome();
         projectMenu().navigateToFolder(PROJECT_NAME, SUB_FOLDER_NAME);
 
-        String path = PROJECT_NAME + "/" + SUB_FOLDER_NAME;
-
         List<FieldDefinition> fields = new ArrayList<>();
 
         fields.add(new FieldDefinition(ALIAS_NAME_CONFLICT, FieldDefinition.ColumnType.String));
@@ -726,7 +724,7 @@ public class SampleTypeParentColumnTest extends BaseWebDriverTest
                 String.join("\n", errors));
         updatePage.removeParentAlias(0);
 
-        log("Now add a valid parent column and check that you cannot now add a field in the sample type with the same name.");
+        log("Now add a valid parent column and check that you cannot not add a field in the sample type with the same name.");
         updatePage.addParentAlias(GOOD_PARENT_NAME, SampleTypeDesigner.CURRENT_SAMPLE_TYPE);
         updatePage.clickSave();
 
@@ -751,7 +749,17 @@ public class SampleTypeParentColumnTest extends BaseWebDriverTest
 
         updatePage.clickCancel();
 
-        log("Validated name conflicts.");
+        // GH Issue 1257
+        log("Check that you cannot add a field with an import alias that conflicts with the parent import alias");
+        waitAndClickAndWait(Locator.lkButton("Edit Type"));
+        updatePage = new UpdateSampleTypePage(getDriver());
+        updatePage.getFieldsPanel().addField("DupeAliasCheck")
+                .setImportAliases(ALIAS_NAME_CONFLICT);
+        errors = updatePage.clickSaveExpectingErrors();
+        errorMsgExpectedTxt = "Import alias " + ALIAS_NAME_CONFLICT + " on field DupeAliasCheck conflicts with a field name.";
+        assertThat("Error message", String.join("\n", errors), CoreMatchers.containsString(errorMsgExpectedTxt));
+
+        updatePage.clickCancel();
     }
 
     @Test
