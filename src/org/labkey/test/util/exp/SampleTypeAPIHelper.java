@@ -15,6 +15,7 @@
  */
 package org.labkey.test.util.exp;
 
+import org.json.JSONArray;
 import org.junit.Assert;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
@@ -28,14 +29,12 @@ import org.labkey.test.params.FieldInfo;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.DomainUtils;
 import org.labkey.test.util.DomainUtils.DomainKind;
-import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.TestDataGenerator;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -150,19 +149,7 @@ public class SampleTypeAPIHelper
     public static Map<String, Integer> getRowIdsForSamples(String containerPath, String sampleTypeName, List<String> sampleNames) throws IOException, CommandException
     {
         // Use json for the value parameter of the filter. This allows for tricky characters like ";" to be passed to the API.
-        StringBuilder json = new StringBuilder("{json:[");
-
-        Iterator<String> iterator = sampleNames.iterator();
-
-        while (iterator.hasNext())
-        {
-            String sampleName = iterator.next();
-            json.append(EscapeUtil.toJSONStr(sampleName));
-            if (iterator.hasNext())
-                json.append(", ");
-            else
-                json.append("]}");
-        }
+        StringBuilder json = new StringBuilder("{json:").append(new JSONArray(sampleNames)).append("}");
 
         // Use the details view to avoid column and filter settings on the default view
         String detailsView = "~~DETAILS~~";
