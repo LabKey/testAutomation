@@ -123,7 +123,7 @@ public class CspLogUtil
                     throw new RuntimeException("Failed to read recent CSP violations.", e);
                 }
 
-                boolean foundVioloation = false;
+                boolean foundViolation = false;
                 MultiValuedMap<Crawler.ControllerActionId, String> violations = new HashSetValuedHashMap<>();
                 List<CspReport> cspReports = new ArrayList<>();
                 StringBuilder sb = new StringBuilder();
@@ -137,11 +137,11 @@ public class CspLogUtil
                     {
                         cspReports.add(new CspReport(sb.toString()));
                         sb = new StringBuilder();
-                        foundVioloation = true;
+                        foundViolation = true;
                     }
                 }
 
-                if (!foundVioloation)
+                if (!foundViolation)
                 {
                     throw new AssertionError("Detected CSP violations but unable to parse log file: " + recentWarningsFile.getAbsolutePath());
                 }
@@ -225,10 +225,20 @@ class CspReport
 
     CspReport(String reportStr)
     {
-        // Support report-to reports only. GitHub Issue #900
-        JSONObject report = new JSONObject(reportStr).getJSONObject("body");
-        _violatedDirective = report.getString("effectiveDirective");
-        _documentUrl = report.getString("documentURL");
+        // Support report-uri and report-to reports
+        JSONObject json = new JSONObject(reportStr);
+        JSONObject report = json.optJSONObject("body");
+        if (report != null)
+        {
+            _violatedDirective = report.getString("effectiveDirective");
+            _documentUrl = report.getString("documentURL");
+        }
+        else
+        {
+            report = json.getJSONObject("csp-report");
+            _violatedDirective = report.getString("violated-directive");
+            _documentUrl = report.getString("document-uri");
+        }
     }
 
     public String getViolatedDirective()
