@@ -264,8 +264,7 @@ public class EntityBulkUpdateDialog extends EntityBulkDialog
      */
     private FileAttachmentContainer getFileField(CharSequence fieldIdentifier)
     {
-        FieldKey identifier = FileAttachmentContainer.fileUploadFieldKey(fieldIdentifier);
-        return enableAndWait(identifier, elementCache().fileUploadField(identifier));
+        return enableAndWait(fieldIdentifier, elementCache().fileUploadField(fieldIdentifier));
     }
 
     /**
@@ -307,8 +306,7 @@ public class EntityBulkUpdateDialog extends EntityBulkDialog
 
     public FileUploadField getExistingFileCard(CharSequence fieldIdentifier)
     {
-        FieldKey identifier = FileAttachmentContainer.fileUploadFieldKey(fieldIdentifier);
-        return enableAndWait(identifier, elementCache().fileField(identifier));
+        return enableAndWait(fieldIdentifier, elementCache().fileField(fieldIdentifier));
     }
 
     /**

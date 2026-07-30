@@ -102,7 +102,7 @@ public class ParentEntityEditPanel extends Panel<ParentEntityEditPanel.ElementCa
                                 .find(this);
 
                         // For the first parent the panel is ready if the entity type selector is ready and the options have been populated.
-                        return firstParentSelector.isInteractive() && !firstParentSelector.getOptions().isEmpty();
+                        return firstParentSelector.isInteractive();
 
                     }
                 }
