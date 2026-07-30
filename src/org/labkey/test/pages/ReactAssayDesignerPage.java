@@ -15,6 +15,7 @@
  */
 package org.labkey.test.pages;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
@@ -29,6 +30,9 @@ import org.labkey.test.components.html.OptionSelect;
 import org.labkey.test.components.ui.files.AttachmentCard;
 import org.labkey.test.pages.assay.plate.PlateTemplateListPage;
 import org.labkey.test.util.Maps;
+import org.labkey.test.util.TestLogger;
+import org.labkey.test.util.core.webdav.WebDavUploadHelper;
+import org.labkey.test.util.core.webdav.WebDavUrlFactory;
 import org.labkey.test.util.selenium.WebElementUtils;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -256,7 +260,7 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
 
     public ReactAssayDesignerPage addTransformScript(File transformScript)
     {
-        return setTransformScript(transformScript, false, null);
+        return setTransformScript(transformScript, true, null);
     }
 
     public ReactAssayDesignerPage addTransformScript(File transformScript, boolean usingFileUpload)
@@ -278,6 +282,11 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
         String targetPath = transformScript.getAbsolutePath();
         if (usingFileUpload)
         {
+            // GitHub Issue #159: The upload fails if a file of the same name is already in the assay's "@scripts" dir,
+            // so remove any leftover file first.
+            if (expectedError == null)
+                removeExistingScriptFile(transformScript.getName());
+
             getWrapper().setFormElement(Locator.tagWithClass("input", "file-upload__input"), transformScript);
             targetPath = "/@scripts/" + transformScript.getName();
         }
@@ -302,6 +311,22 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
         }
 
         return this;
+    }
+
+    /**
+     * Remove a file from the "@scripts" dir of the container that this assay design lives in, if it is present. Uses
+     * WebDav directly instead of the "Manage script files" UI, which opens in a separate browser tab.
+     * @param fileName Name of the transform script file to remove
+     */
+    private void removeExistingScriptFile(String fileName)
+    {
+        String manageScriptsUrl = StringUtils.stripEnd(elementCache().manageScriptFilesLink.getDomProperty("href"), "/");
+        WebDavUploadHelper webDavHelper = new WebDavUploadHelper(WebDavUrlFactory.fromDirectoryUrl(manageScriptsUrl));
+        if (webDavHelper.fileExists(fileName))
+        {
+            TestLogger.log("Removing existing transform script file: " + fileName);
+            webDavHelper.deleteFile(fileName);
+        }
     }
 
     public ReactAssayDesignerPage removeTransformScript(String fileName)
@@ -388,6 +413,8 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
         final Checkbox qcEnabledCheckbox = Checkbox(Locator.checkboxById("assay-design-qcEnabled")).findWhenNeeded(propertiesPanel);
         final Checkbox plateTemplateCheckbox = Checkbox(Locator.checkboxById("assay-design-plateMetadata")).findWhenNeeded(propertiesPanel);
         final Checkbox activeStatusCheckBox = Checkbox(Locator.checkboxById("assay-design-status")).findWhenNeeded(propertiesPanel);
+        final WebElement manageScriptFilesLink = Locator.tagWithClass("div", "transform-script--manage-link")
+                .child(Locator.linkWithText("Manage script files")).refindWhenNeeded(propertiesPanel);
 
         final WebElement hitSelectionCriteriaBtn = Locator.tagWithClass("div", "filter-criteria-input__button")
                 .child(Locator.button("Edit Criteria")).findWhenNeeded(propertiesPanel);
