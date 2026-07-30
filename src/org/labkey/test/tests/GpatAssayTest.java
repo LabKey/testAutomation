@@ -282,6 +282,22 @@ public class GpatAssayTest extends BaseWebDriverTest
         return assayDesignerPage;
     }
 
+    @Test // GitHub Issue #159
+    public void testAssayTransformScriptPathError()
+    {
+        File trialData = TestFileUtils.getSampleData("GPAT/renameAssayTrial.xls");
+        String assayName = TestDataGenerator.randomDomainName();
+        log(String.format("Create an assay named '%s'.", assayName));
+        ReactAssayDesignerPage assayDesignerPage = startCreateGpatAssay(trialData, assayName);
+
+        log("Verify error message when trying to add transform script with path outside of @scripts dir");
+        assayDesignerPage.addTransformScript(RTRANSFORM_SCRIPT_FILE_NOOP, false);
+        List<String> errors = assayDesignerPage.clickSaveExpectingErrors();
+        Assert.assertTrue("Error msg not as expected during assay creation",
+                errors.contains("The transform script must exist within this folder's @scripts directory."));
+        assayDesignerPage.clickCancel();
+    }
+
     @Test
     public void testMultipleFileUploadInAssayRun()
     {
