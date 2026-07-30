@@ -757,7 +757,7 @@ public class ElispotAssayTest extends AbstractAssayTest
         List<String> expected4FMedians = Arrays.asList("0.0", "0.0", "6666.7", "0.0");
         List<String> expected6FMeans = Arrays.asList("0.0", "0.0", "0.0", "0.0");
         List<String> expected6FMedians = Arrays.asList("0.0", "0.0", "0.0", "0.0");
-        Bag<List<String>> expectedRows = new HashBag<>(DataRegionTable.collateColumnsIntoRows(
+        MultiSet<List<String>> expectedRows = new HashMultiSet<>(DataRegionTable.collateColumnsIntoRows(
                 expectedPtids,
                 expected2FMeans,
                 expected2FMedians,
@@ -766,7 +766,7 @@ public class ElispotAssayTest extends AbstractAssayTest
                 expected6FMeans,
                 expected6FMedians));
 
-        Bag<List<String>> actualRows = new HashBag<>(table.getRows(
+        MultiSet<List<String>> actualRows = new HashMultiSet<>(table.getRows(
                 "ParticipantID",
                 "Atg2FMean",
                 "Atg2FMedian",
