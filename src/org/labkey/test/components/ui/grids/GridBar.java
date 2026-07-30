@@ -252,6 +252,28 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
         return menuButtonText;
     }
 
+    /**
+     * Get the text of the standalone action buttons on the grid bar, i.e. buttons that are not dropdown-menu
+     * toggles (for example a "Derive Samples" button that isn't collapsed into a "More" menu).
+     *
+     * @return the (non-empty) labels of the standalone buttons.
+     */
+    public List<String> getButtonText()
+    {
+        List<String> buttonText = new ArrayList<>();
+        for (WebElement button : BootstrapLocators.button().findElements(this))
+        {
+            String cssClass = button.getAttribute("class");
+            if (cssClass == null || !cssClass.contains("dropdown-toggle"))
+            {
+                String text = button.getText().trim();
+                if (!text.isEmpty())
+                    buttonText.add(text);
+            }
+        }
+        return buttonText;
+    }
+
     public List<String> getMenuText(String buttonText)
     {
         MultiMenu multiMenu = null;
