@@ -15,7 +15,6 @@
  */
 package org.labkey.test.pages;
 
-import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
@@ -320,7 +319,7 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
      */
     private void removeExistingScriptFile(String fileName)
     {
-        String manageScriptsUrl = StringUtils.stripEnd(elementCache().manageScriptFilesLink.getDomProperty("href"), "/");
+        String manageScriptsUrl = elementCache().manageScriptFilesLink.getDomProperty("href");
         WebDavUploadHelper webDavHelper = new WebDavUploadHelper(WebDavUrlFactory.fromDirectoryUrl(manageScriptsUrl));
         if (webDavHelper.fileExists(fileName))
         {
@@ -339,11 +338,15 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
         return this;
     }
 
-    public String getTransformScriptPath(String fileName) throws Exception
+    /**
+     * The server side path of a transform script configured on this assay design, as shown on the script's card. This
+     * is the same value as the card's "Copy path" menu option, read from the DOM to avoid a clipboard round trip.
+     * @param fileName Name of the transform script file
+     */
+    public String getTransformScriptPath(String fileName)
     {
         AttachmentCard card = new AttachmentCard.FileAttachmentCardFinder(getDriver()).withTitle(fileName).waitFor(this);
-        card.clickMenuOption("Copy path");
-        return getWrapper().getClipboardContent();
+        return card.getDescription();
     }
 
     public enum MetadataInputFormat implements OptionSelect.SelectOption

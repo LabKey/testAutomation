@@ -109,11 +109,9 @@ public class AttachmentCard extends WebDriverComponent<AttachmentCard.ElementCac
         return elementCache().unavailableWarning.isPresent();
     }
 
-    public void clickMenuOption(String optionText)
+    public String getDescription()
     {
-        if (!elementCache().menu.isPresent())
-            throw new IllegalStateException("Unable to find menu");
-        elementCache().menu.get().clickSubMenu(false, optionText);
+        return elementCache().description.getText();
     }
 
     public boolean canRemove()
@@ -153,6 +151,7 @@ public class AttachmentCard extends WebDriverComponent<AttachmentCard.ElementCac
     protected class ElementCache extends Component<?>.ElementCache
     {
         final WebElement fileSize = Locator.byClass("attachment-card__size").findWhenNeeded(this);
+        final WebElement description = Locator.byClass("attachment-card__description").refindWhenNeeded(this);
         final WebElement icon = Locator.byClass("attachment-card__icon_img").findWhenNeeded(this);
         Optional<BootstrapMenu> menu = BootstrapMenu.finder(getDriver())
                 .locatedBy(Locator.tagWithClass("div", "attachment-card__menu"))
