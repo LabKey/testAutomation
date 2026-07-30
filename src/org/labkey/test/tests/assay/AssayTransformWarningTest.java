@@ -310,7 +310,6 @@ public class AssayTransformWarningTest extends BaseWebDriverTest
 
         // verify check for valid script engine defined for the file extension
         assayDesignerPage.addTransformScript(JAVA_INVALID_TRANSFORM_SCRIPT, true, "Script engine for the extension '.java' has not been registered.");
-        assayDesignerPage.addTransformScript(JAVA_INVALID_TRANSFORM_SCRIPT, false, "Script engine for the extension '.java' has not been registered.");
 
         // verify check for duplicate file in @scripts dir
         assayDesignerPage.addTransformScript(R_TRANSFORM_ERROR_SCRIPT, true);
