@@ -339,6 +339,13 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
         return this;
     }
 
+    public String getTransformScriptPath(String fileName) throws Exception
+    {
+        AttachmentCard card = new AttachmentCard.FileAttachmentCardFinder(getDriver()).withTitle(fileName).waitFor(this);
+        card.clickMenuOption("Copy path");
+        return getWrapper().getClipboardContent();
+    }
+
     public enum MetadataInputFormat implements OptionSelect.SelectOption
     {
         MANUAL,

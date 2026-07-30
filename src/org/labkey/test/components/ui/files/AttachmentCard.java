@@ -109,6 +109,13 @@ public class AttachmentCard extends WebDriverComponent<AttachmentCard.ElementCac
         return elementCache().unavailableWarning.isPresent();
     }
 
+    public void clickMenuOption(String optionText)
+    {
+        if (!elementCache().menu.isPresent())
+            throw new IllegalStateException("Unable to find menu");
+        elementCache().menu.get().clickSubMenu(false, optionText);
+    }
+
     public boolean canRemove()
     {
         return getRemoveOption() != null;
