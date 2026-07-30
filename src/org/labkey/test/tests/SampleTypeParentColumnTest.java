@@ -27,6 +27,7 @@ import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.Daily;
+import org.labkey.test.components.domain.DomainFieldRow;
 import org.labkey.test.components.ui.domainproperties.samples.SampleTypeDesigner;
 import org.labkey.test.pages.ImportDataPage;
 import org.labkey.test.pages.experiment.CreateSampleTypePage;
@@ -753,10 +754,31 @@ public class SampleTypeParentColumnTest extends BaseWebDriverTest
         clickFolder(SUB_FOLDER_NAME);
         log("Check that you cannot add a field with an import alias that conflicts with the parent import alias");
         updatePage = sampleHelper.goToEditSampleType(SAMPLE_TYPE_NAME);
-        updatePage.getFieldsPanel().addField("DupeAliasCheck")
-                .setImportAliases(GOOD_PARENT_NAME);
+        DomainFieldRow fieldRow = updatePage.getFieldsPanel().addField("DupeAliasCheck");
+        fieldRow.setImportAliases(GOOD_PARENT_NAME);
         errors = updatePage.clickSaveExpectingErrors();
         errorMsgExpectedTxt = "Field 'DupeAliasCheck' has an import alias '" + GOOD_PARENT_NAME + "' that conflicts with a parent alias header.";
+        assertThat("Error message", String.join("\n", errors), CoreMatchers.containsString(errorMsgExpectedTxt));
+
+        log("Check that you cannot add a parent import alias that conflicts with a field alias");
+        String fieldAlias1 = "Alias1";
+        String fieldAlias2 = "Alias2";
+        fieldRow.setImportAliases(fieldAlias1 + " " + fieldAlias2);
+        updatePage.removeParentAlias(GOOD_PARENT_NAME);
+        updatePage.addParentAlias(fieldAlias2);
+        errors = updatePage.clickSaveExpectingErrors();
+        errorMsgExpectedTxt = "Field 'DupeAliasCheck' has an import alias '" + fieldAlias2 + "' that conflicts with a parent alias header.";
+        assertThat("Error message", String.join("\n", errors), CoreMatchers.containsString(errorMsgExpectedTxt));
+        updatePage.removeParentAlias(fieldAlias2);
+        log("Save with the import aliases defined for a field.");
+        updatePage.clickSave();
+
+        log("Verify an update to add a conflicting alias for an existing field alias also fails");
+        clickFolder(SUB_FOLDER_NAME);
+        updatePage = sampleHelper.goToEditSampleType(SAMPLE_TYPE_NAME);
+        updatePage.addParentAlias(fieldAlias1);
+        errors = updatePage.clickSaveExpectingErrors();
+        errorMsgExpectedTxt = "Field 'DupeAliasCheck' has an import alias '" + fieldAlias1 + "' that conflicts with a parent alias header.";
         assertThat("Error message", String.join("\n", errors), CoreMatchers.containsString(errorMsgExpectedTxt));
 
         updatePage.clickCancel();
