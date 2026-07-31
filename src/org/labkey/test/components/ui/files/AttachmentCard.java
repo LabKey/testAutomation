@@ -109,6 +109,11 @@ public class AttachmentCard extends WebDriverComponent<AttachmentCard.ElementCac
         return elementCache().unavailableWarning.isPresent();
     }
 
+    public String getDescription()
+    {
+        return elementCache().description.getText();
+    }
+
     public boolean canRemove()
     {
         return getRemoveOption() != null;
@@ -146,6 +151,7 @@ public class AttachmentCard extends WebDriverComponent<AttachmentCard.ElementCac
     protected class ElementCache extends Component<?>.ElementCache
     {
         final WebElement fileSize = Locator.byClass("attachment-card__size").findWhenNeeded(this);
+        final WebElement description = Locator.byClass("attachment-card__description").refindWhenNeeded(this);
         final WebElement icon = Locator.byClass("attachment-card__icon_img").findWhenNeeded(this);
         Optional<BootstrapMenu> menu = BootstrapMenu.finder(getDriver())
                 .locatedBy(Locator.tagWithClass("div", "attachment-card__menu"))
