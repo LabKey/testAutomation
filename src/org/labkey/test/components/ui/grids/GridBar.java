@@ -260,11 +260,8 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
      */
     public List<String> getButtonText()
     {
-        return BootstrapLocators.button().findElements(this).stream()
-                .filter(button -> {
-                    String cssClass = button.getAttribute("class");
-                    return cssClass == null || !cssClass.contains("dropdown-toggle");
-                })
+        return BootstrapLocators.button().withoutClass("dropdown-toggle").findElements(this)
+                .stream()
                 .map(button -> button.getText().trim())
                 .filter(text -> !text.isEmpty())
                 .toList();
