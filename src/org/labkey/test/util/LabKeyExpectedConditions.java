@@ -32,8 +32,8 @@ import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.Wait;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class LabKeyExpectedConditions
@@ -41,6 +41,19 @@ public class LabKeyExpectedConditions
     private LabKeyExpectedConditions()
     {
         // Utility class
+    }
+
+    /**
+     * Matches the logic used by {@link FluentWait#until(Function)} to evaluate success: any result other than
+     * {@code null} or {@link Boolean#FALSE} counts as success.
+     *
+     * @param result the value returned by a poll of a {@link Wait}'s condition
+     * @param <T> the result type of the condition being polled
+     * @return {@code true} if {@code result} counts as a successful poll result, {@code false} otherwise
+     */
+    static <T> boolean isSuccessResult(T result)
+    {
+        return result != null && !Boolean.FALSE.equals(result);
     }
 
     /**
@@ -273,12 +286,44 @@ public class LabKeyExpectedConditions
         @Override @NotNull
         public <V> V until(@NotNull Function<? super T, ? extends V> isTrue)
         {
-            List<V> result;
-            result = _wrapped.until(input -> {
+            return _wrapped.until(input -> {
                 V value = isTrue.apply(input);
                 return value == null ? null : Collections.singletonList(value);
-            });
-            return result.getFirst();
+            }).getFirst();
         }
     }
+
+    /**
+     * Wraps a condition so that {@code action} runs after each unsuccessful poll, e.g. to clear a stale element cache.
+     * {@code action} does not run once {@code isTrue} succeeds.
+     *
+     * @param isTrue condition to poll for, e.g. via {@link Wait#until(Function)}
+     * @param action side effect to run after a poll of {@code isTrue} fails, before the next poll
+     * @param <T> input type of the condition, typically {@link WebDriver}
+     * @param <V> result type of the condition
+     * @return a {@link Function} usable anywhere {@code isTrue} would be, that also performs {@code action} between failed polls
+     */
+    public static <T, V> Function<T, V> withActionBetweenPolls(Function<? super T, ? extends V> isTrue, Consumer<? super T> action)
+    {
+        return new Function<>()
+        {
+            @Override
+            public V apply(T driver)
+            {
+                V value = isTrue.apply(driver);
+                if (!isSuccessResult(value))
+                {
+                    action.accept(driver);
+                }
+                return value;
+            }
+
+            @Override
+            public String toString()
+            {
+                return isTrue.toString();
+            }
+        };
+    }
+
 }
