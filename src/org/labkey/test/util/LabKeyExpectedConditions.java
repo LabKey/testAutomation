@@ -33,6 +33,7 @@ import org.openqa.selenium.support.ui.Wait;
 
 import java.util.Collections;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -41,19 +42,6 @@ public class LabKeyExpectedConditions
     private LabKeyExpectedConditions()
     {
         // Utility class
-    }
-
-    /**
-     * Matches the logic used by {@link FluentWait#until(Function)} to evaluate success: any result other than
-     * {@code null} or {@link Boolean#FALSE} counts as success.
-     *
-     * @param result the value returned by a poll of a {@link Wait}'s condition
-     * @param <T> the result type of the condition being polled
-     * @return {@code true} if {@code result} counts as a successful poll result, {@code false} otherwise
-     */
-    static <T> boolean isSuccessResult(T result)
-    {
-        return result != null && !Boolean.FALSE.equals(result);
     }
 
     /**
@@ -295,7 +283,7 @@ public class LabKeyExpectedConditions
 
     /**
      * Wraps a condition so that {@code action} runs after each unsuccessful poll, e.g. to clear a stale element cache.
-     * {@code action} does not run once {@code isTrue} succeeds.
+     * {@code action} does not run once {@code isTrue} succeeds or wait times out.
      *
      * @param isTrue condition to poll for, e.g. via {@link Wait#until(Function)}
      * @param action side effect to run after a poll of {@code isTrue} fails, before the next poll
@@ -307,15 +295,15 @@ public class LabKeyExpectedConditions
     {
         return new Function<>()
         {
+            private final AtomicBoolean firstCheck = new AtomicBoolean(false);
+
             @Override
             public V apply(T driver)
             {
-                V value = isTrue.apply(driver);
-                if (!isSuccessResult(value))
-                {
+                if (!firstCheck.getAndSet(true))
                     action.accept(driver);
-                }
-                return value;
+
+                return isTrue.apply(driver);
             }
 
             @Override
