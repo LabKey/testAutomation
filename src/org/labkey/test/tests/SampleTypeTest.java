@@ -301,7 +301,69 @@ public class SampleTypeTest extends BaseWebDriverTest
         assertTextPresent(stringCol1.getLabel(), stringCol2.getLabel(), stringCol3.getLabel(), calcCol.getLabel(), "PlainValue", "PercentValue", "PlainValueConcat");
     }
 
-        // Issue 47280: LKSM: Trailing/Leading whitespace in Source name won't resolve when deriving samples
+    @Test  // GH Issue 1257
+    public void testOverlappingAliases()
+    {
+        final String sampleTypeName = "OverlappingAliasSampleType";
+        final String fieldOne = "AliasFieldOne";
+        final String fieldTwo = "AliasFieldTwo";
+        final String sharedAlias = "sharedAlias";
+
+        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
+
+        clickProject(PROJECT_NAME);
+        CreateSampleTypePage createPage = sampleHelper
+                .goToCreateNewSampleType()
+                .setName(sampleTypeName);
+        DomainFormPanel fieldsPanel = createPage.getFieldsPanel();
+
+        log("Verify there can be no duplicate import aliases for different fields in a sample type (case-insensitive). ");
+        fieldsPanel.addField(fieldOne).setImportAliases(sharedAlias);
+        fieldsPanel.addField(fieldTwo).setImportAliases(sharedAlias);
+
+        checker().verifyThat("Expected an error when two fields share an import alias",
+                String.join("\n", createPage.clickSaveExpectingErrors()),
+                containsString("You have 2 field errors."));
+        checker().screenShotIfNewError("duplicateImportAlias");
+
+        log("Aliases differing only by case are still duplicates.");
+        createPage = new CreateSampleTypePage(this.getDriver());
+        fieldsPanel.getField(fieldTwo).setImportAliases(sharedAlias.toUpperCase());
+        checker().verifyThat("Expected an error when two fields share an import alias differing only by case",
+                String.join("\n", createPage.clickSaveExpectingErrors()),
+                containsString("You have 2 field errors."));
+        checker().screenShotIfNewError("duplicateImportAliasIgnoringCase");
+
+        log("Verify there can be no import aliases that collide with field names (case-insensitive).");
+        createPage = new CreateSampleTypePage(this.getDriver());
+        fieldsPanel.getField(fieldTwo).setImportAliases("");
+        fieldsPanel.getField(fieldOne).setImportAliases(fieldTwo);
+        checker().verifyThat("Expected an error when an import alias matches another field's name",
+                String.join("\n", createPage.clickSaveExpectingErrors()),
+                containsString("Import alias '" + fieldTwo + "' on field '" + fieldOne + "' conflicts with a field name."));
+        checker().screenShotIfNewError("importAliasConflictsWithFieldName");
+
+        log("An alias that matches a field name except for case is still a conflict.");
+        createPage = new CreateSampleTypePage(this.getDriver());
+        fieldsPanel.getField(fieldOne).setImportAliases(fieldTwo.toLowerCase());
+        checker().verifyThat("Expected an error when an import alias matches another field's name except for case",
+                String.join("\n", createPage.clickSaveExpectingErrors()),
+                containsString("Import alias '" + fieldTwo.toLowerCase() + "' on field '" + fieldOne + "' conflicts with a field name."));
+        checker().screenShotIfNewError("importAliasConflictsWithFieldNameIgnoringCase");
+
+        log("An alias that repeats its own field's name is redundant but not ambiguous, so it should be allowed.");
+        fieldsPanel.getField(fieldOne).setImportAliases(fieldOne);
+        createPage.clickSave();
+
+        clickProject(PROJECT_NAME);
+        UpdateSampleTypePage updatePage = sampleHelper.goToEditSampleType(sampleTypeName);
+        checker().verifyEquals("Import alias matching its own field name was not saved",
+                fieldOne, updatePage.getFieldsPanel().getField(fieldOne).getImportAliases());
+        checker().screenShotIfNewError("selfReferencingImportAlias");
+        updatePage.clickCancel();
+    }
+
+    // Issue 47280: LKSM: Trailing/Leading whitespace in Source name won't resolve when deriving samples
     @Test
     public void testImportSamplesWithTrailingSpace() throws IOException, CommandException
     {
