@@ -260,18 +260,14 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
      */
     public List<String> getButtonText()
     {
-        List<String> buttonText = new ArrayList<>();
-        for (WebElement button : BootstrapLocators.button().findElements(this))
-        {
-            String cssClass = button.getAttribute("class");
-            if (cssClass == null || !cssClass.contains("dropdown-toggle"))
-            {
-                String text = button.getText().trim();
-                if (!text.isEmpty())
-                    buttonText.add(text);
-            }
-        }
-        return buttonText;
+        return BootstrapLocators.button().findElements(this).stream()
+                .filter(button -> {
+                    String cssClass = button.getAttribute("class");
+                    return cssClass == null || !cssClass.contains("dropdown-toggle");
+                })
+                .map(button -> button.getText().trim())
+                .filter(text -> !text.isEmpty())
+                .toList();
     }
 
     public List<String> getMenuText(String buttonText)
