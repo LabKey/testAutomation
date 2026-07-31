@@ -95,12 +95,13 @@ public class DetailTable extends WebDriverComponent<DetailTable.ElementCache>
     private WebElement getField(CharSequence identifier)
     {
         FieldReferenceManager.FieldReference fieldReference = elementCache().getFieldManager().findFieldReferenceOrNull(identifier);
-        if (fieldReference != null && fieldReference.getElement().isDisplayed())
+        if (fieldReference != null)
         {
             return fieldReference.getElement();
         }
         else if (elementCache().siblingField(identifier).isDisplayed())
         {
+            // Track down where/if this is still needed
             TestLogger.info("sibling field " + identifier + " found");
             return elementCache().siblingField(identifier);
         }
