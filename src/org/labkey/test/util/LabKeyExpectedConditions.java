@@ -33,7 +33,6 @@ import org.openqa.selenium.support.ui.Wait;
 
 import java.util.Collections;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -257,6 +256,11 @@ public class LabKeyExpectedConditions
         };
     }
 
+    static <T> boolean isSuccessResult(T result)
+    {
+        return result != null && !Boolean.FALSE.equals(result);
+    }
+
     /**
      * Wraps a 'Wait' to terminate after function return a non-null value.
      * Normally, 'Wait' expects a non-null, non-false return value
@@ -295,15 +299,15 @@ public class LabKeyExpectedConditions
     {
         return new Function<>()
         {
-            private final AtomicBoolean firstCheck = new AtomicBoolean(false);
-
             @Override
             public V apply(T driver)
             {
-                if (!firstCheck.getAndSet(true))
+                V value = isTrue.apply(driver);
+                if (!isSuccessResult(value))
+                {
                     action.accept(driver);
-
-                return isTrue.apply(driver);
+                }
+                return value;
             }
 
             @Override
