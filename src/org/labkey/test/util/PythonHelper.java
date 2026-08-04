@@ -82,7 +82,7 @@ public class PythonHelper
         ConfigureReportsAndScriptsPage scripts = ConfigureReportsAndScriptsPage.beginAt(_test);
 
         String defaultScriptName = "Python Scripting Engine";
-        if (scripts.isEnginePresent("Python"))
+        if (scripts.isEnginePresent(defaultScriptName))
         {
             TestLogger.log("Python engine already configured");
             if (!TestProperties.isTestRunningOnTeamCity())
@@ -99,6 +99,7 @@ public class PythonHelper
         String pythonVersion = getPythonVersion(getPythonExecutable());
 
         ConfigureReportsAndScriptsPage.EngineConfig config = new ConfigureReportsAndScriptsPage.EngineConfig(getPythonExecutable());
+        config.setName(defaultScriptName);
         config.setLanguage("Python");
         config.setExtensions("py");
         config.setVersion(pythonVersion);
