@@ -5,7 +5,7 @@ plugins {
     id 'maven-publish'
 }
 
-import org.labkey.gradle.task.RunTestSuite
+
 import org.labkey.gradle.task.RunUiTest
 import org.labkey.gradle.util.BuildUtils
 import org.labkey.gradle.util.GroupNames
@@ -52,6 +52,7 @@ project.dependencies {
     api "com.github.lookfirst:sardine:${project.lookfirstSardineVersion}"
     implementation "javax.xml.bind:jaxb-api:${jaxbApiOldVersion}"
     implementation "org.glassfish.jaxb:jaxb-runtime:${jaxbOldVersion}"
+    implementation "org.glassfish.jersey.media:jersey-media-multipart:${jerseyVersion}"
     api "commons-beanutils:commons-beanutils:${commonsBeanutilsVersion}"
     implementation "org.apache.tika:tika-core:${tikaVersion}"
     implementation "org.apache.commons:commons-compress:${commonsCompressVersion}"
