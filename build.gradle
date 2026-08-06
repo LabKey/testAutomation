@@ -25,20 +25,18 @@ project.dependencies {
     api("org.seleniumhq.selenium:selenium-api:${seleniumVersion}")
     api("org.assertj:assertj-core:${assertjVersion}")
     implementation("org.awaitility:awaitility:${awaitilityVersion}")
-    implementation("commons-io:commons-io:${commonsIoVersion}")
+    implementation("commons-io:commons-io:${commonsIoVersion}") // Dependency of poi, tika, and commons-compress
     implementation("com.fasterxml.jackson.core:jackson-annotations:${jacksonAnnotationsVersion}")
     implementation("org.bouncycastle:bcprov-jdk18on:${bouncycastleVersion}")
     implementation("org.apache.commons:commons-csv:${apacheCommonsCsvVersion}")
 
-    //api "org.seleniumhq.selenium:selenium-server:${seleniumVersion}"
     implementation("org.seleniumhq.selenium:selenium-firefox-driver:${seleniumVersion}")
     api("org.seleniumhq.selenium:selenium-support:${seleniumVersion}")
     implementation("org.seleniumhq.selenium:selenium-remote-driver:${seleniumVersion}")
     implementation("org.seleniumhq.selenium:selenium-chrome-driver:${seleniumVersion}")
     implementation "org.seleniumhq.selenium:selenium-ie-driver:${seleniumVersion}"
-    implementation("org.eclipse.jetty:jetty-util:${jettyVersion}")
 
-    implementation("com.google.guava:guava:${guavaVersion}")
+    implementation("com.google.guava:guava:${guavaVersion}") // Dependency of mockserver
     api("org.apache.httpcomponents.core5:httpcore5:${httpcore5Version}")
     api("org.apache.httpcomponents.client5:httpclient5:${httpclient5Version}")
     api("org.hamcrest:hamcrest:${hamcrestVersion}")
@@ -50,8 +48,8 @@ project.dependencies {
     implementation "org.apache.logging.log4j:log4j-core:${log4j2Version}"
     implementation "org.apache.logging.log4j:log4j-iostreams:${log4j2Version}"
     api "com.github.lookfirst:sardine:${project.lookfirstSardineVersion}"
-    implementation "javax.xml.bind:jaxb-api:${jaxbApiOldVersion}"
-    implementation "org.glassfish.jaxb:jaxb-runtime:${jaxbOldVersion}"
+//    implementation "javax.xml.bind:jaxb-api:${jaxbApiOldVersion}"
+//    implementation "org.glassfish.jaxb:jaxb-runtime:${jaxbOldVersion}"
     implementation "org.glassfish.jersey.media:jersey-media-multipart:${jerseyVersion}"
     api "commons-beanutils:commons-beanutils:${commonsBeanutilsVersion}"
     implementation "org.apache.tika:tika-core:${tikaVersion}"
