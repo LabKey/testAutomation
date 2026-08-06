@@ -187,6 +187,11 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
         return elementCache().searchInput;
     }
 
+    public boolean isSearchIconPresent()
+    {
+        return elementCache().searchToggle.isDisplayed();
+    }
+
     public AdminMenu adminMenu()
     {
         return elementCache().adminMenu;
