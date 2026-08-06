@@ -20,6 +20,7 @@ import org.junit.Assume;
 import org.junit.Test;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.pages.test.TestReauthPage;
 
 import java.util.Arrays;
@@ -122,12 +123,17 @@ public abstract class AbstractReauthTest extends BaseWebDriverTest
         signOut();
         clickSignIn();
         authenticate(user.email, user.password);
+        // An IdP's SAML POST-binding page auto-submits to LabKey, so the browser can still be on the IdP
+        // origin here. getCurrentUser() copies only the cookies visible to the current URL, which excludes
+        // LabKey's session cookie, so wait for the browser to land back on LabKey before checking the user.
+        waitFor(() -> getDriver().getCurrentUrl().startsWith(WebTestHelper.getBaseURL()),
+            "Browser didn't return to LabKey after authenticating", WAIT_FOR_PAGE);
         assertSignedInAs(user);
     }
 
     private void assertSignedInAs(User user)
     {
-        if (!waitFor(() -> getCurrentUser().equals(user.email), 1_000))
+        if (!waitFor(() -> getCurrentUser().equals(user.email), WAIT_FOR_PAGE))
             assertEquals("Signed in as", user.email, getCurrentUser());
     }
 

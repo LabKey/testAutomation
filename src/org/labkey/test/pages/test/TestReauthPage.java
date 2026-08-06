@@ -23,6 +23,7 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.Map;
 import java.util.Optional;
@@ -56,7 +57,16 @@ public class TestReauthPage extends LabKeyPage<TestReauthPage.ElementCache>
 
     public void clickReauth()
     {
-        clickAndWait(elementCache().reauthLink);
+        WebElement link = elementCache().reauthLink;
+
+        shortWait().until(
+                ExpectedConditions.attributeContains(
+                        link,
+                        "href",
+                        "returnUrl"
+                )
+        );
+        clickAndWait(link);
         clearCache();
     }
 
