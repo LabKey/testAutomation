@@ -52,7 +52,7 @@ public class CalculatedColumnAssistantDialog extends ModalDialog
     public CalculatedColumnAssistantDialog submitPrompt()
     {
         int previousCount = getAssistantResponses().size();
-        elementCache().promptSubmitButton.click();
+        clickSubmitWithoutWaiting();
         waitForThinkingSpinnerToDisappear();
         WebDriverWrapper.waitFor(() -> getAssistantResponses().size() > previousCount,
                 "No new assistant response appeared in chat history.", 10_000);
@@ -61,7 +61,8 @@ public class CalculatedColumnAssistantDialog extends ModalDialog
 
     private void waitForThinkingSpinnerToDisappear()
     {
-        WebDriverWrapper.waitFor(() -> !Locators.thinkingSpinner.existsIn(this), 60_000);
+        WebDriverWrapper.waitFor(() -> !Locators.thinkingSpinner.existsIn(this) &&
+                Locators.submitIcon.existsIn(elementCache().promptSubmitButton), 60_000);
     }
 
     /**
@@ -175,7 +176,7 @@ public class CalculatedColumnAssistantDialog extends ModalDialog
      */
     public void clickStop()
     {
-        Locators.stopButton.findElement(this).click();
+        Locators.stopIcon.findElement(elementCache().promptSubmitButton).click();
     }
 
     /**
@@ -184,7 +185,7 @@ public class CalculatedColumnAssistantDialog extends ModalDialog
      */
     public void clickSubmitWithoutWaiting()
     {
-        elementCache().promptSubmitButton.click();
+        Locators.submitIcon.findElement(elementCache().promptSubmitButton).click();
     }
 
     private WebElement lastAssistantResponseElement()
@@ -230,8 +231,9 @@ public class CalculatedColumnAssistantDialog extends ModalDialog
                 .withDescendant(Locator.tagWithClass("button", "clickable-text"))
                         .descendant(Locator.tag("code"));
 
-        public static final Locator.XPathLocator stopButton = Locator.tagWithClass("button", "prompt-button")
-                .withDescendant(Locator.tagWithClass("i", "fa-stop"));
+        public static final Locator.XPathLocator stopIcon = Locator.byClass("fa-stop");
+
+        public static final Locator.XPathLocator submitIcon = Locator.byClass("fa-arrow-up");
     }
 
     protected class ElementCache extends ModalDialog.ElementCache
