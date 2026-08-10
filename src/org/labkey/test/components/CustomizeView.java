@@ -31,7 +31,6 @@ import org.labkey.test.components.ext4.Window;
 import org.labkey.test.params.FieldKey;
 import org.labkey.test.selenium.RefindingWebElement;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
@@ -45,9 +44,14 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.labkey.test.components.ext4.Checkbox.Ext4Checkbox;
 import static org.labkey.test.components.ext4.RadioButton.RadioButton;
@@ -336,18 +340,16 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
         Sort
     }
 
-    private String encodeFieldKeyPart(String fieldKeyPart)
+    // match Ext.htmlEncode (https://cdn.sencha.com/ext/gpl/4.2.1/docs/#!/api/Ext-method-htmlEncode)
+    private static final Map<String, String> extHtmlEncode = Stream.of("&", "<", ">", "'",  "\"")
+            .collect(Collectors.toMap(c -> c, c -> URLEncoder.encode(c, StandardCharsets.UTF_8)));
+    private static String extHtmlEncode(String fieldKeyPart)
     {
-        String _fieldKeyPart = EscapeUtil.encodeUriPath(fieldKeyPart);
-        if (_fieldKeyPart != null)
+        for (Map.Entry<String, String> entry : extHtmlEncode.entrySet())
         {
-            // Jetty encodes # ? ; ' but we want to preserve these characters in paths
-            _fieldKeyPart = _fieldKeyPart.replaceAll("%23", "#");
-            _fieldKeyPart = _fieldKeyPart.replaceAll("%3F", "?");
-            _fieldKeyPart = _fieldKeyPart.replaceAll("%3B", ";");
-            _fieldKeyPart = _fieldKeyPart.replaceAll("%27", "'");
+            fieldKeyPart = fieldKeyPart.replace(entry.getKey(), entry.getValue());
         }
-        return _fieldKeyPart;
+        return fieldKeyPart;
     }
 
     /**
@@ -358,7 +360,7 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
     {
         Iterator<FieldKey> fieldKeyIterator = Objects.requireNonNull(FieldKey.fromFieldKey(fieldKey), "Invalid fieldKey: " + fieldKey).getIterator();
         FieldKey currentFieldKey = fieldKeyIterator.next();
-        String dataRecordId = encodeFieldKeyPart(currentFieldKey.toString().toUpperCase());
+        String dataRecordId = extHtmlEncode(currentFieldKey.toString().toUpperCase());
 
         while (fieldKeyIterator.hasNext())
         {
@@ -375,7 +377,7 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
             WebDriverWrapper.waitFor(() -> Locator.css("tr[data-recordid] + tr:not(.x4-grid-row)").findElements(getComponentElement()).isEmpty(), 2000); // Spacer row appears during expansion animation
 
             currentFieldKey = fieldKeyIterator.next();
-            dataRecordId = encodeFieldKeyPart(currentFieldKey.toString().toUpperCase());
+            dataRecordId = extHtmlEncode(currentFieldKey.toString().toUpperCase());
         }
 
         return Locator.tag("tr").withClass("x4-grid-data-row").withAttribute("data-recordid", dataRecordId).findElement(getComponentElement());
