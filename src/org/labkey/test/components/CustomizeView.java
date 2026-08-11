@@ -44,14 +44,9 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static org.labkey.test.components.ext4.Checkbox.Ext4Checkbox;
 import static org.labkey.test.components.ext4.RadioButton.RadioButton;
@@ -340,16 +335,9 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
         Sort
     }
 
-    // match Ext.htmlEncode (https://cdn.sencha.com/ext/gpl/4.2.1/docs/#!/api/Ext-method-htmlEncode)
-    private static final Map<String, String> extHtmlEncode = Stream.of("&", "<", ">", "'",  "\"")
-            .collect(Collectors.toMap(c -> c, c -> URLEncoder.encode(c, StandardCharsets.UTF_8)));
-    private static String extHtmlEncode(String fieldKeyPart)
+    private String extHtmlEncode(String fieldKeyPart)
     {
-        for (Map.Entry<String, String> entry : extHtmlEncode.entrySet())
-        {
-            fieldKeyPart = fieldKeyPart.replace(entry.getKey(), entry.getValue());
-        }
-        return fieldKeyPart;
+        return getWrapper().executeScript("return encodeURI(arguments[0]);", String.class, fieldKeyPart);
     }
 
     /**
