@@ -335,7 +335,10 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
         Sort
     }
 
-    private String extHtmlEncode(String fieldKeyPart)
+    /**
+     * Match encoding from FieldMetaStore.js
+     */
+    private String encodeURI(String fieldKeyPart)
     {
         return getWrapper().executeScript("return encodeURI(arguments[0]);", String.class, fieldKeyPart);
     }
@@ -348,7 +351,7 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
     {
         Iterator<FieldKey> fieldKeyIterator = Objects.requireNonNull(FieldKey.fromFieldKey(fieldKey), "Invalid fieldKey: " + fieldKey).getIterator();
         FieldKey currentFieldKey = fieldKeyIterator.next();
-        String dataRecordId = extHtmlEncode(currentFieldKey.toString().toUpperCase());
+        String dataRecordId = encodeURI(currentFieldKey.toString().toUpperCase());
 
         while (fieldKeyIterator.hasNext())
         {
@@ -365,7 +368,7 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
             WebDriverWrapper.waitFor(() -> Locator.css("tr[data-recordid] + tr:not(.x4-grid-row)").findElements(getComponentElement()).isEmpty(), 2000); // Spacer row appears during expansion animation
 
             currentFieldKey = fieldKeyIterator.next();
-            dataRecordId = extHtmlEncode(currentFieldKey.toString().toUpperCase());
+            dataRecordId = encodeURI(currentFieldKey.toString().toUpperCase());
         }
 
         return Locator.tag("tr").withClass("x4-grid-data-row").withAttribute("data-recordid", dataRecordId).findElement(getComponentElement());
