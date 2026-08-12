@@ -104,4 +104,13 @@ public abstract class Log4jUtils
     {
         driver.beginAt(WebTestHelper.buildURL("admin", "showPrimaryLogSinceMark"));
     }
+
+    /** The primary log since the last {@link #resetLogMark()}, for tests that assert on what the server logged. */
+    @LogMethod(quiet = true)
+    public static String getLogSinceMark(WebDriverWrapper driver) throws IOException
+    {
+        SimpleHttpRequest request = new SimpleHttpRequest(WebTestHelper.buildURL("admin", "showPrimaryLogSinceMark"));
+        request.copySession(driver.getDriver());
+        return request.getResponse().getResponseBody();
+    }
 }
