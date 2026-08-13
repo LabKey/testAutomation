@@ -52,7 +52,7 @@ public class CalculatedColumnAssistantDialog extends ModalDialog
     public CalculatedColumnAssistantDialog submitPrompt()
     {
         int previousCount = getAssistantResponses().size();
-        elementCache().promptSubmitButton.click();
+        clickSubmitWithoutWaiting();
         waitForThinkingSpinnerToDisappear();
         WebDriverWrapper.waitFor(() -> getAssistantResponses().size() > previousCount,
                 "No new assistant response appeared in chat history.", 10_000);
@@ -61,7 +61,8 @@ public class CalculatedColumnAssistantDialog extends ModalDialog
 
     private void waitForThinkingSpinnerToDisappear()
     {
-        WebDriverWrapper.waitFor(() -> !Locators.thinkingSpinner.existsIn(this), 60_000);
+        WebDriverWrapper.waitFor(() -> !Locators.thinkingSpinner.existsIn(this) &&
+                Locators.submitIcon.existsIn(elementCache().promptSubmitButton), 60_000);
     }
 
     /**
@@ -175,7 +176,7 @@ public class CalculatedColumnAssistantDialog extends ModalDialog
      */
     public void clickStop()
     {
-        Locators.stopButton.findElement(this).click();
+        Locators.stopIcon.findElement(elementCache().promptSubmitButton).click();
     }
 
     /**
@@ -184,7 +185,10 @@ public class CalculatedColumnAssistantDialog extends ModalDialog
      */
     public void clickSubmitWithoutWaiting()
     {
-        elementCache().promptSubmitButton.click();
+        int previousCount = Locators.userPrompt.findElements(this).size();
+        Locators.submitIcon.findElement(elementCache().promptSubmitButton).click();
+        WebDriverWrapper.waitFor(() -> Locators.userPrompt.findElements(this).size() > previousCount,
+                "New prompt didn't appear.", 2_000);
     }
 
     private WebElement lastAssistantResponseElement()
@@ -217,9 +221,14 @@ public class CalculatedColumnAssistantDialog extends ModalDialog
 
     public static class Locators
     {
-        public static final Locator.XPathLocator assistantResponse = Locator.tagWithClass("div", "chat-item").withClass("assistant-response");
+        public static final Locator.XPathLocator chatItem = Locator.byClass("chat-item");
 
-        public static final Locator.XPathLocator pendingBubble = Locator.tagWithClass("div", "chat-item").withClass("pending");
+        public static final Locator.XPathLocator assistantResponse = chatItem
+                .withClass("assistant-response").withoutClass("pending");
+
+        public static final Locator.XPathLocator pendingBubble = chatItem.withClass("pending");
+
+        public static final Locator.XPathLocator userPrompt = chatItem.withClass("user-prompt");
 
         public static final Locator.XPathLocator thinkingSpinner = Locator.tagWithClass("i", "fa-spinner");
 
@@ -230,8 +239,9 @@ public class CalculatedColumnAssistantDialog extends ModalDialog
                 .withDescendant(Locator.tagWithClass("button", "clickable-text"))
                         .descendant(Locator.tag("code"));
 
-        public static final Locator.XPathLocator stopButton = Locator.tagWithClass("button", "prompt-button")
-                .withDescendant(Locator.tagWithClass("i", "fa-stop"));
+        public static final Locator.XPathLocator stopIcon = Locator.byClass("fa-stop");
+
+        public static final Locator.XPathLocator submitIcon = Locator.byClass("fa-arrow-up");
     }
 
     protected class ElementCache extends ModalDialog.ElementCache

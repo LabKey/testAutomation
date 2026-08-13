@@ -31,7 +31,6 @@ import org.labkey.test.components.ext4.Window;
 import org.labkey.test.params.FieldKey;
 import org.labkey.test.selenium.RefindingWebElement;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
@@ -336,18 +335,12 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
         Sort
     }
 
-    private String encodeFieldKeyPart(String fieldKeyPart)
+    /**
+     * Match encoding from FieldMetaStore.js
+     */
+    private String encodeURI(String fieldKeyPart)
     {
-        String _fieldKeyPart = EscapeUtil.encodeUriPath(fieldKeyPart);
-        if (_fieldKeyPart != null)
-        {
-            // Jetty encodes # ? ; ' but we want to preserve these characters in paths
-            _fieldKeyPart = _fieldKeyPart.replaceAll("%23", "#");
-            _fieldKeyPart = _fieldKeyPart.replaceAll("%3F", "?");
-            _fieldKeyPart = _fieldKeyPart.replaceAll("%3B", ";");
-            _fieldKeyPart = _fieldKeyPart.replaceAll("%27", "'");
-        }
-        return _fieldKeyPart;
+        return getWrapper().executeScript("return encodeURI(arguments[0]);", String.class, fieldKeyPart);
     }
 
     /**
@@ -358,7 +351,7 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
     {
         Iterator<FieldKey> fieldKeyIterator = Objects.requireNonNull(FieldKey.fromFieldKey(fieldKey), "Invalid fieldKey: " + fieldKey).getIterator();
         FieldKey currentFieldKey = fieldKeyIterator.next();
-        String dataRecordId = encodeFieldKeyPart(currentFieldKey.toString().toUpperCase());
+        String dataRecordId = encodeURI(currentFieldKey.toString().toUpperCase());
 
         while (fieldKeyIterator.hasNext())
         {
@@ -375,7 +368,7 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
             WebDriverWrapper.waitFor(() -> Locator.css("tr[data-recordid] + tr:not(.x4-grid-row)").findElements(getComponentElement()).isEmpty(), 2000); // Spacer row appears during expansion animation
 
             currentFieldKey = fieldKeyIterator.next();
-            dataRecordId = encodeFieldKeyPart(currentFieldKey.toString().toUpperCase());
+            dataRecordId = encodeURI(currentFieldKey.toString().toUpperCase());
         }
 
         return Locator.tag("tr").withClass("x4-grid-data-row").withAttribute("data-recordid", dataRecordId).findElement(getComponentElement());
