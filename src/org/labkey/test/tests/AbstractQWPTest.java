@@ -20,6 +20,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.util.search.SearchAdminAPIHelper;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -59,6 +60,10 @@ public abstract class AbstractQWPTest extends BaseWebDriverTest
         waitForElement(Locator.css("span.labkey-wp-title-text").withText(QWP_SCHEMA_LISTING.getLeft()));
 
         getTabSignalsPairs().stream().forEach(this::testQWPTab);
+
+        // Indexing 'sampleDataTest5k' holds locks that deadlock with the DROP TABLE, so let it finish first
+        sleep(2_000);
+        SearchAdminAPIHelper.waitForIndexer();
 
         log("Drop QWPDemo test data");
         beginAt(WebTestHelper.buildURL("simpletest", getProjectName(), "QWPDemo"));
