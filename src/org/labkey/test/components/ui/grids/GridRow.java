@@ -126,6 +126,18 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
     }
 
     /**
+     * gets the color of the swatch rendered in the specified cell, for example a sample color or a sample type's
+     * label color
+     * @return A string such as "rgb(104, 204, 202)", or an empty string if the cell has no color swatch
+     */
+    public String getCellColor(CharSequence columnIdentifier)
+    {
+        WebElement icon = Locator.tagWithClassContaining("i", "color-icon__circle")
+                .findElementOrNull(getCell(columnIdentifier));
+        return icon == null ? "" : icon.getCssValue("background-color");
+    }
+
+    /**
      * Returns true if the row contains all of the specified column/value pairs
      * @param partialMap Map of key (column) value (text)
      */

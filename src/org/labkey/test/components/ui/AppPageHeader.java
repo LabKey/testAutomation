@@ -107,6 +107,14 @@ public class AppPageHeader extends WebDriverComponent<AppPageHeader.ElementCache
         throw new UnsupportedOperationException("Label color is not supported by AppPageHeader.");
     }
 
+    /**
+     * @throws UnsupportedOperationException Sample color is not supported by AppPageHeader.
+     */
+    public String getSampleColor()
+    {
+        throw new UnsupportedOperationException("Sample color is not supported by AppPageHeader.");
+    }
+
     @Override
     protected ElementCache newElementCache()
     {
