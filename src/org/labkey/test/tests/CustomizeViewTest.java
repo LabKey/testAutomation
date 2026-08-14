@@ -35,6 +35,7 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.SummaryStatisticsHelper;
 import org.labkey.test.util.TestDataGenerator;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -75,6 +76,12 @@ public class CustomizeViewTest extends BaseWebDriverTest
                     { "7", "Yak", "Yakson", "88", "" },
             };
 
+    // GitHub Issue 1219: a deliberately wide list used to verify that summary statistics save action
+    private final static String WIDE_LIST_NAME = "WideListTest";
+    private final static String WIDE_LIST_KEY_COLUMN = "Key";
+    private final static int WIDE_LIST_COLUMN_COUNT = 160;
+    private final static String WIDE_STAT_COLUMN = "Field001";
+
     private SummaryStatisticsHelper _summaryStatisticsHelper;
 
     @Override
@@ -94,6 +101,7 @@ public class CustomizeViewTest extends BaseWebDriverTest
     {
         _containerHelper.createProject(PROJECT_NAME, null);
         createList();
+        createWideList();
     }
 
     @Before
@@ -232,6 +240,21 @@ public class CustomizeViewTest extends BaseWebDriverTest
         assertThat(drt.getColumnLabels(), hasItem("Last Name"));
         drt.removeColumn(FieldKey.fromParts(LAST_NAME_COLUMN).toString(), true);
         assertThat(drt.getColumnLabels(), hasItem("Last Name"));
+    }
+
+    // GitHub Issue 1219: Adding a summary statistic must work on very wide datasets
+    @Test
+    public void testSummaryStatisticsOnWideDataset()
+    {
+        GridPage.beginAt(this, PROJECT_NAME, WIDE_LIST_NAME);
+        DataRegionTable drt = new DataRegionTable("query", getDriver());
+
+        log("Set summary statistic on a wide (" + WIDE_LIST_COLUMN_COUNT + "-column) dataset");
+        drt.setSummaryStatistic(WIDE_STAT_COLUMN, SummaryStatisticsHelper.BASE_STAT_SUM, "60");
+        assertTrue("Summary statistic row didn't appear; the saveQueryViews request likely exceeded the server JSON input limit (Issue 1219)",
+                drt.hasSummaryStatisticRow());
+        String summaryStatStr = SummaryStatisticsHelper.BASE_STAT_SUM + ": 60";
+        assertEquals("Wrong summary statistics", summaryStatStr, _summaryStatisticsHelper.getSummaryStatisticFooterAsString(drt, WIDE_STAT_COLUMN));
     }
 
     @Test
@@ -397,6 +420,24 @@ public class CustomizeViewTest extends BaseWebDriverTest
                     LIST_COLUMNS.get(2).getName(), rowData[3],
                     LIST_COLUMNS.get(3).getName(), rowData[4]));
         }
+
+        testDataGenerator.insertRows(createDefaultConnection());
+    }
+
+    // GitHub Issue 1219: create a wide list
+    private void createWideList() throws Exception
+    {
+        List<FieldDefinition> fields = new ArrayList<>();
+        for (int i = 1; i <= WIDE_LIST_COLUMN_COUNT; i++)
+            fields.add(new FieldDefinition(String.format("Field%03d", i), ColumnType.Integer));
+
+        ListDefinition listDefinition = new IntListDefinition(WIDE_LIST_NAME, WIDE_LIST_KEY_COLUMN).setFields(fields);
+        TestDataGenerator testDataGenerator = listDefinition.create(createDefaultConnection(), PROJECT_NAME);
+
+        // Only the key and the column under test need values; the remaining columns stay null. Sum == 60.
+        testDataGenerator.addCustomRow(Map.of(WIDE_LIST_KEY_COLUMN, "1", WIDE_STAT_COLUMN, "10"));
+        testDataGenerator.addCustomRow(Map.of(WIDE_LIST_KEY_COLUMN, "2", WIDE_STAT_COLUMN, "20"));
+        testDataGenerator.addCustomRow(Map.of(WIDE_LIST_KEY_COLUMN, "3", WIDE_STAT_COLUMN, "30"));
 
         testDataGenerator.insertRows(createDefaultConnection());
     }
