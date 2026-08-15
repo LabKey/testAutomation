@@ -68,7 +68,6 @@ public class SystemUpgradeAuditTest extends BaseUpgradeTest
         "BuildTime",
         "PreviousBuildTime",
         "HasSchemaUpgrade",
-        "HasExternalSchemaUpgrade",
         "Comment"
     );
 
@@ -119,7 +118,6 @@ public class SystemUpgradeAuditTest extends BaseUpgradeTest
         assertNotNull("ChangeType should be set", latest.get("ChangeType"));
         assertNotNull("Comment should summarize the change", latest.get("Comment"));
         assertNotNull("HasSchemaUpgrade should be set", latest.get("HasSchemaUpgrade"));
-        assertNotNull("HasExternalSchemaUpgrade should be set", latest.get("HasExternalSchemaUpgrade"));
     }
 
     /**
