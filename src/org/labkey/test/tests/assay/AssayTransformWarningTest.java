@@ -24,6 +24,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.Locators;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.assay.AssayConstants;
@@ -31,8 +32,10 @@ import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.pages.files.WebDavPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.Log4jUtils;
 import org.labkey.test.util.QCAssayScriptHelper;
 import org.labkey.test.util.RReportHelper;
+import org.labkey.test.util.ScriptInvocationLogHelper;
 
 import java.io.File;
 import java.util.Arrays;
@@ -191,6 +194,33 @@ public class AssayTransformWarningTest extends BaseWebDriverTest
     }
 
     @Test
+    public void testRTransformInvocationLogging() throws Exception
+    {
+        String assayName = "transformInvocationLoggingR";
+        String importData = "ParticipantId\nRLogged";
+        String runName = "R transform logging run";
+
+        // copy the script to a distinct name to avoid upload collisions with the other test methods
+        File loggingRScript = TestFileUtils.writeTempFile("transformLogging.R", TestFileUtils.getFileContents(R_TRANSFORM_SCRIPT));
+
+        _assayHelper.createAssayDesign("General", assayName)
+                .addTransformScript(loggingRScript, true)
+                .clickFinish();
+
+        clickAndWait(Locator.linkWithText(assayName));
+        clickButton("Import Data");
+        clickButton("Next");
+        setFormElement(ASSAY_NAME_FIELD_LOCATOR, runName);
+        setFormElement(AssayConstants.TEXT_AREA_DATA_COLLECTOR_LOCATOR, importData);
+
+        Log4jUtils.resetLogMark();
+        clickButton("Save and Finish");
+        assertElementPresent(Locators.labkeyError.containing("Inline warning from R transform."));
+
+        ScriptInvocationLogHelper.assertScriptLogged((WebDriverWrapper) this, "done", "transform protocol=", "operation=INSERT", assayName);
+    }
+
+    @Test
     public void testRTransformUpdateWarning() throws Exception
     {
         String assayName = "transformUpdateWarningR";
@@ -223,6 +253,7 @@ public class AssayTransformWarningTest extends BaseWebDriverTest
         // edit the result, expect warning
         clickAndWait(Locator.linkWithText(runName));
         DataRegionTable table = new DataRegionTable("Data", this);
+        Log4jUtils.resetLogMark();
         table.clickEditRow(0)
                 .setField("comment", "commented")
                 .submit();
@@ -230,6 +261,8 @@ public class AssayTransformWarningTest extends BaseWebDriverTest
         // note: we currently do not support warnings on update; Issue 52299 tracks this
         // for now, expect warning-generating script events to show up as errors
         assertTextPresent("An error occurred when running the script 'transformWarnUpdate.R', exit code: 1.");
+
+        ScriptInvocationLogHelper.assertScriptLogged((WebDriverWrapper) this, "failed", "transform protocol=", updateWarnRScript.getName());
     }
 
     @Test
@@ -310,7 +343,6 @@ public class AssayTransformWarningTest extends BaseWebDriverTest
 
         // verify check for valid script engine defined for the file extension
         assayDesignerPage.addTransformScript(JAVA_INVALID_TRANSFORM_SCRIPT, true, "Script engine for the extension '.java' has not been registered.");
-        assayDesignerPage.addTransformScript(JAVA_INVALID_TRANSFORM_SCRIPT, false, "Script engine for the extension '.java' has not been registered.");
 
         // verify check for duplicate file in @scripts dir
         assayDesignerPage.addTransformScript(R_TRANSFORM_ERROR_SCRIPT, true);

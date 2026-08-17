@@ -17,6 +17,7 @@ package org.labkey.test.tests.assay;
 
 import org.junit.BeforeClass;
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.util.Python3Helper;
 import org.labkey.test.util.RReportHelper;
 
 import java.util.Collections;
@@ -38,6 +39,7 @@ public abstract class AbstractAssayTransformTest extends BaseWebDriverTest
     protected void doSetup()
     {
         new RReportHelper(this).ensureRConfig();
+        new Python3Helper(this).ensurePythonConfig();
         _containerHelper.createProject(getProjectName(), "Assay");
     }
 

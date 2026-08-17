@@ -422,6 +422,41 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
         return elementCache().input.getAttribute("name");
     }
 
+    /**
+     * Determines whether the "Add New" menu footer is present at the bottom of the select's menu area. This item is
+     * rendered only when the underlying schema/query is registered and configured to support adding new values.
+     *
+     * @return true if the "Add New" menu item is visible, otherwise false
+     */
+    public boolean isAddNewVisible()
+    {
+        open();
+        return Locators.addEntitiesFooter.isDisplayed(this);
+    }
+
+    /**
+     * Clicks the "Add New" menu item at the bottom of the select's menu area. The menu is opened first if it is not
+     * already expanded. This intentionally returns void: the resulting UI varies by schema/query, so the caller is
+     * responsible for constructing and interacting with whatever the click produces.
+     */
+    public void clickAddNew()
+    {
+        open();
+
+        try
+        {
+            Locators.addEntitiesFooter.findElement(this).click();
+        }
+        catch (WebDriverException e)
+        {
+            // ReactSelect is notoriously bad at positioning the menu so that it does not render off the screen.
+            // That said, it can behave better if you close and reopen the menu.
+            close();
+            open();
+            Locators.addEntitiesFooter.findElement(this).click();
+        }
+    }
+
     protected T scrollIntoView()
     {
         try
@@ -515,6 +550,7 @@ public abstract class BaseReactSelect<T extends BaseReactSelect<T>> extends WebD
         }
 
         public static final Locator.XPathLocator option = Locator.tagWithClass("div", "select-input__option");
+        public static final Locator.XPathLocator addEntitiesFooter = Locator.tagWithClass("div", "add-entities-footer");
         public static final Locator placeholder = Locator.tagWithClass("div", "select-input__placeholder");
         public static final Locator clear = Locator.tagWithClass("div","select-input__clear-indicator");
         public static final Locator arrow = Locator.tagWithClass("div","select-input__dropdown-indicator");

@@ -16,6 +16,7 @@
 package org.labkey.test.util;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
@@ -248,7 +249,7 @@ public class ApiPermissionsHelper extends PermissionsHelper
         return id;
     }
 
-    public Integer getUserId(String user)
+    public Integer getUserId(@Nullable String user)
     {
         try
         {
@@ -291,12 +292,12 @@ public class ApiPermissionsHelper extends PermissionsHelper
         return (List)response.getParsedData().get("groupMembers");
     }
 
-    private List<Map<String, Object>> getUserGroups(String container, String user) throws CommandException
+    private List<Map<String, Object>> getUserGroups(String container, @Nullable String user) throws CommandException
     {
         return getUserPerms(container, user).getProperty("container.groups");
     }
 
-    public List<String> getUserRoles(String container, String user)
+    public List<String> getUserRoles(String container, @Nullable String user)
     {
         try
         {
@@ -308,7 +309,20 @@ public class ApiPermissionsHelper extends PermissionsHelper
         }
     }
 
-    private CommandResponse getUserPerms(String container, String user) throws CommandException
+    public List<String> getUserPermissions(String container, @Nullable String user)
+    {
+        try
+        {
+            return getUserPerms(container, user).getProperty("container.effectivePermissions");
+        }
+        catch (CommandException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
+    // Pass null for current user
+    private CommandResponse getUserPerms(String container, @Nullable String user) throws CommandException
     {
         Connection connection = getConnection();
         SimpleGetCommand command = new SimpleGetCommand("security", "getUserPerms");
@@ -658,12 +672,12 @@ public class ApiPermissionsHelper extends PermissionsHelper
     }
 
     @Override
-    public void removeUserFromGroup(String groupName, String userName)
+    public void removeUserFromGroup(String groupName, String userName, String projectPath)
     {
         Integer groupId = getGroupId(groupName);
         if (groupId == null)
             throw new IllegalArgumentException("Attempting to remove members from non-existent site group: " + groupName);
-        removeMembersFromGroup(groupId, userName);
+        removeMembersFromGroup(groupId, projectPath, userName);
     }
 
     @Override
@@ -672,10 +686,10 @@ public class ApiPermissionsHelper extends PermissionsHelper
         Integer groupId = getSiteGroupId(groupName);
         if (groupId == null)
             throw new IllegalArgumentException("Attempting to remove members from non-existent group: " + groupName);
-        removeMembersFromGroup(groupId, userName);
+        removeMembersFromGroup(groupId, "/", userName);
     }
 
-    private void removeMembersFromGroup(Integer groupId, String... members)
+    private void removeMembersFromGroup(Integer groupId, String projectPath, String... members)
     {
         BulkUpdateGroupCommand command = new BulkUpdateGroupCommand(groupId);
         command.setCreateGroup(false);
@@ -685,7 +699,7 @@ public class ApiPermissionsHelper extends PermissionsHelper
         try
         {
             Connection connection = getConnection();
-            command.execute(connection, "/");
+            command.execute(connection, projectPath);
         }
         catch (IOException | CommandException e)
         {

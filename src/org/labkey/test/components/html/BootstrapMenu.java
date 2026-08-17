@@ -29,10 +29,20 @@ import java.util.List;
 public class BootstrapMenu extends BaseBootstrapMenu
 {
     /* componentElement should contain the toggle anchor *and* the UL containing list items */
+    public BootstrapMenu(WebElement componentElement, WebDriver driver)
+    {
+        super(componentElement, driver);
+    }
+
+    /**
+     * @deprecated Non-standard parameter order
+     */
+    @Deprecated (since = "26.8")
     public BootstrapMenu(WebDriver driver, WebElement componentElement)
     {
         super(componentElement, driver);
     }
+
 
     static public BootstrapMenuFinder finder(WebDriver driver)
     {

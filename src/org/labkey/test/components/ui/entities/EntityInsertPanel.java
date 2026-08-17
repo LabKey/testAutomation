@@ -360,6 +360,13 @@ public class EntityInsertPanel extends WebDriverComponent<EntityInsertPanel.Elem
         return panel;
     }
 
+    public EntityInsertPanel removeFile(String fileName)
+    {
+        var panel = showFileUpload();
+        panel.fileUploadPanel().removeFile(fileName);
+        return panel;
+    }
+
     private WebElement getFileUploadTab()
     {
         return modeSelectListItem("from File")

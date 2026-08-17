@@ -789,8 +789,9 @@ public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverCompon
 
     public List<String> getGridMessages()
     {
-        return getWrapper().getTexts(Locator.tagWithClass("div", "grid-messages")
-                .child(Locator.tagWithClass("div", "grid-message")).findElements(this));
+        return getWrapper().shortWait().ignoring(StaleElementReferenceException.class)
+                .until(d -> getWrapper().getTexts(Locator.tagWithClass("div", "grid-messages")
+                        .child(Locator.tagWithClass("div", "grid-message")).findElements(this)));
     }
 
     public boolean hasGridError()

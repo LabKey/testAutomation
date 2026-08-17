@@ -37,6 +37,10 @@ public abstract class BootstrapLocators
         return button().withText(text);
     }
 
+    public static final String APP_USER_MENU_CLASS = "user-dropdown";
+    // Part of '@labkey/components/navigation/UserMenuGroup.tsx'
+    public static final Locator appUserMenu = Locator.byClass(APP_USER_MENU_CLASS);
+
     // '@labkey/components/base/Alert.tsx'
     public static final Locator infoBanner = Locator.tagWithClass("div", BannerType.INFO.getCss());
     public static final Locator successBanner = Locator.tagWithClass("div", BannerType.SUCCESS.getCss());

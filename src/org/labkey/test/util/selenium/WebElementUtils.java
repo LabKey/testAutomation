@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
 
 import static org.labkey.test.Locator.NBSP;
 
@@ -136,5 +137,47 @@ public abstract class WebElementUtils
         {
             return false;
         }
+    }
+
+    /**
+     * Convenience method to extract some attribute from a WebElement. Stale or missing elements will return a default.
+     * @param element WebElement to inspect; may be stale or backed by a missing DOM node
+     * @param mapper function applied to {@code element} to extract the desired value
+     * @param defaultValue value returned when {@code element} is stale or missing
+     * @return the mapped value, or {@code defaultValue} if the element is unavailable
+     * @param <T> type of the extracted value
+     */
+    public static <T> T tryMapElement(WebElement element, Function<WebElement, T> mapper, T defaultValue)
+    {
+        try
+        {
+            return mapper.apply(element);
+        }
+        catch (NoSuchElementException | StaleElementReferenceException _) { }
+
+        return defaultValue;
+    }
+
+    /**
+     * Convenience overload of {@link #tryMapElement(WebElement, Function, Object)} that defaults to an empty string.
+     * @param element WebElement to inspect; may be stale or backed by a missing DOM node
+     * @param mapper function applied to {@code element} to extract a String value
+     * @return the mapped value, or {@code ""} if the element is unavailable
+     */
+    public static String tryMapElement(WebElement element, Function<WebElement, String> mapper)
+    {
+        return tryMapElement(element, mapper, "");
+    }
+
+    /**
+     * Gets the visible text of each element in a list. Elements that are stale or missing return {@code null}.
+     * @param elements list of elements to inspect
+     * @return list of visible text values, with {@code null} for any unavailable element
+     * @see WebElement#getText()
+     * @see #tryMapElement(WebElement, Function, Object)
+     */
+    public static List<String> getTexts(List<WebElement> elements)
+    {
+        return elements.stream().map(el -> tryMapElement(el, WebElement::getText, null)).toList();
     }
 }
