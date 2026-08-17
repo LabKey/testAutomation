@@ -1055,7 +1055,15 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
      */
     public void fillDown(WebElement selectStart, WebElement selectEnd, WebElement dragEnd)
     {
-        selectCellRange(selectStart, dragEnd);
+        dragToCell(selectStart, dragEnd);
+        if (!(WebDriverWrapper.waitFor(
+                () -> isInSelection(selectStart) && isInSelection(dragEnd), 2_000)))
+        {
+            dragToCell(selectStart, dragEnd);
+            WebDriverWrapper.waitFor(() -> isInSelection(selectStart) && isInSelection(dragEnd),
+                    "Cell range did not become selected for fill-down", 2_000);
+        }
+
         String fillValue = getCellValue(selectEnd);
         new Actions(getDriver()).keyDown(MODIFIER_KEY).sendKeys("d").keyUp(MODIFIER_KEY).build().perform();
         WebDriverWrapper.waitFor(() -> fillValue.equals(getCellValue(dragEnd)),
