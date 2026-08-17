@@ -1049,25 +1049,33 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
 
     /**
      * Select {@code selectStart} through {@code dragEnd} and fill down from {@code selectEnd}'s row using Ctrl/Cmd+D.
+     * The drag that establishes the selection is occasionally treated as a click, leaving the key combination
+     * nothing to fill, so the whole sequence is retried once.
      * @param selectStart top-left cell of the range to select
      * @param selectEnd   cell whose value will be filled down (must be in {@code selectStart}'s row)
      * @param dragEnd     bottom-right cell of the range to select and fill down to
      */
     public void fillDown(WebElement selectStart, WebElement selectEnd, WebElement dragEnd)
     {
-        dragToCell(selectStart, dragEnd);
-        if (!(WebDriverWrapper.waitFor(
-                () -> isInSelection(selectStart) && isInSelection(dragEnd), 2_000)))
-        {
-            dragToCell(selectStart, dragEnd);
-            WebDriverWrapper.waitFor(() -> isInSelection(selectStart) && isInSelection(dragEnd),
-                    "Cell range did not become selected for fill-down", 2_000);
-        }
-
         String fillValue = getCellValue(selectEnd);
+
+        selectAndFillDown(selectStart, dragEnd);
+        if (!WebDriverWrapper.waitFor(() -> fillValue.equals(getCellValue(dragEnd)), 3_000))
+        {
+            selectAndFillDown(selectStart, dragEnd);
+            WebDriverWrapper.waitFor(() -> fillValue.equals(getCellValue(dragEnd)),
+                    "Fill-down did not populate end cell with value: " + fillValue, 5_000);
+        }
+    }
+
+    /**
+     * Drag-select {@code selectStart} through {@code dragEnd} and send the fill-down key combination.
+     */
+    private void selectAndFillDown(WebElement selectStart, WebElement dragEnd)
+    {
+        dragToCell(selectStart, dragEnd);
+        WebDriverWrapper.waitFor(() -> isInSelection(selectStart) && isInSelection(dragEnd), 2_000);
         new Actions(getDriver()).keyDown(MODIFIER_KEY).sendKeys("d").keyUp(MODIFIER_KEY).build().perform();
-        WebDriverWrapper.waitFor(() -> fillValue.equals(getCellValue(dragEnd)),
-                "Fill-down did not populate end cell with value: " + fillValue, 3_000);
     }
 
     public void selectCellRange(WebElement startCell, WebElement endCell)
