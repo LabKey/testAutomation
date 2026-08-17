@@ -329,13 +329,13 @@ public class AuditLogHelper
         return dataChangeString;
     }
 
-
-    public void checkLastTransactionAuditLogDetails(String containerPath, Map<TransactionDetail, Object> expectedDetails)
+    public @NotNull Integer checkLastTransactionAuditLogDetails(String containerPath, Map<TransactionDetail, Object> expectedDetails)
     {
         Integer transactionAuditId = getLastTransactionId(containerPath);
         if (transactionAuditId == null)
             fail("No TransactionAuditEvent found in container: " + containerPath);
         checkTransactionAuditLogDetails(transactionAuditId, expectedDetails);
+        return transactionAuditId;
     }
 
     public void checkTransactionAuditLogDetails(Integer transactionAuditId, Map<TransactionDetail, Object> expectedDetails)
