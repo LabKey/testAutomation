@@ -111,7 +111,7 @@ public class SampleTypeDefinition extends DomainProps
         return this;
     }
 
-    protected InventoryMetricUnit getInventoryMetricUnit()
+    public InventoryMetricUnit getInventoryMetricUnit()
     {
         return _inventoryMetricUnit;
     }
@@ -122,23 +122,23 @@ public class SampleTypeDefinition extends DomainProps
         return this;
     }
 
-    protected String getLabelColor()
+    public String getLabelColor()
     {
         return _labelColor;
     }
 
-    protected SampleTypeDefinition setLabelColor(String color)
+    public SampleTypeDefinition setLabelColor(String color)
     {
         _labelColor = color;
         return this;
     }
 
-    protected String getAliquotNameExpression()
+    public String getAliquotNameExpression()
     {
         return _aliquotNameExpression;
     }
 
-    protected SampleTypeDefinition setAliquotNameExpression(String aliquotNameExpression)
+    public SampleTypeDefinition setAliquotNameExpression(String aliquotNameExpression)
     {
         _aliquotNameExpression = aliquotNameExpression;
         return this;
