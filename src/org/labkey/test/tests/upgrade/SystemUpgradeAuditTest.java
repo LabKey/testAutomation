@@ -16,7 +16,6 @@
 package org.labkey.test.tests.upgrade;
 
 import org.junit.Assume;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
@@ -41,23 +40,26 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 /**
  * Covers the audit event recorded by SystemUpgradeAuditProvider when the server comes up on a new version or build.
  * Most assertions hold on any single boot; testVersionChangeRecorded is the reason this is an upgrade test, since a
- * recorded version <i>change</i> only exists once a server has booted twice on two different versions.
+ * recorded version <i>change</i> only exists once a server has booted twice on two different versions.<br>
+ * Reads from /home and builds what it needs inside each test, so it needs no setup phase - and therefore no matching
+ * copy on the preceding ESR branch, which the setup phase would otherwise run.
  */
 @Category({})
 public class SystemUpgradeAuditTest extends BaseUpgradeTest
 {
-    /** The release the provider shipped in. Upgrading from anything earlier leaves no prior event to change from. */
-    private static final String FIRST_AUDITED_VERSION = "26.9";
-
     private static final String AUDIT_QUERY = "SystemUpgradeAuditEvent";
     private static final String AUDIT_LOG_LABEL = "System Upgrade events";
 
-    private static final TestUser PROJECT_ADMIN = new TestUser("project_admin@systemupgradeaudit.test");
+    private static final String PROJECT_ADMIN_EMAIL = "project_admin@systemupgradeaudit.test";
+
+    /** Every server has one, so no test-owned project is needed to query with a project-scoped container filter. */
+    private static final String HOME_PROJECT = "/home";
 
     private static final List<String> AUDIT_COLUMNS = List.of(
         "RowId",
@@ -71,32 +73,17 @@ public class SystemUpgradeAuditTest extends BaseUpgradeTest
         "Comment"
     );
 
+    /** The event is written at startup and each test creates what it needs, so the setup phase has nothing to do. */
     @Override
     protected void doSetup()
     {
-        _containerHelper.createProject(getProjectName(), null);
-        PROJECT_ADMIN.create(this)
-            .setInitialPassword()
-            .addPermission(PermissionsHelper.PROJECT_ADMIN_ROLE, getProjectName());
     }
 
-    @Before
-    public void preTest()
-    {
-        PROJECT_ADMIN.load(this);
-    }
-
+    /** This test owns no project, so there is nothing for the framework to clean up. */
     @Override
     protected String getProjectName()
     {
-        return getClass().getSimpleName() + " Project";
-    }
-
-    @Override
-    protected void doCleanup(boolean afterTest)
-    {
-        _containerHelper.deleteProject(getProjectName(), afterTest);
-        _userHelper.deleteUsers(afterTest, PROJECT_ADMIN);
+        return null;
     }
 
     @Override
@@ -125,26 +112,33 @@ public class SystemUpgradeAuditTest extends BaseUpgradeTest
      * different versions, so the event carries both of them.
      */
     @Test
-    @EarliestVersion(FIRST_AUDITED_VERSION)
     public void testVersionChangeRecorded() throws Exception
     {
         Assume.assumeFalse("A version change is only visible after the upgrade", isUpgradeSetupPhase);
         assertNotNull("Set webtest.upgradePreviousVersion or labkeyVersion to verify the recorded change", setupVersion);
 
         Map<String, Object> latest = getUpgradeEvents(createDefaultConnection()).getFirst();
-
         String previousReleaseVersion = (String) latest.get("PreviousReleaseVersion");
-        assertNotNull("Event should record the version the server upgraded from", previousReleaseVersion);
-        assertEquals("Event should record the version the setup phase ran on",
-            setupVersion.trim(2), new Version(previousReleaseVersion).trim(2));
-        assertEquals("Event should record the version the server upgraded to",
-            getServerReleaseVersion(), latest.get("ReleaseVersion"));
-        assertEquals("Booting on a newer release should be recorded as an upgrade", "Upgrade", latest.get("ChangeType"));
-        assertNotEquals("A new build should have been deployed", latest.get("PreviousBuildTime"), latest.get("BuildTime"));
 
-        // Every release bumps the core module's SchemaVersion, so crossing a release boundary always runs scripts.
-        // This is the only phase where the flag can be checked against a known-true expectation.
-        assertEquals("Upgrading across releases should have run schema scripts", true, latest.get("HasSchemaUpgrade"));
+        if (wasSetupBefore(getServerReleaseVersion()))
+        {
+            assertNotNull("Event should record the version the server upgraded from", previousReleaseVersion);
+            assertEquals("Event should record the version the setup phase ran on",
+                setupVersion.trim(2), new Version(previousReleaseVersion).trim(2));
+            assertEquals("Event should record the version the server upgraded to",
+                getServerReleaseVersion(), latest.get("ReleaseVersion"));
+            assertEquals("Booting on a newer release should be recorded as an upgrade", "Upgrade", latest.get("ChangeType"));
+            assertNotEquals("A new build should have been deployed", latest.get("PreviousBuildTime"), latest.get("BuildTime"));
+
+            // Every release bumps the core module's SchemaVersion, so crossing a release boundary always runs scripts.
+            // This is the only phase where the flag can be checked against a known-true expectation.
+            assertEquals("Upgrading across releases should have run schema scripts", true, latest.get("HasSchemaUpgrade"));
+        }
+        else
+        {
+            // Redeploying the same build records no second event, so the setup boot's baseline is still the newest row.
+            assertNull("A redeploy of the same release should not record a version change", previousReleaseVersion);
+        }
     }
 
     /**
@@ -182,24 +176,36 @@ public class SystemUpgradeAuditTest extends BaseUpgradeTest
     @Test
     public void testRootContainerPermissions() throws Exception
     {
-        Connection projectAdmin = PROJECT_ADMIN.getUserConnection();
         ApiPermissionsHelper permissionsHelper = new ApiPermissionsHelper(this);
+        TestUser projectAdmin = new TestUser(PROJECT_ADMIN_EMAIL);
+        projectAdmin.create(this)
+            .setInitialPassword()
+            .addPermission(PermissionsHelper.PROJECT_ADMIN_ROLE, HOME_PROJECT);
 
-        assertFalse("Site admin should see the system upgrade event",
-            getUpgradeEvents(createDefaultConnection()).isEmpty());
-
-        assertTrue("Project admin without a site-level audit role should not see the root container event",
-            getUpgradeEventsFromProject(projectAdmin).isEmpty());
-
-        permissionsHelper.setSiteRoleUserPermissions(PROJECT_ADMIN.getEmail(), PermissionsHelper.SEE_AUDIT_LOG_SITE_ROLE);
         try
         {
-            assertFalse("A user holding the site-level audit role should see the root container event",
-                getUpgradeEventsFromProject(projectAdmin).isEmpty());
+            Connection connection = projectAdmin.getUserConnection();
+
+            assertFalse("Site admin should see the system upgrade event",
+                getUpgradeEvents(createDefaultConnection()).isEmpty());
+
+            assertTrue("Project admin without a site-level audit role should not see the root container event",
+                getUpgradeEventsFromProject(connection).isEmpty());
+
+            permissionsHelper.setSiteRoleUserPermissions(projectAdmin.getEmail(), PermissionsHelper.SEE_AUDIT_LOG_SITE_ROLE);
+            try
+            {
+                assertFalse("A user holding the site-level audit role should see the root container event",
+                    getUpgradeEventsFromProject(connection).isEmpty());
+            }
+            finally
+            {
+                permissionsHelper.removeUserRoleAssignment(projectAdmin.getEmail(), PermissionsHelper.SEE_AUDIT_LOG_SITE_ROLE, "/");
+            }
         }
         finally
         {
-            permissionsHelper.removeUserRoleAssignment(PROJECT_ADMIN.getEmail(), PermissionsHelper.SEE_AUDIT_LOG_SITE_ROLE, "/");
+            projectAdmin.deleteUser();
         }
     }
 
@@ -212,7 +218,7 @@ public class SystemUpgradeAuditTest extends BaseUpgradeTest
     /** What the app grids do: query from a project with an allFolders container filter */
     private List<Map<String, Object>> getUpgradeEventsFromProject(Connection connection) throws IOException, CommandException
     {
-        return executeSelect(connection, getProjectName(), ContainerFilter.AllFolders);
+        return executeSelect(connection, HOME_PROJECT, ContainerFilter.AllFolders);
     }
 
     private List<Map<String, Object>> executeSelect(Connection connection, String containerPath, ContainerFilter containerFilter) throws IOException, CommandException
