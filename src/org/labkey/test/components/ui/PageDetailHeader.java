@@ -42,6 +42,18 @@ public class PageDetailHeader extends AppPageHeader
         return tryMapElement(elementCache().colorIcon, el -> el.getCssValue("background-color"));
     }
 
+    /**
+     * Get the rgb style value for the sample color swatch that precedes the title. A sample with its own color shows
+     * this swatch instead of the sample type's label color in the subtitle.
+     *
+     * @return A string such as "rgb(104, 204, 202)", or an empty string if there is no sample color swatch.
+     */
+    @Override
+    public String getSampleColor()
+    {
+        return tryMapElement(elementCache().sampleColorIcon, el -> el.getCssValue("background-color"));
+    }
+
     @Override
     protected ElementCache elementCache()
     {
@@ -81,6 +93,7 @@ public class PageDetailHeader extends AppPageHeader
         }
 
         final WebElement colorIcon = Locator.byClass("color-icon__circle-small").findWhenNeeded(subtitle);
+        final WebElement sampleColorIcon = Locator.byClass("sample-color-header").findWhenNeeded(title);
     }
 
     public static class PageDetailHeaderFinder extends WebDriverComponentFinder<PageDetailHeader, PageDetailHeaderFinder>
