@@ -447,4 +447,12 @@ public class AdminConsoleTest extends AbstractAdminConsoleTest
                             initialState, optionalFeaturesPage.getFeatureStatus(testId));
         }
     }
+
+    @Test
+    public void testEmailTimeoutSettings()
+    {
+        log("Verifying that default email timeout properties are set");
+        goToAdminConsole().clickTestEmailConfiguration();
+        assertTextPresent("mail.smtp.writetimeout", "mail.smtp.timeout", "mail.smtp.connectiontimeout");
+    }
 }
