@@ -111,33 +111,60 @@ public class SampleTypeDefinition extends DomainProps
         return this;
     }
 
+    /**
+     * Pretty much limited to Sample Types in the apps.
+     * @return an InventoryMetricUnit value
+     */
     public InventoryMetricUnit getInventoryMetricUnit()
     {
         return _inventoryMetricUnit;
     }
 
+    /**
+     * Pretty much limited to Sample Types in the apps.
+     * @param inventoryMetricUnit an InventoryMetricUnit value
+     * @return This SampleTypeDefinition object
+     */
     public SampleTypeDefinition setInventoryMetricUnit(InventoryMetricUnit inventoryMetricUnit)
     {
         _inventoryMetricUnit = inventoryMetricUnit;
         return this;
     }
 
+    /**
+     * Pretty much limited to Sample Types in the apps.
+     * @return The hex value of the label color.
+     */
     public String getLabelColor()
     {
         return _labelColor;
     }
 
+    /**
+     * Pretty much limited to Sample Types in the apps.
+     * @param color Hex value of the label color.
+     * @return This SampleTypeDefinition object
+     */
     public SampleTypeDefinition setLabelColor(String color)
     {
         _labelColor = color;
         return this;
     }
 
+    /**
+     * Pretty much limited to Sample Types in the apps.
+     * @return The name expression to use for aliquot creation.
+     */
     public String getAliquotNameExpression()
     {
         return _aliquotNameExpression;
     }
 
+    /**
+     * Pretty much limited to Sample Types in the apps.
+     * @param aliquotNameExpression The name expression to use for aliquot creation.
+     * @return This SampleTypeDefinition object
+     */
     public SampleTypeDefinition setAliquotNameExpression(String aliquotNameExpression)
     {
         _aliquotNameExpression = aliquotNameExpression;
