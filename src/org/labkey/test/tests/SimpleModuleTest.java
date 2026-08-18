@@ -446,7 +446,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         deleteCmd.execute(createDefaultConnection(), getProjectName());
     }
 
-    private void submitAndTestExpectedFailure(Command<?, ?> cmd, String expectedError) throws Exception
+    private void submitAndTestExpectedFailure(Command<?> cmd, String expectedError) throws Exception
     {
         try
         {
