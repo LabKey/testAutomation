@@ -54,6 +54,13 @@ public class ServerUsageUtils
             throw new NoSuchElementException("Server metrics for " + module + " module do not exist. Found: " + modules.keySet());
     }
 
+    public static long getModuleMetricValue(Connection connection, String module, String metricPath) throws IOException, CommandException
+    {
+        Map<String, Object> metrics = getModuleMetrics(connection, module);
+        Number count = JSONUtils.getProperty(metricPath, metrics);
+        return count.longValue();
+    }
+
     @NotNull
     public static String getTestMothershipReportUrl(String type, UsageReportingLevel level, boolean submit, @Nullable String forwardedFor)
     {

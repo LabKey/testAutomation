@@ -256,6 +256,11 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
         clickSettingsLink("postgres table sizes");
     }
 
+    public void clickTestEmailConfiguration()
+    {
+        clickSettingsLink("test email configuration");
+    }
+
     public List<WebElement> getAllAdminConsoleLinks()
     {
         goToSettingsSection();

@@ -149,6 +149,19 @@ public class DetailTable extends WebDriverComponent<DetailTable.ElementCache>
     }
 
     /**
+     * Return the color of the swatch rendered in a field's value, for example the sample color on a details panel.
+     *
+     * @param fieldLabel The label of the field to get.
+     * @return A string such as "rgb(104, 204, 202)", or an empty string if the field has no color swatch.
+     **/
+    public String getFieldColor(String fieldLabel)
+    {
+        WebElement icon = Locator.tagWithClassContaining("i", "color-icon__circle")
+                .findElementOrNull(getField(fieldLabel));
+        return icon == null ? "" : icon.getCssValue("background-color");
+    }
+
+    /**
      * Gets the value of a cell identified by its data-fieldKey attribute
      * @param identifier value of the data-fieldKey attribute on the intended element
      * @return  Text value of the specified element

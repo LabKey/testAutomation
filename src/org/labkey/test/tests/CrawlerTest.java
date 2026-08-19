@@ -59,6 +59,7 @@ public class CrawlerTest extends BaseWebDriverTest
     {
         super.doCleanup(afterTest);
         _userHelper.deleteUsers(afterTest, USER);
+        _cspConfigHelper.setEnforceCsp(true);
     }
 
     @BeforeClass

@@ -28,6 +28,7 @@ import org.labkey.test.pages.core.admin.LimitActiveUserPage;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PipelineToolsHelper;
 import org.labkey.test.util.TestLogger;
+import org.labkey.test.util.core.admin.CspConfigHelper;
 import org.labkey.test.util.core.login.DbLoginUtils;
 import org.labkey.test.util.login.AuthenticationAPIUtils;
 import org.openqa.selenium.WebDriverException;
@@ -169,6 +170,15 @@ public class TestScrubber extends ExtraSiteWrapper
         catch (Exception e)
         {
             TestLogger.error("Failed to disable pipeline triggers after test", e);
+        }
+
+        try
+        {
+            new CspConfigHelper(this::createDefaultConnection).setEnforceCsp(true);
+        }
+        catch (NullPointerException e)
+        {
+            TestLogger.error("Failed to enable CSP enforcement after test", e);
         }
 
     }
