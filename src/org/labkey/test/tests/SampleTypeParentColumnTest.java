@@ -782,6 +782,21 @@ public class SampleTypeParentColumnTest extends BaseWebDriverTest
         assertThat("Error message", String.join("\n", errors), CoreMatchers.containsString(errorMsgExpectedTxt));
 
         updatePage.clickCancel();
+
+        // GH Issue 1474: import aliases must not collide with a reserved field name
+        clickFolder(SUB_FOLDER_NAME);
+        updatePage = sampleHelper.goToEditSampleType(SAMPLE_TYPE_NAME);
+        log("Check that an import alias cannot collide with a reserved field name.");
+        for (String reservedName : Arrays.asList("Folder", "Container", "genId", "CpasType", "FreezeThawCount"))
+        {
+            updatePage.getFieldsPanel().getField("DupeAliasCheck").setImportAliases(reservedName);
+            errors = updatePage.clickSaveExpectingErrors();
+            errorMsgExpectedTxt = "Import alias '" + reservedName + "' on field 'DupeAliasCheck' conflicts with a reserved field name.";
+            assertThat("Error message for reserved import alias '" + reservedName + "'",
+                    String.join("\n", errors), CoreMatchers.containsString(errorMsgExpectedTxt));
+
+        }
+        updatePage.clickCancel();
     }
 
     @Test

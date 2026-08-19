@@ -351,6 +351,18 @@ public class SampleTypeTest extends BaseWebDriverTest
                 containsString("Import alias '" + fieldTwo.toLowerCase() + "' on field '" + fieldOne + "' conflicts with a field name."));
         checker().screenShotIfNewError("importAliasConflictsWithFieldNameIgnoringCase");
 
+        // GH Issue 1474: import aliases must not collide with a reserved field name
+        log("Verify an import alias cannot collide with a reserved field name. GH Issue 1474");
+        for (String reservedName : Arrays.asList("Folder", "Container", "genId", "CpasType", "FreezeThawCount"))
+        {
+            createPage = new CreateSampleTypePage(this.getDriver());
+            fieldsPanel.getField(fieldOne).setImportAliases(reservedName);
+            checker().verifyThat("Expected an error when an import alias matches reserved field name '" + reservedName + "'",
+                    String.join("\n", createPage.clickSaveExpectingErrors()),
+                    containsString("Import alias '" + reservedName + "' on field '" + fieldOne + "' conflicts with a reserved field name."));
+            checker().screenShotIfNewError("importAliasConflictsWithReservedName_" + reservedName);
+        }
+
         log("An alias that repeats its own field's name is redundant but not ambiguous, so it should be allowed.");
         fieldsPanel.getField(fieldOne).setImportAliases(fieldOne);
         createPage.clickSave();
