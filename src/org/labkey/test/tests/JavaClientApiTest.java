@@ -31,7 +31,9 @@ import org.labkey.remoteapi.domain.DropDomainCommand;
 import org.labkey.remoteapi.domain.GetDomainDetailsCommand;
 import org.labkey.remoteapi.domain.PropertyDescriptor;
 import org.labkey.remoteapi.domain.SaveDomainCommand;
+import org.labkey.remoteapi.query.BaseQueryCommand;
 import org.labkey.remoteapi.query.DeleteRowsCommand;
+import org.labkey.remoteapi.query.ExecuteSqlCommand;
 import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.InsertRowsCommand;
 import org.labkey.remoteapi.query.SaveRowsResponse;
@@ -70,6 +72,7 @@ import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PermissionsHelper.PrincipalType;
 import org.labkey.test.util.PortalHelper;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -608,6 +611,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
         cn.stopImpersonating();
     }
 
+    // Also tests SelectRowCommand and ExecuteSqlCommand
     @Test
     public void testSaveRowsApiCommand() throws Exception
     {
@@ -741,18 +745,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
         // Verify players list after operations
         {
             var selectRowsCommand = new SelectRowsCommand(schemaName, playersListName);
-            selectRowsCommand.addSort(new Sort("JerseyNumber", Sort.Direction.ASCENDING));
-
-            var resp = selectRowsCommand.execute(conn, PROJECT_NAME);
-            assertEquals(3, resp.getRowCount());
-
-            var players = resp.getRows();
-            assertEquals(19, players.get(0).get("jerseyNumber")); // verify case-insensitive
-            assertEquals("Seattle Mariners", players.get(0).get("Team"));
-            assertEquals(24, players.get(1).get("Jerseynumber")); // verify case-insensitive
-            assertEquals("Seattle Mariners", players.get(1).get("Team"));
-            assertEquals(44, players.get(2).get("JerseyNumber"));
-            assertEquals("New York Yankees", players.get(2).get("Team"));
+            verifyJerseys(conn, selectRowsCommand, 3);
         }
 
         // Verify teams list after operations
@@ -773,6 +766,63 @@ public class JavaClientApiTest extends BaseWebDriverTest
             assertEquals("San Francisco", teams.get(2).get("City"));
             assertEquals("Giants", teams.get(2).get("Team"));
         }
+
+        // Test ExecuteSqlCommand basic SELECT
+        {
+            var executeSqlCommand = new ExecuteSqlCommand(schemaName, "SELECT * FROM " + schemaName + "." + ExecuteSqlCommand.quoteIdentifier(playersListName));
+            var resp = verifyJerseys(conn, executeSqlCommand, 3);
+            // setIncludeMetadata(true), the default, should result in metadata and column model
+            assertNotNull(resp.getMetaData());
+            assertNotNull(resp.getColumnModel()); // setIncludeMetadata(true), the default
+        }
+
+        // Test ExecuteSqlCommand includeMetadata, offset, and maxRows properties
+        {
+            var executeSqlCommand = new ExecuteSqlCommand(schemaName, "SELECT * FROM " + schemaName + "." + ExecuteSqlCommand.quoteIdentifier(playersListName));
+            executeSqlCommand.addSort(new Sort("JerseyNumber", Sort.Direction.ASCENDING));
+            executeSqlCommand.setIncludeMetadata(false);
+            executeSqlCommand.setOffset(2);
+            executeSqlCommand.setMaxRows(1);
+            var resp = verifyJerseys(conn, executeSqlCommand, 1);
+            // setIncludeMetadata(false) should result in no metadata or column model
+            assertNull(resp.getMetaData());
+            assertNull(resp.getColumnModel());
+        }
+
+        // Test ExecuteSqlCommand parameterized query
+        {
+            var executeSqlCommand = new ExecuteSqlCommand(schemaName,
+                "PARAMETERS\n" +
+                "(\n" +
+                "    Number INTEGER\n" +
+                ")\nSELECT * FROM " + schemaName + "." + ExecuteSqlCommand.quoteIdentifier(playersListName) +
+                "\nWHERE JerseyNumber = Number");
+            executeSqlCommand.setQueryParameters(Map.of("Number", "44"));
+            verifyJerseys(conn, executeSqlCommand, 1);
+        }
+    }
+
+    private SelectRowsResponse verifyJerseys(Connection conn, BaseQueryCommand<SelectRowsResponse> command, int expectedCount) throws IOException, CommandException
+    {
+        command.addSort(new Sort("JerseyNumber", Sort.Direction.ASCENDING));
+        var resp = command.execute(conn, PROJECT_NAME);
+        var players = resp.getRows();
+        assertEquals(expectedCount, players.size());
+
+        // Phelps (the Yankee) is always the last player
+        var lastPlayer = players.getLast();
+        assertEquals(44, lastPlayer.get("JerseyNumber"));
+        assertEquals("New York Yankees", lastPlayer.get("Team"));
+
+        if (expectedCount == 3)
+        {
+            assertEquals(19, players.get(0).get("jerseyNumber")); // verify case-insensitive
+            assertEquals("Seattle Mariners", players.get(0).get("Team"));
+            assertEquals(24, players.get(1).get("Jerseynumber")); // verify case-insensitive
+            assertEquals("Seattle Mariners", players.get(1).get("Team"));
+        }
+
+        return resp;
     }
 
     @Override
