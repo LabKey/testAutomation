@@ -17,7 +17,7 @@ package org.labkey.test.tests;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
@@ -58,9 +58,9 @@ import org.labkey.test.util.PermissionsHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.StudyHelper;
 import org.labkey.test.util.TestDataGenerator;
-import org.labkey.test.util.data.TestDataUtils;
 import org.labkey.test.util.UIUserHelper;
 import org.labkey.test.util.WikiHelper;
+import org.labkey.test.util.data.TestDataUtils;
 import org.labkey.test.util.query.QueryUtils;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.TimeoutException;
@@ -1481,9 +1481,9 @@ public class ClientAPITest extends BaseWebDriverTest
             SimpleGetCommand cmd = new SimpleGetCommand(source.getControllerName(), source.getActionName())
             {
                 @Override
-                protected HttpGet getHttpRequest(Connection connection, String folderPath) throws URISyntaxException
+                protected HttpUriRequest getHttpRequest(Connection connection, String folderPath) throws URISyntaxException
                 {
-                    HttpGet request = super.getHttpRequest(connection, folderPath);
+                    HttpUriRequest request = super.getHttpRequest(connection, folderPath);
                     request.setHeader("Content-Type", requestContentType);
 
                     return request;

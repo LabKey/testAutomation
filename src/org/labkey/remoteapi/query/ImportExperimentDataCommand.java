@@ -28,7 +28,8 @@ public class ImportExperimentDataCommand extends ImportDataCommand
 {
     private AuditLogHelper.AuditBehaviorType _auditBehavior;
     private Boolean _crossTypeImport;
-    private String _containerPath;
+
+    private final String _containerPath;
 
     public ImportExperimentDataCommand(String schemaName, String queryName, String containerPath)
     {
@@ -76,5 +77,4 @@ public class ImportExperimentDataCommand extends ImportDataCommand
         }
         return post;
     }
-
 }
