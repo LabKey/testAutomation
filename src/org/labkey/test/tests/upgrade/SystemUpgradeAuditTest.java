@@ -58,6 +58,9 @@ public class SystemUpgradeAuditTest extends BaseUpgradeTest
 
     private static final String PROJECT_ADMIN_EMAIL = "project_admin@systemupgradeaudit.test";
 
+    /** First release that records SystemUpgradeAuditEvent, so the earliest one that can be a recorded previous version. */
+    private static final String FIRST_AUDITED_RELEASE = "26.9";
+
     /** Every server has one, so no test-owned project is needed to query with a project-scoped container filter. */
     private static final String HOME_PROJECT = "/home";
 
@@ -120,7 +123,8 @@ public class SystemUpgradeAuditTest extends BaseUpgradeTest
         Map<String, Object> latest = getUpgradeEvents(createDefaultConnection()).getFirst();
         String previousReleaseVersion = (String) latest.get("PreviousReleaseVersion");
 
-        if (wasSetupBefore(getServerReleaseVersion()))
+        // The audit event was added in 26.9, so a setup boot on an earlier release left no event to compare against.
+        if (wasSetupWithin(FIRST_AUDITED_RELEASE, null) && wasSetupBefore(getServerReleaseVersion()))
         {
             assertNotNull("Event should record the version the server upgraded from", previousReleaseVersion);
             assertEquals("Event should record the version the setup phase ran on",
@@ -136,8 +140,10 @@ public class SystemUpgradeAuditTest extends BaseUpgradeTest
         }
         else
         {
-            // Redeploying the same build records no second event, so the setup boot's baseline is still the newest row.
-            assertNull("A redeploy of the same release should not record a version change", previousReleaseVersion);
+            // Redeploying the same build records no second event, and a pre-26.9 setup boot recorded none at all, so
+            // either way the newest row is a baseline.
+            assertNull("Without a prior " + FIRST_AUDITED_RELEASE + " event there should be no recorded version change",
+                previousReleaseVersion);
         }
     }
 
