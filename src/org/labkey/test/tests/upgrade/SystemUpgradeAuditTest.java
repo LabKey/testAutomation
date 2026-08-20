@@ -54,7 +54,7 @@ import static org.junit.Assert.assertTrue;
 public class SystemUpgradeAuditTest extends BaseUpgradeTest
 {
     private static final String AUDIT_QUERY = "SystemUpgradeAuditEvent";
-    private static final String AUDIT_LOG_LABEL = "System Upgrade events";
+    private static final String AUDIT_LOG_LABEL = "System Upgrade Events";
 
     private static final String PROJECT_ADMIN_EMAIL = "project_admin@systemupgradeaudit.test";
 
