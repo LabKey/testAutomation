@@ -20,19 +20,19 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.params.FieldKey;
-import org.openqa.selenium.By;
+import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.TestLogger;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
-import static org.labkey.test.util.selenium.WebElementUtils.getTextContent;
 
 /**
  * This is a 'special' table that has only two columns, and no header. An example of this table can be seen in the
@@ -74,49 +74,36 @@ public class DetailTable extends WebDriverComponent<DetailTable.ElementCache>
     @Override
     protected void waitForReady()
     {
-        getWrapper().shortWait().withMessage("waiting for detailTable to load").until(wd -> isLoaded());
+        getWrapper().shortWait().withMessage("waiting for detailTable to load").until(_ -> isLoaded());
     }
 
     public Boolean isLoaded()
     {
-        // Need to wrap the checks in a try / catch for a stale element exception. This can happen because the "this"
-        // reference can go stale after editing a sample and reloading the grid with the updated data is happening.
-        try
-        {
-            return !Locators.loadingGrid.existsIn(this) &&
-                    !Locators.spinner.existsIn(this) &&
-                    Locator.tag("td").existsIn(this);
-        }
-        catch(StaleElementReferenceException stale)
-        {
-            return false;
-        }
-
+        return !Locators.loadingGrid.existsIn(this) &&
+                !Locators.spinner.existsIn(this) &&
+                Locator.tag("td").existsIn(this);
     }
-
-    // TODO Not sure if the get & click methods are correct (or appropriate?), for a @glass component.
-    //  It may be appropriate to have these interfaces but maybe the way the cell is identified should be different.
 
     /**
      * Rather than add yet another method to get a field value, do a 'best guess' to find the appropriate field. This
      * will return the first field that meets the criteria.
      *
-     * @param identifier Some text string that can identify the field.
-     * @return A web element that either had an attribute value equal to the identifier, or had a text in a sibling field (label) with the identifier.
+     * @param identifier fieldKey, name, or label
+     * @return A web element resolved by fieldKey, name, or label; or, for tables without those data attributes,
+     * a value cell found by its sibling label text.
      */
-    private WebElement getField(String identifier)
+    private WebElement getField(CharSequence identifier)
     {
-        if(elementCache().dataByLabel(identifier).isDisplayed())
+        FieldReferenceManager.FieldReference fieldReference = elementCache().getFieldManager().findFieldReferenceOrNull(identifier);
+        if (fieldReference != null)
         {
-            return elementCache().dataByLabel(identifier);
+            return fieldReference.getElement();
         }
         else if (elementCache().siblingField(identifier).isDisplayed())
         {
+            // Track down where/if this is still needed
+            TestLogger.info("sibling field " + identifier + " found");
             return elementCache().siblingField(identifier);
-        }
-        else if (elementCache().dataFieldByKey(identifier).isDisplayed())
-        {
-            return elementCache().dataFieldByKey(identifier);
         }
         else
         {
@@ -124,7 +111,11 @@ public class DetailTable extends WebDriverComponent<DetailTable.ElementCache>
         }
     }
 
-    public boolean hasField(String identifier)
+    /**
+     * @param identifier fieldKey, name, or label
+     * @return True if the field is present, false otherwise.
+     */
+    public boolean hasField(CharSequence identifier)
     {
         try
         {
@@ -137,20 +128,24 @@ public class DetailTable extends WebDriverComponent<DetailTable.ElementCache>
         }
     }
 
-    public boolean fieldHasFormatPill(String identifier)
+    /**
+     * @param identifier fieldKey, name, or label
+     * @return True if the field's value has a conditional-format status pill applied.
+     */
+    public boolean fieldHasFormatPill(CharSequence identifier)
     {
         return Locator.tagWithClass("*", "status-pill").existsIn(getField(identifier));
     }
 
     /**
-     * Return the value of a cell identified by the text in the left most column.
+     * Return the value of a field cell, resolved by fieldKey, name, or label.
      *
-     * @param fieldlabel The label of the field to get.
-     * @return A value of the cell as a string.
+     * @param identifier fieldKey, name, or label
+     * @return The value of the cell as a string.
      **/
-    public String getFieldValue(String fieldlabel)
+    public String getFieldValue(CharSequence identifier)
     {
-        return getField(fieldlabel).getText();
+        return getField(identifier).getText();
     }
 
     /**
@@ -168,35 +163,36 @@ public class DetailTable extends WebDriverComponent<DetailTable.ElementCache>
 
     /**
      * Gets the value of a cell identified by its data-fieldKey attribute
-     * @param fieldKey  value of the data-fieldKey attribute on the intended element
+     * @param identifier value of the data-fieldKey attribute on the intended element
      * @return  Text value of the specified element
+     * @deprecated Use {@link #getFieldValue(CharSequence)} instead; it now resolves fieldKey, name, and label alike.
      */
-    public String getFieldValueByKey(String fieldKey)
+    @Deprecated (since = "26.8")
+    public String getFieldValueByKey(CharSequence identifier)
     {
-        return elementCache().dataFieldByKey(fieldKey).getText();
+        return getFieldValue(identifier);
     }
 
     /**
      * Click on a cell in a grid.
      *
-     * @param fieldLabel The label of the field to click.
+     * @param identifier fieldKey, name, or label
      **/
-    public void clickField(String fieldLabel)
+    public void clickField(CharSequence identifier)
     {
         String urlBefore = getWrapper().getCurrentRelativeURL().toLowerCase();
 
         // Should not click the container, it could be a td which would miss the clickable element.
         // Maybe this shouldn't assume an anchor but should be a generic(*)?
-        Locator.tag("a").waitForElement(getField(fieldLabel), _queryWaitMsec).click();
+        Locator.tag("a").waitForElement(getField(identifier), _queryWaitMsec).click();
 
         WebDriverWrapper.waitFor(()->!urlBefore.equals(getWrapper().getCurrentRelativeURL().toLowerCase()),
-                String.format("Clicking field (link) '%s' did not navigate.", fieldLabel), 500);
+                String.format("Clicking field (link) '%s' did not navigate.", identifier), 500);
 
     }
 
     /**
-     * Returns a map of the values in the grid. The key is the first column and the value is the second column. The
-     * first column is a property or attribute name or some identifier. The second column is the value of that property.
+     * Returns a map of the values in the grid, keyed by each field's label.
      *
      * @return A map with string values.
      **/
@@ -204,18 +200,16 @@ public class DetailTable extends WebDriverComponent<DetailTable.ElementCache>
     {
         Map<String, String> tableData = new LinkedHashMap<>();
 
-        for(WebElement tableRow : getComponentElement().findElements(By.cssSelector("tr")))
+        for (FieldReferenceManager.FieldReference fieldReference : elementCache().getFieldManager().getColumnHeaders())
         {
-            List<WebElement> tds = tableRow.findElements(By.tagName("td"));
-
-            tableData.put(getTextContent(tds.get(0)), tds.get(1).getText());
+            tableData.put(fieldReference.getLabel(), fieldReference.getElement().getText());
         }
 
         return tableData;
     }
 
     /**
-     * Returns a map of the values in the grid. Data is keyed by column FieldKeys.
+     * Returns a map of the values in the grid, keyed by each field's FieldKey.
      *
      * @return A map with string values.
      **/
@@ -223,18 +217,16 @@ public class DetailTable extends WebDriverComponent<DetailTable.ElementCache>
     {
         Map<FieldKey, String> tableData = new LinkedHashMap<>();
 
-        for(WebElement tableRow : Locator.tag("tr").findElements(getComponentElement()))
+        for (FieldReferenceManager.FieldReference fieldReference : elementCache().getFieldManager().getColumnHeaders())
         {
-            WebElement dataCell = Locator.tag("td").withAttribute("data-fieldkey").findElement(tableRow);
-
-            tableData.put(FieldKey.fromFieldKey(dataCell.getDomAttribute("data-fieldkey")), dataCell.getText());
+            tableData.put(fieldReference.getFieldKey(), fieldReference.getElement().getText());
         }
 
         return tableData;
     }
 
     /**
-     * Returns a map of the values in the grid. Data is keyed by column names.
+     * Returns a map of the values in the grid, keyed by each field's name.
      * Warning: Names are not guaranteed to be unique.
      *
      * @return A map with string values.
@@ -264,7 +256,6 @@ public class DetailTable extends WebDriverComponent<DetailTable.ElementCache>
         static final Locator.XPathLocator detailTable = Locator.tagWithClass("table", "detail-component--table__fixed");
 
         static final Locator loadingGrid = Locator.css("tbody tr.grid-loading");
-        static final Locator emptyGrid = Locator.css("tbody tr.grid-empty");
         static final Locator spinner = Locator.css("span i.fa-spinner");
 
     }
@@ -275,24 +266,75 @@ public class DetailTable extends WebDriverComponent<DetailTable.ElementCache>
         return new ElementCache();
     }
 
-    protected class ElementCache extends Component<?>.ElementCache
+    protected class ElementCache extends Component<ElementCache>.ElementCache
     {
-        public final WebElement dataByLabel(String fieldLabel)
-        {
-            return Locator.tagWithAttribute("td", "data-caption", fieldLabel).findWhenNeeded(this);
-        }
-
-        public final WebElement dataFieldByKey(String fieldKey)
-        {
-            return Locator.tagWithAttribute("td", "data-fieldkey", fieldKey).findWhenNeeded(this);
-        }
-
         // Some tables will show a value in a td with no attributes, use the td that has the text (label) to find the value.
-        public final WebElement siblingField(String fieldLabel)
+        public final WebElement siblingField(CharSequence identifier)
         {
-            return Locator.tagContainingText("td", fieldLabel).followingSibling("td").findWhenNeeded(this);
+            return Locator.tagContainingText("td", identifier.toString()).followingSibling("td").findWhenNeeded(this);
         }
 
+        private FieldReferenceManager _fieldReferenceManager;
+
+        @LogMethod
+        private FieldReferenceManager getFieldManager()
+        {
+            if (_fieldReferenceManager == null)
+            {
+                List<DetailTableFieldReference> columnHeaders = new ArrayList<>();
+
+                List<WebElement> valueCells = Locator.tagWithAttribute("td", "data-fieldkey").findElements(this);
+                // Use JavaScript to get fieldKeys and captions in one operation, rather than making 2N calls to 'WebElement.getDomAttribute'
+                List<List<String>> captionsAndKeys = getWrapper().executeScript(
+                    """
+                    var cells = arguments[0];
+                    var captions = [];
+                    var fieldkeys = [];
+                    for (var i = 0; i < cells.length; i++)
+                    {
+                        captions.push(cells[i].dataset.caption);
+                        fieldkeys.push(cells[i].dataset.fieldkey);
+                    }
+                    return [captions, fieldkeys];
+                    """, List.class,
+                valueCells);
+                List<String> captions = captionsAndKeys.get(0);
+                List<String> fieldkeys = captionsAndKeys.get(1);
+                for (int i = 0; i < valueCells.size(); i++)
+                {
+                    columnHeaders.add(new DetailTableFieldReference(valueCells.get(i), i, fieldkeys.get(i), captions.get(i)));
+                }
+
+                _fieldReferenceManager = new FieldReferenceManager(columnHeaders);
+            }
+
+            return _fieldReferenceManager;
+        }
+    }
+
+    private static class DetailTableFieldReference extends FieldReferenceManager.FieldReference
+    {
+        private final FieldKey _fieldKey;
+        private final String _label;
+
+        public DetailTableFieldReference(WebElement element, int domIndex, String fieldKey, String label)
+        {
+            super(element, domIndex);
+            _fieldKey = FieldKey.fromFieldKey(fieldKey);
+            _label = label;
+        }
+
+        @Override
+        public FieldKey getFieldKey()
+        {
+            return _fieldKey;
+        }
+
+        @Override
+        public String getLabel()
+        {
+            return _label;
+        }
     }
 
     public static class DetailTableFinder extends WebDriverComponent.WebDriverComponentFinder<DetailTable, DetailTableFinder>
