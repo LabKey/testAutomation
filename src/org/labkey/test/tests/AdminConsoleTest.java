@@ -24,6 +24,7 @@ import org.labkey.remoteapi.SimpleGetCommand;
 import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestProperties;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.OptionalFeatureHelper;
@@ -46,6 +47,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.labkey.test.WebTestHelper.buildURL;
 import static org.labkey.test.util.PermissionsHelper.APP_ADMIN_ROLE;
 import static org.labkey.test.util.PermissionsHelper.READER_ROLE;
 
@@ -451,8 +453,22 @@ public class AdminConsoleTest extends AbstractAdminConsoleTest
     @Test
     public void testEmailTimeoutSettings()
     {
+        // Disable email recording if it's on, otherwise we won't see timeouts
+        boolean emailRecordEnabled = false;
+        if (!TestProperties.isWithoutTestModules())
+        {
+            beginAt(buildURL("dumbster", "begin"));
+            emailRecordEnabled = isChecked(Locator.checkboxById("emailRecordOn"));
+            if (emailRecordEnabled)
+                disableEmailRecorder();
+        }
+
         log("Verifying that default email timeout properties are set");
         goToAdminConsole().clickTestEmailConfiguration();
         assertTextPresent("mail.smtp.writetimeout", "mail.smtp.timeout", "mail.smtp.connectiontimeout");
+
+        // Restore email recorder if it was on
+        if (emailRecordEnabled)
+            enableEmailRecorder();
     }
 }
