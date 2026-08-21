@@ -199,15 +199,8 @@ public class SystemUpgradeAuditTest extends BaseUpgradeTest
                 getUpgradeEventsFromProject(connection).isEmpty());
 
             permissionsHelper.setSiteRoleUserPermissions(projectAdmin.getEmail(), PermissionsHelper.SEE_AUDIT_LOG_SITE_ROLE);
-            try
-            {
-                assertFalse("A user holding the site-level audit role should see the root container event",
-                    getUpgradeEventsFromProject(connection).isEmpty());
-            }
-            finally
-            {
-                permissionsHelper.removeUserRoleAssignment(projectAdmin.getEmail(), PermissionsHelper.SEE_AUDIT_LOG_SITE_ROLE, "/");
-            }
+            assertFalse("A user holding the site-level audit role should see the root container event",
+                getUpgradeEventsFromProject(connection).isEmpty());
         }
         finally
         {
