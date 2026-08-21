@@ -463,12 +463,17 @@ public class AdminConsoleTest extends AbstractAdminConsoleTest
                 disableEmailRecorder();
         }
 
-        log("Verifying that default email timeout properties are set");
-        goToAdminConsole().clickTestEmailConfiguration();
-        assertTextPresent("mail.smtp.writetimeout", "mail.smtp.timeout", "mail.smtp.connectiontimeout");
-
-        // Restore email recorder if it was on
-        if (emailRecordEnabled)
-            enableEmailRecorder();
+        try
+        {
+            log("Verifying that default email timeout properties are set");
+            goToAdminConsole().clickTestEmailConfiguration();
+            assertTextPresent("mail.smtp.writetimeout", "mail.smtp.timeout", "mail.smtp.connectiontimeout");
+        }
+        finally
+        {
+            // Restore email recorder if it was on
+            if (emailRecordEnabled)
+                enableEmailRecorder();
+        }
     }
 }
