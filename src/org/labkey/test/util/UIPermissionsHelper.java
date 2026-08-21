@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2019 LabKey Corporation
+ * Copyright (c) 2016-2026 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -316,11 +316,11 @@ public class UIPermissionsHelper extends PermissionsHelper
     @Override
     public void removeUserFromSiteGroup(String groupName, String userEmail)
     {
-        removeUserFromGroup(groupName, userEmail);
+        removeUserFromGroup(groupName, userEmail, "/");
     }
 
     @Override
-    public void removeUserFromGroup(String groupName, String userEmail)
+    public void removeUserFromGroup(String groupName, String userEmail, String projectPath)
     {
         if (!_driver.isTextPresent("Group " + groupName))
             selectGroup(groupName);

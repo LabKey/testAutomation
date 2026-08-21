@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2019 LabKey Corporation
+ * Copyright (c) 2009-2026 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,13 +20,9 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+@Deprecated // Use built-in Map.of() instead. Though note: Map.of() does not allow null values.
 public class Maps
 {
-    public static <K, V> Map<K, V> of()
-    {
-        return Collections.emptyMap();
-    }
-
     public static <K, V> Map<K, V> of(K k1, V v1)
     {
         return Collections.singletonMap(k1, v1);

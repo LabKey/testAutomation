@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2019 LabKey Corporation
+ * Copyright (c) 2013-2026 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -181,6 +181,11 @@ public abstract class TestProperties
     public static boolean isNewWebDriverForEachTest()
     {
         return !getBooleanProperty("selenium.reuseWebDriver", false);
+    }
+
+    public static boolean allowZombieGeckodriver()
+    {
+        return getBooleanProperty("webtest.allowZombieGeckodriver", false);
     }
 
     public static boolean isViewCheckSkipped()

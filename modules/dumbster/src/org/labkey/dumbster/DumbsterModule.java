@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2016 LabKey Corporation
+ * Copyright (c) 2008-2026 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,6 @@ import org.jetbrains.annotations.NotNull;
 import org.labkey.api.module.CodeOnlyModule;
 import org.labkey.api.module.ModuleContext;
 import org.labkey.api.settings.AppProps;
-import org.labkey.api.util.MailHelper;
-import org.labkey.api.util.SmtpTransportProvider;
 import org.labkey.api.view.BaseWebPartFactory;
 import org.labkey.api.view.Portal;
 import org.labkey.api.view.ViewContext;
@@ -67,7 +65,9 @@ public class DumbsterModule extends CodeOnlyModule
     @Override
     public void doStartup(ModuleContext moduleContext)
     {
-        if (MailHelper.getActiveProvider() instanceof SmtpTransportProvider && AppProps.getInstance().isMailRecorderEnabled())
+        // The recorder installs its own SMTP provider to capture mail, so it can run regardless of how the server's
+        // real email transport is configured.
+        if (AppProps.getInstance().isMailRecorderEnabled())
             DumbsterManager.get().start();
     }
 }

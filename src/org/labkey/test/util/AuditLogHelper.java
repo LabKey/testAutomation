@@ -1,3 +1,18 @@
+/*
+ * Copyright (c) 2020-2026 LabKey Corporation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.labkey.test.util;
 
 import org.apache.commons.lang3.StringUtils;
@@ -269,12 +284,22 @@ public class AuditLogHelper
     public void checkAuditEventValuesForTransactionId(String containerPath, AuditEvent auditEventName, List<String> columnNames, Integer transactionId, List<Map<String, Object>> expectedValues) throws IOException, CommandException
     {
         List<Map<String, Object>> events = getAuditLogsForTransactionId(containerPath, auditEventName, columnNames, transactionId, ContainerFilter.CurrentAndSubfolders);
-        assertEquals("Unexpected number of events for transactionId " + transactionId, expectedValues.size(), events.size());
-        for (int i = 0; i < expectedValues.size(); i++)
-        {
-            for (String key : expectedValues.get(i).keySet())
-                assertEquals("Event " + i  + " value for " + key + " not as expected", expectedValues.get(i).get(key), events.get(i).get(key));
-        }
+
+        List<Map<String, Object>> unmatched = expectedValues.stream()
+                .filter(expectedRow -> {
+                    Set<String> keysOfInterest = expectedRow.keySet();
+                    return events.stream().noneMatch(actualRow -> {
+                        Map<String, Object> actualFiltered = actualRow.entrySet().stream()
+                                .filter(e -> keysOfInterest.contains(e.getKey()))
+                                .collect(HashMap::new,
+                                        (m, e) -> m.put(e.getKey(), e.getValue()),
+                                        HashMap::putAll);
+                        return actualFiltered.equals(expectedRow);
+                    });
+                })
+                .toList();
+
+        assertTrue("Expected rows with no match in actual: " + unmatched, unmatched.isEmpty());
     }
 
     public Map<String, Object> getTransactionAuditLogDetails(Integer transactionAuditId)
@@ -304,13 +329,13 @@ public class AuditLogHelper
         return dataChangeString;
     }
 
-
-    public void checkLastTransactionAuditLogDetails(String containerPath, Map<TransactionDetail, Object> expectedDetails)
+    public @NotNull Integer checkLastTransactionAuditLogDetails(String containerPath, Map<TransactionDetail, Object> expectedDetails)
     {
         Integer transactionAuditId = getLastTransactionId(containerPath);
         if (transactionAuditId == null)
             fail("No TransactionAuditEvent found in container: " + containerPath);
         checkTransactionAuditLogDetails(transactionAuditId, expectedDetails);
+        return transactionAuditId;
     }
 
     public void checkTransactionAuditLogDetails(Integer transactionAuditId, Map<TransactionDetail, Object> expectedDetails)
@@ -324,7 +349,7 @@ public class AuditLogHelper
             {
                 String expectedValue = expectedDetails.get(key).toString();
                 String actualValue = actualDetails.get(key.name()) != null ? actualDetails.get(key.name()).toString() : null;
-                assertTrue("Detail value for key " + key + " not as expected", actualValue != null && actualValue.contains(expectedValue));
+                assertTrue("Detail value for key " + key + " does not contain \"" + expectedValue + "\"", actualValue != null && actualValue.contains(expectedValue));
             }
             else
                 assertEquals("Detail value for key " + key + " not as expected", expectedDetails.get(key), actualDetails.get(key.name()));

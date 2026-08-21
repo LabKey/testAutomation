@@ -1,3 +1,18 @@
+/*
+ * Copyright (c) 2025-2026 LabKey Corporation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.labkey.remoteapi.query;
 
 import org.apache.hc.client5.http.classic.methods.HttpPost;
@@ -13,8 +28,8 @@ public class ImportExperimentDataCommand extends ImportDataCommand
 {
     private AuditLogHelper.AuditBehaviorType _auditBehavior;
     private Boolean _crossTypeImport;
-    private Boolean _crossFolderImport;
-    private String _containerPath;
+
+    private final String _containerPath;
 
     public ImportExperimentDataCommand(String schemaName, String queryName, String containerPath)
     {
@@ -42,16 +57,6 @@ public class ImportExperimentDataCommand extends ImportDataCommand
         _crossTypeImport = crossTypeImport;
     }
 
-    public Boolean getCrossFolderImport()
-    {
-        return _crossFolderImport;
-    }
-
-    public void setCrossFolderImport(Boolean crossFolderImport)
-    {
-        _crossFolderImport = crossFolderImport;
-    }
-
     @Override
     protected HttpPost createRequest(URI uri) {
         HttpPost post = super.createRequest(uri);
@@ -61,8 +66,6 @@ public class ImportExperimentDataCommand extends ImportDataCommand
             params.put("auditBehavior", _auditBehavior.name());
         if (_crossTypeImport)
             params.put("crossTypeImport", "true");
-        if (_crossFolderImport)
-            params.put("crossFolderImport", "true");
         String url = WebTestHelper.buildURL("experiment", _containerPath, action, params);
         try
         {
@@ -74,5 +77,4 @@ public class ImportExperimentDataCommand extends ImportDataCommand
         }
         return post;
     }
-
 }

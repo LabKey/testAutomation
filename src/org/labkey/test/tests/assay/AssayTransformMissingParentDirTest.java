@@ -1,9 +1,23 @@
+/*
+ * Copyright (c) 2025-2026 LabKey Corporation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.labkey.test.tests.assay;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.labkey.api.util.FileUtil;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Assays;
@@ -12,13 +26,10 @@ import org.labkey.test.components.assay.AssayConstants;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.pages.assay.AssayImportPage;
 import org.labkey.test.pages.assay.AssayRunsPage;
+import org.labkey.test.pages.files.WebDavPage;
 import org.labkey.test.params.assay.GeneralAssayDesign;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.AccessDeniedException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
 
 /**
@@ -28,49 +39,38 @@ import java.util.List;
 @Category({Assays.class, Daily.class})
 public class AssayTransformMissingParentDirTest extends AbstractAssayTransformTest
 {
+    private static final File RTRANSFORM_SCRIPT_FILE_NOOP = TestFileUtils.getSampleData("qc/noopTransform.R");
+
     @Test
     public void testMissingParentDirectoryRegression() throws Exception
     {
-        // Create a nested directory and an R transform script within it
+        // create a General assay and add the transform
         String assayName = "missingParentDirAssay";
-        Path parentDir = Files.createTempDirectory("assay-transform-parent-");
-        Path nestedDir = FileUtil.createDirectories(parentDir.resolve("child"), false);
-        String scriptName = "transformMissingParent.R";
-        String transformContent = "library(Rlabkey);";
-        File transformFile = nestedDir.resolve(scriptName).toFile();
-        TestFileUtils.writeFile(transformFile, transformContent);
-
-        // Create a General assay and add the transform by absolute path (not upload)
+        String transformFileName = RTRANSFORM_SCRIPT_FILE_NOOP.getName();
         var protocolResponse = new GeneralAssayDesign(assayName).setBatchFields(List.of(), false).createAssay(getProjectName(), createDefaultConnection());
         var assayDesignerPage = ReactAssayDesignerPage.beginAt(this, getProjectName(), protocolResponse.getProtocolId(),
                 "general", "");
-        // add by path so the absolute path is stored; this allows reproducing the missing parent dir scenario
-        assayDesignerPage.addTransformScript(transformFile);
+        assayDesignerPage.addTransformScript(RTRANSFORM_SCRIPT_FILE_NOOP);
+        String transformScriptPath = assayDesignerPage.getTransformScriptPath(transformFileName);
         assayDesignerPage.clickSave();
 
-        // Now delete the parent dir to ensure we handle it reasonably. On Windows something locks the directory, maybe
-        // an external process. If that happens sleep for a second and try again.
-        for (int attempt = 1; attempt <= 10; attempt++) {
-            try
-            {
-                FileUtils.deleteDirectory(parentDir.toFile());
-                log(String.format("Deletion of directory %s was successful.", parentDir));
-                break;
-            } catch (AccessDeniedException deniedException) {
-                // Yes I know AccessDeniedException is a subset of an IOException, but I wanted to log explicitly a
-                // failure and retry because of an AccessDeniedException from some other IOException.
-                log(String.format("Access denied trying to delete directory %s. Error: %s. Waiting 10s and retrying. Attempt %d of 10.",
-                        parentDir, deniedException.getMessage(), attempt));
-                if (attempt == 10) throw deniedException;
-                sleep(10_000);
-            }
-            catch (IOException ioException) {
-                log(String.format("IOException trying to delete directory %s. Error: %s. Waiting 10s and retrying. Attempt %d of 10.",
-                        parentDir, ioException.getMessage(), attempt));
-                if (attempt == 10) throw ioException;
-                sleep(10_000);
-            }
-        }
+        // move the script into a nested directory in the @scripts webdav path
+        WebDavPage webDavPage = WebDavPage.beginAt(this, getProjectName() + "/@scripts");
+        webDavPage.getFileBrowserHelper().createFolder("child");
+        File transformFile = new File(transformScriptPath);
+        File destinationFile = new File(transformFile.getParent() + "/child", transformFileName);
+        FileUtils.moveFile(transformFile, destinationFile);
+
+        // update the assay design with the new nested dir file path
+        assayDesignerPage = ReactAssayDesignerPage.beginAt(this, getProjectName(), protocolResponse.getProtocolId(),
+                "general", "");
+        assayDesignerPage.removeTransformScript(transformFileName);
+        assayDesignerPage.addTransformScript(destinationFile, false);
+        assayDesignerPage.clickSave();
+
+        // Now delete the nested dir to ensure we handle it reasonably
+        File destinationDir = new File(transformFile.getParent() + "/child");
+        FileUtils.deleteDirectory(destinationDir);
 
         // Attempt to import data and verify a reasonable error message is shown
         String importData = """
@@ -78,7 +78,8 @@ public class AssayTransformMissingParentDirTest extends AbstractAssayTransformTe
                 1\tP1\timport after parent deleted
                 """;
 
-        new AssayRunsPage(getDriver()).getTable().clickHeaderButtonAndWait("Import Data");
+        AssayRunsPage.beginAt(this, getProjectName(), protocolResponse.getProtocolId())
+            .getTable().clickHeaderButtonAndWait("Import Data");
         var importPage = new AssayImportPage(getDriver());
         importPage.setNamedInputText("Name", "missingParentImport");
         importPage.setNamedTextAreaValue(AssayConstants.TEXT_AREA_DATA_COLLECTOR_TEXT_AREA_NAME, importData);
@@ -86,16 +87,15 @@ public class AssayTransformMissingParentDirTest extends AbstractAssayTransformTe
 
         // Expect an error page/message indicating the transform script path cannot be used
         // Be tolerant to platform-specific phrasing; assert any of these appear
-        String expectedPath = transformFile.getAbsolutePath();
         checker().withScreenshot("missing-parent-error")
                 .verifyTrue("Expect an error message about the transform script path not being found",
-                        isTextPresent("transformMissingParent.R, configured for this assay does not exist."));
+                        isTextPresent(transformFileName + ", configured for this assay does not exist."));
 
         // Fix the assay design by removing the transform script
         goToProjectHome();
         assayDesignerPage = ReactAssayDesignerPage.beginAt(this, getProjectName(), protocolResponse.getProtocolId(),
                 "general", getURL().toString());
-        assayDesignerPage.removeTransformScript(scriptName);
+        assayDesignerPage.removeTransformScript(transformFileName);
         assayDesignerPage.clickSave();
 
         // Retry the import and verify it succeeds without the transform

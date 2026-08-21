@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2019 LabKey Corporation
+ * Copyright (c) 2017-2026 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -166,7 +166,6 @@ public class AssayExportImportTest extends BaseWebDriverTest
         Connection cn = createDefaultConnection();
         Protocol protocol = new GetProtocolCommand("General").execute(cn, projectName).getProtocol();
         protocol.setName(assayName);
-        protocol.setProtocolTransformScripts(List.of(new File(SAMPLE_DATA_LOCATION, PERL_SCRIPT).getAbsolutePath()));
         protocol.setSaveScriptFiles(true);
         protocol.setEditableResults(true);
         protocol.setEditableRuns(true);
@@ -199,7 +198,17 @@ public class AssayExportImportTest extends BaseWebDriverTest
             resultsFields.add(new FieldDefinition("resultFileField", ColumnType.File));
         domains.get("Data Fields").setFields(resultsFields);
 
-        return new SaveProtocolCommand(protocol).execute(cn, projectName).getProtocol().getProtocolId();
+        Integer protocolId = new SaveProtocolCommand(protocol).execute(cn, projectName).getProtocol().getProtocolId();
+
+        // GitHub Issue #159: The transform script must live in the assay's "@scripts" directory, so add it through the
+        // designer's file upload rather than setting an absolute path on the protocol via the API.
+        log("Add the transform script '" + PERL_SCRIPT + "' to the assay design using the designer's file upload.");
+        goToProjectHome(projectName);
+        ReactAssayDesignerPage assayDesignerPage = ReactAssayDesignerPage.beginAt(this, projectName, protocolId, "General", getURL().toString());
+        assayDesignerPage.addTransformScript(new File(SAMPLE_DATA_LOCATION, PERL_SCRIPT));
+        assayDesignerPage.clickFinish();
+
+        return protocolId;
     }
 
     public void addNewField(String projectName, String assayName, FieldDefinition newField)

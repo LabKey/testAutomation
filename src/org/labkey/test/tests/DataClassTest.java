@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019 LabKey Corporation
+ * Copyright (c) 2020-2026 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.hamcrest.CoreMatchers;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -26,6 +27,7 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.domain.AdvancedSettingsDialog;
 import org.labkey.test.components.domain.BaseDomainDesigner;
+import org.labkey.test.components.domain.DomainFieldRow;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.pages.core.admin.BaseSettingsPage.DATE_FORMAT;
 import org.labkey.test.pages.core.admin.BaseSettingsPage.TIME_FORMAT;
@@ -180,6 +182,19 @@ public class DataClassTest extends BaseWebDriverTest
                         "'Name Expression' is a reserved field name in 'Reserved Field Names Test'.",
                         "Please correct errors in Reserved Field Names Test before saving."),
                 createPage.clickSaveExpectingErrors());
+        domainFormPanel.removeAllFields(false);
+
+        log("Verify a reserved field name cannot be used as a field import alias. GH Issue 1474");
+        String aliasHostField = "AliasHostField";
+        DomainFieldRow fieldRow = domainFormPanel.manuallyDefineFields(aliasHostField);
+        for (String reservedName : Arrays.asList("Container", "Folder", "genId", "runid", "DataFileUrl", "NameExpression"))
+        {
+            fieldRow.setImportAliases(reservedName);
+            checker().verifyThat("Expected an error when an import alias matches reserved field name '" + reservedName + "'",
+                    String.join("\n", createPage.clickSaveExpectingErrors()),
+                    CoreMatchers.containsString("Import alias '" + reservedName + "' on field '" + aliasHostField + "' conflicts with a reserved field name."));
+            checker().screenShotIfNewError("importAliasConflictsWithReservedName_" + reservedName);
+        }
 
         createPage.clickCancel();
     }
@@ -291,6 +306,7 @@ public class DataClassTest extends BaseWebDriverTest
         createPage.clickSave();
 
         viewRawTableMetadata(dataClassName);
+        assertTextPresentCaseInsensitive("fk_rowid_"); // GitHub Issue 1117
         verifyTableIndices("unique_constraint_test_", List.of("field_Name1", "fieldName_2"));
         assertTextNotPresent("unique_constraint_test_fieldname_3");
         verifyTableIndexNonUnique("unique_constraint_test_", "field_Name1", true);

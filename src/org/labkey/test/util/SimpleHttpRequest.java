@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2019 LabKey Corporation
+ * Copyright (c) 2014-2026 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,13 +18,12 @@ package org.labkey.test.util;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.glassfish.jersey.media.multipart.ContentDisposition;
 import org.labkey.remoteapi.Connection;
 import org.labkey.test.TestFileUtils;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.WebDriver;
 
-import javax.mail.internet.ContentDisposition;
-import javax.mail.internet.ParseException;
 import java.io.File;
 import java.io.IOException;
 import java.net.Authenticator;
@@ -32,6 +31,7 @@ import java.net.HttpURLConnection;
 import java.net.PasswordAuthentication;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.text.ParseException;
 import java.util.Base64;
 import java.util.Collection;
 import java.util.Collections;
@@ -184,7 +184,7 @@ public class SimpleHttpRequest
                 {
                     try
                     {
-                        responseFilename = new ContentDisposition(contentDisposition).getParameter("filename");
+                        responseFilename = new ContentDisposition(contentDisposition).getFileName();
                     }
                     catch (ParseException ignore) { }
                 }

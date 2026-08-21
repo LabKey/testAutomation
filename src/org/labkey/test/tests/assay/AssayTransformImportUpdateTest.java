@@ -1,9 +1,25 @@
+/*
+ * Copyright (c) 2025-2026 LabKey Corporation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.labkey.test.tests.assay;
 
 import org.assertj.core.api.Assertions;
 import org.junit.Assume;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
@@ -19,11 +35,14 @@ import org.labkey.test.pages.core.admin.ShowAdminPage;
 import org.labkey.test.pages.pipeline.PipelineStatusDetailsPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.assay.GeneralAssayDesign;
+import org.labkey.test.util.core.admin.ServerUsageUtils;
 
 import java.io.File;
+import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import static org.labkey.test.pages.ReactAssayDesignerPage.ScriptFileEvent.Edit;
 import static org.labkey.test.pages.ReactAssayDesignerPage.ScriptFileEvent.Import;
@@ -33,6 +52,10 @@ import static org.labkey.test.pages.ReactAssayDesignerPage.ScriptFileEvent.Impor
 @BaseWebDriverTest.ClassTimeout(minutes = 4)
 public class AssayTransformImportUpdateTest extends AbstractAssayTransformTest
 {
+    // GH Issue 1130: feature areas that ScriptPackageUsageTracker records package usage under, one per language
+    private static final String R_PACKAGE_USAGE_AREA = "rPackageUsage";
+    private static final String PYTHON_PACKAGE_USAGE_AREA = "pythonPackageUsage";
+
     @Test
     public void testEnableTransformForUpdate() throws Exception
     {
@@ -97,6 +120,10 @@ public class AssayTransformImportUpdateTest extends AbstractAssayTransformTest
         assayDesignerPage.setEditableResults(true);
         assayDesignerPage.setScriptActionCheckbox(insertOrUpdateTransform, Edit, true);
         assayDesignerPage.clickSave();
+
+        // GH Issue 1130: baseline the tracked usage count before any transform script has run in this test
+        long initialRlabkeyUsage = getRPackageUsageCount("Rlabkey");
+        long initialDependentUsage = getRPackageUsageCount("httr");
 
         // now import data and ensure the expected transform operation occurred
         String importData = """
@@ -199,6 +226,118 @@ public class AssayTransformImportUpdateTest extends AbstractAssayTransformTest
         int assaysWithTransformScripts = Integer.parseInt(metricsPage.getValue());
         checker().verifyTrue("expect protocolsWithTransformScriptCount to have value >0",
                 assaysWithTransformScripts > 0);
+
+        // GH Issue 1130: check the metric package tracking for R packages on the successful executions (2 in this case)
+        metricsPage.clickClearButton();
+        metricsPage.setJsonPathInput("modules.API.simpleMetricCounts." + R_PACKAGE_USAGE_AREA);
+        checker().verifyTrue("expect Rlabkey to be present in the R package usage metrics",
+                metricsPage.isValidKeyPresent("Rlabkey"));
+        checker().verifyTrue("expect httr to be present in the R package usage metrics",
+                metricsPage.isValidKeyPresent("httr"));
+        checker().screenShotIfNewError("missing rPackageUsage metrics");
+
+        long finalRlabkeyUsage = getRPackageUsageCount("Rlabkey");
+        long finalDependentUsage = getRPackageUsageCount("httr");
+        checker().wrapAssertion(() -> Assertions.assertThat(finalRlabkeyUsage)
+                .as("expect one Rlabkey usage to be recorded for each of the two transform script runs")
+                .isEqualTo(initialRlabkeyUsage + 2));
+        checker().wrapAssertion(() -> Assertions.assertThat(finalDependentUsage)
+                .as("expect one Rlabkey usage to be recorded for each of the two transform script runs")
+                .isEqualTo(initialDependentUsage + 2));
+    }
+
+    // GH Issue 1130
+    @Test
+    public void testPythonTransformPackageUsage() throws Exception
+    {
+        String pythonTransform = "packageUsageTransform.py";
+        String pythonTransformAssay = "pythonTransformAssay";
+        String transformContent = """
+                from labkey.utils import transform_helper
+                filepath = '${runInfo}'
+                def transform(grid):
+                    isHeaderChecked = False
+                    for row in grid:
+                        if isHeaderChecked == False:
+                            row.append('testing')
+                            isHeaderChecked = True
+                        else:
+                            row.append(123)
+                    return grid
+                transform_helper(transform, filepath)
+                """;
+        File transformFile = TestFileUtils.writeTempFile(pythonTransform, transformContent);
+        var protocolResponse = new GeneralAssayDesign(pythonTransformAssay)
+                .setDataFields(List.of(new FieldDefinition("Comment", FieldDefinition.ColumnType.String)), true)
+                .createAssay(getProjectName(), createDefaultConnection());
+        goToProjectHome();
+
+        var assayDesignerPage = ReactAssayDesignerPage.beginAt(this, getProjectName(), protocolResponse.getProtocolId(),
+                "general", getURL().toString());
+        assayDesignerPage.addTransformScript(transformFile, true);
+        assayDesignerPage.goToBatchFields().removeAllFields(true);
+        assayDesignerPage.clickSave();
+
+        long initialUsage = getPythonPackageUsageCount("labkey");
+
+        String importData = """
+                VisitID	ParticipantID	Comment
+                1	1	this is the python transform import
+                """;
+
+        clickAndWait(Locator.linkWithText(pythonTransformAssay));
+        new AssayRunsPage(getDriver()).getTable().clickHeaderButtonAndWait("Import Data");
+        var importPage = new AssayImportPage(getDriver());
+        importPage.setNamedInputText("Name", "pythonTransformImport");
+        importPage.setNamedTextAreaValue(AssayConstants.TEXT_AREA_DATA_COLLECTOR_TEXT_AREA_NAME, importData);
+        importPage.clickSaveAndFinish();
+
+        var assayDataPage = new AssayRunsPage(getDriver()).clickAssayIdLink("pythonTransformImport");
+        var commentData = assayDataPage.getDataTable().getColumnDataAsText("Comment");
+        checker().wrapAssertion(() -> Assertions.assertThat(commentData)
+                .as("expect the no-op python transform script to leave the imported data unchanged")
+                .containsOnly("this is the python transform import"));
+        checker().screenShotIfNewError("unexpected python transform data");
+
+        // GH Issue 1130: check the metric package tracking for python packages on the single successful execution
+        var metricsPage = UsageStatisticsPage.beginAt(this);
+        metricsPage.setJsonPathInput("modules.API.simpleMetricCounts." + PYTHON_PACKAGE_USAGE_AREA);
+        checker().verifyTrue("expect labkey to be present in the python package usage metrics",
+                metricsPage.isValidKeyPresent("labkey"));
+        checker().screenShotIfNewError("missing pythonPackageUsage metrics");
+
+        long finalUsage = getPythonPackageUsageCount("labkey");
+        checker().wrapAssertion(() -> Assertions.assertThat(finalUsage)
+                .as("expect one labkey usage to be recorded for the single python transform script run")
+                .isEqualTo(initialUsage + 1));
+    }
+
+    private long getRPackageUsageCount(String packageName) throws IOException, CommandException
+    {
+        return getPackageUsageCount(R_PACKAGE_USAGE_AREA, packageName);
+    }
+
+    private long getPythonPackageUsageCount(String packageName) throws IOException, CommandException
+    {
+        return getPackageUsageCount(PYTHON_PACKAGE_USAGE_AREA, packageName);
+    }
+
+    /**
+     * GH Issue 1130: script package usage is recorded via SimpleMetricsService, which reports a cumulative per-package
+     * count under the API module's "simpleMetricCounts" node. Returns 0 if this server hasn't recorded the package
+     * yet, which is the case until the first successful script run for that language.
+     */
+    private long getPackageUsageCount(String featureArea, String packageName) throws IOException, CommandException
+    {
+        try
+        {
+            String metricPath = "simpleMetricCounts." + featureArea + "." + packageName;
+            return ServerUsageUtils.getModuleMetricValue(createDefaultConnection(), "API", metricPath);
+        }
+        catch (NoSuchElementException e)
+        {
+            return 0;
+        }
     }
 
     // Issue 50774

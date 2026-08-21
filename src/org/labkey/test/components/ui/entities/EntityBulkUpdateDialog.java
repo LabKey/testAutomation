@@ -1,3 +1,18 @@
+/*
+ * Copyright (c) 2020-2026 LabKey Corporation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.labkey.test.components.ui.entities;
 
 import org.jetbrains.annotations.NotNull;
@@ -18,6 +33,7 @@ import org.labkey.test.components.ui.files.FileUploadField;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldKey;
 import org.labkey.test.util.AuditLogHelper;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -26,6 +42,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -247,8 +264,7 @@ public class EntityBulkUpdateDialog extends EntityBulkDialog
      */
     private FileAttachmentContainer getFileField(CharSequence fieldIdentifier)
     {
-        FieldKey identifier = FileAttachmentContainer.fileUploadFieldKey(fieldIdentifier);
-        return enableAndWait(identifier, elementCache().fileUploadField(identifier));
+        return enableAndWait(fieldIdentifier, elementCache().fileUploadField(fieldIdentifier));
     }
 
     /**
@@ -290,8 +306,7 @@ public class EntityBulkUpdateDialog extends EntityBulkDialog
 
     public FileUploadField getExistingFileCard(CharSequence fieldIdentifier)
     {
-        FieldKey identifier = FileAttachmentContainer.fileUploadFieldKey(fieldIdentifier);
-        return enableAndWait(identifier, elementCache().fileField(identifier));
+        return enableAndWait(fieldIdentifier, elementCache().fileField(fieldIdentifier));
     }
 
     /**
@@ -325,15 +340,29 @@ public class EntityBulkUpdateDialog extends EntityBulkDialog
 
     public List<String> getFieldNames()
     {
-        List<WebElement> labels = Locator.tagWithClass("label", "control-label").withAttribute("for")
-                .waitForElements(elementCache(), 2_000);
+        List<WebElement> controlLabels = Locator.byClass("control-label").waitForElements(elementCache(), 2_000);
+        List<String> names = new ArrayList<>();
+        for (WebElement label : controlLabels)
+        {
+            if (label.getAttribute("data-fieldkey") == null)
+                try
+                {
+                    label = label.findElement(Locator.tagWithAttribute("span", "data-fieldkey"));
+                }
+                catch (NoSuchElementException e)
+                {
+                    throw new RuntimeException("Could not find field key for label: " + label.getText(), e);
+                }
+            String attribute = label.getAttribute("data-fieldkey");
+            names.add(FieldKey.fromFieldKey(attribute).getFullName());
+        }
 
         // Amount and Units is an example that has a "hide-label" for StoredAmount
         List<WebElement> hiddenLabels = Locator.tagWithClass("label", "hide-label").withAttribute("for")
                 .findElements(elementCache());
-        labels.addAll(hiddenLabels);
+        names.addAll(hiddenLabels.stream().map(a -> FieldKey.fromFieldKey(a.getDomAttribute("for")).getFullName()).toList());
 
-        return labels.stream().map(a -> FieldKey.fromFieldKey(a.getDomAttribute("for")).getFullName()).toList();
+        return names;
     }
 
     public EntityBulkUpdateDialog waitForFieldsToBe(List<String> expectedFieldNames, int waitMilliseconds)
@@ -425,7 +454,7 @@ public class EntityBulkUpdateDialog extends EntityBulkDialog
         {
             String fieldKey = FieldKey.fromName(fieldIdentifier).toString();
             return Locator.tagWithClass("div", "row")
-                    .withDescendant(Locator.tagWithAttribute("label", "for", fieldKey))
+                    .withDescendant(Locator.tagWithAttribute("span", "data-fieldkey", fieldKey))
                     .waitForElement(this, WAIT_TIMEOUT);
         }
 

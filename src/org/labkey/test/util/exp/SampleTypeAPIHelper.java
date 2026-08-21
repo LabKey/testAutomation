@@ -1,5 +1,21 @@
+/*
+ * Copyright (c) 2019-2026 LabKey Corporation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.labkey.test.util.exp;
 
+import org.json.JSONArray;
 import org.junit.Assert;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
@@ -13,14 +29,12 @@ import org.labkey.test.params.FieldInfo;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.DomainUtils;
 import org.labkey.test.util.DomainUtils.DomainKind;
-import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.TestDataGenerator;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -134,26 +148,16 @@ public class SampleTypeAPIHelper
      */
     public static Map<String, Integer> getRowIdsForSamples(String containerPath, String sampleTypeName, List<String> sampleNames) throws IOException, CommandException
     {
-
         // Use json for the value parameter of the filter. This allows for tricky characters like ";" to be passed to the API.
-        StringBuilder json = new StringBuilder("{json:[");
+        StringBuilder json = new StringBuilder("{json:").append(new JSONArray(sampleNames)).append("}");
 
-        Iterator<String> iterator = sampleNames.iterator();
-
-        while (iterator.hasNext()) {
-            String sampleName = iterator.next();
-            json.append(EscapeUtil.toJSONStr(sampleName));
-            if (iterator.hasNext()) {
-                json.append(", ");
-            } else {
-                json.append("]}");
-            }
-        }
-
+        // Use the details view to avoid column and filter settings on the default view
+        String detailsView = "~~DETAILS~~";
         Connection connection = WebTestHelper.getRemoteApiConnection();
         SelectRowsCommand cmd = new SelectRowsCommand("samples", sampleTypeName);
-        cmd.setColumns(Arrays.asList("RowId", "Name"));
+        cmd.setColumns(List.of("RowId", "Name"));
         cmd.addFilter("Name", json, Filter.Operator.IN);
+        cmd.setViewName(detailsView);
 
         SelectRowsResponse response = cmd.execute(connection, containerPath);
 
@@ -161,10 +165,11 @@ public class SampleTypeAPIHelper
 
         // There have been some TC failures where selectRows is not returning anything when it should. Adding this
         // logging to help get more logging when/if it happens again.
-        if(response.getRowCount().intValue() == 0)
+        if (response.getRowCount().intValue() == 0)
         {
             cmd = new SelectRowsCommand("samples", sampleTypeName);
-            cmd.setColumns(Arrays.asList("Name"));
+            cmd.setColumns(List.of("Name"));
+            cmd.setViewName(detailsView);
 
             SelectRowsResponse responseCount = cmd.execute(connection, containerPath);
 
@@ -172,7 +177,7 @@ public class SampleTypeAPIHelper
                     sampleTypeName, responseCount.getRowCount().intValue());
 
             List<String> names = new ArrayList<>();
-            for(Map<String, Object> row : responseCount.getRows())
+            for (Map<String, Object> row : responseCount.getRows())
             {
                 Object tempName = row.get("Name");
                 names.add(tempName.toString());
@@ -183,7 +188,7 @@ public class SampleTypeAPIHelper
 
         Map<String, Integer> rowIds = new TreeMap<>();
 
-        for(Map<String, Object> row : response.getRows())
+        for (Map<String, Object> row : response.getRows())
         {
             Object name = row.get("Name");
             Object value = row.get("RowId");
@@ -191,8 +196,7 @@ public class SampleTypeAPIHelper
         }
 
         // Check that the names returned from the query match the names sent in.
-        Assert.assertEquals(errorMsg,
-                new HashSet<>(sampleNames), rowIds.keySet());
+        Assert.assertEquals(errorMsg, new HashSet<>(sampleNames), rowIds.keySet());
 
         return rowIds;
     }

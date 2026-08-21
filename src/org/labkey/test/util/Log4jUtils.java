@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2019 LabKey Corporation
+ * Copyright (c) 2018-2026 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -103,5 +103,14 @@ public abstract class Log4jUtils
     public static void showLogSinceMark(WebDriverWrapper driver) throws IOException
     {
         driver.beginAt(WebTestHelper.buildURL("admin", "showPrimaryLogSinceMark"));
+    }
+
+    /** The primary log since the last {@link #resetLogMark()}, for tests that assert on what the server logged. */
+    @LogMethod(quiet = true)
+    public static String getLogSinceMark(WebDriverWrapper driver) throws IOException
+    {
+        SimpleHttpRequest request = new SimpleHttpRequest(WebTestHelper.buildURL("admin", "showPrimaryLogSinceMark"));
+        request.copySession(driver.getDriver());
+        return request.getResponse().getResponseBody();
     }
 }

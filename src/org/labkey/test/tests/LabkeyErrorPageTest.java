@@ -1,3 +1,18 @@
+/*
+ * Copyright (c) 2020-2026 LabKey Corporation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.labkey.test.tests;
 
 import org.hamcrest.CoreMatchers;
@@ -87,7 +102,7 @@ public class LabkeyErrorPageTest extends BaseWebDriverTest
 
         checker().verifyEquals("Incorrect error heading message", "Oops! A server configuration error has occurred.",
                 errorPage.getErrorHeading());
-        checker().verifyEquals("Incorrect error sub-heading message", "The requested page cannot be found. You have a configuration problem.",
+        checker().verifyEquals("Incorrect error sub-heading message", "You have a configuration problem.",
                 errorPage.getSubErrorHeading());
         checker().verifyThat("Incorrect error image", errorPage.getErrorImage(), CoreMatchers.containsString(imageTitle));
         checker().verifyTrue("'Show Details' button should appear on configuration error page",

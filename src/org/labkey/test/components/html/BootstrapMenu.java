@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2019 LabKey Corporation
+ * Copyright (c) 2017-2026 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,10 +29,20 @@ import java.util.List;
 public class BootstrapMenu extends BaseBootstrapMenu
 {
     /* componentElement should contain the toggle anchor *and* the UL containing list items */
+    public BootstrapMenu(WebElement componentElement, WebDriver driver)
+    {
+        super(componentElement, driver);
+    }
+
+    /**
+     * @deprecated Non-standard parameter order
+     */
+    @Deprecated (since = "26.8")
     public BootstrapMenu(WebDriver driver, WebElement componentElement)
     {
         super(componentElement, driver);
     }
+
 
     static public BootstrapMenuFinder finder(WebDriver driver)
     {

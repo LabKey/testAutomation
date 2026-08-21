@@ -1,3 +1,18 @@
+/*
+ * Copyright (c) 2021-2026 LabKey Corporation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.labkey.test.components.ui.notifications;
 
 import org.labkey.test.Locator;
@@ -5,6 +20,7 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.ui.pipeline.ImportsPage;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -123,7 +139,7 @@ public class ServerNotificationMenu extends WebDriverComponent<ServerNotificatio
     protected boolean isExpanded()
     {
         boolean ariaExpanded = "true".equals(elementCache().toggle.getAttribute("aria-expanded"));
-        boolean menuContentDisplayed = elementCache().menuContent.isDisplayed();
+        boolean menuContentDisplayed = elementCache().menuContent().isDisplayed();
 
         return ariaExpanded && menuContentDisplayed;
     }
@@ -157,10 +173,19 @@ public class ServerNotificationMenu extends WebDriverComponent<ServerNotificatio
 
     public ImportsPage clickViewAll()
     {
-        expand();
-        WebDriverWrapper.waitFor(elementCache().viewAllLink()::isDisplayed,
-                "View all link did not become visible.", 2_500);
-        elementCache().viewAllLink().click();
+        // Retry for clicking 'View all activity' link because of stale element.
+        WebDriverWrapper.waitFor(() -> {
+            try
+            {
+                expand();
+                elementCache().viewAllLink().click();
+                return true;
+            }
+            catch (StaleElementReferenceException | NoSuchElementException retry)
+            {
+                return false;
+            }
+        }, "View all link did not become clickable.", 5_000);
         return new ImportsPage(getWrapper());
     }
 
@@ -176,16 +201,14 @@ public class ServerNotificationMenu extends WebDriverComponent<ServerNotificatio
 
         // Wait for the listing container to show up. The listing container is in the open menu, scope the search to that.
         Locator notificationsContainerLocator = Locator.tagWithClass("div", "server-notifications-listing-container");
-        WebDriverWrapper.waitFor(()-> notificationsContainerLocator.refindWhenNeeded(elementCache().menuContent).isDisplayed(),
+        WebDriverWrapper.waitFor(()-> notificationsContainerLocator.areAnyVisible(elementCache().menuContent()),
                 "List container did not render.", 500);
 
         // Find again (lambda requires a final reference to the component).
-        WebElement listContainer = notificationsContainerLocator.refindWhenNeeded(elementCache().menuContent);
+        WebElement listContainer = notificationsContainerLocator.refindWhenNeeded(elementCache().menuContent());
 
         // It may be a moment before any notifications show up.
-        WebDriverWrapper.waitFor(()-> Locator.tagWithClass("ul", "server-notifications-listing")
-                        .refindWhenNeeded(listContainer)
-                        .isDisplayed(),
+        WebDriverWrapper.waitFor(()-> Locator.tagWithClass("ul", "server-notifications-listing").areAnyVisible(listContainer),
                 "There are no notifications in the drop down.", 1_000);
 
         // Just wait for a moment in case the list is slow to update with the most recent notification.
@@ -198,7 +221,7 @@ public class ServerNotificationMenu extends WebDriverComponent<ServerNotificatio
 
         // Find the container again, don't return listContainer WebElement previously found. If the list was slow to
         // update with the most recent notification the old reference will be stale.
-        return notificationsContainerLocator.refindWhenNeeded((elementCache().menuContent));
+        return notificationsContainerLocator.refindWhenNeeded((elementCache().menuContent()));
     }
 
     /**
@@ -257,9 +280,12 @@ public class ServerNotificationMenu extends WebDriverComponent<ServerNotificatio
 
     protected class ElementCache extends Component<?>.ElementCache
     {
-        public final WebElement menuContent = Locator.byClass("navbar-menu__content").refindWhenNeeded(this);
+        public final WebElement menuContent()
+        {
+            return Locator.byClass("navbar-menu__content").refindWhenNeeded(this);
+        }
 
-        public final WebElement toggle = Locator.byClass("navbar-menu-button").findWhenNeeded(this);
+        public final WebElement toggle = Locator.byClass("navbar-menu-button").refindWhenNeeded(this);
 
         public final WebElement statusIcon()
         {
@@ -268,14 +294,14 @@ public class ServerNotificationMenu extends WebDriverComponent<ServerNotificatio
 
         public final WebElement noNotificationsElement()
         {
-            return Locator.tagWithClass("div", "server-notifications-footer").refindWhenNeeded(elementCache().menuContent);
+            return Locator.tagWithClass("div", "server-notifications-footer").refindWhenNeeded(elementCache().menuContent());
         }
 
         public final WebElement markAll()
         {
             return Locator.tagWithClass("h3", "navbar-menu-header")
                     .child(Locator.byClass("clickable-text"))
-                    .refindWhenNeeded(elementCache().menuContent);
+                    .refindWhenNeeded(elementCache().menuContent());
         }
 
         public final WebElement viewAllLink()

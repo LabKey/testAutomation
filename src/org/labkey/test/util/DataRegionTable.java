@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2021 LabKey Corporation
+ * Copyright (c) 2008-2026 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -207,6 +207,12 @@ public class DataRegionTable extends DataRegion
             return this;
         }
 
+        public DataRegionFinder inWebPart(String webPartTitle)
+        {
+            _loc = PortalHelper.Locators.webPart(webPartTitle).append(Locators.dataRegion());
+            return this;
+        }
+
         @Override
         protected Locator locator()
         {
@@ -233,15 +239,22 @@ public class DataRegionTable extends DataRegion
         }
     }
 
+    /**
+     * @deprecated Use {@link DataRegionFinder} directly
+     */
     @Deprecated
     public static DataRegionTable findDataRegion(WebDriverWrapper test)
     {
         return DataRegion(test.getDriver()).find();
     }
 
+    /**
+     * @deprecated Use {@link DataRegionFinder#inWebPart(String)}
+     */
+    @Deprecated
     public static DataRegionTable findDataRegionWithinWebpart(WebDriverWrapper test, String webPartTitle)
     {
-        return DataRegion(test.getDriver()).find(new RefindingWebElement(PortalHelper.Locators.webPart(webPartTitle), test.getDriver()));
+        return DataRegion(test.getDriver()).inWebPart(webPartTitle).find();
     }
 
     public int getColumnCount()

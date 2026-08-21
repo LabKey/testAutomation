@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 LabKey Corporation
+ * Copyright (c) 2020-2026 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.remoteapi.puppeteer.PuppeteerSettings;
 import org.labkey.remoteapi.puppeteer.PuppeteerStatus;
-import org.labkey.test.WebTestHelper;
 
 import java.io.IOException;
 
@@ -37,7 +36,9 @@ public class PuppeteerHelper
 
     public static String getRemoteServiceURL()
     {
-        return WebTestHelper.getTargetServer() + ":3031";
+        // Note: We are explicitly using localhost here instead of WebTestHelper.getTargetServer() because on TC it will
+        // use the hostname of the server, which is running Puppeteer with http, so API requests to it will be rejected.
+        return "http://localhost:3031";
     }
 
     public static PuppeteerStatus getStatus(Connection connection) throws IOException, CommandException

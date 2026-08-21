@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 LabKey Corporation
+ * Copyright (c) 2019-2026 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@ package org.labkey.test.tests;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
@@ -47,6 +46,7 @@ import org.labkey.test.util.ArtifactCollector;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.OptionalFeatureHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
 import org.labkey.test.util.TestDataGenerator;
@@ -59,7 +59,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -98,11 +98,19 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
         return BrowserType.CHROME;
     }
 
-    @BeforeClass
-    public static void setupProject()
+    @Override
+    protected void doCleanup(boolean afterTest)
     {
-        SampleTypeFolderExportImportTest init = getCurrentTest();
-        init.doSetup();
+        super.doCleanup(afterTest);
+        if (afterTest)
+        {
+            OptionalFeatureHelper.resetOptionalFeature(createDefaultConnection(), "deriveSamplesNotInApp");
+        }
+        else {
+            OptionalFeatureHelper.setOptionalFeature(createDefaultConnection(), "deriveSamplesNotInApp", true);
+            SampleTypeFolderExportImportTest init = getCurrentTest();
+            init.doSetup();
+        }
     }
 
     private void doSetup()
@@ -132,17 +140,9 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
             return false;
 
         // Order the two lists so compare can be done by index and not by searching the two lists.
-        Collections.sort(list01, (Map<String, String> o1, Map<String, String> o2)->
-                {
-                    return o1.get("Name").compareTo(o2.get("Name"));
-                }
-        );
+        list01.sort(Comparator.comparing((Map<String, String> o) -> o.get("Name")));
 
-        Collections.sort(list02, (Map<String, String> o1, Map<String, String> o2)->
-                {
-                    return o1.get("Name").compareTo(o2.get("Name"));
-                }
-        );
+        list02.sort(Comparator.comparing((Map<String, String> o) -> o.get("Name")));
 
         boolean areEqual = true;
 
@@ -476,11 +476,12 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
                 "ParentAlias", "Parent3, Parent2", "SelfParent", "Child5", "DataClassParent", "data2, data3"));
         testDgen.insertRows();
 
-        PortalHelper portalHelper = new PortalHelper(this);
-        portalHelper.addWebPart("Sample Types");
-        portalHelper.addWebPart("Experiment Runs");
+        new PortalHelper(this).doInAdminMode(portalHelper -> {
+            portalHelper.addWebPart("Sample Types");
+            portalHelper.addWebPart("Experiment Runs");
+        });
 
-        DataRegionTable sourceRunsTable = DataRegionTable.DataRegion(getDriver()).withName("Runs").waitFor();
+        DataRegionTable sourceRunsTable = DataRegionTable.DataRegion(getDriver()).inWebPart("Experiment Runs").waitFor();
         List<String> runNames = sourceRunsTable.getColumnDataAsText("Name");
 
         clickAndWait(Locator.linkWithText(testSamples));
@@ -501,7 +502,7 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
         importFolderFromZip(exportedFolderFile, false, 1);
         goToProjectFolder(IMPORT_PROJECT_NAME, importFolder);
 
-        List<String> importedRunNames = DataRegionTable.DataRegion(getDriver()).withName("Runs").waitFor()
+        List<String> importedRunNames = DataRegionTable.DataRegion(getDriver()).inWebPart("Experiment Runs").waitFor()
                 .getColumnDataAsText("Name");
         for (String sourceRun : runNames)
         {
@@ -521,7 +522,7 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
         List<Map<String, String>> destRowData = destSamplesTable.getTableData();
 
         // now ensure expected data in the sampleType made it to the destination folder
-        for (Map exportedRow : sourceRowData)
+        for (Map<String, String> exportedRow : sourceRowData)
         {
             // find the map from the exported project with the same name
             Map<String, String> matchingMap = destRowData.stream().filter(a-> a.get("Name").equals(exportedRow.get("Name")))
@@ -541,15 +542,28 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
             assertThat("expect export and import values to be equivalent",
                     exportedRow.get(decimalColFieldKey), equalTo(matchingMap.get(decimalColFieldKey)));
 
-            List<String> sourceParents = Arrays.asList(exportedRow.get("Inputs/Materials/parentSamples").toString()
+            List<String> sourceParents = Arrays.asList(exportedRow.get("Inputs/Materials/parentSamples")
                     .replace(" ", "").split(","));
             String[] importedParents = matchingMap.get("Inputs/Materials/parentSamples").replace(" ", "").split(",");
             assertThat("expect parent sampleType derivation to round trip with equivalent values", sourceParents, hasItems(importedParents));
-            List<String> sourceDataParents = Arrays.asList(exportedRow.get("Inputs/Data/parentDataClass").toString()
+            List<String> sourceDataParents = Arrays.asList(exportedRow.get("Inputs/Data/parentDataClass")
                     .replace(" ", "").split(","));
             String[] importedDataParents = matchingMap.get("Inputs/Data/parentDataClass").replace(" ", "").split(",");
             assertThat("expect parent dataClass derivation to round trip with equivalent values", sourceDataParents, hasItems(importedDataParents));
         }
+
+        // GitHub Issue 1117
+        String importFolderPath = IMPORT_PROJECT_NAME + "/" + importFolder;
+        verifyRowIdForeignKey(importFolderPath, "samples", testSamples);
+        verifyRowIdForeignKey(importFolderPath, "samples", parentSampleType);
+        verifyRowIdForeignKey(importFolderPath, "exp.data", dataClass);
+    }
+
+    private void verifyRowIdForeignKey(String containerPath, String schemaName, String queryName)
+    {
+        beginAt(WebTestHelper.buildURL("query", containerPath, "rawTableMetaData",
+                Map.of("schemaName", schemaName, "query.queryName", queryName)));
+        assertTextPresentCaseInsensitive("fk_rowid_");
     }
 
     @Test
@@ -739,7 +753,7 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
             importData.add(importedDataTable.getRowDataAsMap(i));
         }
 
-        for (Map exportedRow : exportData)
+        for (Map<String, String> exportedRow : exportData)
         {
             // find the map from the exported project with the same name
             Map<String, String> matchingMap = importData.stream().filter(a -> a.get("sampleId").equals(exportedRow.get("sampleId")))
@@ -775,14 +789,14 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
             if (field.isNamePartMatch(namePart))
                 return field;
         }
-        return null;
+        throw new RuntimeException("Field " + namePart + " not found: " + fields.stream().map(FieldDefinition::getName).toList());
     }
 
     private StringBuilder checkDisplayFields(String displayField, List<String> columnLabels)
     {
         StringBuilder tmpString = new StringBuilder();
 
-        if(!columnLabels.contains("Name"))
+        if(!columnLabels.contains(displayField))
         {
             String errorMsg = "Did not find the 'Name' column.";
             log("\n*************** ERROR ***************\n" + errorMsg + "\n*************** ERROR ***************");

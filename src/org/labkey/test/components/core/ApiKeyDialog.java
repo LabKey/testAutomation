@@ -1,8 +1,24 @@
+/*
+ * Copyright (c) 2024-2026 LabKey Corporation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.labkey.test.components.core;
 
 import org.labkey.test.Locator;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.html.Input;
+import org.labkey.test.components.html.OptionSelect;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -136,6 +152,12 @@ public class ApiKeyDialog extends ModalDialog
         return elementCache().descriptionDisplay.getText();
     }
 
+    public ApiKeyDialog setRestrictionRole(String restrictionRole)
+    {
+        elementCache().restrictionRoleSelect.selectByVisibleText(restrictionRole);
+        return this;
+    }
+
     public String getInputFieldValue()
     {
         return elementCache().inputField.getValue();
@@ -157,8 +179,10 @@ public class ApiKeyDialog extends ModalDialog
     {
         Input descriptionInput = Input.Input(Locator.tagWithId("input", "keyDescription"), getDriver()).findWhenNeeded(this);
         WebElement descriptionDisplay = Locator.tagWithClassContaining("div", "api-key__description").findWhenNeeded(this);
+        OptionSelect<OptionSelect.SelectOption> restrictionRoleSelect = new OptionSelect<>(Locator.tagWithId("select", "keyRole")
+            .findWhenNeeded(this).withTimeout(2000));
         WebElement generateApiKeyButton = Locator.tagWithText("button", "Generate API Key").findWhenNeeded(this);
-        Input inputField = Input.Input(Locator.tagWithClass("input", "api-key__input"), getDriver()).findWhenNeeded(this);
+        Input inputField = Input.Input(Locator.tagWithClass("input", "api-key__display"), getDriver()).findWhenNeeded(this);
         WebElement copyKeyButton = Locator.tagWithName("button", "copy_apikey_token").findWhenNeeded(this);
         WebElement doneButton = Locator.tagWithText("button", "Done").findWhenNeeded(this);
     }

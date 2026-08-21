@@ -1,3 +1,18 @@
+/*
+ * Copyright (c) 2020-2026 LabKey Corporation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.labkey.test.components.ui.grids;
 
 import org.labkey.test.Locator;
@@ -44,7 +59,7 @@ public class DetailDataPanel extends WebDriverComponent<DetailDataPanel.ElementC
     public String getTitle()
     {
         if (_title == null)
-            _title = elementCache().heading.getText();
+            _title = elementCache().headingText.getText();
         return _title;
     }
 
@@ -160,12 +175,15 @@ public class DetailDataPanel extends WebDriverComponent<DetailDataPanel.ElementC
 
     protected class ElementCache extends Component<?>.ElementCache
     {
-        final WebElement heading = Locator.tagWithClass("span", "detail__edit--heading").parent().findWhenNeeded(this);
+        final Locator.XPathLocator editHeadingLocator = Locator.tagWithClass("span", "detail__edit--heading");
+        final Locator.XPathLocator headingLocator = editHeadingLocator.parent();
+        final WebElement editHeading = editHeadingLocator.findWhenNeeded(this);
+        final WebElement headingText = headingLocator.childTag("span").findWhenNeeded(this);
 
         public Optional<WebElement> editButton()
         {
             return Locator.byClass("detail__edit-button")
-                    .findOptionalElement(heading);
+                    .findOptionalElement(editHeading);
         }
 
         // If this panel is for an aliquot sample there will be more than one table present.
@@ -223,7 +241,7 @@ public class DetailDataPanel extends WebDriverComponent<DetailDataPanel.ElementC
                 return _baseLocatorAsTooltip;
             else if (_title != null)
                 return _baseLocator.withChild(Locator.byClass("panel-heading")
-                        .withText(_title));
+                        .withText().containing(_title));
             else
                 return _baseLocator;
         }

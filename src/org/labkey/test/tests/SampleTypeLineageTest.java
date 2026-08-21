@@ -1,9 +1,25 @@
+/*
+ * Copyright (c) 2020-2026 LabKey Corporation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.labkey.test.tests;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.SimpleGetCommand;
 import org.labkey.remoteapi.experiment.LineageCommand;
 import org.labkey.remoteapi.experiment.LineageNode;
 import org.labkey.remoteapi.experiment.LineageResponse;
@@ -14,6 +30,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.params.FieldDefinition;
@@ -21,6 +38,7 @@ import org.labkey.test.params.FieldKey;
 import org.labkey.test.params.experiment.DataClassDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.OptionalFeatureHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
 import org.labkey.test.util.TestDataGenerator;
@@ -55,7 +73,7 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
     @Override
     public List<String> getAssociatedModules()
     {
-        return Arrays.asList("experiment");
+        return List.of("experiment");
     }
 
     @Override
@@ -69,7 +87,6 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
     {
         SampleTypeLineageTest init = getCurrentTest();
 
-        // Comment out this line (after you run once) it will make iterating on  tests much easier.
         init.doSetup();
     }
 
@@ -84,6 +101,7 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
         portalHelper.addWebPart("Sample Types");
 
         portalHelper.exitAdminMode();
+        OptionalFeatureHelper.setOptionalFeature(createDefaultConnection(), "deriveSamplesNotInApp", true);
     }
 
     @Override
@@ -91,9 +109,7 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
     {
         super.doCleanup(afterTest);
 
-        // If you are debugging tests change this function to do nothing.
-        // It can make re-running faster but you need to valid the integrity of the test data on your own.
-//        log("Do nothing.");
+        OptionalFeatureHelper.resetOptionalFeature(createDefaultConnection(), "deriveSamplesNotInApp");
     }
 
     /**
@@ -781,9 +797,9 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
             fail("Expect CommandException when inserting bogus lineage");
         }catch (CommandException successMaybe)
         {
-            assertTrue("expect bad lineage to produce error containing [Sample 'BOGUS' not found in Sample Type 'badLineageTest'.];\n" +
+            assertTrue("expect bad lineage to produce error containing [Parent sample 'BOGUS' from Sample Type 'badLineageTest' not found in the current context.];\n" +
                             "instead got: [" + successMaybe.getMessage() + "]",
-                    successMaybe.getMessage().contains("Sample 'BOGUS' not found in Sample Type 'badLineageTest'."));
+                    successMaybe.getMessage().contains("Parent sample 'BOGUS' from Sample Type 'badLineageTest' not found in the current context."));
         }
     }
 
@@ -810,9 +826,9 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
             fail("Expect CommandException when inserting bogus lineage");
         }catch (CommandException successMaybe)  // success looks like a CommandException with the expected message
         {
-            assertTrue("expect bad lineage to produce error containing [Sample 'BOGUS' not found in Sample Type 'badParentLineage'.];\n" +
+            assertTrue("expect bad lineage to produce error containing [Parent sample 'BOGUS' from Sample Type 'badParentLineage' not found in the current context.];\n" +
                             "instead got: [" + successMaybe.getMessage() + "]",
-                    successMaybe.getMessage().contains("Sample 'BOGUS' not found in Sample Type 'badParentLineage'."));
+                    successMaybe.getMessage().contains("Parent sample 'BOGUS' from Sample Type 'badParentLineage' not found in the current context."));
         }
 
         // clean up on success
@@ -842,7 +858,7 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
         // create a sample type with the following explicit domain columns
         SampleTypeDefinition sampleType = new SampleTypeDefinition("Family");
         TestDataGenerator sampleGenerator = sampleType.create(createDefaultConnection(), getProjectName());
-        
+
         sampleGenerator.addRow(List.of("A"));
         sampleGenerator.addRow(List.of("B"));
         sampleGenerator.addCustomRow(Map.of("name", "C", "MaterialInputs/Family", "A,B"));
@@ -1216,4 +1232,19 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
 
     }
 
+    @Test
+    public void testDiagnosticActions() throws IOException, CommandException
+    {
+        // CycleCheckAction: confirm the page loads and the acyclic test data reports no cycles
+        beginAt(WebTestHelper.buildURL("experiment", PROJECT_NAME, "cycleCheck"));
+        assertTextPresent("This operation can use a lot of memory.");
+        clickButton("Continue");
+        assertTextPresent("No cycles found");
+
+        // CheckEdgesAction: confirm the API returns success with an empty cycle list
+        var cmd = new SimpleGetCommand("experiment", "checkEdges");
+        Map<String, Object> response = cmd.execute(createDefaultConnection(), "/" + PROJECT_NAME).getParsedData();
+        assertEquals("CheckEdgesAction should report success", Boolean.TRUE, response.get("success"));
+        assertEquals("CheckEdgesAction should find no cycle edges", List.of(), response.get("result"));
+    }
 }

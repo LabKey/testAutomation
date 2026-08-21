@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2019 LabKey Corporation
+ * Copyright (c) 2017-2026 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -185,6 +185,11 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
             WebDriverWrapper.waitFor(this::isSearchBarExpanded, "Search bar didn't expand", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
         }
         return elementCache().searchInput;
+    }
+
+    public boolean isSearchIconPresent()
+    {
+        return elementCache().searchToggle.isDisplayed();
     }
 
     public AdminMenu adminMenu()

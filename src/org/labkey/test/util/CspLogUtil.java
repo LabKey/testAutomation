@@ -1,3 +1,18 @@
+/*
+ * Copyright (c) 2023-2026 LabKey Corporation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.labkey.test.util;
 
 import org.apache.commons.collections4.MultiValuedMap;
@@ -26,8 +41,8 @@ import java.util.Set;
 public class CspLogUtil
 {
     private static final List<String> ignoredViolations = List.of(
-            "/_rstudio/",
-            "/_rstudioReport/"
+        "/_rstudio/",
+        "/_rstudioReport/"
     );
     private static final Set<String> ignoredDirectives = Collections.emptySet();
 
@@ -108,8 +123,8 @@ public class CspLogUtil
                     throw new RuntimeException("Failed to read recent CSP violations.", e);
                 }
 
-                boolean foundVioloation = false;
-                MultiValuedMap<Crawler.ControllerActionId, String> violoations = new HashSetValuedHashMap<>();
+                boolean foundViolation = false;
+                MultiValuedMap<Crawler.ControllerActionId, String> violations = new HashSetValuedHashMap<>();
                 List<CspReport> cspReports = new ArrayList<>();
                 StringBuilder sb = new StringBuilder();
                 for (String line : warningLines)
@@ -122,18 +137,18 @@ public class CspLogUtil
                     {
                         cspReports.add(new CspReport(sb.toString()));
                         sb = new StringBuilder();
-                        foundVioloation = true;
+                        foundViolation = true;
                     }
                 }
 
-                if (!foundVioloation)
+                if (!foundViolation)
                 {
                     throw new AssertionError("Detected CSP violations but unable to parse log file: " + recentWarningsFile.getAbsolutePath());
                 }
 
                 for (CspReport cspReport : cspReports)
                 {
-                    String url = cspReport.getDocumentUri();
+                    String url = cspReport.getDocumentUrl();
                     String violatedDirective = cspReport.getViolatedDirective();
                     if (ignoredViolations.stream().anyMatch(url::contains) || ignoredDirectives.contains(violatedDirective))
                     {
@@ -142,20 +157,20 @@ public class CspLogUtil
                     else
                     {
                         Crawler.ControllerActionId actionId = new Crawler.ControllerActionId(url);
-                        violoations.put(actionId, cspReport.toString());
+                        violations.put(actionId, cspReport.toString());
                     }
                 }
 
-                if (!violoations.isEmpty())
+                if (!violations.isEmpty())
                 {
                     StringBuilder errorMessage = new StringBuilder()
                             .append("Detected CSP violations on the following actions (See log for more detail: ")
                             .append(recentWarningsFile.getAbsolutePath())
                             .append("):");
-                    for (Crawler.ControllerActionId actionId : violoations.keySet())
+                    for (Crawler.ControllerActionId actionId : violations.keySet())
                     {
                         errorMessage.append("\n\t");
-                        Collection<String> urls = violoations.get(actionId);
+                        Collection<String> urls = violations.get(actionId);
                         errorMessage.append(actionId);
                         if (urls.size() > 1)
                         {
@@ -206,13 +221,24 @@ public class CspLogUtil
 class CspReport
 {
     private final String _violatedDirective;
-    private final String _documentUri;
+    private final String _documentUrl;
 
     CspReport(String reportStr)
     {
-        JSONObject report = new JSONObject(reportStr).getJSONObject("csp-report");
-        _violatedDirective = report.getString("violated-directive");
-        _documentUri = report.getString("document-uri");
+        // Support report-uri and report-to reports
+        JSONObject json = new JSONObject(reportStr);
+        JSONObject report = json.optJSONObject("body");
+        if (report != null)
+        {
+            _violatedDirective = report.getString("effectiveDirective");
+            _documentUrl = report.getString("documentURL");
+        }
+        else
+        {
+            report = json.getJSONObject("csp-report");
+            _violatedDirective = report.getString("violated-directive");
+            _documentUrl = report.getString("document-uri");
+        }
     }
 
     public String getViolatedDirective()
@@ -220,14 +246,14 @@ class CspReport
         return _violatedDirective;
     }
 
-    public String getDocumentUri()
+    public String getDocumentUrl()
     {
-        return _documentUri;
+        return _documentUrl;
     }
 
     @Override
     public String toString()
     {
-        return getViolatedDirective() + ": " + getDocumentUri();
+        return getViolatedDirective() + ": " + getDocumentUrl();
     }
 }

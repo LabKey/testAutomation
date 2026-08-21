@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019 LabKey Corporation
+ * Copyright (c) 2008-2026 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,6 +64,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.labkey.test.WebTestHelper.buildURL;
+import static org.labkey.test.WebTestHelper.getHttpResponse;
 import static org.labkey.test.util.PermissionsHelper.AUTHOR_ROLE;
 import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
 import static org.labkey.test.util.PermissionsHelper.READER_ROLE;
@@ -100,7 +101,7 @@ public class SecurityTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        ((SecurityTest)getCurrentTest()).doSetup();
+        ((SecurityTest) getCurrentTest()).doSetup();
     }
 
     protected void doSetup()
@@ -425,9 +426,9 @@ public class SecurityTest extends BaseWebDriverTest
         if (isPresent)
         {
             clickAndWait(userAccessLink);
-            
+
             // check for the expected number of group membership links (note: they may be hidden by expandos)
-            click(Locator.xpath("//tr[td/a[text()='" + getProjectName() + "']]//img" ));
+            click(Locator.xpath("//tr[td/a[text()='" + getProjectName() + "']]//img"));
             assertElementPresent(Locator.linkWithText(groupName), expectedCount);
             return;
         }
@@ -476,10 +477,10 @@ public class SecurityTest extends BaseWebDriverTest
         DataRegionTable table = new DataRegionTable("query", getDriver());
 
         table.getDataAsText(2, 2);
-        String createdBy      = table.getDataAsText(2, "Created By");
+        String createdBy = table.getDataAsText(2, "Created By");
         String impersonatedBy = table.getDataAsText(2, "Impersonated By");
-        String user           = table.getDataAsText(2, "User");
-        String comment        = table.getDataAsText(2, "Comment");
+        String user = table.getDataAsText(2, "User");
+        String comment = table.getDataAsText(2, "Comment");
 
         assertTrue("Incorrect display for deleted user -- expected '<nnnn>', found '" + user + "'", user.matches("<\\d{4,}>"));
         assertEquals("Incorrect log entry for deleted user",
@@ -504,7 +505,7 @@ public class SecurityTest extends BaseWebDriverTest
         _userHelper.deleteUsers(false, selfRegUserEmail);
 
         int getResponse = setAuthenticationParameter("SelfRegistration", true);
-        assertEquals("failed to set authentication param to enable self register via http get", 200, getResponse );
+        assertEquals("failed to set authentication param to enable self register via http get", 200, getResponse);
         signOut();
 
         // test: attempt login, check if register button appears, click register
@@ -514,7 +515,7 @@ public class SecurityTest extends BaseWebDriverTest
         }
         assertTitleContains(SIGN_IN_TEXT);
         assertElementPresent(Locator.tagWithName("form", "login"));
-        clickAndWait(Locator.lkButton("Register"));
+        clickAndWait(Locator.linkWithText("Register"));
 
         assertTitleContains("Register");
         assertElementPresent(Locator.tagWithName("form", "register"));
@@ -542,7 +543,7 @@ public class SecurityTest extends BaseWebDriverTest
             clickAndWait(Locator.linkWithText(SIGN_IN_TEXT));
         }
         assertTitleContains(SIGN_IN_TEXT);
-        WebElement link = Locator.button("Register").findElementOrNull(getDriver());
+        WebElement link = Locator.linkWithText("Register").findElementOrNull(getDriver());
         assertFalse("Self-registration button is visible", link != null && link.isDisplayed());
 
         beginAt(buildURL("login", "register"));
@@ -550,5 +551,40 @@ public class SecurityTest extends BaseWebDriverTest
 
         // cleanup: sign admin back in
         signIn();
+    }
+
+    @LogMethod
+    @Test
+    public void invokeMutatingSqlAction()
+    {
+        String getUrl = buildURL("test", "executeMutatingSqlGet");
+        String postUrl = buildURL("test", "executeMutatingSqlPost");
+        String feature = "AllowMutatingSqlViaGet";
+        Connection conn = createDefaultConnection();
+
+        try
+        {
+            OptionalFeatureHelper.disableOptionalFeature(conn, feature);
+
+            // Ensure that a GET request invoking mutating SQL is forbidden
+            beginAt(getUrl);
+            assertTextPresent("MUTATING SQL executed as part of handling action: GET org.labkey.devtools.TestController$ExecuteMutatingSqlGetAction");
+            checkExpectedErrors(2);
+
+            // Ensure that a POST request to a POST action can invoke mutating SQL
+            SimpleHttpResponse response = getHttpResponse(postUrl, "POST");
+            assertTrue(response.getResponseBody().contains("UPDATE via POST was allowed!"));
+            assertEquals(HttpStatus.SC_OK, response.getResponseCode());
+
+            // Turn on the deprecated feature flag and ensure that a GET request can now invoke mutating SQL
+            OptionalFeatureHelper.enableOptionalFeature(conn, feature);
+            beginAt(getUrl);
+            assertTextPresent("UPDATE via GET was allowed!");
+        }
+        finally
+        {
+            // Restore flag to its original value
+            OptionalFeatureHelper.resetOptionalFeature(conn, feature);
+        }
     }
 }

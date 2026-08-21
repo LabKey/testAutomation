@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2019 LabKey Corporation
+ * Copyright (c) 2015-2026 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,11 @@ public abstract class Component<EC extends Component.ElementCache> implements Se
     private boolean _cacheCreated = false;
 
     public abstract WebElement getComponentElement();
+
+    public boolean isDisplayed()
+    {
+        return getComponentElement().isDisplayed();
+    }
 
     @Override
     public String toString()

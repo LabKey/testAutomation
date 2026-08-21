@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2019 LabKey Corporation
+ * Copyright (c) 2015-2026 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,9 +51,9 @@ import org.labkey.test.components.core.login.SetPasswordForm;
 import org.labkey.test.components.dumbster.EmailRecordTable;
 import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.components.html.SiteNavBar;
-import org.labkey.test.components.ui.navigation.UserMenu;
 import org.labkey.test.pages.core.admin.CustomizeSitePage;
 import org.labkey.test.pages.core.admin.ShowAdminPage;
+import org.labkey.test.pages.core.login.SignInPage;
 import org.labkey.test.pages.user.UserDetailsPage;
 import org.labkey.test.util.APIUserHelper;
 import org.labkey.test.util.ApiPermissionsHelper;
@@ -146,7 +146,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         {
             beginAtAcceptingAlerts(buildURL("login", "login"));
             waitForAnyElement("Should be on login or Home portal", Locator.id("email"), SiteNavBar.Locators.userMenu,
-                    UserMenu.appUserMenu());
+                    BootstrapLocators.appUserMenu);
         }
 
         if (PasswordUtil.getUsername().equals(getCurrentUser()))
@@ -156,12 +156,12 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         }
         else
         {
-            fillSignInFormAndSubmit();
+            fillSignInFormAndSubmit("Sign In");
 
             // verify we're signed in now
             if (!waitFor(() ->
             {
-                if(isElementPresent(UserMenu.appUserMenu()))
+                if (isElementPresent(BootstrapLocators.appUserMenu))
                 {
                     goToHome();
                 }
@@ -197,14 +197,22 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         WebTestHelper.saveSession(PasswordUtil.getUsername(), getDriver());
     }
 
-    public void fillSignInFormAndSubmit()
+    public void fillSignInFormAndSubmit(String buttonText)
     {
-        log("Signing in as " + PasswordUtil.getUsername());
+        fillSignInFormAndSubmit(buttonText, PasswordUtil.getUsername(), PasswordUtil.getPassword());
+    }
+
+    public void fillSignInFormAndSubmit(String buttonText, String username, String password)
+    {
+        log(buttonText + " as " + username);
         assertElementPresent(Locator.tagWithName("form", "login"));
-        setFormElement(Locator.name("email"), PasswordUtil.getUsername());
-        setFormElement(Locator.name("password"), PasswordUtil.getPassword());
+        setFormElement(Locator.name("email"), username);
+        setFormElement(Locator.name("password"), password);
         acceptTermsOfUse(null, false);
-        clickButton("Sign In", 0);
+        WebElement signInButton = Locator.byClass("signin-btn").findElement(getDriver());
+        if (buttonText != null)
+            assertEquals("Wrong sign-in button text", buttonText, signInButton.getText());
+        signInButton.click();
     }
 
     /**
@@ -404,20 +412,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             }
         }
 
-        assertTitleContains("Sign In");
-
-        assertElementPresent(Locator.tagWithName("form", "login"));
-        setFormElement(Locator.id("email"), email);
-        setFormElement(Locator.id("password"), password);
-        WebElement signInButton = Locator.lkButton("Sign In").findElement(getDriver());
-        doAndMaybeWaitForPageToLoad(10_000, () -> {
-            signInButton.click();
-            shortWait().until(ExpectedConditions.invisibilityOfElementLocated(Locator.byClass("signing-in-msg")));
-            shortWait().until(ExpectedConditions.or(
-                    ExpectedConditions.stalenessOf(signInButton), // Successful login
-                    ExpectedConditions.presenceOfElementLocated(Locators.labkeyError.withText()))); // Error during sign-in
-            return ExpectedConditions.stalenessOf(signInButton).apply(null);
-        });
+        new SignInPage(getDriver()).signIn(email, password);
     }
 
     public void signInShouldFail(String email, String password, String... expectedMessages)

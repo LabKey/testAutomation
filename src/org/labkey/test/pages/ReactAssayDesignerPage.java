@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2019 LabKey Corporation
+ * Copyright (c) 2019-2026 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,9 @@ import org.labkey.test.components.html.OptionSelect;
 import org.labkey.test.components.ui.files.AttachmentCard;
 import org.labkey.test.pages.assay.plate.PlateTemplateListPage;
 import org.labkey.test.util.Maps;
+import org.labkey.test.util.TestLogger;
+import org.labkey.test.util.core.webdav.WebDavUploadHelper;
+import org.labkey.test.util.core.webdav.WebDavUrlFactory;
 import org.labkey.test.util.selenium.WebElementUtils;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -256,7 +259,7 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
 
     public ReactAssayDesignerPage addTransformScript(File transformScript)
     {
-        return setTransformScript(transformScript, false, null);
+        return setTransformScript(transformScript, true, null);
     }
 
     public ReactAssayDesignerPage addTransformScript(File transformScript, boolean usingFileUpload)
@@ -278,6 +281,11 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
         String targetPath = transformScript.getAbsolutePath();
         if (usingFileUpload)
         {
+            // GitHub Issue #159: The upload fails if a file of the same name is already in the assay's "@scripts" dir,
+            // so remove any leftover file first.
+            if (expectedError == null)
+                removeExistingScriptFile(transformScript.getName());
+
             getWrapper().setFormElement(Locator.tagWithClass("input", "file-upload__input"), transformScript);
             targetPath = "/@scripts/" + transformScript.getName();
         }
@@ -298,10 +306,26 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
         {
             getWrapper().waitFor(()-> Locator.tagWithClass("div", "alert-danger").withText(expectedError).isDisplayed(this),
                     "Transform script expected error not found", WAIT_FOR_JAVASCRIPT);
-            getWrapper().click(Locator.tagWithClass("i", "container--removal-icon"));
+            getWrapper().click(Locator.tagWithClass("span", "container--removal-icon"));
         }
 
         return this;
+    }
+
+    /**
+     * Remove a file from the "@scripts" dir of the container that this assay design lives in, if it is present. Uses
+     * WebDav directly instead of the "Manage script files" UI, which opens in a separate browser tab.
+     * @param fileName Name of the transform script file to remove
+     */
+    private void removeExistingScriptFile(String fileName)
+    {
+        String manageScriptsUrl = elementCache().manageScriptFilesLink.getDomProperty("href");
+        WebDavUploadHelper webDavHelper = new WebDavUploadHelper(WebDavUrlFactory.fromDirectoryUrl(manageScriptsUrl));
+        if (webDavHelper.fileExists(fileName))
+        {
+            TestLogger.log("Removing existing transform script file: " + fileName);
+            webDavHelper.deleteFile(fileName);
+        }
     }
 
     public ReactAssayDesignerPage removeTransformScript(String fileName)
@@ -312,6 +336,17 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
         int afterCount = Locator.tagWithClass("div", "attachment-card__description").findElements(this).size();
         assertEquals("Transform script count not as expected after remove.", beforeCount - 1, afterCount);
         return this;
+    }
+
+    /**
+     * The server side path of a transform script configured on this assay design, as shown on the script's card. This
+     * is the same value as the card's "Copy path" menu option, read from the DOM to avoid a clipboard round trip.
+     * @param fileName Name of the transform script file
+     */
+    public String getTransformScriptPath(String fileName)
+    {
+        AttachmentCard card = new AttachmentCard.FileAttachmentCardFinder(getDriver()).withTitle(fileName).waitFor(this);
+        return card.getDescription();
     }
 
     public enum MetadataInputFormat implements OptionSelect.SelectOption
@@ -388,6 +423,8 @@ public class ReactAssayDesignerPage extends DomainDesignerPage
         final Checkbox qcEnabledCheckbox = Checkbox(Locator.checkboxById("assay-design-qcEnabled")).findWhenNeeded(propertiesPanel);
         final Checkbox plateTemplateCheckbox = Checkbox(Locator.checkboxById("assay-design-plateMetadata")).findWhenNeeded(propertiesPanel);
         final Checkbox activeStatusCheckBox = Checkbox(Locator.checkboxById("assay-design-status")).findWhenNeeded(propertiesPanel);
+        final WebElement manageScriptFilesLink = Locator.tagWithClass("div", "transform-script--manage-link")
+                .child(Locator.linkWithText("Manage script files")).refindWhenNeeded(propertiesPanel);
 
         final WebElement hitSelectionCriteriaBtn = Locator.tagWithClass("div", "filter-criteria-input__button")
                 .child(Locator.button("Edit Criteria")).findWhenNeeded(propertiesPanel);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2019 LabKey Corporation
+ * Copyright (c) 2016-2026 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,6 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
-import org.labkey.test.util.Maps;
 import org.labkey.test.util.SimpleHttpRequest;
 import org.labkey.test.util.SimpleHttpResponse;
 import org.labkey.test.util.Timer;
@@ -128,71 +127,54 @@ public abstract class SearchAdminAPIHelper
     @LogMethod(quiet = true)
     public static void startCrawler(WebDriver driver)
     {
-        SimpleHttpRequest request = new SimpleHttpRequest(WebTestHelper.buildURL("search", "admin", Maps.of("start", "true")));
-        request.copySession(driver);
-        request.setRequestMethod("POST");
-        try
-        {
-            SimpleHttpResponse response = request.getResponse();
-            assertEquals("Failed to start search crawler", HttpStatus.SC_OK, response.getResponseCode());
-        }
-        catch (IOException e)
-        {
-            throw new RuntimeException("Failed to start search crawler", e);
-        }
+        invokeAdminAction(driver, "start search crawler", Map.of("start", "true"));
     }
 
     @LogMethod(quiet = true)
     public static void pauseCrawler(WebDriver driver)
     {
-        SimpleHttpRequest request = new SimpleHttpRequest(WebTestHelper.buildURL("search", "admin", Maps.of("pause", "true")));
-        request.copySession(driver);
-        request.setRequestMethod("POST");
-        try
-        {
-            SimpleHttpResponse response = request.getResponse();
-            assertEquals("Failed to pause search crawler", HttpStatus.SC_OK, response.getResponseCode());
-        }
-        catch (IOException e)
-        {
-            throw new RuntimeException("Failed to pause search crawler", e);
-        }
+        invokeAdminAction(driver, "pause search crawler", Map.of("pause", "true"));
+    }
+
+    @LogMethod(quiet = true)
+    public static void hideSearchIcon(WebDriver driver)
+    {
+        invokeAdminAction(driver, "hide search icon", Map.of("hideSearchIcon", "true"));
+    }
+
+    @LogMethod(quiet = true)
+    public static void showSearchIcon(WebDriver driver)
+    {
+        invokeAdminAction(driver, "show search icon", Map.of("showSearchIcon", "true"));
     }
 
     @LogMethod(quiet = true)
     public static void setDirectoryType(@LoggedParam DirectoryType type, WebDriver driver)
     {
         pauseCrawler(driver);
-        SimpleHttpRequest request = new SimpleHttpRequest(WebTestHelper.buildURL("search", "admin",
-                Maps.of("directory", "true", "directoryType", type.toString())));
-        request.copySession(driver);
-        request.setRequestMethod("POST");
-        try
-        {
-            SimpleHttpResponse response = request.getResponse();
-            assertEquals("Failed to set search directoryType", HttpStatus.SC_OK, response.getResponseCode());
-        }
-        catch (IOException e)
-        {
-            throw new RuntimeException("Failed to set search directoryType", e);
-        }
+        invokeAdminAction(driver, "set search directoryType", Map.of("directory", "true", "directoryType", type.toString()));
         startCrawler(driver);
     }
 
     @LogMethod(quiet = true)
     public static void deleteIndex(WebDriver driver)
     {
-        SimpleHttpRequest request = new SimpleHttpRequest(WebTestHelper.buildURL("search", "admin", Maps.of("delete", "true")));
+        invokeAdminAction(driver, "delete search index", Map.of("delete", "true"));
+    }
+
+    private static void invokeAdminAction(WebDriver driver, String operation, Map<String, String> map)
+    {
+        SimpleHttpRequest request = new SimpleHttpRequest(WebTestHelper.buildURL("search", "admin", map));
         request.copySession(driver);
         request.setRequestMethod("POST");
         try
         {
             SimpleHttpResponse response = request.getResponse();
-            assertEquals("Failed to delete search index", HttpStatus.SC_OK, response.getResponseCode());
+            assertEquals("Failed to " + operation, HttpStatus.SC_OK, response.getResponseCode());
         }
         catch (IOException e)
         {
-            throw new RuntimeException("Failed to delete search index", e);
+            throw new RuntimeException("Failed to " + operation, e);
         }
     }
 

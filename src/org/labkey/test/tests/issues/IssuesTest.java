@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2019 LabKey Corporation
+ * Copyright (c) 2008-2026 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -748,6 +748,32 @@ public class IssuesTest extends BaseWebDriverTest
 
         assertElementPresent(Locator.linkWithText(issueIdB));
         assertTextPresent(String.format("Issue %s marked as duplicate of this issue.", issueIdB), "Duplicates");
+    }
+
+    // GitHub Kanban #1946: verify encoding of resolution submitted on resolve
+    @Test
+    public void testResolutionEncodingInChangeSummary()
+    {
+        final String markerId = "testResolutionEncodingInChangeSummary";
+        // The Resolution dropdown won't accept arbitrary text, so we inject the payload into the <select> via JS below.
+        final String testResolution = "testRes<img src=\"x\" id=\"" + markerId + "\">";
+
+        DetailsPage detailsPage = _issuesHelper.addIssue("Resolution Encoding issue", NAME);
+
+        ResolvePage resolvePage = detailsPage.clickResolve();
+        // Force an arbitrary (un-allow-listed) resolution value onto the Resolution select and submit it
+        executeScript(
+                "var sel = document.getElementsByName('Resolution')[0];" +
+                "var opt = document.createElement('option');" +
+                "opt.value = arguments[0]; opt.text = arguments[0]; opt.selected = true;" +
+                "sel.add(opt); sel.value = arguments[0];",
+                testResolution);
+        detailsPage = resolvePage.save();
+
+        // verify that the resolution value is encoded in the summary text
+        assertElementNotPresent("Resolution was not HTML-encoded in the change-summary comment (stored XSS)",
+                Locator.id(markerId));
+        assertTextPresent(testResolution);
     }
 
     @Test

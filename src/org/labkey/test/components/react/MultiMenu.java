@@ -1,15 +1,28 @@
 /*
- * Copyright (c) 2019 LabKey Corporation. All rights reserved. No portion of this work may be reproduced in
- * any form or by any electronic or mechanical means without written permission from LabKey Corporation.
+ * Copyright (c) 2019-2026 LabKey Corporation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.labkey.test.components.react;
 
+import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
+import org.labkey.test.util.selenium.WebElementUtils;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
@@ -274,21 +287,26 @@ public class MultiMenu extends BootstrapMenu
 
         for (WebElement item : listItems)
         {
-            String className = item.getAttribute("class");
-            String role = item.getAttribute("role");
-            String text = item.getText().trim();
+            String className = StringUtils.trimToEmpty(item.getAttribute("class"));
 
-            if (className.contains("dropdown-header") && text.equalsIgnoreCase(heading))
+            if (!headingFound && className.contains("dropdown-header") && item.getText().trim().equalsIgnoreCase(heading))
+            {
                 headingFound = true;
+            }
+            else if (headingFound && !className.contains("dropdown-section-toggle")) // Exclude section toggle
+            {
+                String role = StringUtils.trimToEmpty(item.getAttribute("role"));
 
-            // Once we've found our header we know that all presentation elements belong to the heading
-            // we are interested in
-            if (headingFound && role.equals("presentation"))
-                itemsUnderHeading.add(item);
+                // Once we hit a divider we're done looking at menu items related to the heading, so we can stop iterating
+                if (role.equals("separator"))
+                    break;
 
-            // Once we hit a divider we're done looking at menu items related to the heading, so we can stop iterating
-            if (headingFound && role.equals("separator"))
-                break;
+                // Once we've found our header we know that all presentation elements belong to the heading
+                // we are interested in
+                if (role.equals("presentation"))
+                    itemsUnderHeading.add(item);
+
+            }
         }
 
         return itemsUnderHeading;
@@ -316,6 +334,17 @@ public class MultiMenu extends BootstrapMenu
         WebElement item = getMenuItemUnderHeading(heading, menuItem);
         getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(item));
         item.click();
+    }
+
+    /**
+     * Get the text of all the menu section headers
+     *
+     * @return text from the menu section headers
+     */
+    public List<String> getSectionHeadersText()
+    {
+        expand();
+        return WebElementUtils.getTexts(Locators.dropdownHeader.findElements(this));
     }
 
     /**
@@ -414,24 +443,17 @@ public class MultiMenu extends BootstrapMenu
 
         static public Locator.XPathLocator menuContainer(String text)
         {
-            return menuContainer().withChild(dropdownToggle().withText(text));
+            return menuContainer().withChild(dropdownToggle.withText(text));
         }
 
         static public Locator.XPathLocator menuContainerContains(String text)
         {
-            return menuContainer().withChild(dropdownToggle().containing(text));
+            return menuContainer().withChild(dropdownToggle.containing(text));
         }
 
         // finds the toggle to expand/collapse the root menu
-        public static Locator.XPathLocator dropdownToggle()
-        {
-            return Locator.byClass("dropdown-toggle");
-        }
-
-        public static Locator.XPathLocator dropdownHeader()
-        {
-            return Locator.tagWithClass("li", "dropdown-header");
-        }
+        public static final Locator.XPathLocator dropdownToggle = Locator.byClass("dropdown-toggle");
+        public static final Locator.XPathLocator dropdownHeader = Locator.tagWithClass("li", "dropdown-header");
 
         // finds a menu-item
         public static Locator.XPathLocator menuItem()

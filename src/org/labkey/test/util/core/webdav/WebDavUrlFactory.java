@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 LabKey Corporation
+ * Copyright (c) 2019-2026 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,6 +54,16 @@ public class WebDavUrlFactory
     public static WebDavUrlFactory webFilesUrlFactory(String containerPath)
     {
         return new WebDavUrlFactory(buildBaseWebfilesUrl(containerPath));
+    }
+
+    /**
+     * For cases where the WebDav directory URL is already known (e.g. taken from the 'href' of a link rendered by the
+     * server or a React component) and doesn't need to be constructed from a container path.
+     * @param directoryUrl Absolute URL of a WebDav directory
+     */
+    public static WebDavUrlFactory fromDirectoryUrl(String directoryUrl)
+    {
+        return new WebDavUrlFactory(directoryUrl);
     }
 }
 

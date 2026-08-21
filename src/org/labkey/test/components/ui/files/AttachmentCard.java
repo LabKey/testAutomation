@@ -1,3 +1,18 @@
+/*
+ * Copyright (c) 2021-2026 LabKey Corporation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.labkey.test.components.ui.files;
 
 import org.labkey.test.Locator;
@@ -94,6 +109,11 @@ public class AttachmentCard extends WebDriverComponent<AttachmentCard.ElementCac
         return elementCache().unavailableWarning.isPresent();
     }
 
+    public String getDescription()
+    {
+        return elementCache().description.getText();
+    }
+
     public boolean canRemove()
     {
         return getRemoveOption() != null;
@@ -131,6 +151,7 @@ public class AttachmentCard extends WebDriverComponent<AttachmentCard.ElementCac
     protected class ElementCache extends Component<?>.ElementCache
     {
         final WebElement fileSize = Locator.byClass("attachment-card__size").findWhenNeeded(this);
+        final WebElement description = Locator.byClass("attachment-card__description").refindWhenNeeded(this);
         final WebElement icon = Locator.byClass("attachment-card__icon_img").findWhenNeeded(this);
         Optional<BootstrapMenu> menu = BootstrapMenu.finder(getDriver())
                 .locatedBy(Locator.tagWithClass("div", "attachment-card__menu"))

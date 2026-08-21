@@ -1,3 +1,18 @@
+/*
+ * Copyright (c) 2019-2026 LabKey Corporation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.labkey.test.components.ui.grids;
 
 import org.labkey.test.Locator;
@@ -136,6 +151,19 @@ public class DetailTable extends WebDriverComponent<DetailTable.ElementCache>
     public String getFieldValue(String fieldlabel)
     {
         return getField(fieldlabel).getText();
+    }
+
+    /**
+     * Return the color of the swatch rendered in a field's value, for example the sample color on a details panel.
+     *
+     * @param fieldLabel The label of the field to get.
+     * @return A string such as "rgb(104, 204, 202)", or an empty string if the field has no color swatch.
+     **/
+    public String getFieldColor(String fieldLabel)
+    {
+        WebElement icon = Locator.tagWithClassContaining("i", "color-icon__circle")
+                .findElementOrNull(getField(fieldLabel));
+        return icon == null ? "" : icon.getCssValue("background-color");
     }
 
     /**

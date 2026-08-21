@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2019 LabKey Corporation
+ * Copyright (c) 2013-2026 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,15 +26,18 @@ import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.TestProperties;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Reports;
 import org.labkey.test.pages.reports.ScriptReportPage;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
+import org.labkey.test.util.Log4jUtils;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PermissionsHelper;
 import org.labkey.test.util.RReportHelper;
+import org.labkey.test.util.ScriptInvocationLogHelper;
 import org.openqa.selenium.WebElement;
 
 import java.io.File;
@@ -531,6 +534,19 @@ public class DataReportsTest extends ReportTest
         stopImpersonating();
 
         goToProjectHome();
+    }
+
+    @Test
+    public void testScriptInvocationLogging() throws Exception
+    {
+        final String reportName = "Invocation logging report";
+        final String sentinel = "invocation logging sentinel";
+
+        Log4jUtils.resetLogMark();
+        String output = _rReportHelper.createAndRunRReport(reportName, "print('" + sentinel + "')", false);
+        assertTrue("R report didn't execute. Console output was:\n" + output, output.contains(sentinel));
+
+        ScriptInvocationLogHelper.assertScriptLogged((WebDriverWrapper) this, "done", "report id=", reportName);
     }
 
     /**create an R report from the dataset page

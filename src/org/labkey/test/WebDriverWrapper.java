@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2019 LabKey Corporation
+ * Copyright (c) 2015-2026 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -205,6 +205,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         _ext4Helper = new Ext4Helper(this);
     }
 
+    @Contract(pure = true)
     @NotNull
     public final WebDriver getDriver()
     {
@@ -1352,9 +1353,10 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return "/"; //root
     }
 
+    @Contract(pure = true)
     public String getCurrentContainerPath()
     {
-        return (String)executeScript("return LABKEY.container.path;");
+        return (String) executeScript("return LABKEY.container.path;");
     }
 
     public WhoAmIResponse whoAmI()
@@ -3995,15 +3997,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
     public boolean isChecked(Locator checkBoxLocator)
     {
         return checkBoxLocator.findElement(getDriver()).isSelected();
-    }
-
-    /**
-     * @deprecated Use {@link WebElement#isSelected()}
-     */
-    @Deprecated (since = "22.9")
-    public boolean isChecked(WebElement checkBox)
-    {
-        return checkBox.isSelected();
     }
 
     /**

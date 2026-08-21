@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2019 LabKey Corporation
+ * Copyright (c) 2013-2026 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -446,5 +446,13 @@ public class AdminConsoleTest extends AbstractAdminConsoleTest
                     .verifyEquals("expect page to reflect state after api config",
                             initialState, optionalFeaturesPage.getFeatureStatus(testId));
         }
+    }
+
+    @Test
+    public void testEmailTimeoutSettings()
+    {
+        log("Verifying that default email timeout properties are set");
+        goToAdminConsole().clickTestEmailConfiguration();
+        assertTextPresent("mail.smtp.writetimeout", "mail.smtp.timeout", "mail.smtp.connectiontimeout");
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019 LabKey Corporation
+ * Copyright (c) 2011-2026 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package org.labkey.test.util;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
 import org.apache.poi.ss.util.WorkbookUtil;
-import org.eclipse.jetty.util.URIUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.params.FieldKey;
@@ -153,14 +152,17 @@ public class EscapeUtil
     }
 
     /**
-     * Encode a string to be used as a URL path
-     * For now, simply designates to URIUtil. Will replace with an impl that doesn't require Jetty utils.
+     * Encode a string to be used as a URL path. Doesn't encode '/' because they are not allowed in any path parts such
+     * as project, folder, or file names.
+     *
      * @param path Path to be encoded
-     * @return encoded value or empty string if provided string was `null`
+     * @return encoded path
      */
     public static String encodeUriPath(String path)
     {
-        return URIUtil.encodePath(path);
+        return URLEncoder.encode(StringUtils.trimToEmpty(path), StandardCharsets.UTF_8)
+                .replace("%2F", "/") // '/' is a separator, shouldn't be encoded
+                .replace("+", "%20"); // labKey doesn't, generally, encode space as '+'
     }
 
     /**
@@ -176,13 +178,15 @@ public class EscapeUtil
 
     /**
      * Decode a string representing a URL path
-     * For now, simply designates to URIUtil. Will replace with an impl that doesn't require Jetty utils.
+     *
      * @param path path to be decoded
-     * @return decoded value or empty string if the provided string was `null`
+     * @return decoded path
      */
     public static String decodeUriPath(String path)
     {
-        return URIUtil.decodePath(path);
+        // Prevent '+' becoming ' '
+        path = StringUtils.trimToEmpty(path).replace("+", "%2B");
+        return URLDecoder.decode(path, StandardCharsets.UTF_8);
     }
 
     public static String fieldKeyEncodePart(String str)

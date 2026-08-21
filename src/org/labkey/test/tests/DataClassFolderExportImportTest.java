@@ -1,3 +1,18 @@
+/*
+ * Copyright (c) 2021-2026 LabKey Corporation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.labkey.test.tests;
 
 import org.assertj.core.api.Assertions;
@@ -119,7 +134,7 @@ public class DataClassFolderExportImportTest extends BaseWebDriverTest
             ph.addWebPart("Experiment Runs");
         });
 
-        DataRegionTable sourceRunsTable = DataRegionTable.DataRegion(getDriver()).withName("Runs").waitFor();
+        DataRegionTable sourceRunsTable = DataRegionTable.DataRegion(getDriver()).inWebPart("Experiment Runs").waitFor();
         List<String> runNames = sourceRunsTable.getColumnDataAsText("Name");
 
         clickAndWait(Locator.linkWithText(testDataClass));
@@ -143,7 +158,7 @@ public class DataClassFolderExportImportTest extends BaseWebDriverTest
         importFolderFromZip(exportedFolderFile, false, 1);
         goToProjectFolder(IMPORT_PROJECT_NAME, importFolder);
 
-        List<String> importedRunNames = DataRegionTable.DataRegion(getDriver()).withName("Runs").waitFor()
+        List<String> importedRunNames = DataRegionTable.DataRegion(getDriver()).inWebPart("Experiment Runs").waitFor()
                 .getColumnDataAsText("Name");
         for (String sourceRun : runNames)
         {
@@ -157,7 +172,7 @@ public class DataClassFolderExportImportTest extends BaseWebDriverTest
         List<Map<String, String>> destRowData = destTable.getTableData();
 
         // now ensure expected data in the sampleType made it to the destination folder
-        for (Map exportedRow : sourceRowData)
+        for (Map<String, String> exportedRow : sourceRowData)
         {
             // find the map from the exported project with the same name
             Map<String, String> matchingMap = destRowData.stream().filter(a-> a.get("Name").equals(exportedRow.get("Name")))
@@ -274,7 +289,7 @@ public class DataClassFolderExportImportTest extends BaseWebDriverTest
         List<Map<String, String>> destRowData = importTable.getTableData();
 
         // now ensure expected data in the sampleType made it to the destination folder
-        for (Map exportedRow : sourceRowData)
+        for (Map<String, String> exportedRow : sourceRowData)
         {
             // find the map from the exported project with the same name
             Map<String, String> matchingMap = destRowData.stream().filter(a-> a.get("Name").equals(exportedRow.get("Name")))

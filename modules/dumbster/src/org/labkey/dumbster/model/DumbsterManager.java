@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2016 LabKey Corporation
+ * Copyright (c) 2008-2026 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 import org.labkey.api.settings.AppProps;
 import org.labkey.api.util.ContextListener;
+import org.labkey.api.util.EmailTransportProvider;
 import org.labkey.api.util.MailHelper;
 import org.labkey.api.util.ShutdownListener;
 import org.labkey.api.util.SmtpTransportProvider;
@@ -59,14 +60,15 @@ public class DumbsterManager implements ShutdownListener
 
     SimpleSmtpServer _server;
 
+    // The transport provider that was active before the recorder installed its own; restored on stop().
+    private EmailTransportProvider _previousProvider;
+
+    // True while the recorder's capture provider is installed as the active provider. Guards against overwriting
+    // _previousProvider if start() runs again after the capture server stopped on its own (without a stop() call).
+    private boolean _recording;
+
     public boolean start()
     {
-        if (!(MailHelper.getActiveProvider() instanceof SmtpTransportProvider))
-        {
-            _log.error("Mail recorder cannot be started: active mail provider is not SmtpTransportProvider");
-            return false;
-        }
-
         if (_server != null && !_server.isStopped())
         {
             // We're already running, no need to spin up another, but reset the list of messages
@@ -75,10 +77,8 @@ public class DumbsterManager implements ShutdownListener
         }
 
         int port;
-        ServerSocket socket = null;
-        try
+        try (ServerSocket socket = new ServerSocket(0))
         {
-            socket = new ServerSocket(0);
             port = socket.getLocalPort();
         }
         catch (IOException e)
@@ -86,24 +86,6 @@ public class DumbsterManager implements ShutdownListener
             _log.error("Failed to open a server socket", e);
             return false;
         }
-        finally
-        {
-            try
-            {
-                if (socket != null)
-                    socket.close();
-            }
-            catch (IOException ignored) {}
-        }
-
-        Properties props = new Properties();
-        props.setProperty("mail.smtp.host", "localhost");
-        props.setProperty("mail.smtp.user", "Anonymous");
-        props.setProperty("mail.smtp.port", Integer.toString(port));
-        Session session = Session.getInstance(props);
-
-        _log.info("Switching MailHelper to use port {}", port);
-        MailHelper.setSmtpSession(session);
 
         _log.info("Connecting mail recorder to port {}", port);
         _server = SimpleSmtpServer.start(port);
@@ -113,18 +95,40 @@ public class DumbsterManager implements ShutdownListener
             _server = null;
             return false;
         }
+
+        // Dumbster uses its own SMTP configuration and sets the MailHelper active provider to capture all outgoing
+        // email. Previous provider (official SMTP or Microsoft Graph configuration) is stashed and restored on stop().
+        Properties props = new Properties();
+        props.setProperty("mail.smtp.host", "localhost");
+        props.setProperty("mail.smtp.user", "Anonymous");
+        props.setProperty("mail.smtp.port", Integer.toString(port));
+
+        SmtpTransportProvider recorderProvider = new SmtpTransportProvider();
+        recorderProvider.configure(props);
+
+        _log.info("Switching MailHelper to the mail recorder on port {}", port);
+        if (!_recording)
+        {
+            // Capture the real provider only when first entering the recording state; a restart after the capture
+            // server stopped on its own must not overwrite it with a previously installed recorder provider.
+            _previousProvider = MailHelper.getActiveProvider();
+            _recording = true;
+        }
+        MailHelper.setActiveProvider(recorderProvider);
+
         ContextListener.addShutdownListener(this);
         return true;
     }
 
     public void stop()
     {
-        // Stop the server, if there is one, but leave it around for
-        // viewing until the next call to start() overwrites.
+        // Stop the server, if there is one, but leave it around for viewing until the next call to start() overwrites.
         if (_server != null)
         {
             _log.info("Reverting MailHelper to {} configuration", AppProps.getInstance().getWebappConfigurationFilename());
-            MailHelper.setSmtpSession(null);
+            MailHelper.setActiveProvider(_previousProvider);
+            _previousProvider = null;
+            _recording = false;
 
             _server.stop();
             ContextListener.removeShutdownListener(this);

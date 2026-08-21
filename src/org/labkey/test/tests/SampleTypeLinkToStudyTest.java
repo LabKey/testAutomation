@@ -1,3 +1,18 @@
+/*
+ * Copyright (c) 2021-2026 LabKey Corporation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.labkey.test.tests;
 
 import org.jetbrains.annotations.Nullable;
@@ -25,10 +40,13 @@ import org.labkey.test.pages.study.ManageVisitPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.DomainUtils;
+import org.labkey.test.util.OptionalFeatureHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
 import org.labkey.test.util.StudyHelper;
 import org.labkey.test.util.TestDataGenerator;
+import org.labkey.test.util.data.TestDataUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -52,8 +70,8 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
     final static String ASSAY_NAME = "Test assay";
     final static String SAMPLE_TYPE1 = "Sample type 1";
     final static String SAMPLE_TYPE2 = "Sample type 2";
-    private final static String visitLabel1 = "Screening";
-    private final static String visitLabel2 = "Baseline";
+    private final static String visitLabel1 = TestDataGenerator.randomName("Screening", 4, 4, TRICKY_CHARACTERS, null).name();
+    private final static String visitLabel2 = TestDataGenerator.randomName("Baseline", 4, 4, TRICKY_CHARACTERS, null).name();
     private static final String READER_USER = "reader_user@user.test";
 
     protected DateTimeFormatter _dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -66,7 +84,7 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         init.doSetup();
     }
 
-    private void doSetup()
+    private void doSetup() throws IOException
     {
         _containerHelper.createProject(getProjectName(), null);
         _containerHelper.createProject(VISIT_BASED_STUDY, "Study");
@@ -90,9 +108,13 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         new PortalHelper(getDriver()).addBodyWebPart("Datasets");
 
         createSampleTypes();
+        OptionalFeatureHelper.setOptionalFeature(createDefaultConnection(), "deriveSamplesNotInApp", true);
+
     }
 
-    private void createSampleTypes()
+
+
+    private void createSampleTypes() throws IOException
     {
         SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
 
@@ -110,11 +132,12 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
                         new FieldDefinition("ParticipantId", FieldDefinition.ColumnType.Subject))), data1);
 
         goToProjectHome(SAMPLE_TYPE_PROJECT);
-        String data2 = "Name\tVisitLabel\tVisitDate\tParticipantId\n" +
-                "First\t" + visitLabel1 + "\t" + now + "\tP1\n" +
-                "Second\t" + visitLabel2 + "\t" + now + "\tP2\n" +
-                "Third\t" + visitLabel1 + "\t" + now + "\tP3\n" +
-                "Fourth\t" + visitLabel2 + "\t" + now + "\tP4\n";
+        File data2 = TestDataUtils.writeRowsToFile("samples.tsv", List.of(
+                List.of("Name", "VisitLabel", "VisitDate", "ParticipantId"),
+                List.of("First", visitLabel1, now, "P1"),
+                List.of("Second", visitLabel2, now, "P2"),
+                List.of("Third", visitLabel1, now, "P3"),
+                List.of("Fourth", visitLabel2, now, "P4")));
 
         sampleHelper.createSampleType(new SampleTypeDefinition(SAMPLE_TYPE2)
                 .setFields(List.of(
@@ -707,8 +730,8 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
     public void testVisitLabelAutoLinkToStudy()
     {
         log("Creating the visit labels");
-        String visitLabel = "Baseline";
-        createNewVisits(visitLabel, "100", "250");
+        String visitLabel = TestDataGenerator.randomName("Baseline", 4, 4, TRICKY_CHARACTERS, null).name();
+        createNewVisits(visitLabel, "600", "650");
 
         String sampleName = "Sample with Visit label";
         log("Creating sample type with auto link enabled");
@@ -757,14 +780,10 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
     public void preTest() throws Exception
     {
         //deleting the datasets from study folders.
-        if (TestDataGenerator.doesDomainExists(DATE_BASED_STUDY, "study", "Sample type 1"))
-            TestDataGenerator.deleteDomain(DATE_BASED_STUDY, "study", "Sample type 1");
-        if (TestDataGenerator.doesDomainExists(DATE_BASED_STUDY, "study", "Sample type 2"))
-            TestDataGenerator.deleteDomain(DATE_BASED_STUDY, "study", "Sample type 2");
-        if (TestDataGenerator.doesDomainExists(VISIT_BASED_STUDY, "study", "Sample type 1"))
-            TestDataGenerator.deleteDomain(VISIT_BASED_STUDY, "study", "Sample type 1");
-        if (TestDataGenerator.doesDomainExists(VISIT_BASED_STUDY, "study", "Sample type 2"))
-            TestDataGenerator.deleteDomain(VISIT_BASED_STUDY, "study", "Sample type 2");
+        DomainUtils.ensureDeleted(DATE_BASED_STUDY, "study", "Sample type 1");
+        DomainUtils.ensureDeleted(DATE_BASED_STUDY, "study", "Sample type 2");
+        DomainUtils.ensureDeleted(VISIT_BASED_STUDY, "study", "Sample type 1");
+        DomainUtils.ensureDeleted(VISIT_BASED_STUDY, "study", "Sample type 2");
     }
 
     private void createNewVisits(String label, String startRange, String endRange)
@@ -866,5 +885,6 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         _containerHelper.deleteProject(DATE_BASED_STUDY, false);
         _containerHelper.deleteProject(SAMPLE_TYPE_PROJECT + " Study 1", false);
         _containerHelper.deleteProject(SAMPLE_TYPE_PROJECT + " Study 2", false);
+        OptionalFeatureHelper.resetOptionalFeature(createDefaultConnection(), "deriveSamplesNotInApp");
     }
 }

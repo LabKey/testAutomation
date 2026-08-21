@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019 LabKey Corporation
+ * Copyright (c) 2011-2026 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -280,6 +280,22 @@ public class GpatAssayTest extends BaseWebDriverTest
             assayDesignerPage.setName(assayName);
         randomlyAddTransformScript(assayDesignerPage);
         return assayDesignerPage;
+    }
+
+    @Test // GitHub Issue #159
+    public void testAssayTransformScriptPathError()
+    {
+        File trialData = TestFileUtils.getSampleData("GPAT/renameAssayTrial.xls");
+        String assayName = TestDataGenerator.randomDomainName();
+        log(String.format("Create an assay named '%s'.", assayName));
+        ReactAssayDesignerPage assayDesignerPage = startCreateGpatAssay(trialData, assayName);
+
+        log("Verify error message when trying to add transform script with path outside of @scripts dir");
+        assayDesignerPage.addTransformScript(RTRANSFORM_SCRIPT_FILE_NOOP, false);
+        List<String> errors = assayDesignerPage.clickSaveExpectingErrors();
+        Assert.assertTrue("Error msg not as expected during assay creation",
+                errors.contains("The transform script must exist within this folder's @scripts directory."));
+        assayDesignerPage.clickCancel();
     }
 
     @Test

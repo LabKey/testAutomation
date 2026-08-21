@@ -1,3 +1,18 @@
+/*
+ * Copyright (c) 2020-2026 LabKey Corporation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.labkey.test.components.ui.grids;
 
 import org.labkey.test.Locator;
@@ -108,6 +123,18 @@ public class GridRow extends WebDriverComponent<GridRow.ElementCache>
     {
         var cell =  getCell(columnIdentifier);
         return Locator.byClass("table-cell-content").child(Locator.tag("span")).findElement(cell).getAttribute("style");
+    }
+
+    /**
+     * gets the color of the swatch rendered in the specified cell, for example a sample color or a sample type's
+     * label color
+     * @return A string such as "rgb(104, 204, 202)", or an empty string if the cell has no color swatch
+     */
+    public String getCellColor(CharSequence columnIdentifier)
+    {
+        WebElement icon = Locator.tagWithClassContaining("i", "color-icon__circle")
+                .findElementOrNull(getCell(columnIdentifier));
+        return icon == null ? "" : icon.getCssValue("background-color");
     }
 
     /**

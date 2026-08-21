@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2019 LabKey Corporation
+ * Copyright (c) 2012-2026 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.hc.core5.http.HttpStatus;
 import org.awaitility.Awaitility;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
@@ -44,9 +45,9 @@ import org.labkey.junit.rules.TestWatcher;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
-import org.labkey.remoteapi.admin.ClearCachesCommand;
 import org.labkey.remoteapi.SimpleGetCommand;
 import org.labkey.remoteapi.SimplePostCommand;
+import org.labkey.remoteapi.admin.ClearCachesCommand;
 import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
 import org.labkey.remoteapi.query.ContainerFilter;
 import org.labkey.remoteapi.query.Filter;
@@ -303,8 +304,10 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         return SingletonWebDriver.getInstance().getWebDriver();
     }
 
+    @Contract(pure = true)
     protected abstract String getProjectName();
 
+    @Contract(pure = true)
     public final @Nullable String getPrimaryTestProject()
     {
         return getProjectName();
@@ -2929,16 +2932,40 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             }
             finally
             {
-                clear();
+                clear(closeOldBrowser);
             }
         }
 
         private void clear()
         {
-            if (getDriverService() != null && getDriverService().isRunning())
+            clear(true);
+        }
+
+        private void clear(boolean closedOldBrowser)
+        {
+            if (getDriverService() != null && getDriverService().isRunning() && !shouldLeaveDriverServiceRunning(closedOldBrowser))
                 getDriverService().stop();
             // Don't clear _downloadDir. Cleanup steps might still need it after tearDown
             _driverAndService = new ImmutablePair<>(null, null);
+        }
+
+        /**
+         * Starting with Geckodriver v0.37.0, shutting down the driver service also shuts down the browser.
+         * We need to leave the FirefoxDriverService running after test failures to allow manual inspection of the
+         * browser state.
+         * We can remove this if they add a 'detach' flag to Geckodriver, similar to the one in Chromedriver.
+         * https://github.com/mozilla/geckodriver/issues/2247
+         * https://bugzilla.mozilla.org/show_bug.cgi?id=2046321
+         *
+         * @param closedOldBrowser Indicates that WebDriver was closed
+         * @return true if the DriverService should be left running
+         */
+        private boolean shouldLeaveDriverServiceRunning(boolean closedOldBrowser)
+        {
+            return !closedOldBrowser // Don't leave DriverService running if browser was closed
+                    && BrowserType.FIREFOX.matchesDriver(getWebDriver())
+                    && TestProperties.allowZombieGeckodriver()
+                    && !TestProperties.isTestRunningOnTeamCity();
         }
     }
 

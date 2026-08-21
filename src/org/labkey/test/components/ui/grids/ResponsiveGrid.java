@@ -1,6 +1,17 @@
 /*
- * Copyright (c) 2019 LabKey Corporation. All rights reserved. No portion of this work may be reproduced in
- * any form or by any electronic or mechanical means without written permission from LabKey Corporation.
+ * Copyright (c) 2019-2026 LabKey Corporation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.labkey.test.components.ui.grids;
 
@@ -778,8 +789,9 @@ public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverCompon
 
     public List<String> getGridMessages()
     {
-        return getWrapper().getTexts(Locator.tagWithClass("div", "grid-messages")
-                .child(Locator.tagWithClass("div", "grid-message")).findElements(this));
+        return getWrapper().shortWait().ignoring(StaleElementReferenceException.class)
+                .until(d -> getWrapper().getTexts(Locator.tagWithClass("div", "grid-messages")
+                        .child(Locator.tagWithClass("div", "grid-message")).findElements(this)));
     }
 
     public boolean hasGridError()

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2019 LabKey Corporation
+ * Copyright (c) 2008-2026 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,6 +75,7 @@ import java.net.SocketException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
@@ -493,6 +494,42 @@ public class WebTestHelper
         }
     }
 
+    /**
+     * Convenience method to build an app url for the given controller
+     * @see URLBuilder
+     *
+     * @param containerPath Often getProjectName() or getCurrentContainerPath()
+     * @param controller Name of the controller
+     * @param parts The app resource path
+     * @return A url string that can be used for navigation.
+     */
+    public static String buildAppURL(String containerPath, String controller, Object... parts)
+    {
+        return buildAppURL(containerPath, controller, null, parts).trim();
+    }
+
+    /**
+     * Convenience method to build an app url. Assumes Sample Manager app (samplemanager-app.view)
+     *
+     * @param containerPath  Often getProjectName() or getCurrentContainerPath()
+     * @param controllerName Name of the controller
+     * @param params         Any params that are part of the app query. {@link URLBuilder#setSecondaryQuery(Map)}
+     * @param parts          The app resource path
+     * @return A url string that can be used for navigation.
+     * @see URLBuilder
+     */
+    public static String buildAppURL(String containerPath, String controllerName, Map<String, ?> params, Object... parts)
+    {
+        if (StringUtils.isBlank(containerPath))
+        {
+            throw new IllegalArgumentException("Invalid app containerPath: " + containerPath);
+        }
+        return new URLBuilder(controllerName, "app", containerPath)
+                .setAppResourcePath(parts)
+                .setSecondaryQuery(params)
+                .buildURL();
+    }
+
     public static String buildURL(String controller, String action)
     {
         return buildURL(controller, null, action, Collections.emptyMap());
@@ -545,6 +582,11 @@ public class WebTestHelper
 
     public static Map<String, String> parseUrlQueryString(String query)
     {
+        return parseUrlQueryString(query, true);
+    }
+
+    public static Map<String, String> parseUrlQueryString(String query, boolean decode)
+    {
         if (query != null)
         {
             if (query.startsWith("?"))
@@ -556,10 +598,34 @@ public class WebTestHelper
             for (String arg : queryArgs)
             {
                 String[] split = arg.split("=", 2);
-                parsedQuery.put(split[0], split.length > 1 ? split[1] : null);
+                parsedQuery.put(maybeDecode(split[0], decode), split.length > 1 ? maybeDecode(split[1], decode) : null);
             }
 
             return parsedQuery;
+        }
+
+        return Collections.emptyMap();
+    }
+
+    private static String maybeDecode(String value, boolean decode)
+    {
+        return decode
+                ? URLDecoder.decode(value, StandardCharsets.UTF_8)
+                : value;
+    }
+
+    public static Map<String, String> parseAppQuery(URL url)
+    {
+        String ref = url.getRef();
+
+        if (ref != null)
+        {
+            int queryIndex = ref.indexOf("?");
+
+            if (queryIndex > -1)
+            {
+                return parseUrlQueryString(ref.substring(queryIndex), true);
+            }
         }
 
         return Collections.emptyMap();

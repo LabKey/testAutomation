@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2019 LabKey Corporation
+ * Copyright (c) 2016-2026 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,11 +58,6 @@ public class Checkbox extends Component implements FormItem<Boolean>
     public boolean isSelected()
     {
         return isChecked();
-    }
-
-    public boolean isDisplayed()
-    {
-        return getComponentElement().isDisplayed();
     }
 
     public boolean isChecked()

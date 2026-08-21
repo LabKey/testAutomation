@@ -1,3 +1,18 @@
+/*
+ * Copyright (c) 2019-2026 LabKey Corporation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.labkey.test.params.experiment;
 
 import org.jetbrains.annotations.NotNull;
@@ -96,34 +111,61 @@ public class SampleTypeDefinition extends DomainProps
         return this;
     }
 
-    protected InventoryMetricUnit getInventoryMetricUnit()
+    /**
+     * Pretty much limited to Sample Types in the apps.
+     * @return an InventoryMetricUnit value
+     */
+    public InventoryMetricUnit getInventoryMetricUnit()
     {
         return _inventoryMetricUnit;
     }
 
+    /**
+     * Pretty much limited to Sample Types in the apps.
+     * @param inventoryMetricUnit an InventoryMetricUnit value
+     * @return This SampleTypeDefinition object
+     */
     public SampleTypeDefinition setInventoryMetricUnit(InventoryMetricUnit inventoryMetricUnit)
     {
         _inventoryMetricUnit = inventoryMetricUnit;
         return this;
     }
 
-    protected String getLabelColor()
+    /**
+     * Pretty much limited to Sample Types in the apps.
+     * @return The hex value of the label color.
+     */
+    public String getLabelColor()
     {
         return _labelColor;
     }
 
-    protected SampleTypeDefinition setLabelColor(String color)
+    /**
+     * Pretty much limited to Sample Types in the apps.
+     * @param color Hex value of the label color.
+     * @return This SampleTypeDefinition object
+     */
+    public SampleTypeDefinition setLabelColor(String color)
     {
         _labelColor = color;
         return this;
     }
 
-    protected String getAliquotNameExpression()
+    /**
+     * Pretty much limited to Sample Types in the apps.
+     * @return The name expression to use for aliquot creation.
+     */
+    public String getAliquotNameExpression()
     {
         return _aliquotNameExpression;
     }
 
-    protected SampleTypeDefinition setAliquotNameExpression(String aliquotNameExpression)
+    /**
+     * Pretty much limited to Sample Types in the apps.
+     * @param aliquotNameExpression The name expression to use for aliquot creation.
+     * @return This SampleTypeDefinition object
+     */
+    public SampleTypeDefinition setAliquotNameExpression(String aliquotNameExpression)
     {
         _aliquotNameExpression = aliquotNameExpression;
         return this;

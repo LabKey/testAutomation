@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2019 LabKey Corporation
+ * Copyright (c) 2014-2026 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -175,7 +175,7 @@ public abstract class PermissionsHelper
     @LogMethod(quiet = true)
     public abstract void deleteGroup(@LoggedParam String groupName, boolean failIfNotFound);
 
-    public abstract void removeUserFromGroup(String groupName, String userName);
+    public abstract void removeUserFromGroup(String groupName, String userName, String projectName);
     public abstract void removeUserFromSiteGroup(String groupName, String userName);
 
     public abstract boolean doesGroupExist(String groupName, String projectName);

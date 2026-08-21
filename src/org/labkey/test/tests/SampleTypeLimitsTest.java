@@ -1,3 +1,18 @@
+/*
+ * Copyright (c) 2020-2026 LabKey Corporation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.labkey.test.tests;
 
 import org.jetbrains.annotations.Nullable;
@@ -21,6 +36,7 @@ import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.params.list.ListDefinition;
 import org.labkey.test.params.list.VarListDefinition;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.OptionalFeatureHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
 import org.labkey.test.util.TestDataGenerator;
@@ -102,6 +118,13 @@ public class SampleTypeLimitsTest extends BaseWebDriverTest
         }
     }
 
+    @Override
+    protected void doCleanup(boolean afterTest)
+    {
+        super.doCleanup(afterTest);
+        OptionalFeatureHelper.resetOptionalFeature(createDefaultConnection(), "deriveSamplesNotInApp");
+    }
+
     @Test
     public void testStringLookupFields() throws IOException, CommandException
     {
@@ -181,6 +204,7 @@ public class SampleTypeLimitsTest extends BaseWebDriverTest
     public void testDeriveSamplesLookupFields() throws IOException, CommandException
     {
         goToProjectHome();
+        OptionalFeatureHelper.setOptionalFeature(createDefaultConnection(), "deriveSamplesNotInApp", true);
 
         log("Create sample type with lookup field to " + SAMPLE_TYPE_NAME);
         String sampleTypeName = "SampleTypeWithLookup";

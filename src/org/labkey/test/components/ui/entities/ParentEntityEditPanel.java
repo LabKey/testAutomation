@@ -1,3 +1,18 @@
+/*
+ * Copyright (c) 2020-2026 LabKey Corporation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.labkey.test.components.ui.entities;
 
 import org.junit.Assert;
@@ -87,7 +102,7 @@ public class ParentEntityEditPanel extends Panel<ParentEntityEditPanel.ElementCa
                                 .find(this);
 
                         // For the first parent the panel is ready if the entity type selector is ready and the options have been populated.
-                        return firstParentSelector.isInteractive() && !firstParentSelector.getOptions().isEmpty();
+                        return firstParentSelector.isInteractive();
 
                     }
                 }
@@ -277,7 +292,7 @@ public class ParentEntityEditPanel extends Panel<ParentEntityEditPanel.ElementCa
     public ReactSelect getDisabledEntityTypeByLabel(String typeName)
     {
         return ReactSelect.finder(getDriver())
-                .followingLabelWithSpan(typeName)
+                .withSpanLabel(typeName)
                 .waitFor(elementCache());
     }
 
@@ -300,7 +315,7 @@ public class ParentEntityEditPanel extends Panel<ParentEntityEditPanel.ElementCa
      */
     public List<String> getEntityTypeNames()
     {
-        List<WebElement> labels = Locator.tagWithClass("label", "entity-insert--type-select").findElements(elementCache());
+        List<WebElement> labels = Locator.tagWithClass("span", "entity-insert--type-select").findElements(elementCache());
         return labels.stream().map(WebElement::getText).toList();
     }
 
@@ -312,7 +327,7 @@ public class ParentEntityEditPanel extends Panel<ParentEntityEditPanel.ElementCa
     public List<ReactSelect> getAllEntityTypes()
     {
         return ReactSelect.finder(getDriver())
-                .followingLabelWithClass("entity-insert--type-select")
+                .followingSpanWithClass("entity-insert--type-select")
                 .findAll(elementCache());
     }
 
@@ -340,7 +355,7 @@ public class ParentEntityEditPanel extends Panel<ParentEntityEditPanel.ElementCa
     public List<FilteringReactSelect> getAllParents()
     {
         return FilteringReactSelect.finder(getDriver())
-                .followingLabelWithClass("entity-insert--parent-select")
+                .followingSpanWithClass("entity-insert--parent-select")
                 .findAll(elementCache());
     }
 
