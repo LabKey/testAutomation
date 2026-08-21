@@ -958,7 +958,7 @@ public class ListTest extends BaseWebDriverTest
         SelectRowsResponse rs = cmd.execute(cn, getProjectName());
         if (rs.getRows().isEmpty())
             throw new AssertionError("No ListAuditEvent for " + listName);
-        return ((Number) rs.getRows().get(0).get("RowId")).intValue();
+        return ((Number) rs.getRows().getFirst().get("RowId")).intValue();
     }
 
     /* Issue 23487: add regression coverage for batch insert into list with multiple errors
@@ -1092,9 +1092,9 @@ public class ListTest extends BaseWebDriverTest
     public void testChangeListNameOverAPI() throws Exception
     {
         List<FieldDefinition> cols = Arrays.asList(
-                new FieldDefinition("name", ColumnType.String),
-                new FieldDefinition("title", ColumnType.String),
-                new FieldDefinition("dewey", ColumnType.Decimal)
+            new FieldDefinition("name", ColumnType.String),
+            new FieldDefinition("title", ColumnType.String),
+            new FieldDefinition("dewey", ColumnType.Decimal)
         );
         String listName = "remoteAPIBeforeRename";
         TestDataGenerator dgen = new TestDataGenerator("lists", listName, getProjectName())
@@ -1114,7 +1114,6 @@ public class ListTest extends BaseWebDriverTest
     @Test
     public void testChangeListName()
     {
-
         String listNameBefore = TestDataGenerator.randomDomainName("Before Rename", DomainUtils.DomainKind.IntList);
 
         _listHelper.createList(PROJECT_VERIFY, listNameBefore,
@@ -1962,19 +1961,19 @@ public class ListTest extends BaseWebDriverTest
         ).getRows();
     }
 
- private List<String> getQueryFormFieldNamesDecoded()
+    private List<String> getQueryFormFieldNamesDecoded()
     {
         ArrayList<String> ret = new ArrayList<>();
         Locator.tag("input").attributeStartsWith("name", "quf_")
                 .findElements(getDriver()).stream()
                 .map(el -> el.getDomAttribute("name"))
                 .map(s -> s.substring(4))
-                .forEach(name -> ret.add(name));
+                .forEach(ret::add);
         Locator.tag("input").attributeStartsWith("name", "%_quf_")
                 .findElements(getDriver()).stream()
                 .map(el -> el.getDomAttribute("name"))
                 .map(name -> EscapeUtil.decode(name.substring(6)))
-                .forEach(name -> ret.add(name));
+                .forEach(ret::add);
         return ret;
     }
 
@@ -2017,12 +2016,10 @@ public class ListTest extends BaseWebDriverTest
         // These validate Issue 52069 Issue 52070 Issue 52071
         testTricky("Tricky Field Character", false);
         testTricky("TrickyField Character Auto Key", true);
-
     }
 
     private void testTricky(String listName, boolean autoKey) throws IOException
     {
-
         String keyField = "Key Field \"`~!@#$%^&*()_-+={}[]|\\:;<>,.?/\u5668\u9aa8";
         String keyField_Bulk = "\"" + keyField.replace("\"", "\"\"") + "\"" ;
         String intField = "Int Field \"`~!@#$%^&*()_-+={}[]|\\:;<>,.?/\u00a5\u00e6";
@@ -2141,7 +2138,6 @@ public class ListTest extends BaseWebDriverTest
             expectedValues.add(Map.of(EscapeUtil.fieldKeyEncodePart(keyField), "3",
                     EscapeUtil.fieldKeyEncodePart(intField), "300",
                     EscapeUtil.fieldKeyEncodePart(trickyField), "303"));
-
         }
         else
         {
@@ -2232,7 +2228,6 @@ public class ListTest extends BaseWebDriverTest
             assertEquals(String.format("Row detail for column '%s' not as expected.", expectedFields.get(i)),
                     expectedFields.get(i), actualFields.get(i));
         }
-
     }
 
     private void validateDataRegionTableForTricky(List<Map<String, String>> expectedValue)
