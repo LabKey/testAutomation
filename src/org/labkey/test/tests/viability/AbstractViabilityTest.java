@@ -25,7 +25,6 @@ import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.tests.AbstractAssayTest;
 import org.labkey.test.util.PortalHelper;
-import org.labkey.test.util.PostgresOnlyTest;
 import org.labkey.test.util.QCAssayScriptHelper;
 import org.openqa.selenium.WebDriverException;
 
@@ -35,7 +34,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertTrue;
 
-public abstract class AbstractViabilityTest extends AbstractAssayTest implements PostgresOnlyTest
+public abstract class AbstractViabilityTest extends AbstractAssayTest
 {
     @Override
     public List<String> getAssociatedModules()

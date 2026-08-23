@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Registers the special-character schema "etl test!schema" with the ETLtest module so the DataIntegration
      StoredProcedureStep can resolve it. The schema holds only a stored procedure (no tables); it is
-     created by the etltest-26.000-26.001.sql dbscript. -->
+     created by the postgresql/etltest-26.000-26.001.sql dbscript. The SQL Server equivalent, for use
+     against an external data source, is resources/externalFixtures/sqlserver/. -->
 <tables xmlns="http://labkey.org/data/xml">
 </tables>

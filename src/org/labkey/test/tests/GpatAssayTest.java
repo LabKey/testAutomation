@@ -501,15 +501,7 @@ public class GpatAssayTest extends BaseWebDriverTest
         checker().verifyEquals(String.format("Value in column '%s' is not as expected.", runDate),
                 expectedText, rowMap.get(runDate));
 
-        // Converting a date, time or dateTime field to String will be different between MSSQL and postgres.
-        if (WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.MicrosoftSQLServer)
-        {
-            expectedText = "Jan 1 1970 " + new SimpleDateFormat("h:mma").format(date);
-        }
-        else
-        {
-            expectedText = "1970-01-01 " + defaultTimeFormat.format(date);
-        }
+        expectedText = "1970-01-01 " + defaultTimeFormat.format(date);
 
         checker().verifyEquals(String.format("Value in column '%s' is not as expected.", runTime),
                 expectedText, rowMap.get(runTime));

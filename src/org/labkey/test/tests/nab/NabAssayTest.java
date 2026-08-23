@@ -330,8 +330,6 @@ public class NabAssayTest extends AbstractAssayTest
                         build()).doImport();
 
         assertElementPresent(Locators.labkeyError.containing(getConversionErrorMessage("bad-date", "Date", Date.class)), 1);
-//        These dates are SQL Server specific
-//        assertElementPresent(Locators.labkeyError.containing("Only dates between January 1, 1753 and December 31, 9999 are accepted."), 1);
         assertElementPresent(Locators.labkeyError.containing("Only dates between "), 1);
         clickButton("Cancel");
 
@@ -470,7 +468,7 @@ public class NabAssayTest extends AbstractAssayTest
             region.clickHeaderButtonAndWait("Link to Study");
 
             selectOptionByText(AssayConstants.TARGET_STUDY_FIELD_LOCATOR, "/" + TEST_ASSAY_PRJ_NAB + "/" + TEST_ASSAY_FLDR_STUDY1 + " (" + TEST_ASSAY_FLDR_STUDY1 + " Study)");
-            clickButton("Next", 300_000); // Triggers a query that is, sometimes, very slow on SQL Server
+            clickButton("Next");
 
             region = new DataRegionTable("Data", this);
             region.clickHeaderButtonAndWait("Link to Study");
