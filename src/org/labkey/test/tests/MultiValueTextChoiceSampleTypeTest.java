@@ -32,7 +32,6 @@ import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.DomainUtils;
 import org.labkey.test.util.PortalHelper;
-import org.labkey.test.util.PostgresOnlyTest;
 import org.labkey.test.util.TestDataGenerator;
 import org.labkey.test.util.exp.SampleTypeAPIHelper;
 
@@ -50,7 +49,7 @@ import static org.labkey.test.util.TestDataGenerator.randomTextChoice;
 import static org.labkey.test.util.TestDataGenerator.shuffleSelect;
 
 @Category({Daily.class})
-public class MultiValueTextChoiceSampleTypeTest extends BaseWebDriverTest implements PostgresOnlyTest
+public class MultiValueTextChoiceSampleTypeTest extends BaseWebDriverTest
 {
     private static final String SUB_FOLDER = "ChildFolder_MultiValueTextChoice_SampleType_Test";
     private final String SUB_FOLDER_PATH = getProjectName() + "/" + SUB_FOLDER;

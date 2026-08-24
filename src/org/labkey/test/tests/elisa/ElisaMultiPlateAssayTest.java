@@ -59,9 +59,7 @@ public class ElisaMultiPlateAssayTest extends BaseWebDriverTest
     @Override
     protected void doCleanup(boolean afterTest)
     {
-        // Need an extra-long timeout for deleting project
-        // Issue 42163: Deleting experiment properties is slow on SQL server
-        _containerHelper.deleteProject(getProjectName(), afterTest, 6 * 60_000);
+        _containerHelper.deleteProject(getProjectName(), afterTest);
     }
 
     @BeforeClass

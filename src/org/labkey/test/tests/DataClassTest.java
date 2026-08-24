@@ -52,7 +52,6 @@ import static org.labkey.test.util.DataRegionTable.DataRegion;
 public class DataClassTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "DataClassTestProject";
-    boolean IS_POSTGRES = WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.PostgreSQL;
 
     @Override
     public List<String> getAssociatedModules()
@@ -445,10 +444,8 @@ public class DataClassTest extends BaseWebDriverTest
 
     private void verifyTableIndexNonUnique(String prefix, String suffix, boolean isUnique)
     {
-        String boolDisplay = isUnique ? "0" : "1";
-        if (IS_POSTGRES) boolDisplay = isUnique ? "false" : "true";
-        String fieldKey = prefix + suffix;
-        if (IS_POSTGRES) fieldKey = fieldKey.toLowerCase();
+        String boolDisplay = isUnique ? "false" : "true";
+        String fieldKey = (prefix + suffix).toLowerCase();
         Locator locator = Locator.xpath("//td[contains(text(), '" + fieldKey + "')]/preceding-sibling::td[2][text()='" + boolDisplay + "']");
         checker().verifyTrue("Non_Unique value not as expected in metadata for locator: " + locator, locator.existsIn(getDriver()));
     }
