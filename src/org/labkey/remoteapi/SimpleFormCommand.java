@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class SimpleFormCommand extends Command<CommandResponse, HttpUriRequest>
+public class SimpleFormCommand extends Command<CommandResponse>
 {
     private final Map<String, String> _formData;
 

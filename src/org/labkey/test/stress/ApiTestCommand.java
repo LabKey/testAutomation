@@ -34,7 +34,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.net.URI;
 
-class ApiTestCommand extends Command<CommandResponse, HttpUriRequest>
+class ApiTestCommand extends Command<CommandResponse>
 {
     private final String _url;
     private final String _type;

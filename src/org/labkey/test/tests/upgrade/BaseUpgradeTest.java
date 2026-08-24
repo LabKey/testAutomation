@@ -45,11 +45,29 @@ import static org.apache.commons.lang3.StringUtils.trimToNull;
  * not relevant to the version of LabKey being upgraded from (specified in the {@code webtest.upgradePreviousVersion}
  * system property).<br>
  * The setup steps will be skipped if the {@code webtest.upgradeSetup} system property is set to {@code false}.
+ * <h2>Writing a new upgrade test</h2>
+ * <ul>
+ *     <li>Use a package name containing {@code upgrade}. Do all setup in {@link #doSetup()} rather than a
+ *     {@code @BeforeClass}, and prefer APIs to the UI. {@code @Test} methods must be read-only or re-runnable, since
+ *     cleanup is skipped after the upgrade.</li>
+ *     <li><b>The setup phase runs the older branch's copy of the test</b>, so a test that exists only on the newer
+ *     branch never gets setup and anything touching its project or users fails. Commit a matching copy to a feature
+ *     branch on the preceding ESR release ({@code fb_coolUpgrade} plus {@code 26.3_fb_coolUpgrade}); TeamCity pairs
+ *     them. Both copies do the full setup, allowing for API changes between the releases. The older one can
+ *     do minimal validation and just needs one {@code @Test}. Names the newer copy looks up, such as the project and test
+ *     users, must match exactly.</li>
+ *     <li>Guard methods that depend on setup data with {@link EarliestVersion} naming the earliest release that
+ *     carries a copy of the test, which is not necessarily the release the feature shipped in.</li>
+ *     <li>One leg of the pipeline validates a build against itself, where nothing changed and {@link #setupVersion} is
+ *     the running version. {@link #wasSetupBefore(String)} and {@link #wasSetupWithin(String, String)} adjust
+ *     expectations for that leg; the annotations cannot express it.</li>
+ * </ul>
  */
 public abstract class BaseUpgradeTest extends BaseWebDriverTest
 {
 
     protected static final boolean isUpgradeSetupPhase = TestProperties.getBooleanProperty("webtest.upgradeSetup", true);
+    /** The version the setup phase ran, from {@code webtest.upgradePreviousVersion}; the running version if unset. */
     protected static final Version setupVersion = isUpgradeSetupPhase ? TestProperties.getProductVersion() :
         Optional.ofNullable(trimToNull(System.getProperty("webtest.upgradePreviousVersion"))).map(Version::new)
             .orElse(TestProperties.getProductVersion());
