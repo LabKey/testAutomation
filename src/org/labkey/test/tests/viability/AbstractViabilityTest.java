@@ -69,7 +69,8 @@ public abstract class AbstractViabilityTest extends AbstractAssayTest
     {
         log("** Initialize Folder");
         _containerHelper.createProject(getProjectName(), null);
-        _containerHelper.enableModule("Specimen");
+        if (_studyHelper.isSpecimenModulePresent())
+            _containerHelper.enableModule("Specimen");
         _containerHelper.createSubfolder(getProjectName(), getProjectName(), getFolderName(), "Study", tabs, true);
 
         log("** Create Study");
@@ -85,14 +86,17 @@ public abstract class AbstractViabilityTest extends AbstractAssayTest
 
     protected void importSpecimens(String studyFolder, File specimensPath)
     {
-        log("** Import specimens");
-        clickFolder(studyFolder);
-        clickAndWait(Locator.linkWithText("Specimen Data"));
-        waitAndClickAndWait(Locator.linkWithText("Import Specimens"));
-        waitForElement(Locator.id("tsv"));
-        setFormElement(Locator.id("tsv"), TestFileUtils.getFileContents(specimensPath));
-        submit();
-        assertTextPresent("Specimens uploaded successfully");
+        if (_studyHelper.isSpecimenModulePresent())
+        {
+            log("** Import specimens");
+            clickFolder(studyFolder);
+            clickAndWait(Locator.linkWithText("Specimen Data"));
+            waitAndClickAndWait(Locator.linkWithText("Import Specimens"));
+            waitForElement(Locator.id("tsv"));
+            setFormElement(Locator.id("tsv"), TestFileUtils.getFileContents(specimensPath));
+            submit();
+            assertTextPresent("Specimens uploaded successfully");
+        }
     }
 
     protected void createViabilityAssay()
