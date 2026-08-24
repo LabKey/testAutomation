@@ -24,6 +24,7 @@ import org.labkey.test.components.BodyWebPart;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.TestUser;
 
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.util.PermissionsHelper.AUTHOR_ROLE;
@@ -33,8 +34,8 @@ import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
 @BaseWebDriverTest.ClassTimeout(minutes = 10)
 public class DataViewsPermissionsTest extends StudyBaseTest
 {
-    public static final String AUTHOR_USER = "dvp_author@dataviews.test";
-    public static final String EDITOR_USER = "dvp_editor@dataviews.test";
+    public static final TestUser AUTHOR_USER = new TestUser("dvp_author@dataviews.test");
+    public static final TestUser EDITOR_USER = new TestUser("dvp_editor@dataviews.test");
     private final PortalHelper portalHelper = new PortalHelper(this);
 
     @Override
@@ -61,6 +62,9 @@ public class DataViewsPermissionsTest extends StudyBaseTest
     {
         importStudy();
 
+        AUTHOR_USER.create(this);
+        EDITOR_USER.create(this);
+
         clickFolder(getFolderName());
         portalHelper.addWebPart("Data Views");
         portalHelper.enterAdminMode();
@@ -79,13 +83,13 @@ public class DataViewsPermissionsTest extends StudyBaseTest
         _permissionsHelper.createPermissionsGroup("Editor Group");
         _permissionsHelper.assertPermissionSetting("Editor Group", "No Permissions");
         _permissionsHelper.setPermissions("Editor Group", EDITOR_ROLE);
-        createUserInProjectForGroup(EDITOR_USER, "StudyVerifyProject", "Editor Group", false);
+        addUserToProjectGroup(EDITOR_USER, "StudyVerifyProject", "Editor Group", false);
         clickFolder(getFolderName());
         _permissionsHelper.enterPermissionsUI();
         _permissionsHelper.createPermissionsGroup("Author Group");
         _permissionsHelper.assertPermissionSetting("Author Group", "No Permissions");
         _permissionsHelper.setPermissions("Author Group", AUTHOR_ROLE);
-        createUserInProjectForGroup(AUTHOR_USER, "StudyVerifyProject", "Author Group", false);
+        addUserToProjectGroup(AUTHOR_USER, "StudyVerifyProject", "Author Group", false);
 
         clickFolder(getFolderName());
         clickTab("Manage");
@@ -113,7 +117,6 @@ public class DataViewsPermissionsTest extends StudyBaseTest
         clickButton("Create View", defaultWaitForPage);
         clickFolder(getFolderName());
         portalHelper.removeWebPart("Views");
-        click(Locator.tag("a").withAttributeContaining("href", "editDataViews"));
         openEditPanel("Report 1");
         //_ext4Helper.selectRadioButton ("Visibility","Hidden");
         _ext4Helper.uncheckCheckbox("Shared");
@@ -121,17 +124,15 @@ public class DataViewsPermissionsTest extends StudyBaseTest
         _ext4Helper.clickWindowButton("Report 1","Save",0,0);
         _ext4Helper.waitForMaskToDisappear();
         clickFolder(getFolderName());
-        click(Locator.tag("a").withAttributeContaining("href", "editDataViews"));
         openEditPanel("Report 2");
-        _ext4Helper.selectComboBoxItem("Author", _userHelper.getDisplayNameForEmail(AUTHOR_USER));
+        _ext4Helper.selectComboBoxItem("Author", AUTHOR_USER.getUserDisplayName());
         _ext4Helper.checkCheckbox("Shared");
         sleep(1000);
         _ext4Helper.clickWindowButton("Report 2","Save",0,0);
         _ext4Helper.waitForMaskToDisappear();
         clickFolder(getFolderName());
-        click(Locator.tag("a").withAttributeContaining("href", "editDataViews"));
         openEditPanel("Report 3");
-        _ext4Helper.selectComboBoxItem("Author", _userHelper.getDisplayNameForEmail(EDITOR_USER));
+        _ext4Helper.selectComboBoxItem("Author", EDITOR_USER.getUserDisplayName());
         _ext4Helper.checkCheckbox("Shared");
         sleep(1000);
         _ext4Helper.clickWindowButton("Report 3","Save",0,0);
@@ -139,19 +140,18 @@ public class DataViewsPermissionsTest extends StudyBaseTest
     }
 
     @Override
-    protected void doVerifySteps()
+    protected void doVerifySteps() throws Exception
     {
-        impersonate(EDITOR_USER);
-        click(Locator.tag("a").withAttributeContaining("href", "editDataViews"));
+        // Impersonate via the API. The Ext4 impersonation window is unreliable on this page.
+        EDITOR_USER.impersonate(true);
         openEditPanel("Report 4");
         sleep(1000);
         _ext4Helper.clickWindowButton("Report 4", "Save", 0, 0);
         _ext4Helper.waitForMaskToDisappear();
-        stopImpersonating();
+        EDITOR_USER.stopImpersonating(true);
 
         navigateToFolder("StudyVerifyProject", getFolderName());
-        sleep(500);
-        impersonate(AUTHOR_USER);
+        AUTHOR_USER.impersonate(true);
         PortalHelper portalHelper1 = new PortalHelper(this);
         portalHelper1.clickWebpartMenuItem("Data Views", true, "Add Report", "Link Report");
         setFormElement(Locator.name("viewName"), "Report 5");
@@ -159,7 +159,6 @@ public class DataViewsPermissionsTest extends StudyBaseTest
         sleep(1000);
         clickButton("Save", defaultWaitForPage);
 
-        click(Locator.tag("a").withAttributeContaining("href", "editDataViews"));
         openEditPanel("Report 5");
         sleep(1000);
         _ext4Helper.clickWindowButton("Report 5", "Save", 0, 0);
@@ -168,8 +167,13 @@ public class DataViewsPermissionsTest extends StudyBaseTest
         verifyMineCheckbox();
     }
 
+    /**
+     * Put the Data Views webpart into edit mode and open the edit dialog for a single view.
+     */
     private void openEditPanel(String itemName)
     {
+        waitForElement(Locators.itemLink());
+        click(Locator.tag("a").withAttributeContaining("href", "editDataViews"));
         waitAndClick(Locators.editViewsLink(itemName));
         waitForElement(Ext4Helper.Locators.window(itemName));
     }
@@ -199,11 +203,16 @@ public class DataViewsPermissionsTest extends StudyBaseTest
 
     private int visibleItemCount()
     {
-        return getElementCount(Locator.tagWithClass("a", "x4-tree-node-text").notHidden());
+        return getElementCount(Locators.itemLink().notHidden());
     }
 
     public static class Locators
     {
+        static Locator.XPathLocator itemLink()
+        {
+            return Locator.tagWithClass("a", "x4-tree-node-text");
+        }
+
         static Locator.XPathLocator editViewsLink(String dataset)
         {
             return Locator.tag("tr").withClass("x4-grid-tree-node-leaf").withDescendant(Locator.xpath("td/div/a[normalize-space()="+Locator.xq(dataset)+"]")).append("//span").withClass("edit-views-link");
@@ -221,7 +230,7 @@ public class DataViewsPermissionsTest extends StudyBaseTest
         }
     }
 
-    private void createUserInProjectForGroup(String userName, String projectName, String groupName, boolean sendEmail)
+    private void addUserToProjectGroup(TestUser user, String projectName, String groupName, boolean sendEmail)
     {
         if (isElementPresent(Locator.permissionRendered()))
         {
@@ -230,7 +239,7 @@ public class DataViewsPermissionsTest extends StudyBaseTest
         }
         _permissionsHelper.enterPermissionsUI();
         _permissionsHelper.clickManageGroup(groupName);
-        setFormElement(Locator.name("names"), userName);
+        setFormElement(Locator.name("names"), user.getEmail());
         if (!sendEmail)
             uncheckCheckbox(Locator.checkboxByName("sendEmail"));
         clickButton("Update Group Membership");
