@@ -69,7 +69,8 @@ public abstract class AbstractViabilityTest extends AbstractAssayTest
     {
         log("** Initialize Folder");
         _containerHelper.createProject(getProjectName(), null);
-        _containerHelper.enableModule("Specimen");
+        if (_studyHelper.isSpecimenModulePresent())
+            _containerHelper.enableModule("Specimen");
         _containerHelper.createSubfolder(getProjectName(), getProjectName(), getFolderName(), "Study", tabs, true);
 
         log("** Create Study");

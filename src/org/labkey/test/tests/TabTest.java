@@ -283,7 +283,10 @@ public class TabTest extends SimpleModuleTest
         goToProjectHome();
         _containerHelper.createSubfolder(getProjectName(), COLLAB_FOLDER, "Collaboration");
         _containerHelper.createSubfolder(COLLABFOLDER_PATH, STUDY_FOLDER_TAB_NAME, "Study");
-        _containerHelper.enableModule("Specimen");
+        if (_studyHelper.isSpecimenModulePresent())
+        {
+            _containerHelper.enableModule("Specimen");
+        }
         _containerHelper.createSubfolder(COLLABFOLDER_PATH, ASSAY_FOLDER_TAB_NAME, "Assay");
         clickFolder(COLLAB_FOLDER);
         clickFolder(STUDY_FOLDER_TAB_NAME);
@@ -317,8 +320,11 @@ public class TabTest extends SimpleModuleTest
         clickAndWait(Locator.linkWithText(STUDY_FOLDER_TAB_LABEL));
         assertTextPresent("Study Overview");
         studyContainerTab = PortalTab.finder(getDriver()).withTabText(STUDY_FOLDER_TAB_LABEL).find();
-        studyContainerTab.goToTabContainer("Specimen Data");
-        assertTextPresent("Vial Search", "Import Specimens");
+        if (_studyHelper.isSpecimenModulePresent())
+        {
+            studyContainerTab.goToTabContainer("Specimen Data");
+            assertTextPresent("Vial Search", "Import Specimens");
+        }
         clickAndWait(Locator.linkWithText(ASSAY_FOLDER_TAB_LABEL));
         assertTextPresent("Assay List", EXTRA_ASSAY_WEBPART);
 
@@ -343,8 +349,11 @@ public class TabTest extends SimpleModuleTest
         assertTextPresent(STUDY_FOLDER_TAB_LABEL, ASSAY_FOLDER_TAB_LABEL);
         clickAndWait(Locator.linkWithText(STUDY_FOLDER_TAB_LABEL));
         assertTextPresent("Study Overview");
-        PortalTab.find(STUDY_FOLDER_TAB_LABEL, getDriver()).goToTabContainer("Specimen Data");
-        assertTextPresent("Vial Search", "Import Specimens");
+        if (_studyHelper.isSpecimenModulePresent())
+        {
+            PortalTab.find(STUDY_FOLDER_TAB_LABEL, getDriver()).goToTabContainer("Specimen Data");
+            assertTextPresent("Vial Search", "Import Specimens");
+        }
         PortalTab.find(ASSAY_FOLDER_TAB_LABEL, getDriver()).activate();
         assertTextPresent("Assay List", EXTRA_ASSAY_WEBPART);
 
