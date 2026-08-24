@@ -142,7 +142,6 @@ public class DataViewsPermissionsTest extends StudyBaseTest
     @Override
     protected void doVerifySteps() throws Exception
     {
-        // Impersonate via the API. The Ext4 impersonation window is unreliable on this page.
         EDITOR_USER.impersonate(true);
         openEditPanel("Report 4");
         sleep(1000);
