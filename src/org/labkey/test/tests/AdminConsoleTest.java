@@ -453,27 +453,13 @@ public class AdminConsoleTest extends AbstractAdminConsoleTest
     @Test
     public void testEmailTimeoutSettings()
     {
-        // Disable email recording if it's on, otherwise we won't see timeouts
-        boolean emailRecordEnabled = false;
-        if (!TestProperties.isWithoutTestModules())
-        {
-            beginAt(buildURL("dumbster", "begin"));
-            emailRecordEnabled = isChecked(Locator.checkboxById("emailRecordOn"));
-            if (emailRecordEnabled)
-                disableEmailRecorder();
-        }
+        // Ensure email recording is disabled, otherwise we won't see the default timeout properties
+        disableEmailRecorder();
+        log("Verifying that default email timeout properties are set");
+        goToAdminConsole().clickTestEmailConfiguration();
+        assertTextPresent("mail.smtp.writetimeout", "mail.smtp.timeout", "mail.smtp.connectiontimeout");
 
-        try
-        {
-            log("Verifying that default email timeout properties are set");
-            goToAdminConsole().clickTestEmailConfiguration();
-            assertTextPresent("mail.smtp.writetimeout", "mail.smtp.timeout", "mail.smtp.connectiontimeout");
-        }
-        finally
-        {
-            // Restore email recorder if it was on
-            if (emailRecordEnabled)
-                enableEmailRecorder();
-        }
+        // No need to restore the email recording setting. Any test that cares about capturing emails needs to call
+        // enableEmailRecorder to clear out the email record.
     }
 }
