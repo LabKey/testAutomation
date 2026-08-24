@@ -73,6 +73,7 @@ import static org.labkey.test.WebDriverWrapper.waitFor;
 import static org.labkey.test.util.TestLogger.log;
 import static org.labkey.test.util.data.TestArrayDataUtils.formatMultiValueText;
 import static org.labkey.test.util.selenium.ScrollUtils.Alignment.center;
+import static org.labkey.test.util.selenium.ScrollUtils.Alignment.nearest;
 import static org.labkey.test.util.selenium.WebDriverUtils.MODIFIER_KEY;
 
 public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
@@ -1048,39 +1049,31 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     }
 
     /**
-     * Select {@code selectStart} through {@code dragEnd} and fill down from {@code selectEnd}'s row using Ctrl/Cmd+D.
-     * The drag that establishes the selection is occasionally treated as a click, leaving the key combination
-     * nothing to fill, so the whole sequence is retried once.
+     * Select {@code selectStart} through {@code fillEnd} and fill down from {@code selectEnd}'s row using Ctrl/Cmd+D.
      * @param selectStart top-left cell of the range to select
      * @param selectEnd   cell whose value will be filled down (must be in {@code selectStart}'s row)
-     * @param dragEnd     bottom-right cell of the range to select and fill down to
+     * @param fillEnd     bottom-right cell of the range to select and fill down to
      */
-    public void fillDown(WebElement selectStart, WebElement selectEnd, WebElement dragEnd)
+    public void fillDown(WebElement selectStart, WebElement selectEnd, WebElement fillEnd)
     {
+        selectCellRange(selectStart, fillEnd);
         String fillValue = getCellValue(selectEnd);
-
-        selectAndFillDown(selectStart, dragEnd);
-        if (!WebDriverWrapper.waitFor(() -> fillValue.equals(getCellValue(dragEnd)), 3_000))
-        {
-            selectAndFillDown(selectStart, dragEnd);
-            WebDriverWrapper.waitFor(() -> fillValue.equals(getCellValue(dragEnd)),
-                    "Fill-down did not populate end cell with value: " + fillValue, 5_000);
-        }
+        new Actions(getDriver()).keyDown(MODIFIER_KEY).sendKeys("d").keyUp(MODIFIER_KEY).build().perform();
+        WebDriverWrapper.waitFor(() -> fillValue.equals(getCellValue(fillEnd)),
+                "Fill-down did not populate end cell with value: " + fillValue, 3_000);
     }
 
     /**
-     * Drag-select {@code selectStart} through {@code dragEnd} and send the fill-down key combination.
+     * Select the rectangle of cells with {@code startCell} and {@code endCell} at opposite corners. Shift-click is
+     * used rather than a drag; a drag can only reach cells that stay on screen for the whole gesture.
      */
-    private void selectAndFillDown(WebElement selectStart, WebElement dragEnd)
-    {
-        dragToCell(selectStart, dragEnd);
-        WebDriverWrapper.waitFor(() -> isInSelection(selectStart) && isInSelection(dragEnd), 2_000);
-        new Actions(getDriver()).keyDown(MODIFIER_KEY).sendKeys("d").keyUp(MODIFIER_KEY).build().perform();
-    }
-
     public void selectCellRange(WebElement startCell, WebElement endCell)
     {
-        dragToCell(startCell, endCell);
+        dismissPopover();
+        selectCell(startCell);
+
+        getWrapper().scrollIntoView(endCell);
+        new Actions(getDriver()).keyDown(Keys.SHIFT).click(endCell).keyUp(Keys.SHIFT).build().perform();
 
         WebDriverWrapper.waitFor(()-> isInSelection(startCell) && isInSelection(endCell),
                 "Cell range did not become selected", 2000);
@@ -1090,6 +1083,10 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     {
         var size = destinationCell.getSize();
         dismissPopover();
+
+        // Scroll before the pointer picks anything up: scrolling with the button held skips the rows it scrolls past.
+        ScrollUtils.scrollIntoView(destinationCell, nearest, nearest);
+        ScrollUtils.scrollUnderFloatingHeader(elementToDrag);
 
         new Actions(getDriver())
                 // WebDriver doesn't calculate correct location to click the cell selection handle
