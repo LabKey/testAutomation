@@ -16,6 +16,8 @@
 
 package org.labkey.test;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
@@ -32,5 +34,5 @@ public interface WebTest
      */
     long beginAt(String url);
     URL getURL() throws MalformedURLException;
-    List<String> getAssociatedModules();
+    @Nullable List<String> getAssociatedModules();
 }
