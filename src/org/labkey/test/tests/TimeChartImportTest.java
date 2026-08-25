@@ -139,14 +139,14 @@ public class TimeChartImportTest extends StudyBaseTest
         DATE_CHARTS.add(new TimeChartInfo(
                 "One Measure: y-axis log scale and manual range on right side", 1, 33, false,
                 new String[]{
-                        "0\n50\n100\n150\n200\n250\n300\n350\n10\n100\n1000\n10000\n1e+5\n1e+6\n1e+7\nHIV Test Results\nDays Since Start Date\nViral Load Quantified (copies/ml)\n249318596\n249320107\n249320127\n249320489\n249320897"
+                        "0\n50\n100\n150\n200\n250\n300\n350\n400\n10\n100\n1000\n10000\n1e+5\n1e+6\n1e+7\nHIV Test Results\nDays Since Start Date\nViral Load Quantified (copies/ml)\n249318596\n249320107\n249320127\n249320489\n249320897"
                 }
         ));
 
         DATE_CHARTS.add(new TimeChartInfo(
                 "One Measure: y-axis log scale and manual range", 1, 33, false,
                 new String[]{
-                        "0\n50\n100\n150\n200\n250\n300\n350\n10\n100\n1000\n10000\n1e+5\n1e+6\n1e+7\nHIV Test Results\nDays Since Start Date\nViral Load Quantified (copies/ml)\n249318596\n249320107\n249320127\n249320489\n249320897"
+                        "0\n50\n100\n150\n200\n250\n300\n350\n400\n10\n100\n1000\n10000\n1e+5\n1e+6\n1e+7\nHIV Test Results\nDays Since Start Date\nViral Load Quantified (copies/ml)\n249318596\n249320107\n249320127\n249320489\n249320897"
                 }
         ));
 
