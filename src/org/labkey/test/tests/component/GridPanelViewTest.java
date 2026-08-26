@@ -979,6 +979,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
         log(String.format("Save the view name as '%s'.", trickyViewName));
 
         saveViewDialog.setViewName(trickyViewName)
+                .setMakeShared(false)
                 .saveView();
 
         // Add this view name to the list of views.
@@ -1234,7 +1235,12 @@ public class GridPanelViewTest extends GridPanelBaseTest
         String viewName1 = String.format("No %s", fieldRemoved1);
         log(String.format("Use the 'Save' button on the grid to save the view as '%s'.", viewName1));
         SaveViewDialog saveViewDialog = grid.clickSaveButton(true);
+
+        log("GitHub Issue #899: Expect shared checkbox for session view to match original / shadowed view");
+        checker().verifyTrue("View should default to shared", saveViewDialog.isMakeSharedChecked());
+
         saveViewDialog.setViewName(viewName1)
+                .setMakeShared(false)
                 .saveView();
 
         log(String.format("Go back to '%s' and create a new view.", VIEW_DEFAULT));
@@ -1252,6 +1258,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
         log(String.format("Use the menu to save the view as '%s'. This is now the current view.", viewName2));
         saveViewDialog = grid.saveView();
         saveViewDialog.setViewName(viewName2)
+                .setMakeShared(false)
                 .saveView();
 
         ManageViewsDialog manageViewsDialog = grid.manageViews();
@@ -1347,6 +1354,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
         String viewName3 = "No Bool";
         log(String.format("Change view name to something new, '%s' and validate save works as expected.", viewName3));
         saveViewDialog.setViewName(viewName3);
+        saveViewDialog.setMakeShared(false);
         saveViewDialog.saveView();
 
         checker().withScreenshot("New_View_Name_Error")
@@ -1373,6 +1381,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
         grid.hideColumn(fieldRemoved1);
         saveViewDialog = grid.saveView();
         saveViewDialog.setViewName(viewName1);
+        saveViewDialog.setMakeShared(false);
         saveViewDialog.saveView();
 
         manageViewsDialog = grid.manageViews();

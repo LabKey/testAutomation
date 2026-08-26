@@ -20,9 +20,11 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.query.SaveQueryViewsCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.pages.list.GridPage;
 import org.labkey.test.params.FieldDefinition;
@@ -82,6 +84,12 @@ public class CustomizeViewTest extends BaseWebDriverTest
     private final static int WIDE_LIST_COLUMN_COUNT = 160;
     private final static String WIDE_STAT_COLUMN = "Field001";
 
+    // GitHub Issue 899: view used for subfolder testing
+    private final static String SUBFOLDER_NAME = "InheritViewSubfolder";
+    private final static String INHERIT_LIST_NAME = "InheritViewList";
+    private final static String INHERITED_VIEW_NAME = "ProjectWideView";
+    private final static List<String> INHERITED_VIEW_COLUMNS = List.of(LIST_KEY_COLUMN, FIRST_NAME_COLUMN, AGE_COLUMN);
+
     private SummaryStatisticsHelper _summaryStatisticsHelper;
 
     @Override
@@ -102,6 +110,9 @@ public class CustomizeViewTest extends BaseWebDriverTest
         _containerHelper.createProject(PROJECT_NAME, null);
         createList();
         createWideList();
+
+        _containerHelper.createSubfolder(PROJECT_NAME, SUBFOLDER_NAME);
+        createInheritViewList();
     }
 
     @Before
@@ -404,6 +415,63 @@ public class CustomizeViewTest extends BaseWebDriverTest
         // Verify the row is gone
         drt = new DataRegionTable("query", getDriver());
         assertEquals("Deleted view should no longer appear in the query.CustomViews table", -1, drt.getRowIndex("Name", viewName));
+    }
+
+    // GitHub Issue 899
+    @Test
+    public void testSaveInheritedViewFromSubfolder() throws Exception
+    {
+        final String subfolderPath = PROJECT_NAME + "/" + SUBFOLDER_NAME;
+
+        new SaveQueryViewsCommand("lists", INHERIT_LIST_NAME)
+                .addView(INHERITED_VIEW_NAME, INHERITED_VIEW_COLUMNS, true, true)
+                .execute(createDefaultConnection(), PROJECT_NAME);
+
+        GridPage.beginAt(this, subfolderPath, INHERIT_LIST_NAME);
+        DataRegionTable grid = new DataRegionTable("query", getDriver());
+        grid.goToView(INHERITED_VIEW_NAME);
+        assertEquals("Subfolder should start out showing the view inherited from the project",
+                INHERITED_VIEW_COLUMNS, grid.getColumnNames());
+
+        // Leaving "available in child folders" unchecked is what makes the save target folder implicit
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.removeColumn(FieldKey.fromParts(AGE_COLUMN).toString());
+        _customizeViewsHelper.saveCustomView(INHERITED_VIEW_NAME, true, false);
+
+        grid = new DataRegionTable("query", getDriver());
+        assertEquals("Subfolder save should shadow the inherited view with a local copy",
+                List.of(LIST_KEY_COLUMN, FIRST_NAME_COLUMN), grid.getColumnNames());
+
+        // The subfolder save used to relocate the project's view rather than shadow it, so the project lost the view entirely
+        assertEquals("Project's view should still be inheritable", "true",
+                getCustomViewValue(PROJECT_NAME, INHERITED_VIEW_NAME, "Inheritable"));
+        assertEquals("Shadowing view should be local to the subfolder", "false",
+                getCustomViewValue(subfolderPath, INHERITED_VIEW_NAME, "Inheritable"));
+
+        GridPage.beginAt(this, PROJECT_NAME, INHERIT_LIST_NAME);
+        grid = new DataRegionTable("query", getDriver());
+        grid.goToView(INHERITED_VIEW_NAME);
+        assertEquals("Project's view should be untouched by the subfolder save",
+                INHERITED_VIEW_COLUMNS, grid.getColumnNames());
+    }
+
+    // query.CustomViews only shows views owned by the container, so a row here proves where the view lives
+    private String getCustomViewValue(String containerPath, String viewName, String column)
+    {
+        beginAt(WebTestHelper.buildURL("query", containerPath, "executeQuery", Map.of("schemaName", "query", "queryName", "CustomViews")));
+        DataRegionTable customViews = new DataRegionTable("query", getDriver());
+        int rowIndex = customViews.getRowIndex("Name", viewName);
+        assertNotEquals(String.format("View '%s' should be owned by folder '%s'", viewName, containerPath), -1, rowIndex);
+        return customViews.getDataAsText(rowIndex, column);
+    }
+
+    private void createInheritViewList() throws Exception
+    {
+        new IntListDefinition(INHERIT_LIST_NAME, LIST_KEY_COLUMN)
+                .setFields(List.of(
+                        new FieldDefinition(FIRST_NAME_COLUMN, ColumnType.String),
+                        new FieldDefinition(AGE_COLUMN, ColumnType.Integer)))
+                .create(createDefaultConnection(), PROJECT_NAME);
     }
 
     private void createList() throws Exception
