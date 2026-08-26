@@ -111,7 +111,7 @@ public class FilterStatusValue extends WebDriverComponent<FilterStatusValue.Elem
 
         public final WebElement icon = Locator.tag("i").findWhenNeeded(getComponentElement());
 
-        public final WebElement popover = Locator.tag("div").withClass("lk-popover popover bottom").findWhenNeeded(_driver);
+        public final WebElement popover = Locator.tag("div").withClasses("lk-popover", "popover").findWhenNeeded(_driver);
     }
 
 
