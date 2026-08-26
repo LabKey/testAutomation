@@ -1300,9 +1300,20 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     @LogMethod(quiet = true)
     public void enableEmailRecorder()
     {
+        setEmailRecord(true);
+    }
+
+    @LogMethod(quiet = true)
+    public void disableEmailRecorder()
+    {
+        setEmailRecord(false);
+    }
+
+    private void setEmailRecord(boolean record)
+    {
         assumeTestModules();
-        int responseCode = getHttpResponse(buildURL("dumbster", "setRecordEmail", Maps.of("record", "true")), "POST").getResponseCode();
-        assertEquals("Failed to enable email recording", HttpStatus.SC_OK, responseCode);
+        int responseCode = getHttpResponse(buildURL("dumbster", "setRecordEmail", Maps.of("record", String.valueOf(record))), "POST").getResponseCode();
+        assertEquals("Failed to " + (record ? "enable" : "disable") + " email recording", HttpStatus.SC_OK, responseCode);
     }
 
     public EmailRecordTable goToEmailRecord()

@@ -15,6 +15,7 @@
  */
 package org.labkey.test.util;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.jetbrains.annotations.Nullable;
@@ -80,17 +81,19 @@ public class DataRegionExportHelper extends AbstractDataRegionExportOrSignHelper
         getWrapper().click(Locator.lkButton("Create Script"));
 
         getWrapper().switchToWindow(1);
-        StringBuilder scriptText = new StringBuilder();
-        WebDriverWrapper.waitFor(() -> {
-            scriptText.append(getWrapper().getHtmlSource().trim());
-            return scriptText.toString().split("\n").length > 1; // All exported scripts should be longer than one line
+        String scriptText = WebDriverWrapper.waitFor(() -> {
+            String pageSrc = StringUtils.trimToEmpty(getWrapper().getHtmlSource());
+            if (pageSrc.split("\n").length > 1) // All exported scripts should be longer than one line
+                return pageSrc;
+            else
+                return null;
         }, "Exported script was empty", 10000);
-        verification.accept(scriptText.toString());
+        verification.accept(scriptText);
 
         getWrapper().getDriver().close();
         getWrapper().switchToMainWindow();
 
-        return scriptText.toString();
+        return scriptText;
     }
 
     public Sheet exportXLSAndVerifyRowCountAndHeader(int numRows, Set<String> expectedHeaders)
