@@ -168,6 +168,9 @@ public class FieldSelectionDialog extends ModalDialog
                 .withChild(Locator.tagWithClass("i", "fa-plus"))
                 .findElement(listItem);
 
+        // avoid Selected-list hover popover
+        getWrapper().mouseOver(ModalDialog.Locators.title.findElement(this));
+
         addIcon.click();
 
         return this;
