@@ -652,6 +652,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
                 List.of(colToSort), saveViewDialog.getSortValues());
         checker().verifyEquals("Sort direction shown in the save view dialog not as expected.",
                 SortDirection.ASC, saveViewDialog.getSortDirection(colToSort));
+        checker().screenShotIfNewError("SaveViewModal_Filter_Sort_Display");
 
         saveViewDialog.saveView();
 
