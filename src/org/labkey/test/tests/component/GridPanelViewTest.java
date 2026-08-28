@@ -513,6 +513,12 @@ public class GridPanelViewTest extends GridPanelBaseTest
         checker().verifyFalse("The 'Make default' checkbox should not be checked.",
                 saveViewDialog.isMakeDefaultChecked());
 
+        // GitHub Issue #696: nothing but a column was changed, so both sections show their empty message.
+        checker().verifyEquals("Save view dialog should report that no filters will be saved.",
+                "No filters applied", saveViewDialog.getNoFiltersMessage());
+        checker().verifyEquals("Save view dialog should report that no sort will be saved.",
+                "No sort applied", saveViewDialog.getNoSortsMessage());
+
         checker().screenShotIfNewError("testDefaultViewRemoveColumn_Save_View_Dialog_Defaults_Error");
 
         saveViewDialog.setMakeDefault();
@@ -638,6 +644,15 @@ public class GridPanelViewTest extends GridPanelBaseTest
             saveViewDialog.setMakeShared(false);
             savedViewsForDefaultSampleType.add(viewName);
         }
+
+        // GitHub Issue #696: the dialog shows the filters and sorts that will be saved with the view.
+        checker().verifyEquals("Filters listed in the save view dialog not as expected.",
+                        List.of(expectedPillText), saveViewDialog.getFilterValues());
+        checker().verifyEquals("Sorts listed in the save view dialog not as expected.",
+                List.of(colToSort), saveViewDialog.getSortValues());
+        checker().verifyEquals("Sort direction shown in the save view dialog not as expected.",
+                SortDirection.ASC, saveViewDialog.getSortDirection(colToSort));
+        checker().screenShotIfNewError("SaveViewModal_Filter_Sort_Display");
 
         saveViewDialog.saveView();
 
