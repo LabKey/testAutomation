@@ -16,7 +16,6 @@
 package org.labkey.test.tests.query;
 
 import org.apache.hc.core5.http.HttpStatus;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -70,6 +69,7 @@ public class CustomizeGridPermissionsTest extends BaseWebDriverTest
 
     private static final String SUBFOLDER_NAME = "Child";
     private static final String SUB_VIEW_EDITOR = "gp_sub_view_editor@gridpermissions.test";
+    private static final String READER_SUB_VIEW_EDITOR = "gp_reader_sub_view_editor@gridpermissions.test";
     private static final String SHARED_VIEW_NAME = "Shared Grid View";
     private static final String LOCAL_VIEW_NAME = "Subfolder Grid View";
     private static final String RENAMED_VIEW_NAME = "Renamed Grid View";
@@ -80,7 +80,7 @@ public class CustomizeGridPermissionsTest extends BaseWebDriverTest
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         super.doCleanup(afterTest);
-        _userHelper.deleteUsers(afterTest, READER, EDITOR, VIEW_EDITOR, SUB_VIEW_EDITOR);
+        _userHelper.deleteUsers(afterTest, READER, EDITOR, VIEW_EDITOR, SUB_VIEW_EDITOR, READER_SUB_VIEW_EDITOR);
     }
 
     @BeforeClass
@@ -100,21 +100,20 @@ public class CustomizeGridPermissionsTest extends BaseWebDriverTest
         _userHelper.createUser(EDITOR);
         _userHelper.createUser(VIEW_EDITOR);
         _userHelper.createUser(SUB_VIEW_EDITOR);
+        _userHelper.createUser(READER_SUB_VIEW_EDITOR);
 
         ApiPermissionsHelper permissionsHelper = new ApiPermissionsHelper(this);
         permissionsHelper.addMemberToRole(READER, READER_ROLE, MemberType.user, getProjectName());
         permissionsHelper.addMemberToRole(EDITOR, EDITOR_ROLE, MemberType.user, getProjectName());
         permissionsHelper.addMemberToRole(VIEW_EDITOR, SHARED_VIEW_EDITOR_ROLE, MemberType.user, getProjectName());
+        permissionsHelper.addMemberToRole(READER_SUB_VIEW_EDITOR, READER_ROLE, MemberType.user, getProjectName());
 
         _containerHelper.createSubfolder(getProjectName(), SUBFOLDER_NAME);
         permissionsHelper.addMemberToRole(READER, READER_ROLE, MemberType.user, getSubfolderPath());
         permissionsHelper.addMemberToRole(SUB_VIEW_EDITOR, SHARED_VIEW_EDITOR_ROLE, MemberType.user, getSubfolderPath());
         permissionsHelper.addMemberToRole(VIEW_EDITOR, SHARED_VIEW_EDITOR_ROLE, MemberType.user, getSubfolderPath());
-    }
+        permissionsHelper.addMemberToRole(READER_SUB_VIEW_EDITOR, SHARED_VIEW_EDITOR_ROLE, MemberType.user, getSubfolderPath());
 
-    @Before
-    public void preTest() throws Exception
-    {
         recreateList();
     }
 
@@ -142,6 +141,8 @@ public class CustomizeGridPermissionsTest extends BaseWebDriverTest
     @Test
     public void testReaderDefaultCustomGrid() throws Exception
     {
+        recreateList();
+
         impersonate(READER);
         {
             DataRegionTable list = goToList();
@@ -162,6 +163,8 @@ public class CustomizeGridPermissionsTest extends BaseWebDriverTest
     @Test
     public void testEditorDefaultCustomGrid() throws Exception
     {
+        recreateList();
+
         impersonate(EDITOR);
         {
             DataRegionTable list = goToList();
@@ -183,6 +186,8 @@ public class CustomizeGridPermissionsTest extends BaseWebDriverTest
     @Test
     public void testViewEditorDefaultCustomGrid() throws Exception
     {
+        recreateList();
+
         impersonate(VIEW_EDITOR);
         {
             DataRegionTable list = goToList();
@@ -205,6 +210,8 @@ public class CustomizeGridPermissionsTest extends BaseWebDriverTest
     @Test
     public void testReaderNamedCustomGrid() throws Exception
     {
+        recreateList();
+
         impersonate(READER);
         {
             DataRegionTable list = goToList();
@@ -228,6 +235,8 @@ public class CustomizeGridPermissionsTest extends BaseWebDriverTest
     @Test
     public void testEditorNamedCustomGrid() throws Exception
     {
+        recreateList();
+
         impersonate(EDITOR);
         {
             DataRegionTable list = goToList();
@@ -252,6 +261,8 @@ public class CustomizeGridPermissionsTest extends BaseWebDriverTest
     @Test
     public void testViewEditorNamedCustomGrid()
     {
+        recreateList();
+
         impersonate(VIEW_EDITOR);
         {
             DataRegionTable list = goToList();
@@ -369,6 +380,59 @@ public class CustomizeGridPermissionsTest extends BaseWebDriverTest
         assertViewAbsent(getSubfolderPath(), SHARED_VIEW_NAME);
     }
 
+    @Test // GitHub Issue #1397
+    public void testProjectReaderCannotDeleteInheritedView() throws Exception
+    {
+        createSharedView(getProjectName(), SHARED_VIEW_NAME, true);
+
+        assertEquals("Reading the project is not enough to delete its shared view from the subfolder", HttpStatus.SC_FORBIDDEN,
+                executeAs(READER_SUB_VIEW_EDITOR, getSubfolderPath(), new DeleteQueryViewCommand("lists", LIST_NAME, SHARED_VIEW_NAME)));
+
+        assertViewPresent(getProjectName(), SHARED_VIEW_NAME);
+    }
+
+    @Test // GitHub Issue #1397
+    public void testCompleteDeleteCannotRemoveInheritedView() throws Exception
+    {
+        createSharedView(getProjectName(), SHARED_VIEW_NAME, true);
+
+        // A 'complete' delete removes the personal view and then the view it shadows, which here is the project's
+        assertEquals("Shared view editor should be able to shadow the project's view with a personal one", HttpStatus.SC_OK,
+                executeAs(SUB_VIEW_EDITOR, getSubfolderPath(), savePersonalViewCommand(SHARED_VIEW_NAME)));
+        assertEquals("Deleting the personal view should not cascade to the project's view", HttpStatus.SC_OK,
+                executeAs(SUB_VIEW_EDITOR, getSubfolderPath(),
+                        new DeleteQueryViewCommand("lists", LIST_NAME, SHARED_VIEW_NAME).setComplete(true)));
+
+        assertViewPresent(getProjectName(), SHARED_VIEW_NAME);
+        assertViewAbsent(getSubfolderPath(), SHARED_VIEW_NAME);
+    }
+
+    @Test // GitHub Issue #1440
+    public void testProjectReaderCannotReHomeInheritedView() throws Exception
+    {
+        createSharedView(getProjectName(), SHARED_VIEW_NAME, true);
+
+        assertEquals("Reading the project is not enough to re-home its shared view into the subfolder", HttpStatus.SC_FORBIDDEN,
+                executeAs(READER_SUB_VIEW_EDITOR, getSubfolderPath(), saveViewInContainerCommand(SHARED_VIEW_NAME, getSubfolderPath())));
+
+        assertViewPresent(getProjectName(), SHARED_VIEW_NAME);
+        assertViewAbsent(getSubfolderPath(), SHARED_VIEW_NAME);
+    }
+
+    @Test // GitHub Issue #1440
+    public void testProjectReaderCannotOverwriteInheritedViewFromSession() throws Exception
+    {
+        createSharedView(getProjectName(), SHARED_VIEW_NAME, true);
+
+        assertEquals("Reading the project is not enough to overwrite its shared view from a session view", HttpStatus.SC_FORBIDDEN,
+                executeAs(READER_SUB_VIEW_EDITOR, getSubfolderPath(),
+                        saveSessionViewCommand(SESSION_VIEW_NAME),
+                        saveSessionViewToContainerCommand(SESSION_VIEW_NAME, SHARED_VIEW_NAME, getSubfolderPath())));
+
+        assertViewPresent(getProjectName(), SHARED_VIEW_NAME);
+        assertViewAbsent(getSubfolderPath(), SHARED_VIEW_NAME);
+    }
+
     @Test // GitHub Issue #1440
     public void testSharedViewEditorCanSaveAndUpdateViewInParentFolder() throws Exception
     {
@@ -409,6 +473,11 @@ public class CustomizeGridPermissionsTest extends BaseWebDriverTest
     private SaveQueryViewsCommand saveSharedViewCommand(String viewName, boolean inherit)
     {
         return new SaveQueryViewsCommand("lists", LIST_NAME).addView(viewName, List.of(COLUMN_NAME), true, inherit);
+    }
+
+    private SaveQueryViewsCommand savePersonalViewCommand(String viewName)
+    {
+        return new SaveQueryViewsCommand("lists", LIST_NAME).addView(viewName, List.of(COLUMN_NAME), false, false);
     }
 
     private SaveQueryViewsCommand saveViewInContainerCommand(String viewName, String containerPath)
