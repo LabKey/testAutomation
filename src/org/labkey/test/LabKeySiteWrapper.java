@@ -117,9 +117,9 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     {
         sampleManagerStarter,
         sampleManagerProfessional,
-        labkeyLims,
         limsStarter,
         limsEnterprise,
+        biologics,
     }
 
     public boolean isGuestModeTest()
