@@ -522,49 +522,48 @@ public class FieldSelectionDialog extends ModalDialog
      */
     public FieldSelectionDialog repositionField(FieldKey fieldToMove, FieldKey targetField, boolean beforeTarget)
     {
-        WebElement elementToMove = elementCache().findSelectedField(fieldToMove);
-        WebElement elementTarget = elementCache().findSelectedField(targetField);
+        List<String> order = selectedFieldKeys();
+        int from = indexOfFieldKey(order, fieldToMove);
+        int target = indexOfFieldKey(order, targetField);
+        int to = beforeTarget ? (from < target ? target - 1 : target) : (from < target ? target : target + 1);
 
-        int yBefore =  elementToMove.getRect().getY();
+        getWrapper().keyboardDragAndDrop(elementCache().findDragHandle(fieldToMove), to - from);
 
-        int offset;
-
-        if(beforeTarget)
-        {
-            if(elementTarget.getRect().getY() < elementToMove.getRect().getY())
-            {
-                // If the target is above the field being moved.
-                offset = -1 * elementTarget.getSize().getHeight();
-            }
-            else
-            {
-                // If the target is below the field being moved.
-                offset = -1 * elementTarget.getSize().getHeight() / 2;
-            }
-        }
-        else
-        {
-            offset = elementTarget.getSize().getHeight() / 2 + 10;
-        }
-
-        WebElement dragHandle = Locator.tagWithAttribute("div", "role", "button").findWhenNeeded(elementToMove);
-        getWrapper().mouseOver(dragHandle);
-        new Actions(getDriver())
-                .clickAndHold(dragHandle)
-                .moveToElement(elementTarget)
-                .moveByOffset(2, offset)
-                .release()
-                .perform();
-
-        // Maybe I don't need to wait?
-        WebDriverWrapper.sleep(1_000);
-
-        int yAfter =  elementToMove.getRect().getY();
-
-        WebDriverWrapper.waitFor(()-> yAfter != yBefore, "I don't think I repositioned the field in the list.",
-                1_000);
+        WebDriverWrapper.waitFor(() -> {
+            List<String> now = selectedFieldKeys();
+            return indexOfFieldKey(now, fieldToMove) - indexOfFieldKey(now, targetField) == (beforeTarget ? -1 : 1);
+        }, "Field '" + fieldToMove + "' was not repositioned as expected", 5_000);
 
         return this;
+    }
+
+    /**
+     * Get the 'data-fieldkey' values of the selected fields, in display order.
+     *
+     * @return The encoded field keys.
+     */
+    private List<String> selectedFieldKeys()
+    {
+        return elementCache().getListItemElements(elementCache().selectedFieldsPanel).stream()
+                .map(el -> el.getDomAttribute("data-fieldkey"))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Get the index of a field in the given list, matched case-insensitively (as findFieldRow locates rows).
+     *
+     * @param fieldKeys Encoded field keys, in display order.
+     * @param fieldKey Field to locate.
+     * @return The index, or -1 if not present.
+     */
+    private static int indexOfFieldKey(List<String> fieldKeys, FieldKey fieldKey)
+    {
+        for (int i = 0; i < fieldKeys.size(); i++)
+        {
+            if (fieldKey.toString().equalsIgnoreCase(fieldKeys.get(i)))
+                return i;
+        }
+        return -1;
     }
 
     /**
@@ -660,6 +659,11 @@ public class FieldSelectionDialog extends ModalDialog
         protected WebElement findSelectedField(FieldKey fieldKey)
         {
             return findFieldRow(fieldKey, selectedFieldsPanel);
+        }
+
+        protected WebElement findDragHandle(FieldKey fieldKey)
+        {
+            return Locator.tagWithAttribute("div", "role", "button").findElement(findSelectedField(fieldKey));
         }
 
         protected WebElement findAvailableField(FieldKey fieldKey)
