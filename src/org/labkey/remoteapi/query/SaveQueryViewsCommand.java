@@ -48,6 +48,36 @@ public class SaveQueryViewsCommand extends PostCommand<CommandResponse>
      */
     public SaveQueryViewsCommand addView(String viewName, List<String> columns, boolean shared, boolean inherit)
     {
+        _views.add(view(viewName, columns, shared, inherit));
+        return this;
+    }
+
+    /**
+     * Adds a shared, inheritable view saved into a folder other than the one the command is executed against.
+     *
+     * @param containerPath the folder to save the view into
+     */
+    public SaveQueryViewsCommand addViewInContainer(String viewName, List<String> columns, String containerPath)
+    {
+        Map<String, Object> view = view(viewName, columns, true, true);
+        view.put("containerPath", containerPath);
+        _views.add(view);
+
+        return this;
+    }
+
+    /** Adds a view held in the caller's HTTP session rather than the database. */
+    public SaveQueryViewsCommand addSessionView(String viewName, List<String> columns)
+    {
+        Map<String, Object> view = view(viewName, columns, false, false);
+        view.put("session", true);
+        _views.add(view);
+
+        return this;
+    }
+
+    private static Map<String, Object> view(String viewName, List<String> columns, boolean shared, boolean inherit)
+    {
         List<Map<String, Object>> columnList = columns.stream()
                 .map(fieldKey -> Map.<String, Object>of("fieldKey", fieldKey))
                 .toList();
@@ -58,9 +88,8 @@ public class SaveQueryViewsCommand extends PostCommand<CommandResponse>
         view.put("shared", shared);
         view.put("inherit", inherit);
         view.put("replace", true);
-        _views.add(view);
 
-        return this;
+        return view;
     }
 
     @Override
