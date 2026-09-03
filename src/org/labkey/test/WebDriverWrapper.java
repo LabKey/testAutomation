@@ -3086,6 +3086,35 @@ public abstract class WebDriverWrapper implements WrapsDriver
         builder.clickAndHold(fromEl).moveByOffset(xOffset + 1, yOffset + 1).release().build().perform();
     }
 
+    /**
+     * Reorder a drag-and-drop list with the keyboard instead of the mouse: focus the drag handle, Space to lift,
+     * one Arrow per step, Space to drop. Required for lists built on '@hello-pangea/dnd' (auth configurations,
+     * domain designer, field selection).
+     *
+     * @param dragHandle Element carrying the library's drag handle props; must be focusable.
+     * @param steps Positions to move; negative moves up, positive moves down.
+     */
+    public void keyboardDragAndDrop(WebElement dragHandle, int steps)
+    {
+        dragHandle.sendKeys(Keys.SPACE);
+
+        Actions drag = new Actions(getDriver()).pause(Duration.ofMillis(400));
+        Keys arrow = steps < 0 ? Keys.ARROW_UP : Keys.ARROW_DOWN;
+        for (int i = 0; i < Math.abs(steps); i++)
+            drag.sendKeys(arrow).pause(Duration.ofMillis(300));
+        drag.sendKeys(Keys.SPACE).perform();
+    }
+
+    /**
+     * @see #keyboardDragAndDrop(WebElement, int)
+     * @param dragHandle Drag handle of the element to move.
+     * @param target Drag handle of a sibling element to move it to.
+     */
+    public void keyboardDragAndDrop(WebElement dragHandle, WebElement target)
+    {
+        keyboardDragAndDrop(dragHandle, getElementIndex(target) - getElementIndex(dragHandle));
+    }
+
     // This is useful when making a draggin selection in a plot, and there may be many elements ontop of the one you want.
     public void dragAndDrop(int xOffset, int yOffset)
     {
