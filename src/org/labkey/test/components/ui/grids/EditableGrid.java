@@ -1150,7 +1150,8 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     private void activateCell(WebElement cell)
     {
         // If it is a selector, and it already has focus (is active), it will not have a div.cellular-display
-        if (Locator.tagWithClass("div", "select-input__control--is-focused").findElements(cell).isEmpty())
+        if (Locators.focusedSelect.findElements(cell).isEmpty()
+                && Locators.inputCell.findElements(cell).isEmpty())
             sendKeysToCell(cell, Keys.ENTER);
     }
 
@@ -1178,9 +1179,8 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         catch (NoSuchElementException nse)
         {
             // If the cell is an open/active reactSelect the class attribute is different.
-            return Locator.tagWithClass("div", "select-input__control")
-                    .findElement(cell)
-                    .getDomAttribute("class").contains("select-input__control--is-focused");
+            return !Locators.focusedSelect.findElements(cell).isEmpty()
+                    || !Locators.inputCell.findElements(cell).isEmpty();
         }
     }
 
@@ -1433,6 +1433,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         static final Locator.XPathLocator rows = Locator.tag("tbody").childTag("tr").withoutClass("grid-empty").withoutClass("grid-loading");
         static final Locator headerCells = Locator.css("thead tr th");
         static final Locator inputCell = Locator.css(".eg-input-cell");
+        static final Locator focusedSelect = Locator.tagWithClass("div", "select-input__control--is-focused");
         static final Locator popover = Locator.byClass("popover");
     }
 
