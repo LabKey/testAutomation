@@ -250,6 +250,65 @@ public class PivotQueryTest extends ReportTest
         assertTextPresent("this", "that", "the other", "and more", "but wait", "still more");
     }
 
+    // Verifies a pivot BY a date/timestamp column executes on both platforms.
+    //
+    // QueryPivot emits "<pivot column> = ?" and binds each pivot value as a parameter, so the database
+    // receives two things: the statement text, and an ordered list of typed values to slot into the ?
+    // positions. The declared type of that parameter is what matters — the same value binds differently
+    // depending on which setter is used:
+    //
+    //     stmt.setString(1, "2025-07-28 00:00:00");   // parameter declared VARCHAR
+    //     stmt.setTimestamp(1, someTimestamp);        // parameter declared TIMESTAMP
+    //
+    // A pivot IN value written as a string literal parses to a QString, and getJdbcType() on a QString
+    // returns VARCHAR, so a timestamp pivot value was bound as VARCHAR against a TIMESTAMP column.
+    // The two platforms diverge on that mismatch: SQL Server coerces the parameter to match the column and
+    // the comparison succeeds, while PostgreSQL resolves operators strictly, finds no
+    // "timestamp = character varying" operator, and refuses to run the query at all — no rows, no columns.
+    //
+    // The fix takes the type from the pivot column instead — see QueryPivot.getSql() — and this test is
+    // its coverage.
+    @Test
+    public void testPivotByTimestampColumn()
+    {
+        String datasetName = TestDataGenerator.randomDomainName("D3", DomainUtils.DomainKind.StudyDatasetVisit);
+        String textFieldName = TestDataGenerator.randomFieldName("F1");
+        FieldDefinition textField = new FieldDefinition(textFieldName, FieldDefinition.ColumnType.String);
+        goToProjectHome();
+
+        var datasetDesigner = _studyHelper.defineDataset(datasetName, getProjectName());
+        datasetDesigner.getFieldsPanel().addFields(List.of(textField));
+        var viewDatasetPage = datasetDesigner.clickSave()
+                .clickViewData();
+        List<List<String>> bulkData = List.of(
+            List.of("ParticipantId", "date", textFieldName),
+            List.of("1", "2025-07-28", "alpha"),
+            List.of("1", "2025-07-29", "bravo"),
+            List.of("2", "2025-07-28", "charlie"),
+            List.of("2", "2025-07-29", "delta"));
+        var importPage = viewDatasetPage.getDataRegion().clickImportBulkData();
+        importPage.setText(TestDataUtils.stringFromRows(bulkData));
+        importPage.submit();
+
+        String queryText = """
+                SELECT ParticipantId, date, MAX([F1]) AS F1Max FROM study.[D3]
+                GROUP BY ParticipantId, date
+                PIVOT F1Max BY date IN ('2025-07-28 00:00:00', '2025-07-29 00:00:00')
+                """.replace("[F1]", EscapeUtil.getSqlQuotedValue(textFieldName))
+                .replace("[D3]", EscapeUtil.getSqlQuotedValue(datasetName));
+
+        goToModule("Query");
+        var createQueryPage = createNewQuery("study", datasetName);
+        createQueryPage.setName("PivotByDate");
+        var sourceQueryPage = createQueryPage.clickCreate();
+        sourceQueryPage.setSource(queryText);
+        sourceQueryPage.clickSaveAndFinish();
+
+        // Executing at all is the assertion; the values confirm both pivot columns resolved.
+        assertTextNotPresent("has errors");
+        assertTextPresent("alpha", "bravo", "charlie", "delta");
+    }
+
     @Override public BrowserType bestBrowser()
     {
         return BrowserType.CHROME;
