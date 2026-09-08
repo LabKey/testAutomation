@@ -72,6 +72,11 @@ public class LoginConfigRow extends WebDriverComponent<LoginConfigRow.ElementCac
         return elementCache().editButtonLoc.existsIn(this);
     }
 
+    public WebElement getDragHandle()
+    {
+        return elementCache().dragHandle;
+    }
+
     @Override
     public WebElement getComponentElement()
     {
@@ -93,6 +98,9 @@ public class LoginConfigRow extends WebDriverComponent<LoginConfigRow.ElementCac
 
     protected class ElementCache extends Component<?>.ElementCache
     {
+        final WebElement dragHandle = Locator.xpath("ancestor::div")
+                .withAttribute("data-rfd-drag-handle-draggable-id").findWhenNeeded(this);
+
         final WebElement baseFieldsElement = Locator.tagWithClass("div", "domain-row-base-fields").findWhenNeeded(this);
         final WebElement description = Locator.tagWithClass("div", "description").findWhenNeeded(baseFieldsElement);
         final WebElement details = Locator.tagWithClass("div", "details").findWhenNeeded(baseFieldsElement);
