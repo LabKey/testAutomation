@@ -67,6 +67,37 @@ public class Pager extends WebDriverComponent<Pager.ElementCache>
         return elementCache().jumpToDropdown;
     }
 
+    /**
+     * The "Last Page" jump is present but disabled when already on the last page, and removed entirely when the total
+     * row count is capped (the true last page is unknown). This reports only the actionable case.
+     * @return true if the pager's "Last Page" jump is present and enabled
+     */
+    public boolean isLastPageAvailable()
+    {
+        if (!isLastPageOptionPresent())
+            return false;
+
+        MultiMenu menu = elementCache().jumpToDropdown;
+        try
+        {
+            return !menu.isMenuItemDisabled("Last Page");
+        }
+        finally
+        {
+            menu.collapse();
+        }
+    }
+
+    /**
+     * Unlike {@link #isLastPageAvailable()}, this ignores whether the item is enabled; a present-but-disabled
+     * "Last Page" (i.e. already on the last page) still counts as present.
+     * @return true if the pager's jump menu contains a "Last Page" item
+     */
+    public boolean isLastPageOptionPresent()
+    {
+        return elementCache().jumpToDropdown.getMenuText().contains("Last Page");
+    }
+
     public int getCurrentPage()                 // only works on GridPanel
     {
         return Integer.parseInt(elementCache().currentPageButton.getText());
