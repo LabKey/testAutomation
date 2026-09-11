@@ -16,6 +16,7 @@
 package org.labkey.test.components.ui;
 
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.UpdatingComponent;
 import org.labkey.test.components.WebDriverComponent;
@@ -23,8 +24,6 @@ import org.labkey.test.components.react.MultiMenu;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-
-import java.util.regex.Pattern;
 
 /**
  * Wrapper for UI component defined in 'packages/components/src/internal/components/gridbar/PageSizeSelector.tsx'
@@ -69,13 +68,9 @@ public class Pager extends WebDriverComponent<Pager.ElementCache>
         return elementCache().jumpToDropdown;
     }
 
-    // When the row count is capped the true last page is unknown, so the jump is labeled "Page N" (e.g. "Page 5,000")
-    // and targets the last page of the known range instead of "Last Page".
-    private static final Pattern CAPPED_LAST_PAGE_OPTION = Pattern.compile("Page [\\d,]+");
-
     /**
-     * The "Last Page" jump is present but disabled when already on the last page, and replaced by a capped "Page N"
-     * jump when the count is capped (see {@link #isCappedLastPageAvailable()}). This reports only the actionable case.
+     * The "Last Page" jump is always present; it is disabled only when already on the last page of an exact count.
+     * While the count is capped it stays enabled and lands on the true last row (resolving the exact count first).
      * @return true if the pager's "Last Page" jump is present and enabled
      */
     public boolean isLastPageAvailable()
@@ -104,39 +99,35 @@ public class Pager extends WebDriverComponent<Pager.ElementCache>
         return elementCache().jumpToDropdown.getMenuText().contains("Last Page");
     }
 
-    /**
-     * When the row count is capped, the last-page jump targets the last page of the known range and is labeled "Page N"
-     * (e.g. "Page 5,000") instead of "Last Page".
-     * @return the capped "Page N" jump label, or null if the pager shows a normal "Last Page" jump or none at all
-     */
-    public String getCappedLastPageLabel()
-    {
-        return elementCache().jumpToDropdown.getMenuText().stream()
-                .filter(text -> CAPPED_LAST_PAGE_OPTION.matcher(text).matches())
-                .findFirst()
-                .orElse(null);
-    }
+    // The "Count All Rows" jump appears only while the row count is capped; it computes the exact total on demand.
+    private static final String COUNT_ALL_ROWS_OPTION = "Count All Rows";
 
     /**
-     * When the row count is capped, the last-page jump targets the last page of the known range and is labeled "Page N"
-     * (e.g. "Page 5,000") instead of "Last Page".
-     * @return true if a capped "Page N" last-page jump is present and enabled
+     * @return true if the pager's jump menu offers the "Count All Rows" action, i.e. the row count is currently capped
      */
-    public boolean isCappedLastPageAvailable()
+    public boolean isCountAllRowsAvailable()
     {
-        String label = getCappedLastPageLabel();
-        if (label == null)
-            return false;
-
         MultiMenu menu = elementCache().jumpToDropdown;
         try
         {
-            return !menu.isMenuItemDisabled(label);
+            return menu.getMenuText().contains(COUNT_ALL_ROWS_OPTION);
         }
         finally
         {
             menu.collapse();
         }
+    }
+
+    public Pager countAllRows()
+    {
+        // Count All Rows re-fires only the total count; rows aren't reloaded, so there's no grid update to wait on.
+        // Wait for the exact total to render: the summary shows "... of N" (no capped "+"). The total is briefly hidden
+        // behind a spinner while counting, so require the " of " to be back before checking that the "+" is gone.
+        elementCache().jumpToDropdown.clickSubMenu(false, COUNT_ALL_ROWS_OPTION);
+        WebDriverWrapper.waitFor(() -> summary().contains(" of ") && !summary().contains("+"),
+                "Exact count did not load", 30_000);
+
+        return this;
     }
 
     public int getCurrentPage()                 // only works on GridPanel
