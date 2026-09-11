@@ -16,6 +16,7 @@
 package org.labkey.test.components.ui;
 
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.UpdatingComponent;
 import org.labkey.test.components.WebDriverComponent;
@@ -65,6 +66,68 @@ public class Pager extends WebDriverComponent<Pager.ElementCache>
     {
         elementCache().jumpToDropdown.expand();
         return elementCache().jumpToDropdown;
+    }
+
+    /**
+     * The "Last Page" jump is always present; it is disabled only when already on the last page of an exact count.
+     * While the count is capped it stays enabled and lands on the true last row (resolving the exact count first).
+     * @return true if the pager's "Last Page" jump is present and enabled
+     */
+    public boolean isLastPageAvailable()
+    {
+        if (!isLastPageOptionPresent())
+            return false;
+
+        MultiMenu menu = elementCache().jumpToDropdown;
+        try
+        {
+            return !menu.isMenuItemDisabled("Last Page");
+        }
+        finally
+        {
+            menu.collapse();
+        }
+    }
+
+    /**
+     * Unlike {@link #isLastPageAvailable()}, this ignores whether the item is enabled; a present-but-disabled
+     * "Last Page" (i.e. already on the last page) still counts as present.
+     * @return true if the pager's jump menu contains a "Last Page" item
+     */
+    public boolean isLastPageOptionPresent()
+    {
+        return elementCache().jumpToDropdown.getMenuText().contains("Last Page");
+    }
+
+    // The "Count All Rows" jump appears only while the row count is capped; it computes the exact total on demand.
+    private static final String COUNT_ALL_ROWS_OPTION = "Count All Rows";
+
+    /**
+     * @return true if the pager's jump menu offers the "Count All Rows" action, i.e. the row count is currently capped
+     */
+    public boolean isCountAllRowsAvailable()
+    {
+        MultiMenu menu = elementCache().jumpToDropdown;
+        try
+        {
+            return menu.getMenuText().contains(COUNT_ALL_ROWS_OPTION);
+        }
+        finally
+        {
+            menu.collapse();
+        }
+    }
+
+    public Pager countAllRows()
+    {
+        // Count All Rows re-fires only the total count; rows aren't reloaded, so there's no grid update to wait on.
+        // Wait for the exact total to render: the summary shows "... of N" (no capped "+"). The total is briefly hidden
+        // behind a spinner while counting, so require the " of " to be back before checking that the "+" is gone.
+        elementCache().jumpToDropdown.clickSubMenu(false, COUNT_ALL_ROWS_OPTION);
+        WebDriverWrapper.waitFor(() -> summary().contains(" of ") && !summary().contains("+"),
+                "Exact count did not load", 30_000);
+
+        return this;
     }
 
     public int getCurrentPage()                 // only works on GridPanel
