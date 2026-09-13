@@ -19,6 +19,7 @@ import org.json.JSONArray;
 import org.junit.Assert;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.query.ContainerFilter;
 import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
@@ -199,6 +200,27 @@ public class SampleTypeAPIHelper
         Assert.assertEquals(errorMsg, new HashSet<>(sampleNames), rowIds.keySet());
 
         return rowIds;
+    }
+
+    /**
+     * Row ids of every sample type named {@code sampleTypeName} that is visible from {@code containerPath}, in the
+     * CurrentPlusProjectAndShared scope a sample type lookup resolves against.
+     *
+     * <p>Manufacturing a rowId/name collision needs the id the server actually assigned, because
+     * {@code exp.MaterialSource.RowId} is a database-wide sequence: a hardcoded numeric sample type name collides
+fix 2, 6, 7     * only when the sequence happens to cooperate. Require exactly one match as well, since a resolver reports an
+     * ambiguity rather than picking, and that error is swallowed by the import code.
+     */
+    public static List<Integer> getSampleTypeRowIds(String containerPath, String sampleTypeName) throws IOException, CommandException
+    {
+        SelectRowsCommand cmd = new SelectRowsCommand("exp", "SampleSets");
+        cmd.setColumns(List.of("RowId"));
+        cmd.addFilter("Name", sampleTypeName, Filter.Operator.EQUAL);
+        cmd.setContainerFilter(ContainerFilter.CurrentPlusProjectAndShared);
+
+        return cmd.execute(WebTestHelper.getRemoteApiConnection(), containerPath).getRows().stream()
+                .map(row -> Integer.parseInt(row.get("RowId").toString()))
+                .toList();
     }
 
     /**
