@@ -231,11 +231,7 @@ public abstract class AbstractContainerHelper
             catch (NoSuchElementException missingModule)
             {
                 String supportedDbMessage = "";
-                if (_test instanceof PostgresOnlyTest)
-                {
-                    supportedDbMessage = " " + _test.getClass().getSimpleName() + " is flagged as Postgres only.";
-                }
-                else if (_test instanceof SqlserverOnlyTest)
+                if (_test instanceof SqlserverOnlyTest)
                 {
                     supportedDbMessage = " " + _test.getClass().getSimpleName() + " is flagged as SQL Server only.";
                 }
