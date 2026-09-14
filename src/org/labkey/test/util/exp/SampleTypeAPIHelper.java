@@ -208,7 +208,7 @@ public class SampleTypeAPIHelper
      *
      * <p>Manufacturing a rowId/name collision needs the id the server actually assigned, because
      * {@code exp.MaterialSource.RowId} is a database-wide sequence: a hardcoded numeric sample type name collides
-fix 2, 6, 7     * only when the sequence happens to cooperate. Require exactly one match as well, since a resolver reports an
+     * only when the sequence happens to cooperate. Require exactly one match as well, since a resolver reports an
      * ambiguity rather than picking, and that error is swallowed by the import code.
      */
     public static List<Integer> getSampleTypeRowIds(String containerPath, String sampleTypeName) throws IOException, CommandException
