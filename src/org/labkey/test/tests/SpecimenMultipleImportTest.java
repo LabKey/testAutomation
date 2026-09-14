@@ -19,14 +19,13 @@ package org.labkey.test.tests;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Specimen;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.StudyHelper;
 
 import java.io.File;
 
-@Category({Daily.class, Specimen.class})
+@Category({Specimen.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 6)
 public class SpecimenMultipleImportTest extends StudyBaseTest
 {

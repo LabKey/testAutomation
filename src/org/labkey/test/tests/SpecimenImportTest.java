@@ -26,7 +26,6 @@ import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Specimen;
 import org.labkey.test.components.ext4.RadioButton;
 import org.labkey.test.util.DataRegionTable;
@@ -43,7 +42,7 @@ import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
-@Category({Daily.class, Specimen.class})
+@Category({Specimen.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 5)
 public class SpecimenImportTest extends SpecimenBaseTest
 {
