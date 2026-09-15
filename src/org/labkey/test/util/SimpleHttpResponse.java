@@ -18,6 +18,7 @@ package org.labkey.test.util;
 import org.labkey.test.TestFileUtils;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.util.HashMap;
 import java.util.List;
@@ -43,7 +44,9 @@ public class SimpleHttpResponse
         }
         catch (IOException error)
         {
-            response.responseBody = TestFileUtils.getStreamContentsAsString(con.getErrorStream());
+            // Error stream is null after a failed Basic auth retry
+            InputStream errorStream = con.getErrorStream();
+            response.responseBody = errorStream == null ? "" : TestFileUtils.getStreamContentsAsString(errorStream);
         }
         response.responseHeaderFields = new HashMap<>(con.getHeaderFields());
 

@@ -530,7 +530,7 @@ public class FieldSelectionDialog extends ModalDialog
         int target = indexOfFieldKey(order, targetField);
         int to = beforeTarget ? (from < target ? target - 1 : target) : (from < target ? target : target + 1);
 
-        keyboardReorder(elementCache().findDragHandle(fieldToMove), to - from);
+        getWrapper().keyboardDragAndDrop(elementCache().findDragHandle(fieldToMove), to - from);
 
         WebDriverWrapper.waitFor(() -> {
             List<String> now = selectedFieldKeys();
@@ -538,25 +538,6 @@ public class FieldSelectionDialog extends ModalDialog
         }, "Field '" + fieldToMove + "' was not repositioned as expected", 5_000);
 
         return this;
-    }
-
-    /**
-     * Reorder a row via the keyboard controls: focus the handle, Space to lift, one Arrow per
-     * step, Space to drop. (Mouse drag is unreliable with the library's sensor.)
-     *
-     * @param dragHandle The row's drag handle.
-     * @param steps Positions to move; negative moves up, positive moves down.
-     */
-    private void keyboardReorder(WebElement dragHandle, int steps)
-    {
-        getWrapper().scrollIntoView(dragHandle);
-        getWrapper().executeScript("arguments[0].focus();", dragHandle);
-
-        Actions drag = new Actions(getDriver()).sendKeys(Keys.SPACE).pause(Duration.ofMillis(400)); // lift
-        Keys arrow = steps < 0 ? Keys.ARROW_UP : Keys.ARROW_DOWN;
-        for (int i = 0; i < Math.abs(steps); i++)
-            drag.sendKeys(arrow).pause(Duration.ofMillis(300));
-        drag.sendKeys(Keys.SPACE).perform(); // drop
     }
 
     /**

@@ -59,7 +59,6 @@ import org.labkey.test.util.Crawler;
 import org.labkey.test.util.DevModeOnlyTest;
 import org.labkey.test.util.ExportDiagnosticsPseudoTest;
 import org.labkey.test.util.NonWindowsTest;
-import org.labkey.test.util.PostgresOnlyTest;
 import org.labkey.test.util.ProductionModeOnlyTest;
 import org.labkey.test.util.SqlserverOnlyTest;
 import org.labkey.test.util.TestLogger;
@@ -451,12 +450,7 @@ public class Runner extends TestSuite
             {
                 List<Class<?>> interfaces = ClassUtils.getAllInterfaces(testClass);
                 WebTestHelper.DatabaseType databaseType = WebTestHelper.getDatabaseType();
-                if (interfaces.contains(PostgresOnlyTest.class) && databaseType != WebTestHelper.DatabaseType.PostgreSQL)
-                {
-                    LOG.warn("** Skipping {} test for unsupported database: {}", testClass.getSimpleName(), databaseType);
-                    continue;
-                }
-                else if (interfaces.contains(SqlserverOnlyTest.class) && databaseType != WebTestHelper.DatabaseType.MicrosoftSQLServer)
+                if (interfaces.contains(SqlserverOnlyTest.class) && databaseType != WebTestHelper.DatabaseType.MicrosoftSQLServer)
                 {
                     LOG.warn("** Skipping {} test for unsupported database: {}", testClass.getSimpleName(), databaseType);
                     continue;
@@ -926,7 +920,7 @@ public class Runner extends TestSuite
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(dumpFile)))
         {
-            List<Class<?>> checkedInterfaces = Arrays.asList(PostgresOnlyTest.class, SqlserverOnlyTest.class, WindowsOnlyTest.class, NonWindowsTest.class, DevModeOnlyTest.class);
+            List<Class<?>> checkedInterfaces = Arrays.asList(SqlserverOnlyTest.class, WindowsOnlyTest.class, NonWindowsTest.class, DevModeOnlyTest.class);
             writer.write(String.format("Test\tNightly Suites\tSuites\tTimeout\tpackage\t%s\t%s\n",
                     checkedInterfaces.stream().map(Class::getSimpleName).collect(Collectors.joining("\t")),
                     String.join("\t", suites)));
