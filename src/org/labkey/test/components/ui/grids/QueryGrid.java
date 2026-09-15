@@ -217,6 +217,15 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         return getGridBar().getRecordCount();
     }
 
+    /**
+     * The "Last Page" jump is hidden when the total row count is capped, because the true last page is unknown.
+     * @return true if the grid can jump to its last page
+     */
+    public boolean canJumpToLastPage()
+    {
+        return getGridBar().canJumpToLastPage();
+    }
+
     public QueryGrid waitForRecordCount(int expectedCount)
     {
         return waitForRecordCount(expectedCount, WAIT_FOR_JAVASCRIPT);
