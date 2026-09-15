@@ -31,7 +31,6 @@
         <property name="buildPath" value="C:\labkey18.1\build\modules\search"/>
         <property name="buildType" value="Development"/>
         <property name="sourcePath" value="C:\labkey18.1\server\modules\search"/>
-        <property name="supportedDatabases" value=""/>
         <property name="resourcePath" value=""/>
         <property name="buildNumber" value="Unknown"/>
         <property name="enlistmentId" value="8f681376-45d4-4951-98be-2a35657fb8ef"/>
