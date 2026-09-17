@@ -38,6 +38,7 @@ import java.util.Map;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.labkey.api.security.UserManager.USER_AUDIT_EVENT;
 
 @Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 7)
@@ -51,7 +52,7 @@ public class SiteWideTermsOfUseTest extends BaseTermsOfUseTest
     {
 
         // Get the initial audit log row id, for sitewide terms. Use the row id as a filter when checking the log.
-        int logId = getLatestAuditLogRowId("");
+        int logId = _auditLogHelper.getLatestAuditRowId(USER_AUDIT_EVENT);
 
         int defaultUserId = _userHelper.getUserId(PasswordUtil.getUsername());
         Map<String, Object> defaultUserAuditLogEntry = new HashMap<>();

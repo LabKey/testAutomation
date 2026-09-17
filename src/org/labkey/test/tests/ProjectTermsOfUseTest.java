@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.labkey.api.security.UserManager.USER_AUDIT_EVENT;
 
 @Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 6)
@@ -50,11 +51,8 @@ public class ProjectTermsOfUseTest extends BaseTermsOfUseTest
     @Test
     public void projectTermsOfUseTest() throws IOException, CommandException
     {
-        // Get the various initial audit log row ids. Use as a filter when checking the log.
-        int noTermsInitialRowId = getLatestAuditLogRowId("/" + PUBLIC_NO_TERMS_PROJECT_NAME);
-        int pubTermsInitialRowId = getLatestAuditLogRowId("/" + PUBLIC_TERMS_PROJECT_NAME);
-        int nonPub2TermsInitialRowId = getLatestAuditLogRowId("/" + NON_PUBLIC_TERMS_PROJECT2_NAME);
-        int nonPubTermsInitialRowId = getLatestAuditLogRowId("/" + NON_PUBLIC_TERMS_PROJECT_NAME);
+        // RowId is a single sequence across every container, so one baseline covers every path checked below.
+        int initialRowId = _auditLogHelper.getLatestAuditRowId(USER_AUDIT_EVENT);
 
         log("Terms don't come into play until you log out");
         clickProject(NON_PUBLIC_TERMS_PROJECT2_NAME);
@@ -139,7 +137,7 @@ public class ProjectTermsOfUseTest extends BaseTermsOfUseTest
         log("Validate the audit logs show 'agreement to terms' entry.");
 
         // No terms for this project.
-        validateAuditLogEntries("/" + PUBLIC_NO_TERMS_PROJECT_NAME, noTermsInitialRowId, new ArrayList<>());
+        validateAuditLogEntries("/" + PUBLIC_NO_TERMS_PROJECT_NAME, initialRowId, new ArrayList<>());
 
         // The remaining three projects should have the same audit log entries.
         int defaultUserId = _userHelper.getUserId(PasswordUtil.getUsername());
@@ -154,9 +152,9 @@ public class ProjectTermsOfUseTest extends BaseTermsOfUseTest
         row.put("ImpersonatedBy", null);
         expected.add(row);
 
-        validateAuditLogEntries("/" + PUBLIC_TERMS_PROJECT_NAME, pubTermsInitialRowId, expected);
-        validateAuditLogEntries("/" + NON_PUBLIC_TERMS_PROJECT2_NAME, nonPub2TermsInitialRowId, expected);
-        validateAuditLogEntries("/" + NON_PUBLIC_TERMS_PROJECT_NAME, nonPubTermsInitialRowId, expected);
+        validateAuditLogEntries("/" + PUBLIC_TERMS_PROJECT_NAME, initialRowId, expected);
+        validateAuditLogEntries("/" + NON_PUBLIC_TERMS_PROJECT2_NAME, initialRowId, expected);
+        validateAuditLogEntries("/" + NON_PUBLIC_TERMS_PROJECT_NAME, initialRowId, expected);
     }
 
     protected void deleteWikiPage()

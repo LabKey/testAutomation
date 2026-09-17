@@ -17,16 +17,13 @@ package org.labkey.test.tests;
 
 import org.junit.BeforeClass;
 import org.labkey.remoteapi.CommandException;
-import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.Filter;
-import org.labkey.remoteapi.query.SelectRowsCommand;
-import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.ApiPermissionsHelper;
-import org.labkey.test.util.PasswordUtil;
+import org.labkey.test.util.AuditLogHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.WikiHelper;
 
@@ -53,6 +50,7 @@ public class BaseTermsOfUseTest extends BaseWebDriverTest
     protected final PortalHelper _portalHelper = new PortalHelper(this);
     protected WikiHelper _wikiHelper = new WikiHelper(this);
     protected final ApiPermissionsHelper _permissionsHelper = new ApiPermissionsHelper(this);
+    protected final AuditLogHelper _auditLogHelper = new AuditLogHelper(this);
 
     protected static final String WIKI_TERMS_TITLE = "Terms of Use";
     protected static final String PROJECT_TERMS_SNIPPET = "fight club";
@@ -180,35 +178,17 @@ public class BaseTermsOfUseTest extends BaseWebDriverTest
 
     }
 
-    protected int getLatestAuditLogRowId(String path) throws IOException, CommandException
-    {
-        List<Map<String, Object>> actualLog = getAuditLogEntries(path, -1);
-
-        if (actualLog.isEmpty())
-        {
-            return -1;
-        }
-        else
-        {
-            return ((Number) actualLog.getFirst().get("RowId")).intValue();
-        }
-    }
-
     private List<Map<String, Object>> getAuditLogEntries(String path, int minRowId) throws IOException, CommandException
     {
         log(String.format("Get %s audit log entries for path '%s' where RowId is greater than %d.",
                 USER_AUDIT_EVENT, path, minRowId));
 
-        Connection cn = new Connection(WebTestHelper.getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+        List<Filter> filters = List.of(
+                new Filter("Comment", "Agreed to terms of use", Filter.Operator.EQUAL),
+                new Filter("RowId", minRowId, Filter.Operator.getOperator("GREATER_THAN")));
 
-        SelectRowsCommand cmd = new SelectRowsCommand("auditLog", USER_AUDIT_EVENT);
-        cmd.setColumns(List.of("RowId", "Date", "CreatedBy", "ImpersonatedBy", "User", "Comment"));
-        cmd.addFilter("Comment", "Agreed to terms of use", Filter.Operator.EQUAL);
-        cmd.addFilter("RowId", minRowId, Filter.Operator.getOperator("GREATER_THAN"));
-
-        SelectRowsResponse response = cmd.execute(cn, path);
-
-        return response.getRows();
+        return _auditLogHelper.getAuditLogsFromLKS(path, null, AuditLogHelper.AuditEvent.USER_AUDIT_EVENT,
+                List.of("RowId", "Date", "CreatedBy", "ImpersonatedBy", "User", "Comment"), filters, null, null).getRows();
     }
 
     @Override
