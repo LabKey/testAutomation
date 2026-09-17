@@ -18,10 +18,6 @@ package org.labkey.test.tests;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
-import org.labkey.remoteapi.Connection;
-import org.labkey.remoteapi.query.Filter;
-import org.labkey.remoteapi.query.SelectRowsCommand;
-import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
@@ -35,10 +31,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
-import static org.labkey.api.security.UserManager.USER_AUDIT_EVENT;
 
 @Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 6)
@@ -56,6 +50,12 @@ public class ProjectTermsOfUseTest extends BaseTermsOfUseTest
     @Test
     public void projectTermsOfUseTest() throws IOException, CommandException
     {
+        // Get the various initial audit log row ids. Use as a filter when checking the log.
+        int noTermsInitialRowId = getLatestAuditLogRowId("/" + PUBLIC_NO_TERMS_PROJECT_NAME);
+        int pubTermsInitialRowId = getLatestAuditLogRowId("/" + PUBLIC_TERMS_PROJECT_NAME);
+        int nonPub2TermsInitialRowId = getLatestAuditLogRowId("/" + NON_PUBLIC_TERMS_PROJECT2_NAME);
+        int nonPubTermsInitialRowId = getLatestAuditLogRowId("/" + NON_PUBLIC_TERMS_PROJECT_NAME);
+
         log("Terms don't come into play until you log out");
         clickProject(NON_PUBLIC_TERMS_PROJECT2_NAME);
         assertTextNotPresent("fight club");
@@ -139,7 +139,7 @@ public class ProjectTermsOfUseTest extends BaseTermsOfUseTest
         log("Validate the audit logs show 'agreement to terms' entry.");
 
         // No terms for this project.
-        getAuditLog("/" + PUBLIC_NO_TERMS_PROJECT_NAME, new ArrayList<>());
+        validateAuditLogEntries("/" + PUBLIC_NO_TERMS_PROJECT_NAME, noTermsInitialRowId, new ArrayList<>());
 
         // The remaining three projects should have the same audit log entries.
         int defaultUserId = _userHelper.getUserId(PasswordUtil.getUsername());
@@ -153,11 +153,10 @@ public class ProjectTermsOfUseTest extends BaseTermsOfUseTest
         row.put("User", defaultUserId);
         row.put("ImpersonatedBy", null);
         expected.add(row);
-        expected.add(row);
 
-        getAuditLog("/" + PUBLIC_TERMS_PROJECT_NAME, expected);
-        getAuditLog("/" + NON_PUBLIC_TERMS_PROJECT2_NAME, expected);
-        getAuditLog("/" + NON_PUBLIC_TERMS_PROJECT_NAME, expected);
+        validateAuditLogEntries("/" + PUBLIC_TERMS_PROJECT_NAME, pubTermsInitialRowId, expected);
+        validateAuditLogEntries("/" + NON_PUBLIC_TERMS_PROJECT2_NAME, nonPub2TermsInitialRowId, expected);
+        validateAuditLogEntries("/" + NON_PUBLIC_TERMS_PROJECT_NAME, nonPubTermsInitialRowId, expected);
     }
 
     protected void deleteWikiPage()
@@ -165,38 +164,6 @@ public class ProjectTermsOfUseTest extends BaseTermsOfUseTest
         waitForElementToDisappear(Locator.xpath("//a[contains(@class, 'disabled')]/span[text()='Delete Page']"), WAIT_FOR_JAVASCRIPT);
         clickButton("Delete Page");
         clickButton("Delete");
-    }
-
-    private void getAuditLog(String path, List<Map<String, Object>> expected) throws IOException, CommandException
-    {
-        Connection cn = new Connection(WebTestHelper.getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
-
-        SelectRowsCommand cmd = new SelectRowsCommand("auditLog", USER_AUDIT_EVENT);
-        cmd.setColumns(List.of("CreatedBy", "ImpersonatedBy", "User", "Comment"));
-        cmd.addFilter("Comment", "Agreed to terms of use", Filter.Operator.EQUAL);
-        SelectRowsResponse response = cmd.execute(cn, path);
-
-        List<Map<String, Object>> actualLog = response.getRows();
-
-        checker().verifyEquals("Number of audit log entries not as expected.",
-                expected.size(), actualLog.size());
-
-        List<Map<String, Object>> unmatched = expected.stream()
-                .filter(expectedRow -> {
-                    Set<String> keysOfInterest = expectedRow.keySet();
-                    return actualLog.stream().noneMatch(actualRow -> {
-                        Map<String, Object> actualFiltered = actualRow.entrySet().stream()
-                                .filter(e -> keysOfInterest.contains(e.getKey()))
-                                .collect(HashMap::new,
-                                        (m, e) -> m.put(e.getKey(), e.getValue()),
-                                        HashMap::putAll);
-                        return actualFiltered.equals(expectedRow);
-                    });
-                })
-                .toList();
-
-        checker().verifyTrue("Expected rows with no match in actual: " + unmatched, unmatched.isEmpty());
-
     }
 
 }

@@ -31,6 +31,8 @@ import org.labkey.test.util.PasswordUtil;
 import org.openqa.selenium.WebElement;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
@@ -45,13 +47,31 @@ public class SiteWideTermsOfUseTest extends BaseTermsOfUseTest
     protected static final String NON_PUBLIC_NO_TERMS_PROJECT_NAME = "Non-public No Terms Project";
 
     @Before
-    public void preTest()
+    public void preTest() throws IOException, CommandException
     {
-        assureSiteWideTermsOfUsePage();
+
+        // Get the initial audit log row id, for sitewide terms. Use the row id as a filter when checking the log.
+        int logId = getLatestAuditLogRowId("");
+
+        int defaultUserId = _userHelper.getUserId(PasswordUtil.getUsername());
+        Map<String, Object> defaultUserAuditLogEntry = new HashMap<>();
+        defaultUserAuditLogEntry.put("CreatedBy", defaultUserId);
+        defaultUserAuditLogEntry.put("User", defaultUserId);
+        defaultUserAuditLogEntry.put("ImpersonatedBy", null);
+
+        if (assureSiteWideTermsOfUsePage())
+        {
+            validateAuditLogEntries("", logId, List.of(defaultUserAuditLogEntry));
+        }
+
         if(!isElementPresent(Locator.linkWithText(getProjectName())))
         {
             goToHome();
-            acceptTermsOfUse(null, true);
+            if (acceptTermsOfUse(null, true))
+            {
+                validateAuditLogEntries("", logId, List.of(defaultUserAuditLogEntry));
+            }
+
         }
     }
 
@@ -94,10 +114,11 @@ public class SiteWideTermsOfUseTest extends BaseTermsOfUseTest
                 Locators.bodyTitle().findElement(getDriver()).getText());
     }
 
-    protected void assureSiteWideTermsOfUsePage()
+    protected boolean assureSiteWideTermsOfUsePage()
     {
-        createTermsOfUsePage(null, SITE_WIDE_TERMS_TEXT);
+        boolean signed = createTermsOfUsePage(null, SITE_WIDE_TERMS_TEXT);
         setFrequency(0);
+        return signed;
     }
 
     // Test that the site-wide terms appear when you log out, even if you've accepted the terms when logged in

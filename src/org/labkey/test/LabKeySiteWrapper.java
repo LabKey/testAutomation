@@ -321,22 +321,31 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         }
     }
 
-    protected void acceptTermsOfUse(String termsText, boolean clickAgree)
+    protected boolean acceptTermsOfUse(String termsText, boolean clickAgree)
     {
+        boolean signed = false;
         Optional<WebElement> optionalCheckbox = Locators.termsOfUseCheckbox().findOptionalElement(getDriver());
-        optionalCheckbox.ifPresent(termsCheckbox ->
+
+        if (optionalCheckbox.isPresent())
         {
-            if (termsCheckbox.isDisplayed())
+
+            if (optionalCheckbox.get().isDisplayed())
             {
-                checkCheckbox(termsCheckbox);
+                checkCheckbox(optionalCheckbox.get());
                 if (null != termsText)
                 {
                     assertTextPresent(termsText);
                 }
                 if (clickAgree)
+                {
                     clickButton("Agree");
+                    signed = true;
+                }
             }
-        });
+        }
+
+        return signed;
+
     }
 
     @LogMethod
