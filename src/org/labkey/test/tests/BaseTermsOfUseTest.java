@@ -16,18 +16,25 @@
 package org.labkey.test.tests;
 
 import org.junit.BeforeClass;
+import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.query.Filter;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.ApiPermissionsHelper;
+import org.labkey.test.util.AuditLogHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.WikiHelper;
 
+import java.io.IOException;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import static org.labkey.api.security.UserManager.USER_AUDIT_EVENT;
 import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
 import static org.labkey.test.util.PermissionsHelper.READER_ROLE;
 
@@ -43,6 +50,7 @@ public class BaseTermsOfUseTest extends BaseWebDriverTest
     protected final PortalHelper _portalHelper = new PortalHelper(this);
     protected WikiHelper _wikiHelper = new WikiHelper(this);
     protected final ApiPermissionsHelper _permissionsHelper = new ApiPermissionsHelper(this);
+    protected final AuditLogHelper _auditLogHelper = new AuditLogHelper(this);
 
     protected static final String WIKI_TERMS_TITLE = "Terms of Use";
     protected static final String PROJECT_TERMS_SNIPPET = "fight club";
@@ -112,8 +120,10 @@ public class BaseTermsOfUseTest extends BaseWebDriverTest
         }
     }
 
-    protected void createTermsOfUsePage(String projectName, String body)
+    protected boolean createTermsOfUsePage(String projectName, String body)
     {
+        boolean signed = false;
+
         String message;
         if (null != projectName)
         {
@@ -134,8 +144,51 @@ public class BaseTermsOfUseTest extends BaseWebDriverTest
             setFormElement(Locator.name("title"), WIKI_TERMS_TITLE);
             setFormElement(Locator.name("body"), body);
             _wikiHelper.saveWikiPage();
-            acceptTermsOfUse(null, true);
+            signed = acceptTermsOfUse(null, true);
         }
+
+        return signed;
+    }
+
+    protected void validateAuditLogEntries(String path, int minRowId, List<Map<String, Object>> expected) throws IOException, CommandException
+    {
+        log(String.format("Validating %s user events in the audit log for path / project '%s' and above row id of %d",
+                USER_AUDIT_EVENT, path, minRowId));
+
+        List<Map<String, Object>> actualLog = getAuditLogEntries(path, minRowId);
+
+        checker().verifyEquals("Number of audit log entries not as expected.",
+                expected.size(), actualLog.size());
+
+        List<Map<String, Object>> unmatched = expected.stream()
+                .filter(expectedRow -> {
+                    Set<String> keysOfInterest = expectedRow.keySet();
+                    return actualLog.stream().noneMatch(actualRow -> {
+                        Map<String, Object> actualFiltered = actualRow.entrySet().stream()
+                                .filter(e -> keysOfInterest.contains(e.getKey()))
+                                .collect(HashMap::new,
+                                        (m, e) -> m.put(e.getKey(), e.getValue()),
+                                        HashMap::putAll);
+                        return actualFiltered.equals(expectedRow);
+                    });
+                })
+                .toList();
+
+        checker().verifyTrue("Expected rows with no match in actual: " + unmatched, unmatched.isEmpty());
+
+    }
+
+    private List<Map<String, Object>> getAuditLogEntries(String path, int minRowId) throws IOException, CommandException
+    {
+        log(String.format("Get %s audit log entries for path '%s' where RowId is greater than %d.",
+                USER_AUDIT_EVENT, path, minRowId));
+
+        List<Filter> filters = List.of(
+                new Filter("Comment", "Agreed to terms of use", Filter.Operator.EQUAL),
+                new Filter("RowId", minRowId, Filter.Operator.getOperator("GREATER_THAN")));
+
+        return _auditLogHelper.getAuditLogsFromLKS(path, null, AuditLogHelper.AuditEvent.USER_AUDIT_EVENT,
+                List.of("RowId", "Date", "CreatedBy", "ImpersonatedBy", "User", "Comment"), filters, null, null).getRows();
     }
 
     @Override
