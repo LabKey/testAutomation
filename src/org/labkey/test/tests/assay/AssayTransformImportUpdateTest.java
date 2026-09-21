@@ -301,4 +301,91 @@ public class AssayTransformImportUpdateTest extends AbstractAssayTransformTest
 
         resetErrors();
     }
+
+    @Test
+    public void testReRunIdTransformProperty() throws Exception
+    {
+        String reRunIdTransform = "reRunIdTransform.R";
+        String reRunIdTransformAssay = "reRunIdTransformAssay";
+        String transformContent = """
+                library(Rlabkey);
+                
+                run.props = labkey.transform.readRunPropertiesFile("${runInfo}");
+                
+                run.data.file = labkey.transform.getRunPropertyValue(run.props, "runDataFile");
+                run.output.file = run.props$val3[run.props$name == "runDataFile"];
+                
+                # reRunId is only present in the run properties for a re-import
+                rerun.id = labkey.transform.getRunPropertyValue(run.props, "reRunId");
+                if (is.na(rerun.id)) rerun.id = "";
+                
+                if (file.exists(run.data.file)) {
+                    run.data = read.delim(run.data.file, header=TRUE, sep="\\t", check.names = FALSE);
+                    run.data$ReRunId = rerun.id;
+                    write.table(run.data, file=run.output.file, sep="\\t", na="", row.names=FALSE, quote=FALSE);
+                }
+                """;
+        File transformFile = TestFileUtils.writeTempFile(reRunIdTransform, transformContent);
+        var protocolResponse = new GeneralAssayDesign(reRunIdTransformAssay)
+                .setDataFields(List.of(new FieldDefinition("ReRunId", FieldDefinition.ColumnType.String)), true)
+                .createAssay(getProjectName(), createDefaultConnection());
+        goToProjectHome();
+
+        var assayDesignerPage = ReactAssayDesignerPage.beginAt(this, getProjectName(), protocolResponse.getProtocolId(),
+                "general", getURL().toString());
+        assayDesignerPage.addTransformScript(transformFile, true);
+        assayDesignerPage.goToBatchFields().removeAllFields(true);
+        assayDesignerPage.clickSave();
+
+        String importData = """
+                VisitID\tParticipantID
+                1\t1
+                1\t2
+                """;
+
+        String initialRun = "reRunIdInitialImport";
+        goToProjectHome();
+        clickAndWait(Locator.linkWithText(reRunIdTransformAssay));
+        new AssayRunsPage(getDriver()).getTable().clickHeaderButtonAndWait("Import Data");
+        new AssayImportPage(getDriver())
+                .setNamedInputText("Name", initialRun)
+                .setDataText(importData)
+                .clickSaveAndFinish();
+
+        var initialRunData = new AssayRunsPage(getDriver()).clickAssayIdLink(initialRun)
+                .getDataTable().getColumnDataAsText("ReRunId");
+        checker().wrapAssertion(()-> Assertions.assertThat(initialRunData)
+                .as("expect no reRunId run property for an initial import")
+                .containsOnly(" "));
+        checker().screenShotIfNewError("unexpected initial import transform data");
+
+        int initialRunId = getRunId(reRunIdTransformAssay, initialRun);
+
+        String reImportedRun = "reRunIdReImport";
+        goToProjectHome();
+        clickAndWait(Locator.linkWithText(reRunIdTransformAssay));
+        clickAndWait(Locator.linkWithText(initialRun));
+        clickButton("Re-import run");
+        new AssayImportPage(getDriver())
+                .setNamedInputText("Name", reImportedRun)
+                .setDataText(importData)
+                .clickSaveAndFinish();
+
+        var reImportedRunData = new AssayRunsPage(getDriver()).clickAssayIdLink(reImportedRun)
+                .getDataTable().getColumnDataAsText("ReRunId");
+        checker().wrapAssertion(()-> Assertions.assertThat(reImportedRunData)
+                .as("expect reRunId run property to be the RowId of the run being replaced")
+                .containsOnly(String.valueOf(initialRunId)));
+        checker().screenShotIfNewError("unexpected re-import transform data");
+    }
+
+    private int getRunId(String assayName, String runName)
+    {
+        var rows = executeSelectRowCommand("assay.General." + assayName, "Runs").getRows();
+        return rows.stream()
+                .filter(row -> runName.equals(row.get("Name")))
+                .map(row -> (Integer) row.get("RowId"))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("Unable to find run: " + runName));
+    }
 }
