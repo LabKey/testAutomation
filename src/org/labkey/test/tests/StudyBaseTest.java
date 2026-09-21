@@ -148,7 +148,10 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
 
     protected void setExpectSpecimenImportError(boolean expected)
     {
-        _specimenImporter.setExpectError(expected);
+        if (_studyHelper.isSpecimenModulePresent())
+        {
+            _specimenImporter.setExpectError(expected);
+        }
     }
 
     protected void runUITests() throws Exception

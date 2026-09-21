@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests.viability;
 
+import org.junit.Assume;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
@@ -67,6 +68,8 @@ public class ViabilityTest extends AbstractViabilityTest
     @Test
     public void runUITests() throws Exception
     {
+        Assume.assumeTrue("Specimen module not present", _studyHelper.isSpecimenModulePresent());
+
         // setup a scripting engine to run a java transform script
         new QCAssayScriptHelper(this).ensureEngineConfig();
 
