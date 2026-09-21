@@ -88,14 +88,14 @@ public class TimeChartImportTest extends StudyBaseTest
                 "One Measure: visit based plot per participant", 17, 47, false,
                 new String[]{
                         "1 week Post-V#1\nInt. Vis. %{S.1.1} .%{S.2.1}\nGrp1:F/U/Grp2:V#2\nG1: 6wk/G2: 2wk\n6 week Post-V#2\nG1: V#2/G2: V#3\nInt. Vis. %{S.1.1} .%{S.2.1}\nInt. Vis. %{S.1.1} .%{S.2.1}\n6 wk Post-V#2/V#3\n32.0\n32.5\n33.0\n33.5\n34.0\n34.5\n35.0\n35.5\n36.0\n36.5\n37.0\nAbbr Phy Exam\n999320016\nVisit Label\nTemperature: body\n999320016",
-                        "1 week Post-V#1\nInt. Vis. %{S.1.1} .%{S.2.1}\nGrp1:F/U/Grp2:V#2\nG1: 6wk/G2: 2wk\n6 week Post-V#2\nG1: V#2/G2: V#3\nInt. Vis. %{S.1.1} .%{S.2.1}\nInt. Vis. %{S.1.1} .%{S.2.1}\n6 wk Post-V#2/V#3\n37.0\n37.5\n38.0\n38.5\n39.0\n39.5\nAbbr Phy Exam\n999320518\nVisit Label\nTemperature: body\n999320518"
+                        "1 week Post-V#1\nInt. Vis. %{S.1.1} .%{S.2.1}\nGrp1:F/U/Grp2:V#2\nG1: 6wk/G2: 2wk\n6 week Post-V#2\nG1: V#2/G2: V#3\nInt. Vis. %{S.1.1} .%{S.2.1}\nInt. Vis. %{S.1.1} .%{S.2.1}\n6 wk Post-V#2/V#3\n37.0\n37.5\n38.0\n38.5\n39.0\n39.5\n40.0\nAbbr Phy Exam\n999320518\nVisit Label\nTemperature: body\n999320518"
                 }
         ));
 
         VISIT_CHARTS.add(new TimeChartInfo(
                 "Two Measure: group mean with one plot per dimension", 2, 38, false,
                 new String[]{
-                        "1 week Post-V#1\nInt. Vis. %{S.1.1} .%{S.2.1}\nGrp1:F/U/Grp2:V#2\nG1: 6wk/G2: 2wk\n6 week Post-V#2\n1 wk Post-V#2/V#3\n2 wk Post-V#2/V#3\n4 wk Post-V#2/V#3\n80\n100\n120\n140\n160\n180\n200\nAPX-1: Abbreviated Physical Exam\n1. Weight\nVisit\n1. Weight\nGroup 1\nFemale\nMale",
+                        "1 week Post-V#1\nInt. Vis. %{S.1.1} .%{S.2.1}\nGrp1:F/U/Grp2:V#2\nG1: 6wk/G2: 2wk\n6 week Post-V#2\n1 wk Post-V#2/V#3\n2 wk Post-V#2/V#3\n4 wk Post-V#2/V#3\n60\n80\n100\n120\n140\n160\n180\n200\nAPX-1: Abbreviated Physical Exam\n1. Weight\nVisit\n1. Weight\nGroup 1\nFemale\nMale",
                         "1 week Post-V#1\nInt. Vis. %{S.1.1} .%{S.2.1}\nGrp1:F/U/Grp2:V#2\nG1: 6wk/G2: 2wk\n6 week Post-V#2\n1 wk Post-V#2/V#3\n2 wk Post-V#2/V#3\n4 wk Post-V#2/V#3\n32\n33\n34\n35\n36\n37\n38\n39\n40\nAPX-1: Abbreviated Physical Exam\n2. Body Temp\nVisit\n2. Body Temp\nGroup 1\nFemale\nMale"
                 }
         ));
@@ -110,7 +110,7 @@ public class TimeChartImportTest extends StudyBaseTest
         DATE_CHARTS.add(new TimeChartInfo(
                 "Four Measures: one axis with point click fn enabled", 1, 17, true,
                 new String[]{
-                        "50\n100\n150\n200\n250\n300\n350\n200\n400\n600\n800\n1000\n1200\n1400\nLuminexAssay, Lab Results, GenericAssay, Physical Exam\nDays Since Start Date\nFI, CD4+ (cells/mm3), M1, Weight (kg)\n249318596 ABI-QSTAR\n249318596 CD4+ (cells/mm3)\n249318596 TNF-alpha (40)\n249318596 Weight (kg)"
+                        "50\n100\n150\n200\n250\n300\n350\n400\n200\n400\n600\n800\n1000\n1200\n1400\nLuminexAssay, Lab Results, GenericAssay, Physical Exam\nDays Since Start Date\nFI, CD4+ (cells/mm3), M1, Weight (kg)\n249318596 ABI-QSTAR\n249318596 CD4+ (cells/mm3)\n249318596 TNF-alpha (40)\n249318596 Weight (kg)"
                 }
         ));
 
@@ -124,29 +124,29 @@ public class TimeChartImportTest extends StudyBaseTest
         DATE_CHARTS.add(new TimeChartInfo(
                 "One Measure: FI luminex IL-10 and IL-2 data by Analyte dimension", 2, 30, false,
                 new String[]{
-                        "0\n50\n100\n150\n200\n80\n800\nLuminex\nIL-10 (23)\nDays Since Start Date\nFI\n249318596\n249320107\n249320127\n249320489\n249320897\n249325717",
-                        "0\n50\n100\n150\n200\n60\n600\nLuminex\nIL-2 (3)\nDays Since Start Date\nFI\n249318596\n249320107\n249320127\n249320489\n249320897\n249325717"
+                        "0\n50\n100\n150\n200\n70\n700\nLuminex\nIL-10 (23)\nDays Since Start Date\nFI\n249318596\n249320107\n249320127\n249320489\n249320897\n249325717",
+                        "0\n50\n100\n150\n200\n50\n500\nLuminex\nIL-2 (3)\nDays Since Start Date\nFI\n249318596\n249320107\n249320127\n249320489\n249320897\n249325717"
                 }
         ));
 
         DATE_CHARTS.add(new TimeChartInfo(
                 "One Measure: FI luminex with thin lines and no data points", 1, 5, false,
                 new String[]{
-                        "50\n100\n150\n200\n70\n700\nLuminex\nDays Since Start Date\nFI\n249318596 TNF-alpha (40)\n249318596 IL-2 (3)\n249318596 IL-10 (23)"
+                        "50\n100\n150\n200\n250\n70\n700\nLuminex\nDays Since Start Date\nFI\n249318596 TNF-alpha (40)\n249318596 IL-2 (3)\n249318596 IL-10 (23)"
                 }
         ));
 
         DATE_CHARTS.add(new TimeChartInfo(
                 "One Measure: y-axis log scale and manual range on right side", 1, 33, false,
                 new String[]{
-                        "0\n50\n100\n150\n200\n250\n300\n350\n10\n100\n1000\n10000\n1e+5\n1e+6\n1e+7\nHIV Test Results\nDays Since Start Date\nViral Load Quantified (copies/ml)\n249318596\n249320107\n249320127\n249320489\n249320897"
+                        "0\n50\n100\n150\n200\n250\n300\n350\n400\n10\n100\n1000\n10000\n1e+5\n1e+6\n1e+7\nHIV Test Results\nDays Since Start Date\nViral Load Quantified (copies/ml)\n249318596\n249320107\n249320127\n249320489\n249320897"
                 }
         ));
 
         DATE_CHARTS.add(new TimeChartInfo(
                 "One Measure: y-axis log scale and manual range", 1, 33, false,
                 new String[]{
-                        "0\n50\n100\n150\n200\n250\n300\n350\n10\n100\n1000\n10000\n1e+5\n1e+6\n1e+7\nHIV Test Results\nDays Since Start Date\nViral Load Quantified (copies/ml)\n249318596\n249320107\n249320127\n249320489\n249320897"
+                        "0\n50\n100\n150\n200\n250\n300\n350\n400\n10\n100\n1000\n10000\n1e+5\n1e+6\n1e+7\nHIV Test Results\nDays Since Start Date\nViral Load Quantified (copies/ml)\n249318596\n249320107\n249320127\n249320489\n249320897"
                 }
         ));
 

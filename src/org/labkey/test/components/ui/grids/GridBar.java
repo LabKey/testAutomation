@@ -154,6 +154,11 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
         return !pager().isNextEnabled();
     }
 
+    public boolean canJumpToLastPage()
+    {
+        return pager().isLastPageAvailable();
+    }
+
     /**
      * clicks the 'next' button on the pager associated with this grid and waits for the grid to update
      */

@@ -464,7 +464,7 @@ public class EntityBulkInsertDialog extends EntityBulkDialog
         WebElement quantity = Locator.tagWithId("input", "numItems")
                 .findWhenNeeded(getComponentElement());
 
-        WebElement description = Locator.tagWithId("textarea", "Description")
+        WebElement description = Locator.textarea("Description")
                 .findWhenNeeded(getComponentElement());
 
         RadioButton derivativesOption = new RadioButton.RadioButtonFinder().withNameAndValue("creationType", "Derive")

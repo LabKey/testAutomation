@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
--- Create a schema and stored procedure whose names contain special characters (spaces, exclamation point, and an
+-- SQL Server fixture for the DataIntegration StoredProcedureStep. Apply by hand to an external SQL Server
+-- database; see ../README.md. Not a module dbscript: it is deliberately outside schemas/dbscripts/ so the
+-- module upgrade scanner never runs it against the primary database.
+
+-- Creates a schema and stored procedure whose names contain special characters (spaces, exclamation point, and an
 -- embedded double-quote in the procedure name). These exercise the identifier quoting/escaping that SqlDialect
--- applies when building the CALL statement for the DataIntegration StoredProcedureStep. The schema is registered
--- with the module via the matching schema metadata file; it is created here because the module dbscript filename
--- convention only permits word-character schema names.
+-- applies when building the CALL statement for the StoredProcedureStep. Driven by ETLs/SProcSpecialCharacters.xml.
 
 -- Use double-quote delimited identifiers (with the interior quote doubled as "") rather than [bracket] identifiers.
 -- LabKey's SqlScanner, which splits scripts into statements, does not understand bracket quoting and would misread a

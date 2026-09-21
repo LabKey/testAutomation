@@ -27,7 +27,6 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.pages.LabkeyErrorPage;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.PostgresOnlyTest;
 
 import java.io.IOException;
 import java.util.List;
@@ -40,7 +39,7 @@ import static org.labkey.test.util.PermissionsHelper.PROJECT_ADMIN_ROLE;
 
 @Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 3)
-public class PostgresQueriesTest extends AbstractAdminConsoleTest implements PostgresOnlyTest
+public class PostgresQueriesTest extends AbstractAdminConsoleTest
 {
 
     @Test

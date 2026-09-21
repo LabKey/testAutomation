@@ -15,10 +15,19 @@
  */
 package org.labkey.test.tests.query;
 
-import org.junit.Before;
+import org.apache.hc.core5.http.HttpStatus;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.Command;
+import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.query.DeleteQueryViewCommand;
+import org.labkey.remoteapi.query.Filter;
+import org.labkey.remoteapi.query.RenameQueryViewCommand;
+import org.labkey.remoteapi.query.SaveQueryViewsCommand;
+import org.labkey.remoteapi.query.SaveSessionViewCommand;
+import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
@@ -35,6 +44,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
@@ -55,11 +65,22 @@ public class CustomizeGridPermissionsTest extends BaseWebDriverTest
     private static final String COLUMN_NAME = "container";
     private static final String COLUMN_LABEL = "Folder";
 
+    private static final String SHARED_VIEW_EDITOR_ROLE = "Shared View Editor";
+
+    private static final String SUBFOLDER_NAME = "Child";
+    private static final String SUB_VIEW_EDITOR = "gp_sub_view_editor@gridpermissions.test";
+    private static final String READER_SUB_VIEW_EDITOR = "gp_reader_sub_view_editor@gridpermissions.test";
+    private static final String SHARED_VIEW_NAME = "Shared Grid View";
+    private static final String LOCAL_VIEW_NAME = "Subfolder Grid View";
+    private static final String RENAMED_VIEW_NAME = "Renamed Grid View";
+    private static final String PARENT_VIEW_NAME = "Parent Folder Grid View";
+    private static final String SESSION_VIEW_NAME = "Session Grid View";
+
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         super.doCleanup(afterTest);
-        _userHelper.deleteUsers(afterTest, READER, EDITOR, VIEW_EDITOR);
+        _userHelper.deleteUsers(afterTest, READER, EDITOR, VIEW_EDITOR, SUB_VIEW_EDITOR, READER_SUB_VIEW_EDITOR);
     }
 
     @BeforeClass
@@ -78,16 +99,21 @@ public class CustomizeGridPermissionsTest extends BaseWebDriverTest
         _userHelper.createUser(READER);
         _userHelper.createUser(EDITOR);
         _userHelper.createUser(VIEW_EDITOR);
+        _userHelper.createUser(SUB_VIEW_EDITOR);
+        _userHelper.createUser(READER_SUB_VIEW_EDITOR);
 
         ApiPermissionsHelper permissionsHelper = new ApiPermissionsHelper(this);
         permissionsHelper.addMemberToRole(READER, READER_ROLE, MemberType.user, getProjectName());
         permissionsHelper.addMemberToRole(EDITOR, EDITOR_ROLE, MemberType.user, getProjectName());
-        permissionsHelper.addMemberToRole(VIEW_EDITOR, "Shared View Editor", MemberType.user, getProjectName());
-    }
+        permissionsHelper.addMemberToRole(VIEW_EDITOR, SHARED_VIEW_EDITOR_ROLE, MemberType.user, getProjectName());
+        permissionsHelper.addMemberToRole(READER_SUB_VIEW_EDITOR, READER_ROLE, MemberType.user, getProjectName());
 
-    @Before
-    public void preTest() throws Exception
-    {
+        _containerHelper.createSubfolder(getProjectName(), SUBFOLDER_NAME);
+        permissionsHelper.addMemberToRole(READER, READER_ROLE, MemberType.user, getSubfolderPath());
+        permissionsHelper.addMemberToRole(SUB_VIEW_EDITOR, SHARED_VIEW_EDITOR_ROLE, MemberType.user, getSubfolderPath());
+        permissionsHelper.addMemberToRole(VIEW_EDITOR, SHARED_VIEW_EDITOR_ROLE, MemberType.user, getSubfolderPath());
+        permissionsHelper.addMemberToRole(READER_SUB_VIEW_EDITOR, SHARED_VIEW_EDITOR_ROLE, MemberType.user, getSubfolderPath());
+
         recreateList();
     }
 
@@ -115,6 +141,8 @@ public class CustomizeGridPermissionsTest extends BaseWebDriverTest
     @Test
     public void testReaderDefaultCustomGrid() throws Exception
     {
+        recreateList();
+
         impersonate(READER);
         {
             DataRegionTable list = goToList();
@@ -135,6 +163,8 @@ public class CustomizeGridPermissionsTest extends BaseWebDriverTest
     @Test
     public void testEditorDefaultCustomGrid() throws Exception
     {
+        recreateList();
+
         impersonate(EDITOR);
         {
             DataRegionTable list = goToList();
@@ -156,6 +186,8 @@ public class CustomizeGridPermissionsTest extends BaseWebDriverTest
     @Test
     public void testViewEditorDefaultCustomGrid() throws Exception
     {
+        recreateList();
+
         impersonate(VIEW_EDITOR);
         {
             DataRegionTable list = goToList();
@@ -178,6 +210,8 @@ public class CustomizeGridPermissionsTest extends BaseWebDriverTest
     @Test
     public void testReaderNamedCustomGrid() throws Exception
     {
+        recreateList();
+
         impersonate(READER);
         {
             DataRegionTable list = goToList();
@@ -201,6 +235,8 @@ public class CustomizeGridPermissionsTest extends BaseWebDriverTest
     @Test
     public void testEditorNamedCustomGrid() throws Exception
     {
+        recreateList();
+
         impersonate(EDITOR);
         {
             DataRegionTable list = goToList();
@@ -225,6 +261,8 @@ public class CustomizeGridPermissionsTest extends BaseWebDriverTest
     @Test
     public void testViewEditorNamedCustomGrid()
     {
+        recreateList();
+
         impersonate(VIEW_EDITOR);
         {
             DataRegionTable list = goToList();
@@ -246,6 +284,285 @@ public class CustomizeGridPermissionsTest extends BaseWebDriverTest
         assertTrue("View Editor's customized view should be visible to other users", list.getColumnLabels().contains(COLUMN_LABEL));
     }
 
+    @Test // GitHub Issue #1397
+    public void testReaderCannotRenameSharedView() throws Exception
+    {
+        createSharedView(getProjectName(), SHARED_VIEW_NAME, false);
+
+        assertEquals("Reader should not be able to rename a shared view", HttpStatus.SC_FORBIDDEN,
+                executeAs(READER, getProjectName(), renameCommand(SHARED_VIEW_NAME, RENAMED_VIEW_NAME)));
+
+        assertViewPresent(getProjectName(), SHARED_VIEW_NAME);
+        assertViewAbsent(getProjectName(), RENAMED_VIEW_NAME);
+    }
+
+    @Test // GitHub Issue #1397
+    public void testReaderCannotRenameInheritedViewFromSubfolder() throws Exception
+    {
+        createSharedView(getProjectName(), SHARED_VIEW_NAME, true);
+
+        assertEquals("Reader should not be able to rename a view inherited from the project", HttpStatus.SC_FORBIDDEN,
+                executeAs(READER, getSubfolderPath(), renameCommand(SHARED_VIEW_NAME, RENAMED_VIEW_NAME)));
+
+        assertViewPresent(getProjectName(), SHARED_VIEW_NAME);
+        assertViewAbsent(getProjectName(), RENAMED_VIEW_NAME);
+    }
+
+    @Test // GitHub Issue #1397
+    public void testSharedViewEditorCannotRenameInheritedView() throws Exception
+    {
+        createSharedView(getProjectName(), SHARED_VIEW_NAME, true);
+
+        assertEquals("Subfolder's shared view editor should not be able to rename the project's view", HttpStatus.SC_FORBIDDEN,
+                executeAs(SUB_VIEW_EDITOR, getSubfolderPath(), renameCommand(SHARED_VIEW_NAME, RENAMED_VIEW_NAME)));
+
+        assertViewPresent(getProjectName(), SHARED_VIEW_NAME);
+        assertViewAbsent(getProjectName(), RENAMED_VIEW_NAME);
+    }
+
+    @Test // GitHub Issue #1397
+    public void testSharedViewEditorCanRenameOwnFolderSharedView() throws Exception
+    {
+        assertEquals("Shared view editor should be able to share a view in their own folder", HttpStatus.SC_OK,
+                executeAs(SUB_VIEW_EDITOR, getSubfolderPath(), saveSharedViewCommand(LOCAL_VIEW_NAME, false)));
+        assertEquals("Shared view editor should be able to rename a shared view in their own folder", HttpStatus.SC_OK,
+                executeAs(SUB_VIEW_EDITOR, getSubfolderPath(), renameCommand(LOCAL_VIEW_NAME, RENAMED_VIEW_NAME)));
+
+        assertViewPresent(getSubfolderPath(), RENAMED_VIEW_NAME);
+        assertViewAbsent(getSubfolderPath(), LOCAL_VIEW_NAME);
+    }
+
+    @Test // GitHub Issue #1397
+    public void testSharedViewEditorCannotDeleteInheritedView() throws Exception
+    {
+        createSharedView(getProjectName(), SHARED_VIEW_NAME, true);
+
+        assertEquals("Subfolder's shared view editor should not be able to delete the project's view", HttpStatus.SC_FORBIDDEN,
+                executeAs(SUB_VIEW_EDITOR, getSubfolderPath(), new DeleteQueryViewCommand("lists", LIST_NAME, SHARED_VIEW_NAME)));
+
+        assertViewPresent(getProjectName(), SHARED_VIEW_NAME);
+    }
+
+    @Test // GitHub Issue #1397
+    public void testReaderCannotDeleteSharedView() throws Exception
+    {
+        createSharedView(getProjectName(), SHARED_VIEW_NAME, false);
+
+        assertEquals("Reader should not be able to delete a shared view", HttpStatus.SC_FORBIDDEN,
+                executeAs(READER, getProjectName(), new DeleteQueryViewCommand("lists", LIST_NAME, SHARED_VIEW_NAME)));
+
+        assertViewPresent(getProjectName(), SHARED_VIEW_NAME);
+    }
+
+    @Test // GitHub Issue #1440
+    public void testSharedViewEditorCannotReHomeInheritedView() throws Exception
+    {
+        createSharedView(getProjectName(), SHARED_VIEW_NAME, true);
+
+        assertEquals("Subfolder's shared view editor should not be able to re-home the project's view", HttpStatus.SC_FORBIDDEN,
+                executeAs(SUB_VIEW_EDITOR, getSubfolderPath(), saveViewInContainerCommand(SHARED_VIEW_NAME, getSubfolderPath())));
+
+        assertViewPresent(getProjectName(), SHARED_VIEW_NAME);
+        assertViewAbsent(getSubfolderPath(), SHARED_VIEW_NAME);
+    }
+
+    @Test // GitHub Issue #1440
+    public void testSharedViewEditorCannotOverwriteInheritedViewFromSession() throws Exception
+    {
+        createSharedView(getProjectName(), SHARED_VIEW_NAME, true);
+
+        assertEquals("Subfolder's shared view editor should not be able to overwrite the project's view", HttpStatus.SC_FORBIDDEN,
+                executeAs(SUB_VIEW_EDITOR, getSubfolderPath(),
+                        saveSessionViewCommand(SESSION_VIEW_NAME),
+                        saveSessionViewToContainerCommand(SESSION_VIEW_NAME, SHARED_VIEW_NAME, getSubfolderPath())));
+
+        assertViewPresent(getProjectName(), SHARED_VIEW_NAME);
+        assertViewAbsent(getSubfolderPath(), SHARED_VIEW_NAME);
+    }
+
+    @Test // GitHub Issue #1397
+    public void testProjectReaderCannotDeleteInheritedView() throws Exception
+    {
+        createSharedView(getProjectName(), SHARED_VIEW_NAME, true);
+
+        assertEquals("Reading the project is not enough to delete its shared view from the subfolder", HttpStatus.SC_FORBIDDEN,
+                executeAs(READER_SUB_VIEW_EDITOR, getSubfolderPath(), new DeleteQueryViewCommand("lists", LIST_NAME, SHARED_VIEW_NAME)));
+
+        assertViewPresent(getProjectName(), SHARED_VIEW_NAME);
+    }
+
+    @Test // GitHub Issue #1397
+    public void testCompleteDeleteCannotRemoveInheritedView() throws Exception
+    {
+        createSharedView(getProjectName(), SHARED_VIEW_NAME, true);
+
+        // A 'complete' delete removes the personal view and then the view it shadows, which here is the project's
+        assertEquals("Shared view editor should be able to shadow the project's view with a personal one", HttpStatus.SC_OK,
+                executeAs(SUB_VIEW_EDITOR, getSubfolderPath(), savePersonalViewCommand(SHARED_VIEW_NAME)));
+        assertEquals("Deleting the personal view should not cascade to the project's view", HttpStatus.SC_OK,
+                executeAs(SUB_VIEW_EDITOR, getSubfolderPath(),
+                        new DeleteQueryViewCommand("lists", LIST_NAME, SHARED_VIEW_NAME).setComplete(true)));
+
+        assertViewPresent(getProjectName(), SHARED_VIEW_NAME);
+        assertViewAbsent(getSubfolderPath(), SHARED_VIEW_NAME);
+    }
+
+    @Test // GitHub Issue #1440
+    public void testProjectReaderCannotReHomeInheritedView() throws Exception
+    {
+        createSharedView(getProjectName(), SHARED_VIEW_NAME, true);
+
+        assertEquals("Reading the project is not enough to re-home its shared view into the subfolder", HttpStatus.SC_FORBIDDEN,
+                executeAs(READER_SUB_VIEW_EDITOR, getSubfolderPath(), saveViewInContainerCommand(SHARED_VIEW_NAME, getSubfolderPath())));
+
+        assertViewPresent(getProjectName(), SHARED_VIEW_NAME);
+        assertViewAbsent(getSubfolderPath(), SHARED_VIEW_NAME);
+    }
+
+    @Test // GitHub Issue #1440
+    public void testProjectReaderCannotOverwriteInheritedViewFromSession() throws Exception
+    {
+        createSharedView(getProjectName(), SHARED_VIEW_NAME, true);
+
+        assertEquals("Reading the project is not enough to overwrite its shared view from a session view", HttpStatus.SC_FORBIDDEN,
+                executeAs(READER_SUB_VIEW_EDITOR, getSubfolderPath(),
+                        saveSessionViewCommand(SESSION_VIEW_NAME),
+                        saveSessionViewToContainerCommand(SESSION_VIEW_NAME, SHARED_VIEW_NAME, getSubfolderPath())));
+
+        assertViewPresent(getProjectName(), SHARED_VIEW_NAME);
+        assertViewAbsent(getSubfolderPath(), SHARED_VIEW_NAME);
+    }
+
+    @Test // GitHub Issue #1440
+    public void testSharedViewEditorCanSaveAndUpdateViewInParentFolder() throws Exception
+    {
+        assertEquals("Shared view editor should be able to save a view into the parent folder", HttpStatus.SC_OK,
+                executeAs(VIEW_EDITOR, getSubfolderPath(), saveViewInContainerCommand(PARENT_VIEW_NAME, getProjectName())));
+        assertViewPresent(getProjectName(), PARENT_VIEW_NAME);
+
+        assertEquals("Shared view editor should be able to update the view they saved into the parent folder", HttpStatus.SC_OK,
+                executeAs(VIEW_EDITOR, getSubfolderPath(), saveViewInContainerCommand(PARENT_VIEW_NAME, getProjectName())));
+
+        assertViewPresent(getProjectName(), PARENT_VIEW_NAME);
+        assertViewAbsent(getSubfolderPath(), PARENT_VIEW_NAME);
+    }
+
+    @Test // GitHub Issue #1440
+    public void testSharedViewEditorCanSaveSessionViewToParentFolder() throws Exception
+    {
+        assertEquals("Shared view editor should be able to save a session view into the parent folder", HttpStatus.SC_OK,
+                executeAs(VIEW_EDITOR, getSubfolderPath(),
+                        saveSessionViewCommand(SESSION_VIEW_NAME),
+                        saveSessionViewToContainerCommand(SESSION_VIEW_NAME, PARENT_VIEW_NAME, getProjectName())));
+        assertViewPresent(getProjectName(), PARENT_VIEW_NAME);
+
+        assertEquals("Shared view editor should be able to overwrite the view they saved into the parent folder", HttpStatus.SC_OK,
+                executeAs(VIEW_EDITOR, getSubfolderPath(),
+                        saveSessionViewCommand(SESSION_VIEW_NAME),
+                        saveSessionViewToContainerCommand(SESSION_VIEW_NAME, PARENT_VIEW_NAME, getProjectName())));
+
+        assertViewPresent(getProjectName(), PARENT_VIEW_NAME);
+        assertViewAbsent(getSubfolderPath(), PARENT_VIEW_NAME);
+    }
+
+    private String getSubfolderPath()
+    {
+        return getProjectName() + "/" + SUBFOLDER_NAME;
+    }
+
+    private SaveQueryViewsCommand saveSharedViewCommand(String viewName, boolean inherit)
+    {
+        return new SaveQueryViewsCommand("lists", LIST_NAME).addView(viewName, List.of(COLUMN_NAME), true, inherit);
+    }
+
+    private SaveQueryViewsCommand savePersonalViewCommand(String viewName)
+    {
+        return new SaveQueryViewsCommand("lists", LIST_NAME).addView(viewName, List.of(COLUMN_NAME), false, false);
+    }
+
+    private SaveQueryViewsCommand saveViewInContainerCommand(String viewName, String containerPath)
+    {
+        return new SaveQueryViewsCommand("lists", LIST_NAME).addViewInContainer(viewName, List.of(COLUMN_NAME), containerPath);
+    }
+
+    private SaveQueryViewsCommand saveSessionViewCommand(String viewName)
+    {
+        return new SaveQueryViewsCommand("lists", LIST_NAME).addSessionView(viewName, List.of(COLUMN_NAME));
+    }
+
+    private SaveSessionViewCommand saveSessionViewToContainerCommand(String sessionViewName, String newName, String containerPath)
+    {
+        return new SaveSessionViewCommand("lists", LIST_NAME, sessionViewName, newName)
+                .setShared(true)
+                .setInherit(true)
+                .setContainerPath(containerPath);
+    }
+
+    private RenameQueryViewCommand renameCommand(String viewName, String newName)
+    {
+        return new RenameQueryViewCommand("lists", LIST_NAME, viewName, newName);
+    }
+
+    private void createSharedView(String containerPath, String viewName, boolean inherit) throws Exception
+    {
+        saveSharedViewCommand(viewName, inherit).execute(createDefaultConnection(), containerPath);
+    }
+
+    /**
+     * Runs the commands in order on a single connection while impersonating the given user, returning the HTTP status of
+     * the last one rather than throwing. Sharing the connection lets the last command act on a session view that an
+     * earlier one created; those earlier commands are setup and are expected to succeed.
+     */
+    private int executeAs(String user, String containerPath, Command<?>... commands) throws Exception
+    {
+        Connection connection = createDefaultConnection();
+        connection.impersonate(user);
+        try
+        {
+            for (int i = 0; i < commands.length - 1; i++)
+                commands[i].execute(connection, containerPath);
+
+            try
+            {
+                return commands[commands.length - 1].execute(connection, containerPath).getStatusCode();
+            }
+            catch (CommandException e)
+            {
+                return e.getStatusCode();
+            }
+        }
+        finally
+        {
+            connection.stopImpersonating();
+        }
+    }
+
+    // query.CustomViews only lists views owned by the container, so a row here proves where the view lives
+    private List<String> getCustomViewNames(String containerPath) throws Exception
+    {
+        SelectRowsCommand command = new SelectRowsCommand("query", "CustomViews");
+        command.setColumns(List.of("Name"));
+        command.addFilter("QueryName", LIST_NAME, Filter.Operator.EQUAL);
+
+        return command.execute(createDefaultConnection(), containerPath).getRows().stream()
+                .map(row -> (String) row.get("Name"))
+                .toList();
+    }
+
+    private void assertViewPresent(String containerPath, String viewName) throws Exception
+    {
+        List<String> viewNames = getCustomViewNames(containerPath);
+        assertTrue(String.format("Folder '%s' should own a view named '%s', found: %s", containerPath, viewName, viewNames),
+                viewNames.contains(viewName));
+    }
+
+    private void assertViewAbsent(String containerPath, String viewName) throws Exception
+    {
+        List<String> viewNames = getCustomViewNames(containerPath);
+        assertFalse(String.format("Folder '%s' should not own a view named '%s'", containerPath, viewName),
+                viewNames.contains(viewName));
+    }
+
     @Override
     protected BrowserType bestBrowser()
     {
@@ -261,6 +578,6 @@ public class CustomizeGridPermissionsTest extends BaseWebDriverTest
     @Override
     public List<String> getAssociatedModules()
     {
-        return Arrays.asList("list", "api");
+        return Arrays.asList("list", "api", "query");
     }
 }

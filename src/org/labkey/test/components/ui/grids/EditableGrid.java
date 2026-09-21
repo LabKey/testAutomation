@@ -73,6 +73,7 @@ import static org.labkey.test.WebDriverWrapper.waitFor;
 import static org.labkey.test.util.TestLogger.log;
 import static org.labkey.test.util.data.TestArrayDataUtils.formatMultiValueText;
 import static org.labkey.test.util.selenium.ScrollUtils.Alignment.center;
+import static org.labkey.test.util.selenium.ScrollUtils.Alignment.nearest;
 import static org.labkey.test.util.selenium.WebDriverUtils.MODIFIER_KEY;
 
 public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
@@ -1048,23 +1049,31 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     }
 
     /**
-     * Select {@code selectStart} through {@code dragEnd} and fill down from {@code selectEnd}'s row using Ctrl/Cmd+D.
+     * Select {@code selectStart} through {@code fillEnd} and fill down from {@code selectEnd}'s row using Ctrl/Cmd+D.
      * @param selectStart top-left cell of the range to select
      * @param selectEnd   cell whose value will be filled down (must be in {@code selectStart}'s row)
-     * @param dragEnd     bottom-right cell of the range to select and fill down to
+     * @param fillEnd     bottom-right cell of the range to select and fill down to
      */
-    public void fillDown(WebElement selectStart, WebElement selectEnd, WebElement dragEnd)
+    public void fillDown(WebElement selectStart, WebElement selectEnd, WebElement fillEnd)
     {
-        selectCellRange(selectStart, dragEnd);
+        selectCellRange(selectStart, fillEnd);
         String fillValue = getCellValue(selectEnd);
         new Actions(getDriver()).keyDown(MODIFIER_KEY).sendKeys("d").keyUp(MODIFIER_KEY).build().perform();
-        WebDriverWrapper.waitFor(() -> fillValue.equals(getCellValue(dragEnd)),
+        WebDriverWrapper.waitFor(() -> fillValue.equals(getCellValue(fillEnd)),
                 "Fill-down did not populate end cell with value: " + fillValue, 3_000);
     }
 
+    /**
+     * Select the rectangle of cells with {@code startCell} and {@code endCell} at opposite corners. Shift-click is
+     * used rather than a drag; a drag can only reach cells that stay on screen for the whole gesture.
+     */
     public void selectCellRange(WebElement startCell, WebElement endCell)
     {
-        dragToCell(startCell, endCell);
+        dismissPopover();
+        selectCell(startCell);
+
+        getWrapper().scrollIntoView(endCell);
+        new Actions(getDriver()).keyDown(Keys.SHIFT).click(endCell).keyUp(Keys.SHIFT).build().perform();
 
         WebDriverWrapper.waitFor(()-> isInSelection(startCell) && isInSelection(endCell),
                 "Cell range did not become selected", 2000);
@@ -1074,6 +1083,10 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     {
         var size = destinationCell.getSize();
         dismissPopover();
+
+        // Scroll before the pointer picks anything up: scrolling with the button held skips the rows it scrolls past.
+        ScrollUtils.scrollIntoView(destinationCell, nearest, nearest);
+        ScrollUtils.scrollUnderFloatingHeader(elementToDrag);
 
         new Actions(getDriver())
                 // WebDriver doesn't calculate correct location to click the cell selection handle
@@ -1137,7 +1150,8 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
     private void activateCell(WebElement cell)
     {
         // If it is a selector, and it already has focus (is active), it will not have a div.cellular-display
-        if (Locator.tagWithClass("div", "select-input__control--is-focused").findElements(cell).isEmpty())
+        if (Locators.focusedSelect.findElements(cell).isEmpty()
+                && Locators.inputCell.findElements(cell).isEmpty())
             sendKeysToCell(cell, Keys.ENTER);
     }
 
@@ -1165,9 +1179,8 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         catch (NoSuchElementException nse)
         {
             // If the cell is an open/active reactSelect the class attribute is different.
-            return Locator.tagWithClass("div", "select-input__control")
-                    .findElement(cell)
-                    .getDomAttribute("class").contains("select-input__control--is-focused");
+            return !Locators.focusedSelect.findElements(cell).isEmpty()
+                    || !Locators.inputCell.findElements(cell).isEmpty();
         }
     }
 
@@ -1420,6 +1433,7 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         static final Locator.XPathLocator rows = Locator.tag("tbody").childTag("tr").withoutClass("grid-empty").withoutClass("grid-loading");
         static final Locator headerCells = Locator.css("thead tr th");
         static final Locator inputCell = Locator.css(".eg-input-cell");
+        static final Locator focusedSelect = Locator.tagWithClass("div", "select-input__control--is-focused");
         static final Locator popover = Locator.byClass("popover");
     }
 

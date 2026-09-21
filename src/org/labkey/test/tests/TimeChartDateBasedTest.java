@@ -122,7 +122,7 @@ public class TimeChartDateBasedTest extends TimeChartTest
 
     private static final String SVG_AXIS_X =              "0\n50\n100\n150\n200\n0\n50000\n1e+5\n1.5e+5\n2e+5\n2.5e+5\n3e+5\n3.5e+5\n4e+5\n4.5e+5\n5e+5\n5.5e+5\n6e+5\n6.5e+5\n200\n300\n400\n500\n600\n700\n800\n900\n1000\n1100\n1200\n1300\nHIV Test Results, Lab Results\n249320107\nDays Since Start Date\nViral Load Quantified (copies/ml)\nCD4+ (cells/mm3)\n249320107 CD4+(cells/mm3)\n249320107 Viral LoadQuantified (copies/ml)";
     private static final String SVG_AXIS_X_LEFT =         "0\n50\n100\n150\n200\n2e+5\n2.1e+5\n2.2e+5\n2.3e+5\n2.4e+5\n2.5e+5\n2.6e+5\n2.7e+5\n200\n300\n400\n500\n600\n700\n800\n900\n1000\n1100\n1200\n1300\nHIV Test Results, Lab Results\n249320107\nDays Since Start Date\nViral Load Quantified (copies/ml)\nCD4+ (cells/mm3)\n249320107 CD4+(cells/mm3)\n249320107 Viral LoadQuantified (copies/ml)";
-    private static final String SVG_AXIS_X_LEFT_RIGHT =   "0\n50\n100\n150\n200\n2e+5\n2.1e+5\n2.2e+5\n2.3e+5\n2.4e+5\n2.5e+5\n2.6e+5\n2.7e+5\n250\n300\n350\n400\n450\n500\n550\n600\nHIV Test Results, Lab Results\n249320107\nDays Since Start Date\nViral Load Quantified (copies/ml)\nCD4+ (cells/mm3)\n249320107 CD4+(cells/mm3)\n249320107 Viral LoadQuantified (copies/ml)";
+    private static final String SVG_AXIS_X_LEFT_RIGHT =   "0\n50\n100\n150\n200\n2e+5\n2.1e+5\n2.2e+5\n2.3e+5\n2.4e+5\n2.5e+5\n2.6e+5\n2.7e+5\n250\n300\n350\n400\n450\n500\n550\n600\n650\nHIV Test Results, Lab Results\n249320107\nDays Since Start Date\nViral Load Quantified (copies/ml)\nCD4+ (cells/mm3)\n249320107 CD4+(cells/mm3)\n249320107 Viral LoadQuantified (copies/ml)";
     private static final String AXIS_TIME_CHART = "Axis Time Chart";
     @LogMethod private void axisRangeTest()
     {

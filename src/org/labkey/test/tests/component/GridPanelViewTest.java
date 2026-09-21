@@ -17,7 +17,6 @@ package org.labkey.test.tests.component;
 
 import org.assertj.core.api.Assertions;
 import org.jetbrains.annotations.Nullable;
-import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -31,7 +30,6 @@ import org.labkey.remoteapi.query.Sort;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.WebTestHelper.DatabaseType;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.bootstrap.ModalDialog;
@@ -98,10 +96,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
     public static final List<String> TEXT_MULTI_CHOICE_LIST = randomTextChoice(10, ";");
     public static final String COL_MULTITEXTCHOICE = "Multi Choice";
 
-    private static final boolean MULTI_CHOICE_ENABLED = WebTestHelper.getDatabaseType() == DatabaseType.PostgreSQL;
-    private static final List<String> DEFAULT_COLUMNS = MULTI_CHOICE_ENABLED
-            ? Arrays.asList(COL_NAME, COL_INT, COL_STRING1, COL_STRING2, COL_BOOL, COL_MULTITEXTCHOICE)
-            : Arrays.asList(COL_NAME, COL_INT, COL_STRING1, COL_STRING2, COL_BOOL);
+    private static final List<String> DEFAULT_COLUMNS = Arrays.asList(COL_NAME, COL_INT, COL_STRING1, COL_STRING2, COL_BOOL, COL_MULTITEXTCHOICE);
 
     // Will keep track of state of the columns, that is are they filtered, sorted, or have no modifiers.
     private static Map<String, Integer> defaultColumnState = new HashMap<>();
@@ -213,9 +208,8 @@ public class GridPanelViewTest extends GridPanelBaseTest
                 new FieldDefinition(COL_STRING1, FieldDefinition.ColumnType.String),
                 new FieldDefinition(COL_STRING2, FieldDefinition.ColumnType.String),
                 new FieldDefinition(COL_BOOL, FieldDefinition.ColumnType.Boolean)));
-        if (MULTI_CHOICE_ENABLED)
-            fields.add(new FieldDefinition(COL_MULTITEXTCHOICE, FieldDefinition.ColumnType.MultiValueTextChoice)
-                    .setMultiChoiceValues(TEXT_MULTI_CHOICE_LIST));
+        fields.add(new FieldDefinition(COL_MULTITEXTCHOICE, FieldDefinition.ColumnType.MultiValueTextChoice)
+                .setMultiChoiceValues(TEXT_MULTI_CHOICE_LIST));
 
         createSampleType(VIEW_DIALOG_ST, VIEW_DIALOG_ST_PREFIX, VIEW_DIALOG_ST_SIZE, fields);
 
@@ -262,12 +256,9 @@ public class GridPanelViewTest extends GridPanelBaseTest
             rowData.put(COL_STRING1, stringSets.get(allPossibleIndex));
             rowData.put(COL_STRING2, stringSetMembers.get(memIndex));
             rowData.put(COL_BOOL, sampleId % 2 == 0);
-            if (MULTI_CHOICE_ENABLED)
-            {
-                rowData.put(COL_MULTITEXTCHOICE, sampleId % 5 == 0
-                        ? List.of()
-                        : List.of(TEXT_MULTI_CHOICE_LIST.get(Math.abs(name.hashCode()) % TEXT_MULTI_CHOICE_LIST.size())));
-            }
+            rowData.put(COL_MULTITEXTCHOICE, sampleId % 5 == 0
+                    ? List.of()
+                    : List.of(TEXT_MULTI_CHOICE_LIST.get(Math.abs(name.hashCode()) % TEXT_MULTI_CHOICE_LIST.size())));
             sampleSetDataGenerator.addCustomRow(rowData);
 
             allPossibleIndex++;
@@ -522,6 +513,12 @@ public class GridPanelViewTest extends GridPanelBaseTest
         checker().verifyFalse("The 'Make default' checkbox should not be checked.",
                 saveViewDialog.isMakeDefaultChecked());
 
+        // GitHub Issue #696: nothing but a column was changed, so both sections show their empty message.
+        checker().verifyEquals("Save view dialog should report that no filters will be saved.",
+                "No filters applied", saveViewDialog.getNoFiltersMessage());
+        checker().verifyEquals("Save view dialog should report that no sort will be saved.",
+                "No sort applied", saveViewDialog.getNoSortsMessage());
+
         checker().screenShotIfNewError("testDefaultViewRemoveColumn_Save_View_Dialog_Defaults_Error");
 
         saveViewDialog.setMakeDefault();
@@ -647,6 +644,15 @@ public class GridPanelViewTest extends GridPanelBaseTest
             saveViewDialog.setMakeShared(false);
             savedViewsForDefaultSampleType.add(viewName);
         }
+
+        // GitHub Issue #696: the dialog shows the filters and sorts that will be saved with the view.
+        checker().verifyEquals("Filters listed in the save view dialog not as expected.",
+                        List.of(expectedPillText), saveViewDialog.getFilterValues());
+        checker().verifyEquals("Sorts listed in the save view dialog not as expected.",
+                List.of(colToSort), saveViewDialog.getSortValues());
+        checker().verifyEquals("Sort direction shown in the save view dialog not as expected.",
+                SortDirection.ASC, saveViewDialog.getSortDirection(colToSort));
+        checker().screenShotIfNewError("SaveViewModal_Filter_Sort_Display");
 
         saveViewDialog.saveView();
 
@@ -816,9 +822,6 @@ public class GridPanelViewTest extends GridPanelBaseTest
 
         log(String.format("Remove the filter '%s' and validate grid is now in '%s' mode.", expectedFilter1Text, EDITED_ALERT));
         grid.removeFilter(expectedFilter1Text);
-
-        // On MSSQL/Windows grid.getRows isn't always updated, pause just a moment to let the test code catch up.
-        sleep(500);
 
         validateGridHeader(testName, grid, EDITED_ALERT, true);
 
@@ -991,6 +994,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
         log(String.format("Save the view name as '%s'.", trickyViewName));
 
         saveViewDialog.setViewName(trickyViewName)
+                .setMakeShared(false)
                 .saveView();
 
         // Add this view name to the list of views.
@@ -1084,9 +1088,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
                 customizeModal.isAvailableFieldSelected(columnToAdd));
 
         log("Validate that the order of the fields in the 'Shown in Grid' column are as expected.");
-        expectedFields = MULTI_CHOICE_ENABLED
-                ? List.of(COL_NAME, COL_STRING1, COL_STRING2, COL_INT, COL_BOOL, COL_MULTITEXTCHOICE)
-                : List.of(COL_NAME, COL_STRING1, COL_STRING2, COL_INT, COL_BOOL);
+        expectedFields = List.of(COL_NAME, COL_STRING1, COL_STRING2, COL_INT, COL_BOOL, COL_MULTITEXTCHOICE);
         checker().verifyEquals(String.format("After adding '%s' fields displayed in 'Show in Grid' panel not as expected.", columnToAdd),
                 expectedFields, customizeModal.getSelectedFieldLabels());
 
@@ -1248,7 +1250,12 @@ public class GridPanelViewTest extends GridPanelBaseTest
         String viewName1 = String.format("No %s", fieldRemoved1);
         log(String.format("Use the 'Save' button on the grid to save the view as '%s'.", viewName1));
         SaveViewDialog saveViewDialog = grid.clickSaveButton(true);
+
+        log("GitHub Issue #899: Expect shared checkbox for session view to match original / shadowed view");
+        checker().verifyTrue("View should default to shared", saveViewDialog.isMakeSharedChecked());
+
         saveViewDialog.setViewName(viewName1)
+                .setMakeShared(false)
                 .saveView();
 
         log(String.format("Go back to '%s' and create a new view.", VIEW_DEFAULT));
@@ -1266,6 +1273,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
         log(String.format("Use the menu to save the view as '%s'. This is now the current view.", viewName2));
         saveViewDialog = grid.saveView();
         saveViewDialog.setViewName(viewName2)
+                .setMakeShared(false)
                 .saveView();
 
         ManageViewsDialog manageViewsDialog = grid.manageViews();
@@ -1361,6 +1369,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
         String viewName3 = "No Bool";
         log(String.format("Change view name to something new, '%s' and validate save works as expected.", viewName3));
         saveViewDialog.setViewName(viewName3);
+        saveViewDialog.setMakeShared(false);
         saveViewDialog.saveView();
 
         checker().withScreenshot("New_View_Name_Error")
@@ -1387,6 +1396,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
         grid.hideColumn(fieldRemoved1);
         saveViewDialog = grid.saveView();
         saveViewDialog.setViewName(viewName1);
+        saveViewDialog.setMakeShared(false);
         saveViewDialog.saveView();
 
         manageViewsDialog = grid.manageViews();
@@ -1490,7 +1500,6 @@ public class GridPanelViewTest extends GridPanelBaseTest
     @Test
     public void testCustomGridViewsMVTCtoTC() throws Exception
     {
-        Assume.assumeTrue("Multi-choice text fields are only supported on PostgreSQL", MULTI_CHOICE_ENABLED);
         goToProjectHome();
         resetFieldToMVTC();
         resetDefaultView(DEFAULT_VIEW_SAMPLE_TYPE, DEFAULT_COLUMNS);
@@ -1543,7 +1552,6 @@ public class GridPanelViewTest extends GridPanelBaseTest
     @Test
     public void testCustomGridViewsTCtoMVTC() throws Exception
     {
-        Assume.assumeTrue("Multi-choice text fields are only supported on PostgreSQL", MULTI_CHOICE_ENABLED);
         goToProjectHome();
         resetFieldToMVTC();
         resetDefaultView(DEFAULT_VIEW_SAMPLE_TYPE, DEFAULT_COLUMNS);
@@ -1596,7 +1604,6 @@ public class GridPanelViewTest extends GridPanelBaseTest
     @Test
     public void testCustomGridViewsMVTCtoText() throws Exception
     {
-        Assume.assumeTrue("Multi-choice text fields are only supported on PostgreSQL", MULTI_CHOICE_ENABLED);
         goToProjectHome();
         resetFieldToMVTC();
         resetDefaultView(DEFAULT_VIEW_SAMPLE_TYPE, DEFAULT_COLUMNS);

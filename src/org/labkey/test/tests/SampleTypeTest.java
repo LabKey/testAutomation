@@ -107,7 +107,6 @@ public class SampleTypeTest extends BaseWebDriverTest
     private static final String LOWER_CASE_SAMPLE_TYPE = CASE_INSENSITIVE_SAMPLE_TYPE.toLowerCase();
     private static final String UPPER_CASE_SAMPLE_TYPE = CASE_INSENSITIVE_SAMPLE_TYPE.toUpperCase();
     private static final TestUser USER_FOR_FILTERTEST = new TestUser("filter_user@sampletypetest.test");
-    boolean IS_POSTGRES = WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.PostgreSQL;
 
     @Override
     public List<String> getAssociatedModules()
@@ -2105,10 +2104,8 @@ public class SampleTypeTest extends BaseWebDriverTest
 
     private void verifyTableIndexNonUnique(String prefix, String suffix, boolean isUnique)
     {
-        String boolDisplay = isUnique ? "0" : "1";
-        if (IS_POSTGRES) boolDisplay = isUnique ? "false" : "true";
-        String fieldKey = prefix + suffix;
-        if (IS_POSTGRES) fieldKey = fieldKey.toLowerCase();
+        String boolDisplay = isUnique ? "false" : "true";
+        String fieldKey = (prefix + suffix).toLowerCase();
         Locator locator = Locator.xpath("//td[contains(text(), '" + fieldKey + "')]/preceding-sibling::td[2][text()='" + boolDisplay + "']");
         checker().verifyTrue("Non_Unique value not as expected in metadata for locator: " + locator, locator.existsIn(getDriver()));
     }

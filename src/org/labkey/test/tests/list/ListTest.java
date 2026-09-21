@@ -18,7 +18,6 @@ package org.labkey.test.tests.list;
 
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.MatcherAssert;
-import org.junit.Assume;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -109,7 +108,6 @@ public class ListTest extends BaseWebDriverTest
     protected final static String LIST_NAME_HTML_KEY = "A_HtmlKey_" + DOMAIN_TRICKY_CHARACTERS;
     protected final static ColumnType LIST_KEY_TYPE = ColumnType.String;
     protected final static String LIST_KEY_NAME = "Key";
-    boolean IS_POSTGRES = WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.PostgreSQL;
 
     protected final static String LIST_KEY_NAME2 = "Color \"`~!@#$%^&*()_-+={}[]|\\:;<>,.?/";
     protected final static String LIST_KEY_NAME2_BULK = "\"Color \"\"`~!@#$%^&*()_-+={}[]|\\:;<>,.?/\"";
@@ -637,15 +635,7 @@ public class ListTest extends BaseWebDriverTest
         log("Check Customize View worked");
         assertTextPresent(TEST_DATA[TD_COLOR][3]);
 
-        // Sorting is different between MSSQL and postgres if one of the values is empty / blank.
-        if (WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.MicrosoftSQLServer)
-        {
-            assertTextPresentInThisOrder(TEST_DATA[TD_COLOR][3], TEST_DATA[TD_COLOR][1], TEST_DATA[TD_COLOR][2]);
-        }
-        else
-        {
-            assertTextPresentInThisOrder(TEST_DATA[TD_COLOR][1], TEST_DATA[TD_COLOR][2], TEST_DATA[TD_COLOR][3]);
-        }
+        assertTextPresentInThisOrder(TEST_DATA[TD_COLOR][1], TEST_DATA[TD_COLOR][2], TEST_DATA[TD_COLOR][3]);
 
         assertTextNotPresent(TEST_DATA[TD_COLOR][0], _listColGood.getLabel());
 
@@ -665,14 +655,7 @@ public class ListTest extends BaseWebDriverTest
         File tableFile = new DataRegionExportHelper(new DataRegionTable("query", getDriver())).exportText();
         TextSearcher tsvSearcher = new TextSearcher(tableFile);
 
-        if (WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.MicrosoftSQLServer)
-        {
-            assertTextPresentInThisOrder(tsvSearcher, TEST_DATA[TD_COLOR][3], TEST_DATA[TD_COLOR][1], TEST_DATA[TD_COLOR][2]);
-        }
-        else
-        {
-            assertTextPresentInThisOrder(tsvSearcher, TEST_DATA[TD_COLOR][1], TEST_DATA[TD_COLOR][2], TEST_DATA[TD_COLOR][3]);
-        }
+        assertTextPresentInThisOrder(tsvSearcher, TEST_DATA[TD_COLOR][1], TEST_DATA[TD_COLOR][2], TEST_DATA[TD_COLOR][3]);
 
         assertTextNotPresent(tsvSearcher, TEST_DATA[TD_COLOR][0], _listColGood.getLabel());
         filterTest();
@@ -1779,7 +1762,6 @@ public class ListTest extends BaseWebDriverTest
         listDefinitionPage.clickSave();
 
         String expectedDataChanges = "Indices: [field name1, unique: true, fieldname@3, unique: false, fieldname_2, unique: true] > [FieldName@3, unique: true, fieldName_2, unique: false]";
-        if (!IS_POSTGRES) expectedDataChanges = "Indices: [FieldName@3, unique: false, field Name1, unique: true, fieldName_2, unique: true] > [FieldName@3, unique: true, fieldName_2, unique: false]";
         expectedDomainEvent = new AuditLogHelper.DetailedAuditEventRow(null, listName, null,
                 "The descriptor of domain " + listName + " was updated.",
                 "", null, null, expectedDataChanges);
@@ -1838,7 +1820,6 @@ public class ListTest extends BaseWebDriverTest
     @Test
     public void testMultiChoiceValues() throws IOException, CommandException
     {
-        Assume.assumeTrue("Multi-choice text fields are only supported on PostgreSQL", WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.PostgreSQL);
         // Setup a list with an auto-increment key and a multi-value text choice field.
         String encodedListName = TestDataGenerator.randomDomainName("multiChoiceList", DomainUtils.DomainKind.IntList);
         String keyName = TestDataGenerator.randomFieldName("'><script>alert(\":(\")</script>'");
@@ -1996,10 +1977,8 @@ public class ListTest extends BaseWebDriverTest
 
     private void verifyTableIndexNonUnique(String prefix, String suffix, boolean isUnique)
     {
-        String boolDisplay = isUnique ? "0" : "1";
-        if (IS_POSTGRES) boolDisplay = isUnique ? "false" : "true";
-        String fieldKey = prefix + suffix;
-        if (IS_POSTGRES) fieldKey = fieldKey.toLowerCase();
+        String boolDisplay = isUnique ? "false" : "true";
+        String fieldKey = (prefix + suffix).toLowerCase();
         Locator locator = Locator.xpath("//td[contains(text(), '" + fieldKey + "')]/preceding-sibling::td[2][text()='" + boolDisplay + "']");
         checker().verifyTrue("Non_Unique value not as expected in metadata for locator: " + locator, locator.existsIn(getDriver()));
     }

@@ -245,7 +245,7 @@ public class LinePlotTest extends GenericChartsTest
         checker().verifyEquals("Point count in line plot not as expected", 19, Locator.css("svg g.error-bar").findElements(getDriver()).size());
     }
 
-    private static final String LINE_PLOT_DR_1 = "60\n65\n70\n75\n80\n85\n90\n50\n55\n60\n65\n70\n75\n80\n85\n90\n95\n100\n105\n110\nAPX-1: Abbreviated Physical Exam\n4. Pulse\n1. Weight";
+    private static final String LINE_PLOT_DR_1 = "60\n65\n70\n75\n80\n85\n90\n50\n60\n70\n80\n90\n100\n110\nAPX-1: Abbreviated Physical Exam\n4. Pulse\n1. Weight";
     private static final String LINE_PLOT_DR_2 = "60\n70\n80\n90\n100\n110\n60\n80\n100\n120\n140\n160\n180\n200\nAPX-1: Abbreviated Physical Exam\n4. Pulse\n1. Weight";
     private static final String LINE_PLOT_NAME_DR = "DataRegionLinePlot";
     private static final String LINE_PLOT_DESC_DR = "This line plot was created through a data region's 'Views' menu";
@@ -281,7 +281,7 @@ public class LinePlotTest extends GenericChartsTest
         savePlot(LINE_PLOT_NAME_DR, LINE_PLOT_DESC_DR);
     }
 
-    private static final String LINE_PLOT_QC = "0\n200000\n400000\n600000\n800000\n1000000\n1200000\n0\n1e+7\n2e+7\n3e+7\n4e+7\n5e+7\n6e+7\n7e+7\n8e+7\n9e+7\n1e+8\n1.1e+8\n1.2e+8\nTypes\nInteger\nDouble";
+    private static final String LINE_PLOT_QC = "0\n200000\n400000\n600000\n800000\n1000000\n1200000\n0\n2e+7\n4e+7\n6e+7\n8e+7\n1e+8\n1.2e+8\nTypes\nInteger\nDouble";
     private static final String LINE_PLOT_NAME_QC = "QuickChartLinePlot";
     private static final String LINE_PLOT_DESC_QC = "This line plot was created through the 'Quick Chart' column header menu option";
     @LogMethod

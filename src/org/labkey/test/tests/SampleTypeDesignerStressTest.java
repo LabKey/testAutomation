@@ -28,7 +28,6 @@ import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldInfo;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.PortalHelper;
-import org.labkey.test.util.PostgresOnlyTest;
 import org.labkey.test.util.SampleTypeHelper;
 import org.labkey.test.util.exp.SampleTypeAPIHelper;
 import org.labkey.test.util.query.QueryApiHelper;
@@ -43,7 +42,7 @@ import java.util.Map;
 import java.util.Random;
 
 @Category({Daily.class})
-public class SampleTypeDesignerStressTest extends BaseWebDriverTest implements PostgresOnlyTest
+public class SampleTypeDesignerStressTest extends BaseWebDriverTest
 {
 
     private static final String PROJECT_NAME = "SampleType Designer Stress Test";

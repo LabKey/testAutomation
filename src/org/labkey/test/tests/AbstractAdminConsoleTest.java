@@ -21,7 +21,6 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.PermissionsHelper;
 
-import java.util.Arrays;
 import java.util.List;
 
 import static org.labkey.test.util.PermissionsHelper.APP_ADMIN_ROLE;
@@ -41,7 +40,7 @@ public abstract class AbstractAdminConsoleTest extends BaseWebDriverTest
     @Override
     public List<String> getAssociatedModules()
     {
-        return Arrays.asList("admin");
+        return null;
     }
 
     @Override

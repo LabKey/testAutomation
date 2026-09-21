@@ -117,9 +117,9 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     {
         sampleManagerStarter,
         sampleManagerProfessional,
-        labkeyLims,
         limsStarter,
         limsEnterprise,
+        biologics,
     }
 
     public boolean isGuestModeTest()
@@ -321,22 +321,31 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         }
     }
 
-    protected void acceptTermsOfUse(String termsText, boolean clickAgree)
+    protected boolean acceptTermsOfUse(String termsText, boolean clickAgree)
     {
+        boolean signed = false;
         Optional<WebElement> optionalCheckbox = Locators.termsOfUseCheckbox().findOptionalElement(getDriver());
-        optionalCheckbox.ifPresent(termsCheckbox ->
+
+        if (optionalCheckbox.isPresent())
         {
-            if (termsCheckbox.isDisplayed())
+
+            if (optionalCheckbox.get().isDisplayed())
             {
-                checkCheckbox(termsCheckbox);
+                checkCheckbox(optionalCheckbox.get());
                 if (null != termsText)
                 {
                     assertTextPresent(termsText);
                 }
                 if (clickAgree)
+                {
                     clickButton("Agree");
+                    signed = true;
+                }
             }
-        });
+        }
+
+        return signed;
+
     }
 
     @LogMethod
@@ -1300,9 +1309,20 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     @LogMethod(quiet = true)
     public void enableEmailRecorder()
     {
+        setEmailRecord(true);
+    }
+
+    @LogMethod(quiet = true)
+    public void disableEmailRecorder()
+    {
+        setEmailRecord(false);
+    }
+
+    private void setEmailRecord(boolean record)
+    {
         assumeTestModules();
-        int responseCode = getHttpResponse(buildURL("dumbster", "setRecordEmail", Maps.of("record", "true")), "POST").getResponseCode();
-        assertEquals("Failed to enable email recording", HttpStatus.SC_OK, responseCode);
+        int responseCode = getHttpResponse(buildURL("dumbster", "setRecordEmail", Maps.of("record", String.valueOf(record))), "POST").getResponseCode();
+        assertEquals("Failed to " + (record ? "enable" : "disable") + " email recording", HttpStatus.SC_OK, responseCode);
     }
 
     public EmailRecordTable goToEmailRecord()

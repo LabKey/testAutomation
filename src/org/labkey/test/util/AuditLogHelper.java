@@ -122,7 +122,8 @@ public class AuditLogHelper
         SAMPLE_TIMELINE_EVENT("SampleTimelineEvent"),
         SAMPLE_WORKFLOW_AUDIT_EVENT("SamplesWorkflowAuditEvent"),
         SOURCES_AUDIT_EVENT("SourcesAuditEvent"), // available with SampleManagement module
-        TRANSACTION_AUDIT_EVENT("TransactionAuditEvent");
+        TRANSACTION_AUDIT_EVENT("TransactionAuditEvent"),
+        USER_AUDIT_EVENT("UserAuditEvent");
 
         private final String _name;
 
@@ -210,12 +211,17 @@ public class AuditLogHelper
         return getAuditLogsFromLKS(containerPath, _wrapper.getCurrentProject(), auditEvent, columnNames, filters, maxRows, containerFilter);
     }
 
-    public SelectRowsResponse getAuditLogsFromLKS(String containerPath, @NotNull String projectName, AuditEvent auditEvent, List<String> columnNames,
+    /**
+     * @param projectName Name of the project to filter to. If null or empty, no project filter is applied (e.g. for
+     *                     events logged against the root container, which don't belong to any project).
+     */
+    public SelectRowsResponse getAuditLogsFromLKS(String containerPath, @Nullable String projectName, AuditEvent auditEvent, List<String> columnNames,
                                                   @Nullable List<Filter> filters, @Nullable Integer maxRows, @Nullable ContainerFilter containerFilter) throws IOException, CommandException
     {
         SelectRowsCommand cmd = new SelectRowsCommand("auditLog", auditEvent.getName());
         cmd.setColumns(columnNames);
-        cmd.addFilter("ProjectId/Name", projectName, Filter.Operator.EQUAL);
+        if (StringUtils.isNotEmpty(projectName))
+            cmd.addFilter("ProjectId/Name", projectName, Filter.Operator.EQUAL);
         if (filters != null)
             filters.forEach(cmd::addFilter);
         if (maxRows != null)

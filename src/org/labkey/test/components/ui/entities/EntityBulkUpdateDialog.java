@@ -357,10 +357,15 @@ public class EntityBulkUpdateDialog extends EntityBulkDialog
             names.add(FieldKey.fromFieldKey(attribute).getFullName());
         }
 
-        // Amount and Units is an example that has a "hide-label" for StoredAmount
+        // Amount and Units is an example that has a "hide-label" for StoredAmount. A hidden label renders no
+        // data-fieldkey span, so the field key comes from the name of the control the label points at.
         List<WebElement> hiddenLabels = Locator.tagWithClass("label", "hide-label").withAttribute("for")
                 .findElements(elementCache());
-        names.addAll(hiddenLabels.stream().map(a -> FieldKey.fromFieldKey(a.getDomAttribute("for")).getFullName()).toList());
+        for (WebElement label : hiddenLabels)
+        {
+            WebElement control = Locator.id(label.getDomAttribute("for")).findElement(elementCache());
+            names.add(FieldKey.fromFieldKey(control.getDomAttribute("name")).getFullName());
+        }
 
         return names;
     }

@@ -17,6 +17,7 @@ package org.labkey.test.components.ui.grids;
 
 import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
+import org.labkey.test.SortDirection;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
@@ -24,11 +25,16 @@ import org.labkey.test.components.html.RadioButton;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import java.util.List;
+
 /**
  * Dialog used to save a grid view in an app.
  */
 public class SaveViewDialog extends ModalDialog
 {
+    private static final int FILTER_SECTION = 0;
+    private static final int SORT_SECTION = 1;
+
     QueryGrid grid;
 
     public SaveViewDialog(WebDriver driver, QueryGrid grid)
@@ -183,6 +189,81 @@ public class SaveViewDialog extends ModalDialog
     public boolean isMakeSharedVisible()
     {
         return elementCache().makeShared.isDisplayed();
+    }
+
+    /**
+     * Get the text of the filter pills listed in the dialog.
+     *
+     * @return Filter pill text, empty if the dialog shows the 'no filters' message instead.
+     */
+    public List<String> getFilterValues()
+    {
+        return getSectionValues(FILTER_SECTION);
+    }
+
+    /**
+     * Get the message shown in place of the filter pills when the view will be saved with no filters.
+     *
+     * @return The message, or an empty string if filter pills are shown.
+     */
+    public String getNoFiltersMessage()
+    {
+        return getSectionMessage(FILTER_SECTION);
+    }
+
+    /**
+     * Get the text of the sort pills listed in the dialog. A sort pill shows only the column label; use
+     * {@link #getSortDirection(String)} for the direction.
+     *
+     * @return Sort pill text, empty if the dialog shows the 'no sort' message instead.
+     */
+    public List<String> getSortValues()
+    {
+        return getSectionValues(SORT_SECTION);
+    }
+
+    /**
+     * Get the message shown in place of the sort pills when the view will be saved with no sorts.
+     *
+     * @return The message, or an empty string if sort pills are shown.
+     */
+    public String getNoSortsMessage()
+    {
+        return getSectionMessage(SORT_SECTION);
+    }
+
+    /**
+     * Get the direction of a sort pill. The pill conveys direction only through its icon.
+     *
+     * @param sortValue Text of the sort pill, as returned by {@link #getSortValues()}.
+     * @return The direction the column will be sorted.
+     */
+    public SortDirection getSortDirection(String sortValue)
+    {
+        WebElement pill = Locator.tagWithClass("div", "filter-status-value").withText(sortValue)
+                .waitForElement(getSection(SORT_SECTION), 5_000);
+        String iconClass = Locator.tagWithClass("i", "symbol").findElement(pill).getAttribute("class");
+        return iconClass.contains("fa-sort-amount-desc") ? SortDirection.DESC : SortDirection.ASC;
+    }
+
+    private List<String> getSectionValues(int section)
+    {
+        return Locator.tagWithClass("div", "filter-status-value")
+                .findElements(getSection(section))
+                .stream().map(WebElement::getText)
+                .toList();
+    }
+
+    private String getSectionMessage(int section)
+    {
+        WebElement message = Locator.tagWithClass("div", "save-view-modal__no-action-values")
+                .findElementOrNull(getSection(section));
+        return message == null ? "" : message.getText();
+    }
+
+    private WebElement getSection(int section)
+    {
+        return Locator.tagWithClass("div", "save-view-modal__action-values").findElements(this).get(section);
     }
 
     /**

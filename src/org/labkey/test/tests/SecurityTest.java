@@ -306,7 +306,19 @@ public class SecurityTest extends BaseWebDriverTest
     @LogMethod
     protected void disableGuestAccountTest()
     {
+        // Guests hold Reader on the project, so the API is reachable as guest until the account is disabled
+        new ApiPermissionsHelper(this).setSiteGroupPermissions("Guests", READER_ROLE);
+        String apiUrl = buildURL("query", getProjectName(), "getSchemas");
+        checker().verifyEquals("Basic auth as 'guest' should succeed while guest account is enabled",
+                HttpStatus.SC_OK, getHttpResponse(apiUrl, "guest", "guest").getResponseCode());
+
         OptionalFeatureHelper.setOptionalFeature(createDefaultConnection(), "disableGuestAccount", true);
+
+        checker().verifyEquals("Anonymous API request should be rejected when guest account is disabled",
+                HttpStatus.SC_UNAUTHORIZED, getHttpResponse(apiUrl, "GET", null, null, null).getResponseCode());
+        // Basic auth with the reserved "guest" username must not resurrect the guest account
+        checker().verifyEquals("Basic auth as 'guest' should be rejected when guest account is disabled",
+                HttpStatus.SC_UNAUTHORIZED, getHttpResponse(apiUrl, "guest", "guest").getResponseCode());
 
         goToHome();
         signOut();

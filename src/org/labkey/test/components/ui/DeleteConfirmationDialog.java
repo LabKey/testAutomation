@@ -107,13 +107,17 @@ public class DeleteConfirmationDialog<ConfirmPage extends WebDriverWrapper> exte
 
     public ConfirmPage confirmDelete(Integer waitSeconds)
     {
-        Integer count = getCountFromTitle();
+        return confirmDelete(waitSeconds, getCountFromTitle());
+    }
+
+    public ConfirmPage confirmDelete(Integer waitSeconds, Integer expectedAuditCount)
+    {
         AuditLogHelper.AuditEvent auditEventName = getAuditEvent();
 
         var confirmPage = _confirmationSynchronizationFunction.apply(() -> this.dismiss("Yes, Delete", waitSeconds));
 
-        if (!skipAuditEventCheck && count != null && auditEventName != null && !TestProperties.isTrialServer())
-            verifyAuditEvents(getWrapper(), getWrapper().getCurrentProject(), auditEventName, count);
+        if (!skipAuditEventCheck && expectedAuditCount != null && auditEventName != null && !TestProperties.isTrialServer())
+            verifyAuditEvents(getWrapper(), getWrapper().getCurrentProject(), auditEventName, expectedAuditCount);
 
         return confirmPage;
     }

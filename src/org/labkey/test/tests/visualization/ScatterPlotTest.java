@@ -170,7 +170,7 @@ public class ScatterPlotTest extends GenericChartsTest
 
         // now filter on the other run and verify expected results
         dataPage = AssayRunsPage.beginAt(this, getProjectName(), protocolId).clickAssayIdLink("secondRun");
-        String secondRunExpected = "63.56464.56565.56666.567171172173174175176177178Dataweightheight";
+        String secondRunExpected = "6363.56464.56565.56666.567171172173174175176177178Dataweightheight";
         dataPage.getDataTable().clickReportMenu(false,"HeightWeightAll");
         assertSVG(secondRunExpected);
 
@@ -420,7 +420,7 @@ public class ScatterPlotTest extends GenericChartsTest
         export(EXPORTED_SCRIPT_CHECK_TYPE, MEASURE_1_WEIGHT, MEASURE_5_RESPIRATIONS);
     }
 
-    private static final String SCATTER_PLOT_DR_1 = "60\n65\n70\n75\n80\n85\n90\n50\n55\n60\n65\n70\n75\n80\n85\n90\n95\n100\n105\n110\nAPX-1: Abbreviated Physical Exam\n4. Pulse\n1. Weight";
+    private static final String SCATTER_PLOT_DR_1 = "60\n65\n70\n75\n80\n85\n90\n50\n60\n70\n80\n90\n100\n110\nAPX-1: Abbreviated Physical Exam\n4. Pulse\n1. Weight";
     private static final String SCATTER_PLOT_DR_2 = "60\n70\n80\n90\n100\n110\n60\n80\n100\n120\n140\n160\n180\n200\nAPX-1: Abbreviated Physical Exam\n4. Pulse\n1. Weight";
     private static final String SCATTER_PLOT_NAME_DR = "DataRegionScatterPlot";
     private static final String SCATTER_PLOT_DESC_DR = "This scatter plot was created through a data region's 'Views' menu";
@@ -457,7 +457,7 @@ public class ScatterPlotTest extends GenericChartsTest
         savePlot(SCATTER_PLOT_NAME_DR, SCATTER_PLOT_DESC_DR);
     }
 
-    private static final String SCATTER_PLOT_QC = "0\n200000\n400000\n600000\n800000\n1000000\n1200000\n0\n1e+7\n2e+7\n3e+7\n4e+7\n5e+7\n6e+7\n7e+7\n8e+7\n9e+7\n1e+8\n1.1e+8\n1.2e+8\nTypes\nInteger\nDouble";
+    private static final String SCATTER_PLOT_QC = "0\n200000\n400000\n600000\n800000\n1000000\n1200000\n0\n2e+7\n4e+7\n6e+7\n8e+7\n1e+8\n1.2e+8\nTypes\nInteger\nDouble";
     private static final String SCATTER_PLOT_NAME_QC = "QuickChartScatterPlot";
     private static final String SCATTER_PLOT_DESC_QC = "This scatter plot was created through the 'Quick Chart' column header menu option";
     @LogMethod
@@ -829,7 +829,7 @@ public class ScatterPlotTest extends GenericChartsTest
         stopImpersonating();
     }
 
-    private static final String SCATTER_PLOT_CPF_1 = "0.5\n1.0\n1.5\n2.0\n2.5\n3.0\n3.5\n50\n100\n150\n200\n250\n300\n350\n400\nCPF-1: Follow-up Chemistry Panel\n2a. Creatinine\n1a. ALT (SGPT)";
+    private static final String SCATTER_PLOT_CPF_1 = "0.5\n1.0\n1.5\n2.0\n2.5\n3.0\n3.5\n0\n50\n100\n150\n200\n250\n300\n350\n400\n450\nCPF-1: Follow-up Chemistry Panel\n2a. Creatinine\n1a. ALT (SGPT)";
     private static final String SCATTER_PLOT_NAME_BIN = "BinnedScatterPlotTest";
     private static final String SCATTER_PLOT_DESC_BIN = "This scatter plot was created with the binning threshold set to a number smaller than the data point count.";
 

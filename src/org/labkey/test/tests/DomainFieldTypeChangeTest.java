@@ -24,7 +24,6 @@ import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
-import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.DomainDesignerPage;
 import org.labkey.test.components.assay.AssayConstants;
@@ -154,12 +153,8 @@ public class DomainFieldTypeChangeTest extends BaseWebDriverTest
                 table.getColumnDataAsText(decimalField.getName()));
         checker().verifyEquals("Incorrect values after changing boolean to string", Arrays.asList("yes", "no", "yes", "NewTrue"),
                 table.getColumnDataAsText(booleanField.getName()));
-        if (WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.MicrosoftSQLServer)
-            checker().verifyEquals("Incorrect values after changing date to string", Arrays.asList("Jan 1 2022 12:00AM", "Jan 2 2022 12:00AM", "Jan 3 2022 12:00AM", "New01-02-2022"),
-                    table.getColumnDataAsText(dateField.getName()));
-        else
-            checker().verifyEquals("Incorrect values after changing date to string", Arrays.asList("2022-01-01 00:00:00", "2022-01-02 00:00:00", "2022-01-03 00:00:00", "New01-02-2022"),
-                    table.getColumnDataAsText(dateField.getName()));
+        checker().verifyEquals("Incorrect values after changing date to string", Arrays.asList("2022-01-01 00:00:00", "2022-01-02 00:00:00", "2022-01-03 00:00:00", "New01-02-2022"),
+                table.getColumnDataAsText(dateField.getName()));
     }
 
     @Test
@@ -231,12 +226,8 @@ public class DomainFieldTypeChangeTest extends BaseWebDriverTest
                 table.getColumnDataAsText("runTestBoolean"));
         checker().verifyEquals("Batch fields : Incorrect value after changing Decimal to string", Arrays.asList("1.1"),
                 table.getColumnDataAsText("Batch/batchTestDecimal"));
-        if (WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.MicrosoftSQLServer)
-            checker().verifyEquals("Batch fields : Incorrect value after changing Date to string", Arrays.asList("Jan 1 2022 12:00AM"),
-                    table.getColumnDataAsText("Batch/batchTestDate"));
-        else
-            checker().verifyEquals("Batch fields : Incorrect value after changing Date to string", Arrays.asList("2022-01-01 00:00:00"),
-                    table.getColumnDataAsText("Batch/batchTestDate"));
+        checker().verifyEquals("Batch fields : Incorrect value after changing Date to string", Arrays.asList("2022-01-01 00:00:00"),
+                table.getColumnDataAsText("Batch/batchTestDate"));
 
 
         checker().screenShotIfNewError("AfterRunAndBatchChanges");
