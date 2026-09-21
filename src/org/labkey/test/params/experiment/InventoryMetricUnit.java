@@ -26,7 +26,6 @@ import java.util.List;
  */
 public enum InventoryMetricUnit
 {
-    // If you add a value here you will also need to update SMSampleTypeDefinition.getInventoryMetricUnit.
     G("g", "g (grams)"),
     MG("mg", "mg (milligrams)"),
     KG("kg", "kg (kilograms)"),
