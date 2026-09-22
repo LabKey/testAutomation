@@ -19,7 +19,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.categories.Daily;
+import org.labkey.test.categories.Git;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldDefinition.ColumnType;
 import org.labkey.test.util.PortalHelper;
@@ -32,7 +32,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-@Category({Daily.class})
+@Category({Git.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 4)
 public class TimelineTest extends BaseWebDriverTest
 {
