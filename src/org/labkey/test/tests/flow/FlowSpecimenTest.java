@@ -22,6 +22,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Flow;
 import org.labkey.test.categories.Specimen;
 import org.labkey.test.components.assay.AssayConstants;
@@ -38,7 +39,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * This test checks the flow specimen foreign key behavior from flow.FCSFiles and flow.FCSAnalyses.
  */
-@Category({Flow.class, Specimen.class})
+@Category({Daily.class, Flow.class, Specimen.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 8)
 public class FlowSpecimenTest extends BaseFlowTest
 {

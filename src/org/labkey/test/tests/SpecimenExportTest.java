@@ -20,6 +20,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Specimen;
 import org.labkey.test.util.FileBrowserHelper;
 import org.labkey.test.util.LogMethod;
@@ -29,7 +30,7 @@ import java.io.File;
 
 import static org.junit.Assert.assertTrue;
 
-@Category({Specimen.class})
+@Category({Daily.class, Specimen.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 6)
 public class SpecimenExportTest extends SpecimenBaseTest
 {
