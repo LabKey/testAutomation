@@ -157,6 +157,7 @@ public abstract class AbstractAssayHelper
         DATA_FIELDS("Data Fields"),
         ANALYTE_PROPERTIES("Analyte Properties"),
         RUN_FIELDS("Run Fields"),
+        SAMPLE_FIELDS("Sample Fields"),
         EXCEL_FILE_RUN_PROPERTIES("Excel File Run Properties");
 
         private final String menuSuffix;
