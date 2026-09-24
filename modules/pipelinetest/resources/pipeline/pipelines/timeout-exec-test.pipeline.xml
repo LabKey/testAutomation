@@ -14,7 +14,7 @@
             <!-- See: https://openjdk.java.net/jeps/330 -->
             <exec installPath="${JAVA_HOME}/bin" timeout="3">
                 java pipeline/pipelines/TimeoutExecTest.java -t 8
-                    ${pipeline, protocol name} "${httpSessionId}"
+                    ${pipeline, protocol name} "${apikey}"
             </exec>
         </task>
     </tasks>
