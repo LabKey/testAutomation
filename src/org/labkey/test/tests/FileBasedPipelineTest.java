@@ -31,7 +31,6 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.FileBrowserHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
-import org.labkey.test.util.Maps;
 import org.labkey.test.util.PipelineAnalysisHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelper;
@@ -87,11 +86,11 @@ public class FileBasedPipelineTest extends BaseWebDriverTest
         final String protocolName = "RCopy";
         final String description = "testRCopyPipeline";
         final String[] targetFiles = {SAMPLE_FILE.getName()};
-        final Map<String, String> protocolProperties = Maps.of(
+        final Map<String, String> protocolProperties = Map.of(
             "protocolName", protocolName,
             "protocolDescription", description);
 
-        final Map<String, Set<String>> outputFiles = Maps.of(
+        final Map<String, Set<String>> outputFiles = Map.of(
             "r-copy.xml", Collections.emptySet(),
             "sample.log", Collections.emptySet(),
             "sample-taskInfo.tsv", Collections.emptySet(),
@@ -115,7 +114,7 @@ public class FileBasedPipelineTest extends BaseWebDriverTest
         final String importAction = "Use R to duplicate a file and generate xar exp run (r-copy-inline)";
         final String protocolName = "InlineRCopy";
         final String[] targetFiles = {SAMPLE_FILE.getName()};
-        final Map<String, String> protocolProperties = Maps.of(
+        final Map<String, String> protocolProperties = Map.of(
                 "protocolName", protocolName,
                 "skipLines", "5");
 
@@ -160,7 +159,7 @@ public class FileBasedPipelineTest extends BaseWebDriverTest
         final String importAction = "Use R to create tsv file using locally defined task and import into 'myassay' (r-localtask-assayimport)";
         final String protocolName = "assay_import";
         final String[] targetFiles = {SAMPLE_FILE.getName()};
-        final Map<String, String> protocolProperties = Maps.of(
+        final Map<String, String> protocolProperties = Map.of(
                 "protocolName", protocolName);
 
         final Map<String, Set<String>> outputFiles = new HashMap<>();
@@ -202,7 +201,7 @@ public class FileBasedPipelineTest extends BaseWebDriverTest
         final String importAction = "Use R to duplicate a file";
         final String protocolName = "Inline R Copy";
         final String[] targetFiles = {SAMPLE_FILE.getName()};
-        final Map<String, String> protocolProperties = Maps.of(
+        final Map<String, String> protocolProperties = Map.of(
                 "protocolName", protocolName,
                 "protocolDescription", "");
 
@@ -225,7 +224,7 @@ public class FileBasedPipelineTest extends BaseWebDriverTest
         final String importAction = "Test output location attribute";
         final String protocolName = "with_output_location";
         final String[] targetFiles = {SAMPLE_FILE.getName()};
-        final Map<String, String> protocolProperties = Maps.of(
+        final Map<String, String> protocolProperties = Map.of(
                 "protocolName", protocolName);
         final Map<String, Set<String>> outputFiles = new HashMap<>();
         outputFiles.put("sample-taskInfo.tsv", Collections.emptySet());
@@ -266,7 +265,7 @@ public class FileBasedPipelineTest extends BaseWebDriverTest
         final String importAction = "timeout script test";
         final String protocolName = "timeout_script_test";
         final String[] targetFiles = {SAMPLE_FILE.getName()};
-        final Map<String, String> protocolProperties = Maps.of(
+        final Map<String, String> protocolProperties = Map.of(
                 "protocolName", protocolName);
 
         _containerHelper.createSubfolder(getProjectName(), folderName);
@@ -299,7 +298,7 @@ public class FileBasedPipelineTest extends BaseWebDriverTest
         final String importAction = "timeout exec test";
         final String protocolName = "timeout_exec_test";
         final String[] targetFiles = {SAMPLE_FILE.getName()};
-        final Map<String, String> protocolProperties = Maps.of(
+        final Map<String, String> protocolProperties = Map.of(
                 "protocolName", protocolName);
 
         _containerHelper.createSubfolder(getProjectName(), folderName);
