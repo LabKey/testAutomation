@@ -57,6 +57,7 @@ public class GroupTest extends BaseWebDriverTest
     protected static final String BAD_GROUP = "group3";
     protected static final String CHILD_GROUP = "group4";
     protected static final String EMPTY_GROUP = "emptyGroupToDelete";
+    protected static final String SCRIPT_NAME_GROUP = "scriptGroup'+alert(1)+'";
     protected static final String[] TEST_USERS_FOR_GROUP = {"user1_grouptest@" + SIMPLE_GROUP + ".group.test", "user2_grouptest@" + SIMPLE_GROUP + ".group.test", "user3_grouptest@" + COMPOUND_GROUP + ".group.test"};
     protected static final String[] TEST_DISPLAY_NAMES_FOR_GROUP = {"user1 grouptest", "user2 grouptest", "user3 grouptest"};
     protected static final String SITE_USER_IN_GROUP = "useringroup";
@@ -89,6 +90,7 @@ public class GroupTest extends BaseWebDriverTest
         permissionsHelper.deleteGroup(SITE_USER_GROUP);
         permissionsHelper.deleteGroup(API_SITE_GROUP);
         permissionsHelper.deleteGroup(EMPTY_GROUP);
+        permissionsHelper.deleteGroup(SCRIPT_NAME_GROUP);
         _userHelper.deleteUsers(false, TEST_USERS_FOR_GROUP);
         _userHelper.deleteUsers(false, SITE_USER_EMAILS);
         _containerHelper.deleteProject(getProjectName(), afterTest);
@@ -410,6 +412,20 @@ public class GroupTest extends BaseWebDriverTest
         Assert.assertNotEquals("Filtered number of users should not be the same as the initial count", initialRowCount, table.getDataRowCount());
         Assert.assertEquals("User not in a group should not be in filtered list", -1, table.getRowIndex("Display Name", SITE_USER_NOT_IN_GROUP));
         Assert.assertNotEquals("User in group should be in filtered list", -1, table.getRowIndex("Display Name", SITE_USER_IN_GROUP));
+    }
+
+    // GH Issue 1528
+    @Test
+    public void testDeleteGroupWithScriptInName() throws IOException, CommandException
+    {
+        new ApiPermissionsHelper(this).createGlobalPermissionsGroup(SCRIPT_NAME_GROUP);
+
+        _permissionsHelper.deleteGlobalGroupFromDetailsPage(SCRIPT_NAME_GROUP);
+
+        SelectRowsCommand selectRowsCommand = new SelectRowsCommand("core", "Groups");
+        selectRowsCommand.setFilters(List.of(new Filter("Name", SCRIPT_NAME_GROUP)));
+        SelectRowsResponse response = selectRowsCommand.execute(createDefaultConnection(), "/");
+        assertEquals(SCRIPT_NAME_GROUP + " should have been deleted", 0, response.getRows().size());
     }
 
     @Override protected BrowserType bestBrowser()
