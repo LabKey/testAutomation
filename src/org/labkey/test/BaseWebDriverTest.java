@@ -1261,7 +1261,10 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         checkViews();
 
         if (isTestRunningOnTeamCity())
+        {
             checkActionCoverage();
+            checkConnectionUsage();
+        }
 
         CspLogUtil.checkNewCspWarnings(getArtifactCollector());
 
@@ -1656,6 +1659,66 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
         if (BROWSER_TYPE == BrowserType.CHROME)
             refresh(); // Chrome blocks sequential downloads from javascript
+    }
+
+    @LogMethod
+    protected void checkConnectionUsage()
+    {
+        if (isGuestModeTest())
+            return;
+
+        SimpleHttpResponse response = WebTestHelper.getHttpResponse(WebTestHelper.buildURL("admin", "exportConnectionUsage"));
+        if (response.getResponseCode() != HttpStatus.SC_OK)
+        {
+            TestLogger.error("Failed to export connection usage: " + response.getResponseCode() + " " + response.getResponseMessage());
+            return;
+        }
+
+        String tsv = response.getResponseBody();
+        try
+        {
+            Files.writeString(new File(TestFileUtils.getGradleReportDir(), "ConnectionUsage.tsv").toPath(), tsv);
+        }
+        catch (IOException e)
+        {
+            TestLogger.error("Failed to write connection usage file.", e);
+        }
+
+        writeConnectionStatistics(tsv);
+    }
+
+    private static final double BORROWS_PER_INVOCATION_THRESHOLD = 10;
+
+    private void writeConnectionStatistics(String tsv)
+    {
+        List<String> lines = tsv.lines().filter(line -> !line.isBlank()).toList();
+        if (lines.isEmpty())
+            return;
+
+        List<String> header = Arrays.asList(lines.getFirst().split("\t"));
+        int invocationsCol = header.indexOf("invocations");
+        int borrowsCol = header.indexOf("borrows");
+        int perInvocationCol = header.indexOf("borrowsPerInvocation");
+        int unreturnedCol = header.indexOf("unreturned");
+
+        long invocations = 0;
+        long borrows = 0;
+        long unreturned = 0;
+        int actionsOverThreshold = 0;
+        for (String line : lines.subList(1, lines.size()))
+        {
+            String[] values = line.split("\t");
+            invocations += Long.parseLong(values[invocationsCol]);
+            borrows += Long.parseLong(values[borrowsCol]);
+            unreturned += Long.parseLong(values[unreturnedCol]);
+            if (Double.parseDouble(values[perInvocationCol]) > BORROWS_PER_INVOCATION_THRESHOLD)
+                actionsOverThreshold++;
+        }
+
+        TeamCityUtils.reportBuildStatisticValue("connectionBorrows", borrows);
+        TeamCityUtils.reportBuildStatisticValue("connectionBorrowsPerInvocation", invocations == 0 ? 0 : borrows / (double) invocations);
+        TeamCityUtils.reportBuildStatisticValue("actionsOverBorrowThreshold", actionsOverThreshold);
+        TeamCityUtils.reportBuildStatisticValue("unreturnedConnections", unreturned);
     }
 
     @LogMethod
