@@ -27,6 +27,7 @@ import org.awaitility.Awaitility;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Assume;
 import org.junit.AssumptionViolatedException;
@@ -147,6 +148,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
@@ -1685,6 +1687,43 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         }
 
         writeConnectionStatistics(tsv);
+        checkConnectionPool();
+    }
+
+    private void checkConnectionPool()
+    {
+        SimpleHttpResponse response = WebTestHelper.getHttpResponse(WebTestHelper.buildURL("admin", "getConnectionPoolStats"));
+        if (response.getResponseCode() != HttpStatus.SC_OK)
+        {
+            TestLogger.error("Failed to get connection pool statistics: " + response.getResponseCode() + " " + response.getResponseMessage());
+            return;
+        }
+
+        String json = response.getResponseBody();
+        try
+        {
+            Files.writeString(new File(TestFileUtils.getGradleReportDir(), "ConnectionPool.json").toPath(), json);
+        }
+        catch (IOException e)
+        {
+            TestLogger.error("Failed to write connection pool file.", e);
+        }
+
+        JSONArray dataSources = new JSONObject(json).getJSONArray("dataSources");
+        JSONObject pool = IntStream.range(0, dataSources.length())
+            .mapToObj(dataSources::getJSONObject)
+            .filter(ds -> ds.optBoolean("isLabKeyScope"))
+            .findFirst()
+            .orElse(null);
+        if (null == pool || !pool.has("createdCount"))
+            return;
+
+        long created = pool.getLong("createdCount");
+        long borrowed = pool.getLong("borrowedCount");
+        TeamCityUtils.reportBuildStatisticValue("connectionsOpened", created);
+        TeamCityUtils.reportBuildStatisticValue("connectionsClosed", pool.getLong("destroyedCount"));
+        TeamCityUtils.reportBuildStatisticValue("connectionOpenPercent", borrowed == 0 ? 0 : created * 100.0 / borrowed);
+        TeamCityUtils.reportBuildStatisticValue("maxConnectionBorrowWaitMillis", pool.getLong("maxBorrowWaitMillis"));
     }
 
     private static final double BORROWS_PER_INVOCATION_THRESHOLD = 10;
