@@ -1557,6 +1557,11 @@ public class ClientAPITest extends BaseWebDriverTest
                 CommandResponse paged = selectPeople(cn, apiVersion, countCase.filters(), Map.of("query.maxRows", 1));
                 assertEquals("Count-only rowCount should match paged rowCount: " + description, ((Number) paged.getProperty("rowCount")).intValue(), ((Number) countOnly.getProperty("rowCount")).intValue());
 
+                log("Verify count-only request without metadata and with an offset: " + description);
+                CommandResponse noMetaData = selectPeople(cn, apiVersion, countCase.filters(), Map.of("query.maxRows", 0, "includeTotalCount", true, "includeMetadata", false, "query.offset", 100));
+                assertEquals("Wrong count-only rowCount without metadata: " + description, countCase.expectedCount(), ((Number) noMetaData.getProperty("rowCount")).intValue());
+                assertNull("Count-only request with includeMetadata=false should not return metaData: " + description, noMetaData.getProperty("metaData"));
+
                 log("Verify maxRows=0 without an explicit includeTotalCount=true stays metadata only: " + description);
                 CommandResponse metaDataOnly = selectPeople(cn, apiVersion, countCase.filters(), Map.of("query.maxRows", 0));
                 assertNull("Metadata-only request should not return rowCount: " + description, metaDataOnly.getProperty("rowCount"));
