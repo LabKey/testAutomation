@@ -69,6 +69,8 @@ public class FlowTest extends BaseFlowTest
     private static final String FCS_FILE_1 = "L02-060120-QUV-JS";
     private static final String FCS_FILE_2 = "L04-060120-QUV-JS";
     private static final String QUV_ANALYSIS_NAME = "QUV analysis";
+    private static final String PTID_COLUMN = "Sample PTID";
+    private static final String VISIT_COLUMN = "Sample Visit";
 
     @BeforeClass
     public static void initR()
@@ -100,6 +102,7 @@ public class FlowTest extends BaseFlowTest
         sampleTypeAndMetadataTest();
         customGraphQuery();
         positivityReportTest();
+        backgroundFilterRInjectionTest();
         qcReportTest();
         copyAnalysisScriptTest();
         removeAnalysisFilter();
@@ -498,7 +501,7 @@ public class FlowTest extends BaseFlowTest
         fields.put("Comment", FieldDefinition.ColumnType.String);
 
         uploadSampleDescriptions(TestFileUtils.getSampleData("flow/8color/sample-set.tsv"), fields, new String[]{"Exp Name", "Well Id"}, new String[]{"EXPERIMENT NAME", "WELL ID"});
-        setProtocolMetadata(null, "Sample PTID", null, "Sample Visit", true);
+        setProtocolMetadata(null, PTID_COLUMN, null, VISIT_COLUMN, true);
 
         goToFlowDashboard();
         clickAndWait(Locator.linkContainingText("49 sample descriptions"));
@@ -617,6 +620,39 @@ public class FlowTest extends BaseFlowTest
 
         deleteReport(reportName);
         verifyDeleted(reportName);
+    }
+
+    /**
+     * GH Issue 1525: a background filter value reaches the generated R script as data, not code. The payload closes the
+     * generated string literal and both enclosing list() calls, so an unescaped value aborts qc.R before it emits output.
+     */
+    @LogMethod
+    public void backgroundFilterRInjectionTest()
+    {
+        final String marker = "R_INJECTION_1525";
+        final String reportName = "R injection QC report";
+
+        setProtocolMetadata(null, PTID_COLUMN, null, VISIT_COLUMN,
+                DEFAULT_BACKGROUND_FILTER_VALUE + "\")); stop(\"" + marker + "\"); #");
+
+        log("** Creating QC report '" + reportName + "'");
+        goToFlowDashboard();
+
+        final QCReportEditorPage qcReport = new FlowReportsWebpart(getDriver()).createQCReport();
+        qcReport.setName(reportName);
+        qcReport.setSubset("Singlets/L/Live/3+/4+/(IFNg+|IL2+)");
+        qcReport.setStatistic(QCReportEditorPage.Stat.Freq_Of_Parent);
+        qcReport.addFieldFilter("Name", "Contains", "L02");
+        qcReport.save();
+
+        clickAndWait(Locator.linkWithText(reportName));
+        WebElement reportView = Locator.id("report-view").findElement(getDriver());
+
+        Locator.tagWithClass("table", "labkey-r-tsvout").waitForElement(reportView, WAIT_FOR_PAGE);
+        assertTextNotPresent(marker);
+
+        deleteReport(reportName);
+        setProtocolMetadata(null, PTID_COLUMN, null, VISIT_COLUMN, DEFAULT_BACKGROUND_FILTER_VALUE);
     }
 
     @LogMethod
