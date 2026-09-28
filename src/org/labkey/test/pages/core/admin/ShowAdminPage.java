@@ -191,11 +191,6 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
         return clickSettingsLink("look and feel settings", LookAndFeelSettingsPage::new);
     }
 
-    public void clickMasterPatientIndex()
-    {
-        clickSettingsLink("Master Patient Index");
-    }
-
     public void clickProfiler()
     {
         clickSettingsLink("profiler");

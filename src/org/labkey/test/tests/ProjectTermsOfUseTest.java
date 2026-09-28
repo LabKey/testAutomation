@@ -17,14 +17,23 @@ package org.labkey.test.tests;
 
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.util.Maps;
+import org.labkey.test.util.PasswordUtil;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.labkey.api.security.UserManager.USER_AUDIT_EVENT;
 
 @Category({Daily.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 6)
@@ -40,8 +49,11 @@ public class ProjectTermsOfUseTest extends BaseTermsOfUseTest
     }
 
     @Test
-    public void projectTermsOfUseTest()
+    public void projectTermsOfUseTest() throws IOException, CommandException
     {
+        // RowId is a single sequence across every container, so one baseline covers every path checked below.
+        int initialRowId = _auditLogHelper.getLatestAuditRowId(USER_AUDIT_EVENT);
+
         log("Terms don't come into play until you log out");
         clickProject(NON_PUBLIC_TERMS_PROJECT2_NAME);
         assertTextNotPresent("fight club");
@@ -121,6 +133,28 @@ public class ProjectTermsOfUseTest extends BaseTermsOfUseTest
         clickAndWait(Locator.linkWithText("Edit"));
         deleteWikiPage();
         assertTextNotPresent(WIKI_TERMS_TITLE);
+
+        log("Validate the audit logs show 'agreement to terms' entry.");
+
+        // No terms for this project.
+        validateAuditLogEntries("/" + PUBLIC_NO_TERMS_PROJECT_NAME, initialRowId, new ArrayList<>());
+
+        // The remaining three projects should have the same audit log entries.
+        int defaultUserId = _userHelper.getUserId(PasswordUtil.getUsername());
+        int impersonatedUserId = _userHelper.getUserId(USER);
+        List<Map<String, Object>> expected = new ArrayList<>();
+        expected.add(Map.of("CreatedBy", impersonatedUserId,
+                "User", impersonatedUserId,
+                "ImpersonatedBy", defaultUserId));
+        Map<String, Object> row = new HashMap<>();
+        row.put("CreatedBy", defaultUserId);
+        row.put("User", defaultUserId);
+        row.put("ImpersonatedBy", null);
+        expected.add(row);
+
+        validateAuditLogEntries("/" + PUBLIC_TERMS_PROJECT_NAME, initialRowId, expected);
+        validateAuditLogEntries("/" + NON_PUBLIC_TERMS_PROJECT2_NAME, initialRowId, expected);
+        validateAuditLogEntries("/" + NON_PUBLIC_TERMS_PROJECT_NAME, initialRowId, expected);
     }
 
     protected void deleteWikiPage()
@@ -129,5 +163,6 @@ public class ProjectTermsOfUseTest extends BaseTermsOfUseTest
         clickButton("Delete Page");
         clickButton("Delete");
     }
+
 }
 

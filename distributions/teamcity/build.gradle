@@ -2,7 +2,6 @@ import org.labkey.gradle.plugin.Distribution
 import org.labkey.gradle.plugin.FileModule
 import org.labkey.gradle.task.ModuleDistribution
 import org.labkey.gradle.util.BuildUtils
-import org.labkey.gradle.util.GroupNames
 import org.labkey.gradle.util.ModuleFinder
 
 plugins {
@@ -21,8 +20,6 @@ project.tasks.register("distribution", ModuleDistribution) {
         dist.subDirName = "test"
         dist.extraFileIdentifier = '-test'
         dist.versionPrefix = 'Test'
-
-        dist.extraProperties = [supportedDatabases: "pgsql"]
 }
 
 
@@ -36,7 +33,7 @@ if (project.hasProperty('inheritedDistPath'))
     String testModulesPath = "${BuildUtils.getTestProjectPath(project.gradle)}:modules"
     String dumbsterModule = "${testModulesPath}:dumbster"
     String simpletestModule = "${testModulesPath}:simpletest"
-    String devtoolsModule = BuildUtils.getPlatformModuleProjectPath(project.gradle, "devtools")
+    String devtoolsModule = "${testModulesPath}:devtools"
     List<String> testModules = [dumbsterModule, simpletestModule, devtoolsModule]
     if (project.hasProperty("inheritedDistIncludeAllTestModules"))
     {

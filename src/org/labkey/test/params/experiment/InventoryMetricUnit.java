@@ -26,7 +26,6 @@ import java.util.List;
  */
 public enum InventoryMetricUnit
 {
-    // If you add a value here you will also need to update SMSampleTypeDefinition.getInventoryMetricUnit.
     G("g", "g (grams)"),
     MG("mg", "mg (milligrams)"),
     KG("kg", "kg (kilograms)"),
@@ -36,7 +35,7 @@ public enum InventoryMetricUnit
     UL("uL", "uL (microliters)"),
     L("L", "L (liters)"),
     UNIT("unit", "unit"),
-    UNKNOWN("unknown", "unknown"); // Used by getInventoryMetricUnit. Return if an unknown value is in the UI.
+    UNKNOWN("unknown", "unknown"); // Returned by UI-parsing helpers (e.g. FMCheckInSampleDialog.getUnits()) when the selected value doesn't match a known unit.
 
     private final String _value; // Used when creating a sample type with the API and setting this property.
     private final String _label; // Used when setting the property through the UI.

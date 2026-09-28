@@ -124,13 +124,14 @@ if (!BuildUtils.isIntellij())  {
     }
 }
 
+File testPropertiesFile = project.file('test.properties')
 def initPropertiesTask = project.tasks.register("initProperties", Copy) {
     Copy task ->
         task.group = GroupNames.TEST
         task.description = "Create test.properties if missing"
         task.from(project.file('test.properties.template'))
         task.into(".")
-        task.outputs.files(project.file('test.properties'))
+        task.outputs.files(testPropertiesFile)
         task.rename('test.properties.template', 'test.properties')
         task.filter { String line ->
             if (line.startsWith("#!!")) {
@@ -140,30 +141,27 @@ def initPropertiesTask = project.tasks.register("initProperties", Copy) {
                 return line
             }
         }
-        task.onlyIf{ !project.file('test.properties').exists() }
+        task.onlyIf{ !testPropertiesFile.exists() }
 }
 
+def harInFile = project.findProperty('harInFile')
+def harOutFile = project.findProperty('harOutFile')
 project.tasks.register("convertHarToStressXml", JavaExec) {
     JavaExec task ->
         task.group = GroupNames.TEST
         task.description = "Convert browser HAR dump to XML for use as a stress test activity"
         task.setMainClass('org.labkey.test.stress.HarConverter')
+        task.classpath(project.configurations.uiTestRuntimeClasspath, project.tasks.named('jar'))
 
-        task.configure {
-            classpath {
-                [project.configurations.uiTestRuntimeClasspath, project.tasks.jar]
+        if (harInFile != null) {
+            String[] args = [harInFile]
+            if (harOutFile != null) {
+                args += harOutFile
             }
-
-            if (project.hasProperty('harInFile')) {
-                String[] args = [getProperty('harInFile')]
-                if (project.hasProperty('harOutFile')) {
-                    args += getProperty('harOutFile')
-                }
-                task.args(args)
-            }
+            task.args(args)
         }
         task.doFirst {
-            if (!project.hasProperty('harInFile')) {
+            if (harInFile == null) {
                 throw new IllegalArgumentException("Specify input file for " + task.name + ". -PharInFile=<file>")
             }
         }

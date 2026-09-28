@@ -20,6 +20,7 @@ import org.hamcrest.CoreMatchers;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
@@ -34,11 +35,14 @@ import org.labkey.test.pages.core.admin.BaseSettingsPage.TIME_FORMAT;
 import org.labkey.test.pages.experiment.CreateDataClassPage;
 import org.labkey.test.pages.query.UpdateQueryRowPage;
 import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.experiment.DataClassDefinition;
 import org.labkey.test.util.DataClassHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.TestDataGenerator;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -424,6 +428,46 @@ public class DataClassTest extends BaseWebDriverTest
         checker().verifyEquals("Values in time-only column not as expected.",
                 expectedTimeCol, listTable.getColumnDataAsText(timeField));
 
+    }
+
+    // GitHub Issue #1446
+    @Test
+    public void testDeleteConfirmationCrossFolder() throws IOException, CommandException
+    {
+        final String folderA = "DeleteConfirmFolderA";
+        final String folderB = "DeleteConfirmFolderB";
+        final String pathA = getProjectName() + "/" + folderA;
+        final String pathB = getProjectName() + "/" + folderB;
+        final String markerA = "DeleteConfirmMarkerA";
+        final String markerB = "DeleteConfirmMarkerB";
+        final String unresolvedMsg = "1 of the selected items could not be found in this folder.";
+
+        _containerHelper.createSubfolder(getProjectName(), folderA);
+        _containerHelper.createSubfolder(getProjectName(), folderB);
+        long rowIdA = insertDataClassRow(pathA, "DeleteConfirmClassA", markerA);
+        long rowIdB = insertDataClassRow(pathB, "DeleteConfirmClassB", markerB);
+
+        log("Request delete confirmation in folder A for rows from both folders");
+        beginAt(WebTestHelper.buildURL("experiment", pathA, "deleteSelectedData", Map.of("rowIds", rowIdA)) + "&rowIds=" + rowIdB);
+        assertTextPresent(markerA, unresolvedMsg);
+        assertTextNotPresent(markerB);
+
+        log("Request delete confirmation in folder B for its own row");
+        beginAt(WebTestHelper.buildURL("experiment", pathB, "deleteSelectedData", Map.of("rowIds", rowIdB)));
+        assertTextPresent(markerB);
+        assertTextNotPresent(unresolvedMsg);
+    }
+
+    private long insertDataClassRow(String containerPath, String dataClassName, String rowName) throws IOException, CommandException
+    {
+        TestDataGenerator dgen = new DataClassDefinition(dataClassName).create(createDefaultConnection(), containerPath);
+        dgen.addCustomRow(Map.of("Name", rowName));
+        Map<String, Object> row = dgen.insertRows(createDefaultConnection(), dgen.getRows()).getRows().getFirst();
+        return row.entrySet().stream()
+                .filter(e -> "rowId".equalsIgnoreCase(e.getKey()))
+                .map(e -> ((Number) e.getValue()).longValue())
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("No RowId returned for inserted row " + rowName));
     }
 
     private void viewRawTableMetadata(String dataClassName)
