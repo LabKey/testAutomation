@@ -81,7 +81,7 @@ public class EditInlineField extends WebDriverComponent<EditInlineField.ElementC
         return getComponentElement().getText();
     }
 
-    private boolean isOpen()
+    public boolean isOpen()
     {
         return !elementCache().toggleLoc.existsIn(this) &&
                 elementCache().input.isDisplayed();
