@@ -584,23 +584,25 @@ public class ToolsController extends SpringActionController
                 return new SimpleErrorView(errors);
             }
 
+            // LABKEY_ROOT/repos/labkey/server
+            File serverDir = new File(sourcePath).getParentFile().getParentFile().getParentFile();
             List<ControllerActionId> actionIds = new LinkedList<>();
 
             // As of now, these are the only classes that specify crawler actions
             for (String path : List.of(
-                sourcePath + "/../../clientModules/adjudication/test/src/org/labkey/test/tests/adjudication/AdjudicationAbstractBaseTest.java",
-                sourcePath + "/../../ehrModules/ehr/test/src/org/labkey/test/tests/ehr/ComplianceTrainingTest.java",
-                sourcePath + "/../../limsModules/biologics/test/src/org/labkey/test/tests/biologics/BiologicsReportTest.java",
-                sourcePath + "/../study/test/src/org/labkey/test/tests/study",
-                sourcePath + "/../../../testAutomation/src/org/labkey/test/stress/HarConverter.java",
-                sourcePath + "/../../../testAutomation/src/org/labkey/test/util/Crawler.java"
+                "modules/clientModules/adjudication/test/src/org/labkey/test/tests/adjudication/AdjudicationAbstractBaseTest.java",
+                "modules/ehrModules/ehr/test/src/org/labkey/test/tests/ehr/ComplianceTrainingTest.java",
+                "modules/limsModules/biologics/test/src/org/labkey/test/tests/biologics/BiologicsReportTest.java",
+                "modules/platform/study/test/src/org/labkey/test/tests/study",
+                "testAutomation/src/org/labkey/test/stress/HarConverter.java",
+                "testAutomation/src/org/labkey/test/util/Crawler.java"
             ))
             {
-                File file = new File(path);
+                File file = FileUtil.appendPath(serverDir, new org.labkey.api.util.Path(path));
                 if (!file.exists())
                 {
                     errors.reject(ERROR_MSG, FileUtil.getAbsoluteCaseSensitiveFile(file).getAbsolutePath() + ": path not found!");
-                    return new SimpleErrorView(errors);
+                    continue;
                 }
                 addActionIds(actionIds, file);
             }
@@ -634,8 +636,6 @@ public class ToolsController extends SpringActionController
                     .append("The following " + (missingModuleActions.size() > 1 ? "actions' controllers" : "action's controller") + " could not be resolved to a module running in this deployment:")
                     .unsafeAppend("<br><br>\n");
                 missingModuleActions.forEach(id -> builder.append(id.toString()).unsafeAppend("<br>\n"));
-                builder.unsafeAppend("<br>\n");
-                builder.append("The associated module(s) might not support " + DbScope.getLabKeyScope().getDatabaseProductName() + ".");
                 builder.unsafeAppend("<br><br>\n");
             }
 
@@ -650,7 +650,7 @@ public class ToolsController extends SpringActionController
             return new HtmlView(builder);
         }
 
-        private void addActionIds(List<ControllerActionId> actionIds, File file) throws IOException
+        private void addActionIds(List<ControllerActionId> actionIds, File file)
         {
             if (file.isDirectory())
             {
@@ -675,6 +675,10 @@ public class ToolsController extends SpringActionController
                         if (matcher.find())
                             actionIds.add(new ControllerActionId(matcher.group(1), matcher.group(2)));
                     }
+                }
+                catch (IOException e)
+                {
+                    throw new RuntimeException(e);
                 }
             }
         }
