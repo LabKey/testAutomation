@@ -40,6 +40,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -71,6 +72,7 @@ public class Simulation<T>
     private final Future<Collection<T>> _runningSimulation;
     private final ResultCollector<T> _resultCollector;
     private final boolean _runOnce;
+    private final Duration _shutdownGrace;
 
     /**
      * Simulation will start running immediately upon instantiation. Created by {@link Definition#startSimulation()}
@@ -80,9 +82,10 @@ public class Simulation<T>
      * @param maximumActivityThreads maximum number of threads to split activities across. 6 simulates browser behavior
      * @param resultCollector will be invoked after each request and at the end of the simulation
      * @param runOnce Setting to true will cause the simulation to run once then stop
+     * @param shutdownGrace how long {@link #collectResults()} waits for the run loop to notice it has been stopped
      * @see Definition
      */
-    private Simulation(Connection connection, List<Activity> activities, int delayBetweenActivities, int maximumActivityThreads, ResultCollector<T> resultCollector, boolean runOnce)
+    private Simulation(Connection connection, List<Activity> activities, int delayBetweenActivities, int maximumActivityThreads, ResultCollector<T> resultCollector, boolean runOnce, Duration shutdownGrace)
     {
         _connection = connection;
         _activities = activities;
@@ -91,14 +94,24 @@ public class Simulation<T>
         _runningSimulation = simulationExecutor.submit(this::run);
         _resultCollector = resultCollector;
         _runOnce = runOnce;
+        _shutdownGrace = shutdownGrace;
         simulationMetadata = Map.of(
-                SIMULATION_ID, _connection.getBaseURI().toString(),
+                SIMULATION_ID, UUID.randomUUID().toString(),
                 SERVER_URI, _connection.getBaseURI().toString());
     }
 
     public boolean isStopped()
     {
         return stopped.get();
+    }
+
+    /**
+     * @return true once the simulation's run loop has returned. With {@code runOnce} the loop ends on its own, so
+     * this is how a caller waits for a full pass rather than stopping the simulation after a fixed time.
+     */
+    public boolean isFinished()
+    {
+        return _runningSimulation.isDone();
     }
 
     /**
@@ -110,9 +123,16 @@ public class Simulation<T>
         stopSimulation();
         try
         {
-            return _runningSimulation.get(60, TimeUnit.SECONDS);
+            return _runningSimulation.get(_shutdownGrace.toMillis(), TimeUnit.MILLISECONDS);
         }
-        catch (InterruptedException | ExecutionException | TimeoutException e)
+        catch (TimeoutException e)
+        {
+            throw new RuntimeException(("Simulation did not stop within %ds. Stopping is cooperative -- the run loop "
+                    + "checks only between activities -- so an in-flight request holds it until that request returns "
+                    + "or times out. Requests still running are missing from the results.")
+                    .formatted(_shutdownGrace.toSeconds()), e);
+        }
+        catch (InterruptedException | ExecutionException e)
         {
             throw new RuntimeException(e);
         }
@@ -148,7 +168,7 @@ public class Simulation<T>
     /**
      * Loops through activities until the simulation is {@link #stopped} or once if {@code _runOnce == true}.<br>
      * Runs in a separate thread, submitted to {@link #simulationExecutor} in
-     * {@link #Simulation(Connection, List, int, int, ResultCollector, boolean)}
+     * {@link #Simulation(Connection, List, int, int, ResultCollector, boolean, Duration)}
      * @return simulation results collected by {@link #_resultCollector}
      */
     private Collection<T> run() throws ExecutionException, InterruptedException
@@ -271,6 +291,7 @@ public class Simulation<T>
         private int maxActivityThreads = 6; // This seems to be the number of parallel requests browsers handle
         private int delayBetweenActivities = 5_000;
         private boolean runOnce = false;
+        private Duration shutdownGrace = Duration.ofSeconds(60);
 
         public Definition(Supplier<Connection> connectionFactory)
         {
@@ -316,6 +337,17 @@ public class Simulation<T>
             return this;
         }
 
+        /**
+         * How long {@link Simulation#collectResults()} waits after signalling a stop. Give it at least the request
+         * timeout: a session mid-activity notices the stop only once its in-flight requests return, so a shorter
+         * grace than a request is allowed to take will time out on any workload with slow requests.
+         */
+        public Definition setShutdownGrace(Duration shutdownGrace)
+        {
+            this.shutdownGrace = shutdownGrace;
+            return this;
+        }
+
         public Definition setRunOnce(boolean runOnce)
         {
             this.runOnce = runOnce;
@@ -344,7 +376,7 @@ public class Simulation<T>
             Connection connection = _connectionFactory.get();
             // Prime connection before starting simulation to ensure credentials are good
             new WhoAmICommand().execute(connection, null);
-            return new Simulation<>(connection, buildActivityDefinitions(), delayBetweenActivities, maxActivityThreads, resultCollectorFactory.apply(connection), runOnce);
+            return new Simulation<>(connection, buildActivityDefinitions(), delayBetweenActivities, maxActivityThreads, resultCollectorFactory.apply(connection), runOnce, shutdownGrace);
         }
 
         public Simulation<RequestResult> startSimulation() throws IOException, CommandException

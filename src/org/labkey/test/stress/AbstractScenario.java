@@ -213,6 +213,15 @@ public abstract class AbstractScenario<T>
     }
 
     /**
+     * @return true once every simulation's run loop has returned, which only happens on its own when the
+     * simulations were built with {@code runOnce}
+     */
+    public final boolean allSimulationsFinished()
+    {
+        return !_simulations.isEmpty() && _simulations.stream().allMatch(Simulation::isFinished);
+    }
+
+    /**
      * Stop all background simulations gracefully
      * @return Combined results of all simulations
      */

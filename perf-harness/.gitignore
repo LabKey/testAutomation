@@ -1,0 +1,7 @@
+.venv/
+results/
+__pycache__/
+# Recordings and configs name a deployment's containers, sample types and data, so keep them out of this public repo
+activities/
+runs/*
+!runs/example-*.json

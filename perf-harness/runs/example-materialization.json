@@ -1,0 +1,43 @@
+{
+  "scenarioName": "example-materialization",
+  "baseUrl": "https://labkey.example.com",
+  "sessions": 1,
+  "durationSeconds": 2400,
+  "stopWhenStable": {
+    "samples": 20,
+    "maxRatioToPeak": 0.1
+  },
+  "warmupSeconds": 0,
+  "delayBetweenActivitiesMillis": 10000,
+  "maxActivityThreads": 1,
+  "requireMiniProfiler": false,
+  "requestTimeoutSeconds": 300,
+  "runOnce": false,
+  "clearCachesBeforeRun": [
+    "materialized sample types"
+  ],
+  "resultsDir": "../results",
+  "replacements": {
+    "PROJECT": "My%20Project",
+    "FOLDER": "My%20Project/My%20Folder",
+    "SHARED": "Shared"
+  },
+  "configUnderTest": {
+    "variant": "CHANGEME",
+    "instanceClass": "CHANGEME",
+    "vcpus": "CHANGEME",
+    "memoryGb": "CHANGEME",
+    "burstable": "CHANGEME",
+    "storageType": "CHANGEME",
+    "allocatedStorageGb": "CHANGEME",
+    "storageIops": "CHANGEME",
+    "storageThroughputMbps": "CHANGEME",
+    "parameterGroup": "CHANGEME",
+    "notes": "CHANGEME"
+  },
+  "activities": [
+    {
+      "file": "../activities/materialization-probe.xml"
+    }
+  ]
+}

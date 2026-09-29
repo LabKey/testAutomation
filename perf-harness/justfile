@@ -1,0 +1,64 @@
+venvPath := ".venv"
+binPath := venvPath / "bin"
+python := binPath / "python"
+pip := binPath / "pip"
+harnessCmd := python + ' perf_harness.py'
+analyzeCmd := python + ' har_analyze.py'
+
+[private]
+default:
+	@just --list
+
+# Initializes the environment so you can use the commands in this justfile
+[group('setup')]
+init:
+    @echo '{{ GREEN }}'Creating python venv'{{ NORMAL }}'
+    @python3 -m venv {{ venvPath }}
+    @{{ pip }} install --upgrade pip
+    @echo '{{ GREEN }}'Installing dependencies'{{ NORMAL }}'
+    @{{ pip }} install -r requirements.txt
+
+# Checks the target environment is configured as expected and idle, without generating load
+preflight config *args:
+	@{{ harnessCmd }} preflight {{ config }} {{ args }}
+
+# Snapshots the database, generates load, snapshots again, and reports
+run config *args:
+	@{{ harnessCmd }} run {{ config }} {{ args }}
+
+# Runs one variant's whole set -- materialization, 2 sessions, 4 sessions -- with snapshots attached
+sequence variant *args:
+	@{{ harnessCmd }} sequence {{ variant }} {{ args }}
+
+# Runs continuous background load -- sessions and hours are optional (default 4 sessions, 8 hours)
+soak sessions="4" hours="8" *args:
+	@{{ harnessCmd }} soak --sessions {{ sessions }} --hours {{ hours }} {{ args }}
+
+# Captures a Postgres snapshot from the server over HTTP
+snapshot config out:
+	@{{ harnessCmd }} snapshot {{ config }} {{ out }}
+
+# Finds the live-query-to-materialized latency step in a probe run
+materialization run *args:
+	@{{ harnessCmd }} materialization {{ run }} {{ args }}
+
+# Compares two completed runs
+compare baseline candidate *args:
+	@{{ harnessCmd }} compare {{ baseline }} {{ candidate }} {{ args }}
+
+# Reports how much of a recording the existing activity files already cover
+diff-har har *args:
+	@{{ analyzeCmd }} diff '{{ har }}' {{ args }}
+
+# Projects the load a run config's activities would generate
+project config *args:
+	@{{ analyzeCmd }} project {{ config }} {{ args }}
+
+# Converts a browser HAR recording into a stress activity file
+convert-har harFile outFile:
+	@cd ../../.. && ./gradlew :server:testAutomation:convertHarToStressXml \
+		-PharInFile='{{ absolute_path(harFile) }}' -PharOutFile='{{ absolute_path(outFile) }}'
+
+[group('dev')]
+black:
+	{{ binPath }}/black .

@@ -158,11 +158,43 @@ project.tasks.register("convertHarToStressXml", JavaExec) {
             if (harOutFile != null) {
                 args += harOutFile
             }
-            task.args(args)
+
+            if (project.hasProperty('harInFile')) {
+                String[] args = [getProperty('harInFile')]
+                if (project.hasProperty('harOutFile')) {
+                    args += getProperty('harOutFile')
+                    if (project.hasProperty('harBaseUrl')) {
+                        args += getProperty('harBaseUrl')
+                    }
+                }
+                task.args(args)
+            }
         }
         task.doFirst {
             if (harInFile == null) {
                 throw new IllegalArgumentException("Specify input file for " + task.name + ". -PharInFile=<file>")
+            }
+        }
+}
+
+project.tasks.register("runStressSimulation", JavaExec) {
+    JavaExec task ->
+        task.group = GroupNames.TEST
+        task.description = "Run a stress simulation against a server described by a JSON config file"
+        task.setMainClass('org.labkey.test.stress.SimulationRunner')
+
+        task.configure {
+            classpath {
+                [project.configurations.uiTestRuntimeClasspath, project.tasks.jar]
+            }
+
+            if (project.hasProperty('simulationConfig')) {
+                task.args(getProperty('simulationConfig'))
+            }
+        }
+        task.doFirst {
+            if (!project.hasProperty('simulationConfig')) {
+                throw new IllegalArgumentException("Specify config file for " + task.name + ". -PsimulationConfig=<file>")
             }
         }
 }

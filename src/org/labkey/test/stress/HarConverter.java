@@ -24,8 +24,8 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.labkey.query.xml.ApiTestsDocument;
 import org.labkey.query.xml.TestCaseType;
-import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.Crawler.ControllerActionId;
+import org.labkey.test.util.EscapeUtil;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -34,6 +34,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -91,12 +92,23 @@ public class HarConverter
     public static final Set<ControllerActionId> EXCLUDED_ACTIONS = Set.of(new ControllerActionId("login", "whoami"));
 
     private final String inputParam;
+    private final String _baseUrlOverride;
 
     private final Map<String, String> _containerReplacements = new HashMap<>();
 
     public HarConverter(String inputParam)
     {
+        this(inputParam, null);
+    }
+
+    /**
+     * @param baseUrlOverride server root that recorded URLs are relative to, e.g. {@code https://example.com/labkey}.
+     *                        Needed only when the deployment has a context path; otherwise it is read off the recording.
+     */
+    public HarConverter(String inputParam, String baseUrlOverride)
+    {
         this.inputParam = inputParam;
+        this._baseUrlOverride = baseUrlOverride;
     }
 
     /**
@@ -121,7 +133,7 @@ public class HarConverter
             ? (inputParam.length() > 1 ? inputParam.replaceFirst("(.har)?$", ".xml") : "har.xml")
             : args[1];
 
-        ApiTestsDocument apiTestsDoc = new HarConverter(inputParam).doConversion();
+        ApiTestsDocument apiTestsDoc = new HarConverter(inputParam, args.length > 2 ? args[2] : null).doConversion();
 
         try (OutputStream outputStream = getOutputStream(outputFileName))
         {
@@ -151,10 +163,18 @@ public class HarConverter
             String containerPath = actionId.getContainerPath();
             if (containerPath != null && !containerPath.isBlank())
             {
-                containerPath = "/" + containerPath; // Relative URLs will have a leading slash
-                String replacementString = _containerReplacements.computeIfAbsent(containerPath, k -> "@@CONTAINER" + (_containerReplacements.isEmpty() ? "" : "_" + (_containerReplacements.size() + 1)) + "@@");
-                String urlWithReplacementString = testCase.getUrl().replaceFirst("^" + Pattern.quote(containerPath), replacementString);
-                testCase.setUrl(urlWithReplacementString);
+                // getContainerPath() decodes, so 'My Project' has to be matched against the '/My%20Project' in the URL
+                String encodedPrefix = encodedContainerPrefix(testCase.getUrl(), containerPath);
+                if (encodedPrefix == null)
+                {
+                    LOG.warn("Could not locate container '{}' within '{}'; leaving it hard-coded", containerPath, testCase.getUrl());
+                }
+                else
+                {
+                    String replacementString = _containerReplacements.computeIfAbsent("/" + containerPath,
+                            k -> "@@CONTAINER" + (_containerReplacements.isEmpty() ? "" : "_" + (_containerReplacements.size() + 1)) + "@@");
+                    testCase.setUrl(testCase.getUrl().replaceFirst("^" + Pattern.quote(encodedPrefix), replacementString));
+                }
             }
         }
         if (!_containerReplacements.isEmpty())
@@ -171,6 +191,25 @@ public class HarConverter
     public Map<String, String> getContainerReplacements()
     {
         return _containerReplacements;
+    }
+
+    /**
+     * The leading portion of {@code url} that encodes {@code containerPath}, or null if no path segment boundary
+     * decodes to it.
+     */
+    private static String encodedContainerPrefix(String url, String containerPath)
+    {
+        String target = "/" + containerPath;
+        String path = url.split("\\?", 2)[0];
+        for (int slash = path.indexOf('/', 1); slash >= 0; slash = path.indexOf('/', slash + 1))
+        {
+            String candidate = path.substring(0, slash);
+            if (EscapeUtil.decode(candidate).equals(target))
+            {
+                return candidate;
+            }
+        }
+        return null;
     }
 
     private InputStream getInputStream(String inputParam) throws FileNotFoundException
@@ -202,13 +241,23 @@ public class HarConverter
             JSONObject harJson = new JSONObject(jsonTokener);
             JSONArray entries = harJson.getJSONObject("log").getJSONArray("entries");
 
+            String baseUrl = _baseUrlOverride != null ? _baseUrlOverride : determineBaseUrl(entries);
+            LOG.info("Treating '{}' as the server root", baseUrl);
+
             List<HarRequest> requests = new ArrayList<>();
             for (int i = 0; i < entries.length(); i++)
             {
                 JSONObject entry = entries.getJSONObject(i);
-                if (shouldIncludeHarEntry(entry))
+                String url = entry.getJSONObject("request").getString("url");
+                if (!url.startsWith(baseUrl))
                 {
-                    requests.add(new HarRequest(entry));
+                    LOG.warn("Skipping request to a different server: {}", url);
+                    continue;
+                }
+                String relativeUrl = url.substring(baseUrl.length());
+                if (shouldIncludeHarEntry(relativeUrl))
+                {
+                    requests.add(new HarRequest(entry, relativeUrl));
                 }
             }
 
@@ -222,9 +271,33 @@ public class HarConverter
         }
     }
 
-    private boolean shouldIncludeHarEntry(JSONObject entry)
+    /**
+     * The origin the recording was made against. HAR entries carry absolute URLs, so the recording itself is the only
+     * reliable source: 'test.properties' describes whichever server the UI tests point at, which is rarely the server
+     * that was recorded.
+     */
+    private static String determineBaseUrl(JSONArray entries)
     {
-        String url = entry.getJSONObject("request").getString("url");
+        Map<String, Integer> origins = new HashMap<>();
+        for (int i = 0; i < entries.length(); i++)
+        {
+            URI uri = URI.create(entries.getJSONObject(i).getJSONObject("request").getString("url"));
+            String port = uri.getPort() == -1 ? "" : ":" + uri.getPort();
+            origins.merge(uri.getScheme() + "://" + uri.getHost() + port, 1, Integer::sum);
+        }
+        if (origins.isEmpty())
+        {
+            throw new IllegalArgumentException("No requests in har file");
+        }
+        if (origins.size() > 1)
+        {
+            LOG.warn("Recording spans multiple servers {}; using the most frequent. Pass an explicit base URL to override.", origins.keySet());
+        }
+        return origins.entrySet().stream().max(Map.Entry.comparingByValue()).orElseThrow().getKey();
+    }
+
+    private boolean shouldIncludeHarEntry(String url)
+    {
         try
         {
             ControllerActionId actionId = new ControllerActionId(url);
@@ -241,7 +314,7 @@ public class HarConverter
         }
         catch (IllegalArgumentException ignore)
         {
-            LOG.warn("Request doesn't target expected server ({}): {}", WebTestHelper.getBaseURL(), url);
+            LOG.warn("Unparseable request URL: {}", url);
             return false;
         }
     }
@@ -254,11 +327,11 @@ public class HarConverter
         private final String postText;
         private final int responseCode;
 
-        HarRequest(JSONObject harEntry)
+        HarRequest(JSONObject harEntry, String relativeUrl)
         {
             JSONObject request = harEntry.getJSONObject("request");
             method = request.getString("method").toLowerCase();
-            url = request.getString("url").substring(WebTestHelper.getBaseURL().length());
+            url = relativeUrl;
             JSONObject postData = request.optJSONObject("postData", new JSONObject());
             postMime = postData.optString("mimeType");
             postText = postData.optString("text");

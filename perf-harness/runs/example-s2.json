@@ -1,0 +1,45 @@
+{
+  "scenarioName": "example-s2",
+  "baseUrl": "https://labkey.example.com",
+  "sessions": 2,
+  "durationSeconds": 3600,
+  "runOnce": true,
+  "warmupSeconds": 0,
+  "delayBetweenActivitiesMillis": 5000,
+  "maxActivityThreads": 6,
+  "requireMiniProfiler": false,
+  "requestTimeoutSeconds": 300,
+  "resultsDir": "../results",
+  "replacements": {
+    "PROJECT": "My%20Project",
+    "FOLDER": "My%20Project/My%20Folder",
+    "SHARED": "Shared"
+  },
+  "configUnderTest": {
+    "variant": "CHANGEME",
+    "instanceClass": "CHANGEME",
+    "vcpus": "CHANGEME",
+    "memoryGb": "CHANGEME",
+    "burstable": "CHANGEME",
+    "storageType": "CHANGEME",
+    "allocatedStorageGb": "CHANGEME",
+    "storageIops": "CHANGEME",
+    "storageThroughputMbps": "CHANGEME",
+    "parameterGroup": "CHANGEME",
+    "notes": "CHANGEME"
+  },
+  "activities": [
+    {
+      "file": "../activities/app-dashboard.xml"
+    },
+    {
+      "file": "../activities/sample-grid.xml"
+    },
+    {
+      "file": "../activities/sample-grid-filter.xml"
+    },
+    {
+      "file": "../activities/freezer-home.xml"
+    }
+  ]
+}
