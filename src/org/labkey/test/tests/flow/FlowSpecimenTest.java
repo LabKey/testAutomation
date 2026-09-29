@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests.flow;
 
+import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -62,6 +63,7 @@ public class FlowSpecimenTest extends BaseFlowTest
     @LogMethod
     private void initializeStudyFolder()
     {
+        Assume.assumeTrue("Specimen module not present", _studyHelper.isSpecimenModulePresent());
         log("** Initialize Study Folder");
         _containerHelper.createSubfolder(getProjectName(), getProjectName(), STUDY_FOLDER, "Study", null);
         _containerHelper.enableModule("Specimen");
