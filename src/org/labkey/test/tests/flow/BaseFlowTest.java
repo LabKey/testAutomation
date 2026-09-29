@@ -18,6 +18,7 @@ package org.labkey.test.tests.flow;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
 import org.junit.BeforeClass;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -46,6 +47,7 @@ import static org.junit.Assert.assertEquals;
 abstract public class BaseFlowTest extends BaseWebDriverTest
 {
     protected static final File PIPELINE_PATH = TestFileUtils.getSampleData("flow");
+    protected static final String DEFAULT_BACKGROUND_FILTER_VALUE = "Neg Cont";
 
     @Override
     public List<String> getAssociatedModules()
@@ -265,6 +267,12 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
 
     protected void setProtocolMetadata(String specimenIdColumn, String participantColumn, String dateColumn, String visitColumn, boolean setBackground)
     {
+        setProtocolMetadata(specimenIdColumn, participantColumn, dateColumn, visitColumn, setBackground ? DEFAULT_BACKGROUND_FILTER_VALUE : null);
+    }
+
+    /** A null backgroundValue leaves the match column and background filter settings untouched. */
+    protected void setProtocolMetadata(String specimenIdColumn, String participantColumn, String dateColumn, String visitColumn, @Nullable String backgroundValue)
+    {
         log("** Specify metadata");
         goToFlowDashboard();
         clickAndWait(Locator.linkWithText("Other settings"));
@@ -280,7 +288,7 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
         if (visitColumn != null)
             selectOptionByText(Locator.name("ff_visitColumn"), visitColumn);
 
-        if (setBackground)
+        if (backgroundValue != null)
         {
             // specify forground-background match columns
             Locator loc1 = Locator.name("ff_matchColumn").index(0);
@@ -291,7 +299,7 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
             selectOptionByText(Locator.name("ff_backgroundFilterField").index(0), "Sample Stim");
             Locator loc = Locator.name("ff_backgroundFilterOp").index(0);
             assertEquals("eq", getFormElement(loc));
-            setFormElement(Locator.name("ff_backgroundFilterValue").index(0), "Neg Cont");
+            setFormElement(Locator.name("ff_backgroundFilterValue").index(0), backgroundValue);
         }
 
         clickButton("Set Metadata");
