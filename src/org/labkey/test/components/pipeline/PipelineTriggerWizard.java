@@ -231,6 +231,13 @@ public class PipelineTriggerWizard extends WebDriverComponent<PipelineTriggerWiz
         return this;
     }
 
+    public boolean isParameterFunctionPresent()
+    {
+        showAdvanced();
+        getWrapper().shortWait().until(ExpectedConditions.visibilityOf(elementCache().addCustomParam));
+        return elementCache().paramFunctionInput.getComponentElement().isDisplayed();
+    }
+
     private void showAdvanced()
     {
         if (!Locator.byClass("advanced-settings").findWhenNeeded(this).isDisplayed())
@@ -310,9 +317,9 @@ public class PipelineTriggerWizard extends WebDriverComponent<PipelineTriggerWiz
         //details page elements
         Input nameInput = new Input(Locator.tagWithName("input", "name").findWhenNeeded(this), getDriver());
         Input descriptionInput = new Input(Locator.tagWithName("textarea", "description").findWhenNeeded(this), getDriver());
-        OptionSelect typeSelect = new OptionSelect(Locator.tagWithName("select", "type").findWhenNeeded(this));
-        OptionSelect taskSelect = new OptionSelect(Locator.tagWithName("select", "pipelineId").findWhenNeeded(this));
-        OptionSelect usernameInput = new OptionSelect(Locator.tagWithName("select", "username").findWhenNeeded(this));
+        OptionSelect<OptionSelect.SelectOption> typeSelect = new OptionSelect<>(Locator.tagWithName("select", "type").findWhenNeeded(this));
+        OptionSelect<OptionSelect.SelectOption> taskSelect = new OptionSelect<>(Locator.tagWithName("select", "pipelineId").findWhenNeeded(this));
+        OptionSelect<OptionSelect.SelectOption> usernameInput = new OptionSelect<>(Locator.tagWithName("select", "username").findWhenNeeded(this));
         Input assayProviderInput = new Input(Locator.tagWithName("input", "assay provider").findWhenNeeded(this), getDriver());
         Checkbox enabledCheckbox = new Checkbox(Locator.tagWithName("input", "enabled").findWhenNeeded(this));
         //configuration page elements
@@ -323,12 +330,12 @@ public class PipelineTriggerWizard extends WebDriverComponent<PipelineTriggerWiz
         Input containerMoveInput = new Input(Locator.tagWithName("input", "moveContainer").findWhenNeeded(this), getDriver());
         Input subdirectoryMoveInput = new Input(Locator.tagWithName("input", "moveDirectory").findWhenNeeded(this), getDriver());
         Input copyInput = new Input(Locator.tagWithName("input", "copy").findWhenNeeded(this), getDriver());
-        Input paramFunctionInput = new Input(Locator.tagWithName("textarea", "parameterFunction").findWhenNeeded(this), getDriver());
+        Input paramFunctionInput = new Input(Locator.id("parameter-function").findWhenNeeded(this), getDriver());
         WebElement showAdvanced = Locator.byClass("custom-config__button").withText("Show Advanced Settings").findWhenNeeded(this);
         WebElement addCustomParam = Locator.byClass("custom-config__button").withText("Add Custom Parameter").findWhenNeeded(this);
         Input assayProtocolInput = new Input(Locator.tagWithName("input", "protocolName").findWhenNeeded(this), getDriver());
         Input configurationFileInput = new Input(Locator.name("configFileName").findWhenNeeded(this), getDriver());
-        //navgiation elements
+        //navigation elements
         WebElement detailsButton = Locator.linkContainingText("Details").findWhenNeeded(this);
         WebElement configurationButton = Locator.linkContainingText("Configuration").findWhenNeeded(this);
 
