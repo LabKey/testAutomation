@@ -219,7 +219,7 @@ public class WikiDeletePermissionsTest extends BaseWebDriverTest
         goToDeleteConfirm("P8");
         String warning = SUBTREE_WARNING.findElement(getDriver()).getText();
         Assert.assertTrue("Warning should show the page name as literal text: " + warning, warning.contains(childName));
-        assertElementNotPresent(SUBTREE_WARNING.append(Locator.tag("b")));
+        assertElementNotPresent(Locator.css("span.labkey-error b"));
         AUTHOR_1.stopImpersonating();
     }
 
