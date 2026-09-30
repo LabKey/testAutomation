@@ -193,11 +193,15 @@ public class ChartTypeDialog extends ChartWizardDialog<ChartTypeDialog.ElementCa
 
     public ChartTypeDialog setYAxisSide(int measureIndex, YAxisSide side)
     {
-        WebElement measureEl = elementCache().Y_FIELD_DISPLAY.index(measureIndex).findElement(this);
-        if (!measureEl.getAttribute("class").contains("selected"))
-        {
-            Locator.byClass("field-selection-text").findElement(measureEl).click();
-        }
+        Locator measureLoc = elementCache().Y_FIELD_DISPLAY.index(measureIndex);
+        // A click that lands while the dialog is still rendering doesn't select the measure, so retry it
+        WebDriverWrapper.waitFor(() -> {
+            WebElement el = measureLoc.findElement(this);
+            if (!el.getAttribute("class").contains("x4-item-selected"))
+                Locator.byClass("field-selection-text").findElement(el).click();
+            return WebDriverWrapper.waitFor(() -> measureLoc.findElement(this).getAttribute("class").contains("x4-item-selected"), 1_000);
+        }, "Y axis measure " + measureIndex + " was not selected", 5_000);
+        WebElement measureEl = measureLoc.findElement(this);
         WebElement arrow = Locator.tagWithClass("i", "fa-arrow-circle-" + side.name().toLowerCase()).waitForElement(measureEl, 5_000);
         WebDriverWait quickWait = new WebDriverWait(getWrapper().getDriver(), Duration.ofSeconds(4));
         quickWait.until(ExpectedConditions.visibilityOf(arrow));
