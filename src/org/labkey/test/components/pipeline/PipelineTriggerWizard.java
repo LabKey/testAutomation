@@ -64,7 +64,12 @@ public class PipelineTriggerWizard extends WebDriverComponent<PipelineTriggerWiz
 
     public static PipelineTriggerWizard beginAt(WebDriverWrapper driver, String containerPath, String pipelineTask)
     {
-        driver.beginAt(WebTestHelper.buildURL("pipeline", containerPath, "createPipelineTrigger", Map.of("pipelineTask", pipelineTask)));
+        return beginAt(driver, containerPath, Map.of("pipelineTask", pipelineTask));
+    }
+
+    public static PipelineTriggerWizard beginAt(WebDriverWrapper driver, String containerPath, Map<String, ?> params)
+    {
+        driver.beginAt(WebTestHelper.buildURL("pipeline", containerPath, "createPipelineTrigger", params));
         return new PipelineTriggerWizard(driver.getDriver());
     }
 
@@ -156,6 +161,11 @@ public class PipelineTriggerWizard extends WebDriverComponent<PipelineTriggerWiz
         return this;
     }
 
+    public String getLocation()
+    {
+        return elementCache().locationInput.get();
+    }
+
     public PipelineTriggerWizard setLocation(String value)
     {
         elementCache().locationInput.set(value);
@@ -221,6 +231,12 @@ public class PipelineTriggerWizard extends WebDriverComponent<PipelineTriggerWiz
     {
         elementCache().copyInput.set(value);
         return this;
+    }
+
+    public String getParameterFunction()
+    {
+        showAdvanced();
+        return elementCache().paramFunctionInput.get();
     }
 
     public PipelineTriggerWizard setParameterFunction(String function)
