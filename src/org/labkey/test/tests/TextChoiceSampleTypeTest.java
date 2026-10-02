@@ -15,12 +15,20 @@
  */
 package org.labkey.test.tests;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.junit.LabKeyAssert;
 import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.domain.Domain;
+import org.labkey.remoteapi.domain.PropertyDescriptor;
+import org.labkey.remoteapi.domain.SaveDomainCommand;
+import org.labkey.remoteapi.query.ContainerFilter;
+import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.Daily;
@@ -33,6 +41,7 @@ import org.labkey.test.params.FieldDefinition.ColumnType;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.AuditLogHelper;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
 import org.labkey.test.util.TestDataGenerator;
@@ -726,6 +735,96 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
 
         checker().verifyEquals("Error message not as expected.",
                 String.format("Value '%s' for field '%s' is invalid.", invalidValue, textChoiceFieldCaption), errorMsg.getText());
+    }
+
+    /**
+     * <p>
+     *     Rename TextChoice values in use by more rows than the server updates in one batch.
+     * </p>
+     * <p>
+     *     This test will:
+     *     <ul>
+     *         <li>Create samples in the project and a subfolder using values A, B and C.</li>
+     *         <li>Rename A -> B, B -> C and C -> D in a single domain save.</li>
+     *         <li>Verify each sample was mapped exactly once from its original value.</li>
+     *     </ul>
+     * </p>
+     */
+    @Test
+    public void testChainedValueUpdatesAcrossBatches() throws IOException, CommandException
+    {
+        String sampleTypeName = "Test_TC_Chained_Updates";
+        String textChoiceFieldName = "StatusChoice";
+        String subfolder = "ChainedUpdatesSubfolder";
+        String subfolderPath = getProjectName() + "/" + subfolder;
+        Map<String, String> valueUpdates = Map.of("A", "B", "B", "C", "C", "D");
+        // More than one server-side batch (1000 rows) for A and B
+        Map<String, Integer> rowCounts = Map.of("A", 1100, "B", 1100, "C", 300);
+
+        _containerHelper.createSubfolder(getProjectName(), subfolder);
+
+        FieldDefinition textChoiceField = new FieldDefinition(textChoiceFieldName, ColumnType.TextChoice)
+                .setTextChoiceValues(List.of("A", "B", "C"));
+        TestDataGenerator dataGenerator = SampleTypeAPIHelper.createEmptySampleType(getProjectName(),
+                new SampleTypeDefinition(sampleTypeName).setFields(List.of(textChoiceField)));
+
+        log("Insert samples, alternating between the project and the subfolder so each batch spans both containers.");
+        List<Map<String, Object>> projectRows = new ArrayList<>();
+        List<Map<String, Object>> subfolderRows = new ArrayList<>();
+        for (Map.Entry<String, Integer> entry : rowCounts.entrySet())
+        {
+            for (int i = 0; i < entry.getValue(); i++)
+            {
+                Map<String, Object> row = Map.of("Name", entry.getKey() + "-" + i, textChoiceFieldName, entry.getKey());
+                (i % 2 == 0 ? projectRows : subfolderRows).add(row);
+            }
+        }
+        Connection cn = createDefaultConnection();
+        dataGenerator.getQueryHelper(cn, getProjectName()).insertRows(projectRows);
+        dataGenerator.getQueryHelper(cn, subfolderPath).insertRows(subfolderRows);
+
+        log("Rename A -> B, B -> C and C -> D in one domain save.");
+        Domain domain = dataGenerator.getQueryHelper(cn).getDomainDetails().getDomain();
+        List<PropertyDescriptor> fields = new ArrayList<>();
+        for (PropertyDescriptor field : domain.getFields())
+        {
+            if (!textChoiceFieldName.equals(field.getName()))
+            {
+                fields.add(field);
+                continue;
+            }
+
+            JSONObject fieldJson = field.toJSONObject();
+            // toJSONObject() passes through the unmodifiable validator list, so copy it to editable JSON
+            JSONArray validators = new JSONArray((List<?>) field.getAllProperties().get("propertyValidators"));
+            fieldJson.put("propertyValidators", validators);
+            JSONObject validator = validators.getJSONObject(0);
+            validator.put("expression", EscapeUtil.getTextChoiceValidatorExpression(List.of("B", "C", "D")));
+            validator.put("extraProperties", Map.of("valueUpdates", valueUpdates));
+            fields.add(new PropertyDescriptor(fieldJson));
+        }
+        domain.setFields(fields);
+
+        SaveDomainCommand saveCmd = new SaveDomainCommand("samples", sampleTypeName);
+        saveCmd.setDomainDesign(domain);
+        saveCmd.execute(cn, getProjectName());
+
+        log("Verify each sample was mapped from its original value.");
+        SelectRowsCommand selectCmd = new SelectRowsCommand("samples", sampleTypeName);
+        selectCmd.setColumns(List.of("Name", textChoiceFieldName));
+        selectCmd.setContainerFilter(ContainerFilter.CurrentAndSubfolders);
+        List<Map<String, Object>> rows = selectCmd.execute(cn, getProjectName()).getRows();
+
+        checker().verifyEquals("Unexpected number of samples.", rowCounts.values().stream().mapToInt(Integer::intValue).sum(), rows.size());
+        Map<String, Integer> mismatches = new HashMap<>();
+        for (Map<String, Object> row : rows)
+        {
+            String originalValue = ((String) row.get("Name")).split("-")[0];
+            String expectedValue = valueUpdates.get(originalValue);
+            if (!expectedValue.equals(row.get(textChoiceFieldName)))
+                mismatches.merge(originalValue + " -> " + row.get(textChoiceFieldName), 1, Integer::sum);
+        }
+        checker().verifyTrue("Samples not mapped exactly once from their original value: " + mismatches, mismatches.isEmpty());
     }
 
 }
