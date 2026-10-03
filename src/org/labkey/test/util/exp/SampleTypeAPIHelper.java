@@ -19,6 +19,7 @@ import org.json.JSONArray;
 import org.junit.Assert;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.query.ContainerFilter;
 import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
@@ -199,6 +200,21 @@ public class SampleTypeAPIHelper
         Assert.assertEquals(errorMsg, new HashSet<>(sampleNames), rowIds.keySet());
 
         return rowIds;
+    }
+
+    /**
+     * Row ids of sample types named {@code sampleTypeName} visible from {@code containerPath} under CurrentPlusProjectAndShared.
+     */
+    public static List<Integer> getSampleTypeRowIds(String containerPath, String sampleTypeName) throws IOException, CommandException
+    {
+        SelectRowsCommand cmd = new SelectRowsCommand("exp", "SampleSets");
+        cmd.setColumns(List.of("RowId"));
+        cmd.addFilter("Name", sampleTypeName, Filter.Operator.EQUAL);
+        cmd.setContainerFilter(ContainerFilter.CurrentPlusProjectAndShared);
+
+        return cmd.execute(WebTestHelper.getRemoteApiConnection(), containerPath).getRows().stream()
+                .map(row -> Integer.parseInt(row.get("RowId").toString()))
+                .toList();
     }
 
     /**
