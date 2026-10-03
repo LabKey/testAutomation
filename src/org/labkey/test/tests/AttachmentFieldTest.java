@@ -4,13 +4,16 @@ import org.apache.hc.core5.http.HttpStatus;
 import org.assertj.core.api.Assertions;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.query.InsertRowsCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
+import org.labkey.test.TestProperties;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.pages.ReactAssayDesignerPage;
@@ -19,23 +22,29 @@ import org.labkey.test.pages.experiment.UpdateSampleTypePage;
 import org.labkey.test.pages.list.EditListDefinitionPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
+import org.labkey.test.params.list.IntListDefinition;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PermissionsHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
+import org.labkey.test.util.SimpleHttpResponse;
 import org.labkey.test.util.TestDataGenerator;
-
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Category({Daily.class})
-@BaseWebDriverTest.ClassTimeout(minutes = 2)
+@BaseWebDriverTest.ClassTimeout(minutes = 3)
 public class AttachmentFieldTest extends BaseWebDriverTest
 {
     private static final String RESTRICTED_PROJECT = "AttachmentFieldTest Restricted Project";
@@ -269,5 +278,85 @@ public class AttachmentFieldTest extends BaseWebDriverTest
         int status = WebTestHelper.getHttpResponse(crossContainerUrl, RESTRICTED_USER, PasswordUtil.getPassword()).getResponseCode();
         Assert.assertEquals("Expected 403 Forbidden when user lacks read permission on the object's container",
                 HttpStatus.SC_FORBIDDEN, status);
+    }
+
+    // GH Issue 1463
+    @Test
+    public void testDownloadFileLinkWithDisabledFileRoot() throws Exception
+    {
+        Assume.assumeFalse("Test seeds a server-side path from the local file system", TestProperties.isServerRemote());
+
+        final String folderName = "DisabledFileRoot";
+        final String folderPath = getProjectName() + "/" + folderName;
+        final String sampleTypeName = "FileLinkSamples";
+        final String textListName = "TextPathList";
+        final String fieldName = "LinkedFile";
+        _containerHelper.createSubfolder(getProjectName(), folderName);
+
+        log("Create a sample type with a file field and a list with a same-named text field");
+        new SampleTypeDefinition(sampleTypeName)
+                .setFields(List.of(new FieldDefinition(fieldName, FieldDefinition.ColumnType.File)))
+                .create(createDefaultConnection(), folderPath);
+        new IntListDefinition(textListName, "Key")
+                .setFields(List.of(new FieldDefinition(fieldName, FieldDefinition.ColumnType.String)))
+                .create(createDefaultConnection(), folderPath);
+
+        log("Upload a file while the file root is enabled");
+        SampleTypeHelper.beginAtSampleTypesList(this, folderPath).goToSampleType(sampleTypeName);
+        DataRegionTable.DataRegion(getDriver()).withName("Material")
+                .waitFor()
+                .clickInsertNewRow()
+                .setField("Name", "S1")
+                .setField(fieldName, SAMPLE_FILE)
+                .submit();
+        String managedFileUrl = Locator.tagWithAttributeContaining("a", "href", "downloadFileLink")
+                .findElement(getDriver()).getAttribute("href");
+        Matcher propertyIdMatcher = Pattern.compile("propertyId=(\\d+)").matcher(managedFileUrl);
+        Assert.assertTrue("No propertyId in download URL: " + managedFileUrl, propertyIdMatcher.find());
+
+        String propertyId = propertyIdMatcher.group(1);
+
+        log("Link a sample to a file under a custom pipeline root that is later replaced");
+        clickFolder(folderName);
+        File oldPipelineRoot = TestFileUtils.ensureTestTempDir(getClass().getSimpleName(), "oldPipelineRoot");
+        File orphanedFile = new File(oldPipelineRoot, SAMPLE_FILE.getName());
+        Files.copy(SAMPLE_FILE.toPath(), orphanedFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        setPipelineRoot(oldPipelineRoot.getAbsolutePath(), false);
+        InsertRowsCommand sampleInsert = new InsertRowsCommand("samples", sampleTypeName);
+        sampleInsert.addRow(Map.of("Name", "S2", fieldName, orphanedFile.getAbsolutePath()));
+        Object orphanedRowId = sampleInsert.execute(createDefaultConnection(), folderPath).getRows().getFirst().get("RowId");
+        String outsideFileUrl = WebTestHelper.buildURL("core", folderPath, "downloadFileLink", Map.of(
+                "propertyId", propertyId,
+                "schemaName", "samples",
+                "queryName", sampleTypeName,
+                "pk", String.valueOf(orphanedRowId)));
+
+        log("Pair the file field's propertyId with a same-named text column in a list");
+        InsertRowsCommand listInsert = new InsertRowsCommand("lists", textListName);
+        listInsert.addRow(Map.of(fieldName, orphanedFile.getAbsolutePath()));
+        Object textRowKey = listInsert.execute(createDefaultConnection(), folderPath).getRows().getFirst().get("Key");
+        String mismatchedColumnUrl = WebTestHelper.buildURL("core", folderPath, "downloadFileLink", Map.of(
+                "propertyId", propertyId,
+                "schemaName", "lists",
+                "queryName", textListName,
+                "pk", String.valueOf(textRowKey)));
+
+        log("Replace the pipeline root and disable the file root, so the assay files root is unresolvable");
+        setPipelineRoot(TestFileUtils.ensureTestTempDir(getClass().getSimpleName(), "newPipelineRoot").getAbsolutePath(), false);
+        FileRootsManagementPage.beginAt(this, folderPath)
+                .selectFileRootType(FileRootsManagementPage.FileRootOption.disable)
+                .clickSave();
+
+        Assert.assertEquals("File under the disabled file root should still download",
+                HttpStatus.SC_OK, WebTestHelper.getHttpResponse(managedFileUrl).getResponseCode());
+
+        SimpleHttpResponse outsideResponse = WebTestHelper.getHttpResponse(outsideFileUrl);
+        Assert.assertEquals("File outside every file root should be rejected",
+                HttpStatus.SC_NOT_FOUND, outsideResponse.getResponseCode());
+        Assertions.assertThat(outsideResponse.getResponseBody()).as("Rejection reason")
+                .contains("under a file root for container");
+
+        Assert.assertEquals("propertyId for a different column should be rejected",
+                HttpStatus.SC_BAD_REQUEST, WebTestHelper.getHttpResponse(mismatchedColumnUrl).getResponseCode());
     }
 }
