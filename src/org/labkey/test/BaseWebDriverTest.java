@@ -1669,47 +1669,68 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         if (isGuestModeTest())
             return;
 
-        SimpleHttpResponse response = WebTestHelper.getHttpResponse(WebTestHelper.buildURL("admin", "exportConnectionUsage"));
-        if (response.getResponseCode() != HttpStatus.SC_OK)
+        String json = fetchReport("getConnectionPoolStats", "ConnectionPool.json");
+        if (null == json)
+            return;
+
+        boolean tracked;
+        try
         {
-            TestLogger.error("Failed to export connection usage: " + response.getResponseCode() + " " + response.getResponseMessage());
+            JSONObject stats = new JSONObject(json);
+            tracked = stats.optBoolean("connectionUsageTracked");
+            writePoolStatistics(stats);
+        }
+        catch (RuntimeException e)
+        {
+            TestLogger.error("Failed to parse connection pool statistics.", e);
             return;
         }
 
-        String tsv = response.getResponseBody();
-        try
+        if (!tracked)
         {
-            Files.writeString(new File(TestFileUtils.getGradleReportDir(), "ConnectionUsage.tsv").toPath(), tsv);
-        }
-        catch (IOException e)
-        {
-            TestLogger.error("Failed to write connection usage file.", e);
+            log("Connection usage tracking is off; skipping connection usage statistics.");
+            return;
         }
 
-        writeConnectionStatistics(tsv);
-        checkConnectionPool();
+        String tsv = fetchReport("exportConnectionUsage", "ConnectionUsage.tsv");
+        if (null == tsv)
+            return;
+
+        try
+        {
+            writeConnectionStatistics(tsv);
+        }
+        catch (RuntimeException e)
+        {
+            TestLogger.error("Failed to parse connection usage.", e);
+        }
     }
 
-    private void checkConnectionPool()
+    /** Fetches an admin report and saves it as a build artifact; returns null on failure */
+    private @Nullable String fetchReport(String action, String fileName)
     {
-        SimpleHttpResponse response = WebTestHelper.getHttpResponse(WebTestHelper.buildURL("admin", "getConnectionPoolStats"));
+        SimpleHttpResponse response = WebTestHelper.getHttpResponse(WebTestHelper.buildURL("admin", action));
         if (response.getResponseCode() != HttpStatus.SC_OK)
         {
-            TestLogger.error("Failed to get connection pool statistics: " + response.getResponseCode() + " " + response.getResponseMessage());
-            return;
+            TestLogger.error("Failed to get " + action + ": " + response.getResponseCode() + " " + response.getResponseMessage());
+            return null;
         }
 
-        String json = response.getResponseBody();
+        String body = response.getResponseBody();
         try
         {
-            Files.writeString(new File(TestFileUtils.getGradleReportDir(), "ConnectionPool.json").toPath(), json);
+            Files.writeString(new File(TestFileUtils.getGradleReportDir(), fileName).toPath(), body);
         }
         catch (IOException e)
         {
-            TestLogger.error("Failed to write connection pool file.", e);
+            TestLogger.error("Failed to write " + fileName + ".", e);
         }
+        return body;
+    }
 
-        JSONArray dataSources = new JSONObject(json).getJSONArray("dataSources");
+    private void writePoolStatistics(JSONObject stats)
+    {
+        JSONArray dataSources = stats.getJSONArray("dataSources");
         JSONObject pool = IntStream.range(0, dataSources.length())
             .mapToObj(dataSources::getJSONObject)
             .filter(ds -> ds.optBoolean("isLabKeyScope"))
