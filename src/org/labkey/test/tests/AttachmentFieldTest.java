@@ -9,7 +9,14 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.assay.Batch;
+import org.labkey.remoteapi.assay.Data;
+import org.labkey.remoteapi.assay.Run;
+import org.labkey.remoteapi.assay.SaveAssayBatchCommand;
+import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.InsertRowsCommand;
+import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
@@ -35,6 +42,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
@@ -44,11 +52,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Category({Daily.class})
-@BaseWebDriverTest.ClassTimeout(minutes = 3)
+@BaseWebDriverTest.ClassTimeout(minutes = 5)
 public class AttachmentFieldTest extends BaseWebDriverTest
 {
     private static final String RESTRICTED_PROJECT = "AttachmentFieldTest Restricted Project";
     private static final String RESTRICTED_USER = "restrictedreader@attachmentfieldtest.test";
+    private static final String OUTSIDE_FILE_CONTENT = "AttachmentFieldTest content outside every file root";
     private final File SAMPLE_FILE = new File(TestFileUtils.getSampleData("fileTypes"), "jpg_sample.jpg");
 
     @BeforeClass
@@ -367,5 +376,121 @@ public class AttachmentFieldTest extends BaseWebDriverTest
                 HttpStatus.SC_OK, WebTestHelper.getHttpResponse(managedFileUrl).getResponseCode());
         Assert.assertEquals("File outside every file root should be rejected without a pipeline root",
                 HttpStatus.SC_NOT_FOUND, WebTestHelper.getHttpResponse(outsideFileUrl).getResponseCode());
+    }
+
+    @Test
+    public void testExpDataAbsolutePathWithDisabledFileRoot() throws Exception
+    {
+        Assume.assumeFalse("Test seeds a server-side path from the local file system", TestProperties.isServerRemote());
+
+        final String folderName = "ExpDataAbsolutePath";
+        final String folderPath = getProjectName() + "/" + folderName;
+        _containerHelper.createSubfolder(getProjectName(), folderName);
+
+        log("Create a derivation run while the default pipeline root is available");
+        Data seedData = new Data();
+        seedData.setName("seed");
+        seedData.setPipelinePath("/");
+        Batch savedBatch = saveDerivationRun(folderPath, null, null, seedData);
+        Run savedRun = savedBatch.getRuns().getFirst();
+
+        log("Disable the file root, so the folder has no pipeline root");
+        FileRootsManagementPage.beginAt(this, folderPath)
+                .selectFileRootType(FileRootsManagementPage.FileRootOption.disable)
+                .clickSave();
+
+        log("Attach a file outside every file root to the existing run");
+        File outsideFile = writeOutsideFile(TestFileUtils.ensureTestTempDir(getClass().getSimpleName(), "outsideRoots"));
+        Data outsideData = new Data();
+        outsideData.setName(outsideFile.getName());
+        outsideData.setAbsolutePath(outsideFile.getAbsolutePath());
+        try
+        {
+            saveDerivationRun(folderPath, savedBatch.getId(), savedRun.getId(), outsideData);
+        }
+        catch (CommandException expected)
+        {
+            log("Save rejected the file outside every file root: " + expected.getMessage());
+            return;
+        }
+
+        SimpleHttpResponse showFileResponse = getShowFileResponse(folderPath, getDataRowId(folderPath, outsideFile.getName()));
+        Assert.fail("saveAssayBatch accepted a file outside every file root, and showFile then returned "
+                + showFileResponse.getResponseCode()
+                + (showFileResponse.getResponseBody().contains(OUTSIDE_FILE_CONTENT) ? " with the file's contents" : ""));
+    }
+
+    @Test
+    public void testShowFileWithDisabledFileRoot() throws Exception
+    {
+        Assume.assumeFalse("Test seeds a server-side path from the local file system", TestProperties.isServerRemote());
+
+        final String folderName = "OrphanedExpData";
+        final String folderPath = getProjectName() + "/" + folderName;
+        _containerHelper.createSubfolder(getProjectName(), folderName);
+
+        log("Create an exp.data file under a custom pipeline root that is later removed");
+        File oldPipelineRoot = TestFileUtils.ensureTestTempDir(getClass().getSimpleName(), "oldExpDataPipelineRoot");
+        File orphanedFile = writeOutsideFile(oldPipelineRoot);
+        clickFolder(folderName);
+        setPipelineRoot(oldPipelineRoot.getAbsolutePath(), false);
+        Data orphanedData = new Data();
+        orphanedData.setName(orphanedFile.getName());
+        orphanedData.setAbsolutePath(orphanedFile.getAbsolutePath());
+        saveDerivationRun(folderPath, null, null, orphanedData);
+        int dataRowId = getDataRowId(folderPath, orphanedFile.getName());
+
+        log("Revert to the default pipeline root");
+        clickFolder(folderName);
+        setPipelineRootToDefault();
+        Assert.assertEquals("File outside the pipeline root should be rejected",
+                HttpStatus.SC_FORBIDDEN, getShowFileResponse(folderPath, dataRowId).getResponseCode());
+
+        log("Disable the file root, so the folder has no pipeline root");
+        FileRootsManagementPage.beginAt(this, folderPath)
+                .selectFileRootType(FileRootsManagementPage.FileRootOption.disable)
+                .clickSave();
+        Assert.assertEquals("File outside every file root should be rejected without a pipeline root",
+                HttpStatus.SC_FORBIDDEN, getShowFileResponse(folderPath, dataRowId).getResponseCode());
+    }
+
+    private File writeOutsideFile(File dir) throws IOException
+    {
+        File file = new File(dir, "outsideRoots.txt");
+        Files.writeString(file.toPath(), OUTSIDE_FILE_CONTENT);
+        return file;
+    }
+
+    private Batch saveDerivationRun(String folderPath, @Nullable Integer batchId, @Nullable Integer runId, Data dataInput) throws IOException, CommandException
+    {
+        Run run = new Run();
+        run.setName("Derivation run");
+        if (runId != null)
+            run.setId(runId);
+        run.setDataInputs(List.of(dataInput));
+
+        Batch batch = new Batch();
+        if (batchId != null)
+            batch.setId(batchId);
+        batch.getRuns().add(run);
+
+        return new SaveAssayBatchCommand(SaveAssayBatchCommand.SAMPLE_DERIVATION_PROTOCOL, batch)
+                .execute(createDefaultConnection(), folderPath).getBatch();
+    }
+
+    private int getDataRowId(String folderPath, String dataName) throws IOException, CommandException
+    {
+        SelectRowsCommand select = new SelectRowsCommand("exp", "Data");
+        select.setColumns(List.of("RowId"));
+        select.addFilter("Name", dataName, Filter.Operator.EQUAL);
+        List<Map<String, Object>> rows = select.execute(createDefaultConnection(), folderPath).getRows();
+        Assert.assertEquals("exp.data rows named " + dataName, 1, rows.size());
+        return ((Number) rows.getFirst().get("RowId")).intValue();
+    }
+
+    private SimpleHttpResponse getShowFileResponse(String folderPath, int dataRowId)
+    {
+        return WebTestHelper.getHttpResponse(WebTestHelper.buildURL("experiment", folderPath, "showFile",
+                Map.of("rowId", String.valueOf(dataRowId))));
     }
 }
