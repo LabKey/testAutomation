@@ -15,7 +15,6 @@
  */
 package org.labkey.test.tests;
 
-import org.jetbrains.annotations.Nullable;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -141,12 +140,12 @@ public class SampleTypeLimitsTest extends BaseWebDriverTest
         table.clickInsertNewRow();
         setFormElement(Locator.name("quf_id"), "1");
         setFormElement(Locator.name("quf_name"), "1");
-        verifyInvalidLookupSample("quf_lookUpField", "Sample3", null);
+        verifyInvalidLookupSample("quf_lookUpField", "Sample3");
         verifyValidLookupSample("quf_lookUpField", "Sample1");
 
         log("Verifying editing list row with the sample display name");
         table.clickEditRow("1");
-        verifyInvalidLookupSample("quf_lookUpField", "Sample3", null);
+        verifyInvalidLookupSample("quf_lookUpField", "Sample3");
         verifyValidLookupSample("quf_lookUpField", "Sample2");
 
         log("Verifying editing list row with the sample RowId");
@@ -154,30 +153,27 @@ public class SampleTypeLimitsTest extends BaseWebDriverTest
         SelectRowsCommand command = new SelectRowsCommand("samples", SAMPLE_TYPE_NAME);
         command.setFilters(Arrays.asList(new Filter("Name", "Sample1")));
         SelectRowsResponse response = command.execute(createDefaultConnection(), getProjectName());
-        verifyValidLookupSample("quf_lookUpField", response.getRows().getFirst().get("RowId").toString(), "Sample1", "query", false);
+        verifyValidLookupSample("quf_lookUpField", response.getRows().getFirst().get("RowId").toString(), "Sample1", "query");
     }
 
-    private void verifyInvalidLookupSample(String fieldName, String sampleValue, @Nullable String expectedErrorMsg)
+    private void verifyInvalidLookupSample(String fieldName, String sampleValue)
     {
         setFormElement(Locator.name(fieldName), sampleValue);
         clickButton("Submit");
 
         String errMsg = Locators.labkeyError.findElement(getDriver()).getText();
-        assertEquals("Expected error is different", expectedErrorMsg == null ? "Could not convert value: " + sampleValue : expectedErrorMsg, errMsg);
+        assertEquals("Expected error is different", "Could not convert value: " + sampleValue, errMsg);
     }
 
     private void verifyValidLookupSample(String fieldName, String sampleValue)
     {
-        verifyValidLookupSample(fieldName, sampleValue, sampleValue, "query", false);
+        verifyValidLookupSample(fieldName, sampleValue, sampleValue, "query");
     }
 
-    private void verifyValidLookupSample(String fieldName, String sampleValue, String sampleDisplay, String dataRegionName, boolean navigateViaBreadcrumb)
+    private void verifyValidLookupSample(String fieldName, String sampleValue, String sampleDisplay, String dataRegionName)
     {
         setFormElement(Locator.name(fieldName), sampleValue);
         clickButton("Submit");
-
-        if (navigateViaBreadcrumb)
-            clickAndWait(Locator.tagWithClass("ol", "breadcrumb").childTag("li").index(1).childTag("a"));
 
         log("Verifying row is inserted correctly");
         DataRegionTable table = DataRegionTable.DataRegion(getDriver()).withName(dataRegionName).waitFor();
