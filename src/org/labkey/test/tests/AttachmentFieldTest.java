@@ -410,7 +410,8 @@ public class AttachmentFieldTest extends BaseWebDriverTest
         }
         catch (CommandException expected)
         {
-            log("Save rejected the file outside every file root: " + expected.getMessage());
+            Assertions.assertThat(expected.getMessage()).as("Save rejection reason")
+                    .contains("is not under the pipeline root");
             return;
         }
 
