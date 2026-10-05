@@ -358,5 +358,14 @@ public class AttachmentFieldTest extends BaseWebDriverTest
 
         Assert.assertEquals("propertyId for a different column should be rejected",
                 HttpStatus.SC_BAD_REQUEST, WebTestHelper.getHttpResponse(mismatchedColumnUrl).getResponseCode());
+
+        log("Revert to the default pipeline root, which is unresolvable while the file root is disabled");
+        clickFolder(folderName);
+        setPipelineRootToDefault();
+
+        Assert.assertEquals("File under the disabled file root should download without a pipeline root",
+                HttpStatus.SC_OK, WebTestHelper.getHttpResponse(managedFileUrl).getResponseCode());
+        Assert.assertEquals("File outside every file root should be rejected without a pipeline root",
+                HttpStatus.SC_NOT_FOUND, WebTestHelper.getHttpResponse(outsideFileUrl).getResponseCode());
     }
 }
