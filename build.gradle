@@ -10,6 +10,7 @@ import org.labkey.gradle.task.RunUiTest
 import org.labkey.gradle.util.BuildUtils
 import org.labkey.gradle.util.GroupNames
 import org.labkey.gradle.util.PomFileHelper
+import org.labkey.gradle.plugin.extension.TeamCityExtension
 
 project.group = "org.labkey.api"
 def apiArtifactName = "labkey-api-selenium"
@@ -67,7 +68,7 @@ project.dependencies {
     uiTestRuntimeOnly "org.aspectj:aspectjrt:${aspectjVersion}"
 
     if (!project.hasProperty('testWithLocalApi') && // Use this property temporarily when upgrading XMLBeans or changing dependencies provided by API
-            (project.hasProperty("teamcity") || project.findProject(BuildUtils.getApiProjectPath(project.gradle)) == null)) {
+            (TeamCityExtension.isOnTeamCity(project) || project.findProject(BuildUtils.getApiProjectPath(project.gradle)) == null)) {
         // LabKey XML schemas are used to decode exported folder XMLs and test case XMLs
         // Don't include local version so that running tests doesn't require building API module
         implementation("org.labkey.api:api:${labkeySchemasTestVersion}") { transitive = false }
@@ -96,7 +97,7 @@ if (project.findProject(":remoteapi:labkey-api-jdbc") != null)
     BuildUtils.addLabKeyDependency(project: project, config: "implementation", depProjectPath: ":remoteapi:labkey-api-jdbc")
 }
 
-if (project.hasProperty("teamcity"))
+if (TeamCityExtension.isOnTeamCity(project))
 {
     apply plugin: 'org.labkey.build.teamCity'
 }
