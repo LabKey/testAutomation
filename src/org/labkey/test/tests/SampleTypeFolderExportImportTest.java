@@ -101,8 +101,11 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
     protected void doCleanup(boolean afterTest)
     {
         super.doCleanup(afterTest);
-        SampleTypeFolderExportImportTest init = getCurrentTest();
-        init.doSetup();
+        if (!afterTest)
+        {
+            SampleTypeFolderExportImportTest init = getCurrentTest();
+            init.doSetup();
+        }
     }
 
     private void doSetup()
