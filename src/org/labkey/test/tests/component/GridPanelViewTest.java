@@ -932,7 +932,7 @@ public class GridPanelViewTest extends GridPanelBaseTest
 
         grid.sortColumn(sortColumn, SortDirection.DESC);
 
-        validateGridHeader(testName, grid, EDITED_ALERT, true);
+        validateGridHeader(testName, grid, UPDATED_ALERT, true);
 
         // Save the view otherwise it will have (edited) as a title.
         log("Validate that using 'Save View' from the menu populates the view name field in the dialog.");
