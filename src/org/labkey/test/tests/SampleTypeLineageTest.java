@@ -29,7 +29,6 @@ import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
-import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.ext4.Window;
@@ -38,18 +37,17 @@ import org.labkey.test.params.FieldKey;
 import org.labkey.test.params.experiment.DataClassDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.OptionalFeatureHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
 import org.labkey.test.util.TestDataGenerator;
+import org.labkey.test.util.exp.SampleTypeAPIHelper;
+import org.labkey.test.util.query.QueryApiHelper;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -101,15 +99,6 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
         portalHelper.addWebPart("Sample Types");
 
         portalHelper.exitAdminMode();
-        OptionalFeatureHelper.setOptionalFeature(createDefaultConnection(), "deriveSamplesNotInApp", true);
-    }
-
-    @Override
-    protected void doCleanup(boolean afterTest) throws TestTimeoutException
-    {
-        super.doCleanup(afterTest);
-
-        OptionalFeatureHelper.resetOptionalFeature(createDefaultConnection(), "deriveSamplesNotInApp");
     }
 
     /**
@@ -215,7 +204,7 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testSampleTypeAndLineageInSubfolder()
+    public void testSampleTypeAndLineageInSubfolder() throws IOException, CommandException
     {
         /*
         This test will create a sample type named "ParentFolder_SampleType" in the root folder.
@@ -270,67 +259,24 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
         checker().wrapAssertion(()->assertTextNotPresent(parentFolderSampleType));
 
         log("Derive two samples from the samples already present in this sample type (SubFolder_SampleType).");
-        clickFolder(SUB_FOLDER_NAME);
-        checker().wrapAssertion(()->assertTextPresent(subFolderSampleType, parentFolderSampleType));
+        String subFolderPath = getProjectName() + "/" + SUB_FOLDER_NAME;
+        String grandparents = "SampleSetBVT11,SampleSetBVT4,SampleSetBVT12,SampleSetBVT13,SampleSetBVT14";
+        new QueryApiHelper(createDefaultConnection(), subFolderPath, "samples", subFolderSampleType)
+                .insertRows(List.of(
+                        Map.of("Name", "SampleSetBVT15", "IntCol-Folder", 500, "StringCol-Folder", "firstOutput",
+                                "MaterialInputs/" + subFolderSampleType, grandparents),
+                        Map.of("Name", "SampleSetBVT16", "StringCol-Folder", "secondOutput",
+                                "MaterialInputs/" + subFolderSampleType, grandparents)));
 
-        clickAndWait(Locator.linkWithText(subFolderSampleType));
-        checkCheckbox(Locator.name(".toggle"));
-        clickButton("Derive Samples");
-        waitForElement(Locator.name("inputRole0"));
-
-        selectOptionByText(Locator.name("inputRole0"), "Add a new role...");
-        setFormElement(Locator.id("customRole0"), "FirstRole");
-        selectOptionByText(Locator.name("inputRole1"), "Add a new role...");
-        setFormElement(Locator.id("customRole1"), "SecondRole");
-        selectOptionByText(Locator.name("inputRole2"), "Add a new role...");
-        setFormElement(Locator.id("customRole2"), "ThirdRole");
-        selectOptionByText(Locator.name("inputRole3"), "Add a new role...");
-        setFormElement(Locator.id("customRole3"), "FourthRole");
-        selectOptionByText(Locator.name("outputCount"), "2");
-        selectOptionByText(Locator.name("targetSampleTypeId"), subFolderSampleType + " in /" + getProjectName() + "/" + SUB_FOLDER_NAME);
-        clickButton("Next");
-
-        setFormElement(Locator.name("Output Sample 1_Name"), "SampleSetBVT15");
-        setFormElement(Locator.name("Output Sample 2_Name"), "SampleSetBVT16");
-        checkCheckbox(Locator.name("outputSample1_IntColFolderCheckBox"));
-        setFormElement(Locator.name("Output Sample 1_IntCol-Folder"), "500a");
-        setFormElement(Locator.name("Output Sample 1_StringCol-Folder"), "firstOutput");
-        setFormElement(Locator.name("Output Sample 2_StringCol-Folder"), "secondOutput");
-        clickButton("Submit");
-
-        log("Do a simple check that data validation works.");
-        checker().verifyTrue("Expected error message '(String) for Integer field' is not present.",
-                isTextPresent("(String) for Integer field"));
-        checkCheckbox(Locator.name("outputSample1_IntColFolderCheckBox"));
-        setFormElement(Locator.name("Output Sample 1_IntCol-Folder"), "500");
-        clickButton("Submit");
-
-        clickAndWait(Locator.linkContainingText("Derive 2 samples"));
-        clickAndWait(Locator.linkContainingText("Text View"));
-        assertTextPresent("FirstRole", "SecondRole", "ThirdRole", "FourthRole");
-
-        log("Select one of these new derived samples and derive a sample from it");
-        log("But put this new derived sample in the sample type created in the parent folder (ParentFolder_SampleType)");
-        clickAndWait(Locator.linkContainingText("16"));
-        clickAndWait(Locator.linkContainingText("derive samples from this sample"));
-
-        selectOptionByText(Locator.name("inputRole0"), "FirstRole");
-        selectOptionByText(Locator.name("targetSampleTypeId"), parentFolderSampleType + " in /" + getProjectName());
-        clickButton("Next");
-
+        log("Derive a sample from one of these new derived samples but put it in the sample type created in the parent folder (ParentFolder_SampleType)");
         String derivedSampleName = "Only_In_Sub_Folder";
-        setFormElement(Locator.name("Output Sample 1_Name"), derivedSampleName);
-        setFormElement(Locator.name("Output Sample 1_IntCol"), "600");
-        setFormElement(Locator.name("Output Sample 1_StringCol"), "String");
-        setFormElement(Locator.name("Output Sample 1_DateCol"), "BadDate");
-        uncheckCheckbox(Locator.name("Output Sample 1_BoolCol"));
-        clickButton("Submit");
+        new QueryApiHelper(createDefaultConnection(), subFolderPath, "samples", parentFolderSampleType)
+                .insertRows(List.of(Map.of("Name", derivedSampleName, "IntCol", 600, "StringCol", "String",
+                        "DateCol", "1/1/2007", "BoolCol", false,
+                        "MaterialInputs/" + subFolderSampleType, "SampleSetBVT16")));
 
-        log("Again check that data validation works as expected.");
-        checker().verifyTrue("Expected error message 'is not a valid Date' is not present.",
-                isTextPresent(getConversionErrorMessage("BadDate", "DateCol", Date.class)));
-        setFormElement(Locator.name("Output Sample 1_DateCol"), "1/1/2007");
-        clickButton("Submit");
+        Integer derivedRowId = SampleTypeAPIHelper.getRowIdsForSamples(subFolderPath, parentFolderSampleType, List.of(derivedSampleName)).get(derivedSampleName);
+        beginAt(WebTestHelper.buildURL("experiment", subFolderPath, "showMaterial", Map.of("rowId", derivedRowId)));
 
         log("Check that the correct sample id is shown as the parent.");
         checker().verifyTrue("Link to parent sample not present.",
@@ -353,10 +299,7 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
                 isElementPresent(Locator.linkWithText("Derive sample from SampleSetBVT16")));
 
         checker().verifyTrue("Expected run text is not present.",
-                isElementPresent(
-                        Locator.linkWithText("Derive 2 samples from SampleSetBVT11, SampleSetBVT12, SampleSetBVT13, SampleSetBVT14, SampleSetBVT4")
-                )
-        );
+                isElementPresent(Locator.linkContainingText("Derive 2 samples from ")));
 
         log("Go to the 'SubFolder_SampleType' and make sure the expected data is there.");
         clickFolder(SUB_FOLDER_NAME);
@@ -598,163 +541,6 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
         assertNotNull("RowD should have a parent", rowD.get("Run"));
         assertNotEquals("RowD should not equal B", rowD.get("Run"), rowB.get("Run"));
         assertNotEquals("RowD should not equal C", rowD.get("Run"), rowC.get("Run"));
-    }
-
-    @Test
-    public void testDeriveSampleByUI() throws CommandException, IOException
-    {
-        String sampleTypeName= "LineageUI_01";
-        String namePrefix = "SampleUI-";
-        int newSampleIndex = 6;
-
-        goToProjectHome();
-
-        log("Create a simple sample type with some samples.");
-        final TestDataGenerator dgen = new SampleTypeDefinition(sampleTypeName)
-                .create(createDefaultConnection(), getProjectName());
-
-        for(int i = 1; i < newSampleIndex; i++)
-        {
-            Map<String, Object> sampleData = new HashMap<>();
-            sampleData.put("name", namePrefix + i);
-            dgen.addCustomRow(sampleData);
-        }
-
-        dgen.insertRows(createDefaultConnection(), dgen.getRows());
-        // Refresh the page so the new sample type shows up in the UI.
-        refresh();
-        waitAndClickAndWait(Locator.linkWithText(sampleTypeName));
-
-        log("Go to the first samples detail page and derive a sample from it.");
-
-        String parentSample = namePrefix + "1";
-        log(String.format("Using sample named '%s' as the parent.", parentSample));
-
-        waitAndClickAndWait(Locator.linkWithText(parentSample));
-
-        waitAndClickAndWait(Locator.linkWithText("derive samples from this sample"));
-
-        log("Nothing fancy just going to create a single derived sample in the same sample type.");
-        waitAndClickAndWait(Locator.lkButton("Next"));
-        Locator nameTxtbox = Locator.inputByNameContaining("_Name");
-        waitForElement(nameTxtbox);
-
-        String newSampleName = namePrefix + newSampleIndex;
-        log(String.format("The new sample will be named '%s' and it shall go forth upon the land.", newSampleName));
-
-        setFormElement(nameTxtbox, newSampleName);
-        clickAndWait(Locator.lkButton("Submit"));
-
-        // Increment the index.
-        newSampleIndex++;
-
-        log(String.format("Check that '%s' is shown as the parent.", parentSample));
-        checkRowsInDataRegion("parentMaterials", "Name", List.of(parentSample));
-
-        log(String.format("Go to the detail page for '%s' and verify it has a child.", parentSample));
-        clickAndWait(Locator.linkWithText(parentSample));
-        checkRowsInDataRegion("childMaterials", "Name", List.of(newSampleName));
-
-        log("For the parent also verify that the run column (for the child sample) is populated as expected.");
-        String runTextStrFormat = "Derive sample from %s";
-        checkRowsInDataRegion("childMaterials", "Run", List.of(String.format(runTextStrFormat, parentSample)));
-
-        log("Go back to the sample type page and select several samples from the grid and derive a sample from them.");
-        goToProjectHome();
-        SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
-
-        sampleHelper.goToSampleType(sampleTypeName);
-        DataRegionTable drt = sampleHelper.getSamplesDataRegionTable();
-
-        List<String> parents = Arrays.asList(namePrefix + "2", namePrefix + "3", namePrefix + "4");
-        log(String.format("Using samples '%s' as the parents.", parents));
-
-        for(String parent : parents)
-        {
-            int index = drt.getRowIndex("Name", parent);
-            drt.checkCheckbox(index);
-        }
-
-        drt.clickHeaderButtonAndWait("Derive Samples");
-        log("Again, nothing fancy just going to create a single derived sample.");
-        waitAndClickAndWait(Locator.lkButton("Next"));
-        nameTxtbox = Locator.inputByNameContaining("_Name");
-        waitForElement(nameTxtbox);
-
-        newSampleName = namePrefix + newSampleIndex;
-        log(String.format("The new sample will be named '%s' and it will go to sea.", newSampleName));
-
-        setFormElement(nameTxtbox, newSampleName);
-        clickAndWait(Locator.lkButton("Submit"));
-
-        // Increment the index.
-        newSampleIndex++;
-
-        log("Check that the expected samples are shown as the parents of this new sample.");
-        checkRowsInDataRegion("parentMaterials", "Name", parents);
-
-        log("Go look at each one of the parents and make sure they have the new sample as a child and the run column is correct.");
-
-        String parentListUI = parents.get(0) + ", " + parents.get(1) + ", " + parents.get(2);
-        String runTextUI = String.format(runTextStrFormat, parentListUI);
-
-        for(String parent : parents)
-        {
-            // A link to the sample type should be visible on this page, use it to go back to the sample type page.
-            clickAndWait(Locator.linkWithText(sampleTypeName));
-            clickAndWait(Locator.linkWithText(parent));
-            checkRowsInDataRegion("childMaterials", "Name", List.of(newSampleName));
-            checkRowsInDataRegion("childMaterials", "Run", List.of(runTextUI));
-        }
-
-        log("Finally derive a sample from a sample that was itself also derived.");
-
-        clickAndWait(Locator.linkWithText(sampleTypeName));
-
-        log("Make the parent sample the same sample that was just created.");
-        parentSample = newSampleName;
-        log(String.format("Using sample named '%s' as the parent.", parentSample));
-
-        waitAndClickAndWait(Locator.linkWithText(parentSample));
-
-        waitAndClickAndWait(Locator.linkWithText("derive samples from this sample"));
-
-        log("Again just create a single derived sample.");
-        waitAndClickAndWait(Locator.lkButton("Next"));
-        nameTxtbox = Locator.inputByNameContaining("_Name");
-        waitForElement(nameTxtbox);
-
-        newSampleName = namePrefix + newSampleIndex;
-        log(String.format("The new sample will be named '%s' and this one was a failure to launch and never left home.", newSampleName));
-
-        setFormElement(nameTxtbox, newSampleName);
-        clickAndWait(Locator.lkButton("Submit"));
-
-        List<String> newParents = new ArrayList<>();
-        newParents.add(parentSample);
-        newParents.addAll(parents);
-
-        log(String.format("Check that all samples '%s' are listed as parents.", newParents));
-        checkRowsInDataRegion("parentMaterials", "Name", newParents);
-
-        log("Also check that the run column for the parents are as expected.");
-        checkRowsInDataRegion("parentMaterials", "Run", List.of(runTextUI, " ", " ", " "));
-
-        log(String.format("Go to the 'derived' parent '%s' and verify it has '%s' as a child.", parentSample, newSampleName));
-
-        clickAndWait(Locator.linkWithText(parentSample));
-        checkRowsInDataRegion("childMaterials", "Name", List.of(newSampleName));
-
-        log(String.format("Verify again that '%s' parents are still as expected.", parentSample));
-        checkRowsInDataRegion("parentMaterials", "Name", parents);
-
-        String grandParent = parents.getFirst();
-        log(String.format("Select one of '%s' parents, '%s' and verify that it now has two children.", parentSample, grandParent));
-
-        clickAndWait(Locator.linkWithText(grandParent));
-        checkRowsInDataRegion("childMaterials", "Name", Arrays.asList(newSampleName, parentSample));
-
-        log("Test complete.");
     }
 
     private void checkRowsInDataRegion(String dataRegionName, String columnName, final List<String> expectedValues)
@@ -1133,52 +919,31 @@ public class SampleTypeLineageTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testDeleteSamplesSomeWithDerivedSamples()
+    public void testDeleteSamplesSomeWithDerivedSamples() throws IOException, CommandException
     {
         final String SAMPLE_TYPE_NAME = "DeleteSamplesWithParents" + DOMAIN_TRICKY_CHARACTERS;
         List<String> parentSampleNames = Arrays.asList("P-1", "P-2", "P-3");
-        List<Map<String, String>> sampleData = new ArrayList<>();
-        parentSampleNames.forEach(name -> sampleData.add(Map.of("Name", name)));
+        String childName = parentSampleNames.getFirst() + ".1";
+        String grandchildName = childName + ".1";
+        String twoParentChildName = parentSampleNames.get(1) + "+" + childName + ".1";
+
+        log("Create a sample type with parents, a child, a grandchild and a two-parent child");
+        TestDataGenerator sampleGenerator = new SampleTypeDefinition(SAMPLE_TYPE_NAME)
+                .addField(new FieldDefinition("Blood+"))
+                .addField(new FieldDefinition("Blood-"))
+                .create(createDefaultConnection(), getProjectName());
+        String parentKey = "MaterialInputs/" + SAMPLE_TYPE_NAME;
+        parentSampleNames.forEach(name -> sampleGenerator.addCustomRow(Map.of("Name", name)));
+        sampleGenerator.addCustomRow(Map.of("Name", childName, parentKey, parentSampleNames.getFirst(),
+                "Blood+", "blood plus", "Blood-", "blood minus"));
+        sampleGenerator.addCustomRow(Map.of("Name", grandchildName, parentKey, childName));
+        sampleGenerator.addCustomRow(Map.of("Name", twoParentChildName, parentKey, parentSampleNames.get(1) + "," + childName));
+        sampleGenerator.insertRows();
 
         clickProject(PROJECT_NAME);
         SampleTypeHelper sampleHelper = new SampleTypeHelper(this);
-        log("Create a sample type with some potential parents");
-        sampleHelper.createSampleType(new SampleTypeDefinition(SAMPLE_TYPE_NAME).
-                addField(new FieldDefinition("Blood+")).
-                addField(new FieldDefinition("Blood-")),
-            sampleData);
+        sampleHelper.goToSampleType(SAMPLE_TYPE_NAME);
         DataRegionTable drtSamples = sampleHelper.getSamplesDataRegionTable();
-        log("Derive one sample from another");
-        drtSamples.checkCheckbox(drtSamples.getRowIndex("Name", parentSampleNames.getFirst()));
-        clickButton("Derive Samples");
-        waitAndClickAndWait(Locator.lkButton("Next"));
-        String childName = parentSampleNames.getFirst() + ".1";
-        String nameFieldInputFieldName = "Output Sample 1_Name";
-        String bloodPlusFieldInputFieldName = "Output Sample 1_Blood+";
-        String bloodMinusFieldInputFieldName = "Output Sample 1_Blood-";
-        setFormElement(Locator.name(nameFieldInputFieldName), childName);
-        setFormElement(Locator.name(bloodPlusFieldInputFieldName), "blood plus");
-        setFormElement(Locator.name(bloodMinusFieldInputFieldName), "blood minus");
-        clickButton("Submit");
-
-        log("Derive a sample from the one just created");
-        clickAndWait(Locator.linkContainingText("derive samples from this sample"));
-        clickButton("Next");
-        String grandchildName = childName + ".1";
-        setFormElement(Locator.name(nameFieldInputFieldName), grandchildName);
-        clickButton("Submit");
-
-        log("Derive a sample with two parents");
-        clickAndWait(Locator.linkContainingText(SAMPLE_TYPE_NAME));
-        drtSamples.checkCheckbox(drtSamples.getRowIndex("Name", parentSampleNames.get(1)));
-        drtSamples.checkCheckbox(drtSamples.getRowIndex("Name", childName));
-        clickButton("Derive Samples");
-        waitAndClickAndWait(Locator.lkButton("Next"));
-        String twoParentChildName = parentSampleNames.get(1) + "+" + childName + ".1";
-        setFormElement(Locator.name(nameFieldInputFieldName), twoParentChildName);
-        clickButton("Submit");
-
-        clickAndWait(Locator.linkContainingText(SAMPLE_TYPE_NAME));
 
         // Issue 53306 - ensure that names differing only by special characters were captured correctly and are being
         // shown in the grid
