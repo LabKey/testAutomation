@@ -324,13 +324,13 @@ public class FileBasedPipelineTest extends BaseWebDriverTest
         String startOfApiKey = fullBodyText.substring(apiKeyIndex + API_KEY_LABEL.length(), apiKeyIndex + API_KEY_LABEL.length() + 10);
 
         assertTextPresent(
-                "INFO : hello java timeout world!",
-                // ${pipeline, protocol name} token replacement
-                "arg[2]=" + protocolName,
-                // ${httpSessionId} token replacement. Expect apikey prefix
-                "arg[3]=" + startOfApiKey,
-                "sleeping for 8 seconds",
-                "Process killed after exceeding timeout of 3 seconds");
+            "INFO : hello java timeout world!",
+            // ${pipeline, protocol name} token replacement
+            "arg[2]=" + protocolName,
+            "arg[3]=" + startOfApiKey,
+            "sleeping for 8 seconds",
+            "Process killed after exceeding timeout of 3 seconds"
+        );
         assertTextNotPresent("goodbye java timeout world!");
     }
 
