@@ -197,7 +197,7 @@ public class ToolsController extends SpringActionController
                         {
                             out.println();
                             out.println(
-                                new ButtonBuilder("Delete All " + missing.size() + " File Paths from .gitattributes")
+                                new ButtonBuilder("Delete " + StringUtilsLabKey.pluralize(missing.size(), "File Path") + " from .gitattributes")
                                     .href(new ActionURL(DeleteMissingFilesAction.class, getContainer()).addParameter("module", _moduleName))
                                     .usePost()
                             );
