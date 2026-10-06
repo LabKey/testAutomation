@@ -658,6 +658,12 @@ public class DomainFieldRow extends WebDriverComponent<DomainFieldRow.ElementCac
         return this;
     }
 
+    public List<String> getAvailableLookupTargetTables()
+    {
+        expand();
+        return elementCache().getLookupQuerySelect().getOptions().stream().map(WebElement::getText).collect(Collectors.toList());
+    }
+
     public boolean getLookupValidatorEnabled()
     {
         expand();
