@@ -328,7 +328,6 @@ public class AdminConsoleTest extends AbstractAdminConsoleTest
         List<String> notShownLinks = Arrays.asList(
                 "files",
                 "flow cytometry",
-                "mascot server",
                 "ldap sync admin",
                 "notification service",
                 "ms2",
