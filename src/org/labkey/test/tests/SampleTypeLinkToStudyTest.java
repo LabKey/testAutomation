@@ -21,9 +21,9 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.SortDirection;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.components.CustomizeView;
@@ -41,12 +41,12 @@ import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.DomainUtils;
-import org.labkey.test.util.OptionalFeatureHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
 import org.labkey.test.util.StudyHelper;
 import org.labkey.test.util.TestDataGenerator;
 import org.labkey.test.util.data.TestDataUtils;
+import org.labkey.test.util.query.QueryApiHelper;
 
 import java.io.File;
 import java.io.IOException;
@@ -108,8 +108,6 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         new PortalHelper(getDriver()).addBodyWebPart("Datasets");
 
         createSampleTypes();
-        OptionalFeatureHelper.setOptionalFeature(createDefaultConnection(), "deriveSamplesNotInApp", true);
-
     }
 
 
@@ -330,28 +328,17 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
                         new FieldDefinition("ParticipantId", FieldDefinition.ColumnType.Subject))), data);
 
         goToProjectHome(SAMPLE_TYPE_PROJECT);
-        data = "Name\tVolume\n" +
-                "PL-1\t10\n";
+        data = "Name\tVolume\tMaterialInputs/Blood\n" +
+                "PL-1\t10\t\n" +
+                derivedSampleName + "\t1\tBL-1\n";
         sampleHelper.createSampleType(new SampleTypeDefinition("Plasma")
                 .setFields(List.of(
                         new FieldDefinition("Volume", FieldDefinition.ColumnType.Integer))), data);
 
         goToProjectHome(SAMPLE_TYPE_PROJECT);
-        clickAndWait(Locator.linkWithText("Blood"));
-        DataRegionTable samplesTable = DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
-        samplesTable.setSort("Name", SortDirection.ASC);
-        samplesTable.checkCheckbox(0);
-        samplesTable.clickHeaderButtonAndWait("Derive Samples");
-        selectOptionByText(Locator.name("targetSampleTypeId"), "Plasma in /" + SAMPLE_TYPE_PROJECT);
-        clickButton("Next");
-        setFormElement(Locator.name("Output Sample 1_Name"), derivedSampleName);
-        setFormElement(Locator.name("Output Sample 1_Volume"), "1");
-        clickButton("Submit");
-
-        goToProjectHome(SAMPLE_TYPE_PROJECT);
         clickAndWait(Locator.linkWithText("Plasma"));
 
-        samplesTable = DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
+        DataRegionTable samplesTable = DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
         CustomizeView customizeView = samplesTable.getCustomizeView();
         customizeView.openCustomizeViewPanel();
         customizeView.showHiddenItems();
@@ -632,7 +619,7 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testSubjectTimepointFromParentSample()
+    public void testSubjectTimepointFromParentSample() throws IOException, CommandException
     {
         String parentSampleType = "parent sample";
         log("Creating the parent sample with subject/timepoint fields");
@@ -687,18 +674,11 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         checker().verifyEquals("Incorrect visit ParticipantId in child sample", Arrays.asList("P1","P2"),
                 samplesTable.getColumnDataAsText("Inputs/Materials/parent sample/ParticipantId"));
 
-        log("Verifying adding data to the child sample type using the derivation steps");
-        goToProjectHome(SAMPLE_TYPE_PROJECT);
-        clickAndWait(Locator.linkWithText(parentSampleType));
-        samplesTable = DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
-        samplesTable.checkCheckbox(0);
-        samplesTable.clickHeaderButtonAndWait("Derive Samples");
-        selectOptionByText(Locator.name("targetSampleTypeId"), childSampleType + " in /" + getProjectName());
-        clickButton("Next");
-        setFormElement(Locator.name("Output Sample 1_Name"), "derivedChildSample");
-        clickButton("Submit");
+        log("Inserting a single derived child sample");
+        new QueryApiHelper(createDefaultConnection(), SAMPLE_TYPE_PROJECT, "samples", childSampleType)
+                .insertRows(List.of(Map.of("Name", "derivedChildSample", "MaterialInputs/" + parentSampleType, "Parent-2")));
 
-        log("Verifying the auto link to study by deriving single samples from parent sample");
+        log("Verifying the auto link to study for a single sample derived from a parent sample");
         goToProjectHome(SAMPLE_TYPE_PROJECT);
         clickAndWait(Locator.linkWithText(childSampleType));
         samplesTable = DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
@@ -885,6 +865,5 @@ public class SampleTypeLinkToStudyTest extends BaseWebDriverTest
         _containerHelper.deleteProject(DATE_BASED_STUDY, false);
         _containerHelper.deleteProject(SAMPLE_TYPE_PROJECT + " Study 1", false);
         _containerHelper.deleteProject(SAMPLE_TYPE_PROJECT + " Study 2", false);
-        OptionalFeatureHelper.resetOptionalFeature(createDefaultConnection(), "deriveSamplesNotInApp");
     }
 }

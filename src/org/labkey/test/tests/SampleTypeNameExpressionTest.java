@@ -39,13 +39,13 @@ import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.util.AuditLogHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
-import org.labkey.test.util.OptionalFeatureHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
 import org.labkey.test.util.TestDataGenerator;
 import org.labkey.test.util.TextUtils;
 import org.labkey.test.util.data.TestDataUtils;
 import org.labkey.test.util.exp.SampleTypeAPIHelper;
+import org.labkey.test.util.query.QueryApiHelper;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
@@ -84,7 +84,6 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
     private static final String PARENT_SAMPLE_TYPE_INPUT = escapeForNameExpression(PARENT_SAMPLE_TYPE);
 
     // No random names for deriving sample type
-    // Issue 53306: LabKey Server: Derive samples form does not distinguish between fields that differ by 'special characters'
     private static final FieldInfo COL_DSTR = new FieldInfo("DStr", ColumnType.String);
     private static final FieldInfo COL_DINT = new FieldInfo("DInt", ColumnType.Integer);
 
@@ -131,13 +130,6 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
     {
         SampleTypeNameExpressionTest test = getCurrentTest();
         test.doSetup();
-    }
-
-    @Override
-    protected void doCleanup(boolean afterTest)
-    {
-        super.doCleanup(afterTest);
-        OptionalFeatureHelper.resetOptionalFeature(createDefaultConnection(), "deriveSamplesNotInApp");
     }
 
     private void addDataRow(TestDataGenerator dataGenerator, String name, int intVal)
@@ -204,7 +196,6 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
 
         // Just want to get an updated view of the sample types.
         refresh();
-        OptionalFeatureHelper.setOptionalFeature(createDefaultConnection(), "deriveSamplesNotInApp", true);
     }
 
     @Before
@@ -500,9 +491,6 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
 
         createPage.setNameExpression(sbNameExpression.toString());
 
-        // Issue 53306 There is a problem with the derived sample form and field names that contain "special" characters.
-//        String intField = TestDataGenerator.randomFieldName("Int");
-//        String strField = TestDataGenerator.randomFieldName("Str");
         String intField = "Int";
         String strField = "Str";
         createPage.addFields(Arrays.asList(
@@ -881,21 +869,20 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
 
     /**
      * <p>
-     *     Verify that a derived sample, using a name expression, can be created by clicking the "Derive Samples" link
-     *     from a sample's detail page.
+     *     Verify that a derived sample can be named by a name expression that references parent or grandparent properties.
      * </p>
      * <p>
      *     This test will:
      *     <ul>
-     *         <li>Create a derived sample using the UI and the name expression that reference parent property to name it.</li>
-     *         <li>Create a derived sample using the UI and the name expression that references grandparent property to name it.</li>
+     *         <li>Create a derived sample using the API and the name expression that reference a parent property to name it.</li>
+     *         <li>Create a derived sample using the API and the name expression that references a grandparent property to name it.</li>
      *         <li>Create a derived sample using the bulk import and the name expression that references grandparent property to name it.</li>
      *     </ul>
      * </p>
      * @throws Exception Can be thrown by test helper.
      */
     @Test
-    public void testDeriveSampleFromSampleDetailsPage() throws Exception
+    public void testDeriveSampleWithAncestorNameExpression() throws Exception
     {
 
         goToProjectHome();
@@ -979,32 +966,17 @@ public class SampleTypeNameExpressionTest extends BaseWebDriverTest
 
     private String deriveSample(String parentSampleName, String parentSampleType, String targetSampleType, Map<String, String> setField) throws IOException, CommandException
     {
-        log(String.format("Go to the 'overview' page for sample '%s' in sample type '%s'", parentSampleName, parentSampleType));
-        Integer sampleRowNum = SampleTypeAPIHelper.getRowIdsForSamples(getProjectName(), parentSampleType, Arrays.asList(parentSampleName)).get(parentSampleName);
+        log(String.format("Derive a sample from '%s' in sample type '%s' but give it no name. The name expression should be used to name the derived sample.", parentSampleName, parentSampleType));
+        Map<String, Object> row = new HashMap<>(setField);
+        row.put("MaterialInputs/" + parentSampleType, parentSampleName);
+        String derivedSampleName = (String) new QueryApiHelper(createDefaultConnection(), getProjectName(), "samples", targetSampleType)
+                .insertRows(List.of(row)).getRows().getFirst().get("name");
 
-        String url = WebTestHelper.buildRelativeUrl("experiment", getCurrentContainerPath(), "showMaterial", Map.of("rowId", sampleRowNum));
-        beginAt(url);
+        log(String.format("Go to the 'overview' page for derived sample '%s'", derivedSampleName));
+        Integer sampleRowNum = SampleTypeAPIHelper.getRowIdsForSamples(getProjectName(), targetSampleType, List.of(derivedSampleName)).get(derivedSampleName);
+        beginAt(WebTestHelper.buildRelativeUrl("experiment", getCurrentContainerPath(), "showMaterial", Map.of("rowId", sampleRowNum)));
 
-        log("Derive a sample from this sample but give it no name. The name expression should be used to name the derived sample.");
-
-        waitForElement(Locator.linkWithText("derive samples from this sample"));
-
-        clickAndWait(Locator.linkWithText("derive samples from this sample"));
-
-        selectOptionByText(Locator.name("targetSampleTypeId"),  String.format("%s in /%s", targetSampleType, getProjectName()));
-        clickButton("Next");
-
-        String flagString = "";
-        for(Map.Entry<String, String> entry : setField.entrySet())
-        {
-            setFormElement(Locator.name(String.format("Output Sample 1_%s", entry.getKey())), entry.getValue());
-            flagString = entry.getValue();
-        }
-        clickButton("Submit");
-
-        waitForElement(Locator.tagWithText("td", flagString));
-
-        return Locator.tagWithText("td", "Name:").followingSibling("td").findElement(getDriver()).getText();
+        return derivedSampleName;
     }
 
     /**
