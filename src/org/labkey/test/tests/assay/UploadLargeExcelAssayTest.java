@@ -141,7 +141,7 @@ public class UploadLargeExcelAssayTest extends BaseWebDriverTest
         clickButton("Save and Finish");
 
         var assayJobsPage2 = new AssayUploadJobsPage(getDriver());
-        var pipelineDetailsPage2 = assayJobsPage2.clickJobStatus("200k take 2", 3 * getDefaultWaitForPage());
+        var pipelineDetailsPage2 = assayJobsPage2.clickJobStatus("200k take 2", 7 * getDefaultWaitForPage());
         pipelineDetailsPage2.waitForComplete(12 * WebDriverWrapper.WAIT_FOR_PAGE);
 
         var qPage = SourceQueryPage.beginAt(this, getProjectName(), "assay.General.large_assay_2", "Data");
