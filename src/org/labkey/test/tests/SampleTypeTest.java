@@ -23,7 +23,6 @@ import org.assertj.core.api.Assertions;
 import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
@@ -41,6 +40,7 @@ import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.assay.AssayConstants;
 import org.labkey.test.components.domain.AdvancedSettingsDialog;
 import org.labkey.test.components.domain.BaseDomainDesigner;
+import org.labkey.test.components.domain.DomainFieldRow;
 import org.labkey.test.components.domain.DomainFormPanel;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.components.html.OptionSelect;
@@ -49,10 +49,10 @@ import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.pages.core.admin.BaseSettingsPage;
 import org.labkey.test.pages.experiment.CreateSampleTypePage;
 import org.labkey.test.pages.experiment.UpdateSampleTypePage;
+import org.labkey.test.pages.query.NewQueryPage;
 import org.labkey.test.pages.query.UpdateQueryRowPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.FieldDefinition.ColumnType;
-import org.labkey.test.params.FieldDefinition.LookupInfo;
 import org.labkey.test.params.FieldInfo;
 import org.labkey.test.params.experiment.InventoryMetricUnit;
 import org.labkey.test.params.experiment.SampleTypeDefinition;
@@ -600,65 +600,60 @@ public class SampleTypeTest extends BaseWebDriverTest
         assertEquals(fieldNames.getFirst() + " for sample 'Name' not as expected", "Dee", rowData.get(fieldNames.getFirst()));
     }
 
-    // I don't think this test is doing what was intended. I'm unclear if this is intended to be a lineage test or a
-    // test of a sample type with a look-up column to another sample-type. It behaves as the latter, but that is not
-    // working as expected, and the check at the end of the test fails to capture it.
-    // I think this test should just be deleted.
-    // Tracking in test issue: https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=40475
-    // Marking as Ignore
+    // GH Issue 1512: the domain designer's lookup-field target dropdown must list only user-defined queries that
+    // expose a primary key (valid lookup targets) and omit those that don't.
     @Test
-    @Ignore
-    public void testSamplesWithLookups() throws IOException, CommandException
+    public void testLookupTargetTablesRequirePrimaryKey()
     {
-        // create a basic sample type
-        navigateToFolder(getProjectName(), LOOKUP_FOLDER);
-        TestDataGenerator dgen = new TestDataGenerator("exp.materials", "sampleData", getCurrentContainerPath())
-                .withColumns(List.of(
-                        new FieldDefinition("name", ColumnType.String),
-                        new FieldDefinition("strData", ColumnType.String),
-                        new FieldDefinition("intData", ColumnType.Integer),
-                        new FieldDefinition("floatData", ColumnType.Decimal)
-                ));
-        dgen.createDomain(createDefaultConnection(), SampleTypeAPIHelper.SAMPLE_TYPE_DOMAIN_KIND);
-        dgen.addCustomRow(Map.of("name", "A", "strData", "argy", "intData", 6, "floatData", 2.5));
-        dgen.addCustomRow(Map.of("name", "B", "strData", "bargy","intData", 7, "floatData", 3.5));
-        dgen.addCustomRow(Map.of("name", "C", "strData", "foofoo","intData", 8, "floatData", 4.5));
-        dgen.insertRows(createDefaultConnection(), dgen.getRows());
+        goToProjectHome();
 
-        // create the lookup sample type in a different folder- configured to look to the first one
-        String lookupContainer = getProjectName() + "/" + LOOKUP_FOLDER;
-        navigateToFolder(getProjectName(), FOLDER_NAME);
-        // create another with a lookup to it
-        TestDataGenerator lookupDgen = new TestDataGenerator("exp.materials", "sampleLookups", getCurrentContainerPath())
-                .withColumns(List.of(
-                        new FieldDefinition("name", ColumnType.String),
-                        new FieldDefinition("strLookup", new LookupInfo(lookupContainer, "exp.materials", "sampleData")
-                                .setTableType(ColumnType.String)),
-                        new FieldDefinition("intLookup", new LookupInfo(lookupContainer, "exp.materials", "sampleData")
-                                .setTableType(ColumnType.Integer)),
-                        new FieldDefinition("floatLooky", new LookupInfo(lookupContainer, "exp.materials", "sampleData")
-                                .setTableType(ColumnType.Decimal))
-                ));
-        lookupDgen.createDomain(createDefaultConnection(), SampleTypeAPIHelper.SAMPLE_TYPE_DOMAIN_KIND);
-        lookupDgen.addCustomRow(Map.of("name", "B"));
+        // A sample type to serve as the lookup source; a "SELECT *" query over it inherits its RowId primary key.
+        final String sourceSampleType = "LookupSourceSamples";
+        new SampleTypeHelper(this).createSampleType(new SampleTypeDefinition(sourceSampleType)
+                .setFields(List.of(new FieldDefinition("intData", ColumnType.Integer))));
 
-        // If this is to be a look-up to another sample type I believe the values should be the row index and not the name.
-        lookupDgen.addCustomRow(Map.of("strLookup", "B"));
-        lookupDgen.addCustomRow(Map.of("intLookup", "B"));
-        lookupDgen.addCustomRow(Map.of("floatLooky", "B"));
-        lookupDgen.insertRows(createDefaultConnection(), dgen.getRows());
+        // A user-defined query that exposes a primary key -> valid lookup target.
+        final String pkQuery = "pkLookupQuery";
+        createUserQuery("samples", sourceSampleType, pkQuery, "SELECT * FROM samples.\"" + sourceSampleType + "\"");
 
-        refresh();
-        DataRegionTable.DataRegion(getDriver()).withName(SampleTypeAPIHelper.SAMPLE_TYPE_DOMAIN_KIND).waitFor();
-        waitAndClick(Locator.linkWithText("sampleLookups"));
-        DataRegionTable materialsList =  DataRegionTable.DataRegion(getDriver()).withName("Material").waitFor();
+        // A user-defined query with no primary key (aggregate) -> not a valid lookup target.
+        final String noPkQuery = "noPkLookupQuery";
+        createUserQuery("samples", sourceSampleType, noPkQuery,
+                "SELECT COUNT(*) AS SampleCount FROM samples.\"" + sourceSampleType + "\"");
 
-        // This only checks the number of rows returned but does not check the values in the rows.
-        assertEquals(3, materialsList.getDataRowCount());
+        log("Inspect the lookup target-table options offered for the 'samples' schema in the field designer");
+        DomainFieldRow lookupRow = CreateSampleTypePage.beginAt(this, getProjectName())
+                .setName("LookupConsumerSamples")
+                .getFieldsPanel()
+                .addField("lookupField")
+                .setType(ColumnType.Lookup)
+                .setFromSchema("samples");
 
-        // Not sure why this is being deleted, it makes the test hard to debug.
-        lookupDgen.deleteDomain(createDefaultConnection());
-        dgen.deleteDomain(createDefaultConnection());
+        List<String> targetTables = lookupRow.getAvailableLookupTargetTables();
+        log("Lookup target-table options: " + targetTables);
+
+        checker().verifyTrue("The source sample type itself should be offered as a lookup target",
+                hasLookupOption(targetTables, sourceSampleType));
+        checker().verifyTrue("A user query exposing a primary key should be offered as a lookup target",
+                hasLookupOption(targetTables, pkQuery));
+        checker().verifyFalse("A user query with no primary key should NOT be offered as a lookup target",
+                hasLookupOption(targetTables, noPkQuery));
+    }
+
+    private void createUserQuery(String schemaName, String baseTable, String queryName, String sql)
+    {
+        NewQueryPage.beginAt(this, getProjectName(), schemaName)
+                .setName(queryName)
+                .setBaseTable(baseTable)
+                .clickCreate()
+                .setSource(sql)
+                .clickSaveAndFinish();
+    }
+
+    // The target-table <select> renders each option as "<queryName> (<type>)".
+    private boolean hasLookupOption(List<String> options, String queryName)
+    {
+        return options.stream().anyMatch(o -> o.equals(queryName) || o.startsWith(queryName + " ("));
     }
 
     @Test
