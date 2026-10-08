@@ -70,6 +70,29 @@ public class ExportMenu extends WebDriverComponent<Component.ElementCache>
         return getWrapper().doAndWaitForDownload(exportButton::click);
     }
 
+    public File exportData(GridBar.ExportType exportType, GridBar.ExportHeaderType headerType)
+    {
+        WebElement exportButton = getExportMenuItem(exportType, headerType);
+        return getWrapper().doAndWaitForDownload(exportButton::click);
+    }
+
+    public File exportStorageMap()
+    {
+        _menu.expand();
+        WebElement exportButton = Locator.tag("li")
+                .withDescendant(Locator.tagWithClass("span", "export-menu-icon"))
+                .containing("Storage Map (Excel)")
+                .findElement(this);
+        return getWrapper().doAndWaitForDownload(exportButton::click);
+    }
+
+    public TabSelectionExportDialog openExcelTabsModal(GridBar.ExportHeaderType headerType)
+    {
+        getExportMenuItem(GridBar.ExportType.EXCEL, headerType).click();
+
+        return new TabSelectionExportDialog(this.getDriver());
+    }
+
     public TabSelectionExportDialog openExcelTabsModal()
     {
         WebElement exportButton = getExportMenuItem(GridBar.ExportType.EXCEL);
@@ -88,5 +111,15 @@ public class ExportMenu extends WebDriverComponent<Component.ElementCache>
     {
         _menu.expand();
         return Locator.css("span.export-menu-icon").withClass(exportType.buttonCssClass()).findElements(this).get(index);
+    }
+
+    // Header type sections are only labeled when the menu offers more than one header type
+    private WebElement getExportMenuItem(GridBar.ExportType exportType, GridBar.ExportHeaderType headerType)
+    {
+        _menu.expand();
+        return Locator.tagWithAttribute("li", "role", "heading").containing(headerType.getSectionText())
+                .followingSibling("li")
+                .withDescendant(Locator.tagWithClass("span", "export-menu-icon").withClass(exportType.buttonCssClass()))
+                .findElement(this);
     }
 }
