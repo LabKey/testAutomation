@@ -27,6 +27,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.SimpleGetCommand;
 import org.labkey.remoteapi.SimplePostCommand;
@@ -83,6 +84,7 @@ import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.WebTestHelper.getHttpResponse;
@@ -1525,6 +1527,82 @@ public class ClientAPITest extends BaseWebDriverTest
         {
             throw new RuntimeException("runCommand currently expects the command to fail. Valid responses not yet supported.");
         }
+    }
+
+    private record CountCase(Map<String, Object> filters, int expectedCount) {}
+
+    private static final String MAX_ROWS_PARAM = "query.maxRows";
+    private static final String OFFSET_PARAM = "query.offset";
+    private static final String INCLUDE_TOTAL_COUNT_PARAM = "includeTotalCount";
+    private static final String INCLUDE_METADATA_PARAM = "includeMetadata";
+
+    // GH Issue 1607
+    @Test
+    public void testSelectRowsCountOnly() throws Exception
+    {
+        Connection cn = createDefaultConnection();
+        List<CountCase> countCases = List.of(
+                new CountCase(Map.of(), 7),
+                new CountCase(Map.of("query.Age~gt", 30), 5),
+                new CountCase(Map.of("query.FirstName~eq", "Nobody"), 0),
+                new CountCase(Map.of("query.Age~eq", "notANumber"), 0));
+
+        for (double apiVersion : List.of(8.3, 9.1, 17.1))
+        {
+            for (CountCase countCase : countCases)
+            {
+                String description = "apiVersion " + apiVersion + ", filters " + countCase.filters();
+
+                log("Verify count-only request: " + description);
+                CommandResponse countOnly = selectPeople(cn, apiVersion, countCase.filters(), Map.of(MAX_ROWS_PARAM, 0, INCLUDE_TOTAL_COUNT_PARAM, true));
+                assertEquals("Wrong count-only rowCount: " + description, countCase.expectedCount(), getRowCount(countOnly));
+                List<?> rows = countOnly.getProperty("rows");
+                assertTrue("Count-only request should return no rows: " + description, rows.isEmpty());
+
+                CommandResponse paged = selectPeople(cn, apiVersion, countCase.filters(), Map.of(MAX_ROWS_PARAM, 1));
+                assertEquals("Count-only rowCount should match paged rowCount: " + description, getRowCount(paged), getRowCount(countOnly));
+
+                log("Verify count-only request without metadata and with an offset: " + description);
+                CommandResponse noMetaData = selectPeople(cn, apiVersion, countCase.filters(), Map.of(MAX_ROWS_PARAM, 0, INCLUDE_TOTAL_COUNT_PARAM, true, INCLUDE_METADATA_PARAM, false, OFFSET_PARAM, 100));
+                assertEquals("Wrong count-only rowCount without metadata: " + description, countCase.expectedCount(), getRowCount(noMetaData));
+                assertNull("Count-only request with includeMetadata=false should not return metaData: " + description, noMetaData.getProperty("metaData"));
+
+                log("Verify maxRows=0 without an explicit includeTotalCount=true stays metadata only: " + description);
+                CommandResponse metaDataOnly = selectPeople(cn, apiVersion, countCase.filters(), Map.of(MAX_ROWS_PARAM, 0));
+                assertNull("Metadata-only request should not return rowCount: " + description, metaDataOnly.getProperty("rowCount"));
+                assertNotNull("Metadata-only request should return metaData: " + description, metaDataOnly.getProperty("metaData"));
+                metaDataOnly = selectPeople(cn, apiVersion, countCase.filters(), Map.of(MAX_ROWS_PARAM, 0, INCLUDE_TOTAL_COUNT_PARAM, false));
+                assertNull("includeTotalCount=false request should not return rowCount: " + description, metaDataOnly.getProperty("rowCount"));
+            }
+        }
+
+        log("Verify count-only request with a JSON body");
+        SimplePostCommand post = new SimplePostCommand("query", "selectRows.api");
+        post.setRequiredVersion(17.1);
+        post.setJsonObject(new JSONObject(Map.of("schemaName", "lists", "query.queryName", LIST_NAME,
+                "query.Age~gt", 30, MAX_ROWS_PARAM, 0, INCLUDE_TOTAL_COUNT_PARAM, true)));
+        CommandResponse postResponse = post.execute(cn, API_FOLDER_PATH);
+        assertEquals("Wrong count-only rowCount for JSON body", 5, getRowCount(postResponse));
+        List<?> postRows = postResponse.getProperty("rows");
+        assertTrue("Count-only JSON body request should return no rows", postRows.isEmpty());
+    }
+
+    private CommandResponse selectPeople(Connection cn, double apiVersion, Map<String, Object> filters, Map<String, Object> params) throws IOException, CommandException
+    {
+        Map<String, Object> allParams = new HashMap<>(filters);
+        allParams.putAll(params);
+        allParams.put("schemaName", "lists");
+        allParams.put("query.queryName", LIST_NAME);
+
+        SimpleGetCommand command = new SimpleGetCommand("query", "selectRows.api");
+        command.setRequiredVersion(apiVersion);
+        command.setParameters(allParams);
+        return command.execute(cn, API_FOLDER_PATH);
+    }
+
+    private int getRowCount(CommandResponse response)
+    {
+        return ((Number) response.getProperty("rowCount")).intValue();
     }
 
     @Test

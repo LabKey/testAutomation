@@ -46,12 +46,12 @@ import org.labkey.test.util.ArtifactCollector;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.LogMethod;
-import org.labkey.test.util.OptionalFeatureHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
 import org.labkey.test.util.TestDataGenerator;
 import org.labkey.test.util.exp.DataClassAPIHelper;
 import org.labkey.test.util.exp.SampleTypeAPIHelper;
+import org.labkey.test.util.query.QueryApiHelper;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
@@ -102,12 +102,8 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
     protected void doCleanup(boolean afterTest)
     {
         super.doCleanup(afterTest);
-        if (afterTest)
+        if (!afterTest)
         {
-            OptionalFeatureHelper.resetOptionalFeature(createDefaultConnection(), "deriveSamplesNotInApp");
-        }
-        else {
-            OptionalFeatureHelper.setOptionalFeature(createDefaultConnection(), "deriveSamplesNotInApp", true);
             SampleTypeFolderExportImportTest init = getCurrentTest();
             init.doSetup();
         }
@@ -222,7 +218,7 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testExportAndImportWithMissingAndRequiredFields()
+    public void testExportAndImportWithMissingAndRequiredFields() throws Exception
     {
         final String SAMPLE_TYPE_NAME = "ExportMissingValues";
 
@@ -314,24 +310,16 @@ public class SampleTypeFolderExportImportTest extends BaseWebDriverTest
         cv.saveCustomView();
 
         log("Derive a sample from the given samples, this will create an experiment run which is needed for export.");
-
-        drtSamples.checkAllOnPage();
-        clickAndWait(Locator.lkButtonContainingText("Derive Sample"));
-
-        selectOptionByText(Locator.name("targetSampleTypeId"), SAMPLE_TYPE_NAME + " in /" + PROJECT_NAME);
-        clickButtonContainingText("Next");
-
-        // TODO: Should validate that the Derive Samples action shows the various fields as expected. That is the required and missing value fields should have the correct input type. Will be fixed in 19.2.
-        setFormElement(Locator.tagWithName("input", "Output Sample 1_Name"), sampleNames[8]);
-        setFormElement(Locator.tagWithName("input", "Output Sample 1_" + REQUIRED_FIELD_NAME), "Required text for this field.");
-        setFormElement(Locator.tagWithName("input", "Output Sample 1_" + MISSING_FIELD_NAME), "Q");
-        clickButtonContainingText("Submit");
+        Map<String, Object> derivedSample = Map.of(
+                "Name", sampleNames[8],
+                REQUIRED_FIELD_NAME, "Required text for this field.",
+                MISSING_FIELD_NAME, "Q",
+                "MaterialInputs/" + SAMPLE_TYPE_NAME, String.join(",", Arrays.copyOf(sampleNames, 8)));
+        new QueryApiHelper(createDefaultConnection(), PROJECT_NAME, "samples", SAMPLE_TYPE_NAME)
+                .insertRows(List.of(derivedSample));
 
         // TODO: There is a bug where derived values do not honor missing value fields (treat them as a text field). So the indicator field for this sample will be empty. Will be fixed in 19.2.
         expectedValuesInDB.add(Map.of("Name", sampleNames[8], REQUIRED_FIELD_NAME, "Required text for this field.", MISSING_FIELD_NAME, "Q", INDICATOR_FIELD_NAME, ""));
-
-        // Wait for the header to show up, and view this as success.
-        waitForElementToBeVisible(Locator.tagWithText("h3", "Sample DerivedSample01"));
 
         goToProjectHome();
 

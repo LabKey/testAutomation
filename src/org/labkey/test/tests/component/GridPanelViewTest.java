@@ -927,10 +927,10 @@ public class GridPanelViewTest extends GridPanelBaseTest
 
         }
 
-        log(String.format("Verify that changing the sort order of column '%s' causes the grid view to go to '%s'.",
+        log(String.format("Verify that clearing the sort on column '%s' causes the grid view to go to '%s'.",
                 sortColumn, EDITED_ALERT));
 
-        grid.sortColumn(sortColumn, SortDirection.DESC);
+        grid.clearSort(sortColumn);
 
         validateGridHeader(testName, grid, EDITED_ALERT, true);
 
