@@ -20,8 +20,10 @@ import org.apache.tika.detect.DefaultDetector;
 import org.apache.tika.detect.Detector;
 import org.apache.tika.io.TikaInputStream;
 import org.apache.tika.metadata.Metadata;
+import org.apache.tika.metadata.TikaCoreProperties;
 import org.apache.tika.mime.MediaType;
 import org.apache.tika.mime.MimeTypes;
+import org.apache.tika.parser.ParseContext;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -261,10 +263,10 @@ public class FileType implements Serializable
     protected static String detectContentType(String fileName, byte[] header)
     {
         final Metadata metadata = new Metadata();
-        metadata.set("resourceName", fileName);
+        metadata.set(TikaCoreProperties.RESOURCE_NAME_KEY, fileName);
         try (TikaInputStream is = TikaInputStream.get(header, metadata))
         {
-            MediaType mediaType = DETECTOR.detect(is, metadata);
+            MediaType mediaType = DETECTOR.detect(is, metadata, new ParseContext());
             if (mediaType != null)
                 return mediaType.toString();
 
