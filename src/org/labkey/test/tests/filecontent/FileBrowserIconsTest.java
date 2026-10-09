@@ -100,7 +100,7 @@ public class FileBrowserIconsTest extends BaseWebDriverTest
         validateCount("excel", "span.fa-file-excel-o", 4);
         validateCount("list", "span.fa-list-alt", 2);
         validateCount("powerpoint", "span.fa-file-powerpoint-o", 2);
-        validateCount("file", "span.fa-file-o", 1);
+        validateCount("file", "span.fa-file-o", 3);
 
         checker().screenShotIfNewError("icon_counts");
     }
