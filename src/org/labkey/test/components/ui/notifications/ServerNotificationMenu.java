@@ -196,20 +196,7 @@ public class ServerNotificationMenu extends WebDriverComponent<ServerNotificatio
      */
     private WebElement waitForNotificationList()
     {
-
-        expand();
-
-        // Wait for the listing container to show up. The listing container is in the open menu, scope the search to that.
-        Locator notificationsContainerLocator = Locator.tagWithClass("div", "server-notifications-listing-container");
-        WebDriverWrapper.waitFor(()-> notificationsContainerLocator.areAnyVisible(elementCache().menuContent()),
-                "List container did not render.", 500);
-
-        // Find again (lambda requires a final reference to the component).
-        WebElement listContainer = notificationsContainerLocator.refindWhenNeeded(elementCache().menuContent());
-
-        // It may be a moment before any notifications show up.
-        WebDriverWrapper.waitFor(()-> Locator.tagWithClass("ul", "server-notifications-listing").areAnyVisible(listContainer),
-                "There are no notifications in the drop down.", 1_000);
+        waitForListingVisible();
 
         // Just wait for a moment in case the list is slow to update with the most recent notification.
         WebDriverWrapper.sleep(500);
@@ -218,10 +205,28 @@ public class ServerNotificationMenu extends WebDriverComponent<ServerNotificatio
         // is no guarantee that it contains the most recent message. For example if an import is in progress a message
         // will appear in the list saying as much. When the import is done the 'in progress' message will go away and
         // be replaced with a new 'complete' message.
+        waitForListingVisible();
 
-        // Find the container again, don't return listContainer WebElement previously found. If the list was slow to
-        // update with the most recent notification the old reference will be stale.
-        return notificationsContainerLocator.refindWhenNeeded((elementCache().menuContent()));
+        return LISTING_CONTAINER.refindWhenNeeded(elementCache().menuContent());
+    }
+
+    private static final Locator.XPathLocator LISTING_CONTAINER = Locator.tagWithClass("div", "server-notifications-listing-container");
+
+    private void waitForListingVisible()
+    {
+        // Every notification refresh swaps the listing for a spinner until the reload finishes, so re-find on each poll.
+        WebDriverWrapper.waitFor(() -> {
+            try
+            {
+                expand();
+                return LISTING_CONTAINER.child(Locator.tagWithClass("ul", "server-notifications-listing"))
+                        .areAnyVisible(elementCache().menuContent());
+            }
+            catch (StaleElementReferenceException | NoSuchElementException retry)
+            {
+                return false;
+            }
+        }, "There are no notifications in the drop down.", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
     }
 
     /**

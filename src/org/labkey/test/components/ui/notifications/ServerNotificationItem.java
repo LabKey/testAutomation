@@ -15,11 +15,14 @@
  */
 package org.labkey.test.components.ui.notifications;
 
+import org.apache.commons.lang3.mutable.MutableObject;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.util.TestLogger;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -191,15 +194,29 @@ public class ServerNotificationItem extends WebDriverComponent<ServerNotificatio
     public void clickViewLink()
     {
         String currentUrl = getDriver().getCurrentUrl().toLowerCase();
-        String targetUrl = elementCache().link.getAttribute("href").toLowerCase();
-
         TestLogger.log(String.format("ServerNotificationItem.clickViewLink: currentUrl: %s", currentUrl));
-        TestLogger.log(String.format("ServerNotificationItem.clickViewLink: targetUrl: %s", targetUrl));
 
-        elementCache().link.click();
+        // A notification refresh can re-render or briefly remove the list; retry until the link is back.
+        MutableObject<String> targetUrl = new MutableObject<>();
+        WebDriverWrapper.waitFor(() -> {
+            try
+            {
+                targetUrl.setValue(elementCache().link.getAttribute("href").toLowerCase());
+                elementCache().link.click();
+                return true;
+            }
+            catch (StaleElementReferenceException | NoSuchElementException retry)
+            {
+                return false;
+            }
+        }, "The 'View' link in the notification did not become clickable.", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
+
+
+        String value = targetUrl.get();
+        TestLogger.log(String.format("ServerNotificationItem.clickViewLink: targetUrl: %s", value));
 
         // If the url before clicking the link is the same as the target then don't wait for a navigation.
-        if(!targetUrl.equalsIgnoreCase(currentUrl))
+        if(value == null || !value.equalsIgnoreCase(currentUrl))
         {
             WebDriverWrapper.waitFor(()->!getDriver().getCurrentUrl().equalsIgnoreCase(currentUrl),
                     "Clicking the 'View' link in the notification did not navigate in time.", 5_000);
