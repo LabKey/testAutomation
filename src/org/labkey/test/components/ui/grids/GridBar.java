@@ -74,9 +74,24 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
         return elementCache().exportMenu.exportData(exportType, index);
     }
 
+    public File exportData(ExportType exportType, ExportHeaderType headerType)
+    {
+        return elementCache().exportMenu.exportData(exportType, headerType);
+    }
+
+    public File exportStorageMap()
+    {
+        return elementCache().exportMenu.exportStorageMap();
+    }
+
     public TabSelectionExportDialog openExcelTabsModal()
     {
         return elementCache().exportMenu.openExcelTabsModal();
+    }
+
+    public TabSelectionExportDialog openExcelTabsModal(ExportHeaderType headerType)
+    {
+        return elementCache().exportMenu.openExcelTabsModal(headerType);
     }
 
     /**
@@ -411,6 +426,24 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
         public Character getSeparator()
         {
             return _separator;
+        }
+    }
+
+    public enum ExportHeaderType
+    {
+        CAPTION("Grid View Labels"),
+        IMPORT_FIELD("Field Names");
+
+        private final String _sectionText;
+
+        ExportHeaderType(String sectionText)
+        {
+            _sectionText = sectionText;
+        }
+
+        public String getSectionText()
+        {
+            return _sectionText;
         }
     }
 }
