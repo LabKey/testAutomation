@@ -352,10 +352,10 @@ public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverCompon
         }
 
         WebElement headerCell = elementCache().getColumnHeaderCell(columnIdentifier);
-        // A lingering cell hover popover can cover the header
-        dismissPopover();
         // Scroll to middle in order to make room for the dropdown menu
         getWrapper().scrollToMiddle(headerCell);
+        // A cell hover popover, possibly opened by the scroll, can cover the header
+        dismissPopover();
         getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(headerCell));
         headerCell.click();
 
