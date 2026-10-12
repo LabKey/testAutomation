@@ -27,6 +27,7 @@ import org.awaitility.Awaitility;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Assume;
 import org.junit.AssumptionViolatedException;
@@ -147,6 +148,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
@@ -1261,7 +1263,10 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         checkViews();
 
         if (isTestRunningOnTeamCity())
+        {
             checkActionCoverage();
+            checkConnectionUsage();
+        }
 
         CspLogUtil.checkNewCspWarnings(getArtifactCollector());
 
@@ -1656,6 +1661,124 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
         if (BROWSER_TYPE == BrowserType.CHROME)
             refresh(); // Chrome blocks sequential downloads from javascript
+    }
+
+    @LogMethod
+    protected void checkConnectionUsage()
+    {
+        if (isGuestModeTest())
+            return;
+
+        String json = fetchReport("getConnectionPoolStats", "ConnectionPool.json");
+        if (null == json)
+            return;
+
+        boolean tracked;
+        try
+        {
+            JSONObject stats = new JSONObject(json);
+            tracked = stats.optBoolean("connectionUsageTracked");
+            writePoolStatistics(stats);
+        }
+        catch (RuntimeException e)
+        {
+            TestLogger.error("Failed to parse connection pool statistics.", e);
+            return;
+        }
+
+        if (!tracked)
+        {
+            log("Connection usage tracking is off; skipping connection usage statistics.");
+            return;
+        }
+
+        String tsv = fetchReport("exportConnectionUsage", "ConnectionUsage.tsv");
+        if (null == tsv)
+            return;
+
+        try
+        {
+            writeConnectionStatistics(tsv);
+        }
+        catch (RuntimeException e)
+        {
+            TestLogger.error("Failed to parse connection usage.", e);
+        }
+    }
+
+    /** Fetches an admin report and saves it as a build artifact; returns null on failure */
+    private @Nullable String fetchReport(String action, String fileName)
+    {
+        SimpleHttpResponse response = WebTestHelper.getHttpResponse(WebTestHelper.buildURL("admin", action));
+        if (response.getResponseCode() != HttpStatus.SC_OK)
+        {
+            TestLogger.error("Failed to get " + action + ": " + response.getResponseCode() + " " + response.getResponseMessage());
+            return null;
+        }
+
+        String body = response.getResponseBody();
+        try
+        {
+            Files.writeString(new File(TestFileUtils.getGradleReportDir(), fileName).toPath(), body);
+        }
+        catch (IOException e)
+        {
+            TestLogger.error("Failed to write " + fileName + ".", e);
+        }
+        return body;
+    }
+
+    private void writePoolStatistics(JSONObject stats)
+    {
+        JSONArray dataSources = stats.getJSONArray("dataSources");
+        JSONObject pool = IntStream.range(0, dataSources.length())
+            .mapToObj(dataSources::getJSONObject)
+            .filter(ds -> ds.optBoolean("isLabKeyScope"))
+            .findFirst()
+            .orElse(null);
+        if (null == pool || !pool.has("createdCount"))
+            return;
+
+        long created = pool.getLong("createdCount");
+        long borrowed = pool.getLong("borrowedCount");
+        TeamCityUtils.reportBuildStatisticValue("connectionsOpened", created);
+        TeamCityUtils.reportBuildStatisticValue("connectionsClosed", pool.getLong("destroyedCount"));
+        TeamCityUtils.reportBuildStatisticValue("connectionOpenPercent", borrowed == 0 ? 0 : created * 100.0 / borrowed);
+        TeamCityUtils.reportBuildStatisticValue("maxConnectionBorrowWaitMillis", pool.getLong("maxBorrowWaitMillis"));
+    }
+
+    private static final double BORROWS_PER_INVOCATION_THRESHOLD = 10;
+
+    private void writeConnectionStatistics(String tsv)
+    {
+        List<String> lines = tsv.lines().filter(line -> !line.isBlank()).toList();
+        if (lines.isEmpty())
+            return;
+
+        List<String> header = Arrays.asList(lines.getFirst().split("\t"));
+        int invocationsCol = header.indexOf("invocations");
+        int borrowsCol = header.indexOf("borrows");
+        int perInvocationCol = header.indexOf("borrowsPerInvocation");
+        int unreturnedCol = header.indexOf("unreturned");
+
+        long invocations = 0;
+        long borrows = 0;
+        long unreturned = 0;
+        int actionsOverThreshold = 0;
+        for (String line : lines.subList(1, lines.size()))
+        {
+            String[] values = line.split("\t");
+            invocations += Long.parseLong(values[invocationsCol]);
+            borrows += Long.parseLong(values[borrowsCol]);
+            unreturned += Long.parseLong(values[unreturnedCol]);
+            if (Double.parseDouble(values[perInvocationCol]) > BORROWS_PER_INVOCATION_THRESHOLD)
+                actionsOverThreshold++;
+        }
+
+        TeamCityUtils.reportBuildStatisticValue("connectionBorrows", borrows);
+        TeamCityUtils.reportBuildStatisticValue("connectionBorrowsPerInvocation", invocations == 0 ? 0 : borrows / (double) invocations);
+        TeamCityUtils.reportBuildStatisticValue("actionsOverBorrowThreshold", actionsOverThreshold);
+        TeamCityUtils.reportBuildStatisticValue("unreturnedConnections", unreturned);
     }
 
     @LogMethod

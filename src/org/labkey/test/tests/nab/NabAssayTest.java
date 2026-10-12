@@ -17,11 +17,13 @@
 package org.labkey.test.tests.nab;
 
 import org.jetbrains.annotations.Nullable;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.SimpleGetCommand;
 import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.SelectRowsCommand;
@@ -71,11 +73,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.labkey.test.util.PermissionsHelper.READER_ROLE;
@@ -391,6 +395,7 @@ public class NabAssayTest extends AbstractAssayTest
         verifyCrossContainerQCDataDenied();
         verifyCrossContainerSaveQCControlInfoDenied();
         verifyCrossContainerGraphDenied();
+        verifyQCSaveRefreshesOtherSessions();
 
         // Test editing runs
         // Set the design to allow editing
@@ -721,6 +726,99 @@ public class NabAssayTest extends AbstractAssayTest
         SimpleHttpResponse crossContainer = getNabRunApi("graph.view", getProjectName(), runId);
         assertEquals("Cross-container NAb graph should be denied", 404, crossContainer.getResponseCode());
         assertTrue("Cross-container error message not as expected", crossContainer.getResponseBody().contains("Run " + runId + " does not exist."));
+    }
+
+    // NAb runs are cached per session, so a QC save from another session must not leave this one with stale results
+    @LogMethod
+    private void verifyQCSaveRefreshesOtherSessions()
+    {
+        String runFolderPath = getProjectName() + "/" + TEST_ASSAY_FLDR_NAB;
+        int runId = firstRowId("Runs", runFolderPath, null);
+
+        for (String fitType : Arrays.asList("FOUR_PARAMETER", null))
+        {
+            log("Load QC info in the browser session, fit type: " + (fitType == null ? "default" : fitType));
+            JSONObject before = getQCControlInfo(runFolderPath, runId, fitType);
+
+            JSONArray exclusions = new JSONArray();
+            JSONArray dilutions = getFirstSampleDilutions(before);
+            for (int i = 0; i < dilutions.length(); i++)
+            {
+                JSONArray wells = dilutions.getJSONObject(i).getJSONArray("wells");
+                assertTrue("Expected replicate wells for each dilution", wells.length() > 1);
+                JSONObject well = wells.getJSONObject(0);
+                exclusions.put(new JSONObject()
+                        .put("plate", well.getInt("plateNum"))
+                        .put("row", well.getInt("row"))
+                        .put("col", well.getInt("col")));
+            }
+
+            log("Exclude a replicate well per dilution of the first sample from a separate API session");
+            saveQCExclusions(runFolderPath, runId, exclusions);
+            try
+            {
+                JSONObject after = getQCControlInfo(runFolderPath, runId, fitType);
+                assertNotEquals("Browser session should see QC exclusions saved in another session",
+                        getFirstSampleNeut(before), getFirstSampleNeut(after));
+            }
+            finally
+            {
+                saveQCExclusions(runFolderPath, runId, new JSONArray());
+            }
+        }
+    }
+
+    private JSONObject getQCControlInfo(String containerPath, long runId, @Nullable String fitType)
+    {
+        Map<String, Object> params = new HashMap<>();
+        params.put("rowId", runId);
+        if (fitType != null)
+            params.put("fitType", fitType);
+
+        SimpleGetCommand command = new SimpleGetCommand("nabassay", "getQCControlInfo");
+        command.setParameters(params);
+        try
+        {
+            // createDefaultConnection() shares the browser's session, which holds the cached run
+            return new JSONObject(command.execute(createDefaultConnection(), containerPath).getParsedData());
+        }
+        catch (IOException | CommandException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void saveQCExclusions(String containerPath, long runId, JSONArray exclusions)
+    {
+        SimplePostCommand command = new SimplePostCommand("nabassay", "saveQCControlInfo");
+        command.setJsonObject(new JSONObject().put("runId", runId).put("excluded", exclusions));
+        try
+        {
+            // Not createDefaultConnection(), which copies the browser's cookies and so shares its session
+            command.execute(WebTestHelper.getRemoteApiConnection(false), containerPath);
+        }
+        catch (IOException | CommandException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private JSONArray getFirstSampleDilutions(JSONObject qcInfo)
+    {
+        return qcInfo.getJSONArray("dilutionSummaries").getJSONObject(0).getJSONArray("dilutions");
+    }
+
+    private List<String> getFirstSampleNeut(JSONObject qcInfo)
+    {
+        JSONArray dilutions = getFirstSampleDilutions(qcInfo);
+        List<String> values = new ArrayList<>();
+        for (int i = 0; i < dilutions.length(); i++)
+        {
+            JSONObject dilution = dilutions.getJSONObject(i);
+            values.add(dilution.getString("neut"));
+            values.add(dilution.getString("neutPlusMinus"));
+        }
+        return values;
     }
 
     private SimpleHttpResponse getNabRunApi(String action, String containerPath, long runId)
