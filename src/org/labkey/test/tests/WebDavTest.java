@@ -18,7 +18,12 @@ package org.labkey.test.tests;
 
 import com.github.sardine.DavResource;
 import com.github.sardine.Sardine;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.io.entity.ByteArrayEntity;
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -147,6 +152,46 @@ public class WebDavTest extends BaseWebDriverTest
         SimpleHttpRequest request = new SimpleHttpRequest(baseWebDavUrl + "?uf=%uf");
         SimpleHttpResponse response = request.getResponse();
         assertEquals("Wrong response for unparsable parameter", HttpStatus.SC_BAD_REQUEST, response.getResponseCode());
+    }
+
+    @Test
+    public void testUnparseableParameters() throws Exception
+    {
+        String beginUrl = WebTestHelper.buildURL("project", getProjectName(), "begin");
+        assertGetResponse(HttpStatus.SC_OK, beginUrl);
+        assertGetResponse(HttpStatus.SC_BAD_REQUEST, beginUrl + "?x=%C3%28");
+        assertGetResponse(HttpStatus.SC_BAD_REQUEST, beginUrl + "?x=%uf");
+        assertGetResponse(HttpStatus.SC_BAD_REQUEST, beginUrl + "?=foo");
+        // The 404 page reads the request parameters
+        assertGetResponse(HttpStatus.SC_BAD_REQUEST, WebTestHelper.buildURL("project", getProjectName(), "noSuchAction") + "?x=%uf");
+    }
+
+    @Test
+    public void testMalformedMultipart() throws Exception
+    {
+        String beginUrl = WebTestHelper.buildURL("project", getProjectName(), "begin");
+        String truncated = "--XYZ\r\nContent-Disposition: form-data; name=\"a\"\r\n\r\nvalue";
+
+        assertPostResponse(HttpStatus.SC_BAD_REQUEST, beginUrl, "multipart/form-data; boundary=XYZ", truncated);
+        assertPostResponse(HttpStatus.SC_BAD_REQUEST, beginUrl, "multipart/form-data", "junk");
+        assertPostResponse(HttpStatus.SC_BAD_REQUEST, baseWebDavUrl, "multipart/form-data; boundary=XYZ", truncated);
+    }
+
+    private void assertGetResponse(int expectedStatus, String url) throws IOException
+    {
+        SimpleHttpResponse response = new SimpleHttpRequest(url).getResponse();
+        assertEquals("Wrong response for " + url, expectedStatus, response.getResponseCode());
+    }
+
+    private void assertPostResponse(int expectedStatus, String url, String contentType, String body) throws IOException
+    {
+        HttpPost post = new HttpPost(url);
+        post.setEntity(new ByteArrayEntity(body.getBytes(StandardCharsets.UTF_8), ContentType.parse(contentType)));
+        try (CloseableHttpClient client = WebTestHelper.getHttpClient())
+        {
+            int status = client.execute(post, ClassicHttpResponse::getCode);
+            assertEquals("Wrong response for POST of " + contentType + " to " + url, expectedStatus, status);
+        }
     }
 
     @Test
