@@ -15,10 +15,14 @@
  */
 package org.labkey.test.pages;
 
+import com.deque.html.axecore.results.Results;
+import com.deque.html.axecore.selenium.AxeBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locators;
 import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.util.AccessibilityUtils;
+import org.labkey.test.util.TestLogger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
@@ -46,6 +50,8 @@ public class LabKeyPage<EC extends LabKeyPage.ElementCache> extends WebDriverWra
             _test = (BaseWebDriverTest)test;
         _wrapsDriver = test;
         waitForPage();
+
+        AccessibilityUtils.scanPage(this);
     }
 
     public LabKeyPage(WebDriver driver)

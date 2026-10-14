@@ -37,6 +37,8 @@ project.dependencies {
     implementation("org.seleniumhq.selenium:selenium-chrome-driver:${seleniumVersion}")
     implementation "org.seleniumhq.selenium:selenium-ie-driver:${seleniumVersion}"
 
+    implementation("com.deque.html.axe-core:selenium:${axeCoreSeleniumVersion}")
+
     implementation("com.google.guava:guava:${guavaVersion}") // Dependency of mockserver
     api("org.apache.httpcomponents.core5:httpcore5:${httpcore5Version}")
     api("org.apache.httpcomponents.client5:httpclient5:${httpclient5Version}")
