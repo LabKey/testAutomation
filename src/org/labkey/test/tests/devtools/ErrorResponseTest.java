@@ -107,7 +107,17 @@ public class ErrorResponseTest extends BaseWebDriverTest
 
         assertPostResponse(HttpStatus.SC_BAD_REQUEST, beginUrl, "multipart/form-data; boundary=XYZ", truncated);
         assertPostResponse(HttpStatus.SC_BAD_REQUEST, beginUrl, "multipart/form-data", "junk");
+        // Tomcat doesn't parse other multipart types when reading parameters, so this fails later, in the action's multipart resolution
+        assertPostResponse(HttpStatus.SC_BAD_REQUEST, beginUrl, "multipart/mixed; boundary=XYZ", truncated);
         assertPostResponse(HttpStatus.SC_BAD_REQUEST, WebDavUtils.buildBaseWebDavUrl(getProjectName(), "@files/"), "multipart/form-data; boundary=XYZ", truncated);
+    }
+
+    @Test
+    public void testOversizedMultipartFields() throws Exception
+    {
+        // Non-file parts count against the connector's maxPostSize, 2MB by default
+        String oversized = "--XYZ\r\nContent-Disposition: form-data; name=\"a\"\r\n\r\n" + "x".repeat(3 * 1024 * 1024) + "\r\n--XYZ--\r\n";
+        assertPostResponse(HttpStatus.SC_REQUEST_TOO_LONG, WebTestHelper.buildURL("project", getProjectName(), "begin"), "multipart/form-data; boundary=XYZ", oversized);
     }
 
     private void assertGetResponse(int expectedStatus, String url) throws IOException
