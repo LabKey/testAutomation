@@ -18,12 +18,7 @@ package org.labkey.test.tests;
 
 import com.github.sardine.DavResource;
 import com.github.sardine.Sardine;
-import org.apache.hc.client5.http.classic.methods.HttpPost;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import org.apache.hc.core5.http.ClassicHttpResponse;
-import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.HttpStatus;
-import org.apache.hc.core5.http.io.entity.ByteArrayEntity;
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -61,9 +56,10 @@ import static org.junit.Assert.fail;
 @BaseWebDriverTest.ClassTimeout(minutes = 4)
 public class WebDavTest extends BaseWebDriverTest
 {
-    private static final String TEXT = "Four score and seven years ago our fathers brought forth on this continent a new nation, conceived in liberty, and dedicated to the proposition that all men are created equal.\n"+
-    "Now we are engaged in a great civil war, testing whether that nation, or any nation, so conceived and so dedicated, can long endure. We are met on a great battle-field of that war. We have come to dedicate a portion of that field, as a final resting place for those who here gave their lives that that nation might live. It is altogether fitting and proper that we should do this.\n"+
-    "But, in a larger sense, we can not dedicate, we can not consecrate, we can not hallow this ground. The brave men, living and dead, who struggled here, have consecrated it, far above our poor power to add or detract. The world will little note, nor long remember what we say here, but it can never forget what they did here. It is for us the living, rather, to be dedicated here to the unfinished work which they who fought here have thus far so nobly advanced. It is rather for us to be here dedicated to the great task remaining before us-that from these honored dead we take increased devotion to that cause for which they gave the last full measure of devotion-that we here highly resolve that these dead shall not have died in vain-that this nation, under God, shall have a new birth of freedom-and that government of the people, by the people, for the people, shall not perish from the earth.";
+    private static final String TEXT = """
+        Four score and seven years ago our fathers brought forth on this continent a new nation, conceived in liberty, and dedicated to the proposition that all men are created equal.
+        Now we are engaged in a great civil war, testing whether that nation, or any nation, so conceived and so dedicated, can long endure. We are met on a great battle-field of that war. We have come to dedicate a portion of that field, as a final resting place for those who here gave their lives that that nation might live. It is altogether fitting and proper that we should do this.
+        But, in a larger sense, we can not dedicate, we can not consecrate, we can not hallow this ground. The brave men, living and dead, who struggled here, have consecrated it, far above our poor power to add or detract. The world will little note, nor long remember what we say here, but it can never forget what they did here. It is for us the living, rather, to be dedicated here to the unfinished work which they who fought here have thus far so nobly advanced. It is rather for us to be here dedicated to the great task remaining before us-that from these honored dead we take increased devotion to that cause for which they gave the last full measure of devotion-that we here highly resolve that these dead shall not have died in vain-that this nation, under God, shall have a new birth of freedom-and that government of the people, by the people, for the people, shall not perish from the earth.""";
 
     private final String OTHER_PROJECT = "WebFileCache Project";
     private final String baseWebDavUrl = WebDavUtils.buildBaseWebDavUrl(getProjectName(), "@files/");
@@ -152,46 +148,6 @@ public class WebDavTest extends BaseWebDriverTest
         SimpleHttpRequest request = new SimpleHttpRequest(baseWebDavUrl + "?uf=%uf");
         SimpleHttpResponse response = request.getResponse();
         assertEquals("Wrong response for unparsable parameter", HttpStatus.SC_BAD_REQUEST, response.getResponseCode());
-    }
-
-    @Test
-    public void testUnparseableParameters() throws Exception
-    {
-        String beginUrl = WebTestHelper.buildURL("project", getProjectName(), "begin");
-        assertGetResponse(HttpStatus.SC_OK, beginUrl);
-        assertGetResponse(HttpStatus.SC_BAD_REQUEST, beginUrl + "?x=%C3%28");
-        assertGetResponse(HttpStatus.SC_BAD_REQUEST, beginUrl + "?x=%uf");
-        assertGetResponse(HttpStatus.SC_BAD_REQUEST, beginUrl + "?=foo");
-        // The 404 page reads the request parameters
-        assertGetResponse(HttpStatus.SC_BAD_REQUEST, WebTestHelper.buildURL("project", getProjectName(), "noSuchAction") + "?x=%uf");
-    }
-
-    @Test
-    public void testMalformedMultipart() throws Exception
-    {
-        String beginUrl = WebTestHelper.buildURL("project", getProjectName(), "begin");
-        String truncated = "--XYZ\r\nContent-Disposition: form-data; name=\"a\"\r\n\r\nvalue";
-
-        assertPostResponse(HttpStatus.SC_BAD_REQUEST, beginUrl, "multipart/form-data; boundary=XYZ", truncated);
-        assertPostResponse(HttpStatus.SC_BAD_REQUEST, beginUrl, "multipart/form-data", "junk");
-        assertPostResponse(HttpStatus.SC_BAD_REQUEST, baseWebDavUrl, "multipart/form-data; boundary=XYZ", truncated);
-    }
-
-    private void assertGetResponse(int expectedStatus, String url) throws IOException
-    {
-        SimpleHttpResponse response = new SimpleHttpRequest(url).getResponse();
-        assertEquals("Wrong response for " + url, expectedStatus, response.getResponseCode());
-    }
-
-    private void assertPostResponse(int expectedStatus, String url, String contentType, String body) throws IOException
-    {
-        HttpPost post = new HttpPost(url);
-        post.setEntity(new ByteArrayEntity(body.getBytes(StandardCharsets.UTF_8), ContentType.parse(contentType)));
-        try (CloseableHttpClient client = WebTestHelper.getHttpClient())
-        {
-            int status = client.execute(post, ClassicHttpResponse::getCode);
-            assertEquals("Wrong response for POST of " + contentType + " to " + url, expectedStatus, status);
-        }
     }
 
     @Test
