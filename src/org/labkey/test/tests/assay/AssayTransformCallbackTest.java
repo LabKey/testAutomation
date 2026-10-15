@@ -129,6 +129,7 @@ public class AssayTransformCallbackTest extends AbstractAssayTransformTest
         sleep(8_000);
 
         deleteFolder(folderPath);
+        assertEquals("Folder delete should finish while the transform script is still running", 0, selectRuns(BACKGROUND_ASSAY, null).getRowCount().intValue());
 
         goToDataPipeline();
         waitForPipelineJobsToComplete(1, false);
