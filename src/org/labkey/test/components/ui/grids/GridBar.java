@@ -23,7 +23,7 @@ import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.react.MultiMenu;
 import org.labkey.test.components.ui.Pager;
-import org.openqa.selenium.Keys;
+import org.labkey.test.components.ui.grids.SearchSuggestionMenu.SuggestionKind;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 import static org.labkey.test.WebDriverWrapper.sleep;
 
@@ -43,6 +44,9 @@ import static org.labkey.test.WebDriverWrapper.sleep;
  */
 public class GridBar extends WebDriverComponent<GridBar.ElementCache>
 {
+    private static final int SUGGESTION_ATTEMPTS = 5;
+    private static final int SUGGESTION_RETRY_MS = 1_000;
+
     private final WebElement _gridBarElement;
     private final QueryGrid _queryGrid;
 
@@ -316,37 +320,124 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
         throw new NoSuchElementException("Couldn't find menu button with text '" + buttonText + "'.");
     }
 
+    /**
+     * Type into the search input and wait for its suggestions, without applying any of them.
+     */
+    public SearchSuggestionMenu typeSearch(String term)
+    {
+        elementCache().searchBox.set(term);
+        return getSearchSuggestionMenu().waitForSuggestions();
+    }
+
+    public SearchSuggestionMenu getSearchSuggestionMenu()
+    {
+        return new SearchSuggestionMenu(elementCache().searchBox.getComponentElement(), getDriver());
+    }
+
+    /**
+     * Search all columns for the term (the Q filter), replacing any applied search. A blank term clears the search.
+     */
     public GridBar searchFor(String searchStr)
     {
-
         clearSearch();
+        if (searchStr.isBlank())
+            return this;
 
-        _queryGrid.doAndWaitForUpdate(()->
+        SearchSuggestionMenu menu = typeSearch(searchStr);
+        _queryGrid.doAndWaitForUpdate(() -> menu.clickSuggestion(SuggestionKind.SEARCH));
+        return this;
+    }
+
+    /**
+     * Apply the filter suggestion with the given label, e.g. "Sample ID is S-1". It replaces any applied search and
+     * every filter on its column.
+     */
+    public GridBar chooseSuggestion(String term, String label)
+    {
+        SearchSuggestionMenu menu = typeSearchUntil(term, SuggestionKind.FILTER, label::equals);
+        _queryGrid.doAndWaitForUpdate(() -> menu.clickSuggestion(SuggestionKind.FILTER, label));
+        return this;
+    }
+
+    /**
+     * Choose a compose suggestion, e.g. "Filter Sample ID…", which opens the filter modal with a draft filter.
+     */
+    public GridFilterModal composeFromSearch(String term, String label)
+    {
+        return composeFromSearch(term, label::equals);
+    }
+
+    /**
+     * Choose the first compose suggestion whose label matches, for labels whose column count varies, e.g.
+     * <code>label -> label.startsWith("Filter a string field for")</code>.
+     */
+    public GridFilterModal composeFromSearch(String term, Predicate<String> label)
+    {
+        typeSearchUntil(term, SuggestionKind.COMPOSE, label).clickSuggestion(SuggestionKind.COMPOSE, label);
+        return new GridFilterModal(getDriver(), _queryGrid);
+    }
+
+    /**
+     * Type the term and press Enter right away, as a user would, which applies the top suggestion once it loads.
+     * Only for terms whose top suggestion is a filter or a search; a compose suggestion opens a modal instead.
+     */
+    public GridBar applyTopSuggestion(String term)
+    {
+        _queryGrid.doAndWaitForUpdate(() ->
         {
-            elementCache().searchBox.set(searchStr);
-            elementCache().searchBox.getComponentElement().sendKeys(Keys.ENTER);
+            elementCache().searchBox.set(term);
+            getSearchSuggestionMenu().pressEnter();
         });
         return this;
     }
 
+    /**
+     * Get the suggestion labels for the term, then close the menu.
+     */
+    public List<String> getSearchSuggestions(String term)
+    {
+        SearchSuggestionMenu menu = typeSearch(term);
+        List<String> labels = menu.getLabels();
+        menu.close();
+        return labels;
+    }
+
+    // Data-derived suggestions load in the background and can miss a cold request's time budget; retyping refetches them
+    private SearchSuggestionMenu typeSearchUntil(String term, SuggestionKind kind, Predicate<String> label)
+    {
+        SearchSuggestionMenu menu = typeSearch(term);
+        for (int attempt = 1; attempt < SUGGESTION_ATTEMPTS && !hasSuggestion(menu, kind, label); attempt++)
+        {
+            sleep(SUGGESTION_RETRY_MS);
+            menu = typeSearch(term);
+        }
+        return menu;
+    }
+
+    private static boolean hasSuggestion(SearchSuggestionMenu menu, SuggestionKind kind, Predicate<String> label)
+    {
+        return menu.getSuggestions().stream().anyMatch(s -> s.kind() == kind && label.test(s.label()));
+    }
+
+    /**
+     * Remove the applied search, if any, and empty the search input.
+     */
     public GridBar clearSearch()
     {
-        if (elementCache().clearSearchButton.isDisplayed())
+        _queryGrid.getSearchStatusValue().ifPresent(search -> _queryGrid.doAndWaitForUpdate(search::remove));
+
+        if (!getSearchExpression().isEmpty())
         {
-            _queryGrid.doAndWaitForUpdate(() ->
-            {
-                elementCache().clearSearchButton.click();
-            });
-        }
-        else if (!elementCache().searchBox.get().isEmpty())
-        {
-            // Sometimes the search box has something in it, but the filter isn't set, so the clear button isn't visible
-            // This happens when we use beginAt to navigate to the page we're already on.
-            elementCache().searchBox.set("");
+            // Selenium's clear() bypasses React's onChange, which would leave the typed text in the component's state
+            getWrapper().actionClear(elementCache().searchBox.getComponentElement());
         }
         return this;
     }
 
+    /**
+     * Get the text in the search input. Applying any suggestion empties the input, so this is the uncommitted text; use
+     * {@link QueryGrid#getAppliedSearch()} for the applied search.
+     */
     public String getSearchExpression()
     {
         return elementCache().searchBox.get();
@@ -378,7 +469,6 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
         }
 
         protected final Input searchBox = Input.Input(Locator.tagWithClass("input", "grid-panel__search-input"), getDriver()).findWhenNeeded(this);
-        protected final WebElement clearSearchButton = Locator.byClass("fa-remove").findWhenNeeded(this);
     }
 
     protected static abstract class Locators

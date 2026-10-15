@@ -1093,12 +1093,16 @@ public class GridPanelTest extends GridPanelBaseTest
                 .verifyEquals("Number of rows after filter applied not as expected.",
                         expectedCount, grid.getRecordCount());
 
-        log("Remove all of the filters.");
+        log("Remove the filters, but not the search ('Remove all' would remove the search too).");
 
-        grid = grid.clickRemoveAllButton();
+        // Dismiss from the right, since removing a value shifts the text of the values to its right
+        for (FilterStatusValue filterPill : grid.getFilterStatusValues(FilterStatusValue.FilterStatusType.filter).reversed())
+        {
+            grid.doAndWaitForUpdate(filterPill::remove);
+        }
 
-        checker().verifyEquals("Search expression not as expected after clearing filters.",
-                searchString, grid.getGridBar().getSearchExpression());
+        checker().verifyEquals("Search not as expected after removing the filters.",
+                searchString, grid.getAppliedSearch());
 
         // Again can use a query to get the expected number of rows from the search.
         filters = new ArrayList<>();
