@@ -62,6 +62,7 @@ public class AssayTransformCallbackTest extends AbstractAssayTransformTest
     private static final String CALLBACK_STATUS = "CallbackStatus";
     private static final String TRANSFORM_COMMENT = "set by transform";
     private static final String CALLBACK_DATA = "ParticipantID\tVisitID\nP1\t1\n";
+    private static final String DEFAULT_TRANSFORM_SCRIPT_TIMEOUT = "60";
     private static final int SCRIPT_SLEEP_SECONDS = 45;
     private static final int REQUEST_TIMEOUT_MS = (int) TimeUnit.MINUTES.toMillis(3);
 
@@ -80,8 +81,9 @@ public class AssayTransformCallbackTest extends AbstractAssayTransformTest
     @Override
     protected void doCleanup(boolean afterTest)
     {
+        // Only when testTransformScriptTimeout failed before restoring it
         if (_timeoutChanged)
-            setTransformScriptTimeout("60");
+            setTransformScriptTimeout(DEFAULT_TRANSFORM_SCRIPT_TIMEOUT);
         super.doCleanup(afterTest);
     }
 
@@ -178,6 +180,9 @@ public class AssayTransformCallbackTest extends AbstractAssayTransformTest
         {
             assertTrue("Unexpected error: " + e.getMessage(), e.getMessage().contains("Process killed after exceeding timeout"));
         }
+
+        // Restore before the other tests in this class, whose scripts can run close to a minute
+        setTransformScriptTimeout(DEFAULT_TRANSFORM_SCRIPT_TIMEOUT);
     }
 
     private int createCallbackAssay(String name, boolean backgroundUpload)
@@ -264,7 +269,7 @@ public class AssayTransformCallbackTest extends AbstractAssayTransformTest
 
     private void setTransformScriptTimeout(String minutes)
     {
-        _timeoutChanged = true;
+        _timeoutChanged = !DEFAULT_TRANSFORM_SCRIPT_TIMEOUT.equals(minutes);
         CustomizeSitePage.beginAt(this)
                 .setAssayTransformScriptTimeout(minutes)
                 .save();
