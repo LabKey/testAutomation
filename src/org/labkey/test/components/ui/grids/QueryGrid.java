@@ -143,9 +143,48 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         return elementCache().gridBar;
     }
 
+    /**
+     * Get every value in the filter status bar, including the applied search and a view's filters.
+     */
     public List<FilterStatusValue> getFilterStatusValues()
     {
         return elementCache().getFilterStatusFilterValues();
+    }
+
+    public List<FilterStatusValue> getFilterStatusValues(FilterStatusValue.FilterStatusType type)
+    {
+        return new FilterStatusValue.FilterStatusValueFinder(getDriver()).withType(type)
+                .findAll(elementCache().filterStatusPanel);
+    }
+
+    /**
+     * Get the search applied from the search input. A saved view's search shows as a locked value, which the search
+     * input never replaces, so it isn't included.
+     */
+    public Optional<FilterStatusValue> getSearchStatusValue()
+    {
+        return getFilterStatusValues(FilterStatusValue.FilterStatusType.search).stream()
+                .filter(value -> !value.isLocked())
+                .findFirst();
+    }
+
+    /**
+     * @return the term of the applied search, or an empty string if there is none
+     */
+    public String getAppliedSearch()
+    {
+        return getSearchStatusValue().map(FilterStatusValue::getText).orElse("");
+    }
+
+    /**
+     * Click the applied search, which puts its term back in the search input and reopens the suggestion menu.
+     */
+    public SearchSuggestionMenu editSearch()
+    {
+        getSearchStatusValue()
+                .orElseThrow(() -> new IllegalStateException("No search is applied to the grid."))
+                .open();
+        return getGridBar().getSearchSuggestionMenu().waitForSuggestions();
     }
 
     /**
@@ -259,32 +298,28 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     // search, sort and filter methods
 
     /**
-     * searches the grid, from the GridBar search input and waits for the grid to refresh
-     * if the searchTerm is different from the current searchTerm
+     * Search all columns for the term (the Q filter) and wait for the grid to refresh, unless that search is already
+     * applied. See {@link GridBar#searchFor(String)}.
      */
     public QueryGrid search(String searchTerm)
     {
-        String currentSearchExp = getGridBar().getSearchExpression();
-        if (!searchTerm.equals(currentSearchExp))
-            doAndWaitForUpdate(()-> getGridBar().searchFor(searchTerm));
+        if (!searchTerm.equals(getAppliedSearch()))
+            getGridBar().searchFor(searchTerm);
 
         return this;
     }
 
     /**
-     * removes any search filter applied to the grid by removing the search term, which will update the grid
+     * Remove the applied search, if any, and empty the search input.
      */
     public QueryGrid clearSearch()
     {
-        String currentSearchExp = getGridBar().getSearchExpression();
-        if (!currentSearchExp.isBlank())
-            getGridBar().clearSearch();
-
+        getGridBar().clearSearch();
         return this;
     }
 
     /**
-     * clears grid filter expressions added by the user (i.e. from the filter modal)
+     * Remove every value in the filter status bar, including the applied search.
      */
     public QueryGrid clearFilters()
     {
@@ -304,6 +339,9 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         return elementCache().removeAllFilters.isDisplayed();
     }
 
+    /**
+     * Click 'Remove all', which also removes the applied search.
+     */
     public QueryGrid clickRemoveAllButton()
     {
         doAndWaitForUpdate(()->elementCache().removeAllFilters.click());
