@@ -111,6 +111,12 @@ public class CustomizeSitePage extends LabKeyPage<CustomizeSitePage.ElementCache
         return this;
     }
 
+    public CustomizeSitePage setAssayTransformScriptTimeout(String value)
+    {
+        elementCache().assayTransformScriptTimeout.set(value);
+        return this;
+    }
+
     public CustomizeSitePage setExt3Required(boolean enable)
     {
         elementCache().ext3Required.set(enable);
@@ -235,6 +241,7 @@ public class CustomizeSitePage extends LabKeyPage<CustomizeSitePage.ElementCache
         protected final Input memoryUsageDumpInterval = Input(Locator.id("memoryUsageDumpInterval"), getDriver()).findWhenNeeded(this);
         protected final Input maxBLOBSize = Input(Locator.id("maxBLOBSize"), getDriver()).findWhenNeeded(this);
         protected final Input readOnlyHttpRequestTimeout = Input(Locator.id("readOnlyHttpRequestTimeout"), getDriver()).findWhenNeeded(this);
+        protected final Input assayTransformScriptTimeout = Input(Locator.id("assayTransformScriptTimeout"), getDriver()).findWhenNeeded(this);
         protected final Checkbox ext3Required = Checkbox(Locator.id("ext3Required")).findWhenNeeded(this);
         protected final Checkbox ext3APIRequired = Checkbox(Locator.id("ext3APIRequired")).findWhenNeeded(this);
 
