@@ -298,7 +298,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     // search, sort and filter methods
 
     /**
-     * Search all columns for the term (the Q filter) and wait for the grid to refresh, unless that search is already
+     * Search all fields for the term (the Q filter) and wait for the grid to refresh, unless that search is already
      * applied. See {@link GridBar#searchFor(String)}.
      */
     public QueryGrid search(String searchTerm)
