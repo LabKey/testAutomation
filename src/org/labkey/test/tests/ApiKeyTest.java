@@ -47,12 +47,13 @@ import org.labkey.test.categories.Daily;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.core.ApiKeyPanel;
 import org.labkey.test.components.ui.grids.QueryGrid;
-import org.labkey.test.pages.core.admin.CustomizeSitePage;
+import org.labkey.test.pages.core.admin.CustomizeSitePage.KeyExpirationOptions;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.list.IntListDefinition;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PasswordUtil;
+import org.labkey.test.util.SiteSettingsHelper;
 import org.labkey.test.util.TestUser;
 import org.labkey.test.util.URLBuilder;
 import org.labkey.test.util.query.QueryApiHelper;
@@ -86,6 +87,12 @@ public class ApiKeyTest extends BaseWebDriverTest
     private static final String LIST_VALUE = "value";
     private static final TestUser EDITOR_USER = new TestUser("editor@apikey.test");
     private static final AtomicInteger valueCount = new AtomicInteger();
+    private static final String ALLOW_API_KEYS = "allowApiKeys";
+    private static final String API_KEY_EXPIRATION_SECONDS = "apiKeyExpirationSeconds";
+    private static final String ALLOW_SESSION_KEYS = "allowSessionKeys";
+
+    // Static so a setting changed in one test method is restored by doCleanup on a later instance
+    private static final SiteSettingsHelper SITE_SETTINGS = new SiteSettingsHelper();
 
     @BeforeClass
     public static void setupProject() throws Exception
@@ -99,6 +106,7 @@ public class ApiKeyTest extends BaseWebDriverTest
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         super.doCleanup(afterTest);
+        SITE_SETTINGS.restoreSettings();
         _userHelper.deleteUsers(false, EDITOR_USER);
     }
 
@@ -119,10 +127,7 @@ public class ApiKeyTest extends BaseWebDriverTest
     public void testSessionKey() throws IOException
     {
         log("Get session key and use it in a command.");
-        goToAdminConsole()
-                .clickSiteSettings()
-                .setAllowSessionKeys(true)
-                .save();
+        SITE_SETTINGS.setSetting(ALLOW_SESSION_KEYS, true);
 
         String apiKey = generateSessionKey();
 
@@ -130,10 +135,7 @@ public class ApiKeyTest extends BaseWebDriverTest
         verifySessionKeyCsrf(createApiKeyConnection(apiKey));
 
         log("Verify session key remains valid if key generation is turned off");
-        goToAdminConsole()
-                .clickSiteSettings()
-                .setAllowSessionKeys(false)
-                .save();
+        SITE_SETTINGS.setSetting(ALLOW_SESSION_KEYS, false);
         verifyValidAPIKey(createApiKeyConnection(apiKey));
         verifySessionKeyCsrf(createApiKeyConnection(apiKey));
 
@@ -149,11 +151,7 @@ public class ApiKeyTest extends BaseWebDriverTest
     public void testNonAdminUser() throws IOException
     {
         log("Ensure apiKey generation is enabled.");
-        goToAdminConsole()
-                .clickSiteSettings()
-                .setAllowApiKeys(true)
-                .setApiKeyExpiration(CustomizeSitePage.KeyExpirationOptions.ONE_WEEK)
-                .save();
+        enableApiKeys(KeyExpirationOptions.ONE_WEEK);
         signOut();
 
         log("Log in as non-admin user.");
@@ -175,11 +173,7 @@ public class ApiKeyTest extends BaseWebDriverTest
     {
         List<Map<String, Object>> _generatedApiKeys = new ArrayList<>();
 
-        goToAdminConsole()
-                .clickSiteSettings()
-                .setAllowApiKeys(true)
-                .setApiKeyExpiration(CustomizeSitePage.KeyExpirationOptions.ONE_WEEK)
-                .save();
+        enableApiKeys(KeyExpirationOptions.ONE_WEEK);
 
         String apiKey = generateAPIKeyAndRecord(_generatedApiKeys);
         log("Verify active API key via api authentication");
@@ -196,10 +190,7 @@ public class ApiKeyTest extends BaseWebDriverTest
         assertEquals("Number of keys after UI deletion not as expected", beforeDeleteCount - 1, grid.getRecordCount());
 
         log("Verify existing active API key with disabled api key setting");
-        goToAdminConsole()
-                .clickSiteSettings()
-                .setAllowApiKeys(false)
-                .save();
+        SITE_SETTINGS.setSetting(ALLOW_API_KEYS, false);
         verifyValidAPIKey(createApiKeyConnection(apiKey));
 
         log("Verify key deletion via UI with disabled api key generation works.");
@@ -222,11 +213,7 @@ public class ApiKeyTest extends BaseWebDriverTest
         List<Map<String, Object>> _generatedApiKeys = new ArrayList<>();
 
         log("Generating an apikey which expire in one week");
-        goToAdminConsole()
-                .clickSiteSettings()
-                .setAllowApiKeys(true)
-                .setApiKeyExpiration(CustomizeSitePage.KeyExpirationOptions.ONE_WEEK)
-                .save();
+        enableApiKeys(KeyExpirationOptions.ONE_WEEK);
 
         String apiKey1 = generateAPIKeyAndRecord(_generatedApiKeys);
         Connection cn = createApiKeyConnection(apiKey1);
@@ -245,11 +232,7 @@ public class ApiKeyTest extends BaseWebDriverTest
         verifyInvalidAPIKey(createApiKeyConnection(apiKey1), false);
 
         log("Generating the apikey which expires in ten seconds");
-        goToAdminConsole()
-                .clickSiteSettings()
-                .setAllowApiKeys(true)
-                .setApiKeyExpiration(CustomizeSitePage.KeyExpirationOptions.TEN_SECONDS)
-                .save();
+        enableApiKeys(KeyExpirationOptions.TEN_SECONDS);
 
         log("Verify apikey expiration");
         goToExternalToolPage();
@@ -268,14 +251,8 @@ public class ApiKeyTest extends BaseWebDriverTest
     public void testApiKeysImpersonation() throws IOException
     {
         log("Verify key table and generation are not available while impersonating");
-        goToAdminConsole()
-                .clickSiteSettings()
-                .setAllowApiKeys(true)
-                .setApiKeyExpiration(CustomizeSitePage.KeyExpirationOptions.ONE_WEEK)
-                .save()
-                .clickSiteSettings()
-                .setAllowSessionKeys(true)
-                .save();
+        enableApiKeys(KeyExpirationOptions.ONE_WEEK);
+        SITE_SETTINGS.setSetting(ALLOW_SESSION_KEYS, true);
         List<Map<String, Object>> _generatedApiKeys = new ArrayList<>();
         generateAPIKeyAndRecord(_generatedApiKeys);
         goToProjectHome();
@@ -317,11 +294,7 @@ public class ApiKeyTest extends BaseWebDriverTest
     public void testApiKeyDisabled() throws IOException
     {
         log("Verify generating API keys would fail when setting is disabled");
-        goToAdminConsole()
-                .clickSiteSettings()
-                .setAllowApiKeys(false)
-                .setAllowSessionKeys(true)
-                .save();
+        SITE_SETTINGS.setSettings(Map.of(ALLOW_API_KEYS, false, ALLOW_SESSION_KEYS, true));
         Connection cn = createDefaultConnection();
         SimplePostCommand generateAPIKeyCommand = new SimplePostCommand("security", "createApiKey");
         generateAPIKeyCommand.setParameters(new HashMap<>(Maps.of("type", "apikey")));
@@ -342,11 +315,7 @@ public class ApiKeyTest extends BaseWebDriverTest
     public void testSessionKeyDisabled() throws IOException
     {
         log("Verify generating API keys would fail when setting is disabled");
-        goToAdminConsole()
-                .clickSiteSettings()
-                .setAllowApiKeys(true)
-                .setAllowSessionKeys(false)
-                .save();
+        SITE_SETTINGS.setSettings(Map.of(ALLOW_API_KEYS, true, ALLOW_SESSION_KEYS, false));
         Connection cn = createDefaultConnection();
         SimplePostCommand generateAPIKeyCommand = new SimplePostCommand("security", "createApiKey");
         generateAPIKeyCommand.setParameters(new HashMap<>(Maps.of("type", "session")));
@@ -368,11 +337,7 @@ public class ApiKeyTest extends BaseWebDriverTest
     {
         List<Map<String, Object>> _generatedApiKeys = new ArrayList<>();
 
-        goToAdminConsole()
-            .clickSiteSettings()
-            .setAllowApiKeys(true)
-            .setApiKeyExpiration(CustomizeSitePage.KeyExpirationOptions.ONE_WEEK)
-            .save();
+        enableApiKeys(KeyExpirationOptions.ONE_WEEK);
 
         String apiKey = generateAPIKey(null, "Reader");
         _generatedApiKeys.add(getLastAPIKeyRecord());
@@ -390,6 +355,11 @@ public class ApiKeyTest extends BaseWebDriverTest
         log("Verify revoked/deleted api key");
         deleteAPIKeys(_generatedApiKeys);
         verifyInvalidAPIKey(createApiKeyConnection(apiKey), false);
+    }
+
+    private void enableApiKeys(KeyExpirationOptions expiration)
+    {
+        SITE_SETTINGS.setSettings(Map.of(ALLOW_API_KEYS, true, API_KEY_EXPIRATION_SECONDS, expiration.getValue()));
     }
 
     private void verifyValidAPIKey(Connection connection) throws IOException

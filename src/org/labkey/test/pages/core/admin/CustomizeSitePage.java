@@ -27,6 +27,8 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 
+import java.util.List;
+
 import static org.labkey.test.components.html.Checkbox.Checkbox;
 import static org.labkey.test.components.html.Input.Input;
 import static org.labkey.test.components.html.RadioButton.RadioButton;
@@ -50,6 +52,14 @@ public class CustomizeSitePage extends LabKeyPage<CustomizeSitePage.ElementCache
         clickAndWait(scrollIntoView(elementCache().saveButton));
 
         return new ShowAdminPage(getDriver());
+    }
+
+    /** Saves expecting validation to fail; the page stays put and lists the errors */
+    public List<String> saveExpectingErrors()
+    {
+        scrollIntoView(elementCache().saveButton).click();
+        // The error container is always rendered; the save clears it and adds a div per error
+        return getTexts(Locator.tag("div").waitForElements(elementCache().errors, WAIT_FOR_JAVASCRIPT));
     }
 
     public CustomizeSitePage setPrimarySiteAdmin(String value)
@@ -208,6 +218,7 @@ public class CustomizeSitePage extends LabKeyPage<CustomizeSitePage.ElementCache
     protected class ElementCache extends LabKeyPage<?>.ElementCache
     {
         protected final WebElement saveButton = Locator.lkButton("Save").findWhenNeeded(this);
+        protected final WebElement errors = Locator.id("siteSettingsErrors").findWhenNeeded(this);
 
         // Site Administrators
         protected final Select primaryAdmin = Select(Locator.id("administratorContactEmail")).findWhenNeeded(this);

@@ -193,11 +193,6 @@ public abstract class TestProperties
         return !getBooleanProperty("viewCheck", true);
     }
 
-    public static boolean isSystemMaintenanceDisabled()
-    {
-        return "never".equals(System.getProperty("systemMaintenance"));
-    }
-
     public static boolean isHeapDumpCollectionEnabled()
     {
         return getBooleanProperty("webtest.enable.heap.dump", false);
