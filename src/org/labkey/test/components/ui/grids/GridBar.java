@@ -335,7 +335,7 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
     }
 
     /**
-     * Search all columns for the term (the Q filter), replacing any applied search. A blank term clears the search.
+     * Search all fields for the term (the Q filter), replacing any applied search. A blank term clears the search.
      */
     public GridBar searchFor(String searchStr)
     {

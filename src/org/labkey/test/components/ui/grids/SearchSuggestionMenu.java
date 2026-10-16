@@ -189,7 +189,7 @@ public class SearchSuggestionMenu extends WebDriverComponent<SearchSuggestionMen
 
     /**
      * Matches the <code>data-kind</code> of a suggestion: a filter applies directly, a compose opens the filter
-     * modal with a draft filter, and a search applies the Q filter ("Search all columns").
+     * modal with a draft filter, and a search applies the Q filter ("Search all fields").
      */
     public enum SuggestionKind
     {
