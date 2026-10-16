@@ -70,7 +70,10 @@ public class SiteSettingsHelper
     public Map<String, Object> updateSettings(Map<String, ?> settings) throws IOException, CommandException
     {
         SimplePostCommand command = new SimplePostCommand("admin", "updateSiteSettings");
-        command.setJsonObject(new JSONObject(Map.of("settings", settings)));
+        // JSONObject(Map) drops null values, which would leave a null-valued setting unrestored
+        JSONObject json = new JSONObject();
+        settings.forEach((name, value) -> json.put(name, value == null ? JSONObject.NULL : value));
+        command.setJsonObject(new JSONObject().put("settings", json));
         return getSettings(command.execute(_connectionSupplier.get(), "/"));
     }
 

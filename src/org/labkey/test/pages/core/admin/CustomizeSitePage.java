@@ -25,7 +25,6 @@ import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 
 import java.util.List;
@@ -59,9 +58,8 @@ public class CustomizeSitePage extends LabKeyPage<CustomizeSitePage.ElementCache
     public List<String> saveExpectingErrors()
     {
         scrollIntoView(elementCache().saveButton).click();
-        shortWait().until(ExpectedConditions.visibilityOf(elementCache().errors));
-
-        return getTexts(Locator.tag("div").findElements(elementCache().errors));
+        // The error container is always rendered; the save clears it and adds a div per error
+        return getTexts(Locator.tag("div").waitForElements(elementCache().errors, WAIT_FOR_JAVASCRIPT));
     }
 
     public CustomizeSitePage setPrimarySiteAdmin(String value)
