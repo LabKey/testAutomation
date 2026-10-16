@@ -107,6 +107,15 @@ public class GridFilterModal extends ModalDialog
         return elementCache().findFieldOptions().stream().map(WebElementUtils::getTextContent).collect(Collectors.toList());
     }
 
+    /**
+     * @return label of the field whose filters are shown
+     */
+    public String getActiveFieldLabel()
+    {
+        return WebElementUtils.getTextContent(elementCache().listItemLoc.withClass("active")
+                .findElement(elementCache().fieldsSelectionPanel));
+    }
+
     public List<String> getFilteredFieldLabels()
     {
         List<WebElement> filteredElements = Locator.byClass("list-group-item").withChild(

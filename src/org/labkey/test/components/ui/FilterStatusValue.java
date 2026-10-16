@@ -23,6 +23,8 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
+import java.util.Arrays;
+
 public class FilterStatusValue extends WebDriverComponent<FilterStatusValue.ElementCache>
 {
     private final WebElement _el;
@@ -49,6 +51,16 @@ public class FilterStatusValue extends WebDriverComponent<FilterStatusValue.Elem
     public String getText()
     {
         return elementCache().textSpan.getText();
+    }
+
+    public FilterStatusType getType()
+    {
+        return FilterStatusType.fromKeyword(getComponentElement().getDomAttribute("data-keyword"));
+    }
+
+    public boolean isSearch()
+    {
+        return getType() == FilterStatusType.search;
     }
 
     private boolean isActive()
@@ -80,6 +92,10 @@ public class FilterStatusValue extends WebDriverComponent<FilterStatusValue.Elem
                 , "The value item ["+originalText+"] did not disappear.", 1000);
     }
 
+    /**
+     * Click the value. A filter opens the filter modal; a search puts its term back in the grid's search input and
+     * opens the suggestion menu (see {@link org.labkey.test.components.ui.grids.QueryGrid#editSearch()}).
+     */
     public void open()
     {
         getWrapper().mouseOver(getComponentElement());
@@ -154,28 +170,30 @@ public class FilterStatusValue extends WebDriverComponent<FilterStatusValue.Elem
             }
             if (_type != null)
             {
-                locator = locator.withChild(Locator.tagWithClass("i", _type.getIconClass()));
+                locator = locator.withAttribute("data-keyword", _type.name());
             }
 
             return locator;
         }
     }
 
+    /**
+     * Matches the <code>data-keyword</code> of a value, its action's keyword. Hovering a value swaps its type icon for
+     * the remove icon, so the icon can't identify the type.
+     */
     public enum FilterStatusType
     {
-        filter("fa-filter"),
-        view("fa-table");
+        filter,
+        search,
+        sort,
+        view;
 
-        private final String iconCls;
-
-        FilterStatusType(String iconCls)
+        public static FilterStatusType fromKeyword(String keyword)
         {
-            this.iconCls = iconCls;
-        }
-
-        public String getIconClass()
-        {
-            return iconCls;
+            return Arrays.stream(values())
+                    .filter(type -> type.name().equals(keyword))
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalStateException("Unknown filter status keyword: " + keyword));
         }
     }
 }
