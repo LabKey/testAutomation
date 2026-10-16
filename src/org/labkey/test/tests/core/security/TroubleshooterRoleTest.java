@@ -42,6 +42,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.util.PermissionsHelper.TROUBLESHOOTER_ROLE;
 
@@ -82,24 +83,38 @@ public class TroubleshooterRoleTest extends BaseWebDriverTest
     @Test
     public void testAuditLogsIsAccessible() throws Exception
     {
-        // Ensure that there is at least one event to see
+        // Project-scoped event that the troubleshooter's root-only role must not expose
         new IntListDefinition("AuditList", "id").create(createDefaultConnection(), getProjectName());
+        assertTrue("Admin should see the project's domain event",
+            getAuditLogProjects(ShowAuditLogPage.beginAt(this, "DomainAuditEvent")).contains(getProjectName()));
 
         impersonate(TROUBLESHOOTER_USER);
         ShowAdminPage showAdminPage = goToAdminConsole().goToSettingsSection();
 
         log("Verifying audit log link is present");
         assertTrue("Audit log is not present for troubleshooter",
-                isElementPresent(Locator.linkWithText("audit log")));
+            isElementPresent(Locator.linkWithText("audit log")));
 
         log("Verify the export file is non empty");
         ShowAuditLogPage auditLogPage = showAdminPage.clickAuditLog();
-        auditLogPage.selectView("Domain events");
+        auditLogPage.selectView("User events");
         DataRegionTable logTable = auditLogPage.getLogTable();
         assertTrue("Troubleshooter should see audit entries", logTable.getDataRowCount() > 0);
         File exportedFile = logTable.expandExportPanel().exportText();
         int exportedRowCount = IteratorUtils.size(FileUtils.lineIterator(exportedFile)) - 1;
         assertTrue("Empty downloaded [" + exportedFile.getName() + "]", exportedRowCount > 0);
+
+        log("Verify troubleshooter can't see audit events outside the root");
+        auditLogPage.selectView("Domain events");
+        assertFalse("Troubleshooter should not see the project's domain event",
+            getAuditLogProjects(auditLogPage).contains(getProjectName()));
+    }
+
+    private List<String> getAuditLogProjects(ShowAuditLogPage auditLogPage)
+    {
+        DataRegionTable logTable = auditLogPage.getLogTable();
+        logTable.showAll();
+        return logTable.getColumnDataAsText("ProjectId");
     }
 
     @Test

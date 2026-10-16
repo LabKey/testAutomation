@@ -16,6 +16,7 @@
 package org.labkey.test.tests;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
 import org.jetbrains.annotations.NotNull;
@@ -1389,7 +1390,7 @@ public class ClientAPITest extends BaseWebDriverTest
         {
             // The order in the response isn't guaranteed. Loop to find one we know should be in the list.
             String responseValue = map.get("value");
-            if (StringUtils.startsWith(responseValue, _autocompleteUserDisplayName))
+            if (Strings.CS.startsWith(responseValue, _autocompleteUserDisplayName))
             {
                 String correctValue = displayNameOnly ? _autocompleteUserDisplayName : AUTOCOMPLETE_USER + " (" + _autocompleteUserDisplayName + ")";
                 assertEquals("Incorrect autocomplete value from for user " + AUTOCOMPLETE_USER + errMsg, correctValue, responseValue);
