@@ -17,6 +17,7 @@
 package org.labkey.test;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.Contract;
@@ -1764,7 +1765,7 @@ public abstract class Locator extends By
             if (clause.isEmpty())
                 return this;
             List<String> elementSeparators = Arrays.asList(" ", ",", ">", "+", "~");
-            if (StringUtils.endsWith(getLoc(), "*") && !elementSeparators.contains(clause.substring(clause.length())))
+            if (Strings.CS.endsWith(getLoc(), "*") && !elementSeparators.contains(clause.substring(clause.length())))
                 return new CssLocator(getLoc().substring(0, getLoc().length() - 1) + clause); // *.class becomes .class
             else
                 return new CssLocator(getLoc() + clause);
