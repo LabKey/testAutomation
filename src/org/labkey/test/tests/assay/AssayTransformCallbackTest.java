@@ -82,6 +82,7 @@ public class AssayTransformCallbackTest extends AbstractAssayTransformTest
     protected void doCleanup(boolean afterTest)
     {
         // Only when testTransformScriptTimeout failed before restoring it
+        // TODO GH Issue 1721: restore the original value through the site settings API instead of the UI (https://github.com/LabKey/testAutomation/pull/3254)
         if (_timeoutChanged)
             setTransformScriptTimeout(DEFAULT_TRANSFORM_SCRIPT_TIMEOUT);
         super.doCleanup(afterTest);
@@ -126,10 +127,12 @@ public class AssayTransformCallbackTest extends AbstractAssayTransformTest
         importPage.setNamedInputText(CALLBACK_STATUS, "pending");
         importPage.setDataText(CALLBACK_DATA);
         importPage.clickSaveAndFinish();
-        sleep(8_000);
+        waitFor(() -> isActiveAndStarted(getJobStatus()), "Background import job didn't start", REQUEST_TIMEOUT_MS);
 
         deleteFolder(folderPath);
-        assertEquals("Folder delete should finish while the transform script is still running", 0, selectRuns(BACKGROUND_ASSAY, null).getRowCount().intValue());
+        String status = getJobStatus();
+        assertTrue("Folder delete should finish while the transform script is still running, but job status is " + status, isActiveAndStarted(status));
+        assertEquals("Runs before the background import finished", 0, selectRuns(BACKGROUND_ASSAY, null).getRowCount().intValue());
 
         goToDataPipeline();
         waitForPipelineJobsToComplete(1, false);
@@ -183,6 +186,7 @@ public class AssayTransformCallbackTest extends AbstractAssayTransformTest
         }
 
         // Restore before the other tests in this class, whose scripts can run close to a minute
+        // TODO GH Issue 1721: move to a finally block once this uses the site settings API rather than navigating (https://github.com/LabKey/testAutomation/pull/3254)
         setTransformScriptTimeout(DEFAULT_TRANSFORM_SCRIPT_TIMEOUT);
     }
 
@@ -266,6 +270,27 @@ public class AssayTransformCallbackTest extends AbstractAssayTransformTest
         if (filter != null)
             command.addFilter(filter);
         return command.execute(createDefaultConnection(), folderPath);
+    }
+
+    private String getJobStatus()
+    {
+        try
+        {
+            SelectRowsCommand command = new SelectRowsCommand("pipeline", "Job");
+            command.setColumns(List.of("Status"));
+            SelectRowsResponse response = command.execute(createDefaultConnection(), getProjectName());
+            assertTrue("Pipeline jobs in " + getProjectName(), response.getRowCount().intValue() <= 1);
+            return response.getRows().isEmpty() ? null : (String) response.getRows().getFirst().get("Status");
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static boolean isActiveAndStarted(String status)
+    {
+        return status != null && !status.endsWith("WAITING") && !List.of("COMPLETE", "ERROR", "CANCELLED").contains(status);
     }
 
     private void setTransformScriptTimeout(String minutes)
