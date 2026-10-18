@@ -15,7 +15,7 @@
  */
 package org.labkey.test.util.di;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.jetbrains.annotations.NotNull;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
@@ -243,7 +243,7 @@ public class DataIntegrationHelper
         final String etlLogFile = getEtlLogFile(jobId);
 
         for (String logString : logStrings)
-            assertTrue("Log file did not contain: " + logString, StringUtils.containsIgnoreCase(etlLogFile, logString));
+            assertTrue("Log file did not contain: " + logString, Strings.CI.contains(etlLogFile, logString));
     }
 
     public void assertNotInEtlLogFile(String jobId, String... logStrings) throws CommandException, IOException
@@ -251,6 +251,6 @@ public class DataIntegrationHelper
         final String etlLogFile = getEtlLogFile(jobId);
 
         for (String logString : logStrings)
-            assertFalse("Log file contained : " + logString, StringUtils.containsIgnoreCase(etlLogFile, logString));
+            assertFalse("Log file contained : " + logString, Strings.CI.contains(etlLogFile, logString));
     }
 }

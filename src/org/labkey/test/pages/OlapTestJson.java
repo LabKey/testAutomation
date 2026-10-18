@@ -15,7 +15,7 @@
  */
 package org.labkey.test.pages;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
@@ -66,7 +66,7 @@ public class OlapTestJson
             {
                 String expected = results[i][j];
                 String actual = _test.getTableCellText(table, i, j);
-                if (StringUtils.equals(expected,actual))
+                if (Strings.CS.equals(expected,actual))
                     continue;
                 try
                 {

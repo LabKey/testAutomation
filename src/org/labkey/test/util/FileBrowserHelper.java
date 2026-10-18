@@ -15,7 +15,7 @@
  */
 package org.labkey.test.util;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.jetbrains.annotations.Nullable;
@@ -992,7 +992,7 @@ public class FileBrowserHelper extends WebDriverWrapper
         String encoded = URLEncoder.encode(rawIdPart, StandardCharsets.UTF_8).replace("+", "%20");
 
         for (var entry : DECODE_UNRESERVED_MARKS.entrySet())
-            encoded = StringUtils.replace(encoded, entry.getValue(), entry.getKey());
+            encoded = Strings.CS.replace(encoded, entry.getValue(), entry.getKey());
 
         return encoded;
     }
