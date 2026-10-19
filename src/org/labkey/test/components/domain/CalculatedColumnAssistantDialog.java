@@ -10,11 +10,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Modal that opens when the user clicks the "AI Assistant" button inside the Calculation field options.
+ * Modal that opens when the user clicks the "LabKey Assistant" button inside the Calculation field options.
  */
 public class CalculatedColumnAssistantDialog extends ModalDialog
 {
-    public static final String TITLE = "Expression AI Assistant";
+    public static final String TITLE = "LabKey Assistant - Expressions";
 
     private final DomainFieldRow _row;
 
