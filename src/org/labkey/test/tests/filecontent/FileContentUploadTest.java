@@ -58,7 +58,6 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -75,8 +74,6 @@ import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
 @BaseWebDriverTest.ClassTimeout(minutes = 6)
 public class FileContentUploadTest extends BaseWebDriverTest
 {
-    private static final String FILE_DESCRIPTION = "FileContentTestFile";
-    private static final String CUSTOM_PROPERTY_VALUE = "ExtendedProperty";
     private static final String CUSTOM_PROPERTY = "customProperty";
     protected static final String TEST_USER = "user_filecontent@filecontentupload.test";
     private static final String TEST_GROUP = "FileContentTestGroup";
@@ -140,6 +137,10 @@ public class FileContentUploadTest extends BaseWebDriverTest
     @Test
     public void testFileBrowser()
     {
+        String fileDescription = "FileContentTestFile";
+        String fileReplacedDescription = "FileContentReplacedTestFile";
+        String customPropertyValue = "ExtendedProperty";
+
         sendFileDigest();
 
         SearchHelper _searchHelper = getSearchHelper();
@@ -152,20 +153,20 @@ public class FileContentUploadTest extends BaseWebDriverTest
         final File testFile = TestFileUtils.getSampleData("security/InlineFile.html");
         final String filename = testFile.getName();
         List<FileBrowserExtendedProperty> fileProperties = new ArrayList<>();
-        fileProperties.add(new FileBrowserExtendedProperty(CUSTOM_PROPERTY, CUSTOM_PROPERTY_VALUE, false));
+        fileProperties.add(new FileBrowserExtendedProperty(CUSTOM_PROPERTY, customPropertyValue, false));
         fileProperties.add(new FileBrowserExtendedProperty("LookupColumn:", LOOKUP_VALUE_2, true));
 
-        _fileBrowserHelper.uploadFile(testFile, FILE_DESCRIPTION, fileProperties, false);
+        _fileBrowserHelper.uploadFile(testFile, fileDescription, fileProperties, false);
         assertElementPresent(Locator.linkWithText(LOOKUP_VALUE_2));
-        assertElementPresent(Locator.linkWithText(CUSTOM_PROPERTY_VALUE));
-        assertAttributeEquals(Locator.linkWithText(CUSTOM_PROPERTY_VALUE), "href", "http://labkey.test/?a=" + CUSTOM_PROPERTY_VALUE + "&b=" + LOOKUP_VALUE_2);
+        assertElementPresent(Locator.linkWithText(customPropertyValue));
+        assertAttributeEquals(Locator.linkWithText(customPropertyValue), "href", "http://labkey.test/?a=" + customPropertyValue + "&b=" + LOOKUP_VALUE_2);
 
         log("replace file");
         refresh();
         fileProperties = new ArrayList<>();
-        fileProperties.add(new FileBrowserExtendedProperty(CUSTOM_PROPERTY, CUSTOM_PROPERTY_VALUE, false));
+        fileProperties.add(new FileBrowserExtendedProperty(CUSTOM_PROPERTY, customPropertyValue, false));
         fileProperties.add(new FileBrowserExtendedProperty("LookupColumn:", LOOKUP_VALUE_1, true));
-        _fileBrowserHelper.uploadFile(testFile, FILE_DESCRIPTION, fileProperties, true);
+        _fileBrowserHelper.uploadFile(testFile, fileReplacedDescription, fileProperties, true);
 
         log("move file");
         final String folderName = "Test folder";
@@ -184,8 +185,12 @@ public class FileContentUploadTest extends BaseWebDriverTest
 
         _searchHelper.enqueueSearchItem(filename); // No results for old file name
         _searchHelper.enqueueSearchItem(newFileName, folderName, Locator.linkContainingText(newFileName));
-        _searchHelper.enqueueSearchItem(FILE_DESCRIPTION, folderName, Locator.linkContainingText(newFileName));
-        _searchHelper.enqueueSearchItem(CUSTOM_PROPERTY_VALUE, folderName, Locator.linkContainingText(newFileName));
+        _searchHelper.addUnwantedResult(newFileName, Locator.linkContainingText(filename));
+        _searchHelper.enqueueSearchItem(fileDescription); // No results for old description
+        _searchHelper.enqueueSearchItem(fileReplacedDescription, folderName, Locator.linkContainingText(newFileName));
+        _searchHelper.addUnwantedResult(fileReplacedDescription, Locator.linkContainingText(filename));
+        _searchHelper.enqueueSearchItem(customPropertyValue, folderName, Locator.linkContainingText(newFileName));
+        _searchHelper.addUnwantedResult(customPropertyValue, Locator.linkContainingText(filename));
 
         _searchHelper.verifySearchResults(getProjectName(), "searchAfterRename");
 
@@ -194,8 +199,8 @@ public class FileContentUploadTest extends BaseWebDriverTest
         _fileBrowserHelper.deleteFile(folderName + "/" + newFileName);
         waitForElementToDisappear(Locator.css(".labkey-filecontent-grid div.x4-grid-cell-inner").withText(newFileName));
         _searchHelper.enqueueSearchItem(newFileName);
-        _searchHelper.enqueueSearchItem(FILE_DESCRIPTION);
-        _searchHelper.enqueueSearchItem(CUSTOM_PROPERTY_VALUE);
+        _searchHelper.enqueueSearchItem(fileReplacedDescription);
+        _searchHelper.enqueueSearchItem(customPropertyValue);
 
         _searchHelper.verifySearchResults(getProjectName(), "searchAfterDelete");
 
@@ -203,7 +208,7 @@ public class FileContentUploadTest extends BaseWebDriverTest
         _fileBrowserHelper.clickFileBrowserButton(BrowserAction.AUDIT_HISTORY);
         assertTextPresent(
                 "File uploaded to project: /" + getProjectName(),
-                "annotations updated: " + CUSTOM_PROPERTY + "=" + CUSTOM_PROPERTY_VALUE,
+                "annotations updated: " + CUSTOM_PROPERTY + "=" + customPropertyValue,
                 "File deleted from project: /" + getProjectName());
 
         sendFileDigest();
@@ -240,7 +245,7 @@ public class FileContentUploadTest extends BaseWebDriverTest
         navigateToFolder(getProjectName(), subfolderName);
         final File testFile = TestFileUtils.getSampleData("security/InlineFile2.html");
         final String filename = testFile.getName();
-        _fileBrowserHelper.uploadFile(testFile, FILE_DESCRIPTION, Collections.emptyList(), false);
+        _fileBrowserHelper.uploadFile(testFile);
 
         _fileBrowserHelper.goToAdminMenu();
         _fileBrowserHelper.goToConfigureButtonsTab();
