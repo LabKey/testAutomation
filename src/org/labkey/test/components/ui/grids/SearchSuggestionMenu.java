@@ -35,8 +35,6 @@ import java.util.function.Predicate;
  */
 public class SearchSuggestionMenu extends WebDriverComponent<SearchSuggestionMenu.ElementCache>
 {
-    private static final int SUGGESTION_WAIT_MS = 10_000;
-
     private final WebElement _input;
     private final WebElement _listbox;
     private final WebDriver _driver;
@@ -75,7 +73,7 @@ public class SearchSuggestionMenu extends WebDriverComponent<SearchSuggestionMen
         WebDriverWrapper.waitFor(() -> isOpen()
                         && !Locators.loading.existsIn(_listbox)
                         && Locators.option.existsIn(_listbox),
-                "Search suggestions did not finish loading.", SUGGESTION_WAIT_MS);
+                "Search suggestions did not finish loading.", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
         return this;
     }
 
