@@ -30,10 +30,10 @@ import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.pages.ReactAssayDesignerPage;
 import org.labkey.test.pages.assay.AssayImportPage;
-import org.labkey.test.pages.core.admin.CustomizeSitePage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.assay.GeneralAssayDesign;
 import org.labkey.test.params.experiment.DataClassDefinition;
+import org.labkey.test.util.SiteSettingsHelper;
 
 import java.io.File;
 import java.util.List;
@@ -62,13 +62,15 @@ public class AssayTransformCallbackTest extends AbstractAssayTransformTest
     private static final String CALLBACK_STATUS = "CallbackStatus";
     private static final String TRANSFORM_COMMENT = "set by transform";
     private static final String CALLBACK_DATA = "ParticipantID\tVisitID\nP1\t1\n";
-    private static final String DEFAULT_TRANSFORM_SCRIPT_TIMEOUT = "60";
+    private static final String ASSAY_TRANSFORM_SCRIPT_TIMEOUT = "assayTransformScriptTimeout";
     private static final int SCRIPT_SLEEP_SECONDS = 45;
     private static final int REQUEST_TIMEOUT_MS = (int) TimeUnit.MINUTES.toMillis(3);
 
+    // Static so a setting changed in one test method is restored by doCleanup on a later instance
+    private static final SiteSettingsHelper SITE_SETTINGS = new SiteSettingsHelper();
+
     private static int _syncAssayId;
     private static int _backgroundAssayId;
-    private static boolean _timeoutChanged;
 
     @Override
     protected void doSetup()
@@ -81,10 +83,7 @@ public class AssayTransformCallbackTest extends AbstractAssayTransformTest
     @Override
     protected void doCleanup(boolean afterTest)
     {
-        // Only when testTransformScriptTimeout failed before restoring it
-        // TODO GH Issue 1721: restore the original value through the site settings API instead of the UI (https://github.com/LabKey/testAutomation/pull/3254)
-        if (_timeoutChanged)
-            setTransformScriptTimeout(DEFAULT_TRANSFORM_SCRIPT_TIMEOUT);
+        SITE_SETTINGS.restoreSettings();
         super.doCleanup(afterTest);
     }
 
@@ -173,7 +172,7 @@ public class AssayTransformCallbackTest extends AbstractAssayTransformTest
     @Test
     public void testTransformScriptTimeout() throws Exception
     {
-        setTransformScriptTimeout("1");
+        SITE_SETTINGS.setSetting(ASSAY_TRANSFORM_SCRIPT_TIMEOUT, 1);
 
         try
         {
@@ -184,10 +183,11 @@ public class AssayTransformCallbackTest extends AbstractAssayTransformTest
         {
             assertTrue("Unexpected error: " + e.getMessage(), e.getMessage().contains("Process killed after exceeding timeout"));
         }
-
-        // Restore before the other tests in this class, whose scripts can run close to a minute
-        // TODO GH Issue 1721: move to a finally block once this uses the site settings API rather than navigating (https://github.com/LabKey/testAutomation/pull/3254)
-        setTransformScriptTimeout(DEFAULT_TRANSFORM_SCRIPT_TIMEOUT);
+        finally
+        {
+            // Restore before the other tests in this class, whose scripts can run close to a minute
+            SITE_SETTINGS.restoreSettings();
+        }
     }
 
     private int createCallbackAssay(String name, boolean backgroundUpload)
@@ -291,13 +291,5 @@ public class AssayTransformCallbackTest extends AbstractAssayTransformTest
     private static boolean isActiveAndStarted(String status)
     {
         return status != null && !status.endsWith("WAITING") && !List.of("COMPLETE", "ERROR", "CANCELLED").contains(status);
-    }
-
-    private void setTransformScriptTimeout(String minutes)
-    {
-        _timeoutChanged = !DEFAULT_TRANSFORM_SCRIPT_TIMEOUT.equals(minutes);
-        CustomizeSitePage.beginAt(this)
-                .setAssayTransformScriptTimeout(minutes)
-                .save();
     }
 }
