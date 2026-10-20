@@ -34,11 +34,9 @@ import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.apache.hc.core5.http.protocol.HttpContext;
 import org.jetbrains.annotations.Nullable;
-import org.json.JSONObject;
 import org.junit.Assume;
 import org.labkey.api.data.dialect.DatabaseNotSupportedException;
 import org.labkey.remoteapi.CommandException;
-import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.SimpleGetCommand;
 import org.labkey.remoteapi.SimplePostCommand;
@@ -1100,17 +1098,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         invokeApiAction(null, "admin", "resetErrorMark", "Failed to reset server errors");
     }
 
-    @LogMethod
-    public void disableMaintenance()
-    {
-        if ( isGuestModeTest() )
-            return;
-        beginAt(WebTestHelper.buildURL("admin", "customizeSite"));
-        click(Locator.radioButtonByNameAndValue("systemMaintenanceInterval", "never"));
-        clickButton("Save");
-    }
-
-    private static long smStart = 0;
+      private static long smStart = 0;
     private static String smUrl = null;
 
     public void startSystemMaintenance()
@@ -1244,66 +1232,6 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         TestLogger.decreaseIndent();
 
         _originalFeatureFlags = new HashMap<>();
-    }
-
-    @LogMethod(quiet = true)
-    public boolean disableMiniProfiler()
-    {
-        boolean restoreMiniProfiler = isMiniProfilerEnabled();
-        if (restoreMiniProfiler)
-            setMiniProfilerEnabled(false);
-        return restoreMiniProfiler;
-    }
-
-    @LogMethod(quiet = true)
-    public boolean isMiniProfilerEnabled()
-    {
-        Connection cn = createDefaultConnection();
-        SimpleGetCommand command = new SimpleGetCommand("mini-profiler", "isEnabled");
-        try
-        {
-            CommandResponse r = command.execute(cn, null);
-            Map<String, Object> response = r.getParsedData();
-            if (response.containsKey("success") && (Boolean)response.get("success"))
-            {
-                Map<String, Object> data = (Map<String, Object>)response.get("data");
-                return (Boolean)data.get("enabled");
-            }
-        }
-        catch (IOException e)
-        {
-            throw new RuntimeException("Failed to get mini-profiler enabled state", e);
-        }
-        catch (CommandException e)
-        {
-            TestLogger.log("Unable to get miniProfiler state. Ignoring: " + e.getStatusCode());
-        }
-
-        return false;
-    }
-
-    @LogMethod
-    public void setMiniProfilerEnabled(boolean enabled)
-    {
-        Connection cn = createDefaultConnection();
-        SimplePostCommand setEnabled = new SimplePostCommand("mini-profiler", "enable");
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("enabled", enabled);
-        setEnabled.setJsonObject(jsonObject);
-        try
-        {
-            CommandResponse r = setEnabled.execute(cn, null);
-            Map<String, Object> response = r.getParsedData();
-            if (response.containsKey("success") && (Boolean)response.get("success"))
-            {
-                Map<String, Object> data = (Map<String, Object>)response.get("data");
-                log("MiniProfiler state updated, enabled=" + data.get("enabled"));
-            }
-        }
-        catch (IOException | CommandException e)
-        {
-            throw new RuntimeException("Failed to " + (enabled ? "enable" : "disable") + " mini-profiler", e);
-        }
     }
 
     @LogMethod(quiet = true)

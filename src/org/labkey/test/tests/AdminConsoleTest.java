@@ -127,19 +127,18 @@ public class AdminConsoleTest extends AbstractAdminConsoleTest
         customizeSitePage.setSslPort("-4");
         customizeSitePage.setMemoryUsageDumpInterval("-3");
         customizeSitePage.setReadOnlyHttpRequestTimeout("-1");
-        customizeSitePage.save();
-        assertTextPresent(
+        Assertions.assertThat(customizeSitePage.saveExpectingErrors()).as("Validation errors").containsExactlyInAnyOrder(
             "Maximum BLOB size cannot be set higher than 209715200 bytes",
             "HTTPS port must be between 1 and 65,535",
             "Memory logging frequency must be non-negative",
             "HTTP timeout must be non-negative"
         );
 
-        customizeSitePage = new CustomizeSitePage(getDriver());
         customizeSitePage.setMaxBLOBSize("-10");
         customizeSitePage.setSslPort(Integer.toString(256 * 256)); // 2^16
-        customizeSitePage.save();
-        assertTextPresent(
+        customizeSitePage.setMemoryUsageDumpInterval("0");
+        customizeSitePage.setReadOnlyHttpRequestTimeout("0");
+        Assertions.assertThat(customizeSitePage.saveExpectingErrors()).as("Validation errors").containsExactlyInAnyOrder(
             "Maximum BLOB size cannot be negative",
             "HTTPS port must be between 1 and 65,535"
         );
@@ -155,17 +154,11 @@ public class AdminConsoleTest extends AbstractAdminConsoleTest
         if (!customizeSitePage.isShowRibbonMessage())
             customizeSitePage.setShowRibbonMessage(true);
 
-        customizeSitePage.save();
-
-        waitForElement(Locator.xpath("//div[contains(text(), 'Cannot enable the ribbon message without providing a message to show')]"));
+        Assertions.assertThat(customizeSitePage.saveExpectingErrors()).as("Validation errors")
+            .containsExactly("Cannot enable the ribbon message without providing a message to show");
 
         String linkText = "and also click this...";
         String html = "READ ME!!!  <a href='<%=contextPath%>" + "/home/project-begin.view'>" + linkText + "</a>";
-
-        customizeSitePage = new CustomizeSitePage(getDriver());
-        //only check if not already checked
-        if (!customizeSitePage.isShowRibbonMessage())
-            customizeSitePage.setShowRibbonMessage(true);
 
         customizeSitePage.setRibbonMessage(html).save();
 

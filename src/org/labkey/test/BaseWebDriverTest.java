@@ -162,7 +162,6 @@ import static org.labkey.test.TestProperties.isLeakCheckSkipped;
 import static org.labkey.test.TestProperties.isLinkCheckEnabled;
 import static org.labkey.test.TestProperties.isQueryCheckSkipped;
 import static org.labkey.test.TestProperties.isRunWebDriverHeadless;
-import static org.labkey.test.TestProperties.isSystemMaintenanceDisabled;
 import static org.labkey.test.TestProperties.isTestCleanupSkipped;
 import static org.labkey.test.TestProperties.isTestRunningOnTeamCity;
 import static org.labkey.test.TestProperties.isViewCheckSkipped;
@@ -432,7 +431,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     private static final String BEFORE_CLASS = "BeforeClass";
     private static final String AFTER_CLASS = "AfterClass";
     private static boolean beforeClassSucceeded = false;
-    private static boolean reenableMiniProfiler = false;
     private static long previousLeakCheck = 0;
     private static long testCount;
     private static int currentTestNumber;
@@ -697,13 +695,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             enableEmailRecorder();
         }
         catch (AssumptionViolatedException | AssertionError ignore) { } // Tests should, generally, enable dumbster if they need it
-        reenableMiniProfiler = disableMiniProfiler();
-
-        if (isSystemMaintenanceDisabled())
-        {
-            // Disable scheduled system maintenance to prevent timeouts during nightly tests.
-            disableMaintenance();
-        }
 
         cleanup(false);
 
@@ -1298,9 +1289,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             checkLeaks();
         }
 
-        if (reenableMiniProfiler && !TestProperties.isTestRunningOnTeamCity())
-            setMiniProfilerEnabled(true);
-
         resetOptionalFlags();
     }
 
@@ -1320,9 +1308,9 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 return false;
             }
         }, msWait);
-        if (pendingRequestCount.getValue() > 0)
-            TestLogger.log(pendingRequestCount.getValue() + " requests still pending after " + msWait + "ms");
-        if (pendingRequestCount.getValue() < 0)
+        if (pendingRequestCount.intValue() > 0)
+            TestLogger.log(pendingRequestCount.intValue() + " requests still pending after " + msWait + "ms");
+        if (pendingRequestCount.intValue() < 0)
             TestLogger.log("Unable to fetch pending request count" + msWait + "ms");
 
     }
@@ -2306,7 +2294,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
         try
         {
-            longWait().until(webDriver ->
+            longWait().until(_ ->
             {
                 if (titleName == null && searchResults.getResultCount().equals(expectedResults) ||
                         titleName != null && isElementPresent(Locator.linkContainingText(titleName)))
