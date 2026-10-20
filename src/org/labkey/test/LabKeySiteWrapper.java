@@ -1098,17 +1098,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         invokeApiAction(null, "admin", "resetErrorMark", "Failed to reset server errors");
     }
 
-    @LogMethod
-    public void disableMaintenance()
-    {
-        if ( isGuestModeTest() )
-            return;
-        beginAt(WebTestHelper.buildURL("admin", "customizeSite"));
-        click(Locator.radioButtonByNameAndValue("systemMaintenanceInterval", "never"));
-        clickButton("Save");
-    }
-
-    private static long smStart = 0;
+      private static long smStart = 0;
     private static String smUrl = null;
 
     public void startSystemMaintenance()
