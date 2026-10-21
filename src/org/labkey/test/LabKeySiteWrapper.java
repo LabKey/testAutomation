@@ -464,6 +464,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     protected String getPasswordResetUrl(int userId)
     {
         beginAt(buildURL("security", "showResetEmail", Map.of("userId", userId)));
+        clickButton("Generate New Link");
 
         WebElement resetLink = Locator.xpath("//a[contains(@href, 'setPassword.view')]").findElement(getDriver());
         shortWait().until(ExpectedConditions.elementToBeClickable(resetLink));
