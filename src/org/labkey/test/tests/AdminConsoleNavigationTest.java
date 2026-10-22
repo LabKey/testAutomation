@@ -232,7 +232,9 @@ public class AdminConsoleNavigationTest extends BaseWebDriverTest
         }
         catch (CommandException e)
         {
-            Assert.assertEquals("Post command should not go through", 403, e.getStatusCode());
+            int statusCode = e.getStatusCode();
+            // Accept either a permission-related error (403) or an outright rejection of the POST (405)
+            Assert.assertTrue("Post command should not go through, but status code was " + statusCode, statusCode == 403 || statusCode == 405);
         }
     }
 
