@@ -15,16 +15,24 @@
  */
 package org.labkey.test.tests.assay;
 
+import org.json.JSONObject;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.assay.Batch;
 import org.labkey.remoteapi.assay.ImportRunCommand;
 import org.labkey.remoteapi.assay.ImportRunResponse;
+import org.labkey.remoteapi.assay.Run;
+import org.labkey.remoteapi.assay.SaveAssayBatchCommand;
+import org.labkey.remoteapi.assay.SaveAssayBatchResponse;
+import org.labkey.remoteapi.assay.SaveAssayRunsCommand;
 import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
+import org.labkey.remoteapi.query.Sort;
 import org.labkey.remoteapi.security.DeleteContainerCommand;
 import org.labkey.test.TestFileUtils;
+import org.labkey.test.TestProperties;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.Daily;
@@ -33,11 +41,13 @@ import org.labkey.test.pages.assay.AssayImportPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.assay.GeneralAssayDesign;
 import org.labkey.test.params.experiment.DataClassDefinition;
+import org.labkey.test.params.list.IntListDefinition;
 import org.labkey.test.util.SiteSettingsHelper;
 
 import java.io.File;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -49,8 +59,8 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 /**
- * GH Issue 1707: an assay import must not hold a database transaction while its transform script runs, or a script
- * that calls back into the server can deadlock with a concurrent folder delete.
+ * GH Issue 1707, GH Issue 1720: an assay import must not hold a database transaction while its transform script runs,
+ * or a script that calls back into the server can deadlock with a concurrent folder delete.
  */
 @Category({Assays.class, Daily.class})
 public class AssayTransformCallbackTest extends AbstractAssayTransformTest
@@ -61,6 +71,8 @@ public class AssayTransformCallbackTest extends AbstractAssayTransformTest
     private static final String SLEEP_SECONDS = "SleepSeconds";
     private static final String CALLBACK_STATUS = "CallbackStatus";
     private static final String TRANSFORM_COMMENT = "set by transform";
+    private static final String WORK_DIRS_LIST = "TransformWorkDirs";
+    private static final String WORK_DIR = "WorkDir";
     private static final String CALLBACK_DATA = "ParticipantID\tVisitID\nP1\t1\n";
     private static final String ASSAY_TRANSFORM_SCRIPT_TIMEOUT = "assayTransformScriptTimeout";
     private static final int SCRIPT_SLEEP_SECONDS = 45;
@@ -78,6 +90,16 @@ public class AssayTransformCallbackTest extends AbstractAssayTransformTest
         super.doSetup();
         _syncAssayId = createCallbackAssay(SYNC_ASSAY, false);
         _backgroundAssayId = createCallbackAssay(BACKGROUND_ASSAY, true);
+        try
+        {
+            new IntListDefinition(WORK_DIRS_LIST, "Key")
+                    .setFields(List.of(new FieldDefinition(WORK_DIR)))
+                    .create(createDefaultConnection(), getProjectName());
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -90,28 +112,63 @@ public class AssayTransformCallbackTest extends AbstractAssayTransformTest
     @Test
     public void testImportRunCallbackDuringFolderDelete() throws Exception
     {
-        String folderPath = createFolderWithDataClass("Sync Delete");
+        assertFolderDeleteDuringCallback("Sync Delete", () -> importRun(_syncAssayId, SCRIPT_SLEEP_SECONDS).getRunId());
+    }
 
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        try
+    @Test
+    public void testSaveBatchCallbackDuringFolderDelete() throws Exception
+    {
+        assertFolderDeleteDuringCallback("Save Batch Delete", () ->
+                saveBatch(batchOf(callbackRun(SCRIPT_SLEEP_SECONDS, "pending", "P1"))).getBatch().getRuns().getFirst().getId());
+    }
+
+    @Test
+    public void testSaveRunsCallbackDuringFolderDelete() throws Exception
+    {
+        assertFolderDeleteDuringCallback("Save Runs Delete", () -> {
+            SaveAssayRunsCommand command = new SaveAssayRunsByAssayIdCommand(_syncAssayId, List.of(callbackRun(SCRIPT_SLEEP_SECONDS, "pending", "P1")));
+            command.setTimeout(REQUEST_TIMEOUT_MS);
+            return command.execute(createDefaultConnection(), getProjectName()).getRuns().getFirst().getId();
+        });
+    }
+
+    @Test
+    public void testSaveBatchScriptFailureSavesNothing() throws Exception
+    {
+        int runsBefore = selectRuns(SYNC_ASSAY, null).getRowCount().intValue();
+        int workDirsBefore = selectWorkDirs().size();
+
+        assertSaveRejected(batchOf(callbackRun(0, "report", "P1"), callbackRun(0, "fail", "P2")));
+
+        assertEquals("Runs after the second run's script failed", runsBefore, selectRuns(SYNC_ASSAY, null).getRowCount().intValue());
+        List<String> allWorkDirs = selectWorkDirs();
+        List<String> workDirs = allWorkDirs.subList(workDirsBefore, allWorkDirs.size());
+        assertEquals("Transform script working directories reported", 2, workDirs.size());
+        if (!TestProperties.isServerRemote())
         {
-            Future<ImportRunResponse> importFuture = executor.submit(() -> importRun(_syncAssayId, SCRIPT_SLEEP_SECONDS));
-            sleep(5_000);
-            assertFalse("Import finished before the transform script's sleep ended", importFuture.isDone());
-
-            deleteFolder(folderPath);
-            assertFalse("Folder delete should finish while the transform script is still running", importFuture.isDone());
-
-            ImportRunResponse response = importFuture.get(REQUEST_TIMEOUT_MS, TimeUnit.MILLISECONDS);
-            SelectRowsResponse runs = selectRuns(SYNC_ASSAY, new Filter("RowId", response.getRunId()));
-            assertEquals("Runs with RowId " + response.getRunId(), 1, runs.getRowCount().intValue());
-            assertEquals("Run property set by the transform script", "succeeded", runs.getRows().getFirst().get(CALLBACK_STATUS));
-            assertEquals("Run comment set by the transform script", TRANSFORM_COMMENT, runs.getRows().getFirst().get("Comments"));
+            for (String workDir : workDirs)
+                assertFalse("Transform script working directory should be deleted: " + workDir, new File(workDir).exists());
         }
-        finally
-        {
-            executor.shutdownNow();
-        }
+    }
+
+    @Test
+    public void testSaveBatchUpdatesExistingRun() throws Exception
+    {
+        Batch batch = saveBatch(batchOf(callbackRun(0, "pending", "P1"))).getBatch();
+        int runId = batch.getRuns().getFirst().getId();
+
+        // A failing script elsewhere in the request must leave the existing run's results alone
+        Batch failingUpdate = batchOf(existingRun(runId, "P2"), callbackRun(0, "fail", "P3"));
+        failingUpdate.setId(batch.getId());
+        assertSaveRejected(failingUpdate);
+        assertEquals("Results after a failed update", List.of("P1"), selectResultParticipants(runId));
+
+        Batch update = batchOf(existingRun(runId, "P2"));
+        update.setId(batch.getId());
+        saveBatch(update);
+        assertEquals("Results after the update", List.of("P2"), selectResultParticipants(runId));
+        SelectRowsResponse runs = selectRuns(SYNC_ASSAY, new Filter("RowId", runId));
+        assertEquals("Run property set by the update's transform script", "succeeded", runs.getRows().getFirst().get(CALLBACK_STATUS));
     }
 
     @Test
@@ -190,6 +247,32 @@ public class AssayTransformCallbackTest extends AbstractAssayTransformTest
         }
     }
 
+    private void assertFolderDeleteDuringCallback(String folderName, Callable<Integer> save) throws Exception
+    {
+        String folderPath = createFolderWithDataClass(folderName);
+
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        try
+        {
+            Future<Integer> saveFuture = executor.submit(save);
+            sleep(5_000);
+            assertFalse("Save finished before the transform script's sleep ended", saveFuture.isDone());
+
+            deleteFolder(folderPath);
+            assertFalse("Folder delete should finish while the transform script is still running", saveFuture.isDone());
+
+            int runId = saveFuture.get(REQUEST_TIMEOUT_MS, TimeUnit.MILLISECONDS);
+            SelectRowsResponse runs = selectRuns(SYNC_ASSAY, new Filter("RowId", runId));
+            assertEquals("Runs with RowId " + runId, 1, runs.getRowCount().intValue());
+            assertEquals("Run property set by the transform script", "succeeded", runs.getRows().getFirst().get(CALLBACK_STATUS));
+            assertEquals("Run comment set by the transform script", TRANSFORM_COMMENT, runs.getRows().getFirst().get("Comments"));
+        }
+        finally
+        {
+            executor.shutdownNow();
+        }
+    }
+
     private int createCallbackAssay(String name, boolean backgroundUpload)
     {
         try
@@ -238,6 +321,68 @@ public class AssayTransformCallbackTest extends AbstractAssayTransformTest
         command.setProperties(Map.of(SLEEP_SECONDS, sleepSeconds, CALLBACK_STATUS, "pending"));
         command.setTimeout(REQUEST_TIMEOUT_MS);
         return command.execute(createDefaultConnection(), getProjectName());
+    }
+
+    private static Run callbackRun(int sleepSeconds, String callbackStatus, String participantId)
+    {
+        Run run = new Run();
+        run.setProperties(Map.of(SLEEP_SECONDS, sleepSeconds, CALLBACK_STATUS, callbackStatus));
+        run.setResultData(List.of(Map.of("ParticipantID", participantId, "VisitID", 1)));
+        return run;
+    }
+
+    private static Run existingRun(int runId, String participantId)
+    {
+        Run run = callbackRun(0, "pending", participantId);
+        run.setId(runId);
+        return run;
+    }
+
+    private static Batch batchOf(Run... runs)
+    {
+        Batch batch = new Batch();
+        batch.setRuns(List.of(runs));
+        return batch;
+    }
+
+    private SaveAssayBatchResponse saveBatch(Batch batch) throws Exception
+    {
+        SaveAssayBatchCommand command = new SaveAssayBatchCommand(_syncAssayId, batch);
+        command.setTimeout(REQUEST_TIMEOUT_MS);
+        return command.execute(createDefaultConnection(), getProjectName());
+    }
+
+    private void assertSaveRejected(Batch batch) throws Exception
+    {
+        try
+        {
+            saveBatch(batch);
+            fail("Save should fail when a transform script rejects a run");
+        }
+        catch (CommandException e)
+        {
+            assertTrue("Unexpected error: " + e.getMessage(), e.getMessage().contains("Transform script rejected the run"));
+        }
+    }
+
+    private List<String> selectResultParticipants(int runId) throws Exception
+    {
+        SelectRowsCommand command = new SelectRowsCommand("assay.General." + SYNC_ASSAY, "Data");
+        command.setColumns(List.of("ParticipantID"));
+        command.addFilter(new Filter("Run/RowId", runId));
+        return command.execute(createDefaultConnection(), getProjectName()).getRows().stream()
+                .map(row -> (String) row.get("ParticipantID"))
+                .toList();
+    }
+
+    private List<String> selectWorkDirs() throws Exception
+    {
+        SelectRowsCommand command = new SelectRowsCommand("lists", WORK_DIRS_LIST);
+        command.setColumns(List.of(WORK_DIR));
+        command.addSort("Key", Sort.Direction.ASCENDING);
+        return command.execute(createDefaultConnection(), getProjectName()).getRows().stream()
+                .map(row -> (String) row.get(WORK_DIR))
+                .toList();
     }
 
     private Map<?, ?> importDataRowsFromBrowser(String folderPath, Boolean saveDataAsFile)
@@ -291,5 +436,25 @@ public class AssayTransformCallbackTest extends AbstractAssayTransformTest
     private static boolean isActiveAndStarted(String status)
     {
         return status != null && !status.endsWith("WAITING") && !List.of("COMPLETE", "ERROR", "CANCELLED").contains(status);
+    }
+
+    /** SaveAssayRunsCommand only identifies a protocol by name, which the server treats as a non-assay protocol */
+    private static class SaveAssayRunsByAssayIdCommand extends SaveAssayRunsCommand
+    {
+        private final int _assayId;
+
+        SaveAssayRunsByAssayIdCommand(int assayId, List<Run> runs)
+        {
+            super(null, runs);
+            _assayId = assayId;
+        }
+
+        @Override
+        public JSONObject getJsonObject()
+        {
+            JSONObject json = super.getJsonObject();
+            json.put("assayId", _assayId);
+            return json;
+        }
     }
 }

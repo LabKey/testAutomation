@@ -14,6 +14,7 @@
 #  limitations under the License.
 ##
 # Sleeps for the SleepSeconds run property, then queries exp.Data through the API before letting the import finish.
+# A CallbackStatus of "report" or "fail" first records the script's working directory in the TransformWorkDirs list; "fail" then rejects the run.
 suppressMessages(library(Rlabkey));
 
 labkey.setDefaults(apiKey = "${apikey}");
@@ -21,9 +22,18 @@ labkey.setDefaults(apiKey = "${apikey}");
 run.props = labkey.transform.readRunPropertiesFile("${runInfo}");
 sleep.seconds = as.numeric(labkey.transform.getRunPropertyValue(run.props, "SleepSeconds"));
 runprop.output.file = labkey.transform.getRunPropertyValue(run.props, "transformedRunPropertiesFile");
+errors.file = labkey.transform.getRunPropertyValue(run.props, "errorsFile");
+status = labkey.transform.getRunPropertyValue(run.props, "CallbackStatus");
+
+if (status %in% c("report", "fail"))
+    labkey.insertRows(baseUrl = "${baseServerURL}", folderPath = "${containerPath}", schemaName = "lists", queryName = "TransformWorkDirs", toInsert = data.frame(WorkDir = dirname("${runInfo}")));
 
 Sys.sleep(sleep.seconds);
 
 rows = labkey.selectRows(baseUrl = "${baseServerURL}", folderPath = "${containerPath}", schemaName = "exp", queryName = "Data", colSelect = "RowId");
 
-writeLines(c(paste("CallbackStatus", "succeeded", sep = "\t"), paste("runComments", "set by transform", sep = "\t")), runprop.output.file);
+if (status == "fail") {
+    writeLines(paste("error", "", "Transform script rejected the run", sep = "\t"), errors.file);
+} else {
+    writeLines(c(paste("CallbackStatus", "succeeded", sep = "\t"), paste("runComments", "set by transform", sep = "\t")), runprop.output.file);
+}
