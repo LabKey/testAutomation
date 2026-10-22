@@ -15,6 +15,7 @@
 ##
 # Sleeps for the SleepSeconds run property, then queries exp.Data through the API before letting the import finish.
 # A CallbackStatus of "report" or "fail" first records the script's working directory in the TransformWorkDirs list; "fail" then rejects the run.
+# "edit" moves the Sync Callback Assay results of participant EditedByScript to visit 2, editing the run while its script runs.
 suppressMessages(library(Rlabkey));
 
 labkey.setDefaults(apiKey = "${apikey}");
@@ -27,6 +28,11 @@ status = labkey.transform.getRunPropertyValue(run.props, "CallbackStatus");
 
 if (status %in% c("report", "fail"))
     labkey.insertRows(baseUrl = "${baseServerURL}", folderPath = "${containerPath}", schemaName = "lists", queryName = "TransformWorkDirs", toInsert = data.frame(WorkDir = dirname("${runInfo}")));
+
+if (status == "edit") {
+    results = labkey.selectRows(baseUrl = "${baseServerURL}", folderPath = "${containerPath}", schemaName = "assay.General.Sync Callback Assay", queryName = "Data", colSelect = "RowId", colFilter = makeFilter(c("ParticipantID", "EQUAL", "EditedByScript")), colNameOpt = "fieldname");
+    labkey.updateRows(baseUrl = "${baseServerURL}", folderPath = "${containerPath}", schemaName = "assay.General.Sync Callback Assay", queryName = "Data", toUpdate = data.frame(RowId = results$RowId, VisitID = 2));
+}
 
 Sys.sleep(sleep.seconds);
 

@@ -74,6 +74,9 @@ public class AssayTransformCallbackTest extends AbstractAssayTransformTest
     private static final String WORK_DIRS_LIST = "TransformWorkDirs";
     private static final String WORK_DIR = "WorkDir";
     private static final String CALLBACK_DATA = "ParticipantID\tVisitID\nP1\t1\n";
+    private static final String SCRIPT_REJECTED = "Transform script rejected the run";
+    // The callback script's "edit" status updates the visit of this participant's results
+    private static final String EDITED_PARTICIPANT = "EditedByScript";
     private static final String ASSAY_TRANSFORM_SCRIPT_TIMEOUT = "assayTransformScriptTimeout";
     private static final int SCRIPT_SLEEP_SECONDS = 45;
     private static final int REQUEST_TIMEOUT_MS = (int) TimeUnit.MINUTES.toMillis(3);
@@ -138,7 +141,7 @@ public class AssayTransformCallbackTest extends AbstractAssayTransformTest
         int runsBefore = selectRuns(SYNC_ASSAY, null).getRowCount().intValue();
         int workDirsBefore = selectWorkDirs().size();
 
-        assertSaveRejected(batchOf(callbackRun(0, "report", "P1"), callbackRun(0, "fail", "P2")));
+        assertSaveRejected(batchOf(callbackRun(0, "report", "P1"), callbackRun(0, "fail", "P2")), SCRIPT_REJECTED);
 
         assertEquals("Runs after the second run's script failed", runsBefore, selectRuns(SYNC_ASSAY, null).getRowCount().intValue());
         List<String> allWorkDirs = selectWorkDirs();
@@ -158,17 +161,90 @@ public class AssayTransformCallbackTest extends AbstractAssayTransformTest
         int runId = batch.getRuns().getFirst().getId();
 
         // A failing script elsewhere in the request must leave the existing run's results alone
-        Batch failingUpdate = batchOf(existingRun(runId, "P2"), callbackRun(0, "fail", "P3"));
+        Batch failingUpdate = batchOf(existingRun(runId, "pending", "P2"), callbackRun(0, "fail", "P3"));
         failingUpdate.setId(batch.getId());
-        assertSaveRejected(failingUpdate);
+        assertSaveRejected(failingUpdate, SCRIPT_REJECTED);
         assertEquals("Results after a failed update", List.of("P1"), selectResultParticipants(runId));
 
-        Batch update = batchOf(existingRun(runId, "P2"));
+        int workDirsBefore = selectWorkDirs().size();
+        Batch update = batchOf(existingRun(runId, "report", "P2"));
         update.setId(batch.getId());
         saveBatch(update);
         assertEquals("Results after the update", List.of("P2"), selectResultParticipants(runId));
+        assertEquals("Working directories reported by the update's transform script", workDirsBefore + 1, selectWorkDirs().size());
         SelectRowsResponse runs = selectRuns(SYNC_ASSAY, new Filter("RowId", runId));
         assertEquals("Run property set by the update's transform script", "succeeded", runs.getRows().getFirst().get(CALLBACK_STATUS));
+    }
+
+    @Test
+    public void testSaveBatchUpdateReusingStoredResults() throws Exception
+    {
+        Batch batch = saveBatch(batchOf(callbackRun(0, "pending", "P1"))).getBatch();
+        int runId = batch.getRuns().getFirst().getId();
+        int workDirsBefore = selectWorkDirs().size();
+
+        // The server compares the stored results its script saw with a read inside the transaction; unchanged ones must match
+        Batch update = batchOf(existingRunWithoutResults(runId, "report"));
+        update.setId(batch.getId());
+        saveBatch(update);
+
+        assertEquals("Working directories reported by the update's transform script", workDirsBefore + 1, selectWorkDirs().size());
+        assertEquals("Results after the update", List.of("P1"), selectResultParticipants(runId));
+    }
+
+    @Test
+    public void testSaveBatchRunChangedDuringScript() throws Exception
+    {
+        Batch batch = saveBatch(batchOf(callbackRun(0, "pending", EDITED_PARTICIPANT))).getBatch();
+        int runId = batch.getRuns().getFirst().getId();
+
+        Batch update = batchOf(existingRunWithoutResults(runId, "edit"));
+        update.setId(batch.getId());
+        assertSaveRejected(update, "changed while its transform scripts ran");
+
+        assertEquals("Visits after the script edited the run's results", List.of(2), selectResultVisits(runId));
+    }
+
+    @Test
+    public void testSaveDuplicateRunRejected() throws Exception
+    {
+        Batch batch = saveBatch(batchOf(callbackRun(0, "pending", "P1"))).getBatch();
+        int runId = batch.getRuns().getFirst().getId();
+        int workDirsBefore = selectWorkDirs().size();
+        String duplicateError = "Run " + runId + " appears more than once";
+
+        Batch duplicates = batchOf(existingRun(runId, "report", "P2"), existingRun(runId, "report", "P3"));
+        duplicates.setId(batch.getId());
+        assertSaveRejected(duplicates, duplicateError);
+
+        SaveAssayRunsCommand command = new SaveAssayRunsByAssayIdCommand(_syncAssayId, List.of(existingRun(runId, "report", "P2"), existingRun(runId, "report", "P3")));
+        command.setTimeout(REQUEST_TIMEOUT_MS);
+        try
+        {
+            command.execute(createDefaultConnection(), getProjectName());
+            fail("Save runs should fail when a run appears more than once");
+        }
+        catch (CommandException e)
+        {
+            assertTrue("Unexpected error: " + e.getMessage(), e.getMessage().contains(duplicateError));
+        }
+
+        assertEquals("Results after the rejected saves", List.of("P1"), selectResultParticipants(runId));
+        assertEquals("Working directories reported by rejected saves", workDirsBefore, selectWorkDirs().size());
+    }
+
+    @Test
+    public void testSaveBatchMissingBatchRunsNoScripts() throws Exception
+    {
+        int runsBefore = selectRuns(SYNC_ASSAY, null).getRowCount().intValue();
+        int workDirsBefore = selectWorkDirs().size();
+
+        Batch missing = batchOf(callbackRun(0, "report", "P1"));
+        missing.setId(Integer.MAX_VALUE);
+        assertSaveRejected(missing, "Could not find assay batch");
+
+        assertEquals("Runs after saving to a missing batch", runsBefore, selectRuns(SYNC_ASSAY, null).getRowCount().intValue());
+        assertEquals("Working directories reported for a missing batch", workDirsBefore, selectWorkDirs().size());
     }
 
     @Test
@@ -280,7 +356,10 @@ public class AssayTransformCallbackTest extends AbstractAssayTransformTest
             int protocolId = new GeneralAssayDesign(name)
                     .setBatchFields(List.of(), false)
                     .setRunFields(List.of(new FieldDefinition(SLEEP_SECONDS, FieldDefinition.ColumnType.Integer), new FieldDefinition(CALLBACK_STATUS)), true)
-                    .addProtocolTransformer(protocol -> protocol.setBackgroundUpload(backgroundUpload))
+                    .addProtocolTransformer(protocol -> {
+                        protocol.setBackgroundUpload(backgroundUpload);
+                        protocol.setEditableResults(true);
+                    })
                     .createAssay(getProjectName(), createDefaultConnection())
                     .getProtocolId();
             ReactAssayDesignerPage.beginAt(this, getProjectName(), protocolId, "general", "")
@@ -331,10 +410,19 @@ public class AssayTransformCallbackTest extends AbstractAssayTransformTest
         return run;
     }
 
-    private static Run existingRun(int runId, String participantId)
+    private static Run existingRun(int runId, String callbackStatus, String participantId)
     {
-        Run run = callbackRun(0, "pending", participantId);
+        Run run = callbackRun(0, callbackStatus, participantId);
         run.setId(runId);
+        return run;
+    }
+
+    /** Run always posts dataInputs, so the server replaces the run's content using its stored results. */
+    private static Run existingRunWithoutResults(int runId, String callbackStatus)
+    {
+        Run run = new Run();
+        run.setId(runId);
+        run.setProperties(Map.of(SLEEP_SECONDS, 0, CALLBACK_STATUS, callbackStatus));
         return run;
     }
 
@@ -352,16 +440,16 @@ public class AssayTransformCallbackTest extends AbstractAssayTransformTest
         return command.execute(createDefaultConnection(), getProjectName());
     }
 
-    private void assertSaveRejected(Batch batch) throws Exception
+    private void assertSaveRejected(Batch batch, String expectedError) throws Exception
     {
         try
         {
             saveBatch(batch);
-            fail("Save should fail when a transform script rejects a run");
+            fail("Save should fail with: " + expectedError);
         }
         catch (CommandException e)
         {
-            assertTrue("Unexpected error: " + e.getMessage(), e.getMessage().contains("Transform script rejected the run"));
+            assertTrue("Unexpected error: " + e.getMessage(), e.getMessage().contains(expectedError));
         }
     }
 
@@ -372,6 +460,16 @@ public class AssayTransformCallbackTest extends AbstractAssayTransformTest
         command.addFilter(new Filter("Run/RowId", runId));
         return command.execute(createDefaultConnection(), getProjectName()).getRows().stream()
                 .map(row -> (String) row.get("ParticipantID"))
+                .toList();
+    }
+
+    private List<Integer> selectResultVisits(int runId) throws Exception
+    {
+        SelectRowsCommand command = new SelectRowsCommand("assay.General." + SYNC_ASSAY, "Data");
+        command.setColumns(List.of("VisitID"));
+        command.addFilter(new Filter("Run/RowId", runId));
+        return command.execute(createDefaultConnection(), getProjectName()).getRows().stream()
+                .map(row -> ((Number) row.get("VisitID")).intValue())
                 .toList();
     }
 
