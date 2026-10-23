@@ -35,6 +35,9 @@ import java.util.function.Predicate;
  */
 public class SearchSuggestionMenu extends WebDriverComponent<SearchSuggestionMenu.ElementCache>
 {
+    // The client polls for up to ~18 seconds after the first response (SUGGESTION_POLL_DELAYS_MS)
+    private static final int POLLING_TIMEOUT_MS = 30_000;
+
     private final WebElement _input;
     private final WebElement _listbox;
     private final WebDriver _driver;
@@ -43,8 +46,9 @@ public class SearchSuggestionMenu extends WebDriverComponent<SearchSuggestionMen
     {
         _input = input;
         _driver = driver;
-        // The button bar renders a hidden second copy of the input for narrow layouts, so follow the input's own listbox id
-        _listbox = Locator.id(input.getDomAttribute("aria-controls")).refindWhenNeeded(driver);
+        // The button bar renders a hidden second copy of the input for narrow layouts, so find the listbox from this input.
+        // The input names it in aria-controls only while the menu is open.
+        _listbox = Locator.xpath("ancestor::form[1]//ul[@role='listbox']").refindWhenNeeded(input);
     }
 
     @Override
@@ -65,15 +69,16 @@ public class SearchSuggestionMenu extends WebDriverComponent<SearchSuggestionMen
     }
 
     /**
-     * Wait for the menu to open and finish loading. Options are keyed by position and replaced when suggestions
-     * arrive, so an option clicked while loading can turn into a different suggestion.
+     * Wait for the menu to open, finish loading and stop polling. Options are keyed by position and a poll can insert
+     * suggestions above the others, so an option clicked before then can turn into a different suggestion.
      */
     public SearchSuggestionMenu waitForSuggestions()
     {
         WebDriverWrapper.waitFor(() -> isOpen()
                         && !Locators.loading.existsIn(_listbox)
+                        && !"true".equals(_listbox.getDomAttribute("aria-busy"))
                         && Locators.option.existsIn(_listbox),
-                "Search suggestions did not finish loading.", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
+                "Search suggestions did not finish loading.", POLLING_TIMEOUT_MS);
         return this;
     }
 

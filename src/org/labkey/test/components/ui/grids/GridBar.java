@@ -44,8 +44,7 @@ import static org.labkey.test.WebDriverWrapper.sleep;
  */
 public class GridBar extends WebDriverComponent<GridBar.ElementCache>
 {
-    private static final int SUGGESTION_ATTEMPTS = 5;
-    private static final int SUGGESTION_RETRY_MS = 1_000;
+    private static final int SUGGESTION_ATTEMPTS = 2;
 
     private final WebElement _gridBarElement;
     private final QueryGrid _queryGrid;
@@ -402,15 +401,12 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
         return labels;
     }
 
-    // Data-derived suggestions load in the background and can miss a cold request's time budget; retyping refetches them
+    // The menu waits out the client's polling for data-derived suggestions; retyping restarts it only if a scan outlasts it
     private SearchSuggestionMenu typeSearchUntil(String term, SuggestionKind kind, Predicate<String> label)
     {
         SearchSuggestionMenu menu = typeSearch(term);
         for (int attempt = 1; attempt < SUGGESTION_ATTEMPTS && !hasSuggestion(menu, kind, label); attempt++)
-        {
-            sleep(SUGGESTION_RETRY_MS);
             menu = typeSearch(term);
-        }
         return menu;
     }
 
