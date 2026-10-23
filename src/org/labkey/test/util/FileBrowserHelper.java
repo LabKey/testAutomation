@@ -435,6 +435,19 @@ public class FileBrowserHelper extends WebDriverWrapper
         return Locators.gridRow(fileName).childTag("td").position(7).refindWhenNeeded(getDriver()).getText();
     }
 
+    public String getFileLastModified(String fileName)
+    {
+        return Locators.gridRow(fileName).childTag("td").position(4).refindWhenNeeded(getDriver()).getText();
+    }
+
+    /**
+     * Read the 'Modified' timestamp from the details panel below the file grid. Requires a selected file.
+     */
+    public String getDetailsModified()
+    {
+        return Locators.detailsValue("Modified:").waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT).getText();
+    }
+
     public Window<?> editProperty(String fileName)
     {
         selectFileBrowserItem(fileName);
@@ -1016,6 +1029,13 @@ public class FileBrowserHelper extends WebDriverWrapper
         public static Locator.XPathLocator gridRowCheckbox()
         {
             return gridRow().append(Locator.tagWithClass("div", "x4-grid-row-checker"));
+        }
+
+        public static Locator.XPathLocator detailsValue(String label)
+        {
+            return Locator.tagWithClass("table", "fb-details")
+                    .append(Locator.tag("tr").withChild(Locator.tag("th").withText(label)))
+                    .append(Locator.tag("td"));
         }
 
         public static Locator.XPathLocator gridRow()
