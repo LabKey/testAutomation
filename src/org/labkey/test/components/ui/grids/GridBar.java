@@ -349,8 +349,8 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
     }
 
     /**
-     * Apply the filter suggestion with the given label, e.g. "Sample ID is S-1". It replaces any applied search and
-     * every filter on its column.
+     * Apply the filter suggestion with the given label, e.g. "Sample ID is S-1". It replaces every filter on its
+     * column and keeps any applied search.
      */
     public GridBar chooseSuggestion(String term, String label)
     {
