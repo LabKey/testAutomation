@@ -29,8 +29,10 @@ status = labkey.transform.getRunPropertyValue(run.props, "CallbackStatus");
 if (status %in% c("report", "fail"))
     labkey.insertRows(baseUrl = "${baseServerURL}", folderPath = "${containerPath}", schemaName = "lists", queryName = "TransformWorkDirs", toInsert = data.frame(WorkDir = dirname("${runInfo}")));
 
-if (status == "edit") {
+if (identical(status, "edit")) {
     results = labkey.selectRows(baseUrl = "${baseServerURL}", folderPath = "${containerPath}", schemaName = "assay.General.Sync Callback Assay", queryName = "Data", colSelect = "RowId", colFilter = makeFilter(c("ParticipantID", "EQUAL", "EditedByScript")), colNameOpt = "fieldname");
+    if (nrow(results) == 0)
+        stop("No Sync Callback Assay result for participant EditedByScript to edit");
     labkey.updateRows(baseUrl = "${baseServerURL}", folderPath = "${containerPath}", schemaName = "assay.General.Sync Callback Assay", queryName = "Data", toUpdate = data.frame(RowId = results$RowId, VisitID = 2));
 }
 
@@ -38,7 +40,7 @@ Sys.sleep(sleep.seconds);
 
 rows = labkey.selectRows(baseUrl = "${baseServerURL}", folderPath = "${containerPath}", schemaName = "exp", queryName = "Data", colSelect = "RowId");
 
-if (status == "fail") {
+if (identical(status, "fail")) {
     writeLines(paste("error", "", "Transform script rejected the run", sep = "\t"), errors.file);
 } else {
     writeLines(c(paste("CallbackStatus", "succeeded", sep = "\t"), paste("runComments", "set by transform", sep = "\t")), runprop.output.file);

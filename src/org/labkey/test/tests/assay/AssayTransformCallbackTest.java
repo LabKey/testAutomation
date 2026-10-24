@@ -19,6 +19,7 @@ import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.junit.function.ThrowingRunnable;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.assay.Batch;
 import org.labkey.remoteapi.assay.ImportRunCommand;
@@ -55,12 +56,13 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * GH Issue 1707, GH Issue 1720: an assay import must not hold a database transaction while its transform script runs,
@@ -166,15 +168,11 @@ public class AssayTransformCallbackTest extends AbstractAssayTransformTest
         int runId = batch.getRuns().getFirst().getId();
 
         // A failing script elsewhere in the request must leave the existing run's results alone
-        Batch failingUpdate = batchOf(existingRun(runId, "pending", "P2"), callbackRun(0, "fail", "P3"));
-        failingUpdate.setId(batch.getId());
-        assertSaveRejected(failingUpdate, SCRIPT_REJECTED);
+        assertSaveRejected(batchOf(batch.getId(), existingRun(runId, "pending", "P2"), callbackRun(0, "fail", "P3")), SCRIPT_REJECTED);
         assertEquals("Results after a failed update", List.of("P1"), selectResultParticipants(runId));
 
         int workDirsBefore = selectWorkDirs().size();
-        Batch update = batchOf(existingRun(runId, "report", "P2"));
-        update.setId(batch.getId());
-        saveBatch(update);
+        saveBatch(batchOf(batch.getId(), existingRun(runId, "report", "P2")));
         assertEquals("Results after the update", List.of("P2"), selectResultParticipants(runId));
         assertEquals("Working directories reported by the update's transform script", workDirsBefore + 1, selectWorkDirs().size());
         SelectRowsResponse runs = selectRuns(SYNC_ASSAY, new Filter("RowId", runId));
@@ -189,9 +187,7 @@ public class AssayTransformCallbackTest extends AbstractAssayTransformTest
         int workDirsBefore = selectWorkDirs().size();
 
         // The server compares the stored results its script saw with a read inside the transaction; unchanged ones must match
-        Batch update = batchOf(existingRunWithoutResults(runId, "report"));
-        update.setId(batch.getId());
-        saveBatch(update);
+        saveBatch(batchOf(batch.getId(), existingRunWithoutResults(runId, "report")));
 
         assertEquals("Working directories reported by the update's transform script", workDirsBefore + 1, selectWorkDirs().size());
         assertEquals("Results after the update", List.of("P1"), selectResultParticipants(runId));
@@ -203,9 +199,7 @@ public class AssayTransformCallbackTest extends AbstractAssayTransformTest
         Batch batch = saveBatch(batchOf(callbackRun(0, "pending", EDITED_PARTICIPANT))).getBatch();
         int runId = batch.getRuns().getFirst().getId();
 
-        Batch update = batchOf(existingRunWithoutResults(runId, "edit"));
-        update.setId(batch.getId());
-        assertSaveRejected(update, "changed while its transform scripts ran");
+        assertSaveRejected(batchOf(batch.getId(), existingRunWithoutResults(runId, "edit")), "changed while its transform scripts ran");
 
         assertEquals("Visits after the script edited the run's results", List.of(2), selectResultVisits(runId));
     }
@@ -218,21 +212,11 @@ public class AssayTransformCallbackTest extends AbstractAssayTransformTest
         int workDirsBefore = selectWorkDirs().size();
         String duplicateError = "Run " + runId + " appears more than once";
 
-        Batch duplicates = batchOf(existingRun(runId, "report", "P2"), existingRun(runId, "report", "P3"));
-        duplicates.setId(batch.getId());
-        assertSaveRejected(duplicates, duplicateError);
+        assertSaveRejected(batchOf(batch.getId(), existingRun(runId, "report", "P2"), existingRun(runId, "report", "P3")), duplicateError);
 
         SaveAssayRunsCommand command = new SaveAssayRunsByAssayIdCommand(_syncAssayId, List.of(existingRun(runId, "report", "P2"), existingRun(runId, "report", "P3")));
         command.setTimeout(REQUEST_TIMEOUT_MS);
-        try
-        {
-            command.execute(createDefaultConnection(), getProjectName());
-            fail("Save runs should fail when a run appears more than once");
-        }
-        catch (CommandException e)
-        {
-            assertTrue("Unexpected error: " + e.getMessage(), e.getMessage().contains(duplicateError));
-        }
+        assertRejected(() -> command.execute(createDefaultConnection(), getProjectName()), duplicateError);
 
         assertEquals("Results after the rejected saves", List.of("P1"), selectResultParticipants(runId));
         assertEquals("Working directories reported by rejected saves", workDirsBefore, selectWorkDirs().size());
@@ -244,9 +228,7 @@ public class AssayTransformCallbackTest extends AbstractAssayTransformTest
         int runsBefore = selectRuns(SYNC_ASSAY, null).getRowCount().intValue();
         int workDirsBefore = selectWorkDirs().size();
 
-        Batch missing = batchOf(callbackRun(0, "report", "P1"));
-        missing.setId(Integer.MAX_VALUE);
-        assertSaveRejected(missing, "Could not find assay batch");
+        assertSaveRejected(batchOf(Integer.MAX_VALUE, callbackRun(0, "report", "P1")), "Could not find assay batch");
 
         assertEquals("Runs after saving to a missing batch", runsBefore, selectRuns(SYNC_ASSAY, null).getRowCount().intValue());
         assertEquals("Working directories reported for a missing batch", workDirsBefore, selectWorkDirs().size());
@@ -366,12 +348,7 @@ public class AssayTransformCallbackTest extends AbstractAssayTransformTest
 
         try
         {
-            importRun(_syncAssayId, 90);
-            fail("Import should fail when the transform script exceeds the timeout");
-        }
-        catch (CommandException e)
-        {
-            assertTrue("Unexpected error: " + e.getMessage(), e.getMessage().contains("Process killed after exceeding timeout"));
+            assertRejected(() -> importRun(_syncAssayId, 90), "Process killed after exceeding timeout");
         }
         finally
         {
@@ -389,10 +366,10 @@ public class AssayTransformCallbackTest extends AbstractAssayTransformTest
         {
             Future<Integer> saveFuture = executor.submit(save);
             sleep(5_000);
-            assertFalse("Save finished before the transform script's sleep ended", saveFuture.isDone());
+            assertStillRunning(saveFuture, "Save finished before the transform script's sleep ended");
 
             deleteFolder(folderPath);
-            assertFalse("Folder delete should finish while the transform script is still running", saveFuture.isDone());
+            assertStillRunning(saveFuture, "Folder delete should finish while the transform script is still running");
 
             int runId = saveFuture.get(REQUEST_TIMEOUT_MS, TimeUnit.MILLISECONDS);
             SelectRowsResponse runs = selectRuns(SYNC_ASSAY, new Filter("RowId", runId));
@@ -404,6 +381,14 @@ public class AssayTransformCallbackTest extends AbstractAssayTransformTest
         {
             executor.shutdownNow();
         }
+    }
+
+    /** A save that already failed rethrows its own error instead of failing on timing. */
+    private static void assertStillRunning(Future<?> future, String message) throws Exception
+    {
+        if (future.isDone())
+            future.get();
+        assertFalse(message, future.isDone());
     }
 
     private int createCallbackAssay(String name, boolean backgroundUpload)
@@ -472,17 +457,15 @@ public class AssayTransformCallbackTest extends AbstractAssayTransformTest
         return command.execute(createDefaultConnection(), getProjectName());
     }
 
-    private void assertImportRejected(File dataFile, @Nullable Integer reRunId) throws Exception
+    private void assertImportRejected(File dataFile, @Nullable Integer reRunId)
     {
-        try
-        {
-            importRun(_syncAssayId, dataFile, 0, "fail", reRunId);
-            fail("Import should fail when the transform script rejects the run");
-        }
-        catch (CommandException e)
-        {
-            assertTrue("Unexpected error: " + e.getMessage(), e.getMessage().contains(SCRIPT_REJECTED));
-        }
+        assertRejected(() -> importRun(_syncAssayId, dataFile, 0, "fail", reRunId), SCRIPT_REJECTED);
+    }
+
+    private static void assertRejected(ThrowingRunnable request, String expectedError)
+    {
+        CommandException e = assertThrows("Request should fail with: " + expectedError, CommandException.class, request);
+        assertTrue("Unexpected error: " + e.getMessage(), e.getMessage().contains(expectedError));
     }
 
     private File writeDataFile(String name) throws Exception
@@ -532,7 +515,15 @@ public class AssayTransformCallbackTest extends AbstractAssayTransformTest
 
     private static Batch batchOf(Run... runs)
     {
+        return batchOf(null, runs);
+    }
+
+    /** A null batchId saves a new batch. */
+    private static Batch batchOf(@Nullable Integer batchId, Run... runs)
+    {
         Batch batch = new Batch();
+        if (batchId != null)
+            batch.setId(batchId);
         batch.setRuns(List.of(runs));
         return batch;
     }
@@ -544,36 +535,28 @@ public class AssayTransformCallbackTest extends AbstractAssayTransformTest
         return command.execute(createDefaultConnection(), getProjectName());
     }
 
-    private void assertSaveRejected(Batch batch, String expectedError) throws Exception
+    private void assertSaveRejected(Batch batch, String expectedError)
     {
-        try
-        {
-            saveBatch(batch);
-            fail("Save should fail with: " + expectedError);
-        }
-        catch (CommandException e)
-        {
-            assertTrue("Unexpected error: " + e.getMessage(), e.getMessage().contains(expectedError));
-        }
+        assertRejected(() -> saveBatch(batch), expectedError);
     }
 
     private List<String> selectResultParticipants(int runId) throws Exception
     {
-        SelectRowsCommand command = new SelectRowsCommand("assay.General." + SYNC_ASSAY, "Data");
-        command.setColumns(List.of("ParticipantID"));
-        command.addFilter(new Filter("Run/RowId", runId));
-        return command.execute(createDefaultConnection(), getProjectName()).getRows().stream()
-                .map(row -> (String) row.get("ParticipantID"))
-                .toList();
+        return selectResultColumn(runId, "ParticipantID", String.class::cast);
     }
 
     private List<Integer> selectResultVisits(int runId) throws Exception
     {
+        return selectResultColumn(runId, "VisitID", value -> ((Number) value).intValue());
+    }
+
+    private <T> List<T> selectResultColumn(int runId, String column, Function<Object, T> mapper) throws Exception
+    {
         SelectRowsCommand command = new SelectRowsCommand("assay.General." + SYNC_ASSAY, "Data");
-        command.setColumns(List.of("VisitID"));
+        command.setColumns(List.of(column));
         command.addFilter(new Filter("Run/RowId", runId));
         return command.execute(createDefaultConnection(), getProjectName()).getRows().stream()
-                .map(row -> ((Number) row.get("VisitID")).intValue())
+                .map(row -> mapper.apply(row.get(column)))
                 .toList();
     }
 
