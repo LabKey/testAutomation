@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests.assay;
 
+import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -26,6 +27,7 @@ import org.labkey.remoteapi.assay.Run;
 import org.labkey.remoteapi.assay.SaveAssayBatchCommand;
 import org.labkey.remoteapi.assay.SaveAssayBatchResponse;
 import org.labkey.remoteapi.assay.SaveAssayRunsCommand;
+import org.labkey.remoteapi.query.ContainerFilter;
 import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
@@ -42,6 +44,7 @@ import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.assay.GeneralAssayDesign;
 import org.labkey.test.params.experiment.DataClassDefinition;
 import org.labkey.test.params.list.IntListDefinition;
+import org.labkey.test.util.AuditLogHelper;
 import org.labkey.test.util.SiteSettingsHelper;
 
 import java.io.File;
@@ -55,12 +58,14 @@ import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 /**
  * GH Issue 1707, GH Issue 1720: an assay import must not hold a database transaction while its transform script runs,
- * or a script that calls back into the server can deadlock with a concurrent folder delete.
+ * or a script that calls back into the server can deadlock with a concurrent folder delete. Files saved before the
+ * script runs must still have their audit events recorded in the import's transaction.
  */
 @Category({Assays.class, Daily.class})
 public class AssayTransformCallbackTest extends AbstractAssayTransformTest
@@ -303,6 +308,58 @@ public class AssayTransformCallbackTest extends AbstractAssayTransformTest
     }
 
     @Test
+    public void testImportRunFileAuditInImportTransaction() throws Exception
+    {
+        File dataFile = writeDataFile("auditImportRun.tsv");
+        importRun(_syncAssayId, dataFile, 0, "pending", null);
+
+        Map<String, Object> audit = selectOnlyFileAudit(dataFile);
+        assertEquals("Transaction of the data file's audit event", new AuditLogHelper(this).getLastTransactionId(getProjectName()), audit.get("TransactionId"));
+    }
+
+    @Test
+    public void testUploadWizardFileAuditInImportTransaction() throws Exception
+    {
+        File dataFile = writeDataFile("auditUploadWizard.tsv");
+        beginAt(WebTestHelper.buildURL("assay", getProjectName(), "uploadWizard", Map.of("rowId", _syncAssayId)));
+        AssayImportPage importPage = new AssayImportPage(getDriver());
+        importPage.setNamedInputText(SLEEP_SECONDS, "0");
+        importPage.setNamedInputText(CALLBACK_STATUS, "pending");
+        importPage.setDataFile(dataFile);
+        importPage.clickSaveAndFinish();
+
+        Map<String, Object> audit = selectOnlyFileAudit(dataFile);
+        assertEquals("Transaction of the data file's audit event", new AuditLogHelper(this).getLastTransactionId(getProjectName()), audit.get("TransactionId"));
+    }
+
+    @Test
+    public void testFailedImportSkipsAuditOfDeletedFile() throws Exception
+    {
+        File dataFile = writeDataFile("auditFailedImport.tsv");
+        assertImportRejected(dataFile, null);
+
+        // The failed import deletes its data file, so an audit event would name a file that no longer exists
+        assertEquals("Audit events for the failed import's data file", List.of(), selectFileAudits(dataFile));
+    }
+
+    @Test
+    public void testFailedReRunAuditsKeptFile() throws Exception
+    {
+        int runId = importRun(_syncAssayId, writeDataFile("auditOriginalRun.tsv"), 0, "pending", null).getRunId();
+        File reRunFile = writeDataFile("auditFailedReRun.tsv");
+        assertImportRejected(reRunFile, runId);
+
+        // A failed re-run keeps its data file, but the transaction its audit event was held for rolled back
+        Map<String, Object> audit = selectOnlyFileAudit(reRunFile);
+        assertNull("Transaction of the kept file's audit event", audit.get("TransactionId"));
+        if (!TestProperties.isServerRemote())
+        {
+            File savedFile = new File((String) audit.get(AuditLogHelper.COL_FILE_AUDIT_DIRECTORY), (String) audit.get(AuditLogHelper.COL_FILE_AUDIT_FILE));
+            assertTrue("Failed re-run should keep its data file: " + savedFile, savedFile.exists());
+        }
+    }
+
+    @Test
     public void testTransformScriptTimeout() throws Exception
     {
         SITE_SETTINGS.setSetting(ASSAY_TRANSFORM_SCRIPT_TIMEOUT, 1);
@@ -394,12 +451,59 @@ public class AssayTransformCallbackTest extends AbstractAssayTransformTest
 
     private ImportRunResponse importRun(int assayId, int sleepSeconds) throws Exception
     {
-        File dataFile = new File(TestFileUtils.ensureTestTempDir(getClass().getSimpleName()), "callbackData.tsv");
-        TestFileUtils.writeFile(dataFile, CALLBACK_DATA);
-        ImportRunCommand command = new ImportRunCommand(assayId, dataFile);
-        command.setProperties(Map.of(SLEEP_SECONDS, sleepSeconds, CALLBACK_STATUS, "pending"));
+        return importRun(assayId, writeDataFile("callbackData.tsv"), sleepSeconds, "pending", null);
+    }
+
+    private ImportRunResponse importRun(int assayId, File dataFile, int sleepSeconds, String callbackStatus, @Nullable Integer reRunId) throws Exception
+    {
+        ImportRunCommand command = new ImportRunCommand(assayId, dataFile)
+        {
+            @Override
+            protected Map<String, Object> createParameterMap()
+            {
+                Map<String, Object> params = super.createParameterMap();
+                if (reRunId != null)
+                    params.put("reRunId", reRunId);
+                return params;
+            }
+        };
+        command.setProperties(Map.of(SLEEP_SECONDS, sleepSeconds, CALLBACK_STATUS, callbackStatus));
         command.setTimeout(REQUEST_TIMEOUT_MS);
         return command.execute(createDefaultConnection(), getProjectName());
+    }
+
+    private void assertImportRejected(File dataFile, @Nullable Integer reRunId) throws Exception
+    {
+        try
+        {
+            importRun(_syncAssayId, dataFile, 0, "fail", reRunId);
+            fail("Import should fail when the transform script rejects the run");
+        }
+        catch (CommandException e)
+        {
+            assertTrue("Unexpected error: " + e.getMessage(), e.getMessage().contains(SCRIPT_REJECTED));
+        }
+    }
+
+    private File writeDataFile(String name) throws Exception
+    {
+        File dataFile = new File(TestFileUtils.ensureTestTempDir(getClass().getSimpleName()), name);
+        TestFileUtils.writeFile(dataFile, CALLBACK_DATA);
+        return dataFile;
+    }
+
+    private List<Map<String, Object>> selectFileAudits(File providedFile) throws Exception
+    {
+        return new AuditLogHelper(this).getAuditLogsFromLKS(getProjectName(), AuditLogHelper.AuditEvent.FILE_SYSTEM_EVENT,
+                List.of("TransactionId", AuditLogHelper.COL_FILE_AUDIT_FILE, AuditLogHelper.COL_FILE_AUDIT_DIRECTORY),
+                List.of(new Filter(AuditLogHelper.COL_FILE_AUDIT_PROVIDED_FILE, providedFile.getName())), null, ContainerFilter.CurrentAndSubfolders).getRows();
+    }
+
+    private Map<String, Object> selectOnlyFileAudit(File providedFile) throws Exception
+    {
+        List<Map<String, Object>> audits = selectFileAudits(providedFile);
+        assertEquals("Audit events for " + providedFile.getName(), 1, audits.size());
+        return audits.getFirst();
     }
 
     private static Run callbackRun(int sleepSeconds, String callbackStatus, String participantId)
