@@ -166,6 +166,14 @@ public class FilterExpressionPanel extends WebDriverComponent<FilterExpressionPa
         return elementCache().filterTypeSelects.get(index).getOptions().contains(filterCaption);
     }
 
+    /**
+     * @return caption of the selected filter type, e.g. "Equals"
+     */
+    public String getFilterType(int index)
+    {
+        return elementCache().filterTypeSelects.get(index).getValue();
+    }
+
     public String getFilterTextValue(int index)
     {
         return elementCache().textValuesFirst.get(index).getValue();

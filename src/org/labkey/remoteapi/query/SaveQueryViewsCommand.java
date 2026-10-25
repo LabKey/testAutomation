@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.SequencedMap;
 
 /**
  * Saves custom grid views via query-saveQueryViews.api.
@@ -48,6 +49,23 @@ public class SaveQueryViewsCommand extends PostCommand<CommandResponse>
      */
     public SaveQueryViewsCommand addView(String viewName, List<String> columns, boolean shared, boolean inherit)
     {
+        _views.add(view(viewName, columns(columns), shared, inherit));
+        return this;
+    }
+
+    /**
+     * @param columnTitles field keys to show, in order, each with its title or null for the default caption
+     */
+    public SaveQueryViewsCommand addView(String viewName, SequencedMap<String, String> columnTitles, boolean shared, boolean inherit)
+    {
+        List<Map<String, Object>> columns = new ArrayList<>();
+        columnTitles.forEach((fieldKey, title) -> {
+            Map<String, Object> column = new HashMap<>();
+            column.put("fieldKey", fieldKey);
+            if (title != null)
+                column.put("title", title);
+            columns.add(column);
+        });
         _views.add(view(viewName, columns, shared, inherit));
         return this;
     }
@@ -59,7 +77,7 @@ public class SaveQueryViewsCommand extends PostCommand<CommandResponse>
      */
     public SaveQueryViewsCommand addViewInContainer(String viewName, List<String> columns, String containerPath)
     {
-        Map<String, Object> view = view(viewName, columns, true, true);
+        Map<String, Object> view = view(viewName, columns(columns), true, true);
         view.put("containerPath", containerPath);
         _views.add(view);
 
@@ -69,22 +87,25 @@ public class SaveQueryViewsCommand extends PostCommand<CommandResponse>
     /** Adds a view held in the caller's HTTP session rather than the database. */
     public SaveQueryViewsCommand addSessionView(String viewName, List<String> columns)
     {
-        Map<String, Object> view = view(viewName, columns, false, false);
+        Map<String, Object> view = view(viewName, columns(columns), false, false);
         view.put("session", true);
         _views.add(view);
 
         return this;
     }
 
-    private static Map<String, Object> view(String viewName, List<String> columns, boolean shared, boolean inherit)
+    private static List<Map<String, Object>> columns(List<String> fieldKeys)
     {
-        List<Map<String, Object>> columnList = columns.stream()
+        return fieldKeys.stream()
                 .map(fieldKey -> Map.<String, Object>of("fieldKey", fieldKey))
                 .toList();
+    }
 
+    private static Map<String, Object> view(String viewName, List<Map<String, Object>> columns, boolean shared, boolean inherit)
+    {
         Map<String, Object> view = new HashMap<>();
         view.put("name", viewName);
-        view.put("columns", columnList);
+        view.put("columns", columns);
         view.put("shared", shared);
         view.put("inherit", inherit);
         view.put("replace", true);

@@ -224,7 +224,7 @@ public class MultiMenu extends BootstrapMenu
 
         List<WebElement> menuList = Locator.tagWithAttribute("a", "role", "menuitem").findElements(this);
         List<String> menuText = new ArrayList<>();
-        for(WebElement menuItem : menuList)
+        for (WebElement menuItem : menuList)
         {
             menuText.add(menuItem.getText());
         }
@@ -337,14 +337,17 @@ public class MultiMenu extends BootstrapMenu
     }
 
     /**
-     * Get the text of all the menu section headers
+     * Get the text of all the menu section headers. Headers render uppercase, so this reads their DOM text, which
+     * matches the label of a menu button collapsed into the section.
      *
      * @return text from the menu section headers
      */
     public List<String> getSectionHeadersText()
     {
         expand();
-        return WebElementUtils.getTexts(Locators.dropdownHeader.findElements(this));
+        return Locators.dropdownHeader.findElements(this).stream()
+                .map(header -> WebElementUtils.getTextContent(header).trim())
+                .toList();
     }
 
     /**
@@ -400,7 +403,7 @@ public class MultiMenu extends BootstrapMenu
     }
 
     /**
-     * Gets the first menu item with the specified text under the specifed toggle
+     * Gets the first menu item with the specified text under the specified toggle
      * @param toggle    Text of the toggle to expand
      * @param menuItem  Text of the menu-item to get
      * @return  The menu-item element, if found
