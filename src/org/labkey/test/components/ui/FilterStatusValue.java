@@ -19,9 +19,11 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
+
+import java.util.Arrays;
 
 public class FilterStatusValue extends WebDriverComponent<FilterStatusValue.ElementCache>
 {
@@ -51,6 +53,16 @@ public class FilterStatusValue extends WebDriverComponent<FilterStatusValue.Elem
         return elementCache().textSpan.getText();
     }
 
+    public FilterStatusType getType()
+    {
+        return FilterStatusType.fromKeyword(getComponentElement().getDomAttribute("data-keyword"));
+    }
+
+    public boolean isSearch()
+    {
+        return getType() == FilterStatusType.search;
+    }
+
     private boolean isActive()
     {
         return getComponentElement().getAttribute("class").contains("is-active");
@@ -65,21 +77,29 @@ public class FilterStatusValue extends WebDriverComponent<FilterStatusValue.Elem
     {
         String originalText = getText();
         getWrapper().mouseOver(getComponentElement());
-        if(elementCache().popover.isDisplayed())
-        {
+        if (elementCache().popover.isDisplayed())
             getWrapper().mouseOut();
-        }
         elementCache().icon.click();
 
         // If the item you're dismissing is not the rightmost, it won't become stale; instead, its text will
         // be swapped out with the one to its right.  So, we check to see that either the text has changed or
-        // the item became stale. ExpectedConditions.textToBePresentInElement returns false if element is stale.
-        WebDriverWrapper.waitFor(()-> ExpectedConditions.not(
-                ExpectedConditions.textToBePresentInElement(elementCache().textSpan, originalText))
-                        .apply(getDriver())
-                , "The value item ["+originalText+"] did not disappear.", 1000);
+        // the item became stale. The text must differ exactly: a search "S-1" is replaced by a filter "Name = S-1".
+        WebDriverWrapper.waitFor(() -> {
+            try
+            {
+                return !originalText.equals(elementCache().textSpan.getText());
+            }
+            catch (StaleElementReferenceException e)
+            {
+                return true;
+            }
+        }, "The value item ["+originalText+"] did not disappear.", 1000);
     }
 
+    /**
+     * Click the value. A filter opens the filter modal; a search puts its term back in the grid's search input and
+     * opens the suggestion menu (see {@link org.labkey.test.components.ui.grids.QueryGrid#editSearch()}).
+     */
     public void open()
     {
         getWrapper().mouseOver(getComponentElement());
@@ -91,7 +111,6 @@ public class FilterStatusValue extends WebDriverComponent<FilterStatusValue.Elem
 
     /**
      * A filter will be locked if it was applied by a view.
-     *
      * @return True if the locked icon is present, false otherwise.
      */
     public boolean isLocked()
@@ -113,7 +132,6 @@ public class FilterStatusValue extends WebDriverComponent<FilterStatusValue.Elem
 
         public final WebElement popover = Locator.tag("div").withClasses("lk-popover", "popover").findWhenNeeded(_driver);
     }
-
 
     public static class FilterStatusValueFinder extends WebDriverComponentFinder<FilterStatusValue, FilterStatusValueFinder>
     {
@@ -154,28 +172,30 @@ public class FilterStatusValue extends WebDriverComponent<FilterStatusValue.Elem
             }
             if (_type != null)
             {
-                locator = locator.withChild(Locator.tagWithClass("i", _type.getIconClass()));
+                locator = locator.withAttribute("data-keyword", _type.name());
             }
 
             return locator;
         }
     }
 
+    /**
+     * Matches the <code>data-keyword</code> of a value, its action's keyword. Hovering a value swaps its type icon for
+     * the remove icon, so the icon can't identify the type.
+     */
     public enum FilterStatusType
     {
-        filter("fa-filter"),
-        view("fa-table");
+        filter,
+        search,
+        sort,
+        view;
 
-        private final String iconCls;
-
-        FilterStatusType(String iconCls)
+        public static FilterStatusType fromKeyword(String keyword)
         {
-            this.iconCls = iconCls;
-        }
-
-        public String getIconClass()
-        {
-            return iconCls;
+            return Arrays.stream(values())
+                    .filter(type -> type.name().equals(keyword))
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalStateException("Unknown filter status keyword: " + keyword));
         }
     }
 }

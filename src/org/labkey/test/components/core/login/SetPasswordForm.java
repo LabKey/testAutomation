@@ -73,6 +73,7 @@ public class SetPasswordForm extends WebDriverComponent<SetPasswordForm.ElementC
     public static SetPasswordForm goToInitialPasswordForUser(WebDriverWrapper wrapper, int userId)
     {
         wrapper.beginAt(WebTestHelper.buildURL("security", "showRegistrationEmail", Map.of("userId", userId)));
+        wrapper.clickButton("Generate New Link");
         // Get setPassword URL from notification email.
         WebElement resetLink = Locator.linkWithHref("setPassword.view").findElement(wrapper.getDriver());
 
