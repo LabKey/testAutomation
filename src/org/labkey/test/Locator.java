@@ -1098,6 +1098,28 @@ public abstract class Locator extends By
         }
 
         @Override
+        public XPathLocator position(int pos)
+        {
+            return nthChild(pos);
+        }
+
+        @Override
+        public XPathLocator nthChild(int pos)
+        {
+            return new XPathCSSLocator(
+                    _xLoc.nthChild(pos),
+                    _cssLoc.nthChild(pos));
+        }
+
+        @Override
+        public XPathLocator nthOfType(int n)
+        {
+            return new XPathCSSLocator(
+                    _xLoc.nthOfType(n),
+                    _cssLoc.nthOfType(n));
+        }
+
+        @Override
         public XPathLocator withClass(String cssClass)
         {
             return new XPathCSSLocator(
@@ -1602,7 +1624,17 @@ public abstract class Locator extends By
 
         public XPathLocator position(int pos)
         {
-            return this.withPredicate(String.valueOf(pos));
+            return this.withPredicate("position() = " + pos);
+        }
+
+        public XPathLocator nthChild(int pos)
+        {
+            return this.position(pos);
+        }
+
+        public XPathLocator nthOfType(int n)
+        {
+            return this.withPredicate(String.valueOf(n));
         }
 
         //Experimental. Might not work quite right within non-global SearchContext
@@ -1758,6 +1790,16 @@ public abstract class Locator extends By
                 throw new IllegalArgumentException("An index has already been specified for this Locator");
 
             return new CssLocator(getLoc(), index, _contains, _text);
+        }
+
+        public CssLocator nthChild(int n)
+        {
+            return append(":nth-child(" + n + ")");
+        }
+
+        public CssLocator nthOfType(int n)
+        {
+            return append(":nth-of-type(" + n + ")");
         }
 
         public CssLocator append(final String clause)
