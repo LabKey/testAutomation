@@ -27,7 +27,6 @@ import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.PostCommand;
-import org.labkey.remoteapi.SimpleGetCommand;
 import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.remoteapi.security.CreateUserCommand;
 import org.labkey.remoteapi.security.CreateUserResponse;
@@ -262,10 +261,7 @@ public class APIUserHelper extends AbstractUserHelper
 
         try
         {
-            SimpleGetCommand getRegEmailCommand = new SimpleGetCommand("security", "showRegistrationEmail");
-            getRegEmailCommand.setParameters(Map.of("userId", userId));
-
-            String responseText = getRegEmailCommand.execute(connectionSupplier.get(), null).getText();
+            String responseText = new GenerateRegistrationLinkCommand(userId).execute(connectionSupplier.get(), null).getText();
             Matcher matcher = regEmailVerification.matcher(responseText);
 
             if (matcher.find())
@@ -321,6 +317,26 @@ public class APIUserHelper extends AbstractUserHelper
         {
             throw new RuntimeException(e);
         }
+    }
+}
+
+// Replaces the user's verification token and returns the registration email containing the new link
+class GenerateRegistrationLinkCommand extends PostCommand<CommandResponse>
+{
+    private final int _userId;
+
+    public GenerateRegistrationLinkCommand(int userId)
+    {
+        super("security", "showRegistrationEmail");
+        _userId = userId;
+    }
+
+    @Override
+    protected HttpPost createRequest(URI uri)
+    {
+        HttpPost request = new HttpPost(uri);
+        request.setEntity(new UrlEncodedFormEntity(List.of(new BasicNameValuePair("userId", String.valueOf(_userId)))));
+        return request;
     }
 }
 
