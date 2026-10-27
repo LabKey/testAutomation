@@ -39,6 +39,8 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 @Category({Daily.class, Assays.class})
 @BaseWebDriverTest.ClassTimeout(minutes = 7)
 public class NabAssayThawListTest extends AbstractAssayTest
@@ -194,6 +196,20 @@ public class NabAssayThawListTest extends AbstractAssayTest
                             Locator.checkedRadioInGroup(AssayConstants.PARTICIPANT_VISIT_RESOLVER_FIELD_NAME).findElement(getDriver()).getAttribute("value"));
         assertTextPresent("These values are overridden by defaults");
 
+        // GH Issue 1687: validate that the replaced run is deletable.
+        navToRunDetails();
+        clickAndWait(Locator.linkWithText("Delete and Re-import"));
+        String reImportUrl = getCurrentRelativeURL();
+
+        log("Verify an author can't replace a run they can't delete");
+        impersonateRole("Author");
+        beginAt(reImportUrl);
+        clickButton("Next");
+        clickButton("Save and Finish", 60000);
+        assertTextPresent("You do not have permission to replace run");
+        stopImpersonating(false);
+        assertThat(getRunAssayIds()).as("run targeted by the author's re-import").contains(THAW_LIST_ASSAY_ID);
+
         log("Verify Delete and Re-import doesn't autofill SpecimenId");
         navToRunDetails();
         clickAndWait(Locator.linkWithText("Delete and Re-import"));
@@ -208,6 +224,13 @@ public class NabAssayThawListTest extends AbstractAssayTest
         assertElementPresent(Locator.input("Specimen 1_InitialDilution").withAttribute("value", "20.0"));
 
         verifyValidation(iob);
+    }
+
+    private List<String> getRunAssayIds()
+    {
+        navigateToFolder(getProjectName(), TEST_ASSAY_FLDR_NAB);
+        clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
+        return new DataRegionTable("Runs", this).getColumnDataAsText("Assay ID");
     }
 
     protected void navToRunDetails()
