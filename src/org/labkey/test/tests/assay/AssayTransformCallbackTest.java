@@ -22,8 +22,10 @@ import org.junit.experimental.categories.Category;
 import org.junit.function.ThrowingRunnable;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.assay.Batch;
+import org.labkey.remoteapi.assay.Data;
 import org.labkey.remoteapi.assay.ImportRunCommand;
 import org.labkey.remoteapi.assay.ImportRunResponse;
+import org.labkey.remoteapi.assay.Material;
 import org.labkey.remoteapi.assay.Run;
 import org.labkey.remoteapi.assay.SaveAssayBatchCommand;
 import org.labkey.remoteapi.assay.SaveAssayBatchResponse;
@@ -44,9 +46,11 @@ import org.labkey.test.pages.assay.AssayImportPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.assay.GeneralAssayDesign;
 import org.labkey.test.params.experiment.DataClassDefinition;
+import org.labkey.test.params.experiment.SampleTypeDefinition;
 import org.labkey.test.params.list.IntListDefinition;
 import org.labkey.test.util.AuditLogHelper;
 import org.labkey.test.util.SiteSettingsHelper;
+import org.labkey.test.util.core.webdav.WebDavUploadHelper;
 
 import java.io.File;
 import java.util.List;
@@ -80,6 +84,9 @@ public class AssayTransformCallbackTest extends AbstractAssayTransformTest
     private static final String TRANSFORM_COMMENT = "set by transform";
     private static final String WORK_DIRS_LIST = "TransformWorkDirs";
     private static final String WORK_DIR = "WorkDir";
+    private static final String SAMPLE_TYPE = "Callback Samples";
+    private static final String INPUT_SAMPLE = "S1";
+    private static final String CYCLE_SAMPLE = "S2";
     private static final String CALLBACK_DATA = "ParticipantID\tVisitID\nP1\t1\n";
     private static final String SCRIPT_REJECTED = "Transform script rejected the run";
     // The callback script's "edit" status updates the visit of this participant's results
@@ -105,6 +112,11 @@ public class AssayTransformCallbackTest extends AbstractAssayTransformTest
             new IntListDefinition(WORK_DIRS_LIST, "Key")
                     .setFields(List.of(new FieldDefinition(WORK_DIR)))
                     .create(createDefaultConnection(), getProjectName());
+            new SampleTypeDefinition(SAMPLE_TYPE)
+                    .create(createDefaultConnection(), getProjectName())
+                    .addCustomRow(Map.of("Name", INPUT_SAMPLE))
+                    .addCustomRow(Map.of("Name", CYCLE_SAMPLE))
+                    .insertRows();
         }
         catch (Exception e)
         {
@@ -232,6 +244,40 @@ public class AssayTransformCallbackTest extends AbstractAssayTransformTest
 
         assertEquals("Runs after saving to a missing batch", runsBefore, selectRuns(SYNC_ASSAY, null).getRowCount().intValue());
         assertEquals("Working directories reported for a missing batch", workDirsBefore, selectWorkDirs().size());
+    }
+
+    @Test
+    public void testSaveBatchWithInputsAndOutputs() throws Exception
+    {
+        int workDirsBefore = selectWorkDirs().size();
+        Run run = callbackRun(0, "report", "P1");
+        run.setMaterialInputs(List.of(sample(INPUT_SAMPLE)));
+        run.setMaterialOutputs(List.of(sample("Derived " + INPUT_SAMPLE)));
+        run.setDataInputs(List.of(uploadedData("callbackInput.txt")));
+        run.setDataOutputs(List.of(uploadedData("callbackOutput.txt")));
+
+        Run saved = saveBatch(batchOf(run)).getBatch().getRuns().getFirst();
+
+        assertEquals("Working directories reported by the transform script", workDirsBefore + 1, selectWorkDirs().size());
+        assertEquals("Material inputs", List.of(INPUT_SAMPLE), saved.getMaterialInputs().stream().map(Material::getName).toList());
+        assertEquals("Material outputs", List.of("Derived " + INPUT_SAMPLE), saved.getMaterialOutputs().stream().map(Material::getName).toList());
+        assertEquals("Data inputs", List.of("callbackInput.txt"), saved.getDataInputs().stream().map(Data::getName).toList());
+        assertEquals("Data outputs named callbackOutput.txt", 1, saved.getDataOutputs().stream().filter(data -> "callbackOutput.txt".equals(data.getName())).count());
+    }
+
+    @Test
+    public void testSaveBatchMaterialCycleRejectedBeforeScripts() throws Exception
+    {
+        int runsBefore = selectRuns(SYNC_ASSAY, null).getRowCount().intValue();
+        int workDirsBefore = selectWorkDirs().size();
+        Run run = callbackRun(0, "report", "P1");
+        run.setMaterialInputs(List.of(sample(CYCLE_SAMPLE)));
+        run.setMaterialOutputs(List.of(sample(CYCLE_SAMPLE)));
+
+        assertSaveRejected(batchOf(run), "Circular input/output '" + CYCLE_SAMPLE + "'");
+
+        assertEquals("Runs after a circular save", runsBefore, selectRuns(SYNC_ASSAY, null).getRowCount().intValue());
+        assertEquals("Working directories reported for a circular save", workDirsBefore, selectWorkDirs().size());
     }
 
     @Test
@@ -495,6 +541,25 @@ public class AssayTransformCallbackTest extends AbstractAssayTransformTest
         run.setProperties(Map.of(SLEEP_SECONDS, sleepSeconds, CALLBACK_STATUS, callbackStatus));
         run.setResultData(List.of(Map.of("ParticipantID", participantId, "VisitID", 1)));
         return run;
+    }
+
+    private static Material sample(String name)
+    {
+        Material material = new Material();
+        material.setName(name);
+        material.setSampleSetName(SAMPLE_TYPE);
+        return material;
+    }
+
+    private Data uploadedData(String name) throws Exception
+    {
+        File file = new File(TestFileUtils.ensureTestTempDir(getClass().getSimpleName()), name);
+        TestFileUtils.writeFile(file, name);
+        new WebDavUploadHelper(getProjectName()).uploadFile(file);
+        Data data = new Data();
+        data.setName(name);
+        data.setPipelinePath(name);
+        return data;
     }
 
     private static Run existingRun(int runId, String callbackStatus, String participantId)
