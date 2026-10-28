@@ -66,7 +66,6 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static org.awaitility.Awaitility.await;
 import static org.labkey.test.BaseWebDriverTest.WAIT_FOR_JAVASCRIPT;
@@ -117,20 +116,15 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         Locators.spinner.waitForElementToDisappear(this, 30000);
     }
 
-    public static String quoteForPaste(Stream<String> values)
-    {
-        return values.map(CSVFormat.DEFAULT::format).collect(Collectors.joining("\n"));
-    }
-
     /**
      * Quote values to be pasted into a lookup column. Prevents a value containing a comma from being interpreted as
-     * multiple values. Not suitable for text fields.
+     * multiple values.
      * @param values the raw values
-     * @return The values, quoted if necessary for pasting into a single lookup column
+     * @return The values, quoted if necessary for pasting into a single cell
      */
     public static String quoteForPaste(String... values)
     {
-        return quoteForPaste(Arrays.stream(values));
+        return Arrays.stream(values).map(CSVFormat.DEFAULT::format).collect(Collectors.joining(","));
     }
 
     public void clickDelete()
