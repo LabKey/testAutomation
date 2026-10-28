@@ -237,13 +237,7 @@ public class AssayTransformCallbackTest extends AbstractAssayTransformTest
     @Test
     public void testSaveBatchMissingBatchRunsNoScripts() throws Exception
     {
-        int runsBefore = selectRuns(SYNC_ASSAY, null).getRowCount().intValue();
-        int workDirsBefore = selectWorkDirs().size();
-
-        assertSaveRejected(batchOf(Integer.MAX_VALUE, callbackRun(0, "report", "P1")), "Could not find assay batch");
-
-        assertEquals("Runs after saving to a missing batch", runsBefore, selectRuns(SYNC_ASSAY, null).getRowCount().intValue());
-        assertEquals("Working directories reported for a missing batch", workDirsBefore, selectWorkDirs().size());
+        assertRejectedBeforeScripts(batchOf(Integer.MAX_VALUE, callbackRun(0, "report", "P1")), "Could not find assay batch");
     }
 
     @Test
@@ -268,16 +262,11 @@ public class AssayTransformCallbackTest extends AbstractAssayTransformTest
     @Test
     public void testSaveBatchMaterialCycleRejectedBeforeScripts() throws Exception
     {
-        int runsBefore = selectRuns(SYNC_ASSAY, null).getRowCount().intValue();
-        int workDirsBefore = selectWorkDirs().size();
         Run run = callbackRun(0, "report", "P1");
         run.setMaterialInputs(List.of(sample(CYCLE_SAMPLE)));
         run.setMaterialOutputs(List.of(sample(CYCLE_SAMPLE)));
 
-        assertSaveRejected(batchOf(run), "Circular input/output '" + CYCLE_SAMPLE + "'");
-
-        assertEquals("Runs after a circular save", runsBefore, selectRuns(SYNC_ASSAY, null).getRowCount().intValue());
-        assertEquals("Working directories reported for a circular save", workDirsBefore, selectWorkDirs().size());
+        assertRejectedBeforeScripts(batchOf(run), "Circular input/output '" + CYCLE_SAMPLE + "'");
     }
 
     @Test
@@ -603,6 +592,17 @@ public class AssayTransformCallbackTest extends AbstractAssayTransformTest
     private void assertSaveRejected(Batch batch, String expectedError)
     {
         assertRejected(() -> saveBatch(batch), expectedError);
+    }
+
+    private void assertRejectedBeforeScripts(Batch batch, String expectedError) throws Exception
+    {
+        int runsBefore = selectRuns(SYNC_ASSAY, null).getRowCount().intValue();
+        int workDirsBefore = selectWorkDirs().size();
+
+        assertSaveRejected(batch, expectedError);
+
+        assertEquals("Runs after the rejected save", runsBefore, selectRuns(SYNC_ASSAY, null).getRowCount().intValue());
+        assertEquals("Working directories reported by the rejected save", workDirsBefore, selectWorkDirs().size());
     }
 
     private List<String> selectResultParticipants(int runId) throws Exception
