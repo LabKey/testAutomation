@@ -183,6 +183,9 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
         {
             elementCache().searchToggle.click();
             WebDriverWrapper.waitFor(this::isSearchBarExpanded, "Search bar didn't expand", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
+            // 'active' starts a width transition; the input is clipped and not interactable until it finishes
+            WebDriverWrapper.waitFor(() -> elementCache().globalSearch.getSize().getWidth() >= elementCache().searchInput.getSize().getWidth(),
+                    "Search bar didn't finish expanding", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
         }
         return elementCache().searchInput;
     }
@@ -213,6 +216,8 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
         public final WebElement searchContainer = Locator.byClass("navbar-search")
                 .findWhenNeeded(this).withTimeout(WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
         public final WebElement searchToggle = Locator.id("global-search-trigger")
+                .findWhenNeeded(this).withTimeout(WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
+        public final WebElement globalSearch = Locator.id("global-search")
                 .findWhenNeeded(this).withTimeout(WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
         public final WebElement searchInput = Locator.input("q")
                 .findWhenNeeded(this).withTimeout(WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
