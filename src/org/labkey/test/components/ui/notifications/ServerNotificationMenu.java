@@ -281,7 +281,7 @@ public class ServerNotificationMenu extends WebDriverComponent<ServerNotificatio
         return new ElementCache();
     }
 
-    public static final Locator rootLocator = Locator.byClass("navbar-dropdown").withChild(Locator.byClass("server-notifications"));
+    public static final Locator rootLocator = Locator.byClass("server-notifications");
 
     protected class ElementCache extends Component<?>.ElementCache
     {
