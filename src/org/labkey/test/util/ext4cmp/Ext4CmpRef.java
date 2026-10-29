@@ -87,7 +87,7 @@ public class Ext4CmpRef
     @LogMethod(quiet = true)
     public static void waitForComponent(final WebDriverWrapper test, @LoggedParam final String query)
     {
-        test.waitFor(() -> (Boolean)test.executeScript("return !!Ext4.ComponentQuery.query(\"" + query + "\").length;"),
+        test.waitFor(() -> (Boolean)test.executeScript("return !!window.Ext4 && !!Ext4.ComponentQuery.query(\"" + query + "\").length;"),
                 "Component did not appear: " + query, WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
     }
 
