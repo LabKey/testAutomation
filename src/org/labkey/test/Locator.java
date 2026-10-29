@@ -1072,11 +1072,6 @@ public abstract class Locator extends By
             _cssLoc = cssLoc;
         }
 
-        protected XPathCSSLocator(XPathCSSLocator copy)
-        {
-            this(copy._xLoc, copy._cssLoc);
-        }
-
         @Override
         public XPathLocator containing(String contains)
         {
@@ -1100,14 +1095,8 @@ public abstract class Locator extends By
         @Override
         public XPathLocator position(int pos)
         {
-            return nthChild(pos);
-        }
-
-        @Override
-        public XPathLocator nthChild(int pos)
-        {
             return new XPathCSSLocator(
-                    _xLoc.nthChild(pos),
+                    _xLoc.position(pos),
                     _cssLoc.nthChild(pos));
         }
 
