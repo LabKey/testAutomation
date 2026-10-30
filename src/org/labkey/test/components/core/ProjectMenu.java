@@ -34,7 +34,7 @@ import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 
 /**
  * Wraps the project/folder menu nav in labkey pages
- * Defined in org/labkey/core/project/folderNav.jsp and {@link org.labkey.api.view.menu.FolderMenu}
+ * Defined in org/labkey/core/project/folderNav.jsp and {@link org.labkey.core.view.menu.FolderMenu}
  */
 public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
 {
