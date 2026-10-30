@@ -112,14 +112,15 @@ function startChatting(chatEndpoint)
 
     function sendMessage(prompt)
     {
-        var url = new URL(chatEndpoint);
-        url.searchParams.set('prompt', prompt);
+        var params = new URLSearchParams();
+        params.set('prompt', prompt);
         if (conversationId !== undefined)
-            url.searchParams.set('conversationId', conversationId);
+            params.set('conversationId', conversationId);
         var req = new XMLHttpRequest();
-        req.open('GET', url.toString(), true);
+        req.open('POST', chatEndpoint.toString(), true);
+        req.setRequestHeader('X-LABKEY-CSRF', LABKEY.CSRF);
         req.onreadystatechange = handleChatResponse;
-        req.send();
+        req.send(params);
         const loadingSpinner = document.querySelector('.loading-spinner');
         loadingSpinner.classList.remove('loading-spinner--hidden');
     }

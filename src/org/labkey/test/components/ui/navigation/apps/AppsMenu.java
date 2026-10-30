@@ -131,11 +131,6 @@ public class AppsMenu extends WebDriverComponent<AppsMenu.ElementCache>
 
     public static class AppsMenuFinder extends WebDriverComponent.WebDriverComponentFinder<AppsMenu, AppsMenuFinder>
     {
-        private final Locator _locator = Locator.XPathLocator.union(
-                Locator.byClass("product-navigation-menu"), // Bio/FM/SM
-                Locator.id("headerProductDropdown") // LKS
-        );
-
         public AppsMenuFinder(WebDriver driver)
         {
             super(driver);
