@@ -15,6 +15,7 @@
  */
 package org.labkey.test.util;
 
+import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -30,13 +31,13 @@ import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.remoteapi.query.Sort;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
-import org.labkey.test.components.ui.grids.EditableGrid;
 import org.labkey.test.pages.core.admin.ShowAdminPage;
 import org.labkey.test.pages.core.admin.ShowAuditLogPage;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -45,6 +46,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static java.lang.Integer.parseInt;
 import static org.junit.Assert.assertEquals;
@@ -905,7 +907,7 @@ public class AuditLogHelper
     // returns the expected audit-log serialization format for multi-choice values
     public String joinMultiChoiceForAudit(String... sorted)
     {
-        return EditableGrid.quoteValues(", ", sorted);
+        return Arrays.stream(sorted).map(CSVFormat.DEFAULT::format).collect(Collectors.joining(", "));
     }
 
 }
