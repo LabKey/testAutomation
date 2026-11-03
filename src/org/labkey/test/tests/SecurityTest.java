@@ -31,6 +31,7 @@ import org.labkey.test.categories.BVT;
 import org.labkey.test.components.dumbster.EmailRecordTable;
 import org.labkey.test.pages.LabkeyErrorPage;
 import org.labkey.test.pages.admin.PermissionsPage;
+import org.labkey.test.pages.security.AddUsersPage;
 import org.labkey.test.pages.user.ShowUsersPage;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
@@ -61,6 +62,7 @@ import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.labkey.test.WebTestHelper.buildURL;
@@ -80,6 +82,8 @@ public class SecurityTest extends BaseWebDriverTest
     protected static final String PROJECT_ADMIN_USER = "admin_securitytest@security.test";
     protected static final String NORMAL_USER = "user_securitytest@security.test";
     private static final String ADDED_USER = "fromprojectusers@security.test";
+    private static final String CLONE_SOURCE_USER = "clone_source@security.test";
+    private static final String CLONE_TARGET_USER = "clone_target@security.test";
     protected static final String TO_BE_DELETED_USER = "delete_me@security.test";
     protected static final String SITE_ADMIN_USER = "siteadmin_securitytest@security.test";
     protected static final String NOT_FOUND_ERROR = "notFound";
@@ -119,7 +123,7 @@ public class SecurityTest extends BaseWebDriverTest
     {
         _containerHelper.deleteProject(getProjectName(), afterTest);
 
-        _userHelper.deleteUsers(false, ADMIN_USER_TEMPLATE, NORMAL_USER_TEMPLATE, PROJECT_ADMIN_USER, NORMAL_USER, SITE_ADMIN_USER, TO_BE_DELETED_USER, ADDED_USER);
+        _userHelper.deleteUsers(false, ADMIN_USER_TEMPLATE, NORMAL_USER_TEMPLATE, PROJECT_ADMIN_USER, NORMAL_USER, SITE_ADMIN_USER, TO_BE_DELETED_USER, ADDED_USER, CLONE_SOURCE_USER, CLONE_TARGET_USER);
 
         // Make sure the feature is turned off.
         Connection cn = createDefaultConnection();
@@ -399,14 +403,39 @@ public class SecurityTest extends BaseWebDriverTest
         impersonateRoles(PermissionsHelper.PROJECT_ADMIN_ROLE);
         ShowUsersPage usersPage = goToProjectUsers();
 
-        usersPage
-            .clickAddUsers()
+        AddUsersPage addUsersPage = usersPage.clickAddUsers();
+        assertElementNotPresent("Project admins shouldn't be offered permission cloning", Locator.id("cloneUserCheck"));
+        addUsersPage
             .setNewUsers(Arrays.asList(ADDED_USER))
             .setSendNotification(true)
             .clickAddUsers();
 
         assertTextPresent(ADDED_USER);
         stopImpersonating();
+    }
+
+    // GH Issue 1696: cloning copies assignments from every project, so project admins mustn't be able to clone
+    @Test
+    public void testCantClonePermissionsAsProjAdmin()
+    {
+        _userHelper.createUser(CLONE_SOURCE_USER);
+        beginAt(WebTestHelper.buildURL("project", getProjectName(), "begin"));
+        impersonateRoles(PermissionsHelper.PROJECT_ADMIN_ROLE);
+
+        Long status = executeAsyncScript("""
+                const callback = arguments[arguments.length - 1];
+                LABKEY.Ajax.request({
+                    url: LABKEY.ActionURL.buildURL('security', 'addUsers'),
+                    method: 'POST',
+                    params: { newUsers: arguments[0], cloneUser: arguments[1] },
+                    success: response => callback(response.status),
+                    failure: response => callback(response.status),
+                });
+                """, Long.class, CLONE_TARGET_USER, CLONE_SOURCE_USER);
+        stopImpersonating();
+
+        assertEquals("Project admin's clone request should be refused", Long.valueOf(HttpStatus.SC_FORBIDDEN), status);
+        assertNull("User shouldn't be created by a refused clone request", _userHelper.getUserId(CLONE_TARGET_USER));
     }
 
     @Test
