@@ -26,6 +26,7 @@ import java.time.ZoneId;
 import java.util.function.Supplier;
 
 import static org.labkey.test.WebDriverWrapper.sleep;
+import static org.labkey.test.util.LabKeyExpectedConditions.isSuccessResult;
 
 public class Timer
 {
@@ -112,8 +113,4 @@ public class Timer
         return waitFor(checker, () -> failMessage);
     }
 
-    private static <T> boolean isSuccessResult(T result)
-    {
-        return result != null && !Boolean.FALSE.equals(result);
-    }
 }
