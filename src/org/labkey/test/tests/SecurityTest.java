@@ -84,6 +84,8 @@ public class SecurityTest extends BaseWebDriverTest
     private static final String ADDED_USER = "fromprojectusers@security.test";
     private static final String CLONE_SOURCE_USER = "clone_source@security.test";
     private static final String CLONE_TARGET_USER = "clone_target@security.test";
+    private static final String APP_ADMIN_CLONE_TARGET_USER = "appadmin_clone_target@security.test";
+    private static final String PRIVILEGED_CLONE_TARGET_USER = "privileged_clone_target@security.test";
     protected static final String TO_BE_DELETED_USER = "delete_me@security.test";
     protected static final String SITE_ADMIN_USER = "siteadmin_securitytest@security.test";
     protected static final String NOT_FOUND_ERROR = "notFound";
@@ -111,6 +113,8 @@ public class SecurityTest extends BaseWebDriverTest
     protected void doSetup()
     {
         _containerHelper.createProject(PROJECT_NAME, null);
+        _userHelper.createUser(CLONE_SOURCE_USER);
+        new ApiPermissionsHelper(PROJECT_NAME).addMemberToRole(CLONE_SOURCE_USER, EDITOR_ROLE, PermissionsHelper.MemberType.user, PROJECT_NAME);
     }
 
     protected boolean isQuickTest()
@@ -123,7 +127,7 @@ public class SecurityTest extends BaseWebDriverTest
     {
         _containerHelper.deleteProject(getProjectName(), afterTest);
 
-        _userHelper.deleteUsers(false, ADMIN_USER_TEMPLATE, NORMAL_USER_TEMPLATE, PROJECT_ADMIN_USER, NORMAL_USER, SITE_ADMIN_USER, TO_BE_DELETED_USER, ADDED_USER, CLONE_SOURCE_USER, CLONE_TARGET_USER);
+        _userHelper.deleteUsers(false, ADMIN_USER_TEMPLATE, NORMAL_USER_TEMPLATE, PROJECT_ADMIN_USER, NORMAL_USER, SITE_ADMIN_USER, TO_BE_DELETED_USER, ADDED_USER, CLONE_SOURCE_USER, CLONE_TARGET_USER, APP_ADMIN_CLONE_TARGET_USER, PRIVILEGED_CLONE_TARGET_USER);
 
         // Make sure the feature is turned off.
         Connection cn = createDefaultConnection();
@@ -404,7 +408,7 @@ public class SecurityTest extends BaseWebDriverTest
         ShowUsersPage usersPage = goToProjectUsers();
 
         AddUsersPage addUsersPage = usersPage.clickAddUsers();
-        assertElementNotPresent("Project admins shouldn't be offered permission cloning", Locator.id("cloneUserCheck"));
+        assertFalse("Project admins shouldn't be offered permission cloning", addUsersPage.isClonePermissionOffered());
         addUsersPage
             .setNewUsers(Arrays.asList(ADDED_USER))
             .setSendNotification(true)
@@ -418,7 +422,6 @@ public class SecurityTest extends BaseWebDriverTest
     @Test
     public void testCantClonePermissionsAsProjAdmin()
     {
-        _userHelper.createUser(CLONE_SOURCE_USER);
         beginAt(WebTestHelper.buildURL("project", getProjectName(), "begin"));
         impersonateRoles(PermissionsHelper.PROJECT_ADMIN_ROLE);
 
@@ -436,6 +439,33 @@ public class SecurityTest extends BaseWebDriverTest
 
         assertEquals("Project admin's clone request should be refused", Long.valueOf(HttpStatus.SC_FORBIDDEN), status);
         assertNull("User shouldn't be created by a refused clone request", _userHelper.getUserId(CLONE_TARGET_USER));
+    }
+
+    @Test
+    public void testClonePermissionsAsAppAdmin()
+    {
+        goToSiteUsers();
+        impersonateRole(PermissionsHelper.APP_ADMIN_ROLE);
+
+        AddUsersPage addUsersPage = goToSiteUsers().clickAddUsers();
+        assertTrue("App admins should be offered permission cloning", addUsersPage.isClonePermissionOffered());
+        addUsersPage = addUsersPage
+            .setNewUsers(List.of(PRIVILEGED_CLONE_TARGET_USER))
+            .setClonedUser(PasswordUtil.getUsername())
+            .setSendNotification(false)
+            .clickAddUsers();
+        assertTextPresent("cannot be cloned. Only site administrators can clone users assigned a privileged role.");
+
+        addUsersPage
+            .setNewUsers(List.of(APP_ADMIN_CLONE_TARGET_USER))
+            .setClonedUser(CLONE_SOURCE_USER)
+            .setSendNotification(false)
+            .clickAddUsers();
+        assertTextPresent("Group memberships and role assignments were cloned from " + CLONE_SOURCE_USER);
+        stopImpersonating();
+
+        assertNull("Refused privileged clone shouldn't create a user", _userHelper.getUserId(PRIVILEGED_CLONE_TARGET_USER));
+        new ApiPermissionsHelper(getProjectName()).assertPermissionSetting(APP_ADMIN_CLONE_TARGET_USER, EDITOR_ROLE);
     }
 
     @Test
