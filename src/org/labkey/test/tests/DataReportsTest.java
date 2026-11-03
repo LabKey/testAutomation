@@ -569,22 +569,18 @@ public class DataReportsTest extends ReportTest
         TestUser reader = new TestUser(SCRIPT_READER_USER).create(this).setInitialPassword().addPermission(READER_ROLE, getProjectName());
         TestUser editor = new TestUser(SCRIPT_EDITOR_USER).create(this).setInitialPassword().addPermission(EDITOR_ROLE, getProjectName());
 
-        log("Reader saves a private R report through saveReportView");
+        log("saveReportView accepts only crosstab reports");
         Map<String, Object> privateReport = scriptReportParams("Reader R report");
         privateReport.put("shareReport", false);
-        assertScriptReportRejected(reader.getUserConnection(), "saveReportView", privateReport, HttpStatus.SC_FORBIDDEN);
+        assertUnsupportedReportType(reader.getUserConnection(), "saveReportView", privateReport);
 
-        log("Editor saves a shared R report through saveReportView");
         Map<String, Object> sharedReport = scriptReportParams("Editor R report");
         sharedReport.put("shareReport", true);
-        assertScriptReportRejected(editor.getUserConnection(), "saveReportView", sharedReport, HttpStatus.SC_FORBIDDEN);
+        assertUnsupportedReportType(editor.getUserConnection(), "saveReportView", sharedReport);
 
         log("saveReport requires admin and accepts only dataset grid views");
         assertScriptReportRejected(editor.getUserConnection(), "saveReport", scriptReportParams("Editor R report"), HttpStatus.SC_FORBIDDEN);
-        SimplePostCommand command = new SimplePostCommand("study-reports", "saveReport");
-        command.setParameters(scriptReportParams("Admin R report"));
-        CommandResponse response = command.execute(createDefaultConnection(), getProjectName() + "/" + getFolderName());
-        assertTrue("saveReport didn't reject an R report:\n" + response.getText(), response.getText().contains("Unsupported report type: Study.rReport"));
+        assertUnsupportedReportType(createDefaultConnection(), "saveReport", scriptReportParams("Admin R report"));
     }
 
     private Map<String, Object> scriptReportParams(String label)
@@ -594,6 +590,15 @@ public class DataReportsTest extends ReportTest
         params.put("label", label);
         params.put("params", "script=" + URLEncoder.encode("print('GH Issue 1682')", StandardCharsets.UTF_8));
         return params;
+    }
+
+    private void assertUnsupportedReportType(Connection connection, String action, Map<String, Object> params) throws IOException, CommandException
+    {
+        SimplePostCommand command = new SimplePostCommand("study-reports", action);
+        command.setParameters(params);
+        CommandResponse response = command.execute(connection, getProjectName() + "/" + getFolderName());
+        assertTrue("study-reports-" + action + " didn't reject an R report:\n" + response.getText(),
+                response.getText().contains("Unsupported report type: Study.rReport"));
     }
 
     private void assertScriptReportRejected(Connection connection, String action, Map<String, Object> params, int expectedStatus) throws IOException
