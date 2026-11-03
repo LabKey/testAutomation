@@ -15,6 +15,7 @@
  */
 package org.labkey.test.components.html;
 
+import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
@@ -172,8 +173,8 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
 
     public boolean isSearchBarExpanded()
     {
-        String searchBarContainerClass = elementCache().searchContainer.getAttribute("class");
-        return searchBarContainerClass.contains("active");
+        String searchBarContainerClass = StringUtils.trimToEmpty(elementCache().searchContainer.getAttribute("class"));
+        return searchBarContainerClass.contains("active") && elementCache().searchInput.isEnabled();
     }
 
     /* toggles the search form open and returns the search input element */

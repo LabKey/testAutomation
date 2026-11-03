@@ -364,6 +364,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     profile.setPreference("print_printer", "Print to File");
                     profile.setPreference("print.print_to_filename", new File(downloadDir, "print.pdf").getAbsolutePath());
 
+                    profile.setPreference("browser.chrome.guess_favicon", false); // '/favicon.ico' 404s and generates duplicate session cookies
                     profile.setPreference("browser.download.folderList", 2);
                     profile.setPreference("browser.download.downloadDir", downloadDir.getAbsolutePath());
                     profile.setPreference("browser.download.dir", downloadDir.getAbsolutePath());
