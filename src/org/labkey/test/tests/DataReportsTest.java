@@ -15,12 +15,17 @@
  */
 package org.labkey.test.tests;
 
+import org.apache.hc.core5.http.HttpStatus;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.CommandResponse;
+import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
@@ -35,13 +40,20 @@ import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PermissionsHelper;
 import org.labkey.test.util.RReportHelper;
+import org.labkey.test.util.TestUser;
 import org.openqa.selenium.WebElement;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.labkey.test.util.PermissionsHelper.AUTHOR_ROLE;
 import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
 import static org.labkey.test.util.PermissionsHelper.PROJECT_ADMIN_ROLE;
@@ -127,13 +139,15 @@ public class DataReportsTest extends ReportTest
 
     protected final static String R_USER = "r_editor@report.test";
     protected final static String AUTHOR_USER = "author_user@report.test";
+    private final static String SCRIPT_READER_USER = "script_reader@report.test";
+    private final static String SCRIPT_EDITOR_USER = "script_editor@report.test";
 
     private final ApiPermissionsHelper _apiPermissionsHelper = new ApiPermissionsHelper(this);
 
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        _userHelper.deleteUsers(false, R_USER, AUTHOR_USER);
+        _userHelper.deleteUsers(false, R_USER, AUTHOR_USER, SCRIPT_READER_USER, SCRIPT_EDITOR_USER);
         super.doCleanup(afterTest);
     }
 
@@ -531,6 +545,59 @@ public class DataReportsTest extends ReportTest
         stopImpersonating();
 
         goToProjectHome();
+    }
+
+    @Test
+    public void testStudyActionsRejectNewScriptReports() throws Exception
+    {
+        TestUser reader = new TestUser(SCRIPT_READER_USER).create(this).setInitialPassword().addPermission(READER_ROLE, getProjectName());
+        TestUser editor = new TestUser(SCRIPT_EDITOR_USER).create(this).setInitialPassword().addPermission(EDITOR_ROLE, getProjectName());
+
+        log("saveReportView accepts only crosstab reports");
+        Map<String, Object> privateReport = scriptReportParams("Reader R report");
+        privateReport.put("shareReport", false);
+        assertUnsupportedReportType(reader.getUserConnection(), "saveReportView", privateReport);
+
+        Map<String, Object> sharedReport = scriptReportParams("Editor R report");
+        sharedReport.put("shareReport", true);
+        assertUnsupportedReportType(editor.getUserConnection(), "saveReportView", sharedReport);
+
+        log("saveReport requires admin and accepts only dataset grid views");
+        assertScriptReportRejected(editor.getUserConnection(), "saveReport", scriptReportParams("Editor R report"), HttpStatus.SC_FORBIDDEN);
+        assertUnsupportedReportType(createDefaultConnection(), "saveReport", scriptReportParams("Admin R report"));
+    }
+
+    private Map<String, Object> scriptReportParams(String label)
+    {
+        Map<String, Object> params = new HashMap<>();
+        params.put("reportType", "Study.rReport");
+        params.put("label", label);
+        params.put("params", "script=" + URLEncoder.encode("print('GH Issue 1682')", StandardCharsets.UTF_8));
+        return params;
+    }
+
+    private void assertUnsupportedReportType(Connection connection, String action, Map<String, Object> params) throws IOException, CommandException
+    {
+        SimplePostCommand command = new SimplePostCommand("study-reports", action);
+        command.setParameters(params);
+        CommandResponse response = command.execute(connection, getProjectName() + "/" + getFolderName());
+        assertTrue("study-reports-" + action + " didn't reject an R report:\n" + response.getText(),
+                response.getText().contains("Unsupported report type: Study.rReport"));
+    }
+
+    private void assertScriptReportRejected(Connection connection, String action, Map<String, Object> params, int expectedStatus) throws IOException
+    {
+        SimplePostCommand command = new SimplePostCommand("study-reports", action);
+        command.setParameters(params);
+        try
+        {
+            command.execute(connection, getProjectName() + "/" + getFolderName());
+            fail("Non-developer saved a new R report through study-reports-" + action);
+        }
+        catch (CommandException e)
+        {
+            assertEquals("Wrong status saving R report through study-reports-" + action, expectedStatus, e.getStatusCode());
+        }
     }
 
     /**create an R report from the dataset page
