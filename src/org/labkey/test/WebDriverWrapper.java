@@ -401,9 +401,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
                     profile.setPreference("browser.ssl_override_behavior", 0);
 
-                    // TODO: Issue 38785: dom.disable_beforeunload FireFox preference is causing numerous test failures
-                    // profile.setPreference("dom.disable_beforeunload", false);
-
                     profile.setAcceptUntrustedCertificates(true);
                     profile.setAssumeUntrustedCertificateIssuer(false);
 
@@ -412,7 +409,8 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     capabilities.setLogLevel(FirefoxDriverLogLevel.WARN);
                     capabilities.addPreference("--log", "WARN");
 
-                    String browserPath = System.getProperty("selenium.firefox.binary", "");
+                    // TODO: revert hard-coded firefox version before merging
+                    String browserPath = System.getenv("FIREFOX153"); //System.getProperty("selenium.firefox.binary", "");
                     if (!browserPath.isEmpty())
                     {
                         capabilities.setBinary(browserPath);
