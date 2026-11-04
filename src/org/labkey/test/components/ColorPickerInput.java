@@ -17,13 +17,11 @@ package org.labkey.test.components;
 
 import org.labkey.test.Locator;
 import org.labkey.test.components.html.Input;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.Color;
 
-import java.util.List;
-
-public class ColorPickerInput extends WebDriverComponent<Component<?>.ElementCache>
+public class ColorPickerInput extends WebDriverComponent<ColorPickerInput.ElementCache>
 {
     private final WebDriver _driver;
     final WebElement _componentElement;
@@ -47,20 +45,31 @@ public class ColorPickerInput extends WebDriverComponent<Component<?>.ElementCac
 
     public void setHexValue(String hexValue)
     {
-        List<WebElement> inputs = Locator.tag("input").findElements(this);
-        if (inputs.isEmpty())
-            throw new NoSuchElementException("Input tag not found in color picker");
-        WebElement hexInput = inputs.getFirst();
-        new Input(hexInput, getDriver()).setWithPaste(hexValue);
+        setColor(Color.fromString(hexValue));
     }
 
-    public String getHexValue()
+    public void setColor(Color color)
     {
-        List<WebElement> inputs = Locator.tag("input").findElements(this);
-        if (inputs.isEmpty())
-            throw new NoSuchElementException("Input tag not found in color picker");
-        WebElement hexInput = inputs.getFirst();
-        return new Input(hexInput, getDriver()).getValue();
+        elementCache().hexInput.setWithPaste(color.asHex());
+        getWrapper().quickWait().until(_ -> getSelectedColor().equals(color));
+    }
+
+    public Color getSelectedColor()
+    {
+        return  Color.fromString(elementCache().selectedColorDiv.getCssValue("background"));
+    }
+
+    @Override
+    protected ElementCache newElementCache()
+    {
+        return new ElementCache();
+    }
+
+    protected class ElementCache extends Component<ElementCache>.ElementCache
+    {
+        final WebElement inputFooter = Locator.byClass("flexbox-fix").findWhenNeeded(this);
+        final WebElement selectedColorDiv = Locator.tag("div").findWhenNeeded(inputFooter);
+        final Input hexInput = Input.Input(Locator.tag("input").withLabel("hex"), getDriver()).findWhenNeeded(inputFooter);
     }
 
     public static class ColorPickerInputFinder extends WebDriverComponentFinder<ColorPickerInput, ColorPickerInput.ColorPickerInputFinder>
