@@ -410,7 +410,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     capabilities.addPreference("--log", "WARN");
 
                     // TODO: revert hard-coded firefox version before merging
-                    String browserPath = System.getenv("FIREFOX153"); //System.getProperty("selenium.firefox.binary", "");
+                    String browserPath = TestProperties.isTestRunningOnTeamCity() ? System.getenv("FIREFOX153") : System.getProperty("selenium.firefox.binary", "");
                     if (!browserPath.isEmpty())
                     {
                         capabilities.setBinary(browserPath);
