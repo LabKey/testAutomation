@@ -28,6 +28,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.FileBrowser;
+import org.labkey.test.pages.files.FileContentPage;
 import org.labkey.test.util.APIContainerHelper;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.PortalHelper;
@@ -101,6 +102,9 @@ public class FileBrowserTimeZoneTest extends BaseWebDriverTest
 
         checker().screenShotIfNewError("last_modified_column");
 
+        // The Files web part suppresses the details panel; only the 'Manage Files' page shows it.
+        FileContentPage.beginAt(this);
+        _fileBrowserHelper.waitForFileGridReady();
         _fileBrowserHelper.selectFileBrowserItem(TEST_FILE.getName());
         checker().verifyEquals(timeZoneError("'Modified' in the file details panel", browserZoneRendering),
                 expected, _fileBrowserHelper.getDetailsModified());

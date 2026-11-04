@@ -116,20 +116,15 @@ public class EditableGrid extends WebDriverComponent<EditableGrid.ElementCache>
         Locators.spinner.waitForElementToDisappear(this, 30000);
     }
 
-    public static String quoteValues(String delimiter, String... sorted)
-    {
-        return Arrays.stream(sorted).map(CSVFormat.DEFAULT::format).collect(Collectors.joining(delimiter));
-    }
-
     /**
-     * Quote values to be pasted into lookup columns. Prevents a value containing a comma from being interpreted as
+     * Quote values to be pasted into a lookup column. Prevents a value containing a comma from being interpreted as
      * multiple values.
      * @param values the raw values
-     * @return The values, quoted if necessary for pasting into a single lookup cell
+     * @return The values, quoted if necessary for pasting into a single cell
      */
     public static String quoteForPaste(String... values)
     {
-        return quoteValues(",", values);
+        return Arrays.stream(values).map(CSVFormat.DEFAULT::format).collect(Collectors.joining(","));
     }
 
     public void clickDelete()
