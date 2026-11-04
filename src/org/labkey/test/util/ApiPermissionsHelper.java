@@ -35,6 +35,7 @@ import org.labkey.remoteapi.security.RemoveAssignmentCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
+import org.openqa.selenium.NotFoundException;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -43,6 +44,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public class ApiPermissionsHelper extends PermissionsHelper
 {
@@ -121,16 +123,16 @@ public class ApiPermissionsHelper extends PermissionsHelper
 
     public List<String> getGroupRoles(String container, String groupName)
     {
-        List<Map<String, Object>> groups = getGroups(container);
-        List<String> roles = new ArrayList<>();
+        List<Group> groups = getGroups(container);
 
-        for (Map<String, Object> group : groups)
+        for (Group group : groups)
         {
-            if (group.get("name").equals(groupName))
-                roles.addAll((List<String>) group.get("roles"));
+            if (group.name().equals(groupName))
+                return group.roles();
         }
 
-        return roles;
+        throw new NotFoundException("Group not found in '%s': %s. Found [%s]"
+                .formatted(groupName, container, groups.stream().map(Group::name).collect(Collectors.joining(", "))));
     }
 
     @Override
@@ -142,12 +144,12 @@ public class ApiPermissionsHelper extends PermissionsHelper
     @Override
     public boolean isUserInGroup(String memberToCheck, String groupName, String container, PrincipalType principalType)
     {
-        List<Map<String, Object>> inTheseGroups = new ArrayList<>();
+        List<String> inTheseGroups = new ArrayList<>();
         if (principalType == PrincipalType.USER)
         {
             try
             {
-                inTheseGroups = getUserGroups(container, memberToCheck);
+                getUserGroups(container, memberToCheck).forEach(group -> inTheseGroups.add((String) group.get("name")));
             }
             catch (CommandException ex)
             {
@@ -156,11 +158,11 @@ public class ApiPermissionsHelper extends PermissionsHelper
         }
         else if (principalType == PrincipalType.GROUP)
         {
-            for(Map<String, Object> group : getGroups(container))
+            for (Group group : getGroups(container))
             {
-                if (memberToCheck.equals(group.get("name")))
+                if (memberToCheck.equals(group.name()))
                 {
-                    inTheseGroups = (List)group.get("groups");
+                    inTheseGroups.addAll(group.memberOf());
                     break;
                 }
             }
@@ -168,13 +170,7 @@ public class ApiPermissionsHelper extends PermissionsHelper
         else
             throw new IllegalArgumentException(principalType.toString() + " not supported");
 
-        for (Map<String, Object> group : inTheseGroups)
-        {
-            if (groupName.equals(group.get("name")))
-                return true;
-        }
-
-        return false;
+        return inTheseGroups.contains(groupName);
     }
 
     public boolean doesUserHaveRole(String userEmail, String roleName, String containerPath)
@@ -184,7 +180,22 @@ public class ApiPermissionsHelper extends PermissionsHelper
         return userRoles.contains(roleName);
     }
 
-    private List<Map<String, Object>> getGroups(String container)
+    public record Group(int id, String name, boolean isProjectGroup, List<String> roles, List<String> memberOf)
+    {
+        @SuppressWarnings("unchecked")
+        private static Group fromJson(Map<String, Object> json)
+        {
+            List<Map<String, Object>> memberOf = (List<Map<String, Object>>) json.get("groups");
+            return new Group(
+                    ((Number) json.get("id")).intValue(),
+                    (String) json.get("name"),
+                    (Boolean) json.get("isProjectGroup"),
+                    List.copyOf((List<String>) json.get("roles")),
+                    memberOf.stream().map(g -> (String) g.get("name")).toList());
+        }
+    }
+
+    private List<Group> getGroups(String container)
     {
         Connection connection = getConnection();
         GetGroupPermsCommand command = new GetGroupPermsCommand();
@@ -198,32 +209,32 @@ public class ApiPermissionsHelper extends PermissionsHelper
             throw new RuntimeException(e);
         }
 
-        return (List) ((Map) response.getParsedData().get("container")).get("groups");
+        List<Map<String, Object>> groups = response.getProperty("container.groups");
+        return groups.stream().map(Group::fromJson).toList();
     }
 
-    private List<Map<String, Object>> getProjectGroups(String project)
+    private List<Group> getProjectGroups(String project)
     {
-        List<Map<String, Object>> groups = new ArrayList<>(getGroups(project));
+        List<Group> groups = getGroups(project);
 
         if (project.isEmpty() || project.equals("/"))
             return groups;
 
-        groups.removeIf(group -> !(Boolean) group.get("isProjectGroup"));
-        return groups;
+        return groups.stream().filter(Group::isProjectGroup).toList();
     }
 
-    public List<Map<String, Object>> getSiteGroups()
+    public List<Group> getSiteGroups()
     {
         return getGroups("/");
     }
 
     private Integer getProjectGroupId(String groupName, String project)
     {
-        for (Map<String, Object> group : getProjectGroups(project))
+        for (Group group : getProjectGroups(project))
         {
-            if (groupName.equals(group.get("name")))
+            if (groupName.equals(group.name()))
             {
-                return (int)group.get("id");
+                return group.id();
             }
         }
         return null;
@@ -231,11 +242,11 @@ public class ApiPermissionsHelper extends PermissionsHelper
 
     private Integer getSiteGroupId(String groupName)
     {
-        for (Map<String, Object> group : getSiteGroups())
+        for (Group group : getSiteGroups())
         {
-            if (groupName.equals(group.get("name")))
+            if (groupName.equals(group.name()))
             {
-                return (int)group.get("id");
+                return group.id();
             }
         }
         return null;
@@ -259,37 +270,6 @@ public class ApiPermissionsHelper extends PermissionsHelper
         {
             return null;
         }
-    }
-
-    //TODO: Not yet implemented
-    private List<String> getGroupMembers(String container, String groupName)
-    {
-        Integer groupId = null;
-        List<Map<String, Object>> groups = getGroups(container);
-        for (Map<String, Object> group : groups)
-        {
-            if (groupName.equals(group.get("name")))
-            {
-                groupId = (int)group.get("id");
-                break;
-            }
-        }
-
-        Connection connection = getConnection();
-        SimpleGetCommand command = new SimpleGetCommand("security", "getGroupMembers");
-        command.setParameters(Maps.of("groupId", groupId));
-
-        CommandResponse response;
-        try
-        {
-            response = command.execute(connection, container);
-        }
-        catch (IOException | CommandException e)
-        {
-            throw new RuntimeException(e);
-        }
-
-        return (List)response.getParsedData().get("groupMembers");
     }
 
     private List<Map<String, Object>> getUserGroups(String container, @Nullable String user) throws CommandException
@@ -326,7 +306,8 @@ public class ApiPermissionsHelper extends PermissionsHelper
     {
         Connection connection = getConnection();
         SimpleGetCommand command = new SimpleGetCommand("security", "getUserPerms");
-        command.setParameters(Maps.of("userEmail", user));
+        if (user != null)
+            command.setParameters(Map.of("userEmail", user));
 
         CommandResponse response;
         try
@@ -665,10 +646,7 @@ public class ApiPermissionsHelper extends PermissionsHelper
 
     private List<String> getGroupNames(String project)
     {
-        final List<Map<String, Object>> groups = getGroups(project);
-        List<String> groupNames = new ArrayList<>();
-        groups.forEach(group -> groupNames.add((String)group.get("name")));
-        return groupNames;
+        return getGroups(project).stream().map(Group::name).toList();
     }
 
     @Override
