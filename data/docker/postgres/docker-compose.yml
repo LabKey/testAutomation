@@ -1,0 +1,22 @@
+services:
+
+  db:
+    image: postgres:${PG_VERSION:-18}
+    # synchronous_commit=off trades the last few commits on a crash for faster commits; the database is disposable
+    command: -c max_wal_size=5GB -c synchronous_commit=off
+    # Run as the PG_DATA_DIR owner so the host user can delete the database files
+    user: "${UID:?Set UID to the uid that owns PG_DATA_DIR}"
+    ports:
+      - ${PG_PORT:-5432}:5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: sasa
+    volumes:
+      # PostgreSQL 18+ images keep PGDATA in a version-specific subdirectory of /var/lib/postgresql
+      - ${PG_DATA_DIR:?Set PG_DATA_DIR to the host directory for database files}:/var/lib/postgresql
+    healthcheck:
+      # TCP, not the socket: the first-run init server listens only on the socket and would report ready too early
+      test: ["CMD", "pg_isready", "-h", "127.0.0.1", "-U", "postgres"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
