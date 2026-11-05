@@ -178,6 +178,18 @@ public class TestUser
             getWrapper().refresh();
     }
 
+    public void doWhileImpersonating(ThrowingConsumer<Connection> action) throws Exception
+    {
+        doWhileImpersonating(action, false);
+    }
+
+    public void doWhileImpersonating(ThrowingConsumer<Connection> action, boolean refresh) throws Exception
+    {
+        impersonate(refresh);
+        action.accept(_impersonationConnection);
+        stopImpersonating(refresh);
+    }
+
     private APIUserHelper getApiUserHelper()
     {
         if (_apiUserHelper == null)

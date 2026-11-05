@@ -27,8 +27,6 @@ import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.SimpleGetCommand;
 import org.labkey.remoteapi.SimplePostCommand;
-import org.labkey.remoteapi.security.WhoAmICommand;
-import org.labkey.remoteapi.security.WhoAmIResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
@@ -558,33 +556,33 @@ public class DataReportsTest extends ReportTest
     {
         // Delete first so a rerun against a server where a previous run left the users behind starts clean
         _userHelper.deleteUsers(false, SCRIPT_READER_USER, SCRIPT_EDITOR_USER);
-        TestUser reader = new TestUser(SCRIPT_READER_USER).create(this).setInitialPassword().addPermission(READER_ROLE, getProjectName());
-        TestUser editor = new TestUser(SCRIPT_EDITOR_USER).create(this).setInitialPassword().addPermission(EDITOR_ROLE, getProjectName());
-        Connection readerConnection = connectionFor(reader);
-        Connection editorConnection = connectionFor(editor);
+        TestUser reader = new TestUser(SCRIPT_READER_USER).create(this).addPermission(READER_ROLE, getProjectName());
+        TestUser editor = new TestUser(SCRIPT_EDITOR_USER).create(this).addPermission(EDITOR_ROLE, getProjectName());
         Connection adminConnection = createDefaultConnection();
 
         log("saveReportView accepts only crosstab reports");
         Map<String, Object> privateReport = scriptReportParams("Reader R report");
         privateReport.put("shareReport", false);
-        assertUnsupportedReportType(readerConnection, "saveReportView", privateReport);
+        reader.doWhileImpersonating(connection -> assertUnsupportedReportType(connection, "saveReportView", privateReport));
 
         Map<String, Object> sharedReport = scriptReportParams("Editor R report");
         sharedReport.put("shareReport", true);
-        assertUnsupportedReportType(editorConnection, "saveReportView", sharedReport);
+        editor.doWhileImpersonating(connection -> assertUnsupportedReportType(connection, "saveReportView", sharedReport));
 
         log("saveReport requires admin and accepts only dataset grid views");
         Map<String, Object> editorReport = scriptReportParams("Editor R report via saveReport");
-        try
-        {
-            postStudyReports(editorConnection, "saveReport", editorReport);
-            fail("Non-admin saved a new R report through study-reports-saveReport");
-        }
-        catch (CommandException e)
-        {
-            assertEquals("Wrong status saving R report through study-reports-saveReport", HttpStatus.SC_FORBIDDEN, e.getStatusCode());
-        }
-        assertReportNotSaved(editorConnection, editorReport);
+        editor.doWhileImpersonating(connection -> {
+            try
+            {
+                postStudyReports(connection, "saveReport", editorReport);
+                fail("Non-admin saved a new R report through study-reports-saveReport");
+            }
+            catch (CommandException e)
+            {
+                assertEquals("Wrong status saving R report through study-reports-saveReport", HttpStatus.SC_FORBIDDEN, e.getStatusCode());
+            }
+            assertReportNotSaved(connection, editorReport);
+        });
         assertUnsupportedReportType(adminConnection, "saveReport", scriptReportParams("Admin R report"));
 
         log("The actions still save the report types they're for");
@@ -605,15 +603,6 @@ public class DataReportsTest extends ReportTest
         gridView.put("params", "schemaName=study&queryName=" + URLEncoder.encode(DATA_SET_NAME, StandardCharsets.UTF_8));
         postStudyReports(adminConnection, "saveReport", gridView);
         assertTrue("study-reports-saveReport didn't save a grid view", reportNames(adminConnection).contains("Admin grid view"));
-    }
-
-    // TestUser in this branch has no doWhileImpersonating, so confirm the basic-auth connection acts as the user
-    private Connection connectionFor(TestUser user) throws IOException, CommandException
-    {
-        Connection connection = user.getUserConnection();
-        WhoAmIResponse whoAmI = new WhoAmICommand().execute(connection, "/");
-        assertEquals("Connection isn't logged in as the intended user", user.getEmail(), whoAmI.getEmail());
-        return connection;
     }
 
     private Map<String, Object> scriptReportParams(String label)
