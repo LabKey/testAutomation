@@ -86,7 +86,7 @@ public class DeleteConfirmationDialog<ConfirmPage extends WebDriverWrapper> exte
         WebDriverWrapper.waitFor(()-> elementCache().body.isDisplayed() &&
                         !elementCache().title.getText().isEmpty() &&
                         !BootstrapLocators.loadingSpinner.existsIn(this),
-                "The delete confirmation dialog did not become ready.", 1_000);
+                "The delete confirmation dialog did not become ready.", 2_500);
     }
 
     public DeleteConfirmationDialog<ConfirmPage> setSkipAuditEventCheck(boolean skipAuditEventCheck)
