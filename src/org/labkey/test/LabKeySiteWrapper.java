@@ -985,14 +985,14 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         ApiPermissionsHelper helper = new ApiPermissionsHelper(this);
         // Site groups are returned in known order: alphabetical by name, except that "Users" is replaced with
         // "All Site Users" after sorting takes place
-        List<Map<String, Object>> siteGroups = helper.getSiteGroups();
+        List<ApiPermissionsHelper.Group> siteGroups = helper.getSiteGroups();
         assertEquals(2, siteGroups.size());
-        Map<String, Object> guests = siteGroups.getFirst();
-        assertEquals("Guests", guests.get("name"));
-        assertEquals(-3, guests.get("id"));
-        Map<String, Object> users = siteGroups.get(1);
-        assertEquals("All Site Users", users.get("name"));
-        assertEquals(-2, users.get("id"));
+        ApiPermissionsHelper.Group guests = siteGroups.getFirst();
+        assertEquals("Guests", guests.name());
+        assertEquals(-3, guests.id());
+        ApiPermissionsHelper.Group users = siteGroups.get(1);
+        assertEquals("All Site Users", users.name());
+        assertEquals(-2, users.id());
     }
 
     public static final Pattern ERROR_PATTERN = Pattern.compile("^(ERROR|FATAL)", Pattern.MULTILINE);
