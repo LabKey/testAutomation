@@ -566,20 +566,20 @@ public class DataReportsTest extends ReportTest
     @Test
     public void testStudyActionsRejectNewScriptReports() throws Exception
     {
-        TestUser reader = new TestUser(SCRIPT_READER_USER).create(this).setInitialPassword().addPermission(READER_ROLE, getProjectName());
-        TestUser editor = new TestUser(SCRIPT_EDITOR_USER).create(this).setInitialPassword().addPermission(EDITOR_ROLE, getProjectName());
+        TestUser reader = new TestUser(SCRIPT_READER_USER).create(this).addPermission(READER_ROLE, getProjectName());
+        TestUser editor = new TestUser(SCRIPT_EDITOR_USER).create(this).addPermission(EDITOR_ROLE, getProjectName());
 
         log("saveReportView accepts only crosstab reports");
         Map<String, Object> privateReport = scriptReportParams("Reader R report");
         privateReport.put("shareReport", false);
-        assertUnsupportedReportType(reader.getUserConnection(), "saveReportView", privateReport);
+        reader.doWhileImpersonating(connection -> assertUnsupportedReportType(connection, "saveReportView", privateReport));
 
         Map<String, Object> sharedReport = scriptReportParams("Editor R report");
         sharedReport.put("shareReport", true);
-        assertUnsupportedReportType(editor.getUserConnection(), "saveReportView", sharedReport);
+        editor.doWhileImpersonating(connection -> assertUnsupportedReportType(connection, "saveReportView", sharedReport));
 
         log("saveReport requires admin and accepts only dataset grid views");
-        assertScriptReportRejected(editor.getUserConnection(), "saveReport", scriptReportParams("Editor R report"), HttpStatus.SC_FORBIDDEN);
+        editor.doWhileImpersonating(connection -> assertScriptReportRejected(connection, "saveReport", scriptReportParams("Editor R report"), HttpStatus.SC_FORBIDDEN));
         assertUnsupportedReportType(createDefaultConnection(), "saveReport", scriptReportParams("Admin R report"));
     }
 
