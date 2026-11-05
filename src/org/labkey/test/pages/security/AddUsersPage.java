@@ -56,6 +56,11 @@ public class AddUsersPage extends LabKeyPage<AddUsersPage.ElementCache>
         return this;
     }
 
+    public boolean isClonePermissionOffered()
+    {
+        return elementCache().clonePermissionCheckboxLoc.existsIn(elementCache());
+    }
+
     public AddUsersPage setSendNotification(boolean sendNotification)
     {
         elementCache().sendNotificationCheckbox.set(sendNotification);
@@ -83,7 +88,8 @@ public class AddUsersPage extends LabKeyPage<AddUsersPage.ElementCache>
     protected class ElementCache extends LabKeyPage.ElementCache
     {
         final Input newUsersInput = Input.Input(Locator.id("newUsers"), getDriver()).findWhenNeeded(this);
-        final Checkbox clonePermissionCheckbox = Checkbox.Checkbox(Locator.id("cloneUserCheck")).findWhenNeeded(this);
+        final Locator clonePermissionCheckboxLoc = Locator.id("cloneUserCheck");
+        final Checkbox clonePermissionCheckbox = Checkbox.Checkbox(clonePermissionCheckboxLoc).findWhenNeeded(this);
         final Input cloneUserInput = Input.Input(Locator.id("cloneUser"), getDriver()).findWhenNeeded(this);
         final Checkbox sendNotificationCheckbox = Checkbox.Checkbox(Locator.id("sendMail")).findWhenNeeded(this);
         final WebElement addUsersButton = Locator.lkButton("Add Users").findWhenNeeded(this);
