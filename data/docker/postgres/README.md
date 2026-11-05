@@ -41,9 +41,11 @@ the directory to start fresh.
 
 ## Environment variables
 
-| Variable      | Default    | Purpose                                                |
-|---------------|------------|--------------------------------------------------------|
+| Variable      | Default    | Purpose                                               |
+|---------------|------------|-------------------------------------------------------|
 | `PG_DATA_DIR` | (required) | Host directory mounted as the database data directory |
-| `UID`         | (required) | User ID the database runs as; must own `PG_DATA_DIR`   |
+| `UID`         | (required) | User ID the database runs as; must own `PG_DATA_DIR`  |
 | `PG_VERSION`  | `18`       | PostgreSQL major version (`postgres` image tag)       |
-| `PG_PORT`     | `5432`     | Host port the database listens on                      |
+| `PG_PORT`     | `5432`     | Host port the database listens on                     |
+| `PG_USER`     | `postgres` | Database superuser name                               |
+| `PG_PASSWORD` | `sasa`     | Database superuser password                           |
