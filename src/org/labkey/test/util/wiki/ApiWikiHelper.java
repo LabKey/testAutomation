@@ -27,8 +27,7 @@ import java.io.IOException;
 
 public class ApiWikiHelper
 {
-    /** Returns the new wiki's entityId */
-    public String createWiki(String containerPath, SaveWikiParams wikiParams) throws CommandException
+    public void createWiki(String containerPath, SaveWikiParams wikiParams) throws CommandException
     {
         SimplePostCommand command = new SimplePostCommand("wiki", "saveWiki");
         command.setJsonObject(wikiParams.toJSON());
@@ -38,7 +37,6 @@ public class ApiWikiHelper
         {
             CommandResponse response = command.execute(connection, containerPath);
             Assert.assertTrue(response.getText(), response.getProperty("success"));
-            return response.getProperty("wikiProps.entityId");
         }
         catch (IOException e)
         {
