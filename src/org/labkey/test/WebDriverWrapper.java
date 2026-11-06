@@ -406,7 +406,8 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
                     FirefoxOptions capabilities = new FirefoxOptions();
                     capabilities.setProfile(profile);
-                    capabilities.setLogLevel(FirefoxDriverLogLevel.WARN);
+                    // TODO: revert debug logging before merging
+                    capabilities.setLogLevel(FirefoxDriverLogLevel.TRACE);
                     capabilities.addPreference("--log", "WARN");
 
                     // TODO: revert hard-coded firefox version before merging
@@ -439,6 +440,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                         try
                         {
                             retry.printStackTrace(System.err);
+                            TestLogger.warn("geckodriver: " + newDriverService.getExecutable());
                             newDriverService.stop();
                             newDriverService = driverServiceBuilder.build();
                             sleep(10000);
