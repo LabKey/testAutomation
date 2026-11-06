@@ -18,6 +18,7 @@ package org.labkey.test;
 import org.apache.commons.collections4.MultiValuedMap;
 import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -409,6 +410,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     // TODO: revert debug logging before merging
                     capabilities.setLogLevel(FirefoxDriverLogLevel.TRACE);
                     capabilities.addPreference("--log", "WARN");
+                    if (SystemUtils.IS_OS_WINDOWS)
+                    {
+                        // TODO: Firefox 153 dies on the Windows agents after failing to launch its GPU process
+                        capabilities.addPreference("layers.gpu-process.enabled", false);
+                    }
 
                     // TODO: revert hard-coded firefox version before merging
                     String browserPath = TestProperties.isTestRunningOnTeamCity() ? System.getenv("FIREFOX153") : System.getProperty("selenium.firefox.binary", "");
