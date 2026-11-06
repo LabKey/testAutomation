@@ -20,7 +20,6 @@ import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-import java.util.List;
 
 public class ConfirmDeletePage extends LabKeyPage<ConfirmDeletePage.ElementCache>
 {
@@ -37,11 +36,9 @@ public class ConfirmDeletePage extends LabKeyPage<ConfirmDeletePage.ElementCache
         _deleteBtnText = deleteBtnText;
     }
 
-    /** Names of the lists offered for deletion under the page's "Defined in containerPath:" heading */
-    public List<String> getListNames(String containerPath)
+    public boolean isConfirmDeletePresent()
     {
-        Locator listLinks = Locator.xpath("//div[normalize-space(text()[1]) = " + Locator.xq("Defined in " + containerPath + ":") + "]/ul/li/a");
-        return getTexts(listLinks.findElements(getDriver()));
+        return elementCache().deleteButton.isDisplayed();
     }
 
     public BeginPage confirmDelete()

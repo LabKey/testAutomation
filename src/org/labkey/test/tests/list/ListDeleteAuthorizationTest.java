@@ -51,7 +51,7 @@ public class ListDeleteAuthorizationTest extends BaseWebDriverTest
     private static final String PROJECT_PATH = "/ListDeleteAuthorizationTest";
     private static final String FOLDER_NAME = "FolderA";
     private static final String FOLDER_PATH = PROJECT_PATH + "/" + FOLDER_NAME;
-    private static final String LIST_DESIGNER_ROLE = "Assay Designer";
+    private static final String ASSAY_DESIGNER_ROLE = "Assay Designer";
 
     private static final TestUser DESIGNER = new TestUser("designer@listdeleteauthorization.test");
     private static final TestUser PICKLIST_OWNER = new TestUser("picklistowner@listdeleteauthorization.test");
@@ -80,14 +80,14 @@ public class ListDeleteAuthorizationTest extends BaseWebDriverTest
 
         DESIGNER.create(this)
                 .addPermission(EDITOR_ROLE, PROJECT_PATH)
-                .addPermission(LIST_DESIGNER_ROLE, PROJECT_PATH)
+                .addPermission(ASSAY_DESIGNER_ROLE, PROJECT_PATH)
                 .addPermission(EDITOR_ROLE, FOLDER_PATH)
-                .addPermission(LIST_DESIGNER_ROLE, FOLDER_PATH);
+                .addPermission(ASSAY_DESIGNER_ROLE, FOLDER_PATH);
 
         PICKLIST_OWNER.create(this)
                 .setInitialPassword()
                 .addPermission(EDITOR_ROLE, PROJECT_PATH)
-                .addPermission(LIST_DESIGNER_ROLE, PROJECT_PATH)
+                .addPermission(ASSAY_DESIGNER_ROLE, PROJECT_PATH)
                 .addPermission(EDITOR_ROLE, FOLDER_PATH);
 
         Connection conn = createDefaultConnection();
@@ -106,7 +106,7 @@ public class ListDeleteAuthorizationTest extends BaseWebDriverTest
 
         ApiPermissionsHelper permissionsHelper = new ApiPermissionsHelper(this);
         permissionsHelper.removeUserRoleAssignment(PICKLIST_OWNER.getEmail(), EDITOR_ROLE, PROJECT_PATH);
-        permissionsHelper.removeUserRoleAssignment(PICKLIST_OWNER.getEmail(), LIST_DESIGNER_ROLE, PROJECT_PATH);
+        permissionsHelper.removeUserRoleAssignment(PICKLIST_OWNER.getEmail(), ASSAY_DESIGNER_ROLE, PROJECT_PATH);
     }
 
     // Deleting by name from a subfolder must delete the resolved project list, not the folder list sharing its listId
@@ -117,9 +117,9 @@ public class ListDeleteAuthorizationTest extends BaseWebDriverTest
         beginAt(WebTestHelper.buildURL("list", FOLDER_PATH, "deleteListDefinition", Map.of("name", PROJECT_LIST.getName())));
         ConfirmDeletePage confirmPage = new ConfirmDeletePage(getDriver());
         checker().withScreenshot().verifyEquals("The confirm page should offer the project list named in the request",
-                List.of(PROJECT_LIST.getName()), confirmPage.getListNames(PROJECT_PATH));
+                List.of(PROJECT_LIST.getName()), getListsOfferedForDeletion(PROJECT_PATH));
         checker().withScreenshot().verifyEquals("The confirm page should not offer the folder list sharing its listId",
-                List.of(), confirmPage.getListNames(FOLDER_PATH));
+                List.of(), getListsOfferedForDeletion(FOLDER_PATH));
         confirmPage.confirmDelete();
         DESIGNER.stopImpersonating();
 
@@ -145,8 +145,17 @@ public class ListDeleteAuthorizationTest extends BaseWebDriverTest
         checker().withScreenshot().verifyTrue("The owner should be told they lack permission in the picklist's container",
                 isTextPresent(expectedError));
         checker().withScreenshot().verifyFalse("Deleting a picklist was offered to its owner without access to the picklist's container",
-                isElementPresent(Locator.lkButton("Confirm Delete")));
+                new ConfirmDeletePage(getDriver()).isConfirmDeletePresent());
         PICKLIST_OWNER.stopImpersonating();
+
+        checker().verifyTrue("A picklist was deleted by its owner without access to the picklist's container",
+                DomainUtils.doesDomainExist(PROJECT_PATH, "lists", OWNED_PICKLIST.getName()));
+    }
+
+    // Lists named under the deleteListDefinition confirm page's "Defined in <containerPath>:" heading
+    private List<String> getListsOfferedForDeletion(String containerPath)
+    {
+        return getTexts(Locator.tagContainingText("div", "Defined in " + containerPath + ":").descendant(Locator.tag("a")).findElements(getDriver()));
     }
 
     @Override
