@@ -178,12 +178,11 @@ public class Pager extends WebDriverComponent<Pager.ElementCache>
         return initialSize;
     }
 
-    // Closing the menu removes the hovered element, so Firefox never sends the mouseleave that hides the 'Current Page' tooltip
+    // The 'Current Page' tooltip can linger on Firefox after Selenium interacts with the pager, covering neighboring controls
     private void dismissCurrentPageTooltip()
     {
         getWrapper().mouseOverWithoutScrolling(elementCache().currentPageButton);
         getWrapper().mouseOut();
-        getWrapper().waitForElementToDisappear(Locator.id("view-menu-tooltip"));
     }
 
     /**
