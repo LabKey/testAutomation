@@ -20,6 +20,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -33,7 +34,6 @@ import org.labkey.test.params.list.ListDefinition;
 import org.labkey.test.util.APIContainerHelper;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DomainUtils;
-import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.TestUser;
 
 import java.io.IOException;
@@ -96,13 +96,13 @@ public class ListDeleteAuthorizationTest extends BaseWebDriverTest
 
         // List ids come from a per-container sequence, so the first list in each container collides
         assertEquals("Precondition: the project and folder lists should share a listId",
-                ListHelper.getListId(conn, PROJECT_PATH, PROJECT_LIST.getName()), ListHelper.getListId(conn, FOLDER_PATH, FOLDER_LIST.getName()));
+                getListId(conn, PROJECT_PATH, PROJECT_LIST.getName()), getListId(conn, FOLDER_PATH, FOLDER_LIST.getName()));
 
         // The owner creates the picklist, then loses all access to the project
         var picklistCommand = OWNED_PICKLIST.getCreateCommand();
         picklistCommand.getOptions().put("category", "PrivatePicklist");
         picklistCommand.execute(PICKLIST_OWNER.getUserConnection(), PROJECT_PATH);
-        OWNED_PICKLIST.setListId(ListHelper.getListId(PICKLIST_OWNER.getUserConnection(), PROJECT_PATH, OWNED_PICKLIST.getName()));
+        OWNED_PICKLIST.setListId(getListId(PICKLIST_OWNER.getUserConnection(), PROJECT_PATH, OWNED_PICKLIST.getName()));
 
         ApiPermissionsHelper permissionsHelper = new ApiPermissionsHelper(this);
         permissionsHelper.removeUserRoleAssignment(PICKLIST_OWNER.getEmail(), EDITOR_ROLE, PROJECT_PATH);
@@ -156,6 +156,16 @@ public class ListDeleteAuthorizationTest extends BaseWebDriverTest
     private List<String> getListsOfferedForDeletion(String containerPath)
     {
         return getTexts(Locator.tagContainingText("div", "Defined in " + containerPath + ":").descendant(Locator.tag("a")).findElements(getDriver()));
+    }
+
+    private static int getListId(Connection connection, String containerPath, String listName) throws IOException, CommandException
+    {
+        SelectRowsCommand select = new SelectRowsCommand("ListManager", "ListManager");
+        select.setColumns(List.of("ListId"));
+        select.addFilter(new Filter("Name", listName));
+        List<Map<String, Object>> rows = select.execute(connection, containerPath).getRows();
+        assertEquals("Expected exactly one list named " + listName + " in " + containerPath, 1, rows.size());
+        return ((Number) rows.getFirst().get("ListId")).intValue();
     }
 
     @Override

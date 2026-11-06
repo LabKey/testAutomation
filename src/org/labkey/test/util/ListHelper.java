@@ -17,10 +17,6 @@
 package org.labkey.test.util;
 
 import org.jetbrains.annotations.NotNull;
-import org.labkey.remoteapi.CommandException;
-import org.labkey.remoteapi.Connection;
-import org.labkey.remoteapi.query.Filter;
-import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
@@ -37,12 +33,10 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.WrapsDriver;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.util.DataRegionTable.DataRegion;
 
@@ -60,16 +54,6 @@ public class ListHelper extends LabKeySiteWrapper
     public ListHelper(WebDriver driver)
     {
         this(() -> driver);
-    }
-
-    public static int getListId(Connection connection, String containerPath, String listName) throws IOException, CommandException
-    {
-        SelectRowsCommand select = new SelectRowsCommand("ListManager", "ListManager");
-        select.setColumns(List.of("ListId"));
-        select.addFilter(new Filter("Name", listName));
-        List<Map<String, Object>> rows = select.execute(connection, containerPath).getRows();
-        assertEquals("Expected exactly one list named " + listName + " in " + containerPath, 1, rows.size());
-        return ((Number) rows.getFirst().get("ListId")).intValue();
     }
 
     @Override
