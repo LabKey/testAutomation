@@ -20,29 +20,27 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
-import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Data;
+import org.labkey.test.pages.list.ConfirmDeletePage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.params.list.IntListDefinition;
 import org.labkey.test.params.list.ListDefinition;
 import org.labkey.test.util.APIContainerHelper;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DomainUtils;
+import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.TestUser;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
 
 // GH Issue 1447: deleteListDefinition must delete the list it authorized, in that list's own container
@@ -98,63 +96,57 @@ public class ListDeleteAuthorizationTest extends BaseWebDriverTest
 
         // List ids come from a per-container sequence, so the first list in each container collides
         assertEquals("Precondition: the project and folder lists should share a listId",
-                getListId(conn, PROJECT_PATH, PROJECT_LIST.getName()), getListId(conn, FOLDER_PATH, FOLDER_LIST.getName()));
+                ListHelper.getListId(conn, PROJECT_PATH, PROJECT_LIST.getName()), ListHelper.getListId(conn, FOLDER_PATH, FOLDER_LIST.getName()));
 
         // The owner creates the picklist, then loses all access to the project
         var picklistCommand = OWNED_PICKLIST.getCreateCommand();
-        Map<String, Object> options = new HashMap<>(picklistCommand.getOptions());
-        options.put("category", "PrivatePicklist");
-        picklistCommand.setOptions(options);
+        picklistCommand.getOptions().put("category", "PrivatePicklist");
         picklistCommand.execute(PICKLIST_OWNER.getUserConnection(), PROJECT_PATH);
-        OWNED_PICKLIST.setListId(getListId(PICKLIST_OWNER.getUserConnection(), PROJECT_PATH, OWNED_PICKLIST.getName()));
+        OWNED_PICKLIST.setListId(ListHelper.getListId(PICKLIST_OWNER.getUserConnection(), PROJECT_PATH, OWNED_PICKLIST.getName()));
 
         ApiPermissionsHelper permissionsHelper = new ApiPermissionsHelper(this);
         permissionsHelper.removeUserRoleAssignment(PICKLIST_OWNER.getEmail(), EDITOR_ROLE, PROJECT_PATH);
         permissionsHelper.removeUserRoleAssignment(PICKLIST_OWNER.getEmail(), LIST_DESIGNER_ROLE, PROJECT_PATH);
     }
 
+    // Deleting by name from a subfolder must delete the resolved project list, not the folder list sharing its listId
     @Test
     public void testDeleteByNameDeletesTheAuthorizedList() throws IOException, CommandException
     {
         DESIGNER.impersonate();
         beginAt(WebTestHelper.buildURL("list", FOLDER_PATH, "deleteListDefinition", Map.of("name", PROJECT_LIST.getName())));
-        assertElementPresent(Locator.linkWithText(PROJECT_LIST.getName()));
-        clickButton("Confirm Delete");
+        ConfirmDeletePage confirmPage = new ConfirmDeletePage(getDriver());
+        checker().withScreenshot().verifyEquals("The confirm page should offer the project list named in the request",
+                List.of(PROJECT_LIST.getName()), confirmPage.getListNames(PROJECT_PATH));
+        checker().withScreenshot().verifyEquals("The confirm page should not offer the folder list sharing its listId",
+                List.of(), confirmPage.getListNames(FOLDER_PATH));
+        confirmPage.confirmDelete();
         DESIGNER.stopImpersonating();
 
-        assertTrue("The unrelated folder list was deleted instead of the authorized project list",
-                DomainUtils.doesDomainExist(FOLDER_PATH, "lists", FOLDER_LIST.getName()));
-        assertEquals("The unrelated folder list lost its data", FOLDER_LIST_ROWS,
-                new SelectRowsCommand("lists", FOLDER_LIST.getName()).execute(createDefaultConnection(), FOLDER_PATH).getRowCount().intValue());
-        assertFalse("The project list named in the request was not deleted",
+        boolean folderListExists = DomainUtils.doesDomainExist(FOLDER_PATH, "lists", FOLDER_LIST.getName());
+        checker().verifyTrue("The unrelated folder list was deleted instead of the authorized project list", folderListExists);
+        if (folderListExists)
+            checker().verifyEquals("The unrelated folder list lost its data", FOLDER_LIST_ROWS,
+                    new SelectRowsCommand("lists", FOLDER_LIST.getName()).execute(createDefaultConnection(), FOLDER_PATH).getRowCount().intValue());
+        checker().verifyFalse("The project list named in the request was not deleted",
                 DomainUtils.doesDomainExist(PROJECT_PATH, "lists", PROJECT_LIST.getName()));
     }
 
+    // Owning a picklist must not allow deleting it after losing access to the picklist's container
     @Test
     public void testOwnPicklistNotDeletableWithoutAccessToItsContainer() throws IOException, CommandException
     {
         String listIdContainer = OWNED_PICKLIST.getListId() + "," + new APIContainerHelper(this).getContainerId(PROJECT_PATH);
+        String expectedError = String.format("You do not have permission to delete list %s in container %s",
+                OWNED_PICKLIST.getListId(), getProjectName());
 
         PICKLIST_OWNER.impersonate();
         beginAt(WebTestHelper.buildURL("list", FOLDER_PATH, "deleteListDefinition", Map.of("listIds", listIdContainer)));
-        boolean offeredDelete = isElementPresent(Locator.lkButton("Confirm Delete"));
-        if (offeredDelete)
-            clickButton("Confirm Delete");
+        checker().withScreenshot().verifyTrue("The owner should be told they lack permission in the picklist's container",
+                isTextPresent(expectedError));
+        checker().withScreenshot().verifyFalse("Deleting a picklist was offered to its owner without access to the picklist's container",
+                isElementPresent(Locator.lkButton("Confirm Delete")));
         PICKLIST_OWNER.stopImpersonating();
-
-        assertFalse("Deleting a picklist was offered to its owner without access to the picklist's container", offeredDelete);
-        assertTrue("A picklist was deleted by its owner without access to the picklist's container",
-                DomainUtils.doesDomainExist(PROJECT_PATH, "lists", OWNED_PICKLIST.getName()));
-    }
-
-    private static int getListId(Connection conn, String containerPath, String listName) throws IOException, CommandException
-    {
-        var select = new SelectRowsCommand("ListManager", "ListManager");
-        select.setColumns(List.of("ListID"));
-        select.addFilter(new Filter("Name", listName));
-        var rows = select.execute(conn, containerPath).getRows();
-        assertEquals("Expected exactly one list named " + listName + " in " + containerPath, 1, rows.size());
-        return ((Number) rows.getFirst().get("ListID")).intValue();
     }
 
     @Override
@@ -173,6 +165,6 @@ public class ListDeleteAuthorizationTest extends BaseWebDriverTest
     @Override
     public List<String> getAssociatedModules()
     {
-        return List.of("list");
+        return List.of("list", "assay");
     }
 }
