@@ -18,6 +18,7 @@ package org.labkey.test;
 import org.apache.commons.collections4.MultiValuedMap;
 import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -364,6 +365,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     profile.setPreference("print_printer", "Print to File");
                     profile.setPreference("print.print_to_filename", new File(downloadDir, "print.pdf").getAbsolutePath());
 
+                    profile.setPreference("browser.chrome.guess_favicon", false); // '/favicon.ico' 404s and generates duplicate session cookies
                     profile.setPreference("browser.download.folderList", 2);
                     profile.setPreference("browser.download.downloadDir", downloadDir.getAbsolutePath());
                     profile.setPreference("browser.download.dir", downloadDir.getAbsolutePath());
@@ -400,18 +402,22 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
                     profile.setPreference("browser.ssl_override_behavior", 0);
 
-                    // TODO: Issue 38785: dom.disable_beforeunload FireFox preference is causing numerous test failures
-                    // profile.setPreference("dom.disable_beforeunload", false);
-
                     profile.setAcceptUntrustedCertificates(true);
                     profile.setAssumeUntrustedCertificateIssuer(false);
 
                     FirefoxOptions capabilities = new FirefoxOptions();
                     capabilities.setProfile(profile);
-                    capabilities.setLogLevel(FirefoxDriverLogLevel.WARN);
+                    // TODO: revert debug logging before merging
+                    capabilities.setLogLevel(FirefoxDriverLogLevel.TRACE);
                     capabilities.addPreference("--log", "WARN");
+                    if (SystemUtils.IS_OS_WINDOWS)
+                    {
+                        // TODO: Firefox 153 dies on the Windows agents after failing to launch its GPU process
+                        capabilities.addPreference("layers.gpu-process.enabled", false);
+                    }
 
-                    String browserPath = System.getProperty("selenium.firefox.binary", "");
+                    // TODO: revert hard-coded firefox version before merging
+                    String browserPath = TestProperties.isTestRunningOnTeamCity() ? System.getenv("FIREFOX153") : System.getProperty("selenium.firefox.binary", "");
                     if (!browserPath.isEmpty())
                     {
                         capabilities.setBinary(browserPath);
@@ -440,6 +446,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                         try
                         {
                             retry.printStackTrace(System.err);
+                            TestLogger.warn("geckodriver: " + newDriverService.getExecutable());
                             newDriverService.stop();
                             newDriverService = driverServiceBuilder.build();
                             sleep(10000);

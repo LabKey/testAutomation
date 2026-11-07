@@ -20,7 +20,6 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.pages.TimeChartWizard;
 import org.labkey.test.selenium.LazyWebElement;
 import org.labkey.test.util.Ext4Helper;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -334,12 +333,14 @@ public class ChartTypeDialog extends ChartWizardDialog<ChartTypeDialog.ElementCa
         WebElement column = elementCache().getColumn(columnName, columnGridCls);
         getWrapper().scrollIntoView(column);
         column.click();
-        getWrapper();
+        WebDriverWrapper.waitFor(target::isDisplayed, "Target element is not displayed", 5000);
+        Locator.XPathLocator selectionText = Locator.xpath("../div[contains(@class, 'field-area')]//div[contains(@class, 'field-selection-text')]");
+        List<WebElement> previousSelection = selectionText.findElements(target);
+        // Firefox 153 sometimes drops the click on the field area, so retry until the selection re-renders
         WebDriverWrapper.waitFor(() -> {
-            return target.isDisplayed();
-        }, "Target element is not displayed", 5000);
-        getWrapper().actionClick(target); // The drop text may be obscured, just need to click the location
-        getWrapper().waitForFormElementToNotEqual(target.findElement(By.xpath("//div[contains(@class, 'field-selection-text')]")), columnName);
+            getWrapper().actionClick(target); // The drop text may be obscured, just need to click the location
+            return WebDriverWrapper.waitFor(() -> selectionText.findElements(target).stream().anyMatch(el -> !previousSelection.contains(el)), 1000);
+        }, "Column '" + columnName + "' was not applied to the field area", WAIT_FOR_JAVASCRIPT);
         return this;
     }
 
