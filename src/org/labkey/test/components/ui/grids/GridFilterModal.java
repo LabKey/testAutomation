@@ -16,6 +16,7 @@
 package org.labkey.test.components.ui.grids;
 
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.UpdatingComponent;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.html.Checkbox;
@@ -131,7 +132,7 @@ public class GridFilterModal extends ModalDialog
      */
     public FilterExpressionPanel selectExpressionTab()
     {
-        elementCache().filterTabs.selectTab("Filter");
+        filterTabs().selectTab("Filter");
         return elementCache().filterExpressionPanel();
     }
 
@@ -147,7 +148,7 @@ public class GridFilterModal extends ModalDialog
      */
     public FilterFacetedPanel selectFacetTab()
     {
-        elementCache().filterTabs.selectTab("Choose values");
+        filterTabs().selectTab("Choose values");
         return elementCache().filterFacetedPanel();
     }
 
@@ -158,7 +159,18 @@ public class GridFilterModal extends ModalDialog
      */
     public List<String> getTabText()
     {
-        return elementCache().filterTabs.getTabText();
+        return filterTabs().getTabText();
+    }
+
+    /**
+     * The tabs for the selected field, once they are shown. Kanban 2177: the dialog shows a spinner in their
+     * place until the server reports what it knows about the column, which decides which tab opens.
+     */
+    private Tabs filterTabs()
+    {
+        WebDriverWrapper.waitFor(() -> Locator.byClass("nav-tabs").existsIn(elementCache().filterPanel),
+                "Filter tabs never appeared for the selected field", 10_000);
+        return elementCache().filterTabs;
     }
 
     public String getActiveTab()
@@ -167,7 +179,7 @@ public class GridFilterModal extends ModalDialog
 
         for(String tabText : getTabText())
         {
-            if(elementCache().filterTabs.isTabSelected(tabText))
+            if(filterTabs().isTabSelected(tabText))
             {
                 activeTab = tabText;
                 break;
