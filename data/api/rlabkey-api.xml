@@ -45,11 +45,11 @@
             <![CDATA[
                 library(Rlabkey)
                 urls <- c(
-                    labkey.buildURL("https://lk.test", "query", "selectRows.api", "home"),
-                    labkey.buildURL("https://lk.test/", "query", "selectRows.api", "/home/"),
-                    labkey.buildURL("https://lk.test/labkey", "query", "selectRows.api", "/my folder/sub"),
-                    labkey.buildURL("https://lk.test", "query", "selectRows.api", "/"),
-                    labkey.buildURL("https://lk.test", "query", "getQueries.api", "home", list(schemaName="lists")))
+                    Rlabkey:::labkey.buildURL("https://lk.test", "query", "selectRows.api", "home"),
+                    Rlabkey:::labkey.buildURL("https://lk.test/", "query", "selectRows.api", "/home/"),
+                    Rlabkey:::labkey.buildURL("https://lk.test/labkey", "query", "selectRows.api", "/my folder/sub"),
+                    Rlabkey:::labkey.buildURL("https://lk.test", "query", "selectRows.api", "/"),
+                    Rlabkey:::labkey.buildURL("https://lk.test", "query", "getQueries.api", "home", list(schemaName="lists")))
                 cat(paste0("url: ", urls, "\n"), sep="")
                 cat("doubled slash:", any(grepl("[^:]//", urls)), "\n")
             ]]>
