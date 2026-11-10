@@ -201,6 +201,9 @@ public class ManageViewsDialog extends ModalDialog
         if(tag.isDisplayed())
         {
             elementCache().revertDefault.click();
+            // Closing the dialog before the revert saves reloads the grid with the old default
+            WebDriverWrapper.waitFor(() -> !Locator.tagWithText("button", "Revert").withClass("clickable-text").existsIn(this),
+                    "Default view was not reverted.", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
         }
         return this;
     }
