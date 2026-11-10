@@ -66,6 +66,8 @@ exports.beforeInsert = beforeInsert;
 function beforeUpdate(row, oldRow, errors) {
     if (row.Comments === 'Managed Update') {
         row.Country = 'MANAGED-UPD';
+    } else if (row.Comments === 'Managed Merge') {
+        row.Country = 'MANAGED-MERGE';
     } else if (row.Comments === 'Managed Struct') {
         row.Country = 'MANAGED-STRUCT';
         row.undeclaredUpdateCol = 'bad';

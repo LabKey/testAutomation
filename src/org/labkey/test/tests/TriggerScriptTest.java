@@ -738,7 +738,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
         String strDateVal = requiresDate ? "\t" + setupResp.getRows().get(1).get("Date") : "";
         String srrDateVal = requiresDate ? "\t" + setupResp.getRows().get(2).get("Date") : "";
 
-        // Merge via DIB: trigger sets managed column → success
+        // Merge via DIB: MERGE into an existing row fires beforeUpdate, which sets managed column → success
         importData(cn, schemaName, queryName, tsvHeader + updKey + updDateVal + "\tManaged Merge\n", ImportDataCommand.InsertOption.MERGE);
         SelectRowsResponse selResp = new QueryApiHelper(cn, getProjectName(), schemaName, queryName)
                 .selectRows(null, List.of(new Filter(keyColumnName, updKey)));
@@ -751,7 +751,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
 
         // Merge via DIB: structural add error — trigger adds undeclared column → error
         assertImportError(cn, schemaName, queryName, tsvHeader + strKey + strDateVal + "\tManaged Struct\n",
-                ImportDataCommand.InsertOption.MERGE, "attempted to add: 'undeclaredInsertCol'");
+                ImportDataCommand.InsertOption.MERGE, "attempted to add: 'undeclaredUpdateCol'");
 
         // Merge via DIB: structural remove error — trigger deletes column → error
         assertImportError(cn, schemaName, queryName, tsvHeader + srrKey + srrDateVal + "\tManaged Struct Remove\n",
