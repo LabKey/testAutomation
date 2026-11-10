@@ -18,6 +18,7 @@ package org.labkey.test;
 import org.apache.commons.collections4.MultiValuedMap;
 import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -417,7 +418,8 @@ public abstract class WebDriverWrapper implements WrapsDriver
                         capabilities.setBinary(browserPath);
                     }
 
-                    if (TestProperties.isRunWebDriverHeadless())
+                    // TODO: revert before merging; experiment for Firefox 153 dying while opening its first window on the Windows agents
+                    if (TestProperties.isRunWebDriverHeadless() || SystemUtils.IS_OS_WINDOWS)
                     {
                         TestLogger.warn("Launching Firefox in headless mode. This is still experimental");
                         capabilities.addArguments("--headless");
