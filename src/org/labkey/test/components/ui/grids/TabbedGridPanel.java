@@ -20,6 +20,7 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.react.MultiMenu;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -137,7 +138,17 @@ public class TabbedGridPanel extends WebDriverComponent<TabbedGridPanel.ElementC
             var tab = elementCache().navTab(tabText);
             getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(tab));
             tab.click();
-            WebDriverWrapper.waitFor(()-> isSelected(tabText), "tab did not become selected in time", 2000);
+            WebDriverWrapper.waitFor(() -> {
+                try
+                {
+                    return isSelected(tabText);
+                }
+                catch (NoSuchElementException countReloading)
+                {
+                    // The tab's row count disappears while the selected grid reloads
+                    return false;
+                }
+            }, "tab did not become selected in time", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
             getWrapper().shortWait().until(ExpectedConditions.stalenessOf(grid.getComponentElement()));
             grid = getSelectedGrid();
         }
