@@ -148,8 +148,12 @@ public abstract class EntityTypeDesigner<T extends EntityTypeDesigner<T>> extend
 
     public String getNameExpressionPreview()
     {
-        getWrapper().mouseOver(elementCache().helpTarget("Naming "));
-        waitFor(()->elementCache().popover.isDisplayed(), "No tooltip was shown for the Name Expression.", 1_000);
+        // A hover can miss if a banner shifts the layout while it lands
+        waitFor(() -> {
+            getWrapper().mouseOut();
+            getWrapper().mouseOver(elementCache().helpTarget("Naming "));
+            return waitFor(() -> elementCache().popover.isDisplayed(), 1_000);
+        }, "No tooltip was shown for the Naming Pattern.", 5_000);
         return elementCache().popover.getText();
     }
 
