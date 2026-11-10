@@ -15,11 +15,15 @@
  */
 package org.labkey.test.tests.announcements;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.remoteapi.announcements.AnnouncementModel;
 import org.labkey.remoteapi.announcements.CreateMessageThreadCommand;
 import org.labkey.remoteapi.announcements.DeleteMessageThreadCommand;
@@ -32,20 +36,28 @@ import org.labkey.remoteapi.announcements.UpdateMessageThreadCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.pages.LabkeyErrorPage;
+import org.labkey.test.util.TestUser;
 import org.labkey.test.util.WikiHelper;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
 import static org.labkey.test.util.PermissionsHelper.READER_ROLE;
 
 @Category({Daily.class})
 public class AnnouncementAPITest extends BaseWebDriverTest
 {
+    private static final String OTHER_PROJECT = "AnnouncementAPITest Other Project";
+    private static final TestUser EDITOR = new TestUser("editor@announcementapi.test");
+
     @BeforeClass
     public static void setupProject()
     {
@@ -57,6 +69,16 @@ public class AnnouncementAPITest extends BaseWebDriverTest
     private void doSetup()
     {
         _containerHelper.createProject(getProjectName());
+        _containerHelper.createProject(OTHER_PROJECT);
+        EDITOR.create(this).setInitialPassword().addPermission(EDITOR_ROLE, getProjectName());
+    }
+
+    @Override
+    protected void doCleanup(boolean afterTest)
+    {
+        super.doCleanup(afterTest);
+        _containerHelper.deleteProject(OTHER_PROJECT, false);
+        _userHelper.deleteUsers(false, EDITOR);
     }
 
     @Before
@@ -380,6 +402,49 @@ public class AnnouncementAPITest extends BaseWebDriverTest
         }
 
         stopImpersonatingHTTP();
+    }
+
+    // GH Issue 1688
+    @Test
+    public void testQueryUpdateCannotRetargetMessage() throws Exception
+    {
+        AnnouncementModel otherThread = createThread(new AnnouncementModel().setTitle("Other thread").setBody("other body"), OTHER_PROJECT);
+        Connection editorConnection = EDITOR.getUserConnection();
+        AnnouncementModel ownThread = new CreateMessageThreadCommand(new AnnouncementModel().setTitle("Editor thread").setBody("body"))
+                .execute(editorConnection, getProjectName())
+                .getAnnouncementModel();
+        Map<String, Object> ownKey = Map.of("RowId", ownThread.getRowId());
+
+        assertThrows("Expect saveRows to refuse a row in another folder",
+                CommandException.class,
+                () -> updateChangingKeys(editorConnection, ownKey, Map.of("RowId", otherThread.getRowId(), "Container", otherThread.getContainerId(), "Title", "Overwritten", "Body", "Overwritten")));
+        assertThrows("Expect saveRows to refuse a new parent",
+                CommandException.class,
+                () -> updateChangingKeys(editorConnection, ownKey, Map.of("RowId", ownThread.getRowId(), "Parent", otherThread.getEntityId())));
+
+        AnnouncementModel otherAfter = getThread(otherThread, OTHER_PROJECT).getAnnouncementModel();
+        assertThat("Other folder's title", otherAfter.getTitle(), is("Other thread"));
+        assertThat("Other folder's body", otherAfter.getBody(), is("other body"));
+        assertNull("Editor's thread should remain top-level", getThread(ownThread).getAnnouncementModel().getParent());
+
+        // Positive control: an ordinary edit of the editor's own message still works
+        updateChangingKeys(editorConnection, ownKey, Map.of("RowId", ownThread.getRowId(), "Title", "Edited"));
+        assertThat("Editor's title", getThread(ownThread).getAnnouncementModel().getTitle(), is("Edited"));
+    }
+
+    private void updateChangingKeys(Connection connection, Map<String, Object> oldKeys, Map<String, Object> values) throws Exception
+    {
+        JSONObject row = new JSONObject()
+                .put("oldKeys", new JSONObject(oldKeys))
+                .put("values", new JSONObject(values));
+        JSONObject command = new JSONObject()
+                .put("command", "updateChangingKeys")
+                .put("schemaName", "announcement")
+                .put("queryName", "Announcement")
+                .put("rows", new JSONArray().put(row));
+        SimplePostCommand saveRows = new SimplePostCommand("query", "saveRows");
+        saveRows.setJsonObject(new JSONObject().put("commands", new JSONArray().put(command)));
+        saveRows.execute(connection, getProjectName());
     }
 
     private AnnouncementModel createThread(AnnouncementModel thread) throws Exception
