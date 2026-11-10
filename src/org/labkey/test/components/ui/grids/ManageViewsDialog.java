@@ -35,6 +35,7 @@ import java.util.stream.Collectors;
  */
 public class ManageViewsDialog extends ModalDialog
 {
+    private String _pendingDeleteView;
 
     public ManageViewsDialog(WebDriver driver)
     {
@@ -124,6 +125,7 @@ public class ManageViewsDialog extends ModalDialog
         Assert.assertTrue(String.format("View named '%s' cannot be deleted.", viewName), canViewBeDeleted(viewName));
 
         Locator.tagWithClass("i", "fa-trash-o").findElement(elementCache().viewRow(viewName)).click();
+        _pendingDeleteView = viewName;
 
         return this;
     }
@@ -162,6 +164,13 @@ public class ManageViewsDialog extends ModalDialog
         WebElement deleteYesButton = elementCache().deleteYesButton;
         deleteYesButton.click();
         getWrapper().quickWait().until(ExpectedConditions.stalenessOf(deleteYesButton));
+        if (_pendingDeleteView != null)
+        {
+            // The confirmation closes before the view list reloads, and that reload discards any newer confirmation
+            Locator deletedRow = elementCache().viewRowLoc(_pendingDeleteView);
+            getWrapper().shortWait().until(wd -> deletedRow.findElements(this).isEmpty());
+            _pendingDeleteView = null;
+        }
         return this;
     }
 
@@ -175,6 +184,7 @@ public class ManageViewsDialog extends ModalDialog
         WebElement deleteNoButton = elementCache().deleteNoButton;
         deleteNoButton.click();
         getWrapper().quickWait().until(ExpectedConditions.stalenessOf(deleteNoButton));
+        _pendingDeleteView = null;
         return this;
     }
 
@@ -250,7 +260,12 @@ public class ManageViewsDialog extends ModalDialog
 
         protected WebElement viewRow(String viewName)
         {
-            return Locator.tagWithText("div", viewName).parent("div").withClass("row").findElement(this);
+            return viewRowLoc(viewName).findElement(this);
+        }
+
+        protected Locator viewRowLoc(String viewName)
+        {
+            return Locator.tagWithText("div", viewName).parent("div").withClass("row");
         }
 
         protected final WebElement viewNameInput = Locator.tagWithName("input", "gridViewName")
