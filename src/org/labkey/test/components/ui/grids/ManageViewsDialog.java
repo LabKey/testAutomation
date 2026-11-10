@@ -234,6 +234,8 @@ public class ManageViewsDialog extends ModalDialog
     public ManageViewsDialog makeViewDefault(String viewName)
     {
         Locator.tagWithText("button", "Make default").findElement(elementCache().viewRow(viewName)).click();
+        // The saved default is enabled for revert once the view list reloads
+        var _ = WebDriverWrapper.waitFor(() -> Locator.tagWithText("button", "Revert").withClass("clickable-text").existsIn(this), WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
 
         return this;
     }
