@@ -18,7 +18,6 @@ package org.labkey.test;
 import org.apache.commons.collections4.MultiValuedMap;
 import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -427,16 +426,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     // Firefox 128: UnhandledAlertException doesn't include alert text. Need to leave alerts to get text manually.
                     capabilities.setUnhandledPromptBehaviour(UnexpectedAlertBehaviour.IGNORE);
                     FirefoxOptions firefoxOptions = new FirefoxOptions(capabilities);
-
-                    if (SystemUtils.IS_OS_WINDOWS)
-                    {
-                        // TODO: revert before merging; experiment for Firefox 153 failing to start on the Windows agents
-                        browserEnv.put("MOZ_DISABLE_GPU_SANDBOX", "1");
-                        browserEnv.put("MOZ_DISABLE_CONTENT_SANDBOX", "1");
-                        browserEnv.put("MOZ_DISABLE_RDD_SANDBOX", "1");
-                        browserEnv.put("MOZ_DISABLE_SOCKET_PROCESS_SANDBOX", "1");
-                        browserEnv.put("MOZ_DISABLE_UTILITY_SANDBOX", "1");
-                    }
 
                     GeckoDriverService.Builder driverServiceBuilder = new GeckoDriverService.Builder()
                         .withEnvironment(browserEnv);
