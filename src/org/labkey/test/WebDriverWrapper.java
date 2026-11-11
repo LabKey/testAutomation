@@ -3529,12 +3529,20 @@ public abstract class WebDriverWrapper implements WrapsDriver
         }
         else if (text.length() < 1000 && !text.contains("\n") && !text.contains("\t"))
         {
-            input.clear();
-            if (!waitFor(()-> getFormElement(input).isEmpty(), 500))
+            if (isExtFormField(input))
             {
-                TestLogger.warn("Failed to clear input: " + input);
+                // clear() blurs the field, which lets an ExtJS form refill it (e.g. with a default) before the text is typed
+                input.sendKeys(Keys.chord(WebDriverUtils.MODIFIER_KEY, "a"), text);
             }
-            input.sendKeys(text);
+            else
+            {
+                input.clear();
+                if (!waitFor(()-> getFormElement(input).isEmpty(), 500))
+                {
+                    TestLogger.warn("Failed to clear input: " + input);
+                }
+                input.sendKeys(text);
+            }
             if (!waitFor(()-> getFormElement(input).equals(text), 500))
             {
                 TestLogger.warn("Failed to set input: " + input);
@@ -3556,6 +3564,14 @@ public abstract class WebDriverWrapper implements WrapsDriver
         {
             log("input element is stale, not going to try and fire blur event.");
         }
+    }
+
+    private static final Pattern EXT_FORM_TEXT_CLASS = Pattern.compile("\\bx4?-form-text\\b");
+
+    private boolean isExtFormField(WebElement input)
+    {
+        String elementClass = input.getDomAttribute("class");
+        return elementClass != null && EXT_FORM_TEXT_CLASS.matcher(elementClass).find();
     }
 
     public void actionClick(WebElement el)
