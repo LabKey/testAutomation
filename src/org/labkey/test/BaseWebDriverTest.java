@@ -198,6 +198,7 @@ import static org.labkey.test.teamcity.TeamCityUtils.publishArtifact;
 public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cleanable, WebTest
 {
     private static BaseWebDriverTest currentTest;
+    private static String currentTestMethodName;
     private final BrowserType BROWSER_TYPE;
 
     private String _lastPageTitle = null;
@@ -292,6 +293,14 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     public static <T extends BaseWebDriverTest> T getCurrentTest()
     {
         return (T)currentTest;
+    }
+
+    /**
+     * @return Name of the running test method, or null outside a test method (e.g. during @BeforeClass)
+     */
+    public static @Nullable String getCurrentTestMethodName()
+    {
+        return currentTestMethodName;
     }
 
     private static Class<? extends BaseWebDriverTest> getCurrentTestClass()
@@ -848,6 +857,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 currentTestNumber++;
                 testStartTimeStamp = System.currentTimeMillis();
 
+                currentTestMethodName = description.getMethodName();
                 TestLogger.resetLogger();
                 TestLogger.setTestLogContext(description.getMethodName());
                 TestLogger.log("// Begin Test Case [" + currentTestNumber + "/" + testCount + "] - " + description.getMethodName() + " \\\\");
@@ -884,6 +894,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             @Override
             protected void finished(Description description)
             {
+                currentTestMethodName = null;
                 if (currentTestNumber == testCount)
                 {
                     TestLogger.resetLogger();

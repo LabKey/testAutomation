@@ -21,6 +21,7 @@ import org.hamcrest.Matcher;
 import org.hamcrest.MatcherAssert;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
 import org.labkey.junit.LabKeyAssert;
 import org.labkey.test.BaseWebDriverTest;
@@ -171,13 +172,16 @@ public class DeferredErrorCollector
      * Then resets the error mark.
      *
      * @param screenshotName A string to identify screenshots; Will be included in screenshot filenames.
+     *                       Defaults to the running test method's name if blank.
      * @return True if a screenshot was taken, false otherwise.
      * @see #takeScreenShot(String)
      */
-    public boolean screenShotIfNewError(@NotNull String screenshotName)
+    public boolean screenShotIfNewError(@Nullable String screenshotName)
     {
         if (errorsSinceMark() > 0)
         {
+            if (StringUtils.isBlank(screenshotName))
+                screenshotName = StringUtils.defaultIfBlank(BaseWebDriverTest.getCurrentTestMethodName(), "recordedError");
             final String s = artifactCollector.dumpPageSnapshot(screenshotName);
             allErrors.getLast().setScreenshotName(s);
             artifactCollector.reportTestMetadata(s);
@@ -534,7 +538,7 @@ class DeferredErrorCollectorWrapper extends DeferredErrorCollector
     }
 
     @Override
-    public boolean screenShotIfNewError(@NotNull String screenshotName)
+    public boolean screenShotIfNewError(@Nullable String screenshotName)
     {
         return wrappedCollector.screenShotIfNewError(screenshotName);
     }
