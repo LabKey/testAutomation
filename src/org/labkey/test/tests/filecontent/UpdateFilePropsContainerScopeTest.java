@@ -142,7 +142,7 @@ public class UpdateFilePropsContainerScopeTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testForeignContainerAbsolutePathRejected() throws Exception
+    public void testAbsoluteFilePathMustBeUnderFolderRoot() throws Exception
     {
         final File localFile = TestFileUtils.getSampleData("security/InlineFile_drop.html");
         navigateToFolder(getProjectName(), FOLDER_A);
@@ -157,7 +157,7 @@ public class UpdateFilePropsContainerScopeTest extends BaseWebDriverTest
         log("A path under the folder's own file root should be accepted.");
         insertFileRow(FOLDER_A, absoluteFilePath(FOLDER_A, localFile.getName()), localFileUrl);
 
-        log("Foreign-container path should be rejected even though davUrl resolves to a local file.");
+        log("A path outside the folder's file roots should be rejected.");
         try
         {
             insertFileRow(FOLDER_A, absoluteFilePath(FOLDER_B, foreignFile.getName()), localFileUrl);
