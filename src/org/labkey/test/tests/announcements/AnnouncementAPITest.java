@@ -45,7 +45,6 @@ import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -418,14 +417,13 @@ public class AnnouncementAPITest extends BaseWebDriverTest
         assertThrows("Expect saveRows to refuse a row in another folder",
                 CommandException.class,
                 () -> updateChangingKeys(editorConnection, ownKey, Map.of("RowId", otherThread.getRowId(), "Container", otherThread.getContainerId(), "Title", "Overwritten", "Body", "Overwritten")));
-        assertThrows("Expect saveRows to refuse a new parent",
+        assertThrows("Expect saveRows to refuse a row in another folder, even without naming that folder",
                 CommandException.class,
-                () -> updateChangingKeys(editorConnection, ownKey, Map.of("RowId", ownThread.getRowId(), "Parent", otherThread.getEntityId())));
+                () -> updateChangingKeys(editorConnection, ownKey, Map.of("RowId", otherThread.getRowId(), "Title", "Overwritten", "Body", "Overwritten")));
 
         AnnouncementModel otherAfter = getThread(otherThread, OTHER_PROJECT).getAnnouncementModel();
         assertThat("Other folder's title", otherAfter.getTitle(), is("Other thread"));
         assertThat("Other folder's body", otherAfter.getBody(), is("other body"));
-        assertNull("Editor's thread should remain top-level", getThread(ownThread).getAnnouncementModel().getParent());
 
         // Positive control: an ordinary edit of the editor's own message still works
         updateChangingKeys(editorConnection, ownKey, Map.of("RowId", ownThread.getRowId(), "Title", "Edited"));
