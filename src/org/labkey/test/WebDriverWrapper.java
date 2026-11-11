@@ -331,6 +331,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     prefs.put("credentials_enable_service", false);
                     prefs.put("profile.password_manager_enabled", false);
                     prefs.put("safebrowsing.enabled", false); // Disable "This type of file can harm your computer."
+                    if (TestProperties.isRunWebDriverHeadless())
+                    {
+                        // Chrome denies navigator.clipboard.readText (see getClipboardContent) without this
+                        prefs.put("profile.content_settings.exceptions.clipboard", Map.of("*", Map.of("setting", 1)));
+                    }
                     options.setExperimentalOption("prefs", prefs);
                     options.setExperimentalOption("detach", true); // Leaves browser window open after stopping the driver service
                     options.addArguments("test-type"); // Suppress '--ignore-certificate-errors' warning
@@ -358,14 +363,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     profile.setPreference("dom.max_script_run_time", 0);
                     profile.setPreference("dom.max_chrome_script_run_time", 0);
                     //profile.setPreference("dom.reporting.enabled", true); // Enable support for CSP report-to
-
-                    if (TestProperties.isRunWebDriverHeadless())
-                    {
-                        // Bypass clipboard permission prompts
-                        profile.setPreference("dom.events.asyncClipboard.readText", true);
-                        profile.setPreference("dom.events.asyncClipboard.clipboardItem", true);
-                        profile.setPreference("dom.events.testing.asyncClipboard", true);
-                    }
 
                     // Prevent crawler from hanging on '_print=1' pages
                     profile.setPreference("print.always_print_silent", true);
@@ -539,10 +536,10 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return BrowserType.FIREFOX.matchesDriver(getDriver());
     }
 
-    // The clipboard prefs that allow navigator.clipboard without a user gesture are only set for headless Firefox
-    private boolean isHeadlessFirefox()
+    // Headless browsers have their own clipboard, separate from the system clipboard
+    private boolean useBrowserClipboard()
     {
-        return TestProperties.isRunWebDriverHeadless() && isFirefox();
+        return TestProperties.isRunWebDriverHeadless();
     }
 
     public Object executeScript(@Language("JavaScript") String script, Object... arguments)
@@ -3651,9 +3648,8 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     protected void setClipboardContent(String text, boolean isHtml)
     {
-        if (isHeadlessFirefox())
+        if (useBrowserClipboard())
         {
-            // Headless Firefox has its own clipboard, separate from the system clipboard
             if (isHtml)
             {
                 executeScript("""
@@ -3692,7 +3688,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public String getClipboardContent() throws IOException, UnsupportedFlavorException
     {
-        if (isHeadlessFirefox())
+        if (useBrowserClipboard())
         {
             return (String) executeScript("return navigator.clipboard.readText();");
         }
