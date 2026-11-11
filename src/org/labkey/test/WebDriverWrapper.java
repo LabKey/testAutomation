@@ -3529,9 +3529,9 @@ public abstract class WebDriverWrapper implements WrapsDriver
         }
         else if (text.length() < 1000 && !text.contains("\n") && !text.contains("\t"))
         {
-            if (isExtFormField(input))
+            if (isExt4FormField(input))
             {
-                // clear() blurs the field, which lets an ExtJS form refill it (e.g. with a default) before the text is typed
+                // clear() blurs the field, which lets an Ext4 form refill it (e.g. with a default) before the text is typed
                 input.sendKeys(Keys.chord(WebDriverUtils.MODIFIER_KEY, "a"), text);
             }
             else
@@ -3566,12 +3566,13 @@ public abstract class WebDriverWrapper implements WrapsDriver
         }
     }
 
-    private static final Pattern EXT_FORM_TEXT_CLASS = Pattern.compile("\\bx4?-form-text\\b");
+    private static final Pattern EXT4_FORM_TEXT_CLASS = Pattern.compile("\\bx4-form-text\\b");
 
-    private boolean isExtFormField(WebElement input)
+    // Typing over an Ext3 field (e.g. the data region filter dialog) leaves it empty, so this is Ext4 only
+    private boolean isExt4FormField(WebElement input)
     {
         String elementClass = input.getDomAttribute("class");
-        return elementClass != null && EXT_FORM_TEXT_CLASS.matcher(elementClass).find();
+        return elementClass != null && EXT4_FORM_TEXT_CLASS.matcher(elementClass).find();
     }
 
     public void actionClick(WebElement el)
