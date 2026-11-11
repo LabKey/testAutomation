@@ -54,6 +54,8 @@ public class UpdateFilePropsContainerScopeTest extends BaseWebDriverTest
     private static final String FOLDER_A = "FolderA";
     private static final String FOLDER_B = "FolderB";
     private static final String CUSTOM_PROPERTY = "CustomProp";
+    private static final String ROOTS_ERROR = "managed file roots";
+    private static final String FOLDER_ERROR = "is not in this folder";
 
     @Override
     protected @Nullable String getProjectName()
@@ -151,40 +153,47 @@ public class UpdateFilePropsContainerScopeTest extends BaseWebDriverTest
         _fileBrowserHelper.uploadFile(localFile);
         String localFileUrl = WebDavUtils.buildBaseWebDavUrl(getProjectName() + "/" + FOLDER_A) + localFile.getName();
 
-        goToProjectHome();
         final File foreignFile = TestFileUtils.getSampleData("security/InlineFile.html");
         navigateToFolder(getProjectName(), FOLDER_B);
         _fileBrowserHelper.uploadFile(foreignFile);
+        String foreignFileUrl = WebDavUtils.buildBaseWebDavUrl(getProjectName() + "/" + FOLDER_B) + foreignFile.getName();
 
-        log("A path under the folder's own file root should be accepted.");
-        insertFileRow(FOLDER_A, absoluteFilePath(FOLDER_A, localFile.getName()), localFileUrl);
+        String localPath = absoluteFilePath(FOLDER_A, localFile.getName());
+        String foreignPath = absoluteFilePath(FOLDER_B, foreignFile.getName());
+
+        log("A path under the folder's own file root, with no davUrl, should be accepted.");
+        insertFileRow(FOLDER_A, Map.of("AbsoluteFilePath", localPath));
 
         log("A path outside the folder's file roots should be rejected.");
-        assertRejected(FOLDER_A, absoluteFilePath(FOLDER_B, foreignFile.getName()), localFileUrl);
+        assertRejected(FOLDER_A, Map.of("AbsoluteFilePath", foreignPath, "davUrl", localFileUrl), ROOTS_ERROR);
 
         log("A traversing path that starts with the folder's own root should be rejected.");
-        Path localDir = Paths.get(absoluteFilePath(FOLDER_A, localFile.getName())).getParent();
-        Path foreignPath = Paths.get(absoluteFilePath(FOLDER_B, foreignFile.getName()));
-        String traversing = localDir.resolve(localDir.relativize(foreignPath)).toString();
+        Path localDir = Paths.get(localPath).getParent();
+        String traversing = localDir.resolve(localDir.relativize(Paths.get(foreignPath))).toString();
         assertTrue("Expected a traversing path, got: " + traversing, traversing.contains(".."));
-        assertRejected(FOLDER_A, traversing, localFileUrl);
+        assertRejected(FOLDER_A, Map.of("AbsoluteFilePath", traversing, "davUrl", localFileUrl), ROOTS_ERROR);
+
+        log("An out-of-root path supplied as DataFileUrl should be rejected too.");
+        assertRejected(FOLDER_A, Map.of("DataFileUrl", Paths.get(foreignPath).toUri().toString()), ROOTS_ERROR);
+
+        log("A davUrl naming a resource in another folder should be rejected.");
+        assertRejected(FOLDER_A, Map.of("AbsoluteFilePath", localPath, "davUrl", foreignFileUrl), FOLDER_ERROR);
     }
 
-    private void assertRejected(String folder, String absoluteFilePath, String davUrl)
+    private void assertRejected(String folder, Map<String, String> row, String expectedMessage) throws Exception
     {
         try
         {
-            insertFileRow(folder, absoluteFilePath, davUrl);
-            fail("Expected rejection: an absolute path outside the folder's managed file roots must not be stored: " + absoluteFilePath);
+            insertFileRow(folder, row);
+            fail("Expected rejection of " + row);
         }
-        catch (Exception ex)
+        catch (CommandException ex)
         {
-            assertTrue("Expected 'managed file roots' in error message, got: " + ex.getMessage(),
-                    ex.getMessage() != null && ex.getMessage().contains("managed file roots"));
+            assertTrue("Expected '" + expectedMessage + "' in error message, got: " + ex.getMessage(),
+                    ex.getMessage() != null && ex.getMessage().contains(expectedMessage));
         }
     }
 
-    /** The uploaded file's server-side path, read back from its exp.Data row so the test needn't know the file root layout. */
     private String absoluteFilePath(String folder, String fileName) throws Exception
     {
         SelectRowsResponse response = new QueryApiHelper(WebTestHelper.getRemoteApiConnection(), getProjectName() + "/" + folder, "exp", "Data")
@@ -193,10 +202,10 @@ public class UpdateFilePropsContainerScopeTest extends BaseWebDriverTest
         return Paths.get(URI.create((String) response.getRows().get(0).get("DataFileUrl"))).toString();
     }
 
-    private void insertFileRow(String folder, String absoluteFilePath, String davUrl) throws Exception
+    private void insertFileRow(String folder, Map<String, String> row) throws Exception
     {
         new QueryApiHelper(WebTestHelper.getRemoteApiConnection(), getProjectName() + "/" + folder, "exp", "Data")
-                .insertRows(List.of(Map.of("AbsoluteFilePath", absoluteFilePath, "davUrl", davUrl)));
+                .insertRows(List.of(row));
     }
 
     @Override
