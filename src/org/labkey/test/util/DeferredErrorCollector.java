@@ -120,13 +120,18 @@ public class DeferredErrorCollector
     }
 
     /**
-     * Create temporary error collector that takes a screenshot for any recorded errors.
+     * Create temporary error collector that takes a screenshot for any recorded errors, named for the running test method.
      *
      * @return Wrapped error collector. Intended to be used only once.
      */
     public final DeferredErrorCollector withScreenshot()
     {
-        return withScreenshot("recordedError");
+        return withScreenshot(defaultScreenshotName());
+    }
+
+    private static @NotNull String defaultScreenshotName()
+    {
+        return StringUtils.defaultIfBlank(BaseWebDriverTest.getCurrentTestMethodName(), "recordedError");
     }
 
     /**
@@ -181,7 +186,7 @@ public class DeferredErrorCollector
         if (errorsSinceMark() > 0)
         {
             if (StringUtils.isBlank(screenshotName))
-                screenshotName = StringUtils.defaultIfBlank(BaseWebDriverTest.getCurrentTestMethodName(), "recordedError");
+                screenshotName = defaultScreenshotName();
             final String s = artifactCollector.dumpPageSnapshot(screenshotName);
             allErrors.getLast().setScreenshotName(s);
             artifactCollector.reportTestMetadata(s);
