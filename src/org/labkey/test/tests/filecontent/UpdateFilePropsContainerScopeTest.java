@@ -37,6 +37,8 @@ import org.labkey.test.util.query.QueryApiHelper;
 
 import java.io.File;
 import java.net.URI;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -158,15 +160,27 @@ public class UpdateFilePropsContainerScopeTest extends BaseWebDriverTest
         insertFileRow(FOLDER_A, absoluteFilePath(FOLDER_A, localFile.getName()), localFileUrl);
 
         log("A path outside the folder's file roots should be rejected.");
+        assertRejected(FOLDER_A, absoluteFilePath(FOLDER_B, foreignFile.getName()), localFileUrl);
+
+        log("A traversing path that starts with the folder's own root should be rejected.");
+        Path localDir = Paths.get(absoluteFilePath(FOLDER_A, localFile.getName())).getParent();
+        Path foreignPath = Paths.get(absoluteFilePath(FOLDER_B, foreignFile.getName()));
+        String traversing = localDir.resolve(localDir.relativize(foreignPath)).toString();
+        assertTrue("Expected a traversing path, got: " + traversing, traversing.contains(".."));
+        assertRejected(FOLDER_A, traversing, localFileUrl);
+    }
+
+    private void assertRejected(String folder, String absoluteFilePath, String davUrl)
+    {
         try
         {
-            insertFileRow(FOLDER_A, absoluteFilePath(FOLDER_B, foreignFile.getName()), localFileUrl);
-            fail("Expected rejection: an absolute path outside the folder's managed file roots must not be stored.");
+            insertFileRow(folder, absoluteFilePath, davUrl);
+            fail("Expected rejection: an absolute path outside the folder's managed file roots must not be stored: " + absoluteFilePath);
         }
-        catch (CommandException ex)
+        catch (Exception ex)
         {
             assertTrue("Expected 'managed file roots' in error message, got: " + ex.getMessage(),
-                    ex.getMessage().contains("managed file roots"));
+                    ex.getMessage() != null && ex.getMessage().contains("managed file roots"));
         }
     }
 
@@ -176,7 +190,7 @@ public class UpdateFilePropsContainerScopeTest extends BaseWebDriverTest
         SelectRowsResponse response = new QueryApiHelper(WebTestHelper.getRemoteApiConnection(), getProjectName() + "/" + folder, "exp", "Data")
                 .selectRows(List.of("Name", "DataFileUrl"), List.of(new Filter("Name", fileName)));
         assertEquals("Expected a single exp.Data row for " + fileName, 1, response.getRows().size());
-        return new URI((String) response.getRows().get(0).get("DataFileUrl")).getPath();
+        return Paths.get(URI.create((String) response.getRows().get(0).get("DataFileUrl"))).toString();
     }
 
     private void insertFileRow(String folder, String absoluteFilePath, String davUrl) throws Exception
