@@ -23,6 +23,8 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.SimplePostCommand;
+import org.labkey.remoteapi.query.Filter;
+import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebTestHelper;
@@ -31,11 +33,15 @@ import org.labkey.test.categories.FileBrowser;
 import org.labkey.test.components.DomainDesignerPage;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.core.webdav.WebDavUtils;
+import org.labkey.test.util.query.QueryApiHelper;
 
 import java.io.File;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -133,6 +139,50 @@ public class UpdateFilePropsContainerScopeTest extends BaseWebDriverTest
         SimplePostCommand cmd = new SimplePostCommand("filecontent", "updateFileProps");
         cmd.setJsonObject(body);
         cmd.execute(WebTestHelper.getRemoteApiConnection(), getProjectName() + "/" + folder);
+    }
+
+    @Test
+    public void testForeignContainerAbsolutePathRejected() throws Exception
+    {
+        final File localFile = TestFileUtils.getSampleData("security/InlineFile_drop.html");
+        navigateToFolder(getProjectName(), FOLDER_A);
+        _fileBrowserHelper.uploadFile(localFile);
+        String localFileUrl = WebDavUtils.buildBaseWebDavUrl(getProjectName() + "/" + FOLDER_A) + localFile.getName();
+
+        goToProjectHome();
+        final File foreignFile = TestFileUtils.getSampleData("security/InlineFile.html");
+        navigateToFolder(getProjectName(), FOLDER_B);
+        _fileBrowserHelper.uploadFile(foreignFile);
+
+        log("A path under the folder's own file root should be accepted.");
+        insertFileRow(FOLDER_A, absoluteFilePath(FOLDER_A, localFile.getName()), localFileUrl);
+
+        log("Foreign-container path should be rejected even though davUrl resolves to a local file.");
+        try
+        {
+            insertFileRow(FOLDER_A, absoluteFilePath(FOLDER_B, foreignFile.getName()), localFileUrl);
+            fail("Expected rejection: an absolute path outside the folder's managed file roots must not be stored.");
+        }
+        catch (CommandException ex)
+        {
+            assertTrue("Expected 'managed file roots' in error message, got: " + ex.getMessage(),
+                    ex.getMessage().contains("managed file roots"));
+        }
+    }
+
+    /** The uploaded file's server-side path, read back from its exp.Data row so the test needn't know the file root layout. */
+    private String absoluteFilePath(String folder, String fileName) throws Exception
+    {
+        SelectRowsResponse response = new QueryApiHelper(WebTestHelper.getRemoteApiConnection(), getProjectName() + "/" + folder, "exp", "Data")
+                .selectRows(List.of("Name", "DataFileUrl"), List.of(new Filter("Name", fileName)));
+        assertEquals("Expected a single exp.Data row for " + fileName, 1, response.getRows().size());
+        return new URI((String) response.getRows().get(0).get("DataFileUrl")).getPath();
+    }
+
+    private void insertFileRow(String folder, String absoluteFilePath, String davUrl) throws Exception
+    {
+        new QueryApiHelper(WebTestHelper.getRemoteApiConnection(), getProjectName() + "/" + folder, "exp", "Data")
+                .insertRows(List.of(Map.of("AbsoluteFilePath", absoluteFilePath, "davUrl", davUrl)));
     }
 
     @Override
