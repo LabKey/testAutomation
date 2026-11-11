@@ -18,7 +18,6 @@ package org.labkey.test;
 import org.apache.commons.collections4.MultiValuedMap;
 import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -360,6 +359,14 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     profile.setPreference("dom.max_chrome_script_run_time", 0);
                     //profile.setPreference("dom.reporting.enabled", true); // Enable support for CSP report-to
 
+                    if (TestProperties.isRunWebDriverHeadless())
+                    {
+                        // Bypass clipboard permission prompts
+                        profile.setPreference("dom.events.asyncClipboard.readText", true);
+                        profile.setPreference("dom.events.asyncClipboard.clipboardItem", true);
+                        profile.setPreference("dom.events.testing.asyncClipboard", true);
+                    }
+
                     // Prevent crawler from hanging on '_print=1' pages
                     profile.setPreference("print.always_print_silent", true);
                     profile.setPreference("print_printer", "Print to File");
@@ -418,8 +425,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                         capabilities.setBinary(browserPath);
                     }
 
-                    // TODO: revert before merging; experiment for Firefox 153 dying while opening its first window on the Windows agents
-                    if (TestProperties.isRunWebDriverHeadless() || SystemUtils.IS_OS_WINDOWS)
+                    if (TestProperties.isRunWebDriverHeadless())
                     {
                         TestLogger.warn("Launching Firefox in headless mode. This is still experimental");
                         capabilities.addArguments("--headless");
@@ -531,6 +537,12 @@ public abstract class WebDriverWrapper implements WrapsDriver
     public boolean isFirefox()
     {
         return BrowserType.FIREFOX.matchesDriver(getDriver());
+    }
+
+    // The clipboard prefs that allow navigator.clipboard without a user gesture are only set for headless Firefox
+    private boolean isHeadlessFirefox()
+    {
+        return TestProperties.isRunWebDriverHeadless() && isFirefox();
     }
 
     public Object executeScript(@Language("JavaScript") String script, Object... arguments)
@@ -3532,7 +3544,9 @@ public abstract class WebDriverWrapper implements WrapsDriver
             if (isExt4FormField(input))
             {
                 // clear() blurs the field, which lets an Ext4 form refill it (e.g. with a default) before the text is typed
-                input.sendKeys(Keys.chord(WebDriverUtils.MODIFIER_KEY, "a"), text);
+                // Typing in the same sendKeys call as the chord sends it with the modifier still held
+                input.sendKeys(Keys.chord(WebDriverUtils.MODIFIER_KEY, "a"));
+                input.sendKeys(text);
             }
             else
             {
@@ -3637,19 +3651,38 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     protected void setClipboardContent(String text, boolean isHtml)
     {
-        Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
-        Transferable sel;
-
-        if (isHtml)
+        if (isHeadlessFirefox())
         {
-            sel = new HtmlFragmentSelection(text);
+            // Headless Firefox has its own clipboard, separate from the system clipboard
+            if (isHtml)
+            {
+                executeScript("""
+                        return navigator.clipboard.write([new ClipboardItem({
+                            'text/html': new Blob([arguments[0]], {type: 'text/html'}),
+                            'text/plain': new Blob([arguments[0]], {type: 'text/plain'})
+                        })]);""", text);
+            }
+            else
+            {
+                executeScript("return navigator.clipboard.writeText(arguments[0]);", text);
+            }
         }
         else
         {
-            sel = new StringSelection(text);
-        }
+            Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
+            Transferable sel;
 
-        c.setContents(sel, null);
+            if (isHtml)
+            {
+                sel = new HtmlFragmentSelection(text);
+            }
+            else
+            {
+                sel = new StringSelection(text);
+            }
+
+            c.setContents(sel, null);
+        }
     }
 
     protected void setClipboardContent(String text)
@@ -3659,6 +3692,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public String getClipboardContent() throws IOException, UnsupportedFlavorException
     {
+        if (isHeadlessFirefox())
+        {
+            return (String) executeScript("return navigator.clipboard.readText();");
+        }
+
         Transferable t = Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null);
 
         if (t != null)
