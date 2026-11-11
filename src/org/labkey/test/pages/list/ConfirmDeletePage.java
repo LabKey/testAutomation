@@ -36,6 +36,11 @@ public class ConfirmDeletePage extends LabKeyPage<ConfirmDeletePage.ElementCache
         _deleteBtnText = deleteBtnText;
     }
 
+    public boolean isConfirmDeletePresent()
+    {
+        return elementCache().deleteButton.isDisplayed();
+    }
+
     public BeginPage confirmDelete()
     {
         clickAndWait(elementCache().deleteButton);

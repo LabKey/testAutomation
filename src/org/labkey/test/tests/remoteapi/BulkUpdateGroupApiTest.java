@@ -15,6 +15,8 @@
  */
 package org.labkey.test.tests.remoteapi;
 
+import org.assertj.core.api.Assertions;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -29,6 +31,7 @@ import org.labkey.test.categories.Daily;
 import org.labkey.test.tests.AuditLogTest;
 import org.labkey.test.util.APIUserHelper;
 import org.labkey.test.util.ApiPermissionsHelper;
+import org.labkey.test.util.ApiPermissionsHelper.Group;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PermissionsHelper;
 import org.labkey.test.util.PermissionsHelper.PrincipalType;
@@ -63,6 +66,7 @@ public class BulkUpdateGroupApiTest extends BaseWebDriverTest
     private static Integer group1Id;
     private static Integer group2Id;
     private static final String siteGroup = "createdSiteGroup";
+    private static final String PRE_EXISTING_SITE_GROUP = "preexistingSiteGroup";
     private static final String OTHER_PROJECT = "BulkUpdateGroupApiTest Other Project";
     private static final String OTHER_GROUP = "otherProjectGroup";
     private static Integer otherProjectGroupId;
@@ -74,6 +78,7 @@ public class BulkUpdateGroupApiTest extends BaseWebDriverTest
         _containerHelper.deleteProject(OTHER_PROJECT, afterTest);
         deleteTestUsers(EMAIL_SUFFIX);
         _permissionsHelper.deleteGroup(siteGroup);
+        _permissionsHelper.deleteGroup(PRE_EXISTING_SITE_GROUP);
     }
 
     private void deleteTestUsers(String suffix)
@@ -271,21 +276,29 @@ public class BulkUpdateGroupApiTest extends BaseWebDriverTest
     @Test
     public void testAddToSystemGroups() throws Exception
     {
+        List<Group> systemGroups = new ApiPermissionsHelper(this).getSiteGroups().stream().filter(g -> g.id() < 0).toList();
+        Assertions.assertThat(systemGroups.stream().map(Group::name).toList()).as("System groups").hasSize(2);
+
         // Attempt to add members to "Site: All Site Users" and "Site: Guests"
-        for (int groupId : new int[]{-2, -3})
+        for (Group group : systemGroups)
         {
-            BulkUpdateGroupCommand command = new BulkUpdateGroupCommand(groupId);
+            BulkUpdateGroupCommand command = new BulkUpdateGroupCommand(group.id());
             command.addMemberUser(USER1);
             Connection connection = createDefaultConnection();
 
-            BulkUpdateGroupResponse response = command.execute(connection, getProjectName());
+            try
+            {
+                command.execute(connection, null);
+                Assert.fail("Adding members to read-only site group '%s' should have failed".formatted(group.name()));
+            }
+            catch (CommandException e)
+            {
+                Assertions.assertThat(e).message().startsWith("Can not update members of system group:");
+            }
 
-            List<String> errors = collectErrors(response);
-            assertEquals("Expected one error but errors were:\n" + String.join("\n", errors), 1, errors.size());
-            String error = errors.getFirst();
-            assertTrue(error.startsWith("Can't add a member to the ") && error.endsWith(" group"));
         }
     }
+
 
     @Test
     public void testCreateGroupWithMembers() throws Exception
@@ -531,6 +544,29 @@ public class BulkUpdateGroupApiTest extends BaseWebDriverTest
         }
 
         _permissionsHelper.assertUserNotInGroup(USER1, OTHER_GROUP, OTHER_PROJECT, PrincipalType.USER);
+    }
+
+    // Site groups may only be modified from the root container, even by a site admin.
+    @Test
+    public void testModifySiteGroupFromProjectError() throws Exception
+    {
+        int siteGroupId = _permissionsHelper.createGlobalPermissionsGroup(PRE_EXISTING_SITE_GROUP);
+
+        BulkUpdateGroupCommand command = new BulkUpdateGroupCommand(siteGroupId);
+        command.addMemberUser(USER1);
+        Connection connection = createDefaultConnection();
+
+        try
+        {
+            String message = command.execute(connection, getProjectName()).getText();
+            fail("Expected CommandException modifying a site group from a project\nResponse:\n" + message);
+        }
+        catch (CommandException e)
+        {
+            assertEquals("Wrong status modifying a site group from a project: " + e.getMessage(), 403, e.getStatusCode());
+        }
+
+        _permissionsHelper.assertUserNotInGroup(USER1, PRE_EXISTING_SITE_GROUP, "/", PrincipalType.USER);
     }
 
     // Adding an existing user to a group requires only AdminPermission, but creating a brand-new user additionally requires AddUserPermission.
