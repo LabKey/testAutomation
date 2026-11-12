@@ -40,4 +40,28 @@
             ]]>
         </response>
     </test>
+    <test name="build URL slashes" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+                urls <- c(
+                    Rlabkey:::labkey.buildURL("https://lk.test", "query", "selectRows.api", "home"),
+                    Rlabkey:::labkey.buildURL("https://lk.test/", "query", "selectRows.api", "/home/"),
+                    Rlabkey:::labkey.buildURL("https://lk.test/labkey", "query", "selectRows.api", "/my folder/sub"),
+                    Rlabkey:::labkey.buildURL("https://lk.test", "query", "selectRows.api", "/"),
+                    Rlabkey:::labkey.buildURL("https://lk.test", "query", "getQueries.api", "home", list(schemaName="lists")))
+                cat(paste0("url: ", urls, "\n"), sep="")
+                cat("doubled slash:", any(grepl("[^:]//", urls)), "\n")
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                url: https://lk.test/home/query-selectRows.api
+                url: https://lk.test/labkey/my%20folder/sub/query-selectRows.api
+                url: https://lk.test/query-selectRows.api
+                url: https://lk.test/home/query-getQueries.api?schemaName=lists
+                doubled slash: FALSE
+            ]]>
+        </response>
+    </test>
 </ApiTests>
