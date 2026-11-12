@@ -609,9 +609,8 @@ public class TestDataGenerator
 
     /**
      * Creates a String containing the given part with random characters from charSet surrounding it. The name
-     * will have leading and trailing spaces removed and multiple internal spaces collapsed to a single space
-     * in order to be compatible with UI display. Because of this space treatment, there may be fewer than the
-     * specified number of characters before and after the given part.
+     * will have leading and trailing spaces removed in order to be compatible with UI display. Because of this
+     * trimming, there may be fewer than the specified number of characters before and after the given part.
      *
      * @param part          the part that is to be included between random strings
      * @param numStartChars maximum number of random characters from charSet
@@ -720,9 +719,13 @@ public class TestDataGenerator
         String chars = ALL_ILLEGAL_QUERY_KEY_CHARACTERS + " %()=+-[]_|*`'\":;\\<>?!@#^" + NON_LATIN_STRING
                 + WIDE_PLACEHOLDER + REPEAT_PLACEHOLDER + ALL_CHARS_PLACEHOLDER;
 
+        // A part that already yields adjacent label spaces could never pass the check. The caller must have provided it for a reason.
+        boolean checkLabelSpaces = !hasAdjacentLabelSpaces(part);
         int currentTries = 0;
         RandomName randomFieldName = randomName(part, getNumChars(numStartChars, 5), getNumChars(numEndChars, 50), chars, exclusion);
-        while ((maxLength != null && randomFieldName.name().length() > maxLength) || isDomainAndFieldNameInvalid(_domainKind, null, randomFieldName))
+        while ((maxLength != null && randomFieldName.name().length() > maxLength)
+                || (checkLabelSpaces && hasAdjacentLabelSpaces(randomFieldName.name()))
+                || isDomainAndFieldNameInvalid(_domainKind, null, randomFieldName))
         {
             randomFieldName = randomName(part, getNumChars(numStartChars, 5), getNumChars(numEndChars, 50), chars, exclusion);
             if (++currentTries >= MAX_RANDOM_TRIES)
@@ -730,8 +733,13 @@ public class TestDataGenerator
         }
 
         TestLogger.log("Generated random field name for domainKind " + _domainKind + ": " + randomFieldName);
-        // Consistent with randomDomainName: UI collapses multiple whitespace chars to a single space
-        return randomFieldName.name().replaceAll("\\s+", " ");
+        return randomFieldName.name();
+    }
+
+    // labelFromName turns '_' into a space, so '_' next to a space yields adjacent spaces in the default label
+    private static boolean hasAdjacentLabelSpaces(String fieldName)
+    {
+        return FieldDefinition.labelFromName(fieldName).contains("  ");
     }
 
     private static boolean isDomainAndFieldNameInvalid(DomainKind domainKind, @Nullable RandomName domainName, @Nullable RandomName fieldName)
