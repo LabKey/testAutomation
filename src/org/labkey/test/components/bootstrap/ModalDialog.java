@@ -184,7 +184,7 @@ public class ModalDialog extends WebDriverComponent<ModalDialog.ElementCache>
 
     public static class ModalDialogFinder extends WebDriverComponent.WebDriverComponentFinder<ModalDialog, ModalDialogFinder>
     {
-        private Locator _locator;
+        private Locator.XPathLocator _locator;
 
         public ModalDialogFinder(WebDriver driver)
         {
@@ -207,6 +207,13 @@ public class ModalDialog extends WebDriverComponent<ModalDialog.ElementCache>
         public ModalDialogFinder withBodyTextContaining(String text)
         {
             _locator = Locators.dialog.withDescendant(Locators.body.containing(text));
+            return this;
+        }
+
+        /** Skip a placeholder dialog that only shows a spinner until a loaded dialog replaces it. */
+        public ModalDialogFinder withoutLoadingSpinner()
+        {
+            _locator = _locator.withoutPredicate(BootstrapLocators.loadingSpinner);
             return this;
         }
 
