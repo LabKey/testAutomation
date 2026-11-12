@@ -43,6 +43,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import static org.labkey.test.components.ext4.Window.Window;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -105,6 +106,7 @@ public class UpdateFilePropsContainerScopeTest extends BaseWebDriverTest
         final File localFile = TestFileUtils.getSampleData("security/InlineFile.html");
         navigateToFolder(getProjectName(), FOLDER_A);
         _fileBrowserHelper.uploadFile(localFile);
+        dismissFilePropertiesWindow();
         String localFileUrl = WebDavUtils.buildBaseWebDavUrl(getProjectName() + "/" + FOLDER_A) + localFile.getName();
 
         goToProjectHome();
@@ -151,6 +153,8 @@ public class UpdateFilePropsContainerScopeTest extends BaseWebDriverTest
         final File localFile = TestFileUtils.getSampleData("security/InlineFile_drop.html");
         navigateToFolder(getProjectName(), FOLDER_A);
         _fileBrowserHelper.uploadFile(localFile);
+        dismissFilePropertiesWindow();
+
         String localFileUrl = WebDavUtils.buildBaseWebDavUrl(getProjectName() + "/" + FOLDER_A) + localFile.getName();
 
         final File foreignFile = TestFileUtils.getSampleData("security/InlineFile.html");
@@ -178,6 +182,13 @@ public class UpdateFilePropsContainerScopeTest extends BaseWebDriverTest
 
         log("A davUrl naming a resource in another folder should be rejected.");
         assertRejected(FOLDER_A, Map.of("AbsoluteFilePath", localPath, "davUrl", foreignFileUrl), FOLDER_ERROR);
+    }
+
+    /** Only FolderA has a file properties domain, so its uploads leave a modal whose mask blocks the folder menu. */
+    private void dismissFilePropertiesWindow()
+    {
+        Window(getDriver()).withTitle("Extended File Properties").waitFor().clickButton("Cancel", true);
+        _ext4Helper.waitForMaskToDisappear();
     }
 
     private void assertRejected(String folder, Map<String, String> row, String expectedMessage) throws Exception
