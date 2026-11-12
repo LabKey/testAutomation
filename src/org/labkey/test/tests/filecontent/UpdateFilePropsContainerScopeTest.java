@@ -23,6 +23,8 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.SimplePostCommand;
+import org.labkey.remoteapi.query.Filter;
+import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebTestHelper;
@@ -31,11 +33,18 @@ import org.labkey.test.categories.FileBrowser;
 import org.labkey.test.components.DomainDesignerPage;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.core.webdav.WebDavUtils;
+import org.labkey.test.util.query.QueryApiHelper;
 
 import java.io.File;
+import java.net.URI;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
+import static org.labkey.test.components.ext4.Window.Window;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -46,6 +55,8 @@ public class UpdateFilePropsContainerScopeTest extends BaseWebDriverTest
     private static final String FOLDER_A = "FolderA";
     private static final String FOLDER_B = "FolderB";
     private static final String CUSTOM_PROPERTY = "CustomProp";
+    private static final String ROOTS_ERROR = "managed file roots";
+    private static final String FOLDER_ERROR = "is not in this folder";
 
     @Override
     protected @Nullable String getProjectName()
@@ -95,6 +106,7 @@ public class UpdateFilePropsContainerScopeTest extends BaseWebDriverTest
         final File localFile = TestFileUtils.getSampleData("security/InlineFile.html");
         navigateToFolder(getProjectName(), FOLDER_A);
         _fileBrowserHelper.uploadFile(localFile);
+        dismissFilePropertiesWindow();
         String localFileUrl = WebDavUtils.buildBaseWebDavUrl(getProjectName() + "/" + FOLDER_A) + localFile.getName();
 
         goToProjectHome();
@@ -133,6 +145,78 @@ public class UpdateFilePropsContainerScopeTest extends BaseWebDriverTest
         SimplePostCommand cmd = new SimplePostCommand("filecontent", "updateFileProps");
         cmd.setJsonObject(body);
         cmd.execute(WebTestHelper.getRemoteApiConnection(), getProjectName() + "/" + folder);
+    }
+
+    @Test
+    public void testAbsoluteFilePathMustBeUnderFolderRoot() throws Exception
+    {
+        final File localFile = TestFileUtils.getSampleData("security/InlineFile_drop.html");
+        navigateToFolder(getProjectName(), FOLDER_A);
+        _fileBrowserHelper.uploadFile(localFile);
+        dismissFilePropertiesWindow();
+
+        String localFileUrl = WebDavUtils.buildBaseWebDavUrl(getProjectName() + "/" + FOLDER_A) + localFile.getName();
+
+        final File foreignFile = TestFileUtils.getSampleData("security/InlineFile.html");
+        navigateToFolder(getProjectName(), FOLDER_B);
+        _fileBrowserHelper.uploadFile(foreignFile);
+        String foreignFileUrl = WebDavUtils.buildBaseWebDavUrl(getProjectName() + "/" + FOLDER_B) + foreignFile.getName();
+
+        String localPath = absoluteFilePath(FOLDER_A, localFile.getName());
+        String foreignPath = absoluteFilePath(FOLDER_B, foreignFile.getName());
+
+        log("A path under the folder's own file root, with no davUrl, should be accepted.");
+        insertFileRow(FOLDER_A, Map.of("AbsoluteFilePath", localPath));
+
+        log("A path outside the folder's file roots should be rejected.");
+        assertRejected(FOLDER_A, Map.of("AbsoluteFilePath", foreignPath, "davUrl", localFileUrl), ROOTS_ERROR);
+
+        log("A traversing path that starts with the folder's own root should be rejected.");
+        Path localDir = Paths.get(localPath).getParent();
+        String traversing = localDir.resolve(localDir.relativize(Paths.get(foreignPath))).toString();
+        assertTrue("Expected a traversing path, got: " + traversing, traversing.contains(".."));
+        assertRejected(FOLDER_A, Map.of("AbsoluteFilePath", traversing, "davUrl", localFileUrl), ROOTS_ERROR);
+
+        log("An out-of-root path supplied as DataFileUrl should be rejected too.");
+        assertRejected(FOLDER_A, Map.of("DataFileUrl", Paths.get(foreignPath).toUri().toString()), ROOTS_ERROR);
+
+        log("A davUrl naming a resource in another folder should be rejected.");
+        assertRejected(FOLDER_A, Map.of("AbsoluteFilePath", localPath, "davUrl", foreignFileUrl), FOLDER_ERROR);
+    }
+
+    /** Only FolderA has a file properties domain, so its uploads leave a modal whose mask blocks the folder menu. */
+    private void dismissFilePropertiesWindow()
+    {
+        Window(getDriver()).withTitle("Extended File Properties").waitFor().clickButton("Cancel", true);
+        _ext4Helper.waitForMaskToDisappear();
+    }
+
+    private void assertRejected(String folder, Map<String, String> row, String expectedMessage) throws Exception
+    {
+        try
+        {
+            insertFileRow(folder, row);
+            fail("Expected rejection of " + row);
+        }
+        catch (CommandException ex)
+        {
+            assertTrue("Expected '" + expectedMessage + "' in error message, got: " + ex.getMessage(),
+                    ex.getMessage() != null && ex.getMessage().contains(expectedMessage));
+        }
+    }
+
+    private String absoluteFilePath(String folder, String fileName) throws Exception
+    {
+        SelectRowsResponse response = new QueryApiHelper(WebTestHelper.getRemoteApiConnection(), getProjectName() + "/" + folder, "exp", "Data")
+                .selectRows(List.of("Name", "DataFileUrl"), List.of(new Filter("Name", fileName)));
+        assertEquals("Expected a single exp.Data row for " + fileName, 1, response.getRows().size());
+        return Paths.get(URI.create((String) response.getRows().get(0).get("DataFileUrl"))).toString();
+    }
+
+    private void insertFileRow(String folder, Map<String, String> row) throws Exception
+    {
+        new QueryApiHelper(WebTestHelper.getRemoteApiConnection(), getProjectName() + "/" + folder, "exp", "Data")
+                .insertRows(List.of(row));
     }
 
     @Override

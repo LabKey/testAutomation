@@ -89,7 +89,7 @@ XarSchema_minimum.xsd">
 		<exp:Data rdf:about="${AutoFileLSID}">
 			<exp:Name>Tandem Settings</exp:Name>
 			<exp:CpasType>Data</exp:CpasType>
-			<exp:DataFileUrl>\xtandem\Example5\tandem.xml</exp:DataFileUrl>
+			<exp:DataFileUrl>xtandem\Example5\tandem.xml</exp:DataFileUrl>
 		</exp:Data>
 		<exp:Data rdf:about="${AutoFileLSID}">
 			<exp:Name>Bovine_mini.fasta</exp:Name>
@@ -107,12 +107,12 @@ XarSchema_minimum.xsd">
 				<exp:ExperimentLogEntry ActionSequenceRef="1"/>
 				<exp:ExperimentLogEntry ActionSequenceRef="60">
 					<exp:CommonParametersApplied>
-						<exp:SimpleVal Name="OutputDataFileTemplate" OntologyEntryURI="terms.fhcrc.org#XarTemplate.OutputDataFile" ValueType="String">\xtandem\Example5\CAexample_mini.xtan.xml</exp:SimpleVal>
+						<exp:SimpleVal Name="OutputDataFileTemplate" OntologyEntryURI="terms.fhcrc.org#XarTemplate.OutputDataFile" ValueType="String">xtandem\Example5\CAexample_mini.xtan.xml</exp:SimpleVal>
 					</exp:CommonParametersApplied>
 				</exp:ExperimentLogEntry>
 				<exp:ExperimentLogEntry ActionSequenceRef="70">
 					<exp:CommonParametersApplied>
-						<exp:SimpleVal Name="OutputDataFileTemplate" OntologyEntryURI="terms.fhcrc.org#XarTemplate.OutputDataFile" ValueType="String">\xtandem\Example5\CAexample_mini.pep.xml</exp:SimpleVal>
+						<exp:SimpleVal Name="OutputDataFileTemplate" OntologyEntryURI="terms.fhcrc.org#XarTemplate.OutputDataFile" ValueType="String">xtandem\Example5\CAexample_mini.pep.xml</exp:SimpleVal>
 					</exp:CommonParametersApplied>
 				</exp:ExperimentLogEntry>
 				<exp:ExperimentLogEntry ActionSequenceRef="1000"/>
