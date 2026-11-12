@@ -48,6 +48,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.labkey.test.util.PermissionsHelper.AUTHOR_ROLE;
 import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
 import static org.labkey.test.util.PermissionsHelper.READER_ROLE;
 
@@ -56,6 +57,7 @@ public class AnnouncementAPITest extends BaseWebDriverTest
 {
     private static final String OTHER_PROJECT = "AnnouncementAPITest Other Project";
     private static final TestUser EDITOR = new TestUser("editor@announcementapi.test");
+    private static final TestUser AUTHOR = new TestUser("author@announcementapi.test");
 
     @BeforeClass
     public static void setupProject()
@@ -70,6 +72,7 @@ public class AnnouncementAPITest extends BaseWebDriverTest
         _containerHelper.createProject(getProjectName());
         _containerHelper.createProject(OTHER_PROJECT);
         EDITOR.create(this).setInitialPassword().addPermission(EDITOR_ROLE, getProjectName());
+        AUTHOR.create(this).setInitialPassword().addPermission(AUTHOR_ROLE, getProjectName());
     }
 
     @Override
@@ -77,7 +80,7 @@ public class AnnouncementAPITest extends BaseWebDriverTest
     {
         super.doCleanup(afterTest);
         _containerHelper.deleteProject(OTHER_PROJECT, false);
-        _userHelper.deleteUsers(false, EDITOR);
+        _userHelper.deleteUsers(false, EDITOR, AUTHOR);
     }
 
     @Before
@@ -428,6 +431,27 @@ public class AnnouncementAPITest extends BaseWebDriverTest
         // Positive control: an ordinary edit of the editor's own message still works
         updateChangingKeys(editorConnection, ownKey, Map.of("RowId", ownThread.getRowId(), "Title", "Edited"));
         assertThat("Editor's title", getThread(ownThread).getAnnouncementModel().getTitle(), is("Edited"));
+    }
+
+    // GH Issue 1853
+    @Test
+    public void testUpdateFormCannotRetargetMessage() throws Exception
+    {
+        AnnouncementModel adminThread = createThread(new AnnouncementModel().setTitle("Admin thread").setBody("admin body"));
+        Connection authorConnection = AUTHOR.getUserConnection();
+        AnnouncementModel ownThread = new CreateMessageThreadCommand(new AnnouncementModel().setTitle("Author thread").setBody("body"))
+                .execute(authorConnection, getProjectName())
+                .getAnnouncementModel();
+
+        SimplePostCommand update = new SimplePostCommand("announcements", "update");
+        update.setParameters(Map.of("entityId", ownThread.getEntityId(), "rowId", adminThread.getRowId(), "title", "Overwritten", "body", "Overwritten"));
+        assertThrows("Expect update to refuse a row other than the one checked",
+                CommandException.class,
+                () -> update.execute(authorConnection, getProjectName()));
+
+        AnnouncementModel adminAfter = getThread(adminThread).getAnnouncementModel();
+        assertThat("Admin thread title", adminAfter.getTitle(), is("Admin thread"));
+        assertThat("Admin thread body", adminAfter.getBody(), is("admin body"));
     }
 
     private void updateChangingKeys(Connection connection, Map<String, Object> oldKeys, Map<String, Object> values) throws Exception
