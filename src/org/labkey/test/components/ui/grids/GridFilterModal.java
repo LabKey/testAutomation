@@ -26,6 +26,7 @@ import org.labkey.test.components.ui.search.FilterFacetedPanel;
 import org.labkey.test.params.WrapsFieldKey;
 import org.labkey.test.util.selenium.WebElementUtils;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -168,25 +169,26 @@ public class GridFilterModal extends ModalDialog
      */
     private Tabs filterTabs()
     {
-        WebDriverWrapper.waitFor(() -> Locator.byClass("nav-tabs").existsIn(elementCache().filterPanel),
-                "Filter tabs never appeared for the selected field", 10_000);
+        WebDriverWrapper.waitFor(() -> {
+            try
+            {
+                return Locator.byClass("nav-tabs").existsIn(elementCache().filterPanel);
+            }
+            catch (NoSuchElementException | StaleElementReferenceException retry)
+            {
+                // The values column is re-rendered around the spinner, so its elements come and go
+                return false;
+            }
+        }, "Filter tabs never appeared for the selected field", 10_000);
         return elementCache().filterTabs;
     }
 
+    /**
+     * @return key of the selected tab ('Filter' or 'ChooseValues'), which is independent of the tab's label
+     */
     public String getActiveTab()
     {
-        String activeTab = "";
-
-        for(String tabText : getTabText())
-        {
-            if(filterTabs().isTabSelected(tabText))
-            {
-                activeTab = tabText;
-                break;
-            }
-        }
-
-        return activeTab;
+        return filterTabs().getSelectedTabKey();
     }
 
     /**
