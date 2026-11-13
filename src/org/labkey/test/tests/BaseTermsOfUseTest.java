@@ -35,7 +35,6 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.labkey.api.security.UserManager.USER_AUDIT_EVENT;
-import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
 import static org.labkey.test.util.PermissionsHelper.READER_ROLE;
 
 public class BaseTermsOfUseTest extends BaseWebDriverTest
@@ -44,7 +43,6 @@ public class BaseTermsOfUseTest extends BaseWebDriverTest
     protected static final String PUBLIC_TERMS_PROJECT_NAME = "TermsOfUse Public Project";
     protected static final String NON_PUBLIC_TERMS_PROJECT2_NAME = "TermsOfUse Non-Public Project 2";
     protected static final String NON_PUBLIC_TERMS_PROJECT_NAME = "TermsOfUse Non-Public Project";
-    protected static final String USERS_GROUP = "Users";
     protected static final String USER = "termsofuse_user2@termsofuse.test";
 
     protected final PortalHelper _portalHelper = new PortalHelper(this);
@@ -79,7 +77,6 @@ public class BaseTermsOfUseTest extends BaseWebDriverTest
     protected void doSetup()
     {
         _userHelper.createUser(USER);
-        _permissionsHelper.createPermissionsGroup(USERS_GROUP, USER);
 
         createPublicProject(PUBLIC_NO_TERMS_PROJECT_NAME);
         createProjectWithTermsOfUse(PUBLIC_TERMS_PROJECT_NAME, "The first rule of fight club is do not talk about fight club.", true);
@@ -91,7 +88,6 @@ public class BaseTermsOfUseTest extends BaseWebDriverTest
     {
         log("Create public project " + projectName);
         _containerHelper.createProject(projectName, null);
-        _permissionsHelper.setPermissions(USERS_GROUP, EDITOR_ROLE);
         _permissionsHelper.setSiteGroupPermissions("All Site Users", READER_ROLE);
         _permissionsHelper.setSiteGroupPermissions("Guests", READER_ROLE);
     }
