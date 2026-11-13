@@ -325,14 +325,7 @@ public class SampleTypeTest extends BaseWebDriverTest
                 containsString("You have 2 field errors."));
         checker().screenShotIfNewError("duplicateImportAlias");
 
-        log("Aliases differing only by case are still duplicates.");
-        createPage = new CreateSampleTypePage(this.getDriver());
-        fieldsPanel.getField(fieldTwo).setImportAliases(sharedAlias.toUpperCase());
-        checker().verifyThat("Expected an error when two fields share an import alias differing only by case",
-                String.join("\n", createPage.clickSaveExpectingErrors()),
-                containsString("You have 2 field errors."));
-        checker().screenShotIfNewError("duplicateImportAliasIgnoringCase");
-
+        // Interleave the scenarios so consecutive saves don't produce identical errors
         log("Verify there can be no import aliases that collide with field names (case-insensitive).");
         createPage = new CreateSampleTypePage(this.getDriver());
         fieldsPanel.getField(fieldTwo).setImportAliases("");
@@ -342,8 +335,18 @@ public class SampleTypeTest extends BaseWebDriverTest
                 containsString("Import alias '" + fieldTwo + "' on field '" + fieldOne + "' conflicts with a field name."));
         checker().screenShotIfNewError("importAliasConflictsWithFieldName");
 
+        log("Aliases differing only by case are still duplicates.");
+        createPage = new CreateSampleTypePage(this.getDriver());
+        fieldsPanel.getField(fieldOne).setImportAliases(sharedAlias);
+        fieldsPanel.getField(fieldTwo).setImportAliases(sharedAlias.toUpperCase());
+        checker().verifyThat("Expected an error when two fields share an import alias differing only by case",
+                String.join("\n", createPage.clickSaveExpectingErrors()),
+                containsString("You have 2 field errors."));
+        checker().screenShotIfNewError("duplicateImportAliasIgnoringCase");
+
         log("An alias that matches a field name except for case is still a conflict.");
         createPage = new CreateSampleTypePage(this.getDriver());
+        fieldsPanel.getField(fieldTwo).setImportAliases("");
         fieldsPanel.getField(fieldOne).setImportAliases(fieldTwo.toLowerCase());
         checker().verifyThat("Expected an error when an import alias matches another field's name except for case",
                 String.join("\n", createPage.clickSaveExpectingErrors()),

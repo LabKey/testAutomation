@@ -18,6 +18,8 @@ package org.labkey.test.components.react;
 import org.jetbrains.annotations.NotNull;
 import org.labkey.test.Locator;
 import org.labkey.test.util.TestLogger;
+import org.labkey.test.util.selenium.ScrollUtils;
+import org.labkey.test.util.selenium.ScrollUtils.Alignment;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
@@ -99,7 +101,7 @@ public class ReactSelect extends BaseReactSelect<ReactSelect>
             try
             {
                 optionEl = elementCache().findOption(option);
-                getWrapper().scrollIntoView(optionEl);
+                scrollOptionIntoView(optionEl);
             }
             catch (NoSuchElementException nse)
             {
@@ -135,7 +137,7 @@ public class ReactSelect extends BaseReactSelect<ReactSelect>
         for (int i = 0; i < 5 && !optionEl.isDisplayed(); i++)
         {
             sleep(500);
-            getWrapper().scrollIntoView(optionEl);
+            scrollOptionIntoView(optionEl);
             TestLogger.debug("scroll optionEl into view, attempt " + i);
         }
 
@@ -145,6 +147,12 @@ public class ReactSelect extends BaseReactSelect<ReactSelect>
         optionEl.click();
 
         new FluentWait<>(getWrapper().getDriver()).withTimeout(Duration.ofSeconds(1)).until(ExpectedConditions.stalenessOf(optionEl));
+    }
+
+    // Aligning a tall option to the end of a short menu can scroll its center out of the list, leaving it unclickable
+    private void scrollOptionIntoView(WebElement optionEl)
+    {
+        ScrollUtils.scrollIntoView(optionEl, Alignment.nearest, Alignment.nearest);
     }
 
     @Override

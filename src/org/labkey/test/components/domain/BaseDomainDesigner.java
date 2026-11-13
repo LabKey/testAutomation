@@ -17,9 +17,11 @@ package org.labkey.test.components.domain;
 
 import org.labkey.test.BootstrapLocators;
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.util.selenium.ScrollUtils;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -89,8 +91,27 @@ public abstract class BaseDomainDesigner<EC extends BaseDomainDesigner.ElementCa
 
     public List<String> clickSaveExpectingErrors()
     {
+        List<String> previousErrors = getErrors();
         elementCache().saveButton.click();
-        return getWrapper().getTexts(BootstrapLocators.errorBanner.waitForElements(getWrapper().shortWait())).stream()
+        // The error banner is updated in place rather than re-rendered, so wait for its text to change
+        return WebDriverWrapper.waitFor(() -> {
+                    try
+                    {
+                        List<String> errors = getErrors();
+                        return !errors.isEmpty() && !errors.equals(previousErrors) ? errors : null;
+                    }
+                    catch (StaleElementReferenceException ignore)
+                    {
+                        return null;
+                    }
+                },
+                () -> "Save didn't produce new errors. Previous errors: " + previousErrors + ". ",
+                WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
+    }
+
+    private List<String> getErrors()
+    {
+        return getWrapper().getTexts(BootstrapLocators.errorBanner.findElements(getDriver())).stream()
                 .map(String::trim)
                 .collect(Collectors.toList());
     }

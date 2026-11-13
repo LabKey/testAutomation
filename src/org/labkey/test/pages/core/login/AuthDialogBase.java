@@ -16,11 +16,13 @@
 package org.labkey.test.pages.core.login;
 
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.react.ToggleButton;
 import org.labkey.test.params.login.AuthenticationProvider;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 
 public abstract class AuthDialogBase<T extends AuthDialogBase<T>> extends ModalDialog
 {
@@ -80,6 +82,10 @@ public abstract class AuthDialogBase<T extends AuthDialogBase<T>> extends ModalD
     {
         String buttonText = _row == null ? "Finish" : "Apply";
         Locators.dismissButton(buttonText).waitForElement(this, 2000).click();
+        // Required-field errors show immediately; server validation errors arrive after the save request
+        WebDriverWrapper.waitFor(() -> Locator.tagWithClassContaining("div", "modal__tiny-error").existsIn(this) ||
+                        !Locator.byClass("modal__error-message").findOptionalElement(this).map(WebElement::getText).orElse("").isBlank(),
+                "No error was shown after applying the configuration.", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
         return getThis();
     }
 

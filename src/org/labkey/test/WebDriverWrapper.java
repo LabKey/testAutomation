@@ -331,6 +331,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     prefs.put("credentials_enable_service", false);
                     prefs.put("profile.password_manager_enabled", false);
                     prefs.put("safebrowsing.enabled", false); // Disable "This type of file can harm your computer."
+                    if (TestProperties.isRunWebDriverHeadless())
+                    {
+                        // Chrome denies navigator.clipboard.readText (see getClipboardContent) without this
+                        prefs.put("profile.content_settings.exceptions.clipboard", Map.of("*", Map.of("setting", 1)));
+                    }
                     options.setExperimentalOption("prefs", prefs);
                     options.setExperimentalOption("detach", true); // Leaves browser window open after stopping the driver service
                     options.addArguments("test-type"); // Suppress '--ignore-certificate-errors' warning
@@ -364,6 +369,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     profile.setPreference("print_printer", "Print to File");
                     profile.setPreference("print.print_to_filename", new File(downloadDir, "print.pdf").getAbsolutePath());
 
+                    profile.setPreference("browser.chrome.guess_favicon", false); // '/favicon.ico' 404s and generates duplicate session cookies
                     profile.setPreference("browser.download.folderList", 2);
                     profile.setPreference("browser.download.downloadDir", downloadDir.getAbsolutePath());
                     profile.setPreference("browser.download.dir", downloadDir.getAbsolutePath());
@@ -528,6 +534,12 @@ public abstract class WebDriverWrapper implements WrapsDriver
     public boolean isFirefox()
     {
         return BrowserType.FIREFOX.matchesDriver(getDriver());
+    }
+
+    // Headless browsers have their own clipboard, separate from the system clipboard
+    private boolean useBrowserClipboard()
+    {
+        return TestProperties.isRunWebDriverHeadless();
     }
 
     public Object executeScript(@Language("JavaScript") String script, Object... arguments)
@@ -3526,12 +3538,22 @@ public abstract class WebDriverWrapper implements WrapsDriver
         }
         else if (text.length() < 1000 && !text.contains("\n") && !text.contains("\t"))
         {
-            input.clear();
-            if (!waitFor(()-> getFormElement(input).isEmpty(), 500))
+            if (isExt4FormField(input))
             {
-                TestLogger.warn("Failed to clear input: " + input);
+                // clear() blurs the field, which lets an Ext4 form refill it (e.g. with a default) before the text is typed
+                // Typing in the same sendKeys call as the chord sends it with the modifier still held
+                input.sendKeys(Keys.chord(WebDriverUtils.MODIFIER_KEY, "a"));
+                input.sendKeys(text);
             }
-            input.sendKeys(text);
+            else
+            {
+                input.clear();
+                if (!waitFor(()-> getFormElement(input).isEmpty(), 500))
+                {
+                    TestLogger.warn("Failed to clear input: " + input);
+                }
+                input.sendKeys(text);
+            }
             if (!waitFor(()-> getFormElement(input).equals(text), 500))
             {
                 TestLogger.warn("Failed to set input: " + input);
@@ -3553,6 +3575,15 @@ public abstract class WebDriverWrapper implements WrapsDriver
         {
             log("input element is stale, not going to try and fire blur event.");
         }
+    }
+
+    private static final Pattern EXT4_FORM_TEXT_CLASS = Pattern.compile("\\bx4-form-text\\b");
+
+    // Typing over an Ext3 field (e.g. the data region filter dialog) leaves it empty, so this is Ext4 only
+    private boolean isExt4FormField(WebElement input)
+    {
+        String elementClass = input.getDomAttribute("class");
+        return elementClass != null && EXT4_FORM_TEXT_CLASS.matcher(elementClass).find();
     }
 
     public void actionClick(WebElement el)
@@ -3617,19 +3648,37 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     protected void setClipboardContent(String text, boolean isHtml)
     {
-        Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
-        Transferable sel;
-
-        if (isHtml)
+        if (useBrowserClipboard())
         {
-            sel = new HtmlFragmentSelection(text);
+            if (isHtml)
+            {
+                executeScript("""
+                        return navigator.clipboard.write([new ClipboardItem({
+                            'text/html': new Blob([arguments[0]], {type: 'text/html'}),
+                            'text/plain': new Blob([arguments[0]], {type: 'text/plain'})
+                        })]);""", text);
+            }
+            else
+            {
+                executeScript("return navigator.clipboard.writeText(arguments[0]);", text);
+            }
         }
         else
         {
-            sel = new StringSelection(text);
-        }
+            Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
+            Transferable sel;
 
-        c.setContents(sel, null);
+            if (isHtml)
+            {
+                sel = new HtmlFragmentSelection(text);
+            }
+            else
+            {
+                sel = new StringSelection(text);
+            }
+
+            c.setContents(sel, null);
+        }
     }
 
     protected void setClipboardContent(String text)
@@ -3639,6 +3688,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public String getClipboardContent() throws IOException, UnsupportedFlavorException
     {
+        if (useBrowserClipboard())
+        {
+            return (String) executeScript("return navigator.clipboard.readText();");
+        }
+
         Transferable t = Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null);
 
         if (t != null)
