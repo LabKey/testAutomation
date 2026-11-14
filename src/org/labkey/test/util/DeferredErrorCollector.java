@@ -21,6 +21,7 @@ import org.hamcrest.Matcher;
 import org.hamcrest.MatcherAssert;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
 import org.labkey.junit.LabKeyAssert;
 import org.labkey.test.BaseWebDriverTest;
@@ -119,13 +120,18 @@ public class DeferredErrorCollector
     }
 
     /**
-     * Create temporary error collector that takes a screenshot for any recorded errors.
+     * Create temporary error collector that takes a screenshot for any recorded errors, named for the running test method.
      *
      * @return Wrapped error collector. Intended to be used only once.
      */
     public final DeferredErrorCollector withScreenshot()
     {
-        return withScreenshot("recordedError");
+        return withScreenshot(defaultScreenshotName());
+    }
+
+    private static @NotNull String defaultScreenshotName()
+    {
+        return StringUtils.defaultIfBlank(BaseWebDriverTest.getCurrentTestMethodName(), "recordedError");
     }
 
     /**
@@ -171,13 +177,16 @@ public class DeferredErrorCollector
      * Then resets the error mark.
      *
      * @param screenshotName A string to identify screenshots; Will be included in screenshot filenames.
+     *                       Defaults to the running test method's name if blank.
      * @return True if a screenshot was taken, false otherwise.
      * @see #takeScreenShot(String)
      */
-    public boolean screenShotIfNewError(@NotNull String screenshotName)
+    public boolean screenShotIfNewError(@Nullable String screenshotName)
     {
         if (errorsSinceMark() > 0)
         {
+            if (StringUtils.isBlank(screenshotName))
+                screenshotName = defaultScreenshotName();
             final String s = artifactCollector.dumpPageSnapshot(screenshotName);
             allErrors.getLast().setScreenshotName(s);
             artifactCollector.reportTestMetadata(s);
@@ -534,7 +543,7 @@ class DeferredErrorCollectorWrapper extends DeferredErrorCollector
     }
 
     @Override
-    public boolean screenShotIfNewError(@NotNull String screenshotName)
+    public boolean screenShotIfNewError(@Nullable String screenshotName)
     {
         return wrappedCollector.screenShotIfNewError(screenshotName);
     }
