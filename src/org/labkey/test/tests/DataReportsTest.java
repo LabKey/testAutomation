@@ -17,6 +17,8 @@ package org.labkey.test.tests;
 
 import org.apache.hc.core5.http.HttpStatus;
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -586,23 +588,50 @@ public class DataReportsTest extends ReportTest
         assertUnsupportedReportType(adminConnection, "saveReport", scriptReportParams("Admin R report"));
 
         log("The actions still save the report types they're for");
-        Map<String, Object> crosstab = new HashMap<>();
-        crosstab.put("reportType", "ReportService.crosstabReport");
-        crosstab.put("label", "Admin crosstab");
-        crosstab.put("schemaName", "study");
-        crosstab.put("queryName", DATA_SET_NAME);
-        crosstab.put("shareReport", true);
-        // Skip rendering the new report on the redirect, which this test doesn't need
-        crosstab.put("redirectUrl", WebTestHelper.buildRelativeUrl("project", getProjectName() + "/" + getFolderName(), "begin"));
-        postStudyReports(adminConnection, "saveReportView", crosstab);
-        assertTrue("study-reports-saveReportView didn't save a crosstab report", reportNames(adminConnection).contains("Admin crosstab"));
+        // Other test methods use DEM-1's views and reports, so don't leave these behind
+        try
+        {
+            Map<String, Object> crosstab = new HashMap<>();
+            crosstab.put("reportType", "ReportService.crosstabReport");
+            crosstab.put("label", "Admin crosstab");
+            crosstab.put("schemaName", "study");
+            crosstab.put("queryName", DATA_SET_NAME);
+            crosstab.put("shareReport", true);
+            // Skip rendering the new report on the redirect, which this test doesn't need
+            crosstab.put("redirectUrl", WebTestHelper.buildRelativeUrl("project", getProjectName() + "/" + getFolderName(), "begin"));
+            postStudyReports(adminConnection, "saveReportView", crosstab);
+            assertTrue("study-reports-saveReportView didn't save a crosstab report", reportNames(adminConnection).contains("Admin crosstab"));
 
-        Map<String, Object> gridView = new HashMap<>();
-        gridView.put("reportType", "Study.queryReport");
-        gridView.put("label", "Admin grid view");
-        gridView.put("params", "schemaName=study&queryName=" + URLEncoder.encode(DATA_SET_NAME, StandardCharsets.UTF_8));
-        postStudyReports(adminConnection, "saveReport", gridView);
-        assertTrue("study-reports-saveReport didn't save a grid view", reportNames(adminConnection).contains("Admin grid view"));
+            Map<String, Object> gridView = new HashMap<>();
+            gridView.put("reportType", "Study.queryReport");
+            gridView.put("label", "Admin grid view");
+            gridView.put("params", "schemaName=study&queryName=" + URLEncoder.encode(DATA_SET_NAME, StandardCharsets.UTF_8));
+            postStudyReports(adminConnection, "saveReport", gridView);
+            assertTrue("study-reports-saveReport didn't save a grid view", reportNames(adminConnection).contains("Admin grid view"));
+        }
+        finally
+        {
+            deleteReports(adminConnection, "Admin crosstab", "Admin grid view");
+        }
+    }
+
+    private void deleteReports(Connection connection, String... names) throws IOException, CommandException
+    {
+        List<String> toDelete = List.of(names);
+        SimpleGetCommand browse = new SimpleGetCommand("reports", "browseData");
+        browse.setParameters(Map.of("includeData", true, "includeMetadata", false));
+        List<Map<String, Object>> views = browse.execute(connection, getProjectName() + "/" + getFolderName()).getProperty("data");
+        JSONArray matches = new JSONArray();
+        views.stream()
+                .filter(view -> toDelete.contains((String) view.get("name")))
+                .forEach(view -> matches.put(new JSONObject(Map.of("dataType", view.get("dataType"), "id", view.get("id")))));
+        if (matches.isEmpty())
+            return;
+
+        SimplePostCommand delete = new SimplePostCommand("reports", "deleteViews");
+        delete.setJsonObject(new JSONObject(Map.of("views", matches)));
+        delete.execute(connection, getProjectName() + "/" + getFolderName());
+        assertTrue("Reports weren't deleted: " + toDelete, reportNames(connection).stream().noneMatch(toDelete::contains));
     }
 
     private Map<String, Object> scriptReportParams(String label)
