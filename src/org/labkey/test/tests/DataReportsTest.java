@@ -147,6 +147,7 @@ public class DataReportsTest extends ReportTest
     protected final static String AUTHOR_USER = "author_user@report.test";
     private final static String SCRIPT_READER_USER = "script_reader@report.test";
     private final static String SCRIPT_EDITOR_USER = "script_editor@report.test";
+    private final static String GRID_REPORT_VIEW_NAME = "Admin grid view report view";
 
     private final ApiPermissionsHelper _apiPermissionsHelper = new ApiPermissionsHelper(this);
 
@@ -605,13 +606,32 @@ public class DataReportsTest extends ReportTest
             Map<String, Object> gridView = new HashMap<>();
             gridView.put("reportType", "Study.queryReport");
             gridView.put("label", "Admin grid view");
-            gridView.put("params", "schemaName=study&queryName=" + URLEncoder.encode(DATA_SET_NAME, StandardCharsets.UTF_8));
+            // Saving a grid view report creates a hidden shared view of this name; without one, it replaces DEM-1's default view
+            gridView.put("params", "schemaName=study&queryName=" + URLEncoder.encode(DATA_SET_NAME, StandardCharsets.UTF_8) +
+                    "&viewName=" + URLEncoder.encode(GRID_REPORT_VIEW_NAME, StandardCharsets.UTF_8));
             postStudyReports(adminConnection, "saveReport", gridView);
             assertTrue("study-reports-saveReport didn't save a grid view", reportNames(adminConnection).contains("Admin grid view"));
         }
         finally
         {
             deleteReports(adminConnection, "Admin crosstab", "Admin grid view");
+            deleteCustomView(adminConnection, DATA_SET_NAME, GRID_REPORT_VIEW_NAME);
+        }
+    }
+
+    private void deleteCustomView(Connection connection, String queryName, String viewName) throws IOException, CommandException
+    {
+        SimplePostCommand delete = new SimplePostCommand("query", "deleteView");
+        delete.setJsonObject(new JSONObject(Map.of("schemaName", "study", "queryName", queryName, "viewName", viewName)));
+        try
+        {
+            delete.execute(connection, getProjectName() + "/" + getFolderName());
+        }
+        catch (CommandException e)
+        {
+            // The view doesn't exist if the report save failed
+            if (e.getStatusCode() != HttpStatus.SC_NOT_FOUND)
+                throw e;
         }
     }
 
