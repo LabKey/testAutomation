@@ -22,6 +22,7 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.labkey.api.util.FileUtil;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
@@ -61,6 +62,7 @@ import static org.labkey.test.WebTestHelper.isLocalServer;
 public class ArtifactCollector
 {
     private static final Map<String, AtomicInteger> _shotCounters = new ConcurrentHashMap<>();
+    private static final Map<String, AtomicInteger> _publishCounters = new ConcurrentHashMap<>();
 
     private final WebDriverWrapper _driver;
     private final String _dumpDirName;
@@ -134,7 +136,23 @@ public class ArtifactCollector
     {
         File dumpDir = ensureDumpDir();
         final String artifactName = dumpDir.getName() + ".tar.gz";
-        publishArtifact(dumpDir, artifactName);
+        publishArtifact(isTestRunningOnTeamCity() ? snapshotForPublish(dumpDir) : dumpDir, artifactName);
+    }
+
+    // The agent archives published files asynchronously and fails if they change, so publish a copy nothing else will touch
+    private File snapshotForPublish(File dumpDir)
+    {
+        int index = _publishCounters.computeIfAbsent(_dumpDirName, _ -> new AtomicInteger()).getAndIncrement();
+        File snapshot = FileUtil.appendName(FileUtil.appendName(TestProperties.getDumpDir(), "_publish"), dumpDir.getName() + "-" + index);
+        try
+        {
+            FileUtils.copyDirectory(dumpDir, snapshot);
+        }
+        catch (IOException e)
+        {
+            TestLogger.warn("Failed to fully copy test artifacts for publishing: " + dumpDir, e);
+        }
+        return snapshot;
     }
 
     public void reportTestMetadata(String artifactBaseName)
