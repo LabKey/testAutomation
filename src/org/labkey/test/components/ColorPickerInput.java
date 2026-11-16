@@ -56,7 +56,7 @@ public class ColorPickerInput extends WebDriverComponent<ColorPickerInput.Elemen
 
     public Color getSelectedColor()
     {
-        return  Color.fromString(elementCache().selectedColorDiv.getCssValue("background"));
+        return  Color.fromString(elementCache().selectedColorDiv.getCssValue("background-color"));
     }
 
     @Override
