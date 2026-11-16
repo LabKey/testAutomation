@@ -417,12 +417,14 @@ public class AnnouncementAPITest extends BaseWebDriverTest
                 .getAnnouncementModel();
         Map<String, Object> ownKey = Map.of("RowId", ownThread.getRowId());
 
-        assertThrows("Expect saveRows to refuse a row in another folder",
+        CommandException e = assertThrows("Expect saveRows to refuse a row in another folder",
                 CommandException.class,
                 () -> updateChangingKeys(editorConnection, ownKey, Map.of("RowId", otherThread.getRowId(), "Container", otherThread.getContainerId(), "Title", "Overwritten", "Body", "Overwritten")));
-        assertThrows("Expect saveRows to refuse a row in another folder, even without naming that folder",
+        assertThat("Status code", e.getStatusCode(), is(403));
+        e = assertThrows("Expect saveRows to refuse a row in another folder, even without naming that folder",
                 CommandException.class,
                 () -> updateChangingKeys(editorConnection, ownKey, Map.of("RowId", otherThread.getRowId(), "Title", "Overwritten", "Body", "Overwritten")));
+        assertThat("Status code", e.getStatusCode(), is(403));
 
         AnnouncementModel otherAfter = getThread(otherThread, OTHER_PROJECT).getAnnouncementModel();
         assertThat("Other folder's title", otherAfter.getTitle(), is("Other thread"));
