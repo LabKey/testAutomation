@@ -445,13 +445,20 @@ public class AnnouncementAPITest extends BaseWebDriverTest
 
         SimplePostCommand update = new SimplePostCommand("announcements", "update");
         update.setParameters(Map.of("entityId", ownThread.getEntityId(), "rowId", adminThread.getRowId(), "title", "Overwritten", "body", "Overwritten"));
-        assertThrows("Expect update to refuse a row other than the one checked",
+        CommandException e = assertThrows("Expect update to refuse a row other than the one checked",
                 CommandException.class,
                 () -> update.execute(authorConnection, getProjectName()));
+        assertThat("Status code", e.getStatusCode(), is(403));
 
         AnnouncementModel adminAfter = getThread(adminThread).getAnnouncementModel();
         assertThat("Admin thread title", adminAfter.getTitle(), is("Admin thread"));
         assertThat("Admin thread body", adminAfter.getBody(), is("admin body"));
+
+        // Positive control: an ordinary edit of the author's own message still works
+        SimplePostCommand ownUpdate = new SimplePostCommand("announcements", "update");
+        ownUpdate.setParameters(Map.of("entityId", ownThread.getEntityId(), "rowId", ownThread.getRowId(), "title", "Edited", "body", "body"));
+        ownUpdate.execute(authorConnection, getProjectName());
+        assertThat("Author's title", getThread(ownThread).getAnnouncementModel().getTitle(), is("Edited"));
     }
 
     private void updateChangingKeys(Connection connection, Map<String, Object> oldKeys, Map<String, Object> values) throws Exception
