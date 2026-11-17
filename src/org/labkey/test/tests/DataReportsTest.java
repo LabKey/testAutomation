@@ -17,6 +17,8 @@ package org.labkey.test.tests;
 
 import org.apache.hc.core5.http.HttpStatus;
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -25,6 +27,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.SimpleGetCommand;
 import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -32,6 +35,7 @@ import org.labkey.test.SortDirection;
 import org.labkey.test.TestProperties;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.categories.Reports;
 import org.labkey.test.pages.reports.ScriptReportPage;
@@ -55,6 +59,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.labkey.test.util.PermissionsHelper.AUTHOR_ROLE;
@@ -134,6 +139,7 @@ public class DataReportsTest extends ReportTest
     private final static String R_SCRIPT2_TEXT1 = "999320648";
 
     private final static String DATA_SET = "DEM-1: Demographics";
+    private final static String DATA_SET_NAME = "DEM-1";
     private final static String DATA_BASE_PREFIX = "dem";
     private final static String R_SCRIPT1_ORIG_FUNC = "length(x)";
     private final static String R_SCRIPT1_EDIT_FUNC = "length(x) * 2";
@@ -144,6 +150,7 @@ public class DataReportsTest extends ReportTest
     protected final static String AUTHOR_USER = "author_user@report.test";
     private final static String SCRIPT_READER_USER = "script_reader@report.test";
     private final static String SCRIPT_EDITOR_USER = "script_editor@report.test";
+    private final static String GRID_REPORT_VIEW_NAME = "Admin grid view report view";
 
     private final ApiPermissionsHelper _apiPermissionsHelper = new ApiPermissionsHelper(this);
 
@@ -566,21 +573,101 @@ public class DataReportsTest extends ReportTest
     @Test
     public void testStudyActionsRejectNewScriptReports() throws Exception
     {
-        TestUser reader = new TestUser(SCRIPT_READER_USER).create(this).setInitialPassword().addPermission(READER_ROLE, getProjectName());
-        TestUser editor = new TestUser(SCRIPT_EDITOR_USER).create(this).setInitialPassword().addPermission(EDITOR_ROLE, getProjectName());
+        // Delete first so a rerun against a server where a previous run left the users behind starts clean
+        _userHelper.deleteUsers(false, SCRIPT_READER_USER, SCRIPT_EDITOR_USER);
+        TestUser reader = new TestUser(SCRIPT_READER_USER).create(this).addPermission(READER_ROLE, getProjectName());
+        TestUser editor = new TestUser(SCRIPT_EDITOR_USER).create(this).addPermission(EDITOR_ROLE, getProjectName());
+        Connection adminConnection = createDefaultConnection();
 
         log("saveReportView accepts only crosstab reports");
         Map<String, Object> privateReport = scriptReportParams("Reader R report");
         privateReport.put("shareReport", false);
-        assertUnsupportedReportType(reader.getUserConnection(), "saveReportView", privateReport);
+        reader.doWhileImpersonating(connection -> assertUnsupportedReportType(connection, "saveReportView", privateReport));
 
         Map<String, Object> sharedReport = scriptReportParams("Editor R report");
         sharedReport.put("shareReport", true);
-        assertUnsupportedReportType(editor.getUserConnection(), "saveReportView", sharedReport);
+        editor.doWhileImpersonating(connection -> assertUnsupportedReportType(connection, "saveReportView", sharedReport));
 
         log("saveReport requires admin and accepts only dataset grid views");
-        assertScriptReportRejected(editor.getUserConnection(), "saveReport", scriptReportParams("Editor R report"), HttpStatus.SC_FORBIDDEN);
-        assertUnsupportedReportType(createDefaultConnection(), "saveReport", scriptReportParams("Admin R report"));
+        Map<String, Object> editorReport = scriptReportParams("Editor R report via saveReport");
+        editor.doWhileImpersonating(connection -> {
+            try
+            {
+                postStudyReports(connection, "saveReport", editorReport);
+                fail("Non-admin saved a new R report through study-reports-saveReport");
+            }
+            catch (CommandException e)
+            {
+                assertEquals("Wrong status saving R report through study-reports-saveReport", HttpStatus.SC_FORBIDDEN, e.getStatusCode());
+            }
+            assertReportNotSaved(connection, editorReport);
+        });
+        assertUnsupportedReportType(adminConnection, "saveReport", scriptReportParams("Admin R report"));
+
+        log("The actions still save the report types they're for");
+        // Other test methods use DEM-1's views and reports, so don't leave these behind
+        try
+        {
+            Map<String, Object> crosstab = new HashMap<>();
+            crosstab.put("reportType", "ReportService.crosstabReport");
+            crosstab.put("label", "Admin crosstab");
+            crosstab.put("schemaName", "study");
+            crosstab.put("queryName", DATA_SET_NAME);
+            crosstab.put("shareReport", true);
+            // Skip rendering the new report on the redirect, which this test doesn't need
+            crosstab.put("redirectUrl", WebTestHelper.buildRelativeUrl("project", getProjectName() + "/" + getFolderName(), "begin"));
+            postStudyReports(adminConnection, "saveReportView", crosstab);
+            assertTrue("study-reports-saveReportView didn't save a crosstab report", reportNames(adminConnection).contains("Admin crosstab"));
+
+            Map<String, Object> gridView = new HashMap<>();
+            gridView.put("reportType", "Study.queryReport");
+            gridView.put("label", "Admin grid view");
+            // Saving a grid view report creates a hidden shared view of this name; without one, it replaces DEM-1's default view
+            gridView.put("params", "schemaName=study&queryName=" + URLEncoder.encode(DATA_SET_NAME, StandardCharsets.UTF_8) +
+                    "&viewName=" + URLEncoder.encode(GRID_REPORT_VIEW_NAME, StandardCharsets.UTF_8));
+            postStudyReports(adminConnection, "saveReport", gridView);
+            assertTrue("study-reports-saveReport didn't save a grid view", reportNames(adminConnection).contains("Admin grid view"));
+        }
+        finally
+        {
+            deleteReports(adminConnection, "Admin crosstab", "Admin grid view");
+            deleteCustomView(adminConnection, DATA_SET_NAME, GRID_REPORT_VIEW_NAME);
+        }
+    }
+
+    private void deleteCustomView(Connection connection, String queryName, String viewName) throws IOException, CommandException
+    {
+        SimplePostCommand delete = new SimplePostCommand("query", "deleteView");
+        delete.setJsonObject(new JSONObject(Map.of("schemaName", "study", "queryName", queryName, "viewName", viewName)));
+        try
+        {
+            delete.execute(connection, getProjectName() + "/" + getFolderName());
+        }
+        catch (CommandException e)
+        {
+            // The view doesn't exist if the report save failed
+            if (e.getStatusCode() != HttpStatus.SC_NOT_FOUND)
+                throw e;
+        }
+    }
+
+    private void deleteReports(Connection connection, String... names) throws IOException, CommandException
+    {
+        List<String> toDelete = List.of(names);
+        SimpleGetCommand browse = new SimpleGetCommand("reports", "browseData");
+        browse.setParameters(Map.of("includeData", true, "includeMetadata", false));
+        List<Map<String, Object>> views = browse.execute(connection, getProjectName() + "/" + getFolderName()).getProperty("data");
+        JSONArray matches = new JSONArray();
+        views.stream()
+                .filter(view -> toDelete.contains((String) view.get("name")))
+                .forEach(view -> matches.put(new JSONObject(Map.of("dataType", view.get("dataType"), "id", view.get("id")))));
+        if (matches.isEmpty())
+            return;
+
+        SimplePostCommand delete = new SimplePostCommand("reports", "deleteViews");
+        delete.setJsonObject(new JSONObject(Map.of("views", matches)));
+        delete.execute(connection, getProjectName() + "/" + getFolderName());
+        assertTrue("Reports weren't deleted: " + toDelete, reportNames(connection).stream().noneMatch(toDelete::contains));
     }
 
     private Map<String, Object> scriptReportParams(String label)
@@ -592,28 +679,36 @@ public class DataReportsTest extends ReportTest
         return params;
     }
 
-    private void assertUnsupportedReportType(Connection connection, String action, Map<String, Object> params) throws IOException, CommandException
+    private CommandResponse postStudyReports(Connection connection, String action, Map<String, Object> params) throws IOException, CommandException
     {
         SimplePostCommand command = new SimplePostCommand("study-reports", action);
         command.setParameters(params);
-        CommandResponse response = command.execute(connection, getProjectName() + "/" + getFolderName());
-        assertTrue("study-reports-" + action + " didn't reject an R report:\n" + response.getText(),
-                response.getText().contains("Unsupported report type: Study.rReport"));
+        return command.execute(connection, getProjectName() + "/" + getFolderName());
     }
 
-    private void assertScriptReportRejected(Connection connection, String action, Map<String, Object> params, int expectedStatus) throws IOException
+    private void assertUnsupportedReportType(Connection connection, String action, Map<String, Object> params) throws IOException, CommandException
     {
-        SimplePostCommand command = new SimplePostCommand("study-reports", action);
-        command.setParameters(params);
-        try
-        {
-            command.execute(connection, getProjectName() + "/" + getFolderName());
-            fail("Non-developer saved a new R report through study-reports-" + action);
-        }
-        catch (CommandException e)
-        {
-            assertEquals("Wrong status saving R report through study-reports-" + action, expectedStatus, e.getStatusCode());
-        }
+        CommandResponse response = postStudyReports(connection, action, params);
+        assertTrue("study-reports-" + action + " didn't reject an R report:\n" + response.getText(),
+                response.getText().contains("Unsupported report type: Study.rReport"));
+        assertReportNotSaved(connection, params);
+    }
+
+    // Checks as the caller, who can see their own private reports, and as the admin
+    private void assertReportNotSaved(Connection connection, Map<String, Object> params) throws IOException, CommandException
+    {
+        String label = (String) params.get("label");
+        assertFalse("Rejected report was saved: " + label, reportNames(connection).contains(label));
+        assertFalse("Rejected report was saved: " + label, reportNames(createDefaultConnection()).contains(label));
+    }
+
+    private List<String> reportNames(Connection connection) throws IOException, CommandException
+    {
+        SimpleGetCommand command = new SimpleGetCommand("reports", "browseData");
+        command.setParameters(Map.of("includeData", true, "includeMetadata", false));
+        CommandResponse response = command.execute(connection, getProjectName() + "/" + getFolderName());
+        List<Map<String, Object>> views = response.getProperty("data");
+        return views.stream().map(view -> (String) view.get("name")).toList();
     }
 
     /**create an R report from the dataset page

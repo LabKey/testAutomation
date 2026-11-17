@@ -200,5 +200,15 @@ public class ExpTest extends BaseWebDriverTest
         waitForPipelineJobsToComplete(2, true);
         assertTrue("Error message for duplicate MaterialLsidPrefix not as expected", getServerErrors().contains("Duplicate 'MaterialLSIDPrefix' found"));
         resetErrors();
+
+        // a data file path outside the folder's file roots must fail the import rather than be stored
+        clickFolder(FOLDER_NAME);
+        clickButton("Process and Import Data");
+        _fileBrowserHelper.importFile("experimentbad.xar.xml", "Import Experiment");
+        clickAndWait(Locator.linkWithText("Data Pipeline"));
+        waitForPipelineJobsToComplete(3, true);
+        clickAndWait(Locator.linkWithText("ERROR"));
+        assertTextPresent("Path to data file not allowed", "/xtandem/Example5/tandem.xml");
+        resetErrors();
     }
 }
