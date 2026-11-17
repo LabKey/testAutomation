@@ -16,6 +16,7 @@
 package org.labkey.test.components.ui.grids;
 
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.UpdatingComponent;
 import org.labkey.test.components.bootstrap.ModalDialog;
 import org.labkey.test.components.html.Checkbox;
@@ -25,6 +26,7 @@ import org.labkey.test.components.ui.search.FilterFacetedPanel;
 import org.labkey.test.params.WrapsFieldKey;
 import org.labkey.test.util.selenium.WebElementUtils;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -131,7 +133,7 @@ public class GridFilterModal extends ModalDialog
      */
     public FilterExpressionPanel selectExpressionTab()
     {
-        elementCache().filterTabs.selectTab("Filter");
+        filterTabs().selectTab("Filter");
         return elementCache().filterExpressionPanel();
     }
 
@@ -147,7 +149,7 @@ public class GridFilterModal extends ModalDialog
      */
     public FilterFacetedPanel selectFacetTab()
     {
-        elementCache().filterTabs.selectTab("Choose values");
+        filterTabs().selectTab("Choose values");
         return elementCache().filterFacetedPanel();
     }
 
@@ -158,23 +160,35 @@ public class GridFilterModal extends ModalDialog
      */
     public List<String> getTabText()
     {
-        return elementCache().filterTabs.getTabText();
+        return filterTabs().getTabText();
     }
 
+    /**
+     * The tabs for the selected field, once they are shown. Kanban 2177: the dialog shows a spinner in their
+     * place until the server reports what it knows about the column, which decides which tab opens.
+     */
+    private Tabs filterTabs()
+    {
+        WebDriverWrapper.waitFor(() -> {
+            try
+            {
+                return Locator.byClass("nav-tabs").existsIn(elementCache().filterPanel);
+            }
+            catch (NoSuchElementException | StaleElementReferenceException retry)
+            {
+                // The values column is re-rendered around the spinner, so its elements come and go
+                return false;
+            }
+        }, "Filter tabs never appeared for the selected field", 10_000);
+        return elementCache().filterTabs;
+    }
+
+    /**
+     * @return key of the selected tab ('Filter' or 'ChooseValues'), which is independent of the tab's label
+     */
     public String getActiveTab()
     {
-        String activeTab = "";
-
-        for(String tabText : getTabText())
-        {
-            if(elementCache().filterTabs.isTabSelected(tabText))
-            {
-                activeTab = tabText;
-                break;
-            }
-        }
-
-        return activeTab;
+        return filterTabs().getSelectedTabKey();
     }
 
     /**
