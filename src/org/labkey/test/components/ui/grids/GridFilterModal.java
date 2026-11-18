@@ -165,7 +165,7 @@ public class GridFilterModal extends ModalDialog
 
     /**
      * The tabs for the selected field, once they are shown. Kanban 2177: the dialog shows a spinner in their
-     * place until the server reports what it knows about the column, which decides which tab opens.
+     * place until it knows the grid's size, which decides which tab opens.
      */
     private Tabs filterTabs()
     {
