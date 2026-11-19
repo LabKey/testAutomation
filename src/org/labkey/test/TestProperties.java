@@ -205,7 +205,9 @@ public abstract class TestProperties
 
     public static boolean isRunWebDriverHeadless()
     {
-        return getBooleanProperty("webtest.webdriver.headless", false);
+        // Firefox 153 dies opening its first window on the Windows agents, which run as LocalSystem without a desktop
+        boolean defaultValue = isTestRunningOnTeamCity() && SystemUtils.IS_OS_WINDOWS;
+        return getBooleanProperty("webtest.webdriver.headless", defaultValue);
     }
 
     public static boolean isDumpBrowserConsole()

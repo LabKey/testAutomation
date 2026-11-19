@@ -128,7 +128,11 @@ public class ModalDialog extends WebDriverComponent<ModalDialog.ElementCache>
     /* for synchronous operations that take time, the caller can specify how long to wait */
     public void dismiss(String buttonText, Integer waitSeconds)
     {
-        Locators.dismissButton(buttonText).findElement(getComponentElement()).click();
+        // Dialogs may render their buttons after loading their content
+        WebElement button = Locators.dismissButton(buttonText).findWhenNeeded(getComponentElement());
+        new WebDriverWait(getDriver(), Duration.ofMillis(WAIT_FOR_JAVASCRIPT))
+                .until(ExpectedConditions.elementToBeClickable(button));
+        button.click();
         waitForClose(waitSeconds);
     }
 
@@ -180,7 +184,7 @@ public class ModalDialog extends WebDriverComponent<ModalDialog.ElementCache>
 
     public static class ModalDialogFinder extends WebDriverComponent.WebDriverComponentFinder<ModalDialog, ModalDialogFinder>
     {
-        private Locator _locator;
+        private Locator.XPathLocator _locator;
 
         public ModalDialogFinder(WebDriver driver)
         {
@@ -203,6 +207,13 @@ public class ModalDialog extends WebDriverComponent<ModalDialog.ElementCache>
         public ModalDialogFinder withBodyTextContaining(String text)
         {
             _locator = Locators.dialog.withDescendant(Locators.body.containing(text));
+            return this;
+        }
+
+        /** Skip a placeholder dialog that only shows a spinner until a loaded dialog replaces it. */
+        public ModalDialogFinder withoutLoadingSpinner()
+        {
+            _locator = _locator.withoutPredicate(BootstrapLocators.loadingSpinner);
             return this;
         }
 

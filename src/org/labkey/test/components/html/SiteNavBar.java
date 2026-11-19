@@ -15,6 +15,7 @@
  */
 package org.labkey.test.components.html;
 
+import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
@@ -29,6 +30,7 @@ import org.labkey.test.pages.files.FileContentPage;
 import org.labkey.test.pages.search.SearchResultsPage;
 import org.labkey.test.pages.user.ShowUsersPage;
 import org.labkey.test.util.AbstractUserHelper;
+import org.labkey.test.util.LabKeyExpectedConditions;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.openqa.selenium.NoSuchElementException;
@@ -172,8 +174,8 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
 
     public boolean isSearchBarExpanded()
     {
-        String searchBarContainerClass = elementCache().searchContainer.getAttribute("class");
-        return searchBarContainerClass.contains("active");
+        String searchBarContainerClass = StringUtils.trimToEmpty(elementCache().searchContainer.getAttribute("class"));
+        return searchBarContainerClass.contains("active") && elementCache().searchInput.isEnabled();
     }
 
     /* toggles the search form open and returns the search input element */
@@ -183,6 +185,7 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
         {
             elementCache().searchToggle.click();
             WebDriverWrapper.waitFor(this::isSearchBarExpanded, "Search bar didn't expand", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
+            getWrapper().shortWait().until(LabKeyExpectedConditions.animationIsDone(elementCache().searchInput));
         }
         return elementCache().searchInput;
     }
