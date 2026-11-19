@@ -18,8 +18,11 @@ package org.labkey.test.pages.admin;
 import org.labkey.test.Locator;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.pages.LabKeyPage;
+import org.labkey.test.util.LabKeyExpectedConditions;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+
+import static org.labkey.test.components.ext4.Checkbox.Ext4Checkbox;
 
 public class CreateSubFolderPage extends LabKeyPage
 {
@@ -70,7 +73,10 @@ public class CreateSubFolderPage extends LabKeyPage
         _ext4Helper.selectComboBoxItem(Locator.xpath("//div")
                 .withClass("labkey-wizard-header")
                 .withText("Choose Template Folder:").append("/following-sibling::table[contains(@id, 'combobox')]"), templateFolder);
-        _ext4Helper.checkCheckbox("Include Subfolders");
+        Checkbox includeSubfolders = Ext4Checkbox().withLabel("Include Subfolders").waitFor(getDriver());
+        // The template options animate in after a template is chosen
+        shortWait().until(LabKeyExpectedConditions.animationIsDone(includeSubfolders.getComponentElement()));
+        includeSubfolders.check();
 
         return this;
     }

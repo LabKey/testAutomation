@@ -476,12 +476,15 @@ public class DataViewsTest extends ParticipantListTest
         waitFor(alphabeticalRadio::isChecked, "Radio button 'Alphabetical' did not become checked after clicking.", 2000);
         clickButton("Save", 0);
         _ext4Helper.waitForMaskToDisappear();
-        assertTextPresentInThisOrder(CATEGORIES[0], "Abbreviated Demographics", "Alt ID mapping", "APX-1: Abbreviated Physical Exam",
+        String[] expectedTopCategoryOrder = {CATEGORIES[0], "Abbreviated Demographics", "Alt ID mapping", "APX-1: Abbreviated Physical Exam",
                 "Crosstab: MouseId Counts",
                 "DEM-1: Demographics", "FPX-1: Final Complete Physical Exam", "PRE-1: Pre-Existing Conditions",
                 "R Report: Dataset Column Names", "RCP-1: Reactogenicity-Resolution", "Scatter: Systolic vs Diastolic",
                 "SCL-1: Specimen Collection", "Time Chart: Body Temp + Pulse For Group 2", "Types",
-                "VAC-1: Post-enrollment Vaccination", "verifyAssay");
+                "VAC-1: Post-enrollment Vaccination", "verifyAssay"};
+        // The grid reloads asynchronously after the save mask is removed
+        if (!waitFor(() -> isPresentInThisOrder(expectedTopCategoryOrder) == null, WAIT_FOR_JAVASCRIPT))
+            assertTextPresentInThisOrder(expectedTopCategoryOrder);
 
         // check if bottom category sorts Alphabetical
         assertTextPresentInThisOrder(CATEGORIES[4], "ENR-1: Enrollment", "EPX-1: Enrollment Abbreviated Physical Exam",
