@@ -18,6 +18,7 @@ package org.labkey.test.components.ui.navigation;
 import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
+import org.labkey.test.util.selenium.WebElementUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -89,7 +90,7 @@ public class SubNavBar extends WebDriverComponent<SubNavBar.ElementCache>
         List<String> menuText = new ArrayList<>();
 
         List<WebElement> menuElements = elementCache().tabScrollContainer.findElements(By.tagName("li"));
-        menuElements.forEach(e -> menuText.add(e.getText()));
+        menuElements.forEach(e -> menuText.add(WebElementUtils.getTextContent(e).trim()));
         return menuText;
     }
 
