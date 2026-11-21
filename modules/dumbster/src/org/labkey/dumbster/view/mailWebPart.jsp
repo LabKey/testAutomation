@@ -21,6 +21,7 @@
 <%@ page import="org.apache.commons.lang3.ArrayUtils" %>
 <%@ page import="org.labkey.api.data.Container" %>
 <%@ page import="org.labkey.api.util.HtmlString" %>
+<%@ page import="org.labkey.api.util.HtmlStringBuilder" %>
 <%@ page import="org.labkey.api.util.MailHelper" %>
 <%@ page import="org.labkey.api.view.HttpView" %>
 <%@ page import="org.labkey.api.view.JspView" %>
@@ -145,16 +146,17 @@ function toggleRecorder(checkbox)
             {    %><tr class="labkey-row"><% }
 
 
-            StringBuilder headers = new StringBuilder();
+            HtmlStringBuilder headers = HtmlStringBuilder.of();
             Iterator<String> i = m.getHeaderNames();
 
             while (i.hasNext())
             {
                 String header = i.next();
-                headers.append(h(header));
-                headers.append(": ");
-                headers.append(h(m.getHeaderValue(header)));
-                headers.append("<br/>\n");
+                headers.append(header)
+                    .append(": ")
+                    .append(m.getHeaderValue(header))
+                    .append(HtmlString.BR)
+                    .append("\n");
             }
 
             boolean hasHtml = false;
@@ -170,7 +172,8 @@ function toggleRecorder(checkbox)
 
                 if (hasHtml)
                 {
-                    body = unsafe(map.get("text/html"));
+                    // Show captured HTML email as sent
+                    body = HtmlString.unsafe(map.get("text/html"));
                 }
                 else if (hasText)
                 {
@@ -198,7 +201,7 @@ function toggleRecorder(checkbox)
             <td><a id="<%=h(idSubject)%>"><%=h(m.getHeaderValue("Subject"))%></a>
                 <div id="email_body_<%=rowIndex%>" style="display: none;"><hr><%=body%></div></td>
             <td><a id="<%=h(idHeaders)%>">View headers</a>
-                <div id="email_headers_<%=rowIndex%>" style="display: none;"><hr><%=unsafe(headers.toString())%></div></td>
+                <div id="email_headers_<%=rowIndex%>" style="display: none;"><hr><%=headers%></div></td>
             <%=hasHtml ? createHtml(TD(A(at(href, DumbsterController.getViewMessageURL(c, rowIndex - 1, "html")).at(target, "_messageHtml"), "HTML"))) : createHtml(TD(SPAN(cl("text-muted"), "HTML")))%>
             <%=hasText ? createHtml(TD(A(at(href, DumbsterController.getViewMessageURL(c, rowIndex - 1, "text")).at(target, "_messageText"), "Text"))) : createHtml(TD(SPAN(cl("text-muted"), "Text")))%>
             <%=createHtml(TD(A(at(href, DumbsterController.getViewMessageURL(c, rowIndex - 1, "raw")).at(target, "_messageText"), "Raw")))%>

@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 %>
+<%@ page import="org.labkey.api.util.HtmlString" %>
 <%@ page import="org.labkey.api.view.HttpView" %>
 <%@ page extends="org.labkey.api.jsp.JspBase" %>
 
@@ -23,4 +24,5 @@
     String inject = view.getModelBean();
 %>
 <span>Param:</span>
-<div id="crawlerTestDiv"><%=unsafe(inject)%></div>
+<%-- Deliberately unencoded: CrawlerTest verifies that its injection probes detect this page --%>
+<div id="crawlerTestDiv"><%=HtmlString.unsafe(inject)%></div>
