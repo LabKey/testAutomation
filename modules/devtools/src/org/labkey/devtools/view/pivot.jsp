@@ -16,6 +16,7 @@
      */
 %>
 <%@ taglib prefix="labkey" uri="http://www.labkey.org/taglib" %>
+<%@ page import="org.labkey.api.util.HtmlString" %>
 <%@ page import="org.labkey.api.view.template.ClientDependencies" %>
 <%@ page extends="org.labkey.api.jsp.JspBase" %>
 <%!
@@ -31,7 +32,7 @@
     String schemaName = "Study";
     String cubeName = "SpecimenCube";
     int uid = getRequestScopedUID();
-    String pivotDesignerId = "pivotDesigner" + uid;
+    HtmlString pivotDesignerId = h("pivotDesigner" + uid);
     String cellsetId = "cellset" + uid;
 %>
 <script type="text/javascript" nonce="<%=getScriptNonce()%>">
@@ -477,23 +478,23 @@
   }
 </style>
 <button class="run">RUN</button>
-<table id="<%=unsafe(pivotDesignerId)%>">
+<table id="<%=pivotDesignerId%>">
     <tr>
-        <td rowspan="2"><fieldset style="height:100%"><legend>pages (NYI)</legend><div class="drop" id="<%=unsafe(pivotDesignerId)%>.pages" data-axis="pages" style="min-height:200pt; min-width:100pt;">&nbsp;</div></fieldset></td>
-        <td><fieldset height=100%><legend>filters</legend><div class="drop" id="<%=unsafe(pivotDesignerId)%>.filter" data-axis="filter" style="min-height:100pt; min-width:100pt;">&nbsp;</div></fieldset></td>
-        <td><fieldset height=100%><legend>columns</legend><div class="drop" id="<%=unsafe(pivotDesignerId)%>.columns" data-axis="onColumns" style="min-height:100pt; min-width:100pt;">&nbsp;</div></fieldset></td>
+        <td rowspan="2"><fieldset style="height:100%"><legend>pages (NYI)</legend><div class="drop" id="<%=pivotDesignerId%>.pages" data-axis="pages" style="min-height:200pt; min-width:100pt;">&nbsp;</div></fieldset></td>
+        <td><fieldset height=100%><legend>filters</legend><div class="drop" id="<%=pivotDesignerId%>.filter" data-axis="filter" style="min-height:100pt; min-width:100pt;">&nbsp;</div></fieldset></td>
+        <td><fieldset height=100%><legend>columns</legend><div class="drop" id="<%=pivotDesignerId%>.columns" data-axis="onColumns" style="min-height:100pt; min-width:100pt;">&nbsp;</div></fieldset></td>
     </tr>
     <tr>
-        <td><fieldset height=100%><legend>rows</legend><div class="drop" id="<%=unsafe(pivotDesignerId)%>.rows" data-axis="onRows" style="min-height:100pt; min-width:100pt;"></div></fieldset></td>
-        <td><fieldset height=100%><legend>measures</legend><div id="<%=unsafe(pivotDesignerId)%>.measures" style="min-height:100pt; min-width:100pt;">&nbsp;</div></fieldset></td></tr>
+        <td><fieldset height=100%><legend>rows</legend><div class="drop" id="<%=pivotDesignerId%>.rows" data-axis="onRows" style="min-height:100pt; min-width:100pt;"></div></fieldset></td>
+        <td><fieldset height=100%><legend>measures</legend><div id="<%=pivotDesignerId%>.measures" style="min-height:100pt; min-width:100pt;">&nbsp;</div></fieldset></td></tr>
 </table>
 
 
 <select><option>filter me</option></select>
 <hr>
-<div id="<%=unsafe(pivotDesignerId)%>.filterArea"></div>
+<div id="<%=pivotDesignerId%>.filterArea"></div>
 <h3>I'm a page header</h3>
-<div id="<%=unsafe(cellsetId)%>">
+<div id="<%=h(cellsetId)%>">
 </div>
 <labkey:script>
     LABKEY.Utils.attachEventHandlerForQuerySelector("BUTTON.run", "click", run, true);
