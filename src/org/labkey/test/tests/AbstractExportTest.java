@@ -507,12 +507,12 @@ public abstract class AbstractExportTest extends BaseWebDriverTest
     protected final void assertSASScriptContents(String sasScript, String filterColumn)
     {
         assertTrue("Script is missing %labkeySelectRows call", sasScript.contains("%labkeySelectRows("));
-        assertTrue("Script is missing schemaName property", sasScript.contains("schemaName=\"" + getDataRegionSchemaName() + "\""));
-        assertTrue("Script is missing queryName property", sasScript.contains("queryName=\"" + getDataRegionQueryName() + "\""));
+        assertTrue("Script is missing schemaName property", sasScript.contains("schemaName='" + getDataRegionSchemaName() + "'"));
+        assertTrue("Script is missing queryName property", sasScript.contains("queryName='" + getDataRegionQueryName() + "'"));
         if (null != filterColumn)
         {
             assertTrue("Script is missing filter property", sasScript.contains("filter=%labkeyMakeFilter("));
-            assertTrue("Script is missing filter property", sasScript.contains("\"" + filterColumn + "\",\"EQUAL\",\"foo\""));
+            assertTrue("Script is missing filter property", sasScript.contains("'" + filterColumn + "',\"EQUAL\",'foo'"));
         }
     }
 
