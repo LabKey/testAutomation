@@ -78,9 +78,9 @@ public class AnnouncementAPITest extends BaseWebDriverTest
     @Override
     protected void doCleanup(boolean afterTest)
     {
-        super.doCleanup(afterTest);
-        _containerHelper.deleteProject(OTHER_PROJECT, false);
         _userHelper.deleteUsers(false, EDITOR, AUTHOR);
+        _containerHelper.deleteProject(OTHER_PROJECT, false);
+        super.doCleanup(afterTest);
     }
 
     @Before
@@ -429,6 +429,7 @@ public class AnnouncementAPITest extends BaseWebDriverTest
         AnnouncementModel otherAfter = getThread(otherThread, OTHER_PROJECT).getAnnouncementModel();
         assertThat("Other folder's title", otherAfter.getTitle(), is("Other thread"));
         assertThat("Other folder's body", otherAfter.getBody(), is("other body"));
+        assertThat("Editor's title after refused updates", getThread(ownThread).getAnnouncementModel().getTitle(), is("Editor thread"));
 
         // Positive control: an ordinary edit of the editor's own message still works
         updateChangingKeys(editorConnection, ownKey, Map.of("RowId", ownThread.getRowId(), "Title", "Edited"));
