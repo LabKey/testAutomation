@@ -62,7 +62,7 @@ public class GridPanelTest extends GridPanelBaseTest
     // A sample type with a small number of rows. Used to test paging controls (lack of) when results are small and no
     // filters are applied. Also used to test views (since that is a column centric feature).
     private static final String SMALL_SAMPLE_TYPE = "Small_SampleType";
-    private static final int SMALL_SAMPLE_TYPE_SIZE = DEFAULT_PAGE_SIZE - 2;
+    private static final int SMALL_SAMPLE_TYPE_SIZE = 18;
     private static final String SMALL_SAMPLE_PREFIX = "SM-";
 
     // A sample type with a larger number of fields. Used for filtering and searching.
@@ -105,6 +105,8 @@ public class GridPanelTest extends GridPanelBaseTest
 
     private static final String MULTI_PAGE_STRING = "This will return more than one page of data.";
     private static final int MULTI_PAGE_COUNT = 3;
+    // Smaller than the default page size, so the filtered results in the selection tests span several pages
+    private static final int SELECTION_PAGE_SIZE = 20;
 
     private static final int NUMBER_FOR_STRING = 1234;
     private static final String NUMBER_STRING = String.format("This string has numbers %d in it.", NUMBER_FOR_STRING);
@@ -262,13 +264,13 @@ public class GridPanelTest extends GridPanelBaseTest
                 filterColValue = FIVE_RECORD_STRING;
                 fiveRecordCount++;
             }
-            else if(sampleId % 3 == 0 && onePageCount < DEFAULT_PAGE_SIZE)
+            else if(sampleId % 3 == 0 && onePageCount < SELECTION_PAGE_SIZE)
             {
                 // Add a page string.
                 filterColValue = ONE_PAGE_STRING;
                 onePageCount++;
             }
-            else if(sampleId % 2 == 0 && multiPageCount < DEFAULT_PAGE_SIZE * MULTI_PAGE_COUNT)
+            else if(sampleId % 2 == 0 && multiPageCount < SELECTION_PAGE_SIZE * MULTI_PAGE_COUNT)
             {
                 // Add a multi-page string.
                 filterColValue = MULTI_PAGE_STRING;
@@ -426,7 +428,7 @@ public class GridPanelTest extends GridPanelBaseTest
      *     This test will:
      *     <ul>
      *         <li>Validate default page size is as expected.</li>
-     *         <li>Change page size to 100 and validate rows in grid update and pagination controls update as expected.</li>
+     *         <li>Change page size to 250 and validate rows in grid update and pagination controls update as expected.</li>
      *         <li>Reset to defaults and make sure everything is right with the world.</li>
      *     </ul>
      * </p>
@@ -453,7 +455,7 @@ public class GridPanelTest extends GridPanelBaseTest
 
         checker().screenShotIfNewError("Defaults_Error");
 
-        int newPageSize = 100;
+        int newPageSize = 250;
         log(String.format("Now set page size to %d.", newPageSize));
 
         grid.getGridBar().selectPageSize(Integer.toString(newPageSize));
@@ -521,7 +523,7 @@ public class GridPanelTest extends GridPanelBaseTest
      * <p>
      *     This test will:
      *     <ul>
-     *         <li>Load a small sample type with 20 records.</li>
+     *         <li>Load a small sample type with 18 records.</li>
      *         <li>Validate counts and pagination is not present.</li>
      *         <li>The 'Select All' button is not present.</li>
      *     </ul>
@@ -569,6 +571,7 @@ public class GridPanelTest extends GridPanelBaseTest
     public void testSelectAllButtonWithFilteredResults()
     {
         QueryGrid grid = beginAtQueryGrid(FILTER_SAMPLE_TYPE);
+        grid.getGridBar().selectPageSize(Integer.toString(SELECTION_PAGE_SIZE));
 
         log("Validate that the 'Select All' button works as expected.");
         grid.filterColumn(FILTER_STRING_COL, Filter.Operator.EQUAL, MULTI_PAGE_STRING);
@@ -580,7 +583,7 @@ public class GridPanelTest extends GridPanelBaseTest
         grid.removeColumnFilter(FILTER_STRING_COL);
         checker().withScreenshot("Select_All_Button_Error")
                 .verifyEquals("Number of selected rows not as expected after filter removed.",
-                        String.format(SELECTED_TEXT_FORMAT, MULTI_PAGE_COUNT * DEFAULT_PAGE_SIZE, FILTER_SAMPLE_TYPE_SIZE), grid.getSelectionStatusCount());
+                        String.format(SELECTED_TEXT_FORMAT, MULTI_PAGE_COUNT * SELECTION_PAGE_SIZE, FILTER_SAMPLE_TYPE_SIZE), grid.getSelectionStatusCount());
 
         grid.clearAllSelections();
 
@@ -603,6 +606,7 @@ public class GridPanelTest extends GridPanelBaseTest
     public void testSelectAllOnPageWithFilteredResults()
     {
         QueryGrid grid = beginAtQueryGrid(FILTER_SAMPLE_TYPE);
+        grid.getGridBar().selectPageSize(Integer.toString(SELECTION_PAGE_SIZE));
 
         log("Validate the select all check box at the top of the gird works as expected.");
         grid.filterColumn(FILTER_STRING_COL, Filter.Operator.EQUAL, MULTI_PAGE_STRING);
@@ -610,7 +614,7 @@ public class GridPanelTest extends GridPanelBaseTest
         grid.removeColumnFilter(FILTER_STRING_COL);
         checker().withScreenshot("Select_All_On_Page_Error")
                 .verifyEquals("Using check box at top of grid did not select the expected samples.",
-                        String.format(SELECTED_TEXT_FORMAT, DEFAULT_PAGE_SIZE, FILTER_SAMPLE_TYPE_SIZE), grid.getSelectionStatusCount());
+                        String.format(SELECTED_TEXT_FORMAT, SELECTION_PAGE_SIZE, FILTER_SAMPLE_TYPE_SIZE), grid.getSelectionStatusCount());
 
         grid.clearAllSelections();
 
@@ -635,6 +639,7 @@ public class GridPanelTest extends GridPanelBaseTest
     public void testSelectOnPageAndSelectAllButton()
     {
         QueryGrid grid = beginAtQueryGrid(FILTER_SAMPLE_TYPE);
+        grid.getGridBar().selectPageSize(Integer.toString(SELECTION_PAGE_SIZE));
 
         log("Filter grid to multiple pages.");
         grid.filterColumn(FILTER_STRING_COL, Filter.Operator.EQUAL, MULTI_PAGE_STRING);
@@ -643,7 +648,7 @@ public class GridPanelTest extends GridPanelBaseTest
         grid.selectAllOnPage(true);
         checker().withScreenshot("Select_All_On_Page_Error")
                 .verifyEquals("Using check box at top of grid did not select the expected samples.",
-                        String.format(SELECTED_TEXT_FORMAT, DEFAULT_PAGE_SIZE, MULTI_PAGE_COUNT * DEFAULT_PAGE_SIZE),
+                        String.format(SELECTED_TEXT_FORMAT, SELECTION_PAGE_SIZE, MULTI_PAGE_COUNT * SELECTION_PAGE_SIZE),
                         grid.getSelectionStatusCount());
 
         log("Use the 'Select All' button to select all of the filtered rows.");
@@ -653,7 +658,7 @@ public class GridPanelTest extends GridPanelBaseTest
         grid.selectAllRows();
         checker().withScreenshot("Select_All_Button_With_Some_Selected_Error")
                 .verifyEquals("Number of selected rows not as expected.",
-                        String.format(SELECTED_TEXT_FORMAT, MULTI_PAGE_COUNT * DEFAULT_PAGE_SIZE, MULTI_PAGE_COUNT * DEFAULT_PAGE_SIZE),
+                        String.format(SELECTED_TEXT_FORMAT, MULTI_PAGE_COUNT * SELECTION_PAGE_SIZE, MULTI_PAGE_COUNT * SELECTION_PAGE_SIZE),
                         grid.getSelectionStatusCount());
 
         log("Remove the filter and validate that the selections persisted.");
@@ -661,7 +666,7 @@ public class GridPanelTest extends GridPanelBaseTest
 
         checker().withScreenshot("Select_After_Filter_Removed_Error")
                 .verifyEquals("Number of selected rows not as expected after filter removed.",
-                        String.format(SELECTED_TEXT_FORMAT, MULTI_PAGE_COUNT * DEFAULT_PAGE_SIZE, FILTER_SAMPLE_TYPE_SIZE),
+                        String.format(SELECTED_TEXT_FORMAT, MULTI_PAGE_COUNT * SELECTION_PAGE_SIZE, FILTER_SAMPLE_TYPE_SIZE),
                         grid.getSelectionStatusCount());
 
         log("Apply the filter again...");
@@ -669,7 +674,7 @@ public class GridPanelTest extends GridPanelBaseTest
 
         checker().withScreenshot("Select_Filter_Reapplied_Error")
                 .verifyEquals("Indicated number of selected rows not as expected after filter was reapplied.",
-                        String.format(SELECTED_TEXT_FORMAT, MULTI_PAGE_COUNT * DEFAULT_PAGE_SIZE, MULTI_PAGE_COUNT * DEFAULT_PAGE_SIZE),
+                        String.format(SELECTED_TEXT_FORMAT, MULTI_PAGE_COUNT * SELECTION_PAGE_SIZE, MULTI_PAGE_COUNT * SELECTION_PAGE_SIZE),
                         grid.getSelectionStatusCount());
 
         log("Unselect all of the rows on the first page.");
@@ -677,14 +682,14 @@ public class GridPanelTest extends GridPanelBaseTest
 
         checker().withScreenshot("Select_Clear_Page_Error")
                 .verifyEquals("Indicated number of selected rows not as expected after first page cleared.",
-                        String.format(SELECTED_TEXT_FORMAT, (MULTI_PAGE_COUNT * DEFAULT_PAGE_SIZE) - DEFAULT_PAGE_SIZE, MULTI_PAGE_COUNT * DEFAULT_PAGE_SIZE), grid.getSelectionStatusCount());
+                        String.format(SELECTED_TEXT_FORMAT, (MULTI_PAGE_COUNT * SELECTION_PAGE_SIZE) - SELECTION_PAGE_SIZE, MULTI_PAGE_COUNT * SELECTION_PAGE_SIZE), grid.getSelectionStatusCount());
 
         log("Remove the filter, and validate selection count.");
         grid.removeColumnFilter(FILTER_STRING_COL);
 
         checker().withScreenshot("Select_Remove_Page_Error")
                 .verifyEquals("Indicated number of selected rows not as expected after first page cleared and filter removed.",
-                        String.format(SELECTED_TEXT_FORMAT, (MULTI_PAGE_COUNT * DEFAULT_PAGE_SIZE) - DEFAULT_PAGE_SIZE, FILTER_SAMPLE_TYPE_SIZE), grid.getSelectionStatusCount());
+                        String.format(SELECTED_TEXT_FORMAT, (MULTI_PAGE_COUNT * SELECTION_PAGE_SIZE) - SELECTION_PAGE_SIZE, FILTER_SAMPLE_TYPE_SIZE), grid.getSelectionStatusCount());
 
         grid.clearAllSelections();
 

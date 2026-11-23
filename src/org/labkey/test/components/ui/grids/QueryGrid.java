@@ -15,6 +15,7 @@
  */
 package org.labkey.test.components.ui.grids;
 
+import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
@@ -77,8 +78,6 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         return _driver;
     }
 
-    // get rowMaps
-
     /**
      * Returns the first row with a column text equivalent to the supplied text
      * @param text column text to search for
@@ -120,13 +119,11 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         return getRow(containing).getRowMapByLabel();
     }
 
-    // row selection
-
     /**
      * Selects or un-selects the first row with the specified text in the specified column
      * @param columnIdentifier The exact text of the column header
      * @param text The full text of the cell to match
-     * @param checked   whether or not to check the box
+     * @param checked Whether to check the box
      * @return this grid
      */
     @Override
@@ -214,13 +211,13 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
 
         List<FilterStatusValue> filters = getFilterStatusValues();
 
-        for(FilterStatusValue fsv : filters)
+        for (FilterStatusValue fsv : filters)
         {
             String filterText = fsv.getText();
 
             // Check if this filter text has already been saved. If it has, avoid a duplicate key error by adding a
             // number to key value for the next entry.
-            if(filterCount.containsKey(filterText))
+            if (filterCount.containsKey(filterText))
             {
                 int count = filterCount.get(filterText) + 1;
                 filterText = String.format("%s_%d", filterText, count);
@@ -282,17 +279,50 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     {
         super.doAndWaitForUpdate(() ->
         {
-            WebElement status = hasSelectColumn() ? Locators.selectionStatusContainerLoc.waitForElement(this, 5_000) : null;
-
+            UpdateWatch watch = watchForUpdate();
             func.run();
-
-            if (status != null)
-            {
-                getWrapper().shortWait().until(ExpectedConditions.stalenessOf(status));
-                Locators.selectionStatusContainerLoc.waitForElement(this, 5_000);
-            }
+            waitForUpdate(watch);
         });
     }
+
+    /**
+     * Snapshot the grid before an action that reloads its rows or selections, then pass the result to
+     * {@link #waitForUpdate(UpdateWatch)} after the action.
+     * @return the snapshot, or null when the grid has no selection column and so is not watched
+     */
+    public @Nullable UpdateWatch watchForUpdate()
+    {
+        if (!hasSelectColumn())
+            return null;
+
+        String loadCount = getComponentElement().getDomAttribute(LOAD_COUNT_ATTRIBUTE);
+        // Older @labkey/components builds have no load count, but remount the selection status on every load
+        WebElement status = loadCount == null ? Locators.selectionStatusContainerLoc.waitForElement(this, 5_000) : null;
+        return new UpdateWatch(loadCount, status);
+    }
+
+    /**
+     * Wait for the load that started after {@link #watchForUpdate()} to finish.
+     */
+    public void waitForUpdate(@Nullable UpdateWatch watch)
+    {
+        if (watch == null)
+            return;
+
+        String loadCount = watch.loadCount();
+        WebElement status = watch.status();
+        if (loadCount != null)
+            getWrapper().shortWait().until(_ -> !loadCount.equals(getComponentElement().getDomAttribute(LOAD_COUNT_ATTRIBUTE)));
+        else if (status != null)
+            getWrapper().shortWait().until(ExpectedConditions.stalenessOf(status));
+
+        Locators.selectionStatusContainerLoc.waitForElement(this, 5_000);
+    }
+
+    /**
+     * The grid's state before an update: its load count, or, on builds without one, its selection status element.
+     */
+    public record UpdateWatch(@Nullable String loadCount, @Nullable WebElement status) {}
 
 
     // search, sort and filter methods
@@ -395,7 +425,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
 
     public QueryGrid clearAllSelections()
     {
-        if(hasItemsSelected())
+        if (hasItemsSelected())
         {
             WebElement clearBtn = elementCache().clearBtnLoc.findWhenNeeded(elementCache());
             if (clearBtn.isDisplayed())
@@ -424,12 +454,13 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     {
         var checkBoxes = Locator.tagWithClass("input", "grid-panel__row-checkbox").findElements(this);
         getWrapper().scrollIntoView(checkBoxes.getFirst(), true); // scroll the top row to the top
-        new Actions(getDriver())
-                .click(checkBoxes.get(start))
+        // Checkboxes are disabled while a selection saves, so the shift-click waits for the first click to finish
+        doAndWaitForUpdate(() -> checkBoxes.get(start).click());
+        doAndWaitForUpdate(() -> new Actions(getDriver())
                 .keyDown(Keys.SHIFT)
                 .click(checkBoxes.get(end))
                 .keyUp(Keys.SHIFT)
-                .perform();
+                .perform());
         return this;
     }
 
@@ -448,7 +479,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
             currentView = "Default";
 
         // Clicking the view already shown will not cause a refresh of the grid.
-        if(!currentView.equalsIgnoreCase(viewName))
+        if (!currentView.equalsIgnoreCase(viewName))
             doAndWaitForUpdate(() -> elementCache().viewMenu.clickSubMenu(false, viewName));
 
         return this;
@@ -516,7 +547,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         dialog.setMakeCustom()
                 .setViewName(viewName);
 
-        if(makeAvailable)
+        if (makeAvailable)
         {
             Assert.assertTrue("The option to make view available to sub folders is not present on the dialog.",
                     dialog.isMakeAvailableVisible());
@@ -527,7 +558,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         {
             // If setting 'Make available' to false no need to assert control is present. If the option isn't present
             // the view will not be visible to sub folders by default.
-            if(dialog.isMakeAvailableVisible())
+            if (dialog.isMakeAvailableVisible())
                 dialog.setMakeAvailable(false);
         }
 
@@ -564,7 +595,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         SaveViewDialog dialog = new SaveViewDialog(getDriver(), this);
         dialog.setMakeDefault();
 
-        if(makeAvailable)
+        if (makeAvailable)
         {
             Assert.assertTrue("The option to make view available to sub folders is not present on the dialog.",
                     dialog.isMakeAvailableVisible());
@@ -575,7 +606,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         {
             // If setting 'Make available' to false no need to assert control is present. If the option isn't present
             // the view will not be visible to sub folders by default.
-            if(dialog.isMakeAvailableVisible())
+            if (dialog.isMakeAvailableVisible())
                 dialog.setMakeAvailable(false);
         }
 
@@ -601,10 +632,10 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     public boolean isManageViewsEnabled()
     {
         List<WebElement> menuItems = elementCache().viewMenu.findVisibleMenuItemsWithClass("disabled");
-        for(WebElement menuItem : menuItems)
+        for (WebElement menuItem : menuItems)
         {
             // Why does menuItem.getText() return an empty string here?
-            if(menuItem.getDomProperty("text").contains("Manage Saved Views"))
+            if (menuItem.getDomProperty("text").contains("Manage Saved Views"))
                 return false;
         }
 
@@ -618,7 +649,6 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
      */
     public String getEditAlertText()
     {
-
         // Not sure how reliable this will be. It is possible that the automation can cause two statuses to show up, the
         // 'EDITED' status and the 'SAVED' status can be there at the same time. May need to add a check in the save button
         // and save menu code.
@@ -628,11 +658,9 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         // the call to isDisplayed but before the getText.
         WebElement editAlert = Locator.tagWithClass("span", "view-edit-alert").findWhenNeeded(elementCache().panelHeader());
 
-        if(editAlert.isDisplayed())
+        if (editAlert.isDisplayed())
             return editAlert.getText();
-        else
-            return "";
-
+        return "";
     }
 
     /**
@@ -653,15 +681,12 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         // If this proves to be unreliable it might be easier/safer to return the panel header text and let the test do
         // a .contains() on it to see if it has the expected header.
         WebElement panelHeader = elementCache().panelHeader();
-        if(panelHeader.isDisplayed())
-        {
-            // The view name in the header is not in a separate element.
+
+        // The view name in the header is not in a separate element.
+        if (panelHeader.isDisplayed())
             viewName = WebElementUtils.getTextNodeWithin(panelHeader);
-        }
         else
-        {
             viewName = "";
-        }
 
         return viewName.trim();
     }
@@ -703,15 +728,11 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         WebElement saveButton = Locator.buttonContainingText("Save").findElement(elementCache().panelHeader());
         saveButton.click();
 
-        if(expectSaveDialog)
-        {
+        if (expectSaveDialog)
             return new SaveViewDialog(getDriver(), this);
-        }
-        else
-        {
-            getWrapper().shortWait().until(ExpectedConditions.stalenessOf(saveButton));
-            return null;
-        }
+
+        getWrapper().shortWait().until(ExpectedConditions.stalenessOf(saveButton));
+        return null;
     }
 
     /**
@@ -756,7 +777,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         clearSearch();
 
         // Apply the default view. This should restore any columns that have been hidden.
-        if(revertDefaultView && isManageViewsEnabled())
+        if (revertDefaultView && isManageViewsEnabled())
         {
             // If there are views to be managed it is possible the default view was changed.
             manageViews().revertDefaultView().dismiss();
@@ -768,7 +789,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
 
         // If after selecting the 'Default' view there is still a 'Undo' button visible it means the current view is the
         // default view that has been modified but not saved.
-        if(isUndoButtonVisible())
+        if (isUndoButtonVisible())
             clickUndoButton();
 
         // Save clearing the selection for the last.
@@ -846,6 +867,9 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     {
         return (ElementCache) super.elementCache();
     }
+
+    // Set by GridPanel each time its rows or selections finish loading
+    private static final String LOAD_COUNT_ATTRIBUTE = "data-load-count";
 
     protected static class Locators
     {
@@ -936,5 +960,4 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
             return _locator;
         }
     }
-
 }
