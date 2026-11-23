@@ -15,6 +15,7 @@
  */
 package org.labkey.test.util;
 
+import org.jetbrains.annotations.NotNull;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.query.ExecuteSqlCommand;
 import org.labkey.test.WebDriverWrapper;
@@ -33,6 +34,7 @@ public class RequestCancellationHelper
     public static final int METRICS_TIMEOUT = 180_000;
     public static final String WS_MESSAGE = "wsMessage";
     public static final String WS_CLOSE = "wsClose";
+    private static final int CANCEL_COUNT_POLL_INTERVAL = 500;
 
     private final WebDriverWrapper _test;
 
@@ -44,20 +46,18 @@ public class RequestCancellationHelper
     public void waitForWebSocket()
     {
         // The server ignores any message type but "cancel"
-        WebDriverWrapper.waitFor(() -> (Boolean) _test.executeScript("return LABKEY.WebSocket.send({ type: 'ping' });"),
-            "The notification WebSocket didn't open", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
+        WebDriverWrapper.waitFor(() -> (Boolean) _test.executeScript("return !!(window.LABKEY && LABKEY.WebSocket && LABKEY.WebSocket.send({ type: 'ping' }));"),
+            () -> "The notification WebSocket didn't open; it opens only for a signed-in user with the cancelAbandonedRequests experimental feature on (on this page: "
+                + _test.executeScript("return !!(window.LABKEY && LABKEY.experimental && LABKEY.experimental.cancelAbandonedRequests);") + ")",
+            WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
     }
 
     /** Server-wide count of requests canceled from one source (WS_MESSAGE, WS_CLOSE), from Core's usage metrics */
-    @SuppressWarnings("unchecked")
-    public long getCancelCount(String metric)
+    public long getCancelCount(@NotNull String metric)
     {
         try
         {
-            Map<String, Object> core = ServerUsageUtils.getModuleMetrics(_test.createDefaultConnection().setTimeout(METRICS_TIMEOUT), "Core");
-            Map<String, Object> counts = (Map<String, Object>) core.getOrDefault("simpleMetricCounts", Map.of());
-            Map<String, Object> requestCancel = (Map<String, Object>) counts.getOrDefault("requestCancel", Map.of());
-            return ((Number) requestCancel.getOrDefault(metric, 0)).longValue();
+            return fetchCancelCount(metric);
         }
         catch (IOException | CommandException e)
         {
@@ -65,14 +65,36 @@ public class RequestCancellationHelper
         }
     }
 
-    /** At least, since the counter is server-wide and other cancels can land meanwhile */
-    public void waitForCancelCount(String metric, long minimum)
+    @SuppressWarnings("unchecked")
+    private long fetchCancelCount(String metric) throws IOException, CommandException
     {
-        WebDriverWrapper.waitFor(() -> getCancelCount(metric) >= minimum, "Requests canceled (" + metric + ") never reached " + minimum, METRICS_TIMEOUT);
+        Map<String, Object> core = ServerUsageUtils.getModuleMetrics(_test.createDefaultConnection().setTimeout(METRICS_TIMEOUT), "Core");
+        Map<String, Object> counts = (Map<String, Object>) core.getOrDefault("simpleMetricCounts", Map.of());
+        Map<String, Object> requestCancel = (Map<String, Object>) counts.getOrDefault("requestCancel", Map.of());
+        return ((Number) requestCancel.getOrDefault(metric, 0)).longValue();
+    }
+
+    /** At least, since the counter is server-wide and other cancels can land meanwhile */
+    public void waitForCancelCount(@NotNull String metric, long minimum)
+    {
+        // Each poll gathers every module's metrics, so poll slowly, retry failed polls, and outlast a poll that takes the full METRICS_TIMEOUT
+        WebDriverWrapper.waitFor(() -> {
+            try
+            {
+                if (fetchCancelCount(metric) >= minimum)
+                    return true;
+            }
+            catch (IOException | CommandException e)
+            {
+                TestLogger.log("Retrying after failing to read cancel count: " + e.getMessage());
+            }
+            WebDriverWrapper.sleep(CANCEL_COUNT_POLL_INTERVAL);
+            return false;
+        }, "Requests canceled (" + metric + ") never reached " + minimum, 3 * METRICS_TIMEOUT);
     }
 
     /** Names of the server's modules, sorted; the basis for slow cross joins whose size doesn't depend on the module count */
-    public List<String> getModuleNames(String containerPath) throws IOException, CommandException
+    public @NotNull List<String> getModuleNames(@NotNull String containerPath) throws IOException, CommandException
     {
         return new ExecuteSqlCommand("core", "SELECT Name FROM core.Modules ORDER BY Name")
             .execute(_test.createDefaultConnection(), containerPath)
@@ -80,8 +102,10 @@ public class RequestCancellationHelper
     }
 
     /** "core.Modules m0, core.Modules m1, ..." with {@code joins} tables */
-    public static String crossJoinModules(int joins)
+    public static @NotNull String crossJoinModules(int joins)
     {
+        if (joins < 1)
+            throw new IllegalArgumentException("joins must be at least 1: " + joins);
         return IntStream.range(0, joins).mapToObj(i -> "core.Modules m" + i).collect(Collectors.joining(", "));
     }
 }
