@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<datasets metaDataFile="datasets_metadata.xml" xmlns="http://labkey.org/study/xml">
+  <datasets>
+    <dataset name="DM-1" id="1" category="Demographics CRFs" demographicData="true"/>
+    <dataset name="DMU-1" id="2" category="Demographics CRFs"/>
+    <dataset name="DMM-1" id="3" category="Demographics CRFs"/>
+    <dataset name="DMS-1" id="4" category="Demographics CRFs"/>
+    <dataset name="DMT-1" id="5" category="Demographics CRFs"/>
+    <dataset name="STR-1" id="6" category="HIV Test and Lab Results CRFs"/>
+    <dataset name="SD-1" id="135" category="HIV Test and Lab Results CRFs"/>
+    <dataset name="Screening Viral Load Supplement" id="132" category="HIV Test and Lab Results CRFs"/>
+    <dataset name="LR-1" id="120" category="HIV Test and Lab Results CRFs"/>
+    <dataset name="HTR-1" id="130" category="HIV Test and Lab Results CRFs"/>
+    <dataset name="HT-1" id="136" category="HIV Test and Lab Results CRFs"/>
+    <dataset name="Western Blot Bands Log" id="310" category="HIV Test and Lab Results CRFs"/>
+    <dataset name="Viral Load Supplement" id="138" category="HIV Test and Lab Results CRFs"/>
+    <dataset name="ISC-1" id="11" category="Specimen CRFs"/>
+    <dataset name="Specimen Consent Withdrawal" id="447" category="Specimen CRFs"/>
+    <dataset name="SCL-1" id="449" category="Specimen CRFs"/>
+    <dataset name="IGE-1" id="10" category="Group Assignment CRFs"/>
+    <dataset name="GA-1" id="99" category="Group Assignment CRFs"/>
+    <dataset name="GSA-1" id="101" category="Group Assignment CRFs"/>
+    <dataset name="FU-1" id="100" category="Patient Health and History Information"/>
+    <dataset name="SH-1" id="110" category="Patient Health and History Information"/>
+    <dataset name="PE-1" id="140" category="Patient Health and History Information"/>
+    <dataset name="STE-1" id="150" category="Patient Health and History Information"/>
+    <dataset name="STF-1" id="155" category="Patient Health and History Information"/>
+    <dataset name="HA-1" id="300" category="Patient Health and History Information"/>
+    <dataset name="AL-1" id="301" category="Patient Health and History Information"/>
+    <dataset name="Hormonal Treatment Log" id="305" category="Patient Health and History Information"/>
+    <dataset name="Acute Retroviral Symptoms Page 1 of 4" id="170" category="Patient Health and History Information"/>
+    <dataset name="Acute Retroviral Symptoms Page 2 of 4" id="171" category="Patient Health and History Information"/>
+    <dataset name="Acute Retroviral Symptoms Page 3 of 4" id="172" category="Patient Health and History Information"/>
+    <dataset name="Acute Retroviral Symptoms Page 4 of 4" id="173" category="Patient Health and History Information"/>
+    <dataset name="MV-1" id="463" category="Administrative CRFs"/>
+    <dataset name="IV-1" id="350" category="Administrative CRFs"/>
+    <dataset name="PT-1" id="465" category="Administrative CRFs"/>
+    <dataset name="PRC-1" id="466" category="Administrative CRFs"/>
+    <dataset name="ESI-1" id="489" category="Administrative CRFs"/>
+    <dataset name="End of Study Inventory Page 2" id="491" category="Administrative CRFs"/>
+    <dataset name="TM-1" id="490" category="Administrative CRFs"/>
+    <dataset name="Apoptosis Factors" id="5007" category="Assay Results"/>
+    <dataset name="Binding Antibody" id="5005" category="Assay Results"/>
+    <dataset name="Cytokine" id="5006" category="Assay Results"/>
+    <dataset name="NAB" id="5001" category="Assay Results"/>
+    <dataset name="NAb_DM" id="5009" category="Assay Results"/>
+    <dataset name="HIV-1 Western Blot" id="5004" category="Confirmatory Test Results"/>
+    <dataset name="Viral Load" id="5003" category="Confirmatory Test Results"/>
+    <dataset name="EIA" id="5002" category="Confirmatory Test Results"/>
+    <dataset name="Participants of Interest" id="5012" showByDefault="false" category="Preliminary" demographicData="true"/>
+    <dataset name="Supplemental Serostatus Data" id="5013" showByDefault="false" category="Preliminary"/>
+    <dataset name="Fiebig Stage" id="900" showByDefault="false" category="Calculated Results"/>
+    <dataset name="ClinicalData" id="901" showByDefault="false" category="Calculated Results"/>
+    <dataset name="Viral Load Set Point" id="5010" category="Calculated Results" demographicData="true"/>
+  </datasets>
+</datasets>

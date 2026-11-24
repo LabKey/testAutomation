@@ -334,12 +334,21 @@ public class QueryChartDialog extends ModalDialog
 
     private void doAndWaitForPreview(Runnable action)
     {
+        waitForPreviewToLoad();
         WebElement svg = isPreviewPresent() ? elementCache().svg() : null;
         action.run();
 
         // preview might not appear after action, but it will definitely go stale.
         if (svg != null)
             getWrapper().shortWait().until(ExpectedConditions.stalenessOf(svg));
+        waitForPreviewToLoad();
+    }
+
+    // Each config change re-queries the preview data, and every response redraws the preview
+    private void waitForPreviewToLoad()
+    {
+        WebDriverWrapper.waitFor(() -> !elementCache().previewLoadingLoc.existsIn(elementCache().previewContainer()),
+                "The chart preview did not finish loading.", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
     }
 
     public QueryChartDialog selectYAxisAggregateMethod(String option)
@@ -808,6 +817,7 @@ public class QueryChartDialog extends ModalDialog
         }
 
         private final Locator previewBodyLoc = Locator.tagWithClass("div", "chart-builder-preview-body");
+        private final Locator previewLoadingLoc = Locator.tagWithClass("div", "chart-loading-mask");
         private final Locator svgLoc = Locator.tagWithClass("div", "svg-chart__chart").childTag("svg");
         private final Locator svgErrorLoc = Locator.tagWithClass("div", "svg-chart__chart").childTag("div");
 

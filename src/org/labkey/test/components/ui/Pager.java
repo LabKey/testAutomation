@@ -58,6 +58,7 @@ public class Pager extends WebDriverComponent<Pager.ElementCache>
     {
         _pagedComponent.doAndWaitForUpdate(()->
                 elementCache().jumpToDropdown.clickSubMenu(false, jumpTo));
+        dismissCurrentPageTooltip();
 
         return this;
     }
@@ -86,6 +87,7 @@ public class Pager extends WebDriverComponent<Pager.ElementCache>
         finally
         {
             menu.collapse();
+            dismissCurrentPageTooltip();
         }
     }
 
@@ -115,6 +117,7 @@ public class Pager extends WebDriverComponent<Pager.ElementCache>
         finally
         {
             menu.collapse();
+            dismissCurrentPageTooltip();
         }
     }
 
@@ -124,6 +127,7 @@ public class Pager extends WebDriverComponent<Pager.ElementCache>
         // Wait for the exact total to render: the summary shows "... of N" (no capped "+"). The total is briefly hidden
         // behind a spinner while counting, so require the " of " to be back before checking that the "+" is gone.
         elementCache().jumpToDropdown.clickSubMenu(false, COUNT_ALL_ROWS_OPTION);
+        dismissCurrentPageTooltip();
         WebDriverWrapper.waitFor(() -> summary().contains(" of ") && !summary().contains("+"),
                 "Exact count did not load", 30_000);
 
@@ -169,8 +173,16 @@ public class Pager extends WebDriverComponent<Pager.ElementCache>
         {
             elementCache().jumpToDropdown.collapse();
         }
+        dismissCurrentPageTooltip();
 
         return initialSize;
+    }
+
+    // The 'Current Page' tooltip can linger on Firefox after Selenium interacts with the pager, covering neighboring controls
+    private void dismissCurrentPageTooltip()
+    {
+        getWrapper().mouseOverWithoutScrolling(elementCache().currentPageButton);
+        getWrapper().mouseOut();
     }
 
     /**

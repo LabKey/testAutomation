@@ -1,0 +1,25 @@
+SELECT SpecimenEvent.Labid.Label AS Location,
+SpecimenEvent.Labid.LdmsLabCode,
+SpecimenEvent.ProtocolNumber,
+SpecimenEvent.ParticipantId AS ParticipantId,
+SpecimenEvent.ShipDate,
+SpecimenEvent.ShipBatchNumber,
+SpecimenEvent.SpecimenNumber,
+SpecimenEvent.LabReceiptDate,
+SpecimenEvent.DerivativeType AS DerivativeType,
+SpecimenEvent.AdditiveType AS AdditiveType,
+SpecimenEvent.ShipFlag,
+count (SpecimenEvent.VialId)as NumberOfVials
+FROM SpecimenEvent
+WHERE SpecimenEvent.ShipDate>(CURDATE()-8)and SpecimenEvent.ShipFlag = 1
+Group by SpecimenEvent.ShipDate,
+SpecimenEvent.ShipBatchNumber,
+SpecimenEvent.ProtocolNumber,
+SpecimenEvent.ParticipantId,
+SpecimenEvent.SpecimenNumber,
+SpecimenEvent.LabReceiptDate,
+SpecimenEvent.DerivativeType,
+SpecimenEvent.AdditiveType,
+SpecimenEvent.ShipFlag,
+SpecimenEvent.Labid.Label,
+SpecimenEvent.Labid.LdmsLabCode
