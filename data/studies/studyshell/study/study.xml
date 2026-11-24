@@ -6,5 +6,4 @@
   <datasets dir="datasets" file="datasets_manifest.xml">
     <definition file="CHAVI001.dataset"/>
   </datasets>
-  <specimens dir="specimens" file="CHAVI001.specimens"/>
 </study>

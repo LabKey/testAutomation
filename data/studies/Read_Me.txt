@@ -133,7 +133,7 @@ StudyWithoutDemoBit.folder.zip
 TimeChartTesting.folder.zip
 	TimeChartImportTest.java (DailyC)
 
-studyshell.zip
+studyshell
 	SCHARPStudyTest.java (DailyA)
 
 
