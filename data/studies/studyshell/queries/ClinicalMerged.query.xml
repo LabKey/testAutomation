@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<query name="ClinicalMerged" schemaName="study" xmlns="http://labkey.org/data/xml/query">
+  <metadata>
+      <tables xsi:schemaLocation="" xmlns="http://labkey.org/data/xml"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+      <table tableName="Clinical" tableDbType="NOT_IN_DB">
+        <columns>
+          <column columnName="ViralLoad">
+            <datatype>double</datatype>
+          </column>
+        </columns>
+      </table>
+    </tables>
+  </metadata>
+</query>

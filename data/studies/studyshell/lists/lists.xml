@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tables xmlns="http://labkey.org/data/xml">
+  <table tableName="WB Scoring (Denny)" tableDbType="TABLE">
+    <columns>
+      <column columnName="Key">
+        <datatype>integer</datatype>
+        <columnTitle>Key</columnTitle>
+        <nullable>false</nullable>
+        <isKeyField>true</isKeyField>
+        <isAutoInc>true</isAutoInc>
+      </column>
+      <column columnName="Value">
+        <datatype>varchar</datatype>
+        <columnTitle>Value</columnTitle>
+      </column>
+    </columns>
+    <pkColumnName>Key</pkColumnName>
+  </table>
+</tables>
