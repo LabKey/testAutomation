@@ -81,6 +81,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -93,6 +94,7 @@ import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.params.FieldDefinition.ColumnType;
 import static org.labkey.test.params.FieldDefinition.DOMAIN_TRICKY_CHARACTERS;
@@ -2244,7 +2246,7 @@ public class ListTest extends BaseWebDriverTest
 
     List<FieldDefinition> Acolumns = Arrays.asList(
             col("A", ColumnType.Integer),
-            colURL("title", ColumnType.String, "/junit/echoForm.view?key=${A}&title=${title}&table=A"),
+            colURL("title", ColumnType.String, "/project/begin.view?key=${A}&title=${title}&table=A"),
             col("Bfk", "B")
     );
     String[][] Adata = new String[][]
@@ -2254,7 +2256,7 @@ public class ListTest extends BaseWebDriverTest
 
     List<FieldDefinition> Bcolumns = Arrays.asList(
             col("B", ColumnType.Integer),
-            colURL("title", ColumnType.String, "org.labkey.core.junit.JunitController$EchoFormAction.class?key=${B}&title=${title}&table=B"),
+            colURL("title", ColumnType.String, "org.labkey.core.portal.ProjectController$BeginAction.class?key=${B}&title=${title}&table=B"),
             col("Cfk", "C")
     );
     String[][] Bdata = new String[][]
@@ -2264,7 +2266,7 @@ public class ListTest extends BaseWebDriverTest
 
     List<FieldDefinition> Ccolumns = Arrays.asList(
             col("C", ColumnType.Integer),
-            colURL("title", ColumnType.String, "/junit/echoForm.view?key=${C}&title=${title}&table=C")
+            colURL("title", ColumnType.String, "/project/begin.view?key=${C}&title=${title}&table=C")
     );
     String[][] Cdata = new String[][]
     {
@@ -2370,9 +2372,13 @@ public class ListTest extends BaseWebDriverTest
     }
 
 
-    Locator inputWithValue(String name, String value)
+    private void assertTitleUrl(Locator.XPathLocator link, String table, String title)
     {
-        return Locator.xpath("//input[@name='" + name + "' and @value='" + value + "']");
+        String hrefValue = link.findElement(getDriver()).getDomProperty("href");
+        assertNotNull("Link has no href: " + link, hrefValue);
+        URI href = URI.create(hrefValue);
+        assertTrue("Wrong URL target: " + href, href.getRawPath().endsWith(WebTestHelper.buildRelativeUrl("project", PROJECT_VERIFY, "begin")));
+        assertEquals("Wrong URL parameters: " + href, Map.of("key", "1", "title", title, "table", table), WebTestHelper.parseUrlQueryString(href.getRawQuery()));
     }
 
     @LogMethod
@@ -2387,14 +2393,7 @@ public class ListTest extends BaseWebDriverTest
             beginAt(WebTestHelper.buildURL("query", PROJECT_VERIFY, "executeQuery",
                 Map.of("schemaName", "lists", "query.queryName", "A")));
 
-            pushLocation();
-            {
-                clickAndWait(Locator.linkWithText("one A"));
-                assertElementPresent(inputWithValue("table","A"));
-                assertElementPresent(inputWithValue("title","one A"));
-                assertElementPresent(inputWithValue("key","1"));
-            }
-            popLocation();
+            assertTitleUrl(Locator.linkWithText("one A"), "A", "one A");
 
             pushLocation();
             {
@@ -2413,11 +2412,8 @@ public class ListTest extends BaseWebDriverTest
             _customizeViewsHelper.addColumn("Bfk/Cfk/title");
             _customizeViewsHelper.saveCustomView("allColumns");
 
-            clickAndWait(Locator.linkWithText("one C").index(1));
-            assertElementPresent(inputWithValue("key","1"));
-            assertElementPresent(inputWithValue("table","C"));
-            assertElementPresent(inputWithValue("title","one C"));
-            assertTrue(getCurrentRelativeURL().contains(WebTestHelper.buildRelativeUrl("junit", PROJECT_VERIFY, "echoForm")));
+            assertTitleUrl(Locator.linkWithText("one B").index(1), "B", "one B");
+            assertTitleUrl(Locator.linkWithText("one C").index(1), "C", "one C");
         }
         popLocation();
     }
