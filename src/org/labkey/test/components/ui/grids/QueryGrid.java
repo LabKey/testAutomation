@@ -28,6 +28,7 @@ import org.labkey.test.components.ui.FilterStatusValue;
 import org.labkey.test.util.selenium.WebElementUtils;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
@@ -642,6 +643,12 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
      * @return The name of the grid view from the header. Empty string if no header (default view).
      */
     public String getViewName()
+    {
+        // The header re-renders while the grid reloads, so find it again if it goes stale
+        return getWrapper().shortWait().ignoring(StaleElementReferenceException.class).until(_ -> readViewName());
+    }
+
+    private String readViewName()
     {
         String viewName;
 
