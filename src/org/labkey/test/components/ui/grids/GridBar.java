@@ -108,8 +108,7 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
     }
 
     /**
-     * says whether or not the grid currently shows a pager (for example, when filtered down to zero
-     * or not loaded, the pager will not be present)
+     * Says whether the grid currently shows a pager (e.g., when filtered down to zero or not loaded, the pager will not be present)
      * @return <code>true</code> if grid has a pager
      */
     public boolean hasPager()
@@ -155,7 +154,7 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
         {
             return pager().total();
         }
-        catch(NoSuchElementException | StaleElementReferenceException nse)
+        catch (NoSuchElementException | StaleElementReferenceException nse)
         {
             // If the paging count isn't present return the number of rows in the grid.
             return _queryGrid.getRows().size();

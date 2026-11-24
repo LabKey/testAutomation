@@ -33,6 +33,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.util.HashMap;
 import java.util.List;
@@ -288,17 +289,19 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     /**
      * Snapshot the grid before an action that reloads its rows or selections, then pass the result to
      * {@link #waitForUpdate(UpdateWatch)} after the action.
-     * @return the snapshot, or null when the grid has no selection column and so is not watched
+     * @return the snapshot, or null when the grid can't be watched: an older build's grid without a selection column
      */
     public @Nullable UpdateWatch watchForUpdate()
     {
+        String loadCount = getComponentElement().getDomAttribute(LOAD_COUNT_ATTRIBUTE);
+        if (loadCount != null)
+            return new UpdateWatch(loadCount, null);
+
         if (!hasSelectColumn())
             return null;
 
-        String loadCount = getComponentElement().getDomAttribute(LOAD_COUNT_ATTRIBUTE);
         // Older @labkey/components builds have no load count, but remount the selection status on every load
-        WebElement status = loadCount == null ? Locators.selectionStatusContainerLoc.waitForElement(this, 5_000) : null;
-        return new UpdateWatch(loadCount, status);
+        return new UpdateWatch(null, Locators.selectionStatusContainerLoc.waitForElement(this, 5_000));
     }
 
     /**
@@ -306,17 +309,26 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
      */
     public void waitForUpdate(@Nullable UpdateWatch watch)
     {
+        waitForUpdate(watch, getWrapper().shortWait());
+    }
+
+    /**
+     * Wait, as long as the given wait allows, for the load that started after {@link #watchForUpdate()} to finish.
+     */
+    public void waitForUpdate(@Nullable UpdateWatch watch, WebDriverWait wait)
+    {
         if (watch == null)
             return;
 
         String loadCount = watch.loadCount();
         WebElement status = watch.status();
         if (loadCount != null)
-            getWrapper().shortWait().until(_ -> !loadCount.equals(getComponentElement().getDomAttribute(LOAD_COUNT_ATTRIBUTE)));
+            wait.until(_ -> !loadCount.equals(getComponentElement().getDomAttribute(LOAD_COUNT_ATTRIBUTE)));
         else if (status != null)
-            getWrapper().shortWait().until(ExpectedConditions.stalenessOf(status));
+            wait.until(ExpectedConditions.stalenessOf(status));
 
-        Locators.selectionStatusContainerLoc.waitForElement(this, 5_000);
+        if (hasSelectColumn())
+            wait.until(_ -> Locators.selectionStatusContainerLoc.existsIn(this));
     }
 
     /**
@@ -401,9 +413,10 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         else
         {
             ReactCheckBox selectAll = selectAllBox();
+            // The select-all box waits for each update it starts
             if (selectAll.isIndeterminate() || !selectAll.isChecked())
             {
-                doAndWaitForUpdate(() -> selectAllOnPage(true, null));
+                selectAllOnPage(true, null);
             }
         }
 
@@ -434,7 +447,8 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
             }
             else
             {
-                doAndWaitForUpdate(() -> selectAllOnPage(false));
+                // The select-all box waits for each update it starts, and starts none when already unchecked
+                selectAllOnPage(false);
             }
         }
 
