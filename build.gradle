@@ -126,23 +126,18 @@ if (!BuildUtils.isIntellij())  {
 }
 
 File testPropertiesFile = project.file('test.properties')
-def initPropertiesTask = project.tasks.register("initProperties", Copy) {
-    Copy task ->
+File testPropertiesTemplate = project.file('test.properties.template')
+// Not a Copy task: its destination (this whole directory) would become an output overlapping processResources inputs
+def initPropertiesTask = project.tasks.register("initProperties") {
+    Task task ->
         task.group = GroupNames.TEST
         task.description = "Create test.properties if missing"
-        task.from(project.file('test.properties.template'))
-        task.into(".")
-        task.outputs.files(testPropertiesFile)
-        task.rename('test.properties.template', 'test.properties')
-        task.filter { String line ->
-            if (line.startsWith("#!!")) {
-                return null
-            }
-            else {
-                return line
-            }
-        }
+        task.inputs.file(testPropertiesTemplate)
+        task.outputs.file(testPropertiesFile)
         task.onlyIf{ !testPropertiesFile.exists() }
+        task.doLast {
+            testPropertiesFile.text = testPropertiesTemplate.readLines().findAll { !it.startsWith("#!!") }.join(System.lineSeparator()) + System.lineSeparator()
+        }
 }
 
 def harInFile = project.findProperty('harInFile')
