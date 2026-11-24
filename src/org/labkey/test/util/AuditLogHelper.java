@@ -463,6 +463,20 @@ public class AuditLogHelper
         }
     }
 
+    /**
+     * Perform an action and wait for it to record a new transaction audit event.
+     * @return RowId of the new transaction audit event
+     */
+    public Integer doAndWaitForTransaction(Runnable action, String containerPath)
+    {
+        int prevTransactionId = Objects.requireNonNullElse(getLastTransactionId(containerPath), -1);
+        action.run();
+        return waitFor(() -> {
+            Integer transactionId = getLastTransactionId(containerPath);
+            return transactionId != null && transactionId > prevTransactionId ? transactionId : null;
+        }, "No new transaction audit event was recorded", WAIT_FOR_JAVASCRIPT);
+    }
+
     public Integer doAndWaitForTransaction(Runnable action, String containerPath, AuditEvent auditEventName)
     {
         int prevTransactionId;

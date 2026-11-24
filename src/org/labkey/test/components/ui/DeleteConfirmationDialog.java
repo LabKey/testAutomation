@@ -71,7 +71,8 @@ public class DeleteConfirmationDialog<ConfirmPage extends WebDriverWrapper> exte
 
     protected DeleteConfirmationDialog(String partialTitle, @NotNull WebDriverWrapper sourcePage, Function<Runnable, ConfirmPage> confirmationSynchronizationFunction)
     {
-        this(new ModalDialog.ModalDialogFinder(sourcePage.getDriver()).withTitleIgnoreCase(partialTitle), confirmationSynchronizationFunction);
+        this(new ModalDialog.ModalDialogFinder(sourcePage.getDriver()).withTitleIgnoreCase(partialTitle).withoutLoadingSpinner(),
+                confirmationSynchronizationFunction);
     }
 
     protected DeleteConfirmationDialog(ModalDialogFinder finder, Function<Runnable, ConfirmPage> confirmationSynchronizationFunction)
@@ -86,7 +87,7 @@ public class DeleteConfirmationDialog<ConfirmPage extends WebDriverWrapper> exte
         WebDriverWrapper.waitFor(()-> elementCache().body.isDisplayed() &&
                         !elementCache().title.getText().isEmpty() &&
                         !BootstrapLocators.loadingSpinner.existsIn(this),
-                "The delete confirmation dialog did not become ready.", 1_000);
+                "The delete confirmation dialog did not become ready.", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
     }
 
     public DeleteConfirmationDialog<ConfirmPage> setSkipAuditEventCheck(boolean skipAuditEventCheck)

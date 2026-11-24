@@ -240,8 +240,12 @@ public class DetailDataPanel extends WebDriverComponent<DetailDataPanel.ElementC
             if (_asTooltip)
                 return _baseLocatorAsTooltip;
             else if (_title != null)
+            {
+                // Exact match, so "Details" can't find a "Source Details" or "Parent Details" panel that renders first
+                String title = Locator.xq(_title);
                 return _baseLocator.withChild(Locator.byClass("panel-heading")
-                        .withText().containing(_title));
+                        .withPredicate("descendant-or-self::*[normalize-space()=" + title + "] or text()[normalize-space()=" + title + "]"));
+            }
             else
                 return _baseLocator;
         }
