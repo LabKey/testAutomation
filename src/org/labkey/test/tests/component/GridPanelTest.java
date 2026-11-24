@@ -458,7 +458,7 @@ public class GridPanelTest extends GridPanelBaseTest
         int newPageSize = 250;
         log(String.format("Now set page size to %d.", newPageSize));
 
-        grid.getGridBar().selectPageSize(Integer.toString(newPageSize));
+        grid.getGridBar().selectPageSize(newPageSize);
 
         log("Check to see that the pager thinks it's all true.");
 
@@ -490,7 +490,7 @@ public class GridPanelTest extends GridPanelBaseTest
         checker().screenShotIfNewError("Resize_Error");
 
         log(String.format("Set page size back to the default size %d.", DEFAULT_PAGE_SIZE));
-        grid.getGridBar().selectPageSize(Integer.toString(DEFAULT_PAGE_SIZE));
+        grid.getGridBar().selectPageSize(DEFAULT_PAGE_SIZE);
 
         checker()
                 .withScreenshot("Smaller_page_Size_Dropdown_Menu_Visible")
@@ -571,7 +571,7 @@ public class GridPanelTest extends GridPanelBaseTest
     public void testSelectAllButtonWithFilteredResults()
     {
         QueryGrid grid = beginAtQueryGrid(FILTER_SAMPLE_TYPE);
-        grid.getGridBar().selectPageSize(Integer.toString(SELECTION_PAGE_SIZE));
+        grid.getGridBar().selectPageSize(SELECTION_PAGE_SIZE);
 
         log("Validate that the 'Select All' button works as expected.");
         grid.filterColumn(FILTER_STRING_COL, Filter.Operator.EQUAL, MULTI_PAGE_STRING);
@@ -606,7 +606,7 @@ public class GridPanelTest extends GridPanelBaseTest
     public void testSelectAllOnPageWithFilteredResults()
     {
         QueryGrid grid = beginAtQueryGrid(FILTER_SAMPLE_TYPE);
-        grid.getGridBar().selectPageSize(Integer.toString(SELECTION_PAGE_SIZE));
+        grid.getGridBar().selectPageSize(SELECTION_PAGE_SIZE);
 
         log("Validate the select all check box at the top of the gird works as expected.");
         grid.filterColumn(FILTER_STRING_COL, Filter.Operator.EQUAL, MULTI_PAGE_STRING);
@@ -639,7 +639,7 @@ public class GridPanelTest extends GridPanelBaseTest
     public void testSelectOnPageAndSelectAllButton()
     {
         QueryGrid grid = beginAtQueryGrid(FILTER_SAMPLE_TYPE);
-        grid.getGridBar().selectPageSize(Integer.toString(SELECTION_PAGE_SIZE));
+        grid.getGridBar().selectPageSize(SELECTION_PAGE_SIZE);
 
         log("Filter grid to multiple pages.");
         grid.filterColumn(FILTER_STRING_COL, Filter.Operator.EQUAL, MULTI_PAGE_STRING);
@@ -1461,7 +1461,7 @@ public class GridPanelTest extends GridPanelBaseTest
 
         grid.getGridBar().searchFor(searchString);
 
-        grid.getGridBar().pager().selectPageSize("40");
+        grid.getGridBar().selectPageSize(40);
 
         // Have to use a "magical number" for the expected number of rows returned by the search.
         int expectedCount = 29;

@@ -137,9 +137,9 @@ public class GridBar extends WebDriverComponent<GridBar.ElementCache>
     /**
      * selects the number of rows to be shown per page
      */
-    public GridBar selectPageSize(String pageSize)
+    public GridBar selectPageSize(int pageSize)
     {
-        pager().selectPageSize(pageSize);
+        pager().selectPageSize(String.valueOf(pageSize));
         return this;
     }
 
