@@ -509,7 +509,11 @@ public class ResponsiveGrid<T extends ResponsiveGrid<?>> extends WebDriverCompon
     protected ReactCheckBox selectAllBox()
     {
         ReactCheckBox box = elementCache().selectAllCheckbox;
-        getWrapper().shortWait().until(ExpectedConditions.elementToBeClickable(box.getComponentElement()));
+        WebElement el = box.getComponentElement();
+        // While the grid loads, the box is aria-disabled rather than disabled, so it keeps focus but ignores clicks
+        getWrapper().shortWait().until(ExpectedConditions.and(
+                ExpectedConditions.elementToBeClickable(el),
+                ExpectedConditions.not(ExpectedConditions.attributeToBe(el, "aria-disabled", "true"))));
         return box;
     }
 

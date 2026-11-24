@@ -29,6 +29,7 @@ import org.labkey.test.components.ui.FilterStatusValue;
 import org.labkey.test.util.selenium.WebElementUtils;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
@@ -38,7 +39,9 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
@@ -295,13 +298,19 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     {
         String loadCount = getComponentElement().getDomAttribute(LOAD_COUNT_ATTRIBUTE);
         if (loadCount != null)
-            return new UpdateWatch(loadCount, null);
+        {
+            // A remounted grid restarts its load count at 0, so mark this one to tell a replacement apart
+            String marker = UUID.randomUUID().toString();
+            getWrapper().executeScript("arguments[0].setAttribute(arguments[1], arguments[2]);",
+                    getComponentElement(), WATCH_MARKER_ATTRIBUTE, marker);
+            return new UpdateWatch(loadCount, null, marker);
+        }
 
         if (!hasSelectColumn())
             return null;
 
         // Older @labkey/components builds have no load count, but remount the selection status on every load
-        return new UpdateWatch(null, Locators.selectionStatusContainerLoc.waitForElement(this, 5_000));
+        return new UpdateWatch(null, Locators.selectionStatusContainerLoc.waitForElement(this, 5_000), null);
     }
 
     /**
@@ -323,7 +332,23 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
         String loadCount = watch.loadCount();
         WebElement status = watch.status();
         if (loadCount != null)
-            wait.until(_ -> !loadCount.equals(getComponentElement().getDomAttribute(LOAD_COUNT_ATTRIBUTE)));
+        {
+            // A replaced grid, stale or lacking the marker, counts as updated
+            wait.until(_ -> {
+                try
+                {
+                    WebElement grid = getComponentElement();
+                    return !Objects.equals(watch.marker(), grid.getDomAttribute(WATCH_MARKER_ATTRIBUTE))
+                            || !loadCount.equals(grid.getDomAttribute(LOAD_COUNT_ATTRIBUTE));
+                }
+                catch (StaleElementReferenceException e)
+                {
+                    return true;
+                }
+            });
+            if (ExpectedConditions.stalenessOf(getComponentElement()).apply(getDriver()))
+                return; // The caller has to find the new grid to query it
+        }
         else if (status != null)
             wait.until(ExpectedConditions.stalenessOf(status));
 
@@ -334,7 +359,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
     /**
      * The grid's state before an update: its load count, or, on builds without one, its selection status element.
      */
-    public record UpdateWatch(@Nullable String loadCount, @Nullable WebElement status) {}
+    public record UpdateWatch(@Nullable String loadCount, @Nullable WebElement status, @Nullable String marker) {}
 
 
     // search, sort and filter methods
@@ -884,6 +909,7 @@ public class QueryGrid extends ResponsiveGrid<QueryGrid>
 
     // Set by GridPanel each time its rows or selections finish loading
     private static final String LOAD_COUNT_ATTRIBUTE = "data-load-count";
+    private static final String WATCH_MARKER_ATTRIBUTE = "data-test-update-watch";
 
     protected static class Locators
     {
