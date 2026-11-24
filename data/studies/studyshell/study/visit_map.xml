@@ -1,0 +1,1078 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<visitMap xmlns="http://labkey.org/study/xml">
+  <visit sequenceNum="0.0"/>
+  <visit label="Screening" typeCode="X" sequenceNum="98.0" visitDateDatasetId="1">
+    <datasets>
+      <dataset id="1" type="REQUIRED"/>
+      <dataset id="2" type="OPTIONAL"/>
+      <dataset id="3" type="OPTIONAL"/>
+      <dataset id="4" type="OPTIONAL"/>
+      <dataset id="5" type="OPTIONAL"/>
+      <dataset id="6" type="REQUIRED"/>
+      <dataset id="135" type="REQUIRED"/>
+      <dataset id="11" type="REQUIRED"/>
+      <dataset id="10" type="REQUIRED"/>
+      <dataset id="150" type="REQUIRED"/>
+      <dataset id="5004" type="OPTIONAL"/>
+      <dataset id="5003" type="OPTIONAL"/>
+      <dataset id="5002" type="OPTIONAL"/>
+    </datasets>
+  </visit>
+  <visit label="Screening" sequenceNum="98.1"/>
+  <visit sequenceNum="99.0"/>
+  <visit label="UNC confirm acute" typeCode="O" sequenceNum="100.9">
+    <datasets>
+      <dataset id="130" type="REQUIRED"/>
+      <dataset id="136" type="REQUIRED"/>
+      <dataset id="5004" type="OPTIONAL"/>
+      <dataset id="5003" type="OPTIONAL"/>
+      <dataset id="5002" type="OPTIONAL"/>
+    </datasets>
+  </visit>
+  <visit label="Acute Cohort Enrollment" typeCode="B" sequenceNum="101.0" visitDateDatasetId="99">
+    <datasets>
+      <dataset id="120" type="REQUIRED"/>
+      <dataset id="130" type="REQUIRED"/>
+      <dataset id="136" type="REQUIRED"/>
+      <dataset id="449" type="REQUIRED"/>
+      <dataset id="99" type="REQUIRED"/>
+      <dataset id="110" type="REQUIRED"/>
+      <dataset id="140" type="REQUIRED"/>
+      <dataset id="300" type="OPTIONAL"/>
+      <dataset id="301" type="OPTIONAL"/>
+      <dataset id="5004" type="OPTIONAL"/>
+      <dataset id="5003" type="OPTIONAL"/>
+      <dataset id="5002" type="OPTIONAL"/>
+    </datasets>
+  </visit>
+  <visit sequenceNum="101.01"/>
+  <visit label="Int Vist" typeCode="O" sequenceNum="101.1" maxSequenceNum="101.9" visitDateDatasetId="100">
+    <datasets>
+      <dataset id="120" type="OPTIONAL"/>
+      <dataset id="130" type="OPTIONAL"/>
+      <dataset id="136" type="OPTIONAL"/>
+      <dataset id="449" type="OPTIONAL"/>
+      <dataset id="99" type="OPTIONAL"/>
+      <dataset id="101" type="OPTIONAL"/>
+      <dataset id="100" type="REQUIRED"/>
+      <dataset id="140" type="OPTIONAL"/>
+      <dataset id="155" type="OPTIONAL"/>
+      <dataset id="300" type="OPTIONAL"/>
+      <dataset id="301" type="OPTIONAL"/>
+      <dataset id="350" type="REQUIRED"/>
+      <dataset id="5002" type="OPTIONAL"/>
+    </datasets>
+  </visit>
+  <visit label="Acute Cohort Week 1" typeCode="S" sequenceNum="102.0" visitDateDatasetId="100">
+    <datasets>
+      <dataset id="120" type="OPTIONAL"/>
+      <dataset id="130" type="REQUIRED"/>
+      <dataset id="136" type="REQUIRED"/>
+      <dataset id="449" type="REQUIRED"/>
+      <dataset id="101" type="OPTIONAL"/>
+      <dataset id="100" type="REQUIRED"/>
+      <dataset id="110" type="OPTIONAL"/>
+      <dataset id="140" type="OPTIONAL"/>
+      <dataset id="300" type="OPTIONAL"/>
+      <dataset id="301" type="OPTIONAL"/>
+      <dataset id="5003" type="OPTIONAL"/>
+      <dataset id="5002" type="OPTIONAL"/>
+    </datasets>
+  </visit>
+  <visit label="Int Vist" typeCode="O" sequenceNum="102.1" maxSequenceNum="102.9" visitDateDatasetId="100">
+    <datasets>
+      <dataset id="120" type="OPTIONAL"/>
+      <dataset id="130" type="OPTIONAL"/>
+      <dataset id="136" type="OPTIONAL"/>
+      <dataset id="449" type="OPTIONAL"/>
+      <dataset id="99" type="OPTIONAL"/>
+      <dataset id="101" type="OPTIONAL"/>
+      <dataset id="100" type="REQUIRED"/>
+      <dataset id="140" type="OPTIONAL"/>
+      <dataset id="155" type="OPTIONAL"/>
+      <dataset id="300" type="OPTIONAL"/>
+      <dataset id="301" type="OPTIONAL"/>
+      <dataset id="350" type="REQUIRED"/>
+    </datasets>
+  </visit>
+  <visit label="Acute Cohort Week 2" typeCode="S" sequenceNum="103.0" visitDateDatasetId="100">
+    <datasets>
+      <dataset id="120" type="OPTIONAL"/>
+      <dataset id="130" type="REQUIRED"/>
+      <dataset id="136" type="REQUIRED"/>
+      <dataset id="449" type="REQUIRED"/>
+      <dataset id="101" type="OPTIONAL"/>
+      <dataset id="100" type="REQUIRED"/>
+      <dataset id="110" type="OPTIONAL"/>
+      <dataset id="140" type="OPTIONAL"/>
+      <dataset id="300" type="OPTIONAL"/>
+      <dataset id="301" type="OPTIONAL"/>
+    </datasets>
+  </visit>
+  <visit label="Int Vist" typeCode="O" sequenceNum="103.1" maxSequenceNum="103.9" visitDateDatasetId="100">
+    <datasets>
+      <dataset id="120" type="OPTIONAL"/>
+      <dataset id="130" type="OPTIONAL"/>
+      <dataset id="136" type="OPTIONAL"/>
+      <dataset id="449" type="OPTIONAL"/>
+      <dataset id="99" type="OPTIONAL"/>
+      <dataset id="101" type="OPTIONAL"/>
+      <dataset id="100" type="REQUIRED"/>
+      <dataset id="140" type="OPTIONAL"/>
+      <dataset id="155" type="OPTIONAL"/>
+      <dataset id="300" type="OPTIONAL"/>
+      <dataset id="301" type="OPTIONAL"/>
+      <dataset id="350" type="REQUIRED"/>
+    </datasets>
+  </visit>
+  <visit label="Acute Cohort Week 3" typeCode="S" sequenceNum="104.0" visitDateDatasetId="100">
+    <datasets>
+      <dataset id="120" type="OPTIONAL"/>
+      <dataset id="130" type="REQUIRED"/>
+      <dataset id="136" type="REQUIRED"/>
+      <dataset id="449" type="REQUIRED"/>
+      <dataset id="101" type="OPTIONAL"/>
+      <dataset id="100" type="REQUIRED"/>
+      <dataset id="140" type="OPTIONAL"/>
+      <dataset id="155" type="OPTIONAL"/>
+      <dataset id="300" type="OPTIONAL"/>
+      <dataset id="301" type="OPTIONAL"/>
+    </datasets>
+  </visit>
+  <visit label="Int Vist" typeCode="O" sequenceNum="104.1" maxSequenceNum="104.9" visitDateDatasetId="100">
+    <datasets>
+      <dataset id="120" type="OPTIONAL"/>
+      <dataset id="130" type="OPTIONAL"/>
+      <dataset id="136" type="OPTIONAL"/>
+      <dataset id="449" type="OPTIONAL"/>
+      <dataset id="99" type="OPTIONAL"/>
+      <dataset id="101" type="OPTIONAL"/>
+      <dataset id="100" type="REQUIRED"/>
+      <dataset id="140" type="OPTIONAL"/>
+      <dataset id="155" type="OPTIONAL"/>
+      <dataset id="300" type="OPTIONAL"/>
+      <dataset id="301" type="OPTIONAL"/>
+      <dataset id="350" type="REQUIRED"/>
+    </datasets>
+  </visit>
+  <visit label="Acute Cohort Week 4" typeCode="S" sequenceNum="105.0" visitDateDatasetId="100">
+    <datasets>
+      <dataset id="120" type="OPTIONAL"/>
+      <dataset id="130" type="REQUIRED"/>
+      <dataset id="136" type="REQUIRED"/>
+      <dataset id="449" type="REQUIRED"/>
+      <dataset id="101" type="OPTIONAL"/>
+      <dataset id="100" type="REQUIRED"/>
+      <dataset id="110" type="OPTIONAL"/>
+      <dataset id="140" type="OPTIONAL"/>
+      <dataset id="155" type="OPTIONAL"/>
+      <dataset id="300" type="OPTIONAL"/>
+      <dataset id="301" type="OPTIONAL"/>
+    </datasets>
+  </visit>
+  <visit label="Int Vist" typeCode="O" sequenceNum="105.1" maxSequenceNum="105.9" visitDateDatasetId="100">
+    <datasets>
+      <dataset id="120" type="OPTIONAL"/>
+      <dataset id="130" type="OPTIONAL"/>
+      <dataset id="136" type="OPTIONAL"/>
+      <dataset id="449" type="OPTIONAL"/>
+      <dataset id="99" type="OPTIONAL"/>
+      <dataset id="101" type="OPTIONAL"/>
+      <dataset id="100" type="REQUIRED"/>
+      <dataset id="140" type="OPTIONAL"/>
+      <dataset id="155" type="OPTIONAL"/>
+      <dataset id="300" type="OPTIONAL"/>
+      <dataset id="301" type="OPTIONAL"/>
+      <dataset id="350" type="REQUIRED"/>
+    </datasets>
+  </visit>
+  <visit label="Acute Cohort Week 8" typeCode="S" sequenceNum="106.0" visitDateDatasetId="100">
+    <datasets>
+      <dataset id="120" type="OPTIONAL"/>
+      <dataset id="130" type="REQUIRED"/>
+      <dataset id="136" type="REQUIRED"/>
+      <dataset id="449" type="REQUIRED"/>
+      <dataset id="101" type="OPTIONAL"/>
+      <dataset id="100" type="REQUIRED"/>
+      <dataset id="140" type="OPTIONAL"/>
+      <dataset id="155" type="OPTIONAL"/>
+      <dataset id="300" type="OPTIONAL"/>
+      <dataset id="301" type="OPTIONAL"/>
+    </datasets>
+  </visit>
+  <visit label="Int Vist" typeCode="O" sequenceNum="106.1" maxSequenceNum="106.9" visitDateDatasetId="100">
+    <datasets>
+      <dataset id="120" type="OPTIONAL"/>
+      <dataset id="130" type="OPTIONAL"/>
+      <dataset id="136" type="OPTIONAL"/>
+      <dataset id="449" type="OPTIONAL"/>
+      <dataset id="99" type="OPTIONAL"/>
+      <dataset id="101" type="OPTIONAL"/>
+      <dataset id="100" type="REQUIRED"/>
+      <dataset id="140" type="OPTIONAL"/>
+      <dataset id="155" type="OPTIONAL"/>
+      <dataset id="300" type="OPTIONAL"/>
+      <dataset id="301" type="OPTIONAL"/>
+      <dataset id="350" type="REQUIRED"/>
+    </datasets>
+  </visit>
+  <visit label="Acute Cohort Week 12" typeCode="S" sequenceNum="107.0" visitDateDatasetId="100">
+    <datasets>
+      <dataset id="120" type="REQUIRED"/>
+      <dataset id="130" type="REQUIRED"/>
+      <dataset id="136" type="REQUIRED"/>
+      <dataset id="449" type="REQUIRED"/>
+      <dataset id="101" type="OPTIONAL"/>
+      <dataset id="100" type="REQUIRED"/>
+      <dataset id="110" type="REQUIRED"/>
+      <dataset id="140" type="REQUIRED"/>
+      <dataset id="155" type="REQUIRED"/>
+      <dataset id="300" type="OPTIONAL"/>
+      <dataset id="301" type="OPTIONAL"/>
+    </datasets>
+  </visit>
+  <visit label="Int Vist" typeCode="O" sequenceNum="107.1" maxSequenceNum="107.9" visitDateDatasetId="100">
+    <datasets>
+      <dataset id="120" type="OPTIONAL"/>
+      <dataset id="130" type="OPTIONAL"/>
+      <dataset id="136" type="OPTIONAL"/>
+      <dataset id="449" type="OPTIONAL"/>
+      <dataset id="99" type="OPTIONAL"/>
+      <dataset id="101" type="OPTIONAL"/>
+      <dataset id="100" type="REQUIRED"/>
+      <dataset id="140" type="OPTIONAL"/>
+      <dataset id="155" type="OPTIONAL"/>
+      <dataset id="300" type="OPTIONAL"/>
+      <dataset id="301" type="OPTIONAL"/>
+      <dataset id="350" type="REQUIRED"/>
+    </datasets>
+  </visit>
+  <visit label="Acute Cohort Week 16" typeCode="S" sequenceNum="108.0" visitDateDatasetId="100">
+    <datasets>
+      <dataset id="120" type="OPTIONAL"/>
+      <dataset id="130" type="REQUIRED"/>
+      <dataset id="136" type="REQUIRED"/>
+      <dataset id="449" type="REQUIRED"/>
+      <dataset id="101" type="OPTIONAL"/>
+      <dataset id="100" type="REQUIRED"/>
+      <dataset id="110" type="OPTIONAL"/>
+      <dataset id="140" type="OPTIONAL"/>
+      <dataset id="155" type="OPTIONAL"/>
+      <dataset id="300" type="OPTIONAL"/>
+      <dataset id="301" type="OPTIONAL"/>
+    </datasets>
+  </visit>
+  <visit label="Int Vist" typeCode="O" sequenceNum="108.1" maxSequenceNum="108.9" visitDateDatasetId="100">
+    <datasets>
+      <dataset id="120" type="OPTIONAL"/>
+      <dataset id="130" type="OPTIONAL"/>
+      <dataset id="136" type="OPTIONAL"/>
+      <dataset id="449" type="OPTIONAL"/>
+      <dataset id="99" type="OPTIONAL"/>
+      <dataset id="101" type="OPTIONAL"/>
+      <dataset id="100" type="REQUIRED"/>
+      <dataset id="140" type="OPTIONAL"/>
+      <dataset id="155" type="OPTIONAL"/>
+      <dataset id="300" type="OPTIONAL"/>
+      <dataset id="301" type="OPTIONAL"/>
+      <dataset id="350" type="REQUIRED"/>
+    </datasets>
+  </visit>
+  <visit label="Acute Cohort Week 24" typeCode="S" sequenceNum="109.0" visitDateDatasetId="100">
+    <datasets>
+      <dataset id="120" type="REQUIRED"/>
+      <dataset id="130" type="REQUIRED"/>
+      <dataset id="136" type="REQUIRED"/>
+      <dataset id="449" type="REQUIRED"/>
+      <dataset id="101" type="OPTIONAL"/>
+      <dataset id="100" type="REQUIRED"/>
+      <dataset id="110" type="REQUIRED"/>
+      <dataset id="140" type="REQUIRED"/>
+      <dataset id="155" type="REQUIRED"/>
+      <dataset id="300" type="OPTIONAL"/>
+      <dataset id="301" type="OPTIONAL"/>
+    </datasets>
+  </visit>
+  <visit label="Int Vist" typeCode="O" sequenceNum="109.1" maxSequenceNum="109.9" visitDateDatasetId="100">
+    <datasets>
+      <dataset id="120" type="OPTIONAL"/>
+      <dataset id="130" type="OPTIONAL"/>
+      <dataset id="136" type="OPTIONAL"/>
+      <dataset id="449" type="OPTIONAL"/>
+      <dataset id="99" type="OPTIONAL"/>
+      <dataset id="101" type="OPTIONAL"/>
+      <dataset id="100" type="REQUIRED"/>
+      <dataset id="140" type="OPTIONAL"/>
+      <dataset id="155" type="OPTIONAL"/>
+      <dataset id="300" type="OPTIONAL"/>
+      <dataset id="301" type="OPTIONAL"/>
+      <dataset id="350" type="REQUIRED"/>
+    </datasets>
+  </visit>
+  <visit label="Acute Cohort Week 36" typeCode="S" sequenceNum="110.0" visitDateDatasetId="100">
+    <datasets>
+      <dataset id="120" type="REQUIRED"/>
+      <dataset id="130" type="REQUIRED"/>
+      <dataset id="136" type="REQUIRED"/>
+      <dataset id="449" type="REQUIRED"/>
+      <dataset id="101" type="OPTIONAL"/>
+      <dataset id="100" type="REQUIRED"/>
+      <dataset id="110" type="REQUIRED"/>
+      <dataset id="140" type="REQUIRED"/>
+      <dataset id="155" type="REQUIRED"/>
+      <dataset id="300" type="OPTIONAL"/>
+      <dataset id="301" type="OPTIONAL"/>
+    </datasets>
+  </visit>
+  <visit label="Int Vist" typeCode="O" sequenceNum="110.1" maxSequenceNum="110.9" visitDateDatasetId="100">
+    <datasets>
+      <dataset id="120" type="OPTIONAL"/>
+      <dataset id="130" type="OPTIONAL"/>
+      <dataset id="136" type="OPTIONAL"/>
+      <dataset id="449" type="OPTIONAL"/>
+      <dataset id="99" type="OPTIONAL"/>
+      <dataset id="101" type="OPTIONAL"/>
+      <dataset id="100" type="REQUIRED"/>
+      <dataset id="140" type="OPTIONAL"/>
+      <dataset id="155" type="OPTIONAL"/>
+      <dataset id="300" type="OPTIONAL"/>
+      <dataset id="301" type="OPTIONAL"/>
+      <dataset id="350" type="REQUIRED"/>
+    </datasets>
+  </visit>
+  <visit label="Acute Cohort Week 48" typeCode="S" sequenceNum="111.0" visitDateDatasetId="100">
+    <datasets>
+      <dataset id="120" type="REQUIRED"/>
+      <dataset id="130" type="REQUIRED"/>
+      <dataset id="136" type="REQUIRED"/>
+      <dataset id="449" type="REQUIRED"/>
+      <dataset id="101" type="OPTIONAL"/>
+      <dataset id="100" type="REQUIRED"/>
+      <dataset id="110" type="REQUIRED"/>
+      <dataset id="140" type="REQUIRED"/>
+      <dataset id="155" type="REQUIRED"/>
+      <dataset id="300" type="OPTIONAL"/>
+      <dataset id="301" type="OPTIONAL"/>
+    </datasets>
+  </visit>
+  <visit label="Int Vist" typeCode="O" sequenceNum="111.1" maxSequenceNum="111.9" visitDateDatasetId="100">
+    <datasets>
+      <dataset id="120" type="OPTIONAL"/>
+      <dataset id="130" type="OPTIONAL"/>
+      <dataset id="136" type="OPTIONAL"/>
+      <dataset id="449" type="OPTIONAL"/>
+      <dataset id="99" type="OPTIONAL"/>
+      <dataset id="101" type="OPTIONAL"/>
+      <dataset id="100" type="REQUIRED"/>
+      <dataset id="110" type="OPTIONAL"/>
+      <dataset id="140" type="OPTIONAL"/>
+      <dataset id="155" type="OPTIONAL"/>
+      <dataset id="300" type="OPTIONAL"/>
+      <dataset id="301" type="OPTIONAL"/>
+      <dataset id="350" type="REQUIRED"/>
+    </datasets>
+  </visit>
+  <visit label="Acute Cohort Week 60" typeCode="S" sequenceNum="112.0" visitDateDatasetId="100">
+    <datasets>
+      <dataset id="120" type="REQUIRED"/>
+      <dataset id="130" type="REQUIRED"/>
+      <dataset id="136" type="REQUIRED"/>
+      <dataset id="449" type="REQUIRED"/>
+      <dataset id="101" type="OPTIONAL"/>
+      <dataset id="100" type="REQUIRED"/>
+      <dataset id="110" type="REQUIRED"/>
+      <dataset id="140" type="REQUIRED"/>
+      <dataset id="155" type="REQUIRED"/>
+      <dataset id="300" type="OPTIONAL"/>
+      <dataset id="301" type="OPTIONAL"/>
+    </datasets>
+  </visit>
+  <visit label="Int Vist" typeCode="O" sequenceNum="112.1" maxSequenceNum="112.9" visitDateDatasetId="100">
+    <datasets>
+      <dataset id="120" type="OPTIONAL"/>
+      <dataset id="130" type="OPTIONAL"/>
+      <dataset id="136" type="OPTIONAL"/>
+      <dataset id="449" type="OPTIONAL"/>
+      <dataset id="99" type="OPTIONAL"/>
+      <dataset id="101" type="OPTIONAL"/>
+      <dataset id="100" type="REQUIRED"/>
+      <dataset id="110" type="OPTIONAL"/>
+      <dataset id="140" type="OPTIONAL"/>
+      <dataset id="155" type="OPTIONAL"/>
+      <dataset id="300" type="OPTIONAL"/>
+      <dataset id="301" type="OPTIONAL"/>
+      <dataset id="350" type="REQUIRED"/>
+    </datasets>
+  </visit>
+  <visit label="Acute Cohort Week 72" typeCode="S" sequenceNum="113.0" visitDateDatasetId="100">
+    <datasets>
+      <dataset id="120" type="REQUIRED"/>
+      <dataset id="130" type="REQUIRED"/>
+      <dataset id="136" type="REQUIRED"/>
+      <dataset id="449" type="REQUIRED"/>
+      <dataset id="101" type="OPTIONAL"/>
+      <dataset id="100" type="REQUIRED"/>
+      <dataset id="110" type="REQUIRED"/>
+      <dataset id="140" type="REQUIRED"/>
+      <dataset id="155" type="REQUIRED"/>
+      <dataset id="300" type="OPTIONAL"/>
+      <dataset id="301" type="OPTIONAL"/>
+    </datasets>
+  </visit>
+  <visit label="Int Vist" typeCode="O" sequenceNum="113.1" maxSequenceNum="113.9" visitDateDatasetId="100">
+    <datasets>
+      <dataset id="120" type="OPTIONAL"/>
+      <dataset id="130" type="OPTIONAL"/>
+      <dataset id="136" type="OPTIONAL"/>
+      <dataset id="449" type="OPTIONAL"/>
+      <dataset id="99" type="OPTIONAL"/>
+      <dataset id="101" type="OPTIONAL"/>
+      <dataset id="100" type="REQUIRED"/>
+      <dataset id="140" type="OPTIONAL"/>
+      <dataset id="155" type="OPTIONAL"/>
+      <dataset id="300" type="OPTIONAL"/>
+      <dataset id="301" type="OPTIONAL"/>
+      <dataset id="350" type="REQUIRED"/>
+    </datasets>
+  </visit>
+  <visit label="Acute Cohort Week 84" typeCode="S" sequenceNum="114.0" visitDateDatasetId="100">
+    <datasets>
+      <dataset id="120" type="REQUIRED"/>
+      <dataset id="130" type="REQUIRED"/>
+      <dataset id="136" type="REQUIRED"/>
+      <dataset id="449" type="REQUIRED"/>
+      <dataset id="101" type="OPTIONAL"/>
+      <dataset id="100" type="REQUIRED"/>
+      <dataset id="110" type="REQUIRED"/>
+      <dataset id="140" type="REQUIRED"/>
+      <dataset id="155" type="REQUIRED"/>
+      <dataset id="300" type="OPTIONAL"/>
+      <dataset id="301" type="OPTIONAL"/>
+    </datasets>
+  </visit>
+  <visit label="Int Vist" typeCode="O" sequenceNum="114.1" maxSequenceNum="114.9" visitDateDatasetId="100">
+    <datasets>
+      <dataset id="120" type="OPTIONAL"/>
+      <dataset id="130" type="OPTIONAL"/>
+      <dataset id="136" type="OPTIONAL"/>
+      <dataset id="449" type="OPTIONAL"/>
+      <dataset id="99" type="OPTIONAL"/>
+      <dataset id="101" type="OPTIONAL"/>
+      <dataset id="100" type="REQUIRED"/>
+      <dataset id="140" type="OPTIONAL"/>
+      <dataset id="155" type="OPTIONAL"/>
+      <dataset id="300" type="OPTIONAL"/>
+      <dataset id="301" type="OPTIONAL"/>
+      <dataset id="350" type="REQUIRED"/>
+    </datasets>
+  </visit>
+  <visit label="Acute Cohort Week 96" typeCode="T" sequenceNum="115.0" visitDateDatasetId="100">
+    <datasets>
+      <dataset id="120" type="REQUIRED"/>
+      <dataset id="130" type="REQUIRED"/>
+      <dataset id="136" type="REQUIRED"/>
+      <dataset id="449" type="REQUIRED"/>
+      <dataset id="101" type="OPTIONAL"/>
+      <dataset id="100" type="REQUIRED"/>
+      <dataset id="110" type="REQUIRED"/>
+      <dataset id="140" type="REQUIRED"/>
+      <dataset id="155" type="REQUIRED"/>
+      <dataset id="300" type="OPTIONAL"/>
+      <dataset id="301" type="OPTIONAL"/>
+    </datasets>
+  </visit>
+  <visit label="Int Vist" typeCode="O" sequenceNum="115.1" maxSequenceNum="115.9" visitDateDatasetId="100">
+    <datasets>
+      <dataset id="120" type="OPTIONAL"/>
+      <dataset id="130" type="OPTIONAL"/>
+      <dataset id="136" type="OPTIONAL"/>
+      <dataset id="449" type="OPTIONAL"/>
+      <dataset id="99" type="OPTIONAL"/>
+      <dataset id="101" type="OPTIONAL"/>
+      <dataset id="100" type="REQUIRED"/>
+      <dataset id="140" type="OPTIONAL"/>
+      <dataset id="155" type="OPTIONAL"/>
+      <dataset id="300" type="OPTIONAL"/>
+      <dataset id="301" type="OPTIONAL"/>
+      <dataset id="350" type="REQUIRED"/>
+    </datasets>
+  </visit>
+  <visit sequenceNum="120.0"/>
+  <visit sequenceNum="155.0"/>
+  <visit showByDefault="false" sequenceNum="200.0"/>
+  <visit label="Established Cohort Enrollment" typeCode="B" sequenceNum="201.0" visitDateDatasetId="99">
+    <datasets>
+      <dataset id="120" type="REQUIRED"/>
+      <dataset id="130" type="REQUIRED"/>
+      <dataset id="136" type="REQUIRED"/>
+      <dataset id="449" type="REQUIRED"/>
+      <dataset id="99" type="REQUIRED"/>
+      <dataset id="110" type="REQUIRED"/>
+      <dataset id="140" type="REQUIRED"/>
+      <dataset id="300" type="OPTIONAL"/>
+      <dataset id="301" type="OPTIONAL"/>
+    </datasets>
+  </visit>
+  <visit label="Int Vist" typeCode="O" sequenceNum="201.1" maxSequenceNum="201.9" visitDateDatasetId="100">
+    <datasets>
+      <dataset id="120" type="OPTIONAL"/>
+      <dataset id="130" type="OPTIONAL"/>
+      <dataset id="136" type="OPTIONAL"/>
+      <dataset id="449" type="OPTIONAL"/>
+      <dataset id="99" type="OPTIONAL"/>
+      <dataset id="100" type="REQUIRED"/>
+      <dataset id="140" type="OPTIONAL"/>
+      <dataset id="155" type="OPTIONAL"/>
+      <dataset id="300" type="OPTIONAL"/>
+      <dataset id="301" type="OPTIONAL"/>
+      <dataset id="350" type="REQUIRED"/>
+    </datasets>
+  </visit>
+  <visit sequenceNum="202.0"/>
+  <visit label="Established Cohort Week 2" typeCode="S" sequenceNum="203.0" visitDateDatasetId="100">
+    <datasets>
+      <dataset id="120" type="OPTIONAL"/>
+      <dataset id="130" type="REQUIRED"/>
+      <dataset id="136" type="REQUIRED"/>
+      <dataset id="449" type="REQUIRED"/>
+      <dataset id="100" type="REQUIRED"/>
+      <dataset id="110" type="OPTIONAL"/>
+      <dataset id="140" type="OPTIONAL"/>
+      <dataset id="155" type="OPTIONAL"/>
+      <dataset id="300" type="OPTIONAL"/>
+      <dataset id="301" type="OPTIONAL"/>
+    </datasets>
+  </visit>
+  <visit label="Int Vist" typeCode="O" sequenceNum="203.1" maxSequenceNum="203.9" visitDateDatasetId="100">
+    <datasets>
+      <dataset id="120" type="OPTIONAL"/>
+      <dataset id="130" type="OPTIONAL"/>
+      <dataset id="136" type="OPTIONAL"/>
+      <dataset id="449" type="OPTIONAL"/>
+      <dataset id="99" type="OPTIONAL"/>
+      <dataset id="100" type="REQUIRED"/>
+      <dataset id="140" type="OPTIONAL"/>
+      <dataset id="155" type="OPTIONAL"/>
+      <dataset id="300" type="OPTIONAL"/>
+      <dataset id="301" type="OPTIONAL"/>
+      <dataset id="350" type="REQUIRED"/>
+    </datasets>
+  </visit>
+  <visit label="Established Cohort Week 4" typeCode="S" sequenceNum="205.0" visitDateDatasetId="100">
+    <datasets>
+      <dataset id="120" type="OPTIONAL"/>
+      <dataset id="130" type="REQUIRED"/>
+      <dataset id="136" type="REQUIRED"/>
+      <dataset id="449" type="REQUIRED"/>
+      <dataset id="100" type="REQUIRED"/>
+      <dataset id="110" type="OPTIONAL"/>
+      <dataset id="140" type="OPTIONAL"/>
+      <dataset id="155" type="OPTIONAL"/>
+      <dataset id="300" type="OPTIONAL"/>
+      <dataset id="301" type="OPTIONAL"/>
+    </datasets>
+  </visit>
+  <visit label="Int Vist" typeCode="O" sequenceNum="205.1" maxSequenceNum="205.9" visitDateDatasetId="100">
+    <datasets>
+      <dataset id="120" type="OPTIONAL"/>
+      <dataset id="130" type="OPTIONAL"/>
+      <dataset id="136" type="OPTIONAL"/>
+      <dataset id="449" type="OPTIONAL"/>
+      <dataset id="99" type="OPTIONAL"/>
+      <dataset id="100" type="REQUIRED"/>
+      <dataset id="140" type="OPTIONAL"/>
+      <dataset id="155" type="OPTIONAL"/>
+      <dataset id="300" type="OPTIONAL"/>
+      <dataset id="301" type="OPTIONAL"/>
+      <dataset id="350" type="REQUIRED"/>
+    </datasets>
+  </visit>
+  <visit label="Established Cohort Week 8" typeCode="S" sequenceNum="206.0" visitDateDatasetId="100">
+    <datasets>
+      <dataset id="120" type="OPTIONAL"/>
+      <dataset id="130" type="REQUIRED"/>
+      <dataset id="136" type="REQUIRED"/>
+      <dataset id="449" type="REQUIRED"/>
+      <dataset id="100" type="REQUIRED"/>
+      <dataset id="110" type="OPTIONAL"/>
+      <dataset id="140" type="OPTIONAL"/>
+      <dataset id="155" type="OPTIONAL"/>
+      <dataset id="300" type="OPTIONAL"/>
+      <dataset id="301" type="OPTIONAL"/>
+    </datasets>
+  </visit>
+  <visit label="Int Vist" typeCode="O" sequenceNum="206.1" maxSequenceNum="206.9" visitDateDatasetId="100">
+    <datasets>
+      <dataset id="120" type="OPTIONAL"/>
+      <dataset id="130" type="OPTIONAL"/>
+      <dataset id="136" type="OPTIONAL"/>
+      <dataset id="449" type="OPTIONAL"/>
+      <dataset id="99" type="OPTIONAL"/>
+      <dataset id="100" type="REQUIRED"/>
+      <dataset id="140" type="OPTIONAL"/>
+      <dataset id="155" type="OPTIONAL"/>
+      <dataset id="300" type="OPTIONAL"/>
+      <dataset id="301" type="OPTIONAL"/>
+      <dataset id="350" type="REQUIRED"/>
+    </datasets>
+  </visit>
+  <visit label="Established Cohort Week 12" typeCode="S" sequenceNum="207.0" visitDateDatasetId="100">
+    <datasets>
+      <dataset id="120" type="REQUIRED"/>
+      <dataset id="130" type="REQUIRED"/>
+      <dataset id="136" type="REQUIRED"/>
+      <dataset id="449" type="REQUIRED"/>
+      <dataset id="100" type="REQUIRED"/>
+      <dataset id="110" type="REQUIRED"/>
+      <dataset id="140" type="REQUIRED"/>
+      <dataset id="155" type="REQUIRED"/>
+      <dataset id="300" type="OPTIONAL"/>
+      <dataset id="301" type="OPTIONAL"/>
+    </datasets>
+  </visit>
+  <visit label="Int Vist" typeCode="O" sequenceNum="207.1" maxSequenceNum="207.9" visitDateDatasetId="100">
+    <datasets>
+      <dataset id="120" type="OPTIONAL"/>
+      <dataset id="130" type="OPTIONAL"/>
+      <dataset id="136" type="OPTIONAL"/>
+      <dataset id="449" type="OPTIONAL"/>
+      <dataset id="99" type="OPTIONAL"/>
+      <dataset id="100" type="REQUIRED"/>
+      <dataset id="140" type="OPTIONAL"/>
+      <dataset id="155" type="OPTIONAL"/>
+      <dataset id="300" type="OPTIONAL"/>
+      <dataset id="301" type="OPTIONAL"/>
+      <dataset id="350" type="REQUIRED"/>
+    </datasets>
+  </visit>
+  <visit label="Established Cohort Week 16" typeCode="S" sequenceNum="208.0" visitDateDatasetId="100">
+    <datasets>
+      <dataset id="120" type="OPTIONAL"/>
+      <dataset id="130" type="REQUIRED"/>
+      <dataset id="136" type="REQUIRED"/>
+      <dataset id="449" type="REQUIRED"/>
+      <dataset id="100" type="REQUIRED"/>
+      <dataset id="110" type="OPTIONAL"/>
+      <dataset id="140" type="OPTIONAL"/>
+      <dataset id="155" type="OPTIONAL"/>
+      <dataset id="300" type="OPTIONAL"/>
+      <dataset id="301" type="OPTIONAL"/>
+    </datasets>
+  </visit>
+  <visit label="Int Vist" typeCode="O" sequenceNum="208.1" maxSequenceNum="208.9" visitDateDatasetId="100">
+    <datasets>
+      <dataset id="120" type="OPTIONAL"/>
+      <dataset id="130" type="OPTIONAL"/>
+      <dataset id="136" type="OPTIONAL"/>
+      <dataset id="449" type="OPTIONAL"/>
+      <dataset id="99" type="OPTIONAL"/>
+      <dataset id="100" type="REQUIRED"/>
+      <dataset id="140" type="OPTIONAL"/>
+      <dataset id="155" type="OPTIONAL"/>
+      <dataset id="300" type="OPTIONAL"/>
+      <dataset id="301" type="OPTIONAL"/>
+      <dataset id="350" type="REQUIRED"/>
+    </datasets>
+  </visit>
+  <visit label="Established Cohort Week 24" typeCode="S" sequenceNum="209.0" visitDateDatasetId="100">
+    <datasets>
+      <dataset id="120" type="REQUIRED"/>
+      <dataset id="130" type="REQUIRED"/>
+      <dataset id="136" type="REQUIRED"/>
+      <dataset id="449" type="REQUIRED"/>
+      <dataset id="100" type="REQUIRED"/>
+      <dataset id="110" type="REQUIRED"/>
+      <dataset id="140" type="REQUIRED"/>
+      <dataset id="155" type="REQUIRED"/>
+      <dataset id="300" type="OPTIONAL"/>
+      <dataset id="301" type="OPTIONAL"/>
+    </datasets>
+  </visit>
+  <visit label="Int Vist" typeCode="O" sequenceNum="209.1" maxSequenceNum="209.9" visitDateDatasetId="100">
+    <datasets>
+      <dataset id="120" type="OPTIONAL"/>
+      <dataset id="130" type="OPTIONAL"/>
+      <dataset id="136" type="OPTIONAL"/>
+      <dataset id="449" type="OPTIONAL"/>
+      <dataset id="99" type="OPTIONAL"/>
+      <dataset id="100" type="REQUIRED"/>
+      <dataset id="140" type="OPTIONAL"/>
+      <dataset id="155" type="OPTIONAL"/>
+      <dataset id="300" type="OPTIONAL"/>
+      <dataset id="301" type="OPTIONAL"/>
+      <dataset id="350" type="REQUIRED"/>
+    </datasets>
+  </visit>
+  <visit sequenceNum="210.0"/>
+  <visit label="Established Cohort Week 48" typeCode="S" sequenceNum="211.0" visitDateDatasetId="100">
+    <datasets>
+      <dataset id="120" type="REQUIRED"/>
+      <dataset id="130" type="REQUIRED"/>
+      <dataset id="136" type="REQUIRED"/>
+      <dataset id="449" type="REQUIRED"/>
+      <dataset id="100" type="REQUIRED"/>
+      <dataset id="110" type="REQUIRED"/>
+      <dataset id="140" type="REQUIRED"/>
+      <dataset id="155" type="REQUIRED"/>
+      <dataset id="300" type="OPTIONAL"/>
+      <dataset id="301" type="OPTIONAL"/>
+    </datasets>
+  </visit>
+  <visit label="Int Vist" typeCode="O" sequenceNum="211.1" maxSequenceNum="211.9" visitDateDatasetId="100">
+    <datasets>
+      <dataset id="120" type="OPTIONAL"/>
+      <dataset id="130" type="OPTIONAL"/>
+      <dataset id="136" type="OPTIONAL"/>
+      <dataset id="449" type="OPTIONAL"/>
+      <dataset id="99" type="OPTIONAL"/>
+      <dataset id="100" type="REQUIRED"/>
+      <dataset id="140" type="OPTIONAL"/>
+      <dataset id="155" type="OPTIONAL"/>
+      <dataset id="300" type="OPTIONAL"/>
+      <dataset id="301" type="OPTIONAL"/>
+      <dataset id="350" type="REQUIRED"/>
+    </datasets>
+  </visit>
+  <visit label="Established Cohort Week 72" typeCode="S" sequenceNum="213.0" visitDateDatasetId="100">
+    <datasets>
+      <dataset id="120" type="REQUIRED"/>
+      <dataset id="130" type="REQUIRED"/>
+      <dataset id="136" type="REQUIRED"/>
+      <dataset id="449" type="REQUIRED"/>
+      <dataset id="100" type="REQUIRED"/>
+      <dataset id="110" type="REQUIRED"/>
+      <dataset id="140" type="REQUIRED"/>
+      <dataset id="155" type="REQUIRED"/>
+      <dataset id="300" type="OPTIONAL"/>
+      <dataset id="301" type="OPTIONAL"/>
+    </datasets>
+  </visit>
+  <visit label="Int Vist" typeCode="O" sequenceNum="213.1" maxSequenceNum="213.9" visitDateDatasetId="100">
+    <datasets>
+      <dataset id="120" type="OPTIONAL"/>
+      <dataset id="130" type="OPTIONAL"/>
+      <dataset id="136" type="OPTIONAL"/>
+      <dataset id="449" type="OPTIONAL"/>
+      <dataset id="99" type="OPTIONAL"/>
+      <dataset id="100" type="REQUIRED"/>
+      <dataset id="140" type="OPTIONAL"/>
+      <dataset id="155" type="OPTIONAL"/>
+      <dataset id="300" type="OPTIONAL"/>
+      <dataset id="301" type="OPTIONAL"/>
+      <dataset id="350" type="REQUIRED"/>
+    </datasets>
+  </visit>
+  <visit label="Established Cohort Week 96" typeCode="T" sequenceNum="215.0" visitDateDatasetId="100">
+    <datasets>
+      <dataset id="120" type="REQUIRED"/>
+      <dataset id="130" type="REQUIRED"/>
+      <dataset id="136" type="REQUIRED"/>
+      <dataset id="449" type="REQUIRED"/>
+      <dataset id="100" type="REQUIRED"/>
+      <dataset id="110" type="REQUIRED"/>
+      <dataset id="140" type="REQUIRED"/>
+      <dataset id="155" type="REQUIRED"/>
+      <dataset id="300" type="OPTIONAL"/>
+      <dataset id="301" type="OPTIONAL"/>
+    </datasets>
+  </visit>
+  <visit label="Int Vist" typeCode="O" sequenceNum="215.1" maxSequenceNum="215.9" visitDateDatasetId="100">
+    <datasets>
+      <dataset id="120" type="OPTIONAL"/>
+      <dataset id="130" type="OPTIONAL"/>
+      <dataset id="136" type="OPTIONAL"/>
+      <dataset id="449" type="OPTIONAL"/>
+      <dataset id="99" type="OPTIONAL"/>
+      <dataset id="100" type="REQUIRED"/>
+      <dataset id="140" type="OPTIONAL"/>
+      <dataset id="155" type="OPTIONAL"/>
+      <dataset id="300" type="OPTIONAL"/>
+      <dataset id="301" type="OPTIONAL"/>
+      <dataset id="350" type="REQUIRED"/>
+    </datasets>
+  </visit>
+  <visit sequenceNum="221.0"/>
+  <visit label="UNC confirm neg" typeCode="O" sequenceNum="300.9">
+    <datasets>
+      <dataset id="130" type="REQUIRED"/>
+      <dataset id="136" type="REQUIRED"/>
+    </datasets>
+  </visit>
+  <visit label="Negative Cohort Enrollment" typeCode="B" sequenceNum="301.0" visitDateDatasetId="99">
+    <datasets>
+      <dataset id="120" type="REQUIRED"/>
+      <dataset id="130" type="REQUIRED"/>
+      <dataset id="136" type="REQUIRED"/>
+      <dataset id="449" type="REQUIRED"/>
+      <dataset id="99" type="REQUIRED"/>
+      <dataset id="110" type="REQUIRED"/>
+      <dataset id="140" type="REQUIRED"/>
+      <dataset id="155" type="OPTIONAL"/>
+    </datasets>
+  </visit>
+  <visit label="Int Vist" typeCode="O" sequenceNum="301.1" maxSequenceNum="301.9" visitDateDatasetId="100">
+    <datasets>
+      <dataset id="120" type="OPTIONAL"/>
+      <dataset id="130" type="OPTIONAL"/>
+      <dataset id="136" type="OPTIONAL"/>
+      <dataset id="449" type="OPTIONAL"/>
+      <dataset id="99" type="OPTIONAL"/>
+      <dataset id="101" type="OPTIONAL"/>
+      <dataset id="100" type="REQUIRED"/>
+      <dataset id="140" type="OPTIONAL"/>
+      <dataset id="155" type="OPTIONAL"/>
+      <dataset id="350" type="REQUIRED"/>
+    </datasets>
+  </visit>
+  <visit label="Negative Cohort Week 1" typeCode="S" sequenceNum="302.0" visitDateDatasetId="100">
+    <datasets>
+      <dataset id="120" type="OPTIONAL"/>
+      <dataset id="130" type="REQUIRED"/>
+      <dataset id="136" type="REQUIRED"/>
+      <dataset id="449" type="REQUIRED"/>
+      <dataset id="101" type="REQUIRED"/>
+      <dataset id="100" type="REQUIRED"/>
+      <dataset id="110" type="OPTIONAL"/>
+      <dataset id="140" type="OPTIONAL"/>
+    </datasets>
+  </visit>
+  <visit label="Int Vist" typeCode="O" sequenceNum="302.1" maxSequenceNum="302.9" visitDateDatasetId="100">
+    <datasets>
+      <dataset id="120" type="OPTIONAL"/>
+      <dataset id="130" type="OPTIONAL"/>
+      <dataset id="136" type="OPTIONAL"/>
+      <dataset id="449" type="OPTIONAL"/>
+      <dataset id="99" type="OPTIONAL"/>
+      <dataset id="101" type="OPTIONAL"/>
+      <dataset id="100" type="REQUIRED"/>
+      <dataset id="140" type="OPTIONAL"/>
+      <dataset id="155" type="OPTIONAL"/>
+      <dataset id="350" type="REQUIRED"/>
+    </datasets>
+  </visit>
+  <visit label="Negative Cohort Week 2" typeCode="S" sequenceNum="303.0" visitDateDatasetId="100">
+    <datasets>
+      <dataset id="120" type="OPTIONAL"/>
+      <dataset id="130" type="REQUIRED"/>
+      <dataset id="136" type="REQUIRED"/>
+      <dataset id="449" type="REQUIRED"/>
+      <dataset id="101" type="REQUIRED"/>
+      <dataset id="100" type="REQUIRED"/>
+      <dataset id="110" type="OPTIONAL"/>
+      <dataset id="140" type="OPTIONAL"/>
+      <dataset id="155" type="OPTIONAL"/>
+    </datasets>
+  </visit>
+  <visit label="Int Vist" typeCode="O" sequenceNum="303.1" maxSequenceNum="303.9" visitDateDatasetId="100">
+    <datasets>
+      <dataset id="120" type="OPTIONAL"/>
+      <dataset id="130" type="OPTIONAL"/>
+      <dataset id="136" type="OPTIONAL"/>
+      <dataset id="449" type="OPTIONAL"/>
+      <dataset id="99" type="OPTIONAL"/>
+      <dataset id="101" type="OPTIONAL"/>
+      <dataset id="100" type="REQUIRED"/>
+      <dataset id="140" type="OPTIONAL"/>
+      <dataset id="155" type="OPTIONAL"/>
+      <dataset id="350" type="REQUIRED"/>
+    </datasets>
+  </visit>
+  <visit label="Negative Cohort Week 4" typeCode="S" sequenceNum="305.0" visitDateDatasetId="100">
+    <datasets>
+      <dataset id="120" type="OPTIONAL"/>
+      <dataset id="130" type="REQUIRED"/>
+      <dataset id="136" type="REQUIRED"/>
+      <dataset id="449" type="REQUIRED"/>
+      <dataset id="101" type="REQUIRED"/>
+      <dataset id="100" type="REQUIRED"/>
+      <dataset id="110" type="OPTIONAL"/>
+      <dataset id="140" type="OPTIONAL"/>
+      <dataset id="155" type="OPTIONAL"/>
+    </datasets>
+  </visit>
+  <visit label="Int Vist" typeCode="O" sequenceNum="305.1" maxSequenceNum="305.9" visitDateDatasetId="100">
+    <datasets>
+      <dataset id="120" type="OPTIONAL"/>
+      <dataset id="130" type="OPTIONAL"/>
+      <dataset id="136" type="OPTIONAL"/>
+      <dataset id="449" type="OPTIONAL"/>
+      <dataset id="99" type="OPTIONAL"/>
+      <dataset id="101" type="OPTIONAL"/>
+      <dataset id="100" type="REQUIRED"/>
+      <dataset id="140" type="OPTIONAL"/>
+      <dataset id="155" type="OPTIONAL"/>
+      <dataset id="350" type="REQUIRED"/>
+    </datasets>
+  </visit>
+  <visit label="Negative Cohort Week 8" typeCode="S" sequenceNum="306.0" visitDateDatasetId="100">
+    <datasets>
+      <dataset id="120" type="OPTIONAL"/>
+      <dataset id="130" type="REQUIRED"/>
+      <dataset id="136" type="REQUIRED"/>
+      <dataset id="449" type="REQUIRED"/>
+      <dataset id="101" type="REQUIRED"/>
+      <dataset id="100" type="REQUIRED"/>
+      <dataset id="110" type="OPTIONAL"/>
+      <dataset id="140" type="OPTIONAL"/>
+      <dataset id="155" type="OPTIONAL"/>
+    </datasets>
+  </visit>
+  <visit label="Int Vist" typeCode="O" sequenceNum="306.1" maxSequenceNum="306.9" visitDateDatasetId="100">
+    <datasets>
+      <dataset id="120" type="OPTIONAL"/>
+      <dataset id="130" type="OPTIONAL"/>
+      <dataset id="136" type="OPTIONAL"/>
+      <dataset id="449" type="OPTIONAL"/>
+      <dataset id="99" type="OPTIONAL"/>
+      <dataset id="101" type="OPTIONAL"/>
+      <dataset id="100" type="REQUIRED"/>
+      <dataset id="140" type="OPTIONAL"/>
+      <dataset id="155" type="OPTIONAL"/>
+      <dataset id="350" type="REQUIRED"/>
+    </datasets>
+  </visit>
+  <visit label="Negative Cohort Week 12" typeCode="S" sequenceNum="307.0" visitDateDatasetId="100">
+    <datasets>
+      <dataset id="120" type="REQUIRED"/>
+      <dataset id="130" type="REQUIRED"/>
+      <dataset id="136" type="REQUIRED"/>
+      <dataset id="449" type="REQUIRED"/>
+      <dataset id="101" type="REQUIRED"/>
+      <dataset id="100" type="REQUIRED"/>
+      <dataset id="110" type="REQUIRED"/>
+      <dataset id="140" type="REQUIRED"/>
+      <dataset id="155" type="REQUIRED"/>
+    </datasets>
+  </visit>
+  <visit label="Int Vist" typeCode="O" sequenceNum="307.1" maxSequenceNum="307.9" visitDateDatasetId="100">
+    <datasets>
+      <dataset id="120" type="OPTIONAL"/>
+      <dataset id="130" type="OPTIONAL"/>
+      <dataset id="136" type="OPTIONAL"/>
+      <dataset id="449" type="OPTIONAL"/>
+      <dataset id="99" type="OPTIONAL"/>
+      <dataset id="101" type="OPTIONAL"/>
+      <dataset id="100" type="REQUIRED"/>
+      <dataset id="140" type="OPTIONAL"/>
+      <dataset id="155" type="OPTIONAL"/>
+      <dataset id="350" type="REQUIRED"/>
+    </datasets>
+  </visit>
+  <visit label="Negative Cohort Week 24" typeCode="S" sequenceNum="309.0" visitDateDatasetId="100">
+    <datasets>
+      <dataset id="120" type="REQUIRED"/>
+      <dataset id="130" type="REQUIRED"/>
+      <dataset id="136" type="REQUIRED"/>
+      <dataset id="449" type="REQUIRED"/>
+      <dataset id="101" type="REQUIRED"/>
+      <dataset id="100" type="REQUIRED"/>
+      <dataset id="110" type="REQUIRED"/>
+      <dataset id="140" type="REQUIRED"/>
+      <dataset id="155" type="REQUIRED"/>
+    </datasets>
+  </visit>
+  <visit label="Int Vist" typeCode="O" sequenceNum="309.1" maxSequenceNum="309.9" visitDateDatasetId="100">
+    <datasets>
+      <dataset id="120" type="OPTIONAL"/>
+      <dataset id="130" type="OPTIONAL"/>
+      <dataset id="136" type="OPTIONAL"/>
+      <dataset id="449" type="OPTIONAL"/>
+      <dataset id="99" type="OPTIONAL"/>
+      <dataset id="101" type="OPTIONAL"/>
+      <dataset id="100" type="REQUIRED"/>
+      <dataset id="140" type="OPTIONAL"/>
+      <dataset id="155" type="OPTIONAL"/>
+      <dataset id="350" type="REQUIRED"/>
+    </datasets>
+  </visit>
+  <visit showByDefault="false" sequenceNum="310.0"/>
+  <visit label="Negative Cohort Week 48" typeCode="S" sequenceNum="311.0" visitDateDatasetId="100">
+    <datasets>
+      <dataset id="120" type="REQUIRED"/>
+      <dataset id="130" type="REQUIRED"/>
+      <dataset id="136" type="REQUIRED"/>
+      <dataset id="449" type="REQUIRED"/>
+      <dataset id="101" type="REQUIRED"/>
+      <dataset id="100" type="REQUIRED"/>
+      <dataset id="110" type="REQUIRED"/>
+      <dataset id="140" type="REQUIRED"/>
+      <dataset id="155" type="REQUIRED"/>
+    </datasets>
+  </visit>
+  <visit label="Int Vist" typeCode="O" sequenceNum="311.1" maxSequenceNum="311.9" visitDateDatasetId="100">
+    <datasets>
+      <dataset id="120" type="OPTIONAL"/>
+      <dataset id="130" type="OPTIONAL"/>
+      <dataset id="136" type="OPTIONAL"/>
+      <dataset id="449" type="OPTIONAL"/>
+      <dataset id="99" type="OPTIONAL"/>
+      <dataset id="101" type="OPTIONAL"/>
+      <dataset id="100" type="REQUIRED"/>
+      <dataset id="140" type="OPTIONAL"/>
+      <dataset id="155" type="OPTIONAL"/>
+      <dataset id="350" type="REQUIRED"/>
+    </datasets>
+  </visit>
+  <visit label="Negative Cohort Week 72" typeCode="S" sequenceNum="313.0" visitDateDatasetId="100">
+    <datasets>
+      <dataset id="120" type="REQUIRED"/>
+      <dataset id="130" type="REQUIRED"/>
+      <dataset id="136" type="REQUIRED"/>
+      <dataset id="449" type="REQUIRED"/>
+      <dataset id="101" type="REQUIRED"/>
+      <dataset id="100" type="REQUIRED"/>
+      <dataset id="110" type="REQUIRED"/>
+      <dataset id="140" type="REQUIRED"/>
+      <dataset id="155" type="REQUIRED"/>
+    </datasets>
+  </visit>
+  <visit label="Int Vist" typeCode="O" sequenceNum="313.1" maxSequenceNum="313.9" visitDateDatasetId="100">
+    <datasets>
+      <dataset id="120" type="OPTIONAL"/>
+      <dataset id="130" type="OPTIONAL"/>
+      <dataset id="136" type="OPTIONAL"/>
+      <dataset id="449" type="OPTIONAL"/>
+      <dataset id="99" type="OPTIONAL"/>
+      <dataset id="101" type="OPTIONAL"/>
+      <dataset id="100" type="REQUIRED"/>
+      <dataset id="140" type="OPTIONAL"/>
+      <dataset id="155" type="OPTIONAL"/>
+      <dataset id="350" type="REQUIRED"/>
+    </datasets>
+  </visit>
+  <visit label="Negative Cohort Week 96" typeCode="T" sequenceNum="315.0" visitDateDatasetId="100">
+    <datasets>
+      <dataset id="120" type="REQUIRED"/>
+      <dataset id="130" type="REQUIRED"/>
+      <dataset id="136" type="REQUIRED"/>
+      <dataset id="449" type="REQUIRED"/>
+      <dataset id="101" type="REQUIRED"/>
+      <dataset id="100" type="REQUIRED"/>
+      <dataset id="110" type="REQUIRED"/>
+      <dataset id="140" type="REQUIRED"/>
+      <dataset id="155" type="REQUIRED"/>
+    </datasets>
+  </visit>
+  <visit label="Int Vist" typeCode="O" sequenceNum="315.1" maxSequenceNum="315.9" visitDateDatasetId="100">
+    <datasets>
+      <dataset id="120" type="OPTIONAL"/>
+      <dataset id="130" type="OPTIONAL"/>
+      <dataset id="136" type="OPTIONAL"/>
+      <dataset id="449" type="OPTIONAL"/>
+      <dataset id="99" type="OPTIONAL"/>
+      <dataset id="101" type="OPTIONAL"/>
+      <dataset id="100" type="REQUIRED"/>
+      <dataset id="140" type="OPTIONAL"/>
+      <dataset id="155" type="OPTIONAL"/>
+      <dataset id="350" type="REQUIRED"/>
+    </datasets>
+  </visit>
+  <visit sequenceNum="1101.0"/>
+  <visit label="HIV/AIDS Associated Events Log" sequenceNum="2001.0" maxSequenceNum="2099.0"/>
+  <visit label="Antiretroviral Log" sequenceNum="3001.0" maxSequenceNum="3099.0"/>
+  <visit label="Hormone Treatment Log" sequenceNum="4001.0" maxSequenceNum="4009.0"/>
+  <visit label="Western Blots Bands Log" sequenceNum="5001.0" maxSequenceNum="5009.0"/>
+  <visit label="Pt Trans/Recpt" typeCode="O" sequenceNum="7901.0"/>
+  <visit sequenceNum="9801.0"/>
+  <visit label="Study Termination" typeCode="A" sequenceNum="9999.0"/>
+</visitMap>
