@@ -46,6 +46,8 @@ public class SampleTypeAPIHelper
 {
 
     public static final String SCHEMA_NAME = "exp.materials";
+    /** Query schema holding one table per sample type; SCHEMA_NAME is the domain schema */
+    public static final String SAMPLES_SCHEMA_NAME = "samples";
 
     // Global constants to ease migration from "Sample Set" to "Sample Type"
     public static final String SAMPLE_TYPE_DOMAIN_KIND = DomainKind.SampleSet.name();
