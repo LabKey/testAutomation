@@ -15,11 +15,15 @@
  */
 package org.labkey.test.tests.announcements;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.SimplePostCommand;
 import org.labkey.remoteapi.announcements.AnnouncementModel;
 import org.labkey.remoteapi.announcements.CreateMessageThreadCommand;
 import org.labkey.remoteapi.announcements.DeleteMessageThreadCommand;
@@ -32,20 +36,29 @@ import org.labkey.remoteapi.announcements.UpdateMessageThreadCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.pages.LabkeyErrorPage;
+import org.labkey.test.util.TestUser;
 import org.labkey.test.util.WikiHelper;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.labkey.test.util.PermissionsHelper.AUTHOR_ROLE;
+import static org.labkey.test.util.PermissionsHelper.EDITOR_ROLE;
 import static org.labkey.test.util.PermissionsHelper.READER_ROLE;
 
 @Category({Daily.class})
 public class AnnouncementAPITest extends BaseWebDriverTest
 {
+    private static final String OTHER_PROJECT = "AnnouncementAPITest Other Project";
+    private static final TestUser EDITOR = new TestUser("editor@announcementapi.test");
+    private static final TestUser AUTHOR = new TestUser("author@announcementapi.test");
+
     @BeforeClass
     public static void setupProject()
     {
@@ -57,6 +70,17 @@ public class AnnouncementAPITest extends BaseWebDriverTest
     private void doSetup()
     {
         _containerHelper.createProject(getProjectName());
+        _containerHelper.createProject(OTHER_PROJECT);
+        EDITOR.create(this).setInitialPassword().addPermission(EDITOR_ROLE, getProjectName());
+        AUTHOR.create(this).setInitialPassword().addPermission(AUTHOR_ROLE, getProjectName());
+    }
+
+    @Override
+    protected void doCleanup(boolean afterTest)
+    {
+        _userHelper.deleteUsers(false, EDITOR, AUTHOR);
+        _containerHelper.deleteProject(OTHER_PROJECT, false);
+        super.doCleanup(afterTest);
     }
 
     @Before
@@ -380,6 +404,79 @@ public class AnnouncementAPITest extends BaseWebDriverTest
         }
 
         stopImpersonatingHTTP();
+    }
+
+    // GH Issue 1688
+    @Test
+    public void testQueryUpdateCannotRetargetMessage() throws Exception
+    {
+        AnnouncementModel otherThread = createThread(new AnnouncementModel().setTitle("Other thread").setBody("other body"), OTHER_PROJECT);
+        Connection editorConnection = EDITOR.getUserConnection();
+        AnnouncementModel ownThread = new CreateMessageThreadCommand(new AnnouncementModel().setTitle("Editor thread").setBody("body"))
+                .execute(editorConnection, getProjectName())
+                .getAnnouncementModel();
+        Map<String, Object> ownKey = Map.of("RowId", ownThread.getRowId());
+
+        CommandException e = assertThrows("Expect saveRows to refuse a row in another folder",
+                CommandException.class,
+                () -> updateChangingKeys(editorConnection, ownKey, Map.of("RowId", otherThread.getRowId(), "Container", otherThread.getContainerId(), "Title", "Overwritten", "Body", "Overwritten")));
+        assertThat("Status code", e.getStatusCode(), is(403));
+        e = assertThrows("Expect saveRows to refuse a row in another folder, even without naming that folder",
+                CommandException.class,
+                () -> updateChangingKeys(editorConnection, ownKey, Map.of("RowId", otherThread.getRowId(), "Title", "Overwritten", "Body", "Overwritten")));
+        assertThat("Status code", e.getStatusCode(), is(403));
+
+        AnnouncementModel otherAfter = getThread(otherThread, OTHER_PROJECT).getAnnouncementModel();
+        assertThat("Other folder's title", otherAfter.getTitle(), is("Other thread"));
+        assertThat("Other folder's body", otherAfter.getBody(), is("other body"));
+        assertThat("Editor's title after refused updates", getThread(ownThread).getAnnouncementModel().getTitle(), is("Editor thread"));
+
+        // Positive control: an ordinary edit of the editor's own message still works
+        updateChangingKeys(editorConnection, ownKey, Map.of("RowId", ownThread.getRowId(), "Title", "Edited"));
+        assertThat("Editor's title", getThread(ownThread).getAnnouncementModel().getTitle(), is("Edited"));
+    }
+
+    // GH Issue 1853
+    @Test
+    public void testUpdateFormCannotRetargetMessage() throws Exception
+    {
+        AnnouncementModel adminThread = createThread(new AnnouncementModel().setTitle("Admin thread").setBody("admin body"));
+        Connection authorConnection = AUTHOR.getUserConnection();
+        AnnouncementModel ownThread = new CreateMessageThreadCommand(new AnnouncementModel().setTitle("Author thread").setBody("body"))
+                .execute(authorConnection, getProjectName())
+                .getAnnouncementModel();
+
+        SimplePostCommand update = new SimplePostCommand("announcements", "update");
+        update.setParameters(Map.of("entityId", ownThread.getEntityId(), "rowId", adminThread.getRowId(), "title", "Overwritten", "body", "Overwritten"));
+        CommandException e = assertThrows("Expect update to refuse a row other than the one checked",
+                CommandException.class,
+                () -> update.execute(authorConnection, getProjectName()));
+        assertThat("Status code", e.getStatusCode(), is(403));
+
+        AnnouncementModel adminAfter = getThread(adminThread).getAnnouncementModel();
+        assertThat("Admin thread title", adminAfter.getTitle(), is("Admin thread"));
+        assertThat("Admin thread body", adminAfter.getBody(), is("admin body"));
+
+        // Positive control: an ordinary edit of the author's own message still works
+        SimplePostCommand ownUpdate = new SimplePostCommand("announcements", "update");
+        ownUpdate.setParameters(Map.of("entityId", ownThread.getEntityId(), "rowId", ownThread.getRowId(), "title", "Edited", "body", "body"));
+        ownUpdate.execute(authorConnection, getProjectName());
+        assertThat("Author's title", getThread(ownThread).getAnnouncementModel().getTitle(), is("Edited"));
+    }
+
+    private void updateChangingKeys(Connection connection, Map<String, Object> oldKeys, Map<String, Object> values) throws Exception
+    {
+        JSONObject row = new JSONObject()
+                .put("oldKeys", new JSONObject(oldKeys))
+                .put("values", new JSONObject(values));
+        JSONObject command = new JSONObject()
+                .put("command", "updateChangingKeys")
+                .put("schemaName", "announcement")
+                .put("queryName", "Announcement")
+                .put("rows", new JSONArray().put(row));
+        SimplePostCommand saveRows = new SimplePostCommand("query", "saveRows");
+        saveRows.setJsonObject(new JSONObject().put("commands", new JSONArray().put(command)));
+        saveRows.execute(connection, getProjectName());
     }
 
     private AnnouncementModel createThread(AnnouncementModel thread) throws Exception

@@ -67,7 +67,7 @@ public class DevtoolsModule extends CodeOnlyModule
         OptionalFeatureService.get().addExperimentalFeatureFlag(
             Domain.EXPERIMENTAL_FUZZ_STORAGE_NAME,
             "'fuzz' name of database columns used to back domain properties",
-            "This is dev/test feature and not intended for any production usage.",
+            "This is a dev/test feature and not intended for any production usage.",
             false,
             true
         );

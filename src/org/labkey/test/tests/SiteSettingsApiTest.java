@@ -19,6 +19,7 @@ import org.jetbrains.annotations.Nullable;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.junit.function.ThrowingRunnable;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.test.BaseWebDriverTest;
@@ -141,15 +142,9 @@ public class SiteSettingsApiTest extends BaseWebDriverTest
 
     private void assertForbidden(ThrowingRunnable call)
     {
-        Throwable thrown = assertThrows(Exception.class, call::run);
+        Throwable thrown = assertThrows(Exception.class, call);
         CommandException e = thrown instanceof CommandException ce ? ce : (CommandException) thrown.getCause();
         assertEquals("Status for unauthorized request", 403, e.getStatusCode());
-    }
-
-    @FunctionalInterface
-    private interface ThrowingRunnable
-    {
-        void run() throws Exception;
     }
 
     @Test

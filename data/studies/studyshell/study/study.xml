@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<study label="CHAVI 001" dateBased="false" securityType="ADVANCED_WRITE" xmlns="http://labkey.org/study/xml">
+  <visits file="visit_map.xml"/>
+  <cohorts type="AUTOMATIC" mode="SIMPLE" datasetId="99" datasetProperty="GAgroup"/>
+  <qcStates showPrivateDataByDefault="false"/>
+  <datasets dir="datasets" file="datasets_manifest.xml">
+    <definition file="CHAVI001.dataset"/>
+  </datasets>
+</study>

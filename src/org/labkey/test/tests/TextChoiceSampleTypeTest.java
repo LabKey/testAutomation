@@ -45,6 +45,7 @@ import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SampleTypeHelper;
 import org.labkey.test.util.TestDataGenerator;
+import org.labkey.test.util.core.admin.ServerUsageUtils;
 import org.labkey.test.util.exp.SampleTypeAPIHelper;
 import org.openqa.selenium.WebElement;
 
@@ -55,6 +56,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Category({Daily.class})
@@ -747,6 +749,7 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
      *         <li>Create samples in the project and a subfolder using values A, B and C.</li>
      *         <li>Rename A -> B, B -> C and C -> D in a single domain save.</li>
      *         <li>Verify each sample was mapped exactly once from its original value.</li>
+     *         <li>Verify the save counted as one rename and one field update in the 1001-10000 row bucket.</li>
      *     </ul>
      * </p>
      */
@@ -805,9 +808,16 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
         }
         domain.setFields(fields);
 
+        long renamesBefore = getTextChoiceMetric("renames");
+        long bucketBefore = getTextChoiceMetric("rename1001to10000");
+
         SaveDomainCommand saveCmd = new SaveDomainCommand("samples", sampleTypeName);
         saveCmd.setDomainDesign(domain);
         saveCmd.execute(cn, getProjectName());
+
+        log("GH Issue 1876: Verify the text choice rename usage metrics.");
+        checker().verifyEquals("Unexpected textChoice.renames increment.", 1L, getTextChoiceMetric("renames") - renamesBefore);
+        checker().verifyEquals("Unexpected textChoice.rename1001to10000 increment.", 1L, getTextChoiceMetric("rename1001to10000") - bucketBefore);
 
         log("Verify each sample was mapped from its original value.");
         SelectRowsCommand selectCmd = new SelectRowsCommand("samples", sampleTypeName);
@@ -825,6 +835,19 @@ public class TextChoiceSampleTypeTest extends BaseWebDriverTest
                 mismatches.merge(originalValue + " -> " + row.get(textChoiceFieldName), 1, Integer::sum);
         }
         checker().verifyTrue("Samples not mapped exactly once from their original value: " + mismatches, mismatches.isEmpty());
+    }
+
+    // Counters are absent from the usage report until first incremented
+    private long getTextChoiceMetric(String metricName) throws IOException, CommandException
+    {
+        try
+        {
+            return ServerUsageUtils.getModuleMetricValue(createDefaultConnection(), "Experiment", "simpleMetricCounts.textChoice." + metricName);
+        }
+        catch (NoSuchElementException e)
+        {
+            return 0;
+        }
     }
 
 }
