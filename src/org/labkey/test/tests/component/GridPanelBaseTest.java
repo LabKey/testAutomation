@@ -32,7 +32,7 @@ public class GridPanelBaseTest extends BaseWebDriverTest
 {
     protected static final String TEST_SCHEMA = "samples";
 
-    protected static final int DEFAULT_PAGE_SIZE = 20;
+    protected static final int DEFAULT_PAGE_SIZE = 100;
 
     // View menu options.
     protected static final String VIEW_DEFAULT = "Default";
