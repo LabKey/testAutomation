@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -28,6 +29,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Daily;
 import org.labkey.test.util.PasswordUtil;
+import org.labkey.test.util.SiteSettingsHelper;
 import org.openqa.selenium.WebElement;
 
 import java.io.IOException;
@@ -46,6 +48,15 @@ public class SiteWideTermsOfUseTest extends BaseTermsOfUseTest
 {
     protected static final String SITE_WIDE_TERMS_TEXT = "Site-wide terms of use text for the win";
     protected static final String NON_PUBLIC_NO_TERMS_PROJECT_NAME = "Non-public No Terms Project";
+    private static final String ADMIN_ONLY_MESSAGE = "Site-wide terms test maintenance message";
+
+    private final SiteSettingsHelper _siteSettingsHelper = new SiteSettingsHelper();
+
+    @After
+    public void restoreSiteSettings()
+    {
+        _siteSettingsHelper.restoreSettings();
+    }
 
     @Before
     public void preTest() throws IOException, CommandException
@@ -261,6 +272,34 @@ public class SiteWideTermsOfUseTest extends BaseTermsOfUseTest
         signOutWithSiteWideTerms(SITE_WIDE_TERMS_TEXT, true); // agrees to terms of use as guest
         signInShouldFail(PasswordUtil.getUsername(), "baaaaaaaad", "The email address and password you entered did not match any accounts on file. Note: Passwords are case sensitive; make sure your Caps Lock is off.");
         waitForText(SITE_WIDE_TERMS_TEXT); // should show
+    }
+
+    // GH Issue 1930: site-wide terms in admin-only mode looped guests between agreeToTerms and maintenance
+    @Test
+    public void testAdminOnlyModeWithSiteWideTerms()
+    {
+        _siteSettingsHelper.setSettings(Map.of("adminOnlyMode", true, "adminOnlyMessage", ADMIN_ONLY_MESSAGE));
+
+        log("Visit a project as a guest");
+        getDriver().manage().deleteAllCookies();
+        goToProjectBegin(PUBLIC_NO_TERMS_PROJECT_NAME);
+        String url = String.valueOf(getDriver().getCurrentUrl());
+        assertTrue("Guest should land on the maintenance page: " + url, url.contains("admin-maintenance.view"));
+        assertFalse("Guest should not be sent to the terms of use: " + url, url.contains("agreeToTerms"));
+        assertTextPresent(ADMIN_ONLY_MESSAGE);
+        assertTextNotPresent(SITE_WIDE_TERMS_TEXT);
+
+        log("The maintenance page's startup poll should get JSON, not a terms of use redirect");
+        Map<?, ?> status = executeAsyncScript("""
+                const callback = arguments[arguments.length - 1];
+                fetch(arguments[0]).then(r => r.json()).then(callback, e => callback({error: String(e)}));
+                """, Map.class, WebTestHelper.buildURL("admin", "startupStatus.api"));
+        assertEquals("Unexpected startupStatus response: " + status, Boolean.TRUE, status.get("adminOnly"));
+
+        log("A site admin can still sign in, accepting the terms on the login page");
+        // signIn() waits for startup via a guest request, which admin-only mode answers with the maintenance page
+        simpleSignIn();
+        assertEquals("Signed in as wrong user", PasswordUtil.getUsername(), getCurrentUser());
     }
 
     private final static int FREQUENCY_SECONDS = 10;
